@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="CPP_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://$MODULE_DIR$/../fabricate">
+      <sourceFolder url="file://$MODULE_DIR$/../fabricate/src" isTestSource="false" />
+      <excludeFolder url="file://$MODULE_DIR$/../fabricate/target" />
+    </content>
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>

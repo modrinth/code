@@ -1,0 +1,38 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8"/>
+    <title>Search</title>
+</head>
+
+<body>
+<h1>Test Mod Search</h1>
+<form>
+    <label for="search-input">Search for Mods:</label>
+    <input type="text" id="search-input" oninput="handleSearch()">
+</form>
+
+<p>{{results}}</p>
+
+<script>
+    let input = document.getElementById("search-input");
+
+    function handleSearch() {
+        let safeName = encodeURIComponent(input.value).replace(/%20/g,'+');
+
+        let xmlHttp = new XMLHttpRequest();
+        xmlHttp.onreadystatechange = function() {
+            if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
+                console.log(xmlHttp.responseText);
+                console.log(JSON.parse(xmlHttp.responseText));
+            }
+        }
+        xmlHttp.open("POST", "search?q=" + safeName, true);
+        xmlHttp.send(null);
+
+        window.history.pushState('Search', 'Search', '/search?q=' + safeName);
+    }
+</script>
+</body>
+
+</html>
