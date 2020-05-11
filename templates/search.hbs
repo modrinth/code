@@ -1,0 +1,51 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="static/css/style.css" rel="stylesheet" type="text/css">
+    <link href="static/css/multiselect.css" rel="stylesheet" type="text/css">
+
+    <script src="static/js/multiselect.min.js"></script>
+
+    <title>Search</title>
+</head>
+
+<body>
+<h1>Test Mod Search</h1>
+
+<form>
+    <label for="search-input">Search for Mods:</label>
+    <input type="text" id="search-input" oninput="handleSearch()">
+
+    <label for="categories">Categories:</label>
+    <select id="categories" multiple>
+        <option value="Adventure">Adventure</option>
+        <option value="Technology">Technology</option>
+        <option value="Magic">Magic</option>
+        <option value="Utility">Utility</option>
+    </select>
+
+</form>
+<div id="results" class="results">
+    {{#each results}}
+        <div class="result gray-border rounded-border">
+            <img src="..." width="75px" height="75px">
+            <div class="result-info">
+                <h2>{{this.title}}</h2>
+                <p>{{this.description}}</p>
+            </div>
+        </div>
+    {{/each}}
+</div>
+
+<script src="static/js/search.js"></script>
+<script>
+document.multiselect('#categories')
+</script>
+
+</body>
+
+</html>

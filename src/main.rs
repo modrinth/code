@@ -1,48 +1,48 @@
 #[macro_use]
 extern crate serde_json;
 
-#[macro_use]
-extern crate tantivy;
-
-use actix_web::{web, web::Data, web::Query, App, HttpRequest, HttpResponse, HttpServer, Responder, get, post};
+use actix_web::{web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Responder, get, post};
 use handlebars::Handlebars;
-use serde_derive::Deserialize;
+use meilisearch_sdk::{document::*, indexes::*, client::*, search::*};
+use serde::{Serialize, Deserialize};
+use actix_files as fs;
 
-use tantivy::collector::TopDocs;
-use tantivy::query::{QueryParser};
-use tantivy::schema::*;
-use tantivy::{Index, IndexReader};
-use tantivy::ReloadPolicy;
-use tempdir::TempDir;
+#[derive(Serialize, Deserialize, Debug)]
+struct Mod {
+    mod_id: usize,
+    title: String,
+    description: String,
+}
+
+impl Document for Mod {
+    type UIDType = usize;
+
+    fn get_uid(&self) -> &Self::UIDType {
+        &self.mod_id
+    }
+}
+
 
 #[derive(Deserialize)]
 pub struct SearchRequest {
     q: Option<String>,
+    f: Option<String>,
 }
 
 #[post("search")]
-async fn search_post(Query(info): Query<SearchRequest>, reader: Data<IndexReader>, parser: Data<QueryParser<>>, schema: Data<Schema<>>) -> HttpResponse {
-    let results = handle_search(Query(info), reader, parser, schema);
+async fn search_post(web::Query(info): web::Query<SearchRequest>) -> HttpResponse {
+    let results = search(web::Query(info));
 
-    let mut data = "{ \"results\": [".to_owned();
-
-    for result in &results {
-        data.push_str(&result);
-        data.push_str(",");
-    }
-
-    if &results.len() > &(0 as usize) {
-        data.pop();
-    }
-
-    data.push_str("] }");
+    let data = json!({
+    "results": results,
+    });
 
     HttpResponse::Ok().body(data)
 }
 
 #[get("search")]
-async fn search(Query(info): Query<SearchRequest>, hb: Data<Handlebars<'_>>, reader: Data<IndexReader>, parser: Data<QueryParser<>>, schema: Data<Schema<>>) -> HttpResponse {
-    let results = handle_search(Query(info), reader, parser, schema);
+async fn search_get(web::Query(info): web::Query<SearchRequest>, hb: Data<Handlebars<'_>>) -> HttpResponse {
+    let results = search(web::Query(info));
 
     let data = json!({
     "results": results,
@@ -53,28 +53,27 @@ async fn search(Query(info): Query<SearchRequest>, hb: Data<Handlebars<'_>>, rea
     HttpResponse::Ok().body(body)
 }
 
-fn handle_search(Query(info): Query<SearchRequest>, reader: Data<IndexReader>, parser: Data<QueryParser<>>, schema: Data<Schema<>>) -> Vec<String>{
-    let mut search_query : String = "".to_string();
+fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<Mod> {
+    let client =  Client::new("http://localhost:7700", "");
+
+    let mut search_query = "".to_string();
+    let mut filters = "".to_string();
 
     if let Some(q) = info.q {
         search_query = q;
     }
 
-    let searcher = reader.searcher();
-
-    let mut results = vec![];
-
-    if let Ok(query) = parser.parse_query(&search_query) {
-        if let Ok(top_docs) = searcher.search(&query, &TopDocs::with_limit(10)) {
-            for (_score, doc_address) in top_docs {
-                if let Ok(retrieved_doc) = searcher.doc(doc_address) {
-                    results.push(schema.to_json(&retrieved_doc));
-                }
-            }
-        }
+    if let Some(f) = info.f {
+        filters = f;
     }
 
-    return results;
+    let mut query = Query::new(&search_query).with_limit(10);
+
+    if !filters.is_empty() {
+        query = Query::new(&search_query).with_limit(10).with_filters(&filters);
+    }
+
+    client.get_index("mods").unwrap().search::<Mod>(&query).unwrap().hits
 }
 
 #[get("/")]
@@ -88,72 +87,53 @@ async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
 }
 
 #[actix_rt::main]
-async fn main() -> tantivy::Result<()> {
+async fn main() -> std::io::Result<()> {
     //Handlebars
     let mut handlebars = Handlebars::new();
     handlebars
-        .register_templates_directory(".html", "./static/templates")
+        .register_templates_directory(".hbs", "./templates")
         .unwrap();
     let handlebars_ref = web::Data::new(handlebars);
 
     //Search
-    let index_path = TempDir::new("search_index")?;
 
-    let mut schema_builder = Schema::builder();
+    let client =  Client::new("http://localhost:7700", "");
+    let mut mods = client.get_or_create("mods").unwrap();
 
-    schema_builder.add_text_field("title", TEXT | STORED);
-    schema_builder.add_text_field("keywords", TEXT | STORED);
-    schema_builder.add_text_field("description", TEXT | STORED);
-    schema_builder.add_text_field("body", TEXT);
-
-    let schema = schema_builder.build();
-    let schema_ref = web::Data::new(schema.clone());
-
-    let title = schema.get_field("title").unwrap();
-    let keywords = schema.get_field("keywords").unwrap();
-    let description = schema.get_field("description").unwrap();
-    let body = schema.get_field("body").unwrap();
-
-    let site_index = Index::create_in_dir(&index_path, schema.clone())?;
-    let mut index_writer = site_index.writer(50_000_000)?;
-
-    index_writer.add_document(doc!(
-    title => "Magic",
-    keywords => "Magic Fun Adventure",
-    description => "A magic mod for magical purposes!",
-    body => "A cool magic mod made by your mom :)",
-    ));
-
-    index_writer.add_document(doc!(
-    title => "Technology",
-    keywords => "Technology Fun Adventure",
-    description => "A tech mod for tech purposes!",
-    body => "A tech mod made by your mom :)",
-    ));
-
-    index_writer.commit()?;
-
-    let reader = site_index.reader_builder().reload_policy(ReloadPolicy::OnCommit).try_into()?;
-    let reader_ref = web::Data::new(reader);
-
-    let query_parser =  QueryParser::for_index(&site_index, vec![title, body, keywords, description]);
-    let query_parser_ref = web::Data::new(query_parser);
+    mods.add_documents(vec![
+        Mod {
+            mod_id: 0,
+            title: String::from("Magic Mod"),
+            description: String::from("An illustrious magic mod for magical wizards"),
+        },
+        Mod {
+            mod_id: 1,
+            title: String::from("Tech Mod"),
+            description: String::from("An technological mod for complete NERDS"),
+        },
+        Mod {
+            mod_id: 2,
+            title: String::from("Hood Mod"),
+            description: String::from("A hood mod to roleplay as if you were a real street person. Some adventure stuff too"),
+        },
+        Mod {
+            mod_id: 3,
+            title: String::from("Adventure Mod"),
+            description: String::from("An epic gamer adventure mod for epic adventure gamers"),
+        },
+    ], Some("mod_id")).unwrap();
 
     //Init App
     HttpServer::new(move || {
         App::new()
             .app_data(handlebars_ref.clone())
-            .app_data(reader_ref.clone())
-            .app_data(query_parser_ref.clone())
-            .app_data(schema_ref.clone())
+            .service(fs::Files::new("/static", "./static").show_files_listing())
             .service(index)
-            .service(search)
+            .service(search_get)
             .service(search_post)
     })
         .bind("127.0.0.1:8000")?
         .run()
-        .await?;
-
-    Ok(())
+        .await
 }
 
