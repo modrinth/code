@@ -1,0 +1,102 @@
+.search-container {
+    width: 100%;
+    display: flex;
+    align-content: center;
+}
+
+.search-bar {
+    margin: 0 auto;
+    width: 56.25%;
+    height: 2em;
+}
+
+.results {
+    width: 75%;
+    margin: auto;
+}
+
+.result {
+    display: flex;
+    height: 100px;
+    margin: 30px auto;
+    padding: 5px;
+    width: 75%;
+    flex-direction: row;
+    align-items: center;
+}
+
+.result img {
+    padding: 0 10px 0 5px;
+}
+
+.result-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.result-info * {
+    padding: 0 5px 0 0;
+    margin: 0;
+}
+
+.result-badges {
+    margin: 0 1em 20px auto;
+    align-self: center;
+    height: 75px;
+    display: flex;
+    flex-direction: column;
+}
+
+.result-badge {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 25px;
+    margin: 2px 0;
+    padding: 2px 5px;
+    width: 155px;
+}
+
+.result-badge img {
+    height: 23px;
+}
+
+.result-badge p {
+    margin: 0 auto;
+    font-weight: bolder;
+}
+
+.download-badge {
+    background-color: limegreen;
+    color: white;
+}
+
+.forge-badge {
+    color: #e1a15a;
+    background-color: #1e2d44;
+}
+
+.fabric-badge {
+    color: #585849;
+    background-color: #fffdd0;
+}
+
+.tech-badge {
+    color: white;
+    background-color: red;
+}
+
+.adventure-badge {
+    color: white;
+    background-color: saddlebrown;
+}
+
+.magic-badge {
+    color: white;
+    background-color: rebeccapurple;
+}
+
+.utility-badge {
+    color: white;
+    background-color: orangered;
+}

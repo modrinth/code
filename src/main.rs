@@ -2,16 +2,34 @@
 extern crate serde_json;
 
 use actix_web::{web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Responder, get, post};
-use handlebars::Handlebars;
+use handlebars::*;
 use meilisearch_sdk::{document::*, indexes::*, client::*, search::*};
 use serde::{Serialize, Deserialize};
 use actix_files as fs;
+
+#[derive(Clone, Copy)]
+struct ContainsHelper;
+
+impl HelperDef for ContainsHelper {
+    fn call<'reg: 'rc, 'rc>(&self, h: &Helper<'reg, 'rc>, r: &'reg Handlebars<'_>, ctx: &'rc Context, rc: &mut RenderContext<'reg, 'rc>, out: &mut dyn Output) -> HelperResult {
+        let array = h.param(0).map(|v| serde_json::from_value::<Vec<String>>(v.value().clone()).unwrap()).ok_or(RenderError::new("Parameter not found!"))?;
+        let mut value = h.param(1).map(|v| v.value().as_str().unwrap()).ok_or(RenderError::new("Parameter not found!"))?;
+
+        let tmpl = if array.contains(&String::from(value)) { h.template() } else { h.inverse() };
+
+        match tmpl {
+            Some(ref t) => t.render(r, ctx, rc, out),
+            None => Ok(()),
+        }
+    }
+}
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Mod {
     mod_id: usize,
     title: String,
     description: String,
+    keywords: Vec<String>,
 }
 
 impl Document for Mod {
@@ -90,9 +108,12 @@ async fn index(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
 async fn main() -> std::io::Result<()> {
     //Handlebars
     let mut handlebars = Handlebars::new();
+
+    handlebars.register_helper("contains", Box::new(ContainsHelper));
     handlebars
         .register_templates_directory(".hbs", "./templates")
         .unwrap();
+
     let handlebars_ref = web::Data::new(handlebars);
 
     //Search
@@ -105,21 +126,25 @@ async fn main() -> std::io::Result<()> {
             mod_id: 0,
             title: String::from("Magic Mod"),
             description: String::from("An illustrious magic mod for magical wizards"),
+            keywords: vec![String::from("Fabric"), String::from("Magic")],
         },
         Mod {
             mod_id: 1,
             title: String::from("Tech Mod"),
             description: String::from("An technological mod for complete NERDS"),
+            keywords: vec![String::from("Fabric"), String::from("Utility"), String::from("Technology")],
         },
         Mod {
             mod_id: 2,
             title: String::from("Hood Mod"),
             description: String::from("A hood mod to roleplay as if you were a real street person. Some adventure stuff too"),
+            keywords: vec![String::from("Forge"), String::from("Adventure"), String::from("Technology")]
         },
         Mod {
             mod_id: 3,
             title: String::from("Adventure Mod"),
             description: String::from("An epic gamer adventure mod for epic adventure gamers"),
+            keywords: vec![String::from("Forge"), String::from("Magic"), String::from("Adventure")]
         },
     ], Some("mod_id")).unwrap();
 

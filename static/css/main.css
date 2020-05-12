@@ -1,0 +1,49 @@
+@import url('https://fonts.googleapis.com/css?family=Montserrat:400,600');
+
+body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+}
+
+.temp-circle-logo {
+    height: 50px;
+    width: 50px;
+    background-color: white;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 20%;
+}
+
+.site-header {
+    position: sticky;
+    background-color: black;
+    width: 100%;
+    height: 75px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+.site-header h2 {
+    color: white;
+    font-weight: bolder;
+    padding: 0 20px 0 10px;
+}
+
+.links-container {
+    margin: 0 auto;
+}
+.links-container a {
+    color: white;
+    padding: 0 30px;
+    text-decoration: none;
+}
+
+.rounded-border {
+    border-radius: 10px;
+    border: 1px;
+}
+
+.gray-border {
+    border: 1px solid darkgray;
+}
