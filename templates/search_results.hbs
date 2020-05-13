@@ -1,0 +1,84 @@
+{{#each results}}
+    <div class="result gray-border rounded-border">
+        <img src="..." width="75px" height="75px" class="result-image"/>
+        <div class="result-info">
+            <div class="result-title">
+                <h2>{{this.title}}</h2>
+                <p class="muted"> by {{this.author}}</p>
+            </div>
+            <p>{{this.description}}</p>
+            <div class="mod-info">
+                <img src="static/images/icon/download.svg" alt="download" title="Downloads"/>
+                <p title="Downloads">1.1M</p>
+
+                <img src="static/images/icon/updated.svg" alt="updated" title="Last Updated"/>
+                <p title="Last Updated">5/13/20</p>
+
+                <img src="static/images/icon/version.svg" alt="version" title="Version"/>
+                <p title="Version">1.2.3</p>
+            </div>
+        </div>
+        <div class="result-badges">
+            {{#contains this.keywords "technology"}}
+                <div class="tech-badge result-badge">
+                    <img alt="tech" src="static/images/icon/tech.svg" class="result-image"/>
+                    <p>TECH</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "adventure"}}
+                <div class="adventure-badge result-badge">
+                    <img alt="adventure" src="static/images/icon/adventure.svg" class="result-image"/>
+                    <p>ADVENTURE</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "magic"}}
+                <div class="magic-badge result-badge">
+                    <img alt="magic" src="static/images/icon/magic.svg" class="result-image"/>
+                    <p>MAGIC</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "utility"}}
+                <div class="utility-badge result-badge">
+                    <img alt="util" src="static/images/icon/util.svg" class="result-image"/>
+                    <p>UTILITY</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "decoration"}}
+                <div class="decoration-badge result-badge">
+                    <img alt="decoration" src="static/images/icon/decoration.svg" class="result-image"/>
+                    <p>DECORATION</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "library"}}
+                <div class="library-badge result-badge">
+                    <img alt="library" src="static/images/icon/library.svg" class="result-image"/>
+                    <p>LIBRARY</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "worldgen"}}
+                <div class="world-badge result-badge">
+                    <img alt="world" src="static/images/icon/world.svg" class="result-image"/>
+                    <p>WORLDGEN</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "cursed"}}
+                <div class="cursed-badge result-badge">
+                    <img alt="cursed" src="static/images/icon/cursed.png" class="result-image"/>
+                    <p>CURSED</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "forge"}}
+                <div class="forge-badge result-badge">
+                    <img alt="forge" src="static/images/icon/forge.jpg" class="result-image"/>
+                    <p>FORGE</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "fabric"}}
+                <div class="fabric-badge result-badge">
+                    <img alt="fabric" src="static/images/icon/fabric.png" class="result-image"/>
+                    <p>FABRIC</p>
+                </div>
+            {{/contains}}
+        </div>
+    </div>
+{{/each}}

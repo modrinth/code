@@ -1,5 +1,5 @@
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
@@ -25,68 +25,68 @@
     </div>
 </header>
 
-<div class="search-container">
-    <div class="filters">
-        <label>
-            <input type="checkbox">
-        </label>
+<div class="main-flex">
+    <div class="categories-flex">
+        <div class="categories">
+            <a class="categories-label category-badge category-active">
+                <p>CATEGORIES</p>
+            </a>
+            <a class="tech-badge category-badge category-active" id="technology" onclick="activateCategory(this)">
+                <img alt="tech" src="static/images/icon/tech.svg" class="result-image"/>
+                <p>TECH</p>
+            </a>
+            <a class="adventure-badge category-badge" id="adventure" onclick="activateCategory(this)">
+                <img alt="adventure" src="static/images/icon/adventure.svg" class="result-image"/>
+                <p>ADVENTURE</p>
+            </a>
+            <a class="magic-badge category-badge" id="magic" onclick="activateCategory(this)">
+                <img alt="magic" src="static/images/icon/magic.svg" class="result-image"/>
+                <p>MAGIC</p>
+            </a>
+            <a class="utility-badge category-badge" id="utility" onclick="activateCategory(this)">
+                <img alt="util" src="static/images/icon/util.svg" class="result-image"/>
+                <p>UTILITY</p>
+            </a>
+            <a class="decoration-badge category-badge" id="decoration" onclick="activateCategory(this)">
+                <img alt="decoration" src="static/images/icon/decoration.svg" class="result-image"/>
+                <p>DECORATION</p>
+            </a>
+            <a class="library-badge category-badge" id="library" onclick="activateCategory(this)">
+                <img alt="library" src="static/images/icon/library.svg" class="result-image"/>
+                <p>LIBRARY</p>
+            </a>
+            <a class="world-badge category-badge" id="world" onclick="activateCategory(this)">
+                <img alt="world" src="static/images/icon/world.svg" class="result-image"/>
+                <p>WORLDGEN</p>
+            </a>
+            <a class="cursed-badge category-badge" id="cursed" onclick="activateCategory(this)">
+                <img alt="cursed" src="static/images/icon/cursed.png" class="result-image"/>
+                <p>CURSED</p>
+            </a>
+            <a class="forge-badge category-badge" id="forge" onclick="activateCategory(this)">
+                <img alt="forge" src="static/images/icon/forge.jpg" class="result-image"/>
+                <p>FORGE</p>
+            </a>
+            <a class="fabric-badge category-badge" id="fabric" onclick="activateCategory(this)">
+                <img alt="fabric" src="static/images/icon/fabric.png" class="result-image"/>
+                <p>FABRIC</p>
+            </a>
+        </div>
     </div>
 
-    <input class="search-bar" type="text" id="search-input" placeholder="Search for mods..." oninput="handleSearch()">
+    <div class="column">
+        <div class="search-div">
+            <input class="search-bar" type="text" id="search-input" placeholder="Search for mods..." oninput="handleSearch()">
+        </div>
+
+        <div id="results" class="results">
+            {{> search_results}}
+        </div>
+    </div>
 </div>
 
-<div id="results" class="results">
-    {{#each results}}
-        <div class="result gray-border rounded-border">
-            <img src="..." width="75px" height="75px">
-            <div class="result-info">
-                <h2>{{this.title}}</h2>
-                <p>{{this.description}}</p>
-            </div>
-            <div class="result-badges">
-                {{#contains this.keywords "Technology"}}
-                    <div class="tech-badge result-badge">
-                        <img alt="tech" src="static/images/icon/tech.svg">
-                        <p>TECH</p>
-                    </div>
-                {{/contains}}
-                {{#contains this.keywords "Adventure"}}
-                    <div class="adventure-badge result-badge">
-                        <img alt="adventure" src="static/images/icon/adventure.svg">
-                        <p>ADVENTURE</p>
-                    </div>
-                {{/contains}}
-                {{#contains this.keywords "Magic"}}
-                    <div class="magic-badge result-badge">
-                        <img alt="magic" src="static/images/icon/magic.svg">
-                        <p>MAGIC</p>
-                    </div>
-                {{/contains}}
-                {{#contains this.keywords "Utility"}}
-                    <div class="utility-badge result-badge">
-                        <img alt="util" src="static/images/icon/util.svg">
-                        <p>UTILITY</p>
-                    </div>
-                {{/contains}}
-                {{#contains this.keywords "Forge"}}
-                    <div class="forge-badge result-badge">
-                        <img alt="forge" src="static/images/icon/forge.jpg">
-                        <p>FORGE</p>
-                    </div>
-                {{/contains}}
-                {{#contains this.keywords "Fabric"}}
-                    <div class="fabric-badge result-badge">
-                        <img alt="fabric" src="static/images/icon/fabric.png">
-                        <p>FABRIC</p>
-                    </div>
-                {{/contains}}
-            </div>
-        </div>
-    {{/each}}
-</div>
 
 <script src="static/js/search.js"></script>
 
 </body>
-
 </html>

@@ -3,6 +3,16 @@
 body {
     margin: 0;
     font-family: 'Montserrat', sans-serif;
+    background-color: #f3f2f0;
+}
+
+.main-flex {
+    display: flex;
+    flex-direction: row;
+}
+
+.muted {
+    color: gray;
 }
 
 .temp-circle-logo {
@@ -15,8 +25,10 @@ body {
 }
 
 .site-header {
+    z-index: 2;
     position: sticky;
     background-color: black;
+    top: 0;
     width: 100%;
     height: 75px;
     margin-bottom: 10px;
@@ -45,5 +57,9 @@ body {
 }
 
 .gray-border {
-    border: 1px solid darkgray;
+    border: 1px solid #a9a9a9;
+}
+
+.green {
+    color: #69E781;
 }

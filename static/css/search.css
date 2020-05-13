@@ -1,31 +1,102 @@
-.search-container {
-    width: 100%;
+.column {
     display: flex;
-    align-content: center;
+    flex-direction: column;
+    width: 50%;
+}
+
+.categories-flex {
+    position: sticky;
+    width: 25%;
+}
+
+.categories {
+    position: relative;
+    top: 100px;
+    padding: 5px;
+}
+
+.categories-label {
+    color: white;
+    background-color: black;
+    padding-left: 10px;
+}
+
+.category-badge {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 25px;
+    padding: 2px 5px;
+    cursor: pointer;
+    width: 165px;
+    margin-left: auto;
+    margin-right: 20px;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.category-badge img {
+    height: 23px;
+}
+
+.category-badge p {
+    margin: 0 auto;
+    font-weight: bolder;
+    text-transform: capitalize;
+}
+
+.category-ghost {
+    margin-left: 10px;
 }
 
 .search-bar {
-    margin: 0 auto;
-    width: 56.25%;
+    position: -webkit-sticky !important;
+    position: sticky !important;
     height: 2em;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    top: 80px;
+    width: 100%;
+}
+
+.mod-info {
+    padding-top: 5px !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.mod-info img {
+    height: 12px;
+    padding: 0;
+}
+
+.mod-info p {
+    font-size: 12px;
+    padding: 0 15px 0 5px !important;
 }
 
 .results {
-    width: 75%;
+    width: 100%;
     margin: auto;
 }
 
 .result {
     display: flex;
     height: 100px;
-    margin: 30px auto;
+    margin: 15px auto;
     padding: 5px;
-    width: 75%;
+    width: 100%;
     flex-direction: row;
     align-items: center;
+    background-color: white;
 }
 
-.result img {
+.result-image {
     padding: 0 10px 0 5px;
 }
 
@@ -37,6 +108,12 @@
 .result-info * {
     padding: 0 5px 0 0;
     margin: 0;
+}
+
+.result-title {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
 }
 
 .result-badges {
@@ -64,6 +141,7 @@
 .result-badge p {
     margin: 0 auto;
     font-weight: bolder;
+    text-transform: capitalize;
 }
 
 .download-badge {
@@ -99,4 +177,23 @@
 .utility-badge {
     color: white;
     background-color: orangered;
+}
+
+.decoration-badge {
+    color: white;
+    background-color: #2f92d8;
+}
+
+.world-badge {
+    background-color: yellow;
+}
+
+.library-badge {
+    color: white;
+    background-color: orange;
+}
+
+.cursed-badge {
+    color: white;
+    background-color: palevioletred;
 }
