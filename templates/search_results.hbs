@@ -16,6 +16,15 @@
 
                 <img src="static/images/icon/version.svg" alt="version" title="Version"/>
                 <p title="Version">1.2.3</p>
+
+                <div class="loader-icons">
+                    {{#contains this.keywords "forge"}}
+                        <img alt="forge" src="static/images/icon/forge.jpg" class="forge"/>
+                    {{/contains}}
+                    {{#contains this.keywords "fabric"}}
+                        <img alt="fabric" src="static/images/icon/fabric.png"/>
+                    {{/contains}}
+                </div>
             </div>
         </div>
         <div class="result-badges">
@@ -65,18 +74,6 @@
                 <div class="cursed-badge result-badge">
                     <img alt="cursed" src="static/images/icon/cursed.png" class="result-image"/>
                     <p>CURSED</p>
-                </div>
-            {{/contains}}
-            {{#contains this.keywords "forge"}}
-                <div class="forge-badge result-badge">
-                    <img alt="forge" src="static/images/icon/forge.jpg" class="result-image"/>
-                    <p>FORGE</p>
-                </div>
-            {{/contains}}
-            {{#contains this.keywords "fabric"}}
-                <div class="fabric-badge result-badge">
-                    <img alt="fabric" src="static/images/icon/fabric.png" class="result-image"/>
-                    <p>FABRIC</p>
                 </div>
             {{/contains}}
         </div>

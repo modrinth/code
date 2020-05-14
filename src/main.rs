@@ -30,6 +30,7 @@ struct Mod {
     title: String,
     description: String,
     keywords: Vec<String>,
+    versions: Vec<String>,
 }
 
 impl Document for Mod {
@@ -45,6 +46,7 @@ impl Document for Mod {
 pub struct SearchRequest {
     q: Option<String>,
     f: Option<String>,
+    v: Option<String>,
 }
 
 #[post("search")]
@@ -79,12 +81,22 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<Mod> {
     let mut search_query = "".to_string();
     let mut filters = "".to_string();
 
+
     if let Some(q) = info.q {
         search_query = q;
     }
 
     if let Some(f) = info.f {
         filters = f;
+    }
+
+    if let Some(v) = info.v {
+        if filters.is_empty() {
+            filters = v;
+        }
+        else {
+            filters = format!("({}) AND {}", filters, v);
+        }
     }
 
     let mut query = Query::new(&search_query).with_limit(10);
@@ -129,24 +141,28 @@ async fn main() -> std::io::Result<()> {
             title: String::from("Magic Mod"),
             description: String::from("An illustrious magic mod for magical wizards"),
             keywords: vec![String::from("fabric"), String::from("magic"), String::from("library")],
+            versions: vec![String::from("1.15.2"), String::from("1.15.1"), String::from("1.15")],
         },
         Mod {
             mod_id: 1,
             title: String::from("Tech Mod"),
             description: String::from("An technological mod for complete NERDS"),
             keywords: vec![String::from("fabric"), String::from("utility"), String::from("technology")],
+            versions: vec![String::from("1.14.1"), String::from("1.15.1"), String::from("1.15")],
         },
         Mod {
             mod_id: 2,
             title: String::from("Gamer Mod"),
             description: String::from("A gamer mod to roleplay as if you were an epic gamer person."),
-            keywords: vec![String::from("cursed"), String::from("adventure"), String::from("forge")]
+            keywords: vec![String::from("cursed"), String::from("adventure"), String::from("forge")],
+            versions: vec![String::from("20w20a"), String::from("1.15.1"), String::from("1.15")],
         },
         Mod {
             mod_id: 3,
             title: String::from("Adventure Mod"),
             description: String::from("An epic gamer adventure mod for epic adventure gamers"),
-            keywords: vec![String::from("decoration"), String::from("utility"), String::from("worldgen")]
+            keywords: vec![String::from("decoration"), String::from("utility"), String::from("worldgen")],
+            versions: vec![String::from("1.12.2"), String::from("1.15.1"), String::from("1.15")]
         },
     ], Some("mod_id")).unwrap();
 

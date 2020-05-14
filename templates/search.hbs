@@ -26,10 +26,19 @@
 </header>
 
 <div class="main-flex">
-    <div class="categories-flex">
+    <div class="left-flex">
+        <div class="filters">
+            <select id="filters">
+                <option value="relevance">Relevance</option>
+                <option value="mercedes">Total Downloads</option>
+                <option value="updated">Last Updated</option>
+                <option value="audi">Newest</option>
+            </select>
+        </div>
+
         <div class="categories">
             <a class="categories-label category-badge category-active">
-                <p>CATEGORIES</p>
+                <p>Categories</p>
             </a>
             <a class="tech-badge category-badge category-active" id="technology" onclick="activateCategory(this)">
                 <img alt="tech" src="static/images/icon/tech.svg" class="result-image"/>
@@ -55,13 +64,19 @@
                 <img alt="library" src="static/images/icon/library.svg" class="result-image"/>
                 <p>LIBRARY</p>
             </a>
-            <a class="world-badge category-badge" id="world" onclick="activateCategory(this)">
+            <a class="world-badge category-badge" id="worldgen" onclick="activateCategory(this)">
                 <img alt="world" src="static/images/icon/world.svg" class="result-image"/>
                 <p>WORLDGEN</p>
             </a>
             <a class="cursed-badge category-badge" id="cursed" onclick="activateCategory(this)">
                 <img alt="cursed" src="static/images/icon/cursed.png" class="result-image"/>
                 <p>CURSED</p>
+            </a>
+        </div>
+
+        <div class="categories">
+            <a class="categories-label category-badge category-active">
+                <p>Loaders</p>
             </a>
             <a class="forge-badge category-badge" id="forge" onclick="activateCategory(this)">
                 <img alt="forge" src="static/images/icon/forge.jpg" class="result-image"/>
@@ -74,13 +89,38 @@
         </div>
     </div>
 
-    <div class="column">
+    <div class="search-main">
         <div class="search-div">
             <input class="search-bar" type="text" id="search-input" placeholder="Search for mods..." oninput="handleSearch()">
         </div>
 
         <div id="results" class="results">
             {{> search_results}}
+        </div>
+    </div>
+
+    <div class="versions">
+        <button type="button" class="clear-button" onclick="clearFilters()">Clear Filters</button>
+
+        <div class="version-type">
+            <p class="version-type-label" onclick="toggleVisibility(this)">[+]  Releases</p>
+            <div class="version-scroll" id="releases" style="display: none">
+
+            </div>
+        </div>
+
+        <div class="version-type">
+            <p class="version-type-label" onclick="toggleVisibility(this)">[+]  Snapshots</p>
+            <div class="version-scroll" id="snapshots" style="display: none">
+
+            </div>
+        </div>
+
+        <div class="version-type">
+            <p class="version-type-label" onclick="toggleVisibility(this)">[+]  Archaic</p>
+            <div class="version-scroll" id="archaic" style="display: none">
+
+            </div>
         </div>
     </div>
 </div>

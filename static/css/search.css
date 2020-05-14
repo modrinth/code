@@ -1,18 +1,96 @@
-.column {
-    display: flex;
-    flex-direction: column;
-    width: 50%;
+.clear-button {
+    margin: 30px auto 0 40px;
+    height: 33px;
+    width: 175px;
+
+    background-color: white;
+    border-radius: 5px;
+    border: 1px solid darkgrey;
 }
 
-.categories-flex {
-    position: sticky;
+.versions {
+    display: flex;
+    flex-direction: column;
     width: 25%;
 }
 
+.version-type {
+    margin-top: 20px;
+    margin-left: 40px;
+    margin-right: auto;
+}
+
+.version-scroll {
+    height: 400px;
+    overflow-y: scroll;
+}
+
+.version-type-label {
+    width: 165px;
+    height: 25px;
+    margin-bottom: 0;
+    padding: 2px 5px;
+    cursor: pointer;
+
+    font-weight: bold;
+    color: white;
+    background-color: black;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.version {
+    height: 25px;
+    padding: 2px 5px;
+    cursor: pointer;
+    width: 152px;
+    margin: 0;
+
+    font-weight: bold;
+    color: black;
+    background-color: white;
+    border-bottom: 1px solid darkgrey;
+    border-top: 1px solid darkgrey;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.left-flex {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+}
+
+.filters {
+    margin-top: 30px;
+    margin-right: 25px;
+    margin-left: auto;
+}
+
+.filters select {
+    height: 33px;
+    width: 175px;
+
+    border-radius: 5px;
+    padding: 0 24px;
+    background-color: #ffffff;
+    background-image: none;
+    border: 1px solid darkgrey;
+}
+
 .categories {
-    position: relative;
-    top: 100px;
+    margin-top: 30px;
     padding: 5px;
+    margin-right: 20px;
+    margin-left: auto;
 }
 
 .categories-label {
@@ -29,8 +107,6 @@
     padding: 2px 5px;
     cursor: pointer;
     width: 165px;
-    margin-left: auto;
-    margin-right: 20px;
 
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -51,6 +127,12 @@
 
 .category-ghost {
     margin-left: 10px;
+}
+
+.search-main {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
 }
 
 .search-bar {
@@ -82,7 +164,7 @@
 
 .results {
     width: 100%;
-    margin: auto;
+    margin: 0 auto;
 }
 
 .result {
