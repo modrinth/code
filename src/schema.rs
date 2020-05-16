@@ -13,8 +13,8 @@ table! {
 }
 
 table! {
-    versions (id) {
-        id -> Int4,
+    versions (version_id) {
+        version_id -> Int4,
         mod_id -> Int4,
         title -> Varchar,
         changelog_path -> Varchar,

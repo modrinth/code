@@ -517,8 +517,10 @@ checksum = "33d7ca63eb2efea87a7f56a283acc49e2ce4b2bd54adf7465dc1d81fef13d8fc"
 dependencies = [
  "bitflags",
  "byteorder",
+ "chrono",
  "diesel_derives",
  "pq-sys",
+ "serde_json",
 ]
 
 [[package]]
@@ -590,6 +592,7 @@ dependencies = [
  "actix-files",
  "actix-rt",
  "actix-web",
+ "chrono",
  "diesel",
  "dotenv",
  "handlebars",

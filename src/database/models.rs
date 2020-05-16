@@ -1,13 +1,11 @@
-use serde::{Deserialize, Serialize};
-
-use crate::schema::mods;
+use chrono::NaiveDate;
 
 #[derive(Queryable)]
 pub struct Mod {
     pub id: i32,
     pub title: String,
     pub description: String,
-    pub published: String,
+    pub published: NaiveDate,
     pub author: String,
     pub downloads: i32,
     pub categories: Vec<String>,
@@ -17,12 +15,12 @@ pub struct Mod {
 
 #[derive(Queryable)]
 pub struct Version {
-    pub id: i32,
+    pub version_id: i32,
     pub mod_id: i32,
     pub title: String,
     pub changelog_path: String,
     pub files_path: Vec<String>,
-    pub date_published: String,
+    pub date_published:  NaiveDate,
     pub author: String,
     pub downloads: i32,
     pub dependencies: Vec<String>,

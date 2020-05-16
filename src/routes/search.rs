@@ -1,13 +1,12 @@
 extern crate diesel;
 
-use actix_web::{web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Responder, get, post};
+use actix_web::{web, web::Data, HttpRequest, HttpResponse, get, post};
 use handlebars::*;
 use meilisearch_sdk::{document::*, indexes::*, client::*, search::*};
 use serde::{Serialize, Deserialize};
 
 use crate::database::*;
 use diesel::prelude::*;
-use std::ptr::eq;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct SearchMod {
@@ -26,7 +25,7 @@ impl Document for SearchMod {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Serialize, Deserialize)]
 pub struct SearchRequest {
     q: Option<String>,
     f: Option<String>,
@@ -102,13 +101,13 @@ pub fn index_mods(conn : PgConnection) {
     let results = mods.load::<Mod>(&conn).expect("Error loading mods!");
     let mut docs_to_add = vec![];
 
-    for result in results {
-        let versions = versions.filter(mod_id.eq(result.id)).load::<Version>(&conn).expect("Error loading versions!");
+    for result in results {getting confused
+        let mod_versions = versions.filter(mod_id.eq(result.id)).load::<Version>(&conn).expect("Error loading versions!");
 
-        let mut mod_versions = vec![];
+        let mut mod_game_versions = vec![];
 
-        for version in versions {
-            mod_versions.append(version.game_versions())
+        for version in mod_versions {
+            mod_game_versions.extend(version.game_versions.clone())
         }
 
         docs_to_add.push(SearchMod {
@@ -116,10 +115,9 @@ pub fn index_mods(conn : PgConnection) {
             title: result.title,
             description: result.description,
             keywords: result.categories,
-            versions: vec![]
+            versions: mod_game_versions
         });
     }
 
-    mods_index.add_documents(docs_to_add, Some("mod_id"));
-
+    mods_index.add_documents(docs_to_add, Some("mod_id")).unwrap();
 }

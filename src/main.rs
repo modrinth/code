@@ -4,10 +4,8 @@ extern crate serde_json;
 #[macro_use]
 extern crate diesel;
 
-use actix_web::{web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Responder, get, post};
+use actix_web::{web, App, HttpServer};
 use handlebars::*;
-use meilisearch_sdk::{document::*, indexes::*, client::*, search::*};
-use serde::{Serialize, Deserialize};
 use actix_files as fs;
 
 mod schema;

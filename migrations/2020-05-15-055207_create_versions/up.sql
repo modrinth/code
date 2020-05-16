@@ -1,5 +1,5 @@
 CREATE TABLE versions (
-    id SERIAL PRIMARY KEY,
+    version_id SERIAL PRIMARY KEY,
     mod_id SERIAL NOT NULL,
     title VARCHAR NOT NULL,
     changelog_path VARCHAR NOT NULL,

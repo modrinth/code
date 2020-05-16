@@ -1,4 +1,4 @@
-use actix_web::{web, web::Data, App, HttpRequest, HttpResponse, HttpServer, Responder, get, post};
+use actix_web::{web, HttpResponse, get, post};
 use handlebars::*;
 
 #[get("/")]
