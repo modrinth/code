@@ -1,0 +1,84 @@
+.main-content {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+}
+
+.mod-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    width: 100%;
+    height: 100px;
+    background-color: white;
+    margin: 0;
+    border-bottom: 1px solid darkgrey;
+}
+
+.mod-icon {
+    width: 70px;
+    height: 70px;
+    margin: 15px 10px 15px 25px;
+}
+
+.mod-title {
+    display: flex;
+    flex-direction: column;
+}
+
+.mod-title-text {
+    margin: 0;
+}
+
+.mod-description {
+    width: 100%;
+    background-color: white;
+    border: 1px solid darkgrey;
+    border-top: none;
+    padding: 10px 20px;
+}
+
+.mod-sidebar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    border-left: 1px solid darkgrey;
+    width: 20%;
+    height: 100vh;
+    background-color: white;
+}
+
+.sidebar-entry {
+    margin: 30px auto;
+    text-align: center;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 0 auto;
+}
+
+.sidebar-img {
+    height: 20px;
+    padding: 5px;
+}
+
+.donation-info img {
+    height: 50px;
+    object-fit: cover;
+    width: 200px;
+}
+
+.sidebar-line {
+    height: 1px;
+    width: 80%;
+    background-color: darkgrey;
+    margin: 0 auto;
+}

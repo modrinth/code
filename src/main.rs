@@ -36,6 +36,7 @@ async fn main() -> std::io::Result<()> {
             .service(routes::index_get)
             .service(routes::search_post)
             .service(routes::search_get)
+            .service(routes::mod_editor_get)
     })
         .bind("127.0.0.1:8000")?
         .run()

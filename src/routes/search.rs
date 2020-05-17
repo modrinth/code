@@ -101,7 +101,7 @@ pub fn index_mods(conn : PgConnection) {
     let results = mods.load::<Mod>(&conn).expect("Error loading mods!");
     let mut docs_to_add = vec![];
 
-    for result in results {getting confused
+    for result in results {
         let mod_versions = versions.filter(mod_id.eq(result.id)).load::<Version>(&conn).expect("Error loading versions!");
 
         let mut mod_game_versions = vec![];
