@@ -31,12 +31,29 @@
     margin: 0;
 }
 
+.mod-bar {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    width: 100%;
+    background-color: white;
+    border-bottom: 1px solid darkgrey;
+}
+
+.mod-bar a {
+    margin: 5px 10px;
+    color: gray;
+}
+
 .mod-description {
     width: 100%;
     background-color: white;
     border: 1px solid darkgrey;
     border-top: none;
-    padding: 10px 20px;
+}
+
+.mod-description div {
+    margin: 0 5px;
 }
 
 .mod-sidebar {
@@ -65,8 +82,13 @@
     margin: 0 auto;
 }
 
+.mod-info p{
+    margin: 0 ;
+}
+
 .sidebar-img {
-    height: 20px;
+    width: 20px !important;
+    height: 20px !important;
     padding: 5px;
 }
 
