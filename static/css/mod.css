@@ -31,6 +31,41 @@
     margin: 0;
 }
 
+.mod-buttons {
+    display: flex;
+    flex-direction: column;
+    margin: 10px 30px 10px auto;
+}
+
+.mod-button {
+    margin: 5px 0;
+    display: flex;
+    flex-direction: row;
+    text-decoration: none;
+    width: 120px;
+    height: 30px;
+}
+
+.mod-button img {
+    margin: 5px 10px;
+    width: 20px;
+}
+
+.mod-button p {
+    margin: auto;
+    font-weight: bold;
+}
+
+.download-button {
+    background-color: #69E781;
+    color: white;
+}
+
+.follow-button {
+    background-color: red;
+    color: white;
+}
+
 .mod-bar {
     display: flex;
     flex-direction: row;
@@ -53,7 +88,13 @@
 }
 
 .mod-description div {
-    margin: 0 5px;
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.mod-description img {
+    max-width: 1000px;
 }
 
 .mod-sidebar {
@@ -63,7 +104,7 @@
 
     border-left: 1px solid darkgrey;
     width: 20%;
-    height: 100vh;
+    min-height: 100vh;
     background-color: white;
 }
 
@@ -82,8 +123,20 @@
     margin: 0 auto;
 }
 
-.mod-info p{
-    margin: 0 ;
+.mod-info-entry {
+    display: flex;
+    flex-direction: row;
+    margin: 5px;
+    align-items: center;
+}
+
+.mod-info-entry img {
+    margin: 0 5px;
+    height: 15px;
+}
+
+.mod-info-entry p {
+    margin: 0 auto;
 }
 
 .sidebar-img {
@@ -98,8 +151,42 @@
     width: 200px;
 }
 
+.categories {
+    display: flex;
+    flex-direction: row;
+}
+
+.categories img {
+    width: 40px;
+    margin: 0 10px;
+}
+
+.contributor-card {
+    display: flex;
+    flex-direction: row;
+    height: 50px;
+    width: 200px;
+    margin: 5px 0;
+}
+
+.contributor-card img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+.contributor-card-text {
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+}
+
+.contributor-card-text a {
+    text-decoration: none;
+}
+
 .sidebar-line {
-    height: 1px;
+    height: 2px;
     width: 80%;
     background-color: darkgrey;
     margin: 0 auto;
