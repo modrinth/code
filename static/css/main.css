@@ -27,7 +27,7 @@ body {
 .site-header {
     z-index: 2;
     position: sticky;
-    background-color: black;
+    background-color: #0b75d8;
     top: 0;
     width: 100%;
     height: 75px;
