@@ -4,6 +4,7 @@ use actix_web::{web, web::Data, HttpRequest, HttpResponse, get, post};
 use handlebars::*;
 use meilisearch_sdk::{document::*, indexes::*, client::*, search::*};
 use serde::{Serialize, Deserialize};
+use actix_web::client;
 
 use crate::database::*;
 use diesel::prelude::*;
@@ -91,7 +92,7 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
     client.get_index("mods").unwrap().search::<SearchMod>(&query).unwrap().hits
 }
 
-pub fn index_mods(conn : PgConnection) {
+pub async fn index_mods(conn : PgConnection) {
     use crate::schema::mods::dsl::*;
     use crate::schema::versions::dsl::*;
 
@@ -118,6 +119,19 @@ pub fn index_mods(conn : PgConnection) {
             versions: mod_game_versions
         });
     }
+
+    let mut client = client::Client::default();
+
+    let mut response = client.get("https://addons-ecs.forgesvc.net/api/v2/addon/search?categoryId=0&gameId=432&index=0&pageSize=100&sectionId=6&sort=5")
+        .header("User-Agent", "Actix-web")
+        .header("Content-Type", "application/json")
+        .send().await.unwrap();
+
+    println!("{:?}", response);
+
+    let body = response.body().await.unwrap();
+    println!("Downloaded: {:?} bytes", body);
+
 
     mods_index.add_documents(docs_to_add, Some("mod_id")).unwrap();
 }

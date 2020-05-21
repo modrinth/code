@@ -26,7 +26,7 @@ async fn main() -> std::io::Result<()> {
     let handlebars_ref = web::Data::new(handlebars);
 
     let database = database::connect();
-    routes::index_mods(database);
+    routes::index_mods(database).await;
 
     //Init App
     HttpServer::new(move || {
