@@ -9,6 +9,7 @@ let category_inputs = {
     "library": false,
     "worldgen": false,
     "cursed": false,
+    "misc": false,
     "forge": false,
     "fabric": false,
 }
@@ -141,9 +142,14 @@ function activateVersion(element) {
 }
 
 function handleSearch() {
-    let safeName = encodeURIComponent(input.value).replace(/%20/g,'+');
+    let queryString = "search";
 
-    let queryString = "search?q=" + safeName;
+    if(input.value.length > 0) {
+        queryString += "?q=" + encodeURIComponent(input.value).replace(/%20/g,'+');
+    } else {
+        queryString += "?q=empty"
+    }
+
     let filterString = "";
     let versionString = "";
 

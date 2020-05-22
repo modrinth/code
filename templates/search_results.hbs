@@ -1,15 +1,15 @@
 {{#each results}}
     <div class="result gray-border rounded-border">
-        <img src="..." width="75px" height="75px" class="result-image"/>
+        <img src="{{this.icon_url}}" width="75px" height="75px" class="result-image"/>
         <div class="result-info">
             <div class="result-title">
-                <h2>{{this.title}}</h2>
-                <p class="muted"> by {{this.author}}</p>
+                <a class="result-name" href="{{this.page_url}}"><h2>{{this.title}}</h2></a>
+                <p class="muted"> by  <a class="result-author" href="{{this.author_url}}">{{this.author}}</a></p>
             </div>
             <p>{{this.description}}</p>
             <div class="mod-info">
                 <img src="static/images/icon/download.svg" alt="download" title="Downloads"/>
-                <p title="Downloads">1.1M</p>
+                <p title="Downloads">{{format this.downloads}}</p>
 
                 <img src="static/images/icon/updated.svg" alt="updated" title="Last Updated"/>
                 <p title="Last Updated">5/13/20</p>
@@ -74,6 +74,12 @@
                 <div class="cursed-badge result-badge">
                     <img alt="cursed" src="static/images/icon/cursed.png" class="result-image"/>
                     <p>CURSED</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "misc"}}
+                <div class="misc-badge result-badge">
+                    <img alt="misc" src="static/images/icon/misc.svg" class="result-image"/>
+                    <p>MISC</p>
                 </div>
             {{/contains}}
         </div>

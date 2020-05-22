@@ -19,6 +19,7 @@ async fn main() -> std::io::Result<()> {
     let mut handlebars = Handlebars::new();
 
     handlebars.register_helper("contains", Box::new(helpers::ContainsHelper));
+    handlebars.register_helper("format", Box::new(helpers::HumanFormatHelper));
     handlebars
         .register_templates_directory(".hbs", "./templates")
         .unwrap();

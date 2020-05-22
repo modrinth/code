@@ -179,6 +179,7 @@
 }
 
 .result-image {
+    object-fit: scale-down;
     padding: 0 10px 0 5px;
 }
 
@@ -196,6 +197,17 @@
     display: flex;
     flex-direction: row;
     align-items: baseline;
+    text-decoration: none;
+}
+
+.result-name {
+    text-decoration: none;
+    color: #0b75d8;
+}
+
+.result-author {
+    text-decoration: none;
+    color: #2f92d8;
 }
 
 .result-badges {
@@ -278,4 +290,13 @@
 .cursed-badge {
     color: white;
     background-color: palevioletred;
+}
+
+.cursed-badge img {
+    margin-left: 5px;
+}
+
+.misc-badge {
+    color: white;
+    background-color: deepskyblue;
 }
