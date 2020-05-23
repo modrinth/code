@@ -147,7 +147,7 @@ function handleSearch() {
     if(input.value.length > 0) {
         queryString += "?q=" + encodeURIComponent(input.value).replace(/%20/g,'+');
     } else {
-        queryString += "?q=empty"
+        queryString += "?q=pdsaojdakdka"
     }
 
     let filterString = "";

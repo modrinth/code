@@ -12,10 +12,10 @@
                 <p title="Downloads">{{format this.downloads}}</p>
 
                 <img src="static/images/icon/updated.svg" alt="updated" title="Last Updated"/>
-                <p title="Last Updated">5/13/20</p>
+                <p title="Last Updated">{{this.date_modified}}</p>
 
                 <img src="static/images/icon/version.svg" alt="version" title="Version"/>
-                <p title="Version">1.2.3</p>
+                <p title="Version">{{this.latest_version}}</p>
 
                 <div class="loader-icons">
                     {{#contains this.keywords "forge"}}

@@ -4,7 +4,6 @@ use actix_web::{web, web::Data, HttpRequest, HttpResponse, get, post};
 use handlebars::*;
 use meilisearch_sdk::{document::*, indexes::*, client::*, search::*};
 use serde::{Serialize, Deserialize};
-use actix_web::client;
 
 use crate::database::*;
 use diesel::prelude::*;
@@ -44,7 +43,8 @@ struct CurseForgeMod {
     summary: String,
     downloadCount: f32,
     categories: Vec<Category>,
-    gameVersionLatestFiles: Vec<CurseVersion>
+    gameVersionLatestFiles: Vec<CurseVersion>,
+    dateModified: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -59,6 +59,8 @@ struct SearchMod {
     page_url: String,
     icon_url: String,
     author_url: String,
+    date_modified: String,
+    latest_version: String,
     empty: String,
 }
 
@@ -111,7 +113,7 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
 
     match info.q {
         Some(q) => search_query = q,
-        None => search_query = "empty".to_string()
+        None => search_query = "pdsaojdakdka".to_string()
     }
 
     if let Some(f) = info.f {
@@ -166,29 +168,39 @@ pub async fn index_mods(conn : PgConnection) {
             page_url: "".to_string(),
             icon_url: "".to_string(),
             author_url: "".to_string(),
-            empty: String::from("empty")
+            date_modified: "".to_string(),
+            latest_version: "".to_string(),
+            empty: String::from("pdsaojdakdka")
         });
     }
 
-    let mut client = aws::Client::default();
+    let body = reqwest::get("https://addons-ecs.forgesvc.net/api/v2/addon/search?categoryId=0&gameId=432&index=0&pageSize=10000&sectionId=6&sort=5")
+        .await.unwrap()
+        .text()
+        .await.unwrap();
 
-    let mut response = client.get("https://addons-ecs.forgesvc.net/api/v2/addon/search?categoryId=0&gameId=432&index=0&pageSize=25&sectionId=6&sort=5")
-        .header("User-Agent", "Actix-web")
-        .send().await.unwrap();
-
-
-    let body = response.body().await.unwrap();
-    println!("{:?}", body.len());
-
-    let curseforge_mods : Vec<CurseForgeMod> = serde_json::from_str(std::str::from_utf8(&body).unwrap()).unwrap();
+    let curseforge_mods : Vec<CurseForgeMod> = serde_json::from_str(&body).unwrap();
 
     for curseforge_mod in curseforge_mods {
         let mut mod_game_versions = vec![];
+        let mut using_forge = false;
+
         for version in curseforge_mod.gameVersionLatestFiles {
+            let version_number : String = version.gameVersion.chars().skip(2).take(version.gameVersion.len()).collect();
+
+            if version_number.parse::<f32>().unwrap() < 14.0 {
+                using_forge = true;
+            }
+
             mod_game_versions.push(version.gameVersion);
         }
 
         let mut mod_categories = vec![];
+
+        if using_forge {
+            mod_categories.push(String::from("Forge"));
+        }
+
         for category in curseforge_mod.categories {
             match &category.name[..] {
                 "World Gen" => mod_categories.push(String::from("worldgen")),
@@ -230,24 +242,43 @@ pub async fn index_mods(conn : PgConnection) {
             }
         }
 
+        mod_categories.sort();
+        mod_categories.dedup();
+        mod_categories.truncate(3);
+
         let mut mod_attachments = curseforge_mod.attachments;
         mod_attachments.retain(|x| x.isDefault);
+
+        if mod_attachments.len() == 0 {
+            mod_attachments.push(Attachment {
+                url: "".to_string(),
+                isDefault: true
+            })
+        }
+
+        let mut latest_version = "None".to_string();
+
+        if mod_game_versions.len() > 0 {
+            latest_version = mod_game_versions[0].to_string();
+        }
+
         docs_to_add.push(SearchMod {
             mod_id: curseforge_mod.id,
             author: (&curseforge_mod.authors[0].name).to_string(),
             title: curseforge_mod.name,
             description: curseforge_mod.summary,
             keywords: mod_categories,
-            versions: mod_game_versions,
+            versions: mod_game_versions.clone(),
             downloads: curseforge_mod.downloadCount as i32,
             page_url: curseforge_mod.websiteUrl,
             icon_url: (mod_attachments[0].url).to_string(),
             author_url: (&curseforge_mod.authors[0].url).to_string(),
-            empty: String::from("empty")
+            date_modified: curseforge_mod.dateModified.chars().take(10).collect(),
+            latest_version: latest_version,
+            empty: String::from("pdsaojdakdka")
         })
     }
 
-    println!("{:?}", docs_to_add);
     mods_index.add_documents(docs_to_add, Some("mod_id")).unwrap();
 
     //Write Settings
@@ -274,15 +305,17 @@ pub async fn index_mods(conn : PgConnection) {
         "page_url".to_string(),
         "icon_url".to_string(),
         "author_url".to_string(),
+        "date_modified".to_string(),
+        "latest_version".to_string(),
         "empty".to_string(),
     ];
 
     let searchable_attributes = vec![
-        "author".to_string(),
         "title".to_string(),
         "description".to_string(),
         "keywords".to_string(),
         "versions".to_string(),
+        "author".to_string(),
         "empty".to_string(),
     ];
 
