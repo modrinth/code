@@ -10,6 +10,7 @@ use diesel::prelude::*;
 use actix_web::client::Connector;
 use meilisearch_sdk::settings::Settings;
 use meilisearch_sdk::progress::SettingsUpdate;
+use serde_json::from_str;
 
 #[derive(Serialize, Deserialize, Debug)]
 struct Attachment {
@@ -44,6 +45,7 @@ struct CurseForgeMod {
     downloadCount: f32,
     categories: Vec<Category>,
     gameVersionLatestFiles: Vec<CurseVersion>,
+    dateCreated: String,
     dateModified: String,
 }
 
@@ -59,6 +61,7 @@ struct SearchMod {
     page_url: String,
     icon_url: String,
     author_url: String,
+    date_created: String,
     date_modified: String,
     latest_version: String,
     empty: String,
@@ -77,6 +80,7 @@ pub struct SearchRequest {
     q: Option<String>,
     f: Option<String>,
     v: Option<String>,
+    o: Option<String>,
 }
 
 #[post("search")]
@@ -110,10 +114,11 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
 
     let mut search_query = "".to_string();
     let mut filters = "".to_string();
+    let mut offset = 0;
 
     match info.q {
         Some(q) => search_query = q,
-        None => search_query = "pdsaojdakdka".to_string()
+        None => search_query = "{}{}{}".to_string()
     }
 
     if let Some(f) = info.f {
@@ -129,10 +134,14 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
         }
     }
 
-    let mut query = Query::new(&search_query).with_limit(10);
+    if let Some(o) = info.o {
+        offset = o.parse().unwrap();
+    }
+
+    let mut query = Query::new(&search_query).with_limit(10).with_offset(offset);
 
     if !filters.is_empty() {
-        query = Query::new(&search_query).with_limit(10).with_filters(&filters);
+        query = Query::new(&search_query).with_limit(10).with_filters(&filters).with_offset(offset);
     }
 
     client.get_index("mods").unwrap().search::<SearchMod>(&query).unwrap().hits
@@ -168,9 +177,10 @@ pub async fn index_mods(conn : PgConnection) {
             page_url: "".to_string(),
             icon_url: "".to_string(),
             author_url: "".to_string(),
+            date_created: "".to_string(),
             date_modified: "".to_string(),
             latest_version: "".to_string(),
-            empty: String::from("pdsaojdakdka")
+            empty: String::from("{}{}{}")
         });
     }
 
@@ -197,10 +207,6 @@ pub async fn index_mods(conn : PgConnection) {
 
         let mut mod_categories = vec![];
 
-        if using_forge {
-            mod_categories.push(String::from("Forge"));
-        }
-
         for category in curseforge_mod.categories {
             match &category.name[..] {
                 "World Gen" => mod_categories.push(String::from("worldgen")),
@@ -213,15 +219,16 @@ pub async fn index_mods(conn : PgConnection) {
                 "Processing" => mod_categories.push(String::from("technology")),
                 "Player Transport" => mod_categories.push(String::from("technology")),
                 "Energy, Fluid, and Item Transport" => mod_categories.push(String::from("technology")),
-                "Farming" => mod_categories.push(String::from("technology")),
+                "Food" => mod_categories.push(String::from("food")),
+                "Farming" => mod_categories.push(String::from("food")),
                 "Energy" => mod_categories.push(String::from("technology")),
                 "Redstone" => mod_categories.push(String::from("technology")),
                 "Genetics" => mod_categories.push(String::from("technology")),
                 "Magic" => mod_categories.push(String::from("magic")),
-                "Storage" => mod_categories.push(String::from("technology")),
+                "Storage" => mod_categories.push(String::from("storage")),
                 "API and Library" => mod_categories.push(String::from("library")),
                 "Adventure and RPG" => mod_categories.push(String::from("adventure")),
-                "Map and Information" => mod_categories.push(String::from("adventure")),
+                "Map and Information" => mod_categories.push(String::from("utility")),
                 "Cosmetic" => mod_categories.push(String::from("decoration")),
                 "Addons" => mod_categories.push(String::from("misc")),
                 "Thermal Expansion" => mod_categories.push(String::from("misc")),
@@ -235,7 +242,7 @@ pub async fn index_mods(conn : PgConnection) {
                 "Applied Energistics 2" => mod_categories.push(String::from("misc")),
                 "CraftTweaker" => mod_categories.push(String::from("misc")),
                 "Miscellaneous" => mod_categories.push(String::from("misc")),
-                "Armor, Tools, and Weapons" => mod_categories.push(String::from("technology")),
+                "Armor, Tools, and Weapons" => mod_categories.push(String::from("equipment")),
                 "Server Utility" => mod_categories.push(String::from("utility")),
                 "Fabric" => mod_categories.push(String::from("fabric")),
                 _ => {}
@@ -245,6 +252,10 @@ pub async fn index_mods(conn : PgConnection) {
         mod_categories.sort();
         mod_categories.dedup();
         mod_categories.truncate(3);
+
+        if using_forge {
+            mod_categories.push(String::from("forge"));
+        }
 
         let mut mod_attachments = curseforge_mod.attachments;
         mod_attachments.retain(|x| x.isDefault);
@@ -273,9 +284,10 @@ pub async fn index_mods(conn : PgConnection) {
             page_url: curseforge_mod.websiteUrl,
             icon_url: (mod_attachments[0].url).to_string(),
             author_url: (&curseforge_mod.authors[0].url).to_string(),
+            date_created: curseforge_mod.dateCreated.chars().take(10).collect(),
             date_modified: curseforge_mod.dateModified.chars().take(10).collect(),
             latest_version: latest_version,
-            empty: String::from("pdsaojdakdka")
+            empty: String::from("{}{}{}")
         })
     }
 
@@ -305,6 +317,7 @@ pub async fn index_mods(conn : PgConnection) {
         "page_url".to_string(),
         "icon_url".to_string(),
         "author_url".to_string(),
+        "date_created".to_string(),
         "date_modified".to_string(),
         "latest_version".to_string(),
         "empty".to_string(),

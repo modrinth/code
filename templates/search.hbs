@@ -12,7 +12,7 @@
     <title>Search</title>
 </head>
 
-<body>
+<body onscroll="loadExtra()">
 
 <header class="site-header">
     <div class="temp-circle-logo"></div>
@@ -25,6 +25,10 @@
         <a href="about">about</a>
     </div>
 </header>
+
+<a href="#" class="back-to-top" id="backToTop">
+    <img src="static/images/icon/up.svg" alt="up">
+</a>
 
 <div class="main-flex">
     <div class="left-flex">
@@ -73,6 +77,18 @@
                 <img alt="cursed" src="static/images/icon/cursed.png" class="result-image"/>
                 <p>CURSED</p>
             </a>
+            <a class="storage-badge category-badge" id="storage" onclick="activateCategory(this)">
+                <img alt="storage" src="static/images/icon/storage.svg" class="result-image"/>
+                <p>STORAGE</p>
+            </a>
+            <a class="food-badge category-badge" id="food" onclick="activateCategory(this)">
+                <img alt="food" src="static/images/icon/food.svg" class="result-image"/>
+                <p>FOOD</p>
+            </a>
+            <a class="equipment-badge category-badge" id="equipment" onclick="activateCategory(this)">
+                <img alt="equipment" src="static/images/icon/equipment.svg" class="result-image"/>
+                <p>EQUIPMENT</p>
+            </a>
             <a class="misc-badge category-badge" id="misc" onclick="activateCategory(this)">
                 <img alt="misc" src="static/images/icon/misc.svg" class="result-image"/>
                 <p>MISC</p>
@@ -84,7 +100,7 @@
                 <p>Loaders</p>
             </a>
             <a class="forge-badge category-badge" id="forge" onclick="activateCategory(this)">
-                <img alt="forge" src="static/images/icon/forge.jpg" class="result-image"/>
+                <img alt="forge" src="static/images/icon/forge-alt.svg" class="result-image"/>
                 <p>FORGE</p>
             </a>
             <a class="fabric-badge category-badge" id="fabric" onclick="activateCategory(this)">
@@ -96,7 +112,7 @@
 
     <div class="search-main">
         <div class="search-div">
-            <input class="search-bar" type="text" id="search-input" placeholder="Search for mods..." oninput="handleSearch()">
+            <input class="search-bar" type="text" id="search-input" placeholder="Search for mods..." oninput="handleSearch(0)">
         </div>
 
         <div id="results" class="results">
@@ -129,7 +145,6 @@
         </div>
     </div>
 </div>
-
 
 <script src="static/js/search.js"></script>
 

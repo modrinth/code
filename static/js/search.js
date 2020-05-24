@@ -9,6 +9,9 @@ let category_inputs = {
     "library": false,
     "worldgen": false,
     "cursed": false,
+    "storage": false,
+    "food": false,
+    "equipment": false,
     "misc": false,
     "forge": false,
     "fabric": false,
@@ -93,7 +96,7 @@ function clearFilters() {
         }
     }
 
-    handleSearch();
+    handleSearch(0);
 }
 
 function toggleVisibility(e) {
@@ -124,7 +127,7 @@ function activateCategory(element) {
         document.getElementById(element.id + "-ghost").className = "category-ghost";
     }
 
-    handleSearch();
+    handleSearch(0);
 }
 
 function activateVersion(element) {
@@ -138,16 +141,42 @@ function activateVersion(element) {
         element.style.boxShadow = "0 0";
     }
 
-    handleSearch();
+    handleSearch(0);
 }
 
-function handleSearch() {
+let body = document.documentElement;
+let backToTop = document.getElementById("backToTop");
+
+let currentlyLoadingExtra = false;
+let currentOffset = 0;
+
+function loadExtra() {
+    console.log(body.scrollTop)
+    if (body.scrollTop > 400) {
+        backToTop.style.display = "block";
+    } else {
+        backToTop.style.display = "none";
+    }
+
+
+    if(!currentlyLoadingExtra) {
+        let scrollOffset = (body.scrollTop) / (body.scrollHeight - body.clientHeight);
+
+        if(scrollOffset > 0.9) {
+            currentOffset += 10;
+            handleSearch(currentOffset);
+            currentlyLoadingExtra = true;
+        }
+    }
+}
+
+function handleSearch(index) {
     let queryString = "search";
 
     if(input.value.length > 0) {
         queryString += "?q=" + encodeURIComponent(input.value).replace(/%20/g,'+');
     } else {
-        queryString += "?q=pdsaojdakdka"
+        queryString += "?q={}{}{}"
     }
 
     let filterString = "";
@@ -182,16 +211,30 @@ function handleSearch() {
         queryString += "&v=" + encodeURIComponent( "versions=" + versionString).replace(/%20/g,'+');
     }
 
+    if(index === 0)
+        window.history.pushState('Search', 'Search', queryString);
+    else
+        queryString += "&o=" + index;
+
+    console.log(queryString);
+
     let xmlHttp = new XMLHttpRequest();
 
     xmlHttp.onreadystatechange = function() {
         if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-            resultContainer.innerHTML = xmlHttp.responseText;
+            if(index === 0) {
+                resultContainer.innerHTML = xmlHttp.responseText;
+
+                currentOffset = 0;
+                currentlyLoadingExtra = false;
+            }
+            else {
+                resultContainer.innerHTML += xmlHttp.responseText;
+                currentlyLoadingExtra = false;
+            }
         }
     }
 
     xmlHttp.open("POST", queryString, true);
     xmlHttp.send(null);
-
-    window.history.pushState('Search', 'Search', queryString);
 }

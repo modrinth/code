@@ -11,6 +11,9 @@
                 <img src="static/images/icon/download.svg" alt="download" title="Downloads"/>
                 <p title="Downloads">{{format this.downloads}}</p>
 
+                <img src="static/images/icon/created.svg" alt="created" title="Created"/>
+                <p title="Created">{{this.date_created}}</p>
+
                 <img src="static/images/icon/updated.svg" alt="updated" title="Last Updated"/>
                 <p title="Last Updated">{{this.date_modified}}</p>
 
@@ -19,7 +22,7 @@
 
                 <div class="loader-icons">
                     {{#contains this.keywords "forge"}}
-                        <img alt="forge" src="static/images/icon/forge.jpg" class="forge"/>
+                        <img alt="forge" src="static/images/icon/forge.svg" class="forge"/>
                     {{/contains}}
                     {{#contains this.keywords "fabric"}}
                         <img alt="fabric" src="static/images/icon/fabric.png"/>
@@ -74,6 +77,24 @@
                 <div class="cursed-badge result-badge">
                     <img alt="cursed" src="static/images/icon/cursed.png" class="result-image"/>
                     <p>CURSED</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "storage"}}
+                <div class="storage-badge result-badge">
+                    <img alt="storage" src="static/images/icon/storage.svg" class="result-image"/>
+                    <p>STORAGE</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "food"}}
+                <div class="food-badge result-badge">
+                    <img alt="food" src="static/images/icon/food.svg" class="result-image"/>
+                    <p>FOOD</p>
+                </div>
+            {{/contains}}
+            {{#contains this.keywords "equipment"}}
+                <div class="equipment-badge result-badge">
+                    <img alt="equipment" src="static/images/icon/equipment.svg" class="result-image"/>
+                    <p>EQUIPMENT</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "misc"}}

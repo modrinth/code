@@ -300,3 +300,38 @@
     color: white;
     background-color: deepskyblue;
 }
+
+.storage-badge {
+    color: wheat;
+    background-color: #e1a15a;
+}
+
+
+.food-badge {
+    color: white;
+    background-color: royalblue;
+}
+
+.equipment-badge {
+    color: white;
+    background-color: black;
+}
+
+.forge {
+    padding-top: 5px !important;
+}
+
+.back-to-top {
+    position: fixed;
+    top: 80%;
+    left: 19%;
+    background-color: #0b75d8;
+    text-align: center;
+    padding: 20px;
+    display: none;
+}
+
+.back-to-top img {
+    width: 50px;
+    height: 50px;
+}
