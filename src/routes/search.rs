@@ -1,21 +1,20 @@
 extern crate diesel;
 
-use actix_web::{web, web::Data, HttpRequest, HttpResponse, get, post};
+use actix_web::{get, post, web, web::Data, HttpResponse};
 use handlebars::*;
-use meilisearch_sdk::{document::*, indexes::*, client::*, search::*};
-use serde::{Serialize, Deserialize};
+use meilisearch_sdk::{client::*, document::*, search::*};
+use serde::{Deserialize, Serialize};
 
 use crate::database::*;
 use diesel::prelude::*;
-use actix_web::client::Connector;
+
 use meilisearch_sdk::settings::Settings;
-use meilisearch_sdk::progress::SettingsUpdate;
-use serde_json::from_str;
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 struct Attachment {
     url: String,
-    isDefault: bool,
+    is_default: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -30,23 +29,25 @@ struct Author {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 struct CurseVersion {
-    gameVersion: String,
+    game_version: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 struct CurseForgeMod {
     id: i32,
     name: String,
     authors: Vec<Author>,
     attachments: Vec<Attachment>,
-    websiteUrl: String,
+    website_url: String,
     summary: String,
-    downloadCount: f32,
+    download_count: f32,
     categories: Vec<Category>,
-    gameVersionLatestFiles: Vec<CurseVersion>,
-    dateCreated: String,
-    dateModified: String,
+    game_version_latest_files: Vec<CurseVersion>,
+    date_created: String,
+    date_modified: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -84,11 +85,14 @@ pub struct SearchRequest {
 }
 
 #[post("search")]
-pub async fn search_post(web::Query(info): web::Query<SearchRequest>, hb: Data<Handlebars<'_>>) -> HttpResponse {
+pub async fn search_post(
+    web::Query(info): web::Query<SearchRequest>,
+    hb: Data<Handlebars<'_>>,
+) -> HttpResponse {
     let results = search(web::Query(info));
 
     let data = json!({
-    "results": results,
+        "results": results,
     });
 
     let body = hb.render("search-results", &data).unwrap();
@@ -97,11 +101,14 @@ pub async fn search_post(web::Query(info): web::Query<SearchRequest>, hb: Data<H
 }
 
 #[get("search")]
-pub async fn search_get(web::Query(info): web::Query<SearchRequest>, hb: Data<Handlebars<'_>>) -> HttpResponse {
+pub async fn search_get(
+    web::Query(info): web::Query<SearchRequest>,
+    hb: Data<Handlebars<'_>>,
+) -> HttpResponse {
     let results = search(web::Query(info));
 
     let data = json!({
-    "results": results,
+        "results": results,
     });
 
     let body = hb.render("search", &data).unwrap();
@@ -110,15 +117,15 @@ pub async fn search_get(web::Query(info): web::Query<SearchRequest>, hb: Data<Ha
 }
 
 fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
-    let client =  Client::new("http://localhost:7700", "");
+    let client = Client::new("http://localhost:7700", "");
 
-    let mut search_query = "".to_string();
+    let search_query: String;
     let mut filters = "".to_string();
     let mut offset = 0;
 
     match info.q {
         Some(q) => search_query = q,
-        None => search_query = "{}{}{}".to_string()
+        None => search_query = "{}{}{}".to_string(),
     }
 
     if let Some(f) = info.f {
@@ -128,8 +135,7 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
     if let Some(v) = info.v {
         if filters.is_empty() {
             filters = v;
-        }
-        else {
+        } else {
             filters = format!("({}) AND {}", filters, v);
         }
     }
@@ -141,24 +147,32 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
     let mut query = Query::new(&search_query).with_limit(10).with_offset(offset);
 
     if !filters.is_empty() {
-        query = Query::new(&search_query).with_limit(10).with_filters(&filters).with_offset(offset);
+        query = query.with_filters(&filters);
     }
 
-    client.get_index("mods").unwrap().search::<SearchMod>(&query).unwrap().hits
+    client
+        .get_index("mods")
+        .unwrap()
+        .search::<SearchMod>(&query)
+        .unwrap()
+        .hits
 }
 
-pub async fn index_mods(conn : PgConnection) {
+pub async fn index_mods(conn: PgConnection) {
     use crate::schema::mods::dsl::*;
     use crate::schema::versions::dsl::*;
 
-    let client =  Client::new("http://localhost:7700", "");
+    let client = Client::new("http://localhost:7700", "");
     let mut mods_index = client.get_or_create("mods").unwrap();
 
     let results = mods.load::<Mod>(&conn).expect("Error loading mods!");
-    let mut docs_to_add : Vec<SearchMod> = vec![];
+    let mut docs_to_add: Vec<SearchMod> = vec![];
 
     for result in results {
-        let mod_versions = versions.filter(mod_id.eq(result.id)).load::<Version>(&conn).expect("Error loading versions!");
+        let mod_versions = versions
+            .filter(mod_id.eq(result.id))
+            .load::<Version>(&conn)
+            .expect("Error loading versions!");
 
         let mut mod_game_versions = vec![];
 
@@ -180,7 +194,7 @@ pub async fn index_mods(conn : PgConnection) {
             date_created: "".to_string(),
             date_modified: "".to_string(),
             latest_version: "".to_string(),
-            empty: String::from("{}{}{}")
+            empty: String::from("{}{}{}"),
         });
     }
 
@@ -189,20 +203,25 @@ pub async fn index_mods(conn : PgConnection) {
         .text()
         .await.unwrap();
 
-    let curseforge_mods : Vec<CurseForgeMod> = serde_json::from_str(&body).unwrap();
+    let curseforge_mods: Vec<CurseForgeMod> = serde_json::from_str(&body).unwrap();
 
     for curseforge_mod in curseforge_mods {
         let mut mod_game_versions = vec![];
         let mut using_forge = false;
 
-        for version in curseforge_mod.gameVersionLatestFiles {
-            let version_number : String = version.gameVersion.chars().skip(2).take(version.gameVersion.len()).collect();
+        for version in curseforge_mod.game_version_latest_files {
+            let version_number: String = version
+                .game_version
+                .chars()
+                .skip(2)
+                .take(version.game_version.len())
+                .collect();
 
             if version_number.parse::<f32>().unwrap() < 14.0 {
                 using_forge = true;
             }
 
-            mod_game_versions.push(version.gameVersion);
+            mod_game_versions.push(version.game_version);
         }
 
         let mut mod_categories = vec![];
@@ -218,7 +237,9 @@ pub async fn index_mods(conn : PgConnection) {
                 "Technology" => mod_categories.push(String::from("technology")),
                 "Processing" => mod_categories.push(String::from("technology")),
                 "Player Transport" => mod_categories.push(String::from("technology")),
-                "Energy, Fluid, and Item Transport" => mod_categories.push(String::from("technology")),
+                "Energy, Fluid, and Item Transport" => {
+                    mod_categories.push(String::from("technology"))
+                }
                 "Food" => mod_categories.push(String::from("food")),
                 "Farming" => mod_categories.push(String::from("food")),
                 "Energy" => mod_categories.push(String::from("technology")),
@@ -258,20 +279,20 @@ pub async fn index_mods(conn : PgConnection) {
         }
 
         let mut mod_attachments = curseforge_mod.attachments;
-        mod_attachments.retain(|x| x.isDefault);
+        mod_attachments.retain(|x| x.is_default);
 
-        if mod_attachments.len() == 0 {
+        if mod_attachments.is_empty() {
             mod_attachments.push(Attachment {
                 url: "".to_string(),
-                isDefault: true
+                is_default: true,
             })
         }
 
-        let mut latest_version = "None".to_string();
-
-        if mod_game_versions.len() > 0 {
-            latest_version = mod_game_versions[0].to_string();
-        }
+        let latest_version = if !mod_game_versions.is_empty() {
+            mod_game_versions[0].to_string()
+        } else {
+            "None".to_string()
+        };
 
         docs_to_add.push(SearchMod {
             mod_id: curseforge_mod.id,
@@ -280,30 +301,32 @@ pub async fn index_mods(conn : PgConnection) {
             description: curseforge_mod.summary,
             keywords: mod_categories,
             versions: mod_game_versions.clone(),
-            downloads: curseforge_mod.downloadCount as i32,
-            page_url: curseforge_mod.websiteUrl,
+            downloads: curseforge_mod.download_count as i32,
+            page_url: curseforge_mod.website_url,
             icon_url: (mod_attachments[0].url).to_string(),
             author_url: (&curseforge_mod.authors[0].url).to_string(),
-            date_created: curseforge_mod.dateCreated.chars().take(10).collect(),
-            date_modified: curseforge_mod.dateModified.chars().take(10).collect(),
-            latest_version: latest_version,
-            empty: String::from("{}{}{}")
+            date_created: curseforge_mod.date_created.chars().take(10).collect(),
+            date_modified: curseforge_mod.date_modified.chars().take(10).collect(),
+            latest_version,
+            empty: String::from("{}{}{}"),
         })
     }
 
-    mods_index.add_documents(docs_to_add, Some("mod_id")).unwrap();
+    mods_index
+        .add_documents(docs_to_add, Some("mod_id"))
+        .unwrap();
 
     //Write Settings
     let settings = mods_index.get_settings().unwrap();
 
-    let mut ranking_rules = vec![
+    let ranking_rules = vec![
         "typo".to_string(),
         "words".to_string(),
         "proximity".to_string(),
         "attribute".to_string(),
         "wordsPosition".to_string(),
         "exactness".to_string(),
-        "desc(downloads)".to_string()
+        "desc(downloads)".to_string(),
     ];
 
     let displayed_attributes = vec![
