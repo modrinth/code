@@ -1,4 +1,4 @@
-use actix_web::{web, HttpResponse, get, post};
+use actix_web::{web, HttpResponse, get};
 use handlebars::*;
 
 #[get("modeditor")]
