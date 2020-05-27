@@ -91,7 +91,7 @@ pub async fn search_post(web::Query(info): web::Query<SearchRequest>, hb: Data<H
     "results": results,
     });
 
-    let body = hb.render("search_results", &data).unwrap();
+    let body = hb.render("search-results", &data).unwrap();
 
     HttpResponse::Ok().body(body)
 }
