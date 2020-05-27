@@ -11,7 +11,7 @@ use diesel::prelude::*;
 use meilisearch_sdk::settings::Settings;
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename = "camelCase")]
+#[serde(rename_all = "camelCase")]
 struct Attachment {
     url: String,
     is_default: bool,
@@ -29,13 +29,13 @@ struct Author {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename = "camelCase")]
+#[serde(rename_all = "camelCase")]
 struct CurseVersion {
     game_version: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename = "camelCase")]
+#[serde(rename_all = "camelCase")]
 struct CurseForgeMod {
     id: i32,
     name: String,
