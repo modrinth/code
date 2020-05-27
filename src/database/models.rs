@@ -10,7 +10,7 @@ pub struct Mod {
     pub downloads: i32,
     pub categories: Vec<String>,
     pub body_path: String,
-    pub icon_path: String
+    pub icon_path: String,
 }
 
 #[derive(Queryable)]
@@ -20,10 +20,9 @@ pub struct Version {
     pub title: String,
     pub changelog_path: String,
     pub files_path: Vec<String>,
-    pub date_published:  NaiveDate,
+    pub date_published: NaiveDate,
     pub author: String,
     pub downloads: i32,
     pub dependencies: Vec<String>,
-    pub game_versions: Vec<String>
+    pub game_versions: Vec<String>,
 }
-

@@ -4,14 +4,14 @@ extern crate serde_json;
 #[macro_use]
 extern crate diesel;
 
+use actix_files as fs;
 use actix_web::{web, App, HttpServer};
 use handlebars::*;
-use actix_files as fs;
 
-mod schema;
-mod routes;
-mod helpers;
 mod database;
+mod helpers;
+mod routes;
+mod schema;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
@@ -39,8 +39,7 @@ async fn main() -> std::io::Result<()> {
             .service(routes::search_get)
             .service(routes::mod_editor_get)
     })
-        .bind("127.0.0.1:8000")?
-        .run()
-        .await
+    .bind("127.0.0.1:8000")?
+    .run()
+    .await
 }
-
