@@ -1,12 +1,12 @@
-use diesel::pg::PgConnection;
-use diesel::prelude::*;
-use dotenv::dotenv;
-use std::env;
+use mongodb::options::ClientOptions;
+use mongodb::Client;
+use mongodb::error::Error;
 
-pub fn connect() -> PgConnection {
-    dotenv().ok();
+pub async fn connect() -> Result<Client, Error> {
+    info!("Initializing database connection");
 
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set!");
-    PgConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
+    let mut client_options = ClientOptions::parse("mongodb://localhost:27017").await?;
+    client_options.app_name = Some("Actix Web Server".to_string());
+
+   Client::with_options(client_options)
 }

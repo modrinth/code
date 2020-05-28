@@ -1,14 +1,15 @@
-extern crate diesel;
-
 use actix_web::{get, post, web, web::Data, HttpResponse};
 use handlebars::*;
 use meilisearch_sdk::{client::*, document::*, search::*};
 use serde::{Deserialize, Serialize};
 
 use crate::database::*;
-use diesel::prelude::*;
 
+use futures::stream::StreamExt;
 use meilisearch_sdk::settings::Settings;
+use mongodb::error::Error;
+use bson::Bson;
+use mongodb::Cursor;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -158,45 +159,16 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
         .hits
 }
 
-pub async fn index_mods(conn: PgConnection) {
-    use crate::schema::mods::dsl::*;
-    use crate::schema::versions::dsl::*;
-
+pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
     let client = Client::new("http://localhost:7700", "");
     let mut mods_index = client.get_or_create("mods").unwrap();
 
-    let results = mods.load::<Mod>(&conn).expect("Error loading mods!");
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
-    for result in results {
-        let mod_versions = versions
-            .filter(mod_id.eq(result.id))
-            .load::<Version>(&conn)
-            .expect("Error loading versions!");
+    info!("Indexing database mods!");
 
-        let mut mod_game_versions = vec![];
 
-        for version in mod_versions {
-            mod_game_versions.extend(version.game_versions.clone())
-        }
-
-        docs_to_add.push(SearchMod {
-            mod_id: result.id,
-            author: result.author,
-            title: result.title,
-            description: result.description,
-            keywords: result.categories,
-            versions: mod_game_versions,
-            downloads: result.downloads,
-            page_url: "".to_string(),
-            icon_url: "".to_string(),
-            author_url: "".to_string(),
-            date_created: "".to_string(),
-            date_modified: "".to_string(),
-            latest_version: "".to_string(),
-            empty: String::from("{}{}{}"),
-        });
-    }
+    info!("Indexing curseforge mods!");
 
     let body = reqwest::get("https://addons-ecs.forgesvc.net/api/v2/addon/search?categoryId=0&gameId=432&index=0&pageSize=10000&sectionId=6&sort=5")
         .await.unwrap()
@@ -237,9 +209,7 @@ pub async fn index_mods(conn: PgConnection) {
                 "Technology" => mod_categories.push(String::from("technology")),
                 "Processing" => mod_categories.push(String::from("technology")),
                 "Player Transport" => mod_categories.push(String::from("technology")),
-                "Energy, Fluid, and Item Transport" => {
-                    mod_categories.push(String::from("technology"))
-                }
+                "Energy, Fluid, and Item Transport" => { mod_categories.push(String::from("technology")) }
                 "Food" => mod_categories.push(String::from("food")),
                 "Farming" => mod_categories.push(String::from("food")),
                 "Energy" => mod_categories.push(String::from("technology")),
@@ -364,4 +334,6 @@ pub async fn index_mods(conn: PgConnection) {
         .with_ranking_rules(ranking_rules);
 
     mods_index.set_settings(&write_settings).unwrap();
+
+    Ok(())
 }

@@ -1,11 +1,11 @@
-use chrono::NaiveDate;
+use serde::{Serialize, Deserialize};
 
-#[derive(Queryable)]
+#[derive(Deserialize, Serialize)]
 pub struct Mod {
     pub id: i32,
     pub title: String,
     pub description: String,
-    pub published: NaiveDate,
+    pub published: String,
     pub author: String,
     pub downloads: i32,
     pub categories: Vec<String>,
@@ -13,14 +13,14 @@ pub struct Mod {
     pub icon_path: String,
 }
 
-#[derive(Queryable)]
+#[derive(Deserialize, Serialize)]
 pub struct Version {
     pub version_id: i32,
     pub mod_id: i32,
     pub title: String,
     pub changelog_path: String,
     pub files_path: Vec<String>,
-    pub date_published: NaiveDate,
+    pub date_published: String,
     pub author: String,
     pub downloads: i32,
     pub dependencies: Vec<String>,
