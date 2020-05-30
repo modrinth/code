@@ -33,7 +33,7 @@ async fn main() -> std::io::Result<()> {
     let handlebars_ref = web::Data::new(handlebars);
 
     let client = database::connect().await.unwrap();
-    routes::index_mods(client.clone()).await;
+    routes::index_mods().await;
 
     info!("Starting Actix HTTP server!");
     //Init App

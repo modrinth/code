@@ -65,6 +65,10 @@ window.onload = function () {
 
     xmlHttp.open("GET", "https://launchermeta.mojang.com/mc/game/version_manifest.json", true);
     xmlHttp.send(null);
+
+    const urlParams = new URLSearchParams(window.location.search);
+
+
 }
 
 function clearFilters() {
@@ -145,7 +149,7 @@ function activateVersion(element) {
 }
 
 function changeSortType(element) {
-    selectedType = element.options[element.selectedIndex].text;
+    selectedType = element.options[element.selectedIndex].value;
     console.log(selectedType)
 
     handleSearch(0);

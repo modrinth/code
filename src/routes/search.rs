@@ -7,10 +7,10 @@ use crate::database::*;
 
 use futures::stream::StreamExt;
 use meilisearch_sdk::settings::Settings;
-use mongodb::error::Error;
 use bson::Bson;
 use mongodb::Cursor;
-use std::collections::HashMap;
+use std::collections::{HashMap, VecDeque};
+use std::error::Error;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -65,9 +65,9 @@ struct SearchMod {
     icon_url: String,
     author_url: String,
     date_created: String,
-    created: i32,
+    created: i64,
     date_modified: String,
-    updated: i32,
+    updated: i64,
     latest_version: String,
     empty: String,
 }
@@ -160,12 +160,8 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
         query = query.with_filters(&filters);
     }
 
-    client
-        .get_index(format!("{}_mods", index).as_ref())
-        .unwrap()
-        .search::<SearchMod>(&query)
-        .unwrap()
-        .hits
+    client.get_index(format!("{}_mods", index).as_ref()).unwrap()
+        .search::<SearchMod>(&query).unwrap().hits
 }
 
 /*
@@ -173,9 +169,10 @@ TODO This method needs a lot of refactoring. Here's a list of changes that need 
  - Move Curseforge Indexing to another method/module
  - Get rid of the 4 indexes (when MeiliSearch updates) and replace it with different rules
  - Cleanup this code (it's very messy)
+ - Remove code fragment duplicates
  */
 
-pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
+pub async fn index_mods() -> Result<(), Box<dyn Error>>{
     let client = Client::new("http://localhost:7700", "");
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
@@ -184,15 +181,15 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
     info!("Indexing curseforge mods!");
 
     let body = reqwest::get("https://addons-ecs.forgesvc.net/api/v2/addon/search?categoryId=0&gameId=432&index=0&pageSize=10000&sectionId=6&sort=5")
-        .await.unwrap()
-        .text()
-        .await.unwrap();
+        .await?.text().await?;
 
-    let curseforge_mods: Vec<CurseForgeMod> = serde_json::from_str(&body).unwrap();
+    let curseforge_mods: Vec<CurseForgeMod> = serde_json::from_str(&body)?;
 
     for curseforge_mod in curseforge_mods {
         let mut mod_game_versions = vec![];
+
         let mut using_forge = false;
+        let mut using_fabric = false;
 
         for version in curseforge_mod.game_version_latest_files {
             let version_number: String = version
@@ -202,7 +199,7 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
                 .take(version.game_version.len())
                 .collect();
 
-            if version_number.parse::<f32>().unwrap() < 14.0 {
+            if version_number.parse::<f32>()? < 14.0 {
                 using_forge = true;
             }
 
@@ -253,12 +250,19 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
             }
         }
 
+        if mod_categories.contains(&"fabric".to_owned()) {
+            using_fabric = true;
+        }
+
         mod_categories.sort();
         mod_categories.dedup();
         mod_categories.truncate(3);
 
         if using_forge {
             mod_categories.push(String::from("forge"));
+        }
+        if using_fabric {
+           mod_categories.push(String::from("fabric"));
         }
 
         let mut mod_attachments = curseforge_mod.attachments;
@@ -289,16 +293,67 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
             icon_url: (mod_attachments[0].url).to_string(),
             author_url: (&curseforge_mod.authors[0].url).to_string(),
             date_created: curseforge_mod.date_created.chars().take(10).collect(),
-            created: curseforge_mod.date_created.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap(),
+            created: curseforge_mod.date_created.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse()?,
             date_modified: curseforge_mod.date_modified.chars().take(10).collect(),
-            updated: curseforge_mod.date_modified.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap(),
+            updated: curseforge_mod.date_modified.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse()?,
             latest_version,
             empty: String::from("{}{}{}"),
         })
     }
 
-    //Write Settings
+    //Write Indexes
 
+    //Relevance Index
+    let mut relevance_index = client.get_or_create("relevance_mods").unwrap();
+
+    let mut relevance_rules = default_rules();
+    relevance_rules.push_back("desc(downloads)".to_string());
+
+    relevance_index.set_settings(&default_settings().with_ranking_rules(relevance_rules.into())).unwrap();
+    relevance_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
+
+    //Downloads Index
+    let mut downloads_index = client.get_or_create("downloads_mods").unwrap();
+
+    let mut downloads_rules = default_rules();
+    downloads_rules.push_front("desc(downloads)".to_string());
+
+    downloads_index.set_settings(&default_settings().with_ranking_rules(downloads_rules.into())).unwrap();
+    downloads_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
+
+    //Updated Index
+    let mut updated_index = client.get_or_create("updated_mods").unwrap();
+
+    let mut updated_rules = default_rules();
+    updated_rules.push_front("desc(updated)".to_string());
+
+    updated_index.set_settings(&default_settings().with_ranking_rules(updated_rules.into())).unwrap();
+    updated_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
+
+    //Created Index
+    let mut newest_index = client.get_or_create("newest_mods").unwrap();
+
+    let mut newest_rules = default_rules();
+    newest_rules.push_back("desc(created)".to_string());
+
+    newest_index.set_settings(&default_settings().with_ranking_rules(newest_rules.into())).unwrap();
+    newest_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
+
+    Ok(())
+}
+
+fn default_rules() -> VecDeque<String> {
+    vec![
+        "typo".to_string(),
+        "words".to_string(),
+        "proximity".to_string(),
+        "attribute".to_string(),
+        "wordsPosition".to_string(),
+        "exactness".to_string(),
+    ].into()
+}
+
+fn default_settings() -> Settings {
     let displayed_attributes = vec![
         "mod_id".to_string(),
         "author".to_string(),
@@ -327,76 +382,10 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
         "empty".to_string(),
     ];
 
-    let mut write_settings = Settings::new()
-        .with_displayed_attributes(displayed_attributes)
-        .with_searchable_attributes(searchable_attributes)
+    Settings::new()
+        .with_displayed_attributes(displayed_attributes.clone())
+        .with_searchable_attributes(searchable_attributes.clone())
         .with_accept_new_fields(true)
         .with_stop_words(vec![])
-        .with_synonyms(HashMap::new());
-
-    //Relevance Index
-    let mut relevance_index = client.get_or_create("relevance_mods").unwrap();
-
-    let relevance_rules = vec![
-        "typo".to_string(),
-        "words".to_string(),
-        "proximity".to_string(),
-        "attribute".to_string(),
-        "wordsPosition".to_string(),
-        "exactness".to_string(),
-        "desc(downloads)".to_string(),
-    ];
-
-    relevance_index.set_settings(&write_settings.with_ranking_rules(relevance_rules)).unwrap();
-    relevance_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
-
-    //Downloads Index
-    let mut downloads_index = client.get_or_create("downloads_mods").unwrap();
-
-    let downloads_rules = vec![
-        "desc(downloads)".to_string(),
-        "typo".to_string(),
-        "words".to_string(),
-        "proximity".to_string(),
-        "attribute".to_string(),
-        "wordsPosition".to_string(),
-        "exactness".to_string(),
-    ];
-
-    downloads_index.set_settings(&write_settings.with_ranking_rules(downloads_rules)).unwrap();
-    downloads_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
-
-    //Updated Index
-    let mut updated_index = client.get_or_create("updated_mods").unwrap();
-
-    let updated_rules = vec![
-        "desc(updated)".to_string(),
-        "typo".to_string(),
-        "words".to_string(),
-        "proximity".to_string(),
-        "attribute".to_string(),
-        "wordsPosition".to_string(),
-        "exactness".to_string(),
-    ];
-
-    updated_index.set_settings(&write_settings.with_ranking_rules(updated_rules)).unwrap();
-    updated_index.add_documents(docs_to_add, Some("mod_id")).unwrap();
-
-    //Created Index
-    let mut newest_index = client.get_or_create("newest_mods").unwrap();
-
-    let newest_rules = vec![
-        "desc(created)".to_string(),
-        "typo".to_string(),
-        "words".to_string(),
-        "proximity".to_string(),
-        "attribute".to_string(),
-        "wordsPosition".to_string(),
-        "exactness".to_string(),
-    ];
-
-    newest_index.set_settings(&write_settings.with_ranking_rules(newest_rules)).unwrap();
-    newest_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
-
-    Ok(())
+        .with_synonyms(HashMap::new())
 }
