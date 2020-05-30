@@ -33,11 +33,11 @@
 <div class="main-flex">
     <div class="left-flex">
         <div class="filters">
-            <select id="filters">
-                <option value="relevance">Relevance</option>
-                <option value="mercedes">Total Downloads</option>
+            <select id="filters" onchange="changeSortType(this)">
+                <option value="relevance" selected="selected">Relevance</option>
+                <option value="downloads">Total Downloads</option>
                 <option value="updated">Last Updated</option>
-                <option value="audi">Newest</option>
+                <option value="newest">Newest</option>
             </select>
         </div>
 

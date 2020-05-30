@@ -16,8 +16,8 @@ let category_inputs = {
     "forge": false,
     "fabric": false,
 }
-
 let version_inputs = {};
+let selectedType  = "relevance";
 
 let resultContainer = document.getElementById("results");
 
@@ -144,6 +144,13 @@ function activateVersion(element) {
     handleSearch(0);
 }
 
+function changeSortType(element) {
+    selectedType = element.options[element.selectedIndex].text;
+    console.log(selectedType)
+
+    handleSearch(0);
+}
+
 let body = document.documentElement;
 let backToTop = document.getElementById("backToTop");
 
@@ -209,6 +216,10 @@ function handleSearch(index) {
     if(versionString.length > versionTakeOffLength) {
         versionString = versionString.substring(0, versionString.length - versionTakeOffLength)
         queryString += "&v=" + encodeURIComponent( "versions=" + versionString).replace(/%20/g,'+');
+    }
+
+    if(selectedType) {
+        queryString += "&s=" + encodeURIComponent(selectedType).replace(/%20/g,'+');
     }
 
     if(index === 0)

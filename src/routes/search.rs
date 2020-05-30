@@ -10,6 +10,7 @@ use meilisearch_sdk::settings::Settings;
 use mongodb::error::Error;
 use bson::Bson;
 use mongodb::Cursor;
+use std::collections::HashMap;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -51,7 +52,7 @@ struct CurseForgeMod {
     date_modified: String,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 struct SearchMod {
     mod_id: i32,
     author: String,
@@ -64,7 +65,9 @@ struct SearchMod {
     icon_url: String,
     author_url: String,
     date_created: String,
+    created: i32,
     date_modified: String,
+    updated: i32,
     latest_version: String,
     empty: String,
 }
@@ -83,6 +86,7 @@ pub struct SearchRequest {
     f: Option<String>,
     v: Option<String>,
     o: Option<String>,
+    s: Option<String>,
 }
 
 #[post("search")]
@@ -120,9 +124,10 @@ pub async fn search_get(
 fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
     let client = Client::new("http://localhost:7700", "");
 
-    let search_query: String;
+    let mut search_query: String;
     let mut filters = "".to_string();
     let mut offset = 0;
+    let mut index = "relevance".to_string();
 
     match info.q {
         Some(q) => search_query = q,
@@ -145,6 +150,10 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
         offset = o.parse().unwrap();
     }
 
+    if let Some(s) = info.s {
+        index = s;
+    }
+
     let mut query = Query::new(&search_query).with_limit(10).with_offset(offset);
 
     if !filters.is_empty() {
@@ -152,21 +161,25 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
     }
 
     client
-        .get_index("mods")
+        .get_index(format!("{}_mods", index).as_ref())
         .unwrap()
         .search::<SearchMod>(&query)
         .unwrap()
         .hits
 }
 
+/*
+TODO This method needs a lot of refactoring. Here's a list of changes that need to be made:
+ - Move Curseforge Indexing to another method/module
+ - Get rid of the 4 indexes (when MeiliSearch updates) and replace it with different rules
+ - Cleanup this code (it's very messy)
+ */
+
 pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
     let client = Client::new("http://localhost:7700", "");
-    let mut mods_index = client.get_or_create("mods").unwrap();
-
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
     info!("Indexing database mods!");
-
 
     info!("Indexing curseforge mods!");
 
@@ -276,28 +289,15 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
             icon_url: (mod_attachments[0].url).to_string(),
             author_url: (&curseforge_mod.authors[0].url).to_string(),
             date_created: curseforge_mod.date_created.chars().take(10).collect(),
+            created: curseforge_mod.date_created.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap(),
             date_modified: curseforge_mod.date_modified.chars().take(10).collect(),
+            updated: curseforge_mod.date_modified.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse().unwrap(),
             latest_version,
             empty: String::from("{}{}{}"),
         })
     }
 
-    mods_index
-        .add_documents(docs_to_add, Some("mod_id"))
-        .unwrap();
-
     //Write Settings
-    let settings = mods_index.get_settings().unwrap();
-
-    let ranking_rules = vec![
-        "typo".to_string(),
-        "words".to_string(),
-        "proximity".to_string(),
-        "attribute".to_string(),
-        "wordsPosition".to_string(),
-        "exactness".to_string(),
-        "desc(downloads)".to_string(),
-    ];
 
     let displayed_attributes = vec![
         "mod_id".to_string(),
@@ -311,7 +311,9 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
         "icon_url".to_string(),
         "author_url".to_string(),
         "date_created".to_string(),
+        "created".to_string(),
         "date_modified".to_string(),
+        "updated".to_string(),
         "latest_version".to_string(),
         "empty".to_string(),
     ];
@@ -325,15 +327,76 @@ pub async fn index_mods(conn: mongodb::Client) -> Result<(), Error>{
         "empty".to_string(),
     ];
 
-    let write_settings = Settings::new()
+    let mut write_settings = Settings::new()
         .with_displayed_attributes(displayed_attributes)
         .with_searchable_attributes(searchable_attributes)
-        .with_accept_new_fields(settings.accept_new_fields.unwrap())
-        .with_stop_words(settings.stop_words.unwrap())
-        .with_synonyms(settings.synonyms.unwrap())
-        .with_ranking_rules(ranking_rules);
+        .with_accept_new_fields(true)
+        .with_stop_words(vec![])
+        .with_synonyms(HashMap::new());
 
-    mods_index.set_settings(&write_settings).unwrap();
+    //Relevance Index
+    let mut relevance_index = client.get_or_create("relevance_mods").unwrap();
+
+    let relevance_rules = vec![
+        "typo".to_string(),
+        "words".to_string(),
+        "proximity".to_string(),
+        "attribute".to_string(),
+        "wordsPosition".to_string(),
+        "exactness".to_string(),
+        "desc(downloads)".to_string(),
+    ];
+
+    relevance_index.set_settings(&write_settings.with_ranking_rules(relevance_rules)).unwrap();
+    relevance_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
+
+    //Downloads Index
+    let mut downloads_index = client.get_or_create("downloads_mods").unwrap();
+
+    let downloads_rules = vec![
+        "desc(downloads)".to_string(),
+        "typo".to_string(),
+        "words".to_string(),
+        "proximity".to_string(),
+        "attribute".to_string(),
+        "wordsPosition".to_string(),
+        "exactness".to_string(),
+    ];
+
+    downloads_index.set_settings(&write_settings.with_ranking_rules(downloads_rules)).unwrap();
+    downloads_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
+
+    //Updated Index
+    let mut updated_index = client.get_or_create("updated_mods").unwrap();
+
+    let updated_rules = vec![
+        "desc(updated)".to_string(),
+        "typo".to_string(),
+        "words".to_string(),
+        "proximity".to_string(),
+        "attribute".to_string(),
+        "wordsPosition".to_string(),
+        "exactness".to_string(),
+    ];
+
+    updated_index.set_settings(&write_settings.with_ranking_rules(updated_rules)).unwrap();
+    updated_index.add_documents(docs_to_add, Some("mod_id")).unwrap();
+
+    //Created Index
+    let mut newest_index = client.get_or_create("newest_mods").unwrap();
+
+    let newest_rules = vec![
+        "desc(created)".to_string(),
+        "typo".to_string(),
+        "words".to_string(),
+        "proximity".to_string(),
+        "attribute".to_string(),
+        "wordsPosition".to_string(),
+        "exactness".to_string(),
+    ];
+
+    newest_index.set_settings(&write_settings.with_ranking_rules(newest_rules)).unwrap();
+    newest_index.add_documents(docs_to_add.clone(), Some("mod_id")).unwrap();
 
     Ok(())
 }
