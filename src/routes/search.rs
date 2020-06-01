@@ -50,6 +50,7 @@ struct CurseForgeMod {
     game_version_latest_files: Vec<CurseVersion>,
     date_created: String,
     date_modified: String,
+    game_slug: String,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -180,12 +181,27 @@ pub async fn index_mods() -> Result<(), Box<dyn Error>>{
 
     info!("Indexing curseforge mods!");
 
-    let body = reqwest::get("https://addons-ecs.forgesvc.net/api/v2/addon/search?categoryId=0&gameId=432&index=0&pageSize=10000&sectionId=6&sort=5")
-        .await?.text().await?;
+    let mut indexing_complete = false;
+    let mut current_mod_id = 0;
+    let mut consecutive_returns = 0;
 
-    let curseforge_mods: Vec<CurseForgeMod> = serde_json::from_str(&body)?;
+    while !(consecutive_returns > 1000 && current_mod_id > 300000) {
+        current_mod_id += 1;
+        info!("Requesting mod with id {} from CurseForge!", current_mod_id);
 
-    for curseforge_mod in curseforge_mods {
+        let body = reqwest::get(&format!("https://addons-ecs.forgesvc.net/api/v2/addon/{}", current_mod_id))
+            .await?.text().await?;
+
+        if body.is_empty() {
+            consecutive_returns += 1;
+            continue;
+        }
+
+        let curseforge_mod : CurseForgeMod = serde_json::from_str(&body)?;
+        consecutive_returns == 0;
+
+        if curseforge_mod.game_slug != "minecraft" { continue; }
+
         let mut mod_game_versions = vec![];
 
         let mut using_forge = false;
@@ -298,7 +314,7 @@ pub async fn index_mods() -> Result<(), Box<dyn Error>>{
             updated: curseforge_mod.date_modified.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse()?,
             latest_version,
             empty: String::from("{}{}{}"),
-        })
+        });
     }
 
     //Write Indexes

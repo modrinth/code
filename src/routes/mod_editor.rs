@@ -6,7 +6,7 @@ pub async fn mod_editor_get(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
     let data = json!({
         "name": "Handlebars"
     });
-    let body = hb.render("mod_editor", &data).unwrap();
+    let body = hb.render("mod-page", &data).unwrap();
 
     HttpResponse::Ok().body(body)
 }
