@@ -33,7 +33,7 @@ async fn main() -> std::io::Result<()> {
     let handlebars_ref = web::Data::new(handlebars);
 
     let client = database::connect().await.unwrap();
-    routes::index_mods().await;
+    routes::index_mods(client).await.unwrap();
 
     info!("Starting Actix HTTP server!");
     //Init App
@@ -42,7 +42,6 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
             .app_data(handlebars_ref.clone())
-            .app_data(client.clone())
             .service(fs::Files::new("/static", "./static").show_files_listing())
             .service(routes::index_get)
             .service(routes::search_post)

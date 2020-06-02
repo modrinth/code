@@ -58,10 +58,16 @@ window.onload = function () {
         document.getElementById("filters").value = value;
     }
 
-    let urlVersions = "";
+    let urlVersions = [];
 
-    if(urlParams.has("v"))
-        urlVersions = urlParams.get("v");
+    if(urlParams.has("v")) {
+        let versionsString = urlParams.get("v");
+
+        versionsString = versionsString.replace(/ /g, '');
+        versionsString = versionsString.replace(/versions=/g, '');
+
+        urlVersions = versionsString.split("OR")
+    }
 
     // Set Version categories from Mojang Launcher Meta
 
@@ -93,8 +99,9 @@ window.onload = function () {
                 else
                     versionElement.outerHTML = "";
 
-                if(urlVersions.includes(version.id))
+                if(urlVersions.includes(version.id)) {
                     activateVersion(versionElement);
+                }
             }
         }
     }
