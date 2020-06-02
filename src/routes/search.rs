@@ -143,7 +143,7 @@ fn search(web::Query(info): web::Query<SearchRequest>) -> Vec<SearchMod> {
         if filters.is_empty() {
             filters = v;
         } else {
-            filters = format!("({}) AND {}", filters, v);
+            filters = format!("({}) AND ({})", filters, v);
         }
     }
 
@@ -181,26 +181,16 @@ pub async fn index_mods() -> Result<(), Box<dyn Error>>{
 
     info!("Indexing curseforge mods!");
 
-    let mut indexing_complete = false;
-    let mut current_mod_id = 0;
-    let mut consecutive_returns = 0;
+    let res = reqwest::Client::new().post("https://addons-ecs.forgesvc.net/api/v2/addon")
+        .header(reqwest::header::CONTENT_TYPE, "application/json")
+        .body(format!("{:?}", (1..400000).collect::<Vec<_>>()))
+        .send().await?;
 
-    while !(consecutive_returns > 1000 && current_mod_id > 300000) {
-        current_mod_id += 1;
-        info!("Requesting mod with id {} from CurseForge!", current_mod_id);
+    let text = &res.text().await?;
+    let mut curseforge_mods : Vec<CurseForgeMod> = serde_json::from_str(text)?;
 
-        let body = reqwest::get(&format!("https://addons-ecs.forgesvc.net/api/v2/addon/{}", current_mod_id))
-            .await?.text().await?;
-
-        if body.is_empty() {
-            consecutive_returns += 1;
-            continue;
-        }
-
-        let curseforge_mod : CurseForgeMod = serde_json::from_str(&body)?;
-        consecutive_returns == 0;
-
-        if curseforge_mod.game_slug != "minecraft" { continue; }
+    for curseforge_mod in curseforge_mods {
+        if curseforge_mod.game_slug != "minecraft" || !curseforge_mod.website_url.contains("/mc-mods/") { continue; }
 
         let mut mod_game_versions = vec![];
 
@@ -278,7 +268,7 @@ pub async fn index_mods() -> Result<(), Box<dyn Error>>{
             mod_categories.push(String::from("forge"));
         }
         if using_fabric {
-           mod_categories.push(String::from("fabric"));
+            mod_categories.push(String::from("fabric"));
         }
 
         let mut mod_attachments = curseforge_mod.attachments;
@@ -298,7 +288,7 @@ pub async fn index_mods() -> Result<(), Box<dyn Error>>{
         };
 
         docs_to_add.push(SearchMod {
-            mod_id: curseforge_mod.id,
+            mod_id: -curseforge_mod.id,
             author: (&curseforge_mod.authors[0].name).to_string(),
             title: curseforge_mod.name,
             description: curseforge_mod.summary,
@@ -314,7 +304,7 @@ pub async fn index_mods() -> Result<(), Box<dyn Error>>{
             updated: curseforge_mod.date_modified.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse()?,
             latest_version,
             empty: String::from("{}{}{}"),
-        });
+        })
     }
 
     //Write Indexes

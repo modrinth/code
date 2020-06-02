@@ -22,6 +22,7 @@ let selectedType  = "relevance";
 let resultContainer = document.getElementById("results");
 
 window.onload = function () {
+    //Add category ghosts
     let categories = document.getElementsByClassName("category-badge");
 
     for (let category of categories) {
@@ -31,6 +32,38 @@ window.onload = function () {
 
         category.appendChild(ghost);
     }
+
+    //Set Initial Values based on URL
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if(urlParams.has("q"))
+        document.getElementById("search-input").value = decodeURIComponent(urlParams.get("q"));
+
+    if(urlParams.has("f")) {
+        let value = decodeURIComponent(urlParams.get("f"));
+
+        for (let key in category_inputs) {
+            if (category_inputs.hasOwnProperty(key)) {
+                if(value.includes(key)) {
+                    activateCategory(document.getElementById(key))
+                }
+            }
+        }
+    }
+
+    if(urlParams.has("s")) {
+        let value = decodeURIComponent(urlParams.get("s"));
+
+        selectedType = value;
+        document.getElementById("filters").value = value;
+    }
+
+    let urlVersions = "";
+
+    if(urlParams.has("v"))
+        urlVersions = urlParams.get("v");
+
+    // Set Version categories from Mojang Launcher Meta
 
     let releases = document.getElementById("releases");
     let snapshots = document.getElementById("snapshots");
@@ -59,15 +92,15 @@ window.onload = function () {
                     archaic.appendChild(versionElement)
                 else
                     versionElement.outerHTML = "";
+
+                if(urlVersions.includes(version.id))
+                    activateVersion(versionElement);
             }
         }
     }
 
     xmlHttp.open("GET", "https://launchermeta.mojang.com/mc/game/version_manifest.json", true);
     xmlHttp.send(null);
-
-    const urlParams = new URLSearchParams(window.location.search);
-
 
 }
 
@@ -150,7 +183,6 @@ function activateVersion(element) {
 
 function changeSortType(element) {
     selectedType = element.options[element.selectedIndex].value;
-    console.log(selectedType)
 
     handleSearch(0);
 }
@@ -162,7 +194,6 @@ let currentlyLoadingExtra = false;
 let currentOffset = 0;
 
 function loadExtra() {
-    console.log(body.scrollTop)
     if (body.scrollTop > 400) {
         backToTop.style.display = "block";
     } else {
@@ -208,12 +239,10 @@ function handleSearch(index) {
         queryString += "&f=" + encodeURIComponent( "keywords=" + filterString).replace(/%20/g,'+');
     }
 
-    for (let key in version_inputs) {
-        if (version_inputs.hasOwnProperty(key)) {
+    for (let key in version_inputs)
+        if (version_inputs.hasOwnProperty(key))
             if(version_inputs[key])
                 versionString += key + " OR versions=";
-        }
-    }
 
     let versionTakeOffLength = " OR versions=".length;
 
@@ -222,16 +251,26 @@ function handleSearch(index) {
         queryString += "&v=" + encodeURIComponent( "versions=" + versionString).replace(/%20/g,'+');
     }
 
-    if(selectedType) {
+    if(selectedType)
         queryString += "&s=" + encodeURIComponent(selectedType).replace(/%20/g,'+');
-    }
 
-    if(index === 0)
-        window.history.pushState('Search', 'Search', queryString);
+
+    if(!queryString.includes("?"))
+        queryString = queryString.replace("&", "?")
+
+    if(index === 0) {
+        let viewString = queryString;
+
+        viewString = viewString.replace("?q={}{}{}", "");
+        viewString = viewString.replace("&s=relevance", "");
+
+        if(!viewString.includes("?"))
+            viewString = viewString.replace("&", "?")
+
+        window.history.pushState('Search', 'Search', viewString);
+    }
     else
         queryString += "&o=" + index;
-
-    console.log(queryString);
 
     let xmlHttp = new XMLHttpRequest();
 
