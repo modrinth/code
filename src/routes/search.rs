@@ -174,8 +174,8 @@ TODO This method needs a lot of refactoring. Here's a list of changes that need 
 pub async fn index_mods(client: mongodb::Client) -> Result<(), Box<dyn Error>>{
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
-    docs_to_add.append(&mut index_database(client).await?);
-    docs_to_add.append(&mut index_curseforge().await);
+    /*docs_to_add.append(&mut index_database(client).await?);
+    docs_to_add.append(&mut index_curseforge().await?);*/
 
     //Write Indexes
     //Relevance Index
@@ -252,7 +252,7 @@ async fn index_database(client: mongodb::Client) -> Result<Vec<SearchMod>,  Box<
             versions: mod_game_versions,
             downloads: result.downloads,
             page_url: "".to_string(),
-            icon_url: "".to_string(),
+            icon_url: result.icon_path,
             author_url: "".to_string(),
             date_created: "".to_string(),
             created: 0,

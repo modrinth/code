@@ -1,8 +1,8 @@
 use actix_web::{get, web, HttpResponse};
 use handlebars::*;
 
-#[get("modeditor")]
-pub async fn mod_editor_get(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
+#[get("mod/testmod")]
+pub async fn mod_page_get(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
     let data = json!({
         "name": "Handlebars"
     });

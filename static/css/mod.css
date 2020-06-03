@@ -102,10 +102,14 @@
     background-color: #fefefe;
     border-radius: 5px 5px 0 0;
     border: 1px solid darkgrey;
-    border-bottom: none;
+    border-bottom: none !important;
+    text-decoration: none;
+    cursor: pointer;
 }
 
 .mod-bar-active {
+    border: 2px solid #0b75d8 !important;
+    color: #0b75d8 !important;
     background-color: white !important;
 }
 
@@ -114,6 +118,8 @@
     background-color: white;
     border-radius: 0 5px 5px 5px;
     border: 1px solid darkgrey;
+    font-size: 16px;
+    line-height: 20px;
 }
 
 .mod-description div {

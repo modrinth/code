@@ -13,15 +13,17 @@ impl HelperDef for HumanFormatHelper {
         _rc: &mut RenderContext<'reg, 'rc>,
         out: &mut dyn Output,
     ) -> HelperResult {
-        let param = h.param(0).and_then(|v| v.value().as_str()).unwrap_or("0.0");
+        let param = h.param(0).and_then(|v| v.value().as_f64()).unwrap_or(0.0);
 
-        if param.len() > 3 {
-            let mut formatted = human_format::Formatter::new().format(param.parse().unwrap());
+        let string = &param.to_string();
+
+        if string.len() > 3 {
+            let mut formatted = human_format::Formatter::new().format(param);
             formatted.retain(|c| !c.is_whitespace());
 
             out.write(formatted.to_uppercase().as_ref())?;
         } else {
-            out.write(param)?;
+            out.write(string)?;
         }
 
         Ok(())
