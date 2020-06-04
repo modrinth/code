@@ -93,11 +93,12 @@
 .mod-bar {
     display: flex;
     flex-direction: row;
+    border-bottom: 1px solid darkgrey;
 }
 
 .mod-bar a {
     margin: 5px 10px 0 0;
-    padding: 5px;
+    padding: 5px 10px;
     color: gray;
     background-color: #fefefe;
     border-radius: 5px 5px 0 0;
@@ -108,12 +109,21 @@
 }
 
 .mod-bar-active {
-    border: 2px solid #0b75d8 !important;
     color: #0b75d8 !important;
+    font-weight: bold;
     background-color: white !important;
 }
 
+.mod-hide {
+    display: none;
+}
+
+.mod-show {
+    display: block;
+}
+
 .mod-description {
+    margin-top: 10px;
     width: 100%;
     background-color: white;
     border-radius: 0 5px 5px 5px;
@@ -243,4 +253,22 @@
     width: 80%;
     background-color: darkgrey;
     margin: 0 auto;
+}
+
+.download {
+    color: white;
+    padding: 10px 5px;
+    margin-bottom: 5px;
+    width: 200px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+}
+
+.download-primary {
+    background-color: #0b75d8;
+}
+
+.download-normal {
+    background-color: #949494;
 }
