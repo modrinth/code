@@ -122,25 +122,6 @@
     display: block;
 }
 
-.mod-description {
-    margin-top: 10px;
-    width: 100%;
-    background-color: white;
-    border-radius: 0 5px 5px 5px;
-    border: 1px solid darkgrey;
-    font-size: 16px;
-    line-height: 20px;
-}
-
-.mod-description div {
-    margin: 0 auto;
-    padding: 5px;
-}
-
-.mod-description img {
-    max-width: 1000px;
-}
-
 .sidebar {
     display: flex;
     flex-direction: column;
@@ -272,6 +253,25 @@
     background-color: #949494;
 }
 
+.mod-description {
+    margin-top: 10px;
+    width: 100%;
+    background-color: white;
+    border-radius: 0 5px 5px 5px;
+    border: 1px solid darkgrey;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.mod-description div {
+    margin: 0 auto;
+    padding: 5px;
+}
+
+.mod-description img {
+    max-width: 1000px;
+}
+
 .files-search {
     margin-top: 10px;
     margin-bottom: 25px;
@@ -292,4 +292,18 @@
     height: 33px;
     width: 10%;
     margin-left: auto;
+}
+
+.api {
+    margin-top: 10px;
+    width: 100%;
+    background-color: white;
+    border-radius: 0 5px 5px 5px;
+    border: 1px solid darkgrey;
+    font-size: 16px;
+    line-height: 20px;
+}
+
+.api-container {
+    padding: 10px;
 }

@@ -14,3 +14,5 @@ function toggleSection(element) {
     currentlySelectedDiv.classList.remove("mod-hide");
     currentlySelectedDiv.classList.add("mod-show");
 }
+
+hljs.initHighlightingOnLoad();

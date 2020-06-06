@@ -381,7 +381,7 @@ async fn index_curseforge() ->  Result<Vec<SearchMod>,  Box<dyn Error>>{
             mod_id: -curseforge_mod.id,
             author: (&curseforge_mod.authors[0].name).to_string(),
             title: curseforge_mod.name,
-            description: curseforge_mod.summary,
+            description: curseforge_mod.summary.chars().take(150).collect(),
             keywords: mod_categories,
             versions: mod_game_versions.clone(),
             downloads: curseforge_mod.download_count as i32,
