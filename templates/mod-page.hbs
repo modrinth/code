@@ -48,12 +48,12 @@
         </div>
 
         <div class="mod-bar">
-            <a class="mod-bar-active" onclick="toggleSection(this)" id="description-bar">Description</a>
-            <a onclick="toggleSection(this)" id="files-bar">Files</a>
-            <a onclick="toggleSection(this)" id="api-bar">API</a>
-            <a href="https://github.com/Geometrically/fabricate">Source</a>
-            <a href="https://github.com/Geometrically/fabricate/wiki">Wiki</a>
-            <a href="https://github.com/Geometrically/fabricate/issues">Issues</a>
+            <a class="mod-bar-active mod-bar-href" onclick="toggleSection(this)" id="description-bar">Description</a>
+            <a class="mod-bar-href" onclick="toggleSection(this)" id="files-bar">Files</a>
+            <a class="mod-bar-href" onclick="toggleSection(this)" id="api-bar">API</a>
+            <a class="mod-bar-href" href="https://github.com/Geometrically/fabricate">Source</a>
+            <a class="mod-bar-href" href="https://github.com/Geometrically/fabricate/wiki">Wiki</a>
+            <a class="mod-bar-href" href="https://github.com/Geometrically/fabricate/issues">Issues</a>
         </div>
 
         <div class="mod-description mod-show" id="description">
@@ -78,30 +78,59 @@
 
         <div class="api mod-hide" id="api">
             <div class="api-container">
-                <h2>Maven</h2>
-                <p>This project has an API accessible from maven. You can add it to your project using the artifact below.</p>
-                <pre>
-                    <code>
+                <div class="api-code-ref">
+                    <h2>Maven</h2>
+                    <p>This project has an API accessible from maven. You can add it to your project using the artifact below.</p>
+
+                    <div class="api-code-blocks">
+                        <div class="code-block-navigation">
+                            <a class="mod-bar-href mod-bar-active" onclick="toggleBuildSection(this)" id="gradle-code-bar">Gradle</a>
+                            <a class="mod-bar-href" onclick="toggleBuildSection(this)" id="maven-code-bar">Maven</a>
+                        </div>
+
+                        <pre class="api-code-block gradle mod-show" id="gradle-code">
+
 repositories {
-    jcenter()
+    maven {
+       url "https://cdn.sitename.com/maven"
+    }
 }
 
 dependencies {
-    modApi "me.sargunvohra.mcmods:autoconfig1u:ABC"
+    modApi "anime.sucks:balls:1.0"
 }
-                    </code>
-                </pre>
+                        </pre>
+                        <pre class="api-code-block mod-hide" id="maven-code">
 
-                <h2>Website API</h2>
-                <p>All projects and project files can be pulled using our REST API. You can pull this project's information using the code snippets below.</p>
-                <pre>
-                    <code>
-var client = new FabricateClient();
-var mod = await client.requestMod(123);
+&lt;dependency&gt;
+    &lt;groupId&gt;anime.sucks&lt;/groupId&gt;
+    &lt;artifactId&gt;balls&lt;/artifactId&gt;
+    &lt;version&gt;1.0&lt;/version&gt;
+&lt;/dependency&gt;
+                        </pre>
+                    </div>
+                </div>
 
-Console.WriteLine(mod);
-                    </code>
-                </pre>
+                <div class="api-code-ref">
+                    <h2>Website API</h2>
+                    <p>All projects and project files can be pulled using our REST API. You can pull this project's information using the code snippets below.</p>
+                    <div class="api-code-blocks">
+                        <div class="code-block-navigation">
+                            <a class="mod-bar-href mod-bar-active" onclick="toggleApiSection(this)" id="curl-code-bar">cURL</a>
+                            <a class="mod-bar-href" onclick="toggleApiSection(this)" id="js-code-bar">JS</a>
+                        </div>
+
+                        <pre class="api-code-block extra-top mod-show shell" id="curl-code">
+
+$ curl -XGET -H "Content-type: application/json" 'http://api.sitename.com/mod/testmod'
+                        </pre>
+                        <pre class="api-code-block extra-top mod-hide javascript" id="js-code">
+
+let httpClient = TooLazyToMakeWorkingCode();
+httpClient.request('http://api.sitename.com/mod/testmod');
+                        </pre>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
