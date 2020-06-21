@@ -1,0 +1,48 @@
+.creation-main {
+    margin: 10px auto;
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+}
+
+progress::-webkit-progress-value { background: #0b75d8; }
+progress::-moz-progress-bar { background: #0b75d8; }
+
+.creation-progress-bar {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+
+    border: none;
+
+    height: 20px;
+    background: #999;
+    color: #0b75d8;
+
+    margin: 10px 0 0 0;
+}
+
+.creation-parts-header {
+    display: flex;
+    flex-direction: row;
+    color: #999;
+}
+
+.creation-parts-header a {
+    text-align: center;
+    width: 20%;
+}
+
+.creation-parts-header-active {
+    color: #0b75d8 !important;
+    font-weight: bold;
+}
+
+.creation-parts {
+    margin-top: 30px;
+    background: #fff;
+}
+
+.creation-part {
+    padding: 5px;
+}

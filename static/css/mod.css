@@ -252,7 +252,8 @@
     background-color: #949494;
 }
 
-.mod-description {
+.mod-main {
+    padding: 5px;
     margin-top: 0px;
     width: 100%;
     background-color: white;
@@ -262,7 +263,7 @@
     line-height: 20px;
 }
 
-.mod-description div {
+.mod-description {
     margin: 0 auto;
     padding: 5px;
 }
