@@ -3,9 +3,10 @@
     height: 33px;
     width: 175px;
 
-    background-color: white;
+	color: var(--content-text);
+    background-color: var(--content-background);
     border-radius: 5px;
-    border: 1px solid darkgrey;
+    border: 1px solid var(--border);
 }
 
 .versions {
@@ -51,10 +52,10 @@
     margin: 0;
 
     font-weight: bold;
-    color: black;
-    background-color: white;
-    border-bottom: 1px solid darkgrey;
-    border-top: 1px solid darkgrey;
+    color: var(--content-text);
+    background-color: var(--content-background);
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
 
     -webkit-touch-callout: none;
     -webkit-user-select: none;
@@ -82,9 +83,10 @@
 
     border-radius: 5px;
     padding: 0 10px;
-    background-color: #ffffff;
+	color: var(--content-text);
+    background-color: var(--content-background);
     background-image: none;
-    border: 1px solid darkgrey;
+    border: 1px solid var(--border);
 }
 
 .categories {
@@ -139,6 +141,9 @@
 .search-bar {
     position: -webkit-sticky !important;
     position: sticky !important;
+	color: var(--content-text);
+	background-color: var(--content-background);
+	border-color: var(--border);
     height: 2em;
     margin-top: 30px;
     margin-bottom: 15px;
@@ -176,7 +181,7 @@
     width: 100%;
     flex-direction: row;
     align-items: center;
-    background-color: white;
+    background-color: var(--content-background);
 }
 
 .result-image {
@@ -203,7 +208,7 @@
 
 .result-name {
     text-decoration: none;
-    color: #0b75d8;
+    color: var(--highlight);
 }
 
 .result-author {
@@ -256,41 +261,42 @@
 
 .tech-badge {
     color: white;
-    background-color: red;
+    background-color: var(--tech-color);
 }
 
 .adventure-badge {
     color: white;
-    background-color: saddlebrown;
+    background-color: var(--adventure-color);
 }
 
 .magic-badge {
     color: white;
-    background-color: rebeccapurple;
+    background-color: var(--magic-color);
 }
 
 .utility-badge {
     color: white;
-    background-color: orangered;
+    background-color: var(--utility-color);
 }
 
 .decoration-badge {
     color: white;
-    background-color: #2f92d8;
+    background-color: var(--decoration-color);
 }
 
 .world-badge {
-    background-color: yellow;
+	color: black;
+	background-color: var(--world-color);
 }
 
 .library-badge {
     color: white;
-    background-color: orange;
+    background-color: var(--library-color);
 }
 
 .cursed-badge {
     color: white;
-    background-color: palevioletred;
+    background-color: var(--cursed-color);
 }
 
 .cursed-badge img {
@@ -299,34 +305,36 @@
 
 .misc-badge {
     color: white;
-    background-color: deepskyblue;
+    background-color: var(--misc-color);
 }
 
 .storage-badge {
     color: wheat;
-    background-color: #e1a15a;
+    background-color: var(--storage-color);
 }
 
 
 .food-badge {
     color: white;
-    background-color: royalblue;
+    background-color: var(--food-color);
 }
 
 .equipment-badge {
     color: white;
-    background-color: black;
+    background-color: var(--equipment-color);
 }
 
 .forge {
-    padding-top: 5px !important;
+	height: 12px;
+	padding-top: 5px !important;
+	fill: var(--forge-color);
 }
 
 .back-to-top {
     position: fixed;
     top: 80%;
     left: 19%;
-    background-color: #0b75d8;
+    background-color: var(--highlight);
     text-align: center;
     padding: 20px;
     display: none;
