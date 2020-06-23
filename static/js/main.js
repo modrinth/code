@@ -1,3 +1,5 @@
-if (localStorage.getItem("theme")) {
-	document.documentElement.setAttribute("data-theme", localStorage.getItem("theme"));
+window.onload = function () {
+	if (localStorage.getItem("theme")) {
+		document.documentElement.setAttribute("theme", localStorage.getItem("theme"));
+	}
 }

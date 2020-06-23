@@ -174,8 +174,8 @@ TODO This method needs a lot of refactoring. Here's a list of changes that need 
 pub async fn index_mods(client: mongodb::Client) -> Result<(), Box<dyn Error>>{
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
-    /*docs_to_add.append(&mut index_database(client).await?);
-    docs_to_add.append(&mut index_curseforge().await?);*/
+    docs_to_add.append(&mut index_database(client).await?);
+    //docs_to_add.append(&mut index_curseforge(1, 400000).await?);
 
     //Write Indexes
     //Relevance Index
@@ -266,20 +266,23 @@ async fn index_database(client: mongodb::Client) -> Result<Vec<SearchMod>,  Box<
     Ok(docs_to_add)
 }
 
-async fn index_curseforge() ->  Result<Vec<SearchMod>,  Box<dyn Error>>{
+async fn index_curseforge(start_index: i32, end_index: i32) ->  Result<Vec<SearchMod>,  Box<dyn Error>>{
     info!("Indexing curseforge mods!");
 
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
     let res = reqwest::Client::new().post("https://addons-ecs.forgesvc.net/api/v2/addon")
         .header(reqwest::header::CONTENT_TYPE, "application/json")
-        .body(format!("{:?}", (1..400000).collect::<Vec<_>>()))
+        .body(format!("{:?}", (start_index..end_index).collect::<Vec<_>>()))
         .send().await?;
 
     let text = &res.text().await?;
     let curseforge_mods : Vec<CurseForgeMod> = serde_json::from_str(text)?;
 
+    let mut max_index = 0;
+
     for curseforge_mod in curseforge_mods {
+        max_index = curseforge_mod.id;
         if curseforge_mod.game_slug != "minecraft" || !curseforge_mod.website_url.contains("/mc-mods/") { continue; }
 
         let mut mod_game_versions = vec![];
@@ -397,6 +400,7 @@ async fn index_curseforge() ->  Result<Vec<SearchMod>,  Box<dyn Error>>{
         })
     }
 
+    //TODO Reindex every hour for new mods.
     Ok(docs_to_add)
 }
 
