@@ -3,113 +3,135 @@
         <img src="{{this.icon_url}}" width="75px" height="75px" class="result-image"/>
         <div class="result-info">
             <div class="result-title">
-                <a class="result-name" href="{{this.page_url}}"><h2>{{this.title}}</h2></a>
-                <p class="muted"> by  <a class="result-author" href="{{this.author_url}}">{{this.author}}</a></p>
+                <a class="result-name" href="{{this.page_url}}"><h2>{{this.title}}</h2></a><!--
+                --><p class="muted result-author-container">by <a class="result-author" href="{{this.author_url}}">{{this.author}}</a></p>
             </div>
             <p>{{this.description}}</p>
             <div class="mod-info">
-                <img src="/static/images/icon/download.svg" alt="download" title="Downloads"/>
-                <p title="Downloads">{{format this.downloads}}</p>
+                <span class="mod-downloads" title="Downloads">
+                    <img src="/static/images/icon/download.svg" alt="downloads"/><!--
+                    -->{{format this.downloads}}
+                </span>
 
-                <img src="/static/images/icon/created.svg" alt="created" title="Created"/>
-                <p title="Created">{{this.date_created}}</p>
+                <span class="mod-created" title="Created">
+                    <img src="/static/images/icon/created.svg" alt="created"/><!--
+                    -->{{this.date_created}}
+                </span>
 
-                <img src="/static/images/icon/updated.svg" alt="updated" title="Last Updated"/>
-                <p title="Last Updated">{{this.date_modified}}</p>
+                <span class="mod-updated" title="Last Updated">
+                    <img src="/static/images/icon/updated.svg" alt="updated"/><!--
+                    -->{{this.date_modified}}
+                </span>
 
-                <img src="/static/images/icon/version.svg" alt="version" title="Version"/>
-                <p title="Version">{{this.latest_version}}</p>
+                <span class="mod-version" title="Version">
+                    <img src="/static/images/icon/version.svg" alt="version" /><!--
+                    -->{{this.latest_version}}
+                </span>
 
                 <div class="loader-icons">
                     {{#contains this.keywords "forge"}}
-						<svg viewBox="0 0 120 66.7" class="forge">
-							<path d="M91.6,16.7l-37.8-1.9l46.2,0v-3.7H47.8l0,7.8v6.2c0,0.1-1.5-9.1-1.9-11.7h-4.1v6.8v6.2
-										c0,0.1-1.8-10.9-1.9-12.3c-10.4,0-27.9,0-27.9,0c1.9,1.6,12.4,10.6,19.9,14.3c3.7,1.8,8.3,1.9,12.4,2c2.1,0.1,4.2,0.2,5.8,1.8
-										c2.3,2.2,2.8,5.7,0.8,8.3c-1.9,2.6-7.3,3.2-7.3,3.2L39,49.1v6.4h10.3l0.3-6.3l8.9-6.3c-0.9,0.8-3.1,2.8-6.2,7.7
-										c-0.7,1.1-1.3,2.3-1.7,3.5c2.2-1.9,6.8-3.2,12.2-3.2c5.3,0,9.9,1.3,12.1,3.2c-0.4-1.2-1-2.4-1.7-3.5c-3.2-4.9-5.3-6.9-6.2-7.7
-										l8.9,6.3l0.3,6.3h9.6v-6.4l-4.5-5.5c0,0-6.7-0.4-8.4-3.2C67.7,32.6,74.8,20.4,91.6,16.7z"/>
-						</svg>
+                        <div class="loader-forge" title="Forge">
+                            <svg viewBox="0 0 120 66.7" class="forge">
+                                <path d="M91.6,16.7l-37.8-1.9l46.2,0v-3.7H47.8l0,7.8v6.2c0,0.1-1.5-9.1-1.9-11.7h-4.1v6.8v6.2
+                                            c0,0.1-1.8-10.9-1.9-12.3c-10.4,0-27.9,0-27.9,0c1.9,1.6,12.4,10.6,19.9,14.3c3.7,1.8,8.3,1.9,12.4,2c2.1,0.1,4.2,0.2,5.8,1.8
+                                            c2.3,2.2,2.8,5.7,0.8,8.3c-1.9,2.6-7.3,3.2-7.3,3.2L39,49.1v6.4h10.3l0.3-6.3l8.9-6.3c-0.9,0.8-3.1,2.8-6.2,7.7
+                                            c-0.7,1.1-1.3,2.3-1.7,3.5c2.2-1.9,6.8-3.2,12.2-3.2c5.3,0,9.9,1.3,12.1,3.2c-0.4-1.2-1-2.4-1.7-3.5c-3.2-4.9-5.3-6.9-6.2-7.7
+                                            l8.9,6.3l0.3,6.3h9.6v-6.4l-4.5-5.5c0,0-6.7-0.4-8.4-3.2C67.7,32.6,74.8,20.4,91.6,16.7z"/>
+                            </svg><!--
+                            --><span>Forge</span>
+                        </div>
                     {{/contains}}
                     {{#contains this.keywords "fabric"}}
-                        <img alt="fabric" src="/static/images/icon/fabric.png"/>
+                        <div class="loader-fabric" title="Fabric">
+                            <img alt="fabric" src="/static/images/icon/fabric.png"/><!--
+                            --><span>Fabric</span>
+                        </div>
                     {{/contains}}
                 </div>
             </div>
         </div>
         <div class="result-badges">
             {{#contains this.keywords "technology"}}
-                <div class="tech-badge result-badge">
+                <div class="tech-badge result-badge" title="Tech">
                     <img alt="tech" src="/static/images/icon/tech.svg" class="result-image"/>
                     <p>TECH</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "adventure"}}
-                <div class="adventure-badge result-badge">
+                <div class="adventure-badge result-badge" title="Adventure">
                     <img alt="adventure" src="/static/images/icon/adventure.svg" class="result-image"/>
                     <p>ADVENTURE</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "magic"}}
-                <div class="magic-badge result-badge">
+                <div class="magic-badge result-badge" title="Magic">
                     <img alt="magic" src="/static/images/icon/magic.svg" class="result-image"/>
                     <p>MAGIC</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "utility"}}
-                <div class="utility-badge result-badge">
+                <div class="utility-badge result-badge" title="Utility">
                     <img alt="util" src="/static/images/icon/util.svg" class="result-image"/>
                     <p>UTILITY</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "decoration"}}
-                <div class="decoration-badge result-badge">
+                <div class="decoration-badge result-badge" title="Fecoration">
                     <img alt="decoration" src="/static/images/icon/decoration.svg" class="result-image"/>
                     <p>DECORATION</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "library"}}
-                <div class="library-badge result-badge">
+                <div class="library-badge result-badge" title="Library">
                     <img alt="library" src="/static/images/icon/library.svg" class="result-image"/>
                     <p>LIBRARY</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "worldgen"}}
-                <div class="world-badge result-badge">
+                <div class="world-badge result-badge" title="World">
                     <img alt="world" src="/static/images/icon/world.svg" class="result-image"/>
                     <p>WORLDGEN</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "cursed"}}
-                <div class="cursed-badge result-badge">
+                <div class="cursed-badge result-badge" title="Cursed">
                     <img alt="cursed" src="/static/images/icon/cursed.png" class="result-image"/>
                     <p>CURSED</p>
                     <p>CURSED</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "storage"}}
-                <div class="storage-badge result-badge">
+                <div class="storage-badge result-badge" title="Storage">
                     <img alt="storage" src="/static/images/icon/storage.svg" class="result-image"/>
                     <p>STORAGE</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "food"}}
-                <div class="food-badge result-badge">
+                <div class="food-badge result-badge" title="Food">
                     <img alt="food" src="/static/images/icon/food.svg" class="result-image"/>
                     <p>FOOD</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "equipment"}}
-                <div class="equipment-badge result-badge">
+                <div class="equipment-badge result-badge" title="Equipment">
                     <img alt="equipment" src="/static/images/icon/equipment.svg" class="result-image"/>
                     <p>EQUIPMENT</p>
                 </div>
             {{/contains}}
             {{#contains this.keywords "misc"}}
-                <div class="misc-badge result-badge">
+                <div class="misc-badge result-badge" title="Misc">
                     <img alt="misc" src="/static/images/icon/misc.svg" class="result-image"/>
                     <p>MISC</p>
                 </div>
             {{/contains}}
         </div>
+    </div>
+{{else}}
+    <div class="search-error">
+        {{#if ../query.q}}
+        <h2>No results found for query <code>"{{../query.q}}"</code></h2>
+        {{else}}
+        <h2>No results found</h2>
+        {{/if}}
     </div>
 {{/each}}
