@@ -294,6 +294,10 @@
     background-color: #1e2d44;
 }
 
+.forge-badge img {
+    width: 23px;
+}
+
 .fabric-badge {
     color: #585849;
     background-color: #fffdd0;
@@ -325,7 +329,7 @@
 }
 
 .world-badge {
-	color: black;
+	color: white;
 	background-color: var(--world-color);
 }
 
@@ -349,7 +353,7 @@
 }
 
 .storage-badge {
-    color: wheat;
+    color: white;
     background-color: var(--storage-color);
 }
 

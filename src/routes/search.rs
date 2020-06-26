@@ -172,7 +172,6 @@ fn search(info: &SearchRequest) -> Vec<SearchMod> {
 TODO This method needs a lot of refactoring. Here's a list of changes that need to be made:
  - Move Curseforge Indexing to another method/module
  - Get rid of the 4 indexes (when MeiliSearch updates) and replace it with different rules
- - Cleanup this code (it's very messy)
  - Remove code fragment duplicates
  */
 

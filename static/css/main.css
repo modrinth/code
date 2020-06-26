@@ -13,18 +13,18 @@
 	--muted: gray;
 	--forge-color: #1e2d44;
 
-	--tech-color: red;
-	--adventure-color: saddlebrown;
-	--magic-color: rebeccapurple;
-	--utility-color: orangered;
-	--decoration-color: #2f92d8;
-	--world-color: yellow;
-	--library-color: orange;
-	--cursed-color: palevioletred;
-	--misc-color: deepskyblue;
-	--storage-color: #e1a15a;
-	--food-color: royalblue;
-	--equipment-color: black;
+	--tech-color: #d01111;
+	--adventure-color: #c8a800;
+	--magic-color: #7532b8;
+	--utility-color: #e3690f;
+	--decoration-color: #14a593;
+	--world-color: #32a31f;
+	--library-color: #1363b8;
+	--cursed-color: #933151;
+	--misc-color: #323232;
+	--storage-color: #a77741;
+	--food-color: #9f1823;
+	--equipment-color: #654700;
 }
 
 [data-theme="dark"] {
@@ -130,7 +130,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .site-header h2 {
-    color: --var(white-text);
+    color: var(--white-text);
     font-weight: bolder;
     padding: 0 20px 0 10px;
 }
