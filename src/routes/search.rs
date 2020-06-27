@@ -9,6 +9,9 @@ use std::collections::{HashMap, VecDeque};
 use std::error::Error;
 
 use crate::database::*;
+use futures_timer::Delay;
+use futures::TryFutureExt;
+use std::time::Duration;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -175,10 +178,10 @@ TODO This method needs a lot of refactoring. Here's a list of changes that need 
  - Remove code fragment duplicates
  */
 
-pub async fn index_mods(client: mongodb::Client) -> Result<(), Box<dyn Error>>{
+pub async fn index_mods(db: mongodb::Client) -> Result<(), Box<dyn Error>>{
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
-    docs_to_add.append(&mut index_database(client).await?);
+    docs_to_add.append(&mut index_database(db.clone()).await?);
     //docs_to_add.append(&mut index_curseforge(1, 400000).await?);
 
     //Write Indexes

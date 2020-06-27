@@ -224,8 +224,6 @@ function handleSearch(index) {
 
     if(input.value.length > 0) {
         queryString += "?q=" + encodeURIComponent(input.value).replace(/%20/g,'+');
-    } else {
-        queryString += "?q={}{}{}"
     }
 
     let filterString = "";

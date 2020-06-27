@@ -9,17 +9,25 @@ edition = "2018"
 [dependencies]
 actix-web = "2.0"
 actix-rt = "1.1.1"
-actix-files = "0.2.1"
+actix-files = "0.2.2"
+
+reqwest = "0.10.4"
+
+meilisearch-sdk = "0.1.4"
+
 handlebars = { version = "3.0.0", features = ["dir_source"] }
 serde_json = "1.0"
 serde = {version="1.0", features=["derive"]}
-meilisearch-sdk = "0.1.4"
-human_format = "1.0.3"
-reqwest = "0.10.4"
+
+dotenv = "0.15"
 log = "0.4.8"
 env_logger = "0.7.1"
+
 mongodb = "1.0.0"
 bson = "1.0.0"
+
 futures = "0.3.5"
-dotenv = "0.15"
+futures-timer = "3.0.2"
+
 pulldown-cmark = "0.7.1"
+human_format = "1.0.3"
