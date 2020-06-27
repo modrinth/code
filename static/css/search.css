@@ -119,7 +119,7 @@
 }
 
 .category-badge img {
-    height: 23px;
+    width: 23px;
 }
 
 .category-badge p {
@@ -294,10 +294,6 @@
     background-color: #1e2d44;
 }
 
-.forge-badge img {
-    width: 23px;
-}
-
 .fabric-badge {
     color: #585849;
     background-color: #fffdd0;
@@ -341,10 +337,6 @@
 .cursed-badge {
     color: white;
     background-color: var(--cursed-color);
-}
-
-.cursed-badge img {
-    margin-left: 5px;
 }
 
 .misc-badge {
