@@ -156,3 +156,47 @@ h1, h2, h3, h4, h5, h6 {
 .green {
     color: #69E781;
 }
+
+.info-popup {
+	z-index: 10;
+	position: absolute;
+	width: 500px;
+    background-color: var(--content-background);
+	color: var(--content-text);
+	border-radius: 5px;
+	border: 1px solid var(--content-text);
+	padding: 20px;
+	top: 50%;
+	left: 50%;
+	margin-right: -50%;
+	transform: translate(-50%, -50%);
+}
+
+.discord-button {
+	text-decoration: none;
+	border-radius: 5px;
+	padding: 5px;
+	font-weight: bold;
+	color: white;
+	background-color: var(--library-color);
+	margin-left: 50px;
+	margin-right: 5px;
+}
+
+.github-button {
+	text-decoration: none;
+	border-radius: 5px;
+	padding: 5px;
+	font-weight: bold;
+	color: white;
+	background-color: var(--magic-color);
+	margin-right: 5px;
+}
+
+.exit-button {
+	border-radius: 5px;
+	padding: 5px;
+	font-weight: bold;
+	color: white;
+	background-color: red;
+}
