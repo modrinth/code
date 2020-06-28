@@ -57,31 +57,11 @@
 
 @media (prefers-color-scheme: dark) {
 	[data-theme="light"] {
-		--background: #f3f2f0;
-		--highlight: #0b75d8;
-		--border: #a9a9a9;
-		--mod-bar: #fefefe;
-		--content-background: white;
-		--nav-background: #dfdfdf;
-		--content-text: black;
-		--header-text: black;
-		--white-text: white;
-		--muted: gray;
-		--forge-color: #1e2d44;
+
 	}
 
 	:root, [data-theme="dark"] {
-		--background: #1b1b1b;
-		--highlight: #0b75d8;
-		--border: #1d1d1d;
-		--mod-bar: #222222;
-		--content-background: rgb(34, 34, 34);
-		--nav-background: #252525;
-		--content-text: rgb(241, 241, 241);
-		--header-text: rgb(241, 241, 241);
-		--white-text: white;
-		--muted: gray;
-		--forge-color: white;
+
 	}
 }
 
