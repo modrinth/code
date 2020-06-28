@@ -17,6 +17,7 @@ use std::time::Duration;
 #[serde(rename_all = "camelCase")]
 struct Attachment {
     url: String,
+    thumbnail_url: String,
     is_default: bool,
 }
 
@@ -376,7 +377,8 @@ async fn index_curseforge(start_index: i32, end_index: i32) ->  Result<Vec<Searc
 
         if mod_attachments.is_empty() {
             mod_attachments.push(Attachment {
-                url: "".to_string(),
+                url: String::new(),
+                thumbnail_url: String::new(),
                 is_default: true,
             })
         }
@@ -387,6 +389,8 @@ async fn index_curseforge(start_index: i32, end_index: i32) ->  Result<Vec<Searc
             "None".to_string()
         };
 
+        let icon_url = mod_attachments[0].thumbnail_url.replace("/256/256/", "/64/64/");
+
         docs_to_add.push(SearchMod {
             mod_id: -curseforge_mod.id,
             author: (&curseforge_mod.authors[0].name).to_string(),
@@ -396,7 +400,7 @@ async fn index_curseforge(start_index: i32, end_index: i32) ->  Result<Vec<Searc
             versions: mod_game_versions.clone(),
             downloads: curseforge_mod.download_count as i32,
             page_url: curseforge_mod.website_url,
-            icon_url: (mod_attachments[0].url).to_string(),
+            icon_url,
             author_url: (&curseforge_mod.authors[0].url).to_string(),
             date_created: curseforge_mod.date_created.chars().take(10).collect(),
             created: curseforge_mod.date_created.chars().filter(|c| c.is_ascii_digit()).collect::<String>().parse()?,

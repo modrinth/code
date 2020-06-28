@@ -118,7 +118,8 @@
     user-select: none;
 }
 
-.category-badge img {
+.category-badge img, .category-badge svg {
+    height: 23px;
     width: 23px;
 }
 
@@ -159,8 +160,9 @@
     flex-wrap: wrap;
 }
 
-.mod-info img {
+.mod-info img, .mod-info svg {
     height: 12px;
+    width: 12px;
     padding: 0;
 }
 
@@ -169,7 +171,7 @@
     padding-right: 15px;
     white-space: nowrap;
 }
-.mod-info > span > img {
+.mod-info > span > img, .mod-info > span > svg {
     padding-right: 5px;
     vertical-align: top;
 }
@@ -178,7 +180,7 @@
     white-space: nowrap;
     display: inline-block;
 }
-.loader-icons img {
+.loader-icons img, .loader-icons svg {
     padding-right: 5px;
 }
 
@@ -274,8 +276,9 @@
     width: 155px;
 }
 
-.result-badge img {
+.result-badge img, .result-badge svg {
     height: 23px;
+    width: 23px;
 }
 
 .result-badge p {
@@ -360,8 +363,9 @@
     background-color: var(--equipment-color);
 }
 
-.forge {
-	height: 12px;
+svg.forge {
+    height: 12px;
+    width: auto;
 	fill: var(--forge-color);
 }
 
