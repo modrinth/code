@@ -1,12 +1,15 @@
 use actix_web::{get, web, HttpResponse};
-use handlebars::*;
+use serde_json::json;
 
 #[get("/")]
-pub async fn index_get(hb: web::Data<Handlebars<'_>>) -> HttpResponse {
+pub async fn index_get() -> HttpResponse {
     let data = json!({
-        "name": "Handlebars"
+        "name": "modrinth-labrinth",
+        "version": env!("CARGO_PKG_VERSION"),
+        //TODO: Add the documentation link
+        "documentation": "Nowhere yet",
+        "about": "Welcome traveler !"
     });
-    let body = hb.render("index", &data).unwrap();
 
-    HttpResponse::Ok().body(body)
+    HttpResponse::Ok().json(data)
 }

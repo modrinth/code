@@ -1,10 +1,9 @@
-name: Rust
+name: Rust building
 
 on:
   push:
     branches: [ master ]
   pull_request:
-    branches: [ master ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -16,7 +15,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: cargo test --verbose
+      - name: Get build cache
+        id: cache-build
+        uses: actions/cache@v2
+        with:
+          path: target/**
+          key: ${{ runner.os }}-build-cache
+      - name: Install toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - uses: actions-rs/cargo@v1
+        name: Build program
+        with:
+          command: build

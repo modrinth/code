@@ -1,40 +1,40 @@
-#[macro_use]
-extern crate serde_json;
-
-#[macro_use]
-extern crate bson;
-
-#[macro_use]
-extern crate log;
-
-use actix_files as fs;
-use actix_web::{web, App, HttpServer};
-use handlebars::*;
+use crate::search::indexing::index_mods;
 use actix_web::middleware::Logger;
+use actix_web::{web, App, HttpServer};
 use env_logger::Env;
+use log::info;
 use std::env;
+use std::fs::File;
 
 mod database;
-mod helpers;
+mod models;
 mod routes;
+mod search;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     env_logger::from_env(Env::default().default_filter_or("info")).init();
     dotenv::dotenv().ok();
 
-    //Handlebars
-    let mut handlebars = Handlebars::new();
-
-    helpers::register_helpers(&mut handlebars);
-    handlebars
-        .register_templates_directory(".hbs", "./templates")
-        .unwrap();
-
-    let handlebars_ref = web::Data::new(handlebars);
-
     let client = database::connect().await.unwrap();
-    routes::index_mods(client).await.unwrap();
+
+    // Get executable path
+    let mut exe_path = env::current_exe()?.parent().unwrap().to_path_buf();
+    // Create the path to the index lock file
+    exe_path.push("index.v1.lock");
+
+    //Indexing mods if not already done
+    if env::args().any(|x| x == "regen") {
+        // User forced regen of indexing
+        info!("Forced regeneration of indexes!");
+        index_mods(client).await.unwrap();
+    } else if exe_path.exists() {
+        // The indexes were not created, or the version was upgraded
+        info!("Indexing of mods for first time...");
+        index_mods(client).await.unwrap();
+        // Create the lock file
+        File::create(exe_path)?;
+    }
 
     info!("Starting Actix HTTP server!");
 
@@ -43,15 +43,11 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
-            .app_data(handlebars_ref.clone())
-            .service(fs::Files::new("/static", "./static").show_files_listing())
             .service(routes::index_get)
-            .service(routes::search_post)
-            .service(routes::search_get)
-            .service(routes::mod_page_get)
-            .service(routes::mod_create_get)
+            .service(routes::mod_search)
+            .default_service(web::get().to(routes::not_found))
     })
-    .bind("127.0.0.1:8000")?
+    .bind("127.0.0.1:".to_string() + &dotenv::var("PORT").unwrap())?
     .run()
     .await
 }
