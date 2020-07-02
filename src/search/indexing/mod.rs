@@ -2,7 +2,6 @@
 pub mod curseforge_import;
 pub mod local_import;
 
-use crate::database::DatabaseError;
 use crate::search::indexing::curseforge_import::index_curseforge;
 use crate::search::indexing::local_import::index_local;
 use crate::search::{SearchError, SearchMod};

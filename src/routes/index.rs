@@ -1,4 +1,4 @@
-use actix_web::{get, web, HttpResponse};
+use actix_web::{get, HttpResponse};
 use serde_json::json;
 
 #[get("/")]

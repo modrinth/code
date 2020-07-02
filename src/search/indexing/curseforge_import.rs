@@ -65,10 +65,7 @@ pub async fn index_curseforge(
     let text = &res.text().await?;
     let curseforge_mods: Vec<CurseForgeMod> = serde_json::from_str(text)?;
 
-    let mut max_index = 0;
-
     for curseforge_mod in curseforge_mods {
-        max_index = curseforge_mod.id;
         if curseforge_mod.game_slug != "minecraft"
             || !curseforge_mod.website_url.contains("/mc-mods/")
         {

@@ -37,3 +37,7 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: test
+        env:
+          BACKBLAZE_BUCKET_ID: ${{ secrets.BACKBLAZE_BUCKET_ID }}
+          BACKBLAZE_KEY: ${{ secrets.BACKBLAZE_KEY }}
+          BACKBLAZE_KEY_ID: ${{ secrets.BACKBLAZE_KEY_ID }}

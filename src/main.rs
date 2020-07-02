@@ -7,6 +7,7 @@ use std::env;
 use std::fs::File;
 
 mod database;
+mod file_hosting;
 mod models;
 mod routes;
 mod search;

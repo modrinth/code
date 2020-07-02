@@ -1,5 +1,5 @@
 [package]
-name = "fabricate"
+name = "modrinth"
 version = "0.1.0"
 #Team members, please add your emails and usernames
 authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "cfanoulis"]
@@ -12,7 +12,7 @@ actix-web = "2.0"
 actix-rt = "1.1.1"
 actix-files = "0.2.2"
 
-reqwest = "0.10.4"
+reqwest = {version="0.10.6", features=["json"]}
 
 meilisearch-sdk = "0.1.4"
 
@@ -33,3 +33,6 @@ async-trait = "0.1.36"
 
 futures = "0.3.5"
 futures-timer = "3.0.2"
+
+base64 = "0.12.3"
+sha1 = {version="0.6.0", features=["std"]}
