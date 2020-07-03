@@ -18,10 +18,8 @@ pub use delete::DeleteFileData;
 
 #[derive(Error, Debug)]
 pub enum FileHostingError {
-    #[error("Error while accessing the data from remote")]
-    RemoteWebsiteError(#[from] reqwest::Error),
-    #[error("Error while serializing or deserializing JSON")]
-    SerDeError(#[from] serde_json::Error),
+    #[error("Error while accessing the data from backblaze")]
+    BackblazeError(#[from] reqwest::Error),
 }
 
 #[cfg(test)]

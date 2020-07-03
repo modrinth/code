@@ -17,7 +17,11 @@ async fn main() -> std::io::Result<()> {
     env_logger::from_env(Env::default().default_filter_or("info")).init();
     dotenv::dotenv().ok();
 
-    let client = database::connect().await.unwrap();
+    check_env_vars();
+
+    let client = database::connect()
+        .await
+        .expect("Database connection failed");
 
     // Get executable path
     let mut exe_path = env::current_exe()?.parent().unwrap().to_path_buf();
@@ -28,11 +32,11 @@ async fn main() -> std::io::Result<()> {
     if env::args().any(|x| x == "regen") {
         // User forced regen of indexing
         info!("Forced regeneration of indexes!");
-        index_mods(client).await.unwrap();
-    } else if exe_path.exists() {
+        index_mods(client).await.expect("Mod indexing failed");
+    } else if !exe_path.exists() {
         // The indexes were not created, or the version was upgraded
         info!("Indexing of mods for first time...");
-        index_mods(client).await.unwrap();
+        index_mods(client).await.expect("Mod indexing failed");
         // Create the lock file
         File::create(exe_path)?;
     }
@@ -48,7 +52,32 @@ async fn main() -> std::io::Result<()> {
             .service(routes::mod_search)
             .default_service(web::get().to(routes::not_found))
     })
-    .bind("127.0.0.1:".to_string() + &dotenv::var("PORT").unwrap())?
+    .bind(dotenv::var("BIND_ADDR").unwrap())?
     .run()
     .await
+}
+
+// This is so that env vars not used immediately don't panic at runtime
+fn check_env_vars() {
+    fn check_var<T: std::str::FromStr>(var: &str) {
+        if dotenv::var(var)
+            .ok()
+            .and_then(|s| s.parse::<T>().ok())
+            .is_none()
+        {
+            log::warn!(
+                "Variable `{}` missing in dotenv or not of type `{}`",
+                var,
+                std::any::type_name::<T>()
+            )
+        }
+    }
+    check_var::<bool>("INDEX_CURSEFORGE");
+    check_var::<String>("MONGODB_ADDR");
+    check_var::<String>("MEILISEARCH_ADDR");
+    check_var::<String>("BIND_ADDR");
+
+    check_var::<String>("BACKBLAZE_KEY_ID");
+    check_var::<String>("BACKBLAZE_KEY");
+    check_var::<String>("BACKBLAZE_BUCKET_ID");
 }

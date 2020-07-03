@@ -60,7 +60,7 @@ pub struct Base62Id(pub u64);
 #[derive(Error, Debug)]
 pub enum DecodingError {
     /// Encountered a non base62 character in base62 string
-    #[error("Invalid character `{0:?}` in base62 encoding")]
+    #[error("Invalid character {0:?} in base62 encoding")]
     InvalidBase62(char),
     /// Encountered integer overflow when decoding a base62 id.
     #[error("Base62 decoding overflowed")]

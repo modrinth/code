@@ -1,4 +1,5 @@
-use crate::search::{SearchError, SearchMod};
+use super::IndexingError;
+use crate::search::SearchMod;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -47,7 +48,7 @@ pub struct CurseForgeMod {
 pub async fn index_curseforge(
     start_index: i32,
     end_index: i32,
-) -> Result<Vec<SearchMod>, SearchError> {
+) -> Result<Vec<SearchMod>, IndexingError> {
     info!("Indexing curseforge mods!");
 
     let mut docs_to_add: Vec<SearchMod> = vec![];
@@ -60,10 +61,13 @@ pub async fn index_curseforge(
             (start_index..end_index).collect::<Vec<_>>()
         ))
         .send()
-        .await?;
+        .await
+        .map_err(IndexingError::CurseforgeImportError)?;
 
-    let text = &res.text().await?;
-    let curseforge_mods: Vec<CurseForgeMod> = serde_json::from_str(text)?;
+    let curseforge_mods: Vec<CurseForgeMod> = res
+        .json()
+        .await
+        .map_err(IndexingError::CurseforgeImportError)?;
 
     for curseforge_mod in curseforge_mods {
         if curseforge_mod.game_slug != "minecraft"
@@ -78,15 +82,14 @@ pub async fn index_curseforge(
         let mut using_fabric = false;
 
         for version in curseforge_mod.game_version_latest_files {
-            let version_number: String = version
+            if let Some(parsed) = version
                 .game_version
-                .chars()
-                .skip(2)
-                .take(version.game_version.len())
-                .collect();
-
-            if version_number.parse::<f32>()? < 14.0 {
-                using_forge = true;
+                .get(2..)
+                .and_then(|f| f.parse::<f32>().ok())
+            {
+                if parsed < 14.0 {
+                    using_forge = true;
+                }
             }
 
             mod_game_versions.push(version.game_version);
@@ -188,17 +191,13 @@ pub async fn index_curseforge(
             date_created: curseforge_mod.date_created.chars().take(10).collect(),
             created: curseforge_mod
                 .date_created
-                .chars()
-                .filter(|c| c.is_ascii_digit())
-                .collect::<String>()
-                .parse()?,
+                .parse::<chrono::DateTime<chrono::Utc>>()?
+                .timestamp(),
             date_modified: curseforge_mod.date_modified.chars().take(10).collect(),
             updated: curseforge_mod
                 .date_modified
-                .chars()
-                .filter(|c| c.is_ascii_digit())
-                .collect::<String>()
-                .parse()?,
+                .parse::<chrono::DateTime<chrono::Utc>>()?
+                .timestamp(),
             latest_version,
             empty: String::from("{}{}{}"),
         })
