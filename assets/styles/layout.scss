@@ -1,0 +1,9 @@
+.columns {
+  display: flex;
+
+  @for $i from 1 through 4 {
+    .column-grow-#{$i} {
+      flex-grow: $i;
+    }
+  }
+}

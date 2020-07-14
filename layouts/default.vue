@@ -2,135 +2,120 @@
   <div class="layout">
     <aside>
       <div class="logo-wrapper">
-        <g-image class="logo" src="~/assets/images/logo.png"/>
+        <img class="logo" src="~/assets/images/logo.png" />
       </div>
       <nav>
         <section class="links">
           <h3>Projects</h3>
           <section>
-            <g-link to="/mods">
+            <nuxt-link to="/modpacks">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round">
-                <polyline points="16 18 22 12 16 6"/>
-                <polyline points="8 6 2 12 8 18"/>
-              </svg>
-              <span>Mods</span>
-            </g-link>
-            <g-link to="/modpacks">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/>
-                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96"/>
-                <line x1="12" y1="22.08" x2="12" y2="12"/>
+                stroke-linejoin="round"
+              >
+                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
+                <path
+                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                />
+                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                <line x1="12" y1="22.08" x2="12" y2="12" />
               </svg>
               <span>
                 Modpacks
               </span>
-            </g-link>
+            </nuxt-link>
+            <nuxt-link to="/mods">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="16 18 22 12 16 6" />
+                <polyline points="8 6 2 12 8 18" />
+              </svg>
+              <span>Mods</span>
+            </nuxt-link>
           </section>
 
           <h3>Community</h3>
           <section>
-            <g-link to="/forums">
+            <nuxt-link to="/support">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-              </svg>
-              <span>Forums</span>
-            </g-link>
-            <g-link to="/support">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"/>
-                <circle cx="12" cy="12" r="4"/>
-                <line x1="4.93" y1="4.93" x2="9.17" y2="9.17"/>
-                <line x1="14.83" y1="14.83" x2="19.07" y2="19.07"/>
-                <line x1="14.83" y1="9.17" x2="18.36" y2="5.64"/>
-                <line x1="4.93" y1="19.07" x2="9.17" y2="14.83"/>
+                stroke-linejoin="round"
+              >
+                <circle cx="12" cy="12" r="10" />
+                <circle cx="12" cy="12" r="4" />
+                <line x1="4.93" y1="4.93" x2="9.17" y2="9.17" />
+                <line x1="14.83" y1="14.83" x2="19.07" y2="19.07" />
+                <line x1="14.83" y1="9.17" x2="18.36" y2="5.64" />
+                <line x1="4.93" y1="19.07" x2="9.17" y2="14.83" />
               </svg>
               <span>Support</span>
-            </g-link>
-            <g-link to="/guides">
+            </nuxt-link>
+            <nuxt-link to="/guides">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                stroke-linejoin="round"
+              >
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
               <span>Guides</span>
-            </g-link>
+            </nuxt-link>
           </section>
 
           <h3>Dashboard</h3>
           <section>
-            <g-link to="/dashboard/projects">
+            <nuxt-link to="/dashboard/projects">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round">
-                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
+                />
               </svg>
               <span>My projects</span>
-            </g-link>
-            <g-link to="/dashboard/analytics">
+            </nuxt-link>
+            <nuxt-link to="/dashboard/analytics">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 stroke-width="2"
                 stroke-linecap="round"
-                stroke-linejoin="round">
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                stroke-linejoin="round"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
               </svg>
               <span>Analytics</span>
-            </g-link>
-            <g-link to="/dashboard/rewards">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round">
-                <circle cx="12" cy="8" r="7"/>
-                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/>
-              </svg>
-              <span>Rewards</span>
-            </g-link>
+            </nuxt-link>
           </section>
         </section>
 
         <section class="user-actions">
           <div class="avatar">
-            <g-image src="~/assets/images/avatar.jpg"/>
+            <img src="~/assets/images/avatar.jpg" />
             <span>
               falseresync
             </span>
@@ -142,9 +127,10 @@
               stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
-              stroke-linejoin="round">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+              stroke-linejoin="round"
+            >
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
           </div>
         </section>
@@ -168,61 +154,12 @@
         </div>
       </header> -->
 
-      <div class="content">
-        <slot/>
-      </div>
+      <nuxt />
     </main>
   </div>
 </template>
 
 <style lang="scss">
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-
-:root {
-  /**
-    * Colors
-   */
-  --color-text: #1A202C;
-  --color-bg: #FFFFFF;
-
-  --color-text-inverted: var(--color-bg);
-  --color-bg-inverted: var(--color-text);
-
-  --color-brand: #4D9227;
-
-  --color-grey-0: #F7FAFC;
-  --color-grey-1: #EDF2F7;
-  --color-grey-2: #E2E8F0;
-  --color-grey-3: #CBD5E0;
-  --color-grey-4: #A0AEC0;
-  --color-grey-5: #718096;
-  --color-grey-6: #4A5568;
-  --color-grey-7: #2D3748;
-
-  /**
-    * Defaults
-   */
-  font-size: 18px;
-}
-
-body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  margin: 0;
-  padding: 0;
-}
-
-svg {
-  height: 24px;
-  width: 24px;
-}
-
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 .layout {
   display: flex;
   min-height: 100vh;
@@ -232,7 +169,7 @@ a {
     border-right: 1px solid var(--color-grey-2);
     display: flex; // Flex here to safely expand navigation height
     flex-direction: column;
-    width: 15%;
+    min-width: 15%;
 
     .logo-wrapper {
       align-items: center;
@@ -282,12 +219,12 @@ a {
 
             &:hover,
             &:focus,
-            &.active {
+            &.nuxt-link-active {
               background-color: var(--color-grey-1);
               color: var(--color-text);
             }
 
-            &.active {
+            &.nuxt-link-active {
               box-shadow: -4px 0 0 0 var(--color-brand);
             }
 
@@ -302,7 +239,6 @@ a {
           }
         }
       }
-
       .user-actions {
         align-items: center;
         border-top: 2px solid var(--color-grey-2);
@@ -337,7 +273,6 @@ a {
       }
     }
   }
-
   main {
     background-color: var(--color-grey-0);
     flex-grow: 1;

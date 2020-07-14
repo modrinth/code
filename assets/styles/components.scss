@@ -1,0 +1,46 @@
+// Here lies 𝖄𝖊 𝕸𝖆𝖗𝖌𝖎𝖓 𝕸𝖆𝖌𝖎𝖈
+// which allows to have just one wrapper div
+.iconified-input {
+  align-items: center;
+  display: inline-flex;
+  flex-direction: row-reverse;
+
+  input {
+    padding-left: 2.5rem;
+
+    &:hover {
+      &+svg {
+        color: var(--color-grey-6);
+      }
+    }
+
+    &:focus {
+      &+svg {
+        color: var(--color-text);
+      }
+    }
+  }
+
+  svg {
+    color: var(--color-grey-5);
+    margin-right: -2rem;
+  }
+}
+
+.badge {
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: bold;
+  letter-spacing: 0.02rem;
+  padding: 0.25rem 0.5rem;
+
+  &.red {
+    background-color: #fed7d7;
+    color: #9b2c2c;
+  }
+
+  &.green {
+    background-color: #c6f6d5;
+    color: #276749;
+  }
+}
