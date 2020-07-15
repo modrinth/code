@@ -26,6 +26,11 @@ pub enum IndexingError {
     EnvError(#[from] dotenv::Error),
 }
 
+// The chunk size for adding mods to the indexing database. If the request size
+// is too large (>10MiB) then the request fails with an error.  This chunk size
+// assumes a max average size of 1KiB per mod to avoid this cap.
+const MEILISEARCH_CHUNK_SIZE: usize = 10000;
+
 pub async fn index_mods(db: mongodb::Client) -> Result<(), IndexingError> {
     // Check if the index exists
     let address = &*dotenv::var("MEILISEARCH_ADDR")?;
@@ -53,9 +58,14 @@ pub async fn index_mods(db: mongodb::Client) -> Result<(), IndexingError> {
     relevance_index
         .set_settings(&default_settings().with_ranking_rules(relevance_rules.into()))
         .map_err(IndexingError::IndexDBError)?;
-    relevance_index
-        .add_documents(docs_to_add.clone(), Some("mod_id"))
-        .map_err(IndexingError::IndexDBError)?;
+
+    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
+        // TODO: get meilisearch sdk to not require cloning (ie take a reference to docs_to_add)
+        // This may require making our own fork of it.
+        relevance_index
+            .add_documents(Vec::from(chunk), Some("mod_id"))
+            .map_err(IndexingError::IndexDBError)?;
+    }
 
     //Downloads Index
     let mut downloads_index = client
@@ -68,9 +78,12 @@ pub async fn index_mods(db: mongodb::Client) -> Result<(), IndexingError> {
     downloads_index
         .set_settings(&default_settings().with_ranking_rules(downloads_rules.into()))
         .map_err(IndexingError::IndexDBError)?;
-    downloads_index
-        .add_documents(docs_to_add.clone(), Some("mod_id"))
-        .map_err(IndexingError::IndexDBError)?;
+
+    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
+        downloads_index
+            .add_documents(Vec::from(chunk), Some("mod_id"))
+            .map_err(IndexingError::IndexDBError)?;
+    }
 
     //Updated Index
     let mut updated_index = client
@@ -83,9 +96,12 @@ pub async fn index_mods(db: mongodb::Client) -> Result<(), IndexingError> {
     updated_index
         .set_settings(&default_settings().with_ranking_rules(updated_rules.into()))
         .map_err(IndexingError::IndexDBError)?;
-    updated_index
-        .add_documents(docs_to_add.clone(), Some("mod_id"))
-        .map_err(IndexingError::IndexDBError)?;
+
+    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
+        updated_index
+            .add_documents(Vec::from(chunk), Some("mod_id"))
+            .map_err(IndexingError::IndexDBError)?;
+    }
 
     //Created Index
     let mut newest_index = client
@@ -98,9 +114,12 @@ pub async fn index_mods(db: mongodb::Client) -> Result<(), IndexingError> {
     newest_index
         .set_settings(&default_settings().with_ranking_rules(newest_rules.into()))
         .map_err(IndexingError::IndexDBError)?;
-    newest_index
-        .add_documents(docs_to_add.clone(), Some("mod_id"))
-        .map_err(IndexingError::IndexDBError)?;
+
+    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
+        newest_index
+            .add_documents(Vec::from(chunk), Some("mod_id"))
+            .map_err(IndexingError::IndexDBError)?;
+    }
 
     Ok(())
 }
