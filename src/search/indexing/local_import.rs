@@ -41,16 +41,22 @@ pub async fn index_local(client: mongodb::Client) -> Result<Vec<SearchMod>, Inde
             mod_game_versions.append(&mut version.game_versions);
         }
 
+        let mut icon_url = "".to_string();
+
+        if let Some(url) = result.icon_url {
+            icon_url = url;
+        }
+
         docs_to_add.push(SearchMod {
             mod_id: result.id,
-            author: result.author,
+            author: "".to_string(),
             title: result.title,
             description: result.description,
             keywords: result.categories,
             versions: mod_game_versions,
             downloads: result.downloads,
             page_url: "".to_string(),
-            icon_url: result.icon_path,
+            icon_url,
             author_url: "".to_string(),
             date_created: "".to_string(),
             created: 0,

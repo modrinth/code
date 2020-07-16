@@ -84,12 +84,27 @@ macro_rules! from_base62id {
     };
 }
 
-from_base62id! {
-    ModId, ModId;
-    UserId, UserId;
-    VersionId, VersionId;
-    TeamId, TeamId;
+macro_rules! impl_base62_display {
+    ($struct:ty) => {
+        impl std::fmt::Display for $struct {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                f.write_str(&base62_impl::to_base62(self.0))
+            }
+        }
+    };
 }
+impl_base62_display!(Base62Id);
+
+macro_rules! base62_id_impl {
+    ($struct:ty, $cons:expr) => {
+        from_base62id!($struct, $cons;);
+        impl_base62_display!($struct);
+    }
+}
+base62_id_impl!(ModId, ModId);
+base62_id_impl!(UserId, UserId);
+base62_id_impl!(VersionId, VersionId);
+base62_id_impl!(TeamId, TeamId);
 
 pub mod base62_impl {
     use serde::de::{self, Deserializer, Visitor};

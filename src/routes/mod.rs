@@ -1,4 +1,5 @@
 mod index;
+mod mod_creation;
 mod mods;
 mod not_found;
 

@@ -19,9 +19,28 @@ async fn main() -> std::io::Result<()> {
 
     check_env_vars();
 
+    //Database Connecter
     let client = database::connect()
         .await
         .expect("Database connection failed");
+    let client_ref = web::Data::new(client.clone());
+
+    //File Hosting Initializer
+    let authorization_data = file_hosting::authorize_account(
+        dotenv::var("BACKBLAZE_KEY_ID").unwrap(),
+        dotenv::var("BACKBLAZE_KEY").unwrap(),
+    )
+    .await
+    .unwrap();
+    let upload_url_data = file_hosting::get_upload_url(
+        authorization_data.clone(),
+        dotenv::var("BACKBLAZE_BUCKET_ID").unwrap(),
+    )
+    .await
+    .unwrap();
+
+    let authorization_data_ref = web::Data::new(authorization_data);
+    let upload_url_data_ref = web::Data::new(upload_url_data);
 
     // Get executable path
     let mut exe_path = env::current_exe()?.parent().unwrap().to_path_buf();
@@ -48,6 +67,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
+            .data(client_ref.clone())
+            .data(authorization_data_ref.clone())
+            .data(upload_url_data_ref.clone())
             .service(routes::index_get)
             .service(routes::mod_search)
             .default_service(web::get().to(routes::not_found))

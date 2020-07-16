@@ -24,7 +24,7 @@ pub struct AuthorizationData {
     pub recommended_part_size: i32,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct UploadUrlData {
     pub bucket_id: String,

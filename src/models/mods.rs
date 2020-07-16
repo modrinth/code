@@ -24,11 +24,12 @@ pub struct Mod {
     // unnecessary info
     /// The team of people that has ownership of this mod.
     pub team: Team,
-
     /// The title or name of the mod.
     pub title: String,
     /// A short description of the mod.
     pub description: String,
+    /// The link to the long description of the mod.
+    pub body_url: String,
     /// The date at which the mod was first published.
     pub published: DateTime<Utc>,
 
@@ -38,10 +39,8 @@ pub struct Mod {
     pub categories: Vec<String>,
     /// A list of ids for versions of the mod.
     pub versions: Vec<VersionId>,
-
-    /// The latest version of the mod.
-    pub latest_version: Version,
-
+    ///The URL of the icon of the mod
+    pub icon_url: Option<String>,
     /// An optional link to where to submit bugs or issues with the mod.
     pub issues_url: Option<String>,
     /// An optional link to the source code for the mod.
@@ -60,6 +59,8 @@ pub struct Version {
 
     /// The name of this version
     pub name: String,
+    /// The version number. Ideally will follow semantic versioning
+    pub version_number: String,
     /// A link to the changelog for this version of the mod.
     pub changelog_url: Option<String>,
     /// The date that this version was published.
@@ -72,9 +73,11 @@ pub struct Version {
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
     /// A list of mods that this version depends on.
-    pub dependencies: Vec<ModId>,
+    pub dependencies: Vec<VersionId>,
     /// A list of versions of Minecraft that this version of the mod supports.
     pub game_versions: Vec<GameVersion>,
+    /// The loaders that this version works on
+    pub loaders: Vec<ModLoader>,
 }
 
 /// A single mod file, with a url for the file and the file's hash
@@ -96,17 +99,33 @@ pub struct FileHash {
     pub hash: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub enum VersionType {
     Release,
     Beta,
     Alpha,
 }
 
+impl ToString for VersionType {
+    fn to_string(&self) -> String {
+        match self {
+            VersionType::Release => "release",
+            VersionType::Beta => "beta",
+            VersionType::Alpha => "alpha",
+        }
+        .to_string()
+    }
+}
+
 /// A specific version of Minecraft
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 #[serde(transparent)]
 pub struct GameVersion(pub String);
+
+/// A mod loader
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(transparent)]
+pub struct ModLoader(pub String);
 
 #[derive(Serialize, Deserialize)]
 pub struct SearchRequest {

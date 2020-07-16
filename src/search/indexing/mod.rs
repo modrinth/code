@@ -43,7 +43,7 @@ pub async fn index_mods(db: mongodb::Client) -> Result<(), IndexingError> {
         .parse()
         .expect("`INDEX_CURSEFORGE` is not a boolean.")
     {
-        docs_to_add.append(&mut index_curseforge(1, 400000).await?);
+        docs_to_add.append(&mut index_curseforge(1, 400_000).await?);
     }
     //Write Indexes
     //Relevance Index

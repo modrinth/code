@@ -28,6 +28,7 @@ mod tests {
 
     #[actix_rt::test]
     async fn test_authorization() {
+        println!("{}", dotenv::var("BACKBLAZE_BUCKET_ID").unwrap());
         let authorization_data = authorize_account(
             dotenv::var("BACKBLAZE_KEY_ID").unwrap(),
             dotenv::var("BACKBLAZE_KEY").unwrap(),
