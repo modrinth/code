@@ -18,8 +18,20 @@ pub use delete::DeleteFileData;
 
 #[derive(Error, Debug)]
 pub enum FileHostingError {
+    #[cfg(feature = "backblaze")]
     #[error("Error while accessing the data from backblaze")]
-    BackblazeError(#[from] reqwest::Error),
+    HttpError(#[from] reqwest::Error),
+
+    #[cfg(feature = "backblaze")]
+    #[error("Backblaze error: {0}")]
+    BackblazeError(serde_json::Value),
+
+    #[cfg(not(feature = "backblaze"))]
+    #[error("File system error in file hosting: {0}")]
+    FileSystemError(#[from] std::io::Error),
+    #[cfg(not(feature = "backblaze"))]
+    #[error("Invalid Filename")]
+    InvalidFilename,
 }
 
 #[cfg(test)]
@@ -59,18 +71,18 @@ mod tests {
         .await
         .unwrap();
         let upload_data = upload_file(
-            upload_url_data,
-            "text/plain".to_string(),
-            "test.txt".to_string(),
+            &upload_url_data,
+            "text/plain",
+            "test.txt",
             "test file".to_string().into_bytes(),
         )
         .await
         .unwrap();
 
         delete_file_version(
-            authorization_data,
-            upload_data.file_id,
-            upload_data.file_name,
+            &authorization_data,
+            &upload_data.file_id,
+            &upload_data.file_name,
         )
         .await
         .unwrap();

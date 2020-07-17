@@ -26,14 +26,16 @@ pub enum CreateError {
     MultipartError(actix_multipart::MultipartError),
     #[error("Error while parsing JSON")]
     SerDeError(#[from] serde_json::Error),
+    #[error("Error while serializing BSON")]
+    BsonError(#[from] bson::ser::Error),
     #[error("Error while uploading file")]
     FileHostingError(#[from] FileHostingError),
-    #[error("Error while parsing string as UTF-8")]
-    InvalidUtf8Input(#[source] std::string::FromUtf8Error),
     #[error("{}", .0)]
     MissingValueError(String),
     #[error("Error while trying to generate random ID")]
     RandomIdError,
+    #[error("Invalid format for mod icon: {0}")]
+    InvalidIconFormat(String),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -42,10 +44,11 @@ impl actix_web::ResponseError for CreateError {
             CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::BsonError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::SerDeError(..) => StatusCode::BAD_REQUEST,
             CreateError::MultipartError(..) => StatusCode::BAD_REQUEST,
-            CreateError::InvalidUtf8Input(..) => StatusCode::BAD_REQUEST,
             CreateError::MissingValueError(..) => StatusCode::BAD_REQUEST,
+            CreateError::InvalidIconFormat(..) => StatusCode::BAD_REQUEST,
             CreateError::RandomIdError => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -56,11 +59,12 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::EnvError(..) => "environment_error",
                 CreateError::DatabaseError(..) => "database_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
+                CreateError::BsonError(..) => "database_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",
-                CreateError::InvalidUtf8Input(..) => "invalid_input",
                 CreateError::MissingValueError(..) => "invalid_input",
                 CreateError::RandomIdError => "id_generation_error",
+                CreateError::InvalidIconFormat(..) => "invalid_input",
             },
             description: &self.to_string(),
         })
@@ -158,33 +162,30 @@ pub async fn mod_create(
                 mod_create_data = Some(serde_json::from_slice(&data)?);
             } else {
                 let file_name = content_disposition.get_filename().ok_or_else(|| {
-                    CreateError::MissingValueError("Missing content file name!".to_string())
+                    CreateError::MissingValueError("Missing content file name".to_string())
                 })?;
-                let file_extension = String::from_utf8(
-                    content_disposition
-                        .get_filename_ext()
-                        .ok_or_else(|| {
-                            CreateError::MissingValueError("Missing file extension!".to_string())
-                        })?
-                        .clone()
-                        .value,
-                )
-                .map_err(CreateError::InvalidUtf8Input)?;
+                let file_extension = if let Some(last_period) = file_name.rfind('.') {
+                    file_name.get(last_period + 1..).unwrap_or("")
+                } else {
+                    return Err(CreateError::MissingValueError(
+                        "Missing content file extension".to_string(),
+                    ));
+                };
 
                 if let Some(create_data) = &mod_create_data {
                     if name == "icon" {
                         if let Some(ext) = get_image_content_type(file_extension) {
                             let upload_data = upload_file(
-                                upload_url.get_ref().clone(),
+                                upload_url.get_ref(),
                                 ext,
-                                format!("mods/icons/{}/{}", mod_id.0, file_name),
+                                &format!("mods/icons/{}/{}", mod_id, file_name),
                                 data.to_vec(),
                             )
                             .await?;
 
                             icon_url = format!("{}/{}", cdn_url, upload_data.file_name);
                         } else {
-                            panic!("Invalid Icon Format!");
+                            return Err(CreateError::InvalidIconFormat(file_extension.to_string()));
                         }
                     } else if &*file_extension == "jar" {
                         let initial_version_data = create_data
@@ -210,9 +211,9 @@ pub async fn mod_create(
                             match created_version_filter.next() {
                                 Some(created_version) => {
                                     let upload_data = upload_file(
-                                        upload_url.get_ref().clone(),
-                                        "application/java-archive".to_string(),
-                                        format!(
+                                        upload_url.get_ref(),
+                                        "application/java-archive",
+                                        &format!(
                                             "{}/{}/{}",
                                             create_data.mod_namespace.replace(".", "/"),
                                             version_data.version_number,
@@ -258,21 +259,21 @@ pub async fn mod_create(
 
                                     let body_url = format!(
                                         "data/{}/changelogs/{}/body.md",
-                                        mod_id.0, version_id.0
+                                        mod_id, version_id
                                     );
 
                                     upload_file(
-                                        upload_url.get_ref().clone(),
-                                        "text/plain".to_string(),
-                                        body_url.clone(),
+                                        upload_url.get_ref(),
+                                        "text/plain",
+                                        &body_url,
                                         version_data.version_body.into_bytes(),
                                     )
                                     .await?;
 
                                     let upload_data = upload_file(
-                                        upload_url.get_ref().clone(),
-                                        "application/java-archive".to_string(),
-                                        format!(
+                                        upload_url.get_ref(),
+                                        "application/java-archive",
+                                        &format!(
                                             "{}/{}/{}",
                                             create_data.mod_namespace.replace(".", "/"),
                                             version_data.version_number,
@@ -340,12 +341,12 @@ pub async fn mod_create(
     }
 
     if let Some(create_data) = mod_create_data {
-        let body_url = format!("data/{}/body.md", mod_id.0);
+        let body_url = format!("data/{}/body.md", mod_id);
 
         upload_file(
-            upload_url.get_ref().clone(),
-            "text/plain".to_string(),
-            body_url.clone(),
+            upload_url.get_ref(),
+            "text/plain",
+            &body_url,
             create_data.mod_body.into_bytes(),
         )
         .await?;
@@ -380,8 +381,7 @@ pub async fn mod_create(
             wiki_url: create_data.wiki_url,
         };
 
-        let serialized_mod = serde_json::to_string(&created_mod)?;
-        let document = Bson::from(serialized_mod)
+        let document = bson::to_bson(&created_mod)?
             .as_document()
             .ok_or_else(|| {
                 CreateError::MissingValueError(
@@ -396,7 +396,7 @@ pub async fn mod_create(
     Ok(HttpResponse::Ok().into())
 }
 
-fn get_image_content_type(extension: String) -> Option<String> {
+fn get_image_content_type(extension: &str) -> Option<&'static str> {
     let content_type = match &*extension {
         "bmp" => "image/bmp",
         "gif" => "image/gif",
@@ -409,7 +409,7 @@ fn get_image_content_type(extension: String) -> Option<String> {
     };
 
     if content_type != "" {
-        Some(content_type.to_string())
+        Some(content_type)
     } else {
         None
     }
