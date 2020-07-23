@@ -2,20 +2,27 @@ name: Unit Tests
 
 on:
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
+
+env:
+  CARGO_TERM_COLOR: always
+  SQLX_OFFLINE: true
 
 jobs:
   test:
     name: ${{ matrix.os }}-rust-${{ matrix.rust }}
     runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.continue-on-error }}
     strategy:
       matrix:
         os: [ubuntu-latest]
-        rust:
-          - stable
-          - beta
-          - nightly
+        rust: [beta, nightly]
+        continue-on-error: [true]
+        include:
+          - os: ubuntu-latest
+          - rust: stable
+          - continue-on-error: false
 
     steps:
       - uses: actions/checkout@v2
@@ -34,6 +41,8 @@ jobs:
       - uses: actions-rs/cargo@v1
         with:
           command: build
+        env:
+          SQLX_OFFLINE: true
       - uses: actions-rs/cargo@v1
         with:
           command: test
@@ -41,3 +50,4 @@ jobs:
           BACKBLAZE_BUCKET_ID: ${{ secrets.BACKBLAZE_BUCKET_ID }}
           BACKBLAZE_KEY: ${{ secrets.BACKBLAZE_KEY }}
           BACKBLAZE_KEY_ID: ${{ secrets.BACKBLAZE_KEY_ID }}
+          SQLX_OFFLINE: true

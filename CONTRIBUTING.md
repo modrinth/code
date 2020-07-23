@@ -6,10 +6,15 @@ We reccomend using [Docker](https://www.docker.com/) for setting up your dev env
 ```sh
 docker-compose up
 ```
-which will deploy a Meilisearch container on port 7700, a MongoDB instance on port 27017 and a MongoDB web UI on port 8081
+which will deploy a Meilisearch container on port 7700, a PostgreSQL container on port 5432 and a pgAdmin web UI on port 8070.
+When prompted to input a server password in pgAdmin, simply enter nothing into the password field.
 
-Alternatively, follow theese steps:
-1. Install and run a [MeiliSearch](https://docs.meilisearch.com/guides/introduction/quick_start_guide.html) instance
-2. Install [A local MongoDB server](https://www.mongodb.com/try/download/community)
-3. Run `mongod --dbpath path/to/db`
-4. Everything should be setup and you should be ready to contribute.
+You will have to set up the database now. To do so, install the sqlx cli:
+```sh
+cargo install --git https://github.com/launchbadge/sqlx sqlx-cli --no-default-features --features postgres
+```
+then, run the following commands to create the database and install schemas:
+```sh
+sqlx database create
+sqlx migrate run
+```

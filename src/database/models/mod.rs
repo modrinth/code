@@ -1,32 +1,25 @@
-mod mod_item;
-mod team_item;
-mod version_item;
+#![allow(unused)]
+// TODO: remove attr once routes are created
 
-use crate::database::DatabaseError::NotFound;
-use crate::database::Result;
-use async_trait::async_trait;
-use bson::doc;
-use bson::Document;
+use thiserror::Error;
+
+pub mod ids;
+pub mod mod_item;
+pub mod team_item;
+pub mod version_item;
+
+pub use ids::*;
 pub use mod_item::Mod;
-use mongodb::Database;
 pub use team_item::Team;
 pub use team_item::TeamMember;
 pub use version_item::FileHash;
 pub use version_item::Version;
 pub use version_item::VersionFile;
 
-#[async_trait]
-pub trait Item {
-    fn get_collection() -> &'static str;
-    async fn get_by_id(client: Database, id: &str) -> Result<Box<Self>> {
-        let filter = doc! { "_id": id };
-        let collection = client.collection(Self::get_collection());
-        let doc: Document = match collection.find_one(filter, None).await? {
-            Some(e) => e,
-            None => return Err(NotFound()),
-        };
-        let elem: Box<Self> = Self::from_doc(doc)?;
-        Ok(elem)
-    }
-    fn from_doc(elem: Document) -> Result<Box<Self>>;
+#[derive(Error, Debug)]
+pub enum DatabaseError {
+    #[error("Error while interacting with the database")]
+    DatabaseError(#[from] sqlx::error::Error),
+    #[error("Error while trying to generate random ID")]
+    RandomIdError,
 }

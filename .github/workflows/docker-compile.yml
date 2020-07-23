@@ -1,0 +1,25 @@
+name: Docker image build
+
+on:
+  push:
+    branches:
+    - !master
+  pull_request:
+env:
+  CARGO_TERM_COLOR: always
+  SQLX_OFFLINE: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and push Docker images
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: modrinth/labrinth/labrinth
+          tag_with_ref: true
+          tag_with_sha: true

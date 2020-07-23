@@ -1,4 +1,5 @@
-use crate::file_hosting::{AuthorizationData, FileHostingError};
+use super::authorization::AuthorizationData;
+use crate::file_hosting::FileHostingError;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -8,7 +9,6 @@ pub struct DeleteFileData {
     pub file_name: String,
 }
 
-#[cfg(feature = "backblaze")]
 pub async fn delete_file_version(
     authorization_data: &AuthorizationData,
     file_id: &str,
@@ -39,20 +39,4 @@ pub async fn delete_file_version(
     } else {
         Err(FileHostingError::BackblazeError(response.json().await?))
     }
-}
-
-#[cfg(not(feature = "backblaze"))]
-pub async fn delete_file_version(
-    _authorization_data: &AuthorizationData,
-    file_id: &str,
-    file_name: &str,
-) -> Result<DeleteFileData, FileHostingError> {
-    let path = std::path::Path::new(&dotenv::var("MOCK_FILE_PATH").unwrap())
-        .join(file_name.replace("../", ""));
-    std::fs::remove_file(path)?;
-
-    Ok(DeleteFileData {
-        file_id: file_id.to_string(),
-        file_name: file_name.to_string(),
-    })
 }

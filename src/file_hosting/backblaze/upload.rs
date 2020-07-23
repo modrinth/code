@@ -1,4 +1,4 @@
-use crate::file_hosting::authorization::UploadUrlData;
+use super::authorization::UploadUrlData;
 use crate::file_hosting::FileHostingError;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +16,6 @@ pub struct UploadFileData {
     pub upload_timestamp: u64,
 }
 
-#[cfg(feature = "backblaze")]
 //Content Types found here: https://www.backblaze.com/b2/docs/content-types.html
 pub async fn upload_file(
     url_data: &UploadUrlData,
@@ -46,30 +45,4 @@ pub async fn upload_file(
     } else {
         Err(FileHostingError::BackblazeError(response.json().await?))
     }
-}
-
-#[cfg(not(feature = "backblaze"))]
-pub async fn upload_file(
-    _url_data: &UploadUrlData,
-    content_type: &str,
-    file_name: &str,
-    file_bytes: Vec<u8>,
-) -> Result<UploadFileData, FileHostingError> {
-    let path = std::path::Path::new(&dotenv::var("MOCK_FILE_PATH").unwrap())
-        .join(file_name.replace("../", ""));
-    std::fs::create_dir_all(path.parent().ok_or(FileHostingError::InvalidFilename)?)?;
-    let content_sha1 = sha1::Sha1::from(&file_bytes).hexdigest();
-
-    std::fs::write(path, &file_bytes)?;
-    Ok(UploadFileData {
-        file_id: String::from("MOCK_FILE_ID"),
-        file_name: file_name.to_string(),
-        account_id: String::from("MOCK_ACCOUNT_ID"),
-        bucket_id: String::from("MOCK_BUCKET_ID"),
-        content_length: file_bytes.len() as u32,
-        content_sha1,
-        content_md5: None,
-        content_type: content_type.to_string(),
-        upload_timestamp: chrono::Utc::now().timestamp_millis() as u64,
-    })
 }

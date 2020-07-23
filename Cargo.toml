@@ -1,9 +1,13 @@
 [package]
-name = "modrinth"
+name = "labrinth"
 version = "0.1.0"
 #Team members, please add your emails and usernames
-authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "cfanoulis"]
+authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "Charalampos Fanoulis <yo@fanoulis.dev>"]
 edition = "2018"
+
+[[bin]]
+name = "labrinth"
+path = "src/main.rs"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -18,16 +22,13 @@ reqwest = {version="0.10.6", features=["json"]}
 meilisearch-sdk = "0.1.4"
 
 serde_json = "1.0"
-serde = {version="1.0", features=["derive"]}
+serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 rand = "0.7"
 
 dotenv = "0.15"
 log = "0.4.8"
 env_logger = "0.7.1"
-
-mongodb = "1.0.0"
-bson = "1.0.0"
 
 thiserror = "1.0.20"
 async-trait = "0.1.36"
@@ -38,6 +39,14 @@ futures-timer = "3.0.2"
 base64 = "0.12.3"
 sha1 = {version="0.6.0", features=["std"]}
 
-[features]
-default = []
-backblaze = []
+[dependencies.sqlx]
+git = "https://github.com/launchbadge/sqlx/"
+branch = "master"
+default-features = false
+features = ["runtime-actix", "postgres", "chrono", "offline", "macros"]
+
+[dependencies.sqlx-macros]
+git = "https://github.com/launchbadge/sqlx/"
+branch = "master"
+default-features = false
+features = ["runtime-actix", "postgres", "chrono", "offline"]

@@ -1,90 +1,53 @@
+use async_trait::async_trait;
 use thiserror::Error;
 
-mod authorization;
-mod delete;
-mod upload;
+mod backblaze;
+mod mock;
 
-pub use authorization::authorize_account;
-pub use authorization::get_upload_url;
-pub use authorization::AuthorizationData;
-pub use authorization::AuthorizationPermissions;
-pub use authorization::UploadUrlData;
-
-pub use upload::upload_file;
-pub use upload::UploadFileData;
-
-pub use delete::delete_file_version;
-pub use delete::DeleteFileData;
+pub use backblaze::BackblazeHost;
+pub use mock::MockHost;
 
 #[derive(Error, Debug)]
 pub enum FileHostingError {
-    #[cfg(feature = "backblaze")]
     #[error("Error while accessing the data from backblaze")]
     HttpError(#[from] reqwest::Error),
-
-    #[cfg(feature = "backblaze")]
     #[error("Backblaze error: {0}")]
     BackblazeError(serde_json::Value),
-
-    #[cfg(not(feature = "backblaze"))]
     #[error("File system error in file hosting: {0}")]
     FileSystemError(#[from] std::io::Error),
-    #[cfg(not(feature = "backblaze"))]
     #[error("Invalid Filename")]
     InvalidFilename,
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+#[derive(Debug, Clone)]
+pub struct UploadFileData {
+    pub file_id: String,
+    pub file_name: String,
+    pub content_length: u32,
+    pub content_sha1: String,
+    pub content_md5: Option<String>,
+    pub content_type: String,
+    pub upload_timestamp: u64,
+}
 
-    #[actix_rt::test]
-    async fn test_authorization() {
-        println!("{}", dotenv::var("BACKBLAZE_BUCKET_ID").unwrap());
-        let authorization_data = authorize_account(
-            dotenv::var("BACKBLAZE_KEY_ID").unwrap(),
-            dotenv::var("BACKBLAZE_KEY").unwrap(),
-        )
-        .await
-        .unwrap();
+#[derive(Debug, Clone)]
+pub struct DeleteFileData {
+    pub file_id: String,
+    pub file_name: String,
+}
 
-        get_upload_url(
-            authorization_data,
-            dotenv::var("BACKBLAZE_BUCKET_ID").unwrap(),
-        )
-        .await
-        .unwrap();
-    }
+#[async_trait]
+pub trait FileHost {
+    async fn upload_file(
+        &self,
+        content_type: &str,
+        file_name: &str,
+        file_bytes: Vec<u8>,
+    ) -> Result<UploadFileData, FileHostingError>;
 
-    #[actix_rt::test]
-    async fn test_file_management() {
-        let authorization_data = authorize_account(
-            dotenv::var("BACKBLAZE_KEY_ID").unwrap(),
-            dotenv::var("BACKBLAZE_KEY").unwrap(),
-        )
-        .await
-        .unwrap();
-        let upload_url_data = get_upload_url(
-            authorization_data.clone(),
-            dotenv::var("BACKBLAZE_BUCKET_ID").unwrap(),
-        )
-        .await
-        .unwrap();
-        let upload_data = upload_file(
-            &upload_url_data,
-            "text/plain",
-            "test.txt",
-            "test file".to_string().into_bytes(),
-        )
-        .await
-        .unwrap();
-
-        delete_file_version(
-            &authorization_data,
-            &upload_data.file_id,
-            &upload_data.file_name,
-        )
-        .await
-        .unwrap();
-    }
+    async fn delete_file_version(
+        &self,
+        file_id: &str,
+        file_name: &str,
+    ) -> Result<DeleteFileData, FileHostingError>;
 }

@@ -1,0 +1,197 @@
+{
+  "db": "PostgreSQL",
+  "1ffce9b2d5c9fa6c8b9abce4bad9f9419c44ad6367b7463b979c91b9b5b4fea1": {
+    "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE id=$1)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
+  "4c99c0840159d18e88cd6094a41117258f2337346c145d926b5b610c76b5125f": {
+    "query": "\n                SELECT c.category\n                FROM mods_categories mc\n                    INNER JOIN categories c ON mc.joining_category_id=c.id\n                WHERE mc.joining_mod_id = $1\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "category",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "c0899dcff4d7bc1ba3e953e5099210316bff2f98e6ab77ba84bc612eac4bce0a": {
+    "query": "\n                SELECT gv.version FROM versions\n                    INNER JOIN game_versions_versions gvv ON gvv.joining_version_id=versions.id\n                    INNER JOIN game_versions gv ON gvv.game_version_id=gv.id\n                WHERE versions.mod_id = $1\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "ccd913bb2f3006ffe881ce2fc4ef1e721d18fe2eed6ac62627046c955129610c": {
+    "query": "SELECT EXISTS(SELECT 1 FROM files WHERE id=$1)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
+  "d6453e50041b5521fa9e919a9162e533bb9426f8c584d98474c6ad414db715c8": {
+    "query": "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
+  "e7d0a64a08df6783c942f2fcadd94dd45f8d96ad3d3736e52ce90f68d396cdab": {
+    "query": "SELECT EXISTS(SELECT 1 FROM team_members WHERE id=$1)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
+  "e8d4589132b094df1e7a3ca0440344fc8013c0d20b3c71a1142ccbee91fb3c70": {
+    "query": "SELECT EXISTS(SELECT 1 FROM teams WHERE id=$1)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
+  "efe1bc80203f608226fa33e44654b681cc4430cec63bf7cf09b5281ff8c1c437": {
+    "query": "\n        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published FROM mods m\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 4,
+          "name": "icon_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "body_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "published",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false
+      ]
+    }
+  }
+}

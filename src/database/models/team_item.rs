@@ -1,19 +1,74 @@
-use serde::{Deserialize, Serialize};
+use super::ids::*;
+
+pub struct TeamBuilder {
+    pub members: Vec<TeamMemberBuilder>,
+}
+pub struct TeamMemberBuilder {
+    pub user_id: UserId,
+    pub name: String,
+    pub role: String,
+}
+
+impl TeamBuilder {
+    pub async fn insert(
+        self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<TeamId, super::DatabaseError> {
+        let team_id = generate_team_id(&mut *transaction).await?;
+
+        let team = Team { id: team_id };
+
+        sqlx::query(
+            "
+            INSERT INTO teams (id)
+            VALUES ($1)
+            ",
+        )
+        .bind(team.id)
+        .execute(&mut *transaction)
+        .await?;
+
+        for member in self.members {
+            let team_member_id = generate_team_member_id(&mut *transaction).await?;
+            let team_member = TeamMember {
+                id: team_member_id,
+                team_id,
+                user_id: member.user_id,
+                name: member.name,
+                role: member.role,
+            };
+
+            sqlx::query(
+                "
+                INSERT INTO team_members (id, team_id, user_id, name, role)
+                VALUES ($1, $2)
+                ",
+            )
+            .bind(team_member.id)
+            .bind(team_member.team_id)
+            .bind(team_member.user_id)
+            .bind(team_member.name)
+            .bind(team_member.role)
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        Ok(team_id)
+    }
+}
 
 /// A team of users who control a mod
-#[derive(Serialize, Deserialize)]
 pub struct Team {
     /// The id of the team
-    pub id: i32,
-    /// A list of the members of the team
-    pub members: Vec<TeamMember>,
+    pub id: TeamId,
 }
 
 /// A member of a team
-#[derive(Serialize, Deserialize, Clone)]
 pub struct TeamMember {
+    pub id: TeamMemberId,
+    pub team_id: TeamId,
     /// The ID of the user associated with the member
-    pub user_id: i32,
+    pub user_id: UserId,
     /// The name of the user
     pub name: String,
     pub role: String,

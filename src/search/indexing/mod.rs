@@ -7,6 +7,7 @@ use crate::search::indexing::local_import::index_local;
 use crate::search::SearchMod;
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::settings::Settings;
+use sqlx::postgres::PgPool;
 use std::collections::{HashMap, VecDeque};
 use thiserror::Error;
 
@@ -21,7 +22,7 @@ pub enum IndexingError {
     #[error("Error while parsing a timestamp: {0}")]
     ParseDateError(#[from] chrono::format::ParseError),
     #[error("Database Error: {0}")]
-    DatabaseError(#[from] crate::database::DatabaseError),
+    DatabaseError(#[from] sqlx::error::Error),
     #[error("Environment Error")]
     EnvError(#[from] dotenv::Error),
 }
@@ -31,14 +32,14 @@ pub enum IndexingError {
 // assumes a max average size of 1KiB per mod to avoid this cap.
 const MEILISEARCH_CHUNK_SIZE: usize = 10000;
 
-pub async fn index_mods(db: mongodb::Client) -> Result<(), IndexingError> {
+pub async fn index_mods(pool: PgPool) -> Result<(), IndexingError> {
     // Check if the index exists
     let address = &*dotenv::var("MEILISEARCH_ADDR")?;
     let client = Client::new(address, "");
 
     let mut docs_to_add: Vec<SearchMod> = vec![];
 
-    docs_to_add.append(&mut index_local(db.clone()).await?);
+    docs_to_add.append(&mut index_local(pool.clone()).await?);
     if dotenv::var("INDEX_CURSEFORGE")?
         .parse()
         .expect("`INDEX_CURSEFORGE` is not a boolean.")
