@@ -54,7 +54,7 @@
   color: BCBCBC
 - name: 'Meta: GitHub'
   description: Issues and PRs related to GitHub.
-  color: 010101
+  color: "000000"
 - name: 'Meta: BugFix'
   description: PRs that fix bugs or issues.
   color: BCBCBC
