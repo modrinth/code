@@ -131,6 +131,10 @@ pub struct ModLoader(pub String);
 #[derive(Serialize, Deserialize)]
 pub struct SearchRequest {
     pub query: Option<String>,
+    /// Must match a json 2 deep array of strings `[["categories:misc"]]`
+    // TODO: We may want to have a better representation of this, so that
+    // we are less likely to break backwards compatability
+    pub facets: Option<String>,
     pub filters: Option<String>,
     pub version: Option<String>,
     pub offset: Option<String>,

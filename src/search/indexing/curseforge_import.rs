@@ -1,5 +1,5 @@
 use super::IndexingError;
-use crate::search::SearchMod;
+use crate::search::UploadSearchMod;
 use log::info;
 use serde::{Deserialize, Serialize};
 
@@ -48,10 +48,10 @@ pub struct CurseForgeMod {
 pub async fn index_curseforge(
     start_index: i32,
     end_index: i32,
-) -> Result<Vec<SearchMod>, IndexingError> {
+) -> Result<Vec<UploadSearchMod>, IndexingError> {
     info!("Indexing curseforge mods!");
 
-    let mut docs_to_add: Vec<SearchMod> = vec![];
+    let mut docs_to_add: Vec<UploadSearchMod> = vec![];
 
     let res = reqwest::Client::new()
         .post("https://addons-ecs.forgesvc.net/api/v2/addon")
@@ -177,32 +177,32 @@ pub async fn index_curseforge(
             .thumbnail_url
             .replace("/256/256/", "/64/64/");
 
-        docs_to_add.push(SearchMod {
-            mod_id: -curseforge_mod.id as i64,
+        let created = curseforge_mod
+            .date_created
+            .parse::<chrono::DateTime<chrono::Utc>>()?;
+        let modified = curseforge_mod
+            .date_modified
+            .parse::<chrono::DateTime<chrono::Utc>>()?;
+
+        docs_to_add.push(UploadSearchMod {
+            mod_id: format!("curse-{}", curseforge_mod.id),
             author: (&curseforge_mod.authors[0].name).to_string(),
             title: curseforge_mod.name,
             description: curseforge_mod.summary.chars().take(150).collect(),
-            keywords: mod_categories,
+            categories: mod_categories,
             versions: mod_game_versions.clone(),
             downloads: curseforge_mod.download_count as i32,
             page_url: curseforge_mod.website_url,
             icon_url,
             author_url: (&curseforge_mod.authors[0].url).to_string(),
-            date_created: curseforge_mod.date_created.chars().take(10).collect(),
-            created: curseforge_mod
-                .date_created
-                .parse::<chrono::DateTime<chrono::Utc>>()?
-                .timestamp(),
-            date_modified: curseforge_mod.date_modified.chars().take(10).collect(),
-            updated: curseforge_mod
-                .date_modified
-                .parse::<chrono::DateTime<chrono::Utc>>()?
-                .timestamp(),
+            date_created: created.to_string(),
+            created_timestamp: created.timestamp(),
+            date_modified: modified.to_string(),
+            modified_timestamp: modified.timestamp(),
             latest_version,
-            empty: String::from("{}{}{}"),
+            empty: std::borrow::Cow::Borrowed("{}{}{}"),
         })
     }
 
-    //TODO Reindex every hour for new mods.
     Ok(docs_to_add)
 }

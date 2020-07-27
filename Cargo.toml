@@ -19,8 +19,6 @@ actix-multipart = "0.2.0"
 
 reqwest = {version="0.10.6", features=["json"]}
 
-meilisearch-sdk = "0.1.4"
-
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
@@ -50,3 +48,8 @@ git = "https://github.com/launchbadge/sqlx/"
 branch = "master"
 default-features = false
 features = ["runtime-actix", "postgres", "chrono", "offline"]
+
+[dependencies.meilisearch-sdk]
+# Temp fork with some patches
+git = "https://github.com/Aeledfyr/meilisearch-rust"
+branch = "master"

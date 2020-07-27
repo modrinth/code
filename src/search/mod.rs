@@ -6,6 +6,7 @@ use meilisearch_sdk::client::Client;
 use meilisearch_sdk::document::Document;
 use meilisearch_sdk::search::Query;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 use thiserror::Error;
 
 pub mod indexing;
@@ -13,7 +14,7 @@ pub mod indexing;
 #[derive(Error, Debug)]
 pub enum SearchError {
     #[error("Error while connecting to the MeiliSearch database")]
-    IndexDBError(meilisearch_sdk::errors::Error),
+    IndexDBError(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
     #[error("Error while parsing an integer: {0}")]
@@ -45,36 +46,75 @@ impl actix_web::ResponseError for SearchError {
     }
 }
 
+/// A mod document used for uploading mods to meilisearch's indices.
+/// This contains some extra data that is not returned by search results.
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct SearchMod {
-    pub mod_id: i64,
+pub struct UploadSearchMod {
+    pub mod_id: String,
     pub author: String,
     pub title: String,
     pub description: String,
-    pub keywords: Vec<String>,
+    pub categories: Vec<String>,
     pub versions: Vec<String>,
     pub downloads: i32,
     pub page_url: String,
     pub icon_url: String,
     pub author_url: String,
-    pub date_created: String,
-    pub created: i64,
-    pub date_modified: String,
-    pub updated: i64,
     pub latest_version: String,
-    pub empty: String,
+
+    /// RFC 3339 formatted creation date of the mod
+    pub date_created: String,
+    /// Unix timestamp of the creation date of the mod
+    pub created_timestamp: i64,
+    /// RFC 3339 formatted date/time of last major modification (update)
+    pub date_modified: String,
+    /// Unix timestamp of the last major modification
+    pub modified_timestamp: i64,
+
+    /// Must be "{}{}{}", a hack until meilisearch supports searches
+    /// with empty queries (https://github.com/meilisearch/MeiliSearch/issues/729)
+    // This is a Cow to prevent unnecessary allocations for a static
+    // string
+    pub empty: Cow<'static, str>,
 }
 
-impl Document for SearchMod {
-    type UIDType = i64;
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ResultSearchMod {
+    pub mod_id: String,
+    pub author: String,
+    pub title: String,
+    pub description: String,
+    pub categories: Vec<String>,
+    // TODO: more efficient format for listing versions, without many repetitions
+    pub versions: Vec<String>,
+    pub downloads: i32,
+    pub page_url: String,
+    pub icon_url: String,
+    pub author_url: String,
+    /// RFC 3339 formatted creation date of the mod
+    pub date_created: String,
+    /// RFC 3339 formatted modification date of the mod
+    pub date_modified: String,
+    pub latest_version: String,
+}
+
+impl Document for UploadSearchMod {
+    type UIDType = String;
 
     fn get_uid(&self) -> &Self::UIDType {
         &self.mod_id
     }
 }
 
-pub fn search_for_mod(info: &SearchRequest) -> Result<Vec<SearchMod>, SearchError> {
-    use std::borrow::Cow;
+impl Document for ResultSearchMod {
+    type UIDType = String;
+
+    fn get_uid(&self) -> &Self::UIDType {
+        &self.mod_id
+    }
+}
+
+pub async fn search_for_mod(info: &SearchRequest) -> Result<Vec<ResultSearchMod>, SearchError> {
     let address = &*dotenv::var("MEILISEARCH_ADDR")?;
     let client = Client::new(address, "");
 
@@ -98,11 +138,15 @@ pub fn search_for_mod(info: &SearchRequest) -> Result<Vec<SearchMod>, SearchErro
     if !filters.is_empty() {
         query = query.with_filters(&filters);
     }
+    if let Some(facets) = &info.facets {
+        let facets = serde_json::from_str::<Vec<Vec<&str>>>(facets)?;
+        query = query.with_facet_filters(facets);
+    }
 
     Ok(client
         .get_index(format!("{}_mods", index).as_ref())
-        .map_err(SearchError::IndexDBError)?
-        .search::<SearchMod>(&query)
-        .map_err(SearchError::IndexDBError)?
+        .await?
+        .search::<ResultSearchMod>(&query)
+        .await?
         .hits)
 }

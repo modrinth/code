@@ -1,11 +1,13 @@
 /// This module is used for the indexing from any source.
 pub mod curseforge_import;
 pub mod local_import;
+pub mod queue;
 
-use crate::search::indexing::curseforge_import::index_curseforge;
-use crate::search::indexing::local_import::index_local;
-use crate::search::SearchMod;
+use crate::search::UploadSearchMod;
+use curseforge_import::index_curseforge;
+use local_import::index_local;
 use meilisearch_sdk::client::Client;
+use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::Settings;
 use sqlx::postgres::PgPool;
 use std::collections::{HashMap, VecDeque};
@@ -14,7 +16,7 @@ use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum IndexingError {
     #[error("Error while connecting to the MeiliSearch database")]
-    IndexDBError(meilisearch_sdk::errors::Error),
+    IndexDBError(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while importing mods from CurseForge")]
     CurseforgeImportError(reqwest::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
@@ -32,95 +34,115 @@ pub enum IndexingError {
 // assumes a max average size of 1KiB per mod to avoid this cap.
 const MEILISEARCH_CHUNK_SIZE: usize = 10000;
 
-pub async fn index_mods(pool: PgPool) -> Result<(), IndexingError> {
-    // Check if the index exists
+#[derive(Debug)]
+pub struct IndexingSettings {
+    pub index_external: bool,
+    pub index_local: bool,
+}
+
+impl IndexingSettings {
+    pub fn from_env() -> Self {
+        let index_local = true;
+        let index_external = dotenv::var("INDEX_CURSEFORGE")
+            .ok()
+            .and_then(|b| b.parse::<bool>().ok())
+            .unwrap_or(false);
+
+        Self {
+            index_external,
+            index_local,
+        }
+    }
+}
+
+pub async fn index_mods(pool: PgPool, settings: IndexingSettings) -> Result<(), IndexingError> {
+    let mut docs_to_add: Vec<UploadSearchMod> = vec![];
+
+    if settings.index_local {
+        docs_to_add.append(&mut index_local(pool.clone()).await?);
+    }
+    if settings.index_external {
+        docs_to_add.append(&mut index_curseforge(1, 400_000).await?);
+    }
+
+    // Write Indices
+
+    add_mods(docs_to_add).await?;
+
+    Ok(())
+}
+
+async fn create_index<'a>(
+    client: &'a Client<'a>,
+    name: &'a str,
+    rules: impl FnOnce() -> Vec<String>,
+) -> Result<Index<'a>, IndexingError> {
+    match client.get_index(name).await {
+        // TODO: update index settings on startup (or delete old indices on startup)
+        Ok(index) => Ok(index),
+        Err(meilisearch_sdk::errors::Error::IndexNotFound) => {
+            // Only create index and set settings if the index doesn't already exist
+            let index = client.create_index(name, Some("mod_id")).await?;
+
+            index
+                .set_settings(&default_settings().with_ranking_rules(rules()))
+                .await?;
+
+            Ok(index)
+        }
+        Err(e) => {
+            log::warn!("Unhandled error while creating index: {}", e);
+            Err(IndexingError::IndexDBError(e))
+        }
+    }
+}
+
+async fn add_to_index(index: Index<'_>, mods: &[UploadSearchMod]) -> Result<(), IndexingError> {
+    for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
+        index.add_documents(chunk, Some("mod_id")).await?;
+    }
+    Ok(())
+}
+
+pub async fn add_mods(mods: Vec<UploadSearchMod>) -> Result<(), IndexingError> {
     let address = &*dotenv::var("MEILISEARCH_ADDR")?;
     let client = Client::new(address, "");
 
-    let mut docs_to_add: Vec<SearchMod> = vec![];
+    // Relevance Index
+    let relevance_index = create_index(&client, "relevance_mods", || {
+        let mut relevance_rules = default_rules();
+        relevance_rules.push_back("desc(downloads)".to_string());
+        relevance_rules.into()
+    })
+    .await?;
+    add_to_index(relevance_index, &mods).await?;
 
-    docs_to_add.append(&mut index_local(pool.clone()).await?);
-    if dotenv::var("INDEX_CURSEFORGE")?
-        .parse()
-        .expect("`INDEX_CURSEFORGE` is not a boolean.")
-    {
-        docs_to_add.append(&mut index_curseforge(1, 400_000).await?);
-    }
-    //Write Indexes
-    //Relevance Index
+    // Downloads Index
+    let downloads_index = create_index(&client, "downloads_mods", || {
+        let mut downloads_rules = default_rules();
+        downloads_rules.push_front("desc(downloads)".to_string());
+        downloads_rules.into()
+    })
+    .await?;
+    add_to_index(downloads_index, &mods).await?;
 
-    let mut relevance_index = client
-        .get_or_create("relevance_mods")
-        .map_err(IndexingError::IndexDBError)?;
+    // Updated Index
+    let updated_index = create_index(&client, "updated_mods", || {
+        let mut updated_rules = default_rules();
+        updated_rules.push_front("desc(updated)".to_string());
+        updated_rules.into()
+    })
+    .await?;
+    add_to_index(updated_index, &mods).await?;
 
-    let mut relevance_rules = default_rules();
-    relevance_rules.push_back("desc(downloads)".to_string());
-
-    relevance_index
-        .set_settings(&default_settings().with_ranking_rules(relevance_rules.into()))
-        .map_err(IndexingError::IndexDBError)?;
-
-    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
-        // TODO: get meilisearch sdk to not require cloning (ie take a reference to docs_to_add)
-        // This may require making our own fork of it.
-        relevance_index
-            .add_documents(Vec::from(chunk), Some("mod_id"))
-            .map_err(IndexingError::IndexDBError)?;
-    }
-
-    //Downloads Index
-    let mut downloads_index = client
-        .get_or_create("downloads_mods")
-        .map_err(IndexingError::IndexDBError)?;
-
-    let mut downloads_rules = default_rules();
-    downloads_rules.push_front("desc(downloads)".to_string());
-
-    downloads_index
-        .set_settings(&default_settings().with_ranking_rules(downloads_rules.into()))
-        .map_err(IndexingError::IndexDBError)?;
-
-    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
-        downloads_index
-            .add_documents(Vec::from(chunk), Some("mod_id"))
-            .map_err(IndexingError::IndexDBError)?;
-    }
-
-    //Updated Index
-    let mut updated_index = client
-        .get_or_create("updated_mods")
-        .map_err(IndexingError::IndexDBError)?;
-
-    let mut updated_rules = default_rules();
-    updated_rules.push_front("desc(updated)".to_string());
-
-    updated_index
-        .set_settings(&default_settings().with_ranking_rules(updated_rules.into()))
-        .map_err(IndexingError::IndexDBError)?;
-
-    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
-        updated_index
-            .add_documents(Vec::from(chunk), Some("mod_id"))
-            .map_err(IndexingError::IndexDBError)?;
-    }
-
-    //Created Index
-    let mut newest_index = client
-        .get_or_create("newest_mods")
-        .map_err(IndexingError::IndexDBError)?;
-
-    let mut newest_rules = default_rules();
-    newest_rules.push_back("desc(created)".to_string());
-
-    newest_index
-        .set_settings(&default_settings().with_ranking_rules(newest_rules.into()))
-        .map_err(IndexingError::IndexDBError)?;
-
-    for chunk in docs_to_add.chunks(MEILISEARCH_CHUNK_SIZE) {
-        newest_index
-            .add_documents(Vec::from(chunk), Some("mod_id"))
-            .map_err(IndexingError::IndexDBError)?;
-    }
+    // Created Index
+    let newest_index = create_index(&client, "newest_mods", || {
+        let mut newest_rules = default_rules();
+        newest_rules.push_front("desc(created)".to_string());
+        newest_rules.into()
+    })
+    .await?;
+    add_to_index(newest_index, &mods).await?;
 
     Ok(())
 }
@@ -144,7 +166,7 @@ fn default_settings() -> Settings {
         "author".to_string(),
         "title".to_string(),
         "description".to_string(),
-        "keywords".to_string(),
+        "categories".to_string(),
         "versions".to_string(),
         "downloads".to_string(),
         "page_url".to_string(),
@@ -155,13 +177,12 @@ fn default_settings() -> Settings {
         "date_modified".to_string(),
         "updated".to_string(),
         "latest_version".to_string(),
-        "empty".to_string(),
     ];
 
     let searchable_attributes = vec![
         "title".to_string(),
         "description".to_string(),
-        "keywords".to_string(),
+        "categories".to_string(),
         "versions".to_string(),
         "author".to_string(),
         "empty".to_string(),
@@ -173,6 +194,7 @@ fn default_settings() -> Settings {
         .with_accept_new_fields(true)
         .with_stop_words(vec![])
         .with_synonyms(HashMap::new())
+        .with_attributes_for_faceting(vec![String::from("categories")])
 }
 
 //endregion

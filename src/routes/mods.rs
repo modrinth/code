@@ -6,5 +6,6 @@ use actix_web::{get, web, HttpResponse};
 pub async fn mod_search(
     web::Query(info): web::Query<SearchRequest>,
 ) -> Result<HttpResponse, SearchError> {
-    Ok(HttpResponse::Ok().json(search_for_mod(&info)?))
+    let results = search_for_mod(&info).await?;
+    Ok(HttpResponse::Ok().json(results))
 }

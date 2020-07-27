@@ -1145,6 +1145,7 @@ dependencies = [
  "serde_json",
  "sha1",
  "sqlx",
+ "sqlx-macros",
  "thiserror",
 ]
 
@@ -1257,11 +1258,10 @@ dependencies = [
 [[package]]
 name = "meilisearch-sdk"
 version = "0.1.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e99e00b31a0e33add02a01c969a108144882ef27915d81292deda71baa6b6eea"
+source = "git+https://github.com/Aeledfyr/meilisearch-rust#ba1f1e530cb383f421273f6863378bc9bc222f7b"
 dependencies = [
  "log",
- "minreq",
+ "reqwest",
  "serde",
  "serde_json",
  "urlencoding",
@@ -1300,12 +1300,6 @@ checksum = "791daaae1ed6889560f8c4359194f56648355540573244a5448a83ba1ecc7435"
 dependencies = [
  "adler32",
 ]
-
-[[package]]
-name = "minreq"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ab229c252995e9d56cc66857f3ab2c41e3138b1a6c92089f013698388e64d6bd"
 
 [[package]]
 name = "mio"
@@ -1347,33 +1341,6 @@ dependencies = [
  "net2",
  "winapi 0.2.8",
  "ws2_32-sys",
-]
-
-[[package]]
-name = "modrinth"
-version = "0.1.0"
-dependencies = [
- "actix-files",
- "actix-multipart",
- "actix-rt",
- "actix-web",
- "async-trait",
- "base64 0.12.3",
- "chrono",
- "dotenv",
- "env_logger",
- "futures",
- "futures-timer",
- "log",
- "meilisearch-sdk",
- "rand",
- "reqwest",
- "serde",
- "serde_json",
- "sha1",
- "sqlx",
- "sqlx-macros",
- "thiserror",
 ]
 
 [[package]]
