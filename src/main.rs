@@ -15,8 +15,8 @@ mod search;
 
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
-    env_logger::from_env(Env::default().default_filter_or("info")).init();
     dotenv::dotenv().ok();
+    env_logger::from_env(Env::default().default_filter_or("info")).init();
 
     check_env_vars();
 
@@ -145,6 +145,7 @@ async fn main() -> std::io::Result<()> {
             .wrap(Logger::new("%a %{User-Agent}i"))
             .data(pool.clone())
             .data(file_host.clone())
+            .data(indexing_queue.clone())
             .service(routes::index_get)
             .service(routes::mod_search)
             .service(routes::mod_create)

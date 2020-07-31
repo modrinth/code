@@ -45,69 +45,69 @@ impl VersionBuilder {
 
         for file in self.files {
             let file_id = generate_file_id(&mut *transaction).await?;
-            sqlx::query(
+            sqlx::query!(
                 "
                 INSERT INTO files (id, version_id, url, filename)
                 VALUES ($1, $2, $3, $4)
                 ",
+                file_id as FileId,
+                self.version_id as VersionId,
+                file.url,
+                file.filename,
             )
-            .bind(file_id)
-            .bind(self.version_id)
-            .bind(file.url)
-            .bind(file.filename)
             .execute(&mut *transaction)
             .await?;
 
             for hash in file.hashes {
-                sqlx::query(
+                sqlx::query!(
                     "
                     INSERT INTO hashes (file_id, algorithm, hash)
                     VALUES ($1, $2, $3)
                     ",
+                    file_id as FileId,
+                    hash.algorithm,
+                    hash.hash,
                 )
-                .bind(file_id)
-                .bind(hash.algorithm)
-                .bind(hash.hash)
                 .execute(&mut *transaction)
                 .await?;
             }
         }
 
         for dependency in self.dependencies {
-            sqlx::query(
+            sqlx::query!(
                 "
                 INSERT INTO dependencies (dependent_id, dependency_id)
                 VALUES ($1, $2)
                 ",
+                self.version_id as VersionId,
+                dependency as VersionId,
             )
-            .bind(self.version_id)
-            .bind(dependency)
             .execute(&mut *transaction)
             .await?;
         }
 
         for loader in self.loaders {
-            sqlx::query(
+            sqlx::query!(
                 "
-                INSERT INTO dependencies (loader_id, version_id)
+                INSERT INTO loaders_versions (loader_id, version_id)
                 VALUES ($1, $2)
                 ",
+                loader as LoaderId,
+                self.version_id as VersionId,
             )
-            .bind(loader)
-            .bind(self.version_id)
             .execute(&mut *transaction)
             .await?;
         }
 
         for game_version in self.game_versions {
-            sqlx::query(
+            sqlx::query!(
                 "
-                INSERT INTO dependencies (game_version_id, joining_version_id)
+                INSERT INTO game_versions_versions (game_version_id, joining_version_id)
                 VALUES ($1, $2)
                 ",
+                game_version as GameVersionId,
+                self.version_id as VersionId,
             )
-            .bind(game_version)
-            .bind(self.version_id)
             .execute(&mut *transaction)
             .await?;
         }
@@ -132,7 +132,7 @@ impl Version {
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
-        sqlx::query(
+        sqlx::query!(
             "
             INSERT INTO versions (
                 id, mod_id, name, version_number,
@@ -145,15 +145,15 @@ impl Version {
                 $7, $8
             )
             ",
+            self.id as VersionId,
+            self.mod_id as ModId,
+            &self.name,
+            &self.version_number,
+            self.changelog_url.as_ref(),
+            self.date_published,
+            self.downloads,
+            self.release_channel as ChannelId,
         )
-        .bind(self.id)
-        .bind(self.mod_id)
-        .bind(&self.name)
-        .bind(&self.version_number)
-        .bind(self.changelog_url.as_ref())
-        .bind(self.date_published)
-        .bind(self.downloads)
-        .bind(self.release_channel)
         .execute(&mut *transaction)
         .await?;
 
@@ -166,16 +166,15 @@ impl Version {
     {
         use futures::stream::TryStreamExt;
 
-        let vec = sqlx::query_as::<_, (VersionId,)>(
+        let vec = sqlx::query!(
             "
-            SELECT id FROM versions v
-            INNER JOIN dependencies d ON d.dependency_id = v.id
-            WHERE d.dependent_id = $1
+            SELECT dependency_id id FROM dependencies
+            WHERE dependent_id = $1
             ",
+            self.id as VersionId,
         )
-        .bind(self.id)
         .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|(v,)| v)) })
+        .try_filter_map(|e| async { Ok(e.right().map(|v| VersionId(v.id))) })
         .try_collect::<Vec<VersionId>>()
         .await?;
 

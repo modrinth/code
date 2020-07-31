@@ -73,28 +73,38 @@ generate_ids!(
 );
 
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct UserId(pub i64);
 
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct TeamId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct TeamMemberId(pub i64);
 
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct ModId(pub i64);
 
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct VersionId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]
-pub struct ChannelId(pub i64);
+#[sqlx(transparent)]
+pub struct ChannelId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct GameVersionId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct LoaderId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct CategoryId(pub i32);
 
 #[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
 pub struct FileId(pub i64);
 
 use crate::models::ids;

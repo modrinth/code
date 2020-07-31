@@ -18,13 +18,13 @@ impl TeamBuilder {
 
         let team = Team { id: team_id };
 
-        sqlx::query(
+        sqlx::query!(
             "
             INSERT INTO teams (id)
             VALUES ($1)
             ",
+            team.id as TeamId,
         )
-        .bind(team.id)
         .execute(&mut *transaction)
         .await?;
 
@@ -38,17 +38,17 @@ impl TeamBuilder {
                 role: member.role,
             };
 
-            sqlx::query(
+            sqlx::query!(
                 "
-                INSERT INTO team_members (id, team_id, user_id, name, role)
-                VALUES ($1, $2)
+                INSERT INTO team_members (id, team_id, user_id, member_name, role)
+                VALUES ($1, $2, $3, $4, $5)
                 ",
+                team_member.id as TeamMemberId,
+                team_member.team_id as TeamId,
+                team_member.user_id as UserId,
+                team_member.name,
+                team_member.role,
             )
-            .bind(team_member.id)
-            .bind(team_member.team_id)
-            .bind(team_member.user_id)
-            .bind(team_member.name)
-            .bind(team_member.role)
             .execute(&mut *transaction)
             .await?;
         }

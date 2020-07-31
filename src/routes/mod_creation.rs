@@ -261,9 +261,9 @@ async fn mod_create_inner(
 
                 // TODO: do a real lookup for the channels
                 let release_channel = match version_data.release_channel {
-                    VersionType::Release => models::ChannelId(0),
-                    VersionType::Beta => models::ChannelId(2),
-                    VersionType::Alpha => models::ChannelId(4),
+                    VersionType::Release => models::ChannelId(1),
+                    VersionType::Beta => models::ChannelId(3),
+                    VersionType::Alpha => models::ChannelId(5),
                 };
 
                 let version = models::version_item::VersionBuilder {

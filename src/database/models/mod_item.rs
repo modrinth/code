@@ -40,14 +40,14 @@ impl ModBuilder {
         }
 
         for category in self.categories {
-            sqlx::query(
+            sqlx::query!(
                 "
-                INSERT INTO mod_categories (joining_mod_id, joining_category_id)
+                INSERT INTO mods_categories (joining_mod_id, joining_category_id)
                 VALUES ($1, $2)
                 ",
+                self.mod_id as ModId,
+                category as CategoryId,
             )
-            .bind(self.mod_id)
-            .bind(category)
             .execute(&mut *transaction)
             .await?;
         }
@@ -75,7 +75,7 @@ impl Mod {
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
-        sqlx::query(
+        sqlx::query!(
             "
             INSERT INTO mods (
                 id, team_id, title, description, body_url,
@@ -88,18 +88,18 @@ impl Mod {
                 $10, $11
             )
             ",
+            self.id as ModId,
+            self.team_id as TeamId,
+            &self.title,
+            &self.description,
+            &self.body_url,
+            self.published,
+            self.downloads,
+            self.icon_url.as_ref(),
+            self.issues_url.as_ref(),
+            self.source_url.as_ref(),
+            self.wiki_url.as_ref(),
         )
-        .bind(self.id)
-        .bind(self.team_id)
-        .bind(&self.title)
-        .bind(&self.description)
-        .bind(&self.body_url)
-        .bind(self.published)
-        .bind(self.downloads)
-        .bind(self.icon_url.as_ref())
-        .bind(self.issues_url.as_ref())
-        .bind(self.source_url.as_ref())
-        .bind(self.wiki_url.as_ref())
         .execute(&mut *transaction)
         .await?;
 
