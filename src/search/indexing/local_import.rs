@@ -4,6 +4,7 @@ use log::info;
 use super::IndexingError;
 use crate::search::UploadSearchMod;
 use sqlx::postgres::PgPool;
+use std::borrow::Cow;
 
 pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingError> {
     info!("Indexing local mods!");
@@ -71,7 +72,8 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 date_modified: formatted,
                 modified_timestamp: timestamp,
                 latest_version: "".to_string(), // TODO: Info about latest version
-                empty: std::borrow::Cow::Borrowed("{}{}{}"),
+                host: Cow::Borrowed("modrinth"),
+                empty: Cow::Borrowed("{}{}{}"),
             });
         }
     }

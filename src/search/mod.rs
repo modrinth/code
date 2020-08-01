@@ -71,6 +71,8 @@ pub struct UploadSearchMod {
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
 
+    pub host: Cow<'static, str>,
+
     /// Must be "{}{}{}", a hack until meilisearch supports searches
     /// with empty queries (https://github.com/meilisearch/MeiliSearch/issues/729)
     // This is a Cow to prevent unnecessary allocations for a static
@@ -96,6 +98,9 @@ pub struct ResultSearchMod {
     /// RFC 3339 formatted modification date of the mod
     pub date_modified: String,
     pub latest_version: String,
+
+    /// The host of the mod: Either `modrinth` or `curseforge`
+    pub host: String,
 }
 
 impl Document for UploadSearchMod {

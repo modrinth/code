@@ -11,6 +11,7 @@ use actix_web::{post, HttpResponse};
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
+use std::borrow::Cow;
 use std::sync::Arc;
 use thiserror::Error;
 
@@ -416,7 +417,8 @@ async fn mod_create_inner(
         // TODO: store and return modified time
         date_modified: formatted,
         modified_timestamp: timestamp,
-        empty: std::borrow::Cow::Borrowed("{}{}{}"),
+        host: Cow::Borrowed("modrinth"),
+        empty: Cow::Borrowed("{}{}{}"),
     };
 
     indexing_queue.add(index_mod);

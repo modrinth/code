@@ -72,6 +72,76 @@ pub async fn index_mods(pool: PgPool, settings: IndexingSettings) -> Result<(), 
     Ok(())
 }
 
+pub async fn reset_indices() -> Result<(), IndexingError> {
+    let address = &*dotenv::var("MEILISEARCH_ADDR")?;
+    let client = Client::new(address, "");
+
+    client.delete_index("relevance_mods").await?;
+    client.delete_index("downloads_mods").await?;
+    client.delete_index("updated_mods").await?;
+    client.delete_index("newest_mods").await?;
+    Ok(())
+}
+
+pub async fn reconfigure_indices() -> Result<(), IndexingError> {
+    let address = &*dotenv::var("MEILISEARCH_ADDR")?;
+    let client = Client::new(address, "");
+
+    // Relevance Index
+    update_index(&client, "relevance_mods", {
+        let mut relevance_rules = default_rules();
+        relevance_rules.push_back("desc(downloads)".to_string());
+        relevance_rules.into()
+    })
+    .await?;
+
+    // Downloads Index
+    update_index(&client, "downloads_mods", {
+        let mut downloads_rules = default_rules();
+        downloads_rules.push_front("desc(downloads)".to_string());
+        downloads_rules.into()
+    })
+    .await?;
+
+    // Updated Index
+    update_index(&client, "updated_mods", {
+        let mut updated_rules = default_rules();
+        updated_rules.push_front("desc(modified_timestamp)".to_string());
+        updated_rules.into()
+    })
+    .await?;
+
+    // Created Index
+    update_index(&client, "newest_mods", {
+        let mut newest_rules = default_rules();
+        newest_rules.push_front("desc(created_timestamp)".to_string());
+        newest_rules.into()
+    })
+    .await?;
+
+    Ok(())
+}
+
+async fn update_index<'a>(
+    client: &'a Client<'a>,
+    name: &'a str,
+    rules: Vec<String>,
+) -> Result<Index<'a>, IndexingError> {
+    let index = match client.get_index(name).await {
+        Ok(index) => index,
+        Err(meilisearch_sdk::errors::Error::IndexNotFound) => {
+            client.create_index(name, Some("mod_id")).await?
+        }
+        Err(e) => {
+            return Err(IndexingError::IndexDBError(e));
+        }
+    };
+    index
+        .set_settings(&default_settings().with_ranking_rules(rules))
+        .await?;
+    Ok(index)
+}
+
 async fn create_index<'a>(
     client: &'a Client<'a>,
     name: &'a str,
@@ -129,7 +199,7 @@ pub async fn add_mods(mods: Vec<UploadSearchMod>) -> Result<(), IndexingError> {
     // Updated Index
     let updated_index = create_index(&client, "updated_mods", || {
         let mut updated_rules = default_rules();
-        updated_rules.push_front("desc(updated)".to_string());
+        updated_rules.push_front("desc(modified_timestamp)".to_string());
         updated_rules.into()
     })
     .await?;
@@ -138,7 +208,7 @@ pub async fn add_mods(mods: Vec<UploadSearchMod>) -> Result<(), IndexingError> {
     // Created Index
     let newest_index = create_index(&client, "newest_mods", || {
         let mut newest_rules = default_rules();
-        newest_rules.push_front("desc(created)".to_string());
+        newest_rules.push_front("desc(created_timestamp)".to_string());
         newest_rules.into()
     })
     .await?;
@@ -173,10 +243,9 @@ fn default_settings() -> Settings {
         "icon_url".to_string(),
         "author_url".to_string(),
         "date_created".to_string(),
-        "created".to_string(),
         "date_modified".to_string(),
-        "updated".to_string(),
         "latest_version".to_string(),
+        "host".to_string(),
     ];
 
     let searchable_attributes = vec![
@@ -194,7 +263,7 @@ fn default_settings() -> Settings {
         .with_accept_new_fields(true)
         .with_stop_words(vec![])
         .with_synonyms(HashMap::new())
-        .with_attributes_for_faceting(vec![String::from("categories")])
+        .with_attributes_for_faceting(vec![String::from("categories"), String::from("host")])
 }
 
 //endregion

@@ -24,6 +24,7 @@ serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
 rand = "0.7"
 
+gumdrop = "0.8"
 dotenv = "0.15"
 log = "0.4.8"
 env_logger = "0.7.1"

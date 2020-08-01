@@ -13,9 +13,9 @@ impl Scheduler {
         }
     }
 
-    pub fn run<F, R>(&mut self, interval: std::time::Duration, task: F)
+    pub fn run<F, R>(&mut self, interval: std::time::Duration, mut task: F)
     where
-        F: Fn() -> R + Send + 'static,
+        F: FnMut() -> R + Send + 'static,
         R: std::future::Future<Output = ()> + Send + 'static,
     {
         let future = time::interval(interval).for_each_concurrent(2, move |_| task());

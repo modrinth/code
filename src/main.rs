@@ -1,6 +1,7 @@
 use actix_web::middleware::Logger;
 use actix_web::{web, App, HttpServer};
 use env_logger::Env;
+use gumdrop::Options;
 use log::{info, warn};
 use search::indexing::index_mods;
 use search::indexing::IndexingSettings;
@@ -13,10 +14,25 @@ mod routes;
 mod scheduler;
 mod search;
 
+#[derive(Debug, Options)]
+struct Config {
+    #[options(help = "Print help message")]
+    help: bool,
+
+    #[options(no_short, help = "Skip indexing on startup")]
+    skip_first_index: bool,
+    #[options(no_short, help = "Reset the settings of the indices")]
+    reconfigure_indices: bool,
+    #[options(no_short, help = "Reset the documents in the indices")]
+    reset_indices: bool,
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
     env_logger::from_env(Env::default().default_filter_or("info")).init();
+
+    let config = Config::parse_args_default_or_exit();
 
     check_env_vars();
 
@@ -43,10 +59,17 @@ async fn main() -> std::io::Result<()> {
         Arc::new(file_hosting::MockHost::new())
     };
 
-    // TODO: use a real arg parsing library
-    let skip_initial = std::env::args().any(|x| x == "skip");
+    if config.reset_indices {
+        info!("Resetting indices");
+        search::indexing::reset_indices().await.unwrap();
+    } else if config.reconfigure_indices {
+        info!("Reconfiguring indices");
+        search::indexing::reconfigure_indices().await.unwrap();
+    }
+
     // Allow manually skipping the initial indexing for quicker iteration
     // and startup times.
+    let skip_initial = config.skip_first_index;
     if skip_initial {
         info!("Skipping initial indexing");
     }
@@ -66,9 +89,12 @@ async fn main() -> std::io::Result<()> {
     let mut skip = skip_initial;
     scheduler.run(local_index_interval, move || {
         let pool_ref = pool_ref.clone();
+        let local_skip = skip;
+        if skip {
+            skip = false;
+        }
         async move {
-            if skip {
-                skip = false;
+            if local_skip {
                 return;
             }
             info!("Indexing local database");
@@ -90,9 +116,12 @@ async fn main() -> std::io::Result<()> {
     let mut skip = skip_initial;
     scheduler.run(std::time::Duration::from_secs(15 * 60), move || {
         let queue = queue_ref.clone();
+        let local_skip = skip;
+        if skip {
+            skip = false;
+        }
         async move {
-            if skip {
-                skip = false;
+            if local_skip {
                 return;
             }
             info!("Indexing created mod queue");

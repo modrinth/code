@@ -2,6 +2,7 @@ use super::IndexingError;
 use crate::search::UploadSearchMod;
 use log::info;
 use serde::{Deserialize, Serialize};
+use std::borrow::Cow;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -200,7 +201,8 @@ pub async fn index_curseforge(
             date_modified: modified.to_string(),
             modified_timestamp: modified.timestamp(),
             latest_version,
-            empty: std::borrow::Cow::Borrowed("{}{}{}"),
+            host: Cow::Borrowed("curseforge"),
+            empty: Cow::Borrowed("{}{}{}"),
         })
     }
 
