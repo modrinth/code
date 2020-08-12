@@ -14,7 +14,6 @@ use sqlx::postgres::PgPool;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InitialVersionData {
-    pub mod_id: ModId,
     pub file_parts: Vec<String>,
     pub version_number: String,
     pub version_title: String,
@@ -30,8 +29,10 @@ struct InitialFileData {
     // TODO: hashes?
 }
 
-#[post("api/v1/version")]
+// under `/api/v1/mod/{mod_id}`
+#[post("version")]
 pub async fn version_create(
+    url_data: actix_web::web::Path<(ModId,)>,
     payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<std::sync::Arc<dyn FileHost + Send + Sync>>,
@@ -39,11 +40,14 @@ pub async fn version_create(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
+    let mod_id = url_data.into_inner().0.into();
+
     let result = version_create_inner(
         payload,
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
+        mod_id,
     )
     .await;
 
@@ -69,6 +73,7 @@ async fn version_create_inner(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
+    mod_id: models::ModId,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenv::var("CDN_URL")?;
 
@@ -94,12 +99,9 @@ async fn version_create_inner(
             initial_version_data = Some(version_create_data);
             let version_create_data = initial_version_data.as_ref().unwrap();
 
-            // TODO: get mod_id from path (POST `/api/v1/mod/{mod_id}/version`)
-            let mod_id: ModId = version_create_data.mod_id;
-
             let results = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
-                models::ModId::from(mod_id) as models::ModId
+                mod_id as models::ModId
             )
             .fetch_one(&mut *transaction)
             .await?;
@@ -113,7 +115,7 @@ async fn version_create_inner(
             let results = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number=$1) AND (mod_id=$2))",
                 version_create_data.version_number,
-                models::ModId::from(mod_id) as models::ModId,
+                mod_id as models::ModId,
             )
             .fetch_one(&mut *transaction)
             .await?;
@@ -125,7 +127,11 @@ async fn version_create_inner(
             }
 
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
-            let body_url = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
+            let body_url = format!(
+                "data/{}/changelogs/{}/body.md",
+                ModId::from(mod_id),
+                version_id
+            );
 
             let uploaded_text = file_host
                 .upload_file(
@@ -149,7 +155,7 @@ async fn version_create_inner(
 
             version_builder = Some(VersionBuilder {
                 version_id: version_id.into(),
-                mod_id: mod_id.into(),
+                mod_id,
                 name: version_create_data.version_title.clone(),
                 version_number: version_create_data.version_number.clone(),
                 changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
@@ -246,16 +252,19 @@ async fn version_create_inner(
                 hashes: file
                     .hashes
                     .iter()
-                    .map(|hash| crate::models::mods::FileHash {
-                        algorithm: hash.algorithm.clone(),
-                        // This is a hack since the hashes are currently stored as ASCII
-                        // in the database, but represented here as a Vec<u8>.  At some
-                        // point we need to change the hash to be the real bytes  in the
-                        // database and add more processing here.
-                        hash: String::from_utf8(hash.hash.clone()).unwrap(),
+                    .map(|hash| {
+                        (
+                            hash.algorithm.clone(),
+                            // This is a hack since the hashes are currently stored as ASCII
+                            // in the database, but represented here as a Vec<u8>.  At some
+                            // point we need to change the hash to be the real bytes  in the
+                            // database and add more processing here.
+                            String::from_utf8(hash.hash.clone()).unwrap(),
+                        )
                     })
                     .collect(),
                 url: file.url.clone(),
+                filename: file.filename.clone(),
             })
             .collect::<Vec<_>>(),
         dependencies: version_data_safe.dependencies,
@@ -270,9 +279,10 @@ async fn version_create_inner(
 
 // TODO: file deletion, listing, etc
 
-#[post("api/v1/version/{version_id}/file")]
+// under /api/v1/mod/{mod_id}/version/{version_id}
+#[post("file")]
 pub async fn upload_file_to_version(
-    url_data: actix_web::web::Path<(VersionId,)>,
+    url_data: actix_web::web::Path<(ModId, VersionId)>,
     payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<std::sync::Arc<dyn FileHost + Send + Sync>>,
@@ -280,7 +290,9 @@ pub async fn upload_file_to_version(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let version_id = models::VersionId::from(url_data.into_inner().0);
+    let data = url_data.into_inner();
+    let mod_id = models::ModId::from(data.0);
+    let version_id = models::VersionId::from(data.1);
 
     let result = upload_file_to_version_inner(
         payload,
@@ -288,6 +300,7 @@ pub async fn upload_file_to_version(
         &***file_host,
         &mut uploaded_files,
         version_id,
+        mod_id,
     )
     .await;
 
@@ -314,6 +327,7 @@ async fn upload_file_to_version_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
+    mod_id: models::ModId,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenv::var("CDN_URL")?;
 
@@ -339,6 +353,12 @@ async fn upload_file_to_version_inner(
             ));
         }
     };
+    if version.mod_id as u64 != mod_id.0 as u64 {
+        return Err(CreateError::InvalidInput(
+            "An invalid version id was supplied".to_string(),
+        ));
+    }
+
     let mod_id = ModId(version.mod_id as u64);
     let version_number = version.version_number;
 

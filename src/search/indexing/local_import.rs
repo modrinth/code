@@ -34,7 +34,22 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
             .try_collect::<Vec<String>>()
             .await?;
 
-            let categories = sqlx::query!(
+            // TODO: only loaders for recent versions? For mods that have moved from forge to fabric
+            let loaders: Vec<String> = sqlx::query!(
+                "
+                SELECT loaders.loader FROM versions
+                INNER JOIN loaders_versions lv ON lv.version_id = versions.id
+                INNER JOIN loaders ON loaders.id = lv.loader_id
+                WHERE versions.mod_id = $1
+                ",
+                result.id
+            )
+            .fetch_many(&pool)
+            .try_filter_map(|e| async { Ok(e.right().map(|c| c.loader)) })
+            .try_collect::<Vec<String>>()
+            .await?;
+
+            let mut categories = sqlx::query!(
                 "
                 SELECT c.category
                 FROM mods_categories mc
@@ -47,6 +62,8 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
             .try_filter_map(|e| async { Ok(e.right().map(|c| c.category)) })
             .try_collect::<Vec<String>>()
             .await?;
+
+            categories.extend(loaders);
 
             let mut icon_url = "".to_string();
 

@@ -1,5 +1,5 @@
 use super::DatabaseError;
-use crate::models::ids::random_base62;
+use crate::models::ids::random_base62_rng;
 use sqlx_macros::Type;
 
 const ID_RETRY_COUNT: usize = 20;
@@ -9,8 +9,10 @@ macro_rules! generate_ids {
         $vis async fn $function_name(
             con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         ) -> Result<$return_type, DatabaseError> {
+            use rand::Rng;
+            let mut rng = rand::thread_rng();
             let length = $id_length;
-            let mut id = random_base62(length);
+            let mut id = random_base62_rng(&mut rng, length);
             let mut retry_count = 0;
 
             // Check if ID is unique
@@ -20,7 +22,7 @@ macro_rules! generate_ids {
                     .await?;
 
                 if results.exists.unwrap_or(true) {
-                    id = random_base62(length);
+                    id = random_base62_rng(&mut rng, length);
                 } else {
                     break;
                 }

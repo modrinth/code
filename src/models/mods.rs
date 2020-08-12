@@ -81,20 +81,13 @@ pub struct Version {
 /// A single mod file, with a url for the file and the file's hash
 #[derive(Serialize, Deserialize)]
 pub struct VersionFile {
-    /// A list of hashes of the file
-    pub hashes: Vec<FileHash>,
+    /// A map of hashes of the file.  The key is the hashing algorithm
+    /// and the value is the string version of the hash.
+    pub hashes: std::collections::HashMap<String, String>,
     /// A direct link to the file for downloading it.
     pub url: String,
-}
-
-/// A hash of a mod's file
-#[derive(Serialize, Deserialize)]
-pub struct FileHash {
-    // TODO: decide specific algorithms
-    /// The hashing algorithm used for this hash; could be "md5", "sha1", etc
-    pub algorithm: String,
-    /// The file hash, using the specified algorithm
-    pub hash: String,
+    /// A direct link to the file for downloading it.
+    pub filename: String,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

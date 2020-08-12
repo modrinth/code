@@ -142,7 +142,7 @@ pub async fn index_curseforge(
             }
         }
 
-        if mod_categories.contains(&"fabric".to_owned()) {
+        if mod_categories.iter().any(|e| e == "fabric") {
             using_fabric = true;
         }
 
@@ -154,7 +154,8 @@ pub async fn index_curseforge(
             mod_categories.push(String::from("forge"));
         }
         if using_fabric {
-            mod_categories.push(String::from("fabric"));
+            // The only way this could happen is if "fabric" is already a category
+            // mod_categories.push(String::from("fabric"));
         }
 
         let mut mod_attachments = curseforge_mod.attachments;

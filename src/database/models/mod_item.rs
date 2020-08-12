@@ -105,4 +105,175 @@ impl Mod {
 
         Ok(())
     }
+
+    pub async fn get<'a, 'b, E>(id: ModId, executor: E) -> Result<Option<Self>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT title, description, downloads,
+                   icon_url, body_url, published,
+                   issues_url, source_url, wiki_url,
+                   team_id
+            FROM mods
+            WHERE id = $1
+            ",
+            id as ModId,
+        )
+        .fetch_optional(executor)
+        .await?;
+
+        if let Some(row) = result {
+            Ok(Some(Mod {
+                id,
+                team_id: TeamId(row.team_id),
+                title: row.title,
+                description: row.description,
+                downloads: row.downloads,
+                body_url: row.body_url,
+                icon_url: row.icon_url,
+                published: row.published,
+                issues_url: row.issues_url,
+                source_url: row.source_url,
+                wiki_url: row.wiki_url,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub async fn remove_full<'a, 'b, E>(
+        id: ModId,
+        exec: E,
+    ) -> Result<Option<()>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT team_id FROM mods WHERE id = $1
+            ",
+            id as ModId,
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        let team_id: TeamId = if let Some(id) = result {
+            TeamId(id.team_id)
+        } else {
+            return Ok(None);
+        };
+
+        sqlx::query!(
+            "
+            DELETE FROM mods_categories
+            WHERE joining_mod_id = $1
+            ",
+            id as ModId,
+        )
+        .execute(exec)
+        .await?;
+
+        use futures::TryStreamExt;
+        let versions: Vec<VersionId> = sqlx::query!(
+            "
+            SELECT id FROM versions
+            WHERE mod_id = $1
+            ",
+            id as ModId,
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|c| VersionId(c.id))) })
+        .try_collect::<Vec<VersionId>>()
+        .await?;
+
+        for version in versions {
+            super::Version::remove_full(version, exec).await?;
+        }
+
+        sqlx::query!(
+            "
+            DELETE FROM mods
+            WHERE id = $1
+            ",
+            id as ModId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM team_members
+            WHERE team_id = $1
+            ",
+            team_id as TeamId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM teams
+            WHERE id = $1
+            ",
+            team_id as TeamId,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(Some(()))
+    }
+
+    pub async fn get_full<'a, 'b, E>(
+        id: ModId,
+        executor: E,
+    ) -> Result<Option<QueryMod>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let result = Self::get(id, executor).await?;
+        if let Some(inner) = result {
+            use futures::TryStreamExt;
+            let categories: Vec<String> = sqlx::query!(
+                "
+                SELECT category FROM mods_categories
+                INNER JOIN categories ON joining_category_id = id
+                WHERE joining_mod_id = $1
+                ",
+                id as ModId,
+            )
+            .fetch_many(executor)
+            .try_filter_map(|e| async { Ok(e.right().map(|c| c.category)) })
+            .try_collect::<Vec<String>>()
+            .await?;
+
+            let versions: Vec<VersionId> = sqlx::query!(
+                "
+                SELECT id FROM versions
+                WHERE mod_id = $1
+                ",
+                id as ModId,
+            )
+            .fetch_many(executor)
+            .try_filter_map(|e| async { Ok(e.right().map(|c| VersionId(c.id))) })
+            .try_collect::<Vec<VersionId>>()
+            .await?;
+
+            Ok(Some(QueryMod {
+                inner,
+                categories,
+                versions,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
+}
+
+pub struct QueryMod {
+    pub inner: Mod,
+
+    pub categories: Vec<String>,
+    pub versions: Vec<VersionId>,
 }

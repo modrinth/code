@@ -36,6 +36,12 @@ pub enum CreateError {
     InvalidIconFormat(String),
     #[error("Error with multipart data: {0}")]
     InvalidInput(String),
+    #[error("Invalid game version: {0}")]
+    InvalidGameVersion(String),
+    #[error("Invalid loader: {0}")]
+    InvalidLoader(String),
+    #[error("Invalid category: {0}")]
+    InvalidCategory(String),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -50,6 +56,9 @@ impl actix_web::ResponseError for CreateError {
             CreateError::MissingValueError(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidIconFormat(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidInput(..) => StatusCode::BAD_REQUEST,
+            CreateError::InvalidGameVersion(..) => StatusCode::BAD_REQUEST,
+            CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
+            CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -65,6 +74,9 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::MissingValueError(..) => "invalid_input",
                 CreateError::InvalidIconFormat(..) => "invalid_input",
                 CreateError::InvalidInput(..) => "invalid_input",
+                CreateError::InvalidGameVersion(..) => "invalid_input",
+                CreateError::InvalidLoader(..) => "invalid_input",
+                CreateError::InvalidCategory(..) => "invalid_input",
             },
             description: &self.to_string(),
         })
@@ -112,7 +124,7 @@ pub async fn undo_uploads(
     Ok(())
 }
 
-#[post("api/v1/mod")]
+#[post("mod")]
 pub async fn mod_create(
     payload: Multipart,
     client: Data<PgPool>,
@@ -256,6 +268,22 @@ async fn mod_create_inner(
                     VersionType::Alpha => models::ChannelId(5),
                 };
 
+                let mut game_versions = Vec::with_capacity(version_data.game_versions.len());
+                for v in &version_data.game_versions {
+                    let id = models::categories::GameVersion::get_id(&v.0, &mut *transaction)
+                        .await?
+                        .ok_or_else(|| CreateError::InvalidGameVersion(v.0.clone()))?;
+                    game_versions.push(id);
+                }
+
+                let mut loaders = Vec::with_capacity(version_data.loaders.len());
+                for l in &version_data.loaders {
+                    let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
+                        .await?
+                        .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
+                    loaders.push(id);
+                }
+
                 let version = models::version_item::VersionBuilder {
                     version_id: version_id.into(),
                     mod_id: mod_id.into(),
@@ -268,9 +296,8 @@ async fn mod_create_inner(
                         .iter()
                         .map(|x| (*x).into())
                         .collect::<Vec<_>>(),
-                    // TODO: add game_versions and loaders info
-                    game_versions: vec![],
-                    loaders: vec![],
+                    game_versions,
+                    loaders,
                     release_channel,
                 };
 
@@ -329,6 +356,14 @@ async fn mod_create_inner(
         )));
     };
 
+    let mut categories = Vec::with_capacity(create_data.categories.len());
+    for category in &create_data.categories {
+        let id = models::categories::Category::get_id(&category, &mut *transaction)
+            .await?
+            .ok_or_else(|| CreateError::InvalidCategory(category.clone()))?;
+        categories.push(id);
+    }
+
     let body_url = format!("data/{}/body.md", mod_id);
 
     let upload_data = file_host
@@ -367,8 +402,7 @@ async fn mod_create_inner(
         source_url: create_data.source_url,
         wiki_url: create_data.wiki_url,
 
-        // TODO: convert `create_data.categories` from Vec<String> to Vec<CategoryId>
-        categories: Vec::new(),
+        categories,
         initial_versions: created_versions,
     };
 

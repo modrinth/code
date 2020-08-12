@@ -3,6 +3,7 @@
 
 use thiserror::Error;
 
+pub mod categories;
 pub mod ids;
 pub mod mod_item;
 pub mod team_item;
@@ -22,4 +23,9 @@ pub enum DatabaseError {
     DatabaseError(#[from] sqlx::error::Error),
     #[error("Error while trying to generate random ID")]
     RandomIdError,
+    #[error(
+        "Invalid identifier: Category/version names must contain only ASCII \
+             alphanumeric characters or '_-'."
+    )]
+    InvalidIdentifier(String),
 }

@@ -171,7 +171,7 @@ pub mod base62_impl {
 
     fn parse_base62(string: &str) -> Result<u64, DecodingError> {
         let mut num: u64 = 0;
-        for c in string.chars().rev() {
+        for c in string.chars() {
             let next_digit;
             if c.is_ascii_digit() {
                 next_digit = (c as u8 - b'0') as u64;

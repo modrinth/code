@@ -176,10 +176,11 @@ async fn main() -> std::io::Result<()> {
             .data(file_host.clone())
             .data(indexing_queue.clone())
             .service(routes::index_get)
-            .service(routes::mod_search)
-            .service(routes::mod_create)
-            .service(routes::version_create)
-            .service(routes::upload_file_to_version)
+            .service(
+                web::scope("/api/v1/")
+                    .configure(routes::tags_config)
+                    .configure(routes::mods_config),
+            )
             .default_service(web::get().to(routes::not_found))
     })
     .bind(dotenv::var("BIND_ADDR").unwrap())?
