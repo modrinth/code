@@ -146,7 +146,7 @@ pub async fn index_curseforge(
             using_fabric = true;
         }
 
-        mod_categories.sort();
+        mod_categories.sort_unstable();
         mod_categories.dedup();
         mod_categories.truncate(3);
 

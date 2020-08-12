@@ -178,6 +178,8 @@ async fn main() -> std::io::Result<()> {
             .service(routes::index_get)
             .service(routes::mod_search)
             .service(routes::mod_create)
+            .service(routes::version_create)
+            .service(routes::upload_file_to_version)
             .default_service(web::get().to(routes::not_found))
     })
     .bind(dotenv::var("BIND_ADDR").unwrap())?

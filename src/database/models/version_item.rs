@@ -20,6 +20,45 @@ pub struct VersionFileBuilder {
     pub hashes: Vec<HashBuilder>,
 }
 
+impl VersionFileBuilder {
+    pub async fn insert(
+        self,
+        version_id: VersionId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<FileId, DatabaseError> {
+        let file_id = generate_file_id(&mut *transaction).await?;
+
+        sqlx::query!(
+            "
+            INSERT INTO files (id, version_id, url, filename)
+            VALUES ($1, $2, $3, $4)
+            ",
+            file_id as FileId,
+            version_id as VersionId,
+            self.url,
+            self.filename,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        for hash in self.hashes {
+            sqlx::query!(
+                "
+                INSERT INTO hashes (file_id, algorithm, hash)
+                VALUES ($1, $2, $3)
+                ",
+                file_id as FileId,
+                hash.algorithm,
+                hash.hash,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        Ok(file_id)
+    }
+}
+
 pub struct HashBuilder {
     pub algorithm: String,
     pub hash: Vec<u8>,
@@ -44,33 +83,7 @@ impl VersionBuilder {
         version.insert(&mut *transaction).await?;
 
         for file in self.files {
-            let file_id = generate_file_id(&mut *transaction).await?;
-            sqlx::query!(
-                "
-                INSERT INTO files (id, version_id, url, filename)
-                VALUES ($1, $2, $3, $4)
-                ",
-                file_id as FileId,
-                self.version_id as VersionId,
-                file.url,
-                file.filename,
-            )
-            .execute(&mut *transaction)
-            .await?;
-
-            for hash in file.hashes {
-                sqlx::query!(
-                    "
-                    INSERT INTO hashes (file_id, algorithm, hash)
-                    VALUES ($1, $2, $3)
-                    ",
-                    file_id as FileId,
-                    hash.algorithm,
-                    hash.hash,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
+            file.insert(self.version_id, transaction);
         }
 
         for dependency in self.dependencies {

@@ -1,5 +1,5 @@
 use super::ids::Base62Id;
-use super::teams::Team;
+use super::teams::TeamId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -20,10 +20,8 @@ pub struct VersionId(pub u64);
 pub struct Mod {
     /// The ID of the mod, encoded as a base62 string.
     pub id: ModId,
-    // TODO: send partial team structure to reduce requests, but avoid sending
-    // unnecessary info
     /// The team of people that has ownership of this mod.
-    pub team: Team,
+    pub team: TeamId,
     /// The title or name of the mod.
     pub title: String,
     /// A short description of the mod.

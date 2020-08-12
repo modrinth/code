@@ -1,8 +1,9 @@
 use crate::database::models;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
-use crate::models::mods::{GameVersion, ModId, VersionId, VersionType};
+use crate::models::mods::{ModId, VersionId, VersionType};
 use crate::models::teams::TeamMember;
+use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::queue::CreationQueue;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
@@ -71,18 +72,6 @@ impl actix_web::ResponseError for CreateError {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
-struct InitialVersionData {
-    pub file_parts: Vec<String>,
-    pub version_number: String,
-    pub version_title: String,
-    pub version_body: String,
-    pub dependencies: Vec<VersionId>,
-    pub game_versions: Vec<GameVersion>,
-    pub release_channel: VersionType,
-    pub loaders: Vec<String>,
-}
-
-#[derive(Serialize, Deserialize, Clone)]
 struct ModCreateData {
     /// The title or name of the mod.
     pub mod_name: String,
@@ -106,12 +95,12 @@ struct ModCreateData {
     pub wiki_url: Option<String>,
 }
 
-struct UploadedFile {
-    file_id: String,
-    file_name: String,
+pub struct UploadedFile {
+    pub file_id: String,
+    pub file_name: String,
 }
 
-async fn undo_uploads(
+pub async fn undo_uploads(
     file_host: &dyn FileHost,
     uploaded_files: &[UploadedFile],
 ) -> Result<(), CreateError> {
@@ -423,10 +412,30 @@ async fn mod_create_inner(
 
     indexing_queue.add(index_mod);
 
+    let response = crate::models::mods::Mod {
+        id: mod_id,
+        team: team_id.into(),
+        title: mod_builder.title.clone(),
+        description: mod_builder.description.clone(),
+        body_url: mod_builder.body_url.clone(),
+        published: now,
+        downloads: 0,
+        categories: create_data.categories.clone(),
+        versions: mod_builder
+            .initial_versions
+            .iter()
+            .map(|v| v.version_id.into())
+            .collect::<Vec<_>>(),
+        icon_url: mod_builder.icon_url.clone(),
+        issues_url: mod_builder.issues_url.clone(),
+        source_url: mod_builder.source_url.clone(),
+        wiki_url: mod_builder.wiki_url.clone(),
+    };
+
     let _mod_id = mod_builder.insert(&mut *transaction).await?;
 
     // TODO: respond with the new mod info, or with just the new mod id.
-    Ok(HttpResponse::Ok().into())
+    Ok(HttpResponse::Ok().json(response))
 }
 
 async fn process_icon_upload(
