@@ -129,9 +129,10 @@ async fn update_index<'a>(
 ) -> Result<Index<'a>, IndexingError> {
     let index = match client.get_index(name).await {
         Ok(index) => index,
-        Err(meilisearch_sdk::errors::Error::IndexNotFound) => {
-            client.create_index(name, Some("mod_id")).await?
-        }
+        Err(meilisearch_sdk::errors::Error::MeiliSearchError {
+            error_code: meilisearch_sdk::errors::ErrorCode::IndexNotFound,
+            ..
+        }) => client.create_index(name, Some("mod_id")).await?,
         Err(e) => {
             return Err(IndexingError::IndexDBError(e));
         }
@@ -150,7 +151,10 @@ async fn create_index<'a>(
     match client.get_index(name).await {
         // TODO: update index settings on startup (or delete old indices on startup)
         Ok(index) => Ok(index),
-        Err(meilisearch_sdk::errors::Error::IndexNotFound) => {
+        Err(meilisearch_sdk::errors::Error::MeiliSearchError {
+                error_code: meilisearch_sdk::errors::ErrorCode::IndexNotFound,
+                ..
+        }) => {
             // Only create index and set settings if the index doesn't already exist
             let index = client.create_index(name, Some("mod_id")).await?;
 
@@ -260,7 +264,6 @@ fn default_settings() -> Settings {
     Settings::new()
         .with_displayed_attributes(displayed_attributes)
         .with_searchable_attributes(searchable_attributes)
-        .with_accept_new_fields(true)
         .with_stop_words(vec![])
         .with_synonyms(HashMap::new())
         .with_attributes_for_faceting(vec![String::from("categories"), String::from("host")])

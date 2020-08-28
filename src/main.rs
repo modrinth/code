@@ -1,6 +1,6 @@
-use actix_web::middleware::Logger;
 use actix_cors::Cors;
-use actix_web::{web, App, HttpServer, http};
+use actix_web::middleware::Logger;
+use actix_web::{http, web, App, HttpServer};
 use env_logger::Env;
 use gumdrop::Options;
 use log::{info, warn};
@@ -178,7 +178,7 @@ async fn main() -> std::io::Result<()> {
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
                     .allowed_header(http::header::CONTENT_TYPE)
                     .max_age(3600)
-                    .finish()
+                    .finish(),
             )
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))

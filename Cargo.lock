@@ -35,6 +35,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-cors"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0a6206917d5c0fdd79d81cec9ef02d3e802df4abf276d96241e1f595d971e002"
+dependencies = [
+ "actix-service",
+ "actix-web",
+ "derive_more",
+ "futures",
+]
+
+[[package]]
 name = "actix-files"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1146,6 +1158,7 @@ dependencies = [
 name = "labrinth"
 version = "0.1.0"
 dependencies = [
+ "actix-cors",
  "actix-files",
  "actix-multipart",
  "actix-rt",
@@ -1278,8 +1291,9 @@ dependencies = [
 
 [[package]]
 name = "meilisearch-sdk"
-version = "0.1.4"
-source = "git+https://github.com/Aeledfyr/meilisearch-rust#ba1f1e530cb383f421273f6863378bc9bc222f7b"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3a9e61da1ebd3d15e0aaa978d3f1f080e3793494ddea0bc6703da4b330ea1ffc"
 dependencies = [
  "log",
  "reqwest",
