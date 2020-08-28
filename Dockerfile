@@ -15,18 +15,18 @@ RUN sed -i 's|dummy.rs|src/main.rs|' Cargo.toml
 
 # Copy everything
 COPY . .
+# Add the wait script
+ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
+RUN chmod +x /wait
 # Build our code
 ARG SQLX_OFFLINE=true
 RUN cargo build --release
 
 
 FROM gcr.io/distroless/cc-debian10
-RUN mkdir /opt/labrinth
-COPY --from=build /usr/src/labrinth/target/release/labrinth /opt/labrinth/labrinth
-COPY --from=build /usr/src/labrinth/target/release/migrations/* /opt/labrinth/migrations/
-WORKDIR /opt/labrinth
-
-ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait
-RUN chmod +x /wait
+COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth
+COPY --from=build /usr/src/labrinth/target/release/migrations/* /labrinth/migrations/
+COPY --from=build /wait /wait
+WORKDIR /labrinth
 
 CMD /wait && /opt/labrinth
