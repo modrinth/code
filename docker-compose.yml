@@ -9,6 +9,7 @@ services:
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: labrinth
+      POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
   meilisearch:
     image: getmeili/meilisearch

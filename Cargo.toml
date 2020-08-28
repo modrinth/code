@@ -45,7 +45,7 @@ sha1 = {version="0.6.0", features=["std"]}
 git = "https://github.com/launchbadge/sqlx/"
 branch = "master"
 default-features = false
-features = ["runtime-actix", "postgres", "chrono", "offline", "macros"]
+features = ["runtime-actix", "postgres", "chrono", "offline", "macros", "migrate"]
 
 [dependencies.sqlx-macros]
 git = "https://github.com/launchbadge/sqlx/"

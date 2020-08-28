@@ -37,6 +37,8 @@ async fn main() -> std::io::Result<()> {
 
     check_env_vars();
 
+    database::check_for_migrations().await.expect("An error occurred while running migrations.");
+
     // Database Connector
     let pool = database::connect()
         .await
