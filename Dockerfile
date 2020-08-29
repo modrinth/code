@@ -24,7 +24,7 @@ RUN cargo build --release
 
 
 FROM bitnami/minideb:latest
-RUN install_packages openssl
+RUN install_packages openssl ca-certificates
 COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth/labrinth
 COPY --from=build /usr/src/labrinth/migrations/* /labrinth/migrations/
 COPY --from=build /wait /wait
