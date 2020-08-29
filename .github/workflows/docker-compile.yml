@@ -2,8 +2,8 @@ name: Docker image build
 
 on:
   push:
-    branches:
-    - !master
+    branches-ignore:
+    - master
   pull_request:
 env:
   CARGO_TERM_COLOR: always

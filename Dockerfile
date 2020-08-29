@@ -23,10 +23,11 @@ ARG SQLX_OFFLINE=true
 RUN cargo build --release
 
 
-FROM gcr.io/distroless/cc-debian10
-COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth
-COPY --from=build /usr/src/labrinth/target/release/migrations/* /labrinth/migrations/
+FROM bitnami/minideb:latest
+RUN install_packages openssl
+COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth/labrinth
+COPY --from=build /usr/src/labrinth/migrations/* /labrinth/migrations/
 COPY --from=build /wait /wait
 WORKDIR /labrinth
 
-CMD /wait && /opt/labrinth
+CMD /wait && /labrinth/labrinth
