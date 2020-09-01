@@ -24,9 +24,7 @@
                 <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
                 <line x1="12" y1="22.08" x2="12" y2="12" />
               </svg>
-              <span>
-                Modpacks
-              </span>
+              <span> Modpacks </span>
             </nuxt-link>
             <nuxt-link to="/mods">
               <svg
@@ -116,9 +114,7 @@
         <section class="user-actions">
           <div class="avatar">
             <img src="~/assets/images/avatar.jpg" />
-            <span>
-              falseresync
-            </span>
+            <span> falseresync </span>
           </div>
           <div class="notifications">
             <svg
