@@ -7,3 +7,18 @@
     }
   }
 }
+
+.rows {
+  display: flex;
+  flex-direction: row;
+
+  @for $i from 1 through 4 {
+    .row-grow-#{$i} {
+      flex-grow: $i;
+    }
+  }
+}
+
+.w-100 {
+  width: 100%;
+}

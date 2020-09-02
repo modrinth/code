@@ -162,6 +162,10 @@
   width: 100%;
 
   aside {
+    top: 0;
+    position: -webkit-sticky;
+    position: sticky;
+    max-height: 100vh;
     border-right: 1px solid var(--color-grey-2);
     display: flex; // Flex here to safely expand navigation height
     flex-direction: column;
@@ -205,9 +209,7 @@
 
           a {
             align-items: center;
-            border-radius: 0.25rem;
-            border-bottom-left-radius: 0;
-            border-top-left-radius: 0;
+            border-radius: 0 0.25rem 0.25rem 0;
             color: var(--color-grey-5);
             display: flex;
             margin-bottom: 0.25rem;
