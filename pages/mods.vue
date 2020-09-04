@@ -72,33 +72,221 @@
       </div>
     </div>
     <section class="filters">
+      <!--#region filters  -->
       <div>
-        <!--<section class="filter-group">
+        <section class="filter-group">
           <h3>Categories</h3>
-          <section>
+          <p>
             <svg
-              enable-background="new 0 0 24 24"
-              height="24"
               viewBox="0 0 24 24"
-              width="24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
             >
-              <g><rect fill="none" height="24" width="24" /></g>
-              <g>
-                <path
-                  d="M22,12c0-1.1-0.9-2-2-2V7c0-1.1-0.9-2-2-2H6C4.9,5,4,5.9,4,7v3c-1.1,0-2,0.9-2,2v5h1.33L4,19h1l0.67-2h12.67L19,19h1 l0.67-2H22V12z M18,10h-5V7h5V10z M6,7h5v3H6V7z M4,12h16v3H4V12z"
-                />
-              </g>
+              <line x1="22" y1="12" x2="2" y2="12"></line>
+              <path
+                d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"
+              ></path>
+              <line x1="6" y1="16" x2="6.01" y2="16"></line>
+              <line x1="10" y1="16" x2="10.01" y2="16"></line>
             </svg>
-            <span>Decoration</span>
-          </section>
-          <section>
-            <span>A</span>
-          </section>
-          <section>
-            <span>A</span>
-          </section>
-        </section>-->
+            Tech
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polygon
+                points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"
+              ></polygon>
+            </svg>
+            Adventure
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M10.42 3C9.88 9.2 4 9.4 4 14.38c0 2.8 1.7 5.35 4.17 6.62.76-2.1 3.83-3.17 3.83-5.57a7.65 7.65 0 013.92 5.52C24.13 15.88 18.9 6.18 10.42 3z"
+              />
+            </svg>
+            Magic
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
+              <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
+            </svg>
+
+            Utility
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              <polyline points="9 22 9 12 15 12 15 22" />
+            </svg>
+            Decoration
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+              <path
+                d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
+              ></path>
+            </svg>
+            Library
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="7" y="7.5" width="10" height="14" rx="5" />
+              <polyline points="2 12.5 4 14.5 7 14.5" />
+              <polyline points="22 12.5 20 14.5 17 14.5" />
+              <polyline points="3 21.5 5 18.5 7 17.5" />
+              <polyline points="21 21.5 19 18.5 17 17.5" />
+              <polyline points="3 8.5 5 10.5 7 11.5" />
+              <polyline points="21 8.5 19 10.5 17 11.5" />
+              <line x1="12" y1="7.5" x2="12" y2="21.5" />
+              <path
+                d="M15.38,8.82A3,3,0,0,0,16,7h0a3,3,0,0,0-3-3H11A3,3,0,0,0,8,7H8a3,3,0,0,0,.61,1.82"
+              />
+              <line x1="9" y1="4.5" x2="8" y2="2.5" />
+              <line x1="15" y1="4.5" x2="16" y2="2.5" />
+            </svg>
+            Cursed
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M12 2v6.5M10 4l2 1 2-1M3.3 7L9 10.2m-4.9-.5L6 8.5l.1-2.2M3.3 17L9 13.7m-2.9 4L6 15.5l-1.9-1.2M12 22v-6.5m2 4.5l-2-1-2 1m5-6.2l5.6 3.3m-.7-2.8L18 15.5l-.1 2.2M20.7 7L15 10.3m2.9-4l.1 2.2 1.9 1.2M12 8.5l3 1.8v3.5l-3 1.8-3-1.8v-3.5l3-1.8z"
+              />
+            </svg>
+            Worldgen
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="21 8 21 21 3 21 3 8"></polyline>
+              <rect x="1" y="3" width="22" height="5"></rect>
+              <line x1="10" y1="12" x2="14" y2="12"></line>
+            </svg>
+            Storage
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path>
+              <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path>
+              <line x1="6" y1="1" x2="6" y2="4"></line>
+              <line x1="10" y1="1" x2="10" y2="4"></line>
+              <line x1="14" y1="1" x2="14" y2="4"></line>
+            </svg>
+            Food
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M17.573 20.038L3.849 7.913 2.753 2.755 7.838 4.06 19.47 18.206l-1.898 1.832z"
+              />
+              <path d="M7.45 14.455l-3.043 3.661 1.887 1.843 3.717-3.25" />
+              <path
+                d="M16.75 10.82l3.333-2.913 1.123-5.152-5.091 1.28-2.483 2.985"
+              />
+              <path d="M21.131 16.602l-5.187 5.01 2.596-2.508 2.667 2.761" />
+              <path d="M2.828 16.602l5.188 5.01-2.597-2.508-2.667 2.761" />
+            </svg>
+            Equipment
+          </p>
+          <p>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="2" y1="12" x2="22" y2="12"></line>
+              <path
+                d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+              ></path>
+            </svg>
+            Misc
+          </p>
+          <h3>Loaders</h3>
+          <p>Forge</p>
+          <p>Fabric</p>
+          <h3>Versions</h3>
+        </section>
       </div>
+      <!--#endregion -->
     </section>
   </div>
 </template>
@@ -106,15 +294,19 @@
 <script>
 import axios from 'axios'
 import SearchResult from '@/components/SearchResult'
+// import Multiselect from 'vue-multiselect'
 
 export default {
   components: {
+    // Multiselect,
     SearchResult,
   },
   data() {
     return {
       query: '',
       results: [],
+      value: null,
+      options: ['1.16.2', '1.16.1'],
     }
   },
   async created() {
@@ -158,6 +350,7 @@ export default {
 }
 </script>
 
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style lang="scss">
 #search-pagination {
   align-items: center;
@@ -193,7 +386,6 @@ export default {
     h3 {
       color: #718096;
       font-size: 0.8rem;
-      text-align: left !important;
       letter-spacing: 0.02rem;
       margin-bottom: 0.5rem;
       margin-top: 1.5rem;
@@ -203,24 +395,23 @@ export default {
 }
 
 .filter-group {
-  text-align: center;
   margin-top: 2em;
 
-  section {
+  p {
+    display: flex;
+    align-items: center;
     cursor: pointer;
-    width: 100%;
-    padding: 2px;
+    padding: 2px 2px 2px 20px;
+    margin: 0 0 0 5px;
     border-left: 4px solid var(--color-grey-3);
     border-radius: 0 0.25rem 0.25rem 0;
-    color: var(--color-grey-3);
-
-    span {
-      margin-left: 10px;
-    }
+    color: var(--color-grey-5);
+    font-size: 1rem;
+    letter-spacing: 0.02rem;
 
     svg {
+      margin-right: 5px;
       height: 1rem;
-      width: 1rem;
     }
 
     &:hover,
