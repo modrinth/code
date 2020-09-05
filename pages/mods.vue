@@ -294,35 +294,19 @@
 <script>
 import axios from 'axios'
 import SearchResult from '@/components/SearchResult'
-// import Multiselect from 'vue-multiselect'
 
 export default {
   components: {
-    // Multiselect,
     SearchResult,
   },
   data() {
     return {
       query: '',
       results: [],
-      value: null,
-      options: ['1.16.2', '1.16.1'],
     }
   },
   async created() {
-    const config = {
-      headers: {
-        Accept: 'application/json',
-      },
-    }
-
-    try {
-      const res = await axios.get('https://api.modrinth.com/api/v1/mod', config)
-
-      this.results = res.data
-    } catch (err) {
-      console.error(err)
-    }
+    await this.onSearchChange()
   },
   methods: {
     async onSearchChange() {
@@ -333,10 +317,13 @@ export default {
       }
 
       try {
-        const res = await axios.get(
-          `https://api.modrinth.com/api/v1/mod?query=${this.query}`,
-          config
-        )
+        let url = 'https://api.modrinth.com/api/v1/mod'
+
+        if (this.query.length > 0) {
+          url += `?query=${this.query}`
+        }
+
+        const res = await axios.get(url, config)
 
         this.results = res.data
       } catch (err) {
@@ -415,9 +402,14 @@ export default {
     }
 
     &:hover,
-    &:focus {
+    &:focus,
+    &.filter-active {
       background-color: var(--color-grey-1);
       color: var(--color-text);
+    }
+
+    .filter-active {
+      border-left: 4px solid var(--color-brand);
     }
   }
 }
