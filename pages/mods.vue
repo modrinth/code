@@ -76,7 +76,7 @@
       <div>
         <section class="filter-group">
           <h3>Categories</h3>
-          <p>
+          <p id="technology" @click="toggleFilter('technology')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -92,9 +92,9 @@
               <line x1="6" y1="16" x2="6.01" y2="16"></line>
               <line x1="10" y1="16" x2="10.01" y2="16"></line>
             </svg>
-            Tech
+            Technology
           </p>
-          <p>
+          <p id="adventure" @click="toggleFilter('adventure')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -110,7 +110,7 @@
             </svg>
             Adventure
           </p>
-          <p>
+          <p id="magic" @click="toggleFilter('magic')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -125,7 +125,7 @@
             </svg>
             Magic
           </p>
-          <p>
+          <p id="utility" @click="toggleFilter('utility')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -137,10 +137,9 @@
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
-
             Utility
           </p>
-          <p>
+          <p id="decoration" @click="toggleFilter('decoration')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -154,7 +153,7 @@
             </svg>
             Decoration
           </p>
-          <p>
+          <p id="library" @click="toggleFilter('library')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -170,7 +169,7 @@
             </svg>
             Library
           </p>
-          <p>
+          <p id="cursed" @click="toggleFilter('cursed')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -195,7 +194,7 @@
             </svg>
             Cursed
           </p>
-          <p>
+          <p id="worldgen" @click="toggleFilter('worldgen')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -210,7 +209,7 @@
             </svg>
             Worldgen
           </p>
-          <p>
+          <p id="storage" @click="toggleFilter('storage')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -225,7 +224,7 @@
             </svg>
             Storage
           </p>
-          <p>
+          <p id="food" @click="toggleFilter('food')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -242,7 +241,7 @@
             </svg>
             Food
           </p>
-          <p>
+          <p id="equipment" @click="toggleFilter('equipment')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -263,7 +262,7 @@
             </svg>
             Equipment
           </p>
-          <p>
+          <p id="misc" @click="toggleFilter('misc')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -281,9 +280,10 @@
             Misc
           </p>
           <h3>Loaders</h3>
-          <p>Forge</p>
-          <p>Fabric</p>
+          <p id="forge" @click="toggleFilter('forge')">Forge</p>
+          <p id="fabric" @click="toggleFilter('fabric')">Fabric</p>
           <h3>Versions</h3>
+          <p>WIP</p>
         </section>
       </div>
       <!--#endregion -->
@@ -293,7 +293,7 @@
 
 <script>
 import axios from 'axios'
-import SearchResult from '@/components/SearchResult'
+import SearchResult from '@/components/ModResult'
 
 export default {
   components: {
@@ -302,6 +302,7 @@ export default {
   data() {
     return {
       query: '',
+      filters: [],
       results: [],
     }
   },
@@ -309,6 +310,20 @@ export default {
     await this.onSearchChange()
   },
   methods: {
+    async toggleFilter(elementName) {
+      const element = document.getElementById(elementName)
+      const index = this.filters.indexOf(element.id)
+
+      if (index !== -1) {
+        element.classList.remove('filter-active')
+        this.filters.splice(index, 1)
+      } else {
+        element.classList.add('filter-active')
+        this.filters.push(element.id)
+      }
+
+      await this.onSearchChange()
+    },
     async onSearchChange() {
       const config = {
         headers: {
@@ -318,9 +333,26 @@ export default {
 
       try {
         let url = 'https://api.modrinth.com/api/v1/mod'
+        const params = []
 
         if (this.query.length > 0) {
-          url += `?query=${this.query}`
+          params.push(`query=${this.query.replace(/ /g, '+')}`)
+        }
+
+        if (this.filters.length > 0) {
+          const facets = []
+
+          for (const facet of this.filters) {
+            facets.push(['categories:' + facet])
+          }
+
+          params.push(`facets=${JSON.stringify(facets)}`)
+        }
+
+        if (params.length > 0) {
+          for (let i = 0; i < params.length; i++) {
+            url += i === 0 ? `?${params[i]}` : `&${params[i]}`
+          }
         }
 
         const res = await axios.get(url, config)
@@ -402,15 +434,16 @@ export default {
     }
 
     &:hover,
-    &:focus,
-    &.filter-active {
+    &:focus {
       background-color: var(--color-grey-1);
       color: var(--color-text);
     }
+  }
 
-    .filter-active {
-      border-left: 4px solid var(--color-brand);
-    }
+  .filter-active {
+    background-color: var(--color-grey-1);
+    color: var(--color-text);
+    border-left: 4px solid var(--color-brand);
   }
 }
 </style>
