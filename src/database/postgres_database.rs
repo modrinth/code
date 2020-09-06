@@ -1,8 +1,8 @@
-use log::{info, debug};
+use log::{debug, info};
+use sqlx::migrate::{Migrate, MigrateDatabase, Migrator};
 use sqlx::postgres::{PgPool, PgPoolOptions};
-use sqlx::migrate::{Migrator, Migrate, MigrateDatabase};
+use sqlx::{Connection, PgConnection, Postgres};
 use std::path::Path;
-use sqlx::{PgConnection, Connection, Postgres};
 
 const MIGRATION_FOLDER: &'static str = "migrations";
 
@@ -29,10 +29,9 @@ pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
     Ok(())
 }
 
-
 pub async fn run_migrations(uri: &str) -> Result<(), sqlx::Error> {
     let migrator = Migrator::new(Path::new(MIGRATION_FOLDER)).await?;
-    let mut conn : PgConnection = PgConnection::connect(uri).await?;
+    let mut conn: PgConnection = PgConnection::connect(uri).await?;
 
     conn.ensure_migrations_table().await?;
 

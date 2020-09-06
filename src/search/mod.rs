@@ -5,7 +5,8 @@ use actix_web::web::HttpResponse;
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::document::Document;
 use meilisearch_sdk::search::Query;
-use serde::{Deserialize, Serialize};
+use serde::ser::SerializeStruct;
+use serde::{Deserialize, Serialize, Serializer};
 use std::borrow::Cow;
 use thiserror::Error;
 
@@ -80,6 +81,17 @@ pub struct UploadSearchMod {
     pub empty: Cow<'static, str>,
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SearchResults {
+    pub hits: Vec<ResultSearchMod>,
+    pub offset: usize,
+    pub limit: usize,
+    pub nb_hits: usize,
+    pub exhaustive_nb_hits: bool,
+    pub processing_time_ms: usize,
+    pub query: String,
+}
+
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResultSearchMod {
     pub mod_id: String,
@@ -119,7 +131,7 @@ impl Document for ResultSearchMod {
     }
 }
 
-pub async fn search_for_mod(info: &SearchRequest) -> Result<Vec<ResultSearchMod>, SearchError> {
+pub async fn search_for_mod(info: &SearchRequest) -> Result<SearchResults, SearchError> {
     let address = &*dotenv::var("MEILISEARCH_ADDR")?;
     let client = Client::new(address, "");
 
@@ -148,10 +160,19 @@ pub async fn search_for_mod(info: &SearchRequest) -> Result<Vec<ResultSearchMod>
         query = query.with_facet_filters(facets);
     }
 
-    Ok(client
+    let results = client
         .get_index(format!("{}_mods", index).as_ref())
         .await?
         .search::<ResultSearchMod>(&query)
-        .await?
-        .hits)
+        .await?;
+
+    Ok(SearchResults {
+        hits: results.hits,
+        offset: results.offset,
+        limit: results.limit,
+        nb_hits: results.nb_hits,
+        exhaustive_nb_hits: results.exhaustive_nb_hits,
+        processing_time_ms: results.processing_time_ms,
+        query: results.query,
+    })
 }
