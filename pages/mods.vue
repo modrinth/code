@@ -357,7 +357,7 @@ export default {
 
         const res = await axios.get(url, config)
 
-        this.results = res.data
+        this.results = res.data.hits
       } catch (err) {
         console.error(err)
       }
