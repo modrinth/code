@@ -10,7 +10,7 @@
             type="search"
             name="search"
             placeholder="Search mods"
-            @input="onSearchChange(true)"
+            @input="onSearchChange(1)"
           />
           <svg
             viewBox="0 0 24 24"
@@ -24,6 +24,24 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </div>
+        <!--<div class="iconified-select column-grow-1">
+          <select id="sort-type" @input="changeSortType">
+            <option value="relevance" selected>Relevance</option>
+            <option value="downloads">Total Downloads</option>
+            <option value="newest">Newest</option>
+            <option value="updated">Updated</option>
+          </select>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>-->
         <div
           v-if="pages.length > 1"
           class="pagination column-grow-1 columns paginates"
@@ -36,7 +54,7 @@
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
-            @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
+            @click="currentPage !== 1 ? onSearchChange(currentPage - 1) : null"
           >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
@@ -46,7 +64,7 @@
             :class="{
               'active-page-number': currentPage !== item,
             }"
-            @click="currentPage !== item ? switchPage(item) : null"
+            @click="currentPage !== item ? onSearchChange(item) : null"
           >
             <span v-if="pages[index - 1] + 1 !== item && item !== 1">...</span>
             <span :class="{ 'disabled-page-number': currentPage === item }">{{
@@ -66,7 +84,7 @@
             stroke-linejoin="round"
             @click="
               currentPage !== pages[pages.length - 1]
-                ? switchPage(currentPage + 1)
+                ? onSearchChange(currentPage + 1)
                 : null
             "
           >
@@ -328,10 +346,11 @@ export default {
       results: [],
       pages: [],
       currentPage: 1,
+      sortType: 'relevance',
     }
   },
   async created() {
-    await this.onSearchChange()
+    await this.onSearchChange(1)
   },
   methods: {
     async toggleFilter(elementName) {
@@ -346,16 +365,14 @@ export default {
         this.filters.push(element.id)
       }
 
-      await this.onSearchChange(true)
+      await this.onSearchChange(1)
     },
-    async switchPage(pageNumber) {
-      this.currentPage = pageNumber
+    async changeSortType() {
+      this.sortType = document.getElementById('sort-type').value
 
-      await this.onSearchChange(false)
+      await this.onSearchChange(1)
     },
-    async onSearchChange(resetPageNumber) {
-      if (resetPageNumber) this.currentPage = 1
-
+    async onSearchChange(newPageNumber) {
       const config = {
         headers: {
           Accept: 'application/json',
@@ -364,7 +381,7 @@ export default {
 
       try {
         let url = 'https://api.modrinth.com/api/v1/mod'
-        const params = []
+        const params = ['limit=6', `index=${this.sortType}`]
 
         if (this.query.length > 0) {
           params.push(`query=${this.query.replace(/ /g, '+')}`)
@@ -380,8 +397,8 @@ export default {
           params.push(`facets=${JSON.stringify(facets)}`)
         }
 
-        if (this.currentPage !== 1) {
-          params.push(`offset=${(this.currentPage - 1) * 10}`)
+        if (newPageNumber !== 1) {
+          params.push(`offset=${(newPageNumber - 1) * 6}`)
         }
 
         if (params.length > 0) {
@@ -393,10 +410,19 @@ export default {
         const res = await axios.get(url, config)
         this.results = res.data.hits
 
-        const pageAmount = Math.ceil(res.data.nb_hits / res.data.limit)
+        const pageAmount = Math.ceil(res.data.total_hits / res.data.limit)
 
+        this.currentPage = newPageNumber
         if (pageAmount > 4) {
-          if (this.currentPage > 4) {
+          if (this.currentPage + 1 >= pageAmount) {
+            this.pages = [
+              1,
+              pageAmount - 3,
+              pageAmount - 2,
+              pageAmount - 1,
+              pageAmount,
+            ]
+          } else if (this.currentPage > 4) {
             this.pages = [
               1,
               this.currentPage - 1,
@@ -506,10 +532,12 @@ export default {
 }
 
 .active-page-number {
+  user-select: none;
   cursor: pointer;
 }
 
 .disabled-page-number {
+  user-select: none;
   cursor: default;
   padding: 2px 3px;
   border-radius: 3px;

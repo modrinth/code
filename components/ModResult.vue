@@ -371,8 +371,7 @@ export default {
 
 <style lang="scss">
 .results {
-  margin-top: 20px;
-  margin-bottom: 50px;
+  margin-top: 10px;
 }
 
 .result {
