@@ -10,7 +10,7 @@
             type="search"
             name="search"
             placeholder="Search mods"
-            @input="onSearchChange"
+            @input="onSearchChange(true)"
           />
           <svg
             viewBox="0 0 24 24"
@@ -24,29 +24,51 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </div>
-        <div class="pagination column-grow-1 columns paginates">
+        <div
+          v-if="pages.length > 1"
+          class="pagination column-grow-1 columns paginates"
+        >
           <svg
+            :class="{ 'disabled-paginate': currentPage === 1 }"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
           >
             <polyline points="15 18 9 12 15 6"></polyline>
           </svg>
-          <p>1</p>
-          <p>2</p>
-          <p>3</p>
-          <p>...</p>
-          <p>10</p>
+          <p
+            v-for="(item, index) in pages"
+            :key="'page-' + item"
+            :class="{
+              'active-page-number': currentPage !== item,
+            }"
+            @click="currentPage !== item ? switchPage(item) : null"
+          >
+            <span v-if="pages[index - 1] + 1 !== item && item !== 1">...</span>
+            <span :class="{ 'disabled-page-number': currentPage === item }">{{
+              item
+            }}</span>
+          </p>
+
           <svg
+            :class="{
+              'disabled-paginate': currentPage === pages[pages.length - 1],
+            }"
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2"
             stroke-linecap="round"
             stroke-linejoin="round"
+            @click="
+              currentPage !== pages[pages.length - 1]
+                ? switchPage(currentPage + 1)
+                : null
+            "
           >
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
@@ -304,6 +326,8 @@ export default {
       query: '',
       filters: [],
       results: [],
+      pages: [],
+      currentPage: 1,
     }
   },
   async created() {
@@ -322,9 +346,16 @@ export default {
         this.filters.push(element.id)
       }
 
-      await this.onSearchChange()
+      await this.onSearchChange(true)
     },
-    async onSearchChange() {
+    async switchPage(pageNumber) {
+      this.currentPage = pageNumber
+
+      await this.onSearchChange(false)
+    },
+    async onSearchChange(resetPageNumber) {
+      if (resetPageNumber) this.currentPage = 1
+
       const config = {
         headers: {
           Accept: 'application/json',
@@ -349,6 +380,10 @@ export default {
           params.push(`facets=${JSON.stringify(facets)}`)
         }
 
+        if (this.currentPage !== 1) {
+          params.push(`offset=${(this.currentPage - 1) * 10}`)
+        }
+
         if (params.length > 0) {
           for (let i = 0; i < params.length; i++) {
             url += i === 0 ? `?${params[i]}` : `&${params[i]}`
@@ -356,9 +391,27 @@ export default {
         }
 
         const res = await axios.get(url, config)
-
         this.results = res.data.hits
+
+        const pageAmount = Math.ceil(res.data.nb_hits / res.data.limit)
+
+        if (pageAmount > 4) {
+          if (this.currentPage > 4) {
+            this.pages = [
+              1,
+              this.currentPage - 1,
+              this.currentPage,
+              this.currentPage + 1,
+              pageAmount,
+            ]
+          } else {
+            this.pages = [1, 2, 3, 4, pageAmount]
+          }
+        } else {
+          this.pages = Array.from({ length: pageAmount }, (_, i) => i + 1)
+        }
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error(err)
       }
     },
@@ -445,5 +498,21 @@ export default {
     color: var(--color-text);
     border-left: 4px solid var(--color-brand);
   }
+}
+
+.disabled-paginate {
+  cursor: default;
+  color: var(--color-grey-3);
+}
+
+.active-page-number {
+  cursor: pointer;
+}
+
+.disabled-page-number {
+  cursor: default;
+  padding: 2px 3px;
+  border-radius: 3px;
+  background-color: var(--color-grey-3);
 }
 </style>
