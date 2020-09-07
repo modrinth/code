@@ -8,6 +8,7 @@ use meilisearch_sdk::search::Query;
 use serde::ser::SerializeStruct;
 use serde::{Deserialize, Serialize, Serializer};
 use std::borrow::Cow;
+use std::cmp::min;
 use thiserror::Error;
 
 pub mod indexing;
@@ -86,10 +87,7 @@ pub struct SearchResults {
     pub hits: Vec<ResultSearchMod>,
     pub offset: usize,
     pub limit: usize,
-    pub nb_hits: usize,
-    pub exhaustive_nb_hits: bool,
-    pub processing_time_ms: usize,
-    pub query: String,
+    pub total_hits: usize,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -144,13 +142,16 @@ pub async fn search_for_mod(info: &SearchRequest) -> Result<SearchResults, Searc
 
     let offset = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
+    let limit = info.limit.unwrap_or(10);
     let search_query: &str = info
         .query
         .as_deref()
         .filter(|s| !s.is_empty())
         .unwrap_or("{}{}{}");
 
-    let mut query = Query::new(search_query).with_limit(10).with_offset(offset);
+    let mut query = Query::new(search_query)
+        .with_limit(min(100, limit))
+        .with_offset(offset);
 
     if !filters.is_empty() {
         query = query.with_filters(&filters);
@@ -170,9 +171,6 @@ pub async fn search_for_mod(info: &SearchRequest) -> Result<SearchResults, Searc
         hits: results.hits,
         offset: results.offset,
         limit: results.limit,
-        nb_hits: results.nb_hits,
-        exhaustive_nb_hits: results.exhaustive_nb_hits,
-        processing_time_ms: results.processing_time_ms,
-        query: results.query,
+        total_hits: results.nb_hits,
     })
 }

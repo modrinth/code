@@ -130,4 +130,5 @@ pub struct SearchRequest {
     pub version: Option<String>,
     pub offset: Option<String>,
     pub index: Option<String>,
+    pub limit: Option<usize>,
 }
