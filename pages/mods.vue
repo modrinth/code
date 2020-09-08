@@ -24,13 +24,14 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </div>
-        <!--<div class="iconified-select column-grow-1">
+        <div class="iconified-select">
           <select id="sort-type" @input="changeSortType">
             <option value="relevance" selected>Relevance</option>
             <option value="downloads">Total Downloads</option>
             <option value="newest">Newest</option>
             <option value="updated">Updated</option>
           </select>
+
           <svg
             viewBox="0 0 24 24"
             fill="none"
@@ -41,7 +42,7 @@
           >
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
-        </div>-->
+        </div>
         <div
           v-if="pages.length > 1"
           class="pagination column-grow-1 columns paginates"
@@ -542,5 +543,51 @@ export default {
   padding: 2px 3px;
   border-radius: 3px;
   background-color: var(--color-grey-3);
+}
+
+.iconified-select {
+  align-items: center;
+  display: inline-flex;
+  flex-direction: row-reverse;
+
+  select {
+    padding-left: 2.5rem;
+
+    &:hover {
+      & + svg {
+        color: var(--color-grey-6);
+      }
+    }
+
+    &:focus {
+      & + svg {
+        color: var(--color-text);
+      }
+    }
+  }
+
+  svg {
+    color: var(--color-grey-5);
+    margin-right: -2rem;
+  }
+}
+
+select {
+  width: 200px;
+  height: 48px;
+  padding: 0.5rem 0.75rem;
+  background: var(--color-bg);
+  border: 2px solid var(--color-grey-3);
+  border-radius: var(--size-rounded-sm);
+  color: var(--color-grey-9);
+  font-size: 1rem;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  &:hover {
+    border-color: var(--color-grey-4);
+    color: var(--color-text);
+  }
 }
 </style>
