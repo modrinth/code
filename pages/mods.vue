@@ -348,12 +348,26 @@ export default {
       pages: [],
       currentPage: 1,
       sortType: 'relevance',
+      maxResults: 6,
     }
   },
-  async created() {
-    await this.onSearchChange(1)
+  async mounted() {
+    window.addEventListener('resize', this.resize)
+    await this.resize()
+  },
+  destroyed() {
+    window.removeEventListener('resize', this.resize)
   },
   methods: {
+    async resize() {
+      const vh = Math.max(
+        document.documentElement.clientHeight || 0,
+        window.innerHeight || 0
+      )
+      this.maxResults = Math.floor(vh / 120 - 1)
+
+      await this.onSearchChange(this.currentPage)
+    },
     async toggleFilter(elementName) {
       const element = document.getElementById(elementName)
       const index = this.filters.indexOf(element.id)
@@ -382,7 +396,7 @@ export default {
 
       try {
         let url = 'https://api.modrinth.com/api/v1/mod'
-        const params = ['limit=6', `index=${this.sortType}`]
+        const params = [`limit=${this.maxResults}`, `index=${this.sortType}`]
 
         if (this.query.length > 0) {
           params.push(`query=${this.query.replace(/ /g, '+')}`)
@@ -399,7 +413,7 @@ export default {
         }
 
         if (newPageNumber !== 1) {
-          params.push(`offset=${(newPageNumber - 1) * 6}`)
+          params.push(`offset=${(newPageNumber - 1) * this.maxResults}`)
         }
 
         if (params.length > 0) {
