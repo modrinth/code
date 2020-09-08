@@ -367,6 +367,11 @@ export default {
       this.maxResults = Math.floor(vh / 120 - 1)
 
       await this.onSearchChange(this.currentPage)
+
+      if (this.currentPage > this.pages[this.pages.length - 1]) {
+        this.currentPage = this.pages[this.pages.length - 1]
+        await this.onSearchChange(this.currentPage)
+      }
     },
     async toggleFilter(elementName) {
       const element = document.getElementById(elementName)
@@ -587,7 +592,7 @@ export default {
 }
 
 select {
-  width: 200px;
+  width: 220px;
   height: 48px;
   padding: 0.5rem 0.75rem;
   background: var(--color-bg);
