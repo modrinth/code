@@ -593,8 +593,7 @@ export default {
 
 select {
   width: 220px;
-  height: 48px;
-  padding: 0.5rem 0.75rem;
+  padding: 8px 5px;
   background: var(--color-bg);
   border: 2px solid var(--color-grey-3);
   border-radius: var(--size-rounded-sm);

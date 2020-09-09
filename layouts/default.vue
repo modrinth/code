@@ -111,7 +111,14 @@
             </nuxt-link>
           </section>
         </section>
-
+        <div class="disclosure">
+          <span>
+            Modrinth is open source software. You may view the source code at
+            <a href="https://github.com/modrinth/knossos"
+              >our GitHub Repository</a
+            >.
+          </span>
+        </div>
         <section class="user-actions">
           <div class="avatar">
             <img src="~/assets/images/avatar.jpg" />
@@ -329,6 +336,16 @@
     .content {
       padding: 1rem 3rem 1rem 2rem;
     }
+  }
+}
+
+.disclosure {
+  margin-top: auto;
+  max-width: 250px;
+  color: var(--color-grey-3);
+
+  a {
+    text-decoration: var(--color-grey-2) underline;
   }
 }
 </style>
