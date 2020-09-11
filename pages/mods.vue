@@ -117,7 +117,10 @@
       <div>
         <section class="filter-group">
           <h3>Categories</h3>
-          <p id="technology" @click="toggleFilter('technology')">
+          <p
+            id="categories:technology"
+            @click="toggleFacet('categories:technology')"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -135,7 +138,10 @@
             </svg>
             Technology
           </p>
-          <p id="adventure" @click="toggleFilter('adventure')">
+          <p
+            id="categories:adventure"
+            @click="toggleFacet('categories:adventure')"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -151,7 +157,7 @@
             </svg>
             Adventure
           </p>
-          <p id="magic" @click="toggleFilter('magic')">
+          <p id="categories:magic" @click="toggleFacet('categories:magic')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -166,7 +172,7 @@
             </svg>
             Magic
           </p>
-          <p id="utility" @click="toggleFilter('utility')">
+          <p id="categories:utility" @click="toggleFacet('categories:utility')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -180,7 +186,10 @@
             </svg>
             Utility
           </p>
-          <p id="decoration" @click="toggleFilter('decoration')">
+          <p
+            id="categories:decoration"
+            @click="toggleFacet('categories:decoration')"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -194,7 +203,7 @@
             </svg>
             Decoration
           </p>
-          <p id="library" @click="toggleFilter('library')">
+          <p id="categories:library" @click="toggleFacet('categories:library')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -210,7 +219,7 @@
             </svg>
             Library
           </p>
-          <p id="cursed" @click="toggleFilter('cursed')">
+          <p id="categories:cursed" @click="toggleFacet('categories:cursed')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -235,7 +244,10 @@
             </svg>
             Cursed
           </p>
-          <p id="worldgen" @click="toggleFilter('worldgen')">
+          <p
+            id="categories:worldgen"
+            @click="toggleFacet('categories:worldgen')"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -250,7 +262,7 @@
             </svg>
             Worldgen
           </p>
-          <p id="storage" @click="toggleFilter('storage')">
+          <p id="categories:storage" @click="toggleFacet('categories:storage')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -265,7 +277,7 @@
             </svg>
             Storage
           </p>
-          <p id="food" @click="toggleFilter('food')">
+          <p id="categories:food" @click="toggleFacet('categories:food')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -282,7 +294,10 @@
             </svg>
             Food
           </p>
-          <p id="equipment" @click="toggleFilter('equipment')">
+          <p
+            id="categories:equipment"
+            @click="toggleFacet('categories:equipment')"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -303,7 +318,7 @@
             </svg>
             Equipment
           </p>
-          <p id="misc" @click="toggleFilter('misc')">
+          <p id="categories:misc" @click="toggleFacet('categories:misc')">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -321,8 +336,19 @@
             Misc
           </p>
           <h3>Loaders</h3>
-          <p id="forge" @click="toggleFilter('forge')">Forge</p>
-          <p id="fabric" @click="toggleFilter('fabric')">Fabric</p>
+          <p id="categories:forge" @click="toggleFacet('categories:forge')">
+            Forge
+          </p>
+          <p id="categories:fabric" @click="toggleFacet('categories:fabric')">
+            Fabric
+          </p>
+          <h3>Platforms</h3>
+          <p id="host:modrinth" @click="toggleFacet('host:modrinth')">
+            Modrinth
+          </p>
+          <p id="host:curseforge" @click="toggleFacet('host:curseforge')">
+            Curseforge
+          </p>
           <h3>Versions</h3>
           <p>WIP</p>
         </section>
@@ -343,7 +369,7 @@ export default {
   data() {
     return {
       query: '',
-      filters: [],
+      facets: [],
       results: [],
       pages: [],
       currentPage: 1,
@@ -373,16 +399,16 @@ export default {
         await this.onSearchChange(this.currentPage)
       }
     },
-    async toggleFilter(elementName) {
+    async toggleFacet(elementName) {
       const element = document.getElementById(elementName)
-      const index = this.filters.indexOf(element.id)
+      const index = this.facets.indexOf(element.id)
 
       if (index !== -1) {
         element.classList.remove('filter-active')
-        this.filters.splice(index, 1)
+        this.facets.splice(index, 1)
       } else {
         element.classList.add('filter-active')
-        this.filters.push(element.id)
+        this.facets.push(element.id)
       }
 
       await this.onSearchChange(1)
@@ -407,14 +433,8 @@ export default {
           params.push(`query=${this.query.replace(/ /g, '+')}`)
         }
 
-        if (this.filters.length > 0) {
-          const facets = []
-
-          for (const facet of this.filters) {
-            facets.push(['categories:' + facet])
-          }
-
-          params.push(`facets=${JSON.stringify(facets)}`)
+        if (this.facets.length > 0) {
+          params.push(`facets=${JSON.stringify([this.facets])}`)
         }
 
         if (newPageNumber !== 1) {

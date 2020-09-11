@@ -157,7 +157,6 @@
           </svg>
         </div>
       </header> -->
-
       <nuxt />
     </main>
   </div>
