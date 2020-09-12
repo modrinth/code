@@ -116,6 +116,7 @@
       <!--#region filters  -->
       <div>
         <section class="filter-group">
+          <button @click="clearFilters">Clear Filters</button>
           <h3>Categories</h3>
           <p
             id="categories:technology"
@@ -399,6 +400,9 @@ export default {
         await this.onSearchChange(this.currentPage)
       }
     },
+    async clearFilters() {
+      for (const facet of this.facets) await this.toggleFacet(facet)
+    },
     async toggleFacet(elementName) {
       const element = document.getElementById(elementName)
       const index = this.facets.indexOf(element.id)
@@ -535,6 +539,19 @@ export default {
 .filter-group {
   margin-top: 2em;
 
+  button {
+    width: 100%;
+    padding: 5px 0;
+    color: var(--color-grey-5);
+    border: none;
+    border-radius: 5px;
+
+    &:hover {
+      background-color: var(--color-grey-1);
+      color: var(--color-text);
+    }
+  }
+
   p {
     display: flex;
     align-items: center;
@@ -585,6 +602,7 @@ export default {
 }
 
 .iconified-select {
+  margin-left: 1em;
   align-items: center;
   display: inline-flex;
   flex-direction: row-reverse;
@@ -608,12 +626,14 @@ export default {
   svg {
     color: var(--color-grey-5);
     margin-right: -2rem;
+    width: 24px;
+    height: 24px;
   }
 }
 
 select {
   width: 220px;
-  padding: 8px 5px;
+  padding: 0.5rem 1rem;
   background: var(--color-bg);
   border: 2px solid var(--color-grey-3);
   border-radius: var(--size-rounded-sm);
