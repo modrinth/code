@@ -149,7 +149,7 @@ async fn main() -> std::io::Result<()> {
             dotenv::var("EXTERNAL_INDEX_INTERVAL")
                 .ok()
                 .map(|i| i.parse().unwrap())
-                .unwrap_or(3600 * 4),
+                .unwrap_or(3600 * 12),
         );
 
         let pool_ref = pool.clone();
@@ -242,6 +242,7 @@ fn check_env_vars() {
         .unwrap_or(false)
     {
         check_var::<usize>("EXTERNAL_INDEX_INTERVAL");
+        check_var::<usize>("MAX_CURSEFORGE_ID");
     }
 
     check_var::<usize>("LOCAL_INDEX_INTERVAL");

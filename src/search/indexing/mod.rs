@@ -62,7 +62,12 @@ pub async fn index_mods(pool: PgPool, settings: IndexingSettings) -> Result<(), 
         docs_to_add.append(&mut index_local(pool.clone()).await?);
     }
     if settings.index_external {
-        docs_to_add.append(&mut index_curseforge(1, 400_000).await?);
+        let end_index = dotenv::var("MAX_CURSEFORGE_ID")
+                .ok()
+                .map(|i| i.parse().unwrap())
+                .unwrap_or(450_000);
+
+        docs_to_add.append(&mut index_curseforge(1, end_index).await?);
     }
 
     // Write Indices
@@ -266,7 +271,7 @@ fn default_settings() -> Settings {
         .with_searchable_attributes(searchable_attributes)
         .with_stop_words(vec![])
         .with_synonyms(HashMap::new())
-        .with_attributes_for_faceting(vec![String::from("categories"), String::from("host")])
+        .with_attributes_for_faceting(vec![String::from("categories"), String::from("host"), String::from("versions")])
 }
 
 //endregion
