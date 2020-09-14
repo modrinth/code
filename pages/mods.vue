@@ -391,7 +391,7 @@ export default {
         document.documentElement.clientHeight || 0,
         window.innerHeight || 0
       )
-      this.maxResults = Math.floor(vh / 120 - 1)
+      this.maxResults = Math.floor((vh - 200) / 120)
 
       await this.onSearchChange(this.currentPage)
 
@@ -514,6 +514,7 @@ export default {
 }
 
 .filters {
+  overflow-y: auto;
   background-color: var(--color-bg);
   border-left: 1px solid var(--color-grey-2);
   top: 0;
@@ -542,7 +543,7 @@ export default {
   button {
     width: 100%;
     padding: 5px 0;
-    color: var(--color-grey-5);
+    color: #718096;
     border: none;
     border-radius: 5px;
 

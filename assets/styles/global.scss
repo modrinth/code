@@ -32,6 +32,25 @@
   font-size: 18px;
 }
 
+:root[data-theme='dark'] {
+  --color-text: #ccccc2;
+  --color-bg: #191917;
+
+  --color-text-inverted: var(--color-bg);
+  --color-bg-inverted: var(--color-text);
+
+  --color-brand: #4d9227;
+
+  --color-grey-7: #f7faf0;
+  --color-grey-6: #f7f2eb;
+  --color-grey-5: #ede9e4;
+  --color-grey-4: #dadcd5;
+  --color-grey-3: #b8bbb4;
+  --color-grey-2: #3b3937;
+  --color-grey-1: #3a3b38;
+  --color-grey-0: #1d1e1b;
+}
+
 body {
   background-color: var(--color-bg);
   color: var(--color-text);

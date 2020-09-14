@@ -137,6 +137,40 @@
               <path d="M13.73 21a2 2 0 0 1-3.46 0" />
             </svg>
           </div>
+          <div class="theme">
+            <svg
+              v-if="theme === 'light'"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              @click="switchTheme"
+            >
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            </svg>
+            <svg
+              v-else
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              @click="switchTheme"
+            >
+              <circle cx="12" cy="12" r="5"></circle>
+              <line x1="12" y1="1" x2="12" y2="3"></line>
+              <line x1="12" y1="21" x2="12" y2="23"></line>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+              <line x1="1" y1="12" x2="3" y2="12"></line>
+              <line x1="21" y1="12" x2="23" y2="12"></line>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+            </svg>
+          </div>
         </section>
       </nav>
     </aside>
@@ -162,6 +196,37 @@
   </div>
 </template>
 
+<script>
+export default {
+  data() {
+    return {
+      theme: 'light',
+    }
+  },
+  mounted() {
+    const theme = localStorage.getItem('data-theme')
+      ? localStorage.getItem('data-theme')
+      : 'light'
+
+    this.theme = theme
+    document.documentElement.setAttribute('data-theme', theme)
+  },
+  methods: {
+    switchTheme() {
+      let theme = localStorage.getItem('data-theme')
+      if (theme === 'dark') {
+        theme = 'light'
+      } else {
+        theme = 'dark'
+      }
+      this.theme = theme
+      localStorage.setItem('data-theme', theme)
+      document.documentElement.setAttribute('data-theme', theme)
+    },
+  },
+}
+</script>
+
 <style lang="scss">
 .layout {
   display: flex;
@@ -176,6 +241,7 @@
     border-right: 1px solid var(--color-grey-2);
     display: flex; // Flex here to safely expand navigation height
     flex-direction: column;
+    max-width: 15%;
     min-width: 15%;
 
     .logo-wrapper {
