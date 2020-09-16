@@ -43,10 +43,7 @@
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </div>
-        <div
-          v-if="pages.length > 1"
-          class="pagination column-grow-1 columns paginates"
-        >
+        <div v-if="pages.length > 1" class="columns paginates">
           <svg
             :class="{ 'disabled-paginate': currentPage === 1 }"
             viewBox="0 0 24 24"
@@ -114,7 +111,7 @@
     </div>
     <section class="filters">
       <!--#region filters  -->
-      <div>
+      <div class="filters-wrapper">
         <section class="filter-group">
           <button @click="clearFilters">Clear Filters</button>
           <h3>Categories</h3>
@@ -351,8 +348,22 @@
             Curseforge
           </p>
           <h3>Versions</h3>
-          <p>WIP</p>
         </section>
+        <multiselect
+          v-model="selectedVersions"
+          :options="versions"
+          :loading="versions.length === 0"
+          :multiple="true"
+          :searchable="true"
+          :show-no-results="false"
+          :close-on-select="false"
+          :clear-on-select="false"
+          :show-labels="false"
+          :limit="6"
+          :hide-selected="true"
+          placeholder="Choose versions..."
+          @input="onSearchChange(1)"
+        ></multiselect>
       </div>
       <!--#endregion -->
     </section>
@@ -360,16 +371,26 @@
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect'
 import axios from 'axios'
 import SearchResult from '@/components/ModResult'
+
+const config = {
+  headers: {
+    Accept: 'application/json',
+  },
+}
 
 export default {
   components: {
     SearchResult,
+    Multiselect,
   },
   data() {
     return {
       query: '',
+      selectedVersions: [],
+      versions: [],
       facets: [],
       results: [],
       pages: [],
@@ -385,6 +406,8 @@ export default {
     //
     // console.log(this.facets)
 
+    await this.fillInitialVersions()
+
     window.addEventListener('resize', this.resize)
     await this.resize()
   },
@@ -392,6 +415,21 @@ export default {
     window.removeEventListener('resize', this.resize)
   },
   methods: {
+    async fillInitialVersions() {
+      try {
+        const res = await axios.get(
+          'https://launchermeta.mojang.com/mc/game/version_manifest.json',
+          config
+        )
+
+        const versions = res.data.versions
+        for (const version of versions) {
+          this.versions.push(version.id)
+        }
+      } catch (err) {
+        console.error(err)
+      }
+    },
     async resize() {
       const vh = Math.max(
         document.documentElement.clientHeight || 0,
@@ -407,9 +445,12 @@ export default {
       }
     },
     async clearFilters() {
-      for (const facet of this.facets) await this.toggleFacet(facet)
+      for (const facet of this.facets) await this.toggleFacet(facet, false)
+
+      this.selectedVersions = []
+      await this.onSearchChange(1)
     },
-    async toggleFacet(elementName) {
+    async toggleFacet(elementName, sendRequest) {
       const element = document.getElementById(elementName)
       const index = this.facets.indexOf(element.id)
 
@@ -421,7 +462,7 @@ export default {
         this.facets.push(element.id)
       }
 
-      await this.onSearchChange(1)
+      if (!sendRequest) await this.onSearchChange(1)
     },
     async changeSortType() {
       this.sortType = document.getElementById('sort-type').value
@@ -429,12 +470,6 @@ export default {
       await this.onSearchChange(1)
     },
     async onSearchChange(newPageNumber) {
-      const config = {
-        headers: {
-          Accept: 'application/json',
-        },
-      }
-
       try {
         const params = [`limit=${this.maxResults}`, `index=${this.sortType}`]
 
@@ -442,11 +477,20 @@ export default {
           params.push(`query=${this.query.replace(/ /g, '+')}`)
         }
 
-        if (this.facets.length > 0) {
+        if (this.facets.length > 0 || this.selectedVersions.length > 0) {
           const formattedFacets = []
           for (const facet of this.facets) {
             formattedFacets.push([facet])
           }
+
+          if (this.selectedVersions.length > 0) {
+            const versionFacets = []
+            for (const facet of this.selectedVersions) {
+              versionFacets.push('versions:' + facet)
+            }
+            formattedFacets.push(versionFacets)
+          }
+
           params.push(`facets=${JSON.stringify(formattedFacets)}`)
         }
 
@@ -533,18 +577,19 @@ export default {
   position: sticky;
   max-height: 100vh;
   min-width: 15%;
+  max-width: 15%;
+}
 
-  div {
-    padding: 0 1.5rem;
+.filters-wrapper {
+  padding: 0 1.5rem;
 
-    h3 {
-      color: #718096;
-      font-size: 0.8rem;
-      letter-spacing: 0.02rem;
-      margin-bottom: 0.5rem;
-      margin-top: 1.5rem;
-      text-transform: uppercase;
-    }
+  h3 {
+    color: #718096;
+    font-size: 0.8rem;
+    letter-spacing: 0.02rem;
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+    text-transform: uppercase;
   }
 }
 
