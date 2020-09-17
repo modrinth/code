@@ -395,16 +395,22 @@ export default {
       results: [],
       pages: [],
       currentPage: 1,
+      overrideOffset: 0,
       sortType: 'relevance',
       maxResults: 6,
     }
   },
   async mounted() {
-    // if (this.$route.query.query) this.query = this.$route.query.query
-    // if (this.$route.query.facets) this.facets = this.$route.query.facets[0]
-    // if (this.$route.query.sortType) this.sortType = this.$route.query.sortType
-    //
-    // console.log(this.facets)
+    if (this.$route.query.q) this.query = this.$route.query.q
+    if (this.$route.query.f) {
+      const facets = this.$route.query.f.split(',')
+
+      for (const facet of facets) await this.toggleFacet(facet, false)
+    }
+    if (this.$route.query.v)
+      this.selectedVersions = this.$route.query.v.split(',')
+    if (this.$route.query.s) this.sortType = this.$route.query.s
+    if (this.$route.query.o) this.overrideOffset = this.$route.query.o
 
     await this.fillInitialVersions()
 
@@ -445,7 +451,7 @@ export default {
       }
     },
     async clearFilters() {
-      for (const facet of this.facets) await this.toggleFacet(facet, false)
+      for (const facet of [...this.facets]) await this.toggleFacet(facet, true)
 
       this.selectedVersions = []
       await this.onSearchChange(1)
@@ -494,8 +500,13 @@ export default {
           params.push(`facets=${JSON.stringify(formattedFacets)}`)
         }
 
-        if (newPageNumber !== 1) {
-          params.push(`offset=${(newPageNumber - 1) * this.maxResults}`)
+        const offset = (newPageNumber - 1) * this.maxResults
+        if (this.overrideOffset > 0) {
+          console.log(this.overrideOffset)
+          params.push(`offset=${this.overrideOffset}`)
+          this.overrideOffset = 0
+        } else if (newPageNumber !== 1) {
+          params.push(`offset=${offset}`)
         }
 
         let url = 'https://api.modrinth.com/api/v1/mod'
@@ -535,6 +546,16 @@ export default {
         } else {
           this.pages = Array.from({ length: pageAmount }, (_, i) => i + 1)
         }
+
+        url = `mods?q=${encodeURIComponent(
+          this.query
+        )}&o=${offset}&f=${encodeURIComponent(
+          this.facets.toString()
+        )}&v=${encodeURIComponent(
+          this.selectedVersions.toString()
+        )}&s=${encodeURIComponent(this.sortType)}`
+
+        window.history.pushState(new Date(), 'Mods', url)
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err)
