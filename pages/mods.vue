@@ -430,7 +430,7 @@ export default {
           if (version.type === 'old_beta' || version.type === 'old_alpha')
             legacyVersions.push(version.id)
         }
-        this.versions.concat(betaVersions, legacyVersions)
+        this.versions = this.versions.concat(betaVersions, legacyVersions)
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err)
@@ -714,8 +714,24 @@ select {
   }
 }
 
+.multiselect__content-wrapper {
+  overflow-x: hidden;
+}
+
 .multiselect__tags {
   background: var(--color-bg);
+}
+
+.multiselect__spinner {
+  background: var(--color-bg);
+}
+
+.multiselect__spinner::before {
+  border-top-color: var(--color-brand);
+}
+
+.multiselect__spinner::after {
+  border-top-color: var(--color-brand);
 }
 
 .multiselect__input {
