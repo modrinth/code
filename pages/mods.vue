@@ -1,6 +1,6 @@
 <template>
   <div class="columns">
-    <div class="content column-grow-4">
+    <div class="content column-grow-5">
       <h2>Mods</h2>
       <section class="search-bar">
         <div class="iconified-input column-grow-2">
@@ -24,24 +24,29 @@
             <line x1="21" y1="21" x2="16.65" y2="16.65" />
           </svg>
         </div>
-        <div class="iconified-select">
-          <select id="sort-type" @input="changeSortType">
-            <option value="relevance" selected>Relevance</option>
-            <option value="downloads">Total Downloads</option>
-            <option value="newest">Newest</option>
-            <option value="updated">Updated</option>
-          </select>
+        <div class="sort-paginate">
+          <div class="iconified-select">
+            <select id="sort-type" @input="changeSortType">
+              <option value="relevance" selected>Relevance</option>
+              <option value="downloads">Total Downloads</option>
+              <option value="newest">Newest</option>
+              <option value="updated">Updated</option>
+            </select>
 
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </div>
+          <div class="mobile-filters-button">
+            <button @click="toggleFiltersMenu">Filter...</button>
+          </div>
         </div>
         <pagination
           :current-page="currentPage"
@@ -96,10 +101,13 @@
         ></pagination>
       </section>
     </div>
-    <section class="filters">
+    <section id="filters" class="filters">
       <!--#region filters  -->
       <div class="filters-wrapper">
         <section class="filter-group">
+          <button class="filter-button-done" @click="toggleFiltersMenu">
+            Done
+          </button>
           <button @click="clearFilters">Clear Filters</button>
           <h3>Categories</h3>
           <p
@@ -411,7 +419,8 @@ export default {
   },
   mounted() {
     document.getElementById('sort-type').value = this.sortType
-    document.getElementById('max-results').value = this.maxResults
+    if (this.pages.length > 1)
+      document.getElementById('max-results').value = this.maxResults
   },
   methods: {
     async fillInitialVersions() {
@@ -566,6 +575,13 @@ export default {
     formatNumber(x) {
       return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
+    toggleFiltersMenu() {
+      const filters = document.getElementById('filters')
+      const currentlyActive = filters.className === 'filters active'
+      filters.className = `filters${currentlyActive ? '' : ' active'}`
+      document.body.style.overflow =
+        document.body.style.overflow !== 'hidden' ? 'hidden' : 'auto'
+    },
   },
 }
 </script>
@@ -576,6 +592,38 @@ export default {
   align-items: center;
   display: flex;
   justify-content: space-between;
+  flex-flow: column;
+  .iconified-input {
+    width: 100%;
+  }
+  .iconified-select {
+    width: 100%;
+    margin-left: 0;
+    select {
+      width: 100%;
+    }
+  }
+  .sort-paginate {
+    display: flex;
+    width: 100%;
+  }
+  @media screen and (min-width: 900px) {
+    flex-flow: row;
+    .iconified-input {
+      width: auto;
+    }
+    .iconified-select {
+      width: auto;
+      margin-left: 1em;
+      select {
+        width: auto;
+      }
+    }
+    .sort-paginate {
+      display: block;
+      width: auto;
+    }
+  }
 }
 
 .search-bottom {
@@ -592,20 +640,39 @@ export default {
   min-height: 96vh;
 }
 
+.mobile-filters-button {
+  display: inline-block;
+  button {
+    background: var(--color-bg);
+    border: 2px solid var(--color-grey-3);
+    border-radius: var(--size-rounded-sm);
+    padding: 0.5rem;
+  }
+
+  // Hide button on larger screens where it's not needed
+  @media screen and (min-width: 900px) {
+    display: none;
+  }
+}
+
 .filters {
   overflow-y: auto;
   background-color: var(--color-bg);
   border-left: 1px solid var(--color-grey-2);
-  top: 0;
-  position: -webkit-sticky;
-  position: sticky;
+  position: fixed;
+  width: 100vw;
+  right: -100vw;
   max-height: 100vh;
   min-width: 15%;
-  max-width: 15%;
-}
+  overflow-y: auto;
+  top: 3.5rem;
+  height: calc(100vh - 3.5rem);
+  transition: right 150ms;
+  flex-shrink: 0; // Stop shrinking when page contents change
 
-.filters-wrapper {
-  padding: 0 1.5rem;
+  .filters-wrapper {
+    padding: 0 0.75rem;
+  }
 
   h3 {
     color: #718096;
@@ -615,10 +682,28 @@ export default {
     margin-top: 1.5rem;
     text-transform: uppercase;
   }
+
+  // Larger screens that don't need to collapse
+  @media screen and (min-width: 900px) {
+    position: sticky;
+    width: 215px;
+    padding-right: 1rem;
+    transition: none;
+  }
+
+  // Desktop
+  @media screen and (min-width: 1145px) {
+    top: 0;
+    height: 100vh;
+  }
+
+  &.active {
+    right: 0;
+  }
 }
 
 .filter-group {
-  margin-top: 2em;
+  margin-top: 1em;
 
   button {
     width: 100%;
@@ -633,6 +718,10 @@ export default {
       background-color: var(--color-grey-2);
       color: var(--color-text);
     }
+  }
+
+  .filter-button-done {
+    display: block;
   }
 
   p {
@@ -650,6 +739,7 @@ export default {
     svg {
       margin-right: 5px;
       height: 1rem;
+      flex-shrink: 0;
     }
 
     &:hover,
@@ -663,6 +753,18 @@ export default {
     background-color: var(--color-grey-1);
     color: var(--color-text);
     border-left: 4px solid var(--color-brand);
+  }
+
+  // Large screens that don't collapse
+  @media screen and (min-width: 900px) {
+    .filter-button-done {
+      display: none;
+    }
+  }
+
+  // Desktop
+  @media screen and (min-width: 1145px) {
+    margin-top: 2em;
   }
 }
 
