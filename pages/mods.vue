@@ -2,7 +2,7 @@
   <div class="columns">
     <div class="content column-grow-4">
       <h2>Mods</h2>
-      <section id="search-pagination">
+      <section class="search-bar">
         <div class="iconified-input column-grow-2">
           <input
             id="search"
@@ -43,52 +43,11 @@
             <polyline points="6 9 12 15 18 9"></polyline>
           </svg>
         </div>
-        <div v-if="pages.length > 1" class="columns paginates">
-          <svg
-            :class="{ 'disabled-paginate': currentPage === 1 }"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            @click="currentPage !== 1 ? onSearchChange(currentPage - 1) : null"
-          >
-            <polyline points="15 18 9 12 15 6"></polyline>
-          </svg>
-          <p
-            v-for="(item, index) in pages"
-            :key="'page-' + item"
-            :class="{
-              'active-page-number': currentPage !== item,
-            }"
-            @click="currentPage !== item ? onSearchChange(item) : null"
-          >
-            <span v-if="pages[index - 1] + 1 !== item && item !== 1">...</span>
-            <span :class="{ 'disabled-page-number': currentPage === item }">{{
-              item
-            }}</span>
-          </p>
-
-          <svg
-            :class="{
-              'disabled-paginate': currentPage === pages[pages.length - 1],
-            }"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            @click="
-              currentPage !== pages[pages.length - 1]
-                ? onSearchChange(currentPage + 1)
-                : null
-            "
-          >
-            <polyline points="9 18 15 12 9 6"></polyline>
-          </svg>
-        </div>
+        <pagination
+          :current-page="currentPage"
+          :pages="pages"
+          @switch-page="onSearchChange"
+        ></pagination>
       </section>
       <div class="results column-grow-4">
         <SearchResult
@@ -108,6 +67,34 @@
           :categories="result.categories"
         />
       </div>
+      <section v-if="pages.length > 1" class="search-bottom">
+        <div class="iconified-select">
+          <select id="max-results" @input="changeMaxResults">
+            <option value="5" selected>5</option>
+            <option value="10">10</option>
+            <option value="15">15</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+          </select>
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <pagination
+          :current-page="currentPage"
+          :pages="pages"
+          @switch-page="onSearchChangeToTop"
+        ></pagination>
+      </section>
     </div>
     <section class="filters">
       <!--#region filters  -->
@@ -374,6 +361,7 @@
 import Multiselect from 'vue-multiselect'
 import axios from 'axios'
 import SearchResult from '@/components/ModResult'
+import Pagination from '@/components/Pagination'
 
 const config = {
   headers: {
@@ -384,6 +372,7 @@ const config = {
 export default {
   components: {
     SearchResult,
+    Pagination,
     Multiselect,
   },
   data() {
@@ -395,12 +384,11 @@ export default {
       results: [],
       pages: [],
       currentPage: 1,
-      overrideOffset: 0,
       sortType: 'relevance',
-      maxResults: 6,
+      maxResults: 5,
     }
   },
-  async mounted() {
+  async created() {
     if (this.$route.query.q) this.query = this.$route.query.q
     if (this.$route.query.f) {
       const facets = this.$route.query.f.split(',')
@@ -409,16 +397,21 @@ export default {
     }
     if (this.$route.query.v)
       this.selectedVersions = this.$route.query.v.split(',')
-    if (this.$route.query.s) this.sortType = this.$route.query.s
-    if (this.$route.query.o) this.overrideOffset = this.$route.query.o
+    if (this.$route.query.s) {
+      this.sortType = this.$route.query.s
+    }
+    if (this.$route.query.m) {
+      this.maxResults = this.$route.query.m
+    }
+    if (this.$route.query.o)
+      this.currentPage = Math.ceil(this.$route.query.o / this.maxResults) + 1
 
     await this.fillInitialVersions()
-
-    window.addEventListener('resize', this.resize)
-    await this.resize()
+    await this.onSearchChange(this.currentPage)
   },
-  destroyed() {
-    window.removeEventListener('resize', this.resize)
+  mounted() {
+    document.getElementById('sort-type').value = this.sortType
+    document.getElementById('max-results').value = this.maxResults
   },
   methods: {
     async fillInitialVersions() {
@@ -429,25 +422,18 @@ export default {
         )
 
         const versions = res.data.versions
+        const betaVersions = []
+        const legacyVersions = []
         for (const version of versions) {
-          this.versions.push(version.id)
+          if (version.type === 'release') this.versions.push(version.id)
+          if (version.type === 'snapshot') betaVersions.push(version.id)
+          if (version.type === 'old_beta' || version.type === 'old_alpha')
+            legacyVersions.push(version.id)
         }
+        this.versions.concat(betaVersions, legacyVersions)
       } catch (err) {
+        // eslint-disable-next-line no-console
         console.error(err)
-      }
-    },
-    async resize() {
-      const vh = Math.max(
-        document.documentElement.clientHeight || 0,
-        window.innerHeight || 0
-      )
-      this.maxResults = Math.floor((vh - 200) / 120)
-
-      await this.onSearchChange(this.currentPage)
-
-      if (this.currentPage > this.pages[this.pages.length - 1]) {
-        this.currentPage = this.pages[this.pages.length - 1]
-        await this.onSearchChange(this.currentPage)
       }
     },
     async clearFilters() {
@@ -457,23 +443,37 @@ export default {
       await this.onSearchChange(1)
     },
     async toggleFacet(elementName, sendRequest) {
-      const element = document.getElementById(elementName)
-      const index = this.facets.indexOf(element.id)
+      const element = process.client
+        ? document.getElementById(elementName)
+        : null
+      const index = this.facets.indexOf(elementName)
 
       if (index !== -1) {
-        element.classList.remove('filter-active')
+        if (process.client) element.classList.remove('filter-active')
         this.facets.splice(index, 1)
       } else {
-        element.classList.add('filter-active')
-        this.facets.push(element.id)
+        if (process.client) element.classList.add('filter-active')
+        this.facets.push(elementName)
       }
 
       if (!sendRequest) await this.onSearchChange(1)
     },
     async changeSortType() {
-      this.sortType = document.getElementById('sort-type').value
+      if (process.client)
+        this.sortType = document.getElementById('sort-type').value
 
       await this.onSearchChange(1)
+    },
+    async changeMaxResults() {
+      if (process.client)
+        this.maxResults = document.getElementById('max-results').value
+
+      await this.onSearchChangeToTop(1)
+    },
+    async onSearchChangeToTop(newPageNumber) {
+      if (process.client) window.scrollTo(0, 0)
+
+      await this.onSearchChange(newPageNumber)
     },
     async onSearchChange(newPageNumber) {
       try {
@@ -501,11 +501,7 @@ export default {
         }
 
         const offset = (newPageNumber - 1) * this.maxResults
-        if (this.overrideOffset > 0) {
-          console.log(this.overrideOffset)
-          params.push(`offset=${this.overrideOffset}`)
-          this.overrideOffset = 0
-        } else if (newPageNumber !== 1) {
+        if (newPageNumber !== 1) {
           params.push(`offset=${offset}`)
         }
 
@@ -547,15 +543,21 @@ export default {
           this.pages = Array.from({ length: pageAmount }, (_, i) => i + 1)
         }
 
-        url = `mods?q=${encodeURIComponent(
-          this.query
-        )}&o=${offset}&f=${encodeURIComponent(
-          this.facets.toString()
-        )}&v=${encodeURIComponent(
-          this.selectedVersions.toString()
-        )}&s=${encodeURIComponent(this.sortType)}`
+        if (process.client) {
+          url = `mods?q=${encodeURIComponent(this.query)}`
 
-        window.history.pushState(new Date(), 'Mods', url)
+          if (offset > 0) url += `&o=${offset}`
+          if (this.facets.length > 0)
+            url += `&f=${encodeURIComponent(this.facets)}`
+          if (this.selectedVersions.length > 0)
+            url += `&v=${encodeURIComponent(this.selectedVersions)}`
+          if (this.sortType !== 'relevance')
+            url += `&s=${encodeURIComponent(this.sortType)}`
+          if (this.maxResults > 5)
+            url += `&m=${encodeURIComponent(this.maxResults)}`
+
+          window.history.pushState(new Date(), 'Mods', url)
+        }
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err)
@@ -570,23 +572,24 @@ export default {
 
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 <style lang="scss">
-#search-pagination {
+.search-bar {
   align-items: center;
   display: flex;
   justify-content: space-between;
 }
 
-.paginates {
+.search-bottom {
   align-items: center;
-}
-
-.paginates p {
-  margin-left: 5px;
-  margin-right: 5px;
+  display: flex;
+  justify-content: flex-end;
+  select {
+    width: 100px;
+    margin-right: 20px;
+  }
 }
 
 .content {
-  min-height: 95vh;
+  min-height: 96vh;
 }
 
 .filters {
@@ -620,12 +623,14 @@ export default {
   button {
     width: 100%;
     padding: 5px 0;
-    color: #718096;
+    outline: none;
+    color: var(--color-grey-5);
+    background-color: var(--color-grey-1);
     border: none;
     border-radius: 5px;
 
     &:hover {
-      background-color: var(--color-grey-1);
+      background-color: var(--color-grey-2);
       color: var(--color-text);
     }
   }
@@ -659,24 +664,6 @@ export default {
     color: var(--color-text);
     border-left: 4px solid var(--color-brand);
   }
-}
-
-.disabled-paginate {
-  cursor: default;
-  color: var(--color-grey-3);
-}
-
-.active-page-number {
-  user-select: none;
-  cursor: pointer;
-}
-
-.disabled-page-number {
-  user-select: none;
-  cursor: default;
-  padding: 2px 3px;
-  border-radius: 3px;
-  background-color: var(--color-grey-3);
 }
 
 .iconified-select {
@@ -725,5 +712,27 @@ select {
     border-color: var(--color-grey-4);
     color: var(--color-text);
   }
+}
+
+.multiselect__tags {
+  background: var(--color-bg);
+}
+
+.multiselect__input {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.multiselect__option {
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+.multiselect__option--highlight {
+  background: var(--color-brand);
+}
+
+.multiselect__tag {
+  background: var(--color-brand);
 }
 </style>
