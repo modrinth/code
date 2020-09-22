@@ -25,25 +25,23 @@
           </svg>
         </div>
         <div class="sort-paginate">
-          <div class="iconified-select">
-            <select id="sort-type" @input="changeSortType">
-              <option value="relevance" selected>Relevance</option>
-              <option value="downloads">Total Downloads</option>
-              <option value="newest">Newest</option>
-              <option value="updated">Updated</option>
-            </select>
-
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
-          </div>
+          <Multiselect
+            v-model="sortType"
+            class="sort-types"
+            placeholder="Select one"
+            track-by="display"
+            label="display"
+            :options="sortTypes"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="false"
+            @input="onSearchChange(1)"
+          >
+            <template slot="singleLabel" slot-scope="{ option }">{{
+              option.display
+            }}</template>
+          </Multiselect>
           <div class="mobile-filters-button">
             <button @click="toggleFiltersMenu">Filter...</button>
           </div>
@@ -73,27 +71,18 @@
         />
       </div>
       <section v-if="pages.length > 1" class="search-bottom">
-        <div class="iconified-select">
-          <select id="max-results" @input="changeMaxResults">
-            <option value="5" selected>5</option>
-            <option value="10">10</option>
-            <option value="15">15</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-            <option value="100">100</option>
-          </select>
-
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <polyline points="6 9 12 15 18 9"></polyline>
-          </svg>
-        </div>
+        <Multiselect
+          v-model="maxResults"
+          class="max-results"
+          placeholder="Select one"
+          :options="[5, 10, 15, 20, 50, 100]"
+          :searchable="false"
+          :close-on-select="true"
+          :show-labels="false"
+          :allow-empty="false"
+          @input="onSearchChange(currentPage)"
+        >
+        </Multiselect>
         <pagination
           :current-page="currentPage"
           :pages="pages"
@@ -110,9 +99,11 @@
           </button>
           <button @click="clearFilters">Clear Filters</button>
           <h3>Categories</h3>
-          <p
-            id="categories:technology"
-            @click="toggleFacet('categories:technology')"
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Technology"
+            facet-name="categories:technology"
+            @toggle="toggleFacet"
           >
             <svg
               viewBox="0 0 24 24"
@@ -129,11 +120,12 @@
               <line x1="6" y1="16" x2="6.01" y2="16"></line>
               <line x1="10" y1="16" x2="10.01" y2="16"></line>
             </svg>
-            Technology
-          </p>
-          <p
-            id="categories:adventure"
-            @click="toggleFacet('categories:adventure')"
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Adventure"
+            facet-name="categories:adventure"
+            @toggle="toggleFacet"
           >
             <svg
               viewBox="0 0 24 24"
@@ -148,9 +140,13 @@
                 points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"
               ></polygon>
             </svg>
-            Adventure
-          </p>
-          <p id="categories:magic" @click="toggleFacet('categories:magic')">
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Magic"
+            facet-name="categories:magic"
+            @toggle="toggleFacet"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -163,9 +159,13 @@
                 d="M10.42 3C9.88 9.2 4 9.4 4 14.38c0 2.8 1.7 5.35 4.17 6.62.76-2.1 3.83-3.17 3.83-5.57a7.65 7.65 0 013.92 5.52C24.13 15.88 18.9 6.18 10.42 3z"
               />
             </svg>
-            Magic
-          </p>
-          <p id="categories:utility" @click="toggleFacet('categories:utility')">
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Utility"
+            facet-name="categories:utility"
+            @toggle="toggleFacet"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -177,11 +177,12 @@
               <rect x="2" y="7" width="20" height="14" rx="2" ry="2" />
               <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" />
             </svg>
-            Utility
-          </p>
-          <p
-            id="categories:decoration"
-            @click="toggleFacet('categories:decoration')"
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Decoration"
+            facet-name="categories:decoration"
+            @toggle="toggleFacet"
           >
             <svg
               viewBox="0 0 24 24"
@@ -194,9 +195,13 @@
               <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
               <polyline points="9 22 9 12 15 12 15 22" />
             </svg>
-            Decoration
-          </p>
-          <p id="categories:library" @click="toggleFacet('categories:library')">
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Library"
+            facet-name="categories:library"
+            @toggle="toggleFacet"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -210,9 +215,13 @@
                 d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"
               ></path>
             </svg>
-            Library
-          </p>
-          <p id="categories:cursed" @click="toggleFacet('categories:cursed')">
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Cursed"
+            facet-name="categories:cursed"
+            @toggle="toggleFacet"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -235,11 +244,12 @@
               <line x1="9" y1="4.5" x2="8" y2="2.5" />
               <line x1="15" y1="4.5" x2="16" y2="2.5" />
             </svg>
-            Cursed
-          </p>
-          <p
-            id="categories:worldgen"
-            @click="toggleFacet('categories:worldgen')"
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Worldgen"
+            facet-name="categories:worldgen"
+            @toggle="toggleFacet"
           >
             <svg
               viewBox="0 0 24 24"
@@ -253,9 +263,13 @@
                 d="M12 2v6.5M10 4l2 1 2-1M3.3 7L9 10.2m-4.9-.5L6 8.5l.1-2.2M3.3 17L9 13.7m-2.9 4L6 15.5l-1.9-1.2M12 22v-6.5m2 4.5l-2-1-2 1m5-6.2l5.6 3.3m-.7-2.8L18 15.5l-.1 2.2M20.7 7L15 10.3m2.9-4l.1 2.2 1.9 1.2M12 8.5l3 1.8v3.5l-3 1.8-3-1.8v-3.5l3-1.8z"
               />
             </svg>
-            Worldgen
-          </p>
-          <p id="categories:storage" @click="toggleFacet('categories:storage')">
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Storage"
+            facet-name="categories:storage"
+            @toggle="toggleFacet"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -268,9 +282,13 @@
               <rect x="1" y="3" width="22" height="5"></rect>
               <line x1="10" y1="12" x2="14" y2="12"></line>
             </svg>
-            Storage
-          </p>
-          <p id="categories:food" @click="toggleFacet('categories:food')">
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Food"
+            facet-name="categories:food"
+            @toggle="toggleFacet"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -285,11 +303,12 @@
               <line x1="10" y1="1" x2="10" y2="4"></line>
               <line x1="14" y1="1" x2="14" y2="4"></line>
             </svg>
-            Food
-          </p>
-          <p
-            id="categories:equipment"
-            @click="toggleFacet('categories:equipment')"
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Equipment"
+            facet-name="categories:equipment"
+            @toggle="toggleFacet"
           >
             <svg
               viewBox="0 0 24 24"
@@ -309,9 +328,13 @@
               <path d="M21.131 16.602l-5.187 5.01 2.596-2.508 2.667 2.761" />
               <path d="M2.828 16.602l5.188 5.01-2.597-2.508-2.667 2.761" />
             </svg>
-            Equipment
-          </p>
-          <p id="categories:misc" @click="toggleFacet('categories:misc')">
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Misc"
+            facet-name="categories:misc"
+            @toggle="toggleFacet"
+          >
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -326,22 +349,37 @@
                 d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
               ></path>
             </svg>
-            Misc
-          </p>
+          </SearchFilter>
           <h3>Loaders</h3>
-          <p id="categories:forge" @click="toggleFacet('categories:forge')">
-            Forge
-          </p>
-          <p id="categories:fabric" @click="toggleFacet('categories:fabric')">
-            Fabric
-          </p>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Forge"
+            facet-name="categories:forge"
+            @toggle="toggleFacet"
+          >
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Fabric"
+            facet-name="categories:fabric"
+            @toggle="toggleFacet"
+          >
+          </SearchFilter>
           <h3>Platforms</h3>
-          <p id="host:modrinth" @click="toggleFacet('host:modrinth')">
-            Modrinth
-          </p>
-          <p id="host:curseforge" @click="toggleFacet('host:curseforge')">
-            Curseforge
-          </p>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Modrinth"
+            facet-name="host:modrinth"
+            @toggle="toggleFacet"
+          >
+          </SearchFilter>
+          <SearchFilter
+            :active-filters="facets"
+            display-name="Curseforge"
+            facet-name="host:curseforge"
+            @toggle="toggleFacet"
+          >
+          </SearchFilter>
           <h3>Versions</h3>
         </section>
         <multiselect
@@ -370,6 +408,7 @@ import Multiselect from 'vue-multiselect'
 import axios from 'axios'
 import SearchResult from '@/components/ModResult'
 import Pagination from '@/components/Pagination'
+import SearchFilter from '@/components/SearchFilter'
 
 const config = {
   headers: {
@@ -382,6 +421,7 @@ export default {
     SearchResult,
     Pagination,
     Multiselect,
+    SearchFilter,
   },
   data() {
     return {
@@ -392,7 +432,13 @@ export default {
       results: [],
       pages: [],
       currentPage: 1,
-      sortType: 'relevance',
+      sortTypes: [
+        { display: 'Relevance', name: 'relevance' },
+        { display: 'Total Downloads', name: 'downloads' },
+        { display: 'Newest', name: 'newest' },
+        { display: 'Updated', name: 'updated' },
+      ],
+      sortType: { display: 'Relevance', name: 'relevance' },
       maxResults: 5,
     }
   },
@@ -416,11 +462,6 @@ export default {
 
     await this.fillInitialVersions()
     await this.onSearchChange(this.currentPage)
-  },
-  mounted() {
-    document.getElementById('sort-type').value = this.sortType
-    if (this.pages.length > 1)
-      document.getElementById('max-results').value = this.maxResults
   },
   methods: {
     async fillInitialVersions() {
@@ -452,32 +493,15 @@ export default {
       await this.onSearchChange(1)
     },
     async toggleFacet(elementName, sendRequest) {
-      const element = process.client
-        ? document.getElementById(elementName)
-        : null
       const index = this.facets.indexOf(elementName)
 
       if (index !== -1) {
-        if (process.client) element.classList.remove('filter-active')
         this.facets.splice(index, 1)
       } else {
-        if (process.client) element.classList.add('filter-active')
         this.facets.push(elementName)
       }
 
       if (!sendRequest) await this.onSearchChange(1)
-    },
-    async changeSortType() {
-      if (process.client)
-        this.sortType = document.getElementById('sort-type').value
-
-      await this.onSearchChange(1)
-    },
-    async changeMaxResults() {
-      if (process.client)
-        this.maxResults = document.getElementById('max-results').value
-
-      await this.onSearchChangeToTop(1)
     },
     async onSearchChangeToTop(newPageNumber) {
       if (process.client) window.scrollTo(0, 0)
@@ -486,7 +510,10 @@ export default {
     },
     async onSearchChange(newPageNumber) {
       try {
-        const params = [`limit=${this.maxResults}`, `index=${this.sortType}`]
+        const params = [
+          `limit=${this.maxResults}`,
+          `index=${this.sortType.name}`,
+        ]
 
         if (this.query.length > 0) {
           params.push(`query=${this.query.replace(/ /g, '+')}`)
@@ -560,8 +587,8 @@ export default {
             url += `&f=${encodeURIComponent(this.facets)}`
           if (this.selectedVersions.length > 0)
             url += `&v=${encodeURIComponent(this.selectedVersions)}`
-          if (this.sortType !== 'relevance')
-            url += `&s=${encodeURIComponent(this.sortType)}`
+          if (this.sortType.name !== 'relevance')
+            url += `&s=${encodeURIComponent(this.sortType.name)}`
           if (this.maxResults > 5)
             url += `&m=${encodeURIComponent(this.maxResults)}`
 
@@ -596,13 +623,6 @@ export default {
   .iconified-input {
     width: 100%;
   }
-  .iconified-select {
-    width: 100%;
-    margin-left: 0;
-    select {
-      width: 100%;
-    }
-  }
   .sort-paginate {
     display: flex;
     width: 100%;
@@ -611,13 +631,6 @@ export default {
     flex-flow: row;
     .iconified-input {
       width: auto;
-    }
-    .iconified-select {
-      width: auto;
-      margin-left: 1em;
-      select {
-        width: auto;
-      }
     }
     .sort-paginate {
       display: block;
@@ -644,6 +657,7 @@ export default {
   display: inline-block;
   button {
     background: var(--color-bg);
+    color: var(--color-text);
     border: 2px solid var(--color-grey-3);
     border-radius: var(--size-rounded-sm);
     padding: 0.5rem;
@@ -664,7 +678,6 @@ export default {
   right: -100vw;
   max-height: 100vh;
   min-width: 15%;
-  overflow-y: auto;
   top: 3.5rem;
   height: calc(100vh - 3.5rem);
   transition: right 150ms;
@@ -722,37 +735,6 @@ export default {
 
   .filter-button-done {
     display: block;
-  }
-
-  p {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    padding: 2px 2px 2px 20px;
-    margin: 0 0 0 5px;
-    border-left: 4px solid var(--color-grey-3);
-    border-radius: 0 0.25rem 0.25rem 0;
-    color: var(--color-grey-5);
-    font-size: 1rem;
-    letter-spacing: 0.02rem;
-
-    svg {
-      margin-right: 5px;
-      height: 1rem;
-      flex-shrink: 0;
-    }
-
-    &:hover,
-    &:focus {
-      background-color: var(--color-grey-1);
-      color: var(--color-text);
-    }
-  }
-
-  .filter-active {
-    background-color: var(--color-grey-1);
-    color: var(--color-text);
-    border-left: 4px solid var(--color-brand);
   }
 
   // Large screens that don't collapse
@@ -816,40 +798,45 @@ select {
   }
 }
 
+.sort-types {
+  min-width: 200px;
+  padding-y: 1rem;
+  border: 2px solid var(--color-grey-3);
+  border-radius: var(--size-rounded-sm);
+
+  .multiselect__tags {
+    padding: 10px 50px 0 8px;
+    border: none;
+  }
+}
+
+.max-results {
+  max-width: 80px;
+}
+
 .multiselect__content-wrapper {
   overflow-x: hidden;
 }
 
-.multiselect__tags {
-  background: var(--color-bg);
-}
-
+.multiselect__tags,
 .multiselect__spinner {
   background: var(--color-bg);
 }
 
-.multiselect__spinner::before {
-  border-top-color: var(--color-brand);
-}
-
+.multiselect__spinner::before,
 .multiselect__spinner::after {
   border-top-color: var(--color-brand);
 }
 
+.multiselect__option--selected.multiselect__option--highlight,
+.multiselect__option,
+.multiselect__single,
 .multiselect__input {
   color: var(--color-text);
   background: var(--color-bg);
 }
 
-.multiselect__option {
-  color: var(--color-text);
-  background: var(--color-bg);
-}
-
-.multiselect__option--highlight {
-  background: var(--color-brand);
-}
-
+.multiselect__option--highlight,
 .multiselect__tag {
   background: var(--color-brand);
 }

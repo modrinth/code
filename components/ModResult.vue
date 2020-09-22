@@ -426,6 +426,7 @@ export default {
   grid-column: 2;
   max-height: 150px;
   font-size: 11pt;
+  margin: auto 0;
 }
 
 .mod-name {
@@ -445,7 +446,6 @@ export default {
   grid-template-rows: 20px 20px;
   margin-top: 5px;
   grid-column: 2;
-  align-self: flex-end;
   align-items: flex-start;
   align-self: flex-start;
 
@@ -486,9 +486,8 @@ export default {
 .categories {
   display: flex;
   flex-direction: row;
-  margin: 0 0 5px 0;
   grid-column: 1;
-  margin-bottom: auto;
+  margin: 0 0 auto;
 }
 
 .categories p {
@@ -526,7 +525,7 @@ export default {
 @media screen and (min-width: 900px) {
   .result {
     grid-template-columns: 90px auto;
-    grid-template-rows: auto auto 30px;
+    grid-template-rows: auto auto 35px;
   }
 
   .result-infos {
@@ -564,7 +563,7 @@ export default {
   }
 
   .mod-name {
-    font-size: 16pt;
+    font-size: 18pt;
   }
 
   .result-summary {
@@ -582,13 +581,13 @@ export default {
   }
 
   .categories {
-    margin: auto 0 5px auto;
+    margin: 0 5px 10px auto;
     grid-row: 3;
     grid-column: 3;
   }
 
   .mod-name {
-    font-size: 18pt;
+    font-size: 20pt;
   }
 }
 
