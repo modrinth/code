@@ -1,5 +1,6 @@
 use actix_web::web;
 
+mod auth;
 mod index;
 mod mod_creation;
 mod mods;
@@ -9,6 +10,7 @@ mod version_creation;
 mod versions;
 
 pub use tags::config as tags_config;
+pub use auth::config as auth_config;
 
 pub use self::index::index_get;
 pub use self::not_found::not_found;

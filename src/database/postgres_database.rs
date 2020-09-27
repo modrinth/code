@@ -1,4 +1,4 @@
-use log::{debug, info};
+use log::info;
 use sqlx::migrate::{Migrate, MigrateDatabase, Migrator};
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::{Connection, PgConnection, Postgres};

@@ -63,9 +63,9 @@ pub async fn index_mods(pool: PgPool, settings: IndexingSettings) -> Result<(), 
     }
     if settings.index_external {
         let end_index = dotenv::var("MAX_CURSEFORGE_ID")
-                .ok()
-                .map(|i| i.parse().unwrap())
-                .unwrap_or(450_000);
+            .ok()
+            .map(|i| i.parse().unwrap())
+            .unwrap_or(450_000);
 
         docs_to_add.append(&mut index_curseforge(1, end_index).await?);
     }
@@ -271,7 +271,11 @@ fn default_settings() -> Settings {
         .with_searchable_attributes(searchable_attributes)
         .with_stop_words(vec![])
         .with_synonyms(HashMap::new())
-        .with_attributes_for_faceting(vec![String::from("categories"), String::from("host"), String::from("versions")])
+        .with_attributes_for_faceting(vec![
+            String::from("categories"),
+            String::from("host"),
+            String::from("versions"),
+        ])
 }
 
 //endregion

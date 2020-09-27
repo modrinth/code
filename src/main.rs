@@ -193,6 +193,7 @@ async fn main() -> std::io::Result<()> {
             .service(routes::index_get)
             .service(
                 web::scope("/api/v1/")
+                    .configure(routes::auth_config)
                     .configure(routes::tags_config)
                     .configure(routes::mods_config),
             )
@@ -246,4 +247,7 @@ fn check_env_vars() {
     }
 
     check_var::<usize>("LOCAL_INDEX_INTERVAL");
+
+    check_var::<String>("GITHUB_CLIENT_ID");
+    check_var::<String>("GITHUB_CLIENT_SECRET");
 }
