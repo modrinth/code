@@ -5,8 +5,7 @@ use actix_web::{get, HttpResponse};
 use actix_web::http::StatusCode;
 use serde::{Deserialize, Serialize};
 use thiserror::Error;
-use serde_json::Value;
-use crate::database::models::generate_state_id;
+use crate::database::models::{generate_state_id, User, UserId};
 use sqlx::postgres::PgPool;
 use crate::models::ids::base62_impl::{to_base62, parse_base62};
 use chrono::Utc;
@@ -30,7 +29,7 @@ pub enum AuthorizationError {
     DatabaseError(#[from] crate::database::models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
-    #[error("Error while communicating to GitHub OAuth2")]
+    #[error("Error while communicating to GitHub OAuth2: {0}")]
     GithubError(#[from] reqwest::Error),
     #[error("Invalid Authentication credentials")]
     InvalidCredentialsError,
@@ -84,14 +83,13 @@ pub struct AccessToken {
     pub token_type: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct GitHubUser {
     pub login: String,
-    pub id: usize,
-    pub node_id: String,
+    pub id: u64,
     pub avatar_url: String,
-    pub gravatar_id: String,
-    pub url: String,
+    pub name: String,
+    pub email: Option<String>,
     pub bio: String,
 }
 
@@ -118,7 +116,7 @@ pub async fn init(Query(info): Query<AuthorizationInit>, client: Data<PgPool>) -
     let client_id = dotenv::var("GITHUB_CLIENT_ID")?;
     let url = format!("https://github.com/login/oauth/authorize?client_id={}&state={}&scope={}", client_id, to_base62(state.0 as u64), "%20repo%20read%3Aorg%20read%3Auser%20user%3Aemail");
 
-    Ok(HttpResponse::PermanentRedirect()
+    Ok(HttpResponse::TemporaryRedirect()
         .header("Location", &*url)
         .json(AuthorizationInit {
             url,
@@ -143,7 +141,6 @@ pub async fn auth_callback(Query(info): Query<Authorization>, client: Data<PgPoo
     let now = Utc::now();
     let duration = result.expires.signed_duration_since(now);
 
-    info!("{:?}", duration.num_seconds());
     if duration.num_seconds() < 0 {
         return Err(AuthorizationError::InvalidCredentialsError);
     }
@@ -176,7 +173,7 @@ pub async fn auth_callback(Query(info): Query<Authorization>, client: Data<PgPoo
         .json()
         .await?;
 
-    let user : Value = client
+    let user : GitHubUser = client
         .get("https://api.github.com/user")
         .header(reqwest::header::USER_AGENT, "Modrinth")
         .header(reqwest::header::AUTHORIZATION, format!("token {}", token.access_token))
@@ -185,11 +182,32 @@ pub async fn auth_callback(Query(info): Query<Authorization>, client: Data<PgPoo
         .json()
         .await?;
 
+    let user_result = User::get_from_github_id(UserId(user.id as i64), &mut *transaction).await?;
+    match user_result{
+        Some(x) => {
+            info!("{:?}", x.id)
+        }
+        None => {
+            let user_id = crate::database::models::generate_user_id(&mut transaction).await?.into();
+
+            User {
+                id: user_id,
+                github_id: UserId(user.id as i64),
+                username: user.login,
+                name: user.name,
+                email: user.email,
+                avatar_url: user.avatar_url,
+                bio: user.bio,
+                created: Utc::now()
+            }.insert(&mut transaction).await?;
+        }
+    }
+
     transaction.commit().await?;
 
-    let redirect_url = format!("{}?url={}", result.url, token.access_token);
+    let redirect_url = format!("{}?code={}", result.url, token.access_token);
 
-    Ok(HttpResponse::PermanentRedirect()
+    Ok(HttpResponse::TemporaryRedirect()
         .header("Location", &*redirect_url)
         .json(AuthorizationInit {
             url: redirect_url,

@@ -8,6 +8,7 @@ pub mod ids;
 pub mod mod_item;
 pub mod team_item;
 pub mod version_item;
+pub mod user_item;
 
 pub use ids::*;
 pub use mod_item::Mod;
@@ -16,6 +17,7 @@ pub use team_item::TeamMember;
 pub use version_item::FileHash;
 pub use version_item::Version;
 pub use version_item::VersionFile;
+pub use user_item::User;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {

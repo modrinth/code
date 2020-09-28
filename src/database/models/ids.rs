@@ -77,8 +77,15 @@ generate_ids!(
     pub generate_state_id,
     StateId,
     8,
-    "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
+    "SELECT EXISTS(SELECT 1 FROM states WHERE id=$1)",
     StateId
+);
+generate_ids!(
+    pub generate_user_id,
+    UserId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM users WHERE id=$1)",
+    UserId
 );
 
 #[derive(Copy, Clone, Debug, Type)]

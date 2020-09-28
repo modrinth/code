@@ -14,7 +14,7 @@ pub mod indexing;
 
 #[derive(Error, Debug)]
 pub enum SearchError {
-    #[error("Error while connecting to the MeiliSearch database")]
+    #[error("Error while connecting to the MeiliSearch database: {0}")]
     IndexDBError(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),

@@ -1,7 +1,8 @@
 use thiserror::Error;
 
 pub use super::mods::{ModId, VersionId};
-pub use super::teams::{TeamId, UserId};
+pub use super::teams::TeamId;
+pub use super::users::UserId;
 
 /// Generates a random 64 bit integer that is exactly `n` characters
 /// long when encoded as base62.

@@ -1,13 +1,8 @@
 use super::ids::Base62Id;
 use serde::{Deserialize, Serialize};
+use crate::models::users::UserId;
 
 //TODO Implement Item for teams
-/// The ID of a specific user, encoded as base62 for usage in the API
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(from = "Base62Id")]
-#[serde(into = "Base62Id")]
-pub struct UserId(pub u64);
-
 /// The ID of a team
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
