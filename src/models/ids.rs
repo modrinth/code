@@ -169,7 +169,7 @@ pub mod base62_impl {
         output
     }
 
-    fn parse_base62(string: &str) -> Result<u64, DecodingError> {
+    pub fn parse_base62(string: &str) -> Result<u64, DecodingError> {
         let mut num: u64 = 0;
         for c in string.chars() {
             let next_digit;
