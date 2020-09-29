@@ -1,6 +1,6 @@
 use super::ids::Base62Id;
-use serde::{Deserialize, Serialize};
 use crate::models::users::UserId;
+use serde::{Deserialize, Serialize};
 
 //TODO Implement Item for teams
 /// The ID of a team

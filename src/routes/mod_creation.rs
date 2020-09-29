@@ -1,14 +1,16 @@
+use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::mods::{ModId, VersionId, VersionType};
 use crate::models::teams::TeamMember;
+use crate::models::users::UserId;
 use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::queue::CreationQueue;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::Data;
-use actix_web::{post, HttpResponse};
+use actix_web::{post, HttpRequest, HttpResponse};
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
@@ -42,6 +44,8 @@ pub enum CreateError {
     InvalidLoader(String),
     #[error("Invalid category: {0}")]
     InvalidCategory(String),
+    #[error("Authentication Error: {0}")]
+    Unauthorized(#[from] AuthenticationError),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -59,6 +63,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidGameVersion(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
+            CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
         }
     }
 
@@ -77,6 +82,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidGameVersion(..) => "invalid_input",
                 CreateError::InvalidLoader(..) => "invalid_input",
                 CreateError::InvalidCategory(..) => "invalid_input",
+                CreateError::Unauthorized(..) => "unauthorized",
             },
             description: &self.to_string(),
         })
@@ -126,6 +132,7 @@ pub async fn undo_uploads(
 
 #[post("mod")]
 pub async fn mod_create(
+    req: HttpRequest,
     payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
@@ -135,6 +142,7 @@ pub async fn mod_create(
     let mut uploaded_files = Vec::new();
 
     let result = mod_create_inner(
+        req,
         payload,
         &mut transaction,
         &***file_host,
@@ -161,6 +169,7 @@ pub async fn mod_create(
 }
 
 async fn mod_create_inner(
+    req: HttpRequest,
     mut payload: Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
@@ -170,6 +179,7 @@ async fn mod_create_inner(
     let cdn_url = dotenv::var("CDN_URL")?;
 
     let mod_id = models::generate_mod_id(transaction).await?.into();
+    let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
     let mut created_versions: Vec<models::version_item::VersionBuilder> = vec![];
 
@@ -287,6 +297,7 @@ async fn mod_create_inner(
                 let version = models::version_item::VersionBuilder {
                     version_id: version_id.into(),
                     mod_id: mod_id.into(),
+                    author_id: user.id.into(),
                     name: version_data.version_title.clone(),
                     version_number: version_data.version_number.clone(),
                     changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
@@ -355,6 +366,16 @@ async fn mod_create_inner(
             "Multipart upload missing `data` field",
         )));
     };
+
+    let ids: Vec<UserId> = (&create_data.team_members)
+        .iter()
+        .map(|m| m.user_id)
+        .collect();
+    if !ids.contains(&user.id) {
+        return Err(CreateError::InvalidInput(String::from(
+            "Team members must include yourself!",
+        )));
+    }
 
     let mut categories = Vec::with_capacity(create_data.categories.len());
     for category in &create_data.categories {
@@ -430,9 +451,9 @@ async fn mod_create_inner(
         versions: versions_list,
         page_url: mod_builder.body_url.clone(),
         icon_url: mod_builder.icon_url.clone().unwrap(),
-        // TODO: Author/team info, latest version info
-        author: String::new(),
-        author_url: String::new(),
+        author: user.username,
+        author_url: format!("https://modrinth.com/user/{}", user.id),
+        // TODO: latest version info
         latest_version: String::new(),
         downloads: 0,
         date_created: formatted.clone(),

@@ -9,8 +9,8 @@ mod tags;
 mod version_creation;
 mod versions;
 
-pub use tags::config as tags_config;
 pub use auth::config as auth_config;
+pub use tags::config as tags_config;
 
 pub use self::index::index_get;
 pub use self::not_found::not_found;
@@ -44,12 +44,15 @@ pub fn versions_config(cfg: &mut web::ServiceConfig) {
 pub enum ApiError {
     #[error("Internal server error")]
     DatabaseError(#[from] crate::database::models::DatabaseError),
+    #[error("Authentication Error")]
+    AuthenticationError,
 }
 
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> actix_web::http::StatusCode {
         match self {
             ApiError::DatabaseError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::AuthenticationError => actix_web::http::StatusCode::UNAUTHORIZED,
         }
     }
 
@@ -58,6 +61,7 @@ impl actix_web::ResponseError for ApiError {
             crate::models::error::ApiError {
                 error: match self {
                     ApiError::DatabaseError(..) => "database_error",
+                    ApiError::AuthenticationError => "unauthorized",
                 },
                 description: &self.to_string(),
             },

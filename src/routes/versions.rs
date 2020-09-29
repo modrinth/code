@@ -1,7 +1,8 @@
 use super::ApiError;
+use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models;
-use actix_web::{delete, get, web, HttpResponse};
+use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 
 // TODO: this needs filtering, and a better response type
@@ -62,6 +63,7 @@ pub async fn version_get(
         let response = models::mods::Version {
             id: data.id.into(),
             mod_id: data.mod_id.into(),
+            author_id: data.author_id.into(),
 
             name: data.name,
             version_number: data.version_number,
@@ -111,12 +113,22 @@ pub async fn version_get(
     }
 }
 
-// TODO: This really needs auth
 #[delete("{version_id}")]
 pub async fn version_delete(
+    req: HttpRequest,
     info: web::Path<(models::ids::ModId, models::ids::VersionId)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_moderator_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     // TODO: check if the mod exists and matches the version id
     let id = info.1;
     let result = database::models::Version::remove_full(id.into(), &**pool)

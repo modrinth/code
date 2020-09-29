@@ -4,7 +4,7 @@ use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::{Connection, PgConnection, Postgres};
 use std::path::Path;
 
-const MIGRATION_FOLDER: &'static str = "migrations";
+const MIGRATION_FOLDER: &str = "migrations";
 
 pub async fn connect() -> Result<PgPool, sqlx::Error> {
     info!("Initializing database connection");

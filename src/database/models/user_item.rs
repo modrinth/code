@@ -9,6 +9,7 @@ pub struct User {
     pub avatar_url: String,
     pub bio: String,
     pub created: chrono::DateTime<chrono::Utc>,
+    pub role: String,
 }
 
 impl User {
@@ -36,30 +37,27 @@ impl User {
             &self.bio,
             self.created,
         )
-            .execute(&mut *transaction)
-            .await?;
+        .execute(&mut *transaction)
+        .await?;
 
         Ok(())
     }
-    pub async fn get<'a, 'b, E>(
-        id: UserId,
-        executor: E,
-    ) -> Result<Option<Self>, sqlx::error::Error>
-        where
-            E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    pub async fn get<'a, 'b, E>(id: UserId, executor: E) -> Result<Option<Self>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
             SELECT u.github_id, u.name, u.email,
                 u.avatar_url, u.username, u.bio,
-                u.created
+                u.created, u.role
             FROM users u
             WHERE u.id = $1
             ",
             id as UserId,
         )
-            .fetch_optional(executor)
-            .await?;
+        .fetch_optional(executor)
+        .await?;
 
         if let Some(row) = result {
             Ok(Some(User {
@@ -71,6 +69,7 @@ impl User {
                 username: row.username,
                 bio: row.bio,
                 created: row.created,
+                role: row.role,
             }))
         } else {
             Ok(None)
@@ -81,21 +80,21 @@ impl User {
         github_id: UserId,
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
-        where
-            E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
             SELECT u.id, u.name, u.email,
                 u.avatar_url, u.username, u.bio,
-                u.created
+                u.created, u.role
             FROM users u
             WHERE u.github_id = $1
             ",
             github_id as UserId,
         )
-            .fetch_optional(executor)
-            .await?;
+        .fetch_optional(executor)
+        .await?;
 
         if let Some(row) = result {
             Ok(Some(User {
@@ -107,6 +106,7 @@ impl User {
                 username: row.username,
                 bio: row.bio,
                 created: row.created,
+                role: row.role,
             }))
         } else {
             Ok(None)
