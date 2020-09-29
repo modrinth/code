@@ -1,7 +1,8 @@
 use thiserror::Error;
 
 pub use super::mods::{ModId, VersionId};
-pub use super::teams::{TeamId, UserId};
+pub use super::teams::TeamId;
+pub use super::users::UserId;
 
 /// Generates a random 64 bit integer that is exactly `n` characters
 /// long when encoded as base62.
@@ -169,7 +170,7 @@ pub mod base62_impl {
         output
     }
 
-    fn parse_base62(string: &str) -> Result<u64, DecodingError> {
+    pub fn parse_base62(string: &str) -> Result<u64, DecodingError> {
         let mut num: u64 = 0;
         for c in string.chars() {
             let next_digit;

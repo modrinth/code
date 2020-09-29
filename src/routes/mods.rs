@@ -1,9 +1,10 @@
 use super::ApiError;
+use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models;
 use crate::models::mods::SearchRequest;
 use crate::search::{search_for_mod, SearchError};
-use actix_web::{delete, get, web, HttpResponse};
+use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 
 #[get("mod")]
@@ -48,13 +49,23 @@ pub async fn mod_get(
     }
 }
 
-// TODO: This really needs auth
 // TODO: The mod remains in meilisearch's index until the index is deleted
 #[delete("{id}")]
 pub async fn mod_delete(
+    req: HttpRequest,
     info: web::Path<(models::ids::ModId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_moderator_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     let id = info.0;
     let result = database::models::Mod::remove_full(id.into(), &**pool)
         .await

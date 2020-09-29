@@ -1,5 +1,6 @@
 use super::ids::Base62Id;
 use super::teams::TeamId;
+use super::users::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -54,6 +55,8 @@ pub struct Version {
     pub id: VersionId,
     /// The ID of the mod this version is for.
     pub mod_id: ModId,
+    /// The ID of the author who published this version
+    pub author_id: UserId,
 
     /// The name of this version
     pub name: String,

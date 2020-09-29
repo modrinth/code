@@ -1,6 +1,7 @@
 use super::ApiError;
+use crate::auth::check_is_admin_from_headers;
 use crate::database::models;
-use actix_web::{delete, get, put, web, HttpResponse};
+use actix_web::{delete, get, put, web, HttpRequest, HttpResponse};
 use models::categories::{Category, GameVersion, Loader};
 use sqlx::PgPool;
 
@@ -32,9 +33,20 @@ pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiE
 // TODO: don't fail if category already exists
 #[put("category/{name}")]
 pub async fn category_create(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     category: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_admin_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     let name = category.into_inner().0;
 
     let _id = Category::builder().name(&name)?.insert(&**pool).await?;
@@ -44,9 +56,20 @@ pub async fn category_create(
 
 #[delete("category/{name}")]
 pub async fn category_delete(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     category: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_admin_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     let name = category.into_inner().0;
     let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
 
@@ -75,9 +98,20 @@ pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiErr
 // TODO: don't fail if loader already exists
 #[put("loader/{name}")]
 pub async fn loader_create(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     loader: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_admin_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     let name = loader.into_inner().0;
 
     let _id = Loader::builder().name(&name)?.insert(&**pool).await?;
@@ -87,9 +121,20 @@ pub async fn loader_create(
 
 #[delete("loader/{name}")]
 pub async fn loader_delete(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     loader: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_admin_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     let name = loader.into_inner().0;
     let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
 
@@ -117,9 +162,20 @@ pub async fn game_version_list(pool: web::Data<PgPool>) -> Result<HttpResponse, 
 // remain idempotent
 #[put("game_version/{name}")]
 pub async fn game_version_create(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     game_version: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_admin_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     let name = game_version.into_inner().0;
 
     let _id = GameVersion::builder()
@@ -132,9 +188,20 @@ pub async fn game_version_create(
 
 #[delete("game_version/{name}")]
 pub async fn game_version_delete(
+    req: HttpRequest,
     pool: web::Data<PgPool>,
     game_version: web::Path<(String,)>,
 ) -> Result<HttpResponse, ApiError> {
+    check_is_admin_from_headers(
+        req.headers(),
+        &mut *pool
+            .acquire()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?,
+    )
+    .await
+    .map_err(|_| ApiError::AuthenticationError)?;
+
     let name = game_version.into_inner().0;
     let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
 

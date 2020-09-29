@@ -73,6 +73,20 @@ generate_ids!(
     "SELECT EXISTS(SELECT 1 FROM team_members WHERE id=$1)",
     TeamMemberId
 );
+generate_ids!(
+    pub generate_state_id,
+    StateId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM states WHERE id=$1)",
+    StateId
+);
+generate_ids!(
+    pub generate_user_id,
+    UserId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM users WHERE id=$1)",
+    UserId
+);
 
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
@@ -108,6 +122,10 @@ pub struct CategoryId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
 pub struct FileId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct StateId(pub i64);
 
 use crate::models::ids;
 

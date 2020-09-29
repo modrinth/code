@@ -1,3 +1,4 @@
+use crate::auth::get_user_from_headers;
 use crate::database::models;
 use crate::database::models::version_item::{VersionBuilder, VersionFileBuilder};
 use crate::file_hosting::FileHost;
@@ -7,7 +8,7 @@ use crate::models::mods::{
 use crate::routes::mod_creation::{CreateError, UploadedFile};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
-use actix_web::{post, HttpResponse};
+use actix_web::{post, HttpRequest, HttpResponse};
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
@@ -32,6 +33,7 @@ struct InitialFileData {
 // under `/api/v1/mod/{mod_id}`
 #[post("version")]
 pub async fn version_create(
+    req: HttpRequest,
     url_data: actix_web::web::Path<(ModId,)>,
     payload: Multipart,
     client: Data<PgPool>,
@@ -43,6 +45,7 @@ pub async fn version_create(
     let mod_id = url_data.into_inner().0.into();
 
     let result = version_create_inner(
+        req,
         payload,
         &mut transaction,
         &***file_host,
@@ -69,6 +72,7 @@ pub async fn version_create(
 }
 
 async fn version_create_inner(
+    req: HttpRequest,
     mut payload: Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
@@ -79,6 +83,8 @@ async fn version_create_inner(
 
     let mut initial_version_data = None;
     let mut version_builder = None;
+
+    let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item.map_err(CreateError::MultipartError)?;
@@ -126,6 +132,25 @@ async fn version_create_inner(
                 ));
             }
 
+            let team_id = sqlx::query!(
+                "SELECT team_id FROM mods WHERE id=$1",
+                mod_id as models::ModId,
+            )
+            .fetch_one(&mut *transaction)
+            .await?
+            .team_id;
+
+            let member_ids_rows =
+                sqlx::query!("SELECT user_id FROM team_members WHERE team_id=$1", team_id,)
+                    .fetch_all(&mut *transaction)
+                    .await?;
+
+            let member_ids: Vec<i64> = member_ids_rows.iter().map(|m| m.user_id).collect();
+
+            if !member_ids.contains(&(user.id.0 as i64)) {
+                return Err(CreateError::InvalidInput("Unauthorized".to_string()));
+            }
+
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
             let body_url = format!(
                 "data/{}/changelogs/{}/body.md",
@@ -156,6 +181,7 @@ async fn version_create_inner(
             version_builder = Some(VersionBuilder {
                 version_id: version_id.into(),
                 mod_id,
+                author_id: user.id.into(),
                 name: version_create_data.version_title.clone(),
                 version_number: version_create_data.version_number.clone(),
                 changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
@@ -239,6 +265,7 @@ async fn version_create_inner(
     let response = Version {
         id: version_builder_safe.version_id.into(),
         mod_id: version_builder_safe.mod_id.into(),
+        author_id: user.id,
         name: version_builder_safe.name.clone(),
         version_number: version_builder_safe.version_number.clone(),
         changelog_url: version_builder_safe.changelog_url.clone(),
@@ -282,6 +309,7 @@ async fn version_create_inner(
 // under /api/v1/mod/{mod_id}/version/{version_id}
 #[post("file")]
 pub async fn upload_file_to_version(
+    req: HttpRequest,
     url_data: actix_web::web::Path<(ModId, VersionId)>,
     payload: Multipart,
     client: Data<PgPool>,
@@ -295,6 +323,7 @@ pub async fn upload_file_to_version(
     let version_id = models::VersionId::from(data.1);
 
     let result = upload_file_to_version_inner(
+        req,
         payload,
         &mut transaction,
         &***file_host,
@@ -322,6 +351,7 @@ pub async fn upload_file_to_version(
 }
 
 async fn upload_file_to_version_inner(
+    req: HttpRequest,
     mut payload: Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
@@ -334,9 +364,11 @@ async fn upload_file_to_version_inner(
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builder: Option<VersionFileBuilder> = None;
 
+    let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+
     let result = sqlx::query!(
         "
-        SELECT mod_id, version_number
+        SELECT mod_id, version_number, author_id
         FROM versions
         WHERE id = $1
         ",
@@ -357,6 +389,10 @@ async fn upload_file_to_version_inner(
         return Err(CreateError::InvalidInput(
             "An invalid version id was supplied".to_string(),
         ));
+    }
+
+    if version.author_id as u64 != user.id.0 {
+        return Err(CreateError::InvalidInput("Unauthorized".to_string()));
     }
 
     let mod_id = ModId(version.mod_id as u64);

@@ -8,6 +8,7 @@ use search::indexing::index_mods;
 use search::indexing::IndexingSettings;
 use std::sync::Arc;
 
+mod auth;
 mod database;
 mod file_hosting;
 mod models;
@@ -193,8 +194,10 @@ async fn main() -> std::io::Result<()> {
             .service(routes::index_get)
             .service(
                 web::scope("/api/v1/")
+                    .configure(routes::auth_config)
                     .configure(routes::tags_config)
-                    .configure(routes::mods_config),
+                    .configure(routes::mods_config)
+                    .configure(routes::users_config),
             )
             .default_service(web::get().to(routes::not_found))
     })
@@ -246,4 +249,7 @@ fn check_env_vars() {
     }
 
     check_var::<usize>("LOCAL_INDEX_INTERVAL");
+
+    check_var::<String>("GITHUB_CLIENT_ID");
+    check_var::<String>("GITHUB_CLIENT_SECRET");
 }

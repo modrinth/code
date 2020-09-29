@@ -5,6 +5,7 @@ use super::DatabaseError;
 pub struct VersionBuilder {
     pub version_id: VersionId,
     pub mod_id: ModId,
+    pub author_id: UserId,
     pub name: String,
     pub version_number: String,
     pub changelog_url: Option<String>,
@@ -73,6 +74,7 @@ impl VersionBuilder {
         let version = Version {
             id: self.version_id,
             mod_id: self.mod_id,
+            author_id: self.author_id,
             name: self.name,
             version_number: self.version_number,
             changelog_url: self.changelog_url,
@@ -133,6 +135,7 @@ impl VersionBuilder {
 pub struct Version {
     pub id: VersionId,
     pub mod_id: ModId,
+    pub author_id: UserId,
     pub name: String,
     pub version_number: String,
     pub changelog_url: Option<String>,
@@ -149,18 +152,19 @@ impl Version {
         sqlx::query!(
             "
             INSERT INTO versions (
-                id, mod_id, name, version_number,
+                id, mod_id, author_id, name, version_number,
                 changelog_url, date_published,
                 downloads, release_channel
             )
             VALUES (
-                $1, $2, $3, $4,
-                $5, $6,
-                $7, $8
+                $1, $2, $3, $4, $5,
+                $6, $7,
+                $8, $9
             )
             ",
             self.id as VersionId,
             self.mod_id as ModId,
+            self.author_id as UserId,
             &self.name,
             &self.version_number,
             self.changelog_url.as_ref(),
@@ -339,7 +343,7 @@ impl Version {
     {
         let result = sqlx::query!(
             "
-            SELECT v.mod_id, v.name, v.version_number,
+            SELECT v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog_url, v.date_published, v.downloads,
                 v.release_channel
             FROM versions v
@@ -354,6 +358,7 @@ impl Version {
             Ok(Some(Version {
                 id,
                 mod_id: ModId(row.mod_id),
+                author_id: UserId(row.author_id),
                 name: row.name,
                 version_number: row.version_number,
                 changelog_url: row.changelog_url,
@@ -375,7 +380,7 @@ impl Version {
     {
         let result = sqlx::query!(
             "
-            SELECT v.mod_id, v.name, v.version_number,
+            SELECT v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog_url, v.date_published, v.downloads,
                 release_channels.channel
             FROM versions v
@@ -455,6 +460,7 @@ impl Version {
             Ok(Some(QueryVersion {
                 id,
                 mod_id: ModId(row.mod_id),
+                author_id: UserId(row.author_id),
                 name: row.name,
                 version_number: row.version_number,
                 changelog_url: row.changelog_url,
@@ -493,6 +499,7 @@ pub struct FileHash {
 pub struct QueryVersion {
     pub id: VersionId,
     pub mod_id: ModId,
+    pub author_id: UserId,
     pub name: String,
     pub version_number: String,
     pub changelog_url: Option<String>,

@@ -5,8 +5,7 @@ use actix_web::web::HttpResponse;
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::document::Document;
 use meilisearch_sdk::search::Query;
-use serde::ser::SerializeStruct;
-use serde::{Deserialize, Serialize, Serializer};
+use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::cmp::min;
 use thiserror::Error;
@@ -15,7 +14,7 @@ pub mod indexing;
 
 #[derive(Error, Debug)]
 pub enum SearchError {
-    #[error("Error while connecting to the MeiliSearch database")]
+    #[error("Error while connecting to the MeiliSearch database: {0}")]
     IndexDBError(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
