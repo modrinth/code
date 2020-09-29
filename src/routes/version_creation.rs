@@ -136,22 +136,19 @@ async fn version_create_inner(
                 "SELECT team_id FROM mods WHERE id=$1",
                 mod_id as models::ModId,
             )
-                .fetch_one(&mut *transaction)
-                .await?.team_id;
+            .fetch_one(&mut *transaction)
+            .await?
+            .team_id;
 
-            let member_ids_rows = sqlx::query!(
-                "SELECT user_id FROM team_members WHERE team_id=$1",
-                team_id,
-            )
-                .fetch_all(&mut *transaction)
-                .await?;
+            let member_ids_rows =
+                sqlx::query!("SELECT user_id FROM team_members WHERE team_id=$1", team_id,)
+                    .fetch_all(&mut *transaction)
+                    .await?;
 
-            let member_ids : Vec<i64> = member_ids_rows.iter()
-                .map(|m| m.user_id)
-                .collect();
+            let member_ids: Vec<i64> = member_ids_rows.iter().map(|m| m.user_id).collect();
 
             if !member_ids.contains(&(user.id.0 as i64)) {
-                return Err(CreateError::InvalidInput("Unauthorized".to_string()))
+                return Err(CreateError::InvalidInput("Unauthorized".to_string()));
             }
 
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
@@ -395,9 +392,7 @@ async fn upload_file_to_version_inner(
     }
 
     if version.author_id as u64 != user.id.0 {
-        return Err(CreateError::InvalidInput(
-            "Unauthorized".to_string(),
-        ));
+        return Err(CreateError::InvalidInput("Unauthorized".to_string()));
     }
 
     let mod_id = ModId(version.mod_id as u64);

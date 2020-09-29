@@ -1,7 +1,7 @@
 use super::ApiError;
 use crate::auth::check_is_admin_from_headers;
 use crate::database::models;
-use actix_web::{delete, get, put, web, HttpResponse, HttpRequest};
+use actix_web::{delete, get, put, web, HttpRequest, HttpResponse};
 use models::categories::{Category, GameVersion, Loader};
 use sqlx::PgPool;
 

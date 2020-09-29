@@ -53,13 +53,12 @@ where
 {
     let github_user = get_github_user_from_token(access_token).await?;
 
-    let res =
-        models::User::get_from_github_id(models::UserId(github_user.id as i64), executor).await?;
+    let res = models::User::get_from_github_id(github_user.id, executor).await?;
 
     match res {
         Some(result) => Ok(User {
             id: UserId::from(result.id),
-            github_id: UserId::from(result.github_id),
+            github_id: result.github_id as u64,
             username: result.username,
             name: result.name,
             email: result.email,

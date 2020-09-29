@@ -6,6 +6,7 @@ mod mod_creation;
 mod mods;
 mod not_found;
 mod tags;
+mod users;
 mod version_creation;
 mod versions;
 
@@ -38,6 +39,16 @@ pub fn versions_config(cfg: &mut web::ServiceConfig) {
                     web::scope("{version_id}").service(version_creation::upload_file_to_version),
                 ),
         );
+}
+
+pub fn users_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(users::user_auth_get);
+
+    cfg.service(
+        web::scope("user")
+            .service(users::user_get)
+            .service(users::user_delete),
+    );
 }
 
 #[derive(thiserror::Error, Debug)]

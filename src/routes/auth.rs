@@ -1,5 +1,5 @@
 use crate::auth::get_github_user_from_token;
-use crate::database::models::{generate_state_id, User, UserId};
+use crate::database::models::{generate_state_id, User};
 use crate::models::error::ApiError;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::ids::DecodingError;
@@ -174,16 +174,15 @@ pub async fn auth_callback(
 
     let user = get_github_user_from_token(&*token.access_token).await?;
 
-    let user_result = User::get_from_github_id(UserId(user.id as i64), &mut *transaction).await?;
+    let user_result = User::get_from_github_id(user.id, &mut *transaction).await?;
     match user_result {
         Some(x) => info!("{:?}", x.id),
         None => {
-            let user_id = crate::database::models::generate_user_id(&mut transaction)
-                .await?;
+            let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
 
             User {
                 id: user_id,
-                github_id: UserId(user.id as i64),
+                github_id: user.id as i64,
                 username: user.login,
                 name: user.name,
                 email: user.email,

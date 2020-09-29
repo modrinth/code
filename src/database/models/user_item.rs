@@ -2,7 +2,7 @@ use super::ids::UserId;
 
 pub struct User {
     pub id: UserId,
-    pub github_id: UserId,
+    pub github_id: i64,
     pub username: String,
     pub name: String,
     pub email: Option<String>,
@@ -29,7 +29,7 @@ impl User {
             )
             ",
             self.id as UserId,
-            self.github_id as UserId,
+            self.github_id,
             &self.username,
             &self.name,
             self.email.as_ref(),
@@ -62,7 +62,7 @@ impl User {
         if let Some(row) = result {
             Ok(Some(User {
                 id,
-                github_id: UserId(row.github_id),
+                github_id: row.github_id,
                 name: row.name,
                 email: row.email,
                 avatar_url: row.avatar_url,
@@ -77,7 +77,7 @@ impl User {
     }
 
     pub async fn get_from_github_id<'a, 'b, E>(
-        github_id: UserId,
+        github_id: u64,
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
@@ -91,7 +91,7 @@ impl User {
             FROM users u
             WHERE u.github_id = $1
             ",
-            github_id as UserId,
+            github_id as i64,
         )
         .fetch_optional(executor)
         .await?;
@@ -99,7 +99,7 @@ impl User {
         if let Some(row) = result {
             Ok(Some(User {
                 id: UserId(row.id),
-                github_id,
+                github_id: github_id as i64,
                 name: row.name,
                 email: row.email,
                 avatar_url: row.avatar_url,

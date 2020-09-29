@@ -9,7 +9,7 @@ pub struct UserId(pub u64);
 #[derive(Serialize, Deserialize)]
 pub struct User {
     pub id: UserId,
-    pub github_id: UserId,
+    pub github_id: u64,
     pub username: String,
     pub name: String,
     pub email: Option<String>,
