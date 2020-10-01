@@ -141,7 +141,7 @@ pub async fn search_for_mod(info: &SearchRequest) -> Result<SearchResults, Searc
 
     let offset = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
-    let limit = info.limit.unwrap_or(10);
+    let limit = info.limit.as_deref().unwrap_or("10").parse()?;
     let search_query: &str = info
         .query
         .as_deref()

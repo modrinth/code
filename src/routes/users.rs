@@ -1,10 +1,10 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::models::users::{Role, UserId};
 use crate::routes::ApiError;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 
-#[post("mod")]
+#[get("user")]
 pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
@@ -35,7 +35,7 @@ pub async fn user_get(
     if let Some(data) = user_data {
         let response = crate::models::users::User {
             id: data.id.into(),
-            github_id: data.github_id as u64,
+            github_id: data.github_id.map(|i| i as u64),
             username: data.username,
             name: data.name,
             email: None,

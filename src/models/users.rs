@@ -9,29 +9,30 @@ pub struct UserId(pub u64);
 #[derive(Serialize, Deserialize)]
 pub struct User {
     pub id: UserId,
-    pub github_id: u64,
+    pub github_id: Option<u64>,
     pub username: String,
     pub name: String,
     pub email: Option<String>,
-    pub avatar_url: String,
-    pub bio: String,
+    pub avatar_url: Option<String>,
+    pub bio: Option<String>,
     pub created: chrono::DateTime<chrono::Utc>,
     pub role: Role,
 }
 
 #[derive(Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Role {
     Developer,
     Moderator,
     Admin,
 }
 
-impl ToString for Role {
-    fn to_string(&self) -> String {
+impl std::fmt::Display for Role {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            Role::Developer => String::from("developer"),
-            Role::Moderator => String::from("moderator"),
-            Role::Admin => String::from("admin"),
+            Role::Developer => write!(fmt, "developer"),
+            Role::Moderator => write!(fmt, "moderator"),
+            Role::Admin => write!(fmt, "admin"),
         }
     }
 }

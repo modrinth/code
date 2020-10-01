@@ -58,7 +58,7 @@ where
     match res {
         Some(result) => Ok(User {
             id: UserId::from(result.id),
-            github_id: result.github_id as u64,
+            github_id: result.github_id.map(|i| i as u64),
             username: result.username,
             name: result.name,
             email: result.email,

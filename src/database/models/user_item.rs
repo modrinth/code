@@ -2,12 +2,12 @@ use super::ids::UserId;
 
 pub struct User {
     pub id: UserId,
-    pub github_id: i64,
+    pub github_id: Option<i64>,
     pub username: String,
     pub name: String,
     pub email: Option<String>,
-    pub avatar_url: String,
-    pub bio: String,
+    pub avatar_url: Option<String>,
+    pub bio: Option<String>,
     pub created: chrono::DateTime<chrono::Utc>,
     pub role: String,
 }
@@ -33,8 +33,8 @@ impl User {
             &self.username,
             &self.name,
             self.email.as_ref(),
-            &self.avatar_url,
-            &self.bio,
+            self.avatar_url.as_ref(),
+            self.bio.as_ref(),
             self.created,
         )
         .execute(&mut *transaction)
@@ -99,7 +99,7 @@ impl User {
         if let Some(row) = result {
             Ok(Some(User {
                 id: UserId(row.id),
-                github_id: github_id as i64,
+                github_id: Some(github_id as i64),
                 name: row.name,
                 email: row.email,
                 avatar_url: row.avatar_url,

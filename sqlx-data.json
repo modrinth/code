@@ -266,118 +266,6 @@
       "nullable": []
     }
   },
-  "351af9c9c1c05556bdd8c373f406a66c9358c51dc4222f8abc5095fbf2458471": {
-    "query": "\n            SELECT u.id, u.name, u.email,\n                u.avatar_url, u.username, u.bio,\n                u.created\n            FROM users u\n            WHERE u.github_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "email",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "avatar_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "username",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "bio",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "created",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
-  "35272854c6aeb743218e73ccf6f34427ab72f25492dfa752f87a50e3da7204c5": {
-    "query": "\n            SELECT v.mod_id, v.name, v.version_number,\n                v.changelog_url, v.date_published, v.downloads,\n                release_channels.channel\n            FROM versions v\n            INNER JOIN release_channels ON v.release_channel = release_channels.id\n            WHERE v.id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 5,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 6,
-          "name": "channel",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "398ac436f5fe2f6a66544204b9ff01ae1ea1204edf03ffc16de657a861cfe0ba": {
     "query": "\n            DELETE FROM categories\n            WHERE category = $1\n            ",
     "describe": {
@@ -537,62 +425,6 @@
         ]
       },
       "nullable": [
-        false,
-        false,
-        false
-      ]
-    }
-  },
-  "5aaae159c75c9385f4d969338bce509852d4b3e3ae9d4c4e366055b5b499b19a": {
-    "query": "\n            SELECT v.mod_id, v.name, v.version_number,\n                v.changelog_url, v.date_published, v.downloads,\n                v.release_channel\n            FROM versions v\n            WHERE v.id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 5,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 6,
-          "name": "release_channel",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
         false,
         false,
         false
@@ -873,32 +705,6 @@
       "nullable": []
     }
   },
-  "a55925860b4a46af864a8c38f942d7cdd85c00638e761b9696de0bf47335173b": {
-    "query": "\n        SELECT mod_id, version_number\n        FROM versions\n        WHERE id = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "version_number",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "a5d47fb171b0a1ba322125e7cedebf5af9c5831c319bbc4f8f087cb63322bee3": {
     "query": "\n            SELECT files.id, files.url, files.filename FROM files\n            WHERE files.version_id = $1\n            ",
     "describe": {
@@ -994,12 +800,12 @@
         ]
       },
       "nullable": [
-        false,
-        false,
         true,
         false,
+        true,
+        true,
         false,
-        false,
+        true,
         false,
         false
       ]
@@ -1523,31 +1329,12 @@
         false,
         false,
         true,
+        true,
         false,
-        false,
-        false,
+        true,
         false,
         false
       ]
-    }
-  },
-  "eaea3f606f926d7e1fc51a9798ce3c6448f0f02d55ce48bb38e84dc1bdced740": {
-    "query": "\n            INSERT INTO versions (\n                id, mod_id, name, version_number,\n                changelog_url, date_published,\n                downloads, release_channel\n            )\n            VALUES (\n                $1, $2, $3, $4,\n                $5, $6,\n                $7, $8\n            )\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Timestamptz",
-          "Int4",
-          "Int4"
-        ]
-      },
-      "nullable": []
     }
   },
   "ebf2d1fbcd12816799b60be6e8dec606eadd96edc26a840a411b44a19dc0497c": {
@@ -1660,62 +1447,6 @@
         ]
       },
       "nullable": [
-        false
-      ]
-    }
-  },
-  "f772d6c3d287da99e00390517ea56cf3190658781da471bef58230e82b892b8c": {
-    "query": "\n            SELECT u.github_id, u.name, u.email,\n                u.avatar_url, u.username, u.bio,\n                u.created\n            FROM users u\n            WHERE u.id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "github_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "email",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "avatar_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "username",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "bio",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "created",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
         false
       ]
     }

@@ -89,7 +89,7 @@ pub struct VersionFile {
     pub hashes: std::collections::HashMap<String, String>,
     /// A direct link to the file for downloading it.
     pub url: String,
-    /// A direct link to the file for downloading it.
+    /// The filename of the file.
     pub filename: String,
 }
 
@@ -101,14 +101,13 @@ pub enum VersionType {
     Alpha,
 }
 
-impl ToString for VersionType {
-    fn to_string(&self) -> String {
+impl std::fmt::Display for VersionType {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            VersionType::Release => "release",
-            VersionType::Beta => "beta",
-            VersionType::Alpha => "alpha",
+            VersionType::Release => write!(fmt, "release"),
+            VersionType::Beta => write!(fmt, "beta"),
+            VersionType::Alpha => write!(fmt, "alpha"),
         }
-        .to_string()
     }
 }
 
@@ -122,6 +121,8 @@ pub struct GameVersion(pub String);
 #[serde(transparent)]
 pub struct ModLoader(pub String);
 
+// These fields must always succeed parsing; deserialize errors aren't
+// processed correctly (don't return JSON errors)
 #[derive(Serialize, Deserialize)]
 pub struct SearchRequest {
     pub query: Option<String>,
@@ -133,5 +134,5 @@ pub struct SearchRequest {
     pub version: Option<String>,
     pub offset: Option<String>,
     pub index: Option<String>,
-    pub limit: Option<usize>,
+    pub limit: Option<String>,
 }

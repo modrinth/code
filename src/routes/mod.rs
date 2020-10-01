@@ -35,9 +35,7 @@ pub fn versions_config(cfg: &mut web::ServiceConfig) {
             web::scope("version")
                 .service(versions::version_get)
                 .service(versions::version_delete)
-                .service(
-                    web::scope("{version_id}").service(version_creation::upload_file_to_version),
-                ),
+                .service(version_creation::upload_file_to_version),
         );
 }
 

@@ -182,12 +182,12 @@ pub async fn auth_callback(
 
             User {
                 id: user_id,
-                github_id: user.id as i64,
+                github_id: Some(user.id as i64),
                 username: user.login,
                 name: user.name,
                 email: user.email,
-                avatar_url: user.avatar_url,
-                bio: user.bio,
+                avatar_url: Some(user.avatar_url),
+                bio: Some(user.bio),
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
             }

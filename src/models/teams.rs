@@ -2,7 +2,6 @@ use super::ids::Base62Id;
 use crate::models::users::UserId;
 use serde::{Deserialize, Serialize};
 
-//TODO Implement Item for teams
 /// The ID of a team
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
@@ -26,6 +25,6 @@ pub struct TeamMember {
     pub user_id: UserId,
     /// The name of the user
     pub name: String,
-    ///The role of the use in the team
+    /// The role of the user in the team
     pub role: String,
 }

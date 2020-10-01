@@ -44,6 +44,8 @@ pub enum CreateError {
     InvalidLoader(String),
     #[error("Invalid category: {0}")]
     InvalidCategory(String),
+    #[error("Invalid file type for version file: {0}")]
+    InvalidFileType(String),
     #[error("Authentication Error: {0}")]
     Unauthorized(#[from] AuthenticationError),
 }
@@ -63,6 +65,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidGameVersion(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidLoader(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
+            CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
             CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
         }
     }
@@ -82,6 +85,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidGameVersion(..) => "invalid_input",
                 CreateError::InvalidLoader(..) => "invalid_input",
                 CreateError::InvalidCategory(..) => "invalid_input",
+                CreateError::InvalidFileType(..) => "invalid_input",
                 CreateError::Unauthorized(..) => "unauthorized",
             },
             description: &self.to_string(),
@@ -204,16 +208,12 @@ async fn mod_create_inner(
             continue;
         }
 
-        let file_name = content_disposition.get_filename().ok_or_else(|| {
-            CreateError::MissingValueError("Missing content file name".to_string())
+        let create_data = mod_create_data.as_ref().ok_or_else(|| {
+            CreateError::InvalidInput(String::from("`data` field must come before file fields"))
         })?;
-        let file_extension = if let Some(last_period) = file_name.rfind('.') {
-            file_name.get((last_period + 1)..).unwrap_or("")
-        } else {
-            return Err(CreateError::MissingValueError(
-                "Missing content file extension".to_string(),
-            ));
-        };
+
+        let (file_name, file_extension) =
+            super::version_creation::get_name_ext(&content_disposition)?;
 
         if name == "icon" {
             icon_url = process_icon_upload(
@@ -229,134 +229,103 @@ async fn mod_create_inner(
             continue;
         }
 
-        if &*file_extension == "jar" {
-            let create_data = mod_create_data.as_ref().ok_or_else(|| {
-                CreateError::InvalidInput(String::from("`data` field must come before file fields"))
+        let version_data = create_data
+            .initial_versions
+            .iter()
+            .find(|x| x.file_parts.iter().any(|n| n == name))
+            .ok_or_else(|| {
+                CreateError::InvalidInput(format!(
+                    "File `{}` (field {}) isn't specified in the versions data",
+                    file_name, name
+                ))
             })?;
 
-            let version_data = create_data
-                .initial_versions
-                .iter()
-                .find(|x| x.file_parts.iter().any(|n| n == name))
-                .ok_or_else(|| {
-                    CreateError::InvalidInput(format!(
-                        "Jar file `{}` (field {}) isn't specified in the versions data",
-                        file_name, name
-                    ))
-                })?;
+        // If a version has already been created for this version, add the
+        // file to it instead of creating a new version.
+        // Versions must have at least one jar file to be uploaded
 
-            // If a version has already been created for this version, add the
-            // file to it instead of creating a new version.
+        let created_version = if let Some(created_version) = created_versions
+            .iter_mut()
+            .find(|x| x.version_number == version_data.version_number)
+        {
+            created_version
+        } else {
+            let version_id: VersionId = models::generate_version_id(transaction).await?.into();
 
-            let created_version = if let Some(created_version) = created_versions
-                .iter_mut()
-                .find(|x| x.version_number == version_data.version_number)
-            {
-                created_version
-            } else {
-                let version_id: VersionId = models::generate_version_id(transaction).await?.into();
+            let body_url = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
 
-                let body_url = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
-
-                let uploaded_text = file_host
-                    .upload_file(
-                        "text/plain",
-                        &body_url,
-                        version_data.version_body.clone().into_bytes(),
-                    )
-                    .await?;
-
-                uploaded_files.push(UploadedFile {
-                    file_id: uploaded_text.file_id.clone(),
-                    file_name: uploaded_text.file_name.clone(),
-                });
-
-                // TODO: do a real lookup for the channels
-                let release_channel = match version_data.release_channel {
-                    VersionType::Release => models::ChannelId(1),
-                    VersionType::Beta => models::ChannelId(3),
-                    VersionType::Alpha => models::ChannelId(5),
-                };
-
-                let mut game_versions = Vec::with_capacity(version_data.game_versions.len());
-                for v in &version_data.game_versions {
-                    let id = models::categories::GameVersion::get_id(&v.0, &mut *transaction)
-                        .await?
-                        .ok_or_else(|| CreateError::InvalidGameVersion(v.0.clone()))?;
-                    game_versions.push(id);
-                }
-
-                let mut loaders = Vec::with_capacity(version_data.loaders.len());
-                for l in &version_data.loaders {
-                    let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
-                        .await?
-                        .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
-                    loaders.push(id);
-                }
-
-                let version = models::version_item::VersionBuilder {
-                    version_id: version_id.into(),
-                    mod_id: mod_id.into(),
-                    author_id: user.id.into(),
-                    name: version_data.version_title.clone(),
-                    version_number: version_data.version_number.clone(),
-                    changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
-                    files: Vec::with_capacity(1),
-                    dependencies: version_data
-                        .dependencies
-                        .iter()
-                        .map(|x| (*x).into())
-                        .collect::<Vec<_>>(),
-                    game_versions,
-                    loaders,
-                    release_channel,
-                };
-
-                created_versions.push(version);
-                created_versions.last_mut().unwrap()
-            };
-
-            // Upload the new jar file
-
-            let mut data = Vec::new();
-            while let Some(chunk) = field.next().await {
-                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-            }
-
-            let upload_data = file_host
+            let uploaded_text = file_host
                 .upload_file(
-                    "application/java-archive",
-                    &format!(
-                        "{}/{}/{}",
-                        create_data.mod_namespace.replace(".", "/"),
-                        version_data.version_number,
-                        file_name
-                    ),
-                    data.to_vec(),
+                    "text/plain",
+                    &body_url,
+                    version_data.version_body.clone().into_bytes(),
                 )
                 .await?;
 
             uploaded_files.push(UploadedFile {
-                file_id: upload_data.file_id.clone(),
-                file_name: upload_data.file_name.clone(),
+                file_id: uploaded_text.file_id.clone(),
+                file_name: uploaded_text.file_name.clone(),
             });
 
-            // Add the newly uploaded file to the existing or new version
+            // TODO: do a real lookup for the channels
+            let release_channel = match version_data.release_channel {
+                VersionType::Release => models::ChannelId(1),
+                VersionType::Beta => models::ChannelId(3),
+                VersionType::Alpha => models::ChannelId(5),
+            };
 
-            // TODO: Malware scan + file validation
-            created_version
-                .files
-                .push(models::version_item::VersionFileBuilder {
-                    filename: file_name.to_string(),
-                    url: format!("{}/{}", cdn_url, upload_data.file_name),
-                    hashes: vec![models::version_item::HashBuilder {
-                        algorithm: "sha1".to_string(),
-                        // This is an invalid cast - the database expects the hash's
-                        // bytes, but this is the string version.
-                        hash: upload_data.content_sha1.into_bytes(),
-                    }],
-                });
-        }
+            let mut game_versions = Vec::with_capacity(version_data.game_versions.len());
+            for v in &version_data.game_versions {
+                let id = models::categories::GameVersion::get_id(&v.0, &mut *transaction)
+                    .await?
+                    .ok_or_else(|| CreateError::InvalidGameVersion(v.0.clone()))?;
+                game_versions.push(id);
+            }
+
+            let mut loaders = Vec::with_capacity(version_data.loaders.len());
+            for l in &version_data.loaders {
+                let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
+                    .await?
+                    .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
+                loaders.push(id);
+            }
+
+            let version = models::version_item::VersionBuilder {
+                version_id: version_id.into(),
+                mod_id: mod_id.into(),
+                author_id: user.id.into(),
+                name: version_data.version_title.clone(),
+                version_number: version_data.version_number.clone(),
+                changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
+                files: Vec::with_capacity(1),
+                dependencies: version_data
+                    .dependencies
+                    .iter()
+                    .map(|x| (*x).into())
+                    .collect::<Vec<_>>(),
+                game_versions,
+                loaders,
+                release_channel,
+            };
+
+            created_versions.push(version);
+            created_versions.last_mut().unwrap()
+        };
+
+        // Upload the new jar file
+        let file_builder = super::version_creation::upload_file(
+            &mut field,
+            file_host,
+            uploaded_files,
+            &cdn_url,
+            &content_disposition,
+            mod_id,
+            &version_data.version_number,
+        )
+        .await?;
+
+        // Add the newly uploaded file to the existing or new version
+        created_version.files.push(file_builder);
     }
 
     let create_data = if let Some(create_data) = mod_create_data {

@@ -43,7 +43,7 @@ pub async fn run_migrations(uri: &str) -> Result<(), sqlx::Error> {
 
     for migration in migrator.iter() {
         if migration.version > version {
-            let elapsed = conn.apply(migration).await?;
+            let _elapsed = conn.apply(migration).await?;
         } else {
             conn.validate(migration).await?;
         }

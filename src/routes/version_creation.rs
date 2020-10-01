@@ -200,61 +200,23 @@ async fn version_create_inner(
             continue;
         }
 
-        let file_name = content_disposition.get_filename().ok_or_else(|| {
-            CreateError::MissingValueError("Missing content file name".to_string())
+        let version = version_builder.as_mut().ok_or_else(|| {
+            CreateError::InvalidInput(String::from("`data` field must come before file fields"))
         })?;
-        let file_extension = if let Some(last_period) = file_name.rfind('.') {
-            file_name.get((last_period + 1)..).unwrap_or("")
-        } else {
-            return Err(CreateError::MissingValueError(
-                "Missing content file extension".to_string(),
-            ));
-        };
 
-        if &*file_extension == "jar" {
-            let version = version_builder.as_mut().ok_or_else(|| {
-                CreateError::InvalidInput(String::from("`data` field must come before file fields"))
-            })?;
+        let file_builder = upload_file(
+            &mut field,
+            file_host,
+            uploaded_files,
+            &cdn_url,
+            &content_disposition,
+            ModId::from(mod_id),
+            &version.version_number,
+        )
+        .await?;
 
-            let mut data = Vec::new();
-            while let Some(chunk) = field.next().await {
-                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-            }
-
-            let upload_data = file_host
-                .upload_file(
-                    "application/java-archive",
-                    &format!(
-                        "{}/{}/{}",
-                        ModId::from(version.mod_id),
-                        version.version_number,
-                        file_name
-                    ),
-                    data.to_vec(),
-                )
-                .await?;
-
-            uploaded_files.push(UploadedFile {
-                file_id: upload_data.file_id.clone(),
-                file_name: upload_data.file_name.clone(),
-            });
-
-            // Add the newly uploaded file to the existing or new version
-
-            // TODO: Malware scan + file validation
-            version
-                .files
-                .push(models::version_item::VersionFileBuilder {
-                    filename: file_name.to_string(),
-                    url: format!("{}/{}", cdn_url, upload_data.file_name),
-                    hashes: vec![models::version_item::HashBuilder {
-                        algorithm: "sha1".to_string(),
-                        // This is an invalid cast - the database expects the hash's
-                        // bytes, but this is the string version.
-                        hash: upload_data.content_sha1.into_bytes(),
-                    }],
-                });
-        }
+        // Add the newly uploaded file to the existing or new version
+        version.files.push(file_builder);
     }
 
     let version_data_safe = initial_version_data
@@ -307,7 +269,7 @@ async fn version_create_inner(
 // TODO: file deletion, listing, etc
 
 // under /api/v1/mod/{mod_id}/version/{version_id}
-#[post("file")]
+#[post("{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
     url_data: actix_web::web::Path<(ModId, VersionId)>,
@@ -362,7 +324,7 @@ async fn upload_file_to_version_inner(
     let cdn_url = dotenv::var("CDN_URL")?;
 
     let mut initial_file_data: Option<InitialFileData> = None;
-    let mut file_builder: Option<VersionFileBuilder> = None;
+    let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
 
     let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
@@ -416,64 +378,108 @@ async fn upload_file_to_version_inner(
             // TODO: currently no data here, but still required
 
             initial_file_data = Some(file_data);
+            continue;
         }
 
-        let file_name = content_disposition.get_filename().ok_or_else(|| {
-            CreateError::MissingValueError("Missing content file name".to_string())
+        let _file_data = initial_file_data.as_ref().ok_or_else(|| {
+            CreateError::InvalidInput(String::from("`data` field must come before file fields"))
         })?;
-        let file_extension = if let Some(last_period) = file_name.rfind('.') {
-            file_name.get((last_period + 1)..).unwrap_or("")
-        } else {
-            return Err(CreateError::MissingValueError(
-                "Missing content file extension".to_string(),
-            ));
-        };
 
-        if &*file_extension == "jar" {
-            let _file_data = initial_file_data.as_ref().ok_or_else(|| {
-                CreateError::InvalidInput(String::from("`data` field must come before file fields"))
-            })?;
+        let file_builder = upload_file(
+            &mut field,
+            file_host,
+            uploaded_files,
+            &cdn_url,
+            &content_disposition,
+            mod_id,
+            &version_number,
+        )
+        .await?;
 
-            let mut data = Vec::new();
-            while let Some(chunk) = field.next().await {
-                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-            }
-
-            let upload_data = file_host
-                .upload_file(
-                    "application/java-archive",
-                    &format!("{}/{}/{}", mod_id, version_number, file_name),
-                    data.to_vec(),
-                )
-                .await?;
-
-            uploaded_files.push(UploadedFile {
-                file_id: upload_data.file_id.clone(),
-                file_name: upload_data.file_name.clone(),
-            });
-
-            // TODO: Malware scan + file validation
-            file_builder = Some(models::version_item::VersionFileBuilder {
-                filename: file_name.to_string(),
-                url: format!("{}/{}", cdn_url, upload_data.file_name),
-                hashes: vec![models::version_item::HashBuilder {
-                    algorithm: "sha1".to_string(),
-                    // This is an invalid cast - the database expects the hash's
-                    // bytes, but this is the string version.
-                    hash: upload_data.content_sha1.into_bytes(),
-                }],
-            });
-            break;
-        }
+        // TODO: Malware scan + file validation
+        file_builders.push(file_builder);
     }
 
-    if let Some(file_builder) = file_builder {
-        file_builder.insert(version_id, &mut *transaction).await?;
-    } else {
+    if file_builders.is_empty() {
         return Err(CreateError::InvalidInput(
-            "A file must be specified".to_string(),
+            "At least one file must be specified".to_string(),
         ));
+    } else {
+        for file_builder in file_builders {
+            file_builder.insert(version_id, &mut *transaction).await?;
+        }
     }
 
     Ok(HttpResponse::Ok().into())
+}
+
+// This function is used for adding a file to a version, uploading the initial
+// files for a version, and for uploading the initial version files for a mod
+pub async fn upload_file(
+    field: &mut Field,
+    file_host: &dyn FileHost,
+    uploaded_files: &mut Vec<UploadedFile>,
+    cdn_url: &str,
+    content_disposition: &actix_web::http::header::ContentDisposition,
+    mod_id: crate::models::ids::ModId,
+    version_number: &str,
+) -> Result<models::version_item::VersionFileBuilder, CreateError> {
+    let (file_name, file_extension) = get_name_ext(content_disposition)?;
+
+    let content_type = mod_file_type(file_extension)
+        .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
+
+    let mut data = Vec::new();
+    while let Some(chunk) = field.next().await {
+        data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+    }
+
+    let upload_data = file_host
+        .upload_file(
+            content_type,
+            &format!("{}/{}/{}", mod_id, version_number, file_name),
+            data.to_vec(),
+        )
+        .await?;
+
+    uploaded_files.push(UploadedFile {
+        file_id: upload_data.file_id.clone(),
+        file_name: upload_data.file_name.clone(),
+    });
+
+    // TODO: Malware scan + file validation
+    Ok(models::version_item::VersionFileBuilder {
+        filename: file_name.to_string(),
+        url: format!("{}/{}", cdn_url, upload_data.file_name),
+        hashes: vec![models::version_item::HashBuilder {
+            algorithm: "sha1".to_string(),
+            // This is an invalid cast - the database expects the hash's
+            // bytes, but this is the string version.
+            hash: upload_data.content_sha1.into_bytes(),
+        }],
+    })
+}
+
+// Currently we only support jar mods; this may change in the future (datapacks?)
+fn mod_file_type(ext: &str) -> Option<&str> {
+    match ext {
+        "jar" => Some("application/java-archive"),
+        _ => None,
+    }
+}
+
+pub fn get_name_ext(
+    content_disposition: &actix_web::http::header::ContentDisposition,
+) -> Result<(&str, &str), CreateError> {
+    let file_name = content_disposition
+        .get_filename()
+        .ok_or_else(|| CreateError::MissingValueError("Missing content file name".to_string()))?;
+    let file_extension = if let Some(last_period) = file_name.rfind('.') {
+        file_name.get((last_period + 1)..).unwrap_or("")
+    } else {
+        return Err(CreateError::MissingValueError(
+            "Missing content file extension".to_string(),
+        ));
+    };
+    Ok((file_name, file_extension))
 }

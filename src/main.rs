@@ -38,6 +38,23 @@ async fn main() -> std::io::Result<()> {
 
     check_env_vars();
 
+    if config.reset_indices {
+        info!("Resetting indices");
+        search::indexing::reset_indices().await.unwrap();
+        return Ok(());
+    } else if config.reconfigure_indices {
+        info!("Reconfiguring indices");
+        search::indexing::reconfigure_indices().await.unwrap();
+        return Ok(());
+    }
+
+    // Allow manually skipping the initial indexing for quicker iteration
+    // and startup times.
+    let skip_initial = config.skip_first_index;
+    if skip_initial {
+        info!("Skipping initial indexing");
+    }
+
     database::check_for_migrations()
         .await
         .expect("An error occurred while running migrations.");
@@ -64,21 +81,6 @@ async fn main() -> std::io::Result<()> {
     } else {
         Arc::new(file_hosting::MockHost::new())
     };
-
-    if config.reset_indices {
-        info!("Resetting indices");
-        search::indexing::reset_indices().await.unwrap();
-    } else if config.reconfigure_indices {
-        info!("Reconfiguring indices");
-        search::indexing::reconfigure_indices().await.unwrap();
-    }
-
-    // Allow manually skipping the initial indexing for quicker iteration
-    // and startup times.
-    let skip_initial = config.skip_first_index;
-    if skip_initial {
-        info!("Skipping initial indexing");
-    }
 
     let mut scheduler = scheduler::Scheduler::new();
 
@@ -171,21 +173,26 @@ async fn main() -> std::io::Result<()> {
         });
     }
 
+    let allowed_origins = dotenv::var("CORS_ORIGINS")
+        .ok()
+        .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
+        .unwrap_or_else(|| vec![String::from("http://localhost")]);
+
     info!("Starting Actix HTTP server!");
 
     // Init App
     HttpServer::new(move || {
+        let mut cors = Cors::new()
+            .allowed_methods(vec!["GET", "POST"])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600);
+        for allowed_origin in &allowed_origins {
+            cors = cors.allowed_origin(allowed_origin);
+        }
+
         App::new()
-            .wrap(
-                Cors::new()
-                    .allowed_origin("http://localhost:3000")
-                    .allowed_origin("https://modrinth.com")
-                    .allowed_methods(vec!["GET", "POST"])
-                    .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-                    .allowed_header(http::header::CONTENT_TYPE)
-                    .max_age(3600)
-                    .finish(),
-            )
+            .wrap(cors.finish())
             .wrap(Logger::default())
             .wrap(Logger::new("%a %{User-Agent}i"))
             .data(pool.clone())
@@ -221,6 +228,15 @@ fn check_env_vars() {
             )
         }
     }
+
+    if dotenv::var("CORS_ORIGINS")
+        .ok()
+        .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
+        .is_none()
+    {
+        warn!("Variable `CORS_ORIGINS` missing in dotenv or not a json array of strings");
+    }
+
     check_var::<String>("CDN_URL");
     check_var::<String>("DATABASE_URL");
     check_var::<String>("MEILISEARCH_ADDR");
