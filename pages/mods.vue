@@ -54,7 +54,7 @@
       </section>
       <div class="results column-grow-4">
         <SearchResult
-          v-for="result in results"
+          v-for="(result, index) in results"
           :id="result.mod_id"
           :key="result.mod_id"
           :author="result.author"
@@ -68,6 +68,7 @@
           :author-url="result.author_url"
           :page-url="result.page_url"
           :categories="result.categories"
+          :is-ad="index % 5"
         />
       </div>
       <section v-if="pages.length > 1" class="search-bottom">

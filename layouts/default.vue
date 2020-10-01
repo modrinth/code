@@ -211,7 +211,7 @@ export default {
       theme: 'light',
     }
   },
-  mounted() {
+  beforeMount() {
     const theme = localStorage.getItem('data-theme')
       ? localStorage.getItem('data-theme')
       : 'light'

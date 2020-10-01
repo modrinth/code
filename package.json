@@ -12,6 +12,7 @@
     "lint": "npm run lint:js"
   },
   "dependencies": {
+    "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.12.2",
     "nuxt": "^2.14.5",
     "vue-multiselect": "^2.1.6"
