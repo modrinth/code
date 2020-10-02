@@ -1,7 +1,9 @@
 <template>
   <div>
     <header class="columns">
-      <img class="logo" src="~/assets/images/logo.svg" alt="logo" />
+      <nuxt-link to="/" no-prefetch
+        ><img class="logo" src="~/assets/images/logo.svg" alt="logo"
+      /></nuxt-link>
       <div class="links">
         <nuxt-link to="/" no-prefetch>Home</nuxt-link>
         <nuxt-link to="/mods" no-prefetch>Mods</nuxt-link>

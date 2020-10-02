@@ -9,10 +9,10 @@
       />
       <!-- TODO: Probably shouldn't be a Unicode symbol -->
       <div class="hamburger-icon">☰</div>
-      <div class="logo-wrapper">
+      <nuxt-link to="/" class="logo-wrapper">
         <img class="logo" src="~/assets/images/logo.svg" />
         <span class="name">modrinth</span>
-      </div>
+      </nuxt-link>
       <nav>
         <section class="links">
           <h3>Projects</h3>
@@ -412,6 +412,7 @@ export default {
     // Desktop
     @media screen and (min-width: 1145px) {
       border-right: 1px solid var(--color-grey-2);
+      min-width: 270px;
       max-width: 270px;
 
       nav {
