@@ -31,7 +31,7 @@
         </p>
       </div>
       <div class="right hero-image">
-        <img src="~/assets/images/search.gif" alt="search" />
+        <img src="~/assets/images/search.gif" alt="search" loading="lazy" />
       </div>
     </div>
     <div class="default-hero columns">
@@ -156,7 +156,7 @@
         </p>
       </div>
       <div class="right hero-image">
-        <img src="~/assets/images/api.gif" alt="api" />
+        <img src="~/assets/images/api.gif" alt="api" loading="lazy" />
       </div>
     </div>
     <footer>
