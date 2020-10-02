@@ -78,7 +78,7 @@ where
     E: sqlx::Executor<'a, Database = sqlx::Postgres>,
 {
     let token = headers
-        .get("Authentication")
+        .get("Authorization")
         .ok_or(AuthenticationError::InvalidCredentialsError)?
         .to_str()
         .map_err(|_| AuthenticationError::InvalidCredentialsError)?;
