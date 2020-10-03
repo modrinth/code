@@ -21,7 +21,56 @@ export default {
       {
         hid: 'description',
         name: 'description',
-        content: process.env.npm_package_description || '',
+        content:
+          'Modrinth is a mod distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including the forge and fabric mod loaders.',
+      },
+      {
+        hid: 'og-title',
+        property: 'og:title',
+        content: 'Modrinth - Modern modding platform for all',
+      },
+      {
+        hid: 'og-site-name',
+        property: 'og:site_name',
+        content: 'Modrinth.com',
+      },
+      {
+        hid: 'og-image',
+        property: 'og:image',
+        content: 'https://modrinth.com/_nuxt/img/logo.e3136b7.svg',
+      },
+      {
+        hid: 'og-image-url',
+        property: 'og:image:url',
+        content: 'https://modrinth.com/_nuxt/img/logo.e3136b7.svg',
+      },
+      { hid: 'og-image-width', property: 'og:image:width', content: 1280 },
+      { hid: 'og-image-height', property: 'og:image:height', content: 720 },
+      {
+        hid: 'og-image-type',
+        property: 'og:image:type',
+        content: 'image/jpeg',
+      },
+      { hid: 'twitter-card', property: 'twitter:card' },
+      {
+        hid: 'twitter-site',
+        property: 'twitter:site',
+        content: 'modrinth.com',
+      },
+      {
+        hid: 'twitter-creator',
+        property: 'twitter:creator',
+        content: 'modrinth',
+      },
+      {
+        hid: 'twitter-img-src',
+        property: 'twitter:image',
+        content: 'https://modrinth.com/_nuxt/img/logo.e3136b7.svg',
+      },
+      {
+        hid: 'twitter-title',
+        property: 'twitter:title',
+        content: 'Modrinth.com',
       },
     ],
     link: [
@@ -45,6 +94,14 @@ export default {
       },
     ],
   },
+
+  vue: {
+    config: {
+      productionTip: false,
+      devtools: true,
+    },
+  },
+
   router: {
     middleware: ['auth'],
   },

@@ -131,14 +131,14 @@
           <a
             v-if="!this.$auth.loggedIn"
             :href="
-              'https://api.modrinth.com/api/v1/auth/init?url=http://localhost:3000' +
+              'https://api.modrinth.com/api/v1/auth/init?url=http://modrinth.com' +
               this.$route.path
             "
             class="log-in-button"
             >Log In</a
           >
           <div v-if="this.$auth.loggedIn" class="avatar">
-            <img :src="this.$auth.user.avatar_url" />
+            <img :src="this.$auth.user.avatar_url" alt="avatar" />
             <span> {{ this.$auth.user.username }} </span>
           </div>
           <div v-if="this.$auth.loggedIn" class="notifications">
@@ -221,10 +221,7 @@ export default {
     }
   },
   created() {
-    if (this.$route.query.code) {
-      this.$auth.setUserToken(this.$route.query.code)
-      console.log(this.$auth.user)
-    }
+    if (this.$route.query.code) this.$auth.setUserToken(this.$route.query.code)
   },
   beforeMount() {
     const theme = localStorage.getItem('data-theme')
