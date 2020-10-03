@@ -68,7 +68,7 @@
           :author-url="result.author_url"
           :page-url="result.page_url"
           :categories="result.categories"
-          :is-ad="index % 5"
+          :is-ad="index === -1"
         />
       </div>
       <section v-if="pages.length > 1" class="search-bottom">
@@ -418,6 +418,7 @@ const config = {
 }
 
 export default {
+  auth: false,
   components: {
     SearchResult,
     Pagination,

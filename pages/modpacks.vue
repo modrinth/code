@@ -33,6 +33,12 @@
   </div>
 </template>
 
+<script>
+export default {
+  auth: false,
+}
+</script>
+
 <style lang="scss">
 #search-pagination {
   align-items: center;

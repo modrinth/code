@@ -87,8 +87,8 @@
             </nuxt-link>
           </section>
 
-          <h3>Dashboard</h3>
-          <section>
+          <h3 v-if="this.$auth.loggedIn">Dashboard</h3>
+          <section v-if="this.$auth.loggedIn">
             <nuxt-link to="/dashboard/projects">
               <svg
                 viewBox="0 0 24 24"
@@ -128,11 +128,20 @@
           </span>
         </div>
         <section class="user-actions">
-          <div class="avatar">
-            <img src="~/assets/images/avatar.jpg" />
-            <span> falseresync </span>
+          <a
+            v-if="!this.$auth.loggedIn"
+            :href="
+              'https://api.modrinth.com/api/v1/auth/init?url=http://localhost:3000' +
+              this.$route.path
+            "
+            class="log-in-button"
+            >Log In</a
+          >
+          <div v-if="this.$auth.loggedIn" class="avatar">
+            <img :src="this.$auth.user.avatar_url" />
+            <span> {{ this.$auth.user.username }} </span>
           </div>
-          <div class="notifications">
+          <div v-if="this.$auth.loggedIn" class="notifications">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -211,6 +220,12 @@ export default {
       theme: 'light',
     }
   },
+  created() {
+    if (this.$route.query.code) {
+      this.$auth.setUserToken(this.$route.query.code)
+      console.log(this.$auth.user)
+    }
+  },
   beforeMount() {
     const theme = localStorage.getItem('data-theme')
       ? localStorage.getItem('data-theme')
@@ -276,7 +291,7 @@ export default {
       }
 
       .name {
-        font-family: 'Montserrat Alternates';
+        font-family: 'Montserrat Alternates', serif;
         margin-left: 0.4rem;
         font-size: 1.3rem;
       }
@@ -405,6 +420,15 @@ export default {
             margin-right: 0.5rem;
             width: 2rem;
           }
+        }
+
+        .log-in-button {
+          text-align: center;
+          padding: 8px 40px;
+          border-radius: 5px;
+          color: var(--color-grey-5);
+          background-color: var(--color-grey-1);
+          margin-left: 2.5rem;
         }
       }
     }

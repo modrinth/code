@@ -195,6 +195,7 @@
 
 <script>
 export default {
+  auth: false,
   layout: 'none',
   data() {
     return {

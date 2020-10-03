@@ -45,6 +45,9 @@ export default {
       },
     ],
   },
+  router: {
+    middleware: ['auth'],
+  },
   /*
    ** Global CSS
    */
@@ -72,7 +75,22 @@ export default {
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
+    '@nuxtjs/auth',
   ],
+  auth: {
+    strategies: {
+      local: {
+        endpoints: {
+          user: {
+            url: 'https://api.modrinth.com/api/v1/user',
+            method: 'get',
+            propertyName: false,
+          },
+        },
+        tokenType: false,
+      },
+    },
+  },
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
