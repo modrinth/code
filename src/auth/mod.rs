@@ -23,7 +23,7 @@ pub struct GitHubUser {
     pub login: String,
     pub id: u64,
     pub avatar_url: String,
-    pub name: String,
+    pub name: Option<String>,
     pub email: Option<String>,
     pub bio: Option<String>,
 }

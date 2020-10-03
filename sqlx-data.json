@@ -801,7 +801,7 @@
       },
       "nullable": [
         true,
-        false,
+        true,
         true,
         true,
         false,
@@ -1327,7 +1327,7 @@
       },
       "nullable": [
         false,
-        false,
+        true,
         true,
         true,
         false,

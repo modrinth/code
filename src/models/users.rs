@@ -11,7 +11,7 @@ pub struct User {
     pub id: UserId,
     pub github_id: Option<u64>,
     pub username: String,
-    pub name: String,
+    pub name: Option<String>,
     pub email: Option<String>,
     pub avatar_url: Option<String>,
     pub bio: Option<String>,
