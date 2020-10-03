@@ -187,7 +187,7 @@ pub async fn auth_callback(
                 name: user.name,
                 email: user.email,
                 avatar_url: Some(user.avatar_url),
-                bio: Some(user.bio),
+                bio: user.bio,
                 created: Utc::now(),
                 role: Role::Developer.to_string(),
             }

@@ -25,7 +25,7 @@ pub struct GitHubUser {
     pub avatar_url: String,
     pub name: String,
     pub email: Option<String>,
-    pub bio: String,
+    pub bio: Option<String>,
 }
 
 pub async fn get_github_user_from_token(
