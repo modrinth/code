@@ -27,12 +27,12 @@ export default {
       {
         hid: 'og-title',
         property: 'og:title',
-        content: 'Modrinth - Modern modding platform for all',
+        content: 'Open source modding platform',
       },
       {
         hid: 'og-site-name',
         property: 'og:site_name',
-        content: 'Modrinth.com',
+        content: 'Modrinth',
       },
       {
         hid: 'og-image',
@@ -70,7 +70,7 @@ export default {
       {
         hid: 'twitter-title',
         property: 'twitter:title',
-        content: 'Modrinth.com',
+        content: 'Modrinth',
       },
     ],
     link: [

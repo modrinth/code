@@ -4,7 +4,9 @@
 
     <div class="section-header">
       <h3>Mods</h3>
-      <button>Create a new mod</button>
+      <nuxt-link class="create-button" to="/create/mod"
+        >Create a new mod</nuxt-link
+      >
     </div>
     <table>
       <thead>
@@ -40,35 +42,6 @@
         </tr>
       </tbody>
     </table>
-
-    <div class="section-header">
-      <h3>Modpacks</h3>
-      <button>Create a new modpack</button>
-    </div>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Downloads</th>
-          <th>Last updated</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <img class="rounded-md" src="~/assets/images/aof-mini.png" />
-          </td>
-          <td>All of Fabric Mini</td>
-          <td>Contributor</td>
-          <td><span class="badge red">Abandoned</span></td>
-          <td>357</td>
-          <td>Apr 1, 2020</td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </template>
 
@@ -80,6 +53,14 @@
   & > * {
     margin-right: 1rem;
   }
+}
+
+.create-button {
+  margin: auto 0;
+  padding: 4px 20px;
+  border-radius: 5px;
+  color: var(--color-grey-5);
+  background-color: var(--color-grey-1);
 }
 
 table {

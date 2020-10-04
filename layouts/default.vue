@@ -122,9 +122,8 @@
         <div class="disclosure">
           <span>
             Modrinth is open source software. You may view the source code at
-            <a href="https://github.com/modrinth/knossos"
-              >our GitHub Repository</a
-            >.
+            our
+            <a href="https://github.com/modrinth/knossos">GitHub Repository</a>.
           </span>
         </div>
         <section class="user-actions">
@@ -138,8 +137,25 @@
             >Log In</a
           >
           <div v-if="this.$auth.loggedIn" class="avatar">
-            <img :src="this.$auth.user.avatar_url" alt="avatar" />
+            <img
+              :src="this.$auth.user.avatar_url"
+              alt="avatar"
+              @click="showPopup = !showPopup"
+            />
             <span> {{ this.$auth.user.username }} </span>
+          </div>
+          <div v-if="showPopup" class="user-actions-popup">
+            <div class="popup-inner">
+              <p>
+                Modrinth ID: <strong>{{ this.$auth.user.id }}</strong>
+              </p>
+              <hr />
+              <p>My profile</p>
+              <p>My teams</p>
+              <hr />
+              <p>Settings</p>
+              <p @click="logout">Logout</p>
+            </div>
           </div>
           <div v-if="this.$auth.loggedIn" class="notifications">
             <svg
@@ -218,6 +234,7 @@ export default {
   data() {
     return {
       theme: 'light',
+      showPopup: false,
     }
   },
   created() {
@@ -246,6 +263,10 @@ export default {
     toggleNavMenu() {
       document.body.style.overflow =
         document.body.style.overflow !== 'hidden' ? 'hidden' : 'auto'
+    },
+    logout() {
+      this.$auth.setToken('local', false)
+      this.$router.go()
     },
   },
 }
@@ -412,6 +433,7 @@ export default {
 
         .avatar {
           img {
+            cursor: pointer;
             border-radius: 50%;
             height: 2rem;
             margin-right: 0.5rem;
@@ -426,6 +448,50 @@ export default {
           color: var(--color-grey-5);
           background-color: var(--color-grey-1);
           margin-left: 2.5rem;
+        }
+
+        .user-actions-popup {
+          position: relative;
+          display: inline-block;
+
+          .popup-inner {
+            width: 140px;
+            border: 2px var(--color-grey-2) solid;
+            background-color: var(--color-bg);
+            color: var(--color-grey-5);
+            font-size: 15px;
+            padding: 8px 0;
+            position: absolute;
+            z-index: 1;
+            margin-bottom: 20px;
+            bottom: 500%;
+            margin-left: -165px;
+
+            hr {
+              color: var(--color-grey-2);
+              height: 1px;
+            }
+            p {
+              cursor: pointer;
+              padding: 8px;
+              margin: 0;
+              &:hover,
+              &:focus {
+                color: var(--color-text-inverted);
+                background-color: var(--color-brand);
+              }
+            }
+          }
+          .popup-inner::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            right: 90%;
+            border-width: 7px;
+            border-style: solid;
+            border-color: var(--color-grey-2) transparent transparent
+              transparent;
+          }
         }
       }
     }
