@@ -143,18 +143,18 @@
               @click="showPopup = !showPopup"
             />
             <span> {{ this.$auth.user.username }} </span>
-          </div>
-          <div v-if="showPopup" class="user-actions-popup">
-            <div class="popup-inner">
-              <p>
-                Modrinth ID: <strong>{{ this.$auth.user.id }}</strong>
-              </p>
-              <hr />
-              <p>My profile</p>
-              <p>My teams</p>
-              <hr />
-              <p>Settings</p>
-              <p @click="logout">Logout</p>
+            <div v-if="showPopup" class="user-actions-popup">
+              <div class="popup-inner">
+                <p>
+                  Modrinth ID: <strong>{{ this.$auth.user.id }}</strong>
+                </p>
+                <hr />
+                <p>My profile</p>
+                <p>My teams</p>
+                <hr />
+                <p>Settings</p>
+                <p @click="logout">Logout</p>
+              </div>
             </div>
           </div>
           <div v-if="this.$auth.loggedIn" class="notifications">
@@ -231,14 +231,15 @@
 
 <script>
 export default {
+  async fetch() {
+    if (this.$route.query.code)
+      await this.$auth.setUserToken(this.$route.query.code)
+  },
   data() {
     return {
       theme: 'light',
       showPopup: false,
     }
-  },
-  created() {
-    if (this.$route.query.code) this.$auth.setUserToken(this.$route.query.code)
   },
   beforeMount() {
     const theme = localStorage.getItem('data-theme')
@@ -441,6 +442,10 @@ export default {
           }
         }
 
+        .theme {
+          cursor: pointer;
+        }
+
         .log-in-button {
           text-align: center;
           padding: 8px 40px;
@@ -452,7 +457,6 @@ export default {
 
         .user-actions-popup {
           position: relative;
-          display: inline-block;
 
           .popup-inner {
             width: 140px;
@@ -486,7 +490,7 @@ export default {
             content: '';
             position: absolute;
             top: 100%;
-            right: 90%;
+            right: 80%;
             border-width: 7px;
             border-style: solid;
             border-color: var(--color-grey-2) transparent transparent

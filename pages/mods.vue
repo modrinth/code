@@ -70,6 +70,9 @@
           :categories="result.categories"
           :is-ad="index === -1"
         />
+        <div class="no-results" v-if="results.length === 0">
+          <p>No results found for your query!</p>
+        </div>
       </div>
       <section v-if="pages.length > 1" class="search-bottom">
         <Multiselect
@@ -425,26 +428,7 @@ export default {
     Multiselect,
     SearchFilter,
   },
-  data() {
-    return {
-      query: '',
-      selectedVersions: [],
-      versions: [],
-      facets: [],
-      results: [],
-      pages: [],
-      currentPage: 1,
-      sortTypes: [
-        { display: 'Relevance', name: 'relevance' },
-        { display: 'Total Downloads', name: 'downloads' },
-        { display: 'Newest', name: 'newest' },
-        { display: 'Updated', name: 'updated' },
-      ],
-      sortType: { display: 'Relevance', name: 'relevance' },
-      maxResults: 5,
-    }
-  },
-  async created() {
+  async fetch() {
     if (this.$route.query.q) this.query = this.$route.query.q
     if (this.$route.query.f) {
       const facets = this.$route.query.f.split(',')
@@ -464,6 +448,25 @@ export default {
 
     await this.fillInitialVersions()
     await this.onSearchChange(this.currentPage)
+  },
+  data() {
+    return {
+      query: '',
+      selectedVersions: [],
+      versions: [],
+      facets: [],
+      results: [],
+      pages: [],
+      currentPage: 1,
+      sortTypes: [
+        { display: 'Relevance', name: 'relevance' },
+        { display: 'Total Downloads', name: 'downloads' },
+        { display: 'Newest', name: 'newest' },
+        { display: 'Updated', name: 'updated' },
+      ],
+      sortType: { display: 'Relevance', name: 'relevance' },
+      maxResults: 5,
+    }
   },
   methods: {
     async fillInitialVersions() {
@@ -721,6 +724,7 @@ export default {
   margin-top: 1em;
 
   button {
+    cursor: pointer;
     width: 100%;
     padding: 5px 0;
     outline: none;
@@ -812,6 +816,14 @@ select {
   }
 }
 
+.no-results {
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+  color: var(--color-text);
+  background-color: var(--color-grey-1);
+}
+
 .max-results {
   max-width: 80px;
 }
@@ -823,6 +835,7 @@ select {
 .multiselect__tags,
 .multiselect__spinner {
   background: var(--color-bg);
+  cursor: pointer;
 }
 
 .multiselect__spinner::before,

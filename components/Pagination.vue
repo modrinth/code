@@ -29,6 +29,7 @@
     <svg
       :class="{
         'disabled-paginate': currentPage === pages[pages.length - 1],
+        'active-paginate': currentPage !== pages[pages.length - 1],
       }"
       viewBox="0 0 24 24"
       fill="none"
@@ -85,7 +86,8 @@ export default {
   color: var(--color-grey-5);
 }
 
-.active-page-number {
+.active-page-number,
+.active-paginate {
   user-select: none;
   cursor: pointer;
 }
