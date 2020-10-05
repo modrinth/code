@@ -13,6 +13,7 @@ pub use super::users::UserId;
 ///
 /// This method panics if `n` is 0 or greater than 11, since a `u64`
 /// can only represent up to 11 character base62 strings
+#[allow(dead_code)]
 pub fn random_base62(n: usize) -> u64 {
     use rand::Rng;
     assert!(n > 0 && n <= 11);

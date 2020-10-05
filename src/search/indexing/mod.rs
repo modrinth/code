@@ -41,6 +41,7 @@ pub struct IndexingSettings {
 }
 
 impl IndexingSettings {
+    #[allow(dead_code)]
     pub fn from_env() -> Self {
         let index_local = true;
         let index_external = dotenv::var("INDEX_CURSEFORGE")

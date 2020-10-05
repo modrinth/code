@@ -15,6 +15,7 @@ use sqlx::postgres::PgPool;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InitialVersionData {
+    pub mod_id: ModId,
     pub file_parts: Vec<String>,
     pub version_number: String,
     pub version_title: String,
@@ -34,7 +35,6 @@ struct InitialFileData {
 #[post("version")]
 pub async fn version_create(
     req: HttpRequest,
-    url_data: actix_web::web::Path<(ModId,)>,
     payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<std::sync::Arc<dyn FileHost + Send + Sync>>,
@@ -42,15 +42,12 @@ pub async fn version_create(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let mod_id = url_data.into_inner().0.into();
-
     let result = version_create_inner(
         req,
         payload,
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
-        mod_id,
     )
     .await;
 
@@ -77,7 +74,6 @@ async fn version_create_inner(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
-    mod_id: models::ModId,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenv::var("CDN_URL")?;
 
@@ -104,6 +100,7 @@ async fn version_create_inner(
             let version_create_data: InitialVersionData = serde_json::from_slice(&data)?;
             initial_version_data = Some(version_create_data);
             let version_create_data = initial_version_data.as_ref().unwrap();
+            let mod_id: models::ModId = version_create_data.mod_id.into();
 
             let results = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
@@ -154,8 +151,7 @@ async fn version_create_inner(
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
             let body_url = format!(
                 "data/{}/changelogs/{}/body.md",
-                ModId::from(mod_id),
-                version_id
+                version_create_data.mod_id, version_id
             );
 
             let uploaded_text = file_host
@@ -180,7 +176,7 @@ async fn version_create_inner(
 
             version_builder = Some(VersionBuilder {
                 version_id: version_id.into(),
-                mod_id,
+                mod_id: version_create_data.mod_id.into(),
                 author_id: user.id.into(),
                 name: version_create_data.version_title.clone(),
                 version_number: version_create_data.version_number.clone(),
@@ -210,7 +206,7 @@ async fn version_create_inner(
             uploaded_files,
             &cdn_url,
             &content_disposition,
-            ModId::from(mod_id),
+            version.mod_id.into(),
             &version.version_number,
         )
         .await?;
@@ -272,7 +268,7 @@ async fn version_create_inner(
 #[post("{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
-    url_data: actix_web::web::Path<(ModId, VersionId)>,
+    url_data: actix_web::web::Path<(VersionId,)>,
     payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<std::sync::Arc<dyn FileHost + Send + Sync>>,
@@ -280,9 +276,7 @@ pub async fn upload_file_to_version(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let data = url_data.into_inner();
-    let mod_id = models::ModId::from(data.0);
-    let version_id = models::VersionId::from(data.1);
+    let version_id = models::VersionId::from(url_data.0);
 
     let result = upload_file_to_version_inner(
         req,
@@ -291,7 +285,6 @@ pub async fn upload_file_to_version(
         &***file_host,
         &mut uploaded_files,
         version_id,
-        mod_id,
     )
     .await;
 
@@ -319,7 +312,6 @@ async fn upload_file_to_version_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
-    mod_id: models::ModId,
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenv::var("CDN_URL")?;
 
@@ -347,11 +339,6 @@ async fn upload_file_to_version_inner(
             ));
         }
     };
-    if version.mod_id as u64 != mod_id.0 as u64 {
-        return Err(CreateError::InvalidInput(
-            "An invalid version id was supplied".to_string(),
-        ));
-    }
 
     if version.author_id as u64 != user.id.0 {
         return Err(CreateError::InvalidInput("Unauthorized".to_string()));

@@ -3,6 +3,7 @@ use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models;
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 // TODO: this needs filtering, and a better response type
@@ -42,23 +43,62 @@ pub async fn version_list(
     }
 }
 
-#[get("{version_id}")]
-pub async fn version_get(
-    info: web::Path<(models::ids::ModId, models::ids::VersionId)>,
+#[derive(Serialize, Deserialize)]
+pub struct VersionIds {
+    pub ids: String,
+}
+
+// TODO: Make this return the versions mod struct
+#[get("versions")]
+pub async fn versions_get(
+    web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.1;
+    let version_ids = serde_json::from_str::<Vec<models::ids::VersionId>>(&*ids.ids)?
+        .into_iter()
+        .map(|x| x.into())
+        .collect();
+    let versions_data = database::models::Version::get_many(version_ids, &**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    use models::mods::VersionType;
+    let versions: Vec<models::mods::Version> = versions_data
+        .into_iter()
+        .map(|data| models::mods::Version {
+            id: data.id.into(),
+            mod_id: data.mod_id.into(),
+            author_id: data.author_id.into(),
+
+            name: data.name,
+            version_number: data.version_number,
+            changelog_url: data.changelog_url,
+            date_published: data.date_published,
+            downloads: data.downloads as u32,
+            version_type: VersionType::Release,
+
+            files: vec![],
+            dependencies: Vec::new(), // TODO: dependencies
+            game_versions: vec![],
+            loaders: vec![],
+        })
+        .collect();
+
+    Ok(HttpResponse::Ok().json(versions))
+}
+
+#[get("{version_id}")]
+pub async fn version_get(
+    info: web::Path<(models::ids::VersionId,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let id = info.0;
     let version_data = database::models::Version::get_full(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     if let Some(data) = version_data {
         use models::mods::VersionType;
-
-        if models::ids::ModId::from(data.mod_id) != info.0 {
-            // Version doesn't belong to that mod
-            return Ok(HttpResponse::NotFound().body(""));
-        }
 
         let response = models::mods::Version {
             id: data.id.into(),

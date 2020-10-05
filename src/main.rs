@@ -204,6 +204,7 @@ async fn main() -> std::io::Result<()> {
                     .configure(routes::auth_config)
                     .configure(routes::tags_config)
                     .configure(routes::mods_config)
+                    .configure(routes::versions_config)
                     .configure(routes::users_config),
             )
             .default_service(web::get().to(routes::not_found))

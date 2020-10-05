@@ -143,6 +143,46 @@ impl Mod {
         }
     }
 
+    pub async fn get_many<'a, E>(mod_ids: Vec<ModId>, exec: E) -> Result<Vec<Mod>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let mod_ids_parsed: Vec<i64> = mod_ids.into_iter().map(|x| x.0).collect();
+        let mods = sqlx::query!(
+            "
+            SELECT id, title, description, downloads,
+                   icon_url, body_url, published,
+                   issues_url, source_url, wiki_url,
+                   team_id
+            FROM mods
+            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
+            ",
+            &mod_ids_parsed
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|m| Mod {
+                id: ModId(m.id),
+                team_id: TeamId(m.team_id),
+                title: m.title,
+                description: m.description,
+                downloads: m.downloads,
+                body_url: m.body_url,
+                icon_url: m.icon_url,
+                published: m.published,
+                issues_url: m.issues_url,
+                source_url: m.source_url,
+                wiki_url: m.wiki_url,
+            }))
+        })
+        .try_collect::<Vec<Mod>>()
+        .await?;
+
+        Ok(mods)
+    }
+
     pub async fn remove_full<'a, 'b, E>(
         id: ModId,
         exec: E,

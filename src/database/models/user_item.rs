@@ -1,4 +1,4 @@
-use super::ids::UserId;
+use super::ids::{ModId, UserId};
 
 pub struct User {
     pub id: UserId,
@@ -111,5 +111,63 @@ impl User {
         } else {
             Ok(None)
         }
+    }
+
+    pub async fn get_many<'a, E>(user_ids: Vec<UserId>, exec: E) -> Result<Vec<User>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let user_ids_parsed: Vec<i64> = user_ids.into_iter().map(|x| x.0).collect();
+        let users = sqlx::query!(
+            "
+            SELECT u.id, u.github_id, u.name, u.email,
+                u.avatar_url, u.username, u.bio,
+                u.created, u.role FROM users u
+            WHERE u.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            ",
+            &user_ids_parsed
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|u| User {
+                id: UserId(u.id),
+                github_id: u.github_id,
+                name: u.name,
+                email: u.email,
+                avatar_url: u.avatar_url,
+                username: u.username,
+                bio: u.bio,
+                created: u.created,
+                role: u.role,
+            }))
+        })
+        .try_collect::<Vec<User>>()
+        .await?;
+
+        Ok(users)
+    }
+
+    pub async fn get_mods<'a, E>(user_id: UserId, exec: E) -> Result<Vec<ModId>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let mods = sqlx::query!(
+            "
+            SELECT m.id FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id
+            WHERE tm.user_id = $1
+            ",
+            user_id as UserId,
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|m| ModId(m.id))) })
+        .try_collect::<Vec<ModId>>()
+        .await?;
+
+        Ok(mods)
     }
 }
