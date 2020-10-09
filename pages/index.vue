@@ -166,7 +166,6 @@
         <img class="logo" src="~/assets/images/logo.svg" alt="logo" />
         <p class="name">modrinth</p>
       </div>
-      <img class="host" src="~/assets/images/fosshost.svg" alt="logo" />
       <p class="copyright">© Guavy LLC</p>
       <div class="column">
         <h4 class="pages">Pages</h4>
@@ -417,15 +416,9 @@ footer {
       font-family: 'Montserrat Alternates', serif;
     }
   }
-  .host {
-    grid-column-start: 1;
-    grid-row-start: 10;
-    grid-row-end: 11;
-    height: 40px;
-  }
   .copyright {
     grid-column-start: 1;
-    grid-row-start: 12;
+    grid-row-start: 10;
     color: var(--color-grey-6);
   }
   h4 {

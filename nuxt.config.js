@@ -125,6 +125,9 @@ export default {
   buildModules: [
     // Doc: https://github.com/nuxt-community/eslint-module
     '@nuxtjs/eslint-module',
+    '@nuxtjs/svg',
+    '@nuxtjs/color-mode',
+    '@nuxtjs/moment',
   ],
   /*
    ** Nuxt.js modules
@@ -133,6 +136,7 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
     '@nuxtjs/auth',
+    '@nuxtjs/markdownit',
   ],
   auth: {
     strategies: {
@@ -152,7 +156,22 @@ export default {
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
-  axios: {},
+  axios: {
+    headers: {
+      common: {
+        Accept: 'application/json',
+      },
+    },
+  },
+  moment: {
+    defaultTimezone: 'America/Los_Angeles',
+    timezone: true,
+    startYear: 2010,
+    endYear: 2030,
+  },
+  markdownit: {
+    injected: true,
+  },
   /*
    ** Build configuration
    ** See https://nuxtjs.org/api/configuration-build/

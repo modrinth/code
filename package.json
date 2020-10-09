@@ -18,8 +18,12 @@
     "vue-multiselect": "^2.1.6"
   },
   "devDependencies": {
+    "@nuxtjs/color-mode": "^1.1.1",
     "@nuxtjs/eslint-config": "^3.1.0",
     "@nuxtjs/eslint-module": "^2.0.0",
+    "@nuxtjs/moment": "^1.6.1",
+    "@nuxtjs/markdownit": "^1.2.10",
+    "@nuxtjs/svg": "^0.1.12",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.9.0",
     "eslint-config-prettier": "^6.11.0",

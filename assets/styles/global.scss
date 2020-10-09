@@ -1,7 +1,4 @@
-:root {
-  /**
-    * Colors
-   */
+.light-mode {
   --color-text: #1a202c;
   --color-bg: #ffffff;
 
@@ -18,21 +15,9 @@
   --color-grey-5: #718096;
   --color-grey-6: #4a5568;
   --color-grey-7: #2d3748;
-
-  /**
-    * Sizes
-   */
-  --size-rounded-sm: 0.25rem;
-  --size-rounded-md: 0.5rem;
-  --size-rounded-lg: 1rem;
-
-  /**
-    * Defaults
-   */
-  font-size: 18px;
 }
 
-:root[data-theme='dark'] {
+.dark-mode {
   --color-text: #ccccc2;
   --color-bg: #191917;
 
@@ -58,6 +43,17 @@ body {
     Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   margin: 0;
   padding: 0;
+  /**
+  * Sizes
+ */
+  --size-rounded-sm: 0.25rem;
+  --size-rounded-md: 0.5rem;
+  --size-rounded-lg: 1rem;
+
+  /**
+    * Defaults
+   */
+  font-size: 18px;
 }
 
 svg {

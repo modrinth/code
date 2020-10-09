@@ -142,7 +142,6 @@
               alt="avatar"
               @click="showPopup = !showPopup"
             />
-            <span> {{ this.$auth.user.username }} </span>
             <div v-if="showPopup" class="user-actions-popup">
               <div class="popup-inner">
                 <p>
@@ -156,6 +155,7 @@
                 <p @click="logout">Logout</p>
               </div>
             </div>
+            <span> {{ this.$auth.user.username }} </span>
           </div>
           <div v-if="this.$auth.loggedIn" class="notifications">
             <svg
@@ -172,14 +172,17 @@
           </div>
           <div class="theme">
             <svg
-              v-if="theme === 'light'"
+              v-if="$colorMode.value === 'light'"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              @click="switchTheme"
+              @click="
+                $colorMode.value =
+                  $colorMode.value === 'dark' ? 'light' : 'dark'
+              "
             >
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
@@ -191,7 +194,10 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              @click="switchTheme"
+              @click="
+                $colorMode.value =
+                  $colorMode.value === 'dark' ? 'light' : 'dark'
+              "
             >
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -237,30 +243,10 @@ export default {
   },
   data() {
     return {
-      theme: 'light',
       showPopup: false,
     }
   },
-  beforeMount() {
-    const theme = localStorage.getItem('data-theme')
-      ? localStorage.getItem('data-theme')
-      : 'light'
-
-    this.theme = theme
-    document.documentElement.setAttribute('data-theme', theme)
-  },
   methods: {
-    switchTheme() {
-      let theme = localStorage.getItem('data-theme')
-      if (theme === 'dark') {
-        theme = 'light'
-      } else {
-        theme = 'dark'
-      }
-      this.theme = theme
-      localStorage.setItem('data-theme', theme)
-      document.documentElement.setAttribute('data-theme', theme)
-    },
     toggleNavMenu() {
       document.body.style.overflow =
         document.body.style.overflow !== 'hidden' ? 'hidden' : 'auto'
@@ -468,8 +454,8 @@ export default {
             position: absolute;
             z-index: 1;
             margin-bottom: 20px;
-            bottom: 500%;
-            margin-left: -165px;
+            bottom: 100%;
+            margin-left: -50px;
 
             hr {
               color: var(--color-grey-2);

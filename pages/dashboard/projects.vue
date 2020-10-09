@@ -4,7 +4,7 @@
 
     <div class="section-header">
       <h3>Mods</h3>
-      <nuxt-link class="create-button" to="/create/mod"
+      <nuxt-link class="create-button" to="/mod/create"
         >Create a new mod</nuxt-link
       >
     </div>
