@@ -24,53 +24,52 @@ export default {
         content:
           'Modrinth is a mod distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including the forge and fabric mod loaders.',
       },
+
+      { hid: 'author', name: 'author', content: 'Modrinth' },
+      { hid: 'publisher', name: 'publisher', content: 'Guavy LLC' },
       {
-        hid: 'og-title',
-        property: 'og:title',
-        content: 'Open source modding platform',
-      },
-      {
-        hid: 'og-site-name',
-        property: 'og:site_name',
+        hid: 'apple-mobile-web-app-title',
+        name: 'apple-mobile-web-app-title',
         content: 'Modrinth',
       },
+      { hid: 'theme-color', name: 'theme-color', content: '#4d9227' },
+
+      { hid: 'og:title', name: 'og:title', content: 'Modrinth' },
       {
-        hid: 'og-image',
-        property: 'og:image',
-        content: 'https://modrinth.com/_nuxt/img/logo.e3136b7.svg',
+        hid: 'og:description',
+        name: 'og:description',
+        content: 'An open source modding platform',
+      },
+      { hid: 'og:type', name: 'og:type', content: 'website' },
+      { hid: 'og:url', name: 'og:url', content: 'https://www.modrinth.com' },
+      {
+        hid: 'og:image',
+        name: 'og:image',
+        content: 'https://cdn.modrinth.com/file/modrinth/modrinth.png',
+      },
+
+      // Twitter
+      {
+        hid: 'twitter:card',
+        name: 'twitter:card',
+        content: 'summary_large_image',
+      },
+      { hid: 'twitter:site', name: 'twitter:site', content: '@modrinth' },
+      { hid: 'twitter:creator', name: 'twitter:creator', content: '@modrinth' },
+      {
+        hid: 'twitter:title',
+        name: 'twitter:title',
+        content: 'An open source modding platform',
       },
       {
-        hid: 'og-image-url',
-        property: 'og:image:url',
-        content: 'https://modrinth.com/_nuxt/img/logo.e3136b7.svg',
-      },
-      { hid: 'og-image-width', property: 'og:image:width', content: 1280 },
-      { hid: 'og-image-height', property: 'og:image:height', content: 720 },
-      {
-        hid: 'og-image-type',
-        property: 'og:image:type',
-        content: 'image/jpeg',
-      },
-      { hid: 'twitter-card', property: 'twitter:card' },
-      {
-        hid: 'twitter-site',
-        property: 'twitter:site',
-        content: 'modrinth.com',
+        hid: 'twitter:description',
+        name: 'twitter:description',
+        content: 'An open source modding platform',
       },
       {
-        hid: 'twitter-creator',
-        property: 'twitter:creator',
-        content: 'modrinth',
-      },
-      {
-        hid: 'twitter-img-src',
-        property: 'twitter:image',
-        content: 'https://modrinth.com/_nuxt/img/logo.e3136b7.svg',
-      },
-      {
-        hid: 'twitter-title',
-        property: 'twitter:title',
-        content: 'Modrinth',
+        hid: 'twitter:image',
+        name: 'twitter:image',
+        content: 'https://cdn.modrinth.com/file/modrinth/modrinth.png',
       },
     ],
     link: [
