@@ -35,13 +35,12 @@ export default {
       { hid: 'theme-color', name: 'theme-color', content: '#4d9227' },
 
       { hid: 'og:site_name', name: 'og:site_name', content: 'Modrinth' },
-      { hid: 'og:title', name: 'og:title', content: 'Modrinth' },
       {
         hid: 'og:description',
         name: 'og:description',
         content: 'An open source modding platform',
       },
-      { hid: 'og:type', name: 'og:type', content: 'object' },
+      { hid: 'og:type', name: 'og:type', content: 'website' },
       { hid: 'og:url', name: 'og:url', content: 'https://www.modrinth.com' },
       {
         hid: 'og:image',
@@ -53,7 +52,7 @@ export default {
       {
         hid: 'twitter:card',
         name: 'twitter:card',
-        content: 'summary_large_image',
+        content: 'summary',
       },
       { hid: 'twitter:site', name: 'twitter:site', content: '@modrinth' },
       { hid: 'twitter:creator', name: 'twitter:creator', content: '@modrinth' },
