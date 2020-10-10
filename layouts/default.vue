@@ -180,7 +180,7 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               @click="
-                $colorMode.value =
+                $colorMode.preference =
                   $colorMode.value === 'dark' ? 'light' : 'dark'
               "
             >
@@ -195,7 +195,7 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               @click="
-                $colorMode.value =
+                $colorMode.preference =
                   $colorMode.value === 'dark' ? 'light' : 'dark'
               "
             >
@@ -253,7 +253,7 @@ export default {
     },
     logout() {
       this.$auth.setToken('local', false)
-      this.$router.go()
+      this.$router.go(null)
     },
   },
 }

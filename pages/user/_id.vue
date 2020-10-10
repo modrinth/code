@@ -8,6 +8,7 @@
 import axios from 'axios'
 
 export default {
+  auth: false,
   async asyncData(data) {
     let res = await axios.get(
       `https://api.modrinth.com/api/v1/user/${data.params.id}`

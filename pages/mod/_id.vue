@@ -6,6 +6,7 @@
 import axios from 'axios'
 
 export default {
+  auth: false,
   async asyncData(data) {
     const res = await axios.get(
       `https://api.modrinth.com/api/v1/mod/${data.params.id}`
