@@ -59,7 +59,7 @@ export default {
       {
         hid: 'twitter:title',
         name: 'twitter:title',
-        content: 'An open source modding platform',
+        content: 'Modrinth',
       },
       {
         hid: 'twitter:description',
