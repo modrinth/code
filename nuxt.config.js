@@ -127,6 +127,7 @@ export default {
     '@nuxtjs/svg',
     '@nuxtjs/color-mode',
     '@nuxtjs/moment',
+    'nuxt-ackee',
   ],
   /*
    ** Nuxt.js modules
@@ -136,7 +137,21 @@ export default {
     '@nuxtjs/axios',
     '@nuxtjs/auth',
     '@nuxtjs/markdownit',
+    '@nuxtjs/robots',
+    '@nuxtjs/sitemap',
   ],
+  ackee: {
+    server: 'https://analytics.modrinth.com',
+    domainId: '1840cc3a-64b1-431e-97a4-c122bb64d4c0',
+    ignoreLocalhost: false,
+    detailed: true,
+  },
+  robots: {
+    Sitemap: 'https://modrinth.com/sitemap.xml',
+  },
+  sitemap: {
+    exclude: ['/dashboard/**', '/dashboard', '/mod/create'],
+  },
   auth: {
     strategies: {
       local: {
