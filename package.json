@@ -14,6 +14,7 @@
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
     "@nuxtjs/axios": "^5.12.2",
+    "@nuxtjs/dayjs": "^1.2.0",
     "@nuxtjs/robots": "^2.4.2",
     "@nuxtjs/sitemap": "^2.4.0",
     "nuxt": "^2.14.5",
@@ -24,7 +25,6 @@
     "@nuxtjs/eslint-config": "^3.1.0",
     "@nuxtjs/eslint-module": "^2.0.0",
     "@nuxtjs/markdownit": "^1.2.10",
-    "@nuxtjs/moment": "^1.6.1",
     "@nuxtjs/svg": "^0.1.12",
     "babel-eslint": "^10.1.0",
     "eslint": "^7.9.0",

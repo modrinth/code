@@ -1,10 +1,5 @@
 export default {
   /*
-   ** Nuxt rendering mode
-   ** See https://nuxtjs.org/api/configuration-mode
-   */
-  mode: 'universal',
-  /*
    ** Nuxt target
    ** See https://nuxtjs.org/api/configuration-target
    */
@@ -126,7 +121,6 @@ export default {
     '@nuxtjs/eslint-module',
     '@nuxtjs/svg',
     '@nuxtjs/color-mode',
-    '@nuxtjs/moment',
     'nuxt-ackee',
   ],
   /*
@@ -134,6 +128,7 @@ export default {
    */
   modules: [
     // Doc: https://axios.nuxtjs.org/usage
+    '@nuxtjs/dayjs',
     '@nuxtjs/axios',
     '@nuxtjs/auth',
     '@nuxtjs/markdownit',
@@ -177,11 +172,10 @@ export default {
       },
     },
   },
-  moment: {
-    defaultTimezone: 'America/Los_Angeles',
-    timezone: true,
-    startYear: 2010,
-    endYear: 2030,
+  dayjs: {
+    locales: ['en'],
+    defaultLocale: 'en',
+    plugins: ['relativeTime'],
   },
   markdownit: {
     injected: true,

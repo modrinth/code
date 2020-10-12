@@ -45,7 +45,7 @@
             d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"
           />
         </svg>
-        <p>{{ $moment(createdAt).fromNow() }}</p>
+        <p>{{ $dayjs(createdAt).fromNow() }}</p>
       </div>
       <div class="result-image columns">
         <svg
@@ -63,7 +63,7 @@
             d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"
           ></path>
         </svg>
-        <p>{{ $moment(updatedAt).fromNow() }}</p>
+        <p>{{ $dayjs(updatedAt).fromNow() }}</p>
       </div>
       <div class="result-image columns">
         <svg

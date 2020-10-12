@@ -377,6 +377,8 @@ export default {
       await this.onSearchChange(newPageNumber)
     },
     async onSearchChange(newPageNumber) {
+      if (this.query === null) return
+
       try {
         const params = [
           `limit=${this.maxResults}`,

@@ -20,30 +20,41 @@
         </tr>
       </thead>
       <tbody>
-        <tr>
+        <tr v-for="mod in mods" :key="mod.id">
           <td>
-            <img class="rounded-md" src="~/assets/images/aof-mini.png" />
+            <img class="rounded-md" :src="mod.icon_url" />
           </td>
-          <td>Finite Water</td>
+          <td>{{ mod.title }}</td>
           <td>Owner</td>
           <td><span class="badge green">Active</span></td>
-          <td>274</td>
-          <td>Nov 4, 2019</td>
-        </tr>
-        <tr>
-          <td>
-            <img class="rounded-md" src="~/assets/images/aof-mini.png" />
-          </td>
-          <td>Vivatech</td>
-          <td>Contributor</td>
-          <td><span class="badge green">Active</span></td>
-          <td>2,381</td>
-          <td>Jul 31, 2019</td>
+          <td>{{ mod.downloads }}</td>
+          <td>{{ $dayjs(mod.published).format('YYYY-MM-DD') }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 </template>
+
+<script>
+import axios from 'axios'
+
+export default {
+  async fetch() {
+    try {
+      const res = await axios.get(
+        `https://api.modrinth.com/api/v1/${this.$auth.user.id}/mods`
+      )
+
+      this.mods = res.data
+    } catch (err) {}
+  },
+  data() {
+    return {
+      mods: [],
+    }
+  },
+}
+</script>
 
 <style lang="scss">
 .section-header {

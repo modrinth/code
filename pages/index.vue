@@ -1,14 +1,14 @@
 <template>
   <div>
     <header class="columns">
-      <nuxt-link to="/" no-prefetch
+      <nuxt-link to="/"
         ><img class="logo" src="~/assets/images/logo.svg" alt="logo"
       /></nuxt-link>
       <div class="links">
-        <nuxt-link to="/" no-prefetch>Home</nuxt-link>
-        <nuxt-link to="/mods" no-prefetch>Mods</nuxt-link>
-        <nuxt-link to="/modpacks" no-prefetch>Packs</nuxt-link>
-        <nuxt-link to="/about" no-prefetch>About</nuxt-link>
+        <nuxt-link to="/">Home</nuxt-link>
+        <nuxt-link to="/mods">Mods</nuxt-link>
+        <nuxt-link to="/modpacks">Packs</nuxt-link>
+        <nuxt-link to="/about">About</nuxt-link>
       </div>
     </header>
     <div class="main-hero columns">
@@ -231,7 +231,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .left,
 .right {
   width: 50%;

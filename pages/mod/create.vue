@@ -1,11 +1,6 @@
 <template>
   <div class="content">
     <h2>Create Mod</h2>
-    <InputLabel
-      label="Name"
-      tooltip="The name of the mod"
-      :required="true"
-    ></InputLabel>
     <input v-model="name" type="text" />
     <input v-model="namespace" type="text" />
     <input v-model="description" type="text" />
@@ -21,10 +16,8 @@
 
 <script>
 import axios from 'axios'
-import InputLabel from '@/components/InputLabel'
 
 export default {
-  components: { InputLabel },
   data() {
     return {
       name: '',
@@ -89,7 +82,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 input {
   width: 200px;
   margin-right: auto;
