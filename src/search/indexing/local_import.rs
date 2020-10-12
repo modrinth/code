@@ -71,7 +71,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 icon_url = url;
             }
 
-            let formatted = result.published.to_string();
+            let formatted = result.published.to_rfc3339();
             let timestamp = result.published.timestamp();
             docs_to_add.push(UploadSearchMod {
                 mod_id: format!("local-{}", crate::models::ids::ModId(result.id as u64)),
