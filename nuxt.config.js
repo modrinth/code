@@ -80,13 +80,7 @@ export default {
           'https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@600&display=swap',
       },
     ],
-    script: [
-      {
-        src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
-        'data-ad-client': 'ca-pub-4800120742989028',
-        async: true,
-      },
-    ],
+    script: [],
   },
 
   vue: {

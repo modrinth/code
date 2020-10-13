@@ -63,7 +63,7 @@
           :latest-version="result.versions[0]"
           :created-at="result.date_created"
           :updated-at="result.date_modified"
-          :downloads="formatNumber(result.downloads)"
+          :downloads="result.downloads.toString()"
           :icon-url="result.icon_url"
           :author-url="result.author_url"
           :page-url="result.page_url"
@@ -468,9 +468,6 @@ export default {
         // eslint-disable-next-line no-console
         console.error(err)
       }
-    },
-    formatNumber(x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
     toggleFiltersMenu() {
       const filters = document.getElementById('filters')

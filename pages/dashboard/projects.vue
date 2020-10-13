@@ -41,11 +41,16 @@ import axios from 'axios'
 export default {
   async fetch() {
     try {
-      const res = await axios.get(
-        `https://api.modrinth.com/api/v1/${this.$auth.user.id}/mods`
+      let res = await axios.get(
+        `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}/mods`
       )
 
-      this.mods = res.data
+      if (res.data) {
+        res = await axios.get(
+          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`
+        )
+        this.mods = res.data
+      }
     } catch (err) {}
   },
   data() {

@@ -5,7 +5,7 @@
       <h2 class="mod-name">
         <a :href="pageUrl">{{ name }}</a>
       </h2>
-      <p class="author">
+      <p class="author" v-if="author">
         by <a :href="authorUrl">{{ author }}</a>
       </p>
     </div>
@@ -28,7 +28,7 @@
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        <p>{{ downloads }}</p>
+        <p>{{ formatNumber(downloads) }}</p>
       </div>
       <div class="result-image columns">
         <svg viewBox="0 0 16 16" fill="#099fef">
@@ -47,7 +47,7 @@
         </svg>
         <p>{{ $dayjs(createdAt).fromNow() }}</p>
       </div>
-      <div class="result-image columns">
+      <div class="result-image columns" v-if="updatedAt">
         <svg
           viewBox="0 0 24 24"
           fill="none"
@@ -195,7 +195,7 @@ export default {
     },
     author: {
       type: String,
-      default: 'Author',
+      default: null,
     },
     description: {
       type: String,
@@ -223,11 +223,11 @@ export default {
     },
     updatedAt: {
       type: String,
-      default: '0000-00-00',
+      default: null,
     },
     latestVersion: {
       type: String,
-      default: '1.16.2',
+      default: 'None',
     },
     categories: {
       type: Array,
@@ -238,6 +238,11 @@ export default {
     isAd: {
       type: Boolean,
       default: false,
+    },
+  },
+  methods: {
+    formatNumber(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
     },
   },
 }
