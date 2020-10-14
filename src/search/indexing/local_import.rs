@@ -6,6 +6,7 @@ use crate::search::UploadSearchMod;
 use sqlx::postgres::PgPool;
 use std::borrow::Cow;
 
+// TODO: only loaders for recent versions? For mods that have moved from forge to fabric
 pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingError> {
     info!("Indexing local mods!");
 
@@ -13,10 +14,9 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
 
     let mut results = sqlx::query!(
         "
-        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published FROM mods m
+        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id FROM mods m
         "
-    )
-    .fetch(&pool);
+    ).fetch(&pool);
 
     while let Some(result) = results.next().await {
         if let Ok(result) = result {
@@ -34,7 +34,6 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
             .try_collect::<Vec<String>>()
             .await?;
 
-            // TODO: only loaders for recent versions? For mods that have moved from forge to fabric
             let loaders: Vec<String> = sqlx::query!(
                 "
                 SELECT loaders.loader FROM versions
@@ -65,14 +64,24 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
 
             categories.extend(loaders);
 
+            let user = sqlx::query!(
+                "
+                SELECT u.id, u.username FROM users u
+                INNER JOIN team_members tm ON tm.role = $1
+                WHERE tm.team_id = $2
+                ",
+                crate::models::teams::OWNER_ROLE,
+                result.team_id,
+            )
+            .fetch_one(&pool)
+            .await?;
+
             let mut icon_url = "".to_string();
 
             if let Some(url) = result.icon_url {
                 icon_url = url;
             }
 
-            let formatted = result.published.to_rfc3339();
-            let timestamp = result.published.timestamp();
             docs_to_add.push(UploadSearchMod {
                 mod_id: format!("local-{}", crate::models::ids::ModId(result.id as u64)),
                 title: result.title,
@@ -80,14 +89,14 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 categories,
                 versions,
                 downloads: result.downloads,
-                page_url: result.body_url,
+                page_url: format!("https://modrinth.com/mod/{}", result.id),
                 icon_url,
-                author: "".to_string(), // TODO: author/team info
-                author_url: "".to_string(),
-                date_created: formatted.clone(),
-                created_timestamp: timestamp,
-                date_modified: formatted,
-                modified_timestamp: timestamp,
+                author: user.username,
+                author_url: format!("https://modrinth.com/user/{}", user.id),
+                date_created: result.published,
+                created_timestamp: result.published.timestamp(),
+                date_modified: result.updated,
+                modified_timestamp: result.updated.timestamp(),
                 latest_version: "".to_string(), // TODO: Info about latest version
                 host: Cow::Borrowed("modrinth"),
                 empty: Cow::Borrowed("{}{}{}"),

@@ -36,15 +36,29 @@ pub async fn mods_get(
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-    let mods: Vec<models::mods::Mod> = mods_data
-        .into_iter()
-        .map(|m| models::mods::Mod {
+    let mut mods: Vec<models::mods::Mod> = Vec::new();
+    for m in mods_data {
+        let status = sqlx::query!(
+            "
+                SELECT status FROM statuses
+                WHERE id = $1
+                ",
+            m.status.0,
+        )
+        .fetch_one(&**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?
+        .status;
+
+        mods.push(models::mods::Mod {
             id: m.id.into(),
             team: m.team_id.into(),
             title: m.title,
             description: m.description,
             body_url: m.body_url,
             published: m.published,
+            updated: m.updated,
+            status: models::mods::ModStatus::from_str(&*status),
 
             downloads: m.downloads as u32,
             categories: vec![],
@@ -54,7 +68,7 @@ pub async fn mods_get(
             source_url: m.source_url,
             wiki_url: m.wiki_url,
         })
-        .collect();
+    }
 
     Ok(HttpResponse::Ok().json(mods))
 }
@@ -71,6 +85,19 @@ pub async fn mod_get(
 
     if let Some(data) = mod_data {
         let m = data.inner;
+
+        let status = sqlx::query!(
+            "
+            SELECT status FROM statuses
+            WHERE id = $1
+            ",
+            m.status.0,
+        )
+        .fetch_one(&**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?
+        .status;
+
         let response = models::mods::Mod {
             id: m.id.into(),
             team: m.team_id.into(),
@@ -78,6 +105,8 @@ pub async fn mod_get(
             description: m.description,
             body_url: m.body_url,
             published: m.published,
+            updated: m.updated,
+            status: models::mods::ModStatus::from_str(&*status),
 
             downloads: m.downloads as u32,
             categories: data.categories,

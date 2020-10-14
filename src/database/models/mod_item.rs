@@ -12,6 +12,7 @@ pub struct ModBuilder {
     pub wiki_url: Option<String>,
     pub categories: Vec<CategoryId>,
     pub initial_versions: Vec<super::version_item::VersionBuilder>,
+    pub status: StatusId,
 }
 
 impl ModBuilder {
@@ -26,6 +27,8 @@ impl ModBuilder {
             description: self.description,
             body_url: self.body_url,
             published: chrono::Utc::now(),
+            updated: chrono::Utc::now(),
+            status: self.status,
             downloads: 0,
             icon_url: self.icon_url,
             issues_url: self.issues_url,
@@ -63,6 +66,8 @@ pub struct Mod {
     pub description: String,
     pub body_url: String,
     pub published: chrono::DateTime<chrono::Utc>,
+    pub updated: chrono::DateTime<chrono::Utc>,
+    pub status: StatusId,
     pub downloads: i32,
     pub icon_url: Option<String>,
     pub issues_url: Option<String>,
@@ -114,6 +119,7 @@ impl Mod {
             "
             SELECT title, description, downloads,
                    icon_url, body_url, published,
+                   updated, status,
                    issues_url, source_url, wiki_url,
                    team_id
             FROM mods
@@ -134,9 +140,11 @@ impl Mod {
                 body_url: row.body_url,
                 icon_url: row.icon_url,
                 published: row.published,
+                updated: row.updated,
                 issues_url: row.issues_url,
                 source_url: row.source_url,
                 wiki_url: row.wiki_url,
+                status: StatusId(row.status),
             }))
         } else {
             Ok(None)
@@ -154,6 +162,7 @@ impl Mod {
             "
             SELECT id, title, description, downloads,
                    icon_url, body_url, published,
+                   updated, status,
                    issues_url, source_url, wiki_url,
                    team_id
             FROM mods
@@ -172,9 +181,11 @@ impl Mod {
                 body_url: m.body_url,
                 icon_url: m.icon_url,
                 published: m.published,
+                updated: m.updated,
                 issues_url: m.issues_url,
                 source_url: m.source_url,
                 wiki_url: m.wiki_url,
+                status: StatusId(m.status),
             }))
         })
         .try_collect::<Vec<Mod>>()

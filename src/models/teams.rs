@@ -8,6 +8,8 @@ use serde::{Deserialize, Serialize};
 #[serde(into = "Base62Id")]
 pub struct TeamId(pub u64);
 
+pub const OWNER_ROLE: &str = "Owner";
+
 // TODO: permissions, role names, etc
 /// A team of users who control a mod
 #[derive(Serialize, Deserialize)]
