@@ -1,6 +1,10 @@
 <template>
   <div class="content">
     <h2>Create Mod</h2>
+    <section class="error" v-if="currentError">
+      <h3>Error</h3>
+      <p>{{ currentError }}</p>
+    </section>
     <section>
       <h3>Initial Data</h3>
       <div class="initial">
@@ -26,17 +30,6 @@
           <input v-model="name" type="text" placeholder="Example Mod" />
           <label
             class="required"
-            title="The namespace of your mod, an example is com.example.mod"
-          >
-            Namespace
-          </label>
-          <input
-            v-model="namespace"
-            type="text"
-            placeholder="com.example.examplemod"
-          />
-          <label
-            class="required"
             title="The short-form description of your mod. This shows up in searches"
           >
             Short Description
@@ -46,6 +39,27 @@
             type="text"
             placeholder="An example mod which does example stuff!"
           />
+          <label
+            title="The categories of your mod, these help your mod appear in search results. Maximum of three!"
+          >
+            Categories
+          </label>
+          <multiselect
+            v-model="categories"
+            class="categories-input"
+            :options="selectableCategories"
+            :loading="selectableCategories.length === 0"
+            :multiple="true"
+            :searchable="false"
+            :show-no-results="false"
+            :close-on-select="false"
+            :clear-on-select="false"
+            :show-labels="false"
+            :max="3"
+            :limit="6"
+            :hide-selected="true"
+            placeholder="Choose categories..."
+          ></multiselect>
         </div>
       </div>
     </section>
@@ -54,7 +68,10 @@
       <p>
         You can type the of the long form of your description here. This editor
         supports markdown. You can find the syntax
-        <a href="https://github.com/dimerapp/markdown/blob/develop/syntax.md"
+        <a
+          href="https://github.com/dimerapp/markdown/blob/develop/syntax.md"
+          target="_blank"
+          rel="noopener noreferrer"
           >here</a
         >.
       </p>
@@ -85,14 +102,26 @@
         </label>
       </div>
     </section>
-    <button @click="createMod">Create mod</button>
+    <button :disabled="!this.$nuxt.$loading" @click="createMod">
+      Create mod
+    </button>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import Multiselect from 'vue-multiselect'
 
 export default {
+  components: {
+    Multiselect,
+  },
+  async asyncData() {
+    const res = await axios.get(`https://api.modrinth.com/api/v1/tag/category`)
+    return {
+      selectableCategories: res.data,
+    }
+  },
   data() {
     return {
       previewImage: null,
@@ -107,10 +136,14 @@ export default {
       source_url: null,
       wiki_url: null,
       icon: null,
+      currentError: null,
     }
   },
   methods: {
     async createMod() {
+      this.$nuxt.$loading.start()
+      this.currentError = null
+
       const formData = new FormData()
 
       formData.append(
@@ -149,12 +182,16 @@ export default {
           },
         })
 
+        await this.$router.replace('/dashboard/projects')
+
         // eslint-disable-next-line no-console
         console.log(result)
       } catch (err) {
-        // eslint-disable-next-line no-console
-        console.error(err)
+        this.currentError = err.response.data.description
+        window.scrollTo({ top: 0, behavior: 'smooth' })
       }
+
+      this.$nuxt.$loading.stop()
     },
     showPreviewImage(e) {
       const reader = new FileReader()
@@ -170,6 +207,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.error {
+  border-left: #e04e3e 7px solid;
+}
+
 section {
   box-shadow: 0 2px 3px 1px var(--color-grey-2);
   margin: 50px 25px;
@@ -186,6 +227,10 @@ input {
   width: 100%;
   padding: 0.5rem 5px;
   margin-bottom: 20px;
+}
+
+.multiselect {
+  margin-top: 0.5rem;
 }
 
 .initial {
@@ -249,7 +294,7 @@ input {
   textarea {
     padding: 20px;
     width: calc(50% - 50px);
-    min-height: 500px;
+    height: 500px;
     resize: none;
     outline: none;
     border: none;
@@ -262,12 +307,14 @@ input {
   div {
     padding: 20px;
     margin: 0;
-    min-height: 540px;
+    height: 540px;
     display: inline-block;
     width: calc(50%);
     box-sizing: border-box;
     vertical-align: top;
     background-color: var(--color-grey-2);
+    overflow-y: auto;
+    overflow-x: hidden;
   }
 }
 

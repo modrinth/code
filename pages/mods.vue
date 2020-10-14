@@ -372,7 +372,7 @@ export default {
       if (!sendRequest) await this.onSearchChange(1)
     },
     async onSearchChangeToTop(newPageNumber) {
-      if (process.client) window.scrollTo(0, 0)
+      if (process.client) window.scrollTo({ top: 0, behavior: 'smooth' })
 
       await this.onSearchChange(newPageNumber)
     },
