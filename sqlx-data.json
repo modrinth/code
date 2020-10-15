@@ -945,6 +945,29 @@
       ]
     }
   },
+  "a2a99a640468a9fb8f0718e5aea6740cf5b33dafd5e038c154d6a13674fa999b": {
+    "query": "\n            INSERT INTO mods (\n                id, team_id, title, description, body_url,\n                published, downloads, icon_url, issues_url,\n                source_url, wiki_url, status\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8, $9,\n                $10, $11, $12\n            )\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Timestamptz",
+          "Int4",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "a39ce28b656032f862b205cffa393a76b989f4803654a615477a94fda5f57354": {
     "query": "\n            DELETE FROM states\n            WHERE id = $1\n            ",
     "describe": {
@@ -1127,28 +1150,6 @@
         "Left": [
           "Int4",
           "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "bdc13b0000987fe08351751fed4f388856eb5c022bb27c2919dd72d4409c2412": {
-    "query": "\n            INSERT INTO mods (\n                id, team_id, title, description, body_url,\n                published, downloads, icon_url, issues_url,\n                source_url, wiki_url\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8, $9,\n                $10, $11\n            )\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Timestamptz",
-          "Int4",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar"
         ]
       },
       "nullable": []

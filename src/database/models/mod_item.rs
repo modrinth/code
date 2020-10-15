@@ -85,12 +85,12 @@ impl Mod {
             INSERT INTO mods (
                 id, team_id, title, description, body_url,
                 published, downloads, icon_url, issues_url,
-                source_url, wiki_url
+                source_url, wiki_url, status
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9,
-                $10, $11
+                $10, $11, $12
             )
             ",
             self.id as ModId,
@@ -104,6 +104,7 @@ impl Mod {
             self.issues_url.as_ref(),
             self.source_url.as_ref(),
             self.wiki_url.as_ref(),
+            self.status.0
         )
         .execute(&mut *transaction)
         .await?;
