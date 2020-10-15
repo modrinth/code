@@ -186,9 +186,17 @@ pub async fn index_curseforge(
             .date_modified
             .parse::<chrono::DateTime<chrono::Utc>>()?;
 
+        let mut author = String::new();
+        let mut author_url = String::new();
+
+        if curseforge_mod.authors.len() > 0 {
+            author = (&curseforge_mod.authors[0].name).to_string();
+            author_url = (&curseforge_mod.authors[0].url).to_string();
+        }
+
         docs_to_add.push(UploadSearchMod {
             mod_id: format!("curse-{}", curseforge_mod.id),
-            author: (&curseforge_mod.authors[0].name).to_string(),
+            author,
             title: curseforge_mod.name,
             description: curseforge_mod.summary.chars().take(150).collect(),
             categories: mod_categories,
@@ -196,7 +204,7 @@ pub async fn index_curseforge(
             downloads: curseforge_mod.download_count as i32,
             page_url: curseforge_mod.website_url,
             icon_url,
-            author_url: (&curseforge_mod.authors[0].url).to_string(),
+            author_url,
             date_created: created,
             created_timestamp: created.timestamp(),
             date_modified: modified,
