@@ -368,8 +368,6 @@ export default {
 
         await this.$router.replace('/dashboard/projects')
 
-        // eslint-disable-next-line no-console
-        console.log(result)
       } catch (err) {
         this.currentError = err.response.data.description
         window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -403,8 +401,6 @@ export default {
       }
 
       this.versions[this.currentVersionIndex].file_parts = newFileParts
-
-      console.log(this.versions)
     },
     createVersion() {
       this.versions.push({
@@ -420,7 +416,6 @@ export default {
       })
 
       this.currentVersionIndex = this.versions.length - 1
-      console.log(this.versions)
     },
     deleteVersion() {
       this.versions.splice(this.currentVersionIndex, 1)
