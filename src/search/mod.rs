@@ -23,6 +23,8 @@ pub enum SearchError {
     IntParsingError(#[from] std::num::ParseIntError),
     #[error("Environment Error")]
     EnvError(#[from] dotenv::Error),
+    #[error("Invalid index to sort by: {0}")]
+    InvalidIndex(String),
 }
 
 impl actix_web::ResponseError for SearchError {
@@ -32,6 +34,7 @@ impl actix_web::ResponseError for SearchError {
             SearchError::IndexDBError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             SearchError::SerDeError(..) => StatusCode::BAD_REQUEST,
             SearchError::IntParsingError(..) => StatusCode::BAD_REQUEST,
+            SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -42,6 +45,7 @@ impl actix_web::ResponseError for SearchError {
                 SearchError::IndexDBError(..) => "indexdb_error",
                 SearchError::SerDeError(..) => "invalid_input",
                 SearchError::IntParsingError(..) => "invalid_input",
+                SearchError::InvalidIndex(..) => "invalid_input",
             },
             description: &self.to_string(),
         })
@@ -161,8 +165,16 @@ pub async fn search_for_mod(info: &SearchRequest) -> Result<SearchResults, Searc
         query = query.with_facet_filters(facets);
     }
 
+    let index = match index {
+        "relevance" => "relevance_mods",
+        "downloads" => "downloads_mods",
+        "updated" => "updated_mods",
+        "newest" => "newest_mods",
+        i => return Err(SearchError::InvalidIndex(i.to_string())),
+    };
+
     let results = client
-        .get_index(format!("{}_mods", index).as_ref())
+        .get_index(index)
         .await?
         .search::<ResultSearchMod>(&query)
         .await?;

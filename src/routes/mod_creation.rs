@@ -203,16 +203,18 @@ async fn mod_create_inner(
             while let Some(chunk) = field.next().await {
                 data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
             }
-            mod_create_data = Some(serde_json::from_slice(&data)?);
+            let create_data: ModCreateData = serde_json::from_slice(&data)?;
+
+            check_length("mod_name", 3, 255, &*create_data.mod_name)?;
+            check_length("mod_description", 3, 2048, &*create_data.mod_description)?;
+
+            mod_create_data = Some(create_data);
             continue;
         }
 
         let create_data = mod_create_data.as_ref().ok_or_else(|| {
             CreateError::InvalidInput(String::from("`data` field must come before file fields"))
         })?;
-
-        check_length("mod_name", 3, 255, &*create_data.mod_name)?;
-        check_length("mod_description", 3, 2048, &*create_data.mod_description)?;
 
         let (file_name, file_extension) =
             super::version_creation::get_name_ext(&content_disposition)?;
@@ -374,16 +376,33 @@ async fn mod_create_inner(
         file_name: upload_data.file_name.clone(),
     });
 
+    let mut author_username = None;
+    let mut author_id = None;
+
     let team = models::team_item::TeamBuilder {
         members: create_data
             .team_members
             .into_iter()
-            .map(|member| models::team_item::TeamMemberBuilder {
-                user_id: member.user_id.into(),
-                name: member.name,
-                role: member.role,
+            .map(|member| {
+                if member.role == crate::models::teams::OWNER_ROLE {
+                    author_id = Some(member.user_id);
+                    author_username = Some(member.name.clone());
+                }
+                models::team_item::TeamMemberBuilder {
+                    user_id: member.user_id.into(),
+                    name: member.name,
+                    role: member.role,
+                }
             })
             .collect(),
+    };
+
+    let (author_username, author_id) = if let (Some(u), Some(id)) = (author_username, author_id) {
+        (u, id)
+    } else {
+        return Err(CreateError::InvalidInput(String::from(
+            "A mod must have an author",
+        )));
     };
 
     let team_id = team.insert(&mut *transaction).await?;
@@ -440,8 +459,8 @@ async fn mod_create_inner(
         versions: versions_list,
         page_url: format!("https://modrinth.com/mod/{}", mod_id),
         icon_url: mod_builder.icon_url.clone().unwrap(),
-        author: user.username,
-        author_url: format!("https://modrinth.com/user/{}", user.id),
+        author: author_username,
+        author_url: format!("https://modrinth.com/user/{}", author_id),
         // TODO: latest version info
         latest_version: String::new(),
         downloads: 0,

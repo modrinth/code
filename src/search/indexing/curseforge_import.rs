@@ -186,12 +186,15 @@ pub async fn index_curseforge(
             .date_modified
             .parse::<chrono::DateTime<chrono::Utc>>()?;
 
-        let mut author = String::new();
-        let mut author_url = String::new();
+        let author;
+        let author_url;
 
-        if curseforge_mod.authors.len() > 0 {
-            author = (&curseforge_mod.authors[0].name).to_string();
-            author_url = (&curseforge_mod.authors[0].url).to_string();
+        if let Some(user) = curseforge_mod.authors.get(0) {
+            author = user.name.clone();
+            author_url = user.url.clone();
+        } else {
+            author = String::from("unknown");
+            author_url = curseforge_mod.website_url.clone();
         }
 
         docs_to_add.push(UploadSearchMod {

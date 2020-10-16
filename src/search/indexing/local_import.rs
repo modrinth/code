@@ -12,14 +12,14 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
 
     let mut docs_to_add: Vec<UploadSearchMod> = vec![];
 
-    let mut results = sqlx::query!(
+    let mut mods = sqlx::query!(
         "
         SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id FROM mods m
         "
     ).fetch(&pool);
 
-    while let Some(result) = results.next().await {
-        if let Ok(result) = result {
+    while let Some(result) = mods.next().await {
+        if let Ok(mod_data) = result {
             let versions: Vec<String> = sqlx::query!(
                 "
                 SELECT gv.version FROM versions
@@ -27,7 +27,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                     INNER JOIN game_versions gv ON gvv.game_version_id=gv.id
                 WHERE versions.mod_id = $1
                 ",
-                result.id
+                mod_data.id
             )
             .fetch_many(&pool)
             .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
@@ -41,7 +41,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 INNER JOIN loaders ON loaders.id = lv.loader_id
                 WHERE versions.mod_id = $1
                 ",
-                result.id
+                mod_data.id
             )
             .fetch_many(&pool)
             .try_filter_map(|e| async { Ok(e.right().map(|c| c.loader)) })
@@ -55,7 +55,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                     INNER JOIN categories c ON mc.joining_category_id=c.id
                 WHERE mc.joining_mod_id = $1
                 ",
-                result.id
+                mod_data.id
             )
             .fetch_many(&pool)
             .try_filter_map(|e| async { Ok(e.right().map(|c| c.category)) })
@@ -71,32 +71,35 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 WHERE tm.team_id = $2
                 ",
                 crate::models::teams::OWNER_ROLE,
-                result.team_id,
+                mod_data.team_id,
             )
             .fetch_one(&pool)
             .await?;
 
             let mut icon_url = "".to_string();
 
-            if let Some(url) = result.icon_url {
+            if let Some(url) = mod_data.icon_url {
                 icon_url = url;
             }
 
+            let mod_id = crate::models::ids::ModId(mod_data.id as u64);
+            let author_id = crate::models::ids::UserId(user.id as u64);
+
             docs_to_add.push(UploadSearchMod {
-                mod_id: format!("local-{}", crate::models::ids::ModId(result.id as u64)),
-                title: result.title,
-                description: result.description,
+                mod_id: format!("local-{}", mod_id),
+                title: mod_data.title,
+                description: mod_data.description,
                 categories,
                 versions,
-                downloads: result.downloads,
-                page_url: format!("https://modrinth.com/mod/{}", result.id),
+                downloads: mod_data.downloads,
+                page_url: format!("https://modrinth.com/mod/{}", mod_id),
                 icon_url,
                 author: user.username,
-                author_url: format!("https://modrinth.com/user/{}", user.id),
-                date_created: result.published,
-                created_timestamp: result.published.timestamp(),
-                date_modified: result.updated,
-                modified_timestamp: result.updated.timestamp(),
+                author_url: format!("https://modrinth.com/user/{}", author_id),
+                date_created: mod_data.published,
+                created_timestamp: mod_data.published.timestamp(),
+                date_modified: mod_data.updated,
+                modified_timestamp: mod_data.updated.timestamp(),
                 latest_version: "".to_string(), // TODO: Info about latest version
                 host: Cow::Borrowed("modrinth"),
                 empty: Cow::Borrowed("{}{}{}"),
