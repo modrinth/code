@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <h2>Create Mod</h2>
-    <section class="error" v-if="currentError">
+    <section v-if="currentError" class="error">
       <h3>Error</h3>
       <p>{{ currentError }}</p>
     </section>
@@ -17,13 +17,13 @@
             "
           />
           <input
-            id="file"
+            id="icon-file"
             class="file-input"
             type="file"
             accept="image/x-png,image/gif,image/jpeg"
             @change="showPreviewImage"
           />
-          <label for="file">Upload Icon</label>
+          <label for="icon-file">Upload Icon</label>
         </div>
         <div class="mod-data">
           <label class="required" title="The name of your mod"> Name </label>
@@ -59,7 +59,7 @@
             :limit="6"
             :hide-selected="true"
             placeholder="Choose categories..."
-          ></multiselect>
+          />
         </div>
       </div>
     </section>
@@ -79,7 +79,125 @@
       <div v-html="$md.render(body)"></div>
     </section>
     <section>
-      <h3>Versions</h3>
+      <div v-if="currentVersionIndex > -1" class="create-version-popup"></div>
+      <div v-if="currentVersionIndex > -1" class="create-version-popup-body">
+        <div class="versions-header">
+          <h3>New Version</h3>
+
+          <div class="popup-icons">
+            <TrashIcon @click="deleteVersion" />
+            <SaveIcon @click="currentVersionIndex = -1" />
+          </div>
+        </div>
+        <label class="required" title="The title of your version">
+          Version Title
+        </label>
+        <input
+          v-model="versions[currentVersionIndex].version_title"
+          type="text"
+          placeholder="Combat Update"
+        />
+        <label
+          class="required"
+          title="The version number of this version. Preferably following semantic versioning"
+        >
+          Version Number
+        </label>
+        <input
+          v-model="versions[currentVersionIndex].version_number"
+          type="text"
+          placeholder="v1.9"
+        />
+        <label class="required" title="The release channel of this version.">
+          Release Channel
+        </label>
+        <Multiselect
+          v-model="versions[currentVersionIndex].release_channel"
+          class="categories-input"
+          placeholder="Select one"
+          :options="['release', 'beta', 'alpha']"
+          :searchable="false"
+          :close-on-select="true"
+          :show-labels="false"
+          :allow-empty="false"
+        />
+        <label
+          class="required"
+          title="The version number of this version. Preferably following semantic versioning"
+        >
+          Loaders
+        </label>
+        <multiselect
+          v-model="versions[currentVersionIndex].loaders"
+          class="categories-input"
+          :options="selectableLoaders"
+          :loading="selectableLoaders.length === 0"
+          :multiple="true"
+          :searchable="false"
+          :show-no-results="false"
+          :close-on-select="true"
+          :clear-on-select="false"
+          :show-labels="false"
+          :limit="6"
+          :hide-selected="true"
+          placeholder="Choose loaders..."
+        />
+        <label
+          class="required"
+          title="The versions of minecraft that this mod version supports"
+        >
+          Game Versions
+        </label>
+        <multiselect
+          v-model="versions[currentVersionIndex].game_versions"
+          class="categories-input"
+          :options="selectableVersions"
+          :loading="selectableVersions.length === 0"
+          :multiple="true"
+          :searchable="true"
+          :show-no-results="false"
+          :close-on-select="false"
+          :clear-on-select="false"
+          :show-labels="false"
+          :limit="6"
+          :hide-selected="true"
+          placeholder="Choose versions..."
+        />
+        <label title="A list of changes for this version"> Changelog </label>
+        <textarea
+          v-model="versions[currentVersionIndex].version_body"
+          class="changelog-editor"
+          placeholder="This editor supports markdown."
+        />
+        <label class="required" title="The files associated with the version">
+          Version Files
+        </label>
+        <input
+          id="version-files"
+          type="file"
+          accept="image/x-png,image/gif,image/jpeg"
+          @change="updateVersionFiles"
+        />
+        <label for="version-files">Upload files</label>
+      </div>
+      <div class="versions-header">
+        <h3>Versions</h3>
+        <PlusIcon @click="createVersion" />
+      </div>
+      <div v-for="(value, index) in versions" :key="index" class="version">
+        <p>{{ value.version_number }}</p>
+        <p class="column-grow-4">{{ value.version_title }}</p>
+        <p>Forge</p>
+        <p v-if="value.release_channel === 'beta'" class="badge yellow">Beta</p>
+        <p v-if="value.release_channel === 'release'" class="badge green">
+          Release
+        </p>
+        <p v-if="value.release_channel === 'alpha'" class="badge red">Alpha</p>
+        <div>
+          <TrashIcon @click="versions.splice(index, 1)" />
+          <EditIcon @click="currentVersionIndex = index" />
+        </div>
+      </div>
     </section>
     <section>
       <h3>Extras</h3>
@@ -112,31 +230,52 @@
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
+import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import EditIcon from '~/assets/images/utils/edit.svg?inline'
+import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
+
 export default {
   components: {
     Multiselect,
+    TrashIcon,
+    EditIcon,
+    PlusIcon,
+    SaveIcon,
   },
   async asyncData() {
-    const res = await axios.get(`https://api.modrinth.com/api/v1/tag/category`)
+    let res = await axios.get(`https://api.modrinth.com/api/v1/tag/category`)
+    const categories = res.data
+
+    res = await axios.get(`https://api.modrinth.com/api/v1/tag/loader`)
+    const loaders = res.data
+
+    res = await axios.get(`https://api.modrinth.com/api/v1/tag/game_version`)
+    const versions = res.data
+
     return {
-      selectableCategories: res.data,
+      selectableCategories: categories,
+      selectableLoaders: loaders,
+      selectableVersions: versions,
     }
   },
   data() {
     return {
       previewImage: null,
+      currentError: null,
+      compiledBody: '',
+      releaseChannels: ['beta', 'alpha', 'release'],
+      currentVersionIndex: -1,
+
       name: '',
-      namespace: '',
       description: '',
       body: '',
-      compiledBody: '',
       versions: [],
       categories: [],
       issues_url: null,
       source_url: null,
       wiki_url: null,
       icon: null,
-      currentError: null,
     }
   },
   methods: {
@@ -171,6 +310,15 @@ export default {
       if (this.icon)
         formData.append('icon', new Blob([this.icon]), this.icon.name)
 
+      for (const version of this.versions) {
+        for (let i = 0; i < version.file_parts; i++) {
+          formData.append(
+            version.file_parts[i],
+            new Blob([version.raw_files[i]])
+          )
+        }
+      }
+
       try {
         const result = await axios({
           url: 'https://api.modrinth.com/api/v1/mod',
@@ -189,6 +337,7 @@ export default {
       } catch (err) {
         this.currentError = err.response.data.description
         window.scrollTo({ top: 0, behavior: 'smooth' })
+        this.$nuxt.$loading.stop()
       }
 
       this.$nuxt.$loading.stop()
@@ -202,6 +351,50 @@ export default {
         this.previewImage = event.target.result
       }
     },
+    updateVersionFiles(e) {
+      this.versions[this.currentVersionIndex].raw_files = e.target.files
+
+      const newFileParts = []
+      for (const rawFile of e.target.files) {
+        newFileParts.push(
+          rawFile.name.concat(
+            Math.random()
+              .toString(36)
+              .replace(/[^a-z]+/g, '')
+              .substr(0, 5)
+          )
+        )
+      }
+
+      this.versions[this.currentVersionIndex].file_parts = newFileParts
+    },
+    createVersion() {
+      this.versions.push({
+        mod_id: 'qFcDZRhp',
+        raw_files: [],
+        file_parts: [],
+        version_number: '',
+        version_title: '',
+        version_body: '',
+        dependencies: [],
+        game_versions: [],
+        release_channel: 'release',
+        loaders: [],
+      })
+
+      this.currentVersionIndex = this.versions.length - 1
+    },
+    deleteVersion() {
+      this.versions.splice(this.currentVersionIndex, 1)
+      this.currentVersionIndex = -1
+    },
+  },
+  head() {
+    return {
+      bodyAttrs: {
+        class: this.currentVersionIndex > -1 ? 'no-scroll' : '',
+      },
+    }
   },
 }
 </script>
@@ -233,6 +426,31 @@ input {
   margin-top: 0.5rem;
 }
 
+[type='file'] {
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  height: 1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute !important;
+  white-space: nowrap;
+  width: 1px;
+
+  + label {
+    border-radius: 5px;
+    color: var(--color-grey-5);
+    background-color: var(--color-grey-1);
+    padding: 10px 20px;
+  }
+
+  &:focus + label,
+  + label:hover,
+  &:focus + label {
+    background-color: var(--color-grey-2);
+    color: var(--color-text);
+  }
+}
+
 .initial {
   display: flex;
   .image-data {
@@ -243,30 +461,6 @@ input {
       width: 100%;
       height: 85%;
       margin-bottom: 20px;
-    }
-    [type='file'] {
-      border: 0;
-      clip: rect(0, 0, 0, 0);
-      height: 1px;
-      overflow: hidden;
-      padding: 0;
-      position: absolute !important;
-      white-space: nowrap;
-      width: 1px;
-
-      + label {
-        border-radius: 5px;
-        color: var(--color-grey-5);
-        background-color: var(--color-grey-1);
-        padding: 10px 20px;
-      }
-
-      &:focus + label,
-      + label:hover,
-      &:focus + label {
-        background-color: var(--color-grey-2);
-        color: var(--color-text);
-      }
     }
   }
 
@@ -342,5 +536,99 @@ button {
 .required:after {
   content: ' *';
   color: red;
+}
+
+.create-version-popup {
+  top: 0;
+  left: 0;
+  z-index: 1;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-grey-0);
+  opacity: 0.6;
+  overflow-x: hidden;
+}
+
+.create-version-popup-body {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  box-shadow: 0 2px 3px 1px var(--color-grey-2);
+  padding: 5px 60px 60px 20px;
+  border-radius: 10px;
+  max-height: 80%;
+  overflow-y: auto;
+  background-color: var(--color-bg);
+
+  .popup-icons {
+    margin-top: 10px;
+    margin-right: -20px;
+    margin-left: auto;
+  }
+
+  .changelog-editor {
+    padding: 20px;
+    width: 100%;
+    height: 200px;
+    resize: none;
+    outline: none;
+    border: none;
+    margin: 10px 0 30px;
+    background-color: var(--color-grey-1);
+    color: var(--color-text);
+    font-family: monospace;
+  }
+}
+
+.versions-header {
+  display: flex;
+  align-items: center;
+}
+
+.new-version {
+  display: inline-block;
+  color: var(--color-grey-5);
+  background-color: var(--color-grey-1);
+  border-radius: 5px;
+  padding: 5px;
+  cursor: pointer;
+  margin-left: auto;
+  float: right;
+
+  &:hover {
+    background-color: var(--color-grey-2);
+    color: var(--color-text);
+  }
+}
+
+.version {
+  padding: 5px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  background-color: var(--color-grey-1);
+}
+
+svg {
+  color: var(--color-grey-5);
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    color: inherit;
+  }
+}
+
+.categories-input {
+  margin-bottom: 15px;
+}
+
+.no-scroll {
+  overflow: hidden;
 }
 </style>

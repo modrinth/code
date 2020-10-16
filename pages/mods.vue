@@ -336,19 +336,10 @@ export default {
     async fillInitialVersions() {
       try {
         const res = await axios.get(
-          'https://launchermeta.mojang.com/mc/game/version_manifest.json'
+          'https://api.modrinth.com/api/v1/tag/game_version'
         )
 
-        const versions = res.data.versions
-        const betaVersions = []
-        const legacyVersions = []
-        for (const version of versions) {
-          if (version.type === 'release') this.versions.push(version.id)
-          if (version.type === 'snapshot') betaVersions.push(version.id)
-          if (version.type === 'old_beta' || version.type === 'old_alpha')
-            legacyVersions.push(version.id)
-        }
-        this.versions = this.versions.concat(betaVersions, legacyVersions)
+        this.versions = res.data
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err)
@@ -668,7 +659,6 @@ select {
 
 .sort-types {
   min-width: 200px;
-  padding-y: 1rem;
   border: 2px solid var(--color-grey-3);
   border-radius: var(--size-rounded-sm);
 
