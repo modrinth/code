@@ -15,7 +15,7 @@ use sqlx::postgres::PgPool;
 
 #[derive(Serialize, Deserialize, Clone)]
 pub struct InitialVersionData {
-    pub mod_id: ModId,
+    pub mod_id: Option<ModId>,
     pub file_parts: Vec<String>,
     pub version_number: String,
     pub version_title: String,
@@ -101,7 +101,11 @@ async fn version_create_inner(
             let version_create_data: InitialVersionData = serde_json::from_slice(&data)?;
             initial_version_data = Some(version_create_data);
             let version_create_data = initial_version_data.as_ref().unwrap();
-            let mod_id: models::ModId = version_create_data.mod_id.into();
+            if version_create_data.mod_id.is_none() {
+                return Err(CreateError::MissingValueError("Missing mod id".to_string()));
+            }
+
+            let mod_id: models::ModId = version_create_data.mod_id.unwrap().into();
 
             let results = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
@@ -152,7 +156,8 @@ async fn version_create_inner(
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
             let body_url = format!(
                 "data/{}/changelogs/{}/body.md",
-                version_create_data.mod_id, version_id
+                version_create_data.mod_id.unwrap(),
+                version_id
             );
 
             let uploaded_text = file_host
@@ -171,10 +176,10 @@ async fn version_create_inner(
             let release_channel = models::ChannelId(
                 sqlx::query!(
                     "
-                SELECT id
-                FROM release_channels
-                WHERE channel = $1
-                ",
+                    SELECT id
+                    FROM release_channels
+                    WHERE channel = $1
+                    ",
                     version_create_data.release_channel.to_string()
                 )
                 .fetch_one(&mut *transaction)
@@ -200,7 +205,7 @@ async fn version_create_inner(
 
             version_builder = Some(VersionBuilder {
                 version_id: version_id.into(),
-                mod_id: version_create_data.mod_id.into(),
+                mod_id: version_create_data.mod_id.unwrap().into(),
                 author_id: user.id.into(),
                 name: version_create_data.version_title.clone(),
                 version_number: version_create_data.version_number.clone(),

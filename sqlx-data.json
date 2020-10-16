@@ -519,26 +519,6 @@
       "nullable": []
     }
   },
-  "40597b84607e77809c13ffa9c6b0b1674bd6378a4737a8f6118e91ae2ede7e4a": {
-    "query": "\n                SELECT id\n                FROM release_channels\n                WHERE channel = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "4411f2aefd43881450da34db81e826110ac86c3a6cef9fd6a3e9e341508d1f09": {
     "query": "\n                SELECT id FROM versions\n                WHERE mod_id = $1\n                ",
     "describe": {
@@ -1495,6 +1475,26 @@
       },
       "nullable": [
         null
+      ]
+    }
+  },
+  "d88b160963bffbf3297de4418a38f4c914819fff94b912fab451b892c7494370": {
+    "query": "\n                        SELECT id\n                        FROM release_channels\n                        WHERE channel = $1\n                        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
       ]
     }
   },

@@ -181,7 +181,7 @@ async fn mod_create_inner(
 ) -> Result<HttpResponse, CreateError> {
     let cdn_url = dotenv::var("CDN_URL")?;
 
-    let mod_id = models::generate_mod_id(transaction).await?.into();
+    let mod_id: ModId = models::generate_mod_id(transaction).await?.into();
     let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
     let mut created_versions: Vec<models::version_item::VersionBuilder> = vec![];
@@ -208,6 +208,80 @@ async fn mod_create_inner(
             check_length("mod_name", 3, 255, &*create_data.mod_name)?;
             check_length("mod_description", 3, 2048, &*create_data.mod_description)?;
 
+            for version_data in &create_data.initial_versions {
+                if version_data.mod_id.is_some() {
+                    return Err(CreateError::InvalidInput(String::from(
+                        "Found mod id in initial version for new mod",
+                    )));
+                }
+                let version_id: VersionId = models::generate_version_id(transaction).await?.into();
+
+                let body_url = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
+
+                let uploaded_text = file_host
+                    .upload_file(
+                        "text/plain",
+                        &body_url,
+                        version_data.version_body.clone().into_bytes(),
+                    )
+                    .await?;
+
+                uploaded_files.push(UploadedFile {
+                    file_id: uploaded_text.file_id.clone(),
+                    file_name: uploaded_text.file_name.clone(),
+                });
+
+                let release_channel = models::ChannelId(
+                    sqlx::query!(
+                        "
+                        SELECT id
+                        FROM release_channels
+                        WHERE channel = $1
+                        ",
+                        version_data.release_channel.to_string()
+                    )
+                    .fetch_one(&mut *transaction)
+                    .await?
+                    .id,
+                );
+
+                let mut game_versions = Vec::with_capacity(version_data.game_versions.len());
+                for v in &version_data.game_versions {
+                    let id = models::categories::GameVersion::get_id(&v.0, &mut *transaction)
+                        .await?
+                        .ok_or_else(|| CreateError::InvalidGameVersion(v.0.clone()))?;
+                    game_versions.push(id);
+                }
+
+                let mut loaders = Vec::with_capacity(version_data.loaders.len());
+                for l in &version_data.loaders {
+                    let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
+                        .await?
+                        .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
+                    loaders.push(id);
+                }
+
+                let version = models::version_item::VersionBuilder {
+                    version_id: version_id.into(),
+                    mod_id: mod_id.into(),
+                    author_id: user.id.into(),
+                    name: version_data.version_title.clone(),
+                    version_number: version_data.version_number.clone(),
+                    changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
+                    files: Vec::with_capacity(1),
+                    dependencies: version_data
+                        .dependencies
+                        .iter()
+                        .map(|x| (*x).into())
+                        .collect::<Vec<_>>(),
+                    game_versions,
+                    loaders,
+                    release_channel,
+                };
+
+                created_versions.push(version);
+            }
+
             mod_create_data = Some(create_data);
             continue;
         }
@@ -233,10 +307,11 @@ async fn mod_create_inner(
             continue;
         }
 
-        let version_data = create_data
+        let (version_index, version_data) = create_data
             .initial_versions
             .iter()
-            .find(|x| x.file_parts.iter().any(|n| n == name))
+            .enumerate()
+            .find(|(_, x)| x.file_parts.iter().any(|n| n == name))
             .ok_or_else(|| {
                 CreateError::InvalidInput(format!(
                     "File `{}` (field {}) isn't specified in the versions data",
@@ -244,83 +319,15 @@ async fn mod_create_inner(
                 ))
             })?;
 
-        // If a version has already been created for this version, add the
-        // file to it instead of creating a new version.
-        // Versions must have at least one jar file to be uploaded
-
-        let created_version = if let Some(created_version) = created_versions
-            .iter_mut()
-            .find(|x| x.version_number == version_data.version_number)
+        let created_version = if let Some(created_version) = created_versions.get_mut(version_index)
         {
             created_version
         } else {
-            let version_id: VersionId = models::generate_version_id(transaction).await?.into();
-
-            let body_url = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
-
-            let uploaded_text = file_host
-                .upload_file(
-                    "text/plain",
-                    &body_url,
-                    version_data.version_body.clone().into_bytes(),
-                )
-                .await?;
-
-            uploaded_files.push(UploadedFile {
-                file_id: uploaded_text.file_id.clone(),
-                file_name: uploaded_text.file_name.clone(),
-            });
-
-            let release_channel = models::ChannelId(
-                sqlx::query!(
-                    "
-                    SELECT id
-                    FROM release_channels
-                    WHERE channel = $1
-                    ",
-                    version_data.release_channel.to_string()
-                )
-                .fetch_one(&mut *transaction)
-                .await?
-                .id,
-            );
-
-            let mut game_versions = Vec::with_capacity(version_data.game_versions.len());
-            for v in &version_data.game_versions {
-                let id = models::categories::GameVersion::get_id(&v.0, &mut *transaction)
-                    .await?
-                    .ok_or_else(|| CreateError::InvalidGameVersion(v.0.clone()))?;
-                game_versions.push(id);
-            }
-
-            let mut loaders = Vec::with_capacity(version_data.loaders.len());
-            for l in &version_data.loaders {
-                let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
-                    .await?
-                    .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
-                loaders.push(id);
-            }
-
-            let version = models::version_item::VersionBuilder {
-                version_id: version_id.into(),
-                mod_id: mod_id.into(),
-                author_id: user.id.into(),
-                name: version_data.version_title.clone(),
-                version_number: version_data.version_number.clone(),
-                changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
-                files: Vec::with_capacity(1),
-                dependencies: version_data
-                    .dependencies
-                    .iter()
-                    .map(|x| (*x).into())
-                    .collect::<Vec<_>>(),
-                game_versions,
-                loaders,
-                release_channel,
-            };
-
-            created_versions.push(version);
-            created_versions.last_mut().unwrap()
+            // This shouldn't be reachable, but better safe than sorry
+            return Err(CreateError::InvalidInput(format!(
+                "File `{}` (field {}) isn't specified in the versions data",
+                file_name, name
+            )));
         };
 
         // Upload the new jar file
@@ -342,10 +349,22 @@ async fn mod_create_inner(
     let create_data = if let Some(create_data) = mod_create_data {
         create_data
     } else {
-        return Err(CreateError::InvalidInput(String::from(
+        return Err(CreateError::MissingValueError(String::from(
             "Multipart upload missing `data` field",
         )));
     };
+
+    for (version_data, builder) in create_data
+        .initial_versions
+        .iter()
+        .zip(created_versions.iter())
+    {
+        if version_data.file_parts.len() != builder.files.len() {
+            return Err(CreateError::InvalidInput(String::from(
+                "Some files were specified in initial_versions but not uploaded",
+            )));
+        }
+    }
 
     let ids: Vec<UserId> = (&create_data.team_members)
         .iter()
@@ -561,10 +580,11 @@ fn check_length(
     max_length: usize,
     string: &str,
 ) -> Result<(), CreateError> {
-    if string.len() > max_length || string.len() < min_length {
+    let length = string.len();
+    if length > max_length || length < min_length {
         Err(CreateError::InvalidInput(format!(
             "The {} must be between {} and {} characters; got {}.",
-            var_name, string, min_length, max_length
+            var_name, min_length, max_length, length
         )))
     } else {
         Ok(())
