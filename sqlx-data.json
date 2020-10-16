@@ -59,6 +59,33 @@
       "nullable": []
     }
   },
+  "0da158263c6588a83421154342db2ede16b9abf9931827790b9fcaf71080c324": {
+    "query": "\n                SELECT u.id, u.username FROM users u\n                INNER JOIN team_members tm ON tm.user_id = u.id\n                WHERE tm.team_id = $2 AND tm.role = $1\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "username",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
   "1016a0bf55e9474357ac5ef725605ac337e82e1a2b93726ae795ec48f0d696dd": {
     "query": "\n            SELECT v.mod_id, v.author_id, v.name, v.version_number,\n                v.changelog_url, v.date_published, v.downloads,\n                release_channels.channel\n            FROM versions v\n            INNER JOIN release_channels ON v.release_channel = release_channels.id\n            WHERE v.id = $1\n            ",
     "describe": {
