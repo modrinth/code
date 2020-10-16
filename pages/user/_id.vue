@@ -10,6 +10,7 @@
         :description="result.description"
         :latest-version="result.versions[0]"
         :created-at="result.published"
+        :updated-at="result.updated"
         :downloads="result.downloads.toString()"
         :icon-url="result.icon_url"
         :author-url="result.author_url"

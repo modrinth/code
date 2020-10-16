@@ -26,25 +26,38 @@
           <label for="icon-file">Upload Icon</label>
         </div>
         <div class="mod-data">
-          <label class="required" title="The name of your mod"> Name </label>
-          <input v-model="name" type="text" placeholder="Example Mod" />
+          <label for="name" class="required" title="The name of your mod">
+            Name
+          </label>
+          <input
+            id="name"
+            v-model="name"
+            required
+            type="text"
+            placeholder="Example Mod"
+          />
           <label
+            for="description"
             class="required"
             title="The short-form description of your mod. This shows up in searches"
           >
             Short Description
           </label>
           <input
+            id="description"
             v-model="description"
+            required
             type="text"
             placeholder="An example mod which does example stuff!"
           />
           <label
+            for="categories"
             title="The categories of your mod, these help your mod appear in search results. Maximum of three!"
           >
             Categories
           </label>
           <multiselect
+            id="categories"
             v-model="categories"
             class="categories-input"
             :options="selectableCategories"
@@ -64,7 +77,14 @@
       </div>
     </section>
     <section class="editor">
-      <h3>Mod Body</h3>
+      <h3>
+        <label
+          for="body"
+          title="You can type the of the long form of your description here."
+        >
+          Mod Body
+        </label>
+      </h3>
       <p>
         You can type the of the long form of your description here. This editor
         supports markdown. You can find the syntax
@@ -75,8 +95,8 @@
           >here</a
         >.
       </p>
-      <textarea v-model="body"></textarea>
-      <div v-html="$md.render(body)"></div>
+      <textarea id="body" v-model="body" @input="setMarkdownBody"></textarea>
+      <div v-html="compiledBody"></div>
     </section>
     <section>
       <div v-if="currentVersionIndex > -1" class="create-version-popup"></div>
@@ -85,26 +105,35 @@
           <h3>New Version</h3>
 
           <div class="popup-icons">
-            <TrashIcon @click="deleteVersion" />
-            <SaveIcon @click="currentVersionIndex = -1" />
+            <TrashIcon title="Discard Version" @click="deleteVersion" />
+            <SaveIcon title="Save Version" @click="currentVersionIndex = -1" />
           </div>
         </div>
-        <label class="required" title="The title of your version">
+        <label
+          for="version-title"
+          class="required"
+          title="The title of your version"
+        >
           Version Title
         </label>
         <input
+          id="version-title"
           v-model="versions[currentVersionIndex].version_title"
+          required
           type="text"
           placeholder="Combat Update"
         />
         <label
+          for="version-number"
           class="required"
           title="The version number of this version. Preferably following semantic versioning"
         >
           Version Number
         </label>
         <input
+          id="version-number"
           v-model="versions[currentVersionIndex].version_number"
+          required
           type="text"
           placeholder="v1.9"
         />
@@ -163,8 +192,11 @@
           :hide-selected="true"
           placeholder="Choose versions..."
         />
-        <label title="A list of changes for this version"> Changelog </label>
+        <label for="version-body" title="A list of changes for this version">
+          Changelog
+        </label>
         <textarea
+          id="version-body"
           v-model="versions[currentVersionIndex].version_body"
           class="changelog-editor"
           placeholder="This editor supports markdown."
@@ -175,7 +207,8 @@
         <input
           id="version-files"
           type="file"
-          accept="image/x-png,image/gif,image/jpeg"
+          accept="application/java-archive,application/zip"
+          multiple
           @change="updateVersionFiles"
         />
         <label for="version-files">Upload files</label>
@@ -229,6 +262,9 @@
 <script>
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
+
+import DOMPurify from 'dompurify'
+import marked from 'marked'
 
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
@@ -367,10 +403,11 @@ export default {
       }
 
       this.versions[this.currentVersionIndex].file_parts = newFileParts
+
+      console.log(this.versions)
     },
     createVersion() {
       this.versions.push({
-        mod_id: 'qFcDZRhp',
         raw_files: [],
         file_parts: [],
         version_number: '',
@@ -383,10 +420,14 @@ export default {
       })
 
       this.currentVersionIndex = this.versions.length - 1
+      console.log(this.versions)
     },
     deleteVersion() {
       this.versions.splice(this.currentVersionIndex, 1)
       this.currentVersionIndex = -1
+    },
+    setMarkdownBody() {
+      this.compiledBody = DOMPurify.sanitize(marked(this.body))
     },
   },
   head() {
@@ -457,6 +498,7 @@ input {
     flex: 1;
 
     img {
+      image-rendering: crisp-edges;
       object-fit: cover;
       width: 100%;
       height: 85%;

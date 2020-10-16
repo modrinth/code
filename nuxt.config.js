@@ -125,7 +125,6 @@ export default {
     '@nuxtjs/dayjs',
     '@nuxtjs/axios',
     '@nuxtjs/auth',
-    '@nuxtjs/markdownit',
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
   ],
@@ -170,9 +169,6 @@ export default {
     locales: ['en'],
     defaultLocale: 'en',
     plugins: ['relativeTime'],
-  },
-  markdownit: {
-    injected: true,
   },
   /*
    ** Build configuration
