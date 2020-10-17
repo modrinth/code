@@ -1,7 +1,9 @@
 <template>
   <div class="layout">
     <aside>
+      <label class="hidden" for="toggle-nav-menu">Toggle Nav Menu</label>
       <input
+        id="toggle-nav-menu"
         class="hamburger-button"
         alt="Open navigation menu"
         type="checkbox"
@@ -10,7 +12,7 @@
       <!-- TODO: Probably shouldn't be a Unicode symbol -->
       <div class="hamburger-icon">☰</div>
       <nuxt-link to="/" class="logo-wrapper">
-        <img class="logo" src="~/assets/images/logo.svg" />
+        <img class="logo" src="~/assets/images/logo.svg" alt="modrinth-logo" />
         <span class="name">modrinth</span>
       </nuxt-link>
       <nav>
@@ -134,41 +136,31 @@
               this.$route.path
             "
             class="log-in-button"
-            >Log In</a
           >
+            Log In
+          </a>
           <div v-if="this.$auth.loggedIn" class="avatar">
-            <img
-              :src="this.$auth.user.avatar_url"
-              alt="avatar"
-              @click="showPopup = !showPopup"
-            />
+            <img :src="this.$auth.user.avatar_url" alt="avatar" />
+            <span> {{ this.$auth.user.username }} </span>
+          </div>
+          <div v-if="this.$auth.loggedIn" class="notifications">
             <div v-if="showPopup" class="user-actions-popup">
               <div class="popup-inner">
                 <p>
                   Modrinth ID: <strong>{{ this.$auth.user.id }}</strong>
                 </p>
                 <hr />
-                <p>My profile</p>
-                <p>My teams</p>
+                <p class="hover">
+                  <nuxt-link :to="'/user/' + this.$auth.user.id">
+                    My profile
+                  </nuxt-link>
+                </p>
+                <p class="hover">My teams</p>
                 <hr />
-                <p>Settings</p>
-                <p @click="logout">Logout</p>
+                <p class="hover" @click="logout">Logout</p>
               </div>
             </div>
-            <span> {{ this.$auth.user.username }} </span>
-          </div>
-          <div v-if="this.$auth.loggedIn" class="notifications">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-            </svg>
+            <SettingsIcon @click="showPopup = !showPopup" />
           </div>
           <div class="theme">
             <svg
@@ -214,29 +206,18 @@
       </nav>
     </aside>
     <main>
-      <!-- <header>
-        <div class="search-wrapper">
-          <input type="search" name="search" id="search" placeholder="Search...">
-          <!/-- Icon follows and not precedes the input so we can target it with CSS' ~ selector --/>
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round">
-            <circle cx="11" cy="11" r="8"/>
-            <line x1="21" y1="21" x2="16.65" y2="16.65"/>
-          </svg>
-        </div>
-      </header> -->
       <nuxt />
     </main>
   </div>
 </template>
 
 <script>
+import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
+
 export default {
+  components: {
+    SettingsIcon,
+  },
   async fetch() {
     if (this.$route.query.code)
       await this.$auth.setUserToken(this.$route.query.code)
@@ -420,7 +401,6 @@ export default {
 
         .avatar {
           img {
-            cursor: pointer;
             border-radius: 50%;
             height: 2rem;
             margin-right: 0.5rem;
@@ -441,11 +421,17 @@ export default {
           margin-left: 2.5rem;
         }
 
+        .notifications {
+          svg {
+            cursor: pointer;
+          }
+        }
+
         .user-actions-popup {
           position: relative;
 
           .popup-inner {
-            width: 140px;
+            width: 120px;
             border: 2px var(--color-grey-2) solid;
             background-color: var(--color-bg);
             color: var(--color-grey-5);
@@ -462,12 +448,15 @@ export default {
               height: 1px;
             }
             p {
-              cursor: pointer;
               padding: 8px;
               margin: 0;
+            }
+
+            .hover {
+              cursor: pointer;
+
               &:hover,
               &:focus {
-                color: var(--color-text-inverted);
                 background-color: var(--color-brand);
               }
             }
@@ -476,7 +465,7 @@ export default {
             content: '';
             position: absolute;
             top: 100%;
-            right: 80%;
+            left: 45%;
             border-width: 7px;
             border-style: solid;
             border-color: var(--color-grey-2) transparent transparent

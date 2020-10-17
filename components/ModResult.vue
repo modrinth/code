@@ -1,11 +1,19 @@
 <template>
   <div class="result rows">
-    <img class="result-icon" :src="iconUrl" />
+    <img
+      class="result-icon"
+      :src="
+        iconUrl
+          ? iconUrl
+          : 'https://cdn.modrinth.com/file/modrinth/placeholder.png'
+      "
+      :alt="name"
+    />
     <div class="rows result-name-author">
       <h2 class="mod-name">
         <a :href="pageUrl">{{ name }}</a>
       </h2>
-      <p class="author" v-if="author">
+      <p v-if="author" class="author">
         by <a :href="authorUrl">{{ author }}</a>
       </p>
     </div>
@@ -47,7 +55,7 @@
         </svg>
         <p>{{ $dayjs(createdAt).fromNow() }}</p>
       </div>
-      <div class="result-image columns" v-if="updatedAt">
+      <div v-if="updatedAt" class="result-image columns">
         <svg
           viewBox="0 0 24 24"
           fill="none"

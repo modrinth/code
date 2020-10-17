@@ -4,6 +4,7 @@
       <h2>Mods</h2>
       <section class="search-bar">
         <div class="iconified-input column-grow-2">
+          <label class="hidden" for="search">Search Mods</label>
           <input
             id="search"
             v-model="query"
@@ -95,7 +96,6 @@
       </section>
     </div>
     <section id="filters" class="filters">
-      <!--#region filters  -->
       <div class="filters-wrapper">
         <section class="filter-group">
           <button class="filter-button-done" @click="toggleFiltersMenu">
@@ -247,7 +247,6 @@
           @input="onSearchChange(1)"
         ></multiselect>
       </div>
-      <!--#endregion -->
     </section>
   </div>
 </template>
@@ -682,6 +681,11 @@ select {
 
 .multiselect__content-wrapper {
   overflow-x: hidden;
+}
+
+.multiselect__tags {
+  border: 2px solid var(--color-grey-3);
+  border-radius: var(--size-rounded-sm);
 }
 
 .multiselect__tags,

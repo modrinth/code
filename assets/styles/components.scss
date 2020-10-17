@@ -34,6 +34,11 @@
   letter-spacing: 0.02rem;
   padding: 0.25rem 0.5rem;
 
+  &.gray {
+    background-color: #c8c1c1;
+    color: #646161;
+  }
+
   &.red {
     background-color: #fed7d7;
     color: #9b2c2c;

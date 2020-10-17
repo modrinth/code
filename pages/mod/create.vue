@@ -13,8 +13,9 @@
             :src="
               previewImage
                 ? previewImage
-                : 'https://i0.kym-cdn.com/entries/icons/facebook/000/013/564/aP2dv.gif'
+                : 'https://cdn.modrinth.com/file/modrinth/placeholder.png'
             "
+            alt="preview-image"
           />
           <input
             id="icon-file"
@@ -89,7 +90,7 @@
         You can type the of the long form of your description here. This editor
         supports markdown. You can find the syntax
         <a
-          href="https://github.com/dimerapp/markdown/blob/develop/syntax.md"
+          href="https://guides.github.com/features/mastering-markdown/"
           target="_blank"
           rel="noopener noreferrer"
           >here</a
@@ -99,14 +100,22 @@
       <div v-html="compiledBody"></div>
     </section>
     <section>
-      <div v-if="currentVersionIndex > -1" class="create-version-popup"></div>
+      <button
+        v-if="currentVersionIndex > -1"
+        class="create-version-popup"
+        @click="currentVersionIndex = -1"
+      />
       <div v-if="currentVersionIndex > -1" class="create-version-popup-body">
         <div class="versions-header">
           <h3>New Version</h3>
 
           <div class="popup-icons">
-            <TrashIcon title="Discard Version" @click="deleteVersion" />
-            <SaveIcon title="Save Version" @click="currentVersionIndex = -1" />
+            <button title="Discard Version" @click="deleteVersion">
+              <TrashIcon />
+            </button>
+            <button title="Exit Version" @click="currentVersionIndex = -1">
+              <ExitIcon />
+            </button>
           </div>
         </div>
         <label
@@ -151,7 +160,6 @@
           :allow-empty="false"
         />
         <label
-          class="required"
           title="The version number of this version. Preferably following semantic versioning"
         >
           Loaders
@@ -171,10 +179,7 @@
           :hide-selected="true"
           placeholder="Choose loaders..."
         />
-        <label
-          class="required"
-          title="The versions of minecraft that this mod version supports"
-        >
+        <label title="The versions of minecraft that this mod version supports">
           Game Versions
         </label>
         <multiselect
@@ -199,7 +204,6 @@
           id="version-body"
           v-model="versions[currentVersionIndex].version_body"
           class="changelog-editor"
-          placeholder="This editor supports markdown."
         />
         <label class="required" title="The files associated with the version">
           Version Files
@@ -211,24 +215,35 @@
           multiple
           @change="updateVersionFiles"
         />
-        <label for="version-files">Upload files</label>
+        <label for="version-files">{{
+          getFilesSelectedText(
+            versions[currentVersionIndex].file_parts.length,
+            'Upload Files'
+          )
+        }}</label>
       </div>
       <div class="versions-header">
         <h3>Versions</h3>
-        <PlusIcon @click="createVersion" />
+        <button title="New Version" class="new-version" @click="createVersion">
+          <PlusIcon />
+        </button>
       </div>
       <div v-for="(value, index) in versions" :key="index" class="version">
         <p>{{ value.version_number }}</p>
         <p class="column-grow-4">{{ value.version_title }}</p>
-        <p>Forge</p>
+        <p>{{ value.loaders.join(', ') }}</p>
         <p v-if="value.release_channel === 'beta'" class="badge yellow">Beta</p>
         <p v-if="value.release_channel === 'release'" class="badge green">
           Release
         </p>
         <p v-if="value.release_channel === 'alpha'" class="badge red">Alpha</p>
         <div>
-          <TrashIcon @click="versions.splice(index, 1)" />
-          <EditIcon @click="currentVersionIndex = index" />
+          <button title="Delete Version" @click="versions.splice(index, 1)">
+            <TrashIcon />
+          </button>
+          <button title="Edit Version" @click="currentVersionIndex = index">
+            <EditIcon />
+          </button>
         </div>
       </div>
     </section>
@@ -253,7 +268,12 @@
         </label>
       </div>
     </section>
-    <button :disabled="!this.$nuxt.$loading" @click="createMod">
+    <button
+      title="Create Mod"
+      class="create-mod"
+      :disabled="!this.$nuxt.$loading"
+      @click="createMod"
+    >
       Create mod
     </button>
   </div>
@@ -266,10 +286,10 @@ import Multiselect from 'vue-multiselect'
 import DOMPurify from 'dompurify'
 import marked from 'marked'
 
+import ExitIcon from '~/assets/images/utils/exit.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
-import SaveIcon from '~/assets/images/utils/save.svg?inline'
 
 export default {
   components: {
@@ -277,7 +297,7 @@ export default {
     TrashIcon,
     EditIcon,
     PlusIcon,
-    SaveIcon,
+    ExitIcon,
   },
   async asyncData() {
     let res = await axios.get(`https://api.modrinth.com/api/v1/tag/category`)
@@ -347,16 +367,17 @@ export default {
         formData.append('icon', new Blob([this.icon]), this.icon.name)
 
       for (const version of this.versions) {
-        for (let i = 0; i < version.file_parts; i++) {
+        for (let i = 0; i < version.raw_files.length; i++) {
           formData.append(
             version.file_parts[i],
-            new Blob([version.raw_files[i]])
+            new Blob([version.raw_files[i]]),
+            version.raw_files[i].name
           )
         }
       }
 
       try {
-        const result = await axios({
+        await axios({
           url: 'https://api.modrinth.com/api/v1/mod',
           method: 'POST',
           data: formData,
@@ -367,14 +388,12 @@ export default {
         })
 
         await this.$router.replace('/dashboard/projects')
-
       } catch (err) {
         this.currentError = err.response.data.description
         window.scrollTo({ top: 0, behavior: 'smooth' })
-        this.$nuxt.$loading.stop()
       }
 
-      this.$nuxt.$loading.stop()
+      this.$nuxt.$loading.finish()
     },
     showPreviewImage(e) {
       const reader = new FileReader()
@@ -389,15 +408,8 @@ export default {
       this.versions[this.currentVersionIndex].raw_files = e.target.files
 
       const newFileParts = []
-      for (const rawFile of e.target.files) {
-        newFileParts.push(
-          rawFile.name.concat(
-            Math.random()
-              .toString(36)
-              .replace(/[^a-z]+/g, '')
-              .substr(0, 5)
-          )
-        )
+      for (let i = 0; i < e.target.files.length; i++) {
+        newFileParts.push(e.target.files[i].name.concat('-' + i))
       }
 
       this.versions[this.currentVersionIndex].file_parts = newFileParts
@@ -423,6 +435,15 @@ export default {
     },
     setMarkdownBody() {
       this.compiledBody = DOMPurify.sanitize(marked(this.body))
+    },
+    getFilesSelectedText(length, defaultText) {
+      if (length === 0) {
+        return defaultText
+      } else if (length === 1) {
+        return '1 file selected'
+      } else if (length > 1) {
+        return length + ' files selected'
+      }
     },
   },
   head() {
@@ -453,7 +474,7 @@ section {
 }
 
 input {
-  width: 100%;
+  width: calc(100% - 15px);
   padding: 0.5rem 5px;
   margin-bottom: 20px;
 }
@@ -473,6 +494,7 @@ input {
   width: 1px;
 
   + label {
+    cursor: pointer;
     border-radius: 5px;
     color: var(--color-grey-5);
     background-color: var(--color-grey-1);
@@ -549,21 +571,16 @@ input {
   }
 }
 
-button {
+.create-mod {
   float: right;
   margin: -10px 25px 20px 0;
   cursor: pointer;
   padding: 10px;
   outline: none;
-  color: var(--color-grey-5);
-  background-color: var(--color-grey-1);
+  color: #fff;
+  background-color: var(--color-brand);
   border: none;
   border-radius: 5px;
-
-  &:hover {
-    background-color: var(--color-grey-2);
-    color: var(--color-text);
-  }
 }
 
 .extras {
@@ -582,9 +599,11 @@ button {
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: var(--color-grey-0);
+  background-color: var(--color-grey-3);
+  border: none;
   opacity: 0.6;
   overflow-x: hidden;
+  cursor: pointer;
 }
 
 .create-version-popup-body {
@@ -617,6 +636,10 @@ button {
     background-color: var(--color-grey-1);
     color: var(--color-text);
     font-family: monospace;
+  }
+
+  button {
+    background-color: var(--color-bg);
   }
 }
 
@@ -651,9 +674,11 @@ button {
   background-color: var(--color-grey-1);
 }
 
-svg {
+button {
+  background-color: var(--color-grey-1);
   color: var(--color-grey-5);
   cursor: pointer;
+  border: none;
 
   &:hover,
   &:focus {
@@ -666,6 +691,6 @@ svg {
 }
 
 .no-scroll {
-  overflow: hidden;
+  overflow: hidden !important;
 }
 </style>

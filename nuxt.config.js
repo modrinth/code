@@ -9,6 +9,9 @@ export default {
    ** See https://nuxtjs.org/api/configuration-head
    */
   head: {
+    htmlAttrs: {
+      lang: 'en',
+    },
     title: 'Modrinth',
     meta: [
       { charset: 'utf-8' },
@@ -131,7 +134,7 @@ export default {
   ackee: {
     server: 'https://analytics.modrinth.com',
     domainId: '1840cc3a-64b1-431e-97a4-c122bb64d4c0',
-    ignoreLocalhost: false,
+    ignoreLocalhost: true,
     detailed: true,
   },
   robots: {

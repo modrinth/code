@@ -26,7 +26,26 @@
           </td>
           <td>{{ mod.title }}</td>
           <td>Owner</td>
-          <td><span class="badge green">Active</span></td>
+          <td>
+            <span v-if="mod.status === 'approved'" class="badge green">
+              Approved
+            </span>
+            <span v-if="mod.status === 'rejected'" class="badge red">
+              Rejected
+            </span>
+            <span v-if="mod.status === 'draft'" class="badge yellow">
+              Draft
+            </span>
+            <span v-if="mod.status === 'processing'" class="badge yellow">
+              Processing
+            </span>
+            <span v-if="mod.status === 'unlisted'" class="badge gray">
+              Unlisted
+            </span>
+            <span v-if="mod.status === 'unknown'" class="badge gray">
+              Unknown
+            </span>
+          </td>
           <td>{{ mod.downloads }}</td>
           <td>{{ $dayjs(mod.published).format('YYYY-MM-DD') }}</td>
         </tr>

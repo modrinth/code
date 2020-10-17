@@ -1,7 +1,18 @@
 <template>
-  <div>
-    <img :src="user.avatar_url" />
-    <div>
+  <div class="content">
+    <div class="user-profile">
+      <img :src="user.avatar_url" :alt="user.username" />
+      <div class="info">
+        <h1>{{ user.username }}</h1>
+        <p>{{ user.bio }}</p>
+        <p>Joined {{ $dayjs(user.created).fromNow() }}</p>
+        <p></p>
+        <p v-if="user.role === 'admin'" class="badge red">Admin</p>
+        <p v-if="user.role === 'moderator'" class="badge yellow">Moderator</p>
+        <p v-if="user.role === 'developer'" class="badge green">Developer</p>
+      </div>
+    </div>
+    <div class="user-mods">
       <SearchResult
         v-for="(result, index) in mods"
         :id="result.mod_id"
@@ -56,4 +67,40 @@ export default {
 }
 </script>
 
-<style lang="scss"></style>
+<style lang="scss" scoped>
+.user-profile {
+  @media screen and (min-width: 900px) {
+    display: inline-flex;
+    text-align: left;
+  }
+  text-align: center;
+  margin-bottom: 20px;
+  margin-left: 15px;
+
+  img {
+    width: 250px;
+    height: 250px;
+  }
+
+  .info {
+    margin-left: 15px;
+
+    p {
+      margin-right: auto;
+    }
+
+    .badge {
+      display: inline-block;
+    }
+  }
+}
+
+.user-mods {
+  border-top: 1px solid var(--color-grey-1);
+  padding-top: 10px;
+  margin: 10px;
+  * {
+    margin-left: 0;
+  }
+}
+</style>
