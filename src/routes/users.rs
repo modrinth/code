@@ -66,7 +66,7 @@ pub async fn user_get(
     info: web::Path<(UserId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.0;
+    let id = info.into_inner().0;
     let user_data = User::get(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
@@ -94,7 +94,7 @@ pub async fn mods_list(
     info: web::Path<(UserId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.0.into();
+    let id = info.into_inner().0.into();
 
     let user_exists = sqlx::query!(
         "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",

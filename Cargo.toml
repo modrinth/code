@@ -12,34 +12,31 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = "2.0"
+actix-web = "3.1.0"
 actix-rt = "1.1.1"
-actix-files = "0.2.2"
-actix-multipart = "0.2.0"
-actix-cors = "0.2.0"
+actix-files = "0.4.0"
+actix-multipart = "0.3.0"
+actix-cors = "0.4.1"
 
 meilisearch-sdk = "0.3.0"
-
-reqwest = {version="0.10.6", features=["json"]}
+reqwest = { version = "0.10.8", features = ["json"] }
 
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 chrono = { version = "0.4", features = ["serde"] }
-rand = "0.7"
+rand = "0.7.3"
+base64 = "0.13.0"
+sha1 = { version = "0.6.0", features = ["std"] }
 
-gumdrop = "0.8"
+gumdrop = "0.8.0"
 dotenv = "0.15"
 log = "0.4.8"
-env_logger = "0.7.1"
+env_logger = "0.8.1"
+thiserror = "1.0.21"
 
-thiserror = "1.0.20"
-async-trait = "0.1.36"
-
-futures = "0.3.5"
+futures = "0.3.6"
 futures-timer = "3.0.2"
-
-base64 = "0.12.3"
-sha1 = {version="0.6.0", features=["std"]}
+async-trait = "0.1.41"
 
 [dependencies.sqlx]
 git = "https://github.com/launchbadge/sqlx/"

@@ -78,7 +78,7 @@ pub async fn mod_get(
     info: web::Path<(models::ids::ModId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.0;
+    let id = info.into_inner().0;
     let mod_data = database::models::Mod::get_full(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
@@ -138,7 +138,7 @@ pub async fn mod_delete(
     .await
     .map_err(|_| ApiError::AuthenticationError)?;
 
-    let id = info.0;
+    let id = info.into_inner().0;
     let result = database::models::Mod::remove_full(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;

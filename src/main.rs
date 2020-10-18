@@ -32,7 +32,7 @@ struct Config {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    env_logger::from_env(Env::default().default_filter_or("info")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let config = Config::parse_args_default_or_exit();
 

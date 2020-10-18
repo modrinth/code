@@ -351,7 +351,7 @@ pub async fn upload_file_to_version(
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
 
-    let version_id = models::VersionId::from(url_data.0);
+    let version_id = models::VersionId::from(url_data.into_inner().0);
 
     let result = upload_file_to_version_inner(
         req,

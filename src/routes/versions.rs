@@ -16,7 +16,7 @@ pub async fn version_list(
     info: web::Path<(models::ids::ModId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.0.into();
+    let id = info.into_inner().0.into();
 
     let mod_exists = sqlx::query!(
         "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)",
@@ -92,7 +92,7 @@ pub async fn version_get(
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.0;
+    let id = info.into_inner().0;
     let version_data = database::models::Version::get_full(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
