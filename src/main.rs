@@ -1,3 +1,4 @@
+use crate::file_hosting::S3Host;
 use actix_cors::Cors;
 use actix_web::middleware::Logger;
 use actix_web::{http, web, App, HttpServer};
@@ -64,12 +65,10 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Database connection failed");
 
-    let backblaze_enabled = dotenv::var("BACKBLAZE_ENABLED")
-        .ok()
-        .and_then(|s| s.parse::<bool>().ok())
-        .unwrap_or(false);
+    let storage_backend = dotenv::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
 
-    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> = if backblaze_enabled {
+    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> = if storage_backend == "backblaze"
+    {
         Arc::new(
             file_hosting::BackblazeHost::new(
                 &dotenv::var("BACKBLAZE_KEY_ID").unwrap(),
@@ -78,8 +77,21 @@ async fn main() -> std::io::Result<()> {
             )
             .await,
         )
-    } else {
+    } else if storage_backend == "s3" {
+        Arc::new(
+            S3Host::new(
+                &*dotenv::var("S3_BUCKET_NAME").unwrap(),
+                &*dotenv::var("S3_REGION").unwrap(),
+                &*dotenv::var("S3_URL").unwrap(),
+                &*dotenv::var("S3_ACCESS_TOKEN").unwrap(),
+                &*dotenv::var("S3_SECRET").unwrap(),
+            )
+            .unwrap(),
+        )
+    } else if storage_backend == "local" {
         Arc::new(file_hosting::MockHost::new())
+    } else {
+        panic!("Invalid storage backend specified. Aborting startup!")
     };
 
     let mut scheduler = scheduler::Scheduler::new();
@@ -243,16 +255,24 @@ fn check_env_vars() {
     check_var::<String>("MEILISEARCH_ADDR");
     check_var::<String>("BIND_ADDR");
 
-    if dotenv::var("BACKBLAZE_ENABLED")
-        .ok()
-        .and_then(|s| s.parse::<bool>().ok())
-        .unwrap_or(false)
-    {
+    check_var::<String>("STORAGE_BACKEND");
+
+    let storage_backend = dotenv::var("STORAGE_BACKEND").ok();
+
+    if storage_backend.as_deref() == Some("backblaze") {
         check_var::<String>("BACKBLAZE_KEY_ID");
         check_var::<String>("BACKBLAZE_KEY");
         check_var::<String>("BACKBLAZE_BUCKET_ID");
-    } else {
+    } else if storage_backend.as_deref() == Some("s3") {
+        check_var::<String>("S3_ACCESS_TOKEN");
+        check_var::<String>("S3_SECRET");
+        check_var::<String>("S3_URL");
+        check_var::<String>("S3_REGION");
+        check_var::<String>("S3_BUCKET_NAME");
+    } else if storage_backend.as_deref() == Some("local") {
         check_var::<String>("MOCK_FILE_PATH");
+    } else if let Some(backend) = storage_backend {
+        warn!("Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".", backend);
     }
 
     check_var::<bool>("INDEX_CURSEFORGE");
