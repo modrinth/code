@@ -72,12 +72,12 @@ pub enum ModStatus {
 impl std::fmt::Display for ModStatus {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            ModStatus::Approved => write!(fmt, "release"),
-            ModStatus::Rejected => write!(fmt, "beta"),
-            ModStatus::Draft => write!(fmt, "alpha"),
+            ModStatus::Approved => write!(fmt, "approved"),
+            ModStatus::Rejected => write!(fmt, "rejected"),
+            ModStatus::Draft => write!(fmt, "draft"),
             ModStatus::Unlisted => write!(fmt, "unlisted"),
-            ModStatus::Processing => write!(fmt, "Processing"),
-            ModStatus::Unknown => write!(fmt, "Unknown"),
+            ModStatus::Processing => write!(fmt, "processing"),
+            ModStatus::Unknown => write!(fmt, "unknown"),
         }
     }
 }
@@ -86,11 +86,21 @@ impl ModStatus {
     pub fn from_str(string: &str) -> ModStatus {
         match string {
             "processing" => ModStatus::Processing,
-            "rejected" => ModStatus::Processing,
-            "approved" => ModStatus::Processing,
-            "draft" => ModStatus::Processing,
-            "unlisted" => ModStatus::Processing,
+            "rejected" => ModStatus::Rejected,
+            "approved" => ModStatus::Approved,
+            "draft" => ModStatus::Draft,
+            "unlisted" => ModStatus::Unlisted,
             _ => ModStatus::Unknown,
+        }
+    }
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ModStatus::Approved => "approved",
+            ModStatus::Rejected => "rejected",
+            ModStatus::Draft => "draft",
+            ModStatus::Unlisted => "unlisted",
+            ModStatus::Processing => "processing",
+            ModStatus::Unknown => "unknown",
         }
     }
 }
@@ -154,6 +164,17 @@ impl std::fmt::Display for VersionType {
             VersionType::Release => write!(fmt, "release"),
             VersionType::Beta => write!(fmt, "beta"),
             VersionType::Alpha => write!(fmt, "alpha"),
+        }
+    }
+}
+
+impl VersionType {
+    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            VersionType::Release => "release",
+            VersionType::Beta => "beta",
+            VersionType::Alpha => "alpha",
         }
     }
 }

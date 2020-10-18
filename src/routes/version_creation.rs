@@ -19,7 +19,7 @@ pub struct InitialVersionData {
     pub file_parts: Vec<String>,
     pub version_number: String,
     pub version_title: String,
-    pub version_body: String,
+    pub version_body: Option<String>,
     pub dependencies: Vec<VersionId>,
     pub game_versions: Vec<GameVersion>,
     pub release_channel: VersionType,
@@ -29,6 +29,45 @@ pub struct InitialVersionData {
 #[derive(Serialize, Deserialize, Clone)]
 struct InitialFileData {
     // TODO: hashes?
+}
+
+pub fn check_version(version: &InitialVersionData) -> Result<(), CreateError> {
+    /*
+    # InitialVersionData
+    file_parts: Vec<String>, 1..=256
+    version_number: 1..=64,
+    version_title: 3..=256,
+    version_body: max of 64KiB,
+    game_versions: Vec<GameVersion>, 1..=256
+    release_channel: VersionType,
+    loaders: Vec<ModLoader>, 1..=256
+    */
+    use super::mod_creation::check_length;
+
+    version
+        .file_parts
+        .iter()
+        .map(|f| check_length(1..=256, "file part name", f))
+        .collect::<Result<_, _>>()?;
+
+    check_length(1..=64, "version number", &version.version_number)?;
+    check_length(3..=256, "version title", &version.version_title)?;
+    if let Some(body) = &version.version_body {
+        check_length(..65536, "version body", body)?;
+    }
+
+    version
+        .game_versions
+        .iter()
+        .map(|v| check_length(1..=256, "game version", &v.0))
+        .collect::<Result<_, _>>()?;
+    version
+        .loaders
+        .iter()
+        .map(|l| check_length(1..=256, "loader name", &l.0))
+        .collect::<Result<_, _>>()?;
+
+    Ok(())
 }
 
 // under `/api/v1/mod/{mod_id}`
@@ -105,8 +144,11 @@ async fn version_create_inner(
                 return Err(CreateError::MissingValueError("Missing mod id".to_string()));
             }
 
+            check_version(version_create_data)?;
+
             let mod_id: models::ModId = version_create_data.mod_id.unwrap().into();
 
+            // Ensure that the mod this version is being added to exists
             let results = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
                 mod_id as models::ModId
@@ -120,6 +162,8 @@ async fn version_create_inner(
                 ));
             }
 
+            // Check whether there is already a version of this mod with the
+            // same version number
             let results = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number=$1) AND (mod_id=$2))",
                 version_create_data.version_number,
@@ -134,58 +178,61 @@ async fn version_create_inner(
                 ));
             }
 
-            let team_id = sqlx::query!(
-                "SELECT team_id FROM mods WHERE id=$1",
+            // Check that the user creating this version is a team member
+            // of the mod the version is being added to.
+            let member_ids = sqlx::query!(
+                "
+                SELECT user_id FROM team_members tm
+                INNER JOIN mods ON mods.team_id = tm.team_id
+                WHERE mods.id = $1
+                ",
                 mod_id as models::ModId,
             )
-            .fetch_one(&mut *transaction)
-            .await?
-            .team_id;
+            .fetch_all(&mut *transaction)
+            .await?;
 
-            let member_ids_rows =
-                sqlx::query!("SELECT user_id FROM team_members WHERE team_id=$1", team_id,)
-                    .fetch_all(&mut *transaction)
-                    .await?;
+            let member_ids: Vec<models::UserId> = member_ids
+                .iter()
+                .map(|m| models::UserId(m.user_id))
+                .collect();
 
-            let member_ids: Vec<i64> = member_ids_rows.iter().map(|m| m.user_id).collect();
-
-            if !member_ids.contains(&(user.id.0 as i64)) {
+            if !member_ids.contains(&user.id.into()) {
+                // TODO: Some team members may not have the permissions
+                // to upload mods; We need a more in depth permissions
+                // system.
                 return Err(CreateError::InvalidInput("Unauthorized".to_string()));
             }
 
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
-            let body_url = format!(
-                "data/{}/changelogs/{}/body.md",
-                version_create_data.mod_id.unwrap(),
-                version_id
-            );
 
-            let uploaded_text = file_host
-                .upload_file(
-                    "text/plain",
-                    &body_url,
-                    version_create_data.version_body.clone().into_bytes(),
-                )
-                .await?;
+            let body_path;
 
-            uploaded_files.push(UploadedFile {
-                file_id: uploaded_text.file_id.clone(),
-                file_name: uploaded_text.file_name.clone(),
-            });
+            if let Some(body) = &version_create_data.version_body {
+                let path = format!(
+                    "data/{}/changelogs/{}/body.md",
+                    version_create_data.mod_id.unwrap(),
+                    version_id
+                );
 
-            let release_channel = models::ChannelId(
-                sqlx::query!(
-                    "
-                    SELECT id
-                    FROM release_channels
-                    WHERE channel = $1
-                    ",
-                    version_create_data.release_channel.to_string()
-                )
-                .fetch_one(&mut *transaction)
-                .await?
-                .id,
-            );
+                let uploaded_text = file_host
+                    .upload_file("text/plain", &path, body.clone().into_bytes())
+                    .await?;
+
+                uploaded_files.push(UploadedFile {
+                    file_id: uploaded_text.file_id.clone(),
+                    file_name: uploaded_text.file_name.clone(),
+                });
+                body_path = Some(path);
+            } else {
+                body_path = None;
+            }
+
+            let release_channel = models::ChannelId::get_id(
+                version_create_data.release_channel.as_str(),
+                &mut *transaction,
+            )
+            .await?
+            .expect("Release channel not found in database");
 
             let mut game_versions = Vec::with_capacity(version_create_data.game_versions.len());
             for v in &version_create_data.game_versions {
@@ -209,8 +256,8 @@ async fn version_create_inner(
                 author_id: user.id.into(),
                 name: version_create_data.version_title.clone(),
                 version_number: version_create_data.version_number.clone(),
-                changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
-                files: Vec::with_capacity(1),
+                changelog_url: body_path.map(|path| format!("{}/{}", cdn_url, path)),
+                files: Vec::new(),
                 dependencies: version_create_data
                     .dependencies
                     .iter()
@@ -243,22 +290,22 @@ async fn version_create_inner(
         version.files.push(file_builder);
     }
 
-    let version_data_safe = initial_version_data
+    let version_data = initial_version_data
         .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
-    let version_builder_safe = version_builder
+    let builder = version_builder
         .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
 
     let response = Version {
-        id: version_builder_safe.version_id.into(),
-        mod_id: version_builder_safe.mod_id.into(),
+        id: builder.version_id.into(),
+        mod_id: builder.mod_id.into(),
         author_id: user.id,
-        name: version_builder_safe.name.clone(),
-        version_number: version_builder_safe.version_number.clone(),
-        changelog_url: version_builder_safe.changelog_url.clone(),
+        name: builder.name.clone(),
+        version_number: builder.version_number.clone(),
+        changelog_url: builder.changelog_url.clone(),
         date_published: chrono::Utc::now(),
         downloads: 0,
-        version_type: version_data_safe.release_channel,
-        files: version_builder_safe
+        version_type: version_data.release_channel,
+        files: builder
             .files
             .iter()
             .map(|file| VersionFile {
@@ -280,12 +327,12 @@ async fn version_create_inner(
                 filename: file.filename.clone(),
             })
             .collect::<Vec<_>>(),
-        dependencies: version_data_safe.dependencies,
-        game_versions: version_data_safe.game_versions,
-        loaders: version_data_safe.loaders,
+        dependencies: version_data.dependencies,
+        game_versions: version_data.game_versions,
+        loaders: version_data.loaders,
     };
 
-    version_builder_safe.insert(transaction).await?;
+    builder.insert(transaction).await?;
 
     Ok(HttpResponse::Ok().json(response))
 }
@@ -447,6 +494,16 @@ pub async fn upload_file(
     let mut data = Vec::new();
     while let Some(chunk) = field.next().await {
         data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+    }
+
+    // Mod file size limit of 25MiB
+    const FILE_SIZE_CAP: usize = 25 * (2 << 30);
+
+    // TODO: override file size cap for authorized users or mods
+    if data.len() >= FILE_SIZE_CAP {
+        return Err(CreateError::InvalidInput(
+            String::from("Mod file exceeds the maximum of 25MiB. Contact a moderator or admin to request permission to upload larger files.")
+        ));
     }
 
     let upload_data = file_host

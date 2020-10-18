@@ -88,7 +88,7 @@ generate_ids!(
     UserId
 );
 
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Type)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
 

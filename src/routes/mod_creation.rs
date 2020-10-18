@@ -1,10 +1,8 @@
 use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models;
-use crate::database::models::StatusId;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::mods::{ModId, ModStatus, VersionId};
-use crate::models::teams::TeamMember;
 use crate::models::users::UserId;
 use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::queue::CreationQueue;
@@ -104,8 +102,6 @@ struct ModCreateData {
     pub mod_body: String,
     /// A list of initial versions to upload with the created mod
     pub initial_versions: Vec<InitialVersionData>,
-    /// The team of people that has ownership of this mod.
-    pub team_members: Vec<TeamMember>,
     /// A list of the categories that the mod is in.
     pub categories: Vec<String>,
     /// An optional link to where to submit bugs or issues with the mod.
@@ -171,6 +167,36 @@ pub async fn mod_create(
     result
 }
 
+/*
+
+Mod Creation Steps:
+Get logged in user
+    Must match the author in the version creation
+
+1. Data
+    - Gets "data" field from multipart form; must be first
+    - Verification: string lengths
+    - Create versions
+        - Some shared logic with version creation
+        - Create list of VersionBuilders
+    - Create ModBuilder
+
+2. Upload
+    - Icon: check file format & size
+        - Upload to backblaze & record URL
+    - Mod files
+        - Check for matching version
+        - File size limits?
+        - Check file type
+            - Eventually, malware scan
+        - Upload to backblaze & create VersionFileBuilder
+    -
+
+3. Creation
+    - Database stuff
+    - Add mod data to indexing queue
+*/
+
 async fn mod_create_inner(
     req: HttpRequest,
     mut payload: Multipart,
@@ -179,156 +205,176 @@ async fn mod_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     indexing_queue: &CreationQueue,
 ) -> Result<HttpResponse, CreateError> {
+    // The base URL for files uploaded to backblaze
     let cdn_url = dotenv::var("CDN_URL")?;
 
+    // The currently logged in user
+    let current_user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+
     let mod_id: ModId = models::generate_mod_id(transaction).await?.into();
-    let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
-    let mut created_versions: Vec<models::version_item::VersionBuilder> = vec![];
+    let mod_create_data;
+    let mut versions;
+    let mut versions_map = std::collections::HashMap::new();
 
-    let mut mod_create_data: Option<ModCreateData> = None;
-    let mut icon_url = "".to_string();
+    {
+        // The first multipart field must be named "data" and contain a
+        // JSON `ModCreateData` object.
+
+        let mut field = payload
+            .next()
+            .await
+            .map(|m| m.map_err(CreateError::MultipartError))
+            .unwrap_or_else(|| {
+                Err(CreateError::MissingValueError(String::from(
+                    "No `data` field in multipart upload",
+                )))
+            })?;
+
+        let content_disposition = field.content_disposition().ok_or_else(|| {
+            CreateError::MissingValueError(String::from("Missing content disposition"))
+        })?;
+        let name = content_disposition
+            .get_name()
+            .ok_or_else(|| CreateError::MissingValueError(String::from("Missing content name")))?;
+
+        if name != "data" {
+            return Err(CreateError::InvalidInput(String::from(
+                "`data` field must come before file fields",
+            )));
+        }
+
+        let mut data = Vec::new();
+        while let Some(chunk) = field.next().await {
+            data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+        }
+        let create_data: ModCreateData = serde_json::from_slice(&data)?;
+
+        {
+            // Verify the lengths of various fields in the mod create data
+            /*
+            # ModCreateData
+            mod_name: 3..=256
+            mod_description: 3..=2048,
+            mod_body: max of 64KiB?,
+            categories: Vec<String>, 1..=256
+            issues_url: 0..=2048, (Validate url?)
+            source_url: 0..=2048,
+            wiki_url: 0..=2048,
+
+            initial_versions: Vec<InitialVersionData>,
+            team_members: Vec<TeamMember>,
+
+            # TeamMember:
+            name: 3..=64
+            role: 3..=64
+            */
+
+            check_length(3..=256, "mod name", &create_data.mod_name)?;
+            check_length(3..=2048, "mod description", &create_data.mod_description)?;
+            check_length(..65536, "mod body", &create_data.mod_body)?;
+
+            create_data
+                .categories
+                .iter()
+                .map(|f| check_length(1..=256, "category", f))
+                .collect::<Result<(), _>>()?;
+
+            if let Some(url) = &create_data.issues_url {
+                check_length(..=2048, "url", url)?;
+            }
+            if let Some(url) = &create_data.wiki_url {
+                check_length(..=2048, "url", url)?;
+            }
+            if let Some(url) = &create_data.source_url {
+                check_length(..=2048, "url", url)?;
+            }
+
+            create_data
+                .initial_versions
+                .iter()
+                .map(|v| super::version_creation::check_version(v))
+                .collect::<Result<(), _>>()?;
+        }
+
+        // Create VersionBuilders for the versions specified in `initial_versions`
+        versions = Vec::with_capacity(create_data.initial_versions.len());
+        for (i, data) in create_data.initial_versions.iter().enumerate() {
+            // Create a map of multipart field names to version indices
+            for name in &data.file_parts {
+                if versions_map.insert(name.to_owned(), i).is_some() {
+                    // If the name is already used
+                    return Err(CreateError::InvalidInput(String::from(
+                        "Duplicate multipart field name",
+                    )));
+                }
+            }
+            versions.push(
+                create_initial_version(
+                    data,
+                    mod_id,
+                    current_user.id,
+                    &cdn_url,
+                    transaction,
+                    file_host,
+                    uploaded_files,
+                )
+                .await?,
+            );
+        }
+
+        mod_create_data = create_data;
+    }
+
+    let mut icon_url = None;
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item.map_err(CreateError::MultipartError)?;
         let content_disposition = field.content_disposition().ok_or_else(|| {
             CreateError::MissingValueError("Missing content disposition".to_string())
         })?;
+
         let name = content_disposition
             .get_name()
             .ok_or_else(|| CreateError::MissingValueError("Missing content name".to_string()))?;
-
-        if name == "data" {
-            let mut data = Vec::new();
-            while let Some(chunk) = field.next().await {
-                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-            }
-            let create_data: ModCreateData = serde_json::from_slice(&data)?;
-
-            check_length("mod_name", 3, 255, &*create_data.mod_name)?;
-            check_length("mod_description", 3, 2048, &*create_data.mod_description)?;
-
-            for version_data in &create_data.initial_versions {
-                if version_data.mod_id.is_some() {
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Found mod id in initial version for new mod",
-                    )));
-                }
-                let version_id: VersionId = models::generate_version_id(transaction).await?.into();
-
-                let body_url = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
-
-                let uploaded_text = file_host
-                    .upload_file(
-                        "text/plain",
-                        &body_url,
-                        version_data.version_body.clone().into_bytes(),
-                    )
-                    .await?;
-
-                uploaded_files.push(UploadedFile {
-                    file_id: uploaded_text.file_id.clone(),
-                    file_name: uploaded_text.file_name.clone(),
-                });
-
-                let release_channel = models::ChannelId(
-                    sqlx::query!(
-                        "
-                        SELECT id
-                        FROM release_channels
-                        WHERE channel = $1
-                        ",
-                        version_data.release_channel.to_string()
-                    )
-                    .fetch_one(&mut *transaction)
-                    .await?
-                    .id,
-                );
-
-                let mut game_versions = Vec::with_capacity(version_data.game_versions.len());
-                for v in &version_data.game_versions {
-                    let id = models::categories::GameVersion::get_id(&v.0, &mut *transaction)
-                        .await?
-                        .ok_or_else(|| CreateError::InvalidGameVersion(v.0.clone()))?;
-                    game_versions.push(id);
-                }
-
-                let mut loaders = Vec::with_capacity(version_data.loaders.len());
-                for l in &version_data.loaders {
-                    let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
-                        .await?
-                        .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
-                    loaders.push(id);
-                }
-
-                let version = models::version_item::VersionBuilder {
-                    version_id: version_id.into(),
-                    mod_id: mod_id.into(),
-                    author_id: user.id.into(),
-                    name: version_data.version_title.clone(),
-                    version_number: version_data.version_number.clone(),
-                    changelog_url: Some(format!("{}/{}", cdn_url, body_url)),
-                    files: Vec::with_capacity(1),
-                    dependencies: version_data
-                        .dependencies
-                        .iter()
-                        .map(|x| (*x).into())
-                        .collect::<Vec<_>>(),
-                    game_versions,
-                    loaders,
-                    release_channel,
-                };
-
-                created_versions.push(version);
-            }
-
-            mod_create_data = Some(create_data);
-            continue;
-        }
-
-        let create_data = mod_create_data.as_ref().ok_or_else(|| {
-            CreateError::InvalidInput(String::from("`data` field must come before file fields"))
-        })?;
 
         let (file_name, file_extension) =
             super::version_creation::get_name_ext(&content_disposition)?;
 
         if name == "icon" {
-            icon_url = process_icon_upload(
-                uploaded_files,
-                mod_id,
-                file_name,
-                file_extension,
-                file_host,
-                field,
-                &cdn_url,
-            )
-            .await?;
+            if icon_url.is_some() {
+                return Err(CreateError::InvalidInput(String::from(
+                    "Mods can only have one icon",
+                )));
+            }
+            // Upload the icon to the cdn
+            icon_url = Some(
+                process_icon_upload(
+                    uploaded_files,
+                    mod_id,
+                    file_name,
+                    file_extension,
+                    file_host,
+                    field,
+                    &cdn_url,
+                )
+                .await?,
+            );
             continue;
         }
 
-        let (version_index, version_data) = create_data
-            .initial_versions
-            .iter()
-            .enumerate()
-            .find(|(_, x)| x.file_parts.iter().any(|n| n == name))
-            .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "File `{}` (field {}) isn't specified in the versions data",
-                    file_name, name
-                ))
-            })?;
-
-        let created_version = if let Some(created_version) = created_versions.get_mut(version_index)
-        {
-            created_version
+        let index = if let Some(i) = versions_map.get(name) {
+            *i
         } else {
-            // This shouldn't be reachable, but better safe than sorry
             return Err(CreateError::InvalidInput(format!(
                 "File `{}` (field {}) isn't specified in the versions data",
                 file_name, name
             )));
         };
+
+        // `index` is always valid for these lists
+        let created_version = versions.get_mut(index).unwrap();
+        let version_data = mod_create_data.initial_versions.get(index).unwrap();
 
         // Upload the new jar file
         let file_builder = super::version_creation::upload_file(
@@ -346,179 +392,222 @@ async fn mod_create_inner(
         created_version.files.push(file_builder);
     }
 
-    let create_data = if let Some(create_data) = mod_create_data {
-        create_data
-    } else {
-        return Err(CreateError::MissingValueError(String::from(
-            "Multipart upload missing `data` field",
-        )));
-    };
-
-    for (version_data, builder) in create_data
-        .initial_versions
-        .iter()
-        .zip(created_versions.iter())
     {
-        if version_data.file_parts.len() != builder.files.len() {
-            return Err(CreateError::InvalidInput(String::from(
-                "Some files were specified in initial_versions but not uploaded",
-            )));
+        // Check to make sure that all specified files were uploaded
+        for (version_data, builder) in mod_create_data.initial_versions.iter().zip(versions.iter())
+        {
+            if version_data.file_parts.len() != builder.files.len() {
+                return Err(CreateError::InvalidInput(String::from(
+                    "Some files were specified in initial_versions but not uploaded",
+                )));
+            }
         }
-    }
 
-    let ids: Vec<UserId> = (&create_data.team_members)
-        .iter()
-        .map(|m| m.user_id)
-        .collect();
-    if !ids.contains(&user.id) {
-        return Err(CreateError::InvalidInput(String::from(
-            "Team members must include yourself!",
-        )));
-    }
+        // Convert the list of category names to actual categories
+        let mut categories = Vec::with_capacity(mod_create_data.categories.len());
+        for category in &mod_create_data.categories {
+            let id = models::categories::Category::get_id(&category, &mut *transaction)
+                .await?
+                .ok_or_else(|| CreateError::InvalidCategory(category.clone()))?;
+            categories.push(id);
+        }
 
-    let mut categories = Vec::with_capacity(create_data.categories.len());
-    for category in &create_data.categories {
-        let id = models::categories::Category::get_id(&category, &mut *transaction)
+        // Upload the mod desciption markdown to the CDN
+        // TODO: Should we also process and upload an html version here for SSR?
+        let body_path = format!("data/{}/body.md", mod_id);
+        {
+            let upload_data = file_host
+                .upload_file(
+                    "text/plain",
+                    &body_path,
+                    mod_create_data.mod_body.into_bytes(),
+                )
+                .await?;
+
+            uploaded_files.push(UploadedFile {
+                file_id: upload_data.file_id,
+                file_name: upload_data.file_name,
+            });
+        }
+
+        let team = models::team_item::TeamBuilder {
+            members: vec![models::team_item::TeamMemberBuilder {
+                user_id: current_user.id.into(),
+                name: current_user.username.clone(),
+                role: crate::models::teams::OWNER_ROLE.to_owned(),
+            }],
+        };
+
+        let team_id = team.insert(&mut *transaction).await?;
+
+        let status = ModStatus::Processing;
+        let status_id = models::StatusId::get_id(&status, &mut *transaction)
             .await?
-            .ok_or_else(|| CreateError::InvalidCategory(category.clone()))?;
-        categories.push(id);
-    }
+            .expect("No database entry found for status");
 
-    let body_url = format!("data/{}/body.md", mod_id);
+        let mod_builder = models::mod_item::ModBuilder {
+            mod_id: mod_id.into(),
+            team_id,
+            title: mod_create_data.mod_name,
+            description: mod_create_data.mod_description,
+            body_url: format!("{}/{}", cdn_url, body_path),
+            icon_url,
+            issues_url: mod_create_data.issues_url,
+            source_url: mod_create_data.source_url,
+            wiki_url: mod_create_data.wiki_url,
 
-    let upload_data = file_host
-        .upload_file("text/plain", &body_url, create_data.mod_body.into_bytes())
-        .await?;
+            categories,
+            initial_versions: versions,
+            status: status_id,
+        };
 
-    uploaded_files.push(UploadedFile {
-        file_id: upload_data.file_id.clone(),
-        file_name: upload_data.file_name.clone(),
-    });
-
-    let mut author_username = None;
-    let mut author_id = None;
-
-    let team = models::team_item::TeamBuilder {
-        members: create_data
-            .team_members
-            .into_iter()
-            .map(|member| {
-                if member.role == crate::models::teams::OWNER_ROLE {
-                    author_id = Some(member.user_id);
-                    author_username = Some(member.name.clone());
-                }
-                models::team_item::TeamMemberBuilder {
-                    user_id: member.user_id.into(),
-                    name: member.name,
-                    role: member.role,
-                }
-            })
-            .collect(),
-    };
-
-    let (author_username, author_id) = if let (Some(u), Some(id)) = (author_username, author_id) {
-        (u, id)
-    } else {
-        return Err(CreateError::InvalidInput(String::from(
-            "A mod must have an author",
-        )));
-    };
-
-    let team_id = team.insert(&mut *transaction).await?;
-
-    let status = ModStatus::Processing;
-    let status_id = sqlx::query!(
-        "
-        SELECT id
-        FROM statuses
-        WHERE status = $1
-        ",
-        status.to_string()
-    )
-    .fetch_one(&mut *transaction)
-    .await?
-    .id;
-
-    let mod_builder = models::mod_item::ModBuilder {
-        mod_id: mod_id.into(),
-        team_id,
-        title: create_data.mod_name,
-        description: create_data.mod_description,
-        body_url: format!("{}/{}", cdn_url, body_url),
-        icon_url: Some(icon_url),
-        issues_url: create_data.issues_url,
-        source_url: create_data.source_url,
-        wiki_url: create_data.wiki_url,
-
-        categories,
-        initial_versions: created_versions,
-        status: StatusId(status_id),
-    };
-
-    let versions_list = mod_builder
-        .initial_versions
-        .iter()
-        .flat_map(|v| {
-            v.game_versions.iter().map(|id| id.0.to_string())
-            // TODO: proper version identifiers, once game versions
-            // have been implemented
-        })
-        .collect::<std::collections::HashSet<String>>()
-        .into_iter()
-        .collect::<Vec<_>>();
-
-    let now = chrono::Utc::now();
-    let timestamp = now.timestamp();
-
-    let index_mod = crate::search::UploadSearchMod {
-        mod_id: format!("local-{}", mod_id),
-        title: mod_builder.title.clone(),
-        description: mod_builder.description.clone(),
-        categories: create_data.categories.clone(),
-        versions: versions_list,
-        page_url: format!("https://modrinth.com/mod/{}", mod_id),
-        icon_url: mod_builder.icon_url.clone().unwrap(),
-        author: author_username,
-        author_url: format!("https://modrinth.com/user/{}", author_id),
-        // TODO: latest version info
-        latest_version: String::new(),
-        downloads: 0,
-        date_created: now,
-        created_timestamp: timestamp,
-        date_modified: now,
-        modified_timestamp: timestamp,
-        host: Cow::Borrowed("modrinth"),
-        empty: Cow::Borrowed("{}{}{}"),
-    };
-
-    indexing_queue.add(index_mod);
-
-    let response = crate::models::mods::Mod {
-        id: mod_id,
-        team: team_id.into(),
-        title: mod_builder.title.clone(),
-        description: mod_builder.description.clone(),
-        body_url: mod_builder.body_url.clone(),
-        published: now,
-        updated: now,
-        status,
-        downloads: 0,
-        categories: create_data.categories.clone(),
-        versions: mod_builder
+        let versions_list = mod_builder
             .initial_versions
             .iter()
-            .map(|v| v.version_id.into())
-            .collect::<Vec<_>>(),
-        icon_url: mod_builder.icon_url.clone(),
-        issues_url: mod_builder.issues_url.clone(),
-        source_url: mod_builder.source_url.clone(),
-        wiki_url: mod_builder.wiki_url.clone(),
+            .flat_map(|v| v.game_versions.iter().map(|id| id.0.to_string()))
+            .collect::<std::collections::HashSet<String>>()
+            .into_iter()
+            .collect::<Vec<_>>();
+
+        let now = chrono::Utc::now();
+        let timestamp = now.timestamp();
+
+        let index_mod = crate::search::UploadSearchMod {
+            mod_id: format!("local-{}", mod_id),
+            title: mod_builder.title.clone(),
+            description: mod_builder.description.clone(),
+            categories: mod_create_data.categories.clone(),
+            versions: versions_list,
+            page_url: format!("https://modrinth.com/mod/{}", mod_id),
+            // This should really be optional in the index
+            icon_url: mod_builder.icon_url.clone().unwrap_or_else(String::new),
+            author: current_user.username.clone(),
+            author_url: format!("https://modrinth.com/user/{}", current_user.id),
+            // TODO: latest version info
+            latest_version: String::new(),
+            downloads: 0,
+            date_created: now,
+            created_timestamp: timestamp,
+            date_modified: now,
+            modified_timestamp: timestamp,
+            host: Cow::Borrowed("modrinth"),
+            empty: Cow::Borrowed("{}{}{}"),
+        };
+
+        indexing_queue.add(index_mod);
+
+        let response = crate::models::mods::Mod {
+            id: mod_id,
+            team: team_id.into(),
+            title: mod_builder.title.clone(),
+            description: mod_builder.description.clone(),
+            body_url: mod_builder.body_url.clone(),
+            published: now,
+            updated: now,
+            status,
+            downloads: 0,
+            categories: mod_create_data.categories.clone(),
+            versions: mod_builder
+                .initial_versions
+                .iter()
+                .map(|v| v.version_id.into())
+                .collect::<Vec<_>>(),
+            icon_url: mod_builder.icon_url.clone(),
+            issues_url: mod_builder.issues_url.clone(),
+            source_url: mod_builder.source_url.clone(),
+            wiki_url: mod_builder.wiki_url.clone(),
+        };
+
+        let _mod_id = mod_builder.insert(&mut *transaction).await?;
+
+        Ok(HttpResponse::Ok().json(response))
+    }
+}
+
+async fn create_initial_version(
+    version_data: &InitialVersionData,
+    mod_id: ModId,
+    author: UserId,
+    cdn_url: &str,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    file_host: &dyn FileHost,
+    uploaded_files: &mut Vec<UploadedFile>,
+) -> Result<models::version_item::VersionBuilder, CreateError> {
+    if version_data.mod_id.is_some() {
+        return Err(CreateError::InvalidInput(String::from(
+            "Found mod id in initial version for new mod",
+        )));
+    }
+
+    check_length(3..=256, "version name", &version_data.version_title)?;
+    check_length(1..=32, "version number", &version_data.version_number)?;
+
+    // Randomly generate a new id to be used for the version
+    let version_id: VersionId = models::generate_version_id(transaction).await?.into();
+
+    // Upload the version's changelog to the CDN
+    let changelog_path = if let Some(changelog) = &version_data.version_body {
+        let changelog_path = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
+
+        let uploaded_text = file_host
+            .upload_file(
+                "text/plain",
+                &changelog_path,
+                changelog.clone().into_bytes(),
+            )
+            .await?;
+
+        uploaded_files.push(UploadedFile {
+            file_id: uploaded_text.file_id,
+            file_name: uploaded_text.file_name,
+        });
+        Some(changelog_path)
+    } else {
+        None
     };
 
-    let _mod_id = mod_builder.insert(&mut *transaction).await?;
+    let release_channel =
+        models::ChannelId::get_id(version_data.release_channel.as_str(), &mut *transaction)
+            .await?
+            .expect("Release Channel not found in database");
 
-    // TODO: respond with the new mod info, or with just the new mod id.
-    Ok(HttpResponse::Ok().json(response))
+    let mut game_versions = Vec::with_capacity(version_data.game_versions.len());
+    for v in &version_data.game_versions {
+        let id = models::categories::GameVersion::get_id(&v.0, &mut *transaction)
+            .await?
+            .ok_or_else(|| CreateError::InvalidGameVersion(v.0.clone()))?;
+        game_versions.push(id);
+    }
+
+    let mut loaders = Vec::with_capacity(version_data.loaders.len());
+    for l in &version_data.loaders {
+        let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
+            .await?
+            .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
+        loaders.push(id);
+    }
+
+    let dependencies = version_data
+        .dependencies
+        .iter()
+        .map(|x| (*x).into())
+        .collect::<Vec<_>>();
+
+    let version = models::version_item::VersionBuilder {
+        version_id: version_id.into(),
+        mod_id: mod_id.into(),
+        author_id: author.into(),
+        name: version_data.version_title.clone(),
+        version_number: version_data.version_number.clone(),
+        changelog_url: changelog_path.map(|path| format!("{}/{}", cdn_url, path)),
+        files: Vec::new(),
+        dependencies,
+        game_versions,
+        loaders,
+        release_channel,
+    };
+
+    Ok(version)
 }
 
 async fn process_icon_upload(
@@ -534,6 +623,12 @@ async fn process_icon_upload(
         let mut data = Vec::new();
         while let Some(chunk) = field.next().await {
             data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+        }
+
+        if data.len() >= 16384 {
+            return Err(CreateError::InvalidInput(String::from(
+                "Icons must be smaller than 16KiB",
+            )));
         }
 
         let upload_data = file_host
@@ -574,17 +669,28 @@ fn get_image_content_type(extension: &str) -> Option<&'static str> {
     }
 }
 
-fn check_length(
-    var_name: &str,
-    min_length: usize,
-    max_length: usize,
-    string: &str,
+pub fn check_length(
+    range: impl std::ops::RangeBounds<usize> + std::fmt::Debug,
+    field_name: &str,
+    field: &str,
 ) -> Result<(), CreateError> {
-    let length = string.len();
-    if length > max_length || length < min_length {
+    use std::ops::Bound;
+
+    let length = field.len();
+    if !range.contains(&length) {
+        let bounds = match (range.start_bound(), range.end_bound()) {
+            (Bound::Included(a), Bound::Included(b)) => format!("between {} and {} bytes", a, b),
+            (Bound::Included(a), Bound::Excluded(b)) => {
+                format!("between {} and {} bytes", a, b - 1)
+            }
+            (Bound::Included(a), Bound::Unbounded) => format!("more than {} bytes", a),
+            (Bound::Unbounded, Bound::Included(b)) => format!("less than or equal to {} bytes", b),
+            (Bound::Unbounded, Bound::Excluded(b)) => format!("less than {} bytes", b),
+            _ => format!("{:?}", range),
+        };
         Err(CreateError::InvalidInput(format!(
-            "The {} must be between {} and {} characters; got {}.",
-            var_name, min_length, max_length, length
+            "The {} must be {}; got {}.",
+            field_name, bounds, length
         )))
     } else {
         Ok(())

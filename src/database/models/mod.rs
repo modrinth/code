@@ -31,3 +31,47 @@ pub enum DatabaseError {
     )]
     InvalidIdentifier(String),
 }
+
+impl ids::ChannelId {
+    pub async fn get_id<'a, E>(
+        channel: &str,
+        exec: E,
+    ) -> Result<Option<ids::ChannelId>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT id FROM release_channels
+            WHERE channel = $1
+            ",
+            channel
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(result.map(|r| ids::ChannelId(r.id)))
+    }
+}
+
+impl ids::StatusId {
+    pub async fn get_id<'a, E>(
+        status: &crate::models::mods::ModStatus,
+        exec: E,
+    ) -> Result<Option<Self>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT id FROM statuses
+            WHERE status = $1
+            ",
+            status.as_str()
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(result.map(|r| ids::StatusId(r.id)))
+    }
+}
