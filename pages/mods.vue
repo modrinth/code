@@ -206,6 +206,7 @@
             facet-name="categories:forge"
             @toggle="toggleFacet"
           >
+            <ForgeLoader />
           </SearchFilter>
           <SearchFilter
             :active-filters="facets"
@@ -213,6 +214,7 @@
             facet-name="categories:fabric"
             @toggle="toggleFacet"
           >
+            <FabricLoader />
           </SearchFilter>
           <h3>Platforms</h3>
           <SearchFilter
@@ -271,6 +273,9 @@ import StorageCategory from '~/assets/images/categories/storage.svg?inline'
 import UtilityCategory from '~/assets/images/categories/utility.svg?inline'
 import WorldGenCategory from '~/assets/images/categories/worldgen.svg?inline'
 
+import ForgeLoader from '~/assets/images/categories/forge.svg?inline'
+import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
+
 export default {
   auth: false,
   components: {
@@ -290,6 +295,8 @@ export default {
     StorageCategory,
     UtilityCategory,
     WorldGenCategory,
+    ForgeLoader,
+    FabricLoader,
   },
   async fetch() {
     if (this.$route.query.q) this.query = this.$route.query.q

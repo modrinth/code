@@ -4,9 +4,8 @@
       <img :src="user.avatar_url" :alt="user.username" />
       <div class="info">
         <h1>{{ user.username }}</h1>
-        <p>{{ user.bio }}</p>
-        <p>Joined {{ $dayjs(user.created).fromNow() }}</p>
-        <p></p>
+        <p class="joined-text">Joined {{ $dayjs(user.created).fromNow() }}</p>
+        <p class="bio" v-if="user.bio">{{ user.bio }}</p>
         <p v-if="user.role === 'admin'" class="badge red">Admin</p>
         <p v-if="user.role === 'moderator'" class="badge yellow">Moderator</p>
         <p v-if="user.role === 'developer'" class="badge green">Developer</p>
@@ -78,6 +77,7 @@ export default {
   margin-left: 15px;
 
   img {
+    border-radius: var(--size-rounded-md);
     width: 250px;
     height: 250px;
   }
@@ -85,8 +85,18 @@ export default {
   .info {
     margin-left: 15px;
 
-    p {
-      margin-right: auto;
+    h1 {
+      margin-bottom: 0;
+    }
+
+    .joined-text {
+      margin-top: 5px;
+      color: var(--color-grey-3);
+    }
+
+    .bio {
+      margin-top: 5px;
+      font-size: 16pt;
     }
 
     .badge {

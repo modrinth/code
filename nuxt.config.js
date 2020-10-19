@@ -83,7 +83,14 @@ export default {
           'https://fonts.googleapis.com/css2?family=Montserrat+Alternates:wght@600&display=swap',
       },
     ],
-    script: [],
+    script: [
+      {
+        src: 'https://analytics.modrinth.com/umami.js',
+        'data-website-id': 'c37613de-245d-4767-90e7-ba7980a4f1a2',
+        async: true,
+        defer: true,
+      },
+    ],
   },
 
   vue: {
@@ -118,7 +125,6 @@ export default {
     '@nuxtjs/eslint-module',
     '@nuxtjs/svg',
     '@nuxtjs/color-mode',
-    'nuxt-ackee',
   ],
   /*
    ** Nuxt.js modules
@@ -131,12 +137,6 @@ export default {
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
   ],
-  ackee: {
-    server: 'https://analytics.modrinth.com',
-    domainId: '1840cc3a-64b1-431e-97a4-c122bb64d4c0',
-    ignoreLocalhost: true,
-    detailed: true,
-  },
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',
   },

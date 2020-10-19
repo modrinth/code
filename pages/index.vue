@@ -1,9 +1,9 @@
 <template>
   <div>
     <header class="columns">
-      <nuxt-link to="/"
-        ><img class="logo" src="~/assets/images/logo.svg" alt="logo"
-      /></nuxt-link>
+      <nuxt-link to="/">
+        <img class="logo" src="~/assets/images/logo.svg" alt="logo" />
+      </nuxt-link>
       <div class="links">
         <nuxt-link to="/">Home</nuxt-link>
         <nuxt-link to="/mods">Mods</nuxt-link>

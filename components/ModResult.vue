@@ -39,20 +39,7 @@
         <p>{{ formatNumber(downloads) }}</p>
       </div>
       <div class="result-image columns">
-        <svg viewBox="0 0 16 16" fill="#099fef">
-          <path
-            fill-rule="evenodd"
-            d="M10.854 7.146a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708 0l-1.5-1.5a.5.5 0 1 1 .708-.708L7.5 9.793l2.646-2.647a.5.5 0 0 1 .708 0z"
-          />
-          <path
-            fill-rule="evenodd"
-            d="M1 4v10a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V4H1zm1-3a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2H2z"
-          />
-          <path
-            fill-rule="evenodd"
-            d="M3.5 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5zm9 0a.5.5 0 0 1 .5.5V1a.5.5 0 0 1-1 0V.5a.5.5 0 0 1 .5-.5z"
-          />
-        </svg>
+        <CalendarIcon fill="#099fef" />
         <p>{{ $dayjs(createdAt).fromNow() }}</p>
       </div>
       <div v-if="updatedAt" class="result-image columns">
@@ -91,22 +78,8 @@
       </div>
 
       <div class="loaders columns">
-        <img
-          v-if="categories.includes('fabric')"
-          src="https://fabricmc.net/assets/logo.png"
-          alt="fabric"
-        />
-
-        <svg v-if="categories.includes('forge')" viewBox="0 0 90 46">
-          <defs>
-            <path
-              id="a"
-              fill="#1e2d44"
-              d="M85.8 49.1l-4.5-5.5q-1.65-.1-3.55-.55-3.8-.95-4.85-2.65Q68.75 34.25 74 27q5.45-7.65 17.55-10.3l-37.8-1.9H100v-3.7H47.75v14q0 .65-1.9-11.7h-4.1v13l-1.9-12.3h-27.9q12.85 10.8 19.9 14.3 2.45 1.2 6.05 1.65 2.1.25 6.35.35 2.1.1 3.1.35 1.65.4 2.7 1.45 1.75 1.7 2 4 .3 2.4-1.2 4.3-1.2 1.65-4.35 2.6l-2.95.6L39 49.1v6.4h10.25l.3-6.3 8.95-6.3q-2.85 2.4-6.25 7.7-.95 1.5-1.7 3.5 1.7-1.45 4.9-2.3 3.3-.9 7.3-.9 3.9 0 7.2.9 3.25.85 4.95 2.3-.6-1.75-1.7-3.5-3.4-5.2-6.2-7.7l8.9 6.3.3 6.3h9.6v-6.4z"
-            />
-          </defs>
-          <use transform="translate(-10.95 -10.3)" xlink:href="#a" />
-        </svg>
+        <FabricLoader v-if="categories.includes('fabric')" stroke="#AC6C3A" />
+        <ForgeLoader v-if="categories.includes('forge')" stroke="#8B81E6" />
       </div>
     </div>
     <div class="categories">
@@ -163,6 +136,8 @@
 </template>
 
 <script>
+import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
+
 import TechCategory from '~/assets/images/categories/tech.svg?inline'
 import AdventureCategory from '~/assets/images/categories/adventure.svg?inline'
 import CursedCategory from '~/assets/images/categories/cursed.svg?inline'
@@ -175,6 +150,9 @@ import MiscCategory from '~/assets/images/categories/misc.svg?inline'
 import StorageCategory from '~/assets/images/categories/storage.svg?inline'
 import UtilityCategory from '~/assets/images/categories/utility.svg?inline'
 import WorldGenCategory from '~/assets/images/categories/worldgen.svg?inline'
+
+import ForgeLoader from '~/assets/images/categories/forge.svg?inline'
+import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 
 export default {
   name: 'ModResult',
@@ -191,6 +169,9 @@ export default {
     StorageCategory,
     UtilityCategory,
     WorldGenCategory,
+    ForgeLoader,
+    FabricLoader,
+    CalendarIcon,
   },
   props: {
     id: {

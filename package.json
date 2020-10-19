@@ -33,7 +33,6 @@
     "eslint-plugin-nuxt": "^1.0.0",
     "eslint-plugin-prettier": "^3.1.4",
     "node-sass": "^4.14.1",
-    "nuxt-ackee": "^2.0.0",
     "prettier": "^2.1.2",
     "sass-loader": "^9.0.3"
   }
