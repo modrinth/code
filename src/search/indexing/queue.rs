@@ -1,4 +1,5 @@
 use super::{add_mods, IndexingError, UploadSearchMod};
+use crate::search::SearchConfig;
 use std::sync::Mutex;
 
 pub struct CreationQueue {
@@ -25,7 +26,10 @@ impl CreationQueue {
     }
 }
 
-pub async fn index_queue(queue: &CreationQueue) -> Result<(), IndexingError> {
+pub async fn index_queue(
+    queue: &CreationQueue,
+    config: &SearchConfig,
+) -> Result<(), IndexingError> {
     let queue = queue.take();
-    add_mods(queue).await
+    add_mods(queue, config).await
 }

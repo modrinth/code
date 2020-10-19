@@ -60,6 +60,8 @@ pub enum ApiError {
     JsonError(#[from] serde_json::Error),
     #[error("Authentication Error")]
     AuthenticationError,
+    #[error("Search Error: {0}")]
+    SearchError(#[from] meilisearch_sdk::errors::Error),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -68,6 +70,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::DatabaseError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::AuthenticationError => actix_web::http::StatusCode::UNAUTHORIZED,
             ApiError::JsonError(..) => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::SearchError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
 
@@ -78,6 +81,7 @@ impl actix_web::ResponseError for ApiError {
                     ApiError::DatabaseError(..) => "database_error",
                     ApiError::AuthenticationError => "unauthorized",
                     ApiError::JsonError(..) => "json_error",
+                    ApiError::SearchError(..) => "search_error",
                 },
                 description: &self.to_string(),
             },

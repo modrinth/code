@@ -39,13 +39,22 @@ async fn main() -> std::io::Result<()> {
 
     check_env_vars();
 
+    let search_config = search::SearchConfig {
+        address: dotenv::var("MEILISEARCH_ADDR").unwrap(),
+        key: dotenv::var("MEILISEARCH_KEY").unwrap(),
+    };
+
     if config.reset_indices {
         info!("Resetting indices");
-        search::indexing::reset_indices().await.unwrap();
+        search::indexing::reset_indices(&search_config)
+            .await
+            .unwrap();
         return Ok(());
     } else if config.reconfigure_indices {
         info!("Reconfiguring indices");
-        search::indexing::reconfigure_indices().await.unwrap();
+        search::indexing::reconfigure_indices(&search_config)
+            .await
+            .unwrap();
         return Ok(());
     }
 
@@ -106,9 +115,11 @@ async fn main() -> std::io::Result<()> {
     );
 
     let pool_ref = pool.clone();
+    let thread_search_config = search_config.clone();
     let mut skip = skip_initial;
     scheduler.run(local_index_interval, move || {
         let pool_ref = pool_ref.clone();
+        let thread_search_config = thread_search_config.clone();
         let local_skip = skip;
         if skip {
             skip = false;
@@ -122,7 +133,7 @@ async fn main() -> std::io::Result<()> {
                 index_local: true,
                 index_external: false,
             };
-            let result = index_mods(pool_ref, settings).await;
+            let result = index_mods(pool_ref, settings, &thread_search_config).await;
             if let Err(e) = result {
                 warn!("Local mod indexing failed: {:?}", e);
             }
@@ -133,9 +144,11 @@ async fn main() -> std::io::Result<()> {
     let indexing_queue = Arc::new(search::indexing::queue::CreationQueue::new());
 
     let queue_ref = indexing_queue.clone();
+    let thread_search_config = search_config.clone();
     let mut skip = skip_initial;
     scheduler.run(std::time::Duration::from_secs(15 * 60), move || {
         let queue = queue_ref.clone();
+        let thread_search_config = thread_search_config.clone();
         let local_skip = skip;
         if skip {
             skip = false;
@@ -145,7 +158,7 @@ async fn main() -> std::io::Result<()> {
                 return;
             }
             info!("Indexing created mod queue");
-            let result = search::indexing::queue::index_queue(&*queue).await;
+            let result = search::indexing::queue::index_queue(&*queue, &thread_search_config).await;
             if let Err(e) = result {
                 warn!("Indexing created mods failed: {:?}", e);
             }
@@ -168,15 +181,17 @@ async fn main() -> std::io::Result<()> {
         );
 
         let pool_ref = pool.clone();
+        let thread_search_config = search_config.clone();
         scheduler.run(external_index_interval, move || {
             info!("Indexing curseforge");
             let pool_ref = pool_ref.clone();
+            let thread_search_config = thread_search_config.clone();
             async move {
                 let settings = IndexingSettings {
                     index_local: false,
                     index_external: true,
                 };
-                let result = index_mods(pool_ref, settings).await;
+                let result = index_mods(pool_ref, settings, &thread_search_config).await;
                 if let Err(e) = result {
                     warn!("External mod indexing failed: {:?}", e);
                 }
@@ -210,6 +225,7 @@ async fn main() -> std::io::Result<()> {
             .data(pool.clone())
             .data(file_host.clone())
             .data(indexing_queue.clone())
+            .data(search_config.clone())
             .service(routes::index_get)
             .service(
                 web::scope("/api/v1/")
@@ -253,6 +269,7 @@ fn check_env_vars() {
     check_var::<String>("CDN_URL");
     check_var::<String>("DATABASE_URL");
     check_var::<String>("MEILISEARCH_ADDR");
+    check_var::<String>("MEILISEARCH_KEY");
     check_var::<String>("BIND_ADDR");
 
     check_var::<String>("STORAGE_BACKEND");

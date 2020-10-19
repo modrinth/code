@@ -3,7 +3,7 @@ use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models;
 use crate::models::mods::SearchRequest;
-use crate::search::{search_for_mod, SearchError};
+use crate::search::{search_for_mod, SearchConfig, SearchError};
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -11,8 +11,9 @@ use sqlx::PgPool;
 #[get("mod")]
 pub async fn mod_search(
     web::Query(info): web::Query<SearchRequest>,
+    config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, SearchError> {
-    let results = search_for_mod(&info).await?;
+    let results = search_for_mod(&info, &**config).await?;
     Ok(HttpResponse::Ok().json(results))
 }
 
@@ -121,12 +122,13 @@ pub async fn mod_get(
         Ok(HttpResponse::NotFound().body(""))
     }
 }
-// TODO: The mod remains in meilisearch's index until the index is deleted
+
 #[delete("{id}")]
 pub async fn mod_delete(
     req: HttpRequest,
     info: web::Path<(models::ids::ModId,)>,
     pool: web::Data<PgPool>,
+    config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(
         req.headers(),
@@ -142,6 +144,13 @@ pub async fn mod_delete(
     let result = database::models::Mod::remove_full(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    let client = meilisearch_sdk::client::Client::new(&*config.key, &*config.address);
+
+    let indexes: Vec<meilisearch_sdk::indexes::Index> = client.get_indexes().await?;
+    for index in indexes {
+        index.delete_document(format!("local-{}", id)).await?;
+    }
 
     if result.is_some() {
         Ok(HttpResponse::Ok().body(""))

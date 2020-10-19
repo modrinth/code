@@ -3,7 +3,7 @@ pub mod curseforge_import;
 pub mod local_import;
 pub mod queue;
 
-use crate::search::UploadSearchMod;
+use crate::search::{SearchConfig, UploadSearchMod};
 use curseforge_import::index_curseforge;
 use local_import::index_local;
 use meilisearch_sdk::client::Client;
@@ -56,7 +56,11 @@ impl IndexingSettings {
     }
 }
 
-pub async fn index_mods(pool: PgPool, settings: IndexingSettings) -> Result<(), IndexingError> {
+pub async fn index_mods(
+    pool: PgPool,
+    settings: IndexingSettings,
+    config: &SearchConfig,
+) -> Result<(), IndexingError> {
     let mut docs_to_add: Vec<UploadSearchMod> = vec![];
 
     if settings.index_local {
@@ -73,14 +77,13 @@ pub async fn index_mods(pool: PgPool, settings: IndexingSettings) -> Result<(), 
 
     // Write Indices
 
-    add_mods(docs_to_add).await?;
+    add_mods(docs_to_add, config).await?;
 
     Ok(())
 }
 
-pub async fn reset_indices() -> Result<(), IndexingError> {
-    let address = &*dotenv::var("MEILISEARCH_ADDR")?;
-    let client = Client::new(address, "");
+pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
+    let client = Client::new(&*config.address, &*config.key);
 
     client.delete_index("relevance_mods").await?;
     client.delete_index("downloads_mods").await?;
@@ -89,9 +92,8 @@ pub async fn reset_indices() -> Result<(), IndexingError> {
     Ok(())
 }
 
-pub async fn reconfigure_indices() -> Result<(), IndexingError> {
-    let address = &*dotenv::var("MEILISEARCH_ADDR")?;
-    let client = Client::new(address, "");
+pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingError> {
+    let client = Client::new(&*config.address, &*config.key);
 
     // Relevance Index
     update_index(&client, "relevance_mods", {
@@ -184,9 +186,11 @@ async fn add_to_index(index: Index<'_>, mods: &[UploadSearchMod]) -> Result<(), 
     Ok(())
 }
 
-pub async fn add_mods(mods: Vec<UploadSearchMod>) -> Result<(), IndexingError> {
-    let address = &*dotenv::var("MEILISEARCH_ADDR")?;
-    let client = Client::new(address, "");
+pub async fn add_mods(
+    mods: Vec<UploadSearchMod>,
+    config: &SearchConfig,
+) -> Result<(), IndexingError> {
+    let client = Client::new(&*config.address, &*config.key);
 
     // Relevance Index
     let relevance_index = create_index(&client, "relevance_mods", || {

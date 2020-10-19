@@ -18,6 +18,8 @@ services:
       - 7700:7700
     volumes:
       - meilisearch-data:/data.ms
+    environment:
+      MEILI_MASTER_KEY: modrinth
   pgadmin:
     image: dpage/pgadmin4:latest
     environment:
