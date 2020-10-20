@@ -2,11 +2,7 @@
   <div class="result rows">
     <img
       class="result-icon"
-      :src="
-        iconUrl
-          ? iconUrl
-          : 'https://cdn.modrinth.com/file/modrinth/placeholder.png'
-      "
+      :src="iconUrl ? iconUrl : 'https://cdn.modrinth.com/placeholder.png'"
       :alt="name"
     />
     <div class="rows result-name-author">

@@ -17,10 +17,10 @@
     "@nuxtjs/dayjs": "^1.2.0",
     "@nuxtjs/robots": "^2.4.2",
     "@nuxtjs/sitemap": "^2.4.0",
-    "dompurify": "^2.1.1",
     "marked": "^1.2.0",
-    "nuxt": "^2.14.5",
-    "vue-multiselect": "^2.1.6"
+    "nuxt": "^2.14.7",
+    "vue-multiselect": "^2.1.6",
+    "xss": "^1.0.8"
   },
   "devDependencies": {
     "@nuxtjs/color-mode": "^1.1.1",
@@ -28,8 +28,8 @@
     "@nuxtjs/eslint-module": "^2.0.0",
     "@nuxtjs/svg": "^0.1.12",
     "babel-eslint": "^10.1.0",
-    "eslint": "^7.9.0",
-    "eslint-config-prettier": "^6.11.0",
+    "eslint": "^7.11.0",
+    "eslint-config-prettier": "^6.13.0",
     "eslint-plugin-nuxt": "^1.0.0",
     "eslint-plugin-prettier": "^3.1.4",
     "node-sass": "^4.14.1",

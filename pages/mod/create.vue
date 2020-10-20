@@ -13,7 +13,7 @@
             :src="
               previewImage
                 ? previewImage
-                : 'https://cdn.modrinth.com/file/modrinth/placeholder.png'
+                : 'https://cdn.modrinth.com/placeholder.png'
             "
             alt="preview-image"
           />
@@ -283,7 +283,7 @@
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
-import DOMPurify from 'dompurify'
+import xss from 'xss'
 import marked from 'marked'
 
 import ExitIcon from '~/assets/images/utils/exit.svg?inline'
@@ -434,7 +434,7 @@ export default {
       this.currentVersionIndex = -1
     },
     setMarkdownBody() {
-      this.compiledBody = DOMPurify.sanitize(marked(this.body))
+      this.compiledBody = xss(marked(this.body))
     },
     getFilesSelectedText(length, defaultText) {
       if (length === 0) {

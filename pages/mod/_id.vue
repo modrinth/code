@@ -1,9 +1,29 @@
 <template>
-  <div>{{ JSON.stringify(mod) }}</div>
+  <div class="columns">
+    <div class="content column-grow-5">
+      <div class="mod-header">
+        <img
+          :src="
+            mod.icon_url
+              ? mod.icon_url
+              : 'https://cdn.modrinth.com/placeholder.png'
+          "
+          alt="mod-icon"
+        />
+      </div>
+      <div class="markdown-body" v-html="modBody"></div>
+    </div>
+    <section class="mod-info">
+      <h3>Mod Name</h3>
+    </section>
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
+
+import xss from 'xss'
+import marked from 'marked'
 
 export default {
   auth: false,
@@ -41,12 +61,11 @@ export default {
     const mod = res.data
 
     res = await axios.get(mod.body_url)
-
-    console.log(res.data)
+    const body = xss(marked(res.data))
 
     return {
       mod,
-      modBody: res.data,
+      modBody: body,
     }
   },
 }

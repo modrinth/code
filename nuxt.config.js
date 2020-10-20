@@ -43,7 +43,7 @@ export default {
       {
         hid: 'og:image',
         name: 'og:image',
-        content: 'https://cdn.modrinth.com/file/modrinth/modrinth.png',
+        content: 'https://cdn.modrinth.com/modrinth.png',
       },
 
       // Twitter
@@ -67,7 +67,7 @@ export default {
       {
         hid: 'twitter:image',
         name: 'twitter:image',
-        content: 'https://cdn.modrinth.com/file/modrinth/modrinth.png',
+        content: 'https://cdn.modrinth.com/modrinth.png',
       },
     ],
     link: [
@@ -96,7 +96,7 @@ export default {
   vue: {
     config: {
       productionTip: false,
-      devtools: true,
+      devtools: false,
     },
   },
 
