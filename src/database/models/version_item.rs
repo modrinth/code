@@ -86,7 +86,7 @@ impl VersionBuilder {
         version.insert(&mut *transaction).await?;
 
         for file in self.files {
-            file.insert(self.version_id, transaction);
+            file.insert(self.version_id, transaction).await?;
         }
 
         for dependency in self.dependencies {

@@ -209,9 +209,9 @@ async fn version_create_inner(
 
             if let Some(body) = &version_create_data.version_body {
                 let path = format!(
-                    "data/{}/changelogs/{}/body.md",
+                    "data/{}/versions/{}/changelog.md",
                     version_create_data.mod_id.unwrap(),
-                    version_id
+                    version_create_data.version_number
                 );
 
                 let uploaded_text = file_host
@@ -219,7 +219,7 @@ async fn version_create_inner(
                     .await?;
 
                 uploaded_files.push(UploadedFile {
-                    file_id: uploaded_text.file_id.clone(),
+                    file_id: uploaded_text.file_id,
                     file_name: uploaded_text.file_name.clone(),
                 });
                 body_path = Some(path);
@@ -509,13 +509,13 @@ pub async fn upload_file(
     let upload_data = file_host
         .upload_file(
             content_type,
-            &format!("{}/{}/{}", mod_id, version_number, file_name),
+            &format!("data/{}/versions/{}/{}", mod_id, version_number, file_name),
             data.to_vec(),
         )
         .await?;
 
     uploaded_files.push(UploadedFile {
-        file_id: upload_data.file_id.clone(),
+        file_id: upload_data.file_id,
         file_name: upload_data.file_name.clone(),
     });
 

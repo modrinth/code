@@ -352,7 +352,6 @@ async fn mod_create_inner(
                 process_icon_upload(
                     uploaded_files,
                     mod_id,
-                    file_name,
                     file_extension,
                     file_host,
                     field,
@@ -414,7 +413,7 @@ async fn mod_create_inner(
 
         // Upload the mod desciption markdown to the CDN
         // TODO: Should we also process and upload an html version here for SSR?
-        let body_path = format!("data/{}/body.md", mod_id);
+        let body_path = format!("data/{}/description.md", mod_id);
         {
             let upload_data = file_host
                 .upload_file(
@@ -547,7 +546,10 @@ async fn create_initial_version(
 
     // Upload the version's changelog to the CDN
     let changelog_path = if let Some(changelog) = &version_data.version_body {
-        let changelog_path = format!("data/{}/changelogs/{}/body.md", mod_id, version_id);
+        let changelog_path = format!(
+            "data/{}/versions/{}/changelog.md",
+            mod_id, version_data.version_number
+        );
 
         let uploaded_text = file_host
             .upload_file(
@@ -613,7 +615,6 @@ async fn create_initial_version(
 async fn process_icon_upload(
     uploaded_files: &mut Vec<UploadedFile>,
     mod_id: ModId,
-    file_name: &str,
     file_extension: &str,
     file_host: &dyn FileHost,
     mut field: actix_multipart::Field,
@@ -625,22 +626,22 @@ async fn process_icon_upload(
             data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
         }
 
-        if data.len() >= 16384 {
+        if data.len() >= 262144 {
             return Err(CreateError::InvalidInput(String::from(
-                "Icons must be smaller than 16KiB",
+                "Icons must be smaller than 256KiB",
             )));
         }
 
         let upload_data = file_host
             .upload_file(
                 content_type,
-                &format!("mods/icons/{}/{}", mod_id, file_name),
+                &format!("data/{}/icon.{}", mod_id, file_extension),
                 data,
             )
             .await?;
 
         uploaded_files.push(UploadedFile {
-            file_id: upload_data.file_id.clone(),
+            file_id: upload_data.file_id,
             file_name: upload_data.file_name.clone(),
         });
 
