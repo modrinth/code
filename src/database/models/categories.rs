@@ -111,7 +111,7 @@ impl Category {
 
 impl<'a> CategoryBuilder<'a> {
     /// The name of the category.  Must be ASCII alphanumeric or `-`/`_`
-    pub fn name(mut self, name: &'a str) -> Result<CategoryBuilder<'a>, DatabaseError> {
+    pub fn name(self, name: &'a str) -> Result<CategoryBuilder<'a>, DatabaseError> {
         if name
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
@@ -236,7 +236,7 @@ impl Loader {
 
 impl<'a> LoaderBuilder<'a> {
     /// The name of the loader.  Must be ASCII alphanumeric or `-`/`_`
-    pub fn name(mut self, name: &'a str) -> Result<LoaderBuilder<'a>, DatabaseError> {
+    pub fn name(self, name: &'a str) -> Result<LoaderBuilder<'a>, DatabaseError> {
         if name
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
@@ -363,7 +363,7 @@ impl GameVersion {
 
 impl<'a> GameVersionBuilder<'a> {
     /// The game version.  Spaces must be replaced with '_' for it to be valid
-    pub fn version(mut self, version: &'a str) -> Result<GameVersionBuilder<'a>, DatabaseError> {
+    pub fn version(self, version: &'a str) -> Result<GameVersionBuilder<'a>, DatabaseError> {
         if version
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))

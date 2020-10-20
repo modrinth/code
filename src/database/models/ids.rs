@@ -9,7 +9,6 @@ macro_rules! generate_ids {
         $vis async fn $function_name(
             con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
         ) -> Result<$return_type, DatabaseError> {
-            use rand::Rng;
             let mut rng = rand::thread_rng();
             let length = $id_length;
             let mut id = random_base62_rng(&mut rng, length);

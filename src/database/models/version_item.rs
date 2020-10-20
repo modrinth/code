@@ -1,4 +1,3 @@
-use super::categories::{GameVersion, Loader};
 use super::ids::*;
 use super::DatabaseError;
 
@@ -183,8 +182,6 @@ impl Version {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)
@@ -220,7 +217,7 @@ impl Version {
 
         use futures::TryStreamExt;
 
-        let mut files = sqlx::query!(
+        let files = sqlx::query!(
             "
             SELECT files.id, files.url, files.filename FROM files
             WHERE files.version_id = $1
@@ -434,7 +431,6 @@ impl Version {
 
         if let Some(row) = result {
             use futures::TryStreamExt;
-            use sqlx::Row;
 
             let game_versions: Vec<String> = sqlx::query!(
                 "
@@ -482,7 +478,7 @@ impl Version {
             .await?;
 
             for file in files.iter_mut() {
-                let mut files = sqlx::query!(
+                let files = sqlx::query!(
                     "
                     SELECT hashes.algorithm, hashes.hash FROM hashes
                     WHERE hashes.file_id = $1

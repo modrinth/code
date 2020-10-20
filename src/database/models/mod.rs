@@ -1,4 +1,4 @@
-#![allow(unused)]
+#![allow(dead_code)]
 // TODO: remove attr once routes are created
 
 use thiserror::Error;
