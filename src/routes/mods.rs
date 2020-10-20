@@ -145,7 +145,7 @@ pub async fn mod_delete(
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-    let client = meilisearch_sdk::client::Client::new(&*config.key, &*config.address);
+    let client = meilisearch_sdk::client::Client::new(&*config.address, &*config.key);
 
     let indexes: Vec<meilisearch_sdk::indexes::Index> = client.get_indexes().await?;
     for index in indexes {
