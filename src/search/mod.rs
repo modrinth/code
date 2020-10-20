@@ -143,7 +143,7 @@ pub async fn search_for_mod(
     info: &SearchRequest,
     config: &SearchConfig,
 ) -> Result<SearchResults, SearchError> {
-    let client = Client::new(&*config.key, &*config.address);
+    let client = Client::new(&*config.address, &*config.key);
 
     let filters: Cow<_> = match (info.filters.as_deref(), info.version.as_deref()) {
         (Some(f), Some(v)) => format!("({}) AND ({})", f, v).into(),
