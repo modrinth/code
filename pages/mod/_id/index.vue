@@ -66,12 +66,12 @@ export default {
         {
           hid: 'apple-mobile-web-app-title',
           name: 'apple-mobile-web-app-title',
-          content: this.mod.title + ' - Modrinth',
+          content: this.mod.title,
         },
         {
           hid: 'og:site_name',
           name: 'og:site_name',
-          content: this.mod.title + ' - Modrinth',
+          content: this.mod.title,
         },
         {
           hid: 'og:description',

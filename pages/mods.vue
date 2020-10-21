@@ -395,7 +395,7 @@ export default {
           if (this.selectedVersions.length > 0) {
             const versionFacets = []
             for (const facet of this.selectedVersions) {
-              versionFacets.push('version:' + facet)
+              versionFacets.push('versions:' + facet)
             }
             formattedFacets.push(versionFacets)
           }

@@ -13,7 +13,11 @@
         <div class="mod-header-text">
           <div class="columns title">
             <h2>{{ mod.title }}</h2>
-            <p>by {{ members.find((x) => x.role === 'Owner').name }}</p>
+            <nuxt-link
+              :to="'/user/' + members.find((x) => x.role === 'Owner').user_id"
+            >
+              <p>by {{ members.find((x) => x.role === 'Owner').name }}</p>
+            </nuxt-link>
           </div>
           <p>{{ mod.description }}</p>
         </div>
@@ -27,7 +31,10 @@
           <VersionIcon />
           Versions
         </nuxt-link>
-        <nuxt-link :to="'/mod/' + mod.id + '/settings'">
+        <nuxt-link
+          v-if="members.find((x) => x.user_id === this.$auth.user.id)"
+          :to="'/mod/' + mod.id + '/settings'"
+        >
           <SettingsIcon />
           Settings
         </nuxt-link>
@@ -63,7 +70,9 @@
         >
           <img :src="member.avatar_url" alt="profile-picture" />
           <div class="member-info">
-            <h4>{{ member.name }}</h4>
+            <nuxt-link :to="'/user/' + member.user_id">
+              <h4>{{ member.name }}</h4>
+            </nuxt-link>
             <p>{{ member.role }}</p>
           </div>
         </div>
