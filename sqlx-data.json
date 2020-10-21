@@ -1,25 +1,5 @@
 {
   "db": "PostgreSQL",
-  "01858339ec93e444b83c5d8793285d7b03982344770221c8a5a9bab9958d78ff": {
-    "query": "\n                    SELECT id\n                    FROM release_channels\n                    WHERE channel = $1\n                    ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "02d8895627dfe108735a6e10ad63239348b71b3322b4734526a2646f17aedf05": {
     "query": "\n            SELECT status FROM statuses\n            WHERE id = $1\n            ",
     "describe": {
@@ -57,26 +37,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "0a3f99eae57c0c3d10aa0014db7fb8a33952da3e7d00949a25ade843859272cb": {
-    "query": "\n            SELECT id\n            FROM release_channels\n            WHERE channel = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
     }
   },
   "0ca11a32b2860e4f5c3d20892a5be3cb419e084f42ba0f98e09b9995027fcc4e": {
@@ -122,26 +82,6 @@
       },
       "nullable": [
         false,
-        false
-      ]
-    }
-  },
-  "0ef06dd5094da2458c558b115ed272da338ade372e717d8580cdf52c0000f80c": {
-    "query": "\n                SELECT user_id FROM team_members\n                WHERE team_id = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "user_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
         false
       ]
     }
@@ -484,26 +424,6 @@
       ]
     }
   },
-  "275939f581a82197b45b0d56248926063f09ef86754498a720c5568cdb1f5ae0": {
-    "query": "SELECT user_id FROM team_members WHERE team_id=$1",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "user_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "29e657d26f0fb24a766f5b5eb6a94d01d1616884d8ca10e91536e974d5b585a6": {
     "query": "\n                INSERT INTO loaders_versions (loader_id, version_id)\n                VALUES ($1, $2)\n                ",
     "describe": {
@@ -579,26 +499,6 @@
       "nullable": []
     }
   },
-  "40597b84607e77809c13ffa9c6b0b1674bd6378a4737a8f6118e91ae2ede7e4a": {
-    "query": "\n                SELECT id\n                FROM release_channels\n                WHERE channel = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "42e072309779598d0c213280dd8052d1b4889cb24ef5204ca13b74f693b94328": {
     "query": "\n                SELECT user_id FROM team_members tm\n                INNER JOIN mods ON mods.team_id = tm.team_id\n                WHERE mods.id = $1\n                ",
     "describe": {
@@ -652,26 +552,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "4c98e4441f8168d00bc7ff47951f15b44ff884cff6fc484645c74bfe3e7e7020": {
-    "query": "\n            SELECT id\n            FROM statuses\n            WHERE status = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
     }
   },
   "4c99c0840159d18e88cd6094a41117258f2337346c145d926b5b610c76b5125f": {
@@ -980,6 +860,44 @@
       "nullable": []
     }
   },
+  "91d7e437c6dfb9b95e68aca92154bd2af4de13eeb9611e08dcad2717d0c41ed9": {
+    "query": "\n            SELECT id, user_id, member_name, role\n            FROM team_members\n            WHERE team_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "member_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "role",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "9a41d6c1d5c250df6114157edf5621a88bc336c5c628ba89182ba999e0af3ba8": {
     "query": "\n            SELECT id, title, description, downloads,\n                   icon_url, body_url, published,\n                   updated, status,\n                   issues_url, source_url, wiki_url,\n                   team_id\n            FROM mods\n            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))\n            ",
     "describe": {
@@ -1213,26 +1131,6 @@
       ]
     }
   },
-  "adecffb1c41f9ddddf60c7c3c5a6be129aa8c49c53a698c6f4c2ee9ba15d6347": {
-    "query": "\n        SELECT id\n        FROM statuses\n        WHERE status = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "b0e3d1c70b87bb54819e3fac04b684a9b857aeedb4dcb7cb400c2af0dbb12922": {
     "query": "\n            DELETE FROM teams\n            WHERE id = $1\n            ",
     "describe": {
@@ -1414,33 +1312,6 @@
       ]
     }
   },
-  "c7ee59f31b20790b6e865b2ec14ecd9985cacb0a84e40f087d0f908033566166": {
-    "query": "\n                SELECT u.id, u.username FROM users u\n                INNER JOIN team_members tm ON tm.role = $1\n                WHERE tm.team_id = $2\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "username",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "c82eb1b059b62444ab1d17e5a0bd7ef8acea4b05c6f3576c07d20c4ca7635a11": {
     "query": "\n                INSERT INTO dependencies (dependent_id, dependency_id)\n                VALUES ($1, $2)\n                ",
     "describe": {
@@ -1546,26 +1417,6 @@
       ]
     }
   },
-  "d0172d12dce3d8ddc888893ec1cdd93ad232685e80f706e70dea22c85d96df63": {
-    "query": "SELECT team_id FROM mods WHERE id=$1",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "team_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "d12bc07adb4dc8147d0ddccd72a4f23ed38cd31d7db3d36ebbe2c9b627130f0b": {
     "query": "\n            DELETE FROM team_members\n            WHERE team_id = $1\n            ",
     "describe": {
@@ -1615,26 +1466,6 @@
       },
       "nullable": [
         null
-      ]
-    }
-  },
-  "d88b160963bffbf3297de4418a38f4c914819fff94b912fab451b892c7494370": {
-    "query": "\n                        SELECT id\n                        FROM release_channels\n                        WHERE channel = $1\n                        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
       ]
     }
   },

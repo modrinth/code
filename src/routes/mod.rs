@@ -6,6 +6,7 @@ mod mod_creation;
 mod mods;
 mod not_found;
 mod tags;
+mod teams;
 mod users;
 mod version_creation;
 mod versions;
@@ -50,6 +51,10 @@ pub fn users_config(cfg: &mut web::ServiceConfig) {
             .service(users::mods_list)
             .service(users::user_delete),
     );
+}
+
+pub fn teams_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(web::scope("team").service(teams::team_members_get));
 }
 
 #[derive(thiserror::Error, Debug)]

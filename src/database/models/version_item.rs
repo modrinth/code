@@ -504,7 +504,7 @@ impl Version {
                 downloads: row.downloads,
 
                 release_channel: row.channel,
-                files: Vec::<QueryFile>::new(),
+                files,
                 loaders,
                 game_versions,
             }))
