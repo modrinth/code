@@ -114,7 +114,7 @@
               <TrashIcon />
             </button>
             <button title="Exit Version" @click="currentVersionIndex = -1">
-              <ExitIcon />
+              <SaveIcon />
             </button>
           </div>
         </div>
@@ -286,7 +286,7 @@ import Multiselect from 'vue-multiselect'
 import xss from 'xss'
 import marked from 'marked'
 
-import ExitIcon from '~/assets/images/utils/exit.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
@@ -297,7 +297,7 @@ export default {
     TrashIcon,
     EditIcon,
     PlusIcon,
-    ExitIcon,
+    SaveIcon,
   },
   async asyncData() {
     let res = await axios.get(`https://api.modrinth.com/api/v1/tag/category`)

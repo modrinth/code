@@ -5,7 +5,7 @@
       <div class="info">
         <h1>{{ user.username }}</h1>
         <p class="joined-text">Joined {{ $dayjs(user.created).fromNow() }}</p>
-        <p class="bio" v-if="user.bio">{{ user.bio }}</p>
+        <p v-if="user.bio" class="bio">{{ user.bio }}</p>
         <p v-if="user.role === 'admin'" class="badge red">Admin</p>
         <p v-if="user.role === 'moderator'" class="badge yellow">Moderator</p>
         <p v-if="user.role === 'developer'" class="badge green">Developer</p>
@@ -83,7 +83,9 @@ export default {
   }
 
   .info {
-    margin-left: 15px;
+    @media screen and (min-width: 900px) {
+      margin-left: 15px;
+    }
 
     h1 {
       margin-bottom: 0;
@@ -91,7 +93,7 @@ export default {
 
     .joined-text {
       margin-top: 5px;
-      color: var(--color-grey-3);
+      color: var(--color-grey-4);
     }
 
     .bio {

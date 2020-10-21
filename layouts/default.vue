@@ -480,6 +480,7 @@ export default {
               &:hover,
               &:focus {
                 background-color: var(--color-brand);
+                color: #fff;
               }
             }
           }
