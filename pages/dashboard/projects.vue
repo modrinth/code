@@ -24,7 +24,11 @@
           <td>
             <img class="rounded-md" :src="mod.icon_url" />
           </td>
-          <td>{{ mod.title }}</td>
+          <td>
+            <nuxt-link :to="'/mod/' + mod.id">
+              {{ mod.title }}
+            </nuxt-link>
+          </td>
           <td>Owner</td>
           <td>
             <span v-if="mod.status === 'approved'" class="badge green">
@@ -80,7 +84,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .section-header {
   display: flex;
   margin-bottom: 1rem;

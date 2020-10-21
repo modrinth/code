@@ -1,18 +1,17 @@
 <template>
   <ModPage :mod="mod" :versions="versions" :members="members">
-    <div class="markdown-body" v-html="body"></div>
+    <div class="version"></div>
   </ModPage>
 </template>
-
 <script>
 import axios from 'axios'
 
-import xss from 'xss'
-import marked from 'marked'
 import ModPage from '@/components/ModPage'
 
 export default {
-  components: { ModPage },
+  components: {
+    ModPage,
+  },
   auth: false,
   async asyncData(data) {
     let res = await axios.get(
@@ -31,11 +30,7 @@ export default {
       members[i].avatar_url = res.data.avatar_url
     }
 
-    res = await axios.get(mod.body_url)
-    const body = xss(marked(res.data))
-
     const versions = []
-
     for (const version of mod.versions) {
       res = await axios.get(
         `https://api.modrinth.com/api/v1/version/${version}`
@@ -46,14 +41,13 @@ export default {
 
     return {
       mod,
-      body,
       versions,
       members,
     }
   },
   head() {
     return {
-      title: this.mod.title + ' - Modrinth',
+      title: this.mod.title + ' - Modrinth - Files',
       meta: [
         {
           hid: 'description',
@@ -93,10 +87,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.markdown-body {
-  padding: 20px;
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
+.version {
   background: var(--color-bg);
-  border-radius: 0 0 var(--size-rounded-sm) var(--size-rounded-sm);
+  border-radius: 0 0 0.5rem 0.5rem;
+  box-shadow: 0 2px 3px 1px var(--color-grey-2);
+  padding: 1em;
 }
 </style>

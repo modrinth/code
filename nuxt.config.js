@@ -45,30 +45,6 @@ export default {
         name: 'og:image',
         content: 'https://cdn.modrinth.com/modrinth.png',
       },
-
-      // Twitter
-      {
-        hid: 'twitter:card',
-        name: 'twitter:card',
-        content: 'summary',
-      },
-      { hid: 'twitter:site', name: 'twitter:site', content: '@modrinth' },
-      { hid: 'twitter:creator', name: 'twitter:creator', content: '@modrinth' },
-      {
-        hid: 'twitter:title',
-        name: 'twitter:title',
-        content: 'Modrinth',
-      },
-      {
-        hid: 'twitter:description',
-        name: 'twitter:description',
-        content: 'An open source modding platform',
-      },
-      {
-        hid: 'twitter:image',
-        name: 'twitter:image',
-        content: 'https://cdn.modrinth.com/modrinth.png',
-      },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
