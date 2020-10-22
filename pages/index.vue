@@ -45,7 +45,7 @@
           That's why we are giving
           <span>one hundred percent of ad revenue back</span> to modders, while
           creating easy to use tools for every modder to publish their mods on
-          on the Modrinth platform.
+          the Modrinth platform.
         </p>
       </div>
       <div class="right columns workflow">

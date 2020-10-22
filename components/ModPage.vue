@@ -32,7 +32,10 @@
           Versions
         </nuxt-link>
         <nuxt-link
-          v-if="members.find((x) => x.user_id === this.$auth.user.id)"
+          v-if="
+            this.$auth.loggedIn &&
+            members.find((x) => x.user_id === this.$auth.user.id)
+          "
           :to="'/mod/' + mod.id + '/settings'"
         >
           <SettingsIcon />
