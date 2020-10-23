@@ -55,6 +55,11 @@
   }
 }
 
+.required:after {
+  content: ' *';
+  color: red;
+}
+
 .markdown-body {
   p {
     padding: 0;

@@ -1,7 +1,17 @@
 <template>
   <ModPage :mod="mod" :versions="versions" :members="members">
     <div class="version">
-      <h3>{{ version.name }}</h3>
+      <div class="header">
+        <h3>{{ version.name }}</h3>
+        <div class="user-actions">
+          <button class="trash red">
+            <TrashIcon />
+          </button>
+          <button class="upload">
+            <UploadIcon />
+          </button>
+        </div>
+      </div>
       <div class="markdown-body" v-html="changelog"></div>
       <hr />
       <div class="columns metadata">
@@ -46,6 +56,8 @@ import xss from 'xss'
 import marked from 'marked'
 
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import UploadIcon from '~/assets/images/utils/upload.svg?inline'
+import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
@@ -56,6 +68,8 @@ export default {
     ForgeIcon,
     FabricIcon,
     DownloadIcon,
+    UploadIcon,
+    TrashIcon,
   },
   auth: false,
   async asyncData(data) {
@@ -122,11 +136,16 @@ export default {
           content: this.mod.title + ' - Modrinth',
         },
         {
+          hid: 'og:url',
+          name: 'og:url',
+          content: `https://modrinth.com/mod/${this.mod.id}`,
+        },
+        {
           hid: 'og:description',
           name: 'og:description',
           content: this.mod.description,
         },
-        { hid: 'og:type', name: 'og:type', content: 'article' },
+        { hid: 'og:type', name: 'og:type', content: 'website' },
         {
           hid: 'og:image',
           name: 'og:image',
@@ -146,6 +165,36 @@ export default {
   border-radius: 0 0 0.5rem 0.5rem;
   box-shadow: 0 2px 3px 1px var(--color-grey-2);
   padding: 1em;
+
+  .header {
+    h3 {
+      display: inline-block;
+    }
+    .user-actions {
+      float: right;
+
+      button {
+        cursor: pointer;
+        margin-right: 10px;
+        padding: 5px;
+        border: none;
+        border-radius: var(--size-rounded-sm);
+      }
+
+      .trash {
+        color: #9b2c2c;
+        background-color: var(--color-bg);
+      }
+
+      .upload {
+        color: var(--color-text);
+        background-color: var(--color-grey-1);
+        * {
+          margin: auto 0;
+        }
+      }
+    }
+  }
 
   hr {
     margin: 20px 0;

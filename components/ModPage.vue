@@ -6,7 +6,7 @@
           :src="
             mod.icon_url
               ? mod.icon_url
-              : 'https://cdn.modrinth.com/placeholder.png'
+              : 'https://cdn.modrinth.com/placeholder.svg'
           "
           alt="mod-icon"
         />
@@ -268,6 +268,7 @@ export default {
 
   .team-member {
     margin-left: 5px;
+    margin-bottom: 10px;
     border: 1px solid var(--color-grey-1);
     border-radius: var(--size-rounded-sm);
 
@@ -297,6 +298,7 @@ export default {
 
   .featured-version {
     margin-left: 5px;
+    margin-bottom: 10px;
     border: 1px solid var(--color-grey-1);
     border-radius: var(--size-rounded-sm);
 

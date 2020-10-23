@@ -74,6 +74,11 @@ export default {
           content: this.mod.title,
         },
         {
+          hid: 'og:url',
+          name: 'og:url',
+          content: `https://modrinth.com/mod/${this.mod.id}`,
+        },
+        {
           hid: 'og:description',
           name: 'og:description',
           content: this.mod.description,

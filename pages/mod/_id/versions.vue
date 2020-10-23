@@ -53,23 +53,159 @@
         </tr>
       </tbody>
     </table>
+    <Popup
+      v-if="showPopup"
+      :show-popup="showPopup"
+      class="create-version-popup-body"
+    >
+      <h3>New Version</h3>
+      <div v-if="currentError" class="error">
+        <h4>Error</h4>
+        <p>{{ currentError }}</p>
+      </div>
+      <label
+        for="version-title"
+        class="required"
+        title="The title of your version"
+      >
+        Version Title
+      </label>
+      <input
+        id="version-title"
+        v-model="createdVersion.version_title"
+        required
+        type="text"
+        placeholder="Combat Update"
+      />
+      <label
+        for="version-number"
+        class="required"
+        title="The version number of this version. Preferably following semantic versioning"
+      >
+        Version Number
+      </label>
+      <input
+        id="version-number"
+        v-model="createdVersion.version_number"
+        required
+        type="text"
+        placeholder="v1.9"
+      />
+      <label class="required" title="The release channel of this version.">
+        Release Channel
+      </label>
+      <Multiselect
+        v-model="createdVersion.release_channel"
+        class="categories-input"
+        placeholder="Select one"
+        :options="['release', 'beta', 'alpha']"
+        :searchable="false"
+        :close-on-select="true"
+        :show-labels="false"
+        :allow-empty="false"
+      />
+      <label
+        title="The version number of this version. Preferably following semantic versioning"
+      >
+        Loaders
+      </label>
+      <multiselect
+        v-model="createdVersion.loaders"
+        class="categories-input"
+        :options="selectableLoaders"
+        :loading="selectableLoaders.length === 0"
+        :multiple="true"
+        :searchable="false"
+        :show-no-results="false"
+        :close-on-select="true"
+        :clear-on-select="false"
+        :show-labels="false"
+        :limit="6"
+        :hide-selected="true"
+        placeholder="Choose loaders..."
+      />
+      <label title="The versions of minecraft that this mod version supports">
+        Game Versions
+      </label>
+      <multiselect
+        v-model="createdVersion.game_versions"
+        class="categories-input"
+        :options="selectableVersions"
+        :loading="selectableVersions.length === 0"
+        :multiple="true"
+        :searchable="true"
+        :show-no-results="false"
+        :close-on-select="false"
+        :clear-on-select="false"
+        :show-labels="false"
+        :limit="6"
+        :hide-selected="true"
+        placeholder="Choose versions..."
+      />
+      <label for="version-body" title="A list of changes for this version">
+        Changelog
+      </label>
+      <textarea
+        id="version-body"
+        v-model="createdVersion.version_body"
+        class="changelog-editor"
+      />
+      <FileInput
+        input-id="version-files"
+        input-accept="application/java-archive,application/zip"
+        default-text="Upload Files"
+        :input-multiple="true"
+        @change="updateVersionFiles"
+      >
+        <label class="required" title="The files associated with the version">
+          Version Files
+        </label>
+      </FileInput>
+
+      <div class="popup-buttons">
+        <button
+          class="trash-button"
+          @click="
+            showPopup = false
+            createdVersion = {}
+          "
+        >
+          <TrashIcon />
+        </button>
+        <button class="default-button" @click="createVersion">
+          Create Version
+        </button>
+      </div>
+    </Popup>
+    <button class="default-button" @click="showPopup = !showPopup">
+      New Version
+    </button>
   </ModPage>
 </template>
 <script>
 import axios from 'axios'
 
+import Multiselect from 'vue-multiselect'
+
 import ModPage from '@/components/ModPage'
 
+import Popup from '@/components/Popup'
+import FileInput from '@/components/FileInput'
+import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
 
 export default {
   components: {
+    Multiselect,
+    FileInput,
+    Popup,
     ModPage,
     ForgeIcon,
     FabricIcon,
     DownloadIcon,
+    TrashIcon,
   },
   auth: false,
   async asyncData(data) {
@@ -98,11 +234,77 @@ export default {
       versions.push(res.data)
     }
 
+    res = await axios.get(`https://api.modrinth.com/api/v1/tag/loader`)
+    const selectableLoaders = res.data
+
+    res = await axios.get(`https://api.modrinth.com/api/v1/tag/game_version`)
+    const selectableVersions = res.data
+
     return {
       mod,
       versions,
       members,
+      selectableLoaders,
+      selectableVersions,
     }
+  },
+  data() {
+    return {
+      showPopup: false,
+      currentError: null,
+      createdVersion: {},
+    }
+  },
+  methods: {
+    updateVersionFiles(e) {
+      this.createdVersion.raw_files = e.target.files
+
+      const newFileParts = []
+      for (let i = 0; i < e.target.files.length; i++) {
+        newFileParts.push(e.target.files[i].name.concat('-' + i))
+      }
+
+      this.createdVersion.file_parts = newFileParts
+    },
+    async createVersion() {
+      this.$nuxt.$loading.start()
+      this.currentError = null
+
+      const formData = new FormData()
+
+      this.createdVersion.mod_id = this.$route.params.id
+
+      formData.append('data', JSON.stringify(this.createdVersion))
+
+      if (this.createdVersion.raw_files) {
+        for (let i = 0; i < this.createdVersion.raw_files.length; i++) {
+          formData.append(
+            this.createdVersion.file_parts[i],
+            new Blob([this.createdVersion.raw_files[i]]),
+            this.createdVersion.raw_files[i].name
+          )
+        }
+      }
+
+      try {
+        await axios({
+          url: 'https://api.modrinth.com/api/v1/version/version',
+          method: 'POST',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: this.$auth.getToken('local'),
+          },
+        })
+
+        await this.$router.go(null)
+      } catch (err) {
+        this.currentError = err.response.data.description
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+
+      this.$nuxt.$loading.finish()
+    },
   },
   head() {
     return {
@@ -125,6 +327,11 @@ export default {
           hid: 'og:site_name',
           name: 'og:site_name',
           content: this.mod.title,
+        },
+        {
+          hid: 'og:url',
+          name: 'og:url',
+          content: `https://modrinth.com/mod/${this.mod.id}`,
         },
         {
           hid: 'og:description',
@@ -208,5 +415,72 @@ table {
       width: 3rem;
     }
   }
+}
+.multiselect {
+  margin-bottom: 20px;
+}
+
+input {
+  width: calc(100% - 15px);
+  padding: 0.5rem 5px;
+  margin-bottom: 20px;
+}
+
+.changelog-editor {
+  padding: 20px;
+  width: calc(100% - 40px);
+  height: 200px;
+  resize: none;
+  outline: none;
+  border: none;
+  margin: 10px 0 30px;
+  background-color: var(--color-grey-1);
+  color: var(--color-text);
+  font-family: monospace;
+}
+
+.popup-buttons {
+  margin-top: 20px;
+  margin-left: auto;
+  display: flex;
+  justify-content: right;
+  align-items: center;
+
+  .default-button {
+    float: none;
+    margin-top: 0;
+  }
+
+  .trash-button {
+    cursor: pointer;
+    margin-right: 10px;
+    padding: 5px;
+    border: none;
+    border-radius: var(--size-rounded-sm);
+    color: #9b2c2c;
+    background-color: var(--color-bg);
+  }
+}
+
+.default-button {
+  float: right;
+  margin-top: 20px;
+  border-radius: var(--size-rounded-sm);
+  cursor: pointer;
+  border: none;
+  padding: 10px;
+  background-color: var(--color-grey-1);
+  color: var(--color-grey-5);
+
+  &:hover,
+  &:focus {
+    color: var(--color-grey-4);
+  }
+}
+
+.error {
+  margin: 20px 0;
+  border-left: #e04e3e 7px solid;
+  padding: 5px 20px 20px 20px;
 }
 </style>

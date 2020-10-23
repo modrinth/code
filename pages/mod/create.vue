@@ -13,18 +13,17 @@
             :src="
               previewImage
                 ? previewImage
-                : 'https://cdn.modrinth.com/placeholder.png'
+                : 'https://cdn.modrinth.com/placeholder.svg'
             "
             alt="preview-image"
           />
-          <input
+          <FileInput
             id="icon-file"
-            class="file-input"
-            type="file"
             accept="image/x-png,image/gif,image/jpeg"
+            default-text="Upload Icon"
+            :multiple="false"
             @change="showPreviewImage"
           />
-          <label for="icon-file">Upload Icon</label>
         </div>
         <div class="mod-data">
           <label for="name" class="required" title="The name of your mod">
@@ -100,12 +99,11 @@
       <div v-html="compiledBody"></div>
     </section>
     <section>
-      <button
+      <Popup
         v-if="currentVersionIndex > -1"
-        class="create-version-popup"
-        @click="currentVersionIndex = -1"
-      />
-      <div v-if="currentVersionIndex > -1" class="create-version-popup-body">
+        :show-popup="currentVersionIndex > -1"
+        class="create-version-popup-body"
+      >
         <div class="versions-header">
           <h3>New Version</h3>
 
@@ -208,20 +206,14 @@
         <label class="required" title="The files associated with the version">
           Version Files
         </label>
-        <input
-          id="version-files"
-          type="file"
-          accept="application/java-archive,application/zip"
-          multiple
+        <FileInput
+          input-id="version-files"
+          input-accept="application/java-archive,application/zip"
+          :input-multiple="true"
+          default-text="Upload Files"
           @change="updateVersionFiles"
         />
-        <label for="version-files">{{
-          getFilesSelectedText(
-            versions[currentVersionIndex].file_parts.length,
-            'Upload Files'
-          )
-        }}</label>
-      </div>
+      </Popup>
       <div class="versions-header">
         <h3>Versions</h3>
         <button title="New Version" class="new-version" @click="createVersion">
@@ -286,6 +278,8 @@ import Multiselect from 'vue-multiselect'
 import xss from 'xss'
 import marked from 'marked'
 
+import Popup from '@/components/Popup'
+import FileInput from '@/components/FileInput'
 import SaveIcon from '~/assets/images/utils/save.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
@@ -293,6 +287,8 @@ import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 
 export default {
   components: {
+    FileInput,
+    Popup,
     Multiselect,
     TrashIcon,
     EditIcon,
@@ -436,22 +432,6 @@ export default {
     setMarkdownBody() {
       this.compiledBody = xss(marked(this.body))
     },
-    getFilesSelectedText(length, defaultText) {
-      if (length === 0) {
-        return defaultText
-      } else if (length === 1) {
-        return '1 file selected'
-      } else if (length > 1) {
-        return length + ' files selected'
-      }
-    },
-  },
-  head() {
-    return {
-      bodyAttrs: {
-        class: this.currentVersionIndex > -1 ? 'no-scroll' : '',
-      },
-    }
   },
 }
 </script>
@@ -481,32 +461,6 @@ input {
 
 .multiselect {
   margin-top: 0.5rem;
-}
-
-[type='file'] {
-  border: 0;
-  clip: rect(0, 0, 0, 0);
-  height: 1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute !important;
-  white-space: nowrap;
-  width: 1px;
-
-  + label {
-    cursor: pointer;
-    border-radius: 5px;
-    color: var(--color-grey-5);
-    background-color: var(--color-grey-1);
-    padding: 10px 20px;
-  }
-
-  &:focus + label,
-  + label:hover,
-  &:focus + label {
-    background-color: var(--color-grey-2);
-    color: var(--color-text);
-  }
 }
 
 .initial {
@@ -587,38 +541,7 @@ input {
   padding: 10px;
 }
 
-.required:after {
-  content: ' *';
-  color: red;
-}
-
-.create-version-popup {
-  top: 0;
-  left: 0;
-  z-index: 1;
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  background-color: var(--color-grey-3);
-  border: none;
-  opacity: 0.6;
-  overflow-x: hidden;
-  cursor: pointer;
-}
-
 .create-version-popup-body {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 2;
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
-  padding: 5px 60px 60px 20px;
-  border-radius: 10px;
-  max-height: 80%;
-  overflow-y: auto;
-  background-color: var(--color-bg);
-
   .popup-icons {
     margin-top: 10px;
     margin-right: -20px;
@@ -627,7 +550,7 @@ input {
 
   .changelog-editor {
     padding: 20px;
-    width: 100%;
+    width: calc(100% - 40px);
     height: 200px;
     resize: none;
     outline: none;
@@ -688,9 +611,5 @@ button {
 
 .categories-input {
   margin-bottom: 15px;
-}
-
-.no-scroll {
-  overflow: hidden !important;
 }
 </style>

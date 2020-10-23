@@ -1,0 +1,50 @@
+<template>
+  <div v-if="showPopup">
+    <div class="popup-overlay" />
+    <div class="popup-body">
+      <slot></slot>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: 'Popup',
+  props: {
+    showPopup: {
+      type: Boolean,
+      default: false,
+    },
+  },
+}
+</script>
+
+<style lang="scss" scoped>
+.popup-overlay {
+  top: 0;
+  left: 0;
+  z-index: 1;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-grey-3);
+  border: none;
+  opacity: 0.6;
+  overflow-x: hidden;
+  cursor: pointer;
+}
+
+.popup-body {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  box-shadow: 0 2px 3px 1px var(--color-grey-2);
+  padding: 5px 60px 60px 20px;
+  border-radius: 10px;
+  max-height: 80%;
+  overflow-y: auto;
+  background-color: var(--color-bg);
+}
+</style>

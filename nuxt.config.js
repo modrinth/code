@@ -31,6 +31,7 @@ export default {
         content: 'Modrinth',
       },
       { hid: 'theme-color', name: 'theme-color', content: '#4d9227' },
+      { hid: 'color-scheme', name: 'color-scheme', content: 'light dark' },
 
       { hid: 'og:site_name', name: 'og:site_name', content: 'Modrinth' },
       {
@@ -45,6 +46,8 @@ export default {
         name: 'og:image',
         content: 'https://cdn.modrinth.com/modrinth.png',
       },
+      { hid: 'twitter:card', name: 'twitter:card', content: 'summary' },
+      { hid: 'twitter:site', name: 'twitter:site', content: '@modrinth' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
