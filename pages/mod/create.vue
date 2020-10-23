@@ -18,10 +18,10 @@
             alt="preview-image"
           />
           <FileInput
-            id="icon-file"
-            accept="image/x-png,image/gif,image/jpeg"
+            input-id="icon-file"
+            input-accept="image/*"
             default-text="Upload Icon"
-            :multiple="false"
+            :input-multiple="false"
             @change="showPreviewImage"
           />
         </div>
@@ -203,16 +203,17 @@
           v-model="versions[currentVersionIndex].version_body"
           class="changelog-editor"
         />
-        <label class="required" title="The files associated with the version">
-          Version Files
-        </label>
         <FileInput
           input-id="version-files"
-          input-accept="application/java-archive,application/zip"
+          input-accept="application/*"
           :input-multiple="true"
           default-text="Upload Files"
           @change="updateVersionFiles"
-        />
+        >
+          <label class="required" title="The files associated with the version">
+            Version Files
+          </label>
+        </FileInput>
       </Popup>
       <div class="versions-header">
         <h3>Versions</h3>

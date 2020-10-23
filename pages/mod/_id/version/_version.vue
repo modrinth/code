@@ -7,7 +7,7 @@
           <button class="trash red">
             <TrashIcon />
           </button>
-          <button class="upload">
+          <button class="upload" @click="showPopup = !showPopup">
             <UploadIcon />
           </button>
         </div>
@@ -46,6 +46,36 @@
         </div>
       </div>
     </div>
+    <Popup :show-popup="showPopup">
+      <h3 class="popup-title">Upload Files</h3>
+      <div v-if="currentError" class="error">
+        <h4>Error</h4>
+        <p>{{ currentError }}</p>
+      </div>
+      <FileInput
+        input-id="version-files"
+        input-accept="application/*"
+        default-text="Upload Files"
+        :input-multiple="true"
+        @change="addFiles"
+      >
+        <label class="required" title="The files associated with the version">
+          Version Files
+        </label>
+      </FileInput>
+      <div class="popup-buttons">
+        <button
+          class="trash-button"
+          @click="
+            showPopup = false
+            filesToUpload = []
+          "
+        >
+          <TrashIcon />
+        </button>
+        <button class="default-button" @click="uploadFiles">Upload</button>
+      </div>
+    </Popup>
   </ModPage>
 </template>
 <script>
@@ -55,6 +85,7 @@ import ModPage from '@/components/ModPage'
 import xss from 'xss'
 import marked from 'marked'
 
+import Popup from '@/components/Popup'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
@@ -64,6 +95,7 @@ import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
 
 export default {
   components: {
+    Popup,
     ModPage,
     ForgeIcon,
     FabricIcon,
@@ -112,6 +144,59 @@ export default {
       version,
       changelog,
     }
+  },
+  data() {
+    return {
+      showPopup: false,
+      currentError: null,
+      filesToUpload: [],
+    }
+  },
+  methods: {
+    addFiles(e) {
+      this.filesToUpload = e.target.files
+
+      for (let i = 0; i < e.target.files.length; i++) {
+        this.filesToUpload[i].multipartName = e.target.files[i].name.concat(
+          '-' + i
+        )
+      }
+    },
+    async uploadFiles() {
+      this.$nuxt.$loading.start()
+      this.currentError = null
+
+      const formData = new FormData()
+
+      formData.append('data', JSON.stringify({}))
+
+      for (const fileToUpload in this.filesToUpload) {
+        formData.append(
+          fileToUpload.multipartName,
+          new Blob([fileToUpload]),
+          fileToUpload.name
+        )
+      }
+
+      try {
+        await axios({
+          url: `https://api.modrinth.com/api/v1/version/${this.version.id}/file`,
+          method: 'POST',
+          data: formData,
+          headers: {
+            'Content-Type': 'multipart/form-data',
+            Authorization: this.$auth.getToken('local'),
+          },
+        })
+
+        await this.$router.go(null)
+      } catch (err) {
+        this.currentError = err.response.data.description
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }
+
+      this.$nuxt.$loading.finish()
+    },
   },
   head() {
     return {
@@ -264,5 +349,46 @@ export default {
       }
     }
   }
+}
+
+.popup-title {
+  margin-bottom: 40px;
+}
+
+.popup-buttons {
+  margin-top: 40px;
+  display: flex;
+  justify-content: left;
+  align-items: center;
+
+  .default-button {
+    border-radius: var(--size-rounded-sm);
+    cursor: pointer;
+    border: none;
+    padding: 10px;
+    background-color: var(--color-grey-1);
+    color: var(--color-grey-5);
+
+    &:hover,
+    &:focus {
+      color: var(--color-grey-4);
+    }
+  }
+
+  .trash-button {
+    cursor: pointer;
+    margin-right: 10px;
+    padding: 5px;
+    border: none;
+    border-radius: var(--size-rounded-sm);
+    color: #9b2c2c;
+    background-color: var(--color-bg);
+  }
+}
+
+.error {
+  margin: 20px 0;
+  border-left: #e04e3e 7px solid;
+  padding: 5px 20px 20px 20px;
 }
 </style>

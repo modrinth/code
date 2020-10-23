@@ -54,7 +54,10 @@
       </tbody>
     </table>
     <Popup
-      v-if="showPopup"
+      v-if="
+        this.$auth.loggedIn &&
+        members.find((x) => x.user_id === this.$auth.user.id)
+      "
       :show-popup="showPopup"
       class="create-version-popup-body"
     >
@@ -441,7 +444,6 @@ input {
 
 .popup-buttons {
   margin-top: 20px;
-  margin-left: auto;
   display: flex;
   justify-content: right;
   align-items: center;

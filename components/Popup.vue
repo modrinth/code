@@ -31,7 +31,6 @@ export default {
   border: none;
   opacity: 0.6;
   overflow-x: hidden;
-  cursor: pointer;
 }
 
 .popup-body {
@@ -41,7 +40,7 @@ export default {
   transform: translate(-50%, -50%);
   z-index: 2;
   box-shadow: 0 2px 3px 1px var(--color-grey-2);
-  padding: 5px 60px 60px 20px;
+  padding: 5px 60px 5px 20px;
   border-radius: 10px;
   max-height: 80%;
   overflow-y: auto;

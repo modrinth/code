@@ -2,14 +2,14 @@
   <div>
     <slot></slot>
     <input
-      :id="id"
+      :id="inputId"
       class="file-input"
       type="file"
-      :accept="accept"
-      :multiple="multiple"
+      :accept="inputAccept"
+      :multiple="inputMultiple"
       @change="onChange"
     />
-    <label :for="id">{{ text }}</label>
+    <label :for="inputId">{{ text }}</label>
   </div>
 </template>
 
@@ -41,7 +41,7 @@ export default {
   },
   methods: {
     onChange(files) {
-      const length = files.target.length
+      const length = files.target.files.length
 
       if (length === 0) {
         this.text = this.defaultText
