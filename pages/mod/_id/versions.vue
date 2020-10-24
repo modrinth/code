@@ -180,7 +180,14 @@
         </button>
       </div>
     </Popup>
-    <button class="default-button" @click="showPopup = !showPopup">
+    <button
+      v-if="
+        this.$auth.loggedIn &&
+        members.find((x) => x.user_id === this.$auth.user.id)
+      "
+      class="default-button"
+      @click="showPopup = !showPopup"
+    >
       New Version
     </button>
   </ModPage>

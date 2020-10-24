@@ -3,7 +3,13 @@
     <div class="version">
       <div class="header">
         <h3>{{ version.name }}</h3>
-        <div class="user-actions">
+        <div
+          v-if="
+            this.$auth.loggedIn &&
+            members.find((x) => x.user_id === this.$auth.user.id)
+          "
+          class="user-actions"
+        >
           <button class="trash red">
             <TrashIcon />
           </button>
