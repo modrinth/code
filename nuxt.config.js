@@ -69,6 +69,11 @@ export default {
         async: true,
         defer: true,
       },
+      {
+        src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
+        'data-ad-client': 'ca-pub-4615302805870170',
+        async: true,
+      },
     ],
   },
 

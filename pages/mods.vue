@@ -308,7 +308,9 @@ export default {
     if (this.$route.query.v)
       this.selectedVersions = this.$route.query.v.split(',')
     if (this.$route.query.s) {
-      this.sortType = this.$route.query.s
+      this.sortType.name = this.$route.query.s
+      this.sortType.display =
+        this.sortType.name.charAt(0).toUpperCase() + this.sortType.name.slice(1)
     }
     if (this.$route.query.m) {
       this.maxResults = this.$route.query.m
