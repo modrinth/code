@@ -299,7 +299,7 @@ export default {
 
       try {
         await axios({
-          url: 'https://api.modrinth.com/api/v1/version/version',
+          url: 'https://api.modrinth.com/api/v1/version',
           method: 'POST',
           data: formData,
           headers: {
