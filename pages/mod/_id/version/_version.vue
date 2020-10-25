@@ -140,8 +140,11 @@ export default {
 
     version.author = members.find((x) => x.user_id === version.author_id)
 
-    res = await axios.get(version.changelog_url)
-    const changelog = xss(marked(res.data))
+    let changelog = ''
+    if (version.changelog_url) {
+      res = await axios.get(version.changelog_url)
+      changelog = xss(marked(res.data))
+    }
 
     return {
       mod,
