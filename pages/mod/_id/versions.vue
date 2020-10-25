@@ -283,6 +283,7 @@ export default {
       const formData = new FormData()
 
       this.createdVersion.mod_id = this.$route.params.id
+      this.createdVersion.dependencies = []
 
       formData.append('data', JSON.stringify(this.createdVersion))
 
