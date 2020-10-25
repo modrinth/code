@@ -672,6 +672,18 @@
       ]
     }
   },
+  "5d7425cfa91e332bf7cc14aa5c300b997e941c49757606f6b906cb5e060d3179": {
+    "query": "\n            UPDATE mods\n            SET updated = NOW()\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "6562c876826ad3091a14eb50fa1f961a971c1d1bb158fc3dcb55d469a73facc6": {
     "query": "\n            SELECT v.mod_id, v.author_id, v.name, v.version_number,\n                v.changelog_url, v.date_published, v.downloads,\n                v.release_channel\n            FROM versions v\n            WHERE v.id = $1\n            ",
     "describe": {

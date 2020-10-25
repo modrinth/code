@@ -50,3 +50,8 @@ git = "https://github.com/launchbadge/sqlx/"
 branch = "master"
 default-features = false
 features = ["runtime-actix", "postgres", "chrono", "offline"]
+
+[dependencies.actix-ratelimit]
+# Temp until actix-ratelimit bumps version on cargo
+git = "https://github.com/TerminalWitchcraft/actix-ratelimit"
+rev = "870822067dfeae7cc0304352d81c4cb79ee27f5a"

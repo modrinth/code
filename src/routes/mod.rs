@@ -32,10 +32,10 @@ pub fn mods_config(cfg: &mut web::ServiceConfig) {
 
 pub fn versions_config(cfg: &mut web::ServiceConfig) {
     cfg.service(versions::versions_get);
+    cfg.service(version_creation::version_create);
     cfg.service(
         web::scope("version")
             .service(versions::version_get)
-            .service(version_creation::version_create)
             .service(versions::version_delete)
             .service(version_creation::upload_file_to_version),
     );

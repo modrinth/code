@@ -70,7 +70,7 @@ pub fn check_version(version: &InitialVersionData) -> Result<(), CreateError> {
     Ok(())
 }
 
-// under `/api/v1/mod/{mod_id}`
+// under `/api/v1/version`
 #[post("version")]
 pub async fn version_create(
     req: HttpRequest,
@@ -107,7 +107,6 @@ pub async fn version_create(
     result
 }
 
-/// TODO: Update mod timestamp when new version is created
 async fn version_create_inner(
     req: HttpRequest,
     mut payload: Multipart,
@@ -339,7 +338,7 @@ async fn version_create_inner(
 
 // TODO: file deletion, listing, etc
 
-// under /api/v1/mod/{mod_id}/version/{version_id}
+// under /api/v1/version/{version_id}
 #[post("{version_id}/file")]
 pub async fn upload_file_to_version(
     req: HttpRequest,
