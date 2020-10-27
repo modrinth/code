@@ -23,7 +23,6 @@ export default {
           'Modrinth is a mod distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including the forge and fabric mod loaders.',
       },
 
-      { hid: 'author', name: 'author', content: 'Modrinth' },
       { hid: 'publisher', name: 'publisher', content: 'Guavy LLC' },
       {
         hid: 'apple-mobile-web-app-title',

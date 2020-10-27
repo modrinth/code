@@ -328,15 +328,14 @@ export default {
             this.mod.description +
             ' View other minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform that is compatible with CurseForge too!',
         },
-
         {
           hid: 'apple-mobile-web-app-title',
           name: 'apple-mobile-web-app-title',
           content: this.mod.title,
         },
         {
-          hid: 'og:site_name',
-          name: 'og:site_name',
+          hid: 'og:title',
+          name: 'og:title',
           content: this.mod.title,
         },
         {
@@ -349,7 +348,7 @@ export default {
           name: 'og:description',
           content: this.mod.description,
         },
-        { hid: 'og:type', name: 'og:type', content: 'article' },
+        { hid: 'og:type', name: 'og:type', content: 'website' },
         {
           hid: 'og:image',
           name: 'og:image',
