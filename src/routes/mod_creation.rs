@@ -460,10 +460,10 @@ async fn mod_create_inner(
             status: status_id,
         };
 
-        let versions_list = mod_builder
+        let versions_list = mod_create_data
             .initial_versions
             .iter()
-            .flat_map(|v| v.game_versions.iter().map(|id| id.0.to_string()))
+            .flat_map(|v| v.game_versions.iter().map(|name| name.0.clone()))
             .collect::<std::collections::HashSet<String>>()
             .into_iter()
             .collect::<Vec<_>>();

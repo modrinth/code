@@ -28,9 +28,6 @@ pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiE
     Ok(HttpResponse::Ok().json(results))
 }
 
-// At some point this may take more info, but it should be able to
-// remain idempotent
-// TODO: don't fail if category already exists
 #[put("category/{name}")]
 pub async fn category_create(
     req: HttpRequest,
@@ -93,9 +90,6 @@ pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiErr
     Ok(HttpResponse::Ok().json(results))
 }
 
-// At some point this may take more info, but it should be able to
-// remain idempotent
-// TODO: don't fail if loader already exists
 #[put("loader/{name}")]
 pub async fn loader_create(
     req: HttpRequest,
@@ -152,19 +146,38 @@ pub async fn loader_delete(
     }
 }
 
-#[get("game_version")]
-pub async fn game_version_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = GameVersion::list(&**pool).await?;
-    Ok(HttpResponse::Ok().json(results))
+#[derive(serde::Deserialize)]
+pub struct GameVersionQueryData {
+    #[serde(rename = "type")]
+    type_: Option<String>,
 }
 
-// At some point this may take more info, but it should be able to
-// remain idempotent
+#[get("game_version")]
+pub async fn game_version_list(
+    pool: web::Data<PgPool>,
+    query: web::Query<GameVersionQueryData>,
+) -> Result<HttpResponse, ApiError> {
+    if let Some(type_) = &query.type_ {
+        let results = GameVersion::list_type(type_, &**pool).await?;
+        Ok(HttpResponse::Ok().json(results))
+    } else {
+        let results = GameVersion::list(&**pool).await?;
+        Ok(HttpResponse::Ok().json(results))
+    }
+}
+
+#[derive(serde::Deserialize)]
+pub struct GameVersionData {
+    #[serde(rename = "type")]
+    type_: String,
+}
+
 #[put("game_version/{name}")]
 pub async fn game_version_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     game_version: web::Path<(String,)>,
+    version_data: web::Json<GameVersionData>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_admin_from_headers(
         req.headers(),
@@ -178,8 +191,12 @@ pub async fn game_version_create(
 
     let name = game_version.into_inner().0;
 
+    // The version type currently isn't limited, but it should be one of:
+    // "release", "snapshot", "alpha", "beta", "other"
+
     let _id = GameVersion::builder()
         .version(&name)?
+        .version_type(&version_data.type_)?
         .insert(&**pool)
         .await?;
 

@@ -278,26 +278,6 @@
       ]
     }
   },
-  "1b74bdb59773ffd2a78a56e4d920bb83c322e180e6174c741d4bb722c353de43": {
-    "query": "\n            INSERT INTO loaders (loader)\n            VALUES ($1)\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "1c7b0eb4341af5a7942e52f632cf582561f10b4b6a41a082fb8a60f04ac17c6e": {
     "query": "SELECT EXISTS(SELECT 1 FROM states WHERE id=$1)",
     "describe": {
@@ -499,6 +479,27 @@
       "nullable": []
     }
   },
+  "3d18702f07161c0cdbc31d70b89ffeb3678617ccc44dfc6fb03dd63f47226c7b": {
+    "query": "\n            INSERT INTO game_versions (version, type)\n            VALUES ($1, $2)\n            ON CONFLICT (version) DO UPDATE\n                SET type = excluded.type\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "42e072309779598d0c213280dd8052d1b4889cb24ef5204ca13b74f693b94328": {
     "query": "\n                SELECT user_id FROM team_members tm\n                INNER JOIN mods ON mods.team_id = tm.team_id\n                WHERE mods.id = $1\n                ",
     "describe": {
@@ -552,6 +553,26 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "49e36828e3a0214b48234435e34311735ae32e08d8be1270f8f0db4b27e708ba": {
+    "query": "\n            INSERT INTO loaders (loader)\n            VALUES ($1)\n            ON CONFLICT (loader) DO NOTHING\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "4c99c0840159d18e88cd6094a41117258f2337346c145d926b5b610c76b5125f": {
@@ -618,26 +639,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "56cb9274e92f185dee3accf69cca2e34c035efbef908baefeb60548fb14e02bd": {
-    "query": "\n            INSERT INTO categories (category)\n            VALUES ($1)\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
     }
   },
   "59cf9d085593887595ea45246291f2cd64fc6677d551e96bdb60c09ff1eebf99": {
@@ -1224,26 +1225,6 @@
       "nullable": []
     }
   },
-  "bee1e8b7f3588c6b0534443775f3d0d66d960e96a5ae8422aa96a69238f375a4": {
-    "query": "\n            INSERT INTO game_versions (version)\n            VALUES ($1)\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "bf7f721664f5e0ed41adc41b5483037256635f28ff6c4e5d3cbcec4387f9c8ef": {
     "query": "SELECT EXISTS(SELECT 1 FROM users WHERE id=$1)",
     "describe": {
@@ -1735,6 +1716,26 @@
       ]
     }
   },
+  "ec4a3ef12a35bb78002fdafccbdb198b15f9a0fdb2b3e4108f9081b7e56e8769": {
+    "query": "\n            SELECT version FROM game_versions\n            WHERE type = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "f0db9d8606ccc2196a9cfafe0e7090dab42bf790f25e0469b8947fac1cf043d5": {
     "query": "\n            SELECT version FROM game_versions\n            WHERE id = $1\n            ",
     "describe": {
@@ -1768,6 +1769,26 @@
       "parameters": {
         "Left": [
           "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "f12ae54acf02e06e9b8774e8c2ea95058a78f6d724645adcd02f9dea6538024f": {
+    "query": "\n            INSERT INTO categories (category)\n            VALUES ($1)\n            ON CONFLICT (category) DO NOTHING\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar"
         ]
       },
       "nullable": [

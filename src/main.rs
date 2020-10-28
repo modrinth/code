@@ -201,6 +201,8 @@ async fn main() -> std::io::Result<()> {
         });
     }
 
+    scheduler::schedule_versions(&mut scheduler, pool.clone(), skip_initial);
+
     let allowed_origins = dotenv::var("CORS_ORIGINS")
         .ok()
         .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
