@@ -1,7 +1,6 @@
 <template>
   <div class="content">
     <h2>My projects</h2>
-
     <div class="section-header">
       <h3>Mods</h3>
       <nuxt-link class="create-button" to="/mod/create"
@@ -55,6 +54,7 @@
         </tr>
       </tbody>
     </table>
+    <div data-ea-publisher="modrinth-com" data-ea-type="text" />
   </div>
 </template>
 

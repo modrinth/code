@@ -11,9 +11,10 @@
         <p v-if="user.role === 'developer'" class="badge green">Developer</p>
       </div>
     </div>
+    <div data-ea-publisher="modrinth-com" data-ea-type="text" />
     <div class="user-mods">
       <SearchResult
-        v-for="(result, index) in mods"
+        v-for="result in mods"
         :id="result.mod_id"
         :key="result.mod_id"
         :name="result.title"
@@ -26,7 +27,6 @@
         :author-url="result.author_url"
         :page-url="result.page_url"
         :categories="result.categories"
-        :is-ad="index === -1"
       />
     </div>
   </div>

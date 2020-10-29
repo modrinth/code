@@ -54,6 +54,7 @@
         ></pagination>
       </section>
       <div class="results column-grow-4">
+        <div data-ea-publisher="modrinth-com" data-ea-type="text" />
         <SearchResult
           v-for="(result, index) in results"
           :id="result.mod_id"

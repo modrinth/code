@@ -22,6 +22,7 @@
           <p>{{ mod.description }}</p>
         </div>
       </div>
+      <div data-ea-publisher="modrinth-com" data-ea-type="text" />
       <div class="mod-navigation">
         <nuxt-link :to="'/mod/' + mod.id">
           <InfoIcon />

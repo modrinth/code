@@ -209,10 +209,6 @@ export default {
         return []
       },
     },
-    isAd: {
-      type: Boolean,
-      default: false,
-    },
   },
   methods: {
     formatNumber(x) {
