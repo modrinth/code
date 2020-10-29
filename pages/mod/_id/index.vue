@@ -56,34 +56,37 @@ export default {
       title: this.mod.title + ' - Modrinth',
       meta: [
         {
-          hid: 'description',
-          name: 'description',
-          content:
-            this.mod.description +
-            ' View other minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform that is compatible with CurseForge too!',
+          hid: 'og:type',
+          name: 'og:type',
+          content: 'website',
         },
-
+        {
+          hid: 'og:title',
+          name: 'og:title',
+          content: this.mod.title,
+        },
         {
           hid: 'apple-mobile-web-app-title',
           name: 'apple-mobile-web-app-title',
           content: this.mod.title,
         },
         {
-          hid: 'og:site_name',
-          name: 'og:site_name',
-          content: this.mod.title,
+          hid: 'og:description',
+          name: 'og:description',
+          content: this.mod.description,
+        },
+        {
+          hid: 'description',
+          name: 'description',
+          content:
+            this.mod.description +
+            ' View other minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform that is compatible with CurseForge too!',
         },
         {
           hid: 'og:url',
           name: 'og:url',
           content: `https://modrinth.com/mod/${this.mod.id}`,
         },
-        {
-          hid: 'og:description',
-          name: 'og:description',
-          content: this.mod.description,
-        },
-        { hid: 'og:type', name: 'og:type', content: 'article' },
         {
           hid: 'og:image',
           name: 'og:image',
