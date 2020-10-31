@@ -1,6 +1,6 @@
 <template>
   <div
-    :class="$colorMode.value"
+    class="ethical-ad"
     data-ea-publisher="modrinth-com"
     :data-ea-type="type"
     data-ea-manual="true"
@@ -20,6 +20,9 @@ export default {
     try {
       // eslint-disable-next-line no-undef
       ethicalads.load()
+
+      const element = document.getElementsByClassName('ethical-ad')
+      element[0].className = 'ethical-ad loaded ' + this.$colorMode.preference
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error(err)

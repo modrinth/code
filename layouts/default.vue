@@ -193,10 +193,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              @click="
-                $colorMode.preference =
-                  $colorMode.value === 'dark' ? 'light' : 'dark'
-              "
+              @click="changeTheme"
             >
               <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
             </svg>
@@ -208,10 +205,7 @@
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              @click="
-                $colorMode.preference =
-                  $colorMode.value === 'dark' ? 'light' : 'dark'
-              "
+              @click="changeTheme"
             >
               <circle cx="12" cy="12" r="5"></circle>
               <line x1="12" y1="1" x2="12" y2="3"></line>
@@ -249,6 +243,9 @@ export default {
       showPopup: false,
     }
   },
+  mounted() {
+    this.themeAds()
+  },
   methods: {
     toggleNavMenu() {
       document.body.style.overflow =
@@ -257,6 +254,19 @@ export default {
     logout() {
       this.$auth.setToken('local', false)
       this.$router.go(null)
+    },
+    changeTheme() {
+      this.$colorMode.preference =
+        this.$colorMode.value === 'dark' ? 'light' : 'dark'
+
+      this.themeAds()
+    },
+    themeAds() {
+      const elements = document.getElementsByClassName('ethical-ad')
+
+      for (const elem of elements) {
+        elem.className = 'ethical-ad loaded ' + this.$colorMode.preference
+      }
     },
   },
 }
