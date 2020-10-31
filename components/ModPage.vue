@@ -22,7 +22,6 @@
           <p>{{ mod.description }}</p>
         </div>
       </div>
-      <div data-ea-publisher="modrinth-com" data-ea-type="text" />
       <div class="mod-navigation">
         <nuxt-link :to="'/mod/' + mod.id">
           <InfoIcon />
@@ -81,7 +80,7 @@
           </div>
         </div>
       </div>
-      <div>
+      <div v-if="versions.length > 0">
         <h3>Featured Versions</h3>
         <div
           v-for="version in versions"
@@ -127,12 +126,15 @@
             <DownloadIcon />
           </nuxt-link>
         </div>
+        <EthicalAd type="image" />
       </div>
     </section>
   </div>
 </template>
 
 <script>
+import EthicalAd from '@/components/EthicalAd'
+
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
@@ -145,6 +147,7 @@ import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
 export default {
   name: 'ModPage',
   components: {
+    EthicalAd,
     ExternalIcon,
     InfoIcon,
     VersionIcon,

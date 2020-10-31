@@ -54,14 +54,16 @@
         </tr>
       </tbody>
     </table>
-    <div data-ea-publisher="modrinth-com" data-ea-type="text" />
+    <EthicalAd />
   </div>
 </template>
 
 <script>
 import axios from 'axios'
+import EthicalAd from '@/components/EthicalAd'
 
 export default {
+  components: { EthicalAd },
   async fetch() {
     try {
       let res = await axios.get(

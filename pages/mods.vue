@@ -54,7 +54,7 @@
         ></pagination>
       </section>
       <div class="results column-grow-4">
-        <div data-ea-publisher="modrinth-com" data-ea-type="text" />
+        <EthicalAd type="text" />
         <SearchResult
           v-for="(result, index) in results"
           :id="result.mod_id"
@@ -261,6 +261,7 @@ import SearchResult from '@/components/ModResult'
 import Pagination from '@/components/Pagination'
 import SearchFilter from '@/components/SearchFilter'
 
+import EthicalAd from '@/components/EthicalAd'
 import TechCategory from '~/assets/images/categories/tech.svg?inline'
 import AdventureCategory from '~/assets/images/categories/adventure.svg?inline'
 import CursedCategory from '~/assets/images/categories/cursed.svg?inline'
@@ -280,6 +281,7 @@ import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 export default {
   auth: false,
   components: {
+    EthicalAd,
     SearchResult,
     Pagination,
     Multiselect,
@@ -345,7 +347,7 @@ export default {
     async fillInitialVersions() {
       try {
         const res = await axios.get(
-          'https://api.modrinth.com/api/v1/tag/game_version'
+          'https://api.modrinth.com/api/v1/tag/game_version?type=release'
         )
 
         this.versions = res.data
