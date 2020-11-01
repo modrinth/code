@@ -170,6 +170,7 @@ pub async fn game_version_list(
 pub struct GameVersionData {
     #[serde(rename = "type")]
     type_: String,
+    date: Option<chrono::DateTime<chrono::Utc>>,
 }
 
 #[put("game_version/{name}")]
@@ -194,11 +195,15 @@ pub async fn game_version_create(
     // The version type currently isn't limited, but it should be one of:
     // "release", "snapshot", "alpha", "beta", "other"
 
-    let _id = GameVersion::builder()
+    let mut builder = GameVersion::builder()
         .version(&name)?
-        .version_type(&version_data.type_)?
-        .insert(&**pool)
-        .await?;
+        .version_type(&version_data.type_)?;
+
+    if let Some(date) = &version_data.date {
+        builder = builder.created(date);
+    }
+
+    let _id = builder.insert(&**pool).await?;
 
     Ok(HttpResponse::Ok().body(""))
 }
