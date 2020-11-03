@@ -150,6 +150,32 @@
 export default {
   auth: false,
   layout: 'home',
+  head: {
+    title: 'TOS - Modrinth',
+    meta: [
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'The Terms of Service of Modrinth, an open source modding platform. Modrinth currently supports Minecraft, including the forge and fabric mod loaders.',
+      },
+      {
+        hid: 'apple-mobile-web-app-title',
+        name: 'apple-mobile-web-app-title',
+        content: 'Terms of Service',
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'Terms of Service',
+      },
+      {
+        hid: 'og:url',
+        name: 'og:url',
+        content: `https://modrinth.com/tos`,
+      },
+    ],
+  },
 }
 </script>
 

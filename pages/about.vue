@@ -23,6 +23,32 @@
 export default {
   auth: false,
   layout: 'home',
+  head: {
+    title: 'About - Modrinth',
+    meta: [
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'View information about Modrinth, an open source modding platform here! Modrinth currently supports Minecraft, including the forge and fabric mod loaders.',
+      },
+      {
+        hid: 'apple-mobile-web-app-title',
+        name: 'apple-mobile-web-app-title',
+        content: 'About',
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'About',
+      },
+      {
+        hid: 'og:url',
+        name: 'og:url',
+        content: `https://modrinth.com/about`,
+      },
+    ],
+  },
 }
 </script>
 

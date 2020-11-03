@@ -141,6 +141,32 @@
 export default {
   auth: false,
   layout: 'home',
+  head: {
+    title: 'Privacy - Modrinth',
+    meta: [
+      {
+        hid: 'description',
+        name: 'description',
+        content:
+          'The privacy policy of Modrinth, an open source modding platform. Modrinth currently supports Minecraft, including the forge and fabric mod loaders.',
+      },
+      {
+        hid: 'apple-mobile-web-app-title',
+        name: 'apple-mobile-web-app-title',
+        content: 'Privacy Policy',
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'Privacy Policy',
+      },
+      {
+        hid: 'og:url',
+        name: 'og:url',
+        content: `https://modrinth.com/privacy`,
+      },
+    ],
+  },
 }
 </script>
 

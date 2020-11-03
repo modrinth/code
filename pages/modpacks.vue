@@ -36,6 +36,26 @@
 <script>
 export default {
   auth: false,
+  head: {
+    title: 'Packs - Modrinth',
+    meta: [
+      {
+        hid: 'apple-mobile-web-app-title',
+        name: 'apple-mobile-web-app-title',
+        content: 'Packs',
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'Packs',
+      },
+      {
+        hid: 'og:url',
+        name: 'og:url',
+        content: `https://modrinth.com/modpacks`,
+      },
+    ],
+  },
 }
 </script>
 
