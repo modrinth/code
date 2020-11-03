@@ -55,7 +55,7 @@
 
           <h3>Community</h3>
           <section>
-            <nuxt-link to="/support">
+            <nuxt-link to="/documentation">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -71,7 +71,7 @@
                 <line x1="14.83" y1="9.17" x2="18.36" y2="5.64" />
                 <line x1="4.93" y1="19.07" x2="9.17" y2="14.83" />
               </svg>
-              <span>Support</span>
+              <span>Documentation</span>
             </nuxt-link>
             <nuxt-link to="/guides">
               <svg
@@ -222,6 +222,10 @@
       </nav>
     </aside>
     <main>
+      <div class="alpha-alert">
+        Modrinth is in early alpha. You can join our
+        <a href="https://discord.gg/gFRbNQ2">discord</a> for updates!
+      </div>
       <nuxt />
     </main>
   </div>
@@ -597,6 +601,16 @@ export default {
         padding: 1rem;
       }
     }
+  }
+}
+
+.alpha-alert {
+  text-align: center;
+  padding: 1em;
+  background-color: var(--color-grey-1);
+
+  a {
+    color: var(--color-grey-3);
   }
 }
 

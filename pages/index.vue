@@ -1,16 +1,5 @@
 <template>
   <div>
-    <header class="columns">
-      <nuxt-link to="/">
-        <img class="logo" src="~/assets/images/logo.svg" alt="logo" />
-      </nuxt-link>
-      <div class="links">
-        <nuxt-link to="/">Home</nuxt-link>
-        <nuxt-link to="/mods">Mods</nuxt-link>
-        <nuxt-link to="/modpacks">Packs</nuxt-link>
-        <nuxt-link to="/about">About</nuxt-link>
-      </div>
-    </header>
     <div class="main-hero columns">
       <div class="left">
         <h1 class="typewriter">{{ currentText }}</h1>
@@ -161,41 +150,13 @@
         <img src="~/assets/images/api.gif" alt="api" loading="lazy" />
       </div>
     </div>
-    <footer>
-      <div class="logo-wrapper columns">
-        <img class="logo" src="~/assets/images/logo.svg" alt="logo" />
-        <p class="name">modrinth</p>
-      </div>
-      <p class="copyright">© Guavy LLC</p>
-      <div class="column">
-        <h4 class="pages">Pages</h4>
-        <nuxt-link to="/">Home</nuxt-link>
-        <nuxt-link to="/mods">Mods</nuxt-link>
-        <nuxt-link to="/packs">Packs</nuxt-link>
-        <nuxt-link to="/about">About</nuxt-link>
-        <nuxt-link to="/support">Support</nuxt-link>
-        <nuxt-link to="/guides">Guides</nuxt-link>
-      </div>
-      <div class="column">
-        <h4 class="developers">Developers</h4>
-        <nuxt-link to="/developers">Documentation</nuxt-link>
-        <a href="https://github.com/modrinth">Open Source</a>
-        <a href="https://github.com/modrinth/knossos/issues">Issues</a>
-      </div>
-      <div class="column">
-        <h4 class="legal">Legal</h4>
-        <nuxt-link to="/tos">Terms of Service</nuxt-link>
-        <nuxt-link to="/privacy">Privacy Policy</nuxt-link>
-        <nuxt-link to="/content">Content Policy</nuxt-link>
-      </div>
-    </footer>
   </div>
 </template>
 
 <script>
 export default {
   auth: false,
-  layout: 'none',
+  layout: 'home',
   data() {
     return {
       currentText: 'Open source',
@@ -235,35 +196,6 @@ export default {
 .left,
 .right {
   width: 50%;
-}
-
-header {
-  width: 100%;
-
-  .logo {
-    margin: 25px 50px;
-    height: 100px;
-  }
-
-  .links {
-    margin: auto 0;
-
-    a {
-      text-transform: uppercase;
-      font-weight: bold;
-      margin: 0 25px;
-
-      &:hover,
-      &:focus {
-        background-color: var(--color-grey-1);
-        color: var(--color-text);
-      }
-
-      &.nuxt-link-active {
-        border-bottom: 3px var(--color-brand) solid;
-      }
-    }
-  }
 }
 
 .main-hero {
@@ -389,53 +321,43 @@ header {
     }
   }
   img {
+    color: var(--color-text);
     align-self: flex-start;
   }
 }
 
-footer {
-  justify-content: center;
-  margin-top: 250px;
-  margin-bottom: 100px;
-  display: grid;
-  column-gap: 50px;
-  grid-template-columns: 175px 120px 120px 175px;
-  grid-template-rows: 20px 20px 20px 20px 20px 20px 20px 20px 20px 20px 20px 20px;
+@media screen and (max-width: 500px) {
+  .hero {
+    margin-top: 0 !important;
+  }
+}
 
-  .logo-wrapper {
-    grid-column-start: 1;
-    grid-row-start: 1;
+@media screen and (max-width: 1300px) {
+  .workflow {
+    display: none;
+  }
 
-    .logo {
-      width: 30px;
-    }
-    .name {
-      place-self: center;
-      margin: 0;
-      font-size: 20px;
-      font-family: 'Montserrat Alternates', serif;
-    }
+  .right {
+    display: none;
   }
-  .copyright {
-    grid-column-start: 1;
-    grid-row-start: 10;
-    color: var(--color-grey-6);
+
+  .left {
+    padding-left: 0 !important;
+    text-align: center;
+    width: 100%;
   }
-  h4 {
-    font-weight: 600;
-    margin: 0 0 20px;
-    grid-row-start: 1;
+
+  .hero {
+    margin-top: 100px;
+    text-align: center;
+    margin-left: 0;
+    width: 100%;
   }
-  .column {
-    display: grid;
-    row-gap: 5px;
-    grid-template-rows: 40px 20px 20px 20px 20px 20px 20px 20px;
-    a {
-      &:hover,
-      &:focus {
-        color: var(--color-grey-5);
-      }
-    }
+}
+
+@media screen and (min-width: 1300px) and (max-width: 1500px) {
+  .hero {
+    margin-left: 10%;
   }
 }
 </style>

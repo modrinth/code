@@ -32,7 +32,11 @@ export default {
 </script>
 
 <style scoped>
+[data-ea-type='text'] {
+  min-height: 70px;
+}
 [data-ea-type='image'] {
   margin: auto 10px;
+  min-height: 260px;
 }
 </style>

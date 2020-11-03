@@ -243,7 +243,7 @@ export default {
 
 .mod-info {
   top: 1rem;
-  height: calc(100vh - 3rem);
+  max-height: calc(100vh - 3rem);
   position: sticky;
   min-width: 270px;
   max-width: 270px;
