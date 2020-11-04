@@ -523,6 +523,18 @@ impl Version {
             Ok(None)
         }
     }
+
+    pub async fn get_many_full<'a, E>(
+        version_ids: Vec<VersionId>,
+        exec: E,
+    ) -> Result<Vec<Option<QueryVersion>>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        // TODO: this could be optimized
+        futures::future::try_join_all(version_ids.into_iter().map(|id| Self::get_full(id, exec)))
+            .await
+    }
 }
 
 pub struct ReleaseChannel {

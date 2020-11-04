@@ -48,7 +48,6 @@ pub struct VersionIds {
     pub ids: String,
 }
 
-// TODO: Make this return the versions mod struct
 #[get("versions")]
 pub async fn versions_get(
     web::Query(ids): web::Query<VersionIds>,
@@ -58,30 +57,14 @@ pub async fn versions_get(
         .into_iter()
         .map(|x| x.into())
         .collect();
-    let versions_data = database::models::Version::get_many(version_ids, &**pool)
+    let versions_data = database::models::Version::get_many_full(version_ids, &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-    use models::mods::VersionType;
     let versions: Vec<models::mods::Version> = versions_data
         .into_iter()
-        .map(|data| models::mods::Version {
-            id: data.id.into(),
-            mod_id: data.mod_id.into(),
-            author_id: data.author_id.into(),
-
-            name: data.name,
-            version_number: data.version_number,
-            changelog_url: data.changelog_url,
-            date_published: data.date_published,
-            downloads: data.downloads as u32,
-            version_type: VersionType::Release,
-
-            files: vec![],
-            dependencies: Vec::new(), // TODO: dependencies
-            game_versions: vec![],
-            loaders: vec![],
-        })
+        .filter_map(|v| v)
+        .map(convert_version)
         .collect();
 
     Ok(HttpResponse::Ok().json(versions))
@@ -98,58 +81,61 @@ pub async fn version_get(
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     if let Some(data) = version_data {
-        use models::mods::VersionType;
-
-        let response = models::mods::Version {
-            id: data.id.into(),
-            mod_id: data.mod_id.into(),
-            author_id: data.author_id.into(),
-
-            name: data.name,
-            version_number: data.version_number,
-            changelog_url: data.changelog_url,
-            date_published: data.date_published,
-            downloads: data.downloads as u32,
-            version_type: match data.release_channel.as_str() {
-                "release" => VersionType::Release,
-                "beta" => VersionType::Beta,
-                "alpha" => VersionType::Alpha,
-                _ => VersionType::Alpha,
-            },
-
-            files: data
-                .files
-                .into_iter()
-                .map(|f| {
-                    models::mods::VersionFile {
-                        url: f.url,
-                        filename: f.filename,
-                        // FIXME: Hashes are currently stored as an ascii byte slice instead
-                        // of as an actual byte array in the database
-                        hashes: f
-                            .hashes
-                            .into_iter()
-                            .map(|(k, v)| Some((k, String::from_utf8(v).ok()?)))
-                            .collect::<Option<_>>()
-                            .unwrap_or_else(Default::default),
-                    }
-                })
-                .collect(),
-            dependencies: Vec::new(), // TODO: dependencies
-            game_versions: data
-                .game_versions
-                .into_iter()
-                .map(models::mods::GameVersion)
-                .collect(),
-            loaders: data
-                .loaders
-                .into_iter()
-                .map(models::mods::ModLoader)
-                .collect(),
-        };
-        Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(convert_version(data)))
     } else {
         Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+fn convert_version(data: database::models::version_item::QueryVersion) -> models::mods::Version {
+    use models::mods::VersionType;
+
+    models::mods::Version {
+        id: data.id.into(),
+        mod_id: data.mod_id.into(),
+        author_id: data.author_id.into(),
+
+        name: data.name,
+        version_number: data.version_number,
+        changelog_url: data.changelog_url,
+        date_published: data.date_published,
+        downloads: data.downloads as u32,
+        version_type: match data.release_channel.as_str() {
+            "release" => VersionType::Release,
+            "beta" => VersionType::Beta,
+            "alpha" => VersionType::Alpha,
+            _ => VersionType::Alpha,
+        },
+
+        files: data
+            .files
+            .into_iter()
+            .map(|f| {
+                models::mods::VersionFile {
+                    url: f.url,
+                    filename: f.filename,
+                    // FIXME: Hashes are currently stored as an ascii byte slice instead
+                    // of as an actual byte array in the database
+                    hashes: f
+                        .hashes
+                        .into_iter()
+                        .map(|(k, v)| Some((k, String::from_utf8(v).ok()?)))
+                        .collect::<Option<_>>()
+                        .unwrap_or_else(Default::default),
+                }
+            })
+            .collect(),
+        dependencies: Vec::new(), // TODO: dependencies
+        game_versions: data
+            .game_versions
+            .into_iter()
+            .map(models::mods::GameVersion)
+            .collect(),
+        loaders: data
+            .loaders
+            .into_iter()
+            .map(models::mods::ModLoader)
+            .collect(),
     }
 }
 

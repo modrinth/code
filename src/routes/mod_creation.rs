@@ -5,7 +5,7 @@ use crate::models::error::ApiError;
 use crate::models::mods::{ModId, ModStatus, VersionId};
 use crate::models::users::UserId;
 use crate::routes::version_creation::InitialVersionData;
-use crate::search::indexing::queue::CreationQueue;
+use crate::search::indexing::{queue::CreationQueue, IndexingError};
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::Data;
@@ -13,7 +13,6 @@ use actix_web::{post, HttpRequest, HttpResponse};
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
-use std::borrow::Cow;
 use std::sync::Arc;
 use thiserror::Error;
 
@@ -25,6 +24,8 @@ pub enum CreateError {
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
     DatabaseError(#[from] models::DatabaseError),
+    #[error("Indexing Error: {0}")]
+    IndexingError(#[from] IndexingError),
     #[error("Error while parsing multipart payload")]
     MultipartError(actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
@@ -55,6 +56,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::SqlxDatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::IndexingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::FileHostingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::SerDeError(..) => StatusCode::BAD_REQUEST,
             CreateError::MultipartError(..) => StatusCode::BAD_REQUEST,
@@ -75,6 +77,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::EnvError(..) => "environment_error",
                 CreateError::SqlxDatabaseError(..) => "database_error",
                 CreateError::DatabaseError(..) => "database_error",
+                CreateError::IndexingError(..) => "indexing_error",
                 CreateError::FileHostingError(..) => "file_hosting_error",
                 CreateError::SerDeError(..) => "invalid_input",
                 CreateError::MultipartError(..) => "invalid_input",
@@ -460,40 +463,7 @@ async fn mod_create_inner(
             status: status_id,
         };
 
-        let versions_list = mod_create_data
-            .initial_versions
-            .iter()
-            .flat_map(|v| v.game_versions.iter().map(|name| name.0.clone()))
-            .collect::<std::collections::HashSet<String>>()
-            .into_iter()
-            .collect::<Vec<_>>();
-
         let now = chrono::Utc::now();
-        let timestamp = now.timestamp();
-
-        let index_mod = crate::search::UploadSearchMod {
-            mod_id: format!("local-{}", mod_id),
-            title: mod_builder.title.clone(),
-            description: mod_builder.description.clone(),
-            categories: mod_create_data.categories.clone(),
-            versions: versions_list,
-            page_url: format!("https://modrinth.com/mod/{}", mod_id),
-            // This should really be optional in the index
-            icon_url: mod_builder.icon_url.clone().unwrap_or_else(String::new),
-            author: current_user.username.clone(),
-            author_url: format!("https://modrinth.com/user/{}", current_user.id),
-            // TODO: latest version info
-            latest_version: String::new(),
-            downloads: 0,
-            date_created: now,
-            created_timestamp: timestamp,
-            date_modified: now,
-            modified_timestamp: timestamp,
-            host: Cow::Borrowed("modrinth"),
-            empty: Cow::Borrowed("{}{}{}"),
-        };
-
-        indexing_queue.add(index_mod);
 
         let response = crate::models::mods::Mod {
             id: mod_id,
@@ -505,7 +475,7 @@ async fn mod_create_inner(
             updated: now,
             status,
             downloads: 0,
-            categories: mod_create_data.categories.clone(),
+            categories: mod_create_data.categories,
             versions: mod_builder
                 .initial_versions
                 .iter()
@@ -518,6 +488,11 @@ async fn mod_create_inner(
         };
 
         let _mod_id = mod_builder.insert(&mut *transaction).await?;
+
+        let index_mod =
+            crate::search::indexing::local_import::query_one(mod_id.into(), &mut *transaction)
+                .await?;
+        indexing_queue.add(index_mod);
 
         Ok(HttpResponse::Ok().json(response))
     }

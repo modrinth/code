@@ -33,43 +33,15 @@ pub async fn mods_get(
         .map(|x| x.into())
         .collect();
 
-    let mods_data = database::models::Mod::get_many(mod_ids, &**pool)
+    let mods_data = database::models::Mod::get_many_full(mod_ids, &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-    let mut mods: Vec<models::mods::Mod> = Vec::new();
-    for m in mods_data {
-        let status = sqlx::query!(
-            "
-                SELECT status FROM statuses
-                WHERE id = $1
-                ",
-            m.status.0,
-        )
-        .fetch_one(&**pool)
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?
-        .status;
-
-        mods.push(models::mods::Mod {
-            id: m.id.into(),
-            team: m.team_id.into(),
-            title: m.title,
-            description: m.description,
-            body_url: m.body_url,
-            published: m.published,
-            updated: m.updated,
-            status: models::mods::ModStatus::from_str(&*status),
-
-            downloads: m.downloads as u32,
-            categories: vec![],
-            versions: vec![],
-            icon_url: m.icon_url,
-            issues_url: m.issues_url,
-            source_url: m.source_url,
-            wiki_url: m.wiki_url,
-        })
-    }
+    let mods = mods_data
+        .into_iter()
+        .filter_map(|m| m)
+        .map(convert_mod)
+        .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(mods))
 }
@@ -85,41 +57,31 @@ pub async fn mod_get(
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     if let Some(data) = mod_data {
-        let m = data.inner;
-
-        let status = sqlx::query!(
-            "
-            SELECT status FROM statuses
-            WHERE id = $1
-            ",
-            m.status.0,
-        )
-        .fetch_one(&**pool)
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?
-        .status;
-
-        let response = models::mods::Mod {
-            id: m.id.into(),
-            team: m.team_id.into(),
-            title: m.title,
-            description: m.description,
-            body_url: m.body_url,
-            published: m.published,
-            updated: m.updated,
-            status: models::mods::ModStatus::from_str(&*status),
-
-            downloads: m.downloads as u32,
-            categories: data.categories,
-            versions: data.versions.into_iter().map(|v| v.into()).collect(),
-            icon_url: m.icon_url,
-            issues_url: m.issues_url,
-            source_url: m.source_url,
-            wiki_url: m.wiki_url,
-        };
-        Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(convert_mod(data)))
     } else {
         Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+fn convert_mod(data: database::models::mod_item::QueryMod) -> models::mods::Mod {
+    let m = data.inner;
+
+    models::mods::Mod {
+        id: m.id.into(),
+        team: m.team_id.into(),
+        title: m.title,
+        description: m.description,
+        body_url: m.body_url,
+        published: m.published,
+        updated: m.updated,
+        status: data.status,
+        downloads: m.downloads as u32,
+        categories: data.categories,
+        versions: data.versions.into_iter().map(|v| v.into()).collect(),
+        icon_url: m.icon_url,
+        issues_url: m.issues_url,
+        source_url: m.source_url,
+        wiki_url: m.wiki_url,
     }
 }
 

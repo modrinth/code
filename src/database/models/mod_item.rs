@@ -312,14 +312,37 @@ impl Mod {
             .try_collect::<Vec<VersionId>>()
             .await?;
 
+            let status = sqlx::query!(
+                "
+                SELECT status FROM statuses
+                WHERE id = $1
+                ",
+                inner.status.0,
+            )
+            .fetch_one(executor)
+            .await?
+            .status;
+
             Ok(Some(QueryMod {
                 inner,
                 categories,
                 versions,
+                status: crate::models::mods::ModStatus::from_str(&status),
             }))
         } else {
             Ok(None)
         }
+    }
+
+    pub async fn get_many_full<'a, E>(
+        mod_ids: Vec<ModId>,
+        exec: E,
+    ) -> Result<Vec<Option<QueryMod>>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        // TODO: this could be optimized
+        futures::future::try_join_all(mod_ids.into_iter().map(|id| Self::get_full(id, exec))).await
     }
 }
 
@@ -328,4 +351,5 @@ pub struct QueryMod {
 
     pub categories: Vec<String>,
     pub versions: Vec<VersionId>,
+    pub status: crate::models::mods::ModStatus,
 }

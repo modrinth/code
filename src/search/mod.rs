@@ -66,13 +66,13 @@ pub struct UploadSearchMod {
     pub author: String,
     pub title: String,
     pub description: String,
-    pub categories: Vec<String>,
+    pub categories: Vec<Cow<'static, str>>,
     pub versions: Vec<String>,
     pub downloads: i32,
     pub page_url: String,
     pub icon_url: String,
     pub author_url: String,
-    pub latest_version: String,
+    pub latest_version: Cow<'static, str>,
 
     /// RFC 3339 formatted creation date of the mod
     pub date_created: DateTime<Utc>,

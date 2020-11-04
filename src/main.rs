@@ -315,6 +315,11 @@ fn check_env_vars() {
 
     check_var::<usize>("LOCAL_INDEX_INTERVAL");
 
+    // In theory this should be an OsString since it's a path, but
+    // dotenv doesn't support that.  The usage of this does treat
+    // it as an OsString, though.
+    check_var::<String>("INDEX_CACHE_PATH");
+
     check_var::<String>("GITHUB_CLIENT_ID");
     check_var::<String>("GITHUB_CLIENT_SECRET");
 }
