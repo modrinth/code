@@ -11,7 +11,7 @@
         <p v-if="user.role === 'developer'" class="badge green">Developer</p>
       </div>
     </div>
-    <div data-ea-publisher="modrinth-com" data-ea-type="text" />
+    <EthicalAd />
     <div class="user-mods">
       <SearchResult
         v-for="result in mods"
@@ -35,10 +35,12 @@
 <script>
 import axios from 'axios'
 import SearchResult from '@/components/ModResult'
+import EthicalAd from '@/components/EthicalAd'
 
 export default {
   auth: false,
   components: {
+    EthicalAd,
     SearchResult,
   },
   async asyncData(data) {

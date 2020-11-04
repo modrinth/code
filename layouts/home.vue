@@ -23,13 +23,13 @@
         <h4 class="pages">Pages</h4>
         <nuxt-link to="/">Home</nuxt-link>
         <nuxt-link to="/mods">Mods</nuxt-link>
-        <nuxt-link to="/packs">Packs</nuxt-link>
+        <nuxt-link to="/modpacks">Packs</nuxt-link>
         <nuxt-link to="/about">About</nuxt-link>
         <nuxt-link to="/guides">Guides</nuxt-link>
       </div>
       <div class="column">
         <h4 class="developers">Developers</h4>
-        <nuxt-link to="/developers">Documentation</nuxt-link>
+        <nuxt-link to="/documentation">Documentation</nuxt-link>
         <a href="https://github.com/modrinth">Open Source</a>
         <a href="https://github.com/modrinth/knossos/issues">Issues</a>
       </div>

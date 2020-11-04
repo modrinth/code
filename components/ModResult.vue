@@ -21,11 +21,22 @@
         <DownloadIcon stroke="#3cdb36" />
         <p>{{ formatNumber(downloads) }}</p>
       </div>
-      <div class="result-image columns">
+      <div
+        v-tooltip="
+          $dayjs(createdAt).format('[Created on] YYYY-MM-DD [at] HH:mm A')
+        "
+        class="result-image columns"
+      >
         <CalendarIcon fill="#099fef" />
         <p>{{ $dayjs(createdAt).fromNow() }}</p>
       </div>
-      <div v-if="updatedAt" class="result-image columns">
+      <div
+        v-if="updatedAt"
+        v-tooltip="
+          $dayjs(updatedAt).format('[Updated on] YYYY-MM-DD [at] HH:mm A')
+        "
+        class="result-image columns"
+      >
         <svg
           viewBox="0 0 24 24"
           fill="none"

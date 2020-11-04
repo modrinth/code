@@ -1,10 +1,6 @@
 <template>
   <div class="content">
     <h2>Create Mod</h2>
-    <section v-if="currentError" class="error">
-      <h3>Error</h3>
-      <p>{{ currentError }}</p>
-    </section>
     <section>
       <h3>Initial Data</h3>
       <div class="initial">
@@ -315,7 +311,6 @@ export default {
   data() {
     return {
       previewImage: null,
-      currentError: null,
       compiledBody: '',
       releaseChannels: ['beta', 'alpha', 'release'],
       currentVersionIndex: -1,
@@ -334,7 +329,6 @@ export default {
   methods: {
     async createMod() {
       this.$nuxt.$loading.start()
-      this.currentError = null
 
       const formData = new FormData()
 
@@ -386,7 +380,13 @@ export default {
 
         await this.$router.replace('/dashboard/projects')
       } catch (err) {
-        this.currentError = err.response.data.description
+        this.$notify({
+          group: 'main',
+          title: 'An Error Occurred',
+          text: err.response.data.description,
+          type: 'error',
+        })
+
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
 
@@ -438,10 +438,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.error {
-  border-left: #e04e3e 7px solid;
-}
-
 section {
   box-shadow: 0 2px 3px 1px var(--color-grey-2);
   margin: 50px 25px;

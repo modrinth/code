@@ -261,7 +261,6 @@ export default {
   data() {
     return {
       showPopup: false,
-      currentError: null,
       createdVersion: {},
     }
   },
@@ -278,7 +277,6 @@ export default {
     },
     async createVersion() {
       this.$nuxt.$loading.start()
-      this.currentError = null
 
       const formData = new FormData()
 
@@ -310,7 +308,12 @@ export default {
 
         await this.$router.go(null)
       } catch (err) {
-        this.currentError = err.response.data.description
+        this.$notify({
+          group: 'main',
+          title: 'An Error Occurred',
+          text: err.response.data.description,
+          type: 'error',
+        })
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
 

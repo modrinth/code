@@ -54,10 +54,6 @@
     </div>
     <Popup :show-popup="showPopup">
       <h3 class="popup-title">Upload Files</h3>
-      <div v-if="currentError" class="error">
-        <h4>Error</h4>
-        <p>{{ currentError }}</p>
-      </div>
       <FileInput
         input-id="version-files"
         input-accept="application/*"
@@ -157,7 +153,6 @@ export default {
   data() {
     return {
       showPopup: false,
-      currentError: null,
       filesToUpload: [],
     }
   },
@@ -173,7 +168,6 @@ export default {
     },
     async uploadFiles() {
       this.$nuxt.$loading.start()
-      this.currentError = null
 
       const formData = new FormData()
 
@@ -200,7 +194,12 @@ export default {
 
         await this.$router.go(null)
       } catch (err) {
-        this.currentError = err.response.data.description
+        this.$notify({
+          group: 'main',
+          title: 'An Error Occurred',
+          text: err.response.data.description,
+          type: 'error',
+        })
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
 
@@ -393,11 +392,5 @@ export default {
     color: #9b2c2c;
     background-color: var(--color-bg);
   }
-}
-
-.error {
-  margin: 20px 0;
-  border-left: #e04e3e 7px solid;
-  padding: 5px 20px 20px 20px;
 }
 </style>

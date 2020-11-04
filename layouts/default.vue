@@ -222,6 +222,13 @@
       </nav>
     </aside>
     <main>
+      <notifications group="main" position="bottom right" />
+      <notifications
+        group="ads"
+        position="bottom right"
+        :duration="-1"
+        :ignore-duplicates="true"
+      />
       <div class="alpha-alert">
         Modrinth is in early alpha. You can join our
         <a href="https://discord.gg/gFRbNQ2">discord</a> for updates!
@@ -610,7 +617,8 @@ export default {
   background-color: var(--color-grey-1);
 
   a {
-    color: var(--color-grey-3);
+    text-decoration: underline;
+    color: var(--color-grey-5);
   }
 }
 

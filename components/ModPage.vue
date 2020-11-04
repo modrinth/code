@@ -57,78 +57,83 @@
       </div>
       <slot />
     </div>
-    <section class="mod-info">
-      <div class="mod-stats">
-        <h3>Info</h3>
-        <p>{{ mod.downloads }} Downloads</p>
-        <p>Created {{ $dayjs(mod.published).fromNow() }}</p>
-        <p>Updated {{ $dayjs(mod.updated).fromNow() }}</p>
-      </div>
-      <div>
-        <h3>Members</h3>
-        <div
-          v-for="member in members"
-          :key="member.user_id"
-          class="team-member columns"
-        >
-          <img :src="member.avatar_url" alt="profile-picture" />
-          <div class="member-info">
-            <nuxt-link :to="'/user/' + member.user_id">
-              <h4>{{ member.name }}</h4>
+    <div>
+      <section class="mod-info">
+        <div class="mod-stats">
+          <h3>Info</h3>
+          <p>{{ mod.downloads }} Downloads</p>
+          <p>Created {{ $dayjs(mod.published).fromNow() }}</p>
+          <p>Updated {{ $dayjs(mod.updated).fromNow() }}</p>
+        </div>
+        <div>
+          <h3>Members</h3>
+          <div
+            v-for="member in members"
+            :key="member.user_id"
+            class="team-member columns"
+          >
+            <img :src="member.avatar_url" alt="profile-picture" />
+            <div class="member-info">
+              <nuxt-link :to="'/user/' + member.user_id">
+                <h4>{{ member.name }}</h4>
+              </nuxt-link>
+              <p>{{ member.role }}</p>
+            </div>
+          </div>
+        </div>
+        <div v-if="versions.length > 0">
+          <h3>Featured Versions</h3>
+          <div
+            v-for="version in versions"
+            :key="version.id"
+            class="featured-version columns"
+          >
+            <div class="version-info">
+              <div class="columns">
+                <h4 class="limit-text-width">
+                  {{ version.name }}
+                </h4>
+                <p
+                  v-if="version.version_type === 'release'"
+                  class="badge green"
+                >
+                  Release
+                </p>
+                <p v-if="version.version_type === 'beta'" class="badge yellow">
+                  Beta
+                </p>
+                <p v-if="version.version_type === 'alpha'" class="badge red">
+                  Alpha
+                </p>
+              </div>
+              <div class="columns info-2">
+                <p class="version-number limit-text-width">
+                  {{ version.version_number }}
+                </p>
+                <FabricIcon
+                  v-if="version.loaders.includes('fabric')"
+                  stroke="#AC6C3A"
+                />
+                <ForgeIcon
+                  v-if="version.loaders.includes('forge')"
+                  stroke="#8B81E6"
+                />
+                <p
+                  v-if="version.game_versions.length > 0"
+                  class="game-version limit-text-width"
+                >
+                  {{ version.game_versions[0] }}
+                </p>
+              </div>
+            </div>
+            <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
+              <DownloadIcon />
             </nuxt-link>
-            <p>{{ member.role }}</p>
           </div>
+          <EthicalAd type="image" />
         </div>
-      </div>
-      <div v-if="versions.length > 0">
-        <h3>Featured Versions</h3>
-        <div
-          v-for="version in versions"
-          :key="version.id"
-          class="featured-version columns"
-        >
-          <div class="version-info">
-            <div class="columns">
-              <h4 class="limit-text-width">
-                {{ version.name }}
-              </h4>
-              <p v-if="version.version_type === 'release'" class="badge green">
-                Release
-              </p>
-              <p v-if="version.version_type === 'beta'" class="badge yellow">
-                Beta
-              </p>
-              <p v-if="version.version_type === 'alpha'" class="badge red">
-                Alpha
-              </p>
-            </div>
-            <div class="columns info-2">
-              <p class="version-number limit-text-width">
-                {{ version.version_number }}
-              </p>
-              <FabricIcon
-                v-if="version.loaders.includes('fabric')"
-                stroke="#AC6C3A"
-              />
-              <ForgeIcon
-                v-if="version.loaders.includes('forge')"
-                stroke="#8B81E6"
-              />
-              <p
-                v-if="version.game_versions.length > 0"
-                class="game-version limit-text-width"
-              >
-                {{ version.game_versions[0] }}
-              </p>
-            </div>
-          </div>
-          <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
-            <DownloadIcon />
-          </nuxt-link>
-        </div>
-        <EthicalAd type="image" />
-      </div>
-    </section>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -243,7 +248,6 @@ export default {
 
 .mod-info {
   top: 1rem;
-  max-height: calc(100vh - 3rem);
   position: sticky;
   min-width: 270px;
   max-width: 270px;
