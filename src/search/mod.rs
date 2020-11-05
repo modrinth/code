@@ -5,7 +5,6 @@ use actix_web::web::HttpResponse;
 use chrono::{DateTime, Utc};
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::document::Document;
-use meilisearch_sdk::search::Query;
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::cmp::min;
@@ -84,12 +83,6 @@ pub struct UploadSearchMod {
     pub modified_timestamp: i64,
 
     pub host: Cow<'static, str>,
-
-    /// Must be "{}{}{}", a hack until meilisearch supports searches
-    /// with empty queries (https://github.com/meilisearch/MeiliSearch/issues/729)
-    // This is a Cow to prevent unnecessary allocations for a static
-    // string
-    pub empty: Cow<'static, str>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -155,23 +148,6 @@ pub async fn search_for_mod(
     let offset = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
     let limit = info.limit.as_deref().unwrap_or("10").parse()?;
-    let search_query: &str = info
-        .query
-        .as_deref()
-        .filter(|s| !s.is_empty())
-        .unwrap_or("{}{}{}");
-
-    let mut query = Query::new(search_query)
-        .with_limit(min(100, limit))
-        .with_offset(offset);
-
-    if !filters.is_empty() {
-        query = query.with_filters(&filters);
-    }
-    if let Some(facets) = &info.facets {
-        let facets = serde_json::from_str::<Vec<Vec<&str>>>(facets)?;
-        query = query.with_facet_filters(facets);
-    }
 
     let index = match index {
         "relevance" => "relevance_mods",
@@ -181,14 +157,44 @@ pub async fn search_for_mod(
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     };
 
-    let results = client
-        .get_index(index)
-        .await?
-        .search::<ResultSearchMod>(&query)
-        .await?;
+    let meilisearch_index = client.get_index(index).await?;
+    let mut query = meilisearch_index.search();
+
+    query.with_limit(min(100, limit)).with_offset(offset);
+
+    if let Some(search) = info.query.as_deref() {
+        if !search.is_empty() {
+            query.with_query(search);
+        }
+    }
+
+    if !filters.is_empty() {
+        query.with_filters(&filters);
+    }
+
+    // So the meilisearch sdk's lifetimes are... broken, to say the least
+    // They are overspecified and almost always wrong, and would generally
+    // just be better if they didn't specify them at all.
+
+    // They also decided to have this take a &[&[&str]], which is impossible
+    // to construct efficiently.  Instead it should take impl Iterator<Item=&[&str]>,
+    // &[impl AsRef<[&str]>], or one of many other proper solutions to that issue.
+
+    let why_meilisearch;
+    let why_must_you_do_this;
+    if let Some(facets) = &info.facets {
+        why_meilisearch = serde_json::from_str::<Vec<Vec<&str>>>(facets)?;
+        why_must_you_do_this = why_meilisearch
+            .iter()
+            .map(|v| v as &[_])
+            .collect::<Vec<&[_]>>();
+        query.with_facet_filters(&why_must_you_do_this);
+    }
+
+    let results = query.execute::<ResultSearchMod>().await?;
 
     Ok(SearchResults {
-        hits: results.hits,
+        hits: results.hits.into_iter().map(|r| r.result).collect(),
         offset: results.offset,
         limit: results.limit,
         total_hits: results.nb_hits,

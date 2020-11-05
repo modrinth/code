@@ -1,11 +1,10 @@
 use crate::file_hosting::S3Host;
 use actix_cors::Cors;
 use actix_ratelimit::{MemoryStore, MemoryStoreActor, RateLimiter};
-use actix_web::middleware::Logger;
 use actix_web::{http, web, App, HttpServer};
 use env_logger::Env;
 use gumdrop::Options;
-use log::{info, warn};
+use log::{error, info, warn};
 use search::indexing::index_mods;
 use search::indexing::IndexingSettings;
 use std::sync::Arc;
@@ -29,6 +28,12 @@ struct Config {
     reconfigure_indices: bool,
     #[options(no_short, help = "Reset the documents in the indices")]
     reset_indices: bool,
+
+    #[options(
+        no_short,
+        help = "Allow missing environment variables on startup. This is a bad idea, but it may work in some cases."
+    )]
+    allow_missing_vars: bool,
 }
 
 #[actix_rt::main]
@@ -38,7 +43,15 @@ async fn main() -> std::io::Result<()> {
 
     let config = Config::parse_args_default_or_exit();
 
-    check_env_vars();
+    if check_env_vars() {
+        error!("Some environment variables are missing!");
+        if !config.allow_missing_vars {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::Other,
+                "Missing required environment variables",
+            ));
+        }
+    }
 
     let search_config = search::SearchConfig {
         address: dotenv::var("MEILISEARCH_ADDR").unwrap(),
@@ -225,8 +238,6 @@ async fn main() -> std::io::Result<()> {
 
         App::new()
             .wrap(cors.finish())
-            .wrap(Logger::default())
-            .wrap(Logger::new("%a %{User-Agent}i"))
             .wrap(
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
                     .with_interval(std::time::Duration::from_secs(60))
@@ -254,8 +265,10 @@ async fn main() -> std::io::Result<()> {
 }
 
 // This is so that env vars not used immediately don't panic at runtime
-fn check_env_vars() {
-    fn check_var<T: std::str::FromStr>(var: &str) {
+fn check_env_vars() -> bool {
+    let mut failed = false;
+
+    fn check_var<T: std::str::FromStr>(var: &str) -> bool {
         if dotenv::var(var)
             .ok()
             .and_then(|s| s.parse::<T>().ok())
@@ -265,7 +278,10 @@ fn check_env_vars() {
                 "Variable `{}` missing in dotenv or not of type `{}`",
                 var,
                 std::any::type_name::<T>()
-            )
+            );
+            true
+        } else {
+            false
         }
     }
 
@@ -275,51 +291,55 @@ fn check_env_vars() {
         .is_none()
     {
         warn!("Variable `CORS_ORIGINS` missing in dotenv or not a json array of strings");
+        failed |= true;
     }
 
-    check_var::<String>("CDN_URL");
-    check_var::<String>("DATABASE_URL");
-    check_var::<String>("MEILISEARCH_ADDR");
-    check_var::<String>("MEILISEARCH_KEY");
-    check_var::<String>("BIND_ADDR");
+    failed |= check_var::<String>("CDN_URL");
+    failed |= check_var::<String>("DATABASE_URL");
+    failed |= check_var::<String>("MEILISEARCH_ADDR");
+    failed |= check_var::<String>("MEILISEARCH_KEY");
+    failed |= check_var::<String>("BIND_ADDR");
 
-    check_var::<String>("STORAGE_BACKEND");
+    failed |= check_var::<String>("STORAGE_BACKEND");
 
     let storage_backend = dotenv::var("STORAGE_BACKEND").ok();
 
     if storage_backend.as_deref() == Some("backblaze") {
-        check_var::<String>("BACKBLAZE_KEY_ID");
-        check_var::<String>("BACKBLAZE_KEY");
-        check_var::<String>("BACKBLAZE_BUCKET_ID");
+        failed |= check_var::<String>("BACKBLAZE_KEY_ID");
+        failed |= check_var::<String>("BACKBLAZE_KEY");
+        failed |= check_var::<String>("BACKBLAZE_BUCKET_ID");
     } else if storage_backend.as_deref() == Some("s3") {
-        check_var::<String>("S3_ACCESS_TOKEN");
-        check_var::<String>("S3_SECRET");
-        check_var::<String>("S3_URL");
-        check_var::<String>("S3_REGION");
-        check_var::<String>("S3_BUCKET_NAME");
+        failed |= check_var::<String>("S3_ACCESS_TOKEN");
+        failed |= check_var::<String>("S3_SECRET");
+        failed |= check_var::<String>("S3_URL");
+        failed |= check_var::<String>("S3_REGION");
+        failed |= check_var::<String>("S3_BUCKET_NAME");
     } else if storage_backend.as_deref() == Some("local") {
-        check_var::<String>("MOCK_FILE_PATH");
+        failed |= check_var::<String>("MOCK_FILE_PATH");
     } else if let Some(backend) = storage_backend {
         warn!("Variable `STORAGE_BACKEND` contains an invalid value: {}. Expected \"backblaze\", \"s3\", or \"local\".", backend);
+        failed |= true;
     }
 
-    check_var::<bool>("INDEX_CURSEFORGE");
+    failed |= check_var::<bool>("INDEX_CURSEFORGE");
     if dotenv::var("INDEX_CURSEFORGE")
         .ok()
         .and_then(|s| s.parse::<bool>().ok())
         .unwrap_or(false)
     {
-        check_var::<usize>("EXTERNAL_INDEX_INTERVAL");
-        check_var::<usize>("MAX_CURSEFORGE_ID");
+        failed |= check_var::<usize>("EXTERNAL_INDEX_INTERVAL");
+        failed |= check_var::<usize>("MAX_CURSEFORGE_ID");
     }
 
-    check_var::<usize>("LOCAL_INDEX_INTERVAL");
+    failed |= check_var::<usize>("LOCAL_INDEX_INTERVAL");
 
     // In theory this should be an OsString since it's a path, but
     // dotenv doesn't support that.  The usage of this does treat
     // it as an OsString, though.
-    check_var::<String>("INDEX_CACHE_PATH");
+    failed |= check_var::<String>("INDEX_CACHE_PATH");
 
-    check_var::<String>("GITHUB_CLIENT_ID");
-    check_var::<String>("GITHUB_CLIENT_SECRET");
+    failed |= check_var::<String>("GITHUB_CLIENT_ID");
+    failed |= check_var::<String>("GITHUB_CLIENT_SECRET");
+
+    failed
 }

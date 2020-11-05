@@ -119,21 +119,23 @@ lazy_static::lazy_static! {
 pub async fn index_curseforge(
     start_index: u32,
     end_index: u32,
-    cache_path: &std::path::Path,
+    cache_path: Option<&std::path::Path>,
 ) -> Result<Vec<UploadSearchMod>, IndexingError> {
     info!("Indexing curseforge mods!");
     let start = std::time::Instant::now();
 
     let mut docs_to_add: Vec<UploadSearchMod> = vec![];
 
-    let cache = std::fs::File::open(cache_path)
+    let cache = cache_path
+        .map(std::fs::File::open)
+        .and_then(Result::ok)
         .map(std::io::BufReader::new)
         .map(serde_json::from_reader::<_, Vec<u32>>);
 
     let requested_ids;
 
     // This caching system can't handle segmented indexing
-    if let Ok(Ok(mut cache)) = cache {
+    if let Some(Ok(mut cache)) = cache {
         let end = cache.last().copied().unwrap_or(start_index);
         cache.extend(end..end_index);
         requested_ids = serde_json::to_string(&cache)?;
@@ -167,11 +169,13 @@ pub async fn index_curseforge(
     // Only write to the cache if this doesn't skip mods at the start
     // The caching system iterates through all ids normally past the last
     // id in the cache, so the end_index shouldn't matter.
-    if start_index <= 1 {
-        let mut ids = curseforge_mods.iter().map(|m| m.id).collect::<Vec<_>>();
-        ids.sort_unstable();
-        if let Err(e) = std::fs::write(cache_path, serde_json::to_string(&ids)?) {
-            log::warn!("Error writing to index id cache: {}", e);
+    if let Some(path) = cache_path {
+        if start_index <= 1 {
+            let mut ids = curseforge_mods.iter().map(|m| m.id).collect::<Vec<_>>();
+            ids.sort_unstable();
+            if let Err(e) = std::fs::write(path, serde_json::to_string(&ids)?) {
+                log::warn!("Error writing to index id cache: {}", e);
+            }
         }
     }
 
@@ -192,8 +196,8 @@ pub async fn index_curseforge(
         for file in curseforge_mod.latest_files {
             for version in file.game_version {
                 match &*version {
-                    "Fabric" => loaders.forge = true,
-                    "Forge" => loaders.fabric = true,
+                    "Fabric" => loaders.fabric = true,
+                    "Forge" => loaders.forge = true,
                     "Rift" => loaders.rift = true,
                     _ => (),
                 }
@@ -309,7 +313,6 @@ pub async fn index_curseforge(
             modified_timestamp: curseforge_mod.date_modified.timestamp(),
             latest_version,
             host: Cow::Borrowed("curseforge"),
-            empty: Cow::Borrowed("{}{}{}"),
         })
     }
 

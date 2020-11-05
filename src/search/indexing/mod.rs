@@ -63,7 +63,7 @@ pub async fn index_mods(
 ) -> Result<(), IndexingError> {
     let mut docs_to_add: Vec<UploadSearchMod> = vec![];
 
-    let cache_path = std::path::PathBuf::from(std::env::var_os("INDEX_CACHE_PATH").unwrap());
+    let cache_path = std::env::var_os("INDEX_CACHE_PATH").map(std::path::PathBuf::from);
 
     if settings.index_local {
         docs_to_add.append(&mut index_local(pool.clone()).await?);
@@ -74,7 +74,7 @@ pub async fn index_mods(
             .map(|i| i.parse().unwrap())
             .unwrap_or(450_000);
 
-        docs_to_add.append(&mut index_curseforge(1, end_index, &cache_path).await?);
+        docs_to_add.append(&mut index_curseforge(1, end_index, cache_path.as_deref()).await?);
     }
 
     // Write Indices
@@ -270,7 +270,6 @@ fn default_settings() -> Settings {
         "categories".to_string(),
         "versions".to_string(),
         "author".to_string(),
-        "empty".to_string(),
     ];
 
     Settings::new()

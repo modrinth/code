@@ -112,7 +112,6 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 modified_timestamp: mod_data.updated.timestamp(),
                 latest_version,
                 host: Cow::Borrowed("modrinth"),
-                empty: Cow::Borrowed("{}{}{}"),
             });
         }
     }
@@ -225,6 +224,5 @@ pub async fn query_one(
         modified_timestamp: mod_data.updated.timestamp(),
         latest_version,
         host: Cow::Borrowed("modrinth"),
-        empty: Cow::Borrowed("{}{}{}"),
     })
 }
