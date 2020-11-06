@@ -495,4 +495,40 @@ input {
   border-left: #e04e3e 7px solid;
   padding: 5px 20px 20px 20px;
 }
+
+@media screen and (max-width: 400px) {
+  th,
+  td {
+    &:nth-child(7) {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 600px) {
+  th,
+  td {
+    &:nth-child(8) {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 800px) {
+  th,
+  td {
+    &:nth-child(5) {
+      display: none;
+    }
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  th,
+  td {
+    &:nth-child(2) {
+      display: none;
+    }
+  }
+}
 </style>

@@ -219,7 +219,6 @@ export default {
 .mod-navigation {
   display: flex;
   margin-top: 20px;
-  overflow-y: auto;
 
   a {
     user-select: none;
@@ -379,5 +378,26 @@ export default {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+@media screen and (max-width: 550px) {
+  .title a {
+    display: none;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  .mod-navigation {
+    display: block;
+    overflow-x: auto;
+    overflow-wrap: break-word;
+    overflow-y: hidden;
+  }
+}
+
+@media screen and (max-width: 1400px) {
+  .mod-info {
+    display: none;
+  }
 }
 </style>
