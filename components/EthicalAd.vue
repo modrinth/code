@@ -9,7 +9,7 @@
     />
     <div v-else class="alt">
       <p>
-        A privacy-focused ad used to fund this site used to be here. Please
+        A privacy-focused ad used to fund this site would've been here. Please
         disable your content blocker to support Modrinth and it's authors.
       </p>
     </div>
