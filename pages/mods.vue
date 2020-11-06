@@ -54,7 +54,9 @@
         ></pagination>
       </section>
       <div class="results column-grow-4">
-        <EthicalAd type="text" />
+        <client-only>
+          <EthicalAd type="text" />
+        </client-only>
         <SearchResult
           v-for="(result, index) in results"
           :id="result.mod_id"
@@ -233,6 +235,13 @@
           >
           </SearchFilter>
           <h3>Versions</h3>
+          <SearchFilter
+            :active-filters="showVersions"
+            display-name="Snapshots"
+            facet-name="snapshots"
+            style="margin-bottom: 10px"
+            @toggle="fillInitialVersions"
+          />
         </section>
         <multiselect
           v-model="selectedVersions"
@@ -327,6 +336,7 @@ export default {
   data() {
     return {
       query: '',
+      showVersions: [],
       selectedVersions: [],
       versions: [],
       facets: [],
@@ -344,11 +354,22 @@ export default {
     }
   },
   methods: {
-    async fillInitialVersions() {
+    async fillInitialVersions(x) {
       try {
-        const res = await axios.get(
+        let url =
           'https://api.modrinth.com/api/v1/tag/game_version?type=release'
-        )
+
+        if (x !== null) {
+          if (!this.showVersions.length > 0) {
+            this.showVersions.push('snapshots')
+
+            url = 'https://api.modrinth.com/api/v1/tag/game_version'
+          } else {
+            this.showVersions = []
+          }
+        }
+
+        const res = await axios.get(url)
 
         this.versions = res.data
       } catch (err) {

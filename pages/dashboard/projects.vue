@@ -54,7 +54,9 @@
         </tr>
       </tbody>
     </table>
-    <EthicalAd />
+    <client-only>
+      <EthicalAd />
+    </client-only>
   </div>
 </template>
 

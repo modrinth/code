@@ -11,7 +11,9 @@
         <p v-if="user.role === 'developer'" class="badge green">Developer</p>
       </div>
     </div>
-    <EthicalAd />
+    <client-only>
+      <EthicalAd />
+    </client-only>
     <div class="user-mods">
       <SearchResult
         v-for="result in mods"

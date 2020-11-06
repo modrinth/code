@@ -130,7 +130,9 @@
               <DownloadIcon />
             </nuxt-link>
           </div>
-          <EthicalAd type="image" />
+          <client-only>
+            <EthicalAd type="image" />
+          </client-only>
         </div>
       </section>
     </div>
