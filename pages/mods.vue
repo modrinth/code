@@ -64,7 +64,7 @@
           :author="result.author"
           :name="result.title"
           :description="result.description"
-          :latest-version="result.versions[0]"
+          :latest-version="result.latest_version"
           :created-at="result.date_created"
           :updated-at="result.date_modified"
           :downloads="result.downloads.toString()"
