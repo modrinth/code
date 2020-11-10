@@ -1,5 +1,6 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
-use crate::database::models::User;
+use crate::database::models::{TeamMember, User};
+use crate::models::teams::Permissions;
 use crate::models::users::{Role, UserId};
 use crate::routes::ApiError;
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
@@ -19,8 +20,7 @@ pub async fn user_auth_get(
                 .await
                 .map_err(|e| ApiError::DatabaseError(e.into()))?,
         )
-        .await
-        .map_err(|_| ApiError::AuthenticationError)?,
+        .await?,
     ))
 }
 
@@ -121,6 +121,47 @@ pub async fn mods_list(
     }
 }
 
+#[get("teams")]
+pub async fn teams(
+    req: HttpRequest,
+    info: web::Path<(UserId,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let id: crate::database::models::UserId = info.into_inner().0.into();
+
+    let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
+
+    let results;
+    let mut same_user = false;
+
+    if let Some(user) = current_user {
+        if user.id.0 == id.0 as u64 {
+            results = TeamMember::get_from_user_private(id, &**pool).await?;
+            same_user = true;
+        } else {
+            results = TeamMember::get_from_user_public(id, &**pool).await?;
+        }
+    } else {
+        results = TeamMember::get_from_user_public(id, &**pool).await?;
+    }
+
+    let team_members: Vec<crate::models::teams::TeamMember> = results
+        .into_iter()
+        .map(|data| crate::models::teams::TeamMember {
+            user_id: data.user_id.into(),
+            name: data.name,
+            role: data.role,
+            permissions: if same_user {
+                data.permissions
+            } else {
+                Permissions::default()
+            },
+        })
+        .collect();
+
+    Ok(HttpResponse::Ok().json(team_members))
+}
+
 // TODO: Make this actually do stuff
 #[delete("{id}")]
 pub async fn user_delete(
@@ -135,8 +176,7 @@ pub async fn user_delete(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?,
     )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    .await?;
 
     let _id = info.0;
     let result = Some(());

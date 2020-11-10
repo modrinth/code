@@ -19,7 +19,7 @@ pub struct User {
     pub role: Role,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
     Developer,

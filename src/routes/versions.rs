@@ -1,7 +1,9 @@
 use super::ApiError;
-use crate::auth::check_is_moderator_from_headers;
+use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::models;
+use crate::models::teams::Permissions;
+use crate::models::users::Role;
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -142,21 +144,44 @@ fn convert_version(data: database::models::version_item::QueryVersion) -> models
 #[delete("{version_id}")]
 pub async fn version_delete(
     req: HttpRequest,
-    info: web::Path<(models::ids::ModId, models::ids::VersionId)>,
+    info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
-        req.headers(),
-        &mut *pool
-            .acquire()
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?,
-    )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let id = info.into_inner().0;
 
-    // TODO: check if the mod exists and matches the version id
-    let id = info.1;
+    if user.role != Role::Moderator || user.role != Role::Admin {
+        let version = database::models::Version::get(id.into(), &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?
+            .ok_or_else(|| {
+                ApiError::InvalidInputError("Invalid Version ID specified!".to_string())
+            })?;
+        let mod_item = database::models::Mod::get(version.mod_id, &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?
+            .ok_or_else(|| {
+                ApiError::InvalidInputError("Invalid Version ID specified!".to_string())
+            })?;
+        let team_member = database::models::TeamMember::get_from_user_id(
+            mod_item.team_id,
+            user.id.into(),
+            &**pool,
+        )
+        .await
+        .map_err(ApiError::DatabaseError)?
+        .ok_or_else(|| ApiError::InvalidInputError("Invalid Version ID specified!".to_string()))?;
+
+        if !team_member
+            .permissions
+            .contains(Permissions::DELETE_VERSION)
+        {
+            return Err(ApiError::CustomAuthenticationError(
+                "You don't have permission to delete versions in this team".to_string(),
+            ));
+        }
+    }
+
     let result = database::models::Version::remove_full(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;

@@ -27,6 +27,7 @@ chrono = { version = "0.4", features = ["serde"] }
 rand = "0.7.3"
 base64 = "0.13.0"
 sha1 = { version = "0.6.0", features = ["std"] }
+bitflags = "1.2.1"
 
 gumdrop = "0.8.0"
 dotenv = "0.15"

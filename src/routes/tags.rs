@@ -41,8 +41,7 @@ pub async fn category_create(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?,
     )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    .await?;
 
     let name = category.into_inner().0;
 
@@ -64,8 +63,7 @@ pub async fn category_delete(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?,
     )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    .await?;
 
     let name = category.into_inner().0;
     let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
@@ -103,8 +101,7 @@ pub async fn loader_create(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?,
     )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    .await?;
 
     let name = loader.into_inner().0;
 
@@ -126,8 +123,7 @@ pub async fn loader_delete(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?,
     )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    .await?;
 
     let name = loader.into_inner().0;
     let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
@@ -187,8 +183,7 @@ pub async fn game_version_create(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?,
     )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    .await?;
 
     let name = game_version.into_inner().0;
 
@@ -221,8 +216,7 @@ pub async fn game_version_delete(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?,
     )
-    .await
-    .map_err(|_| ApiError::AuthenticationError)?;
+    .await?;
 
     let name = game_version.into_inner().0;
     let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;

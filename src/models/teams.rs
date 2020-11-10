@@ -20,6 +20,27 @@ pub struct Team {
     pub members: Vec<TeamMember>,
 }
 
+bitflags::bitflags! {
+    #[derive(Serialize, Deserialize)]
+    pub struct Permissions: u64 {
+        const UPLOAD_VERSION = 1 << 0;
+        const DELETE_VERSION = 1 << 1;
+        const EDIT_DETAILS = 1 << 2;
+        const EDIT_BODY = 1 << 3;
+        const MANAGE_INVITES = 1 << 4;
+        const REMOVE_MEMBER = 1 << 5;
+        const EDIT_MEMBER = 1 << 6;
+        const DELETE_MOD = 1 << 7;
+        const ALL = 0b11111111;
+    }
+}
+
+impl Default for Permissions {
+    fn default() -> Permissions {
+        Permissions::UPLOAD_VERSION | Permissions::DELETE_VERSION
+    }
+}
+
 /// A member of a team
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TeamMember {
@@ -29,4 +50,6 @@ pub struct TeamMember {
     pub name: String,
     /// The role of the user in the team
     pub role: String,
+    /// A bitset containing the user's permissions in this team
+    pub permissions: Permissions,
 }
