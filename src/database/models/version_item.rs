@@ -331,6 +331,7 @@ impl Version {
             "
             SELECT id FROM versions
             WHERE mod_id = $1
+            ORDER BY date_published ASC
             ",
             mod_id as ModId,
         )

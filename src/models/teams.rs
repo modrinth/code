@@ -22,6 +22,7 @@ pub struct Team {
 
 bitflags::bitflags! {
     #[derive(Serialize, Deserialize)]
+    #[serde(transparent)]
     pub struct Permissions: u64 {
         const UPLOAD_VERSION = 1 << 0;
         const DELETE_VERSION = 1 << 1;
@@ -51,5 +52,5 @@ pub struct TeamMember {
     /// The role of the user in the team
     pub role: String,
     /// A bitset containing the user's permissions in this team
-    pub permissions: Permissions,
+    pub permissions: Option<Permissions>,
 }

@@ -107,7 +107,7 @@ impl TeamMember {
             if let Some(m) = e.right() {
                 let permissions = Permissions::from_bits(m.permissions as u64);
                 if let Some(perms) = permissions {
-                    Ok(Some(TeamMember {
+                    Ok(Some(Ok(TeamMember {
                         id: TeamMemberId(m.id),
                         team_id: id,
                         user_id: UserId(m.user_id),
@@ -115,16 +115,20 @@ impl TeamMember {
                         role: m.role,
                         permissions: perms,
                         accepted: m.accepted,
-                    }))
+                    })))
                 } else {
-                    Ok(None)
+                    Ok(Some(Err(super::DatabaseError::BitflagError)))
                 }
             } else {
                 Ok(None)
             }
         })
-        .try_collect::<Vec<TeamMember>>()
+        .try_collect::<Vec<Result<TeamMember, super::DatabaseError>>>()
         .await?;
+
+        let team_members = team_members
+            .into_iter()
+            .collect::<Result<Vec<TeamMember>, super::DatabaseError>>()?;
 
         Ok(team_members)
     }
@@ -152,7 +156,7 @@ impl TeamMember {
             if let Some(m) = e.right() {
                 let permissions = Permissions::from_bits(m.permissions as u64);
                 if let Some(perms) = permissions {
-                    Ok(Some(TeamMember {
+                    Ok(Some(Ok(TeamMember {
                         id: TeamMemberId(m.id),
                         team_id: TeamId(m.team_id),
                         user_id: id,
@@ -160,16 +164,20 @@ impl TeamMember {
                         role: m.role,
                         permissions: perms,
                         accepted: m.accepted,
-                    }))
+                    })))
                 } else {
-                    Ok(None)
+                    Ok(Some(Err(super::DatabaseError::BitflagError)))
                 }
             } else {
                 Ok(None)
             }
         })
-        .try_collect::<Vec<TeamMember>>()
+        .try_collect::<Vec<Result<TeamMember, super::DatabaseError>>>()
         .await?;
+
+        let team_members = team_members
+            .into_iter()
+            .collect::<Result<Vec<TeamMember>, super::DatabaseError>>()?;
 
         Ok(team_members)
     }

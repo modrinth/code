@@ -1,6 +1,5 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::database::models::{TeamMember, User};
-use crate::models::teams::Permissions;
 use crate::models::users::{Role, UserId};
 use crate::routes::ApiError;
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
@@ -152,9 +151,9 @@ pub async fn teams(
             name: data.name,
             role: data.role,
             permissions: if same_user {
-                data.permissions
+                Some(data.permissions)
             } else {
-                Permissions::default()
+                None
             },
         })
         .collect();

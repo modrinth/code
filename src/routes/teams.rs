@@ -30,7 +30,7 @@ pub async fn team_members_get(
                     user_id: data.user_id.into(),
                     name: data.name,
                     role: data.role,
-                    permissions: data.permissions,
+                    permissions: Some(data.permissions),
                 })
                 .collect();
 
@@ -44,7 +44,7 @@ pub async fn team_members_get(
             user_id: data.user_id.into(),
             name: data.name,
             role: data.role,
-            permissions: Permissions::default(),
+            permissions: None,
         })
         .collect();
 
