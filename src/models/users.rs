@@ -45,4 +45,11 @@ impl Role {
             _ => Role::Developer,
         }
     }
+
+    pub fn is_mod(&self) -> bool {
+        match self {
+            Role::Developer => false,
+            Role::Moderator | Role::Admin => true,
+        }
+    }
 }

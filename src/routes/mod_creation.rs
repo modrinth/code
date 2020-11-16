@@ -113,6 +113,8 @@ struct ModCreateData {
     pub source_url: Option<String>,
     /// An optional link to the mod's wiki page or other relevant information.
     pub wiki_url: Option<String>,
+    /// An optional boolean. If true, the mod will be created as a draft.
+    pub is_draft: Option<bool>,
 }
 
 pub struct UploadedFile {
@@ -276,6 +278,12 @@ async fn mod_create_inner(
             check_length(3..=256, "mod name", &create_data.mod_name)?;
             check_length(3..=2048, "mod description", &create_data.mod_description)?;
             check_length(..65536, "mod body", &create_data.mod_body)?;
+
+            if create_data.categories.len() > 3 {
+                return Err(CreateError::InvalidInput(
+                    "The maximum number of categories for a mod is four.".to_string(),
+                ));
+            }
 
             create_data
                 .categories
@@ -444,7 +452,13 @@ async fn mod_create_inner(
 
         let team_id = team.insert(&mut *transaction).await?;
 
-        let status = ModStatus::Processing;
+        let status;
+        if mod_create_data.is_draft.unwrap_or(false) {
+            status = ModStatus::Draft;
+        } else {
+            status = ModStatus::Processing;
+        }
+
         let status_id = models::StatusId::get_id(&status, &mut *transaction)
             .await?
             .expect("No database entry found for status");

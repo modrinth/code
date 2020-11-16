@@ -95,9 +95,10 @@ where
 {
     let user = get_user_from_headers(headers, executor).await?;
 
-    match user.role {
-        Role::Moderator | Role::Admin => Ok(user),
-        _ => Err(AuthenticationError::InvalidCredentialsError),
+    if user.role.is_mod() {
+        Ok(user)
+    } else {
+        Err(AuthenticationError::InvalidCredentialsError)
     }
 }
 

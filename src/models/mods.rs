@@ -58,7 +58,7 @@ pub struct Mod {
 /// Draft - Mod is not displayed on search, and not accessible by URL
 /// Unlisted - Mod is not displayed on search, but accessible by URL
 /// Processing - Mod is not displayed on search, and not accessible by URL (Temporary state, mod under review)
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum ModStatus {
     Approved,
@@ -101,6 +101,24 @@ impl ModStatus {
             ModStatus::Unlisted => "unlisted",
             ModStatus::Processing => "processing",
             ModStatus::Unknown => "unknown",
+        }
+    }
+
+    pub fn is_hidden(&self) -> bool {
+        match self {
+            ModStatus::Approved => false,
+            ModStatus::Rejected => true,
+            ModStatus::Draft => true,
+            ModStatus::Unlisted => false,
+            ModStatus::Processing => true,
+            ModStatus::Unknown => true,
+        }
+    }
+
+    pub fn is_searchable(&self) -> bool {
+        match self {
+            ModStatus::Approved => true,
+            _ => false,
         }
     }
 }
