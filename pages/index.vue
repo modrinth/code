@@ -147,7 +147,16 @@
         </p>
       </div>
       <div class="right hero-image">
-        <img src="~/assets/images/api.gif" alt="api" loading="lazy" />
+        <pre v-highlightjs>
+<code class="javascript">const fetch = require('node-fetch');
+fetch('https://api.modrinth.com/api/v1/mod').then(res => res.json()).then(data => {
+    console.log(data);
+    // hits: [Object {author: "mezz", author_url: "https://www.curseforge.com/members/17072262-mezz?username=mezz", …}, …]
+    // limit: 10
+    // offset: 0
+    /// total_hits: 19440
+});</code>
+        </pre>
       </div>
     </div>
   </div>
@@ -283,6 +292,7 @@ export default {
     right: 0;
     z-index: -1;
     -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
   }
 
   &:before {
