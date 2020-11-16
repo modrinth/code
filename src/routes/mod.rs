@@ -74,6 +74,14 @@ pub fn teams_config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+pub fn moderation_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("moderation")
+            .service(moderation::mods)
+            .service(moderation::versions),
+    );
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
     #[error("Error while uploading file")]

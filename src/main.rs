@@ -255,7 +255,8 @@ async fn main() -> std::io::Result<()> {
                     .configure(routes::mods_config)
                     .configure(routes::versions_config)
                     .configure(routes::teams_config)
-                    .configure(routes::users_config),
+                    .configure(routes::users_config)
+                    .configure(routes::moderation_config),
             )
             .default_service(web::get().to(routes::not_found))
     })
