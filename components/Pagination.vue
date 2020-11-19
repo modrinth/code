@@ -1,7 +1,10 @@
 <template>
   <div v-if="pages.length > 1" class="columns paginates">
     <svg
-      :class="{ 'disabled-paginate': currentPage === 1 }"
+      :class="{
+        'disabled-paginate': currentPage === 1,
+        'active-paginate': currentPage !== 1,
+      }"
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
