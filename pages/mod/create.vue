@@ -336,7 +336,6 @@ export default {
         'data',
         JSON.stringify({
           mod_name: this.name,
-          mod_namespace: this.namespace,
           mod_description: this.description,
           mod_body: this.body,
           initial_versions: this.versions,
@@ -351,6 +350,9 @@ export default {
           issues_url: this.issues_url,
           source_url: this.source_url,
           wiki_url: this.wiki_url,
+          client_side: 'required',
+          server_side: 'required',
+          license_id: 'custom',
         })
       )
 
