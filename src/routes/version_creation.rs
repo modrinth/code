@@ -24,6 +24,7 @@ pub struct InitialVersionData {
     pub game_versions: Vec<GameVersion>,
     pub release_channel: VersionType,
     pub loaders: Vec<ModLoader>,
+    pub featured: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -265,6 +266,7 @@ async fn version_create_inner(
                 game_versions,
                 loaders,
                 release_channel,
+                featured: version_create_data.featured,
             });
 
             continue;
@@ -298,6 +300,7 @@ async fn version_create_inner(
         id: builder.version_id.into(),
         mod_id: builder.mod_id.into(),
         author_id: user.id,
+        featured: builder.featured,
         name: builder.name.clone(),
         version_number: builder.version_number.clone(),
         changelog_url: builder.changelog_url.clone(),
@@ -324,6 +327,7 @@ async fn version_create_inner(
                     .collect(),
                 url: file.url.clone(),
                 filename: file.filename.clone(),
+                primary: file.primary,
             })
             .collect::<Vec<_>>(),
         dependencies: version_data.dependencies,
@@ -528,6 +532,7 @@ pub async fn upload_file(
             // bytes, but this is the string version.
             hash: upload_data.content_sha1.into_bytes(),
         }],
+        primary: uploaded_files.len() == 1,
     })
 }
 

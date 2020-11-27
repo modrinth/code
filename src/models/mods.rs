@@ -21,6 +21,8 @@ pub struct VersionId(pub u64);
 pub struct Mod {
     /// The ID of the mod, encoded as a base62 string.
     pub id: ModId,
+    /// The slug of a mod, used for vanity URLs
+    pub slug: Option<String>,
     /// The team of people that has ownership of this mod.
     pub team: TeamId,
     /// The title or name of the mod.
@@ -35,6 +37,13 @@ pub struct Mod {
     pub updated: DateTime<Utc>,
     /// The status of the mod
     pub status: ModStatus,
+    /// The license of this mod
+    pub license: License,
+
+    /// The support range for the client mod
+    pub client_side: SideType,
+    /// The support range for the server mod
+    pub server_side: SideType,
 
     /// The total number of downloads the mod has had.
     pub downloads: u32,
@@ -42,7 +51,7 @@ pub struct Mod {
     pub categories: Vec<String>,
     /// A list of ids for versions of the mod.
     pub versions: Vec<VersionId>,
-    ///The URL of the icon of the mod
+    /// The URL of the icon of the mod
     pub icon_url: Option<String>,
     /// An optional link to where to submit bugs or issues with the mod.
     pub issues_url: Option<String>,
@@ -50,6 +59,60 @@ pub struct Mod {
     pub source_url: Option<String>,
     /// An optional link to the mod's wiki page or other relevant information.
     pub wiki_url: Option<String>,
+    /// An optional link to the mod's discord
+    pub discord_url: Option<String>,
+    /// An optional list of all donation links the mod has
+    pub donation_urls: Option<Vec<DonationLink>>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub enum SideType {
+    Required,
+    NoFunctionality,
+    Unsupported,
+    Unknown,
+}
+
+impl std::fmt::Display for SideType {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(fmt, "{}", self.as_str())
+    }
+}
+
+impl SideType {
+    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            SideType::Required => "required",
+            SideType::NoFunctionality => "no-functionality",
+            SideType::Unsupported => "unsupported",
+            SideType::Unknown => "unknown",
+        }
+    }
+
+    pub fn from_str(string: &str) -> SideType {
+        match string {
+            "required" => SideType::Required,
+            "no-functionality" => SideType::NoFunctionality,
+            "unsupported" => SideType::Unsupported,
+            _ => SideType::Unknown,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct License {
+    pub id: String,
+    pub name: String,
+    pub url: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct DonationLink {
+    pub id: String,
+    pub platform: String,
+    pub url: String,
 }
 
 /// A status decides the visbility of a mod in search, URLs, and the whole site itself.
@@ -71,14 +134,7 @@ pub enum ModStatus {
 
 impl std::fmt::Display for ModStatus {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            ModStatus::Approved => write!(fmt, "approved"),
-            ModStatus::Rejected => write!(fmt, "rejected"),
-            ModStatus::Draft => write!(fmt, "draft"),
-            ModStatus::Unlisted => write!(fmt, "unlisted"),
-            ModStatus::Processing => write!(fmt, "processing"),
-            ModStatus::Unknown => write!(fmt, "unknown"),
-        }
+        write!(fmt, "{}", self.as_str())
     }
 }
 
@@ -116,10 +172,7 @@ impl ModStatus {
     }
 
     pub fn is_searchable(&self) -> bool {
-        match self {
-            ModStatus::Approved => true,
-            _ => false,
-        }
+        matches!(self, ModStatus::Approved)
     }
 }
 
@@ -132,6 +185,8 @@ pub struct Version {
     pub mod_id: ModId,
     /// The ID of the author who published this version
     pub author_id: UserId,
+    /// Whether the version is featured or not
+    pub featured: bool,
 
     /// The name of this version
     pub name: String,
@@ -166,6 +221,8 @@ pub struct VersionFile {
     pub url: String,
     /// The filename of the file.
     pub filename: String,
+    /// Whether the file is the primary file of a version
+    pub primary: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

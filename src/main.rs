@@ -36,6 +36,11 @@ struct Config {
     allow_missing_vars: bool,
 }
 
+#[derive(Clone)]
+pub struct Pepper {
+    pub pepper: String,
+}
+
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
@@ -155,6 +160,44 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
+    let pool_ref = pool.clone();
+    scheduler.run(std::time::Duration::from_secs(15 * 60), move || {
+        let pool_ref = pool_ref.clone();
+        // Use sqlx to delete records more than an hour old
+        info!("Deleting old records from temporary tables");
+
+        async move {
+            let downloads_result = sqlx::query!(
+                "
+                DELETE FROM downloads
+                WHERE date < (CURRENT_DATE - INTERVAL '30 minutes ago')
+                "
+            )
+                .execute(&pool_ref)
+                .await;
+
+            if let Err(e) = downloads_result {
+                warn!("Deleting old records from temporary table downloads failed: {:?}", e);
+            }
+
+            let states_result = sqlx::query!(
+                "
+                DELETE FROM states
+                WHERE expires < CURRENT_DATE
+                "
+            )
+                .execute(&pool_ref)
+                .await;
+
+            if let Err(e) = states_result {
+                warn!("Deleting old records from temporary table states failed: {:?}", e);
+            }
+
+            info!("Finished deleting old records from temporary tables");
+        }
+
+    });
+
     let indexing_queue = Arc::new(search::indexing::queue::CreationQueue::new());
 
     let queue_ref = indexing_queue.clone();
@@ -216,6 +259,10 @@ async fn main() -> std::io::Result<()> {
 
     scheduler::schedule_versions(&mut scheduler, pool.clone(), skip_initial);
 
+    let ip_salt = Pepper {
+        pepper: crate::models::ids::Base62Id(crate::models::ids::random_base62(11)).to_string()
+    };
+
     let allowed_origins = dotenv::var("CORS_ORIGINS")
         .ok()
         .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
@@ -247,6 +294,7 @@ async fn main() -> std::io::Result<()> {
             .data(file_host.clone())
             .data(indexing_queue.clone())
             .data(search_config.clone())
+            .data(ip_salt.clone())
             .service(routes::index_get)
             .service(
                 web::scope("/api/v1/")

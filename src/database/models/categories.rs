@@ -17,6 +17,18 @@ pub struct Category {
     pub category: String,
 }
 
+pub struct License {
+    pub id: LicenseId,
+    pub short: String,
+    pub name: String,
+}
+
+pub struct DonationPlatform {
+    pub id: DonationPlatformId,
+    pub short: String,
+    pub name: String,
+}
+
 pub struct CategoryBuilder<'a> {
     pub name: Option<&'a str>,
 }
@@ -451,5 +463,295 @@ impl<'a> GameVersionBuilder<'a> {
         .await?;
 
         Ok(GameVersionId(result.id))
+    }
+}
+
+#[derive(Default)]
+pub struct LicenseBuilder<'a> {
+    pub short: Option<&'a str>,
+    pub name: Option<&'a str>,
+}
+
+impl License {
+    pub fn builder() -> LicenseBuilder<'static> {
+        LicenseBuilder::default()
+    }
+
+    pub async fn get_id<'a, E>(id: &str, exec: E) -> Result<Option<LicenseId>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT id FROM licenses
+            WHERE short = $1
+            ",
+            id
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(result.map(|r| LicenseId(r.id)))
+    }
+
+    pub async fn get<'a, E>(id: LicenseId, exec: E) -> Result<License, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT short, name FROM licenses
+            WHERE id = $1
+            ",
+            id as LicenseId
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(License {
+            id,
+            short: result.short,
+            name: result.name,
+        })
+    }
+
+    pub async fn list<'a, E>(exec: E) -> Result<Vec<License>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT id, short, name FROM licenses
+            "
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|c| License {
+                id: LicenseId(c.id),
+                short: c.short,
+                name: c.name,
+            }))
+        })
+        .try_collect::<Vec<License>>()
+        .await?;
+
+        Ok(result)
+    }
+
+    pub async fn remove<'a, E>(short: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use sqlx::Done;
+
+        let result = sqlx::query!(
+            "
+            DELETE FROM licenses
+            WHERE short = $1
+            ",
+            short
+        )
+        .execute(exec)
+        .await?;
+
+        if result.rows_affected() == 0 {
+            // Nothing was deleted
+            Ok(None)
+        } else {
+            Ok(Some(()))
+        }
+    }
+}
+
+impl<'a> LicenseBuilder<'a> {
+    /// The license's short name/abbreviation.  Spaces must be replaced with '_' for it to be valid
+    pub fn short(self, short: &'a str) -> Result<LicenseBuilder<'a>, DatabaseError> {
+        if short
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
+        {
+            Ok(Self {
+                short: Some(short),
+                ..self
+            })
+        } else {
+            Err(DatabaseError::InvalidIdentifier(short.to_string()))
+        }
+    }
+
+    /// The license's long name
+    pub fn name(self, name: &'a str) -> Result<LicenseBuilder<'a>, DatabaseError> {
+        Ok(Self {
+            name: Some(name),
+            ..self
+        })
+    }
+
+    pub async fn insert<'b, E>(self, exec: E) -> Result<LicenseId, DatabaseError>
+    where
+        E: sqlx::Executor<'b, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            INSERT INTO licenses (short, name)
+            VALUES ($1, $2)
+            ON CONFLICT (short) DO NOTHING
+            RETURNING id
+            ",
+            self.short,
+            self.name,
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(LicenseId(result.id))
+    }
+}
+
+#[derive(Default)]
+pub struct DonationPlatformBuilder<'a> {
+    pub short: Option<&'a str>,
+    pub name: Option<&'a str>,
+}
+
+impl DonationPlatform {
+    pub fn builder() -> DonationPlatformBuilder<'static> {
+        DonationPlatformBuilder::default()
+    }
+
+    pub async fn get_id<'a, E>(
+        id: &str,
+        exec: E,
+    ) -> Result<Option<DonationPlatformId>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT id FROM donation_platforms
+            WHERE short = $1
+            ",
+            id
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(result.map(|r| DonationPlatformId(r.id)))
+    }
+
+    pub async fn get<'a, E>(
+        id: DonationPlatformId,
+        exec: E,
+    ) -> Result<DonationPlatform, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT short, name FROM donation_platforms
+            WHERE id = $1
+            ",
+            id as DonationPlatformId
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(DonationPlatform {
+            id,
+            short: result.short,
+            name: result.name,
+        })
+    }
+
+    pub async fn list<'a, E>(exec: E) -> Result<Vec<DonationPlatform>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT id, short, name FROM donation_platforms
+            "
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|c| DonationPlatform {
+                id: DonationPlatformId(c.id),
+                short: c.short,
+                name: c.name,
+            }))
+        })
+        .try_collect::<Vec<DonationPlatform>>()
+        .await?;
+
+        Ok(result)
+    }
+
+    pub async fn remove<'a, E>(short: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use sqlx::Done;
+
+        let result = sqlx::query!(
+            "
+            DELETE FROM donation_platforms
+            WHERE short = $1
+            ",
+            short
+        )
+        .execute(exec)
+        .await?;
+
+        if result.rows_affected() == 0 {
+            // Nothing was deleted
+            Ok(None)
+        } else {
+            Ok(Some(()))
+        }
+    }
+}
+
+impl<'a> DonationPlatformBuilder<'a> {
+    /// The donation platform short name.  Spaces must be replaced with '_' for it to be valid
+    pub fn short(self, short: &'a str) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
+        if short
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
+        {
+            Ok(Self {
+                short: Some(short),
+                ..self
+            })
+        } else {
+            Err(DatabaseError::InvalidIdentifier(short.to_string()))
+        }
+    }
+
+    /// The donation platform long name
+    pub fn name(self, name: &'a str) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
+        Ok(Self {
+            name: Some(name),
+            ..self
+        })
+    }
+
+    pub async fn insert<'b, E>(self, exec: E) -> Result<DonationPlatformId, DatabaseError>
+    where
+        E: sqlx::Executor<'b, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            INSERT INTO donation_platforms (short, name)
+            VALUES ($1, $2)
+            ON CONFLICT (short) DO NOTHING
+            RETURNING id
+            ",
+            self.short,
+            self.name,
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(DonationPlatformId(result.id))
     }
 }

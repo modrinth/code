@@ -260,7 +260,7 @@ impl TeamMember {
                 name: m.member_name,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
-                    .ok_or_else(|| super::DatabaseError::BitflagError)?,
+                    .ok_or(super::DatabaseError::BitflagError)?,
                 accepted: m.accepted,
             }))
         } else {
@@ -297,7 +297,7 @@ impl TeamMember {
                 name: m.member_name,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
-                    .ok_or_else(|| super::DatabaseError::BitflagError)?,
+                    .ok_or(super::DatabaseError::BitflagError)?,
                 accepted: m.accepted,
             }))
         } else {

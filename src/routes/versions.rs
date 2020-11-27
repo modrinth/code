@@ -1,6 +1,6 @@
 use super::ApiError;
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
-use crate::database;
+use crate::{database, Pepper};
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::teams::Permissions;
@@ -151,6 +151,7 @@ fn convert_version(data: database::models::version_item::QueryVersion) -> models
         mod_id: data.mod_id.into(),
         author_id: data.author_id.into(),
 
+        featured: data.featured,
         name: data.name,
         version_number: data.version_number,
         changelog_url: data.changelog_url,
@@ -178,6 +179,7 @@ fn convert_version(data: database::models::version_item::QueryVersion) -> models
                         .map(|(k, v)| Some((k, String::from_utf8(v).ok()?)))
                         .collect::<Option<_>>()
                         .unwrap_or_else(Default::default),
+                    primary: f.primary,
                 }
             })
             .collect(),
@@ -204,6 +206,8 @@ pub struct EditVersion {
     pub game_versions: Option<Vec<models::mods::GameVersion>>,
     pub loaders: Option<Vec<models::mods::ModLoader>>,
     pub accepted: Option<bool>,
+    pub featured: Option<bool>,
+    pub primary_file: Option<(String, String)>,
 }
 
 #[patch("{id}")]
@@ -388,6 +392,65 @@ pub async fn version_edit(
                 }
             }
 
+            if let Some(featured) = &new_version.featured {
+                sqlx::query!(
+                    "
+                    UPDATE versions
+                    SET featured = $1
+                    WHERE (id = $2)
+                    ",
+                    featured,
+                    id as database::models::ids::VersionId,
+                )
+                .execute(&mut *transaction)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+            }
+
+            if let Some(primary_file) = &new_version.primary_file {
+                let result = sqlx::query!(
+                    "
+                    SELECT id FROM files
+                    INNER JOIN hashes ON hash = $1 AND algorithm = $2
+                    ",
+                    primary_file.1.as_bytes(),
+                    primary_file.0
+                )
+                .fetch_optional(&**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?
+                .ok_or_else(|| {
+                    ApiError::InvalidInputError(format!(
+                        "Specified file with hash {} does not exist.",
+                        primary_file.1.clone()
+                    ))
+                })?;
+
+                sqlx::query!(
+                    "
+                    UPDATE files
+                    SET is_primary = FALSE
+                    WHERE (version_id = $1)
+                    ",
+                    id as database::models::ids::VersionId,
+                )
+                .execute(&mut *transaction)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+                sqlx::query!(
+                    "
+                    UPDATE files
+                    SET is_primary = TRUE
+                    WHERE (id = $1)
+                    ",
+                    result.id,
+                )
+                .execute(&mut *transaction)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+            }
+
             if let Some(body) = &new_version.changelog {
                 let mod_id: models::mods::ModId = version_item.mod_id.into();
                 let body_path = format!(
@@ -513,6 +576,102 @@ pub async fn get_version_from_hash(
         } else {
             Ok(HttpResponse::NotFound().body(""))
         }
+    } else {
+        Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct DownloadRedirect {
+    pub url: String,
+}
+
+// under /api/v1/version_file/{hash}/download
+#[get("{version_id}/download")]
+pub async fn download_version(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    algorithm: web::Query<Algorithm>,
+    pepper: web::Data<Pepper>,
+) -> Result<HttpResponse, ApiError> {
+    let hash = info.into_inner().0;
+
+    let result = sqlx::query!(
+        "
+        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id mod_id FROM files f
+        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN hashes ON hash = $1 AND algorithm = $2
+        ",
+        hash.as_bytes(),
+        algorithm.algorithm
+    )
+    .fetch_optional(&**pool)
+    .await
+    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    if let Some(id) = result {
+        let real_ip = req.connection_info();
+        let ip_option = real_ip.realip_remote_addr();
+
+        if let Some(ip) = ip_option {
+            let hash = sha1::Sha1::from(format!("{}{}", ip, pepper.pepper)).hexdigest();
+
+            let download_exists = sqlx::query!(
+                "SELECT EXISTS(SELECT 1 FROM downloads WHERE version_id = $1 AND date > (CURRENT_DATE - INTERVAL '30 minutes ago') AND identifier = $2)",
+                id.version_id,
+                hash,
+            )
+                .fetch_one(&**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?
+                .exists.unwrap_or(false);
+
+            if !download_exists {
+                sqlx::query!(
+                    "
+                INSERT INTO downloads (
+                    version_id, identifier
+                )
+                VALUES (
+                    $1, $2
+                )
+                ",
+                    id.version_id,
+                    hash
+                )
+                .execute(&**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+                sqlx::query!(
+                    "
+                UPDATE versions
+                SET downloads = downloads + 1
+                WHERE id = $1
+                ",
+                    id.version_id,
+                )
+                .execute(&**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+                sqlx::query!(
+                    "
+                UPDATE mods
+                SET downloads = downloads + 1
+                WHERE id = $1
+                ",
+                    id.mod_id,
+                )
+                .execute(&**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+            }
+        }
+        Ok(HttpResponse::TemporaryRedirect()
+            .header("Location", &*id.url)
+            .json(DownloadRedirect { url: id.url }))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

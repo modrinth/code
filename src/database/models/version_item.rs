@@ -13,12 +13,14 @@ pub struct VersionBuilder {
     pub game_versions: Vec<GameVersionId>,
     pub loaders: Vec<LoaderId>,
     pub release_channel: ChannelId,
+    pub featured: bool,
 }
 
 pub struct VersionFileBuilder {
     pub url: String,
     pub filename: String,
     pub hashes: Vec<HashBuilder>,
+    pub primary: bool,
 }
 
 impl VersionFileBuilder {
@@ -81,6 +83,7 @@ impl VersionBuilder {
             downloads: 0,
             release_channel: self.release_channel,
             accepted: false,
+            featured: self.featured,
         };
 
         version.insert(&mut *transaction).await?;
@@ -154,6 +157,7 @@ pub struct Version {
     pub downloads: i32,
     pub release_channel: ChannelId,
     pub accepted: bool,
+    pub featured: bool,
 }
 
 impl Version {
@@ -166,13 +170,13 @@ impl Version {
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
                 changelog_url, date_published,
-                downloads, release_channel, accepted
+                downloads, release_channel, accepted, featured
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9,
-                $10
+                $10, $11
             )
             ",
             self.id as VersionId,
@@ -184,7 +188,8 @@ impl Version {
             self.date_published,
             self.downloads,
             self.release_channel as ChannelId,
-            self.accepted
+            self.accepted,
+            self.featured
         )
         .execute(&mut *transaction)
         .await?;
@@ -234,7 +239,7 @@ impl Version {
 
         let files = sqlx::query!(
             "
-            SELECT files.id, files.url, files.filename FROM files
+            SELECT files.id, files.url, files.filename, files.is_primary FROM files
             WHERE files.version_id = $1
             ",
             id as VersionId,
@@ -246,6 +251,7 @@ impl Version {
                 version_id: id,
                 url: c.url,
                 filename: c.filename,
+                primary: c.is_primary,
             }))
         })
         .try_collect::<Vec<VersionFile>>()
@@ -367,7 +373,7 @@ impl Version {
             "
             SELECT v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog_url, v.date_published, v.downloads,
-                v.release_channel, v.accepted
+                v.release_channel, v.accepted, v.featured
             FROM versions v
             WHERE v.id = $1
             ",
@@ -388,6 +394,7 @@ impl Version {
                 downloads: row.downloads,
                 release_channel: ChannelId(row.release_channel),
                 accepted: row.accepted,
+                featured: row.featured,
             }))
         } else {
             Ok(None)
@@ -408,7 +415,7 @@ impl Version {
             "
             SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog_url, v.date_published, v.downloads,
-                v.release_channel, accepted
+                v.release_channel, v.accepted, v.featured
             FROM versions v
             WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
             ",
@@ -427,6 +434,7 @@ impl Version {
                 downloads: v.downloads,
                 release_channel: ChannelId(v.release_channel),
                 accepted: v.accepted,
+                featured: v.featured,
             }))
         })
         .try_collect::<Vec<Version>>()
@@ -446,7 +454,7 @@ impl Version {
             "
             SELECT v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog_url, v.date_published, v.downloads,
-                release_channels.channel, v.accepted
+                release_channels.channel, v.accepted, v.featured
             FROM versions v
             INNER JOIN release_channels ON v.release_channel = release_channels.id
             WHERE v.id = $1
@@ -487,7 +495,7 @@ impl Version {
 
             let mut files = sqlx::query!(
                 "
-                SELECT files.id, files.url, files.filename FROM files
+                SELECT files.id, files.url, files.filename, files.is_primary FROM files
                 WHERE files.version_id = $1
                 ",
                 id as VersionId,
@@ -499,6 +507,7 @@ impl Version {
                     url: c.url,
                     filename: c.filename,
                     hashes: std::collections::HashMap::new(),
+                    primary: c.is_primary,
                 }))
             })
             .try_collect::<Vec<QueryFile>>()
@@ -535,6 +544,7 @@ impl Version {
                 loaders,
                 game_versions,
                 accepted: row.accepted,
+                featured: row.featured,
             }))
         } else {
             Ok(None)
@@ -564,6 +574,7 @@ pub struct VersionFile {
     pub version_id: VersionId,
     pub url: String,
     pub filename: String,
+    pub primary: bool,
 }
 
 pub struct FileHash {
@@ -587,6 +598,7 @@ pub struct QueryVersion {
     pub game_versions: Vec<String>,
     pub loaders: Vec<String>,
     pub accepted: bool,
+    pub featured: bool,
 }
 
 pub struct QueryFile {
@@ -594,4 +606,5 @@ pub struct QueryFile {
     pub url: String,
     pub filename: String,
     pub hashes: std::collections::HashMap<String, Vec<u8>>,
+    pub primary: bool,
 }

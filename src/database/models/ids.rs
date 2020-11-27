@@ -104,6 +104,15 @@ pub struct ModId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
 pub struct StatusId(pub i32);
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct SideTypeId(pub i32);
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct LicenseId(pub i32);
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct DonationPlatformId(pub i32);
 
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]

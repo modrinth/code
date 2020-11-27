@@ -113,6 +113,43 @@ impl User {
         }
     }
 
+    pub async fn get_from_username<'a, 'b, E>(
+        username: String,
+        executor: E,
+    ) -> Result<Option<Self>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT u.id, u.github_id, u.name, u.email,
+                u.avatar_url, u.bio,
+                u.created, u.role
+            FROM users u
+            WHERE u.username = $1
+            ",
+            username
+        )
+        .fetch_optional(executor)
+        .await?;
+
+        if let Some(row) = result {
+            Ok(Some(User {
+                id: UserId(row.id),
+                github_id: row.github_id,
+                name: row.name,
+                email: row.email,
+                avatar_url: row.avatar_url,
+                username,
+                bio: row.bio,
+                created: row.created,
+                role: row.role,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
+
     pub async fn get_many<'a, E>(user_ids: Vec<UserId>, exec: E) -> Result<Vec<User>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,

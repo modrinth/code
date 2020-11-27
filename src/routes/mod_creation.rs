@@ -2,7 +2,7 @@ use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
-use crate::models::mods::{ModId, ModStatus, VersionId};
+use crate::models::mods::{DonationLink, License, ModId, ModStatus, SideType, VersionId};
 use crate::models::users::UserId;
 use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::{queue::CreationQueue, IndexingError};
@@ -99,6 +99,8 @@ impl actix_web::ResponseError for CreateError {
 struct ModCreateData {
     /// The title or name of the mod.
     pub mod_name: String,
+    /// The slug of a mod, used for vanity URLs
+    pub mod_slug: Option<String>,
     /// A short description of the mod.
     pub mod_description: String,
     /// A long description of the mod, in markdown.
@@ -113,8 +115,20 @@ struct ModCreateData {
     pub source_url: Option<String>,
     /// An optional link to the mod's wiki page or other relevant information.
     pub wiki_url: Option<String>,
+    /// An optional link to the mod's license page
+    pub license_url: Option<String>,
+    /// An optional link to the mod's discord.
+    pub discord_url: Option<String>,
     /// An optional boolean. If true, the mod will be created as a draft.
     pub is_draft: Option<bool>,
+    /// The support range for the client mod
+    pub client_side: SideType,
+    /// The support range for the server mod
+    pub server_side: SideType,
+    /// The license id that the mod follows
+    pub license_id: String,
+    /// An optional list of all donation links the mod has
+    pub donation_urls: Option<Vec<DonationLink>>,
 }
 
 pub struct UploadedFile {
@@ -461,7 +475,53 @@ async fn mod_create_inner(
 
         let status_id = models::StatusId::get_id(&status, &mut *transaction)
             .await?
-            .expect("No database entry found for status");
+            .ok_or_else(|| {
+                CreateError::InvalidInput(format!("Status {} does not exist.", status.clone()))
+            })?;
+        let client_side_id =
+            models::SideTypeId::get_id(&mod_create_data.client_side, &mut *transaction)
+                .await?
+                .ok_or_else(|| {
+                    CreateError::InvalidInput(
+                        "Client side type specified does not exist.".to_string(),
+                    )
+                })?;
+
+        let server_side_id =
+            models::SideTypeId::get_id(&mod_create_data.server_side, &mut *transaction)
+                .await?
+                .ok_or_else(|| {
+                    CreateError::InvalidInput(
+                        "Server side type specified does not exist.".to_string(),
+                    )
+                })?;
+
+        let license_id =
+            models::categories::License::get_id(&mod_create_data.license_id, &mut *transaction)
+                .await?
+                .ok_or_else(|| {
+                    CreateError::InvalidInput("License specified does not exist.".to_string())
+                })?;
+        let mut donation_urls = vec![];
+
+        if let Some(urls) = &mod_create_data.donation_urls {
+            for url in urls {
+                let platform_id = models::DonationPlatformId::get_id(&url.id, &mut *transaction)
+                    .await?
+                    .ok_or_else(|| {
+                        CreateError::InvalidInput(format!(
+                            "Donation platform {} does not exist.",
+                            url.id.clone()
+                        ))
+                    })?;
+
+                donation_urls.push(models::mod_item::DonationUrl {
+                    mod_id: mod_id.into(),
+                    platform_id,
+                    url: url.url.clone(),
+                })
+            }
+        }
 
         let mod_builder = models::mod_item::ModBuilder {
             mod_id: mod_id.into(),
@@ -474,15 +534,23 @@ async fn mod_create_inner(
             source_url: mod_create_data.source_url,
             wiki_url: mod_create_data.wiki_url,
 
+            license_url: mod_create_data.license_url,
+            discord_url: mod_create_data.discord_url,
             categories,
             initial_versions: versions,
             status: status_id,
+            client_side: client_side_id,
+            server_side: server_side_id,
+            license: license_id,
+            slug: mod_create_data.mod_slug,
+            donation_urls,
         };
 
         let now = chrono::Utc::now();
 
         let response = crate::models::mods::Mod {
             id: mod_id,
+            slug: mod_builder.slug.clone(),
             team: team_id.into(),
             title: mod_builder.title.clone(),
             description: mod_builder.description.clone(),
@@ -490,6 +558,13 @@ async fn mod_create_inner(
             published: now,
             updated: now,
             status,
+            license: License {
+                id: mod_create_data.license_id.clone(),
+                name: "".to_string(),
+                url: mod_builder.license_url.clone(),
+            },
+            client_side: mod_create_data.client_side,
+            server_side: mod_create_data.server_side,
             downloads: 0,
             categories: mod_create_data.categories,
             versions: mod_builder
@@ -501,6 +576,8 @@ async fn mod_create_inner(
             issues_url: mod_builder.issues_url.clone(),
             source_url: mod_builder.source_url.clone(),
             wiki_url: mod_builder.wiki_url.clone(),
+            discord_url: mod_builder.discord_url.clone(),
+            donation_urls: mod_create_data.donation_urls.clone(),
         };
 
         let _mod_id = mod_builder.insert(&mut *transaction).await?;
@@ -598,6 +675,7 @@ async fn create_initial_version(
         game_versions,
         loaders,
         release_channel,
+        featured: version_data.featured,
     };
 
     Ok(version)
@@ -642,7 +720,7 @@ async fn process_icon_upload(
     }
 }
 
-fn get_image_content_type(extension: &str) -> Option<&'static str> {
+pub fn get_image_content_type(extension: &str) -> Option<&'static str> {
     let content_type = match &*extension {
         "bmp" => "image/bmp",
         "gif" => "image/gif",
