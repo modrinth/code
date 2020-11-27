@@ -424,6 +424,7 @@ export default {
         game_versions: [],
         release_channel: 'release',
         loaders: [],
+        primary: false,
       })
 
       this.currentVersionIndex = this.versions.length - 1
