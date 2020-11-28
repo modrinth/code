@@ -146,12 +146,12 @@
           open source ecosystem for all Modrinth applications.
         </p>
       </div>
-      <div class="right hero-image">
+      <div class="right hero-image less-margin">
         <pre v-highlightjs>
 <code class="javascript">const fetch = require('node-fetch');
 fetch('https://api.modrinth.com/api/v1/mod').then(res => res.json()).then(data => {
     console.log(data);
-    // hits: [Object {author: "mezz", author_url: "https://www.curseforge.com/members/17072262-mezz?username=mezz", …}, …]
+    // hits: [Object {author: "mezz", author_url: …, …}, …]
     // limit: 10
     // offset: 0
     /// total_hits: 19440
@@ -242,8 +242,8 @@ export default {
 }
 
 .hero {
-  margin-left: 20%;
-  width: 25%;
+  margin-left: 15%;
+  width: 30%;
   h3 {
     font-size: 18px;
     font-weight: bolder;
