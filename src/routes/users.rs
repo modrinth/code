@@ -45,10 +45,7 @@ pub async fn users_get(
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-    let users: Vec<crate::models::users::User> = users_data
-        .into_iter()
-        .map(convert_user)
-        .collect();
+    let users: Vec<crate::models::users::User> = users_data.into_iter().map(convert_user).collect();
 
     Ok(HttpResponse::Ok().json(users))
 }

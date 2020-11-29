@@ -2,12 +2,12 @@ use super::ApiError;
 use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models;
-use crate::models::mods::{ModStatus, VersionType, ModId};
-use actix_web::{get, web, HttpRequest, HttpResponse};
-use serde::{Serialize, Deserialize};
-use sqlx::PgPool;
-use sqlx::types::chrono::{DateTime, Utc};
+use crate::models::mods::{ModId, ModStatus, VersionType};
 use crate::models::teams::TeamId;
+use actix_web::{get, web, HttpRequest, HttpResponse};
+use serde::{Deserialize, Serialize};
+use sqlx::types::chrono::{DateTime, Utc};
+use sqlx::PgPool;
 
 #[derive(Deserialize)]
 pub struct ResultCount {

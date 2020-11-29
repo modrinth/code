@@ -825,6 +825,51 @@
       "nullable": []
     }
   },
+  "389088b3ccff3a3c970aba3deef8831cca140b74ffc74e43a1162a9021428820": {
+    "query": "\n        SELECT f.id id, f.version_id version_id, f.filename filename, v.version_number version_number, v.mod_id mod_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "filename",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_number",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "mod_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "398ac436f5fe2f6a66544204b9ff01ae1ea1204edf03ffc16de657a861cfe0ba": {
     "query": "\n            DELETE FROM categories\n            WHERE category = $1\n            ",
     "describe": {
@@ -1220,31 +1265,16 @@
       "nullable": []
     }
   },
-  "55df56cd9938bca0edbf8d91649c8ce6d946125ad64e570ab127f6d9c6061787": {
-    "query": "\n        SELECT version_id, filename FROM files\n        INNER JOIN hashes ON hash = $1 AND algorithm = $2\n        ",
+  "5322e7791400b47640f897f3e32d9a0f2915da7d71a34c4e6bf6bd648cfaaa6e": {
+    "query": "\n                DELETE FROM files\n                WHERE files.id = $1\n                ",
     "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "version_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "filename",
-          "type_info": "Varchar"
-        }
-      ],
+      "columns": [],
       "parameters": {
         "Left": [
-          "Bytea",
-          "Text"
+          "Int8"
         ]
       },
-      "nullable": [
-        false,
-        false
-      ]
+      "nullable": []
     }
   },
   "560c3ba57c965c3ebdbe393b062da8a30a8a7116a9bace2aa7de2e8431fe0bc7": {
@@ -1486,45 +1516,6 @@
         false,
         true,
         true
-      ]
-    }
-  },
-  "6a0d8560c0a392f66023b4186834f84d822e797b0c8b5ad360ef93a2c2300319": {
-    "query": "\n        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id mod_id FROM files f\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN hashes ON hash = $1 AND algorithm = $2\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 1,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "version_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "mod_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
       ]
     }
   },
@@ -2042,6 +2033,27 @@
       "nullable": []
     }
   },
+  "79d30dd9fe16ac93ece0b6272811e1b644bac8f61b446dceca46a16cb69953a1": {
+    "query": "\n        SELECT f.version_id version_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "7bbbeecf3246a8e07ad073a07f7d057e0990a810d69ae18cec41de60b704b174": {
     "query": "\n            SELECT id, user_id, member_name, role, permissions, accepted\n            FROM team_members\n            WHERE (team_id = $1 AND user_id = $2 AND accepted = TRUE)\n            ",
     "describe": {
@@ -2153,27 +2165,6 @@
       "nullable": []
     }
   },
-  "96585aa2586e69eeae18f5a0c97a93d2c221c8a97470e5f59839b1a52b2e353a": {
-    "query": "\n        SELECT version_id FROM files\n        INNER JOIN hashes ON hash = $1 AND algorithm = $2\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "version_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "97143e41c18d191d09d244113b7b6cdf5bd6ab89c62ac46d0980d700ab288f48": {
     "query": "\n                SELECT name FROM side_types\n                WHERE id = $1\n                ",
     "describe": {
@@ -2252,18 +2243,6 @@
       "nullable": []
     }
   },
-  "9ef9174fa003186a07fbf465e9ac083f6d452cf3c702c6ca05b1f3bbc0e30b5a": {
-    "query": "\n                DELETE FROM files\n                WHERE files.version_id = $1\n                ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "a28188c4840d0f3449379b3bba6b3c4af9483e01f50fd56785317398a59881ca": {
     "query": "\n                SELECT files.id, files.url, files.filename, files.is_primary FROM files\n                WHERE files.version_id = $1\n                ",
     "describe": {
@@ -2336,6 +2315,45 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "a8f22bd234488500b06855c8258e1e290696adba0766b46640bf87d91b150518": {
+    "query": "\n        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id mod_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "mod_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "a90bb6904e1b790c0e29e060dac5ba4c2a6087e07c1197dc1f59f0aff31944c9": {

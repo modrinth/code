@@ -1,9 +1,9 @@
 use super::ApiError;
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
-use crate::{database, Pepper};
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::teams::Permissions;
+use crate::{database, Pepper};
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -117,23 +117,27 @@ pub async fn version_get(
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if let Some(data) = version_data {
-        if let Some(user) = user_option {
-            if !data.accepted && !user.role.is_mod() {
-                let user_id: database::models::ids::UserId = user.id.into();
+        if !data.accepted {
+            if let Some(user) = user_option {
+                if !user.role.is_mod() {
+                    let user_id: database::models::ids::UserId = user.id.into();
 
-                let member_exists = sqlx::query!(
-                     "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.id AND m.id = $1 WHERE tm.user_id = $2)",
-                     data.mod_id as database::models::ModId,
-                     user_id as database::models::ids::UserId,
-                )
-                    .fetch_one(&**pool)
-                    .await
-                    .map_err(|e| ApiError::DatabaseError(e.into()))?
-                    .exists;
+                    let member_exists = sqlx::query!(
+                        "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.id AND m.id = $1 WHERE tm.user_id = $2)",
+                        data.mod_id as database::models::ModId,
+                        user_id as database::models::ids::UserId,
+                    )
+                        .fetch_one(&**pool)
+                        .await
+                        .map_err(|e| ApiError::DatabaseError(e.into()))?
+                        .exists;
 
-                if !member_exists.unwrap_or(false) {
-                    return Ok(HttpResponse::NotFound().body(""));
+                    if !member_exists.unwrap_or(false) {
+                        return Ok(HttpResponse::NotFound().body(""));
+                    }
                 }
+            } else {
+                return Ok(HttpResponse::NotFound().body(""));
             }
         }
 
@@ -553,8 +557,9 @@ pub async fn get_version_from_hash(
 
     let result = sqlx::query!(
         "
-        SELECT version_id FROM files
-        INNER JOIN hashes ON hash = $1 AND algorithm = $2
+        SELECT f.version_id version_id FROM hashes h
+        INNER JOIN files f ON h.file_id = f.id
+        WHERE h.algorithm = $2 AND h.hash = $1
         ",
         hash.as_bytes(),
         algorithm.algorithm
@@ -599,9 +604,10 @@ pub async fn download_version(
 
     let result = sqlx::query!(
         "
-        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id mod_id FROM files f
+        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id mod_id FROM hashes h
+        INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
-        INNER JOIN hashes ON hash = $1 AND algorithm = $2
+        WHERE h.algorithm = $2 AND h.hash = $1
         ",
         hash.as_bytes(),
         algorithm.algorithm
@@ -692,8 +698,10 @@ pub async fn delete_file(
 
     let result = sqlx::query!(
         "
-        SELECT version_id, filename FROM files
-        INNER JOIN hashes ON hash = $1 AND algorithm = $2
+        SELECT f.id id, f.version_id version_id, f.filename filename, v.version_number version_number, v.mod_id mod_id FROM hashes h
+        INNER JOIN files f ON h.file_id = f.id
+        INNER JOIN versions v ON v.id = f.version_id
+        WHERE h.algorithm = $2 AND h.hash = $1
         ",
         hash.as_bytes(),
         algorithm.algorithm
@@ -703,62 +711,51 @@ pub async fn delete_file(
     .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     if let Some(row) = result {
-        let version_data = database::models::Version::get_full(
-            database::models::VersionId(row.version_id),
-            &**pool,
-        )
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        let mut transaction = pool
+            .begin()
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-        if let Some(data) = version_data {
-            let mut transaction = pool
-                .begin()
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-            sqlx::query!(
-                "
+        sqlx::query!(
+            "
                 DELETE FROM hashes
                 WHERE hash = $1 AND algorithm = $2
                 ",
-                hash.as_bytes(),
-                algorithm.algorithm
-            )
-            .execute(&mut *transaction)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+            hash.as_bytes(),
+            algorithm.algorithm
+        )
+        .execute(&mut *transaction)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-            sqlx::query!(
-                "
+        sqlx::query!(
+            "
                 DELETE FROM files
-                WHERE files.version_id = $1
+                WHERE files.id = $1
                 ",
-                data.id as database::models::ids::VersionId,
+            row.id,
+        )
+        .execute(&mut *transaction)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+        let mod_id: models::mods::ModId = database::models::ids::ModId(row.mod_id).into();
+        file_host
+            .delete_file_version(
+                "",
+                &format!(
+                    "data/{}/versions/{}/{}",
+                    mod_id, row.version_number, row.filename
+                ),
             )
-            .execute(&mut *transaction)
+            .await?;
+
+        transaction
+            .commit()
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-            let mod_id: models::mods::ModId = data.mod_id.into();
-            file_host
-                .delete_file_version(
-                    "",
-                    &format!(
-                        "data/{}/versions/{}/{}",
-                        mod_id, data.version_number, row.filename
-                    ),
-                )
-                .await?;
-
-            transaction
-                .commit()
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-            Ok(HttpResponse::Ok().body(""))
-        } else {
-            Ok(HttpResponse::NotFound().body(""))
-        }
+        Ok(HttpResponse::Ok().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

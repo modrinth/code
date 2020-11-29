@@ -459,9 +459,9 @@ impl Mod {
                 ",
                 inner.client_side.0,
             )
-                .fetch_one(executor)
-                .await?
-                .name;
+            .fetch_one(executor)
+            .await?
+            .name;
 
             let server_side = sqlx::query!(
                 "
@@ -470,9 +470,9 @@ impl Mod {
                 ",
                 inner.server_side.0,
             )
-                .fetch_one(executor)
-                .await?
-                .name;
+            .fetch_one(executor)
+            .await?
+            .name;
 
             let license = sqlx::query!(
                 "
@@ -481,8 +481,8 @@ impl Mod {
                 ",
                 inner.license.0,
             )
-                .fetch_one(executor)
-                .await?;
+            .fetch_one(executor)
+            .await?;
 
             Ok(Some(QueryMod {
                 inner,
@@ -493,7 +493,7 @@ impl Mod {
                 license_id: license.short,
                 license_name: license.name,
                 client_side: crate::models::mods::SideType::from_str(&client_side),
-                server_side: crate::models::mods::SideType::from_str(&server_side)
+                server_side: crate::models::mods::SideType::from_str(&server_side),
             }))
         } else {
             Ok(None)

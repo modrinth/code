@@ -173,11 +173,14 @@ async fn main() -> std::io::Result<()> {
                 WHERE date < (CURRENT_DATE - INTERVAL '30 minutes ago')
                 "
             )
-                .execute(&pool_ref)
-                .await;
+            .execute(&pool_ref)
+            .await;
 
             if let Err(e) = downloads_result {
-                warn!("Deleting old records from temporary table downloads failed: {:?}", e);
+                warn!(
+                    "Deleting old records from temporary table downloads failed: {:?}",
+                    e
+                );
             }
 
             let states_result = sqlx::query!(
@@ -186,16 +189,18 @@ async fn main() -> std::io::Result<()> {
                 WHERE expires < CURRENT_DATE
                 "
             )
-                .execute(&pool_ref)
-                .await;
+            .execute(&pool_ref)
+            .await;
 
             if let Err(e) = states_result {
-                warn!("Deleting old records from temporary table states failed: {:?}", e);
+                warn!(
+                    "Deleting old records from temporary table states failed: {:?}",
+                    e
+                );
             }
 
             info!("Finished deleting old records from temporary tables");
         }
-
     });
 
     let indexing_queue = Arc::new(search::indexing::queue::CreationQueue::new());
@@ -260,7 +265,7 @@ async fn main() -> std::io::Result<()> {
     scheduler::schedule_versions(&mut scheduler, pool.clone(), skip_initial);
 
     let ip_salt = Pepper {
-        pepper: crate::models::ids::Base62Id(crate::models::ids::random_base62(11)).to_string()
+        pepper: crate::models::ids::Base62Id(crate::models::ids::random_base62(11)).to_string(),
     };
 
     let allowed_origins = dotenv::var("CORS_ORIGINS")

@@ -350,7 +350,9 @@ pub async fn mod_edit(
                     ));
                 }
 
-                if (status == &ModStatus::Rejected || status == &ModStatus::Approved) && !user.role.is_mod() {
+                if (status == &ModStatus::Rejected || status == &ModStatus::Approved)
+                    && !user.role.is_mod()
+                {
                     return Err(ApiError::CustomAuthenticationError(
                         "You don't have permission to set this status".to_string(),
                     ));
