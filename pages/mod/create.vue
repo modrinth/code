@@ -272,7 +272,7 @@
                 number
               </span>
               <input
-                v-model="versions[currentVersionIndex].name"
+                v-model="versions[currentVersionIndex].version_title"
                 type="text"
                 placeholder="Enter the name"
               />
