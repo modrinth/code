@@ -280,7 +280,7 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         let mut cors = Cors::new()
-            .allowed_methods(vec!["GET", "POST"])
+            .allowed_methods(vec!["GET", "POST", "DELETE", "PATCH", "PUT"])
             .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
             .allowed_header(http::header::CONTENT_TYPE)
             .max_age(3600);

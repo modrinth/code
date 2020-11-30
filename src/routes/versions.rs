@@ -493,18 +493,18 @@ pub async fn version_delete(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id = info.into_inner().0;
 
-    if user.role.is_mod() {
+    if !user.role.is_mod() {
         let version = database::models::Version::get(id.into(), &**pool)
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?
             .ok_or_else(|| {
-                ApiError::InvalidInputError("Invalid Version ID specified!".to_string())
+                ApiError::InvalidInputError("An invalid version ID was specified".to_string())
             })?;
         let mod_item = database::models::Mod::get(version.mod_id, &**pool)
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?
             .ok_or_else(|| {
-                ApiError::InvalidInputError("Invalid Version ID specified!".to_string())
+                ApiError::InvalidInputError("The version is not attached to a mod".to_string())
             })?;
         let team_member = database::models::TeamMember::get_from_user_id(
             mod_item.team_id,
@@ -513,14 +513,18 @@ pub async fn version_delete(
         )
         .await
         .map_err(ApiError::DatabaseError)?
-        .ok_or_else(|| ApiError::InvalidInputError("Invalid Version ID specified!".to_string()))?;
+        .ok_or_else(|| {
+            ApiError::InvalidInputError(
+                "You do not have permission to delete versions in this team".to_string(),
+            )
+        })?;
 
         if !team_member
             .permissions
             .contains(Permissions::DELETE_VERSION)
         {
             return Err(ApiError::CustomAuthenticationError(
-                "You don't have permission to delete versions in this team".to_string(),
+                "You do not have permission to delete versions in this team".to_string(),
             ));
         }
     }
