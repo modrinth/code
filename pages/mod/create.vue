@@ -579,7 +579,7 @@ export default {
           wiki_url: this.wiki_url,
           client_side: this.clientSideType.id,
           server_side: this.serverSideType.id,
-          license: this.license,
+          license_id: this.license.short,
           license_url: this.license_url,
           is_draft: this.draft,
         })
