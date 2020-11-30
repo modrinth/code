@@ -147,20 +147,12 @@
     </aside>
     <main>
       <notifications group="main" position="bottom right" />
-      <notifications
+      <!--<notifications
         group="ads"
         position="bottom right"
         :duration="-1"
         :ignore-duplicates="true"
-      />
-      <div class="alpha-alert hidden">
-        <div class="wrapper">
-          Modrinth is in early alpha. Beware of many bugs and broken and
-          unimplemented features. Join our
-          <a class="text-link" href="https://discord.gg/gFRbNQ2">Discord</a>
-          for updates!
-        </div>
-      </div>
+      />-->
       <Nuxt />
     </main>
   </div>
@@ -466,19 +458,6 @@ export default {
 
   main {
     grid-area: 'main';
-
-    .alpha-alert {
-      background-color: var(--color-bg);
-      border-radius: var(--size-rounded-md);
-      margin: 0.5rem;
-      overflow: hidden;
-      width: fit-content;
-
-      .wrapper {
-        border-left: 0.5rem solid var(--color-brand);
-        padding: 0.75rem 1rem;
-      }
-    }
   }
 }
 

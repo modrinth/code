@@ -232,23 +232,6 @@
             >
               <ForgeLoader />
             </SearchFilter>
-            <h3>Host</h3>
-            <SearchFilter
-              :active-filters="facets"
-              display-name="Modrinth"
-              facet-name="host:modrinth"
-              @toggle="toggleFacet"
-            >
-              <Modrinth />
-            </SearchFilter>
-            <SearchFilter
-              :active-filters="facets"
-              display-name="CurseForge"
-              facet-name="host:curseforge"
-              @toggle="toggleFacet"
-            >
-              <FlameAnvil />
-            </SearchFilter>
             <h3>Versions</h3>
             <SearchFilter
               :active-filters="showVersions"
@@ -305,9 +288,6 @@ import WorldGenCategory from '~/assets/images/categories/worldgen.svg?inline'
 import ForgeLoader from '~/assets/images/categories/forge.svg?inline'
 import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 
-import Modrinth from '~/assets/images/categories/modrinth.svg?inline'
-import FlameAnvil from '~/assets/images/categories/flameanvil.svg?inline'
-
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
 
 export default {
@@ -333,8 +313,6 @@ export default {
     WorldGenCategory,
     ForgeLoader,
     FabricLoader,
-    Modrinth,
-    FlameAnvil,
     SearchIcon,
   },
   async fetch() {
@@ -357,6 +335,7 @@ export default {
     if (this.$route.query.o)
       this.currentPage = Math.ceil(this.$route.query.o / this.maxResults) + 1
 
+    this.facets.push('host:modrinth')
     await this.fillInitialVersions()
     await this.onSearchChange(this.currentPage)
   },

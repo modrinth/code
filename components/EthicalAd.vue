@@ -74,7 +74,7 @@ export default {
 .alt {
   font-size: 14px;
   border-radius: var(--size-rounded-sm);
-  background-color: var(--color-grey-1);
+  background-color: var(--color-raised-bg);
   box-shadow: 0 2px 3px rgba(0, 0, 0, 0.15);
   padding: 0.7em 1em;
   margin: 1em 1em 2em 1em;
