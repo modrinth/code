@@ -1,14 +1,11 @@
 <template>
   <ModPage :mod="mod" :versions="versions" :members="members">
-    <div class="markdown-body" v-html="body"></div>
+    <div v-compiled-markdown="body" class="markdown-body"></div>
   </ModPage>
 </template>
 
 <script>
 import axios from 'axios'
-
-import xss from 'xss'
-import marked from 'marked'
 import ModPage from '@/components/ModPage'
 
 export default {
@@ -31,17 +28,20 @@ export default {
       members[i].avatar_url = res.data.avatar_url
     }
 
-    res = await axios.get(mod.body_url)
-    const body = xss(marked(res.data))
+    const body = (await axios.get(mod.body_url)).data
 
     const versions = []
 
     for (const version of mod.versions) {
-      res = await axios.get(
-        `https://api.modrinth.com/api/v1/version/${version}`
-      )
-
-      versions.push(res.data)
+      try {
+        res = await axios.get(
+          `https://api.modrinth.com/api/v1/version/${version}`
+        )
+        versions.push(res.data)
+      } catch {
+        // eslint-disable-next-line no-console
+        console.log('Some versions may be missing...')
+      }
     }
 
     return {
@@ -102,9 +102,9 @@ export default {
 
 <style lang="scss" scoped>
 .markdown-body {
-  padding: 20px;
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
-  background: var(--color-bg);
-  border-radius: 0 0 var(--size-rounded-sm) var(--size-rounded-sm);
+  padding: 1rem;
+  margin-bottom: var(--spacing-card-md);
+  background: var(--color-raised-bg);
+  border-radius: var(--size-rounded-card);
 }
 </style>

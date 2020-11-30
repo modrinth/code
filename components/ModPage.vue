@@ -1,71 +1,134 @@
 <template>
-  <div class="columns">
-    <div class="content column-grow-5">
-      <div class="mod-header columns">
-        <img
-          :src="
-            mod.icon_url
-              ? mod.icon_url
-              : 'https://cdn.modrinth.com/placeholder.svg'
-          "
-          alt="mod-icon"
-        />
-        <div class="mod-header-text">
-          <div class="columns title">
-            <h2>{{ mod.title }}</h2>
-            <nuxt-link
-              :to="'/user/' + members.find((x) => x.role === 'Owner').user_id"
-            >
-              <p>by {{ members.find((x) => x.role === 'Owner').name }}</p>
-            </nuxt-link>
+  <div class="page-container">
+    <div class="page-contents">
+      <div class="content">
+        <div class="header">
+          <div class="icon">
+            <img
+              :src="
+                mod.icon_url
+                  ? mod.icon_url
+                  : 'https://cdn.modrinth.com/placeholder.svg'
+              "
+              alt="mod - icon"
+            />
           </div>
-          <p>{{ mod.description }}</p>
+          <div class="info">
+            <h2 class="title">{{ mod.title }}</h2>
+            <p class="description">
+              {{ mod.description }}
+            </p>
+          </div>
+        </div>
+        <client-only>
+          <EthicalAd type="text" />
+        </client-only>
+        <div class="mod-navigation">
+          <div class="tabs">
+            <nuxt-link :to="'/mod/' + mod.id" class="tab">
+              Description
+            </nuxt-link>
+            <nuxt-link :to="'/mod/' + mod.id + '/versions'" class="tab">
+              Versions
+            </nuxt-link>
+            <a v-if="mod.wiki_url" :href="mod.wiki_url" class="tab">
+              <ExternalIcon />
+              Wiki
+            </a>
+            <a
+              v-if="mod.issues_url"
+              :href="mod.issues_url"
+              target="_blank"
+              class="tab"
+            >
+              <ExternalIcon />
+              Issues
+            </a>
+            <a
+              v-if="mod.source_url"
+              :href="mod.source_url"
+              target="_blank"
+              class="tab"
+            >
+              <ExternalIcon />
+              Source
+            </a>
+            <nuxt-link
+              v-if="
+                this.$auth.loggedIn &&
+                members.find((x) => x.user_id === this.$auth.user.id)
+              "
+              :to="'/mod/' + mod.id + '/settings'"
+              class="tab"
+            >
+              Settings
+            </nuxt-link>
+            <div class="filler" />
+          </div>
+        </div>
+        <div class="mod-content">
+          <slot />
         </div>
       </div>
-      <div class="mod-navigation">
-        <nuxt-link :to="'/mod/' + mod.id">
-          <InfoIcon />
-          Description
-        </nuxt-link>
-        <nuxt-link :to="'/mod/' + mod.id + '/versions'">
-          <VersionIcon />
-          Versions
-        </nuxt-link>
-        <nuxt-link
-          v-if="
-            this.$auth.loggedIn &&
-            members.find((x) => x.user_id === this.$auth.user.id)
-          "
-          :to="'/mod/' + mod.id + '/settings'"
-        >
-          <SettingsIcon />
-          Settings
-        </nuxt-link>
-        <a v-if="mod.wiki_url" :href="mod.wiki_url">
-          <ExternalIcon />
-          Wiki
-        </a>
-        <a v-if="mod.issues_url" :href="mod.issues_url">
-          <ExternalIcon />
-          Issues
-        </a>
-        <a v-if="mod.source_url" :href="mod.source_url">
-          <ExternalIcon />
-          Source Code
-        </a>
-        <div class="filler" />
-      </div>
-      <slot />
-    </div>
-    <div>
       <section class="mod-info">
-        <div class="mod-stats">
-          <h3>Info</h3>
-          <p>{{ mod.downloads }} Downloads</p>
-          <p>Created {{ $dayjs(mod.published).fromNow() }}</p>
-          <p>Updated {{ $dayjs(mod.updated).fromNow() }}</p>
+        <div class="mod-stats section">
+          <div class="stat">
+            <DownloadIcon />
+            <div class="info">
+              <h4>Downloads</h4>
+              <p class="value">{{ formatNumber(mod.downloads) }}</p>
+            </div>
+          </div>
+          <div class="stat">
+            <CalendarIcon />
+            <div class="info">
+              <h4>Created</h4>
+              <p
+                v-tooltip="
+                  $dayjs(mod.published).format(
+                    '[Created on] YYYY-MM-DD [at] HH:mm A'
+                  )
+                "
+                class="value"
+              >
+                {{ $dayjs(mod.published).fromNow() }}
+              </p>
+            </div>
+          </div>
+          <div class="stat">
+            <TagIcon />
+            <div class="info">
+              <h4>Available For</h4>
+              <p class="value">
+                {{
+                  versions[versions.length - 1]
+                    ? versions[versions.length - 1].game_versions[0]
+                      ? versions[versions.length - 1].game_versions[0]
+                      : 'None'
+                    : 'None'
+                }}
+              </p>
+            </div>
+          </div>
+          <div class="stat">
+            <EditIcon />
+            <div class="info">
+              <h4>Updated</h4>
+              <p
+                v-tooltip="
+                  $dayjs(mod.updated).format(
+                    '[Updated on] YYYY-MM-DD [at] HH:mm A'
+                  )
+                "
+                class="value"
+              >
+                {{ $dayjs(mod.updated).fromNow() }}
+              </p>
+            </div>
+          </div>
+          <Categories :categories="mod.categories.concat(mod.loaders)" />
         </div>
-        <div>
+        <div class="section">
           <h3>Members</h3>
           <div
             v-for="member in members"
@@ -77,63 +140,75 @@
               <nuxt-link :to="'/user/' + member.user_id">
                 <h4>{{ member.name }}</h4>
               </nuxt-link>
-              <p>{{ member.role }}</p>
+              <h3>{{ member.role }}</h3>
             </div>
           </div>
         </div>
-        <div v-if="versions.length > 0">
+        <div v-if="versions.length > 0" class="section">
           <h3>Featured Versions</h3>
           <div
             v-for="version in versions"
             :key="version.id"
-            class="featured-version columns"
+            class="featured-version"
           >
-            <div class="version-info">
-              <div class="columns">
-                <h4 class="limit-text-width">
-                  {{ version.name }}
-                </h4>
-                <p
+            <a
+              :href="findPrimary(version).url"
+              class="download"
+              @click.prevent="
+                downloadFile(
+                  findPrimary(version).hashes.sha1,
+                  findPrimary(version).url
+                )
+              "
+            >
+              <DownloadIcon />
+            </a>
+            <div class="info">
+              <div class="top">
+                <span
                   v-if="version.version_type === 'release'"
                   class="badge green"
                 >
                   Release
-                </p>
-                <p v-if="version.version_type === 'beta'" class="badge yellow">
+                </span>
+                <span
+                  v-if="version.version_type === 'beta'"
+                  class="badge yellow"
+                >
                   Beta
-                </p>
-                <p v-if="version.version_type === 'alpha'" class="badge red">
+                </span>
+                <span v-if="version.version_type === 'alpha'" class="badge red">
                   Alpha
-                </p>
+                </span>
+                <h4 class="title">
+                  <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
+                    {{ version.name }}
+                  </nuxt-link>
+                </h4>
               </div>
-              <div class="columns info-2">
-                <p class="version-number limit-text-width">
-                  {{ version.version_number }}
-                </p>
+              <div class="bottom">
+                <span class="version-number limit-text-width">
+                  {{ version.version_number }} ·
+                </span>
                 <FabricIcon
                   v-if="version.loaders.includes('fabric')"
-                  stroke="#AC6C3A"
+                  class="loader"
                 />
                 <ForgeIcon
                   v-if="version.loaders.includes('forge')"
-                  stroke="#8B81E6"
+                  class="loader"
                 />
-                <p
+                <span
                   v-if="version.game_versions.length > 0"
                   class="game-version limit-text-width"
                 >
-                  {{ version.game_versions[0] }}
-                </p>
+                  · {{ version.game_versions[0] }}
+                </span>
               </div>
             </div>
-            <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
-              <DownloadIcon />
-            </nuxt-link>
           </div>
-          <client-only>
-            <EthicalAd type="image" />
-          </client-only>
         </div>
+        <m-footer class="footer" />
       </section>
     </div>
   </div>
@@ -142,11 +217,16 @@
 <script>
 import EthicalAd from '@/components/EthicalAd'
 
+import Categories from '@/components/Categories'
+import MFooter from '@/components/MFooter'
+
+import axios from 'axios'
+import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import EditIcon from '~/assets/images/utils/edit.svg?inline'
+import TagIcon from '~/assets/images/utils/tag.svg?inline'
+
 import ExternalIcon from '~/assets/images/utils/external.svg?inline'
-import InfoIcon from '~/assets/images/utils/info.svg?inline'
-import VersionIcon from '~/assets/images/utils/version.svg?inline'
-import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
@@ -154,14 +234,16 @@ import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
 export default {
   name: 'ModPage',
   components: {
+    MFooter,
+    Categories,
     EthicalAd,
     ExternalIcon,
-    InfoIcon,
-    VersionIcon,
-    SettingsIcon,
     ForgeIcon,
     FabricIcon,
     DownloadIcon,
+    CalendarIcon,
+    EditIcon,
+    TagIcon,
   },
   props: {
     mod: {
@@ -183,190 +265,168 @@ export default {
       },
     },
   },
+  methods: {
+    formatNumber(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    },
+    findPrimary(version) {
+      let file = version.files.find((x) => x.primary)
+
+      if (!file) {
+        file = version.files[0]
+      }
+
+      if (!file) {
+        file = { url: `/mod/${this.mod.id}/version/${version.id}` }
+      }
+
+      return file
+    },
+    async downloadFile(hash, url) {
+      await axios.get(
+        `https://api.modrinth.com/api/v1/version_file/${hash}/download`
+      )
+
+      const elem = document.createElement('a')
+      elem.download = hash
+      elem.href = url
+      elem.click()
+    },
+  },
 }
 </script>
 
-<style lang="scss">
-.mod-header {
-  align-items: center;
-
-  img {
-    border-radius: var(--size-rounded-md);
-    width: 150px;
-    height: 150px;
-    object-fit: cover;
+<style lang="scss" scoped>
+.header {
+  @extend %row;
+  @extend %card-spaced-b;
+  width: 100%;
+  .icon {
+    margin: auto 0;
+    img {
+      width: 6rem;
+      height: 6rem;
+      margin: var(--spacing-card-md);
+      border-radius: var(--size-rounded-icon);
+      object-fit: contain;
+    }
   }
-
-  .mod-header-text {
-    margin-left: 15px;
-
+  .info {
+    @extend %column;
     .title {
-      align-items: end;
-
-      h2 {
-        margin: 0;
-      }
-
-      p {
-        align-self: flex-end;
-        margin: 0;
-        padding: 0 0 2px 5px;
-      }
+      margin: var(--spacing-card-md) var(--spacing-card-md) 0 0;
+      color: var(--color-text-dark);
+      font-size: var(--font-size-lg);
+    }
+    .description {
+      margin: var(--spacing-card-sm) var(--spacing-card-md) 0 0;
+      height: 100%;
+      color: var(--color-text-dark);
     }
   }
 }
 
 .mod-navigation {
-  display: flex;
-  margin-top: 20px;
-
-  a {
-    user-select: none;
-    display: flex;
-    align-items: center;
-    padding: 10px 20px;
-    border-bottom: 2px solid var(--color-grey-2);
-
-    svg {
-      margin-right: 10px;
-    }
-
-    &:hover,
-    &:focus {
-      border-bottom: 2px solid var(--color-grey-3);
-    }
-
-    &.nuxt-link-exact-active {
-      border-bottom: 2px solid var(--color-brand);
-    }
-  }
-
-  .filler {
-    flex-grow: 1;
-    border-bottom: 2px solid var(--color-grey-2);
-  }
+  @extend %card-spaced-b;
+  padding-bottom: 0.2rem;
 }
 
 .mod-info {
-  top: 1rem;
-  position: sticky;
-  min-width: 270px;
-  max-width: 270px;
-  margin: 1rem;
-  padding: 0 0.75rem 0 1rem;
-  overflow-y: auto;
-  background-color: var(--color-bg);
-  border: 1px solid var(--color-grey-2);
-  border-radius: var(--size-rounded-sm);
+  width: 30rem;
+  height: auto;
+  margin-left: var(--spacing-card-lg);
+
+  .section {
+    padding: var(--spacing-card-sm);
+    @extend %card-spaced-b;
+    margin-top: var(--spacing-card-lg);
+  }
 
   h3 {
-    color: #718096;
-    font-size: 0.8rem;
-    letter-spacing: 0.02rem;
-    margin: 1.5rem 0 0.5rem 0;
-    text-transform: uppercase;
+    @extend %large-label;
   }
 
   .mod-stats {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 0;
     margin-left: 5px;
     p {
-      color: var(--color-grey-4);
       margin: 3px;
+    }
+    .stat {
+      width: 8.5rem;
+      margin: 0.75rem;
+      @extend %stat;
+
+      svg {
+        padding: 0.25rem;
+        border-radius: 50%;
+        background-color: var(--color-button-bg);
+      }
     }
   }
 
   .team-member {
     margin-left: 5px;
     margin-bottom: 10px;
-    border: 1px solid var(--color-grey-1);
-    border-radius: var(--size-rounded-sm);
 
     img {
-      border-radius: var(--size-rounded-sm);
-      border-top-right-radius: 0;
-      border-bottom-right-radius: 0;
+      border-radius: var(--size-rounded-icon);
       height: 50px;
       width: 50px;
     }
     .member-info {
       max-width: 150px;
       overflow: hidden;
-      margin: auto 0 auto 20px;
+      margin: auto 0 auto 0.5rem;
       h4 {
         font-weight: normal;
         margin: 0;
       }
-      p {
-        color: var(--color-grey-4);
-        font-weight: lighter;
-        font-size: 12pt;
-        margin: 0;
+      h3 {
+        margin-top: 0.1rem;
+        margin-bottom: 0;
       }
     }
   }
 
   .featured-version {
-    margin-left: 5px;
-    margin-bottom: 10px;
-    border: 1px solid var(--color-grey-1);
-    border-radius: var(--size-rounded-sm);
-
-    .version-info {
-      padding: 5px 10px;
-      h4 {
-        max-width: 120px;
-        font-weight: normal;
-        margin: 0 10px 0 0;
-      }
-      .badge {
-        margin: 0;
-        display: inline-block;
-      }
-      .info-2 {
-        overflow: hidden;
-        max-width: 180px;
-        align-items: center;
-
-        .version-number {
-          max-width: 80px;
-        }
-
-        .game-version {
-          max-width: 120px;
-        }
-
-        p {
-          color: var(--color-grey-4);
-          font-weight: lighter;
-          margin: 0 10px 0 0;
-        }
-
-        svg {
-          min-width: 24px;
-          min-height: 24px;
-          margin-right: 10px;
-        }
+    @extend %row;
+    padding-top: var(--spacing-card-sm);
+    padding-bottom: var(--spacing-card-sm);
+    .download {
+      display: flex;
+      align-items: center;
+      height: 2.25rem;
+      width: 2.25rem;
+      border-radius: 2rem;
+      background-color: var(--color-button-bg);
+      margin-right: var(--spacing-card-sm);
+      svg {
+        width: 1.25rem;
+        margin: auto;
       }
     }
-
-    a {
-      display: table-cell;
-      margin-left: auto;
-      width: 40px;
-      height: 60px;
-      background-color: var(--color-grey-1);
-      color: var(--color-grey-3);
-
-      svg {
-        margin-top: 15px;
-        height: 30px;
-        width: 40px;
+    .info {
+      @extend %column;
+      font-size: var(--font-size-xs);
+      .top {
+        @extend %row;
+        .badge {
+          font-size: var(--font-size-xs);
+          margin-right: var(--spacing-card-sm);
+        }
+        .title {
+          margin: auto 0;
+        }
       }
-
-      &:hover,
-      &:focus {
-        background-color: var(--color-grey-3);
-        color: var(--color-grey-4);
+      .bottom {
+        margin-top: 0.25rem;
+        @extend %row;
+        .loader {
+          height: 1rem;
+        }
       }
     }
   }

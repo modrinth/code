@@ -5,20 +5,29 @@
         <tr>
           <th></th>
           <th>Name</th>
-          <th>Number</th>
-          <th>Loaders</th>
-          <th>Game Versions</th>
+          <th>Version</th>
+          <th>Mod Loader</th>
+          <th>Minecraft Version</th>
           <th>Status</th>
           <th>Downloads</th>
-          <th>Published</th>
+          <th>Date Published</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="version in versions" :key="version.id">
           <td>
-            <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
+            <a
+              :href="findPrimary(version).url"
+              class="download"
+              @click.prevent="
+                downloadFile(
+                  findPrimary(version).hashes.sha1,
+                  findPrimary(version).url
+                )
+              "
+            >
               <DownloadIcon />
-            </nuxt-link>
+            </a>
           </td>
           <td>
             <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
@@ -27,14 +36,8 @@
           </td>
           <td>{{ version.version_number }}</td>
           <td>
-            <FabricIcon
-              v-if="version.loaders.includes('fabric')"
-              stroke="#AC6C3A"
-            />
-            <ForgeIcon
-              v-if="version.loaders.includes('forge')"
-              stroke="#8B81E6"
-            />
+            <FabricIcon v-if="version.loaders.includes('fabric')" />
+            <ForgeIcon v-if="version.loaders.includes('forge')" />
           </td>
           <td>{{ version.game_versions.join(', ') }}</td>
           <td>
@@ -62,10 +65,6 @@
       class="create-version-popup-body"
     >
       <h3>New Version</h3>
-      <div v-if="currentError" class="error">
-        <h4>Error</h4>
-        <p>{{ currentError }}</p>
-      </div>
       <label
         for="version-title"
         class="required"
@@ -110,7 +109,7 @@
       <label
         title="The version number of this version. Preferably following semantic versioning"
       >
-        Loaders
+        Mod Loaders
       </label>
       <multiselect
         v-model="createdVersion.loaders"
@@ -128,7 +127,7 @@
         placeholder="Choose loaders..."
       />
       <label title="The versions of minecraft that this mod version supports">
-        Game Versions
+        Minecraft Versions
       </label>
       <multiselect
         v-model="createdVersion.game_versions"
@@ -155,7 +154,7 @@
       />
       <FileInput
         input-id="version-files"
-        input-accept="application/java-archive,application/zip"
+        accept="application/java-archive,application/zip"
         default-text="Upload Files"
         :input-multiple="true"
         @change="updateVersionFiles"
@@ -237,11 +236,15 @@ export default {
 
     const versions = []
     for (const version of mod.versions) {
-      res = await axios.get(
-        `https://api.modrinth.com/api/v1/version/${version}`
-      )
-
-      versions.push(res.data)
+      try {
+        res = await axios.get(
+          `https://api.modrinth.com/api/v1/version/${version}`
+        )
+        versions.push(res.data)
+      } catch {
+        // eslint-disable-next-line no-console
+        console.log('Some versions may be missing...')
+      }
     }
 
     res = await axios.get(`https://api.modrinth.com/api/v1/tag/loader`)
@@ -320,6 +323,29 @@ export default {
 
       this.$nuxt.$loading.finish()
     },
+    findPrimary(version) {
+      let file = version.files.find((x) => x.primary)
+
+      if (!file) {
+        file = version.files[0]
+      }
+
+      if (!file) {
+        file = { url: `/mod/${this.mod.id}/version/${version.id}` }
+      }
+
+      return file
+    },
+    async downloadFile(hash, url) {
+      await axios.get(
+        `https://api.modrinth.com/api/v1/version_file/${hash}/download`
+      )
+
+      const elem = document.createElement('a')
+      elem.download = hash
+      elem.href = url
+      elem.click()
+    },
   },
   head() {
     return {
@@ -368,10 +394,10 @@ export default {
 
 <style lang="scss" scoped>
 table {
-  background: var(--color-bg);
   border-collapse: collapse;
-  border-radius: 0 0 0.5rem 0.5rem;
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
+  margin-bottom: var(--spacing-card-md);
+  background: var(--color-raised-bg);
+  border-radius: var(--size-rounded-card);
   table-layout: fixed;
   width: 100%;
 
@@ -383,7 +409,7 @@ table {
   tr:first-child {
     th,
     td {
-      border-bottom: 1px solid var(--color-grey-2);
+      border-bottom: 1px solid var(--color-divider);
     }
   }
 
@@ -391,14 +417,14 @@ table {
   td {
     &:first-child {
       text-align: center;
-      width: 5%;
+      width: 7%;
 
       svg {
-        color: var(--color-grey-3);
+        color: var(--color-text);
 
         &:hover,
         &:focus {
-          color: var(--color-grey-5);
+          color: var(--color-text-hover);
         }
       }
     }
@@ -406,23 +432,23 @@ table {
     &:nth-child(2),
     &:nth-child(5) {
       padding-left: 0;
-      width: 15%;
+      width: 12%;
     }
   }
 
   th {
-    color: #718096;
+    color: var(--color-heading);
     font-size: 0.8rem;
     letter-spacing: 0.02rem;
     margin-bottom: 0.5rem;
     margin-top: 1.5rem;
-    padding: 1rem 1rem;
+    padding: 0.75rem 1rem;
     text-transform: uppercase;
   }
 
   td {
     overflow: hidden;
-    padding: 0.25rem 1rem;
+    padding: 0.75rem 1rem;
 
     img {
       height: 3rem;
@@ -448,7 +474,7 @@ input {
   outline: none;
   border: none;
   margin: 10px 0 30px;
-  background-color: var(--color-grey-1);
+  background-color: var(--color-button-bg);
   color: var(--color-text);
   font-family: monospace;
 }
@@ -482,19 +508,13 @@ input {
   cursor: pointer;
   border: none;
   padding: 10px;
-  background-color: var(--color-grey-1);
-  color: var(--color-grey-5);
+  background-color: var(--color-button-bg);
+  color: var(--color-button-text);
 
   &:hover,
   &:focus {
-    color: var(--color-grey-4);
+    background-color: var(--color-button-bg-hover);
   }
-}
-
-.error {
-  margin: 20px 0;
-  border-left: #e04e3e 7px solid;
-  padding: 5px 20px 20px 20px;
 }
 
 @media screen and (max-width: 400px) {

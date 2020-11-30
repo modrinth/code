@@ -1,7 +1,10 @@
 <template>
   <p
     class="filter"
-    :class="{ 'filter-active': activeFilters.includes(facetName) }"
+    :class="{
+      'filter-active': activeFilters.includes(facetName),
+      cursed: displayName == 'FlameAnvil',
+    }"
     @click="toggle"
   >
     <slot></slot>
@@ -41,30 +44,28 @@ export default {
   display: flex;
   align-items: center;
   cursor: pointer;
-  padding: 2px 2px 2px 20px;
-  margin: 0 0 0 5px;
-  border-left: 4px solid var(--color-grey-3);
-  border-radius: 0 0.25rem 0.25rem 0;
-  color: var(--color-grey-5);
+  padding: 0.4rem 0.3rem;
+  margin: 3px 0 0 0.5rem;
   font-size: 1rem;
   letter-spacing: 0.02rem;
+  @extend %transparent-clickable;
+
+  @media screen and (min-width: 1024px) {
+    padding: 0.2rem 0.3rem;
+  }
 
   svg {
+    color: var(--color-icon);
     margin-right: 5px;
     height: 1rem;
     flex-shrink: 0;
   }
-
-  &:hover,
-  &:focus {
-    background-color: var(--color-grey-1);
-    color: var(--color-text);
-  }
 }
 
 .filter-active {
-  background-color: var(--color-grey-1);
-  color: var(--color-text);
-  border-left: 4px solid var(--color-brand);
+  @extend %transparent-clickable.selected;
+  svg {
+    color: var(--color-brand-light);
+  }
 }
 </style>

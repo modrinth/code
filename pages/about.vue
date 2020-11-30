@@ -1,28 +1,35 @@
 <template>
   <div class="main">
-    <h1>About</h1>
-    <p>
-      Founded in 2020, Modrinth was created to provide modders with an open and
-      intuitive platform to publish their mods on.
-    </p>
+    <div class="container">
+      <h1>About</h1>
+      <p>
+        Founded in 2020, Modrinth was created to provide modders with an open
+        and intuitive platform to publish their mods on.
+      </p>
 
-    <p>
-      Our primary goal is to be as open as possible, with all our code being
-      Open Source, while giving back to the modding community as much as
-      possible.
-    </p>
+      <p>
+        Our primary goal is to be as open as possible, with all our code being
+        Open Source, while giving back to the modding community as much as
+        possible.
+      </p>
 
-    <p>
-      While we still are in early alpha, we hope we can soon be a major modding
-      platform for all modders :)
-    </p>
+      <p>
+        While we still are in early alpha, we hope we can soon be a major
+        modding platform for all modders :)
+      </p>
+    </div>
+    <m-footer class="footer" centered />
   </div>
 </template>
 
 <script>
+import MFooter from '@/components/MFooter'
+
 export default {
+  components: {
+    MFooter,
+  },
   auth: false,
-  layout: 'home',
   head: {
     title: 'About - Modrinth',
     meta: [
@@ -54,7 +61,12 @@ export default {
 
 <style lang="scss" scoped>
 .main {
-  margin: 0 auto;
+  margin: var(--spacing-card-sm) auto;
   max-width: 800px;
+}
+
+.container {
+  @extend %card;
+  padding: var(--spacing-card-sm) var(--spacing-card-lg);
 }
 </style>

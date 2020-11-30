@@ -31,11 +31,15 @@ export default {
     const versions = []
 
     for (const version of mod.versions) {
-      res = await axios.get(
-        `https://api.modrinth.com/api/v1/version/${version}`
-      )
-
-      versions.push(res.data)
+      try {
+        res = await axios.get(
+          `https://api.modrinth.com/api/v1/version/${version}`
+        )
+        versions.push(res.data)
+      } catch {
+        // eslint-disable-next-line no-console
+        console.log('Some versions may be missing...')
+      }
     }
 
     return {

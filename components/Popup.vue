@@ -27,7 +27,7 @@ export default {
   position: fixed;
   width: 100%;
   height: 100%;
-  background-color: var(--color-grey-3);
+  background-color: var(--color-button-bg);
   border: none;
   opacity: 0.6;
   overflow-x: hidden;
@@ -39,7 +39,7 @@ export default {
   left: 50%;
   transform: translate(-50%, -50%);
   z-index: 2;
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
+  box-shadow: 0 2px 3px 1px var(--color-button-bg);
   padding: 5px 60px 5px 20px;
   border-radius: 10px;
   max-height: 80%;

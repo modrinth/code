@@ -1,59 +1,57 @@
 <template>
   <div v-if="pages.length > 1" class="columns paginates">
-    <svg
-      :class="{
-        'disabled-paginate': currentPage === 1,
-        'active-paginate': currentPage !== 1,
-      }"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+    <button
+      :class="{ disabled: currentPage === 1 }"
+      class="paginate has-icon"
       @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
     >
-      <polyline points="15 18 9 12 15 6"></polyline>
-    </svg>
-    <p
+      <LeftArrowIcon />
+    </button>
+    <div
       v-for="(item, index) in pages"
       :key="'page-' + item"
       :class="{
-        'active-page-number': currentPage !== item,
+        'page-number': currentPage !== item,
       }"
-      @click="currentPage !== item ? switchPage(item) : null"
+      class="page-number-container"
     >
-      <span v-if="pages[index - 1] + 1 !== item && item !== 1">...</span>
-      <span :class="{ 'disabled-page-number': currentPage === item }">{{
-        item
-      }}</span>
-    </p>
+      <div v-if="pages[index - 1] + 1 !== item && item !== 1" class="has-icon">
+        <GapIcon />
+      </div>
+      <button
+        :class="{ 'page-number current': currentPage === item }"
+        @click="currentPage !== item ? switchPage(item) : null"
+      >
+        {{ item }}
+      </button>
+    </div>
 
-    <svg
-      :class="{
-        'disabled-paginate': currentPage === pages[pages.length - 1],
-        'active-paginate': currentPage !== pages[pages.length - 1],
-      }"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+    <button
+      :class="{ disabled: currentPage === pages[pages.length - 1] }"
+      class="paginate has-icon"
       @click="
         currentPage !== pages[pages.length - 1]
           ? switchPage(currentPage + 1)
           : null
       "
     >
-      <polyline points="9 18 15 12 9 6"></polyline>
-    </svg>
+      <RightArrowIcon />
+    </button>
   </div>
 </template>
 
 <script>
+import GapIcon from '~/assets/images/utils/gap.svg?inline'
+import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg?inline'
+import RightArrowIcon from '~/assets/images/utils/right-arrow.svg?inline'
+
 export default {
   name: 'Pagination',
+  components: {
+    GapIcon,
+    LeftArrowIcon,
+    RightArrowIcon,
+  },
   props: {
     currentPage: {
       type: Number,
@@ -74,32 +72,41 @@ export default {
 }
 </script>
 
-<style scoped>
-.paginates {
+<style scoped lang="scss">
+button {
+  min-width: 2rem;
+  padding: 0 0.5rem;
+  height: 2rem;
+  border-radius: 2rem;
+  background: transparent;
+  &.page-number.current {
+    background: var(--color-button-bg-hover);
+    color: var(--color-button-text-hover);
+    cursor: default;
+  }
+  &.paginate.disabled {
+    background: none;
+    color: var(--color-button-text-disabled);
+    cursor: default;
+  }
+  &:hover {
+    background: var(--color-button-bg-active);
+    color: var(--color-button-text-active);
+  }
+}
+
+.has-icon {
+  display: flex;
   align-items: center;
+  padding: 0 0.5rem;
+  height: 2rem;
+  svg {
+    width: 1rem;
+  }
 }
 
-.paginates p {
-  margin-left: 5px;
-  margin-right: 5px;
-}
-
-.disabled-paginate {
-  cursor: default;
-  color: var(--color-grey-5);
-}
-
-.active-page-number,
-.active-paginate {
-  user-select: none;
-  cursor: pointer;
-}
-
-.disabled-page-number {
-  user-select: none;
-  cursor: default;
-  padding: 2px 3px;
-  border-radius: 3px;
-  background-color: var(--color-grey-1);
+.page-number-container {
+  display: flex;
+  max-height: 2rem;
 }
 </style>

@@ -1,109 +1,115 @@
 <template>
   <ModPage :mod="mod" :versions="versions" :members="members">
     <div class="version">
-      <div class="header">
-        <h3>{{ version.name }}</h3>
-        <div
-          v-if="
-            this.$auth.loggedIn &&
-            members.find((x) => x.user_id === this.$auth.user.id)
+      <div class="version-header">
+        <h4>{{ version.name }}</h4>
+        <span v-if="version.version_type === 'release'" class="badge green">
+          Release
+        </span>
+        <span v-if="version.version_type === 'beta'" class="badge yellow">
+          Beta
+        </span>
+        <span v-if="version.version_type === 'alpha'" class="badge red">
+          Alpha
+        </span>
+        <span>
+          {{ version.version_number }}
+        </span>
+        <Categories :categories="version.loaders" />
+        <a
+          :href="primaryFile.url"
+          class="download-button"
+          @click.prevent="
+            downloadFile(primaryFile.hashes.sha1, primaryFile.url)
           "
-          class="user-actions"
         >
-          <button class="trash red">
-            <TrashIcon />
-          </button>
-          <button class="upload" @click="showPopup = !showPopup">
-            <UploadIcon />
-          </button>
+          <DownloadIcon />
+          Download
+        </a>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <DownloadIcon />
+          <div class="info">
+            <h4>Downloads</h4>
+            <p class="value">{{ version.downloads }}</p>
+          </div>
+        </div>
+        <div class="stat">
+          <CalendarIcon />
+          <div class="info">
+            <h4>Created</h4>
+            <p
+              v-tooltip="
+                $dayjs(version.published).format(
+                  '[Created on] YYYY-MM-DD [at] HH:mm A'
+                )
+              "
+              class="value"
+            >
+              {{ $dayjs(version.published).fromNow() }}
+            </p>
+          </div>
+        </div>
+        <div class="stat">
+          <TagIcon />
+          <div class="info">
+            <h4>Available For</h4>
+            <p class="value">
+              {{ version.game_versions.join(', ') }}
+            </p>
+          </div>
         </div>
       </div>
-      <div class="markdown-body" v-html="changelog"></div>
-      <hr />
-      <div class="columns metadata">
-        <div class="author">
-          <img :src="version.author.avatar_url" />
-          <p>{{ version.author.name }}</p>
-        </div>
-        <p>{{ version.downloads }} Downloads</p>
-        <div>
-          <FabricIcon
-            v-if="version.loaders.includes('fabric')"
-            stroke="#AC6C3A"
-          />
-          <ForgeIcon
-            v-if="version.loaders.includes('forge')"
-            stroke="#8B81E6"
-          />
-        </div>
-        <div class="game-versions">
-          <p v-for="gameVersion in version.game_versions" :key="gameVersion">
-            {{ gameVersion }}
-          </p>
-        </div>
-      </div>
-      <hr />
+      <div v-compiled-markdown="changelog" class="markdown-body"></div>
       <div class="files">
         <div v-for="file in version.files" :key="file.hashes.sha1">
-          <p>{{ file.filename }}</p>
-          <a :href="file.url" download>
+          <div class="text-wrapper">
+            <p>{{ file.filename }}</p>
+            <div
+              v-if="
+                $auth.loggedIn &&
+                members.find((x) => x.user_id === $auth.user.id)
+              "
+              class="actions"
+            >
+              <button @click="deleteFile(file.hashes.sha1)">Delete File</button>
+              <button @click="makePrimary(file.hashes.sha1)">
+                Make Primary
+              </button>
+            </div>
+          </div>
+          <a
+            :href="file.url"
+            @click.prevent="downloadFile(file.hash, file.url)"
+          >
             <DownloadIcon />
           </a>
         </div>
       </div>
+      <FileInput class="file-input" @change="addFiles" />
     </div>
-    <Popup :show-popup="showPopup">
-      <h3 class="popup-title">Upload Files</h3>
-      <FileInput
-        input-id="version-files"
-        input-accept="application/*"
-        default-text="Upload Files"
-        :input-multiple="true"
-        @change="addFiles"
-      >
-        <label class="required" title="The files associated with the version">
-          Version Files
-        </label>
-      </FileInput>
-      <div class="popup-buttons">
-        <button
-          class="trash-button"
-          @click="
-            showPopup = false
-            filesToUpload = []
-          "
-        >
-          <TrashIcon />
-        </button>
-        <button class="default-button" @click="uploadFiles">Upload</button>
-      </div>
-    </Popup>
   </ModPage>
 </template>
 <script>
 import axios from 'axios'
 
 import ModPage from '@/components/ModPage'
-import xss from 'xss'
-import marked from 'marked'
 
-import Popup from '@/components/Popup'
+import Categories from '@/components/Categories'
+import FileInput from '@/components/FileInput'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
-import UploadIcon from '~/assets/images/utils/upload.svg?inline'
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
-
-import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
-import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
+import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
+import TagIcon from '~/assets/images/utils/tag.svg?inline'
 
 export default {
   components: {
-    Popup,
+    FileInput,
+    Categories,
     ModPage,
-    ForgeIcon,
-    FabricIcon,
     DownloadIcon,
-    UploadIcon,
-    TrashIcon,
+    CalendarIcon,
+    TagIcon,
   },
   auth: false,
   async asyncData(data) {
@@ -125,11 +131,15 @@ export default {
 
     const versions = []
     for (const version of mod.versions) {
-      res = await axios.get(
-        `https://api.modrinth.com/api/v1/version/${version}`
-      )
-
-      versions.push(res.data)
+      try {
+        res = await axios.get(
+          `https://api.modrinth.com/api/v1/version/${version}`
+        )
+        versions.push(res.data)
+      } catch {
+        // eslint-disable-next-line no-console
+        console.log('Some versions may be missing...')
+      }
     }
 
     const version = versions.find((x) => x.id === data.params.version)
@@ -138,8 +148,13 @@ export default {
 
     let changelog = ''
     if (version.changelog_url) {
-      res = await axios.get(version.changelog_url)
-      changelog = xss(marked(res.data))
+      changelog = (await axios.get(version.changelog_url)).data
+    }
+
+    let primaryFile = version.files.find((file) => file.primary)
+
+    if (!primaryFile) {
+      primaryFile = version.files[0]
     }
 
     return {
@@ -148,16 +163,55 @@ export default {
       members,
       version,
       changelog,
+      primaryFile,
     }
   },
   data() {
     return {
-      showPopup: false,
       filesToUpload: [],
     }
   },
   methods: {
-    addFiles(e) {
+    async downloadFile(hash, url) {
+      await axios.get(
+        `https://api.modrinth.com/api/v1/version_file/${hash}/download`
+      )
+
+      const elem = document.createElement('a')
+      elem.download = hash
+      elem.href = url
+      elem.click()
+    },
+    async deleteFile(hash) {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      await axios.delete(
+        `https://api.modrinth.com/api/v1/version_file/${hash}`,
+        config
+      )
+    },
+    async makePrimary(hash) {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      await axios.patch(
+        `https://api.modrinth.com/api/v1/version/${this.version.id}`,
+        {
+          primary_file: {
+            sha1: hash,
+          },
+        },
+        config
+      )
+    },
+    async addFiles(e) {
       this.filesToUpload = e.target.files
 
       for (let i = 0; i < e.target.files.length; i++) {
@@ -165,8 +219,7 @@ export default {
           '-' + i
         )
       }
-    },
-    async uploadFiles() {
+
       this.$nuxt.$loading.start()
 
       const formData = new FormData()
@@ -254,70 +307,38 @@ export default {
 
 <style lang="scss" scoped>
 .version {
-  background: var(--color-bg);
-  border-radius: 0 0 0.5rem 0.5rem;
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
-  padding: 1em;
+  margin-bottom: var(--spacing-card-md);
+  background: var(--color-raised-bg);
+  border-radius: var(--size-rounded-card);
+  padding: 1rem;
 
-  .header {
-    h3 {
-      display: inline-block;
-    }
-    .user-actions {
-      float: right;
-
-      button {
-        cursor: pointer;
-        margin-right: 10px;
-        padding: 5px;
-        border: none;
-        border-radius: var(--size-rounded-sm);
-      }
-
-      .trash {
-        color: #9b2c2c;
-        background-color: var(--color-bg);
-      }
-
-      .upload {
-        color: var(--color-text);
-        background-color: var(--color-grey-1);
-        * {
-          margin: auto 0;
-        }
-      }
-    }
-  }
-
-  hr {
-    margin: 20px 0;
-    color: var(--color-grey-1);
-  }
-
-  .metadata {
+  .version-header {
+    display: flex;
     align-items: center;
-    justify-content: space-between;
 
-    .author {
+    h4,
+    span {
+      margin: auto 0.5rem auto 0;
+    }
+
+    .download-button {
+      margin-left: auto;
+      padding: 0.5rem;
+      color: var(--color-button-text);
+      background-color: var(--color-button-bg);
+      justify-self: flex-end;
       display: flex;
       align-items: center;
-      img {
-        height: 50px;
-        width: 50px;
-        margin-right: 10px;
-      }
-    }
-  }
+      border-radius: var(--size-rounded-sm);
 
-  .game-versions {
-    max-width: 200px;
-    p {
-      margin: 0 0 0 10px;
-      padding: 4px;
-      font-size: 15px;
-      color: var(--color-text);
-      background-color: var(--color-grey-1);
-      display: inline-block;
+      &:hover,
+      &:focus {
+        background-color: var(--color-button-bg-hover);
+      }
+
+      svg {
+        margin-right: 0.25rem;
+      }
     }
   }
 
@@ -326,71 +347,77 @@ export default {
 
     div {
       display: flex;
-      margin-right: 10px;
-      border: 1px solid var(--color-grey-1);
-      border-radius: var(--size-rounded-sm);
+      margin-right: 0.5rem;
+      background: var(--color-bg);
+      border-radius: var(--size-rounded-control);
 
-      p {
-        margin-left: 10px;
-        margin-right: 10px;
+      .text-wrapper {
+        display: flex;
+        flex-direction: column;
+        padding: 0.5rem;
+
+        .actions {
+          width: 100%;
+          display: flex;
+          justify-content: space-between;
+          max-height: 3rem;
+          font-size: var(--font-size-sm);
+
+          button {
+            display: flex;
+            align-items: center;
+
+            svg {
+              margin-left: 0.25rem;
+            }
+          }
+        }
       }
 
       a {
-        display: table-cell;
+        display: flex;
+        align-items: center;
         margin-left: auto;
-        width: 40px;
-        height: 60px;
-        background-color: var(--color-grey-1);
-        color: var(--color-grey-3);
+        width: 2.5rem;
+        height: auto;
+        background-color: var(--color-button-bg);
+        color: var(--color-button-text);
+        border-radius: 0 var(--size-rounded-control) var(--size-rounded-control)
+          0;
 
         svg {
-          margin-top: 15px;
+          vertical-align: center;
           height: 30px;
           width: 40px;
         }
 
         &:hover,
         &:focus {
-          background-color: var(--color-grey-3);
-          color: var(--color-grey-4);
+          background-color: var(--color-button-bg-hover);
+          color: var(--color-button-text-hover);
         }
       }
     }
   }
 }
 
-.popup-title {
-  margin-bottom: 40px;
-}
-
-.popup-buttons {
-  margin-top: 40px;
+.stats {
   display: flex;
-  justify-content: left;
-  align-items: center;
+  flex-wrap: wrap;
+  margin: 0.5rem 0;
+  .stat {
+    margin-right: 0.75rem;
+    @extend %stat;
 
-  .default-button {
-    border-radius: var(--size-rounded-sm);
-    cursor: pointer;
-    border: none;
-    padding: 10px;
-    background-color: var(--color-grey-1);
-    color: var(--color-grey-5);
-
-    &:hover,
-    &:focus {
-      color: var(--color-grey-4);
+    svg {
+      padding: 0.25rem;
+      border-radius: 50%;
+      background-color: var(--color-button-bg);
     }
   }
+}
 
-  .trash-button {
-    cursor: pointer;
-    margin-right: 10px;
-    padding: 5px;
-    border: none;
-    border-radius: var(--size-rounded-sm);
-    color: #9b2c2c;
-    background-color: var(--color-bg);
-  }
+.file-input {
+  margin-top: 2rem;
 }
 </style>

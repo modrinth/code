@@ -1,225 +1,149 @@
 <template>
   <div class="layout">
     <aside>
-      <label class="hidden" for="toggle-nav-menu">Toggle Nav Menu</label>
-      <input
-        id="toggle-nav-menu"
-        class="hamburger-button"
-        alt="Open navigation menu"
-        type="checkbox"
-        @click="toggleNavMenu()"
-      />
-      <!-- TODO: Probably shouldn't be a Unicode symbol -->
-      <div class="hamburger-icon">☰</div>
-      <nuxt-link to="/" class="logo-wrapper">
-        <img class="logo" src="~/assets/images/logo.svg" alt="modrinth-logo" />
-        <span class="name">modrinth</span>
-      </nuxt-link>
-      <nav>
-        <section class="links">
-          <h3>Projects</h3>
-          <section>
-            <nuxt-link to="/modpacks">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <line x1="16.5" y1="9.4" x2="7.5" y2="4.21" />
-                <path
-                  d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
-                />
-                <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
-                <line x1="12" y1="22.08" x2="12" y2="12" />
-              </svg>
-              <span> Modpacks </span>
-            </nuxt-link>
-            <nuxt-link to="/mods">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <polyline points="16 18 22 12 16 6" />
-                <polyline points="8 6 2 12 8 18" />
-              </svg>
+      <section class="navbar columns">
+        <section class="logo column">
+          <NuxtLink to="/">
+            <ModrinthLogo v-if="$colorMode.value === 'light'" />
+            <ModrinthLogoWhite v-else />
+          </NuxtLink>
+          <span class="badge yellow">Beta</span>
+        </section>
+        <section class="column-grow-5 nav">
+          <div class="tabs">
+            <NuxtLink to="/mods" class="tab">
               <span>Mods</span>
-            </nuxt-link>
-          </section>
-
-          <h3>Community</h3>
-          <section>
-            <nuxt-link to="/documentation">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="10" />
-                <circle cx="12" cy="12" r="4" />
-                <line x1="4.93" y1="4.93" x2="9.17" y2="9.17" />
-                <line x1="14.83" y1="14.83" x2="19.07" y2="19.07" />
-                <line x1="14.83" y1="9.17" x2="18.36" y2="5.64" />
-                <line x1="4.93" y1="19.07" x2="9.17" y2="14.83" />
-              </svg>
-              <span>Documentation</span>
-            </nuxt-link>
-            <nuxt-link to="/guides">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
-              </svg>
-              <span>Guides</span>
-            </nuxt-link>
-          </section>
-
-          <h3 v-if="this.$auth.loggedIn">Dashboard</h3>
-          <section v-if="this.$auth.loggedIn">
-            <nuxt-link to="/dashboard/projects">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <path
-                  d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"
-                />
-              </svg>
-              <span>My projects</span>
-            </nuxt-link>
-            <nuxt-link to="/dashboard/analytics">
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-              </svg>
-              <span>Analytics</span>
-            </nuxt-link>
-            <nuxt-link
-              v-if="this.$auth.user.role === 'admin'"
-              to="/dashboard/admin"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              >
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="14.31" y1="8" x2="20.05" y2="17.94"></line>
-                <line x1="9.69" y1="8" x2="21.17" y2="8"></line>
-                <line x1="7.38" y1="12" x2="13.12" y2="2.06"></line>
-                <line x1="9.69" y1="16" x2="3.95" y2="6.06"></line>
-                <line x1="14.31" y1="16" x2="2.83" y2="16"></line>
-                <line x1="16.62" y1="12" x2="10.88" y2="21.94"></line>
-              </svg>
-              <span>Admin</span>
-            </nuxt-link>
-          </section>
-        </section>
-        <div class="disclosure">
-          <span>
-            Modrinth is open source software. You may view the source code at
-            our
-            <a href="https://github.com/modrinth/knossos">GitHub Repository</a>.
-          </span>
-        </div>
-        <section class="user-actions">
-          <a
-            v-if="!this.$auth.loggedIn"
-            :href="
-              'https://api.modrinth.com/api/v1/auth/init?url=http://modrinth.com' +
-              this.$route.path
-            "
-            class="log-in-button"
-          >
-            Log In
-          </a>
-          <div v-if="this.$auth.loggedIn" class="avatar">
-            <img :src="this.$auth.user.avatar_url" alt="avatar" />
-            <span> {{ this.$auth.user.username }} </span>
-          </div>
-          <div v-if="this.$auth.loggedIn" class="notifications">
-            <div v-if="showPopup" class="user-actions-popup">
-              <div class="popup-inner">
-                <p>
-                  Modrinth ID: <strong>{{ this.$auth.user.id }}</strong>
-                </p>
-                <hr />
-                <p class="hover">
-                  <nuxt-link :to="'/user/' + this.$auth.user.id">
-                    My profile
-                  </nuxt-link>
-                </p>
-                <p class="hover">My teams</p>
-                <hr />
-                <p class="hover" @click="logout">Logout</p>
-              </div>
+            </NuxtLink>
+            <div v-if="this.$auth.loggedIn" class="section">
+              <NuxtLink to="/dashboard/projects" class="tab">
+                <span>Dashboard</span>
+              </NuxtLink>
             </div>
-            <SettingsIcon @click="showPopup = !showPopup" />
-          </div>
-          <div class="theme">
-            <svg
-              v-if="$colorMode.value === 'light'"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              @click="changeTheme"
-            >
-              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            </svg>
-            <svg
-              v-else
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              @click="changeTheme"
-            >
-              <circle cx="12" cy="12" r="5"></circle>
-              <line x1="12" y1="1" x2="12" y2="3"></line>
-              <line x1="12" y1="21" x2="12" y2="23"></line>
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-              <line x1="1" y1="12" x2="3" y2="12"></line>
-              <line x1="21" y1="12" x2="23" y2="12"></line>
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-            </svg>
           </div>
         </section>
-      </nav>
+        <section class="column-grow">
+          <template v-if="this.$auth.loggedIn">
+            <section class="user-controls">
+              <div
+                v-click-outside="hideDropdown"
+                class="dropdown"
+                :class="{ open: isDropdownOpen }"
+              >
+                <button class="control" @click="toggleDropdown">
+                  <div class="avatar">
+                    <span>{{ this.$auth.user.username }}</span>
+                    <img :src="this.$auth.user.avatar_url" class="icon" />
+                  </div>
+                  <DropdownIcon class="dropdown-icon" />
+                </button>
+                <div class="content">
+                  <ul v-if="isDropdownOpen" @click="hideDropdown">
+                    <li>
+                      <NuxtLink :to="userUrl">
+                        <UserIcon />
+                        <span>Profile</span>
+                      </NuxtLink>
+                    </li>
+                    <li v-tooltip="'Not implemented yet'" class="hidden">
+                      <NuxtLink :to="userTeamsUrl" disabled>
+                        <UsersIcon />
+                        <span>Teams</span>
+                      </NuxtLink>
+                    </li>
+                    <li>
+                      <button @click="changeTheme">
+                        <MoonIcon v-if="$colorMode.value === 'light'" />
+                        <SunIcon v-else />
+                        <span v-if="$colorMode.value === 'light'">
+                          Dark Mode</span
+                        >
+                        <span v-else>Light Mode</span>
+                      </button>
+                    </li>
+                    <li v-tooltip="'Not implemented yet'" class="hidden">
+                      <NuxtLink to="/settings" disabled>
+                        <SettingsIcon />
+                        <span>Settings</span>
+                      </NuxtLink>
+                    </li>
+                    <hr />
+                    <li>
+                      <button @click="logout">
+                        <LogOutIcon />
+                        <span>Log Out</span>
+                      </button>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </section>
+          </template>
+          <template v-else>
+            <section class="auth-prompt">
+              <a :href="authUrl" class="log-in-button"
+                ><GitHubIcon />Sign In with GitHub</a
+              >
+            </section>
+          </template>
+        </section>
+      </section>
+      <section class="hidden">
+        <section class="links dashboard">
+          <NuxtLink to="/dashboard/projects">
+            <ProjectsIcon />
+            <span>Projects</span>
+          </NuxtLink>
+          <NuxtLink to="/dashboard/analytics">
+            <AnalyticsIcon />
+            <span>Analytics</span>
+          </NuxtLink>
+          <!-- <NuxtLink
+            v-if="this.$auth.user.role === 'admin'"
+            to="/dashboard/admin"
+          >
+            <AdminIcon />
+            <span>Admin</span>
+          </NuxtLink> -->
+        </section>
+        <div>
+          <button class="hamburger" @click="toggleNav">
+            <HamburgerIcon v-if="!isNavOpen" />
+            <ExitIcon v-else />
+          </button>
+        </div>
+        <nav class="visible-md" :class="{ hidden: !isNavOpen }">
+          <section class="navigation">
+            <section class="links community">
+              <NuxtLink to="/modpacks">
+                <ModpackIcon />
+                <span>Modpacks</span>
+              </NuxtLink>
+            </section>
+
+            <hr />
+          </section>
+
+          <section class="footer">
+            <div class="disclosure">
+              Modrinth is open source software. You may view the source code at
+              our
+              <a href="https://github.com/modrinth/knossos">GitHub repository</a
+              >.
+            </div>
+            <div class="legal">
+              <ul>
+                <li>
+                  <NuxtLink to="/tos">Terms</NuxtLink>
+                </li>
+                <li>
+                  <NuxtLink to="/privacy">Privacy</NuxtLink>
+                </li>
+              </ul>
+            </div>
+            <div class="copyright">© Guavy LLC</div>
+          </section>
+        </nav>
+      </section>
     </aside>
     <main>
       <notifications group="main" position="bottom right" />
@@ -229,38 +153,98 @@
         :duration="-1"
         :ignore-duplicates="true"
       />
-      <div class="alpha-alert">
-        Modrinth is in early alpha. You can join our
-        <a href="https://discord.gg/gFRbNQ2">discord</a> for updates!
+      <div class="alpha-alert hidden">
+        <div class="wrapper">
+          Modrinth is in early alpha. Beware of many bugs and broken and
+          unimplemented features. Join our
+          <a class="text-link" href="https://discord.gg/gFRbNQ2">Discord</a>
+          for updates!
+        </div>
       </div>
-      <nuxt />
+      <Nuxt />
     </main>
   </div>
 </template>
 
 <script>
+import ClickOutside from 'vue-click-outside'
+
+import ModrinthLogo from '~/assets/images/text-logo.svg?inline'
+import ModrinthLogoWhite from '~/assets/images/text-logo-white.svg?inline'
+
+import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
+import ProjectsIcon from '~/assets/images/sidebar/projects.svg?inline'
+import AnalyticsIcon from '~/assets/images/sidebar/analytics.svg?inline'
+// import AdminIcon from '~/assets/images/sidebar/admin.svg?inline'
+
+import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
+import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
+import ExitIcon from '~/assets/images/utils/exit.svg?inline'
+import MoonIcon from '~/assets/images/utils/moon.svg?inline'
+import SunIcon from '~/assets/images/utils/sun.svg?inline'
+
+import UserIcon from '~/assets/images/utils/user.svg?inline'
+import UsersIcon from '~/assets/images/utils/users.svg?inline'
 import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
+import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
+import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
 export default {
   components: {
+    ModrinthLogo,
+    ModrinthLogoWhite,
+    ModpackIcon,
+    ProjectsIcon,
+    AnalyticsIcon,
+    // AdminIcon,
+    DropdownIcon,
+    HamburgerIcon,
+    ExitIcon,
+    MoonIcon,
+    SunIcon,
+    UserIcon,
+    UsersIcon,
     SettingsIcon,
+    LogOutIcon,
+    GitHubIcon,
+  },
+  directives: {
+    ClickOutside,
   },
   async fetch() {
-    if (this.$route.query.code)
+    if (this.$route.query.code) {
       await this.$auth.setUserToken(this.$route.query.code)
+    }
   },
   data() {
     return {
-      showPopup: false,
+      isNavOpen: false,
+      isDropdownOpen: false,
     }
+  },
+  computed: {
+    authUrl() {
+      return `https://api.modrinth.com/api/v1/auth/init?url=http://localhost:3000${this.$route.path}`
+    },
+    userUrl() {
+      return `/user/${this.$auth.user.id}`
+    },
+    userTeamsUrl() {
+      return `${this.userUrl}/teams`
+    },
   },
   mounted() {
     this.themeAds()
   },
   methods: {
-    toggleNavMenu() {
-      document.body.style.overflow =
-        document.body.style.overflow !== 'hidden' ? 'hidden' : 'auto'
+    toggleNav() {
+      this.isNavOpen = !this.isNavOpen
+    },
+    toggleDropdown() {
+      this.isDropdownOpen = !this.isDropdownOpen
+    },
+    hideDropdown() {
+      this.isDropdownOpen = false
     },
     logout() {
       this.$auth.setToken('local', false)
@@ -274,7 +258,6 @@ export default {
     },
     themeAds() {
       const elements = document.getElementsByClassName('ethical-ad')
-
       for (const elem of elements) {
         elem.className = 'ethical-ad loaded ' + this.$colorMode.preference
       }
@@ -285,358 +268,241 @@ export default {
 
 <style lang="scss">
 .layout {
-  display: flex;
-  flex-flow: column;
-  min-height: 100vh;
-  width: 100%;
-
-  // Desktop
-  @media screen and (min-width: 1145px) {
-    flex-flow: row;
-  }
+  background-color: var(--color-bg);
+  display: block;
+  height: 100vh;
 
   aside {
-    top: 0;
-    position: sticky;
-    border-right: 0;
-    display: flex; // Flex here to safely expand navigation height
-    flex-direction: column;
-    width: 100vw;
-    max-height: 100vh;
-    background: var(--color-bg);
-    z-index: 10;
-
-    .logo-wrapper {
-      align-items: center;
-      display: flex;
-      height: 3.5rem;
-      width: 100vw;
-      font-family: 'Montserrat', sans-serif;
-
-      .logo {
-        height: 2rem;
-        width: auto;
-        margin-left: 2.5rem;
-      }
-
-      .name {
-        font-family: 'Montserrat Alternates', serif;
-        margin-left: 0.4rem;
-        font-size: 1.3rem;
-      }
-    }
-
-    .hamburger-button {
-      position: absolute;
-      display: block;
-      left: 10px;
-      opacity: 0;
-      margin: 0;
-      top: 1.2rem;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-    }
-
-    .hamburger-icon {
-      display: block;
-      position: absolute;
-      left: 15px;
-      top: 1.2rem;
-      pointer-events: none;
-    }
-
-    .hamburger-button:checked ~ nav {
-      left: 0;
-    }
-
-    nav {
-      display: flex;
-      flex-direction: column;
-      flex-grow: 1;
-      justify-content: space-between;
-      position: absolute;
-      height: calc(100vh - 3.5rem);
-      width: 100vw;
-      left: -100vw;
-      top: 3.5rem;
-      transition: left 150ms;
-      background: var(--color-bg);
-      overflow-y: auto;
-      z-index: 10;
-
-      // Larger screens that still need a collapsed menu
-      @media screen and (min-width: 900px) {
-        width: 300px;
-        left: -300px;
-      }
-
-      & > * {
-        padding: 0 0.75rem;
-      }
-
-      .links {
-        h3 {
-          color: #718096;
-          font-size: 0.8rem;
-          letter-spacing: 0.02rem;
-          margin-bottom: 0.5rem;
-          margin-top: 1.5rem;
-          text-transform: uppercase;
-        }
-
-        section {
-          border-left: 4px solid var(--color-grey-3);
-
-          a {
-            align-items: center;
-            border-radius: 0 0.25rem 0.25rem 0;
-            color: var(--color-grey-5);
-            display: flex;
-            margin-bottom: 0.25rem;
-            padding: 0.5rem 1rem;
-
-            &:hover,
-            &:focus,
-            &.nuxt-link-active {
-              background-color: var(--color-grey-1);
-              color: var(--color-text);
-            }
-
-            &.nuxt-link-active {
-              box-shadow: -4px 0 0 0 var(--color-brand);
-            }
-
-            svg {
-              height: 1rem;
-              width: 1rem;
-              flex-shrink: 0;
-            }
-
-            span {
-              margin-left: 0.5rem;
-            }
-          }
-        }
-      }
-      .user-actions {
+    height: var(--size-navbar-height);
+    background-color: var(--color-raised-bg);
+    max-width: 100vw;
+    .navbar {
+      margin: 0 var(--spacing-card-lg);
+      section.logo {
         align-items: center;
-        border-top: 2px solid var(--color-grey-2);
         display: flex;
         justify-content: space-between;
-        margin-top: 1rem;
-        padding-bottom: 1rem;
-        padding-top: 1rem;
-
-        & > * {
-          align-items: center;
-          display: flex;
-        }
-
+        padding: 1rem 0;
+        color: var(--color-text-dark);
         svg {
-          color: var(--color-grey-5);
-
-          &:hover,
-          &:focus {
-            color: inherit;
-          }
+          height: 1.75rem;
+          width: auto;
         }
-
-        .avatar {
-          img {
-            border-radius: 50%;
-            height: 2rem;
-            margin-right: 0.5rem;
-            width: 2rem;
-          }
+        .badge {
+          margin-left: 0.25rem;
         }
-
-        .theme {
-          cursor: pointer;
-        }
-
-        .log-in-button {
-          text-align: center;
-          padding: 8px 40px;
-          border-radius: 5px;
-          color: var(--color-grey-5);
-          background-color: var(--color-grey-1);
-          margin-left: 2.5rem;
-        }
-
-        .notifications {
+        button {
+          background: none;
+          border: none;
+          margin: 0 0 0 0.5rem;
+          padding: 0;
           svg {
-            cursor: pointer;
+            height: 1.5rem;
+            width: 1.5rem;
           }
         }
-
-        .user-actions-popup {
+      }
+      section.nav {
+        .tabs {
           position: relative;
-
-          .popup-inner {
-            width: 120px;
-            border: 2px var(--color-grey-2) solid;
-            background-color: var(--color-bg);
-            color: var(--color-grey-5);
-            font-size: 15px;
-            padding: 8px 0;
-            position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          .section {
+            border-left: 3px solid var(--color-brand-disabled);
+            margin-left: 0.75rem;
+            padding-left: 0.75rem;
+          }
+          .tab {
+            font-size: var(--font-size-md);
+          }
+        }
+      }
+      section.user-controls {
+        align-items: center;
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        .dropdown {
+          position: relative;
+          display: inline-block;
+          &:hover .control {
+            border-radius: var(--size-rounded-control);
+            background: var(--color-button-bg);
+          }
+          &.open {
+            .control {
+              background: var(--color-button-bg);
+              border-radius: var(--size-rounded-control)
+                var(--size-rounded-control) 0 0;
+              .dropdown-icon {
+                transform: rotate(180deg);
+              }
+            }
+            .content {
+              display: unset;
+            }
+          }
+          .control {
+            border-radius: var(--size-rounded-control);
+            align-items: center;
+            display: flex;
+            padding: 0.3rem 0.75rem;
+            position: relative;
+            z-index: 10;
+            .avatar {
+              align-items: center;
+              display: flex;
+              .icon {
+                border-radius: 50%;
+                height: 2rem;
+                width: 2rem;
+                margin-left: 0.5rem;
+                margin-right: 0.25rem;
+              }
+              span {
+                display: block;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                color: var(--color-text-dark);
+                font-weight: var(--font-weight-medium);
+              }
+            }
+            .dropdown-icon {
+              color: var(--color-text-dark);
+              transition: 150ms ease transform;
+            }
+          }
+          .content {
+            margin: 0rem 0 0 0rem;
+            min-width: 10rem;
+            width: 100%;
+            position: fixed;
+            display: none;
+          }
+          button {
+            background-color: transparent;
+            color: var(--color-text-dark);
+            margin: 0;
+            padding: 0;
+            font-weight: var(--font-weight-medium);
+          }
+          ul {
+            background-color: var(--color-button-bg);
+            border-radius: 0 0 var(--size-rounded-control)
+              var(--size-rounded-control);
+            box-shadow: var(--shadow-dropdown);
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+            list-style: none;
+            padding: 0.5rem 0;
             z-index: 1;
-            margin-bottom: 20px;
-            bottom: 100%;
-            margin-left: -50px;
-
             hr {
-              color: var(--color-grey-2);
-              height: 1px;
+              background-color: var(--color-divider-dark);
+              border: none;
+              color: var(--color-divider-dark);
+              height: 2px;
+              margin: 0.5rem 0;
             }
-            p {
-              padding: 8px;
+            li {
               margin: 0;
-            }
-
-            .hover {
-              cursor: pointer;
-
               &:hover,
-              &:focus {
-                background-color: var(--color-brand);
-                color: #fff;
+              &:focus,
+              &:active {
+                background-color: var(--color-button-bg-active);
+                color: var(--color-text-dark);
+              }
+              a,
+              button {
+                align-items: center;
+                display: flex;
+                padding: 0.75rem 1.5rem;
+                color: var(--color-text-dark);
+                svg {
+                  color: inherit;
+                  height: 1rem;
+                  width: 1rem;
+                }
+                span {
+                  margin-left: 0.5rem;
+                }
               }
             }
           }
-          .popup-inner::after {
-            content: '';
-            position: absolute;
-            top: 100%;
-            left: 45%;
-            border-width: 7px;
-            border-style: solid;
-            border-color: var(--color-grey-2) transparent transparent
-              transparent;
-          }
         }
       }
-    }
-
-    // Desktop
-    @media screen and (min-width: 1145px) {
-      border-right: 1px solid var(--color-grey-2);
-      min-width: 270px;
-      max-width: 270px;
-
-      nav {
-        height: 100%;
-        left: 0;
-        width: 100%;
-        transition: none;
-        position: static;
-      }
-
-      .logo-wrapper {
-        padding: 0 0 0 1.5rem;
-        width: 100%;
-        .logo {
-          margin: 0;
-        }
-      }
-
-      .hamburger-button,
-      .hamburger-icon {
-        display: none;
-      }
-    }
-  }
-  main {
-    background-color: var(--color-grey-0);
-    flex-grow: 1;
-
-    header {
-      align-items: center;
-      background-color: var(--color-bg);
-      box-shadow: 0 1px 1px 0 var(--color-grey-2);
-      display: flex;
-      height: 3.5rem;
-      justify-content: space-between;
-      padding: 0 3rem 0 1rem;
-
-      .search-wrapper {
-        align-items: center;
+      section.auth-prompt {
         display: flex;
-        flex-direction: row-reverse;
-        width: 100%;
-
-        input {
-          border: none;
-          font-size: 1rem;
-          padding: 1rem;
-          width: 100%;
-
-          &::placeholder {
-            color: var(--color-grey-5);
+        align-items: center;
+        height: 100%;
+        .log-in-button {
+          text-align: center;
+          border-radius: var(--size-rounded-control);
+          background-color: var(--color-brand);
+          outline: none;
+          color: var(--color-brand-inverted);
+          display: block;
+          padding: 0.5rem 0.75rem;
+          svg {
+            vertical-align: middle;
+            margin-right: 0.5rem;
           }
-
           &:hover,
           &:focus {
-            & + svg {
-              color: inherit;
-            }
-
-            &::placeholder {
-              color: var(--color-grey-7);
-            }
+            background-color: var(--color-brand-2);
           }
         }
+      }
+      @media screen and (min-width: 1024px) {
+        max-width: 1280px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+  }
 
-        svg {
-          color: var(--color-grey-5);
+  main {
+    grid-area: 'main';
+
+    .alpha-alert {
+      background-color: var(--color-bg);
+      border-radius: var(--size-rounded-md);
+      margin: 0.5rem;
+      overflow: hidden;
+      width: fit-content;
+
+      .wrapper {
+        border-left: 0.5rem solid var(--color-brand);
+        padding: 0.75rem 1rem;
+      }
+    }
+  }
+}
+
+@media (min-width: 1024px) {
+  .layout {
+    aside {
+    }
+
+    main {
+      .alpha-alert {
+        margin: 1rem;
+
+        .wrapper {
+          padding: 1rem 2rem 1rem 1rem;
         }
       }
     }
+  }
+}
 
-    .content {
-      // Default is for small phone sizes (like iPhone 5/SE)
-      padding: 0.5rem 0.35rem 0.5rem 0.35rem;
-
-      // Larger phones
-      @media screen and (min-width: 500px) {
-        padding: 1rem 0.5rem 1rem 0.5rem;
-      }
-
-      // Desktop
-      @media screen and (min-width: 1145px) {
-        padding: 1rem;
-      }
+@media (min-width: 1280px) {
+  .layout {
+    aside {
     }
-  }
-}
-
-.alpha-alert {
-  text-align: center;
-  padding: 1em;
-  background-color: var(--color-grey-1);
-
-  a {
-    text-decoration: underline;
-    color: var(--color-grey-5);
-  }
-}
-
-.disclosure {
-  margin-top: auto;
-  max-width: 250px;
-  color: var(--color-grey-3);
-
-  a {
-    text-decoration: var(--color-grey-2) underline;
-  }
-}
-
-// Hack for very small (iPhone 5/SE) sized phones
-// an x overflow existed and I was unable to figure out why
-@media screen and (max-width: 360px) {
-  body {
-    overflow-x: hidden !important;
   }
 }
 </style>

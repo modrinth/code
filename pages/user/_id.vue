@@ -1,49 +1,94 @@
 <template>
-  <div class="content">
-    <div class="user-profile">
-      <img :src="user.avatar_url" :alt="user.username" />
-      <div class="info">
-        <h1>{{ user.username }}</h1>
-        <p class="joined-text">Joined {{ $dayjs(user.created).fromNow() }}</p>
-        <p v-if="user.bio" class="bio">{{ user.bio }}</p>
-        <p v-if="user.role === 'admin'" class="badge red">Admin</p>
-        <p v-if="user.role === 'moderator'" class="badge yellow">Moderator</p>
-        <p v-if="user.role === 'developer'" class="badge green">Developer</p>
+  <div class="page-container">
+    <div class="page-contents">
+      <div class="sidebar-l">
+        <div class="card">
+          <div class="user-info">
+            <img :src="user.avatar_url" :alt="user.username" />
+            <div class="text">
+              <h2>{{ user.username }}</h2>
+              <p v-if="user.role === 'admin'" class="badge red">Admin</p>
+              <p v-if="user.role === 'moderator'" class="badge yellow">
+                Moderator
+              </p>
+              <p v-if="user.role === 'developer'" class="badge green">
+                Developer
+              </p>
+            </div>
+          </div>
+          <p v-if="user.bio" class="bio">{{ user.bio }}</p>
+        </div>
+        <div class="card stats">
+          <div class="stat">
+            <CalendarIcon />
+            <div class="info">
+              <h4>Created</h4>
+              <p
+                v-tooltip="
+                  $dayjs(user.created).format(
+                    '[Created on] YYYY-MM-DD [at] HH:mm A'
+                  )
+                "
+                class="value"
+              >
+                {{ $dayjs(user.created).fromNow() }}
+              </p>
+            </div>
+          </div>
+          <div class="stat">
+            <DownloadIcon />
+            <div class="info">
+              <h4>Downloads</h4>
+              <p class="value">
+                {{ sumDownloads() }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <m-footer class="footer" />
       </div>
-    </div>
-    <client-only>
-      <EthicalAd />
-    </client-only>
-    <div class="user-mods">
-      <SearchResult
-        v-for="result in mods"
-        :id="result.mod_id"
-        :key="result.mod_id"
-        :name="result.title"
-        :description="result.description"
-        :latest-version="result.versions[0]"
-        :created-at="result.published"
-        :updated-at="result.updated"
-        :downloads="result.downloads.toString()"
-        :icon-url="result.icon_url"
-        :author-url="result.author_url"
-        :page-url="result.page_url"
-        :categories="result.categories"
-      />
+      <div class="content">
+        <client-only>
+          <EthicalAd />
+        </client-only>
+        <div class="mods">
+          <SearchResult
+            v-for="result in mods"
+            :id="result.mod_id"
+            :key="result.mod_id"
+            :name="result.title"
+            :description="result.description"
+            :created-at="result.published"
+            :updated-at="result.updated"
+            :downloads="result.downloads.toString()"
+            :icon-url="result.icon_url"
+            :author-url="result.author_url"
+            :categories="result.categories"
+            :is-modrinth="true"
+          />
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
-import SearchResult from '@/components/ModResult'
+import SearchResult from '@/components/ProjectCard'
 import EthicalAd from '@/components/EthicalAd'
+import MFooter from '@/components/MFooter'
+
+import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
+import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 
 export default {
   auth: false,
   components: {
     EthicalAd,
     SearchResult,
+    CalendarIcon,
+    DownloadIcon,
+    MFooter,
   },
   async asyncData(data) {
     let res = await axios.get(
@@ -67,56 +112,61 @@ export default {
       user,
     }
   },
+  methods: {
+    formatNumber(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    },
+    sumDownloads() {
+      let sum = 0
+
+      for (const mod of this.mods) {
+        sum += mod.downloads
+      }
+
+      return this.formatNumber(sum)
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-.user-profile {
-  @media screen and (min-width: 900px) {
-    display: inline-flex;
-    text-align: left;
+.sidebar-l {
+  min-width: 21rem;
+
+  .user-info {
+    @extend %row;
+    img {
+      width: 6rem;
+      height: 6rem;
+      margin-right: var(--spacing-card-md);
+      border-radius: var(--size-rounded-icon);
+    }
+    .text {
+      h2 {
+        margin: 0;
+        color: var(--color-text-dark);
+        font-size: var(--font-size-lg);
+      }
+      .badge {
+        display: inline-block;
+      }
+    }
   }
-  text-align: center;
-  margin-bottom: 20px;
-  margin-left: 15px;
+  .stats {
+    display: flex;
+    flex-wrap: wrap;
+    .stat {
+      @extend %stat;
 
-  img {
-    border-radius: var(--size-rounded-md);
-    width: 250px;
-    height: 250px;
-  }
-
-  .info {
-    @media screen and (min-width: 900px) {
-      margin-left: 15px;
-    }
-
-    h1 {
-      margin-bottom: 0;
-    }
-
-    .joined-text {
-      margin-top: 5px;
-      color: var(--color-grey-4);
-    }
-
-    .bio {
-      margin-top: 5px;
-      font-size: 16pt;
-    }
-
-    .badge {
-      display: inline-block;
+      svg {
+        padding: 0.25rem;
+        border-radius: 50%;
+        background-color: var(--color-button-bg);
+      }
     }
   }
 }
 
-.user-mods {
-  border-top: 1px solid var(--color-grey-1);
-  padding-top: 10px;
-  margin: 10px;
-  * {
-    margin-left: 0;
-  }
+.mods {
 }
 </style>

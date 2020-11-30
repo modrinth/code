@@ -10,7 +10,7 @@
 
 .rows {
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
 
   @for $i from 1 through 4 {
     .row-grow-#{$i} {
@@ -18,7 +18,20 @@
     }
   }
 }
-
-.w-100 {
-  width: 100%;
+.page-container {
+  margin: var(--spacing-card-lg);
+  .page-contents {
+    display: flex;
+    flex-direction: row;
+    .content {
+      width: 100%;
+    }
+    @media screen and (min-width: 900px) {
+    }
+    @media screen and (min-width: 1024px) {
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  }
 }

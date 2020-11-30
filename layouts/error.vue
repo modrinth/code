@@ -10,10 +10,19 @@
 
 <script>
 export default {
-  props: ['error'],
+  props: {
+    error: {
+      type: Object,
+      default() {
+        return {
+          message: 'Unknown error',
+        }
+      },
+    },
+  },
   layout: 'home',
   created() {
-    console.log(this.error)
+    // console.log(this.error)
   },
 }
 </script>

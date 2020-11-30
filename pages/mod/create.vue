@@ -1,63 +1,56 @@
 <template>
-  <div class="content">
-    <h2>Create Mod</h2>
-    <section>
-      <h3>Initial Data</h3>
-      <div class="initial">
-        <div class="image-data">
-          <img
-            :src="
-              previewImage
-                ? previewImage
-                : 'https://cdn.modrinth.com/placeholder.svg'
-            "
-            alt="preview-image"
-          />
-          <FileInput
-            input-id="icon-file"
-            input-accept="image/*"
-            default-text="Upload Icon"
-            :input-multiple="false"
-            @change="showPreviewImage"
-          />
-        </div>
-        <div class="mod-data">
-          <label for="name" class="required" title="The name of your mod">
-            Name
-          </label>
+  <div class="page-container">
+    <div class="page-contents">
+      <header class="columns">
+        <h2 class="column-grow-1">Create a mod</h2>
+        <button
+          title="Save draft"
+          class="button column"
+          :disabled="!this.$nuxt.$loading"
+          @click="createDraft"
+        >
+          Save draft
+        </button>
+        <button
+          title="Create"
+          class="brand-button column"
+          :disabled="!this.$nuxt.$loading"
+          @click="createMod"
+        >
+          Create
+        </button>
+      </header>
+      <EthicalAd class="advert" />
+      <section class="essentials">
+        <h3>Name</h3>
+        <label>
+          <span>
+            Be creative. TechCraft v7 won't be searchable and won't be clicked
+            on
+          </span>
+          <input v-model="name" type="text" placeholder="Enter the name" />
+        </label>
+        <h3>Summary</h3>
+        <label>
+          <span>
+            Give a quick description to your mod. It will appear in the search
+          </span>
           <input
-            id="name"
-            v-model="name"
-            required
-            type="text"
-            placeholder="Example Mod"
-          />
-          <label
-            for="description"
-            class="required"
-            title="The short-form description of your mod. This shows up in searches"
-          >
-            Short Description
-          </label>
-          <input
-            id="description"
             v-model="description"
-            required
             type="text"
-            placeholder="An example mod which does example stuff!"
+            placeholder="Enter the summary"
           />
-          <label
-            for="categories"
-            title="The categories of your mod, these help your mod appear in search results. Maximum of three!"
-          >
-            Categories
-          </label>
+        </label>
+        <h3>Categories</h3>
+        <label>
+          <span>
+            Select up to 3 categories. They will help to find your mod
+          </span>
           <multiselect
             id="categories"
             v-model="categories"
-            class="categories-input"
-            :options="selectableCategories"
-            :loading="selectableCategories.length === 0"
+            :options="availableCategories"
+            :loading="availableCategories.length === 0"
             :multiple="true"
             :searchable="false"
             :show-no-results="false"
@@ -67,204 +60,399 @@
             :max="3"
             :limit="6"
             :hide-selected="true"
-            placeholder="Choose categories..."
+            placeholder="Choose categories"
           />
-        </div>
-      </div>
-    </section>
-    <section class="editor">
-      <h3>
-        <label
-          for="body"
-          title="You can type the of the long form of your description here."
-        >
-          Mod Body
         </label>
-      </h3>
-      <p>
-        You can type the of the long form of your description here. This editor
-        supports markdown. You can find the syntax
-        <a
-          href="https://guides.github.com/features/mastering-markdown/"
-          target="_blank"
-          rel="noopener noreferrer"
-          >here</a
-        >.
-      </p>
-      <textarea id="body" v-model="body" @input="setMarkdownBody"></textarea>
-      <div v-html="compiledBody"></div>
-    </section>
-    <section>
-      <Popup
-        v-if="currentVersionIndex > -1"
-        :show-popup="currentVersionIndex > -1"
-        class="create-version-popup-body"
-      >
-        <div class="versions-header">
-          <h3>New Version</h3>
-
-          <div class="popup-icons">
-            <button title="Discard Version" @click="deleteVersion">
-              <TrashIcon />
-            </button>
-            <button title="Exit Version" @click="currentVersionIndex = -1">
-              <SaveIcon />
+        <h3>Vanity URL (slug)</h3>
+        <label>
+          <span>
+            Set this to something pretty, so URLs to your mod are more readable
+          </span>
+          <input
+            v-model="slug"
+            id="name"
+            type="text"
+            placeholder="Enter the vanity URL's last bit"
+          />
+        </label>
+      </section>
+      <section class="mod-icon rows">
+        <h3>Icon</h3>
+        <div class="columns row-grow-1">
+          <div class="column-grow-1 rows">
+            <file-input
+              accept="image/png,image/jpeg,image/gif"
+              class="choose-image"
+              prompt="Choose image or drag it here"
+              @change="showPreviewImage"
+            />
+            <ul class="row-grow-1">
+              <li>Must be a square</li>
+              <li>Minimum size is 100x100</li>
+              <li>Acceptable formats are PNG, JPEG and GIF</li>
+            </ul>
+            <button
+              @click="
+                icon = null
+                previewImage = null
+              "
+              class="transparent-button"
+            >
+              Reset icon
             </button>
           </div>
+          <img
+            :src="
+              previewImage
+                ? previewImage
+                : 'https://cdn.modrinth.com/placeholder.svg'
+            "
+            alt="preview-image"
+          />
         </div>
-        <label
-          for="version-title"
-          class="required"
-          title="The title of your version"
-        >
-          Version Title
-        </label>
-        <input
-          id="version-title"
-          v-model="versions[currentVersionIndex].version_title"
-          required
-          type="text"
-          placeholder="Combat Update"
-        />
-        <label
-          for="version-number"
-          class="required"
-          title="The version number of this version. Preferably following semantic versioning"
-        >
-          Version Number
-        </label>
-        <input
-          id="version-number"
-          v-model="versions[currentVersionIndex].version_number"
-          required
-          type="text"
-          placeholder="v1.9"
-        />
-        <label class="required" title="The release channel of this version.">
-          Release Channel
-        </label>
-        <Multiselect
-          v-model="versions[currentVersionIndex].release_channel"
-          class="categories-input"
-          placeholder="Select one"
-          :options="['release', 'beta', 'alpha']"
-          :searchable="false"
-          :close-on-select="true"
-          :show-labels="false"
-          :allow-empty="false"
-        />
-        <label
-          title="The version number of this version. Preferably following semantic versioning"
-        >
-          Loaders
-        </label>
-        <multiselect
-          v-model="versions[currentVersionIndex].loaders"
-          class="categories-input"
-          :options="selectableLoaders"
-          :loading="selectableLoaders.length === 0"
-          :multiple="true"
-          :searchable="false"
-          :show-no-results="false"
-          :close-on-select="true"
-          :clear-on-select="false"
-          :show-labels="false"
-          :limit="6"
-          :hide-selected="true"
-          placeholder="Choose loaders..."
-        />
-        <label title="The versions of minecraft that this mod version supports">
-          Game Versions
-        </label>
-        <multiselect
-          v-model="versions[currentVersionIndex].game_versions"
-          class="categories-input"
-          :options="selectableVersions"
-          :loading="selectableVersions.length === 0"
-          :multiple="true"
-          :searchable="true"
-          :show-no-results="false"
-          :close-on-select="false"
-          :clear-on-select="false"
-          :show-labels="false"
-          :limit="6"
-          :hide-selected="true"
-          placeholder="Choose versions..."
-        />
-        <label for="version-body" title="A list of changes for this version">
-          Changelog
-        </label>
-        <textarea
-          id="version-body"
-          v-model="versions[currentVersionIndex].version_body"
-          class="changelog-editor"
-        />
-        <FileInput
-          input-id="version-files"
-          input-accept="application/*"
-          :input-multiple="true"
-          default-text="Upload Files"
-          @change="updateVersionFiles"
-        >
-          <label class="required" title="The files associated with the version">
-            Version Files
+      </section>
+      <section class="game-sides">
+        <h3>Supported environments</h3>
+        <div class="columns">
+          <span>
+            Let others know if your mod is for clients, servers or universal.
+            For example, IC2 will be required + required, while OptiFine will be
+            required + no functionality
+          </span>
+          <div class="labeled-control">
+            <h3>Client</h3>
+            <Multiselect
+              v-model="clientSideType"
+              placeholder="Select one"
+              track-by="id"
+              label="label"
+              :options="sideTypes"
+              :searchable="false"
+              :close-on-select="true"
+              :show-labels="false"
+              :allow-empty="false"
+            />
+          </div>
+          <div class="labeled-control">
+            <h3>Server</h3>
+            <Multiselect
+              v-model="serverSideType"
+              placeholder="Select one"
+              track-by="id"
+              label="label"
+              :options="sideTypes"
+              :searchable="false"
+              :close-on-select="true"
+              :show-labels="false"
+              :allow-empty="false"
+            />
+          </div>
+        </div>
+      </section>
+      <section class="description">
+        <h3>
+          <label
+            for="body"
+            title="You can type the of the long form of your description here."
+          >
+            Description
           </label>
-        </FileInput>
-      </Popup>
-      <div class="versions-header">
-        <h3>Versions</h3>
-        <button title="New Version" class="new-version" @click="createVersion">
-          <PlusIcon />
-        </button>
-      </div>
-      <div v-for="(value, index) in versions" :key="index" class="version">
-        <p>{{ value.version_number }}</p>
-        <p class="column-grow-4">{{ value.version_title }}</p>
-        <p>{{ value.loaders.join(', ') }}</p>
-        <p v-if="value.release_channel === 'beta'" class="badge yellow">Beta</p>
-        <p v-if="value.release_channel === 'release'" class="badge green">
-          Release
-        </p>
-        <p v-if="value.release_channel === 'alpha'" class="badge red">Alpha</p>
-        <div>
-          <button title="Delete Version" @click="versions.splice(index, 1)">
-            <TrashIcon />
-          </button>
-          <button title="Edit Version" @click="currentVersionIndex = index">
-            <EditIcon />
+        </h3>
+        <span>
+          You can type the of the long form of your description here. This
+          editor supports markdown. You can find the syntax
+          <a
+            href="https://guides.github.com/features/mastering-markdown/"
+            target="_blank"
+            rel="noopener noreferrer"
+            >here</a
+          >.
+        </span>
+        <div class="columns">
+          <div class="textarea-wrapper">
+            <textarea id="body" v-model="body"></textarea>
+          </div>
+          <div v-compiled-markdown="body" class="markdown-body"></div>
+        </div>
+      </section>
+      <section class="versions">
+        <div class="title">
+          <h3>Upload Versions</h3>
+          <button
+            title="Add a version"
+            class="button"
+            :disabled="currentVersionIndex !== -1"
+            @click="createVersion"
+          >
+            Add a version
           </button>
         </div>
-      </div>
-    </section>
-    <section>
-      <h3>Extras</h3>
-      <div class="extras">
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Version</th>
+              <th>Mod Loader</th>
+              <th>Minecraft Version</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(version, index) in versions.filter((it) =>
+                currentVersionIndex !== -1
+                  ? it !== versions[currentVersionIndex]
+                  : true
+              )"
+              :key="version.id"
+            >
+              <td>
+                {{ version.name }}
+              </td>
+              <td>{{ version.version_number }}</td>
+              <td>
+                <FabricIcon v-if="version.loaders.includes('fabric')" />
+                <ForgeIcon v-if="version.loaders.includes('forge')" />
+              </td>
+              <td>{{ version.game_versions.join(', ') }}</td>
+              <td>
+                <span
+                  v-if="version.version_type === 'release'"
+                  class="badge green"
+                >
+                  Release
+                </span>
+                <span
+                  v-if="version.version_type === 'beta'"
+                  class="badge yellow"
+                >
+                  Beta
+                </span>
+                <span v-if="version.version_type === 'alpha'" class="badge red">
+                  Alpha
+                </span>
+              </td>
+              <td>
+                <button
+                  title="Remove version"
+                  @click="versions.splice(index, 1)"
+                >
+                  Remove
+                </button>
+                <button
+                  title="Edit version"
+                  @click="currentVersionIndex = index"
+                >
+                  Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <hr v-if="currentVersionIndex !== -1" />
+        <div v-if="currentVersionIndex !== -1" class="new-version">
+          <div class="controls">
+            <button
+              class="brand-button"
+              title="Save version"
+              @click="currentVersionIndex = -1"
+            >
+              Save version
+            </button>
+            <button title="Discard version" @click="deleteVersion">
+              Discard
+            </button>
+          </div>
+          <div class="main">
+            <h3>Name</h3>
+            <label>
+              <span>
+                This is what users will see first. Will default to version
+                number
+              </span>
+              <input
+                v-model="versions[currentVersionIndex].name"
+                type="text"
+                placeholder="Enter the name"
+              />
+            </label>
+            <h3>Number</h3>
+            <label>
+              <span>
+                That's how your version will appear in mod lists and in URLs
+              </span>
+              <input
+                v-model="versions[currentVersionIndex].version_number"
+                type="text"
+                placeholder="Enter the number"
+              />
+            </label>
+            <h3>Channel</h3>
+            <label>
+              <span>
+                It is important to notify players and pack makers if the version
+                is stable
+              </span>
+              <multiselect
+                v-model="versions[currentVersionIndex].release_channel"
+                placeholder="Select one"
+                :options="['release', 'beta', 'alpha']"
+                :searchable="false"
+                :close-on-select="true"
+                :show-labels="false"
+                :allow-empty="false"
+              />
+            </label>
+            <h3>Loaders</h3>
+            <label>
+              <span>
+                Mark all loaders this version works with. It is essential for
+                search
+              </span>
+              <multiselect
+                v-model="versions[currentVersionIndex].loaders"
+                :options="availableLoaders"
+                :loading="availableLoaders.length === 0"
+                :multiple="true"
+                :searchable="false"
+                :show-no-results="false"
+                :close-on-select="true"
+                :clear-on-select="false"
+                :show-labels="false"
+                :limit="6"
+                :hide-selected="true"
+                placeholder="Choose loaders..."
+              />
+            </label>
+            <h3>Game versions</h3>
+            <label>
+              <span>
+                Mark all game version this version supports. It is essential for
+                search
+              </span>
+              <multiselect
+                v-model="versions[currentVersionIndex].game_versions"
+                :options="availableGameVersions"
+                :loading="availableGameVersions.length === 0"
+                :multiple="true"
+                :searchable="true"
+                :show-no-results="false"
+                :close-on-select="false"
+                :clear-on-select="false"
+                :show-labels="false"
+                :limit="6"
+                :hide-selected="true"
+                placeholder="Choose versions..."
+              />
+            </label>
+            <h3>Files</h3>
+            <label>
+              <span>
+                You should upload a single JAR file. However, you are allowed to
+                upload multiple
+              </span>
+              <FileInput
+                accept="application/*"
+                multiple
+                prompt="Choose files or drag them here"
+                @change="updateVersionFiles"
+              />
+            </label>
+          </div>
+          <div class="changelog">
+            <h3>Changelog</h3>
+            <span>
+              Tell players and modpack makers what's new. It supports the same
+              markdown as description, but it is advisable not to be too
+              creative with it in changelogs
+            </span>
+            <div class="textarea-wrapper">
+              <textarea
+                v-model="versions[currentVersionIndex].changelog"
+              ></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="extra-links">
+        <div class="title">
+          <h3>External links</h3>
+          <i>— this section is optional</i>
+        </div>
         <label
-          title="A link where users can go to report bugs, issues, and concerns about your mod."
+          title="A place for users to report bugs, issues, and concerns about your mod."
         >
-          Issues URL
-          <input v-model="issues_url" type="text" placeholder="Optional" />
+          <span>Issue tracker</span>
+          <input
+            v-model="issues_url"
+            type="url"
+            placeholder="Enter a valid URL"
+          />
         </label>
-        <label title="A link to a page/repository containing the source code ">
-          Source Code Link
-          <input v-model="source_url" type="text" placeholder="Optional" />
+        <label title="A page/repository containing the source code">
+          <span>Source code</span>
+          <input
+            v-model="source_url"
+            type="url"
+            placeholder="Enter a valid URL"
+          />
         </label>
         <label
-          title="A link to a page containing information, documentation, and help for the mod. (Optional)"
+          title="A page containing information, documentation, and help for the mod."
         >
-          Wiki Link
-          <input v-model="wiki_url" type="text" placeholder="Optional" />
+          <span>Wiki page</span>
+          <input
+            v-model="wiki_url"
+            type="url"
+            placeholder="Enter a valid URL"
+          />
         </label>
-      </div>
-    </section>
-    <button
-      title="Create Mod"
-      class="create-mod"
-      :disabled="!this.$nuxt.$loading"
-      @click="createMod"
-    >
-      Create mod
-    </button>
+        <label title="An inivitation link to your Discord server.">
+          <span>Discord invite</span>
+          <input
+            v-model="wiki_url"
+            type="url"
+            placeholder="Enter a valid URL"
+          />
+        </label>
+      </section>
+      <section class="license">
+        <div class="title">
+          <h3>License</h3>
+          <i>— this section is optional</i>
+        </div>
+        <label>
+          <span>
+            It is really important to choose a proper license for your mod. You
+            may choose one from our list or provide a URL to your own license.
+            URL field will be filled automatically for provided licenses
+          </span>
+          <div class="input-group">
+            <Multiselect
+              v-model="license"
+              placeholder="Select one"
+              track-by="short"
+              label="name"
+              :options="availableLicenses"
+              :searchable="true"
+              :close-on-select="true"
+              :show-labels="false"
+            />
+            <input v-model="license_url" type="url" placeholder="License URL" />
+          </div>
+        </label>
+      </section>
+      <!--
+      <section class="donations">
+        <div class="title">
+          <h3>Donation links</h3>
+          <i>— this section is optional</i>
+        </div>
+      </section>
+      -->
+      <m-footer class="footer" centered />
+    </div>
   </div>
 </template>
 
@@ -272,40 +460,45 @@
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
-import xss from 'xss'
-import marked from 'marked'
-
-import Popup from '@/components/Popup'
+import MFooter from '@/components/MFooter'
 import FileInput from '@/components/FileInput'
-import SaveIcon from '~/assets/images/utils/save.svg?inline'
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
-import EditIcon from '~/assets/images/utils/edit.svg?inline'
-import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import EthicalAd from '@/components/EthicalAd'
+
+import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
+import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
 
 export default {
   components: {
+    MFooter,
     FileInput,
-    Popup,
+    EthicalAd,
     Multiselect,
-    TrashIcon,
-    EditIcon,
-    PlusIcon,
-    SaveIcon,
+    ForgeIcon,
+    FabricIcon,
   },
   async asyncData() {
-    let res = await axios.get(`https://api.modrinth.com/api/v1/tag/category`)
-    const categories = res.data
-
-    res = await axios.get(`https://api.modrinth.com/api/v1/tag/loader`)
-    const loaders = res.data
-
-    res = await axios.get(`https://api.modrinth.com/api/v1/tag/game_version`)
-    const versions = res.data
+    const [
+      availableCategories,
+      availableLoaders,
+      availableGameVersions,
+      availableLicenses,
+      // availableDonationPlatforms,
+    ] = (
+      await Promise.all([
+        axios.get(`https://api.modrinth.com/api/v1/tag/category`),
+        axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
+        axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
+        axios.get(`https://api.modrinth.com/api/v1/tag/license`),
+        // axios.get(`https://api.modrinth.com/api/v1/tag/donation_platform`),
+      ])
+    ).map((it) => it.data)
 
     return {
-      selectableCategories: categories,
-      selectableLoaders: loaders,
-      selectableVersions: versions,
+      availableCategories,
+      availableLoaders,
+      availableGameVersions,
+      availableLicenses,
+      // availableDonationPlatforms,
     }
   },
   data() {
@@ -316,6 +509,8 @@ export default {
       currentVersionIndex: -1,
 
       name: '',
+      slug: '',
+      draft: false,
       description: '',
       body: '',
       versions: [],
@@ -324,9 +519,39 @@ export default {
       source_url: null,
       wiki_url: null,
       icon: null,
+      license: null,
+      license_url: null,
+
+      sideTypes: [
+        { label: 'Required', id: 'required' },
+        { label: 'No functionality', id: 'no-functionality' },
+        { label: 'Unsupported', id: 'unsupported' },
+      ],
+      clientSideType: { label: 'Required', id: 'required' },
+      serverSideType: { label: 'Required', id: 'required' },
     }
   },
+  watch: {
+    license(newValue, oldValue) {
+      if (newValue == null) {
+        this.license_url = ''
+        return
+      }
+
+      switch (newValue.short) {
+        case 'custom':
+          this.license_url = ''
+          break
+        default:
+          this.license_url = `https://cdn.modrinth.com/licenses/${newValue.short}.txt`
+      }
+    },
+  },
   methods: {
+    async createDraft() {
+      this.draft = true
+      await this.createMod()
+    },
     async createMod() {
       this.$nuxt.$loading.start()
 
@@ -336,6 +561,8 @@ export default {
         'data',
         JSON.stringify({
           mod_name: this.name,
+          mod_slug: this.slug,
+          mod_namespace: this.namespace,
           mod_description: this.description,
           mod_body: this.body,
           initial_versions: this.versions,
@@ -350,14 +577,17 @@ export default {
           issues_url: this.issues_url,
           source_url: this.source_url,
           wiki_url: this.wiki_url,
-          client_side: 'required',
-          server_side: 'required',
-          license_id: 'custom',
+          client_side: this.clientSideType.id,
+          server_side: this.serverSideType.id,
+          license: this.license,
+          license_url: this.license_url,
+          is_draft: this.draft,
         })
       )
 
-      if (this.icon)
+      if (this.icon) {
         formData.append('icon', new Blob([this.icon]), this.icon.name)
+      }
 
       for (const version of this.versions) {
         for (let i = 0; i < version.raw_files.length; i++) {
@@ -394,6 +624,7 @@ export default {
 
       this.$nuxt.$loading.finish()
     },
+
     showPreviewImage(e) {
       const reader = new FileReader()
       this.icon = e.target.files[0]
@@ -403,6 +634,7 @@ export default {
         this.previewImage = event.target.result
       }
     },
+
     updateVersionFiles(e) {
       this.versions[this.currentVersionIndex].raw_files = e.target.files
 
@@ -413,7 +645,9 @@ export default {
 
       this.versions[this.currentVersionIndex].file_parts = newFileParts
     },
+
     createVersion() {
+      console.log(this.versions)
       this.versions.push({
         raw_files: [],
         file_parts: [],
@@ -429,187 +663,290 @@ export default {
 
       this.currentVersionIndex = this.versions.length - 1
     },
+
     deleteVersion() {
       this.versions.splice(this.currentVersionIndex, 1)
       this.currentVersionIndex = -1
-    },
-    setMarkdownBody() {
-      this.compiledBody = xss(marked(this.body))
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-section {
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
-  margin: 50px 25px;
-  padding: 5px 20px 20px 20px;
-  border-radius: 10px;
-  background-color: var(--color-bg);
-
-  h3 {
-    margin-bottom: 15px;
+.title {
+  * {
+    display: inline;
   }
 }
 
-input {
-  width: calc(100% - 15px);
-  padding: 0.5rem 5px;
-  margin-bottom: 20px;
-}
-
-.multiselect {
-  margin-top: 0.5rem;
-}
-
-.initial {
+label {
   display: flex;
-  .image-data {
-    flex: 1;
 
-    img {
-      image-rendering: crisp-edges;
-      object-fit: cover;
-      width: 100%;
-      height: 85%;
-      margin-bottom: 20px;
-    }
+  span {
+    flex: 2;
+    padding-right: var(--spacing-card-lg);
   }
 
-  .mod-data {
-    flex: 4;
-    margin: 20px;
+  input,
+  .multiselect,
+  .input-group {
+    flex: 3;
+    height: fit-content;
   }
 }
 
-.editor {
-  width: calc(100% - 90px);
-  min-height: 500px;
+.input-group {
+  display: flex;
+  flex-direction: column;
 
-  h3 {
-    margin-bottom: 5px;
+  * {
+    margin-bottom: var(--spacing-card-sm);
   }
-  p {
-    margin-top: 0;
-    margin-bottom: 15px;
-    a {
-      text-decoration: underline;
-    }
-  }
+}
+
+.textarea-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
 
   textarea {
-    padding: 20px;
-    width: calc(50% - 50px);
-    height: 500px;
-    resize: none;
-    outline: none;
-    border: none;
-    margin: 0;
-    background-color: var(--color-grey-1);
-    border-right: 1px solid var(--color-text);
-    color: var(--color-text);
-    font-family: monospace;
-  }
-  div {
-    padding: 20px;
-    margin: 0;
-    height: 540px;
-    display: inline-block;
-    width: calc(50%);
-    box-sizing: border-box;
-    vertical-align: top;
-    background-color: var(--color-grey-2);
+    flex: 1;
     overflow-y: auto;
-    overflow-x: hidden;
-  }
-}
-
-.create-mod {
-  float: right;
-  margin: -10px 25px 20px 0;
-  cursor: pointer;
-  padding: 10px;
-  outline: none;
-  color: #fff;
-  background-color: var(--color-brand);
-  border: none;
-  border-radius: 5px;
-}
-
-.extras {
-  padding: 10px;
-}
-
-.create-version-popup-body {
-  .popup-icons {
-    margin-top: 10px;
-    margin-right: -20px;
-    margin-left: auto;
-  }
-
-  .changelog-editor {
-    padding: 20px;
-    width: calc(100% - 40px);
-    height: 200px;
     resize: none;
-    outline: none;
-    border: none;
-    margin: 10px 0 30px;
-    background-color: var(--color-grey-1);
-    color: var(--color-text);
-    font-family: monospace;
+    max-width: 100%;
+  }
+}
+
+.page-contents {
+  display: grid;
+  grid-template:
+    'header       header      header' auto
+    'advert       advert      advert' auto
+    'essentials   essentials  mod-icon' auto
+    'game-sides   game-sides  game-sides' auto
+    'description  description description' auto
+    'versions     versions    versions' auto
+    'extra-links  license     license' auto
+    'donations    donations   .' auto
+    'footer       footer      footer' auto
+    / 4fr 1fr 4fr;
+  column-gap: var(--spacing-card-md);
+  row-gap: var(--spacing-card-md);
+}
+
+header {
+  @extend %card;
+
+  grid-area: header;
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+
+  h2 {
+    margin: auto 0;
+    color: var(--color-text-dark);
+    font-weight: var(--font-weight-extrabold);
   }
 
   button {
-    background-color: var(--color-bg);
+    margin-left: 0.5rem;
   }
 }
 
-.versions-header {
-  display: flex;
-  align-items: center;
+.advert {
+  grid-area: advert;
 }
 
-.new-version {
-  display: inline-block;
-  color: var(--color-grey-5);
-  background-color: var(--color-grey-1);
-  border-radius: 5px;
-  padding: 5px;
+section {
+  @extend %card;
+
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+}
+
+section.essentials {
+  grid-area: essentials;
+}
+
+section.mod-icon {
+  grid-area: mod-icon;
+
+  img {
+    align-self: flex-start;
+    max-width: 50%;
+    margin-left: var(--spacing-card-lg);
+  }
+}
+
+section.game-sides {
+  grid-area: game-sides;
+
+  .columns {
+    flex-wrap: wrap;
+
+    span {
+      flex: 2;
+    }
+
+    .labeled-control {
+      flex: 2;
+      margin-left: var(--spacing-card-lg);
+    }
+  }
+}
+
+section.description {
+  grid-area: description;
+
+  & > .columns {
+    align-items: stretch;
+    min-height: 10rem;
+    max-height: 40rem;
+
+    & > * {
+      flex: 1;
+      max-width: 50%;
+    }
+  }
+
+  .markdown-body {
+    overflow-y: auto;
+    padding: 0 var(--spacing-card-sm);
+  }
+}
+
+section.versions {
+  grid-area: versions;
+
+  table {
+    border-collapse: collapse;
+    margin-bottom: var(--spacing-card-md);
+    background: var(--color-raised-bg);
+    border-radius: var(--size-rounded-card);
+    table-layout: fixed;
+    width: 100%;
+
+    * {
+      text-align: left;
+    }
+
+    tr:not(:last-child),
+    tr:first-child {
+      th,
+      td {
+        border-bottom: 1px solid var(--color-divider);
+      }
+    }
+
+    th,
+    td {
+      &:first-child {
+        text-align: center;
+        width: 7%;
+
+        svg {
+          color: var(--color-text);
+
+          &:hover,
+          &:focus {
+            color: var(--color-text-hover);
+          }
+        }
+      }
+
+      &:nth-child(2),
+      &:nth-child(5) {
+        padding-left: 0;
+        width: 12%;
+      }
+    }
+
+    th {
+      color: var(--color-heading);
+      font-size: 0.8rem;
+      letter-spacing: 0.02rem;
+      margin-bottom: 0.5rem;
+      margin-top: 1.5rem;
+      padding: 0.75rem 1rem;
+      text-transform: uppercase;
+    }
+
+    td {
+      overflow: hidden;
+      padding: 0.75rem 1rem;
+
+      img {
+        height: 3rem;
+        width: 3rem;
+      }
+    }
+  }
+
+  hr {
+    background-color: var(--color-divider);
+    border: none;
+    color: var(--color-divider);
+    height: 2px;
+    margin: 0.5rem 0;
+  }
+
+  .new-version {
+    display: grid;
+    grid-template:
+      'controls controls' auto
+      'main changelog' auto
+      / 5fr 4fr;
+    column-gap: var(--spacing-card-md);
+
+    .controls {
+      grid-area: controls;
+      display: flex;
+      flex-direction: row-reverse;
+    }
+
+    .main {
+      grid-area: main;
+    }
+
+    .changelog {
+      grid-area: changelog;
+      display: flex;
+      flex-direction: column;
+
+      .textarea-wrapper {
+        flex: 1;
+      }
+    }
+  }
+}
+
+section.extra-links {
+  grid-area: extra-links;
+
+  label {
+    align-items: center;
+    margin-top: var(--spacing-card-sm);
+
+    span {
+      flex: 1;
+    }
+  }
+}
+
+section.license {
+  grid-area: license;
+
+  label {
+    margin-top: var(--spacing-card-sm);
+  }
+}
+
+section.donations {
+  grid-area: donations;
+}
+
+.footer {
+  grid-area: footer;
+}
+
+.choose-image {
   cursor: pointer;
-  margin-left: auto;
-  float: right;
-
-  &:hover {
-    background-color: var(--color-grey-2);
-    color: var(--color-text);
-  }
-}
-
-.version {
-  padding: 5px;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  background-color: var(--color-grey-1);
-}
-
-button {
-  background-color: var(--color-grey-1);
-  color: var(--color-grey-5);
-  cursor: pointer;
-  border: none;
-
-  &:hover,
-  &:focus {
-    color: inherit;
-  }
-}
-
-.categories-input {
-  margin-bottom: 15px;
 }
 </style>

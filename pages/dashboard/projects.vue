@@ -1,80 +1,80 @@
 <template>
-  <div class="content">
-    <h2>My projects</h2>
-    <div class="section-header">
-      <h3>Mods</h3>
-      <nuxt-link class="create-button" to="/mod/create"
-        >Create a new mod</nuxt-link
-      >
+  <div class="page-container">
+    <div class="page-contents">
+      <div class="sidebar-l">
+        <div class="card page-nav">
+          <nuxt-link :to="'/dashboard/projects'" class="tab last">
+            <ModIcon />
+            My mods
+          </nuxt-link>
+        </div>
+        <client-only>
+          <EthicalAd type="image" />
+        </client-only>
+      </div>
+      <div class="content">
+        <div class="section-header columns">
+          <h3 class="column-grow-1">My mods</h3>
+          <nuxt-link class="brand-button column" to="/mod/create">
+            Create a mod
+          </nuxt-link>
+        </div>
+        <ModCard
+          v-for="mod in mods"
+          :id="mod.id"
+          :key="mod.id"
+          :author="mod.author"
+          :name="mod.title"
+          :description="mod.description"
+          :latest-version="mod.latest_version"
+          :created-at="mod.published"
+          :updated-at="mod.updated"
+          :downloads="mod.downloads.toString()"
+          :icon-url="mod.icon_url"
+          :author-url="mod.author_url"
+          :page-url="mod.page_url"
+          :categories="mod.categories"
+          :edit-mode="true"
+          :status="mod.status"
+          :is-modrinth="true"
+        />
+      </div>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th></th>
-          <th>Name</th>
-          <th>Role</th>
-          <th>Status</th>
-          <th>Downloads</th>
-          <th>Last updated</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="mod in mods" :key="mod.id">
-          <td>
-            <img class="rounded-md" :src="mod.icon_url" />
-          </td>
-          <td>
-            <nuxt-link :to="'/mod/' + mod.id">
-              {{ mod.title }}
-            </nuxt-link>
-          </td>
-          <td>Owner</td>
-          <td>
-            <span v-if="mod.status === 'approved'" class="badge green">
-              Approved
-            </span>
-            <span v-if="mod.status === 'rejected'" class="badge red">
-              Rejected
-            </span>
-            <span v-if="mod.status === 'draft'" class="badge yellow">
-              Draft
-            </span>
-            <span v-if="mod.status === 'processing'" class="badge yellow">
-              Processing
-            </span>
-            <span v-if="mod.status === 'unlisted'" class="badge gray">
-              Unlisted
-            </span>
-            <span v-if="mod.status === 'unknown'" class="badge gray">
-              Unknown
-            </span>
-          </td>
-          <td>{{ mod.downloads }}</td>
-          <td>{{ $dayjs(mod.published).format('YYYY-MM-DD') }}</td>
-        </tr>
-      </tbody>
-    </table>
-    <client-only>
-      <EthicalAd />
-    </client-only>
   </div>
 </template>
 
 <script>
 import axios from 'axios'
 import EthicalAd from '@/components/EthicalAd'
+import ModCard from '@/components/ProjectCard'
+
+import ModIcon from '~/assets/images/sidebar/mod.svg?inline'
 
 export default {
-  components: { EthicalAd },
+  components: {
+    EthicalAd,
+    ModCard,
+    ModIcon,
+  },
   async fetch() {
+    const config = {
+      headers: {
+        Authorization: this.$auth.getToken('local'),
+      },
+    }
+
     try {
       let res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}/mods`
+        `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}/mods`,
+        config
       )
 
       if (res.data) {
         res = await axios.get(
-          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`
+          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(
+            res.data
+          )}`,
+          config
         )
         this.mods = res.data
       }
@@ -90,29 +90,23 @@ export default {
 
 <style lang="scss" scoped>
 .section-header {
-  display: flex;
-  margin-bottom: 1rem;
-
-  & > * {
-    margin-right: 1rem;
+  @extend %card;
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+  margin-bottom: var(--spacing-card-md);
+  h3 {
+    margin: auto 0;
+    color: var(--color-text-dark);
+    font-weight: var(--font-weight-extrabold);
   }
 }
 
-.create-button {
-  margin: auto 0;
-  padding: 4px 20px;
-  border-radius: 5px;
-  color: var(--color-grey-5);
-  background-color: var(--color-grey-1);
-}
-
 table {
-  background: var(--color-bg);
   border-collapse: collapse;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 3px 1px var(--color-grey-2);
   table-layout: fixed;
   width: 100%;
+  margin-bottom: var(--spacing-card-md);
+  background: var(--color-raised-bg);
+  border-radius: var(--size-rounded-card);
 
   * {
     text-align: left;
@@ -122,7 +116,7 @@ table {
   tr:first-child {
     th,
     td {
-      border-bottom: 1px solid var(--color-grey-2);
+      border-bottom: 1px solid var(--color-divider);
     }
   }
 
@@ -130,7 +124,7 @@ table {
   td {
     &:first-child {
       text-align: center;
-      width: 5%;
+      width: 7%;
     }
 
     &:nth-child(2) {
@@ -140,7 +134,7 @@ table {
   }
 
   th {
-    color: #718096;
+    color: var(--color-heading);
     font-size: 0.8rem;
     letter-spacing: 0.02rem;
     margin-bottom: 0.5rem;
@@ -150,7 +144,7 @@ table {
   }
 
   td {
-    padding: 0.25rem 1rem;
+    padding: 0.75rem;
 
     img {
       height: 3rem;
@@ -184,5 +178,9 @@ table {
       display: none;
     }
   }
+}
+
+.mod-name {
+  font-weight: bold;
 }
 </style>

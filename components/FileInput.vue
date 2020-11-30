@@ -1,86 +1,53 @@
 <template>
-  <div>
-    <slot></slot>
+  <label class="button">
+    <span>
+      {{ prompt }}
+    </span>
     <input
-      :id="inputId"
-      class="file-input"
       type="file"
-      :accept="inputAccept"
-      :multiple="inputMultiple"
-      @change="onChange"
+      :multiple="multiple"
+      :accept="accept"
+      @change="(files) => $emit('change', files)"
     />
-    <label :for="inputId">{{ text }}</label>
-  </div>
+  </label>
 </template>
 
 <script>
 export default {
   name: 'FileInput',
   props: {
-    defaultText: {
+    prompt: {
       type: String,
-      default: '',
+      default: 'Select file',
     },
-    inputId: {
-      type: String,
-      default: '',
-    },
-    inputAccept: {
-      type: String,
-      default: '',
-    },
-    inputMultiple: {
+    multiple: {
       type: Boolean,
-      default: true,
+      default: false,
     },
-  },
-  data() {
-    return {
-      text: this.defaultText,
-    }
-  },
-  methods: {
-    onChange(files) {
-      const length = files.target.files.length
-
-      if (length === 0) {
-        this.text = this.defaultText
-      } else if (length === 1) {
-        this.text = '1 file selected'
-      } else if (length > 1) {
-        this.text = length + ' files selected'
-      }
-
-      this.$emit('change', files)
+    accept: {
+      type: String,
+      default: null,
     },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-[type='file'] {
-  border: 0;
-  clip: rect(0, 0, 0, 0);
-  height: 1px;
-  overflow: hidden;
-  padding: 0;
-  position: absolute !important;
-  white-space: nowrap;
-  width: 1px;
+label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-card-sm) var(--spacing-card-md);
+}
 
-  + label {
-    cursor: pointer;
-    border-radius: 5px;
-    color: var(--color-grey-5);
-    background-color: var(--color-grey-1);
-    padding: 10px 20px;
-  }
+span {
+  border: 2px dashed var(--color-divider-dark);
+  border-radius: var(--size-rounded-control);
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+}
 
-  &:focus + label,
-  + label:hover,
-  &:focus + label {
-    background-color: var(--color-grey-2);
-    color: var(--color-text);
-  }
+input {
+  display: none;
 }
 </style>
