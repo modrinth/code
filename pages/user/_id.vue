@@ -54,8 +54,8 @@
         <div class="mods">
           <SearchResult
             v-for="result in mods"
-            :id="result.mod_id"
-            :key="result.mod_id"
+            :id="result.id"
+            :key="result.id"
             :name="result.title"
             :description="result.description"
             :created-at="result.published"

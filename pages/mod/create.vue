@@ -69,8 +69,8 @@
             Set this to something pretty, so URLs to your mod are more readable
           </span>
           <input
-            v-model="slug"
             id="name"
+            v-model="slug"
             type="text"
             placeholder="Enter the vanity URL's last bit"
           />
@@ -92,11 +92,11 @@
               <li>Acceptable formats are PNG, JPEG and GIF</li>
             </ul>
             <button
+              class="transparent-button"
               @click="
                 icon = null
                 previewImage = null
               "
-              class="transparent-button"
             >
               Reset icon
             </button>
@@ -647,7 +647,6 @@ export default {
     },
 
     createVersion() {
-      console.log(this.versions)
       this.versions.push({
         raw_files: [],
         file_parts: [],

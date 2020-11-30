@@ -378,6 +378,7 @@ export default {
       ],
       sortType: { display: 'Relevance', name: 'relevance' },
       maxResults: 20,
+      firstRun: true,
     }
   },
   methods: {
@@ -387,7 +388,7 @@ export default {
           'https://api.modrinth.com/api/v1/tag/game_version?type=release'
 
         if (x !== null) {
-          if (!this.showVersions.length > 0) {
+          if (!this.showVersions.length > 0 && !this.firstRun) {
             this.showVersions.push('snapshots')
 
             url = 'https://api.modrinth.com/api/v1/tag/game_version'
@@ -399,6 +400,7 @@ export default {
         const res = await axios.get(url)
 
         this.versions = res.data
+        this.firstRun = false
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err)

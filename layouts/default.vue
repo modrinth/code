@@ -224,7 +224,7 @@ export default {
   },
   computed: {
     authUrl() {
-      return `https://api.modrinth.com/api/v1/auth/init?url=http://localhost:3000${this.$route.path}`
+      return `https://api.modrinth.com/api/v1/auth/init?url=http://modrinth.com${this.$route.path}`
     },
     userUrl() {
       return `/user/${this.$auth.user.id}`
