@@ -91,18 +91,27 @@ export default {
     MFooter,
   },
   async asyncData(data) {
+    const config = {
+      headers: {
+        Authorization: data.$auth.getToken('local'),
+      },
+    }
+
     let res = await axios.get(
-      `https://api.modrinth.com/api/v1/user/${data.params.id}`
+      `https://api.modrinth.com/api/v1/user/${data.params.id}`,
+      config
     )
     const user = res.data
 
     let mods = []
     res = await axios.get(
-      `https://api.modrinth.com/api/v1/user/${data.params.id}/mods`
+      `https://api.modrinth.com/api/v1/user/${data.params.id}/mods`,
+      config
     )
     if (res.data) {
       res = await axios.get(
-        `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`
+        `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`,
+        config
       )
       mods = res.data
     }

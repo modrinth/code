@@ -389,6 +389,7 @@ export default {
       for (const facet of [...this.facets]) await this.toggleFacet(facet, true)
 
       this.selectedVersions = []
+      this.facets.push('host:modrinth')
       await this.onSearchChange(1)
     },
     async toggleFacet(elementName, sendRequest) {

@@ -56,33 +56,25 @@ export default {
     ModCard,
     ModIcon,
   },
-  async fetch() {
+  async asyncData(data) {
     const config = {
       headers: {
-        Authorization: this.$auth.getToken('local'),
+        Authorization: data.$auth.getToken('local'),
       },
     }
 
-    try {
-      let res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}/mods`,
-        config
-      )
+    let res = await axios.get(
+      `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/mods`,
+      config
+    )
 
-      if (res.data) {
-        res = await axios.get(
-          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(
-            res.data
-          )}`,
-          config
-        )
-        this.mods = res.data
-      }
-    } catch (err) {}
-  },
-  data() {
+    res = await axios.get(
+      `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`,
+      config
+    )
+
     return {
-      mods: [],
+      mods: res.data,
     }
   },
 }

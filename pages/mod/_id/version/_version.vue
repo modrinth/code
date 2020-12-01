@@ -119,34 +119,39 @@ export default {
   },
   auth: false,
   async asyncData(data) {
+    const config = {
+      headers: {
+        Authorization: data.$auth.getToken('local'),
+      },
+    }
+
     let res = await axios.get(
-      `https://api.modrinth.com/api/v1/mod/${data.params.id}`
+      `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
+      config
     )
     const mod = res.data
 
     res = await axios.get(
-      `https://api.modrinth.com/api/v1/team/${mod.team}/members`
+      `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
+      config
     )
     const members = res.data
     for (let i = 0; i < members.length; i++) {
       res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${members[i].user_id}`
+        `https://api.modrinth.com/api/v1/user/${members[i].user_id}`,
+        config
       )
       members[i].avatar_url = res.data.avatar_url
     }
 
-    const versions = []
-    for (const version of mod.versions) {
-      try {
-        res = await axios.get(
-          `https://api.modrinth.com/api/v1/version/${version}`
-        )
-        versions.push(res.data)
-      } catch {
-        // eslint-disable-next-line no-console
-        console.log('Some versions may be missing...')
-      }
-    }
+    res = await axios.get(
+      `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
+        mod.versions
+      )}`,
+      config
+    )
+
+    const versions = res.data.reverse()
 
     const version = versions.find((x) => x.id === data.params.version)
 

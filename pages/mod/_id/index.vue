@@ -12,37 +12,41 @@ export default {
   components: { ModPage },
   auth: false,
   async asyncData(data) {
+    const config = {
+      headers: {
+        Authorization: data.$auth.getToken('local'),
+      },
+    }
+
     let res = await axios.get(
-      `https://api.modrinth.com/api/v1/mod/${data.params.id}`
+      `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
+      config
     )
     const mod = res.data
 
     res = await axios.get(
-      `https://api.modrinth.com/api/v1/team/${mod.team}/members`
+      `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
+      config
     )
     const members = res.data
     for (let i = 0; i < members.length; i++) {
       res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${members[i].user_id}`
+        `https://api.modrinth.com/api/v1/user/${members[i].user_id}`,
+        config
       )
       members[i].avatar_url = res.data.avatar_url
     }
 
     const body = (await axios.get(mod.body_url)).data
 
-    const versions = []
+    res = await axios.get(
+      `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
+        mod.versions
+      )}`,
+      config
+    )
 
-    for (const version of mod.versions) {
-      try {
-        res = await axios.get(
-          `https://api.modrinth.com/api/v1/version/${version}`
-        )
-        versions.push(res.data)
-      } catch {
-        // eslint-disable-next-line no-console
-        console.log('Some versions may be missing...')
-      }
-    }
+    const versions = res.data.reverse()
 
     return {
       mod,
