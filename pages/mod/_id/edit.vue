@@ -202,7 +202,7 @@
         <label title="An inivitation link to your Discord server.">
           <span>Discord invite</span>
           <input
-            v-model="mod.wiki_url"
+            v-model="mod.discord_url"
             type="url"
             placeholder="Enter a valid URL"
           />

@@ -411,7 +411,7 @@
         <label title="An inivitation link to your Discord server.">
           <span>Discord invite</span>
           <input
-            v-model="wiki_url"
+            v-model="discord_url"
             type="url"
             placeholder="Enter a valid URL"
           />
@@ -518,6 +518,7 @@ export default {
       issues_url: null,
       source_url: null,
       wiki_url: null,
+      discord_url: null,
       icon: null,
       license: null,
       license_url: null,
@@ -577,6 +578,7 @@ export default {
           issues_url: this.issues_url,
           source_url: this.source_url,
           wiki_url: this.wiki_url,
+          discord_url: this.discord_url,
           client_side: this.clientSideType.id,
           server_side: this.serverSideType.id,
           license_id: this.license.short,
