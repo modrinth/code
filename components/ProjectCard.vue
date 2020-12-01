@@ -95,7 +95,7 @@
       </div>
     </div>
     <div v-if="editMode" class="buttons">
-      <nuxt-link class="transparent-button column" :to="'/mod/' + id + '/edit'">
+      <nuxt-link class="button column" :to="'/mod/' + id + '/edit'">
         Edit
       </nuxt-link>
     </div>

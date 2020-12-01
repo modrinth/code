@@ -58,10 +58,10 @@
                 this.$auth.loggedIn &&
                 members.find((x) => x.user_id === this.$auth.user.id)
               "
-              :to="'/mod/' + mod.id + '/settings'"
+              :to="'/mod/' + mod.id + '/edit'"
               class="tab"
             >
-              Settings
+              Edit
             </nuxt-link>
             <div class="filler" />
           </div>
