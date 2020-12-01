@@ -87,7 +87,13 @@
           </a>
         </div>
       </div>
-      <FileInput class="file-input" @change="addFiles" />
+      <FileInput
+        v-if="
+          $auth.loggedIn && members.find((x) => x.user_id === $auth.user.id)
+        "
+        class="file-input"
+        @change="addFiles"
+      />
     </div>
   </ModPage>
 </template>
