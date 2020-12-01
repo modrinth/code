@@ -434,6 +434,7 @@ export default {
           text-align: center;
           border-radius: var(--size-rounded-control);
           background-color: var(--color-brand);
+          white-space: nowrap;
           outline: none;
           color: var(--color-brand-inverted);
           display: block;
