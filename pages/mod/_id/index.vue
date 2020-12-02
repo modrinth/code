@@ -18,35 +18,38 @@ export default {
       },
     }
 
-    let res = await axios.get(
-      `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-      config
-    )
-    const mod = res.data
-
-    res = await axios.get(
-      `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
-      config
-    )
-    const members = res.data
-    for (let i = 0; i < members.length; i++) {
-      res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${members[i].user_id}`,
+    const mod = (
+      await axios.get(
+        `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
         config
       )
-      members[i].avatar_url = res.data.avatar_url
+    ).data
+
+    const members = (
+      await axios.get(
+        `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
+        config
+      )
+    ).data
+    for (let i = 0; i < members.length; i++) {
+      members[i].avatar_url = (
+        await axios.get(
+          `https://api.modrinth.com/api/v1/user/${members[i].user_id}`,
+          config
+        )
+      ).data.avatar_url
     }
 
+    const versions = (
+      await axios.get(
+        `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
+          mod.versions
+        )}`,
+        config
+      )
+    ).data.reverse()
+
     const body = (await axios.get(mod.body_url)).data
-
-    res = await axios.get(
-      `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-        mod.versions
-      )}`,
-      config
-    )
-
-    const versions = res.data.reverse()
 
     return {
       mod,

@@ -23,11 +23,8 @@
         </client-only>
       </div>
       <div class="content">
-        <div class="section-header columns">
-          <h3 class="column-grow-1">My mods</h3>
-          <nuxt-link class="brand-button column" to="/mod/create">
-            Create a mod
-          </nuxt-link>
+        <div class="section-header">
+          <h3 class="column-grow-1">Mods</h3>
         </div>
         <ModCard
           v-for="mod in mods"
@@ -48,6 +45,9 @@
           :status="mod.status"
           :is-modrinth="true"
         />
+        <div class="section-header">
+          <h3 class="column-grow-1">Versions</h3>
+        </div>
       </div>
     </div>
   </div>
@@ -76,7 +76,7 @@ export default {
     }
 
     let res = await axios.get(
-      `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/mods`,
+      `https://api.modrinth.com/api/v1/moderation/mods`,
       config
     )
 
@@ -85,8 +85,23 @@ export default {
       config
     )
 
+    const mods = res.data
+
+    res = await axios.get(
+      `https://api.modrinth.com/api/v1/moderation/versions`,
+      config
+    )
+
+    res = await axios.get(
+      `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
+        res.data
+      )}`,
+      config
+    )
+
     return {
-      mods: res.data,
+      mods,
+      versions: res.data,
     }
   },
 }
@@ -102,9 +117,5 @@ export default {
     color: var(--color-text-dark);
     font-weight: var(--font-weight-extrabold);
   }
-}
-
-.mod-name {
-  font-weight: bold;
 }
 </style>
