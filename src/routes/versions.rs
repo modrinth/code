@@ -81,7 +81,7 @@ pub async fn versions_get(
                         let user_id: database::models::ids::UserId = user.id.into();
 
                         let member_exists = sqlx::query!(
-                            "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.id AND m.id = $1 WHERE tm.user_id = $2)",
+                            "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.team_id AND m.id = $1 WHERE tm.user_id = $2)",
                             version.mod_id as database::models::ModId,
                             user_id as database::models::ids::UserId,
                         )
@@ -123,7 +123,7 @@ pub async fn version_get(
                     let user_id: database::models::ids::UserId = user.id.into();
 
                     let member_exists = sqlx::query!(
-                        "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.id AND m.id = $1 WHERE tm.user_id = $2)",
+                        "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.team_id AND m.id = $1 WHERE tm.user_id = $2)",
                         data.mod_id as database::models::ModId,
                         user_id as database::models::ids::UserId,
                     )

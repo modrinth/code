@@ -1,10 +1,8 @@
 /// This module is used for the indexing from any source.
-pub mod curseforge_import;
 pub mod local_import;
 pub mod queue;
 
 use crate::search::{SearchConfig, UploadSearchMod};
-use curseforge_import::index_curseforge;
 use local_import::index_local;
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
@@ -63,20 +61,9 @@ pub async fn index_mods(
 ) -> Result<(), IndexingError> {
     let mut docs_to_add: Vec<UploadSearchMod> = vec![];
 
-    let cache_path = std::env::var_os("INDEX_CACHE_PATH").map(std::path::PathBuf::from);
-
     if settings.index_local {
         docs_to_add.append(&mut index_local(pool.clone()).await?);
     }
-    if settings.index_external {
-        let end_index = dotenv::var("MAX_CURSEFORGE_ID")
-            .ok()
-            .map(|i| i.parse().unwrap())
-            .unwrap_or(450_000);
-
-        docs_to_add.append(&mut index_curseforge(1, end_index, cache_path.as_deref()).await?);
-    }
-
     // Write Indices
 
     add_mods(docs_to_add, config).await?;

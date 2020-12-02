@@ -106,6 +106,8 @@ pub enum ApiError {
     InvalidInputError(String),
     #[error("Search Error: {0}")]
     SearchError(#[from] meilisearch_sdk::errors::Error),
+    #[error("Indexing Error: {0}")]
+    IndexingError(#[from] crate::search::indexing::IndexingError),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -117,6 +119,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::CustomAuthenticationError(..) => actix_web::http::StatusCode::UNAUTHORIZED,
             ApiError::JsonError(..) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::SearchError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::IndexingError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::FileHostingError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::InvalidInputError(..) => actix_web::http::StatusCode::BAD_REQUEST,
         }
@@ -132,6 +135,7 @@ impl actix_web::ResponseError for ApiError {
                     ApiError::CustomAuthenticationError(..) => "unauthorized",
                     ApiError::JsonError(..) => "json_error",
                     ApiError::SearchError(..) => "search_error",
+                    ApiError::IndexingError(..) => "indexing_error",
                     ApiError::FileHostingError(..) => "file_hosting_error",
                     ApiError::InvalidInputError(..) => "invalid_input",
                 },

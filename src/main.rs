@@ -228,40 +228,6 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    if dotenv::var("INDEX_CURSEFORGE")
-        .ok()
-        .and_then(|b| b.parse::<bool>().ok())
-        .unwrap_or(false)
-    {
-        // The interval in seconds at which curseforge is indexed for
-        // searching.  Defaults to 4 hours if unset.
-        let external_index_interval = std::time::Duration::from_secs(
-            dotenv::var("EXTERNAL_INDEX_INTERVAL")
-                .ok()
-                .map(|i| i.parse().unwrap())
-                .unwrap_or(3600 * 12),
-        );
-
-        let pool_ref = pool.clone();
-        let thread_search_config = search_config.clone();
-        scheduler.run(external_index_interval, move || {
-            info!("Indexing curseforge");
-            let pool_ref = pool_ref.clone();
-            let thread_search_config = thread_search_config.clone();
-            async move {
-                let settings = IndexingSettings {
-                    index_local: false,
-                    index_external: true,
-                };
-                let result = index_mods(pool_ref, settings, &thread_search_config).await;
-                if let Err(e) = result {
-                    warn!("External mod indexing failed: {:?}", e);
-                }
-                info!("Done indexing curseforge");
-            }
-        });
-    }
-
     scheduler::schedule_versions(&mut scheduler, pool.clone(), skip_initial);
 
     let ip_salt = Pepper {
@@ -375,22 +341,7 @@ fn check_env_vars() -> bool {
         failed |= true;
     }
 
-    failed |= check_var::<bool>("INDEX_CURSEFORGE");
-    if dotenv::var("INDEX_CURSEFORGE")
-        .ok()
-        .and_then(|s| s.parse::<bool>().ok())
-        .unwrap_or(false)
-    {
-        failed |= check_var::<usize>("EXTERNAL_INDEX_INTERVAL");
-        failed |= check_var::<usize>("MAX_CURSEFORGE_ID");
-    }
-
     failed |= check_var::<usize>("LOCAL_INDEX_INTERVAL");
-
-    // In theory this should be an OsString since it's a path, but
-    // dotenv doesn't support that.  The usage of this does treat
-    // it as an OsString, though.
-    failed |= check_var::<String>("INDEX_CACHE_PATH");
 
     failed |= check_var::<String>("GITHUB_CLIENT_ID");
     failed |= check_var::<String>("GITHUB_CLIENT_SECRET");

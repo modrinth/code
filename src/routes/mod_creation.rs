@@ -165,7 +165,7 @@ pub async fn mod_create(
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
-        &***indexing_queue,
+        &***indexing_queue
     )
     .await;
 
@@ -557,7 +557,7 @@ async fn mod_create_inner(
             body_url: mod_builder.body_url.clone(),
             published: now,
             updated: now,
-            status,
+            status: status.clone(),
             license: License {
                 id: mod_create_data.license_id.clone(),
                 name: "".to_string(),
@@ -582,10 +582,12 @@ async fn mod_create_inner(
 
         let _mod_id = mod_builder.insert(&mut *transaction).await?;
 
-        let index_mod =
-            crate::search::indexing::local_import::query_one(mod_id.into(), &mut *transaction)
-                .await?;
-        indexing_queue.add(index_mod);
+        if status.is_searchable() {
+            let index_mod =
+                crate::search::indexing::local_import::query_one(mod_id.into(), &mut *transaction)
+                    .await?;
+            indexing_queue.add(index_mod);
+        }
 
         Ok(HttpResponse::Ok().json(response))
     }

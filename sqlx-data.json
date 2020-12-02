@@ -218,27 +218,6 @@
       ]
     }
   },
-  "15978ec367b2768eea87dcdf1ee2497aa03b8a926139fecffbca22031e3ae7f9": {
-    "query": "SELECT EXISTS(SELECT 1 FROM team_members WHERE id = $1 AND user_id = $2)",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "exists",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      },
-      "nullable": [
-        null
-      ]
-    }
-  },
   "16871e66d8762452be3ca0c80f4733f2db49980205fbf7cb6f9829cdd99cdb65": {
     "query": "\n                        INSERT INTO dependencies (dependent_id, dependency_id)\n                        VALUES ($1, $2)\n                        ",
     "describe": {
@@ -1390,6 +1369,27 @@
       ]
     }
   },
+  "618472f46632ddf15b01bb0df27c9d5e6f5b56a9413a6f7393d6d7c29b852459": {
+    "query": "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.team_id AND m.id = $1 WHERE tm.user_id = $2)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
   "637fd5f9564a79b625e00a705b3c9fe70ba3cba9050c0993557ca46f50d89623": {
     "query": "\n        SELECT * FROM mods\n        WHERE status = (\n            SELECT id FROM statuses WHERE status = $1\n        )\n        ORDER BY updated ASC\n        LIMIT $2;\n        ",
     "describe": {
@@ -1938,27 +1938,6 @@
       "nullable": []
     }
   },
-  "75a1099a12e73484cf0e7dd4b346ea154ea1ff915fe9ee15f936e1e8faed4118": {
-    "query": "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.id AND m.id = $1 WHERE tm.user_id = $2)",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "exists",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      },
-      "nullable": [
-        null
-      ]
-    }
-  },
   "763eaff18057e579472960e9e8256c22ae275f24a45da96bc3e47385376faae3": {
     "query": "\n                UPDATE mods\n                SET downloads = downloads + 1\n                WHERE id = $1\n                ",
     "describe": {
@@ -2018,6 +1997,27 @@
       },
       "nullable": [
         false
+      ]
+    }
+  },
+  "796f057ea8eb5b01d3eedeee9840fb37464ea567f32871953fb07e14ed86af1c": {
+    "query": "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
       ]
     }
   },
