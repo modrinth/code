@@ -93,7 +93,9 @@ export default {
   async asyncData(data) {
     const config = {
       headers: {
-        Authorization: data.$auth.getToken('local'),
+        Authorization: data.$auth.getToken('local')
+          ? data.$auth.getToken('local')
+          : '',
       },
     }
 
