@@ -266,6 +266,14 @@ export default {
     Multiselect,
   },
   async asyncData(data) {
+    const config = {
+      headers: {
+        Authorization: data.$auth.getToken('local')
+          ? data.$auth.getToken('local')
+          : '',
+      },
+    }
+
     const [
       mod,
       availableCategories,
@@ -275,7 +283,10 @@ export default {
       // availableDonationPlatforms,
     ] = (
       await Promise.all([
-        axios.get(`https://api.modrinth.com/api/v1/mod/${data.params.id}`),
+        axios.get(
+          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
+          config
+        ),
         axios.get(`https://api.modrinth.com/api/v1/tag/category`),
         axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
         axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
