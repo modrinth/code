@@ -17,6 +17,10 @@ export default {
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
+        name: 'a.validate.01',
+        content: 'c0d5971ccaf69bcec6d758f0dd9d9af6b4d4',
+      },
+      {
         hid: 'description',
         name: 'description',
         content:
