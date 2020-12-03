@@ -17,10 +17,6 @@ export default {
       { charset: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       {
-        name: 'a.validate.01',
-        content: 'c0d5971ccaf69bcec6d758f0dd9d9af6b4d4',
-      },
-      {
         hid: 'description',
         name: 'description',
         content:
@@ -66,10 +62,6 @@ export default {
         'data-website-id': 'c37613de-245d-4767-90e7-ba7980a4f1a2',
         async: true,
         defer: true,
-      },
-      {
-        src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
-        async: true,
       },
     ],
   },

@@ -4,6 +4,15 @@
       <header class="columns">
         <h2 class="column-grow-1">Edit Mod</h2>
         <button
+          v-if="mod.status === 'rejected' || mod.status === 'draft'"
+          title="Submit for Review"
+          class="button column"
+          :disabled="!this.$nuxt.$loading"
+          @click="saveModReview"
+        >
+          Submit for Review
+        </button>
+        <button
           title="Save"
           class="brand-button column"
           :disabled="!this.$nuxt.$loading"
@@ -88,6 +97,7 @@
               @click="
                 icon = null
                 previewImage = null
+                iconChanged = true
               "
             >
               Reset icon
@@ -95,7 +105,9 @@
           </div>
           <img
             :src="
-              mod.icon_url
+              previewImage
+                ? previewImage
+                : mod.icon_url && !iconChanged
                 ? mod.icon_url
                 : 'https://cdn.modrinth.com/placeholder.svg'
             "
@@ -220,7 +232,7 @@
           </span>
           <div class="input-group">
             <Multiselect
-              v-model="mod.license"
+              v-model="license"
               placeholder="Select one"
               track-by="short"
               label="name"
@@ -229,11 +241,7 @@
               :close-on-select="true"
               :show-labels="false"
             />
-            <input
-              v-model="mod.license.url"
-              type="url"
-              placeholder="License URL"
-            />
+            <input v-model="license_url" type="url" placeholder="License URL" />
           </div>
         </label>
       </section>
@@ -317,15 +325,22 @@ export default {
       availableLoaders,
       availableGameVersions,
       availableLicenses,
+      license: {
+        short: mod.license.id,
+        name: mod.license.name,
+      },
+      license_url: mod.license.url,
       // availableDonationPlatforms,
     }
   },
   data() {
     return {
+      isProcessing: false,
       previewImage: null,
       compiledBody: '',
 
       icon: null,
+      iconChanged: false,
 
       sideTypes: [
         { label: 'Required', id: 'required' },
@@ -351,33 +366,55 @@ export default {
     },
   },
   methods: {
+    async saveModReview() {
+      this.isProcessing = true
+      await this.saveMod()
+    },
     async saveMod() {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
       this.$nuxt.$loading.start()
 
       try {
+        const data = {
+          title: this.mod.title,
+          description: this.mod.description,
+          body: this.body,
+          categories: this.mod.categories,
+          issues_url: this.mod.issues_url,
+          source_url: this.mod.source_url,
+          wiki_url: this.mod.wiki_url,
+          license_url: this.license_url,
+          discord_url: this.mod.discord_url,
+          license_id: this.license.short,
+          client_side: this.clientSideType.id,
+          server_side: this.serverSideType.id,
+          slug: this.mod.mod_slug,
+        }
+
+        if (this.isProcessing) {
+          data.status = 'processing'
+        }
+
         await axios.patch(
           `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
-          {
-            title: this.mod.title,
-            description: this.mod.description,
-            body: this.body,
-            categories: this.mod.categories,
-            issues_url: this.mod.issues_url,
-            source_url: this.mod.source_url,
-            wiki_url: this.mod.wiki_url,
-            license_url: this.mod.license_url,
-            discord_url: this.mod.discord_url,
-            license_id: this.mod.license.short,
-            client_side: this.clientSideType.id,
-            server_side: this.serverSideType.id,
-            slug: this.mod.mod_slug,
-          },
-          {
-            headers: {
-              Authorization: this.$auth.getToken('local'),
-            },
-          }
+          data,
+          config
         )
+
+        if (this.iconChanged) {
+          await axios.patch(
+            `https://api.modrinth.com/api/v1/mod/${this.mod.id}/icon?ext=${
+              this.icon.type.split('/')[this.icon.type.split('/').length - 1]
+            }`,
+            this.icon,
+            config
+          )
+        }
 
         await this.$router.replace(`/mod/${this.mod.id}`)
       } catch (err) {
