@@ -393,7 +393,7 @@ export default {
           license_id: this.license.short,
           client_side: this.clientSideType.id,
           server_side: this.serverSideType.id,
-          slug: this.mod.mod_slug,
+          slug: this.mod.slug,
         }
 
         if (this.isProcessing) {
@@ -431,9 +431,9 @@ export default {
       this.$nuxt.$loading.finish()
     },
 
-    showPreviewImage(e) {
+    showPreviewImage(files) {
       const reader = new FileReader()
-      this.icon = e.target.files[0]
+      this.icon = files[0]
       reader.readAsDataURL(this.icon)
 
       reader.onload = (event) => {

@@ -95,9 +95,7 @@
       </div>
     </div>
     <div v-if="editMode" class="buttons">
-      <nuxt-link class="button column" :to="'/mod/' + id + '/edit'">
-        Edit
-      </nuxt-link>
+      <slot />
     </div>
   </div>
 </template>

@@ -434,8 +434,8 @@
               placeholder="Select one"
               track-by="short"
               label="name"
-              :options="availableLicenses"
               :searchable="true"
+              :options="availableLicenses"
               :close-on-select="true"
               :show-labels="false"
             />
@@ -627,9 +627,9 @@ export default {
       this.$nuxt.$loading.finish()
     },
 
-    showPreviewImage(e) {
+    showPreviewImage(files) {
       const reader = new FileReader()
-      this.icon = e.target.files[0]
+      this.icon = files[0]
       reader.readAsDataURL(this.icon)
 
       reader.onload = (event) => {
@@ -637,12 +637,12 @@ export default {
       }
     },
 
-    updateVersionFiles(e) {
-      this.versions[this.currentVersionIndex].raw_files = e.target.files
+    updateVersionFiles(files) {
+      this.versions[this.currentVersionIndex].raw_files = files
 
       const newFileParts = []
-      for (let i = 0; i < e.target.files.length; i++) {
-        newFileParts.push(e.target.files[i].name.concat('-' + i))
+      for (let i = 0; i < files.length; i++) {
+        newFileParts.push(files[i].name.concat('-' + i))
       }
 
       this.versions[this.currentVersionIndex].file_parts = newFileParts

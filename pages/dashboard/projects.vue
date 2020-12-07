@@ -18,6 +18,7 @@
             Moderation
           </nuxt-link>
         </div>
+        <m-footer class="footer" />
         <client-only>
           <EthicalAd type="image" />
         </client-only>
@@ -47,7 +48,11 @@
           :edit-mode="true"
           :status="mod.status"
           :is-modrinth="true"
-        />
+        >
+          <nuxt-link class="button column" :to="'/mod/' + mod.id + '/edit'">
+            Edit
+          </nuxt-link>
+        </ModCard>
       </div>
     </div>
   </div>
@@ -57,6 +62,7 @@
 import axios from 'axios'
 import EthicalAd from '@/components/EthicalAd'
 import ModCard from '@/components/ProjectCard'
+import MFooter from '@/components/MFooter'
 
 import ModIcon from '~/assets/images/sidebar/mod.svg?inline'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
@@ -67,6 +73,7 @@ export default {
     ModCard,
     ModIcon,
     ModerationIcon,
+    MFooter,
   },
   async asyncData(data) {
     const config = {

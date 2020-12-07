@@ -18,6 +18,7 @@
             Moderation
           </nuxt-link>
         </div>
+        <m-footer class="footer" />
         <client-only>
           <EthicalAd type="image" />
         </client-only>
@@ -44,7 +45,20 @@
           :edit-mode="true"
           :status="mod.status"
           :is-modrinth="true"
-        />
+        >
+          <button
+            class="button column approve"
+            @click="changeModStatus(mod.id, 'approved')"
+          >
+            Approve
+          </button>
+          <button
+            class="button column reject"
+            @click="changeModStatus(mod.id, 'rejected')"
+          >
+            Reject
+          </button>
+        </ModCard>
         <div class="section-header">
           <h3 class="column-grow-1">Versions</h3>
         </div>
@@ -82,11 +96,6 @@ export default {
       config
     )
 
-    res = await axios.get(
-      `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`,
-      config
-    )
-
     const mods = res.data
 
     res = await axios.get(
@@ -94,17 +103,31 @@ export default {
       config
     )
 
-    res = await axios.get(
-      `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-        res.data
-      )}`,
-      config
-    )
-
     return {
       mods,
       versions: res.data,
     }
+  },
+  methods: {
+    async changeModStatus(id, status) {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local')
+            ? this.$auth.getToken('local')
+            : '',
+        },
+      }
+
+      await axios.patch(
+        `https://api.modrinth.com/api/v1/mod/${id}`,
+        {
+          status,
+        },
+        config
+      )
+
+      await this.$router.go(0)
+    },
   },
 }
 </script>
@@ -119,5 +142,9 @@ export default {
     color: var(--color-text-dark);
     font-weight: var(--font-weight-extrabold);
   }
+}
+
+.button {
+  margin: 0.25rem 0;
 }
 </style>

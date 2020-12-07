@@ -280,12 +280,12 @@ export default {
     }
   },
   methods: {
-    updateVersionFiles(e) {
-      this.createdVersion.raw_files = e.target.files
+    updateVersionFiles(files) {
+      this.createdVersion.raw_files = files
 
       const newFileParts = []
-      for (let i = 0; i < e.target.files.length; i++) {
-        newFileParts.push(e.target.files[i].name.concat('-' + i))
+      for (let i = 0; i < files.length; i++) {
+        newFileParts.push(files[i].name.concat('-' + i))
       }
 
       this.createdVersion.file_parts = newFileParts

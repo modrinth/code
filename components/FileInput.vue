@@ -1,13 +1,13 @@
 <template>
-  <label class="button">
+  <label class="button" @drop.prevent="addFile" @dragover.prevent>
     <span>
-      {{ prompt }}
+      {{ text }}
     </span>
     <input
       type="file"
       :multiple="multiple"
       :accept="accept"
-      @change="(files) => $emit('change', files)"
+      @change="onChange"
     />
   </label>
 </template>
@@ -27,6 +27,41 @@ export default {
     accept: {
       type: String,
       default: null,
+    },
+  },
+  data() {
+    return {
+      text: this.prompt,
+      files: [],
+    }
+  },
+  methods: {
+    onChange(files, shouldNotReset) {
+      if (!shouldNotReset) this.files = files.target.files
+
+      const length = this.files.length
+      if (length === 0) {
+        this.text = this.prompt
+      } else if (length === 1) {
+        this.text = '1 file selected'
+      } else if (length > 1) {
+        this.text = length + ' files selected'
+      }
+      this.$emit('change', this.files)
+    },
+    addFile(e) {
+      const droppedFiles = e.dataTransfer.files
+
+      if (!this.multiple) this.files = []
+
+      if (!droppedFiles) return
+      ;[...droppedFiles].forEach((f) => {
+        this.files.push(f)
+      })
+
+      if (!this.multiple && this.files.length > 0) this.files = [this.files[0]]
+
+      if (this.files.length > 0) this.onChange(null, true)
     },
   },
 }
