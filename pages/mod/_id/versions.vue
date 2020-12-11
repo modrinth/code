@@ -52,7 +52,7 @@
             </span>
           </td>
           <td>{{ version.downloads }}</td>
-          <td>{{ $dayjs(version.published).format('YYYY-MM-DD') }}</td>
+          <td>{{ $dayjs(version.date_published).format('YYYY-MM-DD') }}</td>
         </tr>
       </tbody>
     </table>
@@ -233,41 +233,35 @@ export default {
       )
     ).data
 
-    const members = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
-        config
-      )
-    ).data
-    for (let i = 0; i < members.length; i++) {
-      members[i].avatar_url = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/user/${members[i].user_id}`,
+    const [members, versions, selectableLoaders, selectableVersions] = (
+      await Promise.all([
+        axios.get(
+          `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
           config
-        )
-      ).data.avatar_url
-    }
+        ),
+        axios.get(
+          `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
+            mod.versions
+          )}`,
+          config
+        ),
+        axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
+        axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
+      ])
+    ).map((it) => it.data)
 
-    const versions = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-          mod.versions
-        )}`,
-        config
+    const users = await Promise.all(
+      members.map((it) =>
+        axios.get(`https://api.modrinth.com/api/v1/user/${it.user_id}`, config)
       )
-    ).data.reverse()
-
-    const selectableLoaders = (
-      await axios.get(`https://api.modrinth.com/api/v1/tag/loader`)
-    ).data
-
-    const selectableVersions = (
-      await axios.get(`https://api.modrinth.com/api/v1/tag/game_version`)
-    ).data
+    )
+    users.forEach(
+      (it, index) => (members[index].avatar_url = it.data.avatar_url)
+    )
 
     return {
       mod,
-      versions,
+      versions: versions.reverse(),
       members,
       selectableLoaders,
       selectableVersions,

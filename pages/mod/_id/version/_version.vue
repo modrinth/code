@@ -41,13 +41,13 @@
             <h4>Created</h4>
             <p
               v-tooltip="
-                $dayjs(version.published).format(
+                $dayjs(version.date_published).format(
                   '[Created on] YYYY-MM-DD [at] HH:mm A'
                 )
               "
               class="value"
             >
-              {{ $dayjs(version.published).fromNow() }}
+              {{ $dayjs(version.date_published).fromNow() }}
             </p>
           </div>
         </div>
@@ -134,29 +134,29 @@ export default {
       )
     ).data
 
-    const members = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
-        config
-      )
-    ).data
-    for (let i = 0; i < members.length; i++) {
-      members[i].avatar_url = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/user/${members[i].user_id}`,
+    const [members, versions] = (
+      await Promise.all([
+        axios.get(
+          `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
           config
-        )
-      ).data.avatar_url
-    }
+        ),
+        axios.get(
+          `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
+            mod.versions
+          )}`,
+          config
+        ),
+      ])
+    ).map((it) => it.data)
 
-    const versions = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-          mod.versions
-        )}`,
-        config
+    const users = await Promise.all(
+      members.map((it) =>
+        axios.get(`https://api.modrinth.com/api/v1/user/${it.user_id}`, config)
       )
-    ).data.reverse()
+    )
+    users.forEach(
+      (it, index) => (members[index].avatar_url = it.data.avatar_url)
+    )
 
     const version = versions.find((x) => x.id === data.params.version)
 

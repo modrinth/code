@@ -22,11 +22,11 @@
           <div class="stat">
             <CalendarIcon />
             <div class="info">
-              <h4>Created</h4>
+              <h4>Joined</h4>
               <p
                 v-tooltip="
                   $dayjs(user.created).format(
-                    '[Created on] YYYY-MM-DD [at] HH:mm A'
+                    '[Joined] YYYY-MM-DD [at] HH:mm A'
                   )
                 "
                 class="value"

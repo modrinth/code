@@ -155,7 +155,7 @@
             for="body"
             title="You can type the of the long form of your description here."
           >
-            Description
+            Body
           </label>
         </h3>
         <span>

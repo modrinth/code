@@ -18,13 +18,19 @@
         <p>
           We implemented <span>fast and adaptable</span> search algorithms so
           you don't have to wait, while creating a responsive interface that
-          makes sense. Modrinth <span>imports from other platforms</span> along
-          with it's own, so you can stick to elegant mod discovery and a
+          makes sense. Modrinth is full of elegant mod discovery and a platform
           platform which just works.
         </p>
       </div>
       <div class="right hero-image">
-        <img src="~/assets/images/search.gif" alt="search" loading="lazy" />
+        <video
+          src="~/assets/images/search.mp4"
+          alt="search"
+          loading="lazy"
+          loop
+          muted
+          autoplay
+        />
       </div>
     </div>
     <div class="default-hero columns">
@@ -281,7 +287,8 @@ export default {
   padding-top: 75px;
   padding-right: 10%;
 
-  img {
+  img,
+  video {
     height: 300px;
   }
 }
