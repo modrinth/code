@@ -1,11 +1,14 @@
 <template>
   <div class="layout">
-    <aside>
+    <header>
       <section class="navbar columns">
         <section class="logo column">
           <NuxtLink to="/">
-            <ModrinthLogo v-if="$colorMode.value === 'light'" />
-            <ModrinthLogoWhite v-else />
+            <ModrinthLogo
+              v-if="$colorMode.value === 'light'"
+              aria-label="modrinth"
+            />
+            <ModrinthLogoWhite v-else aria-label="modrinth" />
           </NuxtLink>
           <span class="badge yellow">Beta</span>
         </section>
@@ -81,7 +84,7 @@
           <template v-else>
             <section class="auth-prompt">
               <a :href="authUrl" class="log-in-button"
-                ><GitHubIcon />Sign In with GitHub</a
+                ><GitHubIcon aria-hidden="true" />Sign In with GitHub</a
               >
             </section>
           </template>
@@ -144,7 +147,7 @@
           </section>
         </nav>
       </section>
-    </aside>
+    </header>
     <main>
       <notifications group="main" position="bottom right" />
       <!--<notifications
@@ -264,7 +267,7 @@ export default {
   display: block;
   height: 100vh;
 
-  aside {
+  header {
     height: var(--size-navbar-height);
     background-color: var(--color-raised-bg);
     max-width: 100vw;
@@ -464,7 +467,7 @@ export default {
 
 @media (min-width: 1024px) {
   .layout {
-    aside {
+    header {
     }
 
     main {
@@ -481,7 +484,7 @@ export default {
 
 @media (min-width: 1280px) {
   .layout {
-    aside {
+    header {
     }
   }
 }

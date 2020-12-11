@@ -4,6 +4,7 @@
       :class="{ disabled: currentPage === 1 }"
       class="paginate has-icon"
       @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
+      aria-label="Previous Page"
     >
       <LeftArrowIcon />
     </button>
@@ -34,6 +35,7 @@
           ? switchPage(currentPage + 1)
           : null
       "
+      aria-label="Next Page"
     >
       <RightArrowIcon />
     </button>
