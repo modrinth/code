@@ -62,6 +62,7 @@ pub struct SearchConfig {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchMod {
     pub mod_id: String,
+    pub slug: Option<String>,
     pub author: String,
     pub title: String,
     pub description: String,
@@ -96,6 +97,7 @@ pub struct SearchResults {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResultSearchMod {
     pub mod_id: String,
+    pub slug: Option<String>,
     pub author: String,
     pub title: String,
     pub description: String,

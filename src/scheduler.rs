@@ -36,8 +36,12 @@ pub fn schedule_versions(
     pool: sqlx::Pool<sqlx::Postgres>,
     skip_initial: bool,
 ) {
-    // Check mojang's versions every 6 hours
-    let version_index_interval = std::time::Duration::from_secs(60 * 60 * 6);
+    let version_index_interval = std::time::Duration::from_secs(
+        dotenv::var("VERSION_INDEX_INTERVAL")
+            .ok()
+            .map(|i| i.parse().unwrap())
+            .unwrap_or(1800),
+    );
 
     let mut skip = skip_initial;
     scheduler.run(version_index_interval, move || {

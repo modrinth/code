@@ -28,7 +28,6 @@ pub async fn team_members_get(
                 .into_iter()
                 .map(|data| crate::models::teams::TeamMember {
                     user_id: data.user_id.into(),
-                    name: data.name,
                     role: data.role,
                     permissions: Some(data.permissions),
                 })
@@ -42,7 +41,6 @@ pub async fn team_members_get(
         .into_iter()
         .map(|data| crate::models::teams::TeamMember {
             user_id: data.user_id.into(),
-            name: data.name,
             role: data.role,
             permissions: None,
         })
@@ -81,7 +79,6 @@ pub async fn join_team(
             None,
             None,
             Some(true),
-            None,
             &mut transaction,
         )
         .await?;
@@ -174,7 +171,7 @@ pub async fn add_team_member(
         }
     }
 
-    let new_user = crate::database::models::User::get(member.user_id, &**pool)
+    crate::database::models::User::get(member.user_id, &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?
         .ok_or_else(|| ApiError::InvalidInputError("An invalid User ID specified".to_string()))?;
@@ -184,7 +181,6 @@ pub async fn add_team_member(
         id: new_id,
         team_id,
         user_id: new_member.user_id.into(),
-        name: new_user.username,
         role: new_member.role.clone(),
         permissions: new_member.permissions,
         accepted: false,
@@ -205,7 +201,6 @@ pub async fn add_team_member(
 pub struct EditTeamMember {
     pub permissions: Option<Permissions>,
     pub role: Option<String>,
-    pub name: Option<String>,
 }
 
 #[patch("{id}/members/{user_id}")]
@@ -236,31 +231,6 @@ pub async fn edit_team_member(
         }
     };
 
-    // If the only thing being modified is the name, a user can
-    // modify their own member without extra permissions.
-    if user_id == current_user.id.into()
-        && edit_member.permissions.is_none()
-        && edit_member.role.is_none()
-    {
-        TeamMember::edit_team_member(
-            id,
-            user_id,
-            None,
-            None,
-            None,
-            edit_member.name.clone(),
-            &mut transaction,
-        )
-        .await?;
-
-        transaction
-            .commit()
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-        return Ok(HttpResponse::Ok().body(""));
-    }
-
     if !member.permissions.contains(Permissions::EDIT_MEMBER) {
         return Err(ApiError::CustomAuthenticationError(
             "You don't have permission to edit members of this team".to_string(),
@@ -287,7 +257,6 @@ pub async fn edit_team_member(
         edit_member.permissions,
         edit_member.role.clone(),
         None,
-        edit_member.name.clone(),
         &mut transaction,
     )
     .await?;

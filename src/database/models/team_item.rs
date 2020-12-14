@@ -6,7 +6,6 @@ pub struct TeamBuilder {
 }
 pub struct TeamMemberBuilder {
     pub user_id: UserId,
-    pub name: String,
     pub role: String,
     pub permissions: Permissions,
     pub accepted: bool,
@@ -37,7 +36,6 @@ impl TeamBuilder {
                 id: team_member_id,
                 team_id,
                 user_id: member.user_id,
-                name: member.name,
                 role: member.role,
                 permissions: member.permissions,
                 accepted: member.accepted,
@@ -45,13 +43,12 @@ impl TeamBuilder {
 
             sqlx::query!(
                 "
-                INSERT INTO team_members (id, team_id, user_id, member_name, role, permissions, accepted)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted)
+                VALUES ($1, $2, $3, $4, $5, $6)
                 ",
                 team_member.id as TeamMemberId,
                 team_member.team_id as TeamId,
                 team_member.user_id as UserId,
-                team_member.name,
                 team_member.role,
                 team_member.permissions.bits() as i64,
                 team_member.accepted,
@@ -76,8 +73,6 @@ pub struct TeamMember {
     pub team_id: TeamId,
     /// The ID of the user associated with the member
     pub user_id: UserId,
-    /// The name of the user
-    pub name: String,
     pub role: String,
     pub permissions: Permissions,
     pub accepted: bool,
@@ -96,7 +91,7 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT id, user_id, member_name, role, permissions, accepted
+            SELECT id, user_id, role, permissions, accepted
             FROM team_members
             WHERE (team_id = $1 AND accepted = TRUE)
             ",
@@ -111,7 +106,6 @@ impl TeamMember {
                         id: TeamMemberId(m.id),
                         team_id: id,
                         user_id: UserId(m.user_id),
-                        name: m.member_name,
                         role: m.role,
                         permissions: perms,
                         accepted: m.accepted,
@@ -145,7 +139,7 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT id, team_id, member_name, role, permissions, accepted
+            SELECT id, team_id, role, permissions, accepted
             FROM team_members
             WHERE (user_id = $1 AND accepted = TRUE)
             ",
@@ -160,7 +154,6 @@ impl TeamMember {
                         id: TeamMemberId(m.id),
                         team_id: TeamId(m.team_id),
                         user_id: id,
-                        name: m.member_name,
                         role: m.role,
                         permissions: perms,
                         accepted: m.accepted,
@@ -194,7 +187,7 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT id, team_id, member_name, role, permissions, accepted
+            SELECT id, team_id, role, permissions, accepted
             FROM team_members
             WHERE user_id = $1
             ",
@@ -209,7 +202,6 @@ impl TeamMember {
                         id: TeamMemberId(m.id),
                         team_id: TeamId(m.team_id),
                         user_id: id,
-                        name: m.member_name,
                         role: m.role,
                         permissions: perms,
                         accepted: m.accepted,
@@ -242,7 +234,7 @@ impl TeamMember {
     {
         let result = sqlx::query!(
             "
-            SELECT id, user_id, member_name, role, permissions, accepted
+            SELECT id, user_id, role, permissions, accepted
             FROM team_members
             WHERE (team_id = $1 AND user_id = $2 AND accepted = TRUE)
             ",
@@ -257,7 +249,6 @@ impl TeamMember {
                 id: TeamMemberId(m.id),
                 team_id: id,
                 user_id,
-                name: m.member_name,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
                     .ok_or(super::DatabaseError::BitflagError)?,
@@ -279,7 +270,7 @@ impl TeamMember {
     {
         let result = sqlx::query!(
             "
-            SELECT id, user_id, member_name, role, permissions, accepted
+            SELECT id, user_id, role, permissions, accepted
             FROM team_members
             WHERE (team_id = $1 AND user_id = $2)
             ",
@@ -294,7 +285,6 @@ impl TeamMember {
                 id: TeamMemberId(m.id),
                 team_id: id,
                 user_id,
-                name: m.member_name,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
                     .ok_or(super::DatabaseError::BitflagError)?,
@@ -312,16 +302,14 @@ impl TeamMember {
         sqlx::query!(
             "
             INSERT INTO team_members (
-                id, user_id, member_name, role, permissions, accepted
+                id, user_id, role, permissions, accepted
             )
             VALUES (
-                $1, $2, $3, $4, $5,
-                $6
+                $1, $2, $3, $4, $5
             )
             ",
             self.id as TeamMemberId,
             self.user_id as UserId,
-            self.name,
             self.role,
             self.permissions.bits() as i64,
             self.accepted,
@@ -369,7 +357,6 @@ impl TeamMember {
         new_permissions: Option<Permissions>,
         new_role: Option<String>,
         new_accepted: Option<bool>,
-        new_name: Option<String>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), super::DatabaseError> {
         if let Some(permissions) = new_permissions {
@@ -419,22 +406,6 @@ impl TeamMember {
                 .execute(&mut *transaction)
                 .await?;
             }
-        }
-
-        if let Some(name) = new_name {
-            sqlx::query!(
-                "
-                UPDATE team_members
-                SET member_name = $1
-                WHERE (team_id = $2 AND user_id = $3 AND NOT role = $4)
-                ",
-                name,
-                id as TeamId,
-                user_id as UserId,
-                crate::models::teams::OWNER_ROLE,
-            )
-            .execute(&mut *transaction)
-            .await?;
         }
 
         Ok(())

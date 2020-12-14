@@ -14,7 +14,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
 
     let mut mods = sqlx::query!(
         "
-        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.status FROM mods m
+        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.status, m.slug FROM mods m
         "
     ).fetch(&pool);
 
@@ -129,6 +129,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 modified_timestamp: mod_data.updated.timestamp(),
                 latest_version,
                 host: Cow::Borrowed("modrinth"),
+                slug: mod_data.slug,
             });
         }
     }
@@ -142,7 +143,7 @@ pub async fn query_one(
 ) -> Result<UploadSearchMod, IndexingError> {
     let mod_data = sqlx::query!(
         "
-        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id
+        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.slug
         FROM mods m
         WHERE id = $1
         ",
@@ -241,5 +242,6 @@ pub async fn query_one(
         modified_timestamp: mod_data.updated.timestamp(),
         latest_version,
         host: Cow::Borrowed("modrinth"),
+        slug: mod_data.slug,
     })
 }

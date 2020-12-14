@@ -3,16 +3,16 @@ use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::file_hosting::FileHost;
 use crate::models;
-use crate::models::mods::{DonationLink, License, ModStatus, SearchRequest, SideType};
+use crate::models::mods::{DonationLink, License, ModId, ModStatus, SearchRequest, SideType};
 use crate::models::teams::Permissions;
+use crate::search::indexing::queue::CreationQueue;
 use crate::search::{search_for_mod, SearchConfig, SearchError};
+use actix_web::web::Data;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
-use crate::search::indexing::queue::CreationQueue;
-use actix_web::web::Data;
 
 #[get("mod")]
 pub async fn mod_search(
@@ -133,13 +133,30 @@ pub async fn mod_slug_get(
 #[get("{id}")]
 pub async fn mod_get(
     req: HttpRequest,
-    info: web::Path<(models::ids::ModId,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.into_inner().0;
-    let mod_data = database::models::Mod::get_full(id.into(), &**pool)
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    let string = info.into_inner().0;
+    let id_option: Option<ModId> = serde_json::from_str(&*format!("\"{}\"", string)).ok();
+
+    let mut mod_data;
+
+    if let Some(id) = id_option {
+        mod_data = database::models::Mod::get_full(id.into(), &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+        if mod_data.is_none() {
+            mod_data = database::models::Mod::get_full_from_slug(string, &**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        }
+    } else {
+        mod_data = database::models::Mod::get_full_from_slug(string, &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    }
+
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if let Some(data) = mod_data {
@@ -384,9 +401,11 @@ pub async fn mod_edit(
                 if mod_item.status.is_searchable() && !status.is_searchable() {
                     delete_from_index(id.into(), config).await?;
                 } else if !mod_item.status.is_searchable() && status.is_searchable() {
-                    let index_mod =
-                        crate::search::indexing::local_import::query_one(mod_id.into(), &mut *transaction)
-                            .await?;
+                    let index_mod = crate::search::indexing::local_import::query_one(
+                        mod_id.into(),
+                        &mut *transaction,
+                    )
+                    .await?;
 
                     indexing_queue.add(index_mod);
                 }

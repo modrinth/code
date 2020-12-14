@@ -69,7 +69,7 @@ pub struct Mod {
 #[serde(rename_all = "kebab-case")]
 pub enum SideType {
     Required,
-    NoFunctionality,
+    Optional,
     Unsupported,
     Unknown,
 }
@@ -85,7 +85,7 @@ impl SideType {
     pub fn as_str(&self) -> &'static str {
         match self {
             SideType::Required => "required",
-            SideType::NoFunctionality => "no-functionality",
+            SideType::Optional => "optional",
             SideType::Unsupported => "unsupported",
             SideType::Unknown => "unknown",
         }
@@ -94,7 +94,7 @@ impl SideType {
     pub fn from_str(string: &str) -> SideType {
         match string {
             "required" => SideType::Required,
-            "no-functionality" => SideType::NoFunctionality,
+            "optional" => SideType::Optional,
             "unsupported" => SideType::Unsupported,
             _ => SideType::Unknown,
         }

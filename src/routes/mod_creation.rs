@@ -165,7 +165,7 @@ pub async fn mod_create(
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
-        &***indexing_queue
+        &***indexing_queue,
     )
     .await;
 
@@ -457,7 +457,6 @@ async fn mod_create_inner(
         let team = models::team_item::TeamBuilder {
             members: vec![models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
-                name: current_user.username.clone(),
                 role: crate::models::teams::OWNER_ROLE.to_owned(),
                 permissions: crate::models::teams::Permissions::ALL,
                 accepted: true,

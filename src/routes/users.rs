@@ -70,13 +70,29 @@ pub async fn user_username_get(
 
 #[get("{id}")]
 pub async fn user_get(
-    info: web::Path<(UserId,)>,
+    info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.into_inner().0;
-    let user_data = User::get(id.into(), &**pool)
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    let string = info.into_inner().0;
+    let id_option: Option<UserId> = serde_json::from_str(&*format!("\"{}\"", string)).ok();
+
+    let mut user_data;
+
+    if let Some(id) = id_option {
+        user_data = User::get(id.into(), &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+        if user_data.is_none() {
+            user_data = User::get_from_username(string, &**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        }
+    } else {
+        user_data = User::get_from_username(string, &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    }
 
     if let Some(data) = user_data {
         let response = convert_user(data);
@@ -160,7 +176,6 @@ pub async fn teams(
         .into_iter()
         .map(|data| crate::models::teams::TeamMember {
             user_id: data.user_id.into(),
-            name: data.name,
             role: data.role,
             permissions: if same_user {
                 Some(data.permissions)
