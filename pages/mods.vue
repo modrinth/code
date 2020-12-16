@@ -68,7 +68,7 @@
           </client-only>
           <SearchResult
             v-for="(result, index) in results"
-            :id="result.mod_id.split('-')[1]"
+            :id="result.slug ? result.slug : result.mod_id.split('-')[1]"
             :key="result.mod_id"
             :author="result.author"
             :name="result.title"

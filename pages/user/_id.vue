@@ -54,7 +54,7 @@
         <div class="mods">
           <SearchResult
             v-for="result in mods"
-            :id="result.id"
+            :id="result.slug ? result.slug : result.id"
             :key="result.id"
             :name="result.title"
             :description="result.description"

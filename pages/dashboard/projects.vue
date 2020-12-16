@@ -32,7 +32,7 @@
         </div>
         <ModCard
           v-for="mod in mods"
-          :id="mod.id"
+          :id="mod.slug ? mod.slug : mod.id"
           :key="mod.id"
           :author="mod.author"
           :name="mod.title"
