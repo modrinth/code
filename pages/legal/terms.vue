@@ -145,7 +145,7 @@
           a worldwide, non-exclusive, royalty-free, and unrestricted license to
           use, reproduce, distribute copies, prepare derivative works of, or
           display Content in connection with Modrinth in any medium and for any
-          purpose (including commercial purposes), which is irrevocable.
+          purpose (including commercial purposes).
         </li>
       </ul>
     </div>

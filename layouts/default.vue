@@ -1,11 +1,14 @@
 <template>
   <div class="layout">
-    <aside>
+    <header>
       <section class="navbar columns">
         <section class="logo column">
           <NuxtLink to="/">
-            <ModrinthLogo v-if="$colorMode.value === 'light'" />
-            <ModrinthLogoWhite v-else />
+            <ModrinthLogo
+              v-if="$colorMode.value === 'light'"
+              aria-label="modrinth"
+            />
+            <ModrinthLogoWhite v-else aria-label="modrinth" />
           </NuxtLink>
           <span class="badge yellow">Beta</span>
         </section>
@@ -60,12 +63,6 @@
                         <span v-else>Light Mode</span>
                       </button>
                     </li>
-                    <li v-tooltip="'Not implemented yet'" class="hidden">
-                      <NuxtLink to="/settings" disabled>
-                        <SettingsIcon />
-                        <span>Settings</span>
-                      </NuxtLink>
-                    </li>
                     <hr />
                     <li>
                       <button @click="logout">
@@ -81,7 +78,7 @@
           <template v-else>
             <section class="auth-prompt">
               <a :href="authUrl" class="log-in-button"
-                ><GitHubIcon />Sign In with GitHub</a
+                ><GitHubIcon aria-hidden="true" />Sign In with GitHub</a
               >
             </section>
           </template>
@@ -97,13 +94,6 @@
             <AnalyticsIcon />
             <span>Analytics</span>
           </NuxtLink>
-          <!-- <NuxtLink
-            v-if="this.$auth.user.role === 'admin'"
-            to="/dashboard/admin"
-          >
-            <AdminIcon />
-            <span>Admin</span>
-          </NuxtLink> -->
         </section>
         <div>
           <button class="hamburger" @click="toggleNav">
@@ -144,7 +134,7 @@
           </section>
         </nav>
       </section>
-    </aside>
+    </header>
     <main>
       <notifications group="main" position="bottom right" />
       <!--<notifications
@@ -167,7 +157,6 @@ import ModrinthLogoWhite from '~/assets/images/text-logo-white.svg?inline'
 import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
 import ProjectsIcon from '~/assets/images/sidebar/projects.svg?inline'
 import AnalyticsIcon from '~/assets/images/sidebar/analytics.svg?inline'
-// import AdminIcon from '~/assets/images/sidebar/admin.svg?inline'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
@@ -177,7 +166,6 @@ import SunIcon from '~/assets/images/utils/sun.svg?inline'
 
 import UserIcon from '~/assets/images/utils/user.svg?inline'
 import UsersIcon from '~/assets/images/utils/users.svg?inline'
-import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
@@ -188,7 +176,6 @@ export default {
     ModpackIcon,
     ProjectsIcon,
     AnalyticsIcon,
-    // AdminIcon,
     DropdownIcon,
     HamburgerIcon,
     ExitIcon,
@@ -196,7 +183,6 @@ export default {
     SunIcon,
     UserIcon,
     UsersIcon,
-    SettingsIcon,
     LogOutIcon,
     GitHubIcon,
   },
@@ -264,7 +250,7 @@ export default {
   display: block;
   height: 100vh;
 
-  aside {
+  header {
     height: var(--size-navbar-height);
     background-color: var(--color-raised-bg);
     max-width: 100vw;
@@ -464,7 +450,7 @@ export default {
 
 @media (min-width: 1024px) {
   .layout {
-    aside {
+    header {
     }
 
     main {
@@ -481,7 +467,7 @@ export default {
 
 @media (min-width: 1280px) {
   .layout {
-    aside {
+    header {
     }
   }
 }

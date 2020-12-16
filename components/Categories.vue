@@ -1,59 +1,59 @@
 <template>
   <div class="categories">
     <p v-if="categories.includes('fabric')">
-      <FabricLoader />
+      <FabricLoader aria-hidden="true" />
       Fabric
     </p>
     <p v-if="categories.includes('forge')">
-      <ForgeLoader />
+      <ForgeLoader aria-hidden="true" />
       Forge
     </p>
     <p v-if="categories.includes('technology')">
-      <TechCategory />
+      <TechCategory aria-hidden="true" />
       Technology
     </p>
     <p v-if="categories.includes('adventure')">
-      <AdventureCategory />
+      <AdventureCategory aria-hidden="true" />
       Adventure
     </p>
     <p v-if="categories.includes('magic')">
-      <MagicCategory />
+      <MagicCategory aria-hidden="true" />
       Magic
     </p>
     <p v-if="categories.includes('utility')">
-      <UtilityCategory />
+      <UtilityCategory aria-hidden="true" />
       Utility
     </p>
     <p v-if="categories.includes('decoration')">
-      <DecorationCategory />
+      <DecorationCategory aria-hidden="true" />
       Decoration
     </p>
     <p v-if="categories.includes('library')">
-      <LibraryCategory />
+      <LibraryCategory aria-hidden="true" />
       Library
     </p>
     <p v-if="categories.includes('cursed')">
-      <CursedCategory />
+      <CursedCategory aria-hidden="true" />
       Cursed
     </p>
     <p v-if="categories.includes('worldgen')">
-      <WorldGenCategory />
+      <WorldGenCategory aria-hidden="true" />
       Worldgen
     </p>
     <p v-if="categories.includes('storage')">
-      <StorageCategory />
+      <StorageCategory aria-hidden="true" />
       Storage
     </p>
     <p v-if="categories.includes('food')">
-      <FoodCategory />
+      <FoodCategory aria-hidden="true" />
       Food
     </p>
     <p v-if="categories.includes('equipment')">
-      <EquipmentCategory />
+      <EquipmentCategory aria-hidden="true" />
       Equipment
     </p>
     <p v-if="categories.includes('misc')">
-      <MiscCategory />
+      <MiscCategory aria-hidden="true" />
       Misc
     </p>
   </div>
