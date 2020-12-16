@@ -63,12 +63,6 @@
                         <span v-else>Light Mode</span>
                       </button>
                     </li>
-                    <li v-tooltip="'Not implemented yet'" class="hidden">
-                      <NuxtLink to="/settings" disabled>
-                        <SettingsIcon />
-                        <span>Settings</span>
-                      </NuxtLink>
-                    </li>
                     <hr />
                     <li>
                       <button @click="logout">
@@ -100,13 +94,6 @@
             <AnalyticsIcon />
             <span>Analytics</span>
           </NuxtLink>
-          <!-- <NuxtLink
-            v-if="this.$auth.user.role === 'admin'"
-            to="/dashboard/admin"
-          >
-            <AdminIcon />
-            <span>Admin</span>
-          </NuxtLink> -->
         </section>
         <div>
           <button class="hamburger" @click="toggleNav">
@@ -170,7 +157,6 @@ import ModrinthLogoWhite from '~/assets/images/text-logo-white.svg?inline'
 import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
 import ProjectsIcon from '~/assets/images/sidebar/projects.svg?inline'
 import AnalyticsIcon from '~/assets/images/sidebar/analytics.svg?inline'
-// import AdminIcon from '~/assets/images/sidebar/admin.svg?inline'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
@@ -180,7 +166,6 @@ import SunIcon from '~/assets/images/utils/sun.svg?inline'
 
 import UserIcon from '~/assets/images/utils/user.svg?inline'
 import UsersIcon from '~/assets/images/utils/users.svg?inline'
-import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
@@ -191,7 +176,6 @@ export default {
     ModpackIcon,
     ProjectsIcon,
     AnalyticsIcon,
-    // AdminIcon,
     DropdownIcon,
     HamburgerIcon,
     ExitIcon,
@@ -199,7 +183,6 @@ export default {
     SunIcon,
     UserIcon,
     UsersIcon,
-    SettingsIcon,
     LogOutIcon,
     GitHubIcon,
   },

@@ -118,6 +118,11 @@ export default {
     TagIcon,
   },
   auth: false,
+  async fetch() {
+    if (this.version.changelog_url) {
+      this.changelog = (await axios.get(this.version.changelog_url)).data
+    }
+  },
   async asyncData(data) {
     const config = {
       headers: {
@@ -136,10 +141,7 @@ export default {
 
     const [members, versions] = (
       await Promise.all([
-        axios.get(
-          `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
-          config
-        ),
+        axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
         axios.get(
           `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
             mod.versions
@@ -149,23 +151,23 @@ export default {
       ])
     ).map((it) => it.data)
 
-    const users = await Promise.all(
-      members.map((it) =>
-        axios.get(`https://api.modrinth.com/api/v1/user/${it.user_id}`, config)
+    const users = (
+      await axios.get(
+        `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
+          members.map((it) => it.user_id)
+        )}`,
+        config
       )
-    )
-    users.forEach(
-      (it, index) => (members[index].avatar_url = it.data.avatar_url)
-    )
+    ).data
+
+    users.forEach((it, index) => {
+      members[index].avatar_url = it.avatar_url
+      members[index].name = it.username
+    })
 
     const version = versions.find((x) => x.id === data.params.version)
 
     version.author = members.find((x) => x.user_id === version.author_id)
-
-    let changelog = ''
-    if (version.changelog_url) {
-      changelog = (await axios.get(version.changelog_url)).data
-    }
 
     let primaryFile = version.files.find((file) => file.primary)
 
@@ -178,12 +180,12 @@ export default {
       versions,
       members,
       version,
-      changelog,
       primaryFile,
     }
   },
   data() {
     return {
+      changelog: '',
       filesToUpload: [],
     }
   },
@@ -358,6 +360,10 @@ export default {
     }
   }
 
+  .markdown-body {
+    margin: 1rem 0;
+  }
+
   .files {
     display: flex;
 
@@ -434,6 +440,6 @@ export default {
 }
 
 .file-input {
-  margin-top: 2rem;
+  margin-top: 1rem;
 }
 </style>
