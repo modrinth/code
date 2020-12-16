@@ -25,10 +25,16 @@
         </client-only>
         <div class="mod-navigation">
           <div class="tabs">
-            <nuxt-link :to="'/mod/' + mod.id" class="tab">
+            <nuxt-link
+              :to="'/mod/' + (mod.slug ? mod.slug : mod.id)"
+              class="tab"
+            >
               Description
             </nuxt-link>
-            <nuxt-link :to="'/mod/' + mod.id + '/versions'" class="tab">
+            <nuxt-link
+              :to="'/mod/' + (mod.slug ? mod.slug : mod.id) + '/versions'"
+              class="tab"
+            >
               Versions
             </nuxt-link>
             <a v-if="mod.wiki_url" :href="mod.wiki_url" class="tab">

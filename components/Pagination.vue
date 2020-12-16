@@ -3,8 +3,8 @@
     <button
       :class="{ disabled: currentPage === 1 }"
       class="paginate has-icon"
-      @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
       aria-label="Previous Page"
+      @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
     >
       <LeftArrowIcon />
     </button>
@@ -30,12 +30,12 @@
     <button
       :class="{ disabled: currentPage === pages[pages.length - 1] }"
       class="paginate has-icon"
+      aria-label="Next Page"
       @click="
         currentPage !== pages[pages.length - 1]
           ? switchPage(currentPage + 1)
           : null
       "
-      aria-label="Next Page"
     >
       <RightArrowIcon />
     </button>

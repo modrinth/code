@@ -30,7 +30,14 @@
             </a>
           </td>
           <td>
-            <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
+            <nuxt-link
+              :to="
+                '/mod/' +
+                (mod.slug ? mod.slug : mod.id) +
+                '/version/' +
+                version.id
+              "
+            >
               {{ version.name }}
             </nuxt-link>
           </td>
@@ -291,7 +298,7 @@ export default {
 
       const formData = new FormData()
 
-      this.createdVersion.mod_id = this.$route.params.id
+      this.createdVersion.mod_id = this.mod.id
       this.createdVersion.dependencies = []
       this.createdVersion.featured = false
 
