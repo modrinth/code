@@ -343,8 +343,8 @@ export default {
       iconChanged: false,
 
       sideTypes: [
+        { label: 'Optional', id: 'optional' },
         { label: 'Required', id: 'required' },
-        { label: 'No functionality', id: 'no-functionality' },
         { label: 'Unsupported', id: 'unsupported' },
       ],
     }
