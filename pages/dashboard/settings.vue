@@ -36,7 +36,7 @@
       <h3>Bio</h3>
       <label>
         <span>
-          Give a quick description to your mod. It will appear in the search
+          A description of yourself which other users can see on your profile.
         </span>
         <input v-model="bio" type="text" placeholder="Enter your bio" />
       </label>
