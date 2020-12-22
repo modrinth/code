@@ -21,7 +21,7 @@
           </div>
         </div>
         <client-only>
-          <EthicalAd type="text" />
+          <EthicalAd :ad-id="mod.id" type="text" />
         </client-only>
         <div class="mod-navigation">
           <div class="tabs">
@@ -68,6 +68,16 @@
               class="tab"
             >
               Edit
+            </nuxt-link>
+            <nuxt-link
+              v-if="
+                this.$auth.loggedIn &&
+                members.find((x) => x.user_id === this.$auth.user.id)
+              "
+              :to="'/mod/' + mod.id + '/settings'"
+              class="tab"
+            >
+              Settings
             </nuxt-link>
             <div class="filler" />
           </div>

@@ -49,7 +49,7 @@
       </div>
       <div class="content">
         <client-only>
-          <EthicalAd />
+          <EthicalAd ad-id="profile" />
         </client-only>
         <div class="mods">
           <SearchResult

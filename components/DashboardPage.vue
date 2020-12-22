@@ -22,10 +22,10 @@
             Settings
           </nuxt-link>
         </div>
-        <m-footer class="footer" />
         <client-only>
-          <EthicalAd type="image" />
+          <EthicalAd type="image" ad-id="dashboard" />
         </client-only>
+        <m-footer class="footer" />
       </div>
       <div class="content">
         <slot />
@@ -58,5 +58,9 @@ export default {
     color: var(--color-text-dark);
     font-weight: var(--font-weight-extrabold);
   }
+}
+
+.footer {
+  padding-top: 0;
 }
 </style>

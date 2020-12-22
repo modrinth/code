@@ -261,6 +261,7 @@ export default {
 .hero {
   margin-left: 15%;
   width: 30%;
+  z-index: 1;
   h3 {
     font-size: 18px;
     font-weight: bolder;

@@ -63,6 +63,10 @@ export default {
         async: true,
         defer: true,
       },
+      {
+        src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
+        async: true,
+      },
     ],
   },
 
@@ -159,7 +163,7 @@ export default {
     transpile: ['vue-tooltip', 'vue-notification'],
     styleResources: {
       scss: './assets/styles/injected.scss',
-    }
+    },
   },
   loading: {
     color: 'green',

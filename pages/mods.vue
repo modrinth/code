@@ -64,7 +64,7 @@
         </section>
         <div class="results column-grow-4">
           <client-only>
-            <EthicalAd type="text" />
+            <EthicalAd type="text" ad-id="search" />
           </client-only>
           <SearchResult
             v-for="(result, index) in results"
