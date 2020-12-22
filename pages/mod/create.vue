@@ -525,7 +525,7 @@ export default {
 
       sideTypes: [
         { label: 'Required', id: 'required' },
-        { label: 'No functionality', id: 'no-functionality' },
+        { label: 'Optional', id: 'optional' },
         { label: 'Unsupported', id: 'unsupported' },
       ],
       clientSideType: { label: 'Required', id: 'required' },
