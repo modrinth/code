@@ -123,6 +123,7 @@ export default {
     '@nuxtjs/auth',
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
+    'nuxt-clipboard2',
   ],
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',

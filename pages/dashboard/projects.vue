@@ -25,7 +25,10 @@
       :status="mod.status"
       :is-modrinth="true"
     >
-      <nuxt-link class="button column" :to="'/mod/' + mod.id + '/edit'">
+      <nuxt-link
+        class="button buttonse column"
+        :to="'/mod/' + mod.id + '/edit'"
+      >
         Edit
       </nuxt-link>
     </ModCard>
@@ -72,4 +75,8 @@ export default {
 .mod-name {
   font-weight: bold;
 }
+// .buttonse {
+//   margin-left: 4.5rem;
+//   padding: 0.5rem 2rem 0.5rem 2rem;
+// }
 </style>

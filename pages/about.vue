@@ -14,8 +14,8 @@
       </p>
 
       <p>
-        While we still are in early alpha, we hope we can soon be a major
-        modding platform for all modders :)
+        While we still are in beta, we hope we can be a major modding platform
+        for all modders.
       </p>
     </div>
     <m-footer class="footer" centered />

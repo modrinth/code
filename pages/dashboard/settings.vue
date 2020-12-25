@@ -1,3 +1,4 @@
+/* eslint-disable vue/attribute-hyphenation */
 <template>
   <DashboardPage>
     <div class="section-header columns">
@@ -8,7 +9,7 @@
       <h3>Username</h3>
       <label>
         <span>
-          The username used on the modrinth site to identify yourself. This must
+          The username used on the Modrinth site to identify yourself. This must
           be unique.
         </span>
         <input
@@ -41,6 +42,50 @@
         <input v-model="bio" type="text" placeholder="Enter your bio" />
       </label>
     </section>
+    <section class="essentials pad-maker">
+      <h3>Theme</h3>
+      <label>
+        <span
+          >Change the global site theme of Modrinth. You can choose from light
+          mode and dark mode. You can switch it using this button or anywhere by
+          accessing the theme switcher in the navigation bar dropdown.</span
+        >
+        <input
+          type="button"
+          class="button pad-rem"
+          value="Change Theme"
+          @click="changeTheme"
+        />
+      </label>
+    </section>
+    <section class="essentials pad-maker">
+      <h3>Authorization token</h3>
+      <label>
+        <span>
+          Your authorization token can be used with the Modrinth API and for the
+          Minotaur Gradle plugin. However, it must be kept secret!
+        </span>
+        <input
+          type="button"
+          class="button pad-rem"
+          value="Copy to clipboard"
+          @click="copyToken"
+        />
+      </label>
+      <h3>Revoke your token</h3>
+      <label>
+        <span
+          >Beware, this will log you out of Modrinth, and you will have to login
+          again to access Modrinth with a new token.</span
+        >
+        <input
+          type="button"
+          class="button"
+          value="Revoke token"
+          @click="gotoRevoke"
+        />
+      </label>
+    </section>
   </DashboardPage>
 </template>
 
@@ -57,6 +102,7 @@ export default {
     this.name = this.$auth.user.name
     this.email = this.$auth.user.email
     this.bio = this.$auth.user.bio
+    this.token = this.$auth.getToken('local')
   },
   data() {
     return {
@@ -64,9 +110,34 @@ export default {
       name: '',
       email: '',
       bio: '',
+      token: '',
     }
   },
   methods: {
+    changeTheme() {
+      this.$colorMode.preference =
+        this.$colorMode.value === 'dark' ? 'light' : 'dark'
+
+      this.themeAds()
+    },
+    themeAds() {
+      const elements = document.getElementsByClassName('ethical-ad')
+      for (const elem of elements) {
+        elem.className = 'ethical-ad loaded ' + this.$colorMode.preference
+      }
+    },
+    gotoRevoke() {
+      this.$router.replace('/dashboard/misc/revoke-token')
+    },
+    async copyToken() {
+      await this.$copyText(this.token)
+      this.$notify({
+        group: 'main',
+        title: 'Copied to clipboard.',
+        text: 'Copied your Modrinth token to the clipboard.',
+        type: 'success',
+      })
+    },
     async editProfile() {
       const config = {
         headers: {
@@ -105,9 +176,25 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.pad-rem {
+  margin-top: 0;
+}
+
+.pad-maker {
+  margin-top: var(--spacing-card-md);
+}
+
+.save-btn-div {
+  overflow: hidden;
+  clear: both;
+}
+
+.save-btn {
+  float: right;
+}
+
 section {
   @extend %card;
-
   padding: var(--spacing-card-md) var(--spacing-card-lg);
 }
 
@@ -122,6 +209,13 @@ label {
   input {
     flex: 3;
     height: fit-content;
+  }
+  input[type='button'] {
+    height: fit-content;
+    flex: 1;
+  }
+  input[type='button']:hover {
+    cursor: pointer;
   }
 }
 </style>
