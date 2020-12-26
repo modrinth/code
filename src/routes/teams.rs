@@ -154,7 +154,7 @@ pub async fn add_team_member(
     }
     let request = crate::database::models::team_item::TeamMember::get_from_user_id_pending(
         team_id,
-        member.user_id,
+        new_member.user_id.into(),
         &**pool,
     )
     .await?;
