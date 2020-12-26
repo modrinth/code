@@ -148,7 +148,7 @@ pub async fn mods_list(
     }
 }
 
-#[get("teams")]
+#[get("{user_id}/teams")]
 pub async fn teams(
     req: HttpRequest,
     info: web::Path<(UserId,)>,
