@@ -1277,22 +1277,6 @@
       ]
     }
   },
-  "596bf1e0a31e35ab768b1239673a69ac6598b0cb94700a84c15682aae55de9bd": {
-    "query": "\n            INSERT INTO team_members (\n                id, user_id, role, permissions, accepted\n            )\n            VALUES (\n                $1, $2, $3, $4, $5\n            )\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Int8",
-          "Bool"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "5c4262689205aafdd97a74bee0003f39eef0a34c97f97a939c14fb8fe349f7eb": {
     "query": "\n                    UPDATE files\n                    SET is_primary = TRUE\n                    WHERE (id = $1)\n                    ",
     "describe": {
@@ -1582,6 +1566,23 @@
       "parameters": {
         "Left": [
           "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "6fd06767f42be894c7a35c6b61f43407c55de43dc77ed02b39062278f3de81e3": {
+    "query": "\n            INSERT INTO team_members (\n                id, team_id, user_id, role, permissions, accepted\n            )\n            VALUES (\n                $1, $2, $3, $4, $5, $6\n            )\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Int8",
+          "Bool"
         ]
       },
       "nullable": []

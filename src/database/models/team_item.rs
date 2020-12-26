@@ -302,13 +302,14 @@ impl TeamMember {
         sqlx::query!(
             "
             INSERT INTO team_members (
-                id, user_id, role, permissions, accepted
+                id, team_id, user_id, role, permissions, accepted
             )
             VALUES (
-                $1, $2, $3, $4, $5
+                $1, $2, $3, $4, $5, $6
             )
             ",
             self.id as TeamMemberId,
+            self.team_id as TeamId,
             self.user_id as UserId,
             self.role,
             self.permissions.bits() as i64,
