@@ -51,4 +51,6 @@ pub struct TeamMember {
     pub role: String,
     /// A bitset containing the user's permissions in this team
     pub permissions: Option<Permissions>,
+    /// Whether the user has joined the team or is just invited to it
+    pub accepted: bool,
 }

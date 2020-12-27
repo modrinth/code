@@ -93,7 +93,7 @@ impl TeamMember {
             "
             SELECT id, user_id, role, permissions, accepted
             FROM team_members
-            WHERE (team_id = $1 AND accepted = TRUE)
+            WHERE team_id = $1
             ",
             id as TeamId,
         )
