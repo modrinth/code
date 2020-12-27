@@ -182,6 +182,7 @@ pub async fn teams(
             } else {
                 None
             },
+            accepted: data.accepted
         })
         .collect();
 
