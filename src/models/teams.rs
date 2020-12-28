@@ -45,6 +45,8 @@ impl Default for Permissions {
 /// A member of a team
 #[derive(Serialize, Deserialize, Clone)]
 pub struct TeamMember {
+    /// The ID of the team this team member is a member of
+    pub team_id: TeamId,
     /// The ID of the user associated with the member
     pub user_id: UserId,
     /// The role of the user in the team
