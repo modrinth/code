@@ -242,8 +242,8 @@ impl Version {
             ",
             id as VersionId,
         )
-            .execute(exec)
-            .await?;
+        .execute(exec)
+        .await?;
 
         use futures::TryStreamExt;
 
