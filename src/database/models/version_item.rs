@@ -235,6 +235,16 @@ impl Version {
         .execute(exec)
         .await?;
 
+        sqlx::query!(
+            "
+            DELETE FROM downloads
+            WHERE downloads.version_id = $1
+            ",
+            id as VersionId,
+        )
+        .execute(exec)
+        .await?;
+
         use futures::TryStreamExt;
 
         let files = sqlx::query!(

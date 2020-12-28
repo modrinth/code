@@ -27,6 +27,7 @@ pub async fn team_members_get(
             let team_members: Vec<crate::models::teams::TeamMember> = members_data
                 .into_iter()
                 .map(|data| crate::models::teams::TeamMember {
+                    team_id: id,
                     user_id: data.user_id.into(),
                     role: data.role,
                     permissions: Some(data.permissions),
@@ -42,14 +43,13 @@ pub async fn team_members_get(
 
     for team_member in members_data {
         if team_member.accepted {
-            team_members.push(
-                crate::models::teams::TeamMember {
-                    user_id: team_member.user_id.into(),
-                    role: team_member.role,
-                    permissions: None,
-                    accepted: team_member.accepted
-                }
-            )
+            team_members.push(crate::models::teams::TeamMember {
+                team_id: id,
+                user_id: team_member.user_id.into(),
+                role: team_member.role,
+                permissions: None,
+                accepted: team_member.accepted,
+            })
         }
     }
 
@@ -298,7 +298,7 @@ pub async fn remove_team_member(
         }
     };
 
-    let delete_member = TeamMember::get_from_user_id(id, user_id, &**pool).await?;
+    let delete_member = TeamMember::get_from_user_id_pending(id, user_id, &**pool).await?;
 
     if let Some(delete_member) = delete_member {
         if delete_member.role == crate::models::teams::OWNER_ROLE {

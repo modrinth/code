@@ -175,6 +175,7 @@ pub async fn teams(
     let team_members: Vec<crate::models::teams::TeamMember> = results
         .into_iter()
         .map(|data| crate::models::teams::TeamMember {
+            team_id: data.team_id.into(),
             user_id: data.user_id.into(),
             role: data.role,
             permissions: if same_user {
@@ -182,7 +183,7 @@ pub async fn teams(
             } else {
                 None
             },
-            accepted: data.accepted
+            accepted: data.accepted,
         })
         .collect();
 
