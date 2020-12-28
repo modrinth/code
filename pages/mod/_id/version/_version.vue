@@ -1,5 +1,10 @@
 <template>
-  <ModPage :mod="mod" :versions="versions" :members="members">
+  <ModPage
+    :mod="mod"
+    :versions="versions"
+    :members="members"
+    :current-member="currentMember"
+  >
     <div class="version">
       <div class="version-header">
         <h4>{{ version.name }}</h4>
@@ -17,6 +22,7 @@
         </span>
         <Categories :categories="version.loaders" />
         <a
+          v-if="primaryFile"
           :href="primaryFile.url"
           class="download-button"
           @click.prevent="
@@ -63,16 +69,10 @@
       </div>
       <div v-compiled-markdown="changelog" class="markdown-body"></div>
       <div class="files">
-        <div v-for="file in version.files" :key="file.hashes.sha1">
+        <div v-for="file in version.files" :key="file.hashes.sha1" class="file">
           <div class="text-wrapper">
             <p>{{ file.filename }}</p>
-            <div
-              v-if="
-                $auth.loggedIn &&
-                members.find((x) => x.user_id === $auth.user.id)
-              "
-              class="actions"
-            >
+            <div v-if="currentMember" class="actions">
               <button @click="deleteFile(file.hashes.sha1)">Delete File</button>
               <button @click="makePrimary(file.hashes.sha1)">
                 Make Primary
@@ -87,13 +87,7 @@
           </a>
         </div>
       </div>
-      <FileInput
-        v-if="
-          $auth.loggedIn && members.find((x) => x.user_id === $auth.user.id)
-        "
-        class="file-input"
-        @change="addFiles"
-      />
+      <FileInput v-if="currentMember" class="file-input" @change="addFiles" />
     </div>
   </ModPage>
 </template>
@@ -160,7 +154,7 @@ export default {
       )
     ).data
 
-    users.forEach((it, index) => {
+    users.reverse().forEach((it, index) => {
       members[index].avatar_url = it.avatar_url
       members[index].name = it.username
     })
@@ -175,12 +169,17 @@ export default {
       primaryFile = version.files[0]
     }
 
+    const currentMember = data.$auth.loggedIn
+      ? members.find((x) => x.user_id === data.$auth.user.id)
+      : null
+
     return {
       mod,
       versions,
       members,
       version,
       primaryFile,
+      currentMember,
     }
   },
   data() {
@@ -367,11 +366,11 @@ export default {
   .files {
     display: flex;
 
-    div {
+    .file {
       display: flex;
       margin-right: 0.5rem;
-      background: var(--color-bg);
       border-radius: var(--size-rounded-control);
+      border: 1px solid var(--color-divider);
 
       .text-wrapper {
         display: flex;

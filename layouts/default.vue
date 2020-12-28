@@ -47,6 +47,12 @@
                         <span>Profile</span>
                       </NuxtLink>
                     </li>
+                    <li>
+                      <NuxtLink to="/dashboard/notifications">
+                        <NotificationIcon />
+                        <span>Notifications</span>
+                      </NuxtLink>
+                    </li>
                     <li v-tooltip="'Not implemented yet'" class="hidden">
                       <NuxtLink :to="userTeamsUrl" disabled>
                         <UsersIcon />
@@ -154,6 +160,7 @@ import ClickOutside from 'vue-click-outside'
 import ModrinthLogo from '~/assets/images/text-logo.svg?inline'
 import ModrinthLogoWhite from '~/assets/images/text-logo-white.svg?inline'
 
+import NotificationIcon from '~/assets/images/sidebar/notifications.svg?inline'
 import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
 import ProjectsIcon from '~/assets/images/sidebar/projects.svg?inline'
 import AnalyticsIcon from '~/assets/images/sidebar/analytics.svg?inline'
@@ -185,6 +192,7 @@ export default {
     UsersIcon,
     LogOutIcon,
     GitHubIcon,
+    NotificationIcon,
   },
   directives: {
     ClickOutside,

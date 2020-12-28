@@ -1,5 +1,10 @@
 <template>
-  <ModPage :mod="mod" :versions="versions" :members="members">
+  <ModPage
+    :mod="mod"
+    :versions="versions"
+    :members="members"
+    :current-member="currentMember"
+  >
     <table>
       <thead>
         <tr>
@@ -64,10 +69,7 @@
       </tbody>
     </table>
     <Popup
-      v-if="
-        this.$auth.loggedIn &&
-        members.find((x) => x.user_id === this.$auth.user.id)
-      "
+      v-if="currentMember"
       :show-popup="showPopup"
       class="create-version-popup-body"
     >
@@ -187,10 +189,7 @@
       </div>
     </Popup>
     <button
-      v-if="
-        this.$auth.loggedIn &&
-        members.find((x) => x.user_id === this.$auth.user.id)
-      "
+      v-if="currentMember"
       class="default-button"
       @click="showPopup = !showPopup"
     >
@@ -263,10 +262,14 @@ export default {
       )
     ).data
 
-    users.forEach((it, index) => {
+    users.reverse().forEach((it, index) => {
       members[index].avatar_url = it.avatar_url
       members[index].name = it.username
     })
+
+    const currentMember = data.$auth.loggedIn
+      ? members.find((x) => x.user_id === data.$auth.user.id)
+      : null
 
     return {
       mod,
@@ -274,6 +277,7 @@ export default {
       members,
       selectableLoaders,
       selectableVersions,
+      currentMember,
     }
   },
   data() {

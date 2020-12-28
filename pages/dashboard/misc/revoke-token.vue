@@ -42,8 +42,8 @@
         >
       </p>
       <button @click="logout">Continue</button>
-    </section></DashboardPage
-  >
+    </section>
+  </DashboardPage>
 </template>
 
 <script>
@@ -54,8 +54,8 @@ export default {
   },
   methods: {
     async logout() {
-      await this.$auth. setToken('local', false)
-      await this.$router.go(
+      await this.$auth.setToken('local', false)
+      await this.$router.replace(
         'https://api.modrinth.com/api/v1/auth/init?url=https://modrinth.com/'
       )
     },

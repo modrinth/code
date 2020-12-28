@@ -124,6 +124,7 @@ export default {
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
     'nuxt-clipboard2',
+    '@nuxtjs/style-resources',
   ],
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',

@@ -14,7 +14,7 @@
             />
           </div>
           <div class="info">
-            <h2 class="title">{{ mod.title }}</h2>
+            <h1 class="title">{{ mod.title }}</h1>
             <p class="description">
               {{ mod.description }}
             </p>
@@ -60,20 +60,14 @@
               Source
             </a>
             <nuxt-link
-              v-if="
-                this.$auth.loggedIn &&
-                members.find((x) => x.user_id === this.$auth.user.id)
-              "
+              v-if="currentMember"
               :to="'/mod/' + mod.id + '/edit'"
               class="tab"
             >
               Edit
             </nuxt-link>
             <nuxt-link
-              v-if="
-                this.$auth.loggedIn &&
-                members.find((x) => x.user_id === this.$auth.user.id)
-              "
+              v-if="currentMember"
               :to="'/mod/' + mod.id + '/settings'"
               class="tab"
             >
@@ -278,6 +272,12 @@ export default {
       type: Array,
       default() {
         return []
+      },
+    },
+    currentMember: {
+      type: Object,
+      default() {
+        return null
       },
     },
   },

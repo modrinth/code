@@ -17,6 +17,7 @@
     "@nuxtjs/dayjs": "^1.2.0",
     "@nuxtjs/robots": "^2.4.2",
     "@nuxtjs/sitemap": "^2.4.0",
+    "@nuxtjs/style-resources": "^1.0.0",
     "highlight.js": "^10.3.2",
     "marked": "^1.2.0",
     "nuxt": "^2.14.7",

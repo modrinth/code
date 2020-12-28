@@ -1,13 +1,215 @@
 <template>
-  <ModPage :mod="mod" :versions="versions" :members="members"> </ModPage>
+  <ModPage
+    :mod="mod"
+    :versions="versions"
+    :members="members.filter((it) => it.accepted)"
+    :current-member="currentMember"
+  >
+    <div class="section-header columns">
+      <h3 class="column-grow-1">Team members</h3>
+      <div class="column">
+        <input
+          id="username"
+          v-model="currentUsername"
+          type="text"
+          placeholder="Username"
+        />
+        <label for="username" class="hidden">Username</label>
+        <button class="brand-button column" @click="inviteTeamMember">
+          Invite
+        </button>
+      </div>
+    </div>
+    <div
+      v-for="(member, index) in members"
+      :key="member.user_id"
+      class="member"
+      :class="{ open: openTeamMembers.includes(member.user_id) }"
+    >
+      <div class="member-header">
+        <div class="info">
+          <img :src="member.avatar_url" :alt="member.name" />
+          <div class="text">
+            <h4>{{ member.name }}</h4>
+            <h3>{{ member.role }}</h3>
+          </div>
+        </div>
+        <div class="side-buttons">
+          <span v-if="member.accepted" class="badge green">Accepted</span>
+          <span v-else class="badge yellow">Pending</span>
+          <button
+            class="dropdown-icon"
+            @click="
+              openTeamMembers.indexOf(member.user_id) === -1
+                ? openTeamMembers.push(member.user_id)
+                : (openTeamMembers = openTeamMembers.filter(
+                    (it) => it !== member.user_id
+                  ))
+            "
+          >
+            <DropdownIcon />
+          </button>
+        </div>
+      </div>
+      <div class="content">
+        <div class="main-info">
+          <label>
+            Role:
+            <input
+              v-model="members[index].role"
+              type="text"
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
+              "
+            />
+          </label>
+        </div>
+        <h3>Permissions</h3>
+        <div class="permissions">
+          <label>
+            <input
+              type="checkbox"
+              :checked="
+                (member.permissions & UPLOAD_VERSION) === UPLOAD_VERSION
+              "
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+                (currentMember.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
+              "
+              @change="members[index].permissions ^= UPLOAD_VERSION"
+            />
+            Upload Version
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              :checked="
+                (member.permissions & DELETE_VERSION) === DELETE_VERSION
+              "
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+                (currentMember.permissions & DELETE_VERSION) !== DELETE_VERSION
+              "
+              @change="members[index].permissions ^= DELETE_VERSION"
+            />
+            Delete Version
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              :checked="(member.permissions & EDIT_DETAILS) === EDIT_DETAILS"
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+                (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+              "
+              @change="members[index].permissions ^= EDIT_DETAILS"
+            />
+            Edit Details
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              :checked="(member.permissions & EDIT_BODY) === EDIT_BODY"
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+                (currentMember.permissions & EDIT_BODY) !== EDIT_BODY
+              "
+              @change="members[index].permissions ^= EDIT_BODY"
+            />
+            Edit Body
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              :checked="
+                (member.permissions & MANAGE_INVITES) === MANAGE_INVITES
+              "
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+                (currentMember.permissions & MANAGE_INVITES) !== MANAGE_INVITES
+              "
+              @change="members[index].permissions ^= MANAGE_INVITES"
+            />
+            Manage Invites
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              :checked="(member.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+                (currentMember.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
+              "
+              @change="members[index].permissions ^= REMOVE_MEMBER"
+            />
+            Remove Member
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              :checked="(member.permissions & EDIT_MEMBER) === EDIT_MEMBER"
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
+              "
+              @change="members[index].permissions ^= EDIT_MEMBER"
+            />
+            Edit Member
+          </label>
+          <label>
+            <input
+              type="checkbox"
+              :checked="(member.permissions & DELETE_MOD) === DELETE_MOD"
+              :disabled="
+                member.role === 'Owner' ||
+                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+                (currentMember.permissions & DELETE_MOD) !== DELETE_MOD
+              "
+              @change="members[index].permissions ^= DELETE_MOD"
+            />
+            Delete Mod
+          </label>
+        </div>
+        <div class="actions">
+          <button
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
+            "
+            @click="removeTeamMember(index)"
+          >
+            Remove Member
+          </button>
+          <button
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
+            "
+            @click="updateTeamMember(index)"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+  </ModPage>
 </template>
 
 <script>
 import axios from 'axios'
 import ModPage from '@/components/ModPage'
 
+import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
+
 export default {
-  components: { ModPage },
+  components: { ModPage, DropdownIcon },
   async asyncData(data) {
     const config = {
       headers: {
@@ -24,9 +226,8 @@ export default {
       )
     ).data
 
-    const [members, allMembers, versions] = (
+    const [members, versions] = (
       await Promise.all([
-        axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
         axios.get(
           `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
           config
@@ -40,7 +241,7 @@ export default {
       ])
     ).map((it) => it.data)
 
-    const [users, allUsers] = (
+    const [users] = (
       await Promise.all([
         axios.get(
           `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
@@ -48,44 +249,229 @@ export default {
           )}`,
           config
         ),
-        axios.get(
-          `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
-            allMembers.map((it) => it.user_id)
-          )}`,
-          config
-        ),
       ])
     ).map((it) => it.data)
 
-    users.forEach((it, index) => {
+    users.reverse().forEach((it, index) => {
       members[index].avatar_url = it.avatar_url
       members[index].name = it.username
     })
 
-    allUsers.forEach((it, index) => {
-      allMembers[index].avatar_url = it.avatar_url
-      allMembers[index].name = it.username
-      allMembers[index].accepted = members.find(
-        (it) => allMembers[index].user_id === it.user_id
-      )
-    })
+    const currentMember = data.$auth.loggedIn
+      ? members.find((x) => x.user_id === data.$auth.user.id)
+      : null
 
     return {
       mod,
       versions: versions.reverse(),
       members,
-      allMembers,
-      allUsers,
+      currentMember,
     }
+  },
+  data() {
+    return {
+      currentUsername: '',
+      openTeamMembers: [],
+    }
+  },
+  created() {
+    this.UPLOAD_VERSION = 1 << 0
+    this.DELETE_VERSION = 1 << 1
+    this.EDIT_DETAILS = 1 << 2
+    this.EDIT_BODY = 1 << 3
+    this.MANAGE_INVITES = 1 << 4
+    this.REMOVE_MEMBER = 1 << 5
+    this.EDIT_MEMBER = 1 << 6
+    this.DELETE_MOD = 1 << 7
+  },
+  methods: {
+    async inviteTeamMember() {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      this.$nuxt.$loading.start()
+
+      try {
+        const user = (
+          await axios.get(
+            `https://api.modrinth.com/api/v1/user/${this.currentUsername}`
+          )
+        ).data
+
+        const data = {
+          user_id: user.id,
+        }
+
+        await axios.post(
+          `https://api.modrinth.com/api/v1/team/${this.mod.team}/members`,
+          data,
+          config
+        )
+        await this.$router.go(null)
+      } catch (err) {
+        this.$notify({
+          group: 'main',
+          title: 'An Error Occurred',
+          text: err.response.data.description,
+          type: 'error',
+        })
+      }
+
+      this.$nuxt.$loading.finish()
+    },
+    async removeTeamMember(index) {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      this.$nuxt.$loading.start()
+
+      try {
+        await axios.delete(
+          `https://api.modrinth.com/api/v1/team/${this.mod.team}/members/${this.members[index].user_id}`,
+          config
+        )
+        await this.$router.go(null)
+      } catch (err) {
+        this.$notify({
+          group: 'main',
+          title: 'An Error Occurred',
+          text: err.response.data.description,
+          type: 'error',
+        })
+      }
+
+      this.$nuxt.$loading.finish()
+    },
+    async updateTeamMember(index) {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      this.$nuxt.$loading.start()
+
+      try {
+        const data = {
+          permissions: this.members[index].permissions,
+          role: this.members[index].role,
+        }
+
+        await axios.patch(
+          `https://api.modrinth.com/api/v1/team/${this.mod.team}/members/${this.members[index].user_id}`,
+          data,
+          config
+        )
+        await this.$router.go(null)
+      } catch (err) {
+        this.$notify({
+          group: 'main',
+          title: 'An Error Occurred',
+          text: err.response.data.description,
+          type: 'error',
+        })
+      }
+
+      this.$nuxt.$loading.finish()
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.markdown-body {
-  padding: 1rem;
+.section-header {
+  @extend %card;
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
   margin-bottom: var(--spacing-card-md);
-  background: var(--color-raised-bg);
-  border-radius: var(--size-rounded-card);
+  h3 {
+    margin: auto 0;
+    color: var(--color-text-dark);
+    font-weight: var(--font-weight-extrabold);
+  }
+}
+
+.member {
+  @extend %card;
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+  margin-bottom: var(--spacing-card-md);
+
+  .member-header {
+    display: flex;
+    justify-content: space-between;
+    .info {
+      display: flex;
+      img {
+        border-radius: var(--size-rounded-icon);
+        height: 50px;
+        width: 50px;
+      }
+      .text {
+        margin: auto 0 auto 0.5rem;
+        h4 {
+          font-weight: normal;
+          margin: 0;
+        }
+        h3 {
+          text-transform: uppercase;
+          margin-top: 0.1rem;
+          margin-bottom: 0;
+          font-size: var(--font-size-sm);
+          font-weight: var(--font-weight-extrabold);
+          letter-spacing: 0.02rem;
+        }
+      }
+    }
+    .side-buttons {
+      display: flex;
+      align-items: center;
+      .dropdown-icon {
+        margin-left: 1rem;
+        cursor: pointer;
+        color: var(--color-text-dark);
+        background-color: unset;
+        transition: 150ms ease transform;
+        padding: unset;
+      }
+    }
+  }
+
+  .content {
+    display: none;
+
+    .main-info {
+      margin-bottom: var(--spacing-card-lg);
+    }
+    .permissions {
+      margin: 1rem 0;
+      display: grid;
+      grid-template-columns: 10rem 10rem 10rem;
+      grid-template-rows: 1.5rem 1.5rem 1.5rem;
+    }
+  }
+
+  &.open {
+    .member-header {
+      .dropdown-icon {
+        transform: rotate(180deg);
+      }
+    }
+    .content {
+      display: unset;
+      margin: var(--spacing-card-lg);
+    }
+  }
+}
+
+input,
+button {
+  &:disabled {
+    cursor: not-allowed !important;
+  }
 }
 </style>

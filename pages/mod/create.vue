@@ -581,7 +581,7 @@ export default {
           discord_url: this.discord_url,
           client_side: this.clientSideType.id,
           server_side: this.serverSideType.id,
-          license_id: this.license.short,
+          license_id: this.license ? this.license.short : null,
           license_url: this.license_url,
           is_draft: this.draft,
         })

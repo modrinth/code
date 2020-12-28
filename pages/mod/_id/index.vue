@@ -1,5 +1,10 @@
 <template>
-  <ModPage :mod="mod" :versions="versions" :members="members">
+  <ModPage
+    :mod="mod"
+    :versions="versions"
+    :members="members"
+    :current-member="currentMember"
+  >
     <div v-compiled-markdown="body" class="markdown-body"></div>
   </ModPage>
 </template>
@@ -51,15 +56,20 @@ export default {
       )
     ).data
 
-    users.forEach((it, index) => {
+    users.reverse().forEach((it, index) => {
       members[index].avatar_url = it.avatar_url
       members[index].name = it.username
     })
+
+    const currentMember = data.$auth.loggedIn
+      ? members.find((x) => x.user_id === data.$auth.user.id)
+      : null
 
     return {
       mod,
       versions: versions.reverse(),
       members,
+      currentMember,
     }
   },
   data() {
