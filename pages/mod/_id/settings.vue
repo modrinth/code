@@ -252,7 +252,8 @@ export default {
       ])
     ).map((it) => it.data)
 
-    users.reverse().forEach((it, index) => {
+    users.forEach((it) => {
+      const index = members.findIndex((x) => x.user_id === it.user_id)
       members[index].avatar_url = it.avatar_url
       members[index].name = it.username
     })
