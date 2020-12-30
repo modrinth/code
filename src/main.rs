@@ -334,6 +334,7 @@ fn check_env_vars() -> bool {
         failed |= check_var::<String>("S3_URL");
         failed |= check_var::<String>("S3_REGION");
         failed |= check_var::<String>("S3_BUCKET_NAME");
+        failed |= check_var::<String>("S3_PROVIDER");
     } else if storage_backend.as_deref() == Some("local") {
         failed |= check_var::<String>("MOCK_FILE_PATH");
     } else if let Some(backend) = storage_backend {

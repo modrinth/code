@@ -42,14 +42,12 @@ pub async fn team_members_get(
 
     for team_member in members_data {
         if team_member.accepted {
-            team_members.push(
-                crate::models::teams::TeamMember {
-                    user_id: team_member.user_id.into(),
-                    role: team_member.role,
-                    permissions: None,
-                    accepted: team_member.accepted
-                }
-            )
+            team_members.push(crate::models::teams::TeamMember {
+                user_id: team_member.user_id.into(),
+                role: team_member.role,
+                permissions: None,
+                accepted: team_member.accepted,
+            })
         }
     }
 
