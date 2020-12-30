@@ -53,14 +53,14 @@ impl FileHost for S3Host {
 
         if provider == "do" {
             reqwest::Client::new()
-                .delete(format!(
+                .delete(&*format!(
                     "https://api.digitalocean.com/v2/cdn/endpoints/{}/cache",
                     self.bucket.name
                 ))
                 .header(reqwest::header::CONTENT_TYPE, "application/json")
                 .header(
                     reqwest::header::AUTHORIZATION,
-                    &self.bucket.credentials.secret_key,
+                    &self.bucket.credentials.secret_key.unwrap_or_else(""),
                 )
                 .body(
                     serde_json::json!({
