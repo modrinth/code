@@ -875,6 +875,19 @@
       "nullable": []
     }
   },
+  "3f2f05653552ce8c1be95ce0a922ab41f52f40f8ff6c91c6621481102c8f35e3": {
+    "query": "\n                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n                        VALUES ($1, $2)\n                        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "42e072309779598d0c213280dd8052d1b4889cb24ef5204ca13b74f693b94328": {
     "query": "\n                SELECT user_id FROM team_members tm\n                INNER JOIN mods ON mods.team_id = tm.team_id\n                WHERE mods.id = $1\n                ",
     "describe": {
@@ -1249,6 +1262,18 @@
         "Left": [
           "Int8",
           "Varchar"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "507314fdcacaa3c7751738c9d0baee2b90aec719b6b203f922824eced5ea8369": {
+    "query": "\n                    DELETE FROM game_versions_versions WHERE joining_version_id = $1\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
         ]
       },
       "nullable": []
@@ -3824,6 +3849,18 @@
         false,
         false
       ]
+    }
+  },
+  "fa911efc808e726c13659d3ce6baf61dc562e6f1e73fd65537a4ab1dad17120e": {
+    "query": "\n            DELETE FROM downloads\n            WHERE downloads.version_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
     }
   },
   "fb6178b27856ff583039a974173efe5d6be4e347b6cc1d4904cf750a40d1b77f": {

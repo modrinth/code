@@ -361,6 +361,43 @@ pub async fn version_edit(
                 }
             }
 
+            if let Some(game_versions) = &new_version.game_versions {
+                sqlx::query!(
+                    "
+                    DELETE FROM game_versions_versions WHERE joining_version_id = $1
+                    ",
+                    id as database::models::ids::VersionId,
+                )
+                .execute(&mut *transaction)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+                for game_version in game_versions {
+                    let game_version_id = database::models::categories::GameVersion::get_id(
+                        &game_version.0,
+                        &mut *transaction,
+                    )
+                    .await?
+                    .ok_or_else(|| {
+                        ApiError::InvalidInputError(
+                            "No database entry for game version provided.".to_string(),
+                        )
+                    })?;
+
+                    sqlx::query!(
+                        "
+                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)
+                        VALUES ($1, $2)
+                        ",
+                        game_version_id as database::models::ids::GameVersionId,
+                        id as database::models::ids::VersionId,
+                    )
+                    .execute(&mut *transaction)
+                    .await
+                    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+                }
+            }
+
             if let Some(loaders) = &new_version.loaders {
                 sqlx::query!(
                     "
