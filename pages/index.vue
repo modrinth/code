@@ -149,7 +149,11 @@
         <p>
           Modrinth's code is fully open source licensed under AGPL. We've
           created a high peformant Rust based backend that is
-          <span><nuxt-link to="/developers">fully documented</nuxt-link></span>
+          <span
+            ><a href="https://github.com/modrinth/labrinth/wiki"
+              >fully documented</a
+            ></span
+          >
           for all kinds of tools to use. Our team is dedicated to maintaining an
           open source ecosystem for all Modrinth applications.
         </p>

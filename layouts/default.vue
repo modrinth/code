@@ -53,12 +53,12 @@
                         <span>Notifications</span>
                       </NuxtLink>
                     </li>
-                    <li v-tooltip="'Not implemented yet'" class="hidden">
+                    <!--<li v-tooltip="'Not implemented yet'" class="hidden">
                       <NuxtLink :to="userTeamsUrl" disabled>
                         <UsersIcon />
                         <span>Teams</span>
                       </NuxtLink>
-                    </li>
+                    </li>-->
                     <li>
                       <button @click="changeTheme">
                         <MoonIcon v-if="$colorMode.value === 'light'" />
@@ -90,56 +90,6 @@
           </template>
         </section>
       </section>
-      <section class="hidden">
-        <section class="links dashboard">
-          <NuxtLink to="/dashboard/projects">
-            <ProjectsIcon />
-            <span>Projects</span>
-          </NuxtLink>
-          <NuxtLink to="/dashboard/analytics">
-            <AnalyticsIcon />
-            <span>Analytics</span>
-          </NuxtLink>
-        </section>
-        <div>
-          <button class="hamburger" @click="toggleNav">
-            <HamburgerIcon v-if="!isNavOpen" />
-            <ExitIcon v-else />
-          </button>
-        </div>
-        <nav class="visible-md" :class="{ hidden: !isNavOpen }">
-          <section class="navigation">
-            <section class="links community">
-              <NuxtLink to="/modpacks">
-                <ModpackIcon />
-                <span>Modpacks</span>
-              </NuxtLink>
-            </section>
-
-            <hr />
-          </section>
-
-          <section class="footer">
-            <div class="disclosure">
-              Modrinth is open source software. You may view the source code at
-              our
-              <a href="https://github.com/modrinth/knossos">GitHub repository</a
-              >.
-            </div>
-            <div class="legal">
-              <ul>
-                <li>
-                  <NuxtLink to="/tos">Terms</NuxtLink>
-                </li>
-                <li>
-                  <NuxtLink to="/privacy">Privacy</NuxtLink>
-                </li>
-              </ul>
-            </div>
-            <div class="copyright">© Guavy LLC</div>
-          </section>
-        </nav>
-      </section>
     </header>
     <main>
       <notifications group="main" position="bottom right" />
@@ -161,18 +111,12 @@ import ModrinthLogo from '~/assets/images/text-logo.svg?inline'
 import ModrinthLogoWhite from '~/assets/images/text-logo-white.svg?inline'
 
 import NotificationIcon from '~/assets/images/sidebar/notifications.svg?inline'
-import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
-import ProjectsIcon from '~/assets/images/sidebar/projects.svg?inline'
-import AnalyticsIcon from '~/assets/images/sidebar/analytics.svg?inline'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
-import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
-import ExitIcon from '~/assets/images/utils/exit.svg?inline'
 import MoonIcon from '~/assets/images/utils/moon.svg?inline'
 import SunIcon from '~/assets/images/utils/sun.svg?inline'
 
 import UserIcon from '~/assets/images/utils/user.svg?inline'
-import UsersIcon from '~/assets/images/utils/users.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
@@ -180,16 +124,10 @@ export default {
   components: {
     ModrinthLogo,
     ModrinthLogoWhite,
-    ModpackIcon,
-    ProjectsIcon,
-    AnalyticsIcon,
     DropdownIcon,
-    HamburgerIcon,
-    ExitIcon,
     MoonIcon,
     SunIcon,
     UserIcon,
-    UsersIcon,
     LogOutIcon,
     GitHubIcon,
     NotificationIcon,
@@ -204,7 +142,6 @@ export default {
   },
   data() {
     return {
-      isNavOpen: false,
       isDropdownOpen: false,
     }
   },
@@ -223,9 +160,6 @@ export default {
     this.themeAds()
   },
   methods: {
-    toggleNav() {
-      this.isNavOpen = !this.isNavOpen
-    },
     toggleDropdown() {
       this.isDropdownOpen = !this.isDropdownOpen
     },
