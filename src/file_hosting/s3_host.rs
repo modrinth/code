@@ -60,7 +60,7 @@ impl FileHost for S3Host {
                 .header(reqwest::header::CONTENT_TYPE, "application/json")
                 .header(
                     reqwest::header::AUTHORIZATION,
-                    self.bucket.credentials.secret_key.clone().unwrap_or("".to_string()),
+                    self.bucket.credentials.secret_key.clone().unwrap_or_else(|| "".to_string()),
                 )
                 .body(
                     serde_json::json!({
