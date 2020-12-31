@@ -76,7 +76,7 @@ impl FileHost for BackblazeHost {
     }
 }
 
-#[cfg(test)]
+/*#[cfg(test)]
 mod tests {
     use super::*;
     use authorization::*;
@@ -132,4 +132,4 @@ mod tests {
         .await
         .unwrap();
     }
-}
+}*/

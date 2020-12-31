@@ -49,6 +49,33 @@ impl FileHost for S3Host {
             )
             .await?;
 
+        let provider = &*dotenv::var("S3_PROVIDER").unwrap();
+
+        if provider == "do" {
+            reqwest::Client::new()
+                .delete(&*format!(
+                    "https://api.digitalocean.com/v2/cdn/endpoints/{}/cache",
+                    self.bucket.name
+                ))
+                .header(reqwest::header::CONTENT_TYPE, "application/json")
+                .header(
+                    reqwest::header::AUTHORIZATION,
+                    self.bucket
+                        .credentials
+                        .secret_key
+                        .clone()
+                        .unwrap_or_else(|| "".to_string()),
+                )
+                .body(
+                    serde_json::json!({
+                        "files": vec![file_name],
+                    })
+                    .to_string(),
+                )
+                .send()
+                .await?;
+        }
+
         Ok(UploadFileData {
             file_id: file_name.to_string(),
             file_name: file_name.to_string(),
