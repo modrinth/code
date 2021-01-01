@@ -1,10 +1,12 @@
 use crate::file_hosting::S3Host;
 use actix_cors::Cors;
+use actix_ratelimit::errors::ARError;
 use actix_ratelimit::{MemoryStore, MemoryStoreActor, RateLimiter};
 use actix_web::{http, web, App, HttpServer};
 use env_logger::Env;
 use gumdrop::Options;
 use log::{error, info, warn};
+use rand::Rng;
 use search::indexing::index_mods;
 use search::indexing::IndexingSettings;
 use std::sync::Arc;
@@ -234,32 +236,52 @@ async fn main() -> std::io::Result<()> {
         pepper: crate::models::ids::Base62Id(crate::models::ids::random_base62(11)).to_string(),
     };
 
-    let allowed_origins = dotenv::var("CORS_ORIGINS")
-        .ok()
-        .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
-        .unwrap_or_else(|| vec![String::from("http://localhost")]);
-
     let store = MemoryStore::new();
 
     info!("Starting Actix HTTP server!");
 
     // Init App
     HttpServer::new(move || {
-        let mut cors = Cors::new()
-            .allowed_methods(vec!["GET", "POST", "DELETE", "PATCH", "PUT"])
-            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-            .allowed_header(http::header::CONTENT_TYPE)
-            .max_age(3600);
-        for allowed_origin in &allowed_origins {
-            cors = cors.allowed_origin(allowed_origin);
-        }
-
         App::new()
-            .wrap(cors.finish())
             .wrap(
+                Cors::new()
+                    .allowed_methods(vec!["GET", "POST", "DELETE", "PATCH", "PUT"])
+                    .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+                    .allowed_header(http::header::CONTENT_TYPE)
+                    .send_wildcard()
+                    .max_age(3600)
+                    .finish(),
+            )
+            .wrap(
+                // This is a hacky workaround to allowing the frontend server-side renderer to have
+                // an unlimited rate limit, since there is no current way with this library to
+                // have dynamic rate-limit max requests
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
+                    .with_identifier(|req| {
+                        let connection_info = req.connection_info();
+                        let ip = String::from(
+                            connection_info
+                                .remote_addr()
+                                .ok_or(ARError::IdentificationError)?,
+                        );
+
+                        let ignore_ips = dotenv::var("RATE_LIMIT_IGNORE_IPS")
+                            .ok()
+                            .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
+                            .unwrap_or_else(Vec::new);
+
+                        if ignore_ips.contains(&ip) {
+                            // At an even distribution of numbers, this will allow at the most
+                            // 3000 requests per minute from the frontend, which is reasonable
+                            // (50 requests per second)
+                            let random = rand::thread_rng().gen_range(1, 15);
+                            return Ok(format!("{}-{}", ip, random));
+                        }
+
+                        Ok(ip)
+                    })
                     .with_interval(std::time::Duration::from_secs(60))
-                    .with_max_requests(100),
+                    .with_max_requests(200),
             )
             .data(pool.clone())
             .data(file_host.clone())
@@ -305,12 +327,12 @@ fn check_env_vars() -> bool {
         }
     }
 
-    if dotenv::var("CORS_ORIGINS")
+    if dotenv::var("RATE_LIMIT_IGNORE_IPS")
         .ok()
         .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
         .is_none()
     {
-        warn!("Variable `CORS_ORIGINS` missing in dotenv or not a json array of strings");
+        warn!("Variable `RATE_LIMIT_IGNORE_IPS` missing in dotenv or not a json array of strings");
         failed |= true;
     }
 

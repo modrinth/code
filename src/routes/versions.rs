@@ -7,6 +7,7 @@ use crate::{database, Pepper};
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use std::borrow::Borrow;
 use std::sync::Arc;
 
 // TODO: this needs filtering, and a better response type
@@ -633,6 +634,7 @@ pub struct DownloadRedirect {
 }
 
 // under /api/v1/version_file/{hash}/download
+#[allow(clippy::await_holding_refcell_ref)]
 #[get("{version_id}/download")]
 pub async fn download_version(
     req: HttpRequest,
@@ -659,7 +661,7 @@ pub async fn download_version(
 
     if let Some(id) = result {
         let real_ip = req.connection_info();
-        let ip_option = real_ip.realip_remote_addr();
+        let ip_option = real_ip.borrow().remote_addr();
 
         if let Some(ip) = ip_option {
             let hash = sha1::Sha1::from(format!("{}{}", ip, pepper.pepper)).hexdigest();

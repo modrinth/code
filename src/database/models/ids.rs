@@ -1,6 +1,6 @@
 use super::DatabaseError;
 use crate::models::ids::random_base62_rng;
-use sqlx_macros::Type;
+use sqlx::sqlx_macros::Type;
 
 const ID_RETRY_COUNT: usize = 20;
 
