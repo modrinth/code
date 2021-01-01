@@ -99,28 +99,37 @@ export default {
       },
     }
 
-    let res = await axios.get(
-      `https://api.modrinth.com/api/v1/user/${data.params.id}`,
-      config
-    )
-    const user = res.data
-
-    let mods = []
-    res = await axios.get(
-      `https://api.modrinth.com/api/v1/user/${data.params.id}/mods`,
-      config
-    )
-    if (res.data) {
-      res = await axios.get(
-        `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`,
+    try {
+      let res = await axios.get(
+        `https://api.modrinth.com/api/v1/user/${data.params.id}`,
         config
       )
-      mods = res.data
-    }
+      const user = res.data
 
-    return {
-      mods,
-      user,
+      let mods = []
+      res = await axios.get(
+        `https://api.modrinth.com/api/v1/user/${data.params.id}/mods`,
+        config
+      )
+      if (res.data) {
+        res = await axios.get(
+          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(
+            res.data
+          )}`,
+          config
+        )
+        mods = res.data
+      }
+
+      return {
+        mods,
+        user,
+      }
+    } catch {
+      data.error({
+        statusCode: 404,
+        message: 'User not found',
+      })
     }
   },
   methods: {

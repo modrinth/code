@@ -183,7 +183,7 @@ export default {
       {
         hid: 'og:url',
         name: 'og:url',
-        content: `https://modrinth.com/tos`,
+        content: `https://modrinth.com/legal/terms`,
       },
     ],
   },

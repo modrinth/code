@@ -25,7 +25,6 @@
       <div class="right hero-image">
         <video
           src="~/assets/images/search.mp4"
-          alt="search"
           loading="lazy"
           loop
           muted

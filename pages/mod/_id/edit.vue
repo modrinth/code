@@ -282,55 +282,62 @@ export default {
       },
     }
 
-    const [
-      mod,
-      availableCategories,
-      availableLoaders,
-      availableGameVersions,
-      availableLicenses,
-      // availableDonationPlatforms,
-    ] = (
-      await Promise.all([
-        axios.get(
-          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          config
-        ),
-        axios.get(`https://api.modrinth.com/api/v1/tag/category`),
-        axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
-        axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
-        axios.get(`https://api.modrinth.com/api/v1/tag/license`),
-        // axios.get(`https://api.modrinth.com/api/v1/tag/donation_platform`),
-      ])
-    ).map((it) => it.data)
+    try {
+      const [
+        mod,
+        availableCategories,
+        availableLoaders,
+        availableGameVersions,
+        availableLicenses,
+        // availableDonationPlatforms,
+      ] = (
+        await Promise.all([
+          axios.get(
+            `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
+            config
+          ),
+          axios.get(`https://api.modrinth.com/api/v1/tag/category`),
+          axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
+          axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
+          axios.get(`https://api.modrinth.com/api/v1/tag/license`),
+          // axios.get(`https://api.modrinth.com/api/v1/tag/donation_platform`),
+        ])
+      ).map((it) => it.data)
 
-    mod.license = {
-      short: mod.license.id,
-      name: mod.license.name,
-    }
-
-    const res = await axios.get(mod.body_url)
-
-    return {
-      mod,
-      body: res.data,
-      clientSideType: {
-        label: mod.client_side,
-        id: mod.client_side,
-      },
-      serverSideType: {
-        label: mod.server_side,
-        id: mod.server_side,
-      },
-      availableCategories,
-      availableLoaders,
-      availableGameVersions,
-      availableLicenses,
-      license: {
+      mod.license = {
         short: mod.license.id,
         name: mod.license.name,
-      },
-      license_url: mod.license.url,
-      // availableDonationPlatforms,
+      }
+
+      const res = await axios.get(mod.body_url)
+
+      return {
+        mod,
+        body: res.data,
+        clientSideType: {
+          label: mod.client_side,
+          id: mod.client_side,
+        },
+        serverSideType: {
+          label: mod.server_side,
+          id: mod.server_side,
+        },
+        availableCategories,
+        availableLoaders,
+        availableGameVersions,
+        availableLicenses,
+        license: {
+          short: mod.license.id,
+          name: mod.license.name,
+        },
+        license_url: mod.license.url,
+        // availableDonationPlatforms,
+      }
+    } catch {
+      data.error({
+        statusCode: 404,
+        message: 'Mod not found',
+      })
     }
   },
   data() {

@@ -28,49 +28,56 @@ export default {
       },
     }
 
-    const mod = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-        config
-      )
-    ).data
+    try {
+      const mod = (
+        await axios.get(
+          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
+          config
+        )
+      ).data
 
-    const [members, versions] = (
-      await Promise.all([
-        axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
-        axios.get(
-          `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-            mod.versions
+      const [members, versions] = (
+        await Promise.all([
+          axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
+          axios.get(
+            `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
+              mod.versions
+            )}`,
+            config
+          ),
+        ])
+      ).map((it) => it.data)
+
+      const users = (
+        await axios.get(
+          `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
+            members.map((it) => it.user_id)
           )}`,
           config
-        ),
-      ])
-    ).map((it) => it.data)
+        )
+      ).data
 
-    const users = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
-          members.map((it) => it.user_id)
-        )}`,
-        config
-      )
-    ).data
+      users.forEach((it) => {
+        const index = members.findIndex((x) => x.user_id === it.id)
+        members[index].avatar_url = it.avatar_url
+        members[index].name = it.username
+      })
 
-    users.forEach((it) => {
-      const index = members.findIndex((x) => x.user_id === it.id)
-      members[index].avatar_url = it.avatar_url
-      members[index].name = it.username
-    })
+      const currentMember = data.$auth.loggedIn
+        ? members.find((x) => x.user_id === data.$auth.user.id)
+        : null
 
-    const currentMember = data.$auth.loggedIn
-      ? members.find((x) => x.user_id === data.$auth.user.id)
-      : null
-
-    return {
-      mod,
-      versions: versions.reverse(),
-      members,
-      currentMember,
+      return {
+        mod,
+        versions: versions.reverse(),
+        members,
+        currentMember,
+      }
+    } catch {
+      data.error({
+        statusCode: 404,
+        message: 'Mod not found',
+      })
     }
   },
   data() {

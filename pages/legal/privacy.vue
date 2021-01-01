@@ -171,7 +171,7 @@ export default {
       {
         hid: 'og:url',
         name: 'og:url',
-        content: `https://modrinth.com/privacy`,
+        content: `https://modrinth.com/legal/privacy`,
       },
     ],
   },

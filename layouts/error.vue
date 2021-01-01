@@ -1,15 +1,25 @@
 <template>
   <div class="main">
-    <h1>{{ error.message }}</h1>
-    <NuxtLink to="/">
-      An error occurred! Click this text to go back home, and find your way
-      back!
-    </NuxtLink>
+    <div class="container">
+      <NuxtLink to="/">
+        <h2>{{ error.message }}</h2>
+        <p>
+          An error occurred! Click this text to go back home, and find your way
+          back!
+        </p>
+      </NuxtLink>
+    </div>
+    <m-footer class="footer" centered />
   </div>
 </template>
 
 <script>
+import MFooter from '@/components/MFooter'
+
 export default {
+  components: {
+    MFooter,
+  },
   props: {
     error: {
       type: Object,
@@ -29,8 +39,12 @@ export default {
 
 <style lang="scss" scoped>
 .main {
-  margin: 0 auto;
+  margin: var(--spacing-card-sm) auto;
   max-width: 800px;
-  text-align: center;
+}
+
+.container {
+  @extend %card;
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
 }
 </style>
