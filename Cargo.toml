@@ -43,14 +43,4 @@ futures-timer = "3.0.2"
 rust-s3 = "0.26.1"
 async-trait = "0.1.41"
 
-[dependencies.sqlx]
-git = "https://github.com/launchbadge/sqlx/"
-branch = "master"
-default-features = false
-features = ["runtime-actix", "postgres", "chrono", "offline", "macros", "migrate"]
-
-[dependencies.sqlx-macros]
-git = "https://github.com/launchbadge/sqlx/"
-branch = "master"
-default-features = false
-features = ["runtime-actix", "postgres", "chrono", "offline"]
+sqlx = { version = "0.4.2", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate"] }

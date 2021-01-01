@@ -264,7 +264,7 @@ async fn main() -> std::io::Result<()> {
                         let ignore_ips = dotenv::var("RATE_LIMIT_IGNORE_IPS")
                             .ok()
                             .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
-                            .unwrap_or_else(|| vec![]);
+                            .unwrap_or(vec![]);
 
                         if ignore_ips.contains(&ip) {
                             // At an even distribution of numbers, this will allow at the most
