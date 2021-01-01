@@ -146,6 +146,11 @@ export default {
       return this.formatNumber(sum)
     },
   },
+  head() {
+    return {
+      title: this.user.username + ' - Modrinth',
+    }
+  },
 }
 </script>
 
