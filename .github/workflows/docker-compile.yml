@@ -13,11 +13,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      -
-        name: Set up Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
-      -
-        name: Cache Docker layers
+      - name: Cache Docker layers
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
@@ -25,12 +23,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-buildx-
       - name: Build Docker images
-          uses: docker/build-push-action@v1
-          with:
-            push: false
-            username: ${{ github.actor }}
-            password: ${{ secrets.GITHUB_TOKEN }}
-            registry: docker.pkg.github.com
-            repository: modrinth/labrinth/labrinth
-            tag_with_ref: true
-            tag_with_sha: true
+        uses: docker/build-push-action@v1
+        with:
+          push: false
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.pkg.github.com
+          repository: modrinth/labrinth/labrinth
+          tag_with_ref: true
+          tag_with_sha: true
