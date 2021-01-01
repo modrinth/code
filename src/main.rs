@@ -1,15 +1,15 @@
 use crate::file_hosting::S3Host;
 use actix_cors::Cors;
+use actix_ratelimit::errors::ARError;
 use actix_ratelimit::{MemoryStore, MemoryStoreActor, RateLimiter};
 use actix_web::{http, web, App, HttpServer};
 use env_logger::Env;
 use gumdrop::Options;
 use log::{error, info, warn};
+use rand::Rng;
 use search::indexing::index_mods;
 use search::indexing::IndexingSettings;
 use std::sync::Arc;
-use actix_ratelimit::errors::ARError;
-use rand::Rng;
 
 mod auth;
 mod database;
@@ -243,13 +243,15 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         App::new()
-            .wrap(Cors::new()
-                .allowed_methods(vec!["GET", "POST", "DELETE", "PATCH", "PUT"])
-                .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
-                .allowed_header(http::header::CONTENT_TYPE)
-                .send_wildcard()
-                .max_age(3600)
-                .finish())
+            .wrap(
+                Cors::new()
+                    .allowed_methods(vec!["GET", "POST", "DELETE", "PATCH", "PUT"])
+                    .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+                    .allowed_header(http::header::CONTENT_TYPE)
+                    .send_wildcard()
+                    .max_age(3600)
+                    .finish(),
+            )
             .wrap(
                 // This is a hacky workaround to allowing the frontend server-side renderer to have
                 // an unlimited rate limit, since there is no current way with this library to
@@ -257,21 +259,23 @@ async fn main() -> std::io::Result<()> {
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
                     .with_identifier(|req| {
                         let connection_info = req.connection_info();
-                        let ip = String::from(connection_info
-                            .remote_addr()
-                            .ok_or(ARError::IdentificationError)?);
+                        let ip = String::from(
+                            connection_info
+                                .remote_addr()
+                                .ok_or(ARError::IdentificationError)?,
+                        );
 
                         let ignore_ips = dotenv::var("RATE_LIMIT_IGNORE_IPS")
                             .ok()
                             .and_then(|s| serde_json::from_str::<Vec<String>>(&s).ok())
-                            .unwrap_or(vec![]);
+                            .unwrap_or_else(Vec::new);
 
                         if ignore_ips.contains(&ip) {
                             // At an even distribution of numbers, this will allow at the most
                             // 3000 requests per minute from the frontend, which is reasonable
                             // (50 requests per second)
                             let random = rand::thread_rng().gen_range(1, 15);
-                            return Ok(format!("{}-{}", ip, random))
+                            return Ok(format!("{}-{}", ip, random));
                         }
 
                         Ok(ip)
