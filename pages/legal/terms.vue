@@ -104,7 +104,8 @@
       <h2>8. Your Privacy</h2>
 
       <p>
-        Please read our <nuxt-link to="/privacy"> Privacy Policy</nuxt-link>.
+        Please read our
+        <nuxt-link to="/legal/privacy"> Privacy Policy</nuxt-link>.
       </p>
 
       <h2>9. Governing Law</h2>
