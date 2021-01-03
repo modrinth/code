@@ -54,12 +54,12 @@ export default {
 
     const invites = []
 
-    for (let i = 0; i++; i < members.length) {
-      const owner = members[i].find((it) => it.role === 'Owner')
+    for (const member of members) {
+      const owner = member.find((it) => it.role === 'Owner')
 
       const ownerData = (
         await axios.get(
-          `https://api.modrinth.com/api/v1/user/${owner.id}`,
+          `https://api.modrinth.com/api/v1/user/${owner.user_id}`,
           config
         )
       ).data
