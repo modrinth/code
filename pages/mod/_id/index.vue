@@ -17,7 +17,13 @@ export default {
   components: { ModPage },
   auth: false,
   async fetch() {
-    this.body = (await axios.get(this.mod.body_url)).data
+    const reg = /.+?:\/\/.+?(\/.+?)(?:#|\?|$)/
+    const urlPath = reg.exec(this.mod.body_url)[1]
+    this.body = (
+      await axios.get(
+        `https://modrinth-cdn.nyc3.digitaloceanspaces.com${urlPath}`
+      )
+    ).data
   },
   async asyncData(data) {
     const config = {

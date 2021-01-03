@@ -309,7 +309,11 @@ export default {
         name: mod.license.name,
       }
 
-      const res = await axios.get(mod.body_url)
+      const reg = /.+?:\/\/.+?(\/.+?)(?:#|\?|$)/
+      const urlPath = reg.exec(mod.body_url)[1]
+      const res = await axios.get(
+        `https://modrinth-cdn.nyc3.digitaloceanspaces.com${urlPath}`
+      )
 
       return {
         mod,
