@@ -81,7 +81,7 @@
           </div>
           <a
             :href="file.url"
-            @click.prevent="downloadFile(file.hash, file.url)"
+            @click.prevent="downloadFile(file.hashes.sha1, file.url)"
           >
             <DownloadIcon />
           </a>
