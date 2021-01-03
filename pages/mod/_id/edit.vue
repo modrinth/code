@@ -444,6 +444,7 @@ export default {
 
     showPreviewImage(files) {
       const reader = new FileReader()
+      this.iconChanged = true
       this.icon = files[0]
       reader.readAsDataURL(this.icon)
 
