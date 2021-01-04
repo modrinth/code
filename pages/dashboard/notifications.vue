@@ -87,6 +87,7 @@ export default {
       try {
         await axios.post(
           `https://api.modrinth.com/api/v1/team/${teamId}/join`,
+          {},
           config
         )
         await this.$router.go(null)
