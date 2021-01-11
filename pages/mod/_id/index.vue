@@ -5,7 +5,7 @@
     :members="members"
     :current-member="currentMember"
   >
-    <div v-compiled-markdown="body" class="markdown-body"></div>
+    <div v-compiled-markdown="body" v-highlightjs class="markdown-body"></div>
   </ModPage>
 </template>
 
