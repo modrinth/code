@@ -177,7 +177,11 @@ export default {
 
       return {
         mod,
-        versions,
+        versions: versions.sort(
+          (a, b) =>
+            new Date(b.date_published).getTime() -
+            new Date(a.date_published).getTime()
+        ),
         members,
         version,
         primaryFile,
