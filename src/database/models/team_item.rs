@@ -411,4 +411,75 @@ impl TeamMember {
 
         Ok(())
     }
+
+    pub async fn get_from_user_id_mod<'a, 'b, E>(
+        id: ModId,
+        user_id: UserId,
+        executor: E,
+    ) -> Result<Option<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.permissions, tm.accepted FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 AND accepted = TRUE
+            WHERE m.id = $1
+            ",
+            id as ModId,
+            user_id as UserId
+        )
+            .fetch_optional(executor)
+            .await?;
+
+        if let Some(m) = result {
+            Ok(Some(TeamMember {
+                id: TeamMemberId(m.id),
+                team_id: TeamId(m.team_id),
+                user_id,
+                role: m.role,
+                permissions: Permissions::from_bits(m.permissions as u64)
+                    .ok_or(super::DatabaseError::BitflagError)?,
+                accepted: m.accepted,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub async fn get_from_user_id_version<'a, 'b, E>(
+        id: VersionId,
+        user_id: UserId,
+        executor: E,
+    ) -> Result<Option<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.permissions, tm.accepted FROM versions v
+            INNER JOIN mods m ON m.id = v.mod_id
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $2 AND tm.accepted = TRUE
+            WHERE v.id = $1
+            ",
+            id as VersionId,
+            user_id as UserId
+        )
+            .fetch_optional(executor)
+            .await?;
+
+        if let Some(m) = result {
+            Ok(Some(TeamMember {
+                id: TeamMemberId(m.id),
+                team_id: TeamId(m.team_id),
+                user_id,
+                role: m.role,
+                permissions: Permissions::from_bits(m.permissions as u64)
+                    .ok_or(super::DatabaseError::BitflagError)?,
+                accepted: m.accepted,
+            }))
+        } else {
+            Ok(None)
+        }
+    }
 }

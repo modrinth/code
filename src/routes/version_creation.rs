@@ -5,6 +5,7 @@ use crate::file_hosting::FileHost;
 use crate::models::mods::{
     GameVersion, ModId, ModLoader, Version, VersionFile, VersionId, VersionType,
 };
+use crate::models::teams::Permissions;
 use crate::routes::mod_creation::{CreateError, UploadedFile};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
@@ -180,52 +181,25 @@ async fn version_create_inner(
 
             // Check that the user creating this version is a team member
             // of the mod the version is being added to.
-            let member_ids = sqlx::query!(
-                "
-                SELECT user_id FROM team_members tm
-                INNER JOIN mods ON mods.team_id = tm.team_id
-                WHERE mods.id = $1
-                ",
-                mod_id as models::ModId,
-            )
-            .fetch_all(&mut *transaction)
-            .await?;
+            let team_member =
+                models::TeamMember::get_from_user_id_mod(mod_id, user.id.into(), &mut *transaction)
+                    .await?
+                    .ok_or_else(|| {
+                        CreateError::CustomAuthenticationError(
+                            "You don't have permission to upload this version!".to_string(),
+                        )
+                    })?;
 
-            let member_ids: Vec<models::UserId> = member_ids
-                .iter()
-                .map(|m| models::UserId(m.user_id))
-                .collect();
-
-            if !member_ids.contains(&user.id.into()) {
-                // TODO: Some team members may not have the permissions
-                // to upload mods; We need a more in depth permissions
-                // system.
-                return Err(CreateError::InvalidInput("Unauthorized".to_string()));
+            if !team_member
+                .permissions
+                .contains(Permissions::UPLOAD_VERSION)
+            {
+                return Err(CreateError::CustomAuthenticationError(
+                    "You don't have permission to upload this version!".to_string(),
+                ));
             }
 
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
-
-            let body_path;
-
-            if let Some(body) = &version_create_data.version_body {
-                let path = format!(
-                    "data/{}/versions/{}/changelog.md",
-                    version_create_data.mod_id.unwrap(),
-                    version_create_data.version_number
-                );
-
-                let uploaded_text = file_host
-                    .upload_file("text/plain", &path, body.clone().into_bytes())
-                    .await?;
-
-                uploaded_files.push(UploadedFile {
-                    file_id: uploaded_text.file_id,
-                    file_name: uploaded_text.file_name.clone(),
-                });
-                body_path = Some(path);
-            } else {
-                body_path = None;
-            }
 
             let release_channel = models::ChannelId::get_id(
                 version_create_data.release_channel.as_str(),
@@ -256,7 +230,10 @@ async fn version_create_inner(
                 author_id: user.id.into(),
                 name: version_create_data.version_title.clone(),
                 version_number: version_create_data.version_number.clone(),
-                changelog_url: body_path.map(|path| format!("{}/{}", cdn_url, path)),
+                changelog: version_create_data
+                    .version_body
+                    .clone()
+                    .unwrap_or_else(|| "".to_string()),
                 files: Vec::new(),
                 dependencies: version_create_data
                     .dependencies
@@ -303,7 +280,8 @@ async fn version_create_inner(
         featured: builder.featured,
         name: builder.name.clone(),
         version_number: builder.version_number.clone(),
-        changelog_url: builder.changelog_url.clone(),
+        changelog: builder.changelog.clone(),
+        changelog_url: None,
         date_published: chrono::Utc::now(),
         downloads: 0,
         version_type: version_data.release_channel,
@@ -418,8 +396,22 @@ async fn upload_file_to_version_inner(
         }
     };
 
-    if version.author_id as u64 != user.id.0 {
-        return Err(CreateError::InvalidInput("Unauthorized".to_string()));
+    let team_member =
+        models::TeamMember::get_from_user_id_version(version_id, user.id.into(), &mut *transaction)
+            .await?
+            .ok_or_else(|| {
+                CreateError::CustomAuthenticationError(
+                    "You don't have permission to upload files to this version!".to_string(),
+                )
+            })?;
+
+    if team_member
+        .permissions
+        .contains(Permissions::UPLOAD_VERSION)
+    {
+        return Err(CreateError::CustomAuthenticationError(
+            "You don't have permission to upload files to this version!".to_string(),
+        ));
     }
 
     let mod_id = ModId(version.mod_id as u64);
@@ -526,12 +518,20 @@ pub async fn upload_file(
     Ok(models::version_item::VersionFileBuilder {
         filename: file_name.to_string(),
         url: format!("{}/{}", cdn_url, upload_data.file_name),
-        hashes: vec![models::version_item::HashBuilder {
-            algorithm: "sha1".to_string(),
-            // This is an invalid cast - the database expects the hash's
-            // bytes, but this is the string version.
-            hash: upload_data.content_sha1.into_bytes(),
-        }],
+        hashes: vec![
+            models::version_item::HashBuilder {
+                algorithm: "sha1".to_string(),
+                // This is an invalid cast - the database expects the hash's
+                // bytes, but this is the string version.
+                hash: upload_data.content_sha1.into_bytes(),
+            },
+            models::version_item::HashBuilder {
+                algorithm: "sha512".to_string(),
+                // This is an invalid cast - the database expects the hash's
+                // bytes, but this is the string version.
+                hash: upload_data.content_sha512.into_bytes(),
+            },
+        ],
         primary: uploaded_files.len() == 1,
     })
 }

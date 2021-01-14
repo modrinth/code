@@ -1,4 +1,4 @@
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::database::models::{TeamMember, User};
 use crate::file_hosting::FileHost;
 use crate::models::users::{Role, UserId};
@@ -420,24 +420,42 @@ pub async fn user_icon_edit(
     }
 }
 
-// TODO: Make this actually do stuff
+#[derive(Deserialize)]
+pub struct RemovalType {
+    #[serde(default = "default_removal")]
+    removal_type: String,
+}
+
+fn default_removal() -> String {
+    "partial".into()
+}
+
 #[delete("{id}")]
 pub async fn user_delete(
     req: HttpRequest,
     info: web::Path<(UserId,)>,
     pool: web::Data<PgPool>,
+    removal_type: web::Query<RemovalType>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(
-        req.headers(),
-        &mut *pool
-            .acquire()
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?,
-    )
-    .await?;
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let id = info.into_inner().0;
 
-    let _id = info.0;
-    let result = Some(());
+    if !user.role.is_mod() && user.id != id {
+        return Err(ApiError::CustomAuthenticationError(
+            "You do not have permission to delete this user!".to_string(),
+        ));
+    }
+
+    let result;
+    if &*removal_type.removal_type == "full" {
+        result = crate::database::models::User::remove_full(id.into(), &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    } else {
+        result = crate::database::models::User::remove(id.into(), &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    };
 
     if result.is_some() {
         Ok(HttpResponse::Ok().body(""))

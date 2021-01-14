@@ -36,7 +36,7 @@ pub struct ModBuilder {
     pub team_id: TeamId,
     pub title: String,
     pub description: String,
-    pub body_url: String,
+    pub body: String,
     pub icon_url: Option<String>,
     pub issues_url: Option<String>,
     pub source_url: Option<String>,
@@ -63,7 +63,8 @@ impl ModBuilder {
             team_id: self.team_id,
             title: self.title,
             description: self.description,
-            body_url: self.body_url,
+            body: self.body,
+            body_url: None,
             published: chrono::Utc::now(),
             updated: chrono::Utc::now(),
             status: self.status,
@@ -113,7 +114,8 @@ pub struct Mod {
     pub team_id: TeamId,
     pub title: String,
     pub description: String,
-    pub body_url: String,
+    pub body: String,
+    pub body_url: Option<String>,
     pub published: chrono::DateTime<chrono::Utc>,
     pub updated: chrono::DateTime<chrono::Utc>,
     pub status: StatusId,
@@ -138,7 +140,7 @@ impl Mod {
         sqlx::query!(
             "
             INSERT INTO mods (
-                id, team_id, title, description, body_url,
+                id, team_id, title, description, body,
                 published, downloads, icon_url, issues_url,
                 source_url, wiki_url, status, discord_url,
                 client_side, server_side, license_url, license,
@@ -156,7 +158,7 @@ impl Mod {
             self.team_id as TeamId,
             &self.title,
             &self.description,
-            &self.body_url,
+            &self.body,
             self.published,
             self.downloads,
             self.icon_url.as_ref(),
@@ -184,7 +186,7 @@ impl Mod {
         let result = sqlx::query!(
             "
             SELECT title, description, downloads,
-                   icon_url, body_url, published,
+                   icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug
@@ -217,6 +219,7 @@ impl Mod {
                 server_side: SideTypeId(row.server_side),
                 license: LicenseId(row.license),
                 slug: row.slug,
+                body: row.body,
             }))
         } else {
             Ok(None)
@@ -233,7 +236,7 @@ impl Mod {
         let mods = sqlx::query!(
             "
             SELECT id, title, description, downloads,
-                   icon_url, body_url, published,
+                   icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug
@@ -264,6 +267,7 @@ impl Mod {
                 server_side: SideTypeId(m.server_side),
                 license: LicenseId(m.license),
                 slug: m.slug,
+                body: m.body,
             }))
         })
         .try_collect::<Vec<Mod>>()

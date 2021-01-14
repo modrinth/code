@@ -48,6 +48,8 @@ pub enum CreateError {
     InvalidFileType(String),
     #[error("Authentication Error: {0}")]
     Unauthorized(#[from] AuthenticationError),
+    #[error("Authentication Error: {0}")]
+    CustomAuthenticationError(String),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -68,6 +70,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
             CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
+            CreateError::CustomAuthenticationError(..) => StatusCode::UNAUTHORIZED,
         }
     }
 
@@ -89,6 +92,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidCategory(..) => "invalid_input",
                 CreateError::InvalidFileType(..) => "invalid_input",
                 CreateError::Unauthorized(..) => "unauthorized",
+                CreateError::CustomAuthenticationError(..) => "unauthorized",
             },
             description: &self.to_string(),
         })
@@ -334,18 +338,8 @@ async fn mod_create_inner(
                     )));
                 }
             }
-            versions.push(
-                create_initial_version(
-                    data,
-                    mod_id,
-                    current_user.id,
-                    &cdn_url,
-                    transaction,
-                    file_host,
-                    uploaded_files,
-                )
-                .await?,
-            );
+            versions
+                .push(create_initial_version(data, mod_id, current_user.id, transaction).await?);
         }
 
         mod_create_data = create_data;
@@ -436,24 +430,6 @@ async fn mod_create_inner(
             categories.push(id);
         }
 
-        // Upload the mod desciption markdown to the CDN
-        // TODO: Should we also process and upload an html version here for SSR?
-        let body_path = format!("data/{}/description.md", mod_id);
-        {
-            let upload_data = file_host
-                .upload_file(
-                    "text/plain",
-                    &body_path,
-                    mod_create_data.mod_body.into_bytes(),
-                )
-                .await?;
-
-            uploaded_files.push(UploadedFile {
-                file_id: upload_data.file_id,
-                file_name: upload_data.file_name,
-            });
-        }
-
         let team = models::team_item::TeamBuilder {
             members: vec![models::team_item::TeamMemberBuilder {
                 user_id: current_user.id.into(),
@@ -527,7 +503,7 @@ async fn mod_create_inner(
             team_id,
             title: mod_create_data.mod_name,
             description: mod_create_data.mod_description,
-            body_url: format!("{}/{}", cdn_url, body_path),
+            body: mod_create_data.mod_body,
             icon_url,
             issues_url: mod_create_data.issues_url,
             source_url: mod_create_data.source_url,
@@ -553,7 +529,8 @@ async fn mod_create_inner(
             team: team_id.into(),
             title: mod_builder.title.clone(),
             description: mod_builder.description.clone(),
-            body_url: mod_builder.body_url.clone(),
+            body: mod_builder.body.clone(),
+            body_url: None,
             published: now,
             updated: now,
             status: status.clone(),
@@ -596,10 +573,7 @@ async fn create_initial_version(
     version_data: &InitialVersionData,
     mod_id: ModId,
     author: UserId,
-    cdn_url: &str,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    file_host: &dyn FileHost,
-    uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.mod_id.is_some() {
         return Err(CreateError::InvalidInput(String::from(
@@ -612,30 +586,6 @@ async fn create_initial_version(
 
     // Randomly generate a new id to be used for the version
     let version_id: VersionId = models::generate_version_id(transaction).await?.into();
-
-    // Upload the version's changelog to the CDN
-    let changelog_path = if let Some(changelog) = &version_data.version_body {
-        let changelog_path = format!(
-            "data/{}/versions/{}/changelog.md",
-            mod_id, version_data.version_number
-        );
-
-        let uploaded_text = file_host
-            .upload_file(
-                "text/plain",
-                &changelog_path,
-                changelog.clone().into_bytes(),
-            )
-            .await?;
-
-        uploaded_files.push(UploadedFile {
-            file_id: uploaded_text.file_id,
-            file_name: uploaded_text.file_name,
-        });
-        Some(changelog_path)
-    } else {
-        None
-    };
 
     let release_channel =
         models::ChannelId::get_id(version_data.release_channel.as_str(), &mut *transaction)
@@ -670,7 +620,10 @@ async fn create_initial_version(
         author_id: author.into(),
         name: version_data.version_title.clone(),
         version_number: version_data.version_number.clone(),
-        changelog_url: changelog_path.map(|path| format!("{}/{}", cdn_url, path)),
+        changelog: version_data
+            .version_body
+            .clone()
+            .unwrap_or_else(|| "".to_string()),
         files: Vec::new(),
         dependencies,
         game_versions,

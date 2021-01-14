@@ -1,5 +1,5 @@
 use super::ApiError;
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::auth::get_user_from_headers;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::teams::Permissions;
@@ -159,6 +159,7 @@ fn convert_version(data: database::models::version_item::QueryVersion) -> models
         featured: data.featured,
         name: data.name,
         version_number: data.version_number,
+        changelog: data.changelog,
         changelog_url: data.changelog_url,
         date_published: data.date_published,
         downloads: data.downloads as u32,
@@ -220,7 +221,6 @@ pub async fn version_edit(
     req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     new_version: web::Json<EditVersion>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
@@ -233,18 +233,8 @@ pub async fn version_edit(
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     if let Some(version_item) = result {
-        let mod_item = database::models::Mod::get(version_item.mod_id, &**pool)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?
-            .ok_or_else(|| {
-                ApiError::InvalidInputError(
-                    "Attempted to edit version not attached to mod. How did this happen?"
-                        .to_string(),
-                )
-            })?;
-
-        let team_member = database::models::TeamMember::get_from_user_id(
-            mod_item.team_id,
+        let team_member = database::models::TeamMember::get_from_user_id_version(
+            version_item.id,
             user.id.into(),
             &**pool,
         )
@@ -494,17 +484,18 @@ pub async fn version_edit(
             }
 
             if let Some(body) = &new_version.changelog {
-                let mod_id: models::mods::ModId = version_item.mod_id.into();
-                let body_path = format!(
-                    "data/{}/versions/{}/changelog.md",
-                    mod_id, version_item.version_number
-                );
-
-                file_host.delete_file_version("", &*body_path).await?;
-
-                file_host
-                    .upload_file("text/plain", &body_path, body.clone().into_bytes())
-                    .await?;
+                sqlx::query!(
+                    "
+                    UPDATE versions
+                    SET changelog = $1
+                    WHERE (id = $2)
+                    ",
+                    body,
+                    id as database::models::ids::VersionId,
+                )
+                .execute(&mut *transaction)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
             }
 
             transaction
@@ -532,20 +523,8 @@ pub async fn version_delete(
     let id = info.into_inner().0;
 
     if !user.role.is_mod() {
-        let version = database::models::Version::get(id.into(), &**pool)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?
-            .ok_or_else(|| {
-                ApiError::InvalidInputError("An invalid version ID was specified".to_string())
-            })?;
-        let mod_item = database::models::Mod::get(version.mod_id, &**pool)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?
-            .ok_or_else(|| {
-                ApiError::InvalidInputError("The version is not attached to a mod".to_string())
-            })?;
-        let team_member = database::models::TeamMember::get_from_user_id(
-            mod_item.team_id,
+        let team_member = database::models::TeamMember::get_from_user_id_version(
+            id.into(),
             user.id.into(),
             &**pool,
         )
@@ -735,7 +714,7 @@ pub async fn delete_file(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     algorithm: web::Query<Algorithm>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(req.headers(), &**pool).await?;
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
 
     let hash = info.into_inner().0;
 
@@ -754,6 +733,30 @@ pub async fn delete_file(
     .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     if let Some(row) = result {
+        if !user.role.is_mod() {
+            let team_member = database::models::TeamMember::get_from_user_id_version(
+                database::models::ids::VersionId(row.version_id),
+                user.id.into(),
+                &**pool,
+            )
+            .await
+            .map_err(ApiError::DatabaseError)?
+            .ok_or_else(|| {
+                ApiError::CustomAuthenticationError(
+                    "You don't have permission to delete this file!".to_string(),
+                )
+            })?;
+
+            if !team_member
+                .permissions
+                .contains(Permissions::DELETE_VERSION)
+            {
+                return Err(ApiError::CustomAuthenticationError(
+                    "You don't have permission to delete this file!".to_string(),
+                ));
+            }
+        }
+
         let mut transaction = pool
             .begin()
             .await

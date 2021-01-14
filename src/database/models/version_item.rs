@@ -7,7 +7,7 @@ pub struct VersionBuilder {
     pub author_id: UserId,
     pub name: String,
     pub version_number: String,
-    pub changelog_url: Option<String>,
+    pub changelog: String,
     pub files: Vec<VersionFileBuilder>,
     pub dependencies: Vec<VersionId>,
     pub game_versions: Vec<GameVersionId>,
@@ -78,7 +78,8 @@ impl VersionBuilder {
             author_id: self.author_id,
             name: self.name,
             version_number: self.version_number,
-            changelog_url: self.changelog_url,
+            changelog: self.changelog,
+            changelog_url: None,
             date_published: chrono::Utc::now(),
             downloads: 0,
             release_channel: self.release_channel,
@@ -152,6 +153,7 @@ pub struct Version {
     pub author_id: UserId,
     pub name: String,
     pub version_number: String,
+    pub changelog: String,
     pub changelog_url: Option<String>,
     pub date_published: chrono::DateTime<chrono::Utc>,
     pub downloads: i32,
@@ -382,7 +384,7 @@ impl Version {
         let result = sqlx::query!(
             "
             SELECT v.mod_id, v.author_id, v.name, v.version_number,
-                v.changelog_url, v.date_published, v.downloads,
+                v.changelog, v.changelog_url, v.date_published, v.downloads,
                 v.release_channel, v.accepted, v.featured
             FROM versions v
             WHERE v.id = $1
@@ -399,6 +401,7 @@ impl Version {
                 author_id: UserId(row.author_id),
                 name: row.name,
                 version_number: row.version_number,
+                changelog: row.changelog,
                 changelog_url: row.changelog_url,
                 date_published: row.date_published,
                 downloads: row.downloads,
@@ -424,7 +427,7 @@ impl Version {
         let versions = sqlx::query!(
             "
             SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
-                v.changelog_url, v.date_published, v.downloads,
+                v.changelog, v.changelog_url, v.date_published, v.downloads,
                 v.release_channel, v.accepted, v.featured
             FROM versions v
             WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
@@ -439,6 +442,7 @@ impl Version {
                 author_id: UserId(v.author_id),
                 name: v.name,
                 version_number: v.version_number,
+                changelog: v.changelog,
                 changelog_url: v.changelog_url,
                 date_published: v.date_published,
                 downloads: v.downloads,
@@ -463,7 +467,7 @@ impl Version {
         let result = sqlx::query!(
             "
             SELECT v.mod_id, v.author_id, v.name, v.version_number,
-                v.changelog_url, v.date_published, v.downloads,
+                v.changelog, v.changelog_url, v.date_published, v.downloads,
                 release_channels.channel, v.accepted, v.featured
             FROM versions v
             INNER JOIN release_channels ON v.release_channel = release_channels.id
@@ -545,6 +549,7 @@ impl Version {
                 author_id: UserId(row.author_id),
                 name: row.name,
                 version_number: row.version_number,
+                changelog: row.changelog,
                 changelog_url: row.changelog_url,
                 date_published: row.date_published,
                 downloads: row.downloads,
@@ -599,6 +604,7 @@ pub struct QueryVersion {
     pub author_id: UserId,
     pub name: String,
     pub version_number: String,
+    pub changelog: String,
     pub changelog_url: Option<String>,
     pub date_published: chrono::DateTime<chrono::Utc>,
     pub downloads: i32,
