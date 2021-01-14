@@ -440,14 +440,14 @@ pub async fn user_delete(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id = info.into_inner().0;
 
-    if !user.role.is_mod() && user.id == user.id {
+    if !user.role.is_mod() && user.id != id {
         return Err(ApiError::CustomAuthenticationError(
             "You do not have permission to delete this user!".to_string(),
         ));
     }
 
     let result;
-    if removal_type.removal_type == "full".to_string() {
+    if &*removal_type.removal_type == "full" {
         result = crate::database::models::User::remove_full(id.into(), &**pool)
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?;

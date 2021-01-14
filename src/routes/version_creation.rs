@@ -181,17 +181,14 @@ async fn version_create_inner(
 
             // Check that the user creating this version is a team member
             // of the mod the version is being added to.
-            let team_member = models::TeamMember::get_from_user_id_mod(
-                mod_id.into(),
-                user.id.into(),
-                &mut *transaction,
-            )
-            .await?
-            .ok_or_else(|| {
-                CreateError::CustomAuthenticationError(
-                    "You don't have permission to upload this version!".to_string(),
-                )
-            })?;
+            let team_member =
+                models::TeamMember::get_from_user_id_mod(mod_id, user.id.into(), &mut *transaction)
+                    .await?
+                    .ok_or_else(|| {
+                        CreateError::CustomAuthenticationError(
+                            "You don't have permission to upload this version!".to_string(),
+                        )
+                    })?;
 
             if !team_member
                 .permissions
@@ -399,17 +396,14 @@ async fn upload_file_to_version_inner(
         }
     };
 
-    let team_member = models::TeamMember::get_from_user_id_version(
-        version_id.into(),
-        user.id.into(),
-        &mut *transaction,
-    )
-    .await?
-    .ok_or_else(|| {
-        CreateError::CustomAuthenticationError(
-            "You don't have permission to upload files to this version!".to_string(),
-        )
-    })?;
+    let team_member =
+        models::TeamMember::get_from_user_id_version(version_id, user.id.into(), &mut *transaction)
+            .await?
+            .ok_or_else(|| {
+                CreateError::CustomAuthenticationError(
+                    "You don't have permission to upload files to this version!".to_string(),
+                )
+            })?;
 
     if team_member
         .permissions
