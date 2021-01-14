@@ -3,6 +3,7 @@ use async_trait::async_trait;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
+use sha2::Digest;
 
 pub struct S3Host {
     bucket: Bucket,
@@ -40,6 +41,7 @@ impl FileHost for S3Host {
         file_bytes: Vec<u8>,
     ) -> Result<UploadFileData, FileHostingError> {
         let content_sha1 = sha1::Sha1::from(&file_bytes).hexdigest();
+        let content_sha512 = format!("{:x}", sha2::Sha512::digest(&file_bytes));
 
         self.bucket
             .put_object_with_content_type(
@@ -49,37 +51,11 @@ impl FileHost for S3Host {
             )
             .await?;
 
-        let provider = &*dotenv::var("S3_PROVIDER").unwrap();
-
-        if provider == "do" {
-            reqwest::Client::new()
-                .delete(&*format!(
-                    "https://api.digitalocean.com/v2/cdn/endpoints/{}/cache",
-                    self.bucket.name
-                ))
-                .header(reqwest::header::CONTENT_TYPE, "application/json")
-                .header(
-                    reqwest::header::AUTHORIZATION,
-                    self.bucket
-                        .credentials
-                        .secret_key
-                        .clone()
-                        .unwrap_or_else(|| "".to_string()),
-                )
-                .body(
-                    serde_json::json!({
-                        "files": vec![file_name],
-                    })
-                    .to_string(),
-                )
-                .send()
-                .await?;
-        }
-
         Ok(UploadFileData {
             file_id: file_name.to_string(),
             file_name: file_name.to_string(),
             content_length: file_bytes.len() as u32,
+            content_sha512,
             content_sha1,
             content_md5: None,
             content_type: content_type.to_string(),

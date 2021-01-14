@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 #[serde(into = "Base62Id")]
 pub struct UserId(pub u64);
 
+pub const DELETED_USER: UserId = UserId(127155982985829);
+
 #[derive(Serialize, Deserialize)]
 pub struct User {
     pub id: UserId,

@@ -207,4 +207,121 @@ impl User {
 
         Ok(mods)
     }
+
+    pub async fn remove<'a, 'b, E>(id: UserId, exec: E) -> Result<Option<()>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let deleted_user: UserId = crate::models::users::DELETED_USER.into();
+
+        sqlx::query!(
+            "
+            UPDATE team_members
+            SET user_id = $1
+            WHERE (user_id = $2 AND role = $3)
+            ",
+            deleted_user as UserId,
+            id as UserId,
+            crate::models::teams::OWNER_ROLE
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            UPDATE versions
+            SET author_id = $1
+            WHERE (author_id = $2)
+            ",
+            deleted_user as UserId,
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM team_members
+            WHERE user_id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM users
+            WHERE id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(Some(()))
+    }
+
+    pub async fn remove_full<'a, 'b, E>(
+        id: UserId,
+        exec: E,
+    ) -> Result<Option<()>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::TryStreamExt;
+        let mods: Vec<ModId> = sqlx::query!(
+            "
+            SELECT m.id FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id
+            WHERE tm.user_id = $1 AND tm.role = $2
+            ",
+            id as UserId,
+            crate::models::teams::OWNER_ROLE
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|m| ModId(m.id))) })
+        .try_collect::<Vec<ModId>>()
+        .await?;
+
+        for mod_id in mods {
+            let _result = super::mod_item::Mod::remove_full(mod_id, exec).await?;
+        }
+
+        let deleted_user: UserId = crate::models::users::DELETED_USER.into();
+
+        sqlx::query!(
+            "
+            UPDATE versions
+            SET author_id = $1
+            WHERE (author_id = $2)
+            ",
+            deleted_user as UserId,
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM team_members
+            WHERE user_id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM users
+            WHERE id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        Ok(Some(()))
+    }
 }

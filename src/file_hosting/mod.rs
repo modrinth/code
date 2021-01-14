@@ -32,6 +32,7 @@ pub struct UploadFileData {
     pub file_id: String,
     pub file_name: String,
     pub content_length: u32,
+    pub content_sha512: String,
     pub content_sha1: String,
     pub content_md5: Option<String>,
     pub content_type: String,

@@ -32,8 +32,8 @@ pub struct ModerationMod {
     pub title: String,
     /// A short description of the mod.
     pub description: String,
-    /// The link to the long description of the mod.
-    pub body_url: String,
+    /// The long description of the mod.
+    pub body: String,
     /// The date at which the mod was first published.
     pub published: DateTime<Utc>,
     /// The date at which the mod was first published.
@@ -85,7 +85,7 @@ pub async fn mods(
             team: database::models::ids::TeamId(m.team_id).into(),
             title: m.title,
             description: m.description,
-            body_url: m.body_url,
+            body: m.body,
             published: m.published,
             icon_url: m.icon_url,
             issues_url: m.issues_url,
@@ -133,6 +133,7 @@ pub async fn versions(
             featured: m.featured,
             name: m.name,
             version_number: m.version_number,
+            changelog: m.changelog,
             changelog_url: m.changelog_url,
             date_published: m.date_published,
             downloads: m.downloads as u32,

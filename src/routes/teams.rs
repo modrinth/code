@@ -287,7 +287,8 @@ pub async fn remove_team_member(
     let user_id = ids.1.into();
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
-    let team_member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool).await?;
+    let team_member =
+        TeamMember::get_from_user_id_pending(id, current_user.id.into(), &**pool).await?;
 
     let member = match team_member {
         Some(m) => m,
@@ -312,7 +313,7 @@ pub async fn remove_team_member(
             // Members other than the owner can either leave the team, or be
             // removed by a member with the REMOVE_MEMBER permission.
             if delete_member.user_id == member.user_id
-                || member.permissions.contains(Permissions::REMOVE_MEMBER)
+                || (member.permissions.contains(Permissions::REMOVE_MEMBER) && member.accepted)
             {
                 TeamMember::delete(id, user_id, &**pool).await?;
             } else {
@@ -321,7 +322,7 @@ pub async fn remove_team_member(
                 ));
             }
         } else if delete_member.user_id == member.user_id
-            || member.permissions.contains(Permissions::MANAGE_INVITES)
+            || (member.permissions.contains(Permissions::MANAGE_INVITES) && member.accepted)
         {
             // This is a pending invite rather than a member, so the
             // user being invited or team members with the MANAGE_INVITES
