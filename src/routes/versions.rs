@@ -309,9 +309,9 @@ pub async fn version_edit(
                     number,
                     id as database::models::ids::VersionId,
                 )
-                    .execute(&mut *transaction)
-                    .await
-                    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+                .execute(&mut *transaction)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
             }
 
             if let Some(version_type) = &new_version.version_type {
