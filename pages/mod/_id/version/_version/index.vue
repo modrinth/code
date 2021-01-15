@@ -22,7 +22,7 @@
         </span>
         <Categories :categories="version.loaders" />
         <div class="buttons">
-          <button class="action" @click="deleteVersion">
+          <button v-if="currentMember" class="action" @click="deleteVersion">
             <TrashIcon />
             Delete
           </button>
