@@ -3,6 +3,12 @@
     <div class="page-contents">
       <header class="columns">
         <h2 class="column-grow-1">Edit Mod</h2>
+        <nuxt-link
+          :to="'/mod/' + (mod.slug ? mod.slug : mod.id)"
+          class="button column"
+        >
+          Back
+        </nuxt-link>
         <button
           v-if="mod.status === 'rejected' || mod.status === 'draft'"
           title="Submit for Review"
@@ -174,9 +180,9 @@
         </span>
         <div class="columns">
           <div class="textarea-wrapper">
-            <textarea id="body" v-model="body"></textarea>
+            <textarea id="body" v-model="mod.body"></textarea>
           </div>
-          <div v-compiled-markdown="body" class="markdown-body"></div>
+          <div v-compiled-markdown="mod.body" class="markdown-body"></div>
         </div>
       </section>
       <section class="extra-links">
@@ -309,15 +315,12 @@ export default {
         name: mod.license.name,
       }
 
-      const reg = /.+?:\/\/.+?(\/.+?)(?:#|\?|$)/
-      const urlPath = reg.exec(mod.body_url)[1]
-      const res = await axios.get(
-        `https://modrinth-cdn.nyc3.digitaloceanspaces.com${urlPath}`
-      )
+      if (mod.body_url && !mod.body) {
+        mod.body = (await axios.get(mod.body_url)).data
+      }
 
       return {
         mod,
-        body: res.data,
         clientSideType: {
           label: mod.client_side,
           id: mod.client_side,

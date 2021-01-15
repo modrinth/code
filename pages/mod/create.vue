@@ -556,6 +556,12 @@ export default {
     async createMod() {
       this.$nuxt.$loading.start()
 
+      for (const version of this.versions) {
+        if (!version.version_title) {
+          version.version_title = version.version_number
+        }
+      }
+
       const formData = new FormData()
 
       formData.append(

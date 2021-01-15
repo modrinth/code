@@ -6,6 +6,39 @@
     :current-member="currentMember"
   >
     <div class="section-header columns">
+      <h3 class="column-grow-1">General</h3>
+    </div>
+    <section>
+      <h3>Edit Mod</h3>
+      <label>
+        <span> This leads you to a page where you can edit your mod. </span>
+        <nuxt-link class="button" to="edit">Edit</nuxt-link>
+      </label>
+      <h3>Create Version</h3>
+      <label>
+        <span>
+          This leads to a page where you can create a version for your mod.
+        </span>
+        <nuxt-link class="button" to="newversion">Create Version</nuxt-link>
+      </label>
+      <h3>Delete Mod</h3>
+      <label>
+        <span>
+          Clicking on this WILL delete your mod. Do not click on this unless you
+          want your mod deleted. If you delete your mod, all versions and any
+          attatched data will be removed from our servers. This may break other
+          projects, so be careful!
+        </span>
+        <div
+          class="button"
+          :disabled="(currentMember.permissions & DELETE_MOD) !== DELETE_MOD"
+          @click="deleteMod"
+        >
+          Delete Mod
+        </div>
+      </label>
+    </section>
+    <div class="section-header columns">
       <h3 class="column-grow-1">Team members</h3>
       <div class="column">
         <input
@@ -392,6 +425,18 @@ export default {
 
       this.$nuxt.$loading.finish()
     },
+    async deleteMod() {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      await axios.delete(
+        `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
+        config
+      )
+    },
   },
 }
 </script>
@@ -484,6 +529,36 @@ input,
 button {
   &:disabled {
     cursor: not-allowed !important;
+  }
+}
+
+section {
+  @extend %card;
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+  margin-bottom: var(--spacing-card-md);
+
+  label {
+    display: flex;
+
+    span {
+      flex: 2;
+      padding-right: var(--spacing-card-lg);
+    }
+
+    input {
+      flex: 3;
+      height: fit-content;
+    }
+
+    div,
+    a {
+      text-align: center;
+      height: fit-content;
+      flex: 1;
+    }
+    div:hover {
+      cursor: pointer;
+    }
   }
 }
 </style>

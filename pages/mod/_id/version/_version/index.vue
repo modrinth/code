@@ -21,17 +21,31 @@
           {{ version.version_number }}
         </span>
         <Categories :categories="version.loaders" />
-        <a
-          v-if="primaryFile"
-          :href="primaryFile.url"
-          class="download-button"
-          @click.prevent="
-            downloadFile(primaryFile.hashes.sha1, primaryFile.url)
-          "
-        >
-          <DownloadIcon />
-          Download
-        </a>
+        <div class="buttons">
+          <button class="action" @click="deleteVersion">
+            <TrashIcon />
+            Delete
+          </button>
+          <nuxt-link
+            v-if="currentMember"
+            class="action"
+            :to="version.id + '/edit'"
+          >
+            <EditIcon />
+            Edit
+          </nuxt-link>
+          <a
+            v-if="primaryFile"
+            :href="primaryFile.url"
+            class="action"
+            @click.prevent="
+              downloadFile(primaryFile.hashes.sha1, primaryFile.url)
+            "
+          >
+            <DownloadIcon />
+            Download
+          </a>
+        </div>
       </div>
       <div class="stats">
         <div class="stat">
@@ -67,7 +81,10 @@
           </div>
         </div>
       </div>
-      <div v-compiled-markdown="changelog" class="markdown-body"></div>
+      <div
+        v-compiled-markdown="version.changelog ? version.changelog : ''"
+        class="markdown-body"
+      ></div>
       <div class="files">
         <div v-for="file in version.files" :key="file.hashes.sha1" class="file">
           <div class="text-wrapper">
@@ -98,6 +115,8 @@ import ModPage from '@/components/ModPage'
 
 import Categories from '@/components/Categories'
 import FileInput from '@/components/FileInput'
+import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import TagIcon from '~/assets/images/utils/tag.svg?inline'
@@ -110,13 +129,10 @@ export default {
     DownloadIcon,
     CalendarIcon,
     TagIcon,
+    TrashIcon,
+    EditIcon,
   },
   auth: false,
-  async fetch() {
-    if (this.version.changelog_url) {
-      this.changelog = (await axios.get(this.version.changelog_url)).data
-    }
-  },
   async asyncData(data) {
     const config = {
       headers: {
@@ -175,6 +191,10 @@ export default {
         ? members.find((x) => x.user_id === data.$auth.user.id)
         : null
 
+      if (!version.changelog && version.changelog_url) {
+        version.changelog = (await axios.get(version.changelog_url)).data
+      }
+
       return {
         mod,
         versions: versions.sort(
@@ -196,7 +216,6 @@ export default {
   },
   data() {
     return {
-      changelog: '',
       filesToUpload: [],
     }
   },
@@ -212,6 +231,8 @@ export default {
       elem.click()
     },
     async deleteFile(hash) {
+      this.$nuxt.$loading.start()
+
       const config = {
         headers: {
           Authorization: this.$auth.getToken('local'),
@@ -222,8 +243,13 @@ export default {
         `https://api.modrinth.com/api/v1/version_file/${hash}`,
         config
       )
+
+      await this.$router.go(null)
+      this.$nuxt.$loading.finish()
     },
     async makePrimary(hash) {
+      this.$nuxt.$loading.start()
+
       const config = {
         headers: {
           Authorization: this.$auth.getToken('local'),
@@ -233,12 +259,13 @@ export default {
       await axios.patch(
         `https://api.modrinth.com/api/v1/version/${this.version.id}`,
         {
-          primary_file: {
-            sha1: hash,
-          },
+          primary_file: ['sha1', hash],
         },
         config
       )
+
+      await this.$router.go(null)
+      this.$nuxt.$loading.finish()
     },
     async addFiles(e) {
       this.filesToUpload = e.target.files
@@ -285,6 +312,23 @@ export default {
         window.scrollTo({ top: 0, behavior: 'smooth' })
       }
 
+      this.$nuxt.$loading.finish()
+    },
+    async deleteVersion() {
+      this.$nuxt.$loading.start()
+
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      await axios.delete(
+        `https://api.modrinth.com/api/v1/version/${this.version.id}`,
+        config
+      )
+
+      await this.$router.replace(`/mod/${this.mod.id}`)
       this.$nuxt.$loading.finish()
     },
   },
@@ -350,23 +394,27 @@ export default {
       margin: auto 0.5rem auto 0;
     }
 
-    .download-button {
-      margin-left: auto;
-      padding: 0.5rem;
-      color: var(--color-button-text);
-      background-color: var(--color-button-bg);
-      justify-self: flex-end;
+    .buttons {
       display: flex;
-      align-items: center;
-      border-radius: var(--size-rounded-sm);
+      margin-left: auto;
 
-      &:hover,
-      &:focus {
-        background-color: var(--color-button-bg-hover);
-      }
+      .action {
+        padding: 0.5rem;
+        color: var(--color-button-text);
+        background-color: var(--color-button-bg);
+        display: flex;
+        align-items: center;
+        border-radius: var(--size-rounded-sm);
+        margin: 0 0 0 0.5rem;
 
-      svg {
-        margin-right: 0.25rem;
+        &:hover,
+        &:focus {
+          background-color: var(--color-button-bg-hover);
+        }
+
+        svg {
+          margin-right: 0.25rem;
+        }
       }
     }
   }

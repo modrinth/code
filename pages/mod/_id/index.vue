@@ -5,7 +5,11 @@
     :members="members"
     :current-member="currentMember"
   >
-    <div v-compiled-markdown="body" v-highlightjs class="markdown-body"></div>
+    <div
+      v-compiled-markdown="mod.body"
+      v-highlightjs
+      class="markdown-body"
+    ></div>
   </ModPage>
 </template>
 
@@ -16,15 +20,6 @@ import ModPage from '@/components/ModPage'
 export default {
   components: { ModPage },
   auth: false,
-  async fetch() {
-    const reg = /.+?:\/\/.+?(\/.+?)(?:#|\?|$)/
-    const urlPath = reg.exec(this.mod.body_url)[1]
-    this.body = (
-      await axios.get(
-        `https://modrinth-cdn.nyc3.digitaloceanspaces.com${urlPath}`
-      )
-    ).data
-  },
   async asyncData(data) {
     const config = {
       headers: {
@@ -41,6 +36,10 @@ export default {
           config
         )
       ).data
+
+      if (mod.body_url && !mod.body) {
+        mod.body = (await axios.get(mod.body_url)).data
+      }
 
       const [members, versions] = (
         await Promise.all([
@@ -88,11 +87,6 @@ export default {
         statusCode: 404,
         message: 'Mod not found',
       })
-    }
-  },
-  data() {
-    return {
-      body: '',
     }
   },
   head() {

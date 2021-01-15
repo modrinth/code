@@ -26,10 +26,10 @@
       :is-modrinth="true"
     >
       <nuxt-link
-        class="button buttonse column"
-        :to="'/mod/' + mod.id + '/edit'"
+        class="button buttons column"
+        :to="'/mod/' + mod.id + '/settings'"
       >
-        Edit
+        Settings
       </nuxt-link>
     </ModCard>
   </DashboardPage>

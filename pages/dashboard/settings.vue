@@ -5,7 +5,7 @@
       <h3 class="column-grow-1">Settings</h3>
       <button class="brand-button column" @click="editProfile">Save</button>
     </div>
-    <section class="essentials">
+    <section>
       <h3>Username</h3>
       <label>
         <span>
@@ -42,7 +42,7 @@
         <input v-model="bio" type="text" placeholder="Enter your bio" />
       </label>
     </section>
-    <section class="essentials pad-maker">
+    <section class="pad-maker">
       <h3>Theme</h3>
       <label>
         <span
@@ -58,7 +58,7 @@
         />
       </label>
     </section>
-    <section class="essentials pad-maker">
+    <section class="pad-maker">
       <h3>Authorization token</h3>
       <label>
         <span>
@@ -68,7 +68,7 @@
         <input
           type="button"
           class="button pad-rem"
-          value="Copy to clipboard"
+          value="Copy to Clipboard"
           @click="copyToken"
         />
       </label>
@@ -81,8 +81,23 @@
         <input
           type="button"
           class="button"
-          value="Revoke token"
+          value="Revoke Token"
           @click="gotoRevoke"
+        />
+      </label>
+      <h3>Delete your account</h3>
+      <label>
+        <span
+          >Clicking on this WILL delete your user. Do not click on this unless
+          you want your user deleted. If you delete your user, all attached data
+          will be removed from our servers. This cannot be reversed, so be
+          careful!</span
+        >
+        <input
+          type="button"
+          class="button"
+          value="Delete Account"
+          @click="deleteAccount"
         />
       </label>
     </section>
@@ -158,6 +173,31 @@ export default {
         await axios.patch(
           `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}`,
           data,
+          config
+        )
+      } catch (err) {
+        this.$notify({
+          group: 'main',
+          title: 'An Error Occurred',
+          text: err.response.data.description,
+          type: 'error',
+        })
+      }
+
+      this.$nuxt.$loading.finish()
+    },
+    async deleteAccount() {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local'),
+        },
+      }
+
+      this.$nuxt.$loading.start()
+
+      try {
+        await axios.delete(
+          `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}`,
           config
         )
       } catch (err) {

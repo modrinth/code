@@ -68,159 +68,26 @@
         </tr>
       </tbody>
     </table>
-    <Popup
-      v-if="currentMember"
-      :show-popup="showPopup"
-      class="create-version-popup-body"
-    >
-      <h3>New Version</h3>
-      <label
-        for="version-title"
-        class="required"
-        title="The title of your version"
-      >
-        Version Title
-      </label>
-      <input
-        id="version-title"
-        v-model="createdVersion.version_title"
-        required
-        type="text"
-        placeholder="Combat Update"
-      />
-      <label
-        for="version-number"
-        class="required"
-        title="The version number of this version. Preferably following semantic versioning"
-      >
-        Version Number
-      </label>
-      <input
-        id="version-number"
-        v-model="createdVersion.version_number"
-        required
-        type="text"
-        placeholder="v1.9"
-      />
-      <label class="required" title="The release channel of this version.">
-        Release Channel
-      </label>
-      <Multiselect
-        v-model="createdVersion.release_channel"
-        class="categories-input"
-        placeholder="Select one"
-        :options="['release', 'beta', 'alpha']"
-        :searchable="false"
-        :close-on-select="true"
-        :show-labels="false"
-        :allow-empty="false"
-      />
-      <label
-        title="The version number of this version. Preferably following semantic versioning"
-      >
-        Mod Loaders
-      </label>
-      <multiselect
-        v-model="createdVersion.loaders"
-        class="categories-input"
-        :options="selectableLoaders"
-        :loading="selectableLoaders.length === 0"
-        :multiple="true"
-        :searchable="false"
-        :show-no-results="false"
-        :close-on-select="true"
-        :clear-on-select="false"
-        :show-labels="false"
-        :limit="6"
-        :hide-selected="true"
-        placeholder="Choose loaders..."
-      />
-      <label title="The versions of minecraft that this mod version supports">
-        Minecraft Versions
-      </label>
-      <multiselect
-        v-model="createdVersion.game_versions"
-        class="categories-input"
-        :options="selectableVersions"
-        :loading="selectableVersions.length === 0"
-        :multiple="true"
-        :searchable="true"
-        :show-no-results="false"
-        :close-on-select="false"
-        :clear-on-select="false"
-        :show-labels="false"
-        :limit="6"
-        :hide-selected="true"
-        placeholder="Choose versions..."
-      />
-      <label for="version-body" title="A list of changes for this version">
-        Changelog
-      </label>
-      <textarea
-        id="version-body"
-        v-model="createdVersion.version_body"
-        class="changelog-editor"
-      />
-      <FileInput
-        input-id="version-files"
-        accept="application/java-archive,application/zip"
-        default-text="Upload Files"
-        :input-multiple="true"
-        @change="updateVersionFiles"
-      >
-        <label class="required" title="The files associated with the version">
-          Version Files
-        </label>
-      </FileInput>
-
-      <div class="popup-buttons">
-        <button
-          class="trash-button"
-          @click="
-            showPopup = false
-            createdVersion = {}
-          "
-        >
-          <TrashIcon />
-        </button>
-        <button class="default-button" @click="createVersion">
-          Create Version
-        </button>
-      </div>
-    </Popup>
-    <button
-      v-if="currentMember"
-      class="default-button"
-      @click="showPopup = !showPopup"
-    >
+    <nuxt-link v-if="currentMember" to="newversion" class="button">
       New Version
-    </button>
+    </nuxt-link>
   </ModPage>
 </template>
 <script>
 import axios from 'axios'
 
-import Multiselect from 'vue-multiselect'
-
 import ModPage from '@/components/ModPage'
 
-import Popup from '@/components/Popup'
-import FileInput from '@/components/FileInput'
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
 
 export default {
   components: {
-    Multiselect,
-    FileInput,
-    Popup,
     ModPage,
     ForgeIcon,
     FabricIcon,
     DownloadIcon,
-    TrashIcon,
   },
   auth: false,
   async asyncData(data) {
@@ -292,68 +159,7 @@ export default {
       })
     }
   },
-  data() {
-    return {
-      showPopup: false,
-      createdVersion: {},
-    }
-  },
   methods: {
-    updateVersionFiles(files) {
-      this.createdVersion.raw_files = files
-
-      const newFileParts = []
-      for (let i = 0; i < files.length; i++) {
-        newFileParts.push(files[i].name.concat('-' + i))
-      }
-
-      this.createdVersion.file_parts = newFileParts
-    },
-    async createVersion() {
-      this.$nuxt.$loading.start()
-
-      const formData = new FormData()
-
-      this.createdVersion.mod_id = this.mod.id
-      this.createdVersion.dependencies = []
-      this.createdVersion.featured = false
-
-      formData.append('data', JSON.stringify(this.createdVersion))
-
-      if (this.createdVersion.raw_files) {
-        for (let i = 0; i < this.createdVersion.raw_files.length; i++) {
-          formData.append(
-            this.createdVersion.file_parts[i],
-            new Blob([this.createdVersion.raw_files[i]]),
-            this.createdVersion.raw_files[i].name
-          )
-        }
-      }
-
-      try {
-        await axios({
-          url: 'https://api.modrinth.com/api/v1/version',
-          method: 'POST',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: this.$auth.getToken('local'),
-          },
-        })
-
-        await this.$router.go(null)
-      } catch (err) {
-        this.$notify({
-          group: 'main',
-          title: 'An Error Occurred',
-          text: err.response.data.description,
-          type: 'error',
-        })
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }
-
-      this.$nuxt.$loading.finish()
-    },
     findPrimary(version) {
       let file = version.files.find((x) => x.primary)
 
@@ -487,65 +293,9 @@ table {
     }
   }
 }
-.multiselect {
-  margin-bottom: 20px;
-}
 
-input {
-  width: calc(100% - 15px);
-  padding: 0.5rem 5px;
-  margin-bottom: 20px;
-}
-
-.changelog-editor {
-  padding: 20px;
-  width: calc(100% - 40px);
-  height: 200px;
-  resize: none;
-  outline: none;
-  border: none;
-  margin: 10px 0 30px;
-  background-color: var(--color-button-bg);
-  color: var(--color-text);
-  font-family: monospace;
-}
-
-.popup-buttons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: right;
-  align-items: center;
-
-  .default-button {
-    float: none;
-    margin-top: 0;
-  }
-
-  .trash-button {
-    cursor: pointer;
-    margin-right: 10px;
-    padding: 5px;
-    border: none;
-    border-radius: var(--size-rounded-sm);
-    color: #9b2c2c;
-    background-color: var(--color-bg);
-  }
-}
-
-.default-button {
+.button {
   float: right;
-  margin-top: 20px;
-  border-radius: var(--size-rounded-sm);
-  cursor: pointer;
-  border: none;
-  padding: 10px;
-  background-color: var(--color-button-bg);
-  color: var(--color-button-text);
-
-  &:hover,
-  &:focus {
-    background-color: var(--color-button-bg-hover);
-  }
 }
 
 @media screen and (max-width: 400px) {

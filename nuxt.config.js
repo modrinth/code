@@ -47,6 +47,7 @@ export default {
       },
       { hid: 'twitter:card', name: 'twitter:card', content: 'summary' },
       { hid: 'twitter:site', name: 'twitter:site', content: '@modrinth' },
+      { name: 'propeller', content: '9542802736cdc223303e7a97b071550c' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },

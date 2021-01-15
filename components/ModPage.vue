@@ -61,13 +61,6 @@
             </a>
             <nuxt-link
               v-if="currentMember"
-              :to="'/mod/' + mod.id + '/edit'"
-              class="tab"
-            >
-              Edit
-            </nuxt-link>
-            <nuxt-link
-              v-if="currentMember"
               :to="'/mod/' + mod.id + '/settings'"
               class="tab"
             >
