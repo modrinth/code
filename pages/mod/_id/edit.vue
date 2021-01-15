@@ -397,7 +397,7 @@ export default {
         const data = {
           title: this.mod.title,
           description: this.mod.description,
-          body: this.body,
+          body: this.mod.body,
           categories: this.mod.categories,
           issues_url: this.mod.issues_url,
           source_url: this.mod.source_url,
