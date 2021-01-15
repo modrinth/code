@@ -405,7 +405,7 @@ async fn upload_file_to_version_inner(
                 )
             })?;
 
-    if team_member
+    if !team_member
         .permissions
         .contains(Permissions::UPLOAD_VERSION)
     {
