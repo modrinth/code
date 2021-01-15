@@ -267,13 +267,11 @@ export default {
       await this.$router.go(null)
       this.$nuxt.$loading.finish()
     },
-    async addFiles(e) {
-      this.filesToUpload = e.target.files
+    async addFiles(files) {
+      this.filesToUpload = files
 
-      for (let i = 0; i < e.target.files.length; i++) {
-        this.filesToUpload[i].multipartName = e.target.files[i].name.concat(
-          '-' + i
-        )
+      for (let i = 0; i < files.length; i++) {
+        this.filesToUpload[i].multipartName = files[i].name.concat('-' + i)
       }
 
       this.$nuxt.$loading.start()
