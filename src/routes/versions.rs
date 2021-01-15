@@ -206,6 +206,7 @@ fn convert_version(data: database::models::version_item::QueryVersion) -> models
 #[derive(Serialize, Deserialize)]
 pub struct EditVersion {
     pub name: Option<String>,
+    pub version_number: Option<String>,
     pub changelog: Option<String>,
     pub version_type: Option<models::mods::VersionType>,
     pub dependencies: Option<Vec<models::ids::VersionId>>,
@@ -291,6 +292,21 @@ pub async fn version_edit(
                     WHERE (id = $2)
                     ",
                     name,
+                    id as database::models::ids::VersionId,
+                )
+                .execute(&mut *transaction)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+            }
+
+            if let Some(number) = &new_version.version_number {
+                sqlx::query!(
+                    "
+                    UPDATE versions
+                    SET version_number = $1
+                    WHERE (id = $2)
+                    ",
+                    number,
                     id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
