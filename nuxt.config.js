@@ -172,6 +172,12 @@ export default {
     styleResources: {
       scss: './assets/styles/injected.scss',
     },
+    html: {
+      minify: {
+        collapseWhitespace: true, // as @dario30186 mentioned
+        removeComments: true, // 👈 add this line
+      },
+    },
   },
   loading: {
     color: 'green',

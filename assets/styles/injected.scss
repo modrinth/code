@@ -83,5 +83,8 @@
       margin: 0;
       color: var(--color-text-dark);
     }
+    .capitalize {
+      text-transform: capitalize;
+    }
   }
 }

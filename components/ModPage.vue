@@ -37,6 +37,13 @@
             >
               Versions
             </nuxt-link>
+            <nuxt-link
+              v-if="currentMember"
+              :to="'/mod/' + mod.id + '/settings'"
+              class="tab"
+            >
+              Settings
+            </nuxt-link>
             <a v-if="mod.wiki_url" :href="mod.wiki_url" class="tab">
               <ExternalIcon />
               Wiki
@@ -59,13 +66,10 @@
               <ExternalIcon />
               Source
             </a>
-            <nuxt-link
-              v-if="currentMember"
-              :to="'/mod/' + mod.id + '/settings'"
-              class="tab"
-            >
-              Settings
-            </nuxt-link>
+            <a v-if="mod.discord_url" :href="mod.discord_url" class="tab">
+              <ExternalIcon />
+              Discord
+            </a>
             <div class="filler" />
           </div>
         </div>
@@ -127,6 +131,41 @@
               >
                 {{ $dayjs(mod.updated).fromNow() }}
               </p>
+            </div>
+          </div>
+          <div class="stat">
+            <ClientIcon />
+            <div class="info">
+              <h4>Client Side</h4>
+              <p class="value capitalize">{{ mod.client_side }}</p>
+            </div>
+          </div>
+          <div class="stat">
+            <ServerIcon />
+            <div class="info">
+              <h4>Server Side</h4>
+              <p class="value capitalize">{{ mod.server_side }}</p>
+            </div>
+          </div>
+          <div class="stat">
+            <FileTextIcon />
+            <div class="info">
+              <h4>License</h4>
+              <p class="value">
+                <a
+                  v-if="mod.license.url ? mod.license.url : '#'"
+                  :href="mod.license.url"
+                >
+                  {{ mod.license.name }}</a
+                >
+              </p>
+            </div>
+          </div>
+          <div class="stat">
+            <CodeIcon />
+            <div class="info">
+              <h4>Project ID</h4>
+              <p class="value">{{ mod.id }}</p>
             </div>
           </div>
           <Categories :categories="mod.categories.concat(mod.loaders)" />
@@ -211,6 +250,22 @@
             </div>
           </div>
         </div>
+        <div
+          v-if="mod.donation_urls && mod.donation_urls.length > 0"
+          class="section"
+        >
+          <h3>Donation Links</h3>
+          <div
+            v-for="(item, index) in mod.donation_urls"
+            :key="index"
+            class="links"
+          >
+            <a :href="item.url" class="link">
+              <ExternalIcon />
+              {{ item.platform }}
+            </a>
+          </div>
+        </div>
         <m-footer class="footer" />
       </section>
     </div>
@@ -228,6 +283,10 @@ import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import TagIcon from '~/assets/images/utils/tag.svg?inline'
+import ClientIcon from '~/assets/images/utils/client.svg?inline'
+import ServerIcon from '~/assets/images/utils/server.svg?inline'
+import FileTextIcon from '~/assets/images/utils/file-text.svg?inline'
+import CodeIcon from '~/assets/images/sidebar/mod.svg?inline'
 
 import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 
@@ -247,6 +306,10 @@ export default {
     CalendarIcon,
     EditIcon,
     TagIcon,
+    ClientIcon,
+    ServerIcon,
+    FileTextIcon,
+    CodeIcon,
   },
   props: {
     mod: {
@@ -361,6 +424,10 @@ export default {
     margin-top: 0;
     margin-left: 5px;
     p {
+      max-width: 6rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: '';
       margin: 3px;
     }
     .stat {
@@ -436,6 +503,29 @@ export default {
         .loader {
           height: 1rem;
         }
+      }
+    }
+  }
+
+  .links {
+    padding: 0.5rem 1rem;
+
+    .link {
+      display: flex;
+      align-items: center;
+      padding: 0.25rem 0;
+
+      svg {
+        width: 1rem;
+        height: 1rem;
+        margin-right: 0.3rem;
+      }
+
+      &:hover,
+      &:focus {
+        padding-bottom: calc(0.25rem - 3px);
+        border-bottom: 3px solid var(--color-brand-disabled);
+        color: var(--color-text-medium);
       }
     }
   }

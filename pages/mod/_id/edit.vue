@@ -251,14 +251,55 @@
           </div>
         </label>
       </section>
-      <!--
       <section class="donations">
         <div class="title">
           <h3>Donation links</h3>
-          <i>— this section is optional</i>
+          <button
+            title="Add a link"
+            class="button"
+            :disabled="false"
+            @click="
+              donationPlatforms.push({})
+              donationLinks.push('')
+            "
+          >
+            Add a link
+          </button>
+        </div>
+        <div v-for="(item, index) in donationPlatforms" :key="index">
+          <label title="The donation link.">
+            <span>Donation Link</span>
+            <input
+              v-model="donationLinks[index]"
+              type="url"
+              placeholder="Enter a valid URL"
+            />
+          </label>
+          <label title="The donation platform of the link.">
+            <span>Donation Platform</span>
+            <Multiselect
+              v-model="donationPlatforms[index]"
+              placeholder="Select one"
+              track-by="short"
+              label="name"
+              :options="availableDonationPlatforms"
+              :searchable="false"
+              :close-on-select="true"
+              :show-labels="false"
+            />
+          </label>
+          <button
+            class="button"
+            @click="
+              donationPlatforms.splice(index, 1)
+              donationLinks.splice(index, 1)
+            "
+          >
+            Remove Link
+          </button>
+          <hr />
         </div>
       </section>
-      -->
       <m-footer class="footer" centered />
     </div>
   </div>
@@ -295,7 +336,7 @@ export default {
         availableLoaders,
         availableGameVersions,
         availableLicenses,
-        // availableDonationPlatforms,
+        availableDonationPlatforms,
       ] = (
         await Promise.all([
           axios.get(
@@ -306,17 +347,31 @@ export default {
           axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
           axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
           axios.get(`https://api.modrinth.com/api/v1/tag/license`),
-          // axios.get(`https://api.modrinth.com/api/v1/tag/donation_platform`),
+          axios.get(`https://api.modrinth.com/api/v1/tag/donation_platform`),
         ])
       ).map((it) => it.data)
 
       mod.license = {
         short: mod.license.id,
         name: mod.license.name,
+        url: mod.license.url,
       }
 
       if (mod.body_url && !mod.body) {
         mod.body = (await axios.get(mod.body_url)).data
+      }
+
+      const donationPlatforms = []
+      const donationLinks = []
+
+      if (mod.donation_urls) {
+        for (const platform of mod.donation_urls) {
+          donationPlatforms.push({
+            short: platform.id,
+            name: platform.platform,
+          })
+          donationLinks.push(platform.url)
+        }
       }
 
       return {
@@ -338,7 +393,9 @@ export default {
           name: mod.license.name,
         },
         license_url: mod.license.url,
-        // availableDonationPlatforms,
+        availableDonationPlatforms,
+        donationPlatforms,
+        donationLinks,
       }
     } catch {
       data.error({
@@ -408,6 +465,14 @@ export default {
           client_side: this.clientSideType.id,
           server_side: this.serverSideType.id,
           slug: this.mod.slug,
+          license: this.license.short,
+          donation_urls: this.donationPlatforms.map((it, index) => {
+            return {
+              id: it.short,
+              platform: it.name,
+              url: this.donationLinks[index],
+            }
+          }),
         }
 
         if (this.isProcessing) {
@@ -444,7 +509,6 @@ export default {
 
       this.$nuxt.$loading.finish()
     },
-
     showPreviewImage(files) {
       const reader = new FileReader()
       this.iconChanged = true
@@ -463,6 +527,9 @@ export default {
 .title {
   * {
     display: inline;
+  }
+  .button {
+    margin-left: 1rem;
   }
 }
 
@@ -622,6 +689,15 @@ section.license {
 
 section.donations {
   grid-area: donations;
+
+  label {
+    align-items: center;
+    margin-top: var(--spacing-card-sm);
+
+    span {
+      flex: 1;
+    }
+  }
 }
 
 .footer {
