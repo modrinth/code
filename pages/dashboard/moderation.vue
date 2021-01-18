@@ -35,20 +35,6 @@
         Reject
       </button>
     </ModCard>
-    <div class="section-header">
-      <h3 class="column-grow-1">Versions</h3>
-    </div>
-    <div v-for="version in versions" :key="version.id" class="version columns">
-      <div class="text">
-        <nuxt-link :to="`/mod/${version.mod_id}/version/${version.id}`">
-          Version <strong>{{ version.name }}</strong>
-        </nuxt-link>
-      </div>
-      <div class="actions">
-        <button>Reject</button>
-        <button @click="changeVersionStatus(version.id)">Accept</button>
-      </div>
-    </div>
   </DashboardPage>
 </template>
 
@@ -72,21 +58,12 @@ export default {
       },
     }
 
-    let res = await axios.get(
-      `https://api.modrinth.com/api/v1/moderation/mods`,
-      config
-    )
-
-    const mods = res.data
-
-    res = await axios.get(
-      `https://api.modrinth.com/api/v1/moderation/versions`,
-      config
-    )
+    const mods = (
+      await axios.get(`https://api.modrinth.com/api/v1/moderation/mods`, config)
+    ).data
 
     return {
       mods,
-      versions: res.data,
     }
   },
   methods: {
@@ -109,26 +86,6 @@ export default {
 
       await this.$router.go(0)
     },
-
-    async changeVersionStatus(id) {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local')
-            ? this.$auth.getToken('local')
-            : '',
-        },
-      }
-
-      await axios.patch(
-        `https://api.modrinth.com/api/v1/version/${id}`,
-        {
-          accepted: true,
-        },
-        config
-      )
-
-      await this.$router.go(0)
-    },
   },
 }
 </script>
@@ -136,17 +93,5 @@ export default {
 <style lang="scss" scoped>
 .button {
   margin: 0.25rem 0;
-}
-
-.version {
-  @extend %card;
-  padding: var(--spacing-card-sm) var(--spacing-card-lg);
-  margin-bottom: var(--spacing-card-sm);
-  align-items: center;
-  justify-content: space-between;
-
-  p {
-    margin: 0;
-  }
 }
 </style>
