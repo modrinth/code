@@ -2,6 +2,7 @@ use futures::{StreamExt, TryStreamExt};
 use log::info;
 
 use super::IndexingError;
+use crate::models::mods::SideType;
 use crate::search::UploadSearchMod;
 use sqlx::postgres::PgPool;
 use std::borrow::Cow;
@@ -14,7 +15,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
 
     let mut mods = sqlx::query!(
         "
-        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.status, m.slug FROM mods m
+        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.status, m.slug, m.license, m.client_side, m.server_side FROM mods m
         "
     ).fetch(&pool);
 
@@ -112,6 +113,38 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 .map(Cow::Owned)
                 .unwrap_or_else(|| Cow::Borrowed(""));
 
+            let client_side = SideType::from_str(
+                &sqlx::query!(
+                    "
+                SELECT name FROM side_types
+                WHERE id = $1
+                ",
+                    mod_data.client_side,
+                )
+                .fetch_one(&pool)
+                .await?
+                .name,
+            );
+
+            let server_side = SideType::from_str(
+                &sqlx::query!(
+                    "
+                SELECT name FROM side_types
+                WHERE id = $1
+                ",
+                    mod_data.server_side,
+                )
+                .fetch_one(&pool)
+                .await?
+                .name,
+            );
+
+            let license = crate::database::models::categories::License::get(
+                crate::database::models::LicenseId(mod_data.license),
+                &pool,
+            )
+            .await?;
+
             docs_to_add.push(UploadSearchMod {
                 mod_id: format!("local-{}", mod_id),
                 title: mod_data.title,
@@ -128,6 +161,9 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 date_modified: mod_data.updated,
                 modified_timestamp: mod_data.updated.timestamp(),
                 latest_version,
+                license: license.short,
+                client_side: client_side.to_string(),
+                server_side: server_side.to_string(),
                 host: Cow::Borrowed("modrinth"),
                 slug: mod_data.slug,
             });
@@ -143,7 +179,7 @@ pub async fn query_one(
 ) -> Result<UploadSearchMod, IndexingError> {
     let mod_data = sqlx::query!(
         "
-        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.slug
+        SELECT m.id, m.title, m.description, m.downloads, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.slug, m.license, m.client_side, m.server_side
         FROM mods m
         WHERE id = $1
         ",
@@ -225,6 +261,38 @@ pub async fn query_one(
         .map(Cow::Owned)
         .unwrap_or_else(|| Cow::Borrowed(""));
 
+    let client_side = SideType::from_str(
+        &sqlx::query!(
+            "
+                SELECT name FROM side_types
+                WHERE id = $1
+                ",
+            mod_data.client_side,
+        )
+        .fetch_one(&mut *exec)
+        .await?
+        .name,
+    );
+
+    let server_side = SideType::from_str(
+        &sqlx::query!(
+            "
+                SELECT name FROM side_types
+                WHERE id = $1
+                ",
+            mod_data.server_side,
+        )
+        .fetch_one(&mut *exec)
+        .await?
+        .name,
+    );
+
+    let license = crate::database::models::categories::License::get(
+        crate::database::models::LicenseId(mod_data.license),
+        &mut *exec,
+    )
+    .await?;
+
     Ok(UploadSearchMod {
         mod_id: format!("local-{}", mod_id),
         title: mod_data.title,
@@ -241,6 +309,9 @@ pub async fn query_one(
         date_modified: mod_data.updated,
         modified_timestamp: mod_data.updated.timestamp(),
         latest_version,
+        license: license.short,
+        client_side: client_side.to_string(),
+        server_side: server_side.to_string(),
         host: Cow::Borrowed("modrinth"),
         slug: mod_data.slug,
     })

@@ -223,7 +223,16 @@ fn convert_mod(data: database::models::mod_item::QueryMod) -> models::mods::Mod 
         source_url: m.source_url,
         wiki_url: m.wiki_url,
         discord_url: m.discord_url,
-        donation_urls: None,
+        donation_urls: Some(
+            data.donation_urls
+                .into_iter()
+                .map(|d| DonationLink {
+                    id: d.platform_short,
+                    platform: d.platform_name,
+                    url: d.url,
+                })
+                .collect(),
+        ),
     }
 }
 

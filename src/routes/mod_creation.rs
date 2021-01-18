@@ -493,6 +493,8 @@ async fn mod_create_inner(
                 donation_urls.push(models::mod_item::DonationUrl {
                     mod_id: mod_id.into(),
                     platform_id,
+                    platform_short: "".to_string(),
+                    platform_name: "".to_string(),
                     url: url.url.clone(),
                 })
             }

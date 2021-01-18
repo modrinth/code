@@ -54,7 +54,6 @@ pub struct VersionIds {
 
 #[get("versions")]
 pub async fn versions_get(
-    req: HttpRequest,
     web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
@@ -66,39 +65,11 @@ pub async fn versions_get(
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
-
     let mut versions = Vec::new();
 
     for version_data in versions_data {
         if let Some(version) = version_data {
-            let mut authorized = version.accepted;
-
-            if let Some(user) = &user_option {
-                if !authorized {
-                    if user.role.is_mod() {
-                        authorized = true;
-                    } else {
-                        let user_id: database::models::ids::UserId = user.id.into();
-
-                        let member_exists = sqlx::query!(
-                            "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.team_id AND m.id = $1 WHERE tm.user_id = $2)",
-                            version.mod_id as database::models::ModId,
-                            user_id as database::models::ids::UserId,
-                        )
-                            .fetch_one(&**pool)
-                            .await
-                            .map_err(|e| ApiError::DatabaseError(e.into()))?
-                            .exists;
-
-                        authorized = member_exists.unwrap_or(false);
-                    }
-                }
-            }
-
-            if authorized {
-                versions.push(convert_version(version));
-            }
+            versions.push(convert_version(version));
         }
     }
 
@@ -107,7 +78,6 @@ pub async fn versions_get(
 
 #[get("{version_id}")]
 pub async fn version_get(
-    req: HttpRequest,
     info: web::Path<(models::ids::VersionId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
@@ -115,33 +85,8 @@ pub async fn version_get(
     let version_data = database::models::Version::get_full(id.into(), &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
-    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if let Some(data) = version_data {
-        if !data.accepted {
-            if let Some(user) = user_option {
-                if !user.role.is_mod() {
-                    let user_id: database::models::ids::UserId = user.id.into();
-
-                    let member_exists = sqlx::query!(
-                        "SELECT EXISTS(SELECT 1 FROM team_members tm INNER JOIN mods m ON m.team_id = tm.team_id AND m.id = $1 WHERE tm.user_id = $2)",
-                        data.mod_id as database::models::ModId,
-                        user_id as database::models::ids::UserId,
-                    )
-                        .fetch_one(&**pool)
-                        .await
-                        .map_err(|e| ApiError::DatabaseError(e.into()))?
-                        .exists;
-
-                    if !member_exists.unwrap_or(false) {
-                        return Ok(HttpResponse::NotFound().body(""));
-                    }
-                }
-            } else {
-                return Ok(HttpResponse::NotFound().body(""));
-            }
-        }
-
         Ok(HttpResponse::Ok().json(convert_version(data)))
     } else {
         Ok(HttpResponse::NotFound().body(""))
@@ -212,7 +157,6 @@ pub struct EditVersion {
     pub dependencies: Option<Vec<models::ids::VersionId>>,
     pub game_versions: Option<Vec<models::mods::GameVersion>>,
     pub loaders: Option<Vec<models::mods::ModLoader>>,
-    pub accepted: Option<bool>,
     pub featured: Option<bool>,
     pub primary_file: Option<(String, String)>,
 }
@@ -261,28 +205,6 @@ pub async fn version_edit(
                 .begin()
                 .await
                 .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-            if let Some(accepted) = &new_version.accepted {
-                if !user.role.is_mod() {
-                    return Err(ApiError::CustomAuthenticationError(
-                        "You do not have the permissions to edit the approval of this version!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE versions
-                    SET accepted = $1
-                    WHERE (id = $2)
-                    ",
-                    accepted,
-                    id as database::models::ids::VersionId,
-                )
-                .execute(&mut *transaction)
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?;
-            }
 
             if let Some(name) = &new_version.name {
                 sqlx::query!(
