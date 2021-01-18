@@ -81,11 +81,7 @@ pub fn teams_config(cfg: &mut web::ServiceConfig) {
 }
 
 pub fn moderation_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("moderation")
-            .service(moderation::mods)
-            .service(moderation::versions),
-    );
+    cfg.service(web::scope("moderation").service(moderation::mods));
 }
 
 #[derive(thiserror::Error, Debug)]

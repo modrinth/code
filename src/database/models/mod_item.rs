@@ -3,6 +3,8 @@ use super::ids::*;
 pub struct DonationUrl {
     pub mod_id: ModId,
     pub platform_id: DonationPlatformId,
+    pub platform_short: String,
+    pub platform_name: String,
     pub url: String,
 }
 
@@ -429,7 +431,8 @@ impl Mod {
 
             let donations: Vec<DonationUrl> = sqlx::query!(
                 "
-                SELECT joining_platform_id, url FROM mods_donations
+                SELECT d.joining_platform_id, d.url, dp.short, dp.name FROM mods_donations d
+                INNER JOIN donation_platforms dp ON d.joining_platform_id=dp.id
                 WHERE joining_mod_id = $1
                 ",
                 id as ModId,
@@ -439,6 +442,8 @@ impl Mod {
                 Ok(e.right().map(|c| DonationUrl {
                     mod_id: id,
                     platform_id: DonationPlatformId(c.joining_platform_id),
+                    platform_short: c.short,
+                    platform_name: c.name,
                     url: c.url,
                 }))
             })

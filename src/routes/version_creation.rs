@@ -49,8 +49,7 @@ pub fn check_version(version: &InitialVersionData) -> Result<(), CreateError> {
     version
         .file_parts
         .iter()
-        .map(|f| check_length(1..=256, "file part name", f))
-        .collect::<Result<_, _>>()?;
+        .try_for_each(|f| check_length(1..=256, "file part name", f))?;
 
     check_length(1..=64, "version number", &version.version_number)?;
     check_length(3..=256, "version title", &version.version_title)?;
@@ -61,13 +60,11 @@ pub fn check_version(version: &InitialVersionData) -> Result<(), CreateError> {
     version
         .game_versions
         .iter()
-        .map(|v| check_length(1..=256, "game version", &v.0))
-        .collect::<Result<_, _>>()?;
+        .try_for_each(|v| check_length(1..=256, "game version", &v.0))?;
     version
         .loaders
         .iter()
-        .map(|l| check_length(1..=256, "loader name", &l.0))
-        .collect::<Result<_, _>>()?;
+        .try_for_each(|l| check_length(1..=256, "loader name", &l.0))?;
 
     Ok(())
 }

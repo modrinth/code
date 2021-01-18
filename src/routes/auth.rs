@@ -113,7 +113,7 @@ pub async fn init(
         "https://github.com/login/oauth/authorize?client_id={}&state={}&scope={}",
         client_id,
         to_base62(state.0 as u64),
-        "read%3Auser%20user%3Aemail"
+        "read%3Auser"
     );
 
     Ok(HttpResponse::TemporaryRedirect()

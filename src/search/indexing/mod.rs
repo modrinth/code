@@ -15,14 +15,14 @@ use thiserror::Error;
 pub enum IndexingError {
     #[error("Error while connecting to the MeiliSearch database")]
     IndexDBError(#[from] meilisearch_sdk::errors::Error),
-    #[error("Error while importing mods from CurseForge")]
-    CurseforgeImportError(#[from] reqwest::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
     #[error("Error while parsing a timestamp: {0}")]
     ParseDateError(#[from] chrono::format::ParseError),
     #[error("Database Error: {0}")]
-    DatabaseError(#[from] sqlx::error::Error),
+    SqlxError(#[from] sqlx::error::Error),
+    #[error("Database Error: {0}")]
+    DatabaseError(#[from] crate::database::models::DatabaseError),
     #[error("Environment Error")]
     EnvError(#[from] dotenv::Error),
 }
@@ -268,6 +268,9 @@ fn default_settings() -> Settings {
             String::from("categories"),
             String::from("host"),
             String::from("versions"),
+            String::from("license"),
+            String::from("client_side"),
+            String::from("server_side"),
         ])
 }
 
