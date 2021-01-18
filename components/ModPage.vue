@@ -277,14 +277,7 @@
             </a>
           </div>
         </div>
-        <adsbygoogle
-          ad-slot="7510690716"
-          :ad-style="{
-            display: 'inline-block',
-            width: '100%',
-            height: '240px',
-          }"
-        />
+        <adsbygoogle ad-slot="7510690716" ad-format="rectangle" />
         <m-footer class="footer" />
       </section>
     </div>
