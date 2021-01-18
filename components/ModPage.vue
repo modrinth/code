@@ -120,8 +120,12 @@
               <p class="value">
                 {{
                   versions[versions.length - 1]
-                    ? versions[versions.length - 1].game_versions[0]
-                      ? versions[versions.length - 1].game_versions[0]
+                    ? versions[versions.length - 1].game_versions[
+                        versions[versions.length - 1].game_versions.length - 1
+                      ]
+                      ? versions[versions.length - 1].game_versions[
+                          versions[versions.length - 1].game_versions.length - 1
+                        ]
                       : 'None'
                     : 'None'
                 }}
@@ -255,7 +259,8 @@
                   v-if="version.game_versions.length > 0"
                   class="game-version limit-text-width"
                 >
-                  · {{ version.game_versions[0] }}
+                  ·
+                  {{ version.game_versions[version.game_versions.length - 1] }}
                 </span>
               </div>
             </div>
