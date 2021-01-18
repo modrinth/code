@@ -26,9 +26,6 @@
             Settings
           </nuxt-link>
         </div>
-        <client-only>
-          <EthicalAd type="image" ad-id="dashboard" />
-        </client-only>
         <m-footer class="footer" />
       </div>
       <div class="content">

@@ -47,7 +47,6 @@ export default {
       },
       { hid: 'twitter:card', name: 'twitter:card', content: 'summary' },
       { hid: 'twitter:site', name: 'twitter:site', content: '@modrinth' },
-      { name: 'propeller', content: '9542802736cdc223303e7a97b071550c' },
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
@@ -63,15 +62,6 @@ export default {
         'data-website-id': 'c37613de-245d-4767-90e7-ba7980a4f1a2',
         async: true,
         defer: true,
-      },
-      {
-        src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
-        async: true,
-      },
-      {
-        src: 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js',
-        'data-ad-client': 'ca-pub-4615302805870170',
-        async: true,
       },
     ],
   },
@@ -126,6 +116,7 @@ export default {
     '@nuxtjs/sitemap',
     'nuxt-clipboard2',
     '@nuxtjs/style-resources',
+    '@nuxtjs/google-adsense',
   ],
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',
@@ -157,6 +148,9 @@ export default {
         Accept: 'application/json',
       },
     },
+  },
+  'google-adsense': {
+    id: 'ca-pub-4615302805870170',
   },
   dayjs: {
     locales: ['en'],

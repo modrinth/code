@@ -27,7 +27,6 @@
           Save
         </button>
       </header>
-      <EthicalAd class="advert" />
       <section class="essentials">
         <h3>Name</h3>
         <label>
@@ -311,13 +310,11 @@ import Multiselect from 'vue-multiselect'
 
 import MFooter from '@/components/MFooter'
 import FileInput from '@/components/FileInput'
-import EthicalAd from '@/components/EthicalAd'
 
 export default {
   components: {
     MFooter,
     FileInput,
-    EthicalAd,
     Multiselect,
   },
   async asyncData(data) {

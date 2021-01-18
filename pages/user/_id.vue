@@ -45,12 +45,18 @@
             </div>
           </div>
         </div>
+        <adsbygoogle
+          ad-slot="7510690716"
+          :ad-style="{
+            display: 'inline-block',
+            width: '100%',
+            height: '240px',
+          }"
+        />
         <m-footer class="footer" />
       </div>
       <div class="content">
-        <client-only>
-          <EthicalAd ad-id="profile" />
-        </client-only>
+        <adsbygoogle ad-slot="7510690716" ad-format="horizontal" />
         <div class="mods">
           <SearchResult
             v-for="result in mods"
@@ -75,7 +81,6 @@
 <script>
 import axios from 'axios'
 import SearchResult from '@/components/ProjectCard'
-import EthicalAd from '@/components/EthicalAd'
 import MFooter from '@/components/MFooter'
 
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
@@ -84,7 +89,6 @@ import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 export default {
   auth: false,
   components: {
-    EthicalAd,
     SearchResult,
     CalendarIcon,
     DownloadIcon,

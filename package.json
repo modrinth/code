@@ -13,8 +13,9 @@
   },
   "dependencies": {
     "@nuxtjs/auth": "^4.9.1",
-    "@nuxtjs/axios": "^5.12.2",
+    "@nuxtjs/axios": "^5.12.5",
     "@nuxtjs/dayjs": "^1.2.0",
+    "@nuxtjs/google-adsense": "^1.3.0",
     "@nuxtjs/robots": "^2.4.2",
     "@nuxtjs/sitemap": "^2.4.0",
     "@nuxtjs/style-resources": "^1.0.0",

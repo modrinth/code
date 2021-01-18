@@ -15,6 +15,53 @@
         Privacy Policy, do not hesitate to contact us.
       </p>
 
+      <h2>General Data Protection Regulation (GDPR)</h2>
+      <p>We are a Data Controller of your information.</p>
+
+      <p>
+        Guavy LLC legal basis for collecting and using the personal information
+        described in this Privacy Policy depends on the Personal Information we
+        collect and the specific context in which we collect the information:
+      </p>
+      <ul>
+        <li>Guavy LLC needs to perform a contract with you</li>
+        <li>You have given Guavy LLC permission to do so</li>
+        <li>
+          Processing your personal information is in Guavy LLC legitimate
+          interests
+        </li>
+        <li>Guavy LLC needs to comply with the law</li>
+      </ul>
+
+      <p>
+        Guavy LLC will retain your personal information only for as long as is
+        necessary for the purposes set out in this Privacy Policy. We will
+        retain and use your information to the extent necessary to comply with
+        our legal obligations, resolve disputes, and enforce our policies.
+      </p>
+
+      <p>
+        If you are a resident of the European Economic Area (EEA), you have
+        certain data protection rights. If you wish to be informed what Personal
+        Information we hold about you and if you want it to be removed from our
+        systems, please contact us.
+      </p>
+
+      <p>
+        In certain circumstances, you have the following data protection rights:
+      </p>
+      <ul>
+        <li>
+          The right to access, update or to delete the information we have on
+          you.
+        </li>
+        <li>The right of rectification.</li>
+        <li>The right to object.</li>
+        <li>The right of restriction.</li>
+        <li>The right to data portability</li>
+        <li>The right to withdraw consent</li>
+      </ul>
+
       <h2>Log Files</h2>
 
       <p>
@@ -46,25 +93,18 @@
         >.
       </p>
 
-      <h2>Our Advertising Partners</h2>
+      <h2>Google DoubleClick DART Cookie</h2>
 
       <p>
-        Some of advertisers on our site may use cookies and web beacons. Our
-        advertising partners are listed below. Each of our advertising partners
-        has their own Privacy Policy for their policies on user data. For easier
-        access, we hyperlinked to their Privacy Policies below.
+        Google is a third-party vendor on our site. It also uses cookies, known
+        as DART cookies, to serve ads to our site visitors based upon their
+        visit to www.website.com and other sites on the internet. However,
+        visitors may choose to decline the use of DART cookies by visiting the
+        Google ad and content network Privacy Policy at the following URL –
+        <a href="https://policies.google.com/technologies/ads"
+          >https://policies.google.com/technologies/ads</a
+        >
       </p>
-
-      <ul>
-        <li>
-          <p>EthicalAds</p>
-          <p>
-            <a href="https://www.ethicalads.io/privacy-policy/"
-              >https://www.ethicalads.io/privacy-policy/</a
-            >
-          </p>
-        </li>
-      </ul>
 
       <h2>Privacy Policies</h2>
 

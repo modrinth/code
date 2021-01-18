@@ -20,9 +20,13 @@
             </p>
           </div>
         </div>
-        <client-only>
-          <EthicalAd :ad-id="mod.id" type="text" />
-        </client-only>
+        <adsbygoogle
+          ad-slot="7510690716"
+          :page-url="
+            'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
+          "
+          ad-format="horizontal"
+        />
         <div class="mod-navigation">
           <div class="tabs">
             <nuxt-link
@@ -75,6 +79,13 @@
         </div>
         <div class="mod-content">
           <slot />
+          <adsbygoogle
+            ad-slot="7510690716"
+            :page-url="
+              'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
+            "
+            ad-format="horizontal"
+          />
         </div>
       </div>
       <section class="mod-info">
@@ -266,6 +277,14 @@
             </a>
           </div>
         </div>
+        <adsbygoogle
+          ad-slot="7510690716"
+          :ad-style="{
+            display: 'inline-block',
+            width: '100%',
+            height: '240px',
+          }"
+        />
         <m-footer class="footer" />
       </section>
     </div>
@@ -273,8 +292,6 @@
 </template>
 
 <script>
-import EthicalAd from '@/components/EthicalAd'
-
 import Categories from '@/components/Categories'
 import MFooter from '@/components/MFooter'
 
@@ -298,7 +315,6 @@ export default {
   components: {
     MFooter,
     Categories,
-    EthicalAd,
     ExternalIcon,
     ForgeIcon,
     FabricIcon,

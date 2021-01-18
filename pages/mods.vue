@@ -63,9 +63,7 @@
           ></pagination>
         </section>
         <div class="results column-grow-4">
-          <client-only>
-            <EthicalAd type="text" ad-id="search" />
-          </client-only>
+          <adsbygoogle ad-slot="7510690716" ad-format="horizontal" />
           <SearchResult
             v-for="(result, index) in results"
             :id="result.slug ? result.slug : result.mod_id.split('-')[1]"
@@ -257,6 +255,14 @@
             @input="onSearchChange(1)"
           ></multiselect>
         </div>
+        <adsbygoogle
+          ad-slot="7510690716"
+          :ad-style="{
+            display: 'inline-block',
+            width: '100%',
+            height: '240px',
+          }"
+        />
         <m-footer class="footer" />
       </section>
     </div>
@@ -270,7 +276,6 @@ import SearchResult from '@/components/ProjectCard'
 import Pagination from '@/components/Pagination'
 import SearchFilter from '@/components/SearchFilter'
 
-import EthicalAd from '@/components/EthicalAd'
 import MFooter from '@/components/MFooter'
 import TechCategory from '~/assets/images/categories/tech.svg?inline'
 import AdventureCategory from '~/assets/images/categories/adventure.svg?inline'
@@ -294,7 +299,6 @@ export default {
   auth: false,
   components: {
     MFooter,
-    EthicalAd,
     SearchResult,
     Pagination,
     Multiselect,

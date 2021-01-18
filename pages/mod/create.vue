@@ -20,7 +20,6 @@
           Create
         </button>
       </header>
-      <EthicalAd class="advert" />
       <section class="essentials">
         <h3>Name</h3>
         <label>
@@ -504,7 +503,6 @@ import Multiselect from 'vue-multiselect'
 
 import MFooter from '@/components/MFooter'
 import FileInput from '@/components/FileInput'
-import EthicalAd from '@/components/EthicalAd'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
@@ -513,7 +511,6 @@ export default {
   components: {
     MFooter,
     FileInput,
-    EthicalAd,
     Multiselect,
     ForgeIcon,
     FabricIcon,
