@@ -51,7 +51,7 @@
             <FabricIcon v-if="version.loaders.includes('fabric')" />
             <ForgeIcon v-if="version.loaders.includes('forge')" />
           </td>
-          <td>{{ version.game_versions.reverse().join(', ') }}</td>
+          <td>{{ version.game_versions.join(', ') }}</td>
           <td>
             <span v-if="version.version_type === 'release'" class="badge green">
               Release
