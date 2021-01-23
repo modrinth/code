@@ -568,9 +568,15 @@ impl Version {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        // TODO: this could be optimized
-        futures::future::try_join_all(version_ids.into_iter().map(|id| Self::get_full(id, exec)))
-            .await
+        let mut versions = Vec::new();
+
+        for version_id in version_ids {
+            versions.push(Self::get_full(version_id, exec).await?)
+        }
+
+        Ok(versions)
+        /* futures::future::try_join_all(version_ids.into_iter().map(|id| Self::get_full(id, exec)))
+        .await*/
     }
 }
 
