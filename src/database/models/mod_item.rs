@@ -516,8 +516,15 @@ impl Mod {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        // TODO: this could be optimized
-        futures::future::try_join_all(mod_ids.into_iter().map(|id| Self::get_full(id, exec))).await
+        let mut mods = Vec::new();
+
+        for mod_id in mod_ids {
+            mods.push(Self::get_full(mod_id, exec).await?)
+        }
+
+        Ok(versions)
+        /*// TODO: this could be optimized
+        futures::future::try_join_all(mod_ids.into_iter().map(|id| Self::get_full(id, exec))).await*/
     }
 }
 
