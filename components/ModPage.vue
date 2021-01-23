@@ -20,12 +20,10 @@
             </p>
           </div>
         </div>
-        <adsbygoogle
-          ad-slot="7510690716"
+        <Advertisement
           :page-url="
             'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
           "
-          ad-format="horizontal"
         />
         <div class="mod-navigation">
           <div class="tabs">
@@ -79,12 +77,10 @@
         </div>
         <div class="mod-content">
           <slot />
-          <adsbygoogle
-            ad-slot="7510690716"
+          <Advertisement
             :page-url="
               'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
             "
-            ad-format="horizontal"
           />
         </div>
       </div>
@@ -119,12 +115,10 @@
               <h4>Available For</h4>
               <p class="value">
                 {{
-                  versions[versions.length - 1]
-                    ? versions[versions.length - 1].game_versions[
-                        versions[versions.length - 1].game_versions.length - 1
-                      ]
-                      ? versions[versions.length - 1].game_versions[
-                          versions[versions.length - 1].game_versions.length - 1
+                  versions[0]
+                    ? versions[0].game_versions[0]
+                      ? versions[0].game_versions[
+                          versions[0].game_versions.length - 1
                         ]
                       : 'None'
                     : 'None'
@@ -166,7 +160,7 @@
             <FileTextIcon />
             <div class="info">
               <h4>License</h4>
-              <p class="value">
+              <p v-tooltip="mod.license.name" class="value ellipsis">
                 <a
                   v-if="mod.license.url ? mod.license.url : '#'"
                   :href="mod.license.url"
@@ -282,7 +276,12 @@
             </a>
           </div>
         </div>
-        <adsbygoogle ad-slot="7510690716" ad-format="rectangle" />
+        <Advertisement
+          format="rectangle"
+          :page-url="
+            'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
+          "
+        />
         <m-footer class="footer" />
       </section>
     </div>
@@ -307,10 +306,12 @@ import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
+import Advertisement from '~/components/Advertisement'
 
 export default {
   name: 'ModPage',
   components: {
+    Advertisement,
     MFooter,
     Categories,
     ExternalIcon,

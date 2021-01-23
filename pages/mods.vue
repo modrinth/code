@@ -63,7 +63,7 @@
           ></pagination>
         </section>
         <div class="results column-grow-4">
-          <adsbygoogle ad-slot="7510690716" ad-format="horizontal" />
+          <Advertisement />
           <SearchResult
             v-for="(result, index) in results"
             :id="result.slug ? result.slug : result.mod_id.split('-')[1]"
@@ -255,7 +255,7 @@
             @input="onSearchChange(1)"
           ></multiselect>
         </div>
-        <adsbygoogle ad-slot="7510690716" ad-format="rectangle" />
+        <Advertisement format="rectangle" />
         <m-footer class="footer" />
       </section>
     </div>
@@ -287,10 +287,12 @@ import ForgeLoader from '~/assets/images/categories/forge.svg?inline'
 import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
+import Advertisement from '~/components/Advertisement'
 
 export default {
   auth: false,
   components: {
+    Advertisement,
     MFooter,
     SearchResult,
     Pagination,
@@ -623,6 +625,7 @@ export default {
   flex-shrink: 0; // Stop shrinking when page contents change
   .filters-wrapper {
     padding: 0.25rem 0.75rem 0.75rem 0.75rem;
+    margin-bottom: var(--spacing-card-md);
   }
   h3 {
     @extend %large-label;

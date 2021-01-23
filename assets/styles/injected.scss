@@ -86,5 +86,8 @@
     .capitalize {
       text-transform: capitalize;
     }
+    .ellipsis {
+      text-overflow: ellipsis;
+    }
   }
 }

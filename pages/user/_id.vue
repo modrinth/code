@@ -45,11 +45,11 @@
             </div>
           </div>
         </div>
-        <adsbygoogle ad-slot="7510690716" ad-format="rectangle" />
+        <Advertisement format="rectangle" />
         <m-footer class="footer" />
       </div>
       <div class="content">
-        <adsbygoogle ad-slot="7510690716" ad-format="horizontal" />
+        <Advertisement />
         <div class="mods">
           <SearchResult
             v-for="result in mods"
@@ -78,10 +78,12 @@ import MFooter from '@/components/MFooter'
 
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import Advertisement from '~/components/Advertisement'
 
 export default {
   auth: false,
   components: {
+    Advertisement,
     SearchResult,
     CalendarIcon,
     DownloadIcon,
