@@ -575,8 +575,8 @@ impl Version {
         }
 
         Ok(versions)
-       /* futures::future::try_join_all(version_ids.into_iter().map(|id| Self::get_full(id, exec)))
-            .await*/
+        /* futures::future::try_join_all(version_ids.into_iter().map(|id| Self::get_full(id, exec)))
+        .await*/
     }
 }
 

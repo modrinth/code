@@ -522,7 +522,7 @@ impl Mod {
             mods.push(Self::get_full(mod_id, exec).await?)
         }
 
-        Ok(versions)
+        Ok(mods)
         /*// TODO: this could be optimized
         futures::future::try_join_all(mod_ids.into_iter().map(|id| Self::get_full(id, exec))).await*/
     }
