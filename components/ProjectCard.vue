@@ -1,10 +1,12 @@
 <template>
   <article class="project-card">
     <div class="icon">
-      <img
-        :src="iconUrl ? iconUrl : 'https://cdn.modrinth.com/placeholder.svg'"
-        :alt="name"
-      />
+      <nuxt-link v-if="isModrinth" :to="'/mod/' + id">
+        <img
+          :src="iconUrl ? iconUrl : 'https://cdn.modrinth.com/placeholder.svg'"
+          :alt="name"
+        />
+      </nuxt-link>
     </div>
     <div class="info">
       <div class="top">
