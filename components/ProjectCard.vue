@@ -213,6 +213,7 @@ export default {
     .top {
       @extend %row;
       flex-wrap: wrap;
+      flex-shrink: 0;
       margin-top: var(--spacing-card-md);
       margin-right: var(--spacing-card-md);
       .title {
@@ -232,6 +233,7 @@ export default {
     }
     .bottom {
       @extend %column;
+      flex-shrink: 0;
       margin-top: var(--spacing-card-sm);
       margin-right: var(--spacing-card-md);
       margin-bottom: var(--spacing-card-md);
