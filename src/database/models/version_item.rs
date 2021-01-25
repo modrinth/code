@@ -557,7 +557,7 @@ impl Version {
             rc.channel release_channel, v.featured featured,
             ARRAY_AGG(gv.version ORDER BY gv.created) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
             ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
-            ARRAY_AGG(DISTINCT h.hash || ', ' || h.algorithm || ', ' || h.file_id) hashes
+            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
             INNER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
@@ -578,7 +578,7 @@ impl Version {
 
                     v.hashes.unwrap_or(vec![]).into_iter().for_each(|f| {
                         let hash : Vec<&str> = f.split(", ").collect();
-                        hashes.push((FileId(hash[2].parse().unwrap_or(0)), hash[1].to_string(), hash[0].to_string().into_bytes()));
+                        hashes.push((FileId(hash[2].parse().unwrap_or(0)), hash[0].to_string(), hash[1].to_string().into_bytes()));
                     });
 
                     QueryVersion {

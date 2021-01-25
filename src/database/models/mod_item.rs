@@ -420,7 +420,7 @@ impl Mod {
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
             INNER JOIN licenses l ON m.license = l.id
-            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE m.id = $1
             GROUP BY m.id, s.id, cs.id, ss.id, l.id;
             ",
             id as ModId,
@@ -506,13 +506,14 @@ impl Mod {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
-            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions, ARRAY_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
+            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions,
+            ARRAY_AGG( DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
             FROM mods m
             INNER JOIN mods_categories mc ON joining_mod_id = m.id
             INNER JOIN categories c ON mc.joining_category_id = c.id
             INNER JOIN versions v ON v.mod_id = m.id
-            INNER JOIN mods_donations md ON md.joining_mod_id = m.id
-            INNER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+            LEFT OUTER JOIN mods_donations md ON md.joining_mod_id = m.id
+            LEFT OUTER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
