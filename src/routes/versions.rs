@@ -68,9 +68,7 @@ pub async fn versions_get(
     let mut versions = Vec::new();
 
     for version_data in versions_data {
-        if let Some(version) = version_data {
-            versions.push(convert_version(version));
-        }
+        versions.push(convert_version(version_data));
     }
 
     Ok(HttpResponse::Ok().json(versions))
