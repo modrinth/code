@@ -471,188 +471,6 @@
       "nullable": []
     }
   },
-  "1d1ab2b9b33bc9964c0d341385f411d243867a0489706cfb29c0f8689c092bb9": {
-    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions,\n            ARRAY_AGG( DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations\n            FROM mods m\n            INNER JOIN mods_categories mc ON joining_mod_id = m.id\n            INNER JOIN categories c ON mc.joining_category_id = c.id\n            INNER JOIN versions v ON v.mod_id = m.id\n            LEFT OUTER JOIN mods_donations md ON md.joining_mod_id = m.id\n            LEFT OUTER JOIN donation_platforms dp ON md.joining_platform_id = dp.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "description",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 4,
-          "name": "icon_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "body",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "body_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "updated",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 9,
-          "name": "status",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 10,
-          "name": "issues_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 11,
-          "name": "source_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 12,
-          "name": "wiki_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 13,
-          "name": "discord_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 14,
-          "name": "license_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 15,
-          "name": "team_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 16,
-          "name": "client_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 17,
-          "name": "server_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 18,
-          "name": "license",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 19,
-          "name": "slug",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 20,
-          "name": "status_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 21,
-          "name": "client_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 22,
-          "name": "server_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 23,
-          "name": "short",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 24,
-          "name": "license_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 25,
-          "name": "categories",
-          "type_info": "VarcharArray"
-        },
-        {
-          "ordinal": 26,
-          "name": "versions",
-          "type_info": "Int8Array"
-        },
-        {
-          "ordinal": 27,
-          "name": "donations",
-          "type_info": "TextArray"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null,
-        null
-      ]
-    }
-  },
   "1db6be78a74ff04c52ee105e0df30acf5bbf18f1de328980bb7f3da7f5f6569e": {
     "query": "\n            SELECT id FROM side_types\n            WHERE name = $1\n            ",
     "describe": {
@@ -3014,6 +2832,182 @@
       ]
     }
   },
+  "b34f599d25340f20de2d547bd4fc69846d3321492dd7f13de7ecca6a2a752600": {
+    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions\n            FROM mods m\n            INNER JOIN mods_categories mc ON joining_mod_id = m.id\n            INNER JOIN categories c ON mc.joining_category_id = c.id\n            INNER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 4,
+          "name": "icon_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "body_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 9,
+          "name": "status",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 10,
+          "name": "issues_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 11,
+          "name": "source_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 12,
+          "name": "wiki_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 13,
+          "name": "discord_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 14,
+          "name": "license_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 15,
+          "name": "team_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 16,
+          "name": "client_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 17,
+          "name": "server_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 18,
+          "name": "license",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 19,
+          "name": "slug",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 20,
+          "name": "status_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 21,
+          "name": "client_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 22,
+          "name": "server_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 23,
+          "name": "short",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 24,
+          "name": "license_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 25,
+          "name": "categories",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 26,
+          "name": "versions",
+          "type_info": "Int8Array"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null
+      ]
+    }
+  },
   "b69a6f42965b3e7103fcbf46e39528466926789ff31e9ed2591bb175527ec169": {
     "query": "\n            DELETE FROM users\n            WHERE id = $1\n            ",
     "describe": {
@@ -3684,6 +3678,182 @@
       ]
     }
   },
+  "e3d3ec698e523cb7251804d9ef518045ebc5a0a9740c214d2e091ccf7492405d": {
+    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions\n            FROM mods m\n            INNER JOIN mods_categories mc ON joining_mod_id = m.id\n            INNER JOIN categories c ON mc.joining_category_id = c.id\n            INNER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id = $1\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 4,
+          "name": "icon_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "body_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 9,
+          "name": "status",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 10,
+          "name": "issues_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 11,
+          "name": "source_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 12,
+          "name": "wiki_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 13,
+          "name": "discord_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 14,
+          "name": "license_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 15,
+          "name": "team_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 16,
+          "name": "client_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 17,
+          "name": "server_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 18,
+          "name": "license",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 19,
+          "name": "slug",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 20,
+          "name": "status_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 21,
+          "name": "client_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 22,
+          "name": "server_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 23,
+          "name": "short",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 24,
+          "name": "license_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 25,
+          "name": "categories",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 26,
+          "name": "versions",
+          "type_info": "Int8Array"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null
+      ]
+    }
+  },
   "e48c85a2b2e11691afae3799aa126bdd8b7338a973308bbab2760c18bb9cb0b7": {
     "query": "\n                    UPDATE versions\n                    SET featured = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -3975,188 +4145,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "f4e16c3b62a9bc1a41ee4236e3e134ebc942d92199e8a4bb8d4b8692043de399": {
-    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions, ARRAY_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations\n            FROM mods m\n            INNER JOIN mods_categories mc ON joining_mod_id = m.id\n            INNER JOIN categories c ON mc.joining_category_id = c.id\n            INNER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN mods_donations md ON md.joining_mod_id = m.id\n            INNER JOIN donation_platforms dp ON md.joining_platform_id = dp.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id = $1\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "description",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 4,
-          "name": "icon_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "body",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "body_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "updated",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 9,
-          "name": "status",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 10,
-          "name": "issues_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 11,
-          "name": "source_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 12,
-          "name": "wiki_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 13,
-          "name": "discord_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 14,
-          "name": "license_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 15,
-          "name": "team_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 16,
-          "name": "client_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 17,
-          "name": "server_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 18,
-          "name": "license",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 19,
-          "name": "slug",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 20,
-          "name": "status_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 21,
-          "name": "client_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 22,
-          "name": "server_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 23,
-          "name": "short",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 24,
-          "name": "license_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 25,
-          "name": "categories",
-          "type_info": "VarcharArray"
-        },
-        {
-          "ordinal": 26,
-          "name": "versions",
-          "type_info": "Int8Array"
-        },
-        {
-          "ordinal": 27,
-          "name": "donations",
-          "type_info": "TextArray"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null,
-        null
-      ]
     }
   },
   "f7bea04e8e279e27a24de1bdf3c413daa8677994df5131494b28691ed6611efc": {
