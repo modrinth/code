@@ -409,13 +409,11 @@ impl Mod {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
-            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions, ARRAY_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
+            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions
             FROM mods m
             INNER JOIN mods_categories mc ON joining_mod_id = m.id
             INNER JOIN categories c ON mc.joining_category_id = c.id
             INNER JOIN versions v ON v.mod_id = m.id
-            INNER JOIN mods_donations md ON md.joining_mod_id = m.id
-            INNER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
@@ -460,23 +458,7 @@ impl Mod {
                     .into_iter()
                     .map(|v| VersionId(v))
                     .collect(),
-                donation_urls: m
-                    .donations
-                    .clone()
-                    .unwrap_or(vec![])
-                    .into_iter()
-                    .map(|d| {
-                        // TODO: Change this once SQLX allows postgres tuples
-                        let strings: Vec<&str> = d.split(", ").collect();
-                        DonationUrl {
-                            mod_id: ModId(m.id.clone()),
-                            platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                            platform_short: strings[2].to_string(),
-                            platform_name: strings[3].to_string(),
-                            url: strings[1].to_string(),
-                        }
-                    })
-                    .collect(),
+                donation_urls: vec![],
                 status: crate::models::mods::ModStatus::from_str(&m.status_name),
                 license_id: m.short,
                 license_name: m.license_name,
@@ -506,14 +488,11 @@ impl Mod {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
-            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions,
-            ARRAY_AGG( DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
+            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions
             FROM mods m
             INNER JOIN mods_categories mc ON joining_mod_id = m.id
             INNER JOIN categories c ON mc.joining_category_id = c.id
             INNER JOIN versions v ON v.mod_id = m.id
-            LEFT OUTER JOIN mods_donations md ON md.joining_mod_id = m.id
-            LEFT OUTER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
@@ -550,17 +529,7 @@ impl Mod {
                     },
                     categories: m.categories.clone().unwrap_or(vec![]),
                     versions: m.versions.clone().unwrap_or(vec![]).into_iter().map(|v| VersionId(v)).collect(),
-                    donation_urls: m.donations.clone().unwrap_or(vec![]).into_iter().map(|d| {
-                        // TODO: Change this once SQLX allows postgres tuples
-                        let strings : Vec<&str> = d.split(", ").collect();
-                        DonationUrl {
-                            mod_id: ModId(m.id.clone()),
-                            platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                            platform_short: strings[2].to_string(),
-                            platform_name: strings[3].to_string(),
-                            url: strings[1].to_string()
-                        }
-                    }).collect(),
+                    donation_urls: vec![],
                     status: crate::models::mods::ModStatus::from_str(&m.status_name),
                     license_id: m.short,
                     license_name: m.license_name,
