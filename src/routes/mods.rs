@@ -48,35 +48,33 @@ pub async fn mods_get(
 
     let mut mods = Vec::new();
 
-    for mod_data_option in mods_data {
-        if let Some(mod_data) = mod_data_option {
-            let mut authorized = !mod_data.status.is_hidden();
+    for mod_data in mods_data {
+        let mut authorized = !mod_data.status.is_hidden();
 
-            if let Some(user) = &user_option {
-                if !authorized {
-                    if user.role.is_mod() {
-                        authorized = true;
-                    } else {
-                        let user_id: database::models::ids::UserId = user.id.into();
+        if let Some(user) = &user_option {
+            if !authorized {
+                if user.role.is_mod() {
+                    authorized = true;
+                } else {
+                    let user_id: database::models::ids::UserId = user.id.into();
 
-                        let mod_exists = sqlx::query!(
+                    let mod_exists = sqlx::query!(
                             "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",
                             mod_data.inner.team_id as database::models::ids::TeamId,
                             user_id as database::models::ids::UserId,
                         )
-                            .fetch_one(&**pool)
-                            .await
-                            .map_err(|e| ApiError::DatabaseError(e.into()))?
-                            .exists;
+                        .fetch_one(&**pool)
+                        .await
+                        .map_err(|e| ApiError::DatabaseError(e.into()))?
+                        .exists;
 
-                        authorized = mod_exists.unwrap_or(false);
-                    }
+                    authorized = mod_exists.unwrap_or(false);
                 }
             }
+        }
 
-            if authorized {
-                mods.push(convert_mod(mod_data));
-            }
+        if authorized {
+            mods.push(convert_mod(mod_data));
         }
     }
 
