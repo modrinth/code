@@ -517,7 +517,7 @@ impl Version {
                         let mut file_hashes = HashMap::new();
 
                         for hash in &hashes {
-                            if hash.0 .0 == file_id.0 {
+                            if (hash.0).0 == file_id.0 {
                                 file_hashes.insert(hash.1.clone(), hash.2.clone());
                             }
                         }
