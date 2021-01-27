@@ -86,6 +86,14 @@ async fn main() -> std::io::Result<()> {
         info!("Skipping initial indexing");
     }
 
+    // DSN is from SENTRY_DSN env variable.
+    // Has no effect if not set.
+    let sentry = sentry::init(());
+    if sentry.is_enabled() {
+        info!("Enabled Sentry integration");
+        std::env::set_var("RUST_BACKTRACE", "1");
+    }
+
     database::check_for_migrations()
         .await
         .expect("An error occurred while running migrations.");
@@ -283,6 +291,7 @@ async fn main() -> std::io::Result<()> {
                     .with_interval(std::time::Duration::from_secs(60))
                     .with_max_requests(200),
             )
+            .wrap(sentry_actix::Sentry::new())
             .data(pool.clone())
             .data(file_host.clone())
             .data(indexing_queue.clone())
