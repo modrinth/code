@@ -2,7 +2,7 @@
 name = "labrinth"
 version = "0.1.0"
 #Team members, please add your emails and usernames
-authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "Charalampos Fanoulis <yo@fanoulis.dev>"]
+authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "Charalampos Fanoulis <yo@fanoulis.dev>", "AppleTheGolden <scotsbox@protonmail.com>"]
 edition = "2018"
 
 [[bin]]
@@ -45,3 +45,6 @@ rust-s3 = "0.26.1"
 async-trait = "0.1.41"
 
 sqlx = { version = "0.4.2", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate"] }
+
+sentry = { version = "0.22.0", features = ["log"] }
+sentry-actix = "0.22.0"
