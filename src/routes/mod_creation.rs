@@ -306,8 +306,7 @@ async fn mod_create_inner(
             create_data
                 .categories
                 .iter()
-                .map(|f| check_length(1..=256, "category", f))
-                .collect::<Result<(), _>>()?;
+                .try_for_each(|f| check_length(1..=256, "category", f))?;
 
             if let Some(url) = &create_data.issues_url {
                 check_length(..=2048, "url", url)?;
@@ -322,8 +321,7 @@ async fn mod_create_inner(
             create_data
                 .initial_versions
                 .iter()
-                .map(|v| super::version_creation::check_version(v))
-                .collect::<Result<(), _>>()?;
+                .try_for_each(|v| super::version_creation::check_version(v))?;
         }
 
         // Create VersionBuilders for the versions specified in `initial_versions`
@@ -688,7 +686,7 @@ pub fn get_image_content_type(extension: &str) -> Option<&'static str> {
         _ => "",
     };
 
-    if content_type != "" {
+    if !content_type.is_empty() {
         Some(content_type)
     } else {
         None
