@@ -170,14 +170,14 @@ impl Version {
             "
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
-                changelog_url, date_published,
+                changelog, changelog_url, date_published,
                 downloads, release_channel, featured
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9,
-                $10
+                $10, $11
             )
             ",
             self.id as VersionId,
@@ -185,6 +185,7 @@ impl Version {
             self.author_id as UserId,
             &self.name,
             &self.version_number,
+            self.changelog,
             self.changelog_url.as_ref(),
             self.date_published,
             self.downloads,
@@ -465,7 +466,7 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             rc.channel release_channel, v.featured featured,
-            ARRAY_AGG(gv.version ORDER BY gv.created) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
+            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
             ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
             ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes
             FROM versions v
@@ -491,8 +492,8 @@ impl Version {
                 let hash: Vec<&str> = f.split(", ").collect();
                 hashes.push((
                     FileId(hash[2].parse().unwrap_or(0)),
-                    hash[1].to_string(),
-                    hash[0].to_string().into_bytes(),
+                    hash[0].to_string(),
+                    hash[1].to_string().into_bytes(),
                 ));
             });
 
@@ -555,7 +556,7 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             rc.channel release_channel, v.featured featured,
-            ARRAY_AGG(gv.version ORDER BY gv.created) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
+            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
             ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
             ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes
             FROM versions v
