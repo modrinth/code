@@ -491,110 +491,6 @@
       ]
     }
   },
-  "1e932b3ed3a406e860817241dec7616f712c1af59ce041a622a978b3be20ad5b": {
-    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            ARRAY_AGG(gv.version ORDER BY gv.created) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,\n            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,\n            ARRAY_AGG(DISTINCT h.hash || ', ' || h.algorithm || ', ' || h.file_id) hashes\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            INNER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id\n            INNER JOIN loaders_versions lv on v.id = lv.version_id\n            INNER JOIN loaders l on lv.loader_id = l.id\n            INNER JOIN files f on v.id = f.version_id\n            INNER JOIN hashes h on f.id = h.file_id\n            WHERE v.id = $1\n            GROUP BY v.id, rc.id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "author_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "changelog",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 9,
-          "name": "release_channel",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 10,
-          "name": "featured",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 11,
-          "name": "game_versions",
-          "type_info": "VarcharArray"
-        },
-        {
-          "ordinal": 12,
-          "name": "loaders",
-          "type_info": "VarcharArray"
-        },
-        {
-          "ordinal": 13,
-          "name": "files",
-          "type_info": "TextArray"
-        },
-        {
-          "ordinal": 14,
-          "name": "hashes",
-          "type_info": "TextArray"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null,
-        null,
-        null
-      ]
-    }
-  },
   "1ffce9b2d5c9fa6c8b9abce4bad9f9419c44ad6367b7463b979c91b9b5b4fea1": {
     "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE id=$1)",
     "describe": {
@@ -2214,6 +2110,110 @@
         false,
         false,
         true
+      ]
+    }
+  },
+  "94ee8161c16e89692c912c7416d67263896912f7ad86edee567b1a244758a649": {
+    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            ARRAY_AGG(gv.version ORDER BY gv.created) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,\n            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,\n            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            INNER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id\n            INNER JOIN loaders_versions lv on v.id = lv.version_id\n            INNER JOIN loaders l on lv.loader_id = l.id\n            INNER JOIN files f on v.id = f.version_id\n            INNER JOIN hashes h on f.id = h.file_id\n            WHERE v.id = $1\n            GROUP BY v.id, rc.id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "author_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "version_number",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "changelog",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "changelog_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "date_published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 9,
+          "name": "release_channel",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 10,
+          "name": "featured",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "game_versions",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 12,
+          "name": "loaders",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 13,
+          "name": "files",
+          "type_info": "TextArray"
+        },
+        {
+          "ordinal": 14,
+          "name": "hashes",
+          "type_info": "TextArray"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null
       ]
     }
   },
