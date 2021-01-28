@@ -411,9 +411,9 @@ impl Mod {
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
             ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions
             FROM mods m
-            INNER JOIN mods_categories mc ON joining_mod_id = m.id
-            INNER JOIN categories c ON mc.joining_category_id = c.id
-            INNER JOIN versions v ON v.mod_id = m.id
+            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
+            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
+            LEFT OUTER JOIN versions v ON v.mod_id = m.id
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
@@ -490,9 +490,9 @@ impl Mod {
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
             ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions
             FROM mods m
-            INNER JOIN mods_categories mc ON joining_mod_id = m.id
-            INNER JOIN categories c ON mc.joining_category_id = c.id
-            INNER JOIN versions v ON v.mod_id = m.id
+            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
+            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
+            LEFT OUTER JOIN versions v ON v.mod_id = m.id
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id

@@ -104,7 +104,7 @@ struct ModCreateData {
     /// The title or name of the mod.
     pub mod_name: String,
     /// The slug of a mod, used for vanity URLs
-    pub mod_slug: Option<String>,
+    pub mod_slug: String,
     /// A short description of the mod.
     pub mod_description: String,
     /// A long description of the mod, in markdown.
@@ -517,7 +517,7 @@ async fn mod_create_inner(
             client_side: client_side_id,
             server_side: server_side_id,
             license: license_id,
-            slug: mod_create_data.mod_slug,
+            slug: Some(mod_create_data.mod_slug),
             donation_urls,
         };
 

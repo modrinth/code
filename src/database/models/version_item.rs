@@ -471,12 +471,12 @@ impl Version {
             ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
-            INNER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
-            INNER JOIN game_versions gv on gvv.game_version_id = gv.id
-            INNER JOIN loaders_versions lv on v.id = lv.version_id
-            INNER JOIN loaders l on lv.loader_id = l.id
-            INNER JOIN files f on v.id = f.version_id
-            INNER JOIN hashes h on f.id = h.file_id
+            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
+            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
+            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
+            LEFT OUTER JOIN loaders l on lv.loader_id = l.id
+            LEFT OUTER JOIN files f on v.id = f.version_id
+            LEFT OUTER JOIN hashes h on f.id = h.file_id
             WHERE v.id = $1
             GROUP BY v.id, rc.id;
             ",
@@ -561,12 +561,12 @@ impl Version {
             ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
-            INNER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
-            INNER JOIN game_versions gv on gvv.game_version_id = gv.id
-            INNER JOIN loaders_versions lv on v.id = lv.version_id
-            INNER JOIN loaders l on lv.loader_id = l.id
-            INNER JOIN files f on v.id = f.version_id
-            INNER JOIN hashes h on f.id = h.file_id
+            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
+            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
+            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
+            LEFT OUTER JOIN loaders l on lv.loader_id = l.id
+            LEFT OUTER JOIN files f on v.id = f.version_id
+            LEFT OUTER JOIN hashes h on f.id = h.file_id
             WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
             GROUP BY v.id, rc.id;
             ",

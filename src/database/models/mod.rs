@@ -21,7 +21,7 @@ pub use version_item::VersionFile;
 
 #[derive(Error, Debug)]
 pub enum DatabaseError {
-    #[error("Error while interacting with the database")]
+    #[error("Error while interacting with the database: {0}")]
     DatabaseError(#[from] sqlx::error::Error),
     #[error("Error while trying to generate random ID")]
     RandomIdError,
