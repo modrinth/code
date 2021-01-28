@@ -90,7 +90,7 @@ pub enum ApiError {
     EnvError(#[from] dotenv::Error),
     #[error("Error while uploading file")]
     FileHostingError(#[from] FileHostingError),
-    #[error("Internal server error")]
+    #[error("Internal server error: {0}")]
     DatabaseError(#[from] crate::database::models::DatabaseError),
     #[error("Deserialization error: {0}")]
     JsonError(#[from] serde_json::Error),
