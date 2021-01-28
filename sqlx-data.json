@@ -569,6 +569,110 @@
       ]
     }
   },
+  "27193954d279b739f01a97ec47d46e06f2629d64254034b4b775b1e1880cce15": {
+    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,\n            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,\n            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            WHERE v.id = $1\n            GROUP BY v.id, rc.id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "author_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "version_number",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "changelog",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "changelog_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "date_published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 9,
+          "name": "release_channel",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 10,
+          "name": "featured",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "game_versions",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 12,
+          "name": "loaders",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 13,
+          "name": "files",
+          "type_info": "TextArray"
+        },
+        {
+          "ordinal": 14,
+          "name": "hashes",
+          "type_info": "TextArray"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  },
   "29e657d26f0fb24a766f5b5eb6a94d01d1616884d8ca10e91536e974d5b585a6": {
     "query": "\n                INSERT INTO loaders_versions (loader_id, version_id)\n                VALUES ($1, $2)\n                ",
     "describe": {
@@ -847,110 +951,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "42b29f5655da845c870b6b34b8c38202c4f0d1fc5cb67aa8cc0c3d34b7fef291": {
-    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,\n            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,\n            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            INNER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id\n            INNER JOIN loaders_versions lv on v.id = lv.version_id\n            INNER JOIN loaders l on lv.loader_id = l.id\n            INNER JOIN files f on v.id = f.version_id\n            INNER JOIN hashes h on f.id = h.file_id\n            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY v.id, rc.id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "author_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "changelog",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 9,
-          "name": "release_channel",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 10,
-          "name": "featured",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 11,
-          "name": "game_versions",
-          "type_info": "VarcharArray"
-        },
-        {
-          "ordinal": 12,
-          "name": "loaders",
-          "type_info": "VarcharArray"
-        },
-        {
-          "ordinal": 13,
-          "name": "files",
-          "type_info": "TextArray"
-        },
-        {
-          "ordinal": 14,
-          "name": "hashes",
-          "type_info": "TextArray"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null,
-        null,
-        null
-      ]
     }
   },
   "43b793e2df30a6ace9e037e38bb4ea456656cfbe276c151e3a9e0a408d2c249f": {
@@ -1495,8 +1495,8 @@
       ]
     }
   },
-  "64de132f7957a98f71e6a2b22a2584a971dfbeb410b524bae437ab563c71daf5": {
-    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,\n            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,\n            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            INNER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id\n            INNER JOIN loaders_versions lv on v.id = lv.version_id\n            INNER JOIN loaders l on lv.loader_id = l.id\n            INNER JOIN files f on v.id = f.version_id\n            INNER JOIN hashes h on f.id = h.file_id\n            WHERE v.id = $1\n            GROUP BY v.id, rc.id;\n            ",
+  "66a7129cf67c93af622024a9f0383ee30f1a9cf064e699e166b040f8f1bece87": {
+    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id = $1\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
     "describe": {
       "columns": [
         {
@@ -1506,73 +1506,133 @@
         },
         {
           "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
+          "name": "title",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 2,
-          "name": "author_id",
-          "type_info": "Int8"
+          "name": "description",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 3,
-          "name": "version_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "changelog",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
           "name": "downloads",
           "type_info": "Int4"
         },
         {
-          "ordinal": 9,
-          "name": "release_channel",
+          "ordinal": 4,
+          "name": "icon_url",
           "type_info": "Varchar"
         },
         {
+          "ordinal": 5,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "body_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "updated",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 9,
+          "name": "status",
+          "type_info": "Int4"
+        },
+        {
           "ordinal": 10,
-          "name": "featured",
-          "type_info": "Bool"
+          "name": "issues_url",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 11,
-          "name": "game_versions",
-          "type_info": "VarcharArray"
+          "name": "source_url",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 12,
-          "name": "loaders",
-          "type_info": "VarcharArray"
+          "name": "wiki_url",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 13,
-          "name": "files",
-          "type_info": "TextArray"
+          "name": "discord_url",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 14,
-          "name": "hashes",
-          "type_info": "TextArray"
+          "name": "license_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 15,
+          "name": "team_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 16,
+          "name": "client_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 17,
+          "name": "server_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 18,
+          "name": "license",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 19,
+          "name": "slug",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 20,
+          "name": "status_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 21,
+          "name": "client_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 22,
+          "name": "server_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 23,
+          "name": "short",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 24,
+          "name": "license_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 25,
+          "name": "categories",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 26,
+          "name": "versions",
+          "type_info": "Int8Array"
         }
       ],
       "parameters": {
@@ -1585,6 +1645,19 @@
         false,
         false,
         false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
         false,
         false,
         true,
@@ -1592,8 +1665,7 @@
         false,
         false,
         false,
-        null,
-        null,
+        false,
         null,
         null
       ]
@@ -2854,8 +2926,8 @@
       ]
     }
   },
-  "b34f599d25340f20de2d547bd4fc69846d3321492dd7f13de7ecca6a2a752600": {
-    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions\n            FROM mods m\n            INNER JOIN mods_categories mc ON joining_mod_id = m.id\n            INNER JOIN categories c ON mc.joining_category_id = c.id\n            INNER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
+  "b55383bcaf275c83c94236dc91e0c43bd231db652d708484bec8838541f3aed4": {
+    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,\n            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,\n            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY v.id, rc.id;\n            ",
     "describe": {
       "columns": [
         {
@@ -2865,133 +2937,73 @@
         },
         {
           "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
+          "name": "mod_id",
+          "type_info": "Int8"
         },
         {
           "ordinal": 2,
-          "name": "description",
-          "type_info": "Varchar"
+          "name": "author_id",
+          "type_info": "Int8"
         },
         {
           "ordinal": 3,
-          "name": "downloads",
-          "type_info": "Int4"
+          "name": "version_name",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 4,
-          "name": "icon_url",
+          "name": "version_number",
           "type_info": "Varchar"
         },
         {
           "ordinal": 5,
-          "name": "body",
+          "name": "changelog",
           "type_info": "Varchar"
         },
         {
           "ordinal": 6,
-          "name": "body_url",
+          "name": "changelog_url",
           "type_info": "Varchar"
         },
         {
           "ordinal": 7,
-          "name": "published",
+          "name": "date_published",
           "type_info": "Timestamptz"
         },
         {
           "ordinal": 8,
-          "name": "updated",
-          "type_info": "Timestamptz"
+          "name": "downloads",
+          "type_info": "Int4"
         },
         {
           "ordinal": 9,
-          "name": "status",
-          "type_info": "Int4"
+          "name": "release_channel",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 10,
-          "name": "issues_url",
-          "type_info": "Varchar"
+          "name": "featured",
+          "type_info": "Bool"
         },
         {
           "ordinal": 11,
-          "name": "source_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 12,
-          "name": "wiki_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 13,
-          "name": "discord_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 14,
-          "name": "license_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 15,
-          "name": "team_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 16,
-          "name": "client_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 17,
-          "name": "server_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 18,
-          "name": "license",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 19,
-          "name": "slug",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 20,
-          "name": "status_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 21,
-          "name": "client_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 22,
-          "name": "server_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 23,
-          "name": "short",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 24,
-          "name": "license_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 25,
-          "name": "categories",
+          "name": "game_versions",
           "type_info": "VarcharArray"
         },
         {
-          "ordinal": 26,
-          "name": "versions",
-          "type_info": "Int8Array"
+          "ordinal": 12,
+          "name": "loaders",
+          "type_info": "VarcharArray"
+        },
+        {
+          "ordinal": 13,
+          "name": "files",
+          "type_info": "TextArray"
+        },
+        {
+          "ordinal": 14,
+          "name": "hashes",
+          "type_info": "TextArray"
         }
       ],
       "parameters": {
@@ -3004,19 +3016,6 @@
         false,
         false,
         false,
-        true,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
         false,
         false,
         true,
@@ -3024,7 +3023,8 @@
         false,
         false,
         false,
-        false,
+        null,
+        null,
         null,
         null
       ]
@@ -3667,41 +3667,8 @@
       ]
     }
   },
-  "dc6aa2e7bfd5d5004620ddd4cd6a47ecc56159e1489054e0652d56df802fb5e5": {
-    "query": "\n                    UPDATE mods\n                    SET body = $1\n                    WHERE (id = $2)\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "e35fa345b43725309b976efffbc8f9e20a62a5e90a86a82a77b55c39c168d2de": {
-    "query": "\n            SELECT id FROM versions\n            WHERE mod_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "e3d3ec698e523cb7251804d9ef518045ebc5a0a9740c214d2e091ccf7492405d": {
-    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions\n            FROM mods m\n            INNER JOIN mods_categories mc ON joining_mod_id = m.id\n            INNER JOIN categories c ON mc.joining_category_id = c.id\n            INNER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id = $1\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
+  "dbd1e0143971033875c783a1a0bc838b8c06c697ae310a15d283a2d1194275a4": {
+    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
     "describe": {
       "columns": [
         {
@@ -3842,7 +3809,7 @@
       ],
       "parameters": {
         "Left": [
-          "Int8"
+          "Int8Array"
         ]
       },
       "nullable": [
@@ -3873,6 +3840,39 @@
         false,
         null,
         null
+      ]
+    }
+  },
+  "dc6aa2e7bfd5d5004620ddd4cd6a47ecc56159e1489054e0652d56df802fb5e5": {
+    "query": "\n                    UPDATE mods\n                    SET body = $1\n                    WHERE (id = $2)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "e35fa345b43725309b976efffbc8f9e20a62a5e90a86a82a77b55c39c168d2de": {
+    "query": "\n            SELECT id FROM versions\n            WHERE mod_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
       ]
     }
   },
