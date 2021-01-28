@@ -466,9 +466,9 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             rc.channel release_channel, v.featured featured,
-            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
-            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
-            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes
+            STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
+            STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
+            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
@@ -488,7 +488,7 @@ impl Version {
         if let Some(v) = result {
             let mut hashes: Vec<(FileId, String, Vec<u8>)> = Vec::new();
 
-            v.hashes.unwrap_or_default().into_iter().for_each(|f| {
+            v.hashes.unwrap_or_default().split(" ,").for_each(|f| {
                 let hash: Vec<&str> = f.split(", ").collect();
                 hashes.push((
                     FileId(hash[2].parse().unwrap_or(0)),
@@ -511,7 +511,7 @@ impl Version {
                 files: v
                     .files
                     .unwrap_or_default()
-                    .into_iter()
+                    .split(" ,")
                     .map(|f| {
                         let file: Vec<&str> = f.split(", ").collect();
                         let file_id = FileId(file[0].parse().unwrap_or(0));
@@ -532,8 +532,18 @@ impl Version {
                         }
                     })
                     .collect(),
-                game_versions: v.game_versions.unwrap_or_default(),
-                loaders: v.loaders.unwrap_or_default(),
+                game_versions: v
+                    .game_versions
+                    .unwrap_or_default()
+                    .split(",")
+                    .map(|x| x.to_string())
+                    .collect(),
+                loaders: v
+                    .loaders
+                    .unwrap_or_default()
+                    .split(",")
+                    .map(|x| x.to_string())
+                    .collect(),
                 featured: v.featured,
             }))
         } else {
@@ -556,9 +566,9 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             rc.channel release_channel, v.featured featured,
-            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
-            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
-            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes
+            STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
+            STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
+            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
@@ -577,7 +587,7 @@ impl Version {
                 Ok(e.right().map(|v| {
                     let mut hashes : Vec<(FileId, String, Vec<u8>)>  = Vec::new();
 
-                    v.hashes.unwrap_or_default().into_iter().for_each(|f| {
+                    v.hashes.unwrap_or_default().split(" ,").for_each(|f| {
                         let hash : Vec<&str> = f.split(", ").collect();
                         hashes.push((FileId(hash[2].parse().unwrap_or(0)), hash[0].to_string(), hash[1].to_string().into_bytes()));
                     });
@@ -593,7 +603,8 @@ impl Version {
                         date_published: v.date_published,
                         downloads: v.downloads,
                         release_channel: v.release_channel,
-                        files: v.files.unwrap_or_default().into_iter().map(|f| {
+                        files: v.files.unwrap_or_default()
+                            .split(" ,").map(|f| {
                             let file : Vec<&str> = f.split(", ").collect();
                             let file_id = FileId(file[0].parse().unwrap_or(0));
                             let mut file_hashes = HashMap::new();
@@ -612,8 +623,8 @@ impl Version {
                                 primary: file[3].parse().unwrap_or(false)
                             }
                         }).collect(),
-                        game_versions: v.game_versions.unwrap_or_default(),
-                        loaders: v.loaders.unwrap_or_default(),
+                        game_versions: v.game_versions.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
+                        loaders: v.loaders.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
                         featured: v.featured,
                     }
                 }))

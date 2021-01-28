@@ -409,7 +409,7 @@ impl Mod {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
-            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -450,13 +450,17 @@ impl Mod {
                     slug: m.slug.clone(),
                     body: m.body.clone(),
                 },
-                categories: m.categories.clone().unwrap_or_default(),
+                categories: m
+                    .categories
+                    .unwrap_or_default()
+                    .split(",")
+                    .map(|x| x.to_string())
+                    .collect(),
                 versions: m
                     .versions
-                    .clone()
                     .unwrap_or_default()
-                    .into_iter()
-                    .map(VersionId)
+                    .split(",")
+                    .map(|x| VersionId(x.parse().unwrap_or_default()))
                     .collect(),
                 donation_urls: vec![],
                 status: crate::models::mods::ModStatus::from_str(&m.status_name),
@@ -488,7 +492,7 @@ impl Mod {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
-            ARRAY_AGG( DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id) versions
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -527,8 +531,8 @@ impl Mod {
                         slug: m.slug.clone(),
                         body: m.body.clone(),
                     },
-                    categories: m.categories.clone().unwrap_or_default(),
-                    versions: m.versions.clone().unwrap_or_default().into_iter().map(VersionId).collect(),
+                    categories: m.categories.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
+                    versions: m.versions.unwrap_or_default().split(",").map(|x| VersionId(x.parse().unwrap_or_default())).collect(),
                     donation_urls: vec![],
                     status: crate::models::mods::ModStatus::from_str(&m.status_name),
                     license_id: m.short,
