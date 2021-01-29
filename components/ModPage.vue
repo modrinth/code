@@ -46,7 +46,12 @@
             >
               Settings
             </nuxt-link>
-            <a v-if="mod.wiki_url" :href="mod.wiki_url" class="tab">
+            <a
+              v-if="mod.wiki_url"
+              :href="mod.wiki_url"
+              target="_blank"
+              class="tab"
+            >
               <ExternalIcon />
               Wiki
             </a>
@@ -68,7 +73,12 @@
               <ExternalIcon />
               Source
             </a>
-            <a v-if="mod.discord_url" :href="mod.discord_url" class="tab">
+            <a
+              v-if="mod.discord_url"
+              :href="mod.discord_url"
+              target="_blank"
+              class="tab"
+            >
               <ExternalIcon />
               Discord
             </a>
