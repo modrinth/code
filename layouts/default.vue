@@ -67,7 +67,7 @@
                           <MoonIcon v-if="$colorMode.value === 'light'" />
                           <SunIcon v-else />
                           <span v-if="$colorMode.value === 'light'">
-                          Dark Mode</span
+                            Dark Mode</span
                           >
                           <span v-else>Light Mode</span>
                         </button>
