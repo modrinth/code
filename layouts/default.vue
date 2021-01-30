@@ -17,77 +17,81 @@
             <NuxtLink to="/mods" class="tab">
               <span>Mods</span>
             </NuxtLink>
-            <div v-if="this.$auth.loggedIn" class="section">
-              <NuxtLink to="/dashboard/projects" class="tab">
-                <span>Dashboard</span>
-              </NuxtLink>
-            </div>
+            <client-only>
+              <div v-if="this.$auth.loggedIn" class="section">
+                <NuxtLink to="/dashboard/projects" class="tab">
+                  <span>Dashboard</span>
+                </NuxtLink>
+              </div>
+            </client-only>
           </div>
         </section>
         <section class="column-grow">
-          <template v-if="this.$auth.loggedIn">
-            <section class="user-controls">
-              <div
-                v-click-outside="hideDropdown"
-                class="dropdown"
-                :class="{ open: isDropdownOpen }"
-              >
-                <button class="control" @click="toggleDropdown">
-                  <div class="avatar">
-                    <span>{{ this.$auth.user.username }}</span>
-                    <img :src="this.$auth.user.avatar_url" class="icon" />
-                  </div>
-                  <DropdownIcon class="dropdown-icon" />
-                </button>
-                <div class="content">
-                  <ul v-if="isDropdownOpen" @click="hideDropdown">
-                    <li>
-                      <NuxtLink :to="userUrl">
-                        <UserIcon />
-                        <span>Profile</span>
-                      </NuxtLink>
-                    </li>
-                    <li>
-                      <NuxtLink to="/dashboard/notifications">
-                        <NotificationIcon />
-                        <span>Notifications</span>
-                      </NuxtLink>
-                    </li>
-                    <!--<li v-tooltip="'Not implemented yet'" class="hidden">
-                      <NuxtLink :to="userTeamsUrl" disabled>
-                        <UsersIcon />
-                        <span>Teams</span>
-                      </NuxtLink>
-                    </li>-->
-                    <li>
-                      <button @click="changeTheme">
-                        <MoonIcon v-if="$colorMode.value === 'light'" />
-                        <SunIcon v-else />
-                        <span v-if="$colorMode.value === 'light'">
+          <client-only>
+            <template v-if="this.$auth.loggedIn">
+              <section class="user-controls">
+                <div
+                  v-click-outside="hideDropdown"
+                  class="dropdown"
+                  :class="{ open: isDropdownOpen }"
+                >
+                  <button class="control" @click="toggleDropdown">
+                    <div class="avatar">
+                      <span>{{ this.$auth.user.username }}</span>
+                      <img :src="this.$auth.user.avatar_url" class="icon" />
+                    </div>
+                    <DropdownIcon class="dropdown-icon" />
+                  </button>
+                  <div class="content">
+                    <ul v-if="isDropdownOpen" @click="hideDropdown">
+                      <li>
+                        <NuxtLink :to="userUrl">
+                          <UserIcon />
+                          <span>Profile</span>
+                        </NuxtLink>
+                      </li>
+                      <li>
+                        <NuxtLink to="/dashboard/notifications">
+                          <NotificationIcon />
+                          <span>Notifications</span>
+                        </NuxtLink>
+                      </li>
+                      <!--<li v-tooltip="'Not implemented yet'" class="hidden">
+                        <NuxtLink :to="userTeamsUrl" disabled>
+                          <UsersIcon />
+                          <span>Teams</span>
+                        </NuxtLink>
+                      </li>-->
+                      <li>
+                        <button @click="changeTheme">
+                          <MoonIcon v-if="$colorMode.value === 'light'" />
+                          <SunIcon v-else />
+                          <span v-if="$colorMode.value === 'light'">
                           Dark Mode</span
-                        >
-                        <span v-else>Light Mode</span>
-                      </button>
-                    </li>
-                    <hr />
-                    <li>
-                      <button @click="logout">
-                        <LogOutIcon />
-                        <span>Log Out</span>
-                      </button>
-                    </li>
-                  </ul>
+                          >
+                          <span v-else>Light Mode</span>
+                        </button>
+                      </li>
+                      <hr />
+                      <li>
+                        <button @click="logout">
+                          <LogOutIcon />
+                          <span>Log Out</span>
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-              </div>
-            </section>
-          </template>
-          <template v-else>
-            <section class="auth-prompt">
-              <a :href="authUrl" class="log-in-button"
-                ><GitHubIcon aria-hidden="true" />Sign In with GitHub</a
-              >
-            </section>
-          </template>
+              </section>
+            </template>
+            <template v-else>
+              <section class="auth-prompt">
+                <a :href="authUrl" class="log-in-button"
+                  ><GitHubIcon aria-hidden="true" />Sign In with GitHub</a
+                >
+              </section>
+            </template>
+          </client-only>
         </section>
       </section>
     </header>

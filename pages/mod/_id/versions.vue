@@ -68,9 +68,11 @@
         </tr>
       </tbody>
     </table>
-    <nuxt-link v-if="currentMember" to="newversion" class="button">
-      New Version
-    </nuxt-link>
+    <div class="new-version">
+      <nuxt-link v-if="currentMember" to="newversion" class="button">
+        New Version
+      </nuxt-link>
+    </div>
   </ModPage>
 </template>
 <script>
@@ -294,8 +296,10 @@ table {
   }
 }
 
-.button {
-  float: right;
+.new-version {
+  width: 100%;
+  text-align: right;
+  margin-bottom: var(--spacing-card-md);
 }
 
 @media screen and (max-width: 400px) {

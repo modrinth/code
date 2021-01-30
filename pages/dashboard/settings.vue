@@ -93,12 +93,9 @@
           will be removed from our servers. This cannot be reversed, so be
           careful!</span
         >
-        <input
-          type="button"
-          class="button"
-          value="Delete Account"
-          @click="deleteAccount"
-        />
+        <div type="button" class="button" @click="deleteAccount">
+          Delete Account
+        </div>
       </label>
     </section>
   </DashboardPage>
@@ -255,6 +252,16 @@ label {
     flex: 1;
   }
   input[type='button']:hover {
+    cursor: pointer;
+  }
+
+  div,
+  a {
+    text-align: center;
+    height: fit-content;
+    flex: 1;
+  }
+  div:hover {
     cursor: pointer;
   }
 }
