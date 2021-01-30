@@ -208,7 +208,7 @@ pub struct Version {
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
     /// A list of mods that this version depends on.
-    pub dependencies: Vec<VersionId>,
+    pub dependencies: Vec<Dependency>,
     /// A list of versions of Minecraft that this version of the mod supports.
     pub game_versions: Vec<GameVersion>,
     /// The loaders that this version works on
@@ -227,6 +227,16 @@ pub struct VersionFile {
     pub filename: String,
     /// Whether the file is the primary file of a version
     pub primary: bool,
+}
+
+/// A dependency which describes what versions are required, break support, or are optional to the
+/// version's functionality
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Dependency {
+    /// The filename of the file.
+    pub version_id: VersionId,
+    /// Whether the file is the primary file of a version
+    pub dependency_type: DependencyType,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -254,6 +264,44 @@ impl VersionType {
             VersionType::Release => "release",
             VersionType::Beta => "beta",
             VersionType::Alpha => "alpha",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum DependencyType {
+    Required,
+    Optional,
+    Incompatible,
+}
+
+impl std::fmt::Display for DependencyType {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        match self {
+            DependencyType::Required => write!(fmt, "required"),
+            DependencyType::Optional => write!(fmt, "optional"),
+            DependencyType::Incompatible => write!(fmt, "incompatible"),
+        }
+    }
+}
+
+impl DependencyType {
+    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            DependencyType::Required => "required",
+            DependencyType::Optional => "optional",
+            DependencyType::Incompatible => "incompatible",
+        }
+    }
+
+    pub fn from_str(string: &str) -> DependencyType {
+        match string {
+            "required" => DependencyType::Required,
+            "optional" => DependencyType::Optional,
+            "incompatible" => DependencyType::Incompatible,
+            _ => DependencyType::Required,
         }
     }
 }

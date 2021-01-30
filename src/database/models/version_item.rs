@@ -10,7 +10,7 @@ pub struct VersionBuilder {
     pub version_number: String,
     pub changelog: String,
     pub files: Vec<VersionFileBuilder>,
-    pub dependencies: Vec<VersionId>,
+    pub dependencies: Vec<(VersionId, String)>,
     pub game_versions: Vec<GameVersionId>,
     pub loaders: Vec<LoaderId>,
     pub release_channel: ChannelId,
@@ -107,11 +107,12 @@ impl VersionBuilder {
         for dependency in self.dependencies {
             sqlx::query!(
                 "
-                INSERT INTO dependencies (dependent_id, dependency_id)
-                VALUES ($1, $2)
+                INSERT INTO dependencies (dependent_id, dependency_id, dependency_type)
+                VALUES ($1, $2, $3)
                 ",
                 self.version_id as VersionId,
-                dependency as VersionId,
+                dependency.0 as VersionId,
+                dependency.1,
             )
             .execute(&mut *transaction)
             .await?;
@@ -350,6 +351,8 @@ impl Version {
 
     pub async fn get_mod_versions<'a, E>(
         mod_id: ModId,
+        game_versions: Option<Vec<String>>,
+        loaders: Option<Vec<String>>,
         exec: E,
     ) -> Result<Vec<VersionId>, sqlx::Error>
     where
@@ -359,11 +362,19 @@ impl Version {
 
         let vec = sqlx::query!(
             "
-            SELECT id FROM versions
-            WHERE mod_id = $1
-            ORDER BY date_published ASC
+            SELECT version.id FROM (
+                SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v
+                INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
+                INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))
+                INNER JOIN loaders_versions lv ON lv.version_id = v.id
+                INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
+                WHERE v.mod_id = $1
+            ) AS version
+            ORDER BY version.date_published ASC
             ",
             mod_id as ModId,
+            &game_versions.unwrap_or_default(),
+            &loaders.unwrap_or_default(),
         )
         .fetch_many(exec)
         .try_filter_map(|e| async { Ok(e.right().map(|v| VersionId(v.id))) })
@@ -468,7 +479,8 @@ impl Version {
             rc.channel release_channel, v.featured featured,
             STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
             STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
-            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes
+            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
+            STRING_AGG(DISTINCT d.dependency_id || ', ' || d.dependency_type,  ' ,') dependencies
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
@@ -477,6 +489,7 @@ impl Version {
             LEFT OUTER JOIN loaders l on lv.loader_id = l.id
             LEFT OUTER JOIN files f on v.id = f.version_id
             LEFT OUTER JOIN hashes h on f.id = h.file_id
+            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
             WHERE v.id = $1
             GROUP BY v.id, rc.id;
             ",
@@ -490,12 +503,56 @@ impl Version {
 
             v.hashes.unwrap_or_default().split(" ,").for_each(|f| {
                 let hash: Vec<&str> = f.split(", ").collect();
-                hashes.push((
-                    FileId(hash[2].parse().unwrap_or(0)),
-                    hash[0].to_string(),
-                    hash[1].to_string().into_bytes(),
-                ));
+
+                if hash.len() >= 3 {
+                    hashes.push((
+                        FileId(hash[2].parse().unwrap_or(0)),
+                        hash[0].to_string(),
+                        hash[1].to_string().into_bytes(),
+                    ));
+                }
             });
+
+            let mut files = Vec::new();
+
+            v.files.unwrap_or_default().split(" ,").for_each(|f| {
+                let file: Vec<&str> = f.split(", ").collect();
+
+                if file.len() >= 4 {
+                    let file_id = FileId(file[0].parse().unwrap_or(0));
+                    let mut file_hashes = HashMap::new();
+
+                    for hash in &hashes {
+                        if (hash.0).0 == file_id.0 {
+                            file_hashes.insert(hash.1.clone(), hash.2.clone());
+                        }
+                    }
+
+                    files.push(QueryFile {
+                        id: file_id,
+                        url: file[3].to_string(),
+                        filename: file[1].to_string(),
+                        hashes: file_hashes,
+                        primary: file[3].parse().unwrap_or(false),
+                    })
+                }
+            });
+
+            let mut dependencies = Vec::new();
+
+            v.dependencies
+                .unwrap_or_default()
+                .split(" ,")
+                .for_each(|f| {
+                    let dependency: Vec<&str> = f.split(", ").collect();
+
+                    if dependency.len() >= 2 {
+                        dependencies.push((
+                            VersionId(dependency[0].parse().unwrap_or(0)),
+                            dependency[1].to_string(),
+                        ))
+                    }
+                });
 
             Ok(Some(QueryVersion {
                 id: VersionId(v.id),
@@ -508,30 +565,7 @@ impl Version {
                 date_published: v.date_published,
                 downloads: v.downloads,
                 release_channel: v.release_channel,
-                files: v
-                    .files
-                    .unwrap_or_default()
-                    .split(" ,")
-                    .map(|f| {
-                        let file: Vec<&str> = f.split(", ").collect();
-                        let file_id = FileId(file[0].parse().unwrap_or(0));
-                        let mut file_hashes = HashMap::new();
-
-                        for hash in &hashes {
-                            if (hash.0).0 == file_id.0 {
-                                file_hashes.insert(hash.1.clone(), hash.2.clone());
-                            }
-                        }
-
-                        QueryFile {
-                            id: file_id,
-                            url: file[3].to_string(),
-                            filename: file[1].to_string(),
-                            hashes: file_hashes,
-                            primary: file[3].parse().unwrap_or(false),
-                        }
-                    })
-                    .collect(),
+                files,
                 game_versions: v
                     .game_versions
                     .unwrap_or_default()
@@ -545,6 +579,7 @@ impl Version {
                     .map(|x| x.to_string())
                     .collect(),
                 featured: v.featured,
+                dependencies,
             }))
         } else {
             Ok(None)
@@ -568,7 +603,8 @@ impl Version {
             rc.channel release_channel, v.featured featured,
             STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
             STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
-            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes
+            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
+            STRING_AGG(DISTINCT d.dependency_id || ', ' || d.dependency_type,  ' ,') dependencies
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
@@ -577,6 +613,7 @@ impl Version {
             LEFT OUTER JOIN loaders l on lv.loader_id = l.id
             LEFT OUTER JOIN files f on v.id = f.version_id
             LEFT OUTER JOIN hashes h on f.id = h.file_id
+            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
             WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
             GROUP BY v.id, rc.id;
             ",
@@ -589,7 +626,45 @@ impl Version {
 
                     v.hashes.unwrap_or_default().split(" ,").for_each(|f| {
                         let hash : Vec<&str> = f.split(", ").collect();
-                        hashes.push((FileId(hash[2].parse().unwrap_or(0)), hash[0].to_string(), hash[1].to_string().into_bytes()));
+
+                        if hashes.len() >= 3 {
+                            hashes.push((FileId(hash[2].parse().unwrap_or(0)), hash[0].to_string(), hash[1].to_string().into_bytes()));
+                        }
+                    });
+
+                    let mut files = Vec::new();
+
+                    v.files.unwrap_or_default().split(" ,").for_each(|f| {
+                        let file : Vec<&str> = f.split(", ").collect();
+
+                        if file.len() >= 4 {
+                            let file_id = FileId(file[0].parse().unwrap_or(0));
+                            let mut file_hashes = HashMap::new();
+
+                            for hash in &hashes {
+                                if (hash.0).0 == file_id.0 {
+                                    file_hashes.insert(hash.1.clone(), hash.2.clone());
+                                }
+                            }
+
+                            files.push(QueryFile {
+                                id: file_id,
+                                url: file[3].to_string(),
+                                filename: file[1].to_string(),
+                                hashes: file_hashes,
+                                primary: file[3].parse().unwrap_or(false)
+                            })
+                        }
+                    });
+
+                    let mut dependencies = Vec::new();
+
+                    v.dependencies.unwrap_or_default().split(" ,").for_each(|f| {
+                        let dependency: Vec<&str> = f.split(", ").collect();
+
+                        if dependency.len() >= 2 {
+                            dependencies.push((VersionId(dependency[0].parse().unwrap_or(0)), dependency[1].to_string()))
+                        }
                     });
 
                     QueryVersion {
@@ -603,29 +678,11 @@ impl Version {
                         date_published: v.date_published,
                         downloads: v.downloads,
                         release_channel: v.release_channel,
-                        files: v.files.unwrap_or_default()
-                            .split(" ,").map(|f| {
-                            let file : Vec<&str> = f.split(", ").collect();
-                            let file_id = FileId(file[0].parse().unwrap_or(0));
-                            let mut file_hashes = HashMap::new();
-
-                            for hash in &hashes {
-                                if (hash.0).0 == file_id.0 {
-                                    file_hashes.insert(hash.1.clone(), hash.2.clone());
-                                }
-                            }
-
-                            QueryFile {
-                                id: file_id,
-                                url: file[3].to_string(),
-                                filename: file[1].to_string(),
-                                hashes: file_hashes,
-                                primary: file[3].parse().unwrap_or(false)
-                            }
-                        }).collect(),
+                        files,
                         game_versions: v.game_versions.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
                         loaders: v.loaders.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
                         featured: v.featured,
+                        dependencies,
                     }
                 }))
             })
@@ -669,6 +726,7 @@ pub struct QueryVersion {
     pub game_versions: Vec<String>,
     pub loaders: Vec<String>,
     pub featured: bool,
+    pub dependencies: Vec<(VersionId, String)>,
 }
 
 pub struct QueryFile {

@@ -3,7 +3,7 @@ use crate::database::models;
 use crate::database::models::version_item::{VersionBuilder, VersionFileBuilder};
 use crate::file_hosting::FileHost;
 use crate::models::mods::{
-    GameVersion, ModId, ModLoader, Version, VersionFile, VersionId, VersionType,
+    Dependency, GameVersion, ModId, ModLoader, Version, VersionFile, VersionId, VersionType,
 };
 use crate::models::teams::Permissions;
 use crate::routes::mod_creation::{CreateError, UploadedFile};
@@ -21,7 +21,7 @@ pub struct InitialVersionData {
     pub version_number: String,
     pub version_title: String,
     pub version_body: Option<String>,
-    pub dependencies: Vec<VersionId>,
+    pub dependencies: Vec<Dependency>,
     pub game_versions: Vec<GameVersion>,
     pub release_channel: VersionType,
     pub loaders: Vec<ModLoader>,
@@ -221,6 +221,12 @@ async fn version_create_inner(
                 loaders.push(id);
             }
 
+            let dependencies = version_create_data
+                .dependencies
+                .iter()
+                .map(|x| ((x.version_id).into(), x.dependency_type.to_string()))
+                .collect::<Vec<_>>();
+
             version_builder = Some(VersionBuilder {
                 version_id: version_id.into(),
                 mod_id: version_create_data.mod_id.unwrap().into(),
@@ -232,11 +238,7 @@ async fn version_create_inner(
                     .clone()
                     .unwrap_or_else(|| "".to_string()),
                 files: Vec::new(),
-                dependencies: version_create_data
-                    .dependencies
-                    .iter()
-                    .map(|x| (*x).into())
-                    .collect::<Vec<_>>(),
+                dependencies,
                 game_versions,
                 loaders,
                 release_channel,

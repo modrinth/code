@@ -611,7 +611,7 @@ async fn create_initial_version(
     let dependencies = version_data
         .dependencies
         .iter()
-        .map(|x| (*x).into())
+        .map(|x| ((x.version_id).into(), x.dependency_type.to_string()))
         .collect::<Vec<_>>();
 
     let version = models::version_item::VersionBuilder {
