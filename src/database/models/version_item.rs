@@ -625,10 +625,14 @@ impl Version {
                     let mut hashes : Vec<(FileId, String, Vec<u8>)>  = Vec::new();
 
                     v.hashes.unwrap_or_default().split(" ,").for_each(|f| {
-                        let hash : Vec<&str> = f.split(", ").collect();
+                        let hash: Vec<&str> = f.split(", ").collect();
 
-                        if hashes.len() >= 3 {
-                            hashes.push((FileId(hash[2].parse().unwrap_or(0)), hash[0].to_string(), hash[1].to_string().into_bytes()));
+                        if hash.len() >= 3 {
+                            hashes.push((
+                                FileId(hash[2].parse().unwrap_or(0)),
+                                hash[0].to_string(),
+                                hash[1].to_string().into_bytes(),
+                            ));
                         }
                     });
 
