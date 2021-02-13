@@ -302,6 +302,16 @@ impl Mod {
 
         sqlx::query!(
             "
+            DELETE FROM reports
+            WHERE mod_id = $1
+            ",
+            id as ModId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
             DELETE FROM mods_categories
             WHERE joining_mod_id = $1
             ",
@@ -453,13 +463,13 @@ impl Mod {
                 categories: m
                     .categories
                     .unwrap_or_default()
-                    .split(",")
+                    .split(',')
                     .map(|x| x.to_string())
                     .collect(),
                 versions: m
                     .versions
                     .unwrap_or_default()
-                    .split(",")
+                    .split(',')
                     .map(|x| VersionId(x.parse().unwrap_or_default()))
                     .collect(),
                 donation_urls: vec![],
@@ -531,8 +541,8 @@ impl Mod {
                         slug: m.slug.clone(),
                         body: m.body.clone(),
                     },
-                    categories: m.categories.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
-                    versions: m.versions.unwrap_or_default().split(",").map(|x| VersionId(x.parse().unwrap_or_default())).collect(),
+                    categories: m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
+                    versions: m.versions.unwrap_or_default().split(',').map(|x| VersionId(x.parse().unwrap_or_default())).collect(),
                     donation_urls: vec![],
                     status: crate::models::mods::ModStatus::from_str(&m.status_name),
                     license_id: m.short,

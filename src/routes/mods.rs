@@ -192,7 +192,7 @@ pub async fn mod_get(
     }
 }
 
-fn convert_mod(data: database::models::mod_item::QueryMod) -> models::mods::Mod {
+pub fn convert_mod(data: database::models::mod_item::QueryMod) -> models::mods::Mod {
     let m = data.inner;
 
     models::mods::Mod {
@@ -392,6 +392,7 @@ pub async fn mod_edit(
                             "No database entry for status provided.".to_string(),
                         )
                     })?;
+
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -406,7 +407,7 @@ pub async fn mod_edit(
                 .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
                 if mod_item.status.is_searchable() && !status.is_searchable() {
-                    delete_from_index(id.into(), config).await?;
+                    delete_from_index(mod_id, config).await?;
                 } else if !mod_item.status.is_searchable() && status.is_searchable() {
                     let index_mod = crate::search::indexing::local_import::query_one(
                         mod_id.into(),

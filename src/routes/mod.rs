@@ -6,6 +6,7 @@ mod mod_creation;
 mod moderation;
 mod mods;
 mod not_found;
+mod reports;
 mod tags;
 mod teams;
 mod users;
@@ -82,6 +83,12 @@ pub fn teams_config(cfg: &mut web::ServiceConfig) {
 
 pub fn moderation_config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("moderation").service(moderation::mods));
+}
+
+pub fn reports_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(reports::reports);
+    cfg.service(reports::report_create);
+    cfg.service(reports::delete_report);
 }
 
 #[derive(thiserror::Error, Debug)]

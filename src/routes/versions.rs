@@ -11,10 +11,10 @@ use sqlx::PgPool;
 use std::borrow::Borrow;
 use std::sync::Arc;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct VersionListFilters {
-    pub game_versions: Option<Vec<String>>,
-    pub loaders: Option<Vec<String>>,
+    pub game_versions: Option<String>,
+    pub loaders: Option<String>,
     pub featured: Option<bool>,
 }
 
@@ -38,8 +38,14 @@ pub async fn version_list(
     if mod_exists.unwrap_or(false) {
         let version_ids = database::models::Version::get_mod_versions(
             id,
-            filters.game_versions,
-            filters.loaders,
+            filters
+                .game_versions
+                .as_ref()
+                .map(|x| serde_json::from_str(x).unwrap_or_default()),
+            filters
+                .loaders
+                .as_ref()
+                .map(|x| serde_json::from_str(x).unwrap_or_default()),
             &**pool,
         )
         .await
@@ -49,16 +55,34 @@ pub async fn version_list(
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-        let mut response = Vec::new();
-        for version in versions {
-            if let Some(featured) = filters.featured {
-                if featured {
-                    response.push(convert_version(version))
-                }
-            } else {
-                response.push(convert_version(version))
-            }
+        let mut response = versions
+            .iter()
+            .cloned()
+            .filter(|version| {
+                filters
+                    .featured
+                    .map(|featured| featured == version.featured)
+                    .unwrap_or(true)
+            })
+            .map(convert_version)
+            .collect::<Vec<_>>();
+
+        // Attempt to populate versions with "auto featured" versions
+        if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
+            database::models::categories::GameVersion::list_filter(None, Some(true), &**pool)
+                .await?
+                .into_iter()
+                .for_each(|major_version| {
+                    versions
+                        .iter()
+                        .find(|version| version.game_versions.contains(&major_version))
+                        .map(|version| response.push(convert_version(version.clone())))
+                        .unwrap_or(());
+                });
         }
+
+        response.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+        response.dedup_by(|a, b| a.id == b.id);
 
         Ok(HttpResponse::Ok().json(response))
     } else {

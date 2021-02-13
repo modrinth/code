@@ -219,6 +219,16 @@ impl Version {
 
         sqlx::query!(
             "
+            DELETE FROM reports
+            WHERE version_id = $1
+            ",
+            id as VersionId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
             DELETE FROM game_versions_versions gvv
             WHERE gvv.joining_version_id = $1
             ",
@@ -569,13 +579,13 @@ impl Version {
                 game_versions: v
                     .game_versions
                     .unwrap_or_default()
-                    .split(",")
+                    .split(',')
                     .map(|x| x.to_string())
                     .collect(),
                 loaders: v
                     .loaders
                     .unwrap_or_default()
-                    .split(",")
+                    .split(',')
                     .map(|x| x.to_string())
                     .collect(),
                 featured: v.featured,
@@ -683,8 +693,8 @@ impl Version {
                         downloads: v.downloads,
                         release_channel: v.release_channel,
                         files,
-                        game_versions: v.game_versions.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
-                        loaders: v.loaders.unwrap_or_default().split(",").map(|x| x.to_string()).collect(),
+                        game_versions: v.game_versions.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
+                        loaders: v.loaders.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
                         featured: v.featured,
                         dependencies,
                     }
@@ -714,6 +724,7 @@ pub struct FileHash {
     pub hash: Vec<u8>,
 }
 
+#[derive(Clone)]
 pub struct QueryVersion {
     pub id: VersionId,
     pub mod_id: ModId,
@@ -733,6 +744,7 @@ pub struct QueryVersion {
     pub dependencies: Vec<(VersionId, String)>,
 }
 
+#[derive(Clone)]
 pub struct QueryFile {
     pub id: FileId,
     pub url: String,

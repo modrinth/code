@@ -86,6 +86,13 @@ generate_ids!(
     "SELECT EXISTS(SELECT 1 FROM users WHERE id=$1)",
     UserId
 );
+generate_ids!(
+    pub generate_report_id,
+    ReportId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM reports WHERE id=$1)",
+    ReportId
+);
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Type)]
 #[sqlx(transparent)]
@@ -129,6 +136,13 @@ pub struct LoaderId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
 pub struct CategoryId(pub i32);
+
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct ReportId(pub i64);
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct ReportTypeId(pub i32);
 
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
@@ -178,5 +192,15 @@ impl From<ids::VersionId> for VersionId {
 impl From<VersionId> for ids::VersionId {
     fn from(id: VersionId) -> Self {
         ids::VersionId(id.0 as u64)
+    }
+}
+impl From<ids::ReportId> for ReportId {
+    fn from(id: ids::ReportId) -> Self {
+        ReportId(id.0 as i64)
+    }
+}
+impl From<ReportId> for ids::ReportId {
+    fn from(id: ReportId) -> Self {
+        ids::ReportId(id.0 as u64)
     }
 }

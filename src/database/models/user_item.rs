@@ -241,6 +241,16 @@ impl User {
 
         sqlx::query!(
             "
+            DELETE FROM reports
+            WHERE user_id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
             DELETE FROM team_members
             WHERE user_id = $1
             ",

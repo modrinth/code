@@ -75,6 +75,18 @@
       "nullable": []
     }
   },
+  "041f499f542ddab1b81bd445d6cabe225b1b2ad3ec7bbc1f755346c016ae06e6": {
+    "query": "\n            DELETE FROM reports\n            WHERE user_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "04345d9c23430267f755b1420520df91bd403524fd60ba1a94e3a239ea70cae7": {
     "query": "\n                    UPDATE mods\n                    SET source_url = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -199,6 +211,26 @@
       },
       "nullable": [
         false,
+        false
+      ]
+    }
+  },
+  "0dbd0fa9a25416716a047184944d243ed5cb55808c6f300d7335c887f02a7f6e": {
+    "query": "\n            INSERT INTO report_types (name)\n            VALUES ($1)\n            ON CONFLICT (name) DO NOTHING\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      },
+      "nullable": [
         false
       ]
     }
@@ -634,6 +666,26 @@
       "nullable": []
     }
   },
+  "1d3b582e6765e1ae578039e44b5dc9be6f3f845c96ffd43b7ba83f9eab816f93": {
+    "query": "\n            SELECT name FROM report_types\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "1db6be78a74ff04c52ee105e0df30acf5bbf18f1de328980bb7f3da7f5f6569e": {
     "query": "\n            SELECT id FROM side_types\n            WHERE name = $1\n            ",
     "describe": {
@@ -650,6 +702,68 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "1f24988f92819272c10a45fecd7eb96cc901c2f7f4ec191bc1c1cf4982bf1b38": {
+    "query": "\n            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            WHERE r.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "mod_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 4,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 5,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "reporter",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 7,
+          "name": "created",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
         false
       ]
     }
@@ -1619,6 +1733,26 @@
       "nullable": []
     }
   },
+  "56578cb820533fbc17599ee8744b8f563cf4852e7c62a6a935765d3c60235e7b": {
+    "query": "\n                    SELECT version FROM game_versions\n                    WHERE type = $1\n                    ORDER BY created DESC\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "56fc196cbe33032b699348d7a2f3366100bc54decb1d18bb6aad865a88096c67": {
     "query": "\n                SELECT id FROM mods\n                WHERE slug = $1\n                ",
     "describe": {
@@ -1635,6 +1769,94 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "57bb3db92e6a8fb8606005be955e2379f13a04f101f91358322a591a860a7f9e": {
+    "query": "\n        SELECT id FROM reports\n        ORDER BY created ASC\n        LIMIT $1;\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "5a13a79ebb1ab975f88b58e6deaba9685fe16e242c0fa4a5eea54f12f9448e6b": {
+    "query": "\n            DELETE FROM reports\n            WHERE version_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "5ad1f23da1b6f0f613de3412b928d2677a0359111dab4174e69ef6b0ef78202b": {
+    "query": "\n            SELECT rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            WHERE r.id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 4,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "reporter",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 6,
+          "name": "created",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
         false
       ]
     }
@@ -1741,137 +1963,22 @@
       ]
     }
   },
-  "637fd5f9564a79b625e00a705b3c9fe70ba3cba9050c0993557ca46f50d89623": {
-    "query": "\n        SELECT * FROM mods\n        WHERE status = (\n            SELECT id FROM statuses WHERE status = $1\n        )\n        ORDER BY updated ASC\n        LIMIT $2;\n        ",
+  "67d021f0776276081d3c50ca97afa6b78b98860bf929009e845e9c00a192e3b5": {
+    "query": "\n            SELECT id FROM report_types\n            WHERE name = $1\n            ",
     "describe": {
       "columns": [
         {
           "ordinal": 0,
           "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "team_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "description",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "body_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 6,
-          "name": "downloads",
           "type_info": "Int4"
-        },
-        {
-          "ordinal": 7,
-          "name": "icon_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 8,
-          "name": "issues_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 9,
-          "name": "source_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 10,
-          "name": "wiki_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 11,
-          "name": "status",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 12,
-          "name": "updated",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 13,
-          "name": "license",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 14,
-          "name": "license_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 15,
-          "name": "client_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 16,
-          "name": "server_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 17,
-          "name": "discord_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 18,
-          "name": "slug",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 19,
-          "name": "body",
-          "type_info": "Varchar"
         }
       ],
       "parameters": {
         "Left": [
-          "Text",
-          "Int8"
+          "Text"
         ]
       },
       "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        true,
-        true,
         false
       ]
     }
@@ -2127,6 +2234,26 @@
       "nullable": [
         false,
         false,
+        false
+      ]
+    }
+  },
+  "7826a4f18add285afe556335581474071e601361775ef85c91074d70287392b9": {
+    "query": "\n                SELECT version FROM game_versions\n                WHERE major = $1\n                ORDER BY created DESC\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bool"
+        ]
+      },
+      "nullable": [
         false
       ]
     }
@@ -2605,6 +2732,26 @@
         false,
         false,
         false
+      ]
+    }
+  },
+  "97690dda7edea8c985891cae5ad405f628ed81e333bc88df5493c928a4324d43": {
+    "query": "SELECT EXISTS(SELECT 1 FROM reports WHERE id=$1)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
       ]
     }
   },
@@ -3111,6 +3258,27 @@
       ]
     }
   },
+  "b3c1b38d2e72c5ec9e6f34d497fb6eb5d01d6cdd07f38ee4a2bbae3b92911df7": {
+    "query": "\n                    SELECT version FROM game_versions\n                    WHERE major = $1 AND type = $2\n                    ORDER BY created DESC\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bool",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "b69a6f42965b3e7103fcbf46e39528466926789ff31e9ed2591bb175527ec169": {
     "query": "\n            DELETE FROM users\n            WHERE id = $1\n            ",
     "describe": {
@@ -3173,24 +3341,28 @@
       "nullable": []
     }
   },
-  "ba2d5d676aca425a61243a9d8d3b5745c5550aa934df087aac1c9c2b5e49a243": {
-    "query": "\n            SELECT version FROM game_versions\n            WHERE type = $1\n            ORDER BY created DESC\n            ",
+  "b99e906aa6ca18b9f3f111eae7bf0d360f42385ca99228a844387bf9456a6a31": {
+    "query": "\n            DELETE FROM reports WHERE id = $1\n            ",
     "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "version",
-          "type_info": "Varchar"
-        }
-      ],
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "bbfb47ae2c972734785df6b7c3e62077dc544ef4ccf8bb89e9c22c2f50a933c1": {
+    "query": "\n            DELETE FROM report_types\n            WHERE name = $1\n            ",
+    "describe": {
+      "columns": [],
       "parameters": {
         "Left": [
           "Text"
         ]
       },
-      "nullable": [
-        false
-      ]
+      "nullable": []
     }
   },
   "bc91841f9672608a28bd45a862919f2bd34fac0b3479e3b4b67a9f6bea2a562a": {
@@ -3328,6 +3500,26 @@
       "nullable": []
     }
   },
+  "c1a3f6dcef6110d6ea884670fb82bac14b98e922bb5673c048ccce7b7300539b": {
+    "query": "\n            SELECT EXISTS(SELECT 1 FROM reports WHERE id = $1)\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
   "c1fddbf97350871b79cb0c235b1f7488c6616b7c1dfbde76a712fd57e91ba158": {
     "query": "\n            SELECT id FROM game_versions\n            WHERE version = $1\n            ",
     "describe": {
@@ -3346,6 +3538,45 @@
       "nullable": [
         false
       ]
+    }
+  },
+  "c3dcb5a8b798ea6c0922698a007dbc8ab549f5f85bad780da59163f4d6371238": {
+    "query": "\n        SELECT id FROM mods\n        WHERE status = (\n            SELECT id FROM statuses WHERE status = $1\n        )\n        ORDER BY updated ASC\n        LIMIT $2;\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "c3f594d8d0ffcf5df1b36759cf3088bfaec496c5dfdbf496d3b05f0b122a5d0c": {
+    "query": "\n            INSERT INTO reports (\n                id, report_type_id, mod_id, version_id, user_id,\n                body, reporter\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7\n            )\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int4",
+          "Int8",
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Int8"
+        ]
+      },
+      "nullable": []
     }
   },
   "c545a74e902c5c63bca1057b76e94b9547ee21fadbc61964f45837915d5f4608": {
@@ -3622,6 +3853,18 @@
       "nullable": []
     }
   },
+  "cb597bf191d1ffe14634a9e7dc5089262497862eb4ee02091ee27c7a7606417a": {
+    "query": "\n            DELETE FROM reports\n            WHERE mod_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "cc8b672c2733bfd110ed3361c6f477b185b530228c7206cb641dbaa40e41ea9f": {
     "query": "\n            SELECT loader FROM loaders\n            ",
     "describe": {
@@ -3856,6 +4099,24 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "e3235e872f98eb85d3eb4a2518fb9dc88049ce62362bfd02623e9b49ac2e9fed": {
+    "query": "\n            SELECT name FROM report_types\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "e35fa345b43725309b976efffbc8f9e20a62a5e90a86a82a77b55c39c168d2de": {

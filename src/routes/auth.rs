@@ -21,7 +21,7 @@ pub fn config(cfg: &mut ServiceConfig) {
 pub enum AuthorizationError {
     #[error("Environment Error")]
     EnvError(#[from] dotenv::Error),
-    #[error("An unknown database error occured")]
+    #[error("An unknown database error occured: {0}")]
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
     DatabaseError(#[from] crate::database::models::DatabaseError),
