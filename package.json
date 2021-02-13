@@ -20,7 +20,7 @@
     "@nuxtjs/sitemap": "^2.4.0",
     "@nuxtjs/style-resources": "^1.0.0",
     "highlight.js": "^10.3.2",
-    "marked": "^1.2.0",
+    "marked": "^2.0.0",
     "nuxt": "^2.14.7",
     "nuxt-clipboard2": "^0.2.1",
     "v-tooltip": "^2.0.3",
