@@ -1,9 +1,10 @@
 <template>
   <ModPage
     :mod="mod"
-    :versions="versions"
+    :featured-versions="featuredVersions"
     :members="members"
     :current-member="currentMember"
+    :link-bar="[['Description', '']]"
   >
     <div
       v-compiled-markdown="mod.body"
@@ -41,14 +42,11 @@ export default {
         mod.body = (await axios.get(mod.body_url)).data
       }
 
-      const [members, versions] = (
+      const [members, featuredVersions] = (
         await Promise.all([
           axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
           axios.get(
-            `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-              mod.versions
-            )}`,
-            config
+            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
         ])
       ).map((it) => it.data)
@@ -74,11 +72,7 @@ export default {
 
       return {
         mod,
-        versions: versions.sort(
-          (a, b) =>
-            new Date(b.date_published).getTime() -
-            new Date(a.date_published).getTime()
-        ),
+        featuredVersions,
         members,
         currentMember,
       }

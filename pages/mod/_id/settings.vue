@@ -1,9 +1,10 @@
 <template>
   <ModPage
     :mod="mod"
-    :versions="versions"
     :members="members.filter((it) => it.accepted)"
     :current-member="currentMember"
+    :featured-versions="featuredVersions"
+    :link-bar="[['Settings', 'settings']]"
   >
     <div class="section-header columns">
       <h3 class="column-grow-1">General</h3>
@@ -260,17 +261,14 @@ export default {
         )
       ).data
 
-      const [members, versions] = (
+      const [members, featuredVersions] = (
         await Promise.all([
           axios.get(
             `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
             config
           ),
           axios.get(
-            `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-              mod.versions
-            )}`,
-            config
+            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
         ])
       ).map((it) => it.data)
@@ -298,11 +296,7 @@ export default {
 
       return {
         mod,
-        versions: versions.sort(
-          (a, b) =>
-            new Date(b.date_published).getTime() -
-            new Date(a.date_published).getTime()
-        ),
+        featuredVersions,
         members,
         currentMember,
       }

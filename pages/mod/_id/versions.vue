@@ -2,8 +2,10 @@
   <ModPage
     :mod="mod"
     :versions="versions"
+    :featured-versions="featuredVersions"
     :members="members"
     :current-member="currentMember"
+    :link-bar="[['Versions', 'versions']]"
   >
     <table>
       <thead>
@@ -109,17 +111,13 @@ export default {
         )
       ).data
 
-      const [members, versions, selectableLoaders, selectableVersions] = (
+      const [members, versions, featuredVersions] = (
         await Promise.all([
           axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
+          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
           axios.get(
-            `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-              mod.versions
-            )}`,
-            config
+            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
-          axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
-          axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
         ])
       ).map((it) => it.data)
 
@@ -144,14 +142,9 @@ export default {
 
       return {
         mod,
-        versions: versions.sort(
-          (a, b) =>
-            new Date(b.date_published).getTime() -
-            new Date(a.date_published).getTime()
-        ),
+        versions,
+        featuredVersions,
         members,
-        selectableLoaders,
-        selectableVersions,
         currentMember,
       }
     } catch {

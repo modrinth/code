@@ -107,7 +107,7 @@ export default {
 
       let mods = []
       res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${data.params.id}/mods`,
+        `https://api.modrinth.com/api/v1/user/${user.id}/mods`,
         config
       )
       if (res.data) {

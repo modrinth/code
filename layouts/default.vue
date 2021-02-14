@@ -191,16 +191,6 @@ export default {
 </script>
 
 <style lang="scss">
-.page-enter-active,
-.page-leave-active {
-  transition: ease-in-out 100ms;
-}
-
-.page-enter,
-.page-leave-to {
-  opacity: 0;
-}
-
 .layout {
   background-color: var(--color-bg);
   display: block;

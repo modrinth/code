@@ -18,6 +18,23 @@
             <p class="description">
               {{ mod.description }}
             </p>
+            <div class="alt-nav">
+              <p>
+                <nuxt-link to="/mods"> Mods </nuxt-link>
+                >
+                <nuxt-link :to="'/mod/' + (mod.slug ? mod.slug : mod.id)">{{
+                  mod.title
+                }}</nuxt-link>
+                <span v-if="linkBar.length > 0"> ></span>
+                <nuxt-link
+                  v-for="(link, index) in linkBar"
+                  :key="index"
+                  :to="/mod/ + (mod.slug ? mod.slug : mod.id) + '/' + link[1]"
+                  >{{ link[0] }}
+                  <span v-if="index !== linkBar.length - 1"> > </span>
+                </nuxt-link>
+              </p>
+            </div>
           </div>
         </div>
         <Advertisement
@@ -175,7 +192,7 @@
                   v-if="mod.license.url ? mod.license.url : '#'"
                   :href="mod.license.url"
                 >
-                  {{ mod.license.name }}</a
+                  {{ mod.license.id.toUpperCase() }}</a
                 >
               </p>
             </div>
@@ -205,10 +222,10 @@
             </div>
           </div>
         </div>
-        <div v-if="versions.length > 0" class="section">
+        <div v-if="featuredVersions.length > 0" class="section">
           <h3>Featured Versions</h3>
           <div
-            v-for="version in versions"
+            v-for="version in featuredVersions"
             :key="version.id"
             class="featured-version"
           >
@@ -343,6 +360,12 @@ export default {
         return {}
       },
     },
+    featuredVersions: {
+      type: Array,
+      default() {
+        return []
+      },
+    },
     versions: {
       type: Array,
       default() {
@@ -359,6 +382,12 @@ export default {
       type: Object,
       default() {
         return null
+      },
+    },
+    linkBar: {
+      type: Array,
+      default() {
+        return []
       },
     },
   },
@@ -417,8 +446,13 @@ export default {
     }
     .description {
       margin: var(--spacing-card-sm) var(--spacing-card-md) 0 0;
-      height: 100%;
       color: var(--color-text-dark);
+    }
+    .alt-nav {
+      margin: var(--spacing-card-sm) var(--spacing-card-md) 0 0;
+      p {
+        margin: 0;
+      }
     }
   }
 }
@@ -508,6 +542,7 @@ export default {
         width: 1.25rem;
         margin: auto;
       }
+      flex-shrink: 0;
     }
     .info {
       @extend %column;

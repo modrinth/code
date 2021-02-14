@@ -4,6 +4,11 @@
     :versions="versions"
     :members="members"
     :current-member="currentMember"
+    :featured-versions="featuredVersions"
+    :link-bar="[
+      ['Versions', 'versions'],
+      [version.name, 'versions/' + version.id],
+    ]"
   >
     <div class="version">
       <div class="version-header">
@@ -150,14 +155,12 @@ export default {
         )
       ).data
 
-      const [members, versions] = (
+      const [members, versions, featuredVersions] = (
         await Promise.all([
           axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
+          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
           axios.get(
-            `https://api.modrinth.com/api/v1/versions?ids=${JSON.stringify(
-              mod.versions
-            )}`,
-            config
+            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
         ])
       ).map((it) => it.data)
@@ -197,11 +200,8 @@ export default {
 
       return {
         mod,
-        versions: versions.sort(
-          (a, b) =>
-            new Date(b.date_published).getTime() -
-            new Date(a.date_published).getTime()
-        ),
+        versions,
+        featuredVersions,
         members,
         version,
         primaryFile,
