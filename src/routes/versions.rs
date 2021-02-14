@@ -51,7 +51,7 @@ pub async fn version_list(
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-        let versions = database::models::Version::get_many_full(version_ids, &**pool)
+        let mut versions = database::models::Version::get_many_full(version_ids, &**pool)
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
@@ -66,6 +66,8 @@ pub async fn version_list(
             })
             .map(convert_version)
             .collect::<Vec<_>>();
+
+        versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
 
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
