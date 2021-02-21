@@ -280,7 +280,7 @@ export default {
 
       formData.append('data', JSON.stringify({}))
 
-      for (const fileToUpload in this.filesToUpload) {
+      for (const fileToUpload of this.filesToUpload) {
         formData.append(
           fileToUpload.multipartName,
           new Blob([fileToUpload]),
