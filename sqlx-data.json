@@ -235,6 +235,26 @@
       ]
     }
   },
+  "0f29bb5ba767ebd0669c860994e48e3cb2674f0d53f6c4ab85c79d46b04cbb40": {
+    "query": "\n                SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
   "1220d15a56dbf823eaa452fbafa17442ab0568bc81a31fa38e16e3df3278e5f9": {
     "query": "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",
     "describe": {
@@ -3185,6 +3205,26 @@
         true,
         false,
         false
+      ]
+    }
+  },
+  "ac840a3ba466cfa1f914a1e44fcc9052bd1e0e908140e7147d1ff72d1794cfbf": {
+    "query": "\n                            SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)\n                            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
       ]
     }
   },

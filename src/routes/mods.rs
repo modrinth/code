@@ -588,6 +588,29 @@ pub async fn mod_edit(
                     ));
                 }
 
+                if let Some(slug) = slug {
+                    let slug_modid_option: Option<ModId> =
+                        serde_json::from_str(&*format!("\"{}\"", slug)).ok();
+                    if let Some(slug_modid) = slug_modid_option {
+                        let slug_modid: database::models::ids::ModId = slug_modid.into();
+                        let results = sqlx::query!(
+                            "
+                            SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
+                            ",
+                            slug_modid as database::models::ids::ModId
+                        )
+                        .fetch_one(&mut *transaction)
+                        .await
+                        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+                        if results.exists.unwrap_or(true) {
+                            return Err(ApiError::InvalidInputError(
+                                "Slug collides with other mod's id!".to_string(),
+                            ));
+                        }
+                    }
+                }
+
                 sqlx::query!(
                     "
                     UPDATE mods

@@ -46,6 +46,8 @@ pub enum CreateError {
     InvalidCategory(String),
     #[error("Invalid file type for version file: {0}")]
     InvalidFileType(String),
+    #[error("Slug collides with other mod's id!")]
+    SlugCollision,
     #[error("Authentication Error: {0}")]
     Unauthorized(#[from] AuthenticationError),
     #[error("Authentication Error: {0}")]
@@ -71,6 +73,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
             CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
             CreateError::CustomAuthenticationError(..) => StatusCode::UNAUTHORIZED,
+            CreateError::SlugCollision => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -93,6 +96,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::InvalidFileType(..) => "invalid_input",
                 CreateError::Unauthorized(..) => "unauthorized",
                 CreateError::CustomAuthenticationError(..) => "unauthorized",
+                CreateError::SlugCollision => "invalid_input",
             },
             description: &self.to_string(),
         })
@@ -322,6 +326,25 @@ async fn mod_create_inner(
                 .initial_versions
                 .iter()
                 .try_for_each(|v| super::version_creation::check_version(v))?;
+        }
+
+        let slug_modid_option: Option<ModId> =
+            serde_json::from_str(&*format!("\"{}\"", create_data.mod_slug)).ok();
+        if let Some(slug_modid) = slug_modid_option {
+            let slug_modid: models::ids::ModId = slug_modid.into();
+            let results = sqlx::query!(
+                "
+                SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
+                ",
+                slug_modid as models::ids::ModId
+            )
+            .fetch_one(&mut *transaction)
+            .await
+            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+
+            if results.exists.unwrap_or(true) {
+                return Err(CreateError::SlugCollision);
+            }
         }
 
         // Create VersionBuilders for the versions specified in `initial_versions`
