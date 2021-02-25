@@ -38,10 +38,14 @@
         <h1>The world's most modder-friendly platform</h1>
         <p>
           Modrinth intends to give back to the community, not leech from it.
-          That's why we are giving
-          <span>one hundred percent of ad revenue back</span> to modders, while
+          That's why we plan to give creators <span>one hundred percent</span>
+          of the ad revenue earned on their project pages back to them, while
           creating easy to use tools for every modder to publish their mods on
           the Modrinth platform.
+        </p>
+        <p>
+          <span>Note: This is currently not implemented.</span> There is no ETA
+          for when it will be.
         </p>
       </div>
       <div class="right columns workflow">
