@@ -1,5 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::models;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{VersionBuilder, VersionFileBuilder};
 use crate::file_hosting::FileHost;
 use crate::models::mods::{
@@ -271,6 +272,49 @@ async fn version_create_inner(
         .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
     let builder = version_builder
         .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
+
+    let result = sqlx::query!(
+        "
+        SELECT m.title FROM mods m
+        WHERE id = $1
+        ",
+        builder.mod_id as crate::database::models::ids::ModId
+    )
+    .fetch_one(&mut *transaction)
+    .await?;
+
+    use futures::stream::TryStreamExt;
+
+    let users = sqlx::query!(
+        "
+            SELECT follower_id FROM mod_follows
+            WHERE mod_id = $1
+            ",
+        builder.mod_id as crate::database::models::ids::ModId
+    )
+    .fetch_many(&mut *transaction)
+    .try_filter_map(|e| async {
+        Ok(e.right()
+            .map(|m| crate::database::models::ids::UserId(m.follower_id)))
+    })
+    .try_collect::<Vec<crate::database::models::ids::UserId>>()
+    .await?;
+
+    let mod_id: ModId = builder.mod_id.into();
+    let version_id: VersionId = builder.version_id.into();
+
+    NotificationBuilder {
+        title: "A mod you followed has been updated!".to_string(),
+        text: format!(
+            "Mod {} has been updated to version {}",
+            result.title,
+            version_data.version_number.clone()
+        ),
+        link: format!("mod/{}/version/{}", mod_id, version_id),
+        actions: vec![],
+    }
+    .insert_many(users, &mut *transaction)
+    .await?;
 
     let response = Version {
         id: builder.version_id.into(),

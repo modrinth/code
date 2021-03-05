@@ -8,7 +8,7 @@ use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::Settings;
 use sqlx::postgres::PgPool;
-use std::collections::{HashMap, VecDeque};
+use std::collections::VecDeque;
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -97,6 +97,14 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
         let mut downloads_rules = default_rules();
         downloads_rules.push_front("desc(downloads)".to_string());
         downloads_rules.into()
+    })
+    .await?;
+
+    // Follows Index
+    update_index(&client, "follows_mods", {
+        let mut follows_rules = default_rules();
+        follows_rules.push_front("desc(follows)".to_string());
+        follows_rules.into()
     })
     .await?;
 
@@ -242,6 +250,7 @@ fn default_settings() -> Settings {
         "categories".to_string(),
         "versions".to_string(),
         "downloads".to_string(),
+        "follows".to_string(),
         "page_url".to_string(),
         "icon_url".to_string(),
         "author_url".to_string(),
@@ -262,8 +271,6 @@ fn default_settings() -> Settings {
     Settings::new()
         .with_displayed_attributes(displayed_attributes)
         .with_searchable_attributes(searchable_attributes)
-        .with_stop_words(vec![])
-        .with_synonyms(HashMap::new())
         .with_attributes_for_faceting(vec![
             String::from("categories"),
             String::from("host"),

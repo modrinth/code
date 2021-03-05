@@ -49,6 +49,9 @@ pub struct Mod {
 
     /// The total number of downloads the mod has had.
     pub downloads: u32,
+    /// The total number of followers this mod has accumulated
+    pub followers: u32,
+
     /// A list of the categories that the mod is in.
     pub categories: Vec<String>,
     /// A list of ids for versions of the mod.

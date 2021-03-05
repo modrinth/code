@@ -24,7 +24,7 @@ impl User {
                 avatar_url, bio, created
             )
             VALUES (
-                $1, $2, $3, $4, $5,
+                $1, $2, LOWER($3), $4, $5,
                 $6, $7, $8
             )
             ",
@@ -126,7 +126,7 @@ impl User {
                 u.avatar_url, u.bio,
                 u.created, u.role
             FROM users u
-            WHERE u.username = $1
+            WHERE LOWER(u.username) = LOWER($1)
             ",
             username
         )
@@ -239,12 +239,55 @@ impl User {
         .execute(exec)
         .await?;
 
+        use futures::TryStreamExt;
+        let notifications: Vec<i64> = sqlx::query!(
+            "
+            SELECT n.id FROM notifications n
+            WHERE n.user_id = $1
+            ",
+            id as UserId,
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id as i64)) })
+        .try_collect::<Vec<i64>>()
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM notifications
+            WHERE user_id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
         sqlx::query!(
             "
             DELETE FROM reports
             WHERE user_id = $1
             ",
             id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM mod_follows
+            WHERE follower_id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM notifications_actions
+             WHERE notification_id IN (SELECT * FROM UNNEST($1::bigint[]))
+            ",
+            &notifications
         )
         .execute(exec)
         .await?;
@@ -297,6 +340,38 @@ impl User {
         for mod_id in mods {
             let _result = super::mod_item::Mod::remove_full(mod_id, exec).await?;
         }
+
+        let notifications: Vec<i64> = sqlx::query!(
+            "
+            SELECT n.id FROM notifications n
+            WHERE n.user_id = $1
+            ",
+            id as UserId,
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id as i64)) })
+        .try_collect::<Vec<i64>>()
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM notifications
+            WHERE user_id = $1
+            ",
+            id as UserId,
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM notifications_actions
+             WHERE notification_id IN (SELECT * FROM UNNEST($1::bigint[]))
+            ",
+            &notifications
+        )
+        .execute(exec)
+        .await?;
 
         let deleted_user: UserId = crate::models::users::DELETED_USER.into();
 

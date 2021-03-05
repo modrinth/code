@@ -1,10 +1,10 @@
-use super::ApiError;
 use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::mods::{DonationLink, License, ModId, ModStatus, SearchRequest, SideType};
 use crate::models::teams::Permissions;
+use crate::routes::ApiError;
 use crate::search::indexing::queue::CreationQueue;
 use crate::search::{search_for_mod, SearchConfig, SearchError};
 use actix_web::web::Data;
@@ -214,6 +214,7 @@ pub fn convert_mod(data: database::models::mod_item::QueryMod) -> models::mods::
         client_side: data.client_side,
         server_side: data.server_side,
         downloads: m.downloads as u32,
+        followers: m.follows as u32,
         categories: data.categories,
         versions: data.versions.into_iter().map(|v| v.into()).collect(),
         icon_url: m.icon_url,
@@ -333,6 +334,12 @@ pub async fn mod_edit(
                     ));
                 }
 
+                if title.len() > 256 || title.len() < 3 {
+                    return Err(ApiError::InvalidInputError(
+                        "The mod's title must be within 3-256 characters!".to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -352,6 +359,12 @@ pub async fn mod_edit(
                     return Err(ApiError::CustomAuthenticationError(
                         "You do not have the permissions to edit the description of this mod!"
                             .to_string(),
+                    ));
+                }
+
+                if description.len() > 2048 || description.len() < 3 {
+                    return Err(ApiError::InvalidInputError(
+                        "The mod's description must be within 3-256 characters!".to_string(),
                     ));
                 }
 
@@ -479,6 +492,14 @@ pub async fn mod_edit(
                     ));
                 }
 
+                if let Some(issues) = issues_url {
+                    if issues.len() > 2048 {
+                        return Err(ApiError::InvalidInputError(
+                            "The mod's issues url must be less than 2048 characters!".to_string(),
+                        ));
+                    }
+                }
+
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -499,6 +520,14 @@ pub async fn mod_edit(
                         "You do not have the permissions to edit the source URL of this mod!"
                             .to_string(),
                     ));
+                }
+
+                if let Some(source) = source_url {
+                    if source.len() > 2048 {
+                        return Err(ApiError::InvalidInputError(
+                            "The mod's source url must be less than 2048 characters!".to_string(),
+                        ));
+                    }
                 }
 
                 sqlx::query!(
@@ -523,6 +552,14 @@ pub async fn mod_edit(
                     ));
                 }
 
+                if let Some(wiki) = wiki_url {
+                    if wiki.len() > 2048 {
+                        return Err(ApiError::InvalidInputError(
+                            "The mod's wiki url must be less than 2048 characters!".to_string(),
+                        ));
+                    }
+                }
+
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -543,6 +580,14 @@ pub async fn mod_edit(
                         "You do not have the permissions to edit the license URL of this mod!"
                             .to_string(),
                     ));
+                }
+
+                if let Some(license) = license_url {
+                    if license.len() > 2048 {
+                        return Err(ApiError::InvalidInputError(
+                            "The mod's license url must be less than 2048 characters!".to_string(),
+                        ));
+                    }
                 }
 
                 sqlx::query!(
@@ -567,6 +612,14 @@ pub async fn mod_edit(
                     ));
                 }
 
+                if let Some(discord) = discord_url {
+                    if discord.len() > 2048 {
+                        return Err(ApiError::InvalidInputError(
+                            "The mod's discord url must be less than 2048 characters!".to_string(),
+                        ));
+                    }
+                }
+
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -589,6 +642,12 @@ pub async fn mod_edit(
                 }
 
                 if let Some(slug) = slug {
+                    if slug.len() > 64 || slug.len() < 3 {
+                        return Err(ApiError::InvalidInputError(
+                            "The mod's slug must be within 3-64 characters!".to_string(),
+                        ));
+                    }
+
                     let slug_modid_option: Option<ModId> =
                         serde_json::from_str(&*format!("\"{}\"", slug)).ok();
                     if let Some(slug_modid) = slug_modid_option {
@@ -614,7 +673,7 @@ pub async fn mod_edit(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET slug = $1
+                    SET slug = LOWER($1)
                     WHERE (id = $2)
                     ",
                     slug.as_deref(),
@@ -757,6 +816,12 @@ pub async fn mod_edit(
                 if !perms.contains(Permissions::EDIT_BODY) {
                     return Err(ApiError::CustomAuthenticationError(
                         "You do not have the permissions to edit the body of this mod!".to_string(),
+                    ));
+                }
+
+                if body.len() > 65536 {
+                    return Err(ApiError::InvalidInputError(
+                        "The mod's body must be less than 65536 characters!".to_string(),
                     ));
                 }
 
@@ -919,6 +984,89 @@ pub async fn mod_delete(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
+}
+
+#[get("{id}/follow")]
+pub async fn mod_follow(
+    req: HttpRequest,
+    info: web::Path<(models::ids::ModId,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let id = info.into_inner().0;
+
+    let _result = database::models::Mod::get(id.into(), &**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?
+        .ok_or_else(|| ApiError::InvalidInputError("Invalid Mod ID specified!".to_string()))?;
+
+    let user_id: database::models::ids::UserId = user.id.into();
+    let mod_id: database::models::ids::ModId = id.into();
+
+    sqlx::query!(
+        "
+        UPDATE mods
+        SET follows = follows + 1
+        WHERE id = $1
+        ",
+        mod_id as database::models::ids::ModId,
+    )
+    .execute(&**pool)
+    .await
+    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    sqlx::query!(
+        "
+        INSERT INTO mod_follows (follower_id, mod_id)
+        VALUES ($1, $2)
+        ",
+        user_id as database::models::ids::UserId,
+        mod_id as database::models::ids::ModId
+    )
+    .execute(&**pool)
+    .await
+    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    Ok(HttpResponse::Ok().body(""))
+}
+
+#[delete("{id}/follow")]
+pub async fn mod_unfollow(
+    req: HttpRequest,
+    info: web::Path<(models::ids::ModId,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let id = info.into_inner().0;
+
+    let user_id: database::models::ids::UserId = user.id.into();
+    let mod_id: database::models::ids::ModId = id.into();
+
+    sqlx::query!(
+        "
+        UPDATE mods
+        SET follows = follows - 1
+        WHERE id = $1
+        ",
+        mod_id as database::models::ids::ModId,
+    )
+    .execute(&**pool)
+    .await
+    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    sqlx::query!(
+        "
+        DELETE FROM mod_follows
+        WHERE follower_id = $1 AND mod_id = $2
+        ",
+        user_id as database::models::ids::UserId,
+        mod_id as database::models::ids::ModId
+    )
+    .execute(&**pool)
+    .await
+    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    Ok(HttpResponse::Ok().body(""))
 }
 
 pub async fn delete_from_index(

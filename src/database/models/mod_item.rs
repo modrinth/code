@@ -71,6 +71,7 @@ impl ModBuilder {
             updated: chrono::Utc::now(),
             status: self.status,
             downloads: 0,
+            follows: 0,
             icon_url: self.icon_url,
             issues_url: self.issues_url,
             source_url: self.source_url,
@@ -122,6 +123,7 @@ pub struct Mod {
     pub updated: chrono::DateTime<chrono::Utc>,
     pub status: StatusId,
     pub downloads: i32,
+    pub follows: i32,
     pub icon_url: Option<String>,
     pub issues_url: Option<String>,
     pub source_url: Option<String>,
@@ -153,7 +155,7 @@ impl Mod {
                 $6, $7, $8, $9,
                 $10, $11, $12, $13,
                 $14, $15, $16, $17,
-                $18
+                LOWER($18)
             )
             ",
             self.id as ModId,
@@ -187,7 +189,7 @@ impl Mod {
     {
         let result = sqlx::query!(
             "
-            SELECT title, description, downloads,
+            SELECT title, description, downloads, follows,
                    icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
@@ -222,6 +224,7 @@ impl Mod {
                 license: LicenseId(row.license),
                 slug: row.slug,
                 body: row.body,
+                follows: row.follows,
             }))
         } else {
             Ok(None)
@@ -237,7 +240,7 @@ impl Mod {
         let mod_ids_parsed: Vec<i64> = mod_ids.into_iter().map(|x| x.0).collect();
         let mods = sqlx::query!(
             "
-            SELECT id, title, description, downloads,
+            SELECT id, title, description, downloads, follows,
                    icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
@@ -270,6 +273,7 @@ impl Mod {
                 license: LicenseId(m.license),
                 slug: m.slug,
                 body: m.body,
+                follows: m.follows,
             }))
         })
         .try_collect::<Vec<Mod>>()
@@ -299,6 +303,26 @@ impl Mod {
         } else {
             return Ok(None);
         };
+
+        sqlx::query!(
+            "
+            DELETE FROM mod_follows
+            WHERE mod_id = $1
+            ",
+            id as ModId
+        )
+        .execute(exec)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM mod_follows
+            WHERE mod_id = $1
+            ",
+            id as ModId,
+        )
+        .execute(exec)
+        .await?;
 
         sqlx::query!(
             "
@@ -390,7 +414,7 @@ impl Mod {
         let id = sqlx::query!(
             "
                 SELECT id FROM mods
-                WHERE slug = $1
+                WHERE LOWER(slug) = LOWER($1)
                 ",
             slug
         )
@@ -413,7 +437,7 @@ impl Mod {
     {
         let result = sqlx::query!(
             "
-            SELECT m.id id, m.title title, m.description description, m.downloads downloads,
+            SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
@@ -459,6 +483,7 @@ impl Mod {
                     license: LicenseId(m.license),
                     slug: m.slug.clone(),
                     body: m.body.clone(),
+                    follows: m.follows,
                 },
                 categories: m
                     .categories
@@ -496,7 +521,7 @@ impl Mod {
         let mod_ids_parsed: Vec<i64> = mod_ids.into_iter().map(|x| x.0).collect();
         sqlx::query!(
             "
-            SELECT m.id id, m.title title, m.description description, m.downloads downloads,
+            SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
@@ -540,6 +565,7 @@ impl Mod {
                         license: LicenseId(m.license),
                         slug: m.slug.clone(),
                         body: m.body.clone(),
+                        follows: m.follows
                     },
                     categories: m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
                     versions: m.versions.unwrap_or_default().split(',').map(|x| VersionId(x.parse().unwrap_or_default())).collect(),

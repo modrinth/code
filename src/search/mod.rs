@@ -68,6 +68,7 @@ pub struct UploadSearchMod {
     pub description: String,
     pub categories: Vec<Cow<'static, str>>,
     pub versions: Vec<String>,
+    pub follows: i32,
     pub downloads: i32,
     pub page_url: String,
     pub icon_url: String,
@@ -160,6 +161,7 @@ pub async fn search_for_mod(
     let index = match index {
         "relevance" => "relevance_mods",
         "downloads" => "downloads_mods",
+        "follows" => "follows_mods",
         "updated" => "updated_mods",
         "newest" => "newest_mods",
         i => return Err(SearchError::InvalidIndex(i.to_string())),

@@ -1,5 +1,7 @@
 use crate::auth::get_user_from_headers;
+use crate::database::models::notification_item::{NotificationActionBuilder, NotificationBuilder};
 use crate::database::models::TeamMember;
+use crate::models::ids::ModId;
 use crate::models::teams::{Permissions, TeamId};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
@@ -195,6 +197,39 @@ pub async fn add_team_member(
     .insert(&mut transaction)
     .await
     .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    let result = sqlx::query!(
+        "
+        SELECT m.title, m.id FROM mods m
+        WHERE m.team_id = $1
+        ",
+        team_id as crate::database::models::ids::TeamId
+    )
+    .fetch_one(&**pool)
+    .await
+    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    let team: TeamId = team_id.into();
+    NotificationBuilder {
+        title: "You have been invited to join a team!".to_string(),
+        text: format!(
+            "Team invite from {} to join the team for mod {}",
+            current_user.username, result.title
+        ),
+        link: format!("mod/{}", ModId(result.id as u64)),
+        actions: vec![
+            NotificationActionBuilder {
+                title: "Accept".to_string(),
+                action_route: format!("team/{}/join", team),
+            },
+            NotificationActionBuilder {
+                title: "Deny".to_string(),
+                action_route: format!("team/{}/members/{}", team, new_member.user_id),
+            },
+        ],
+    }
+    .insert(new_member.user_id.into(), &mut transaction)
+    .await?;
 
     transaction
         .commit()

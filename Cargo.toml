@@ -19,7 +19,7 @@ actix-multipart = "0.3.0"
 actix-cors = "0.4.1"
 actix-ratelimit = "0.3.0"
 
-meilisearch-sdk = "0.4.0"
+meilisearch-sdk = "0.6.0"
 reqwest = { version = "0.10.8", features = ["json"] }
 
 serde_json = "1.0"

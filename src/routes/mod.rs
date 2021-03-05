@@ -6,6 +6,7 @@ mod mod_creation;
 mod moderation;
 mod mods;
 mod not_found;
+mod notifications;
 mod reports;
 mod tags;
 mod teams;
@@ -65,8 +66,7 @@ pub fn users_config(cfg: &mut web::ServiceConfig) {
             .service(users::mods_list)
             .service(users::user_delete)
             .service(users::user_edit)
-            .service(users::user_icon_edit)
-            .service(users::teams),
+            .service(users::user_icon_edit),
     );
 }
 

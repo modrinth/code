@@ -1,7 +1,10 @@
 use crate::auth::get_user_from_headers;
-use crate::database::models::{TeamMember, User};
+use crate::database::models::User;
 use crate::file_hosting::FileHost;
+use crate::models::ids::NotificationId;
+use crate::models::notifications::Notification;
 use crate::models::users::{Role, UserId};
+use crate::routes::notifications::convert_notification;
 use crate::routes::ApiError;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
@@ -146,48 +149,6 @@ pub async fn mods_list(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
-}
-
-#[get("{user_id}/teams")]
-pub async fn teams(
-    req: HttpRequest,
-    info: web::Path<(UserId,)>,
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
-    let id: crate::database::models::UserId = info.into_inner().0.into();
-
-    let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
-
-    let results;
-    let mut same_user = false;
-
-    if let Some(user) = current_user {
-        if user.id.0 == id.0 as u64 {
-            results = TeamMember::get_from_user_private(id, &**pool).await?;
-            same_user = true;
-        } else {
-            results = TeamMember::get_from_user_public(id, &**pool).await?;
-        }
-    } else {
-        results = TeamMember::get_from_user_public(id, &**pool).await?;
-    }
-
-    let team_members: Vec<crate::models::teams::TeamMember> = results
-        .into_iter()
-        .map(|data| crate::models::teams::TeamMember {
-            team_id: data.team_id.into(),
-            user_id: data.user_id.into(),
-            role: data.role,
-            permissions: if same_user {
-                Some(data.permissions)
-            } else {
-                None
-            },
-            accepted: data.accepted,
-        })
-        .collect();
-
-    Ok(HttpResponse::Ok().json(team_members))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -462,4 +423,64 @@ pub async fn user_delete(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
+}
+
+#[get("{id}/follows")]
+pub async fn user_follows(
+    req: HttpRequest,
+    info: web::Path<(UserId,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let id = info.into_inner().0;
+
+    if !user.role.is_mod() && user.id != id {
+        return Err(ApiError::CustomAuthenticationError(
+            "You do not have permission to see the mods this user follows!".to_string(),
+        ));
+    }
+
+    use futures::TryStreamExt;
+
+    let user_id: crate::database::models::UserId = id.into();
+    let notifications: Vec<NotificationId> = sqlx::query!(
+        "
+            SELECT n.id FROM notifications n
+            WHERE n.user_id = $1
+            ",
+        user_id as crate::database::models::ids::UserId,
+    )
+    .fetch_many(&**pool)
+    .try_filter_map(|e| async { Ok(e.right().map(|m| NotificationId(m.id as u64))) })
+    .try_collect::<Vec<NotificationId>>()
+    .await
+    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+    Ok(HttpResponse::Ok().json(notifications))
+}
+
+#[get("{id}/notifications")]
+pub async fn user_notifications(
+    req: HttpRequest,
+    info: web::Path<(UserId,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let id = info.into_inner().0;
+
+    if !user.role.is_mod() && user.id != id {
+        return Err(ApiError::CustomAuthenticationError(
+            "You do not have permission to see the mods this user follows!".to_string(),
+        ));
+    }
+
+    let notifications: Vec<Notification> =
+        crate::database::models::notification_item::Notification::get_many_user(id.into(), &**pool)
+            .await
+            .map_err(|e| ApiError::DatabaseError(e.into()))?
+            .into_iter()
+            .map(convert_notification)
+            .collect();
+
+    Ok(HttpResponse::Ok().json(notifications))
 }

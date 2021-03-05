@@ -299,6 +299,7 @@ async fn mod_create_inner(
 
             check_length(3..=256, "mod name", &create_data.mod_name)?;
             check_length(3..=2048, "mod description", &create_data.mod_description)?;
+            check_length(3..=64, "mod slug", &create_data.mod_slug)?;
             check_length(..65536, "mod body", &create_data.mod_body)?;
 
             if create_data.categories.len() > 3 {
@@ -319,6 +320,12 @@ async fn mod_create_inner(
                 check_length(..=2048, "url", url)?;
             }
             if let Some(url) = &create_data.source_url {
+                check_length(..=2048, "url", url)?;
+            }
+            if let Some(url) = &create_data.discord_url {
+                check_length(..=2048, "url", url)?;
+            }
+            if let Some(url) = &create_data.license_url {
                 check_length(..=2048, "url", url)?;
             }
 
@@ -565,6 +572,7 @@ async fn mod_create_inner(
             client_side: mod_create_data.client_side,
             server_side: mod_create_data.server_side,
             downloads: 0,
+            followers: 0,
             categories: mod_create_data.categories,
             versions: mod_builder
                 .initial_versions

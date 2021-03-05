@@ -94,6 +94,14 @@ generate_ids!(
     ReportId
 );
 
+generate_ids!(
+    pub generate_notification_id,
+    NotificationId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM notifications WHERE id=$1)",
+    NotificationId
+);
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Type)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
@@ -152,6 +160,13 @@ pub struct FileId(pub i64);
 #[sqlx(transparent)]
 pub struct StateId(pub i64);
 
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct NotificationId(pub i64);
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct NotificationActionId(pub i32);
+
 use crate::models::ids;
 
 impl From<ids::ModId> for ModId {
@@ -202,5 +217,15 @@ impl From<ids::ReportId> for ReportId {
 impl From<ReportId> for ids::ReportId {
     fn from(id: ReportId) -> Self {
         ids::ReportId(id.0 as u64)
+    }
+}
+impl From<ids::NotificationId> for NotificationId {
+    fn from(id: ids::NotificationId) -> Self {
+        NotificationId(id.0 as i64)
+    }
+}
+impl From<NotificationId> for ids::NotificationId {
+    fn from(id: NotificationId) -> Self {
+        ids::NotificationId(id.0 as u64)
     }
 }

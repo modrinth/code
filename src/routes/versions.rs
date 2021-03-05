@@ -257,6 +257,12 @@ pub async fn version_edit(
                 .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
             if let Some(name) = &new_version.name {
+                if name.len() > 256 || name.len() < 3 {
+                    return Err(ApiError::InvalidInputError(
+                        "The version name must be within 3-256 characters!".to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE versions
@@ -272,6 +278,12 @@ pub async fn version_edit(
             }
 
             if let Some(number) = &new_version.version_number {
+                if number.len() > 64 || number.is_empty() {
+                    return Err(ApiError::InvalidInputError(
+                        "The version number must be within 1-64 characters!".to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE versions
@@ -432,8 +444,8 @@ pub async fn version_edit(
             if let Some(primary_file) = &new_version.primary_file {
                 let result = sqlx::query!(
                     "
-                    SELECT id FROM files
-                    INNER JOIN hashes ON hash = $1 AND algorithm = $2
+                    SELECT f.id FROM files f
+                    INNER JOIN hashes h ON h.hash = $1 AND h.algorithm = $2
                     ",
                     primary_file.1.as_bytes(),
                     primary_file.0
@@ -474,6 +486,13 @@ pub async fn version_edit(
             }
 
             if let Some(body) = &new_version.changelog {
+                if body.len() > 65536 {
+                    return Err(ApiError::InvalidInputError(
+                        "The version changelog must be less than 65536 characters long!"
+                            .to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE versions
@@ -648,13 +667,13 @@ pub async fn download_version(
             if !download_exists {
                 sqlx::query!(
                     "
-                INSERT INTO downloads (
-                    version_id, identifier
-                )
-                VALUES (
-                    $1, $2
-                )
-                ",
+                    INSERT INTO downloads (
+                        version_id, identifier
+                    )
+                    VALUES (
+                        $1, $2
+                    )
+                    ",
                     id.version_id,
                     hash
                 )
@@ -664,10 +683,10 @@ pub async fn download_version(
 
                 sqlx::query!(
                     "
-                UPDATE versions
-                SET downloads = downloads + 1
-                WHERE id = $1
-                ",
+                    UPDATE versions
+                    SET downloads = downloads + 1
+                    WHERE id = $1
+                    ",
                     id.version_id,
                 )
                 .execute(&**pool)
@@ -676,10 +695,10 @@ pub async fn download_version(
 
                 sqlx::query!(
                     "
-                UPDATE mods
-                SET downloads = downloads + 1
-                WHERE id = $1
-                ",
+                    UPDATE mods
+                    SET downloads = downloads + 1
+                    WHERE id = $1
+                    ",
                     id.mod_id,
                 )
                 .execute(&**pool)
