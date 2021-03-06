@@ -33,6 +33,8 @@ pub fn mods_config(cfg: &mut web::ServiceConfig) {
             .service(mods::mod_delete)
             .service(mods::mod_edit)
             .service(mods::mod_icon_edit)
+            .service(mods::mod_follow)
+            .service(mods::mod_unfollow)
             .service(web::scope("{mod_id}").service(versions::version_list)),
     );
 }
@@ -66,7 +68,8 @@ pub fn users_config(cfg: &mut web::ServiceConfig) {
             .service(users::mods_list)
             .service(users::user_delete)
             .service(users::user_edit)
-            .service(users::user_icon_edit),
+            .service(users::user_icon_edit)
+            .service(users::user_follows),
     );
 }
 
@@ -78,6 +81,16 @@ pub fn teams_config(cfg: &mut web::ServiceConfig) {
             .service(teams::add_team_member)
             .service(teams::join_team)
             .service(teams::remove_team_member),
+    );
+}
+
+pub fn notifications_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(notifications::notifications_get);
+
+    cfg.service(
+        web::scope("notification")
+            .service(notifications::notification_get)
+            .service(notifications::notification_delete),
     );
 }
 

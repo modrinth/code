@@ -81,6 +81,12 @@ pub async fn version_list(
                         .map(|version| response.push(convert_version(version.clone())))
                         .unwrap_or(());
                 });
+
+            if response.is_empty() {
+                versions
+                    .into_iter()
+                    .for_each(|version| response.push(convert_version(version.clone())));
+            }
         }
 
         response.sort_by(|a, b| b.date_published.cmp(&a.date_published));

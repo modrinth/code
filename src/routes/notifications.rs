@@ -83,7 +83,7 @@ pub fn convert_notification(
             .into_iter()
             .map(|x| NotificationAction {
                 title: x.title,
-                action_route: x.action_route,
+                action_route: (x.action_route_method, x.action_route),
             })
             .collect(),
     }

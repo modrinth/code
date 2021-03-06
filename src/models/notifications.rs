@@ -23,5 +23,6 @@ pub struct Notification {
 #[derive(Serialize, Deserialize)]
 pub struct NotificationAction {
     pub title: String,
-    pub action_route: String,
+    /// The route to call when this notification action is called. Formatted HTTP Method, route
+    pub action_route: (String, String),
 }

@@ -10,7 +10,7 @@ pub struct NotificationBuilder {
 
 pub struct NotificationActionBuilder {
     pub title: String,
-    pub action_route: String,
+    pub action_route: (String, String),
 }
 
 pub struct Notification {
@@ -28,6 +28,7 @@ pub struct NotificationAction {
     pub id: NotificationActionId,
     pub notification_id: NotificationId,
     pub title: String,
+    pub action_route_method: String,
     pub action_route: String,
 }
 
@@ -55,7 +56,8 @@ impl NotificationBuilder {
                     id: NotificationActionId(0),
                     notification_id: id,
                     title: action.title.clone(),
-                    action_route: action.action_route.clone(),
+                    action_route_method: action.action_route.0.clone(),
+                    action_route: action.action_route.1.clone(),
                 })
             }
 
@@ -117,7 +119,7 @@ impl Notification {
         let result = sqlx::query!(
             "
             SELECT n.user_id, n.title, n.text, n.link, n.created, n.read,
-            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route,  ' ,') actions
+            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id = $1
@@ -139,6 +141,7 @@ impl Notification {
                         id: NotificationActionId(action[0].parse().unwrap_or(0)),
                         notification_id: id,
                         title: action[1].to_string(),
+                        action_route_method: action[3].to_string(),
                         action_route: action[2].to_string(),
                     });
                 }
@@ -172,7 +175,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read,
-            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route,  ' ,') actions
+            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id IN (SELECT * FROM UNNEST($1::bigint[]))
@@ -194,6 +197,7 @@ impl Notification {
                             id: NotificationActionId(action[0].parse().unwrap_or(0)),
                             notification_id: id,
                             title: action[1].to_string(),
+                            action_route_method: action[3].to_string(),
                             action_route: action[2].to_string(),
                         });
                     }
@@ -227,7 +231,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read,
-            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route,  ' ,') actions
+            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.user_id = $1
@@ -249,6 +253,7 @@ impl Notification {
                             id: NotificationActionId(action[0].parse().unwrap_or(0)),
                             notification_id: id,
                             title: action[1].to_string(),
+                            action_route_method: action[3].to_string(),
                             action_route: action[2].to_string(),
                         });
                     }
