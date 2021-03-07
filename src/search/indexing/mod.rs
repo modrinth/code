@@ -8,7 +8,7 @@ use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::Settings;
 use sqlx::postgres::PgPool;
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -271,6 +271,8 @@ fn default_settings() -> Settings {
     Settings::new()
         .with_displayed_attributes(displayed_attributes)
         .with_searchable_attributes(searchable_attributes)
+        .with_stop_words(vec![])
+        .with_synonyms(HashMap::new())
         .with_attributes_for_faceting(vec![
             String::from("categories"),
             String::from("host"),
