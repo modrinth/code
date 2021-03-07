@@ -73,8 +73,8 @@
   --color-icon: #acacac;
   --color-text: #cecece;
   --color-text-medium:#e4e4e4;
-  --color-text-dark:#ffffff;
-  --color-heading: #ffffff;
+  --color-text-dark: #fbf8ec;
+  --color-heading: #fbf8ec;
   --color-heading-light: #8a8a8a;
   --color-bg: #171719;
   --color-raised-bg: #222224;
@@ -250,18 +250,12 @@ textarea {
 .ea-content {
   background: var(--color-ad) !important;
   border-radius: var(--size-rounded-card) !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
-  margin-bottom: 0 !important;
-  margin-top: 0 !important;
+  margin: 0 !important;
   box-shadow: var(--shadow-faint) !important;
 }
 
 .ea-callout {
-  margin-top: 0.25rem !important;
-  margin-bottom: 0.25rem !important;
-  margin-left: 0 !important;
-  margin-right: 0 !important;
+  margin: 0.25rem 0 !important;
   padding: 0 !important;
 }
 
