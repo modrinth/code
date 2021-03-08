@@ -74,7 +74,7 @@ pub struct UploadSearchMod {
     pub icon_url: String,
     pub author_url: String,
     pub latest_version: Cow<'static, str>,
-    pub license: String,
+    pub license: Option<String>,
     pub client_side: String,
     pub server_side: String,
 
@@ -117,7 +117,7 @@ pub struct ResultSearchMod {
     /// RFC 3339 formatted modification date of the mod
     pub date_modified: String,
     pub latest_version: String,
-    pub license: String,
+    pub license: Option<String>,
     pub client_side: String,
     pub server_side: String,
 
