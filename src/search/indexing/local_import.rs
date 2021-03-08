@@ -163,8 +163,8 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 modified_timestamp: mod_data.updated.timestamp(),
                 latest_version,
                 license: Some(license.short),
-                client_side: client_side.to_string(),
-                server_side: server_side.to_string(),
+                client_side: Some(client_side.to_string()),
+                server_side: Some(server_side.to_string()),
                 host: Cow::Borrowed("modrinth"),
                 slug: mod_data.slug,
             });
@@ -312,8 +312,8 @@ pub async fn query_one(
         modified_timestamp: mod_data.updated.timestamp(),
         latest_version,
         license: Some(license.short),
-        client_side: client_side.to_string(),
-        server_side: server_side.to_string(),
+        client_side: Some(client_side.to_string()),
+        server_side: Some(server_side.to_string()),
         host: Cow::Borrowed("modrinth"),
         slug: mod_data.slug,
     })

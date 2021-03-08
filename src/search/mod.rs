@@ -75,8 +75,8 @@ pub struct UploadSearchMod {
     pub author_url: String,
     pub latest_version: Cow<'static, str>,
     pub license: Option<String>,
-    pub client_side: String,
-    pub server_side: String,
+    pub client_side: Option<String>,
+    pub server_side: Option<String>,
 
     /// RFC 3339 formatted creation date of the mod
     pub date_created: DateTime<Utc>,
@@ -118,8 +118,8 @@ pub struct ResultSearchMod {
     pub date_modified: String,
     pub latest_version: String,
     pub license: Option<String>,
-    pub client_side: String,
-    pub server_side: String,
+    pub client_side: Option<String>,
+    pub server_side: Option<String>,
 
     /// The host of the mod: Either `modrinth` or `curseforge`
     pub host: String,
