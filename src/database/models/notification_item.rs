@@ -314,15 +314,16 @@ impl NotificationAction {
         sqlx::query!(
             "
             INSERT INTO notifications_actions (
-                notification_id, title, action_route
+                notification_id, title, action_route, action_route_method
             )
             VALUES (
-                $1, $2, $3
+                $1, $2, $3, $4
             )
             ",
             self.notification_id as NotificationId,
             &self.title,
             &self.action_route,
+            &self.action_route_method
         )
         .execute(&mut *transaction)
         .await?;

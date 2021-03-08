@@ -2726,6 +2726,21 @@
       ]
     }
   },
+  "8129255d25bf0624d83f50558b668ed7b7f9c264e380d276522fc82bc871939b": {
+    "query": "\n            INSERT INTO notifications_actions (\n                notification_id, title, action_route, action_route_method\n            )\n            VALUES (\n                $1, $2, $3, $4\n            )\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Varchar",
+          "Varchar",
+          "Varchar"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "82515e4e7e88f1193c956f032caabc70f535f925e212de30f974afd3ec126092": {
     "query": "\n            INSERT INTO licenses (short, name)\n            VALUES ($1, $2)\n            ON CONFLICT (short) DO NOTHING\n            RETURNING id\n            ",
     "describe": {
@@ -4008,20 +4023,6 @@
       "nullable": [
         null
       ]
-    }
-  },
-  "ca1574164dfb16ccee0a1f0468760903453632a5c38dbc64aa667a8ee6086c47": {
-    "query": "\n            INSERT INTO notifications_actions (\n                notification_id, title, action_route\n            )\n            VALUES (\n                $1, $2, $3\n            )\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar",
-          "Varchar"
-        ]
-      },
-      "nullable": []
     }
   },
   "ca52197b89fcc61f131b0937d642133ae19903d183f84513601e16ee7f3df7d8": {
