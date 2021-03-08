@@ -543,7 +543,7 @@ impl Version {
                         url: file[3].to_string(),
                         filename: file[1].to_string(),
                         hashes: file_hashes,
-                        primary: file[3].parse().unwrap_or(false),
+                        primary: file[2].parse().unwrap_or(false),
                     })
                 }
             });

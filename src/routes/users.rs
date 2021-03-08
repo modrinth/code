@@ -1,7 +1,8 @@
 use crate::auth::get_user_from_headers;
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
-use crate::models::ids::NotificationId;
+use crate::models::ids::ModId;
+use crate::models::mods::ModStatus;
 use crate::models::notifications::Notification;
 use crate::models::users::{Role, UserId};
 use crate::routes::notifications::convert_notification;
@@ -136,7 +137,7 @@ pub async fn mods_list(
     .exists;
 
     if user_exists.unwrap_or(false) {
-        let mod_data = User::get_mods(id, &**pool)
+        let mod_data = User::get_mods(id, ModStatus::Approved.as_str(), &**pool)
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
@@ -371,7 +372,6 @@ pub async fn user_icon_edit(
         .execute(&**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
         Ok(HttpResponse::Ok().body(""))
     } else {
         Err(ApiError::InvalidInputError(format!(
@@ -443,20 +443,20 @@ pub async fn user_follows(
     use futures::TryStreamExt;
 
     let user_id: crate::database::models::UserId = id.into();
-    let notifications: Vec<NotificationId> = sqlx::query!(
+    let mods: Vec<ModId> = sqlx::query!(
         "
-            SELECT n.id FROM notifications n
-            WHERE n.user_id = $1
-            ",
+        SELECT mf.mod_id FROM mod_follows mf
+        WHERE mf.follower_id = $1
+        ",
         user_id as crate::database::models::ids::UserId,
     )
     .fetch_many(&**pool)
-    .try_filter_map(|e| async { Ok(e.right().map(|m| NotificationId(m.id as u64))) })
-    .try_collect::<Vec<NotificationId>>()
+    .try_filter_map(|e| async { Ok(e.right().map(|m| ModId(m.mod_id as u64))) })
+    .try_collect::<Vec<ModId>>()
     .await
     .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
-    Ok(HttpResponse::Ok().json(notifications))
+    Ok(HttpResponse::Ok().json(mods))
 }
 
 #[get("{id}/notifications")]

@@ -8,7 +8,7 @@ use crate::routes::ApiError;
 use crate::search::indexing::queue::CreationQueue;
 use crate::search::{search_for_mod, SearchConfig, SearchError};
 use actix_web::web::Data;
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
+use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -986,7 +986,7 @@ pub async fn mod_delete(
     }
 }
 
-#[get("{id}/follow")]
+#[post("{id}/follow")]
 pub async fn mod_follow(
     req: HttpRequest,
     info: web::Path<(models::ids::ModId,)>,
@@ -1003,31 +1003,50 @@ pub async fn mod_follow(
     let user_id: database::models::ids::UserId = user.id.into();
     let mod_id: database::models::ids::ModId = id.into();
 
-    sqlx::query!(
+    let following = sqlx::query!(
         "
-        UPDATE mods
-        SET follows = follows + 1
-        WHERE id = $1
-        ",
-        mod_id as database::models::ids::ModId,
-    )
-    .execute(&**pool)
-    .await
-    .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-    sqlx::query!(
-        "
-        INSERT INTO mod_follows (follower_id, mod_id)
-        VALUES ($1, $2)
+        SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)
         ",
         user_id as database::models::ids::UserId,
         mod_id as database::models::ids::ModId
     )
-    .execute(&**pool)
+    .fetch_one(&**pool)
     .await
-    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    .map_err(|e| ApiError::DatabaseError(e.into()))?
+    .exists
+    .unwrap_or(false);
 
-    Ok(HttpResponse::Ok().body(""))
+    if !following {
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET follows = follows + 1
+            WHERE id = $1
+            ",
+            mod_id as database::models::ids::ModId,
+        )
+        .execute(&**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+        sqlx::query!(
+            "
+            INSERT INTO mod_follows (follower_id, mod_id)
+            VALUES ($1, $2)
+            ",
+            user_id as database::models::ids::UserId,
+            mod_id as database::models::ids::ModId
+        )
+        .execute(&**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+        Ok(HttpResponse::Ok().body(""))
+    } else {
+        Err(ApiError::InvalidInputError(
+            "You are already following this mod!".to_string(),
+        ))
+    }
 }
 
 #[delete("{id}/follow")]
@@ -1042,31 +1061,50 @@ pub async fn mod_unfollow(
     let user_id: database::models::ids::UserId = user.id.into();
     let mod_id: database::models::ids::ModId = id.into();
 
-    sqlx::query!(
+    let following = sqlx::query!(
         "
-        UPDATE mods
-        SET follows = follows - 1
-        WHERE id = $1
-        ",
-        mod_id as database::models::ids::ModId,
-    )
-    .execute(&**pool)
-    .await
-    .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-    sqlx::query!(
-        "
-        DELETE FROM mod_follows
-        WHERE follower_id = $1 AND mod_id = $2
+        SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)
         ",
         user_id as database::models::ids::UserId,
         mod_id as database::models::ids::ModId
     )
-    .execute(&**pool)
+    .fetch_one(&**pool)
     .await
-    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    .map_err(|e| ApiError::DatabaseError(e.into()))?
+    .exists
+    .unwrap_or(false);
 
-    Ok(HttpResponse::Ok().body(""))
+    if following {
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET follows = follows - 1
+            WHERE id = $1
+            ",
+            mod_id as database::models::ids::ModId,
+        )
+        .execute(&**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+        sqlx::query!(
+            "
+            DELETE FROM mod_follows
+            WHERE follower_id = $1 AND mod_id = $2
+            ",
+            user_id as database::models::ids::UserId,
+            mod_id as database::models::ids::ModId
+        )
+        .execute(&**pool)
+        .await
+        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+
+        Ok(HttpResponse::Ok().body(""))
+    } else {
+        Err(ApiError::InvalidInputError(
+            "You are not following this mod!".to_string(),
+        ))
+    }
 }
 
 pub async fn delete_from_index(

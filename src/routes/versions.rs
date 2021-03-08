@@ -450,8 +450,9 @@ pub async fn version_edit(
             if let Some(primary_file) = &new_version.primary_file {
                 let result = sqlx::query!(
                     "
-                    SELECT f.id FROM files f
-                    INNER JOIN hashes h ON h.hash = $1 AND h.algorithm = $2
+                    SELECT f.id id FROM hashes h
+                    INNER JOIN files f ON h.file_id = f.id
+                    WHERE h.algorithm = $2 AND h.hash = $1
                     ",
                     primary_file.1.as_bytes(),
                     primary_file.0
@@ -779,11 +780,10 @@ pub async fn delete_file(
 
         sqlx::query!(
             "
-                DELETE FROM hashes
-                WHERE hash = $1 AND algorithm = $2
-                ",
-            hash.as_bytes(),
-            algorithm.algorithm
+            DELETE FROM hashes
+            WHERE file_id = $1
+            ",
+            row.id
         )
         .execute(&mut *transaction)
         .await
@@ -791,9 +791,9 @@ pub async fn delete_file(
 
         sqlx::query!(
             "
-                DELETE FROM files
-                WHERE files.id = $1
-                ",
+            DELETE FROM files
+            WHERE files.id = $1
+            ",
             row.id,
         )
         .execute(&mut *transaction)

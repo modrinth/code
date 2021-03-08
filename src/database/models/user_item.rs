@@ -186,7 +186,11 @@ impl User {
         Ok(users)
     }
 
-    pub async fn get_mods<'a, E>(user_id: UserId, exec: E) -> Result<Vec<ModId>, sqlx::Error>
+    pub async fn get_mods<'a, E>(
+        user_id: UserId,
+        status: &str,
+        exec: E,
+    ) -> Result<Vec<ModId>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -196,9 +200,10 @@ impl User {
             "
             SELECT m.id FROM mods m
             INNER JOIN team_members tm ON tm.team_id = m.team_id
-            WHERE tm.user_id = $1
+            WHERE tm.user_id = $1 AND m.status = (SELECT s.id FROM statuses s WHERE s.status = $2)
             ",
             user_id as UserId,
+            status,
         )
         .fetch_many(exec)
         .try_filter_map(|e| async { Ok(e.right().map(|m| ModId(m.id))) })

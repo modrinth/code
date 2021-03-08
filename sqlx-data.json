@@ -93,6 +93,27 @@
       "nullable": []
     }
   },
+  "04e8a626bf8e210ab36f2531d63e09583fc431db7818957d69b10d966670a3e6": {
+    "query": "\n            SELECT m.id FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id\n            WHERE tm.user_id = $1 AND m.status = (SELECT s.id FROM statuses s WHERE s.status = $2)\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "0739834cfbef869855ed4e1aea7e1f7601f6519867ee48c573ee901c4498e04c": {
     "query": "\n                UPDATE team_members\n                SET permissions = $1\n                WHERE (team_id = $2 AND user_id = $3 AND NOT role = $4)\n                ",
     "describe": {
@@ -240,6 +261,27 @@
       ],
       "parameters": {
         "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
+  "0fb1cca8a2a37107104244953371fe2f8a5e6edd57f4b325c5842c6571eb16b4": {
+    "query": "\n        SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
           "Int8"
         ]
       },
@@ -785,18 +827,6 @@
       ]
     }
   },
-  "24dd644d22542e4d4493ce1e0ea57ce73e47a1a433ffcedf2631ce2f21bfd2c0": {
-    "query": "\n        UPDATE mods\n        SET follows = follows - 1\n        WHERE id = $1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "24e5daad907eec54505274f93952d5c20f4bbdd3f771eb0a2fdfa6324768df39": {
     "query": "\n            SELECT short, name FROM licenses\n            WHERE id = $1\n            ",
     "describe": {
@@ -1198,21 +1228,20 @@
       ]
     }
   },
-  "3387447d6dd9c63448f021c670457270d0f2c00a270d3c1dd7160f8ed99805d3": {
-    "query": "\n        DELETE FROM mod_follows\n        WHERE follower_id = $1 AND mod_id = $2\n        ",
+  "33fc96ac71cfa382991cfb153e89da1e9f43ebf5367c28b30c336b758222307b": {
+    "query": "\n            DELETE FROM loaders_versions\n            WHERE loaders_versions.version_id = $1\n            ",
     "describe": {
       "columns": [],
       "parameters": {
         "Left": [
-          "Int8",
           "Int8"
         ]
       },
       "nullable": []
     }
   },
-  "33fc96ac71cfa382991cfb153e89da1e9f43ebf5367c28b30c336b758222307b": {
-    "query": "\n            DELETE FROM loaders_versions\n            WHERE loaders_versions.version_id = $1\n            ",
+  "371048e45dd74c855b84cdb8a6a565ccbef5ad166ec9511ab20621c336446da6": {
+    "query": "\n            UPDATE mods\n            SET follows = follows - 1\n            WHERE id = $1\n            ",
     "describe": {
       "columns": [],
       "parameters": {
@@ -1347,6 +1376,19 @@
           "Int8",
           "Int8",
           "Text"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "3bdcbfa5abe43cc9b4f996f147277a7f6921cca00f82cad0ef5d85032c761a36": {
+    "query": "\n            DELETE FROM mod_follows\n            WHERE follower_id = $1 AND mod_id = $2\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
         ]
       },
       "nullable": []
@@ -1765,18 +1807,6 @@
         null,
         null
       ]
-    }
-  },
-  "5322e7791400b47640f897f3e32d9a0f2915da7d71a34c4e6bf6bd648cfaaa6e": {
-    "query": "\n                DELETE FROM files\n                WHERE files.id = $1\n                ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
     }
   },
   "53a8966ac345cc334ad65ea907be81af74e90b1217696c7eedcf8a8e3fca736e": {
@@ -2280,6 +2310,27 @@
       ]
     }
   },
+  "6a7b7704c2a0c52a70f5d881a1e6d3e8e77ddaa83ecc5688cd86bf327775fb76": {
+    "query": "\n                    SELECT f.id id FROM hashes h\n                    INNER JOIN files f ON h.file_id = f.id\n                    WHERE h.algorithm = $2 AND h.hash = $1\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "6b28cb8b54ef57c9b6f03607611f688455f0e2b27eb5deda5a8cbc5b506b4602": {
     "query": "\n            DELETE FROM mods\n            WHERE id = $1\n            ",
     "describe": {
@@ -2326,19 +2377,6 @@
       "columns": [],
       "parameters": {
         "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "6e5ddd4069e59426636cf59a67d19cee449bc7de0762a68327181a5009118ca6": {
-    "query": "\n        INSERT INTO mod_follows (follower_id, mod_id)\n        VALUES ($1, $2)\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
           "Int8"
         ]
       },
@@ -2672,6 +2710,26 @@
       ]
     }
   },
+  "7d760d046292b81a88c5551ce8cde776719ce9d647f04d2928c6f6c122a8ee70": {
+    "query": "\n        SELECT mf.mod_id FROM mod_follows mf\n        WHERE mf.follower_id = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "mod_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "7e73d3a17807f57ba6def5ff718e6dcb3a65ef8da653d839560b24635334cf05": {
     "query": "\n        SELECT m.title FROM mods m\n        WHERE id = $1\n        ",
     "describe": {
@@ -2703,27 +2761,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "80e253ea5c9846a8ce479bb2617773109a8e2583af74bfc30ddbfe3a7c5da8ae": {
-    "query": "\n                    SELECT f.id FROM files f\n                    INNER JOIN hashes h ON h.hash = $1 AND h.algorithm = $2\n                    ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
     }
   },
   "8129255d25bf0624d83f50558b668ed7b7f9c264e380d276522fc82bc871939b": {
@@ -3951,6 +3988,19 @@
       "nullable": []
     }
   },
+  "c55d2132e3e6e92dd50457affab758623dca175dc27a2d3cd4aace9cfdecf789": {
+    "query": "\n            INSERT INTO mod_follows (follower_id, mod_id)\n            VALUES ($1, $2)\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "c5d44333c62223bd3e68185d1fb3f95152fafec593da8d06c9b2b665218a02be": {
     "query": "\n                    UPDATE mods\n                    SET client_side = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -4199,19 +4249,6 @@
       ]
     }
   },
-  "cc9fa2f65f62cea689ab15d4848bbb8efa77ac4a6f23440fa945847844183dd7": {
-    "query": "\n                DELETE FROM hashes\n                WHERE hash = $1 AND algorithm = $2\n                ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "ccd913bb2f3006ffe881ce2fc4ef1e721d18fe2eed6ac62627046c955129610c": {
     "query": "SELECT EXISTS(SELECT 1 FROM files WHERE id=$1)",
     "describe": {
@@ -4241,6 +4278,18 @@
           "Int8",
           "Int8",
           "Text"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "cdd7f8f95c308d9474e214d584c03be0466214da1e157f6bc577b76dbef7df86": {
+    "query": "\n            DELETE FROM hashes\n            WHERE file_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
         ]
       },
       "nullable": []
@@ -4553,6 +4602,18 @@
       ]
     }
   },
+  "e3cc1fd070b97c4cc36bdb2f33080d4e0d7f3c3d81312d9d28a8c3c8213ad54b": {
+    "query": "\n            DELETE FROM files\n            WHERE files.id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "e48c85a2b2e11691afae3799aa126bdd8b7338a973308bbab2760c18bb9cb0b7": {
     "query": "\n                    UPDATE versions\n                    SET featured = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -4713,6 +4774,18 @@
       ]
     }
   },
+  "ed3e866634135d4f4c8a513eae2856ad71212f6eec09bb4ccef1506912a3a44c": {
+    "query": "\n            UPDATE mods\n            SET follows = follows + 1\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "ed4c0b620d01cdcdd0c2b3b5727ae3485d51114ca76e17331cec0d244d7f972d": {
     "query": "\n            SELECT version FROM game_versions\n            ORDER BY created DESC\n            ",
     "describe": {
@@ -4729,18 +4802,6 @@
       "nullable": [
         false
       ]
-    }
-  },
-  "ef994a6ba13ac2b24cd035d5e31302f2a53a63d1baa42d0d7ac84418a82fbb9b": {
-    "query": "\n        UPDATE mods\n        SET follows = follows + 1\n        WHERE id = $1\n        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
     }
   },
   "f0db9d8606ccc2196a9cfafe0e7090dab42bf790f25e0469b8947fac1cf043d5": {
@@ -5116,26 +5177,6 @@
       },
       "nullable": [
         null
-      ]
-    }
-  },
-  "fdb2a6ea649bb23c69af5c756d6137e216603708ffccd4e9162fb1c9765a56aa": {
-    "query": "\n            SELECT m.id FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id\n            WHERE tm.user_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
       ]
     }
   },
