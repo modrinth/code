@@ -23,7 +23,10 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(license_list)
             .service(donation_platform_create)
             .service(donation_platform_list)
-            .service(donation_platform_delete),
+            .service(donation_platform_delete)
+            .service(report_type_create)
+            .service(report_type_delete)
+            .service(report_type_list),
     );
 }
 
