@@ -3,6 +3,7 @@ use crate::models::ids::{ModId, UserId, VersionId};
 use crate::models::reports::{ItemType, Report};
 use crate::routes::ApiError;
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use futures::StreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -18,7 +19,7 @@ pub struct CreateReport {
 pub async fn report_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    new_report: web::Json<CreateReport>,
+    mut body: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
     let mut transaction = pool
         .begin()
@@ -26,6 +27,14 @@ pub async fn report_create(
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     let current_user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+
+    let mut bytes = web::BytesMut::new();
+    while let Some(item) = body.next().await {
+        bytes.extend_from_slice(&item.map_err(|_| {
+            ApiError::InvalidInputError("Error while parsing request payload!".to_string())
+        })?);
+    }
+    let new_report: CreateReport = serde_json::from_slice(bytes.as_ref())?;
 
     let id = crate::database::models::generate_report_id(&mut transaction).await?;
     let report_type = crate::database::models::categories::ReportType::get_id(

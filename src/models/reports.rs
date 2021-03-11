@@ -20,6 +20,7 @@ pub struct Report {
 }
 
 #[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
 pub enum ItemType {
     Mod,
     Version,
