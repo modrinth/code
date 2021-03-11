@@ -213,6 +213,31 @@ impl User {
         Ok(mods)
     }
 
+    pub async fn get_mods_private<'a, E>(
+        user_id: UserId,
+        exec: E,
+    ) -> Result<Vec<ModId>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let mods = sqlx::query!(
+            "
+            SELECT m.id FROM mods m
+            INNER JOIN team_members tm ON tm.team_id = m.team_id
+            WHERE tm.user_id = $1
+            ",
+            user_id as UserId,
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|m| ModId(m.id))) })
+        .try_collect::<Vec<ModId>>()
+        .await?;
+
+        Ok(mods)
+    }
+
     pub async fn remove<'a, 'b, E>(id: UserId, exec: E) -> Result<Option<()>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,

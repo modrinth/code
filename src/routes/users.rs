@@ -122,10 +122,13 @@ fn convert_user(data: crate::database::models::user_item::User) -> crate::models
 
 #[get("{user_id}/mods")]
 pub async fn mods_list(
+    req: HttpRequest,
     info: web::Path<(UserId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let id = info.into_inner().0.into();
+    let user = get_user_from_headers(req.headers(), &**pool).await.ok();
+
+    let id: crate::database::models::UserId = info.into_inner().0.into();
 
     let user_exists = sqlx::query!(
         "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",
@@ -137,9 +140,23 @@ pub async fn mods_list(
     .exists;
 
     if user_exists.unwrap_or(false) {
-        let mod_data = User::get_mods(id, ModStatus::Approved.as_str(), &**pool)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        let user_id: UserId = id.into();
+
+        let mod_data = if let Some(current_user) = user {
+            if current_user.role.is_mod() || current_user.id == user_id {
+                User::get_mods_private(id, &**pool)
+                    .await
+                    .map_err(|e| ApiError::DatabaseError(e.into()))?
+            } else {
+                User::get_mods(id, ModStatus::Approved.as_str(), &**pool)
+                    .await
+                    .map_err(|e| ApiError::DatabaseError(e.into()))?
+            }
+        } else {
+            User::get_mods(id, ModStatus::Approved.as_str(), &**pool)
+                .await
+                .map_err(|e| ApiError::DatabaseError(e.into()))?
+        };
 
         let response = mod_data
             .into_iter()

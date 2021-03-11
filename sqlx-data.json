@@ -5180,6 +5180,26 @@
       ]
     }
   },
+  "fdb2a6ea649bb23c69af5c756d6137e216603708ffccd4e9162fb1c9765a56aa": {
+    "query": "\n            SELECT m.id FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id\n            WHERE tm.user_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "fe73b6928f13955840e8df248688908fb6d82dd1d35dc803676639a6e0864ed5": {
     "query": "\n                DELETE FROM downloads\n                WHERE date < (CURRENT_DATE - INTERVAL '30 minutes ago')\n                ",
     "describe": {
