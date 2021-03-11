@@ -58,14 +58,18 @@ pub async fn report_create(
 
     match new_report.item_type {
         ItemType::Mod => {
-            report.mod_id = Some(serde_json::from_str::<ModId>(&*new_report.item_id)?.into())
+            report.mod_id =
+                Some(serde_json::from_str::<ModId>(&*format!("\"{}\"", new_report.item_id))?.into())
         }
         ItemType::Version => {
-            report.version_id =
-                Some(serde_json::from_str::<VersionId>(&*new_report.item_id)?.into())
+            report.version_id = Some(
+                serde_json::from_str::<VersionId>(&*format!("\"{}\"", new_report.item_id))?.into(),
+            )
         }
         ItemType::User => {
-            report.user_id = Some(serde_json::from_str::<UserId>(&*new_report.item_id)?.into())
+            report.user_id = Some(
+                serde_json::from_str::<UserId>(&*format!("\"{}\"", new_report.item_id))?.into(),
+            )
         }
         ItemType::Unknown => {
             return Err(ApiError::InvalidInputError(format!(
