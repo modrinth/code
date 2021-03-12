@@ -6,6 +6,7 @@
     :members="members"
     :current-member="currentMember"
     :link-bar="[['Versions', 'versions']]"
+    :user-follows="userFollows"
   >
     <table>
       <thead>
@@ -111,12 +112,18 @@ export default {
         )
       ).data
 
-      const [members, versions, featuredVersions] = (
+      const [members, versions, featuredVersions, userFollows] = (
         await Promise.all([
           axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
           axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
           axios.get(
             `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
+          ),
+          axios.get(
+            data.$auth.loggedIn
+              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
+              : `https://api.modrinth.com`,
+            config
           ),
         ])
       ).map((it) => it.data)
@@ -146,6 +153,7 @@ export default {
         featuredVersions,
         members,
         currentMember,
+        userFollows: userFollows.name ? null : userFollows,
       }
     } catch {
       data.error({

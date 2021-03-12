@@ -10,6 +10,7 @@
       [version.name, 'versions/' + version.id],
       ['Edit Version', 'versions/' + version.id + '/edit'],
     ]"
+    :user-follows="userFollows"
   >
     <div class="new-version">
       <div class="controls">
@@ -147,6 +148,7 @@ export default {
         featuredVersions,
         selectableLoaders,
         selectableVersions,
+        userFollows,
       ] = (
         await Promise.all([
           axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
@@ -156,6 +158,12 @@ export default {
           ),
           axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
           axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
+          axios.get(
+            data.$auth.loggedIn
+              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
+              : `https://api.modrinth.com`,
+            config
+          ),
         ])
       ).map((it) => it.data)
 
@@ -202,6 +210,7 @@ export default {
         currentMember,
         selectableLoaders,
         selectableVersions,
+        userFollows: userFollows.name ? null : userFollows,
       }
     } catch {
       data.error({

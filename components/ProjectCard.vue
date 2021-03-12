@@ -15,7 +15,7 @@
           <a v-else :href="pageUrl">{{ name }}</a>
         </h2>
         <p v-if="author" class="author">
-          by <a :href="authorUrl">{{ author }}</a>
+          by <nuxt-link :to="'/user/' + author">{{ author }}</nuxt-link>
         </p>
       </div>
       <p class="description">

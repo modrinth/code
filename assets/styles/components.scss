@@ -15,6 +15,27 @@
   }
 }
 
+.iconified-button {
+  padding: 0.25rem 0.5rem;
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+
+  color: var(--color-button-text);
+  background-color: var(--color-button-bg);
+  border-radius: var(--size-rounded-control);
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-button-bg-hover);
+  }
+
+  svg {
+    width: 1.25rem;
+    margin-right: 0.5rem;
+  }
+}
+
 .badge {
   max-height: 1rem;
   border-radius: 1rem;

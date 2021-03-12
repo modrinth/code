@@ -17,6 +17,16 @@
             </div>
           </div>
           <p v-if="user.bio" class="bio">{{ user.bio }}</p>
+          <div class="buttons">
+            <nuxt-link
+              v-if="this.$auth.loggedIn"
+              :to="`/report/create?id=${user.id}&t=user`"
+              class="iconified-button"
+            >
+              <ReportIcon />
+              Report
+            </nuxt-link>
+          </div>
         </div>
         <div class="card stats">
           <div class="stat">
@@ -76,6 +86,7 @@ import axios from 'axios'
 import SearchResult from '@/components/ProjectCard'
 import MFooter from '@/components/MFooter'
 
+import ReportIcon from '~/assets/images/utils/report.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import Advertisement from '~/components/Advertisement'
@@ -88,6 +99,7 @@ export default {
     CalendarIcon,
     DownloadIcon,
     MFooter,
+    ReportIcon,
   },
   async asyncData(data) {
     const config = {
@@ -174,6 +186,13 @@ export default {
       .badge {
         display: inline-block;
       }
+    }
+  }
+  .buttons {
+    @extend %column;
+
+    .iconified-button {
+      max-width: 4.5rem;
     }
   }
   .stats {

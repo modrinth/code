@@ -9,6 +9,7 @@
       ['Versions', 'versions'],
       [version.name, 'versions/' + version.id],
     ]"
+    :user-follows="userFollows"
   >
     <div class="version">
       <div class="version-header">
@@ -27,13 +28,25 @@
         </span>
         <Categories :categories="version.loaders" />
         <div class="buttons">
-          <button v-if="currentMember" class="action" @click="deleteVersion">
+          <nuxt-link
+            v-if="this.$auth.loggedIn"
+            :to="`/report/create?id=${version.id}&t=version`"
+            class="action iconified-button"
+          >
+            <ReportIcon />
+            Report
+          </nuxt-link>
+          <button
+            v-if="currentMember"
+            class="action iconified-button"
+            @click="deleteVersion"
+          >
             <TrashIcon />
             Delete
           </button>
           <nuxt-link
             v-if="currentMember"
-            class="action"
+            class="action iconified-button"
             :to="version.id + '/edit'"
           >
             <EditIcon />
@@ -42,7 +55,7 @@
           <a
             v-if="primaryFile"
             :href="primaryFile.url"
-            class="action"
+            class="action iconified-button"
             @click.prevent="
               downloadFile(primaryFile.hashes.sha1, primaryFile.url)
             "
@@ -125,6 +138,7 @@ import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import TagIcon from '~/assets/images/utils/tag.svg?inline'
+import ReportIcon from '~/assets/images/utils/report.svg?inline'
 
 export default {
   components: {
@@ -136,6 +150,7 @@ export default {
     TagIcon,
     TrashIcon,
     EditIcon,
+    ReportIcon,
   },
   auth: false,
   async asyncData(data) {
@@ -155,12 +170,18 @@ export default {
         )
       ).data
 
-      const [members, versions, featuredVersions] = (
+      const [members, versions, featuredVersions, userFollows] = (
         await Promise.all([
           axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
           axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
           axios.get(
             `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
+          ),
+          axios.get(
+            data.$auth.loggedIn
+              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
+              : `https://api.modrinth.com`,
+            config
           ),
         ])
       ).map((it) => it.data)
@@ -206,6 +227,7 @@ export default {
         version,
         primaryFile,
         currentMember,
+        userFollows: userFollows.name ? null : userFollows,
       }
     } catch {
       data.error({
@@ -397,22 +419,7 @@ export default {
       margin-left: auto;
 
       .action {
-        padding: 0.5rem;
-        color: var(--color-button-text);
-        background-color: var(--color-button-bg);
-        display: flex;
-        align-items: center;
-        border-radius: var(--size-rounded-sm);
         margin: 0 0 0 0.5rem;
-
-        &:hover,
-        &:focus {
-          background-color: var(--color-button-bg-hover);
-        }
-
-        svg {
-          margin-right: 0.25rem;
-        }
       }
     }
   }

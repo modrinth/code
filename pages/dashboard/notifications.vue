@@ -79,12 +79,8 @@ export default {
       try {
         if (index) {
           const config = {
-            method: Object.keys(
-              notification.actions[index].action_route
-            )[0].toLowerCase(),
-            url: `https://api.modrinth.com/api/v1/${
-              Object.values(notification.actions[index].action_route)[0]
-            }`,
+            method: notification.actions[index].action_route[0].toLowerCase(),
+            url: `https://api.modrinth.com/api/v1/${notification.actions[index].action_route[1]}`,
             headers: {
               Authorization: this.$auth.getToken('local'),
             },

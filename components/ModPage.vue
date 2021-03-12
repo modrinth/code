@@ -36,8 +36,35 @@
               </p>
             </div>
           </div>
+          <div class="buttons">
+            <nuxt-link
+              v-if="this.$auth.loggedIn"
+              :to="`/report/create?id=${mod.id}&t=mod`"
+              class="iconified-button"
+            >
+              <ReportIcon />
+              Report
+            </nuxt-link>
+            <button
+              v-if="userFollows && !userFollows.includes(mod.id)"
+              class="iconified-button"
+              @click="followMod"
+            >
+              <FollowIcon />
+              Follow
+            </button>
+            <button
+              v-if="userFollows && userFollows.includes(mod.id)"
+              class="iconified-button"
+              @click="unfollowMod"
+            >
+              <FollowIcon fill="currentColor" />
+              Unfollow
+            </button>
+          </div>
         </div>
         <Advertisement
+          v-if="mod.status === 'approved' || mod.status === 'unlisted'"
           :page-url="
             'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
           "
@@ -105,6 +132,7 @@
         <div class="mod-content">
           <slot />
           <Advertisement
+            v-if="mod.status === 'approved' || mod.status === 'unlisted'"
             :page-url="
               'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
             "
@@ -304,6 +332,7 @@
           </div>
         </div>
         <Advertisement
+          v-if="mod.status === 'approved' || mod.status === 'unlisted'"
           format="rectangle"
           :page-url="
             'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
@@ -328,6 +357,8 @@ import ClientIcon from '~/assets/images/utils/client.svg?inline'
 import ServerIcon from '~/assets/images/utils/server.svg?inline'
 import FileTextIcon from '~/assets/images/utils/file-text.svg?inline'
 import CodeIcon from '~/assets/images/sidebar/mod.svg?inline'
+import ReportIcon from '~/assets/images/utils/report.svg?inline'
+import FollowIcon from '~/assets/images/utils/heart.svg?inline'
 
 import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 
@@ -352,6 +383,8 @@ export default {
     ServerIcon,
     FileTextIcon,
     CodeIcon,
+    ReportIcon,
+    FollowIcon,
   },
   props: {
     mod: {
@@ -390,6 +423,12 @@ export default {
         return []
       },
     },
+    userFollows: {
+      type: Array,
+      default() {
+        return null
+      },
+    },
   },
   methods: {
     formatNumber(x) {
@@ -417,6 +456,39 @@ export default {
       elem.download = hash
       elem.href = url
       elem.click()
+    },
+    async followMod() {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local')
+            ? this.$auth.getToken('local')
+            : '',
+        },
+      }
+
+      await axios.post(
+        `https://api.modrinth.com/api/v1/mod/${this.mod.id}/follow`,
+        {},
+        config
+      )
+
+      this.userFollows.push(this.mod.id)
+    },
+    async unfollowMod() {
+      const config = {
+        headers: {
+          Authorization: this.$auth.getToken('local')
+            ? this.$auth.getToken('local')
+            : '',
+        },
+      }
+
+      await axios.delete(
+        `https://api.modrinth.com/api/v1/mod/${this.mod.id}/follow`,
+        config
+      )
+
+      this.userFollows.splice(this.userFollows.indexOf(this.mod.id), 1)
     },
   },
 }
@@ -455,6 +527,15 @@ export default {
       }
     }
   }
+  .buttons {
+    @extend %column;
+    margin: var(--spacing-card-md) var(--spacing-card-md) var(--spacing-card-md)
+      auto;
+
+    button {
+      margin: 0.2rem 0 0 0;
+    }
+  }
 }
 
 .mod-navigation {
@@ -470,7 +551,6 @@ export default {
   .section {
     padding: var(--spacing-card-sm);
     @extend %card-spaced-b;
-    margin-top: var(--spacing-card-lg);
   }
 
   h3 {
@@ -481,7 +561,6 @@ export default {
     display: flex;
     flex-wrap: wrap;
     margin-top: 0;
-    margin-left: 5px;
     p {
       max-width: 6rem;
       overflow: hidden;
