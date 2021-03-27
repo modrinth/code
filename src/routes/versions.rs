@@ -71,21 +71,33 @@ pub async fn version_list(
 
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
-            database::models::categories::GameVersion::list_filter(None, Some(true), &**pool)
-                .await?
-                .into_iter()
-                .for_each(|major_version| {
-                    versions
-                        .iter()
-                        .find(|version| version.game_versions.contains(&major_version))
-                        .map(|version| response.push(convert_version(version.clone())))
-                        .unwrap_or(());
-                });
+            let loaders = database::models::categories::Loader::list(&**pool).await?;
+            let game_versions =
+                database::models::categories::GameVersion::list_filter(None, Some(true), &**pool)
+                    .await?;
+
+            let mut joined_filters = Vec::new();
+            for game_version in &game_versions {
+                for loader in &loaders {
+                    joined_filters.push((game_version, loader))
+                }
+            }
+
+            joined_filters.into_iter().for_each(|filter| {
+                versions
+                    .iter()
+                    .find(|version| {
+                        version.game_versions.contains(&filter.0)
+                            && version.loaders.contains(&filter.1)
+                    })
+                    .map(|version| response.push(convert_version(version.clone())))
+                    .unwrap_or(());
+            });
 
             if response.is_empty() {
                 versions
                     .into_iter()
-                    .for_each(|version| response.push(convert_version(version.clone())));
+                    .for_each(|version| response.push(convert_version(version)));
             }
         }
 
