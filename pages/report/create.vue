@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="page-contents">
       <header class="columns">
-        <h2 class="column-grow-1">File a report</h2>
+        <h3 class="column-grow-1">File a report</h3>
         <button
           title="Create"
           class="brand-button column"
@@ -209,7 +209,7 @@ header {
   grid-area: header;
   padding: var(--spacing-card-md) var(--spacing-card-lg);
 
-  h2 {
+  h3 {
     margin: auto 0;
     color: var(--color-text-dark);
     font-weight: var(--font-weight-extrabold);

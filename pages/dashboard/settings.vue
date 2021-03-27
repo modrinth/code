@@ -129,14 +129,6 @@ export default {
     changeTheme() {
       this.$colorMode.preference =
         this.$colorMode.value === 'dark' ? 'light' : 'dark'
-
-      this.themeAds()
-    },
-    themeAds() {
-      const elements = document.getElementsByClassName('ethical-ad')
-      for (const elem of elements) {
-        elem.className = 'ethical-ad loaded ' + this.$colorMode.preference
-      }
     },
     gotoRevoke() {
       this.$router.replace('/dashboard/misc/revoke-token')
@@ -172,6 +164,8 @@ export default {
           data,
           config
         )
+
+        await this.$auth.fetchUser()
       } catch (err) {
         this.$notify({
           group: 'main',

@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="page-contents">
       <header class="columns">
-        <h2 class="column-grow-1">Edit Mod</h2>
+        <h3 class="column-grow-1">Edit Mod</h3>
         <nuxt-link
           :to="'/mod/' + (mod.slug ? mod.slug : mod.id)"
           class="button column"
@@ -133,8 +133,6 @@
             <Multiselect
               v-model="clientSideType"
               placeholder="Select one"
-              track-by="id"
-              label="label"
               :options="sideTypes"
               :searchable="false"
               :close-on-select="true"
@@ -147,8 +145,6 @@
             <Multiselect
               v-model="serverSideType"
               placeholder="Select one"
-              track-by="id"
-              label="label"
               :options="sideTypes"
               :searchable="false"
               :close-on-select="true"
@@ -373,14 +369,8 @@ export default {
 
       return {
         mod,
-        clientSideType: {
-          label: mod.client_side,
-          id: mod.client_side,
-        },
-        serverSideType: {
-          label: mod.server_side,
-          id: mod.server_side,
-        },
+        clientSideType: mod.client_side.charAt(0) + mod.client_side.slice(1),
+        serverSideType: mod.server_side.charAt(0) + mod.server_side.slice(1),
         availableCategories,
         availableLoaders,
         availableGameVersions,
@@ -410,11 +400,7 @@ export default {
       icon: null,
       iconChanged: false,
 
-      sideTypes: [
-        { label: 'Optional', id: 'optional' },
-        { label: 'Required', id: 'required' },
-        { label: 'Unsupported', id: 'unsupported' },
-      ],
+      sideTypes: ['Required', 'Optional', 'Unsupported'],
     }
   },
   watch: {
@@ -459,8 +445,8 @@ export default {
           license_url: this.license_url,
           discord_url: this.mod.discord_url,
           license_id: this.license.short,
-          client_side: this.clientSideType.id,
-          server_side: this.serverSideType.id,
+          client_side: this.clientSideType.toLowerCase(),
+          server_side: this.serverSideType.toLowerCase(),
           slug: this.mod.slug,
           license: this.license.short,
           donation_urls: this.donationPlatforms.map((it, index) => {
@@ -591,7 +577,7 @@ header {
   grid-area: header;
   padding: var(--spacing-card-md) var(--spacing-card-lg);
 
-  h2 {
+  h3 {
     margin: auto 0;
     color: var(--color-text-dark);
     font-weight: var(--font-weight-extrabold);

@@ -1,6 +1,6 @@
 <template>
   <div class="layout">
-    <header>
+    <header class="site-header">
       <section class="navbar columns">
         <section class="logo column">
           <NuxtLink to="/">
@@ -160,9 +160,6 @@ export default {
       return `${this.userUrl}/teams`
     },
   },
-  mounted() {
-    this.themeAds()
-  },
   methods: {
     toggleDropdown() {
       this.isDropdownOpen = !this.isDropdownOpen
@@ -177,14 +174,6 @@ export default {
     changeTheme() {
       this.$colorMode.preference =
         this.$colorMode.value === 'dark' ? 'light' : 'dark'
-
-      this.themeAds()
-    },
-    themeAds() {
-      const elements = document.getElementsByClassName('ethical-ad')
-      for (const elem of elements) {
-        elem.className = 'ethical-ad loaded ' + this.$colorMode.preference
-      }
     },
   },
 }
@@ -196,7 +185,7 @@ export default {
   display: block;
   height: 100vh;
 
-  header {
+  .site-header {
     height: var(--size-navbar-height);
     background-color: var(--color-raised-bg);
     max-width: 100vw;

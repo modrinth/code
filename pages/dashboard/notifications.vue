@@ -101,7 +101,6 @@ export default {
           `https://api.modrinth.com/api/v1/notification/${notification.id}`,
           config
         )
-        await this.$router.replace('/' + notification.link)
       } catch (err) {
         this.$notify({
           group: 'main',

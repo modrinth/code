@@ -38,6 +38,11 @@ export default {
         name: 'og:description',
         content: 'An open source modding platform',
       },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'Modrinth',
+      },
       { hid: 'og:type', name: 'og:type', content: 'website' },
       { hid: 'og:url', name: 'og:url', content: 'https://www.modrinth.com' },
       {

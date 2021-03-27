@@ -64,26 +64,31 @@
         </section>
         <div class="results column-grow-4">
           <Advertisement />
-          <SearchResult
-            v-for="(result, index) in results"
-            :id="result.slug ? result.slug : result.mod_id.split('-')[1]"
-            :key="result.mod_id"
-            :author="result.author"
-            :name="result.title"
-            :description="result.description"
-            :latest-version="result.latest_version"
-            :created-at="result.date_created"
-            :updated-at="result.date_modified"
-            :downloads="result.downloads.toString()"
-            :icon-url="result.icon_url"
-            :author-url="result.author_url"
-            :page-url="result.page_url"
-            :categories="result.categories"
-            :is-ad="index === -1"
-            :is-modrinth="result.host === 'modrinth'"
-          />
-          <div v-if="results.length === 0" class="no-results">
-            <p>No results found for your query!</p>
+          <div v-if="results === null" class="no-results">
+            <p>Loading...</p>
+          </div>
+          <div v-else>
+            <SearchResult
+              v-for="(result, index) in results"
+              :id="result.slug ? result.slug : result.mod_id.split('-')[1]"
+              :key="result.mod_id"
+              :author="result.author"
+              :name="result.title"
+              :description="result.description"
+              :latest-version="result.latest_version"
+              :created-at="result.date_created"
+              :updated-at="result.date_modified"
+              :downloads="result.downloads.toString()"
+              :icon-url="result.icon_url"
+              :author-url="result.author_url"
+              :page-url="result.page_url"
+              :categories="result.categories"
+              :is-ad="index === -1"
+              :is-modrinth="result.host === 'modrinth'"
+            />
+            <div v-if="results.length === 0" class="no-results">
+              <p>No results found for your query!</p>
+            </div>
           </div>
         </div>
         <section v-if="pages.length > 1" class="search-bottom">
@@ -115,8 +120,13 @@
             <button class="filter-button-done" @click="toggleFiltersMenu">
               Done
             </button>
-            <button @click="clearFilters">Reset filters</button>
-            <h3>Categories</h3>
+            <div class="filter-clear-button">
+              <h3>Categories</h3>
+              <button class="iconified-button" @click="clearFilters">
+                <ExitIcon />
+                Clear filters
+              </button>
+            </div>
             <SearchFilter
               :active-filters="facets"
               display-name="Technology"
@@ -230,7 +240,7 @@
             >
               <ForgeLoader />
             </SearchFilter>
-            <h3>Versions</h3>
+            <h3>Minecraft Versions</h3>
             <SearchFilter
               :active-filters="showVersions"
               display-name="Include snapshots"
@@ -254,6 +264,20 @@
             placeholder="Choose versions..."
             @input="onSearchChange(1)"
           ></multiselect>
+          <h3>Licenses</h3>
+          <Multiselect
+            v-model="displayLicense"
+            placeholder="Choose licenses..."
+            :loading="licenses.length === 0"
+            :options="licenses"
+            track-by="name"
+            label="name"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="true"
+            @input="toggleLicense"
+          />
         </div>
         <Advertisement format="rectangle" />
         <m-footer class="footer" />
@@ -287,6 +311,8 @@ import ForgeLoader from '~/assets/images/categories/forge.svg?inline'
 import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
+import ExitIcon from '~/assets/images/utils/exit.svg?inline'
+
 import Advertisement from '~/components/Advertisement'
 
 export default {
@@ -313,6 +339,7 @@ export default {
     ForgeLoader,
     FabricLoader,
     SearchIcon,
+    ExitIcon,
   },
   async fetch() {
     if (this.$route.query.q) this.query = this.$route.query.q
@@ -325,8 +352,24 @@ export default {
       this.selectedVersions = this.$route.query.v.split(',')
     if (this.$route.query.s) {
       this.sortType.name = this.$route.query.s
-      this.sortType.display =
-        this.sortType.name.charAt(0).toUpperCase() + this.sortType.name.slice(1)
+
+      switch (this.sortType.name) {
+        case 'relevance':
+          this.sortType.display = 'Relevance'
+          break
+        case 'downloads':
+          this.sortType.display = 'Downloads'
+          break
+        case 'newest':
+          this.sortType.display = 'Recently created'
+          break
+        case 'updated':
+          this.sortType.display = 'Recently updated'
+          break
+        case 'follows':
+          this.sortType.display = 'Follow count'
+          break
+      }
     }
     if (this.$route.query.m) {
       this.maxResults = this.$route.query.m
@@ -334,26 +377,38 @@ export default {
     if (this.$route.query.o)
       this.currentPage = Math.ceil(this.$route.query.o / this.maxResults) + 1
 
-    await this.fillInitialVersions()
-    await this.onSearchChange(this.currentPage)
+    await Promise.all([
+      this.fillInitialVersions(),
+      this.fillInitialLicenses(),
+      this.onSearchChange(this.currentPage),
+    ])
   },
   data() {
     return {
       query: '',
+
+      displayLicense: '',
+      selectedLicense: '',
+      licenses: [],
+
       showVersions: [],
       selectedVersions: [],
       versions: [],
+
       facets: [],
-      results: [],
+      results: null,
       pages: [],
       currentPage: 1,
+
       sortTypes: [
         { display: 'Relevance', name: 'relevance' },
         { display: 'Download count', name: 'downloads' },
+        { display: 'Follow count', name: 'follows' },
         { display: 'Recently created', name: 'newest' },
         { display: 'Recently updated', name: 'updated' },
       ],
       sortType: { display: 'Relevance', name: 'relevance' },
+
       maxResults: 20,
       firstRun: true,
     }
@@ -383,9 +438,30 @@ export default {
         console.error(err)
       }
     },
+    async fillInitialLicenses() {
+      this.licenses = (
+        await axios.get('https://api.modrinth.com/api/v1/tag/license')
+      ).data
+    },
+    async toggleLicense(license) {
+      if (this.selectedLicense) {
+        const index = this.facets.indexOf(this.selectedLicense)
+
+        this.facets.splice(index, 1)
+      }
+
+      if (license) {
+        this.selectedLicense = `license:${license.short}`
+        this.facets.push(this.selectedLicense)
+      }
+
+      await this.onSearchChange(1)
+    },
     async clearFilters() {
       for (const facet of [...this.facets]) await this.toggleFacet(facet, true)
 
+      this.displayLicense = null
+      this.selectedLicense = null
       this.selectedVersions = []
       await this.onSearchChange(1)
     },
@@ -491,7 +567,7 @@ export default {
           if (this.maxResults > 20)
             url += `&m=${encodeURIComponent(this.maxResults)}`
 
-          window.history.pushState(new Date(), 'Mods', url)
+          window.history.replaceState(new Date(), 'Mods', url)
         }
       } catch (err) {
         // eslint-disable-next-line no-console
@@ -628,7 +704,7 @@ export default {
     margin-bottom: var(--spacing-card-md);
   }
   h3 {
-    @extend %large-label;
+    @extend %small-label;
     margin-top: 1.25em;
   }
   &.active {
@@ -658,15 +734,18 @@ export default {
 }
 
 .filter-group {
-  margin-top: 1em;
-
   button {
     cursor: pointer;
-    width: 100%;
+  }
+
+  .filter-clear-button {
+    display: flex;
+    justify-content: space-between;
   }
 
   .filter-button-done {
     display: block;
+    width: 100%;
   }
 
   // Large screens that don't collapse

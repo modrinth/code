@@ -160,6 +160,47 @@ export default {
   head() {
     return {
       title: this.user.username + ' - Modrinth',
+      meta: [
+        {
+          hid: 'og:type',
+          name: 'og:type',
+          content: 'website',
+        },
+        {
+          hid: 'og:title',
+          name: 'og:title',
+          content: this.user.username,
+        },
+        {
+          hid: 'apple-mobile-web-app-title',
+          name: 'apple-mobile-web-app-title',
+          content: this.user.username,
+        },
+        {
+          hid: 'og:description',
+          name: 'og:description',
+          content: this.user.bio,
+        },
+        {
+          hid: 'description',
+          name: 'description',
+          content:
+            this.user.bio +
+            ' - View minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform that is compatible with CurseForge too!',
+        },
+        {
+          hid: 'og:url',
+          name: 'og:url',
+          content: `https://modrinth.com/user/${this.user.id}`,
+        },
+        {
+          hid: 'og:image',
+          name: 'og:image',
+          content: this.user.avatar_url
+            ? this.user.avatar_url
+            : 'https://cdn.modrinth.com/placeholder.png',
+        },
+      ],
     }
   },
 }

@@ -46,10 +46,21 @@
                 version.id
               "
             >
-              {{ version.name }}
+              {{ version.name ? version.name : version.version_number }}
             </nuxt-link>
           </td>
-          <td>{{ version.version_number }}</td>
+          <td>
+            <nuxt-link
+              :to="
+                '/mod/' +
+                (mod.slug ? mod.slug : mod.id) +
+                '/version/' +
+                version.id
+              "
+            >
+              {{ version.version_number }}
+            </nuxt-link>
+          </td>
           <td>
             <FabricIcon v-if="version.loaders.includes('fabric')" />
             <ForgeIcon v-if="version.loaders.includes('forge')" />

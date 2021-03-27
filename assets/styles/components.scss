@@ -362,6 +362,10 @@
     &:active,
     &:hover {
       background: var(--color-button-bg-hover);
+
+      .multiselect__spinner {
+        background: var(--color-button-bg-hover);
+      }
     }
     .multiselect__single {
       background: transparent;
@@ -393,4 +397,13 @@
       }
     }
   }
+  .multiselect__spinner {
+    background: var(--color-dropdown-bg);
+
+    &:active,
+    &:hover {
+      background: var(--color-button-bg-hover);
+    }
+  }
+
 }

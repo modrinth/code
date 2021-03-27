@@ -2,7 +2,7 @@
   <div class="page-container">
     <div class="page-contents">
       <header class="columns">
-        <h2 class="column-grow-1">Create a mod</h2>
+        <h3 class="column-grow-1">Create a mod</h3>
         <button
           title="Save draft"
           class="button column"
@@ -123,8 +123,6 @@
             <Multiselect
               v-model="clientSideType"
               placeholder="Select one"
-              track-by="id"
-              label="label"
               :options="sideTypes"
               :searchable="false"
               :close-on-select="true"
@@ -137,8 +135,6 @@
             <Multiselect
               v-model="serverSideType"
               placeholder="Select one"
-              track-by="id"
-              label="label"
               :options="sideTypes"
               :searchable="false"
               :close-on-select="true"
@@ -161,11 +157,13 @@
           You can type the of the long form of your description here. This
           editor supports markdown. You can find the syntax
           <a
+            class=""
             href="https://guides.github.com/features/mastering-markdown/"
             target="_blank"
             rel="noopener noreferrer"
             >here</a
-          >.
+          >. HTML can also be used inside your description, excluding scripts
+          and iframes.
         </span>
         <div class="columns">
           <div class="textarea-wrapper">
@@ -193,8 +191,8 @@
               <th>Version</th>
               <th>Mod Loader</th>
               <th>Minecraft Version</th>
-              <th>Status</th>
-              <th></th>
+              <th>Version Type</th>
+              <th>Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -217,18 +215,21 @@
               <td>{{ version.game_versions.join(', ') }}</td>
               <td>
                 <span
-                  v-if="version.version_type === 'release'"
+                  v-if="version.release_channel === 'release'"
                   class="badge green"
                 >
                   Release
                 </span>
                 <span
-                  v-if="version.version_type === 'beta'"
+                  v-if="version.release_channel === 'beta'"
                   class="badge yellow"
                 >
                   Beta
                 </span>
-                <span v-if="version.version_type === 'alpha'" class="badge red">
+                <span
+                  v-if="version.release_channel === 'alpha'"
+                  class="badge red"
+                >
                   Alpha
                 </span>
               </td>
@@ -562,13 +563,9 @@ export default {
       license: null,
       license_url: null,
 
-      sideTypes: [
-        { label: 'Required', id: 'required' },
-        { label: 'Optional', id: 'optional' },
-        { label: 'Unsupported', id: 'unsupported' },
-      ],
-      clientSideType: { label: 'Required', id: 'required' },
-      serverSideType: { label: 'Required', id: 'required' },
+      sideTypes: ['Required', 'Optional', 'Unsupported'],
+      clientSideType: 'Required',
+      serverSideType: 'Required',
 
       donationLinks: [],
       donationPlatforms: [],
@@ -627,8 +624,8 @@ export default {
           source_url: this.source_url,
           wiki_url: this.wiki_url,
           discord_url: this.discord_url,
-          client_side: this.clientSideType.id,
-          server_side: this.serverSideType.id,
+          client_side: this.clientSideType.toLowerCase(),
+          server_side: this.serverSideType.toLowerCase(),
           license_id: this.license ? this.license.short : 'arr',
           license_url: this.license_url,
           is_draft: this.draft,
@@ -805,7 +802,7 @@ header {
   grid-area: header;
   padding: var(--spacing-card-md) var(--spacing-card-lg);
 
-  h2 {
+  h3 {
     margin: auto 0;
     color: var(--color-text-dark);
     font-weight: var(--font-weight-extrabold);
@@ -859,6 +856,10 @@ section.game-sides {
 
 section.description {
   grid-area: description;
+
+  span a {
+    text-decoration: underline;
+  }
 
   & > .columns {
     align-items: stretch;
