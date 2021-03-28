@@ -26,7 +26,7 @@
       :is-modrinth="true"
     >
       <nuxt-link
-        class="button buttons column"
+        class="button column edit-button"
         :to="'/mod/' + mod.id + '/settings'"
       >
         Settings
@@ -74,6 +74,11 @@ export default {
 <style lang="scss" scoped>
 .mod-name {
   font-weight: bold;
+}
+
+.edit-button {
+  align-self: flex-end;
+  margin-right: 2rem;
 }
 // .buttonse {
 //   margin-left: 4.5rem;

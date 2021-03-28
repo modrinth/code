@@ -22,18 +22,20 @@
       :status="mod.status"
       :is-modrinth="true"
     >
-      <button
-        class="button column approve"
-        @click="changeModStatus(mod.id, 'approved', index)"
-      >
-        Approve
-      </button>
-      <button
-        class="button column reject"
-        @click="changeModStatus(mod.id, 'rejected', index)"
-      >
-        Reject
-      </button>
+      <div class="buttons">
+        <button
+          class="button column approve"
+          @click="changeModStatus(mod.id, 'approved', index)"
+        >
+          Approve
+        </button>
+        <button
+          class="button column reject"
+          @click="changeModStatus(mod.id, 'rejected', index)"
+        >
+          Reject
+        </button>
+      </div>
     </ModCard>
     <div class="section-header">
       <h3 class="column-grow-1">Reports</h3>
@@ -145,7 +147,14 @@ export default {
 
 <style lang="scss" scoped>
 .button {
-  margin: 0.25rem 0;
+  margin: 0 5rem 0.5rem auto;
+}
+
+.buttons {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .report {
@@ -156,6 +165,7 @@ export default {
     display: flex;
     align-items: center;
     flex-direction: row;
+    justify-content: center;
 
     .title {
       font-size: var(--font-size-lg);

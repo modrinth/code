@@ -212,6 +212,7 @@ export default {
   }
   .info {
     @extend %column;
+    flex-grow: 1;
     .top {
       @extend %row;
       flex-wrap: wrap;
