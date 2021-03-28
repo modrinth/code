@@ -1,5 +1,5 @@
 # Dockerfile
-FROM node:11.13.0-alpine
+FROM node:14.16.0-alpine
 
 # create destination directory
 RUN mkdir -p /usr/src/knossos
