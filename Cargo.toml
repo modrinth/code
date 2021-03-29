@@ -22,6 +22,10 @@ actix-ratelimit = "0.3.0"
 meilisearch-sdk = "0.6.0"
 reqwest = { version = "0.10.8", features = ["json"] }
 
+yaserde = "0.6.0"
+yaserde_derive = "0.6.0"
+xml-rs = "0.8.3"
+
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "1.5.1"

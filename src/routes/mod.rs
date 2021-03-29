@@ -2,6 +2,7 @@ use actix_web::web;
 
 mod auth;
 mod index;
+mod maven;
 mod mod_creation;
 mod moderation;
 mod mods;
@@ -37,6 +38,11 @@ pub fn mods_config(cfg: &mut web::ServiceConfig) {
             .service(mods::mod_unfollow)
             .service(web::scope("{mod_id}").service(versions::version_list)),
     );
+}
+
+pub fn maven_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(maven::maven_metadata);
+    cfg.service(maven::version_file);
 }
 
 pub fn versions_config(cfg: &mut web::ServiceConfig) {
@@ -113,6 +119,8 @@ pub enum ApiError {
     FileHostingError(#[from] FileHostingError),
     #[error("Internal server error: {0}")]
     DatabaseError(#[from] crate::database::models::DatabaseError),
+    #[error("Internal server error: {0}")]
+    XmlError(String),
     #[error("Deserialization error: {0}")]
     JsonError(#[from] serde_json::Error),
     #[error("Authentication Error: {0}")]
@@ -134,6 +142,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::DatabaseError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::AuthenticationError(..) => actix_web::http::StatusCode::UNAUTHORIZED,
             ApiError::CustomAuthenticationError(..) => actix_web::http::StatusCode::UNAUTHORIZED,
+            ApiError::XmlError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::JsonError(..) => actix_web::http::StatusCode::BAD_REQUEST,
             ApiError::SearchError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
             ApiError::IndexingError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
@@ -150,6 +159,7 @@ impl actix_web::ResponseError for ApiError {
                     ApiError::DatabaseError(..) => "database_error",
                     ApiError::AuthenticationError(..) => "unauthorized",
                     ApiError::CustomAuthenticationError(..) => "unauthorized",
+                    ApiError::XmlError(..) => "xml_error",
                     ApiError::JsonError(..) => "json_error",
                     ApiError::SearchError(..) => "search_error",
                     ApiError::IndexingError(..) => "indexing_error",

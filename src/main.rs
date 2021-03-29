@@ -310,6 +310,7 @@ async fn main() -> std::io::Result<()> {
                     .configure(routes::reports_config)
                     .configure(routes::notifications_config),
             )
+            .service(web::scope("/maven/").configure(routes::maven_config))
             .default_service(web::get().to(routes::not_found))
     })
     .bind(dotenv::var("BIND_ADDR").unwrap())?

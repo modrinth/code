@@ -88,7 +88,7 @@ pub async fn mod_slug_get(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let mod_data = database::models::Mod::get_full_from_slug(id, &**pool)
+    let mod_data = database::models::Mod::get_full_from_slug(&id, &**pool)
         .await
         .map_err(|e| ApiError::DatabaseError(e.into()))?;
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
@@ -145,12 +145,12 @@ pub async fn mod_get(
             .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
         if mod_data.is_none() {
-            mod_data = database::models::Mod::get_full_from_slug(string, &**pool)
+            mod_data = database::models::Mod::get_full_from_slug(&string, &**pool)
                 .await
                 .map_err(|e| ApiError::DatabaseError(e.into()))?;
         }
     } else {
-        mod_data = database::models::Mod::get_full_from_slug(string, &**pool)
+        mod_data = database::models::Mod::get_full_from_slug(&string, &**pool)
             .await
             .map_err(|e| ApiError::DatabaseError(e.into()))?;
     }
