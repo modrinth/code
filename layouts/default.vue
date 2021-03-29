@@ -237,9 +237,11 @@ export default {
         position: relative;
         top: 50%;
         transform: translateY(-50%);
+        min-width: 12rem;
         .dropdown {
           position: relative;
           display: inline-block;
+          flex-grow: 1;
           &:hover .control {
             border-radius: var(--size-rounded-control);
             background: var(--color-button-bg);
@@ -264,9 +266,11 @@ export default {
             padding: 0.3rem 0.75rem;
             position: relative;
             z-index: 10;
+            width: 100%;
             .avatar {
               align-items: center;
               display: flex;
+              flex-grow: 1;
               .icon {
                 border-radius: 50%;
                 height: 2rem;
