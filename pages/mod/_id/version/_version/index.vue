@@ -29,7 +29,7 @@
         <Categories :categories="version.loaders" />
         <div class="buttons">
           <nuxt-link
-            v-if="this.$auth.loggedIn"
+            v-if="this.$auth.user"
             :to="`/report/create?id=${version.id}&t=version`"
             class="action iconified-button"
           >
@@ -154,19 +154,11 @@ export default {
   },
   auth: false,
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     try {
       const mod = (
         await axios.get(
           `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          config
+          data.$auth.headers
         )
       ).data
 
@@ -178,10 +170,10 @@ export default {
             `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
           axios.get(
-            data.$auth.loggedIn
+            data.$auth.user
               ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
               : `https://api.modrinth.com`,
-            config
+            data.$auth.headers
           ),
         ])
       ).map((it) => it.data)
@@ -191,7 +183,7 @@ export default {
           `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
             members.map((it) => it.user_id)
           )}`,
-          config
+          data.$auth.headers
         )
       ).data
 
@@ -211,7 +203,7 @@ export default {
         primaryFile = version.files[0]
       }
 
-      const currentMember = data.$auth.loggedIn
+      const currentMember = data.$auth.user
         ? members.find((x) => x.user_id === data.$auth.user.id)
         : null
 
@@ -255,15 +247,9 @@ export default {
     async deleteFile(hash) {
       this.$nuxt.$loading.start()
 
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       await axios.delete(
         `https://api.modrinth.com/api/v1/version_file/${hash}`,
-        config
+        this.$auth.headers
       )
 
       await this.$router.go(null)
@@ -272,18 +258,12 @@ export default {
     async makePrimary(hash) {
       this.$nuxt.$loading.start()
 
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       await axios.patch(
         `https://api.modrinth.com/api/v1/version/${this.version.id}`,
         {
           primary_file: ['sha1', hash],
         },
-        config
+        this.$auth.headers
       )
 
       await this.$router.go(null)
@@ -317,7 +297,7 @@ export default {
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: this.$auth.getToken('local'),
+            Authorization: this.$auth.token,
           },
         })
 
@@ -337,15 +317,9 @@ export default {
     async deleteVersion() {
       this.$nuxt.$loading.start()
 
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       await axios.delete(
         `https://api.modrinth.com/api/v1/version/${this.version.id}`,
-        config
+        this.$auth.headers
       )
 
       await this.$router.replace(`/mod/${this.mod.id}`)

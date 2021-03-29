@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     async logout() {
-      await this.$auth.setToken('local', false)
+      this.$cookies.remove('auth-token')
       await this.$router.replace(
         'https://api.modrinth.com/api/v1/auth/init?url=https://modrinth.com/'
       )

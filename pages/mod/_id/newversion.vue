@@ -137,19 +137,11 @@ export default {
     Multiselect,
   },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     try {
       const mod = (
         await axios.get(
           `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          config
+          data.$auth.headers
         )
       ).data
 
@@ -168,10 +160,10 @@ export default {
           axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
           axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
           axios.get(
-            data.$auth.loggedIn
+            data.$auth.user
               ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
               : `https://api.modrinth.com`,
-            config
+            data.$auth.headers
           ),
         ])
       ).map((it) => it.data)
@@ -181,7 +173,7 @@ export default {
           `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
             members.map((it) => it.user_id)
           )}`,
-          config
+          data.$auth.headers
         )
       ).data
 
@@ -191,7 +183,7 @@ export default {
         members[index].name = it.username
       })
 
-      const currentMember = data.$auth.loggedIn
+      const currentMember = data.$auth.user
         ? members.find((x) => x.user_id === data.$auth.user.id)
         : null
 
@@ -244,7 +236,7 @@ export default {
           data: formData,
           headers: {
             'Content-Type': 'multipart/form-data',
-            Authorization: this.$auth.getToken('local'),
+            Authorization: this.$auth.token,
           },
         })
         await this.$router.go(null)

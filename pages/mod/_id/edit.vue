@@ -314,14 +314,6 @@ export default {
     Multiselect,
   },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     try {
       const [
         mod,
@@ -334,7 +326,7 @@ export default {
         await Promise.all([
           axios.get(
             `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-            config
+            data.$auth.headers
           ),
           axios.get(`https://api.modrinth.com/api/v1/tag/category`),
           axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
@@ -425,12 +417,6 @@ export default {
       await this.saveMod()
     },
     async saveMod() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       this.$nuxt.$loading.start()
 
       try {
@@ -465,7 +451,7 @@ export default {
         await axios.patch(
           `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
           data,
-          config
+          this.$auth.headers
         )
 
         if (this.iconChanged) {
@@ -474,7 +460,7 @@ export default {
               this.icon.type.split('/')[this.icon.type.split('/').length - 1]
             }`,
             this.icon,
-            config
+            this.$auth.headers
           )
         }
 

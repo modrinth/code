@@ -114,7 +114,7 @@ export default {
     this.name = this.$auth.user.name
     this.email = this.$auth.user.email
     this.bio = this.$auth.user.bio
-    this.token = this.$auth.getToken('local')
+    this.token = this.$auth.token
   },
   data() {
     return {
@@ -134,7 +134,7 @@ export default {
       this.$router.replace('/dashboard/misc/revoke-token')
     },
     async copyToken() {
-      await this.$copyText(this.token)
+      await navigator.clipboard.writeText(this.token)
       this.$notify({
         group: 'main',
         title: 'Copied to clipboard.',
@@ -143,12 +143,6 @@ export default {
       })
     },
     async editProfile() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       this.$nuxt.$loading.start()
 
       try {
@@ -162,10 +156,12 @@ export default {
         await axios.patch(
           `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}`,
           data,
-          config
+          this.$auth.headers
         )
 
-        await this.$auth.fetchUser()
+        await this.$store.dispatch('auth/fetchUser', {
+          token: this.$auth.token,
+        })
       } catch (err) {
         this.$notify({
           group: 'main',
@@ -178,18 +174,12 @@ export default {
       this.$nuxt.$loading.finish()
     },
     async deleteAccount() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       this.$nuxt.$loading.start()
 
       try {
         await axios.delete(
           `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}`,
-          config
+          this.$auth.headers
         )
       } catch (err) {
         this.$notify({

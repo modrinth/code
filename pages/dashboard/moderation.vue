@@ -84,20 +84,18 @@ export default {
     ModCard,
   },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     const mods = (
-      await axios.get(`https://api.modrinth.com/api/v1/moderation/mods`, config)
+      await axios.get(
+        `https://api.modrinth.com/api/v1/moderation/mods`,
+        data.$auth.headers
+      )
     ).data
 
     const reports = (
-      await axios.get(`https://api.modrinth.com/api/v1/report`, config)
+      await axios.get(
+        `https://api.modrinth.com/api/v1/report`,
+        data.$auth.headers
+      )
     ).data
 
     return {
@@ -107,36 +105,20 @@ export default {
   },
   methods: {
     async changeModStatus(id, status, index) {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local')
-            ? this.$auth.getToken('local')
-            : '',
-        },
-      }
-
       await axios.patch(
         `https://api.modrinth.com/api/v1/mod/${id}`,
         {
           status,
         },
-        config
+        this.$auth.headers
       )
 
       this.mods.splice(index, 1)
     },
     async deleteReport(index) {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local')
-            ? this.$auth.getToken('local')
-            : '',
-        },
-      }
-
       await axios.delete(
         `https://api.modrinth.com/api/v1/report/${this.reports[index].id}`,
-        config
+        this.$auth.headers
       )
 
       this.reports.splice(index, 1)

@@ -38,7 +38,7 @@
           </div>
           <div class="buttons">
             <nuxt-link
-              v-if="this.$auth.loggedIn"
+              v-if="this.$auth.user"
               :to="`/report/create?id=${mod.id}&t=mod`"
               class="iconified-button"
             >
@@ -458,34 +458,18 @@ export default {
       elem.click()
     },
     async followMod() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local')
-            ? this.$auth.getToken('local')
-            : '',
-        },
-      }
-
       await axios.post(
         `https://api.modrinth.com/api/v1/mod/${this.mod.id}/follow`,
         {},
-        config
+        this.$auth.headers
       )
 
       this.userFollows.push(this.mod.id)
     },
     async unfollowMod() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local')
-            ? this.$auth.getToken('local')
-            : '',
-        },
-      }
-
       await axios.delete(
         `https://api.modrinth.com/api/v1/mod/${this.mod.id}/follow`,
-        config
+        this.$auth.headers
       )
 
       this.userFollows.splice(this.userFollows.indexOf(this.mod.id), 1)

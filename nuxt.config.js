@@ -77,9 +77,8 @@ export default {
       devtools: true,
     },
   },
-
   router: {
-    middleware: ['auth'],
+    middleware: 'auth',
   },
   /*
    ** Global CSS
@@ -94,6 +93,7 @@ export default {
     '~/plugins/vue-notification.js',
     '~/plugins/compiled-markdown-directive.js',
     '~/plugins/vue-syntax.js',
+    '~/plugins/auth.js',
   ],
   /*
    ** Auto import components
@@ -116,32 +116,17 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/dayjs',
     '@nuxtjs/axios',
-    '@nuxtjs/auth',
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
-    'nuxt-clipboard2',
     '@nuxtjs/style-resources',
     '@nuxtjs/google-adsense',
+    'cookie-universal-nuxt',
   ],
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',
   },
   sitemap: {
     exclude: ['/dashboard/**', '/dashboard', '/mod/create'],
-  },
-  auth: {
-    strategies: {
-      local: {
-        endpoints: {
-          user: {
-            url: 'https://api.modrinth.com/api/v1/user',
-            method: 'get',
-            propertyName: false,
-          },
-        },
-        tokenType: false,
-      },
-    },
   },
   /*
    ** Axios module configuration

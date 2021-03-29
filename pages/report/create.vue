@@ -119,14 +119,6 @@ export default {
       this.$nuxt.$loading.start()
 
       try {
-        const config = {
-          headers: {
-            Authorization: this.$auth.getToken('local')
-              ? this.$auth.getToken('local')
-              : '',
-          },
-        }
-
         const data = {
           report_type: this.reportType,
           item_id: this.itemId,
@@ -134,7 +126,11 @@ export default {
           body: this.body,
         }
 
-        await axios.post('https://api.modrinth.com/api/v1/report', data, config)
+        await axios.post(
+          'https://api.modrinth.com/api/v1/report',
+          data,
+          this.$auth.headers
+        )
 
         await this.$router.replace(`/${this.itemType}/${this.itemId}`)
       } catch (err) {

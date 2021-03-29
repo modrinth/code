@@ -19,7 +19,7 @@
           <p v-if="user.bio" class="bio">{{ user.bio }}</p>
           <div class="buttons">
             <nuxt-link
-              v-if="this.$auth.loggedIn"
+              v-if="this.$auth.user"
               :to="`/report/create?id=${user.id}&t=user`"
               class="iconified-button"
             >
@@ -102,32 +102,19 @@ export default {
     ReportIcon,
   },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     try {
       let res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${data.params.id}`,
-        config
+        `https://api.modrinth.com/api/v1/user/${data.params.id}`
       )
       const user = res.data
 
       let mods = []
       res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${user.id}/mods`,
-        config
+        `https://api.modrinth.com/api/v1/user/${user.id}/mods`
       )
       if (res.data) {
         res = await axios.get(
-          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(
-            res.data
-          )}`,
-          config
+          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`
         )
         mods = res.data
       }
@@ -249,8 +236,5 @@ export default {
       }
     }
   }
-}
-
-.mods {
 }
 </style>

@@ -246,19 +246,11 @@ import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 export default {
   components: { ModPage, DropdownIcon },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     try {
       const mod = (
         await axios.get(
           `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          config
+          data.$auth.headers
         )
       ).data
 
@@ -266,16 +258,16 @@ export default {
         await Promise.all([
           axios.get(
             `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
-            config
+            data.$auth.headers
           ),
           axios.get(
             `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
           axios.get(
-            data.$auth.loggedIn
+            data.$auth.user
               ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
               : `https://api.modrinth.com`,
-            config
+            data.$auth.headers
           ),
         ])
       ).map((it) => it.data)
@@ -286,7 +278,7 @@ export default {
             `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
               members.map((it) => it.user_id)
             )}`,
-            config
+            data.$auth.headers
           ),
         ])
       ).map((it) => it.data)
@@ -297,7 +289,7 @@ export default {
         members[index].name = it.username
       })
 
-      const currentMember = data.$auth.loggedIn
+      const currentMember = data.$auth.user
         ? members.find((x) => x.user_id === data.$auth.user.id)
         : null
 
@@ -333,12 +325,6 @@ export default {
   },
   methods: {
     async inviteTeamMember() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       this.$nuxt.$loading.start()
 
       try {
@@ -355,7 +341,7 @@ export default {
         await axios.post(
           `https://api.modrinth.com/api/v1/team/${this.mod.team}/members`,
           data,
-          config
+          this.auth.headers
         )
         await this.$router.go(null)
       } catch (err) {
@@ -370,18 +356,12 @@ export default {
       this.$nuxt.$loading.finish()
     },
     async removeTeamMember(index) {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       this.$nuxt.$loading.start()
 
       try {
         await axios.delete(
           `https://api.modrinth.com/api/v1/team/${this.mod.team}/members/${this.members[index].user_id}`,
-          config
+          this.$auth.headers
         )
         await this.$router.go(null)
       } catch (err) {
@@ -396,12 +376,6 @@ export default {
       this.$nuxt.$loading.finish()
     },
     async updateTeamMember(index) {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       this.$nuxt.$loading.start()
 
       try {
@@ -413,7 +387,7 @@ export default {
         await axios.patch(
           `https://api.modrinth.com/api/v1/team/${this.mod.team}/members/${this.members[index].user_id}`,
           data,
-          config
+          this.$auth.headers
         )
         await this.$router.go(null)
       } catch (err) {
@@ -428,15 +402,9 @@ export default {
       this.$nuxt.$loading.finish()
     },
     async deleteMod() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local'),
-        },
-      }
-
       await axios.delete(
         `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
-        config
+        this.$auth.headers
       )
     },
   },

@@ -53,18 +53,10 @@ export default {
     DashboardPage,
   },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     const notifications = (
       await axios.get(
         `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/notifications`,
-        config
+        data.$auth.headers
       )
     ).data
 
@@ -82,25 +74,19 @@ export default {
             method: notification.actions[index].action_route[0].toLowerCase(),
             url: `https://api.modrinth.com/api/v1/${notification.actions[index].action_route[1]}`,
             headers: {
-              Authorization: this.$auth.getToken('local'),
+              Authorization: this.$auth.token,
             },
           }
 
           await axios(config)
         }
 
-        const config = {
-          headers: {
-            Authorization: this.$auth.getToken('local')
-              ? this.$auth.getToken('local')
-              : '',
-          },
-        }
-
         await axios.delete(
           `https://api.modrinth.com/api/v1/notification/${notification.id}`,
-          config
+          this.$auth.headers
         )
+
+        this.notifications.splice(index, 1)
       } catch (err) {
         this.$notify({
           group: 'main',

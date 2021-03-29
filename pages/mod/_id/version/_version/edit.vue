@@ -126,19 +126,11 @@ export default {
   },
   auth: false,
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     try {
       const mod = (
         await axios.get(
           `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          config
+          data.$auth.headers
         )
       ).data
 
@@ -159,10 +151,10 @@ export default {
           axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
           axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
           axios.get(
-            data.$auth.loggedIn
+            data.$auth.user
               ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
               : `https://api.modrinth.com`,
-            config
+            data.$auth.headers
           ),
         ])
       ).map((it) => it.data)
@@ -172,7 +164,7 @@ export default {
           `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
             members.map((it) => it.user_id)
           )}`,
-          config
+          data.$auth.headers
         )
       ).data
 
@@ -192,7 +184,7 @@ export default {
         primaryFile = version.files[0]
       }
 
-      const currentMember = data.$auth.loggedIn
+      const currentMember = data.$auth.user
         ? members.find((x) => x.user_id === data.$auth.user.id)
         : null
 
@@ -221,21 +213,13 @@ export default {
   },
   methods: {
     async saveVersion() {
-      const config = {
-        headers: {
-          Authorization: this.$auth.getToken('local')
-            ? this.$auth.getToken('local')
-            : '',
-        },
-      }
-
       this.$nuxt.$loading.start()
 
       try {
         await axios.patch(
           `https://api.modrinth.com/api/v1/version/${this.version.id}`,
           this.version,
-          config
+          this.$auth.headers
         )
         await this.$router.replace(
           `/mod/${this.mod.id}/version/${this.version.id}`

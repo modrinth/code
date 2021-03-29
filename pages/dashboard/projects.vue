@@ -46,22 +46,14 @@ export default {
     ModCard,
   },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     let res = await axios.get(
       `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/mods`,
-      config
+      data.$auth.headers
     )
 
     res = await axios.get(
       `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`,
-      config
+      data.$auth.headers
     )
 
     return {
