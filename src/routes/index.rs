@@ -7,7 +7,7 @@ pub async fn index_get() -> HttpResponse {
         "name": "modrinth-labrinth",
         "version": env!("CARGO_PKG_VERSION"),
         "documentation": "https://modrinth.com/documentation",
-        "about": "Welcome traveler !"
+        "about": "Welcome traveler!"
     });
 
     HttpResponse::Ok().json(data)
