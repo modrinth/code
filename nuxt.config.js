@@ -182,4 +182,7 @@ export default {
     color: 'green',
     height: '2px',
   },
+  env: {
+    version: process.env.VERSION_ID || 'unknown',
+  },
 }

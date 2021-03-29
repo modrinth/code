@@ -24,6 +24,14 @@ jobs:
             ghcr.io/modrinth/knossos
             docker.io/modrinth/knossos
       -
+        name: Get branch name
+        id: vars
+        run: echo ::set-output name=short_ref::${GITHUB_REF#refs/*/}
+      -
+        name: Get short SHA
+        id: slug
+        run: echo "::set-output name=sha8::$(echo ${GITHUB_SHA} | cut -c1-8)"
+      -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
       -
@@ -53,3 +61,5 @@ jobs:
           push: ${{ github.event_name != 'pull_request' }}
           tags: ${{ steps.docker_meta.outputs.tags }}
           labels: ${{ steps.docker_meta.outputs.labels }}
+          build-args: |
+            VERSION_ID=${{ steps.vars.outputs.short_ref }}-${{ steps.slug.outputs.sha8 }}

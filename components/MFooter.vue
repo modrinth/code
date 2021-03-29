@@ -26,13 +26,18 @@
         <a target="_blank" href="https://twitter.com/modrinth">Twitter</a>
       </li>
     </ul>
-    <span> © Guavy LLC </span>
+    <span> © Guavy LLC </span><br />
+    <span v-if="version !== 'unknown'">Version: {{ version }}</span>
   </footer>
 </template>
 
 <script>
 export default {
   props: {
+    version: {
+      type: String,
+      default: process.env.version || 'unknown',
+    },
     centered: {
       type: Boolean,
       default: false,
