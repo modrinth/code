@@ -163,6 +163,7 @@ export default {
       this.isDropdownOpen = false
     },
     logout() {
+      this.$auth.user = null
       this.$cookies.remove('auth-token')
       this.$router.go(null)
     },

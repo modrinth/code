@@ -14,6 +14,8 @@ export default async function (context) {
       const cookie = context.app.$cookies.get('auth-token')
 
       await context.store.dispatch('auth/fetchUser', { token: cookie })
+    } else {
+      context.$auth.user = null
     }
   }
 
