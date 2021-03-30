@@ -10,12 +10,15 @@ export default async function (context) {
       return context.redirect(context.route.path)
     }
 
+    if (context.app.$cookies.get('auth-token-reset')) {
+      context.app.$cookies.removeAll()
+      return
+    }
+
     if (context.app.$cookies.get('auth-token')) {
       const cookie = context.app.$cookies.get('auth-token')
 
       await context.store.dispatch('auth/fetchUser', { token: cookie })
-    } else {
-      context.$auth.user = null
     }
   }
 

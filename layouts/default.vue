@@ -162,10 +162,9 @@ export default {
     hideDropdown() {
       this.isDropdownOpen = false
     },
-    logout() {
-      this.$auth.user = null
-      this.$cookies.remove('auth-token')
-      this.$router.go(null)
+    async logout() {
+      this.$cookies.set('auth-token-reset', true)
+      await this.$router.go(null)
     },
     changeTheme() {
       this.$colorMode.preference =
