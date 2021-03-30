@@ -230,16 +230,18 @@ export default {
         }
       }
       try {
-        await axios({
-          url: 'https://api.modrinth.com/api/v1/version',
-          method: 'POST',
-          data: formData,
-          headers: {
-            'Content-Type': 'multipart/form-data',
-            Authorization: this.$auth.token,
-          },
-        })
-        await this.$router.go(null)
+        const data = (
+          await axios({
+            url: 'https://api.modrinth.com/api/v1/version',
+            method: 'POST',
+            data: formData,
+            headers: {
+              'Content-Type': 'multipart/form-data',
+              Authorization: this.$auth.token,
+            },
+          })
+        ).data
+        await this.$router.push(`/mod/${data.mod_id}/version/${data.id}`)
       } catch (err) {
         this.$notify({
           group: 'main',
