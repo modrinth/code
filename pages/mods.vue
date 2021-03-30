@@ -439,9 +439,18 @@ export default {
       }
     },
     async fillInitialLicenses() {
-      this.licenses = (
+      const licences = (
         await axios.get('https://api.modrinth.com/api/v1/tag/license')
       ).data
+      licences.sort((x, y) => {
+        // Custom case for custom, so it goes to the bottom of the list.
+        if (x.short === 'custom') return 1
+        if (y.short === 'custom') return -1
+        if (x.name < y.name) return -1
+        if (x.name > y.name) return 1
+        return 0
+      })
+      this.licenses = licences
     },
     async toggleLicense(license) {
       if (this.selectedLicense) {
