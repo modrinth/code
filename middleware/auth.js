@@ -1,5 +1,10 @@
 export default async function (context) {
   if (!context.from) {
+    if (context.app.$cookies.get('auth-token-reset')) {
+      context.app.$cookies.removeAll()
+      return
+    }
+
     if (context.route.query.code) {
       context.app.$cookies.set('auth-token', context.route.query.code, {
         secure: true,
@@ -7,15 +12,10 @@ export default async function (context) {
         httpOnly: true,
       })
 
-      return context.redirect(context.route.path)
-    }
-
-    if (context.app.$cookies.get('auth-token-reset')) {
-      context.app.$cookies.removeAll()
-      return
-    }
-
-    if (context.app.$cookies.get('auth-token')) {
+      await context.store.dispatch('auth/fetchUser', {
+        token: context.route.query.code,
+      })
+    } else if (context.app.$cookies.get('auth-token')) {
       const cookie = context.app.$cookies.get('auth-token')
 
       await context.store.dispatch('auth/fetchUser', { token: cookie })

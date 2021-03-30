@@ -48,17 +48,9 @@ export default {
     FollowIcon,
   },
   async asyncData(data) {
-    const config = {
-      headers: {
-        Authorization: data.$auth.getToken('local')
-          ? data.$auth.getToken('local')
-          : '',
-      },
-    }
-
     const res = await axios.get(
       `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`,
-      config
+      data.$auth.headers
     )
 
     const mods = (
