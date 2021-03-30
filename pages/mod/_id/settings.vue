@@ -7,6 +7,15 @@
     :link-bar="[['Settings', 'settings']]"
     :user-follows="userFollows"
   >
+    <ConfirmPopup
+      ref="delete_popup"
+      title="Are you sure you want to delete this mod?"
+      description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
+      :has-to-type="true"
+      :confirmation-text="mod.title"
+      proceed-label="Delete Mod"
+      @proceed="deleteMod"
+    />
     <div class="section-header columns">
       <h3 class="column-grow-1">General</h3>
     </div>
@@ -34,7 +43,7 @@
         <div
           class="button"
           :disabled="(currentMember.permissions & DELETE_MOD) !== DELETE_MOD"
-          @click="deleteMod"
+          @click="showPopup"
         >
           Delete Mod
         </div>
@@ -401,12 +410,21 @@ export default {
 
       this.$nuxt.$loading.finish()
     },
+    showPopup() {
+      this.$refs.delete_popup.show()
+    },
     async deleteMod() {
       await axios.delete(
         `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
         this.$auth.headers
       )
       await this.$router.push('/dashboard/projects')
+      this.$notify({
+        group: 'main',
+        title: 'Action Success',
+        text: 'Your mod has been successfully deleted.',
+        type: 'success',
+      })
     },
   },
 }

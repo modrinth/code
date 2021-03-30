@@ -11,6 +11,22 @@
     ]"
     :user-follows="userFollows"
   >
+    <ConfirmPopup
+      ref="delete_file_popup"
+      title="Are you sure you want to delete this file?"
+      description="This will remove this file forever (like really forever)"
+      :has-to-type="false"
+      proceed-label="Delete File"
+      @proceed="deleteFile(popup_data)"
+    />
+    <ConfirmPopup
+      ref="delete_version_popup"
+      title="Are you sure you want to delete this version?"
+      description="This will remove this version forever (like really forever), and if some mods depends on this version, it won't work anymore."
+      :has-to-type="false"
+      proceed-label="Delete Version"
+      @proceed="deleteVersion()"
+    />
     <div class="version">
       <div class="version-header">
         <h4>{{ version.name }}</h4>
@@ -39,7 +55,7 @@
           <button
             v-if="currentMember"
             class="action iconified-button"
-            @click="deleteVersion"
+            @click="deleteVersionPopup"
           >
             <TrashIcon />
             Delete
@@ -108,7 +124,9 @@
           <div class="text-wrapper">
             <p>{{ file.filename }}</p>
             <div v-if="currentMember" class="actions">
-              <button @click="deleteFile(file.hashes.sha1)">Delete File</button>
+              <button @click="deleteFilePopup(file.hashes.sha1)">
+                Delete File
+              </button>
               <button @click="makePrimary(file.hashes.sha1)">
                 Make Primary
               </button>
@@ -231,6 +249,7 @@ export default {
   data() {
     return {
       filesToUpload: [],
+      popup_data: null,
     }
   },
   methods: {
@@ -243,6 +262,10 @@ export default {
       elem.download = hash
       elem.href = url
       elem.click()
+    },
+    deleteFilePopup(hash) {
+      this.popup_data = hash
+      this.$refs.delete_file_popup.show()
     },
     async deleteFile(hash) {
       this.$nuxt.$loading.start()
@@ -313,6 +336,9 @@ export default {
       }
 
       this.$nuxt.$loading.finish()
+    },
+    deleteVersionPopup() {
+      this.$refs.delete_version_popup.show()
     },
     async deleteVersion() {
       this.$nuxt.$loading.start()
