@@ -3,34 +3,44 @@
     <div class="section-header">
       <h3 class="column-grow-1">Followed mods</h3>
     </div>
-    <ModCard
-      v-for="(mod, index) in mods"
-      :id="mod.id"
-      :key="mod.id"
-      :author="mod.author"
-      :name="mod.title"
-      :description="mod.description"
-      :latest-version="mod.latest_version"
-      :created-at="mod.published"
-      :updated-at="mod.updated"
-      :downloads="mod.downloads.toString()"
-      :icon-url="mod.icon_url"
-      :author-url="mod.author_url"
-      :page-url="mod.page_url"
-      :categories="mod.categories"
-      :edit-mode="true"
-      :is-modrinth="true"
-    >
-      <div class="buttons">
-        <button
-          class="button column unfav-button iconified-button"
-          @click="unfavMod(index)"
-        >
-          <FollowIcon />
-          Unfollow
-        </button>
-      </div>
-    </ModCard>
+    <div v-if="mods.length !== 0">
+      <ModCard
+        v-for="(mod, index) in mods"
+        :id="mod.id"
+        :key="mod.id"
+        :author="mod.author"
+        :name="mod.title"
+        :description="mod.description"
+        :latest-version="mod.latest_version"
+        :created-at="mod.published"
+        :updated-at="mod.updated"
+        :downloads="mod.downloads.toString()"
+        :icon-url="mod.icon_url"
+        :author-url="mod.author_url"
+        :page-url="mod.page_url"
+        :categories="mod.categories"
+        :edit-mode="true"
+        :is-modrinth="true"
+      >
+        <div class="buttons">
+          <button
+            class="button column unfav-button iconified-button"
+            @click="unfavMod(index)"
+          >
+            <FollowIcon />
+            Unfollow
+          </button>
+        </div>
+      </ModCard>
+    </div>
+    <div v-else class="error">
+      <FollowIllustration class="icon"></FollowIllustration><br />
+      <span class="text"
+        >You don't have any followed mods. <br />
+        Why don't you <nuxt-link to="/mods" class="link">search</nuxt-link> for
+        new ones?</span
+      >
+    </div>
   </DashboardPage>
 </template>
 
@@ -40,12 +50,14 @@ import axios from 'axios'
 import ModCard from '@/components/ProjectCard'
 import DashboardPage from '@/components/DashboardPage'
 import FollowIcon from '~/assets/images/utils/heart.svg?inline'
+import FollowIllustration from '~/assets/images/illustrations/follow_illustration.svg?inline'
 
 export default {
   components: {
     DashboardPage,
     ModCard,
     FollowIcon,
+    FollowIllustration,
   },
   async asyncData(data) {
     const res = await axios.get(
@@ -58,7 +70,6 @@ export default {
         `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`
       )
     ).data
-
     return {
       mods,
     }
@@ -99,5 +110,28 @@ export default {
 .unfav-button {
   margin-left: auto;
   padding: 0.5rem;
+}
+.error {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+
+  .icon {
+    width: 8rem;
+    height: 8rem;
+    margin: 1.5rem 0;
+  }
+
+  .text {
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+    text-align: center;
+  }
+
+  .link {
+    text-decoration: underline;
+  }
 }
 </style>

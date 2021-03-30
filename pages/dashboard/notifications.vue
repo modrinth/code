@@ -3,43 +3,49 @@
     <div class="section-header columns">
       <h3 class="column-grow-1">My notifications</h3>
     </div>
-    <div
-      v-for="notification in notifications"
-      :key="notification.id"
-      class="notification columns"
-    >
-      <div class="text">
-        <nuxt-link :to="'/' + notification.link" class="top-wrapper">
-          <h3 class="title">
-            {{ notification.title }}
-          </h3>
-          <p
-            v-tooltip="
-              $dayjs(notification.created).format(
-                '[Created at] YYYY-MM-DD [at] HH:mm A'
-              )
-            "
-            class="date"
-          >
-            Notified {{ $dayjs(notification.created).fromNow() }}
+    <div v-if="notifications.length !== 0">
+      <div
+        v-for="notification in notifications"
+        :key="notification.id"
+        class="notification columns"
+      >
+        <div class="text">
+          <nuxt-link :to="'/' + notification.link" class="top-wrapper">
+            <h3 class="title">
+              {{ notification.title }}
+            </h3>
+            <p
+              v-tooltip="
+                $dayjs(notification.created).format(
+                  '[Created at] YYYY-MM-DD [at] HH:mm A'
+                )
+              "
+              class="date"
+            >
+              Notified {{ $dayjs(notification.created).fromNow() }}
+            </p>
+          </nuxt-link>
+          <p class="description">
+            {{ notification.text }}
           </p>
-        </nuxt-link>
-        <p class="description">
-          {{ notification.text }}
-        </p>
+        </div>
+        <div v-if="notification.actions.length > 0" class="actions">
+          <button
+            v-for="(action, index) in notification.actions"
+            :key="index"
+            @click="performAction(notification, index)"
+          >
+            {{ action.title }}
+          </button>
+        </div>
+        <div v-else class="actions">
+          <button @click="performAction(notification, null)">Dismiss</button>
+        </div>
       </div>
-      <div v-if="notification.actions.length > 0" class="actions">
-        <button
-          v-for="(action, index) in notification.actions"
-          :key="index"
-          @click="performAction(notification, index)"
-        >
-          {{ action.title }}
-        </button>
-      </div>
-      <div v-else class="actions">
-        <button @click="performAction(notification, null)">Dismiss</button>
-      </div>
+    </div>
+    <div v-else class="error">
+      <UpToDate class="icon"></UpToDate><br />
+      <span class="text">You are up-to-date!</span>
     </div>
   </DashboardPage>
 </template>
@@ -47,10 +53,12 @@
 <script>
 import axios from 'axios'
 import DashboardPage from '@/components/DashboardPage'
+import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
 
 export default {
   components: {
     DashboardPage,
+    UpToDate,
   },
   async asyncData(data) {
     const notifications = (
@@ -125,6 +133,28 @@ export default {
 
   p {
     margin: 0;
+  }
+}
+.error {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+
+  .icon {
+    width: 8rem;
+    height: 8rem;
+    margin: 1.5rem 0;
+  }
+
+  .text {
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
+  }
+
+  .link {
+    text-decoration: underline;
   }
 }
 </style>

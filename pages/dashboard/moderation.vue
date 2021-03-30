@@ -3,71 +3,84 @@
     <div class="section-header">
       <h3 class="column-grow-1">Mods</h3>
     </div>
-    <ModCard
-      v-for="(mod, index) in mods"
-      :id="mod.id"
-      :key="mod.id"
-      :author="mod.author"
-      :name="mod.title"
-      :description="mod.description"
-      :latest-version="mod.latest_version"
-      :created-at="mod.published"
-      :updated-at="mod.updated"
-      :downloads="mod.downloads.toString()"
-      :icon-url="mod.icon_url"
-      :author-url="mod.author_url"
-      :page-url="mod.page_url"
-      :categories="mod.categories"
-      :edit-mode="true"
-      :status="mod.status"
-      :is-modrinth="true"
-    >
-      <div class="buttons">
-        <button
-          class="button column approve"
-          @click="changeModStatus(mod.id, 'approved', index)"
-        >
-          Approve
-        </button>
-        <button
-          class="button column reject"
-          @click="changeModStatus(mod.id, 'rejected', index)"
-        >
-          Reject
-        </button>
-      </div>
-    </ModCard>
+    <div v-if="mods.length !== 0">
+      <ModCard
+        v-for="(mod, index) in mods"
+        :id="mod.id"
+        :key="mod.id"
+        :author="mod.author"
+        :name="mod.title"
+        :description="mod.description"
+        :latest-version="mod.latest_version"
+        :created-at="mod.published"
+        :updated-at="mod.updated"
+        :downloads="mod.downloads.toString()"
+        :icon-url="mod.icon_url"
+        :author-url="mod.author_url"
+        :page-url="mod.page_url"
+        :categories="mod.categories"
+        :edit-mode="true"
+        :status="mod.status"
+        :is-modrinth="true"
+      >
+        <div class="buttons">
+          <button
+            class="button column approve"
+            @click="changeModStatus(mod.id, 'approved', index)"
+          >
+            Approve
+          </button>
+          <button
+            class="button column reject"
+            @click="changeModStatus(mod.id, 'rejected', index)"
+          >
+            Reject
+          </button>
+        </div>
+      </ModCard>
+    </div>
+    <div v-else class="error">
+      <Security class="icon"></Security>
+      <br />
+      <span class="text">You are up-to-date!</span>
+    </div>
     <div class="section-header">
       <h3 class="column-grow-1">Reports</h3>
     </div>
-    <div v-for="(report, index) in reports" :key="report.id" class="report">
-      <div class="header">
-        <h5 class="title">
-          Report for {{ report.item_type }}
-          <nuxt-link
-            :to="report.item_type + '/' + report.item_id.replace(/\W/g, '')"
-            >{{ report.item_id }}</nuxt-link
+    <div v-if="reports.length !== 0">
+      <div v-for="(report, index) in reports" :key="report.id" class="report">
+        <div class="header">
+          <h5 class="title">
+            Report for {{ report.item_type }}
+            <nuxt-link
+              :to="report.item_type + '/' + report.item_id.replace(/\W/g, '')"
+              >{{ report.item_id }}
+            </nuxt-link>
+          </h5>
+          <p
+            v-tooltip="
+              $dayjs(report.created).format(
+                '[Created at] YYYY-MM-DD [at] HH:mm A'
+              )
+            "
+            class="date"
           >
-        </h5>
-        <p
-          v-tooltip="
-            $dayjs(report.created).format(
-              '[Created at] YYYY-MM-DD [at] HH:mm A'
-            )
-          "
-          class="date"
-        >
-          Created {{ $dayjs(report.created).fromNow() }}
-        </p>
-        <button class="delete iconified-button" @click="deleteReport(index)">
-          Delete
-        </button>
+            Created {{ $dayjs(report.created).fromNow() }}
+          </p>
+          <button class="delete iconified-button" @click="deleteReport(index)">
+            Delete
+          </button>
+        </div>
+        <div
+          v-compiled-markdown="report.body"
+          v-highlightjs
+          class="markdown-body"
+        ></div>
       </div>
-      <div
-        v-compiled-markdown="report.body"
-        v-highlightjs
-        class="markdown-body"
-      ></div>
+    </div>
+    <div v-else class="error">
+      <Security class="icon"></Security><br />
+      <span class="text">You are up-to-date!</span>
     </div>
   </DashboardPage>
 </template>
@@ -77,11 +90,13 @@ import axios from 'axios'
 
 import ModCard from '@/components/ProjectCard'
 import DashboardPage from '@/components/DashboardPage'
+import Security from '~/assets/images/illustrations/security.svg?inline'
 
 export default {
   components: {
     DashboardPage,
     ModCard,
+    Security,
   },
   async asyncData(data) {
     const mods = (
@@ -157,6 +172,25 @@ export default {
     .iconified-button {
       margin-left: auto;
     }
+  }
+}
+
+.error {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+
+  .icon {
+    width: 8rem;
+    height: 8rem;
+    margin: 1.5rem 0;
+  }
+
+  .text {
+    margin-bottom: 2rem;
+    font-size: 1.25rem;
   }
 }
 </style>

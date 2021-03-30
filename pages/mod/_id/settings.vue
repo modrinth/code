@@ -406,6 +406,7 @@ export default {
         `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
         this.$auth.headers
       )
+      await this.$router.push('/dashboard/projects')
     },
   },
 }
