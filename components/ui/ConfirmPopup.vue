@@ -35,8 +35,13 @@
 </template>
 
 <script>
+import Popup from '~/components/ui/Popup'
+
 export default {
   name: 'ConfirmPopup',
+  components: {
+    Popup,
+  },
   props: {
     confirmationText: {
       type: String,
