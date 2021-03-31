@@ -179,7 +179,7 @@ fetch('https://api.modrinth.com/api/v1/mod').then(res => res.json()).then(data =
 </template>
 
 <script>
-import MFooter from '@/components/MFooter'
+import MFooter from '~/components/layout/MFooter'
 
 export default {
   components: {

@@ -248,7 +248,7 @@
 
 <script>
 import axios from 'axios'
-import ModPage from '@/components/ModPage'
+import ModPage from '@/components/wrapper/ModPage'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 

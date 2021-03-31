@@ -43,9 +43,9 @@
 </template>
 
 <script>
-import GapIcon from '~/assets/images/utils/gap.svg?inline'
-import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg?inline'
-import RightArrowIcon from '~/assets/images/utils/right-arrow.svg?inline'
+import GapIcon from '~/assets/images/utils/gap.svg'
+import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg'
+import RightArrowIcon from '~/assets/images/utils/right-arrow.svg'
 
 export default {
   name: 'Pagination',

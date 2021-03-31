@@ -289,11 +289,11 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import axios from 'axios'
-import SearchResult from '@/components/ProjectCard'
-import Pagination from '@/components/Pagination'
-import SearchFilter from '@/components/SearchFilter'
+import SearchResult from '~/components/ui/ProjectCard'
+import Pagination from '~/components/ui/search/Pagination'
+import SearchFilter from '~/components/ui/search/SearchFilter'
 
-import MFooter from '@/components/MFooter'
+import MFooter from '~/components/layout/MFooter'
 import TechCategory from '~/assets/images/categories/tech.svg?inline'
 import AdventureCategory from '~/assets/images/categories/adventure.svg?inline'
 import CursedCategory from '~/assets/images/categories/cursed.svg?inline'
@@ -313,7 +313,7 @@ import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
 import ExitIcon from '~/assets/images/utils/exit.svg?inline'
 
-import Advertisement from '~/components/Advertisement'
+import Advertisement from '~/components/ui/Advertisement'
 
 export default {
   auth: false,

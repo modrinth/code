@@ -345,10 +345,10 @@
 </template>
 
 <script>
-import Categories from '@/components/Categories'
-import MFooter from '@/components/MFooter'
-
 import axios from 'axios'
+import Categories from '~/components/ui/Categories'
+import MFooter from '~/components/layout/MFooter'
+
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
@@ -364,7 +364,7 @@ import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
-import Advertisement from '~/components/Advertisement'
+import Advertisement from '~/components/ui/Advertisement'
 
 export default {
   name: 'ModPage',

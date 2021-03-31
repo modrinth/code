@@ -47,8 +47,9 @@
 
 <script>
 import axios from 'axios'
-import ModCard from '@/components/ProjectCard'
-import DashboardPage from '@/components/DashboardPage'
+
+import DashboardPage from '@/components/wrapper/DashboardPage'
+import ModCard from '~/components/ui/ProjectCard'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
 
 export default {

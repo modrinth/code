@@ -129,7 +129,7 @@
 import axios from 'axios'
 
 import Multiselect from 'vue-multiselect'
-import ModPage from '~/components/ModPage'
+import ModPage from '@/components/wrapper/ModPage'
 
 export default {
   components: {

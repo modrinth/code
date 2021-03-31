@@ -47,8 +47,8 @@
 <script>
 import axios from 'axios'
 
-import ModCard from '@/components/ProjectCard'
-import DashboardPage from '@/components/DashboardPage'
+import DashboardPage from '@/components/wrapper/DashboardPage'
+import ModCard from '~/components/ui/ProjectCard'
 import FollowIcon from '~/assets/images/utils/heart.svg?inline'
 import FollowIllustration from '~/assets/images/illustrations/follow_illustration.svg?inline'
 

@@ -112,7 +112,7 @@
 </template>
 
 <script>
-import DashboardPage from '@/components/DashboardPage'
+import DashboardPage from '@/components/wrapper/DashboardPage'
 import axios from 'axios'
 
 export default {

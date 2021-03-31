@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import MFooter from '@/components/MFooter'
+import MFooter from '~/components/layout/MFooter'
 
 export default {
   components: {

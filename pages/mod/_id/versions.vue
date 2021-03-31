@@ -92,7 +92,7 @@
 <script>
 import axios from 'axios'
 
-import ModPage from '@/components/ModPage'
+import ModPage from '@/components/wrapper/ModPage'
 
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
