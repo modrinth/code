@@ -1,5 +1,5 @@
 <template>
-  <DashboardPage>
+  <div>
     <div class="section-header columns">
       <h3 class="column-grow-1">My notifications</h3>
     </div>
@@ -44,21 +44,19 @@
       </div>
     </div>
     <div v-else class="error">
-      <UpToDate class="icon"></UpToDate><br />
+      <UpToDate class="icon"></UpToDate>
+      <br />
       <span class="text">You are up-to-date!</span>
     </div>
-  </DashboardPage>
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
-
-import DashboardPage from '@/components/wrapper/DashboardPage'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
 
 export default {
   components: {
-    DashboardPage,
     UpToDate,
   },
   async asyncData(data) {
@@ -136,6 +134,7 @@ export default {
     margin: 0;
   }
 }
+
 .error {
   display: flex;
   flex-direction: column;

@@ -147,9 +147,9 @@
 <script>
 import axios from 'axios'
 
-import ModPage from '@/components/wrapper/ModPage'
+import ModPage from '~/components/layout/ModPage'
 
-import Categories from '~/components/ui/Categories'
+import Categories from '~/components/ui/search/Categories'
 import FileInput from '~/components/ui/FileInput'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'

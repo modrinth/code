@@ -6,14 +6,10 @@ export default async function (context) {
     }
 
     if (context.route.query.code) {
-      const date = new Date()
-      date.setFullYear(new Date().getFullYear() + 1)
-
       context.app.$cookies.set('auth-token', context.route.query.code, {
         secure: true,
         sameSite: 'Strict',
         httpOnly: true,
-        expires: date,
       })
 
       await context.store.dispatch('auth/fetchUser', {
@@ -36,7 +32,7 @@ export default async function (context) {
 
   if (!context.$auth.user) {
     return context.redirect(
-      `https://api.modrinth.com/api/v1/auth/init?url=https://modrinth.com${context.route.path}`
+      `https://api.modrinth.com/api/v1/auth/init?url=https://modrinth.com${context.route.fullPath}`
     )
   }
 }

@@ -8,7 +8,7 @@
               :src="
                 mod.icon_url
                   ? mod.icon_url
-                  : 'https://cdn.modrinth.com/placeholder.svg'
+                  : 'https://cdn.modrinth.com/placeholder.svg?inline'
               "
               alt="mod - icon"
             />
@@ -38,7 +38,7 @@
           </div>
           <div class="buttons">
             <nuxt-link
-              v-if="this.$auth.user && this.$auth.user.id"
+              v-if="this.$auth.user"
               :to="`/report/create?id=${mod.id}&t=mod`"
               class="iconified-button"
             >
@@ -346,7 +346,7 @@
 
 <script>
 import axios from 'axios'
-import Categories from '~/components/ui/Categories'
+import Categories from '~/components/ui/search/Categories'
 import MFooter from '~/components/layout/MFooter'
 
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
@@ -364,7 +364,7 @@ import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
-import Advertisement from '~/components/ui/Advertisement'
+import Advertisement from '~/components/Advertisement'
 
 export default {
   name: 'ModPage',
@@ -676,10 +676,11 @@ export default {
     overflow-y: hidden;
   }
 }
-
+/*
 @media screen and (max-width: 1400px) {
   .mod-info {
     display: none;
   }
 }
+*/
 </style>

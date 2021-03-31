@@ -502,8 +502,8 @@
 import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
-import MFooter from '~/components/layout/MFooter'
 import FileInput from '~/components/ui/FileInput'
+import MFooter from '~/components/layout/MFooter'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'

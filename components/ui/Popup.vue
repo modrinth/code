@@ -32,6 +32,7 @@ export default {
   opacity: 0.6;
   overflow-x: hidden;
 }
+
 .popup-body {
   position: fixed;
   top: 50%;

@@ -1,5 +1,5 @@
 <template>
-  <DashboardPage>
+  <div>
     <div class="section-header">
       <h3 class="column-grow-1">Mods</h3>
     </div>
@@ -9,19 +9,19 @@
         :id="mod.id"
         :key="mod.id"
         :author="mod.author"
-        :name="mod.title"
-        :description="mod.description"
-        :latest-version="mod.latest_version"
-        :created-at="mod.published"
-        :updated-at="mod.updated"
-        :downloads="mod.downloads.toString()"
-        :icon-url="mod.icon_url"
         :author-url="mod.author_url"
-        :page-url="mod.page_url"
         :categories="mod.categories"
+        :created-at="mod.published"
+        :description="mod.description"
+        :downloads="mod.downloads.toString()"
         :edit-mode="true"
-        :status="mod.status"
+        :icon-url="mod.icon_url"
         :is-modrinth="true"
+        :latest-version="mod.latest_version"
+        :name="mod.title"
+        :page-url="mod.page_url"
+        :status="mod.status"
+        :updated-at="mod.updated"
       >
         <div class="buttons">
           <button
@@ -79,22 +79,21 @@
       </div>
     </div>
     <div v-else class="error">
-      <Security class="icon"></Security><br />
+      <Security class="icon"></Security>
+      <br />
       <span class="text">You are up-to-date!</span>
     </div>
-  </DashboardPage>
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
 
-import DashboardPage from '@/components/wrapper/DashboardPage'
 import ModCard from '~/components/ui/ProjectCard'
 import Security from '~/assets/images/illustrations/security.svg?inline'
 
 export default {
   components: {
-    DashboardPage,
     ModCard,
     Security,
   },

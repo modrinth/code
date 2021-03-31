@@ -89,7 +89,7 @@ import MFooter from '~/components/layout/MFooter'
 import ReportIcon from '~/assets/images/utils/report.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
-import Advertisement from '~/components/ui/Advertisement'
+import Advertisement from '~/components/Advertisement'
 
 export default {
   auth: false,

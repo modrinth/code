@@ -290,7 +290,7 @@
 import Multiselect from 'vue-multiselect'
 import axios from 'axios'
 import SearchResult from '~/components/ui/ProjectCard'
-import Pagination from '~/components/ui/search/Pagination'
+import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'
 
 import MFooter from '~/components/layout/MFooter'
@@ -313,7 +313,7 @@ import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
 import ExitIcon from '~/assets/images/utils/exit.svg?inline'
 
-import Advertisement from '~/components/ui/Advertisement'
+import Advertisement from '~/components/Advertisement'
 
 export default {
   auth: false,

@@ -1,5 +1,5 @@
 <template>
-  <DashboardPage>
+  <div>
     <div class="section-header columns">
       <h3 class="column-grow-1">Revoke your Modrinth token</h3>
     </div>
@@ -23,10 +23,11 @@
       <ol>
         <li>
           <a
-            target="_blank"
             href="https://github.com/settings/connections/applications/3acffb2e808d16d4b226"
-            >Head to the Modrinth Application page on GitHub.</a
+            target="_blank"
           >
+            Head to the Modrinth Application page on GitHub.
+          </a>
           Make sure to be logged into the GitHub account you used for Modrinth!
         </li>
         <li>
@@ -36,22 +37,19 @@
       </ol>
       <p>Once you have completed the steps, press the continue button below.</p>
       <p>
-        <strong
-          >This will log you out of Modrinth, however when you log back in your
-          token will be regenerated.</strong
-        >
+        <strong>
+          This will log you out of Modrinth, however when you log back in your
+          token will be regenerated.
+        </strong>
       </p>
       <button @click="logout">Continue</button>
     </section>
-  </DashboardPage>
+  </div>
 </template>
 
 <script>
-import DashboardPage from '@/components/wrapper/DashboardPage'
 export default {
-  components: {
-    DashboardPage,
-  },
+  components: {},
   methods: {
     async logout() {
       this.$cookies.set('auth-token-reset', true)
@@ -103,10 +101,12 @@ label {
     flex: 3;
     height: fit-content;
   }
+
   button {
     :hover {
       cursor: pointer;
     }
+
     height: fit-content;
     flex: 1;
   }

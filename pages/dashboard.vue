@@ -11,6 +11,10 @@
             <NotificationsIcon />
             Notifications
           </nuxt-link>
+          <nuxt-link :to="'/dashboard/follows'" class="tab last">
+            <FollowIcon />
+            Followed Mods
+          </nuxt-link>
           <nuxt-link
             v-if="
               $auth.user.role === 'admin' || $auth.user.role === 'moderator'
@@ -29,7 +33,7 @@
         <m-footer class="footer" />
       </div>
       <div class="content">
-        <slot />
+        <NuxtChild />
       </div>
     </div>
   </div>
@@ -39,6 +43,7 @@ import ModIcon from '~/assets/images/sidebar/mod.svg?inline'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
 import SettingsIcon from '~/assets/images/sidebar/settings.svg?inline'
 import NotificationsIcon from '~/assets/images/sidebar/notifications.svg?inline'
+import FollowIcon from '~/assets/images/utils/heart.svg?inline'
 
 export default {
   name: 'DashboardPage',
@@ -47,22 +52,12 @@ export default {
     ModerationIcon,
     SettingsIcon,
     NotificationsIcon,
+    FollowIcon,
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.section-header {
-  @extend %card;
-  padding: var(--spacing-card-md) var(--spacing-card-lg);
-  margin-bottom: var(--spacing-card-md);
-  h3 {
-    margin: auto 0;
-    color: var(--color-text-dark);
-    font-weight: var(--font-weight-extrabold);
-  }
-}
-
 .footer {
   padding-top: 0;
 }

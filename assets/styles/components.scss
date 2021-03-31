@@ -408,3 +408,15 @@
   }
 
 }
+
+.section-header {
+  @extend %card;
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+  margin-bottom: var(--spacing-card-md);
+  h3 {
+    margin: auto 0;
+    color: var(--color-text-dark);
+    font-weight: var(--font-weight-extrabold);
+  }
+}
+

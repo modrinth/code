@@ -1,6 +1,6 @@
 /* eslint-disable vue/attribute-hyphenation */
 <template>
-  <DashboardPage>
+  <div>
     <ConfirmPopup
       ref="delete_popup"
       title="Are you sure you want to delete your account?"
@@ -108,16 +108,16 @@
         </div>
       </label>
     </section>
-  </DashboardPage>
+  </div>
 </template>
 
 <script>
-import DashboardPage from '@/components/wrapper/DashboardPage'
 import axios from 'axios'
+import ConfirmPopup from '~/components/ui/ConfirmPopup'
 
 export default {
   components: {
-    DashboardPage,
+    ConfirmPopup,
   },
   fetch() {
     this.username = this.$auth.user.username

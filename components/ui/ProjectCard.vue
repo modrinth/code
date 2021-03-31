@@ -3,7 +3,11 @@
     <div class="icon">
       <nuxt-link v-if="isModrinth" :to="'/mod/' + id">
         <img
-          :src="iconUrl ? iconUrl : 'https://cdn.modrinth.com/placeholder.svg'"
+          :src="
+            iconUrl
+              ? iconUrl
+              : 'https://cdn.modrinth.com/placeholder.svg?inline'
+          "
           :alt="name"
         />
       </nuxt-link>
@@ -103,7 +107,7 @@
 </template>
 
 <script>
-import Categories from '~/components/ui/Categories'
+import Categories from '~/components/ui/search/Categories'
 
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
