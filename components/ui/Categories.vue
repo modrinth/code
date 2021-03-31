@@ -60,21 +60,21 @@
 </template>
 
 <script>
-import TechCategory from '~/assets/images/categories/tech.svg'
-import AdventureCategory from '~/assets/images/categories/adventure.svg'
-import CursedCategory from '~/assets/images/categories/cursed.svg'
-import DecorationCategory from '~/assets/images/categories/decoration.svg'
-import EquipmentCategory from '~/assets/images/categories/equipment.svg'
-import FoodCategory from '~/assets/images/categories/food.svg'
-import LibraryCategory from '~/assets/images/categories/library.svg'
-import MagicCategory from '~/assets/images/categories/magic.svg'
-import MiscCategory from '~/assets/images/categories/misc.svg'
-import StorageCategory from '~/assets/images/categories/storage.svg'
-import UtilityCategory from '~/assets/images/categories/utility.svg'
-import WorldGenCategory from '~/assets/images/categories/worldgen.svg'
+import TechCategory from '~/assets/images/categories/tech.svg?inline'
+import AdventureCategory from '~/assets/images/categories/adventure.svg?inline'
+import CursedCategory from '~/assets/images/categories/cursed.svg?inline'
+import DecorationCategory from '~/assets/images/categories/decoration.svg?inline'
+import EquipmentCategory from '~/assets/images/categories/equipment.svg?inline'
+import FoodCategory from '~/assets/images/categories/food.svg?inline'
+import LibraryCategory from '~/assets/images/categories/library.svg?inline'
+import MagicCategory from '~/assets/images/categories/magic.svg?inline'
+import MiscCategory from '~/assets/images/categories/misc.svg?inline'
+import StorageCategory from '~/assets/images/categories/storage.svg?inline'
+import UtilityCategory from '~/assets/images/categories/utility.svg?inline'
+import WorldGenCategory from '~/assets/images/categories/worldgen.svg?inline'
 
-import ForgeLoader from '~/assets/images/categories/forge.svg'
-import FabricLoader from '~/assets/images/categories/fabric.svg'
+import ForgeLoader from '~/assets/images/categories/forge.svg?inline'
+import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 
 export default {
   name: 'Categories',

@@ -105,10 +105,10 @@
 <script>
 import Categories from '~/components/ui/Categories'
 
-import CalendarIcon from '~/assets/images/utils/calendar.svg'
-import DownloadIcon from '~/assets/images/utils/download.svg'
-import EditIcon from '~/assets/images/utils/edit.svg'
-import TagIcon from '~/assets/images/utils/tag.svg'
+import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
+import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import EditIcon from '~/assets/images/utils/edit.svg?inline'
+import TagIcon from '~/assets/images/utils/tag.svg?inline'
 
 export default {
   name: 'ProjectCard',
