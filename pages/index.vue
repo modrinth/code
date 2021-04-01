@@ -19,7 +19,7 @@
           We implemented <span>fast and adaptable</span> search algorithms so
           you don't have to wait, while creating a responsive interface that
           makes sense. Modrinth is full of elegant mod discovery and a platform
-          platform which just works.
+          which just works.
         </p>
       </div>
       <div class="right hero-image">
