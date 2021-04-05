@@ -63,7 +63,7 @@
         <div class="mods">
           <SearchResult
             v-for="result in mods"
-            :id="result.slug ? result.slug : result.id"
+            :id="result.slug || result.id"
             :key="result.id"
             :name="result.title"
             :description="result.description"
@@ -183,9 +183,8 @@ export default {
         {
           hid: 'og:image',
           name: 'og:image',
-          content: this.user.avatar_url
-            ? this.user.avatar_url
-            : 'https://cdn.modrinth.com/placeholder.png',
+          content:
+            this.user.avatar_url || 'https://cdn.modrinth.com/placeholder.png',
         },
       ],
     }
