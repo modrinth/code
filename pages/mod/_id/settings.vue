@@ -350,7 +350,7 @@ export default {
         await axios.post(
           `https://api.modrinth.com/api/v1/team/${this.mod.team}/members`,
           data,
-          this.auth.headers
+          this.$auth.headers
         )
         await this.$router.go(null)
       } catch (err) {
