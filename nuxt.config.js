@@ -61,14 +61,7 @@ export default {
           'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap',
       },
     ],
-    script: [
-      {
-        src: 'https://analytics.modrinth.com/umami.js',
-        'data-website-id': 'c37613de-245d-4767-90e7-ba7980a4f1a2',
-        async: true,
-        defer: true,
-      },
-    ],
+    script: [],
   },
 
   vue: {
@@ -78,7 +71,7 @@ export default {
     },
   },
   router: {
-    middleware: 'auth',
+    middleware: ['auth', 'ads_tracking'],
   },
   /*
    ** Global CSS
@@ -119,9 +112,20 @@ export default {
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
     '@nuxtjs/style-resources',
-    '@nuxtjs/google-adsense',
     'cookie-universal-nuxt',
+    '~/modules/gpt-ads',
+    '~/modules/analytics',
   ],
+  ads: {
+    // Module options
+    ghostMode: true,
+    geoEdgeId: '',
+  },
+  analytics: {
+    enabled: false,
+    script_url: '',
+    tracking_code: '',
+  },
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',
   },
@@ -138,9 +142,6 @@ export default {
         Accept: 'application/json',
       },
     },
-  },
-  'google-adsense': {
-    id: 'ca-pub-4615302805870170',
   },
   dayjs: {
     locales: ['en'],
@@ -169,5 +170,17 @@ export default {
   },
   env: {
     version: process.env.VERSION_ID || 'unknown',
+  },
+  publicRuntimeConfig: {
+    ads: {
+      ghostMode: process.env.ENABLE_ADS == null,
+      GeoEdgeId: process.env.GEOEDGE_ID,
+      networkCode: process.env.GAM_ID,
+    },
+    analytics: {
+      enabled: process.env.ENABLE_ANALYTICS,
+      script_url: process.env.ANALYTICS_URL,
+      tracking_code: process.env.ANALYTICS_ID,
+    },
   },
 }

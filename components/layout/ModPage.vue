@@ -65,9 +65,8 @@
         </div>
         <Advertisement
           v-if="mod.status === 'approved' || mod.status === 'unlisted'"
-          :page-url="
-            'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
-          "
+          ad-unit="banner"
+          size="728x90,468x60"
         />
         <div class="mod-navigation">
           <div class="tabs">
@@ -133,9 +132,8 @@
           <slot />
           <Advertisement
             v-if="mod.status === 'approved' || mod.status === 'unlisted'"
-            :page-url="
-              'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
-            "
+            ad-unit="banner"
+            size="728x90,468x60"
           />
         </div>
       </div>
@@ -333,10 +331,8 @@
         </div>
         <Advertisement
           v-if="mod.status === 'approved' || mod.status === 'unlisted'"
-          format="rectangle"
-          :page-url="
-            'https://modrinth.com/mod/' + (mod.slug ? mod.slug : mod.id)
-          "
+          ad-unit="square"
+          size="250x250,200x200"
         />
         <m-footer class="footer" />
       </section>
@@ -364,7 +360,7 @@ import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 
 import ForgeIcon from '~/assets/images/categories/forge.svg?inline'
 import FabricIcon from '~/assets/images/categories/fabric.svg?inline'
-import Advertisement from '~/components/Advertisement'
+import Advertisement from '~/components/ads/Advertisement'
 
 export default {
   name: 'ModPage',

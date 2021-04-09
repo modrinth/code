@@ -63,7 +63,7 @@
           ></pagination>
         </section>
         <div class="results column-grow-4">
-          <Advertisement />
+          <Advertisement ad-unit="banner" size="728x90,468x60" />
           <div v-if="results === null" class="no-results">
             <p>Loading...</p>
           </div>
@@ -279,7 +279,7 @@
             @input="toggleLicense"
           />
         </div>
-        <Advertisement format="rectangle" />
+        <Advertisement ad-unit="square" size="250x250,200x200" />
         <m-footer class="footer" />
       </section>
     </div>
@@ -313,7 +313,7 @@ import FabricLoader from '~/assets/images/categories/fabric.svg?inline'
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
 import ExitIcon from '~/assets/images/utils/exit.svg?inline'
 
-import Advertisement from '~/components/Advertisement'
+import Advertisement from '~/components/ads/Advertisement'
 
 export default {
   auth: false,

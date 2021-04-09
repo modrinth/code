@@ -1,25 +1,23 @@
 <template>
   <div class="ad-wrapper">
-    <adsbygoogle
-      ad-slot="7510690716"
-      :ad-format="format"
-      :page-url="pageUrl ? pageUrl : undefined"
-    />
+    <div class="ad">
+      <GptAd :ad-unit="adUnit" :size="size" />
+    </div>
   </div>
 </template>
 
 <script>
+/* eslint-disable no-undef */
 export default {
   name: 'Advertisement',
   props: {
-    format: {
+    size: {
       type: String,
-      default: 'horizontal',
+      required: true,
     },
-    pageUrl: {
+    adUnit: {
       type: String,
-      required: false,
-      default: '',
+      required: true,
     },
   },
 }
@@ -29,6 +27,9 @@ export default {
 .ad-wrapper {
   width: 100%;
   @extend %card;
+  display: flex;
+  flex-direction: row;
   margin-bottom: var(--spacing-card-md);
+  justify-content: center;
 }
 </style>

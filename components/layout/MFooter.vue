@@ -26,6 +26,11 @@
         <a target="_blank" href="https://twitter.com/modrinth">Twitter</a>
       </li>
     </ul>
+    <ul>
+      <li>
+        <nuxt-link to="/dashboard/privacy">Set privacy preferences</nuxt-link>
+      </li>
+    </ul>
     <span> © Guavy LLC </span><br />
     <span v-if="version !== 'unknown'">Version: {{ version }}</span>
   </footer>

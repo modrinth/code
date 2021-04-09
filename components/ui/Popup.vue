@@ -23,7 +23,7 @@ export default {
 .popup-overlay {
   top: 0;
   left: 0;
-  z-index: 1;
+  z-index: 10;
   position: fixed;
   width: 100%;
   height: 100%;
@@ -38,11 +38,11 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
+  z-index: 11;
   box-shadow: 0 2px 3px 1px var(--color-button-bg);
   border-radius: 10px;
   max-height: 80%;
   overflow-y: auto;
-  background-color: var(--color-bg);
+  background-color: var(--color-raised-bg);
 }
 </style>
