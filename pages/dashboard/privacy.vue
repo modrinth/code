@@ -48,9 +48,9 @@ import scopes from '@/privacy-toggles'
 export default {
   name: 'Privacy',
   fetch() {
-    if (this.$cookies.get('modrinth-scopes') !== null) {
-      this.$store.dispatch('consent/loadFromCookies', this.$cookies)
+    this.$store.dispatch('consent/loadFromCookies', this.$cookies)
 
+    if (this.$store.state.consent.is_consent_given) {
       Object.keys(scopes.settings).forEach((key) => {
         scopes.settings[key].value = false
       })

@@ -8,7 +8,7 @@ export default async function (context) {
     }
 
     if (context.route.query.code) {
-      const date = new Date(Date.now() + 6 * 60 * 60 * 1000) // 6 hours
+      const date = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
       context.app.$cookies.set('auth-token', context.route.query.code, {
         secure: true,
         sameSite: 'Strict',
