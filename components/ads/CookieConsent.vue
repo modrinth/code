@@ -13,8 +13,8 @@
           button below:
         </span>
         <div class="actions">
-          <button class="btn button" @click="hide">Accept all</button>
-          <button class="btn brand-button" @click="review">Review</button>
+          <button class="btn button" @click="review">Review</button>
+          <button class="btn brand-button" @click="hide">Accept all</button>
         </div>
       </div>
     </div>
@@ -24,12 +24,7 @@
 <script>
 export default {
   name: 'CookieConsent',
-  data() {
-    return {
-      shown: false,
-    }
-  },
-  mounted() {
+  fetch() {
     // Get informations in the store
     this.$store.dispatch('consent/loadFromCookies', this.$cookies)
     if (
@@ -39,12 +34,20 @@ export default {
       this.shown = true
     }
   },
+  data() {
+    return {
+      shown: false,
+    }
+  },
   methods: {
     hide() {
-      this.shown = false
+      this.$store.commit('consent/set_consent', true)
+      this.$store.commit('consent/add_scope', true)
+      this.$store.commit('consent/remove_scope', true)
+      this.$store.dispatch('consent/save', this.$cookies)
     },
     review() {
-      this.hide()
+      this.shown = false
       this.$router.push('/dashboard/privacy')
     },
   },

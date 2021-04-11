@@ -29,6 +29,10 @@
             <SettingsIcon />
             Settings
           </nuxt-link>
+          <nuxt-link :to="'/dashboard/privacy'" class="tab last">
+            <SettingsIcon />
+            Privacy Settings
+          </nuxt-link>
         </div>
         <div v-else class="card page-nav">
           <a :href="authUrl" class="tab last">

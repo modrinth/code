@@ -1,7 +1,7 @@
 import Vue from 'vue';
 
 function isPersonalizedAdsOn(ctx) {
-  let cookies = null
+  let cookies = []
   if (ctx.req != null) {
     //Server side rendering
     cookies = ctx.req.headers.cookie;
@@ -9,6 +9,9 @@ function isPersonalizedAdsOn(ctx) {
     // Rely on the client
     cookies = document.cookie;
   }
+
+  if(!cookies) return true;
+
   let processed = {}
   cookies.split(';').forEach((e) => {
     let val = e.trim().split('=')
@@ -102,7 +105,7 @@ export default async function (ctx, inject) {
   };
   injectScript(gptInitScript);
 
-  
+
   const component = require('./component.js');
   Vue.component('<%= options.componentName %>', component.default || component);
 

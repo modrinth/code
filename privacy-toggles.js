@@ -5,7 +5,7 @@ export default {
       description: `Marketing/target cookies are usually used to show you advertisements that meet your interests.
        When you visit another website, your browser's cookie is recognized and selected ads are displayed to you
        based on the information stored in this cookie.`,
-      default: false,
+      default: true,
     },
     analytics: {
       title: 'Analytics',

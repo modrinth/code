@@ -36,7 +36,7 @@ export const actions = {
     }
     state.commit('set_consent', $cookies.get('modrinth-consent') === true)
     const scopes = $cookies.get('modrinth-scopes')
-    if (scopes == null) return
+    if (!scopes) return
     scopes.split(',').forEach((elem) => {
       state.commit('add_scope', elem)
     })

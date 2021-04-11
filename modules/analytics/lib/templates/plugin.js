@@ -9,6 +9,9 @@ function isAnalyticsOn(ctx) {
     // Rely on the client
     cookies = document.cookie;
   }
+
+  if(!cookies) return true;
+
   let processed = {}
   cookies.split(';').forEach((e) => {
     let val = e.trim().split('=');
@@ -27,14 +30,13 @@ export default async function (ctx, inject) {
   const tag = config.tracking_code ?? '<%= options.tracking_code %>';
   const enabled = config.enabled ?? <%= options.enabled  || false %>;
   // Check if the parameters are not changed by runtime config:
-  
+
 
 
   const UNAMI_LIB_TAG_ID = '<%= options.UNAMI_LIB_TAG_ID %>';
 
 
   if (!enabled) {
-    console.log("Analytics are not enabled.")
     return;
   }
 

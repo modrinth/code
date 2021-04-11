@@ -47,19 +47,24 @@
 import scopes from '@/privacy-toggles'
 export default {
   name: 'Privacy',
-  data: () => {
-    const settings = scopes.settings
-    return {
-      scopes: settings,
-    }
-  },
-  mounted() {
+  fetch() {
+    Object.keys(scopes.settings).forEach((key) => {
+      scopes.settings[key].value = scopes.settings[key].default
+    })
+
     this.$store.dispatch('consent/loadFromCookies', this.$cookies)
+
     // Load the allowed scopes from the store
     this.$store.state.consent.scopes_allowed.forEach((scope) => {
       if (this.scopes[scope] != null)
         this.$set(this.scopes[scope], 'value', true)
     })
+  },
+  data: () => {
+    const settings = scopes.settings
+    return {
+      scopes: settings,
+    }
   },
   options: {
     auth: false,
