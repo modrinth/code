@@ -30,7 +30,7 @@
             Settings
           </nuxt-link>
           <nuxt-link :to="'/dashboard/privacy'" class="tab last">
-            <SettingsIcon />
+            <ShieldIcon />
             Privacy Settings
           </nuxt-link>
         </div>
@@ -60,6 +60,7 @@ import SettingsIcon from '~/assets/images/sidebar/settings.svg?inline'
 import NotificationsIcon from '~/assets/images/sidebar/notifications.svg?inline'
 import FollowIcon from '~/assets/images/utils/heart.svg?inline'
 import UserIcon from '~/assets/images/utils/user.svg?inline'
+import ShieldIcon from '~/assets/images/utils/shield.svg?inline'
 
 export default {
   name: 'DashboardPage',
@@ -70,6 +71,7 @@ export default {
     NotificationsIcon,
     FollowIcon,
     UserIcon,
+    ShieldIcon,
   },
   computed: {
     authUrl() {

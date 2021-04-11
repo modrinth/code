@@ -1,6 +1,5 @@
 <template>
   <div>
-    <ReviewPopup ref="popup" />
     <div
       ref="container"
       class="container"
@@ -22,6 +21,7 @@
 </template>
 
 <script>
+import scopes from '~/privacy-toggles'
 export default {
   name: 'CookieConsent',
   fetch() {
@@ -42,8 +42,10 @@ export default {
   methods: {
     hide() {
       this.$store.commit('consent/set_consent', true)
-      this.$store.commit('consent/add_scope', true)
-      this.$store.commit('consent/remove_scope', true)
+      // Accept all scopes
+      for (const elem in scopes.settings) {
+        this.$store.commit('consent/add_scope', elem)
+      }
       this.$store.dispatch('consent/save', this.$cookies)
 
       this.shown = false

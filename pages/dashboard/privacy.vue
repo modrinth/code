@@ -90,6 +90,12 @@ export default {
         }
       }
       this.$store.dispatch('consent/save', this.$cookies)
+      this.$notify({
+        group: 'main',
+        title: 'Saved',
+        text: 'Your preferences have been saved successfully.',
+        type: 'success',
+      })
     },
   },
 }

@@ -165,6 +165,7 @@ export default {
   watch: {
     $route() {
       this.$refs.nav.className = 'right-group'
+      document.body.style.overflow = 'auto'
     },
   },
   methods: {
@@ -186,7 +187,18 @@ export default {
     },
     async logout() {
       this.$cookies.set('auth-token-reset', true)
-      await this.$router.go(null)
+      // If users logs out on dashboard, redirect on the home page
+      if (this.$route.path.startsWith('/dashboard')) {
+        await this.$router.push('/')
+      } else {
+        await this.$router.go(null)
+      }
+      this.$notify({
+        group: 'main',
+        title: 'Logged Out',
+        text: 'You have logged out successfully!',
+        type: 'success',
+      })
     },
     changeTheme() {
       this.$colorMode.preference =
@@ -198,6 +210,8 @@ export default {
 
 <style lang="scss">
 .layout {
+  overflow-y: auto;
+  overflow-x: hidden;
   background-color: var(--color-bg);
   display: block;
   height: 100vh;

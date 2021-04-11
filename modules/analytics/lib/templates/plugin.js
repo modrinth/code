@@ -10,8 +10,6 @@ function isAnalyticsOn(ctx) {
     cookies = document.cookie;
   }
 
-  if(!cookies) return true;
-
   let processed = {}
   cookies.split(';').forEach((e) => {
     let val = e.trim().split('=');
