@@ -212,7 +212,6 @@ export default {
 .layout {
   background-color: var(--color-bg);
   display: block;
-  height: 100vh;
 
   .site-header {
     height: var(--size-navbar-height);

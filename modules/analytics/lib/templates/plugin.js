@@ -46,7 +46,7 @@ export default async function (ctx, inject) {
       ctx.app.head.script.push(script);
     }
   };
-  if (isAnalyticsOn(ctx)) {
+  // if (isAnalyticsOn(ctx)) {
     // Inject unami
     const analyticsScript = {
       hid: UNAMI_LIB_TAG_ID,
@@ -56,9 +56,9 @@ export default async function (ctx, inject) {
       defer: true,
     };
     injectScript(analyticsScript);
-  } else {
+  // } else {
     // console.log("Analytics scope was denied.")
-  }
+  // }
 
 }
 

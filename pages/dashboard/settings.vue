@@ -103,9 +103,12 @@
           will be removed from our servers. This cannot be reversed, so be
           careful!</span
         >
-        <div type="button" class="button" @click="showPopup">
-          Delete Account
-        </div>
+        <input
+          value="Delete Account"
+          type="button"
+          class="button"
+          @click="showPopup"
+        />
       </label>
     </section>
   </div>

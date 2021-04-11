@@ -25,21 +25,26 @@ import scopes from '~/privacy-toggles'
 export default {
   name: 'CookieConsent',
   fetch() {
-    // Get informations in the store
-    this.$store.dispatch('consent/loadFromCookies', this.$cookies)
-    if (
-      !this.$store.state.consent.is_consent_given &&
-      this.$route.path !== '/dashboard/privacy'
-    ) {
-      this.shown = true
-    }
+    this.checkVisibility()
   },
   data() {
     return {
       shown: false,
     }
   },
+  watch: {
+    $route() {
+      this.checkVisibility()
+    },
+  },
   methods: {
+    checkVisibility() {
+      this.$store.dispatch('consent/loadFromCookies', this.$cookies)
+
+      this.shown =
+        !this.$store.state.consent.is_consent_given &&
+        this.$route.path !== '/dashboard/privacy'
+    },
     hide() {
       this.$store.commit('consent/set_consent', true)
       // Accept all scopes

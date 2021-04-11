@@ -7,12 +7,12 @@ export default {
        based on the information stored in this cookie.`,
       default: true,
     },
-    analytics: {
+    /* analytics: {
       title: 'Analytics',
       description: `Modrinth uses in-house tools that allows us to get insights on how
        each user is using the platform, to improve the experience for
        everyone.`,
       default: true,
-    },
+    }, */
   },
 }
