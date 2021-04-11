@@ -408,6 +408,7 @@ export default {
   .version-header {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
 
     h4,
     span {
@@ -416,9 +417,13 @@ export default {
 
     .buttons {
       display: flex;
-      margin-left: auto;
+      align-self: flex-end;
 
-      .action {
+      @media screen and (min-width: 1024px) {
+        margin-left: auto;
+      }
+
+      .action:not(:first-child) {
         margin: 0 0 0 0.5rem;
       }
     }

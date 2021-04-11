@@ -56,7 +56,7 @@
           </div>
         </div>
         <Advertisement ad-unit="square" size="250x250,200x200" />
-        <m-footer class="footer" />
+        <m-footer class="footer" hide-small />
       </div>
       <div class="content">
         <Advertisement ad-unit="banner" size="728x90,468x60" />
@@ -76,6 +76,7 @@
             :is-modrinth="true"
           />
         </div>
+        <m-footer class="footer" hide-big centered />
       </div>
     </div>
   </div>
@@ -194,7 +195,9 @@ export default {
 
 <style lang="scss" scoped>
 .sidebar-l {
-  min-width: 21rem;
+  @media screen and (min-width: 1024px) {
+    min-width: 21rem;
+  }
 
   .user-info {
     @extend %row;

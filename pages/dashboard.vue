@@ -44,10 +44,11 @@
             Privacy Settings
           </nuxt-link>
         </div>
-        <m-footer class="footer" />
+        <m-footer class="footer" hide-small />
       </div>
       <div class="content">
         <NuxtChild />
+        <m-footer class="footer" hide-big centered />
       </div>
     </div>
   </div>
@@ -79,7 +80,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.footer {
+.hideSmall {
   padding-top: 0;
 }
 </style>

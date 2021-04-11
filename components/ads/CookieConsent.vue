@@ -45,6 +45,8 @@ export default {
       this.$store.commit('consent/add_scope', true)
       this.$store.commit('consent/remove_scope', true)
       this.$store.dispatch('consent/save', this.$cookies)
+
+      this.shown = false
     },
     review() {
       this.shown = false
@@ -56,24 +58,42 @@ export default {
 
 <style scoped lang="scss">
 .container {
+  width: 100%;
+  text-align: center;
+
   z-index: 20;
   position: fixed;
   bottom: 0;
   right: 0;
   .banner {
     @extend %card;
-    margin: 0 2rem 2rem 0;
     padding: 1rem;
-    max-width: 18vw;
-    border-left: solid 5px var(--color-brand);
     font-size: 1.05rem;
+    border-radius: 0;
   }
   .actions {
     display: flex;
     flex-direction: row;
     margin-top: 1rem;
+    justify-content: center;
+
     .btn {
       margin-right: 0.5rem;
+    }
+  }
+
+  @media screen and (min-width: 1024px) {
+    width: unset;
+    text-align: unset;
+
+    .banner {
+      max-width: 18vw;
+      border-left: solid 5px var(--color-brand);
+      margin: 0 2rem 2rem 0;
+    }
+
+    .actions {
+      justify-content: unset;
     }
   }
 }

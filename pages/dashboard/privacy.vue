@@ -118,12 +118,6 @@ export default {
   }
 }
 .consent-container {
-  overflow-x: auto;
-  max-height: 90vh;
-
-  @media screen and (min-width: 900px) {
-    max-height: 50vh;
-  }
   .h1 {
     font-size: 2rem;
     font-weight: bold;

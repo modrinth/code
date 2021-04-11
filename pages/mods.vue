@@ -52,8 +52,9 @@
               >
               </Multiselect>
             </div>
-            <div class="mobile-filters-button">
-              <button @click="toggleFiltersMenu">Filter</button>
+            <div class="labeled-control mobile-filters-button">
+              <h3>Filters</h3>
+              <button @click="toggleFiltersMenu">Open</button>
             </div>
           </div>
           <pagination
@@ -92,7 +93,7 @@
           </div>
         </div>
         <section v-if="pages.length > 1" class="search-bottom">
-          <div class="labeled-control">
+          <div class="per-page labeled-control">
             <h3>Per Page</h3>
             <Multiselect
               v-model="maxResults"
@@ -113,19 +114,22 @@
             @switch-page="onSearchChangeToTop"
           ></pagination>
         </section>
+        <m-footer class="footer" hide-big centered />
       </div>
-      <section id="filters" class="filters">
+      <section ref="filters" class="filters">
         <div class="filters-wrapper">
           <section class="filter-group">
-            <button class="filter-button-done" @click="toggleFiltersMenu">
-              Done
-            </button>
             <div class="filter-clear-button">
               <h3>Categories</h3>
-              <button class="iconified-button" @click="clearFilters">
-                <ExitIcon />
-                Clear filters
-              </button>
+              <div class="columns">
+                <button class="filter-button-done" @click="toggleFiltersMenu">
+                  Close
+                </button>
+                <button class="iconified-button" @click="clearFilters">
+                  <ExitIcon />
+                  Clear filters
+                </button>
+              </div>
             </div>
             <SearchFilter
               :active-filters="facets"
@@ -280,7 +284,7 @@
           />
         </div>
         <Advertisement ad-unit="square" size="250x250,200x200" />
-        <m-footer class="footer" />
+        <m-footer class="footer" hide-small />
       </section>
     </div>
   </div>
@@ -584,9 +588,10 @@ export default {
       }
     },
     toggleFiltersMenu() {
-      const filters = document.getElementById('filters')
-      const currentlyActive = filters.className === 'filters active'
-      filters.className = `filters${currentlyActive ? '' : ' active'}`
+      const currentlyActive = this.$refs.filters.className === 'filters active'
+      this.$refs.filters.className = `filters${
+        currentlyActive ? '' : ' active'
+      }`
       document.body.style.overflow =
         document.body.style.overflow !== 'hidden' ? 'hidden' : 'auto'
     },
@@ -631,28 +636,26 @@ export default {
     min-width: 200px;
   }
   .iconified-input {
-    width: 100%;
+    width: auto;
+    margin-right: auto;
   }
   .sort-paginate {
     margin-left: 0.5rem;
     margin-right: 0.5rem;
     display: flex;
-    width: 100%;
+    width: auto;
     .per-page {
       margin-left: 0.5rem;
       display: none;
     }
   }
-  @media screen and (min-width: 900px) {
+  @media screen and (min-width: 1050px) {
     flex-flow: row;
-    .iconified-input {
-      width: auto;
-    }
     .sort-paginate {
       width: auto;
     }
   }
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 450px) {
     .sort-paginate {
       .per-page {
         display: unset;
@@ -667,22 +670,32 @@ export default {
   justify-content: flex-end;
   background: var(--color-raised-bg);
   border-radius: var(--size-rounded-card);
-  padding: 0.25rem 1rem 0.25rem 1rem;
+  padding: 0 1rem;
   select {
     width: 100px;
     margin-right: 20px;
+  }
+  .per-page {
+    display: none;
+  }
+  @media screen and (min-width: 550px) {
+    padding: 0.25rem 1rem 0.25rem 1rem;
+    .per-page {
+      display: unset;
+    }
   }
 }
 
 .labeled-control {
   h3 {
     @extend %small-label;
-    margin-left: 0.5rem;
+    margin-left: 0.25rem;
   }
 }
 
 .mobile-filters-button {
   display: inline-block;
+  margin-left: 0.5rem;
   button {
     margin-top: 0;
     height: 2.5rem;
@@ -691,7 +704,7 @@ export default {
   }
 
   // Hide button on larger screens where it's not needed
-  @media screen and (min-width: 900px) {
+  @media screen and (min-width: 1250px) {
     display: none;
   }
 }
@@ -720,7 +733,7 @@ export default {
     right: 0;
   }
   // Larger screens that don't need to collapse
-  @media screen and (min-width: 900px) {
+  @media screen and (min-width: 1250px) {
     top: 0;
     right: auto;
     position: unset;
@@ -737,7 +750,7 @@ export default {
       border-radius: var(--size-rounded-card);
     }
   }
-  @media screen and (min-width: 1024px) {
+  @media screen and (min-width: 1250px) {
     width: 300px;
   }
 }
@@ -752,13 +765,8 @@ export default {
     justify-content: space-between;
   }
 
-  .filter-button-done {
-    display: block;
-    width: 100%;
-  }
-
   // Large screens that don't collapse
-  @media screen and (min-width: 900px) {
+  @media screen and (min-width: 1250px) {
     .filter-button-done {
       display: none;
     }

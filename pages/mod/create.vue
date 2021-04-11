@@ -741,31 +741,6 @@ export default {
   }
 }
 
-label {
-  display: flex;
-
-  span {
-    flex: 2;
-    padding-right: var(--spacing-card-lg);
-  }
-
-  input,
-  .multiselect,
-  .input-group {
-    flex: 3;
-    height: fit-content;
-  }
-}
-
-.input-group {
-  display: flex;
-  flex-direction: column;
-
-  * {
-    margin-bottom: var(--spacing-card-sm);
-  }
-}
-
 .textarea-wrapper {
   display: flex;
   flex-direction: column;
@@ -784,14 +759,31 @@ label {
   grid-template:
     'header       header      header' auto
     'advert       advert      advert' auto
-    'essentials   essentials  mod-icon' auto
+    'essentials   essentials  essentials' auto
+    'mod-icon     mod-icon    mod-icon' auto
     'game-sides   game-sides  game-sides' auto
     'description  description description' auto
     'versions     versions    versions' auto
-    'extra-links  license     license' auto
-    'donations    donations   .' auto
+    'extra-links  extra-links extra-links' auto
+    'license      license     license' auto
+    'donations    donations   donations' auto
     'footer       footer      footer' auto
     / 4fr 1fr 4fr;
+
+  @media screen and (min-width: 1024px) {
+    grid-template:
+      'header       header      header' auto
+      'advert       advert      advert' auto
+      'essentials   essentials  mod-icon' auto
+      'game-sides   game-sides  game-sides' auto
+      'description  description description' auto
+      'versions     versions    versions' auto
+      'extra-links  license     license' auto
+      'donations    donations   .' auto
+      'footer       footer      footer' auto
+      / 4fr 1fr 4fr;
+  }
+
   column-gap: var(--spacing-card-md);
   row-gap: var(--spacing-card-md);
 }

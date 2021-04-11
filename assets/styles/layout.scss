@@ -22,13 +22,12 @@
   margin: var(--spacing-card-lg);
   .page-contents {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     .content {
       width: 100%;
     }
-    @media screen and (min-width: 900px) {
-    }
     @media screen and (min-width: 1024px) {
+      flex-direction: row;
       max-width: 1280px;
       margin-left: auto;
       margin-right: auto;

@@ -232,35 +232,4 @@ section {
   @extend %card;
   padding: var(--spacing-card-md) var(--spacing-card-lg);
 }
-
-label {
-  display: flex;
-
-  span {
-    flex: 2;
-    padding-right: var(--spacing-card-lg);
-  }
-
-  input {
-    flex: 3;
-    height: fit-content;
-  }
-  input[type='button'] {
-    height: fit-content;
-    flex: 1;
-  }
-  input[type='button']:hover {
-    cursor: pointer;
-  }
-
-  div,
-  a {
-    text-align: center;
-    height: fit-content;
-    flex: 1;
-  }
-  div:hover {
-    cursor: pointer;
-  }
-}
 </style>

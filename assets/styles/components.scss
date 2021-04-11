@@ -239,7 +239,10 @@
   align-items: center;
   padding: 0.5rem 0.25rem 0.2rem;
   margin: auto 0.5rem;
-  border-bottom: 3px solid transparent;
+
+  span {
+    border-bottom: 3px solid transparent;
+  }
 
   svg {
     width: 1rem;
@@ -249,13 +252,19 @@
 
   &:hover,
   &:focus {
-    border-bottom: 3px solid var(--color-brand-disabled);
     color: var(--color-text-medium);
+
+    span {
+      border-bottom: 3px solid var(--color-brand-disabled);
+    }
   }
 
   &.nuxt-link-exact-active {
-    border-bottom: 3px solid var(--color-brand);
     color: var(--color-text-dark);
+
+    span {
+      border-bottom: 3px solid var(--color-brand);
+    }
   }
 }
 
@@ -300,7 +309,10 @@
 
 .sidebar-l {
   @extend .sidebar;
-  margin-right: var(--spacing-card-lg);
+
+  @media screen and (min-width: 1024px) {
+    margin-right: var(--spacing-card-lg);
+  }
 }
 
 .sidebar-r {
@@ -417,6 +429,53 @@
     margin: auto 0;
     color: var(--color-text-dark);
     font-weight: var(--font-weight-extrabold);
+  }
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+
+  @media screen and (min-width: 1024px) {
+    flex-direction: row;
+  }
+
+  span {
+    flex: 2;
+    padding-right: var(--spacing-card-lg);
+  }
+
+  input,
+  .multiselect,
+  .input-group {
+    flex: 3;
+    height: fit-content;
+  }
+
+  input[type='button'] {
+    height: fit-content;
+    flex: 1;
+  }
+  input[type='button']:hover {
+    cursor: pointer;
+  }
+
+  div,
+  a {
+    height: fit-content;
+    flex: 1;
+  }
+  div:hover {
+    cursor: pointer;
+  }
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+
+  * {
+    margin-bottom: var(--spacing-card-sm);
   }
 }
 
