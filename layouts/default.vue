@@ -210,8 +210,6 @@ export default {
 
 <style lang="scss">
 .layout {
-  overflow-y: auto;
-  overflow-x: hidden;
   background-color: var(--color-bg);
   display: block;
   height: 100vh;
