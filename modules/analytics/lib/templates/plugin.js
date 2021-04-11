@@ -9,7 +9,7 @@ function isAnalyticsOn(ctx) {
     // Rely on the client
     cookies = document.cookie;
   }
-
+  if (cookies == null) return false
   let processed = {}
   cookies.split(';').forEach((e) => {
     let val = e.trim().split('=');
