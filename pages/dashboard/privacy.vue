@@ -48,17 +48,23 @@ import scopes from '@/privacy-toggles'
 export default {
   name: 'Privacy',
   fetch() {
-    Object.keys(scopes.settings).forEach((key) => {
-      scopes.settings[key].value = scopes.settings[key].default
-    })
+    if (this.$cookies.get('modrinth-scopes') !== null) {
+      this.$store.dispatch('consent/loadFromCookies', this.$cookies)
 
-    this.$store.dispatch('consent/loadFromCookies', this.$cookies)
+      Object.keys(scopes.settings).forEach((key) => {
+        scopes.settings[key].value = false
+      })
 
-    // Load the allowed scopes from the store
-    this.$store.state.consent.scopes_allowed.forEach((scope) => {
-      if (this.scopes[scope] != null)
-        this.$set(this.scopes[scope], 'value', true)
-    })
+      // Load the allowed scopes from the store
+      this.$store.state.consent.scopes_allowed.forEach((scope) => {
+        if (this.scopes[scope] != null)
+          this.$set(this.scopes[scope], 'value', true)
+      })
+    } else {
+      Object.keys(scopes.settings).forEach((key) => {
+        scopes.settings[key].value = scopes.settings[key].default
+      })
+    }
   },
   data: () => {
     const settings = scopes.settings
