@@ -6,6 +6,7 @@
           <img
             :src="iconUrl || 'https://cdn.modrinth.com/placeholder.svg?inline'"
             :alt="name"
+            loading="lazy"
           />
         </nuxt-link>
       </div>

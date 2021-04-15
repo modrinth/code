@@ -65,8 +65,8 @@
         </div>
         <Advertisement
           v-if="mod.status === 'approved' || mod.status === 'unlisted'"
-          ad-unit="banner"
-          size="728x90,468x60"
+          type="banner"
+          small-screen="square"
         />
         <div class="mod-navigation">
           <div class="tabs">
@@ -130,11 +130,6 @@
         </div>
         <div class="mod-content">
           <slot />
-          <Advertisement
-            v-if="mod.status === 'approved' || mod.status === 'unlisted'"
-            ad-unit="banner"
-            size="728x90,468x60"
-          />
         </div>
       </div>
       <section class="mod-info">
@@ -331,8 +326,8 @@
         </div>
         <Advertisement
           v-if="mod.status === 'approved' || mod.status === 'unlisted'"
-          ad-unit="square"
-          size="250x250,200x200"
+          type="square"
+          small-screen="destroy"
         />
         <m-footer class="footer" />
       </section>

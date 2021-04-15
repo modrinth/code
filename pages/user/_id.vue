@@ -55,11 +55,11 @@
             </div>
           </div>
         </div>
-        <Advertisement ad-unit="square" size="250x250,200x200" />
+        <Advertisement type="square" small-screen="square" />
         <m-footer class="footer" hide-small />
       </div>
       <div class="content">
-        <Advertisement ad-unit="banner" size="728x90,468x60" />
+        <Advertisement type="banner" small-screen="destroy" />
         <div class="mods">
           <SearchResult
             v-for="result in mods"

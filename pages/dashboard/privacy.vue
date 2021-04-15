@@ -120,12 +120,14 @@ export default {
   margin-top: 1rem;
 }
 .actions {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   margin-right: -0.5rem;
   display: flex;
   flex-direction: row;
   justify-content: flex-end;
+  flex-wrap: wrap;
   .btn {
+    margin-top: 0.5rem;
     margin-right: 0.5rem;
   }
 }

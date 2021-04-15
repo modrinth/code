@@ -64,7 +64,7 @@
           ></pagination>
         </section>
         <div class="results column-grow-4">
-          <Advertisement ad-unit="banner" size="728x90,468x60" />
+          <Advertisement type="banner" small-screen="square" />
           <div v-if="results === null" class="no-results">
             <p>Loading...</p>
           </div>
@@ -283,7 +283,7 @@
             @input="toggleLicense"
           />
         </div>
-        <Advertisement ad-unit="square" size="250x250,200x200" />
+        <Advertisement type="square" small-screen="destroy" />
         <m-footer class="footer" hide-small />
       </section>
     </div>

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 export default {
   name: '<%= options.componentName %>',
   data: () => ({
@@ -29,7 +30,7 @@ export default {
     isResponsive: {
       type: Boolean,
       required: false,
-      default: <%= options.responsive %>,
+      default: '<%= options.responsive %>' === 'true',
     },
     windowResizeDebounce: {
       type: Number,
@@ -44,40 +45,42 @@ export default {
   },
   computed: {
     ghostMode() {
-      return this.$config.ads.ghostMode ?? <%= options.ghostMode %>;
+      return this.$config.ads.ghostMode ?? '<%= options.ghostMode %>' === true
     },
     networkCode() {
-      const { $gptAds } = this;
-      return $gptAds ? $gptAds.networkCode : null;
+      const { $gptAds } = this
+      return $gptAds ? $gptAds.networkCode : null
     },
     adUnitPath() {
-      const { networkCode, adUnit } = this;
-      return `/${networkCode}/${adUnit}`;
+      const { networkCode, adUnit } = this
+      return `/${networkCode}/${adUnit}`
     },
     divId() {
-      const { id } = this;
-      return `div-gpt-ad-${id}-0`;
+      const { id } = this
+      return `div-gpt-ad-${id}-0`
     },
     formattedSize() {
-      return this.formatSizeList(this.size);
+      return this.formatSizeList(this.size)
     },
     style() {
       if (this.ghostMode) {
-        const { formattedSize, currentSizeMappingIndex, mapping } = this;
-        let baseSize = formattedSize;
+        const { formattedSize, currentSizeMappingIndex, mapping } = this
+        let baseSize = formattedSize
         if (currentSizeMappingIndex !== null) {
-          baseSize = mapping[currentSizeMappingIndex][1];
+          baseSize = mapping[currentSizeMappingIndex][1]
         }
-        const size = Array.isArray(baseSize[0]) ? baseSize[0] : [baseSize[0], baseSize[1]];
-        const [width, height] = size;
+        const size = Array.isArray(baseSize[0])
+          ? baseSize[0]
+          : [baseSize[0], baseSize[1]]
+        const [width, height] = size
         return {
           margin: '0 auto',
           width: `${width}px`,
           height: `${height}px`,
           border: '1px solid black',
-        };
+        }
       }
-      return null;
+      return null
     },
   },
   methods: {
@@ -91,12 +94,12 @@ export default {
      */
     formatSize(size) {
       if (Array.isArray(size)) {
-        return size;
+        return size
       }
       if (typeof size === 'string') {
-        return size.split('x').map(value => parseInt(value, 10));
+        return size.split('x').map((value) => parseInt(value, 10))
       }
-      return [];
+      return []
     },
     /**
      * Formats a given list of sizes to make it compatible with GPT API
@@ -109,26 +112,25 @@ export default {
      */
     formatSizeList(sizesList) {
       if (Array.isArray(sizesList)) {
-        return sizesList;
+        return sizesList
       }
       if (typeof sizesList === 'string') {
-        return sizesList
-          .split(',')
-          .map(size => this.formatSize(size));
+        return sizesList.split(',').map((size) => this.formatSize(size))
       }
-      return [];
+      return []
     },
     /**
      * Refresh ad slot
      */
     refreshSlot() {
-      googletag.pubads().refresh([this.adSlot]);
+      console.log('Refreshing slot.')
+      googletag.pubads().refresh([this.adSlot])
     },
-    handleSlotRenderEnded (event) {
+    handleSlotRenderEnded(event) {
       if (event.slot.getSlotId().getDomId() !== this.divId) {
-        return;
+        return
       }
-      this.isEmpty = !!event.isEmpty;
+      this.isEmpty = !!event.isEmpty
     },
     /**
      * Window resize event listener
@@ -137,17 +139,17 @@ export default {
      * the case
      */
     handleWindowResize() {
-      const { windowResizeDebounce } = this;
-      clearTimeout(this.windowResizeListenerDebounce);
+      const { windowResizeDebounce } = this
+      clearTimeout(this.windowResizeListenerDebounce)
       this.windowResizeListenerDebounce = setTimeout(() => {
-        const currentSizeMappingIndex = this.getCurrentSizeMappingIndex();
+        const currentSizeMappingIndex = this.getCurrentSizeMappingIndex()
         if (currentSizeMappingIndex !== this.currentSizeMappingIndex) {
           if (!this.ghostMode) {
-            this.refreshSlot();
+            this.refreshSlot()
           }
-          this.currentSizeMappingIndex = currentSizeMappingIndex;
+          this.currentSizeMappingIndex = currentSizeMappingIndex
         }
-      }, windowResizeDebounce);
+      }, windowResizeDebounce)
     },
     /**
      * Gets the current size mapping index
@@ -155,94 +157,96 @@ export default {
      * @return     {Number}  The current size mapping index
      */
     getCurrentSizeMappingIndex() {
-      const mapping = this.mapping || [];
-      let index = null;
+      const mapping = this.mapping || []
+      let index = null
       mapping.some((size, i) => {
-        const [browserSize] = size;
-        const [width, height] = browserSize;
-        const mediaQuery = `(min-width: ${width}px) and (min-height: ${height}px)`;
+        const [browserSize] = size
+        const [width, height] = browserSize
+        const mediaQuery = `(min-width: ${width}px) and (min-height: ${height}px)`
         if (window.matchMedia(mediaQuery).matches) {
-          index = i;
-          return true;
+          index = i
+          return true
         }
-        return false;
-      });
-      return index;
+        return false
+      })
+      return index
     },
   },
   mounted() {
     if (!window.googletag) {
-      return;
+      return
     }
     const {
-      ghostMode,
       adUnitPath,
       divId,
       sizeMapping,
       isResponsive,
       collapseEmptyDiv,
-    } = this;
-
+    } = this
 
     // Init Ad slot
     googletag.cmd.push(() => {
       const pubadsService = googletag.pubads()
-      pubadsService.addEventListener('slotRenderEnded', this.handleSlotRenderEnded);
-      pubadsService.setTargeting('path', this.$route.path);
+      pubadsService.addEventListener(
+        'slotRenderEnded',
+        this.handleSlotRenderEnded
+      )
+      pubadsService.setTargeting('path', this.$route.path)
 
       const adSlot = googletag
         .defineSlot(adUnitPath, this.formattedSize, divId)
-        .addService(pubadsService);
+        .addService(pubadsService)
 
       // Collapse empty div slot-level override
       if (collapseEmptyDiv !== null) {
-        adSlot.setCollapseEmptyDiv(collapseEmptyDiv);
+        adSlot.setCollapseEmptyDiv(collapseEmptyDiv)
       }
 
       // Build size mapping if any
       if (sizeMapping.length > 0) {
-        const mapping = googletag.sizeMapping();
+        const mapping = googletag.sizeMapping()
         sizeMapping.forEach((size) => {
-          const browserSize = this.formatSize(size[0]);
-          const adSizes = this.formatSizeList(size[1]);
-          mapping.addSize(browserSize, adSizes);
-          this.mapping.push([browserSize, adSizes]);
-        });
-        adSlot.defineSizeMapping(mapping.build());
+          const browserSize = this.formatSize(size[0])
+          const adSizes = this.formatSizeList(size[1])
+          mapping.addSize(browserSize, adSizes)
+          this.mapping.push([browserSize, adSizes])
+        })
+        adSlot.defineSizeMapping(mapping.build())
       }
 
       // Init responsive behavior
       if (this.sizeMapping.length > 0 && isResponsive) {
-        const currentSizeMappingIndex = this.getCurrentSizeMappingIndex();
-        this.currentSizeMappingIndex = currentSizeMappingIndex;
-        window.addEventListener('resize', this.handleWindowResize);
+        const currentSizeMappingIndex = this.getCurrentSizeMappingIndex()
+        this.currentSizeMappingIndex = currentSizeMappingIndex
+        window.addEventListener('resize', this.handleWindowResize)
       }
 
-      this.adSlot = adSlot;
-      this.$gptAds.slots.push(adSlot);
+      this.adSlot = adSlot
+      this.$gptAds.slots.push(adSlot)
 
       if (!this.ghostMode) {
-        googletag.display(divId);
+        googletag.display(divId)
         if (this.$gptAds.individualRefresh) {
-          this.refreshSlot();
+          this.refreshSlot()
         }
       }
-    });
+    })
   },
   beforeDestroy() {
+    console.log('Destroying ad.')
     if (!googletag) {
-      return;
+      return
     }
     // Destroy ad slot
     googletag.cmd.push(() => {
-      const destroyed = googletag.destroySlots([this.adSlot]);
-    });
+      googletag.destroySlots([this.adSlot])
+    })
     // Remove window resize listener
-    window.removeEventListener('resize', this.handleWindowResize);
+    window.removeEventListener('resize', this.handleWindowResize)
   },
   render(h) {
-    const { divId, style, isEmpty } = this;
-    let classAttr = isEmpty ? '<%= options.emptyClass %>' : '';
+    const { divId, style, isEmpty } = this
+    const classAttr = isEmpty ? '<%= options.emptyClass %>' : ''
 
     return h('div', {
       style,
@@ -251,6 +255,6 @@ export default {
         class: classAttr,
       },
       domProps: { innerHTML: '' },
-    });
+    })
   },
-};
+}
