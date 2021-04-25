@@ -13,6 +13,10 @@
           <span class="badge yellow">Beta</span>
         </section>
         <section class="menu-icon">
+          <button @click="changeTheme">
+            <MoonIcon v-if="$colorMode.value === 'light'" />
+            <SunIcon v-else />
+          </button>
           <button @click="toggleNavBar">
             <HamburgerIcon />
           </button>
@@ -89,6 +93,10 @@
             </template>
             <template v-else>
               <section class="auth-prompt">
+                <a class="desktop-header-mode-switch" @click="changeTheme">
+                  <MoonIcon v-if="$colorMode.value === 'light'" />
+                  <SunIcon v-else />
+                </a>
                 <a :href="authUrl" class="log-in-button"
                   ><GitHubIcon aria-hidden="true" />Sign In with GitHub</a
                 >
@@ -224,6 +232,7 @@ export default {
         display: flex;
         justify-content: space-between;
         padding: 1rem 0;
+        margin-left: 1rem;
         color: var(--color-text-dark);
         svg {
           height: 1.75rem;
@@ -248,6 +257,12 @@ export default {
         display: flex;
         margin-left: auto;
         align-items: center;
+        margin-right: 1rem;
+      }
+
+      .desktop-header-mode-switch {
+        margin-right: 1rem;
+        cursor: pointer;
       }
 
       section.right-group {
@@ -450,6 +465,10 @@ export default {
           display: none;
         }
 
+        section.mobile-header-mode-switch {
+          display: none;
+        }
+
         section.right-group {
           flex-direction: unset;
           overflow-y: unset;
@@ -489,6 +508,11 @@ export default {
           section.auth-prompt {
             margin: 0;
           }
+        }
+      }
+      @media only screen and (max-width: 1024px) {
+        .desktop-header-mode-switch {
+          display: none;
         }
       }
     }

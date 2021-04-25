@@ -6,6 +6,14 @@
     </span>
     <ul>
       <li>
+        <a @click="changeTheme">
+          <span v-if="$colorMode.value === 'light'">Switch to Dark Mode</span>
+          <span v-else>Switch to Light Mode</span>
+        </a>
+      </li>
+    </ul>
+    <ul>
+      <li>
         <nuxt-link to="/legal/terms">Terms</nuxt-link>
       </li>
       <li>
@@ -56,6 +64,12 @@ export default {
       default: false,
     },
   },
+  methods: {
+    changeTheme() {
+      this.$colorMode.preference =
+        this.$colorMode.value === 'dark' ? 'light' : 'dark'
+    },
+  },
 }
 </script>
 
@@ -93,6 +107,7 @@ footer {
 
 a {
   text-decoration: underline;
+  cursor: pointer;
 }
 
 .hideSmall {
