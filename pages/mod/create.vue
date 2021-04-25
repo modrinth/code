@@ -80,7 +80,7 @@
         <div class="columns row-grow-1">
           <div class="column-grow-1 rows">
             <file-input
-              accept="image/png,image/jpeg,image/gif"
+              accept="image/png,image/jpeg,image/gif,image/webp"
               class="choose-image"
               prompt="Choose image or drag it here"
               @change="showPreviewImage"
@@ -88,7 +88,7 @@
             <ul class="row-grow-1">
               <li>Must be a square</li>
               <li>Minimum size is 100x100</li>
-              <li>Acceptable formats are PNG, JPEG and GIF</li>
+              <li>Acceptable formats are PNG, JPEG, GIF and WEBP</li>
             </ul>
             <button
               class="transparent-button"
