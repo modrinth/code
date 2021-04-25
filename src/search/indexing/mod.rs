@@ -77,6 +77,7 @@ pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
     client.delete_index("relevance_mods").await?;
     client.delete_index("downloads_mods").await?;
     client.delete_index("follows_mods").await?;
+    client.delete_index("alphabetically_mods").await?;
     client.delete_index("updated_mods").await?;
     client.delete_index("newest_mods").await?;
     Ok(())
@@ -108,6 +109,14 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
         follows_rules.into()
     })
     .await?;
+
+    // Alphabetically Index
+    update_index(&client, "alphabetically_mods", {
+        let mut alphabetically_rules = default_rules();
+        alphabetically_rules.push_front("desc(title)".to_string());
+        alphabetically_rules.into()
+    })
+        .await?;
 
     // Updated Index
     update_index(&client, "updated_mods", {
@@ -216,6 +225,15 @@ pub async fn add_mods(
     })
     .await?;
     add_to_index(follows_index, &mods).await?;
+
+    // Alphabetically Index
+    let alphabetically_index = create_index(&client, "alphabetically_mods", || {
+        let mut alphabetically_rules = default_rules();
+        alphabetically_rules.push_front("desc(title)".to_string());
+        alphabetically_rules.into()
+    })
+        .await?;
+    add_to_index(alphabetically_index, &mods).await?;
 
     // Updated Index
     let updated_index = create_index(&client, "updated_mods", || {

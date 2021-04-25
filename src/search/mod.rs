@@ -163,6 +163,7 @@ pub async fn search_for_mod(
         "relevance" => "relevance_mods",
         "downloads" => "downloads_mods",
         "follows" => "follows_mods",
+        "alphabetically" => "alphabetically_mods",
         "updated" => "updated_mods",
         "newest" => "newest_mods",
         i => return Err(SearchError::InvalidIndex(i.to_string())),
