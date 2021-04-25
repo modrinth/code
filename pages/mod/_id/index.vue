@@ -1,6 +1,7 @@
 <template>
   <ModPage
     :mod="mod"
+    :versions="versions"
     :featured-versions="featuredVersions"
     :members="members"
     :current-member="currentMember"
@@ -35,9 +36,10 @@ export default {
         mod.body = (await axios.get(mod.body_url)).data
       }
 
-      const [members, featuredVersions, userFollows] = (
+      const [members, versions, featuredVersions, userFollows] = (
         await Promise.all([
           axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
+          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
           axios.get(
             `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
@@ -71,6 +73,7 @@ export default {
 
       return {
         mod,
+        versions,
         featuredVersions,
         members,
         currentMember,
