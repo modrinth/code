@@ -83,6 +83,9 @@ export default {
       this.mods.splice(index, 1)
     },
   },
+  head: {
+    title: 'Followed mods - Modrinth',
+  },
 }
 </script>
 

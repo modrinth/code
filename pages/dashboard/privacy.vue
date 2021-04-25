@@ -104,6 +104,9 @@ export default {
       })
     },
   },
+  head: {
+    title: 'Privacy Settings - Modrinth',
+  },
 }
 </script>
 

@@ -13,7 +13,7 @@
           </nuxt-link>
           <nuxt-link :to="'/dashboard/follows'" class="tab last">
             <FollowIcon />
-            Followed Mods
+            Followed mods
           </nuxt-link>
           <nuxt-link
             v-if="

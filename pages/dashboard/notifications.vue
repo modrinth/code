@@ -106,6 +106,9 @@ export default {
       this.$nuxt.$loading.finish()
     },
   },
+  head: {
+    title: 'Notifications - Modrinth',
+  },
 }
 </script>
 

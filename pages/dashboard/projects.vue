@@ -70,6 +70,9 @@ export default {
       mods: res.data,
     }
   },
+  head: {
+    title: 'My mods - Modrinth',
+  },
 }
 </script>
 

@@ -210,6 +210,9 @@ export default {
       this.$refs.delete_popup.show()
     },
   },
+  head: {
+    title: 'Settings - Modrinth',
+  },
 }
 </script>
 
