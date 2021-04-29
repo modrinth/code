@@ -1,6 +1,7 @@
 <template>
   <ModPage
     :mod="mod"
+    :versions="versions"
     :members="members.filter((it) => it.accepted)"
     :current-member="currentMember"
     :featured-versions="featuredVersions"
@@ -263,12 +264,13 @@ export default {
         )
       ).data
 
-      const [members, featuredVersions, userFollows] = (
+      const [members, versions, featuredVersions, userFollows] = (
         await Promise.all([
           axios.get(
             `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
             data.$auth.headers
           ),
+          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
           axios.get(
             `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
           ),
@@ -304,6 +306,7 @@ export default {
 
       return {
         mod,
+        versions,
         featuredVersions,
         members,
         currentMember,
