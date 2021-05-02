@@ -131,11 +131,13 @@ import axios from 'axios'
 
 import Multiselect from 'vue-multiselect'
 import ModPage from '~/components/layout/ModPage'
+import FileInput from '~/components/ui/FileInput'
 
 export default {
   components: {
     ModPage,
     Multiselect,
+    FileInput,
   },
   async asyncData(data) {
     try {

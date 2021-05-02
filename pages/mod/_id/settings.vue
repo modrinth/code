@@ -251,10 +251,12 @@
 import axios from 'axios'
 import ModPage from '~/components/layout/ModPage'
 
+import ConfirmPopup from '~/components/ui/ConfirmPopup'
+
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 
 export default {
-  components: { ModPage, DropdownIcon },
+  components: { ModPage, DropdownIcon, ConfirmPopup },
   async asyncData(data) {
     try {
       const mod = (

@@ -178,12 +178,9 @@ export default {
       networkCode: process.env.GAM_ID,
     },
     analytics: {
-      // enabled: process.env.ENABLE_ANALYTICS,
-      // script_url: process.env.ANALYTICS_URL,
-      // token: process.env.ANALYTICS_ID,
-      enabled: true,
-      script_url: 'https://static.cloudflareinsights.com/beacon.min.js',
-      token: '1e85158b8a414e7b9e2378e249908e5f',
+      enabled: process.env.ENABLE_ANALYTICS,
+      script_url: process.env.ANALYTICS_URL,
+      token: process.env.ANALYTICS_ID,
     },
   },
 }

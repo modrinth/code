@@ -148,6 +148,7 @@
 import axios from 'axios'
 
 import ModPage from '~/components/layout/ModPage'
+import ConfirmPopup from '~/components/ui/ConfirmPopup'
 
 import Categories from '~/components/ui/search/Categories'
 import FileInput from '~/components/ui/FileInput'
@@ -169,6 +170,7 @@ export default {
     TrashIcon,
     EditIcon,
     ReportIcon,
+    ConfirmPopup,
   },
   auth: false,
   async asyncData(data) {
