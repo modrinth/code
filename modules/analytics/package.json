@@ -1,7 +1,7 @@
 {
   "name": "@modrinth/analytics",
   "version": "0.1.0",
-  "description": "Unami integration for Nuxtjs",
+  "description": "Cloudflare analytics integration for Nuxtjs",
   "license": "MIT",
   "contributors": [
     {

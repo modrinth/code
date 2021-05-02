@@ -1,4 +1,4 @@
-import { DEFAULT_OPTIONS, UNAMI_LIB_TAG_ID } from './constants'
+import { DEFAULT_OPTIONS, CF_LIB_TAG_ID } from './constants'
 
 const { resolve } = require('path')
 
@@ -12,7 +12,7 @@ module.exports = async function module(moduleOptions) {
 
   const templatesOptions = {
     ...options,
-    UNAMI_LIB_TAG_ID,
+    CF_LIB_TAG_ID,
   }
 
   this.addPlugin({

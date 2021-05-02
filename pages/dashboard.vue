@@ -62,6 +62,8 @@ import FollowIcon from '~/assets/images/utils/heart.svg?inline'
 import UserIcon from '~/assets/images/utils/user.svg?inline'
 import ShieldIcon from '~/assets/images/utils/shield.svg?inline'
 
+import MFooter from '~/components/layout/MFooter'
+
 export default {
   name: 'DashboardPage',
   components: {
@@ -72,6 +74,7 @@ export default {
     FollowIcon,
     UserIcon,
     ShieldIcon,
+    MFooter,
   },
   computed: {
     authUrl() {

@@ -3,7 +3,7 @@ export default async function (ctx, inject) {
   const config = (ctx.$config && ctx.$config.analytics) || {}
 
   const url = config.script_url ?? '<%= options.script_url %>'
-  const tag = config.tracking_code ?? '<%= options.tracking_code %>'
+  const tag = config.token ?? '<%= options.token %>'
   // eslint-disable-next-line
   const enabled = config.enabled ?? ('<%= options.enabled  || false %>' === 'true');
   // Check if the parameters are not changed by runtime config:
@@ -27,8 +27,10 @@ export default async function (ctx, inject) {
   const analyticsScript = {
     hid: UNAMI_LIB_TAG_ID,
     src: url,
-    'data-website-id': tag,
-    async: true,
+    'data-cf-beacon': JSON.stringify({
+      token: tag,
+      spa: true,
+    }),
     defer: true,
   }
   injectScript(analyticsScript)

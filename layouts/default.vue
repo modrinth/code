@@ -138,6 +138,8 @@ import UserIcon from '~/assets/images/utils/user.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
+import CookieConsent from '~/components/ads/CookieConsent'
+
 export default {
   components: {
     ModrinthLogo,
@@ -150,6 +152,7 @@ export default {
     GitHubIcon,
     NotificationIcon,
     HamburgerIcon,
+    CookieConsent,
   },
   directives: {
     ClickOutside,
