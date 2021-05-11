@@ -1,302 +1,298 @@
 <template>
-  <div class="page-container">
-    <div class="page-contents">
-      <header class="columns">
-        <h3 class="column-grow-1">Edit Mod</h3>
-        <nuxt-link
-          :to="'/mod/' + (mod.slug ? mod.slug : mod.id)"
-          class="button column"
-        >
-          Back
-        </nuxt-link>
-        <button
-          v-if="mod.status === 'rejected' || mod.status === 'draft'"
-          title="Submit for Review"
-          class="button column"
-          :disabled="!this.$nuxt.$loading"
-          @click="saveModReview"
-        >
-          Submit for Review
-        </button>
-        <button
-          title="Save"
-          class="brand-button column"
-          :disabled="!this.$nuxt.$loading"
-          @click="saveMod"
-        >
-          Save
-        </button>
-      </header>
-      <section class="essentials">
-        <h3>Name</h3>
-        <label>
-          <span>
-            Be creative. TechCraft v7 won't be searchable and won't be clicked
-            on
-          </span>
-          <input v-model="mod.title" type="text" placeholder="Enter the name" />
-        </label>
-        <h3>Summary</h3>
-        <label>
-          <span>
-            Give a quick description to your mod. It will appear in the search
-          </span>
-          <input
-            v-model="mod.description"
-            type="text"
-            placeholder="Enter the summary"
-          />
-        </label>
-        <h3>Categories</h3>
-        <label>
-          <span>
-            Select up to 3 categories. They will help to find your mod
-          </span>
-          <multiselect
-            id="categories"
-            v-model="mod.categories"
-            :options="availableCategories"
-            :loading="availableCategories.length === 0"
-            :multiple="true"
-            :searchable="false"
-            :show-no-results="false"
-            :close-on-select="false"
-            :clear-on-select="false"
-            :show-labels="false"
-            :max="3"
-            :limit="6"
-            :hide-selected="true"
-            placeholder="Choose categories"
-          />
-        </label>
-        <h3>Vanity URL (slug)</h3>
-        <label>
-          <span>
-            Set this to something pretty, so URLs to your mod are more readable
-          </span>
-          <input
-            id="name"
-            v-model="mod.slug"
-            type="text"
-            placeholder="Enter the vanity URL's last bit"
-          />
-        </label>
-      </section>
-      <section class="mod-icon rows">
-        <h3>Icon</h3>
-        <div class="columns row-grow-1">
-          <div class="column-grow-1 rows">
-            <file-input
-              accept="image/png,image/jpeg,image/gif,image/webp"
-              class="choose-image"
-              prompt="Choose image or drag it here"
-              @change="showPreviewImage"
-            />
-            <ul class="row-grow-1">
-              <li>Must be a square</li>
-              <li>Minimum size is 100x100</li>
-              <li>Acceptable formats are PNG, JPEG, GIF and WEBP</li>
-            </ul>
-            <button
-              class="transparent-button"
-              @click="
-                icon = null
-                previewImage = null
-                iconChanged = true
-              "
-            >
-              Reset icon
-            </button>
-          </div>
-          <img
-            :src="
-              previewImage
-                ? previewImage
-                : mod.icon_url && !iconChanged
-                ? mod.icon_url
-                : 'https://cdn.modrinth.com/placeholder.svg'
-            "
-            alt="preview-image"
-          />
-        </div>
-      </section>
-      <section class="game-sides">
-        <h3>Supported environments</h3>
-        <div class="columns">
-          <span>
-            Let others know if your mod is for clients, servers or universal.
-            For example, IC2 will be required + required, while OptiFine will be
-            required + no functionality
-          </span>
-          <div class="labeled-control">
-            <h3>Client</h3>
-            <Multiselect
-              v-model="clientSideType"
-              placeholder="Select one"
-              :options="sideTypes"
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-              :allow-empty="false"
-            />
-          </div>
-          <div class="labeled-control">
-            <h3>Server</h3>
-            <Multiselect
-              v-model="serverSideType"
-              placeholder="Select one"
-              :options="sideTypes"
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-              :allow-empty="false"
-            />
-          </div>
-        </div>
-      </section>
-      <section class="description">
-        <h3>
-          <label
-            for="body"
-            title="You can type the of the long form of your description here."
-          >
-            Description
-          </label>
-        </h3>
+  <div class="page-contents">
+    <header class="columns">
+      <h3 class="column-grow-1">Edit Mod</h3>
+      <nuxt-link
+        :to="'/mod/' + (mod.slug ? mod.slug : mod.id)"
+        class="button column"
+      >
+        Back
+      </nuxt-link>
+      <button
+        v-if="mod.status === 'rejected' || mod.status === 'draft'"
+        title="Submit for Review"
+        class="button column"
+        :disabled="!this.$nuxt.$loading"
+        @click="saveModReview"
+      >
+        Submit for Review
+      </button>
+      <button
+        title="Save"
+        class="brand-button column"
+        :disabled="!this.$nuxt.$loading"
+        @click="saveMod"
+      >
+        Save
+      </button>
+    </header>
+    <section class="essentials">
+      <h3>Name</h3>
+      <label>
         <span>
-          You can type the of the long form of your description here. This
-          editor supports markdown. You can find the syntax
-          <a
-            href="https://guides.github.com/features/mastering-markdown/"
-            target="_blank"
-            rel="noopener noreferrer"
-            >here</a
-          >.
+          Be creative. TechCraft v7 won't be searchable and won't be clicked on
         </span>
-        <div class="columns">
-          <div class="textarea-wrapper">
-            <textarea id="body" v-model="mod.body"></textarea>
-          </div>
-          <div v-compiled-markdown="mod.body" class="markdown-body"></div>
-        </div>
-      </section>
-      <section class="extra-links">
-        <div class="title">
-          <h3>External links</h3>
-        </div>
-        <label
-          title="A place for users to report bugs, issues, and concerns about your mod."
-        >
-          <span>Issue tracker</span>
-          <input
-            v-model="mod.issues_url"
-            type="url"
-            placeholder="Enter a valid URL"
+        <input v-model="mod.title" type="text" placeholder="Enter the name" />
+      </label>
+      <h3>Summary</h3>
+      <label>
+        <span>
+          Give a quick description to your mod. It will appear in the search
+        </span>
+        <input
+          v-model="mod.description"
+          type="text"
+          placeholder="Enter the summary"
+        />
+      </label>
+      <h3>Categories</h3>
+      <label>
+        <span>
+          Select up to 3 categories. They will help to find your mod
+        </span>
+        <multiselect
+          id="categories"
+          v-model="mod.categories"
+          :options="availableCategories"
+          :loading="availableCategories.length === 0"
+          :multiple="true"
+          :searchable="false"
+          :show-no-results="false"
+          :close-on-select="false"
+          :clear-on-select="false"
+          :show-labels="false"
+          :max="3"
+          :limit="6"
+          :hide-selected="true"
+          placeholder="Choose categories"
+        />
+      </label>
+      <h3>Vanity URL (slug)</h3>
+      <label>
+        <span>
+          Set this to something pretty, so URLs to your mod are more readable
+        </span>
+        <input
+          id="name"
+          v-model="mod.slug"
+          type="text"
+          placeholder="Enter the vanity URL's last bit"
+        />
+      </label>
+    </section>
+    <section class="mod-icon rows">
+      <h3>Icon</h3>
+      <div class="columns row-grow-1">
+        <div class="column-grow-1 rows">
+          <file-input
+            accept="image/png,image/jpeg,image/gif,image/webp"
+            class="choose-image"
+            prompt="Choose image or drag it here"
+            @change="showPreviewImage"
           />
-        </label>
-        <label title="A page/repository containing the source code">
-          <span>Source code</span>
-          <input
-            v-model="mod.source_url"
-            type="url"
-            placeholder="Enter a valid URL"
-          />
-        </label>
-        <label
-          title="A page containing information, documentation, and help for the mod."
-        >
-          <span>Wiki page</span>
-          <input
-            v-model="mod.wiki_url"
-            type="url"
-            placeholder="Enter a valid URL"
-          />
-        </label>
-        <label title="An inivitation link to your Discord server.">
-          <span>Discord invite</span>
-          <input
-            v-model="mod.discord_url"
-            type="url"
-            placeholder="Enter a valid URL"
-          />
-        </label>
-      </section>
-      <section class="license">
-        <div class="title">
-          <h3>License</h3>
-        </div>
-        <label>
-          <span>
-            It is really important to choose a proper license for your mod. You
-            may choose one from our list or provide a URL to your own license.
-            URL field will be filled automatically for provided licenses
-          </span>
-          <div class="input-group">
-            <Multiselect
-              v-model="license"
-              placeholder="Select one"
-              track-by="short"
-              label="name"
-              :options="availableLicenses"
-              :searchable="true"
-              :close-on-select="true"
-              :show-labels="false"
-            />
-            <input v-model="license_url" type="url" placeholder="License URL" />
-          </div>
-        </label>
-      </section>
-      <section class="donations">
-        <div class="title">
-          <h3>Donation links</h3>
+          <ul class="row-grow-1">
+            <li>Must be a square</li>
+            <li>Minimum size is 100x100</li>
+            <li>Acceptable formats are PNG, JPEG, GIF and WEBP</li>
+          </ul>
           <button
-            title="Add a link"
-            class="button"
-            :disabled="false"
+            class="transparent-button"
             @click="
-              donationPlatforms.push({})
-              donationLinks.push('')
+              icon = null
+              previewImage = null
+              iconChanged = true
             "
           >
-            Add a link
+            Reset icon
           </button>
         </div>
-        <div v-for="(item, index) in donationPlatforms" :key="index">
-          <label title="The donation link.">
-            <span>Donation Link</span>
-            <input
-              v-model="donationLinks[index]"
-              type="url"
-              placeholder="Enter a valid URL"
-            />
-          </label>
-          <label title="The donation platform of the link.">
-            <span>Donation Platform</span>
-            <Multiselect
-              v-model="donationPlatforms[index]"
-              placeholder="Select one"
-              track-by="short"
-              label="name"
-              :options="availableDonationPlatforms"
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-            />
-          </label>
-          <button
-            class="button"
-            @click="
-              donationPlatforms.splice(index, 1)
-              donationLinks.splice(index, 1)
-            "
-          >
-            Remove Link
-          </button>
-          <hr />
+        <img
+          :src="
+            previewImage
+              ? previewImage
+              : mod.icon_url && !iconChanged
+              ? mod.icon_url
+              : 'https://cdn.modrinth.com/placeholder.svg'
+          "
+          alt="preview-image"
+        />
+      </div>
+    </section>
+    <section class="game-sides">
+      <h3>Supported environments</h3>
+      <div class="columns">
+        <span>
+          Let others know if your mod is for clients, servers or universal. For
+          example, IC2 will be required + required, while OptiFine will be
+          required + no functionality
+        </span>
+        <div class="labeled-control">
+          <h3>Client</h3>
+          <Multiselect
+            v-model="clientSideType"
+            placeholder="Select one"
+            :options="sideTypes"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="false"
+          />
         </div>
-      </section>
-      <m-footer class="footer" centered />
-    </div>
+        <div class="labeled-control">
+          <h3>Server</h3>
+          <Multiselect
+            v-model="serverSideType"
+            placeholder="Select one"
+            :options="sideTypes"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="false"
+          />
+        </div>
+      </div>
+    </section>
+    <section class="description">
+      <h3>
+        <label
+          for="body"
+          title="You can type the of the long form of your description here."
+        >
+          Description
+        </label>
+      </h3>
+      <span>
+        You can type the of the long form of your description here. This editor
+        supports markdown. You can find the syntax
+        <a
+          href="https://guides.github.com/features/mastering-markdown/"
+          target="_blank"
+          rel="noopener noreferrer"
+          >here</a
+        >.
+      </span>
+      <div class="columns">
+        <div class="textarea-wrapper">
+          <textarea id="body" v-model="mod.body"></textarea>
+        </div>
+        <div v-compiled-markdown="mod.body" class="markdown-body"></div>
+      </div>
+    </section>
+    <section class="extra-links">
+      <div class="title">
+        <h3>External links</h3>
+      </div>
+      <label
+        title="A place for users to report bugs, issues, and concerns about your mod."
+      >
+        <span>Issue tracker</span>
+        <input
+          v-model="mod.issues_url"
+          type="url"
+          placeholder="Enter a valid URL"
+        />
+      </label>
+      <label title="A page/repository containing the source code">
+        <span>Source code</span>
+        <input
+          v-model="mod.source_url"
+          type="url"
+          placeholder="Enter a valid URL"
+        />
+      </label>
+      <label
+        title="A page containing information, documentation, and help for the mod."
+      >
+        <span>Wiki page</span>
+        <input
+          v-model="mod.wiki_url"
+          type="url"
+          placeholder="Enter a valid URL"
+        />
+      </label>
+      <label title="An inivitation link to your Discord server.">
+        <span>Discord invite</span>
+        <input
+          v-model="mod.discord_url"
+          type="url"
+          placeholder="Enter a valid URL"
+        />
+      </label>
+    </section>
+    <section class="license">
+      <div class="title">
+        <h3>License</h3>
+      </div>
+      <label>
+        <span>
+          It is really important to choose a proper license for your mod. You
+          may choose one from our list or provide a URL to your own license. URL
+          field will be filled automatically for provided licenses
+        </span>
+        <div class="input-group">
+          <Multiselect
+            v-model="license"
+            placeholder="Select one"
+            track-by="short"
+            label="name"
+            :options="availableLicenses"
+            :searchable="true"
+            :close-on-select="true"
+            :show-labels="false"
+          />
+          <input v-model="license_url" type="url" placeholder="License URL" />
+        </div>
+      </label>
+    </section>
+    <section class="donations">
+      <div class="title">
+        <h3>Donation links</h3>
+        <button
+          title="Add a link"
+          class="button"
+          :disabled="false"
+          @click="
+            donationPlatforms.push({})
+            donationLinks.push('')
+          "
+        >
+          Add a link
+        </button>
+      </div>
+      <div v-for="(item, index) in donationPlatforms" :key="index">
+        <label title="The donation link.">
+          <span>Donation Link</span>
+          <input
+            v-model="donationLinks[index]"
+            type="url"
+            placeholder="Enter a valid URL"
+          />
+        </label>
+        <label title="The donation platform of the link.">
+          <span>Donation Platform</span>
+          <Multiselect
+            v-model="donationPlatforms[index]"
+            placeholder="Select one"
+            track-by="short"
+            label="name"
+            :options="availableDonationPlatforms"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+          />
+        </label>
+        <button
+          class="button"
+          @click="
+            donationPlatforms.splice(index, 1)
+            donationLinks.splice(index, 1)
+          "
+        >
+          Remove Link
+        </button>
+        <hr />
+      </div>
+    </section>
   </div>
 </template>
 
@@ -305,11 +301,9 @@ import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
 import FileInput from '~/components/ui/FileInput'
-import MFooter from '~/components/layout/MFooter'
 
 export default {
   components: {
-    MFooter,
     FileInput,
     Multiselect,
   },
@@ -411,6 +405,9 @@ export default {
       }
     },
   },
+  created() {
+    this.$emit('update:link-bar', [['Edit', 'edit']])
+  },
   methods: {
     async saveModReview() {
       this.isProcessing = true
@@ -464,7 +461,9 @@ export default {
           )
         }
 
-        await this.$router.replace(`/mod/${this.mod.id}`)
+        await this.$router.replace(
+          `/mod/${this.mod.slug ? this.mod.slug : this.mod.id}`
+        )
       } catch (err) {
         this.$notify({
           group: 'main',
@@ -545,12 +544,14 @@ label {
   grid-template:
     'header       header      header' auto
     'advert       advert      advert' auto
-    'essentials   essentials  mod-icon' auto
+    'essentials   essentials  essentials' auto
+    'mod-icon     mod-icon    mod-icon' auto
     'game-sides   game-sides  game-sides' auto
     'description  description description' auto
     'versions     versions    versions' auto
-    'extra-links  license     license' auto
-    'donations    donations   .' auto
+    'extra-links  extra-links extra-links' auto
+    'license      license     license' auto
+    'donations    donations   donations' auto
     'footer       footer      footer' auto
     / 4fr 1fr 4fr;
   column-gap: var(--spacing-card-md);

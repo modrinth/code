@@ -1,13 +1,5 @@
 <template>
-  <ModPage
-    :mod="mod"
-    :versions="versions"
-    :featured-versions="featuredVersions"
-    :members="members"
-    :current-member="currentMember"
-    :link-bar="[['New Version', 'newversion']]"
-    :user-follows="userFollows"
-  >
+  <div>
     <div class="new-version">
       <div class="controls">
         <button
@@ -124,88 +116,44 @@
         </div>
       </div>
     </div>
-  </ModPage>
+  </div>
 </template>
 <script>
 import axios from 'axios'
 
 import Multiselect from 'vue-multiselect'
-import ModPage from '~/components/layout/ModPage'
 import FileInput from '~/components/ui/FileInput'
 
 export default {
   components: {
-    ModPage,
     Multiselect,
     FileInput,
   },
+  props: {
+    mod: {
+      type: Object,
+      default() {
+        return {}
+      },
+    },
+  },
   async asyncData(data) {
     try {
-      const mod = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          data.$auth.headers
-        )
-      ).data
-
-      const [
-        members,
-        versions,
-        featuredVersions,
-        selectableLoaders,
-        selectableVersions,
-        userFollows,
-      ] = (
+      const [selectableLoaders, selectableVersions] = (
         await Promise.all([
-          axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
-          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
-          axios.get(
-            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
-          ),
           axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
           axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
-          axios.get(
-            data.$auth.user
-              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
-              : `https://api.modrinth.com`,
-            data.$auth.headers
-          ),
         ])
       ).map((it) => it.data)
 
-      const users = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
-            members.map((it) => it.user_id)
-          )}`,
-          data.$auth.headers
-        )
-      ).data
-
-      users.forEach((it) => {
-        const index = members.findIndex((x) => x.user_id === it.id)
-        members[index].avatar_url = it.avatar_url
-        members[index].name = it.username
-      })
-
-      const currentMember = data.$auth.user
-        ? members.find((x) => x.user_id === data.$auth.user.id)
-        : null
-
       return {
-        mod,
-        versions,
-        featuredVersions,
-        members,
         selectableLoaders,
         selectableVersions,
-        currentMember,
-        userFollows: userFollows.name ? null : userFollows,
       }
     } catch {
       data.error({
         statusCode: 404,
-        message: 'Mod not found',
+        message: 'Unable to fetch versions and loaders',
       })
     }
   },
@@ -213,6 +161,9 @@ export default {
     return {
       createdVersion: {},
     }
+  },
+  created() {
+    this.$emit('update:link-bar', [['New Version', 'newversion']])
   },
   methods: {
     async createVersion() {
@@ -247,7 +198,11 @@ export default {
             },
           })
         ).data
-        await this.$router.push(`/mod/${data.mod_id}/version/${data.id}`)
+        await this.$router.push(
+          `/mod/${this.mod.slug ? this.mod.slug : data.mod_id}/version/${
+            data.id
+          }`
+        )
       } catch (err) {
         this.$notify({
           group: 'main',

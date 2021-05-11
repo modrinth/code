@@ -1,16 +1,5 @@
 <template>
-  <ModPage
-    :mod="mod"
-    :versions="versions"
-    :members="members"
-    :current-member="currentMember"
-    :featured-versions="featuredVersions"
-    :link-bar="[
-      ['Versions', 'versions'],
-      [version.name, 'versions/' + version.id],
-    ]"
-    :user-follows="userFollows"
-  >
+  <div>
     <ConfirmPopup
       ref="delete_file_popup"
       title="Are you sure you want to delete this file?"
@@ -73,7 +62,7 @@
             :href="primaryFile.url"
             class="action iconified-button"
             @click.prevent="
-              downloadFile(primaryFile.hashes.sha1, primaryFile.url)
+              $parent.downloadFile(primaryFile.hashes.sha1, primaryFile.url)
             "
           >
             <DownloadIcon />
@@ -110,7 +99,9 @@
           <div class="info">
             <h4>Available For</h4>
             <p class="value">
-              {{ version.game_versions.join(', ') }}
+              {{
+                version.game_versions ? version.game_versions.join(', ') : ''
+              }}
             </p>
           </div>
         </div>
@@ -142,12 +133,11 @@
       </div>
       <FileInput v-if="currentMember" class="file-input" @change="addFiles" />
     </div>
-  </ModPage>
+  </div>
 </template>
 <script>
 import axios from 'axios'
 
-import ModPage from '~/components/layout/ModPage'
 import ConfirmPopup from '~/components/ui/ConfirmPopup'
 
 import Categories from '~/components/ui/search/Categories'
@@ -163,7 +153,6 @@ export default {
   components: {
     FileInput,
     Categories,
-    ModPage,
     DownloadIcon,
     CalendarIcon,
     TagIcon,
@@ -173,98 +162,66 @@ export default {
     ConfirmPopup,
   },
   auth: false,
-  async asyncData(data) {
-    try {
-      const mod = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          data.$auth.headers
-        )
-      ).data
+  props: {
+    mod: {
+      type: Object,
+      default() {
+        return {}
+      },
+    },
+    versions: {
+      type: Array,
+      default() {
+        return []
+      },
+    },
+    members: {
+      type: Array,
+      default() {
+        return [{}]
+      },
+    },
+    currentMember: {
+      type: Object,
+      default() {
+        return null
+      },
+    },
+  },
+  async fetch() {
+    this.version = this.versions.find(
+      (x) => x.id === this.$route.params.version
+    )
 
-      const [members, versions, featuredVersions, userFollows] = (
-        await Promise.all([
-          axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
-          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
-          axios.get(
-            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
-          ),
-          axios.get(
-            data.$auth.user
-              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
-              : `https://api.modrinth.com`,
-            data.$auth.headers
-          ),
-        ])
-      ).map((it) => it.data)
+    this.primaryFile = this.version.files.find((file) => file.primary)
 
-      const users = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
-            members.map((it) => it.user_id)
-          )}`,
-          data.$auth.headers
-        )
-      ).data
-
-      users.forEach((it) => {
-        const index = members.findIndex((x) => x.user_id === it.id)
-        members[index].avatar_url = it.avatar_url
-        members[index].name = it.username
-      })
-
-      const version = versions.find((x) => x.id === data.params.version)
-
-      version.author = members.find((x) => x.user_id === version.author_id)
-
-      let primaryFile = version.files.find((file) => file.primary)
-
-      if (!primaryFile) {
-        primaryFile = version.files[0]
-      }
-
-      const currentMember = data.$auth.user
-        ? members.find((x) => x.user_id === data.$auth.user.id)
-        : null
-
-      if (!version.changelog && version.changelog_url) {
-        version.changelog = (await axios.get(version.changelog_url)).data
-      }
-
-      return {
-        mod,
-        versions,
-        featuredVersions,
-        members,
-        version,
-        primaryFile,
-        currentMember,
-        userFollows: userFollows.name ? null : userFollows,
-      }
-    } catch {
-      data.error({
-        statusCode: 404,
-        message: 'Version not found',
-      })
+    if (!this.primaryFile) {
+      this.primaryFile = this.version.files[0]
     }
+
+    if (!this.version.changelog && this.version.changelog_url) {
+      this.version.changelog = (
+        await axios.get(this.version.changelog_url)
+      ).data
+    }
+
+    console.log(this.version)
   },
   data() {
     return {
+      primaryFile: {},
+      version: {},
       filesToUpload: [],
       popup_data: null,
     }
   },
+  mounted() {
+    this.$emit('update:link-bar', [
+      ['Versions', 'versions'],
+      [this.version.name, 'versions/' + this.version.id],
+    ])
+  },
   methods: {
-    async downloadFile(hash, url) {
-      await axios.get(
-        `https://api.modrinth.com/api/v1/version_file/${hash}/download`
-      )
-
-      const elem = document.createElement('a')
-      elem.download = hash
-      elem.href = url
-      elem.click()
-    },
     deleteFilePopup(hash) {
       this.popup_data = hash
       this.$refs.delete_file_popup.show()
@@ -353,49 +310,6 @@ export default {
       await this.$router.replace(`/mod/${this.mod.id}`)
       this.$nuxt.$loading.finish()
     },
-  },
-  head() {
-    return {
-      title: this.mod.title + ' - Modrinth - Files',
-      meta: [
-        {
-          hid: 'description',
-          name: 'description',
-          content:
-            this.mod.description +
-            ' View other minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform that is compatible with CurseForge too!',
-        },
-
-        {
-          hid: 'apple-mobile-web-app-title',
-          name: 'apple-mobile-web-app-title',
-          content: this.mod.title,
-        },
-        {
-          hid: 'og:title',
-          name: 'og:title',
-          content: this.mod.title,
-        },
-        {
-          hid: 'og:url',
-          name: 'og:url',
-          content: `https://modrinth.com/mod/${this.mod.id}`,
-        },
-        {
-          hid: 'og:description',
-          name: 'og:description',
-          content: this.mod.description,
-        },
-        { hid: 'og:type', name: 'og:type', content: 'website' },
-        {
-          hid: 'og:image',
-          name: 'og:image',
-          content: this.mod.icon_url
-            ? this.mod.icon_url
-            : 'https://cdn.modrinth.com/placeholder.png',
-        },
-      ],
-    }
   },
 }
 </script>

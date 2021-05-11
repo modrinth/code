@@ -1,13 +1,5 @@
 <template>
-  <ModPage
-    :mod="mod"
-    :versions="versions"
-    :members="members.filter((it) => it.accepted)"
-    :current-member="currentMember"
-    :featured-versions="featuredVersions"
-    :link-bar="[['Settings', 'settings']]"
-    :user-follows="userFollows"
-  >
+  <div>
     <ConfirmPopup
       ref="delete_popup"
       title="Are you sure you want to delete this mod?"
@@ -244,82 +236,37 @@
         </div>
       </div>
     </div>
-  </ModPage>
+  </div>
 </template>
 
 <script>
 import axios from 'axios'
-import ModPage from '~/components/layout/ModPage'
 
 import ConfirmPopup from '~/components/ui/ConfirmPopup'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 
 export default {
-  components: { ModPage, DropdownIcon, ConfirmPopup },
-  async asyncData(data) {
-    try {
-      const mod = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          data.$auth.headers
-        )
-      ).data
-
-      const [members, versions, featuredVersions, userFollows] = (
-        await Promise.all([
-          axios.get(
-            `https://api.modrinth.com/api/v1/team/${mod.team}/members`,
-            data.$auth.headers
-          ),
-          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
-          axios.get(
-            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
-          ),
-          axios.get(
-            data.$auth.user
-              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
-              : `https://api.modrinth.com`,
-            data.$auth.headers
-          ),
-        ])
-      ).map((it) => it.data)
-
-      const [users] = (
-        await Promise.all([
-          axios.get(
-            `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
-              members.map((it) => it.user_id)
-            )}`,
-            data.$auth.headers
-          ),
-        ])
-      ).map((it) => it.data)
-
-      users.forEach((it) => {
-        const index = members.findIndex((x) => x.user_id === it.id)
-        members[index].avatar_url = it.avatar_url
-        members[index].name = it.username
-      })
-
-      const currentMember = data.$auth.user
-        ? members.find((x) => x.user_id === data.$auth.user.id)
-        : null
-
-      return {
-        mod,
-        versions,
-        featuredVersions,
-        members,
-        currentMember,
-        userFollows: userFollows.name ? null : userFollows,
-      }
-    } catch {
-      data.error({
-        statusCode: 404,
-        message: 'Mod not found',
-      })
-    }
+  components: { DropdownIcon, ConfirmPopup },
+  props: {
+    mod: {
+      type: Object,
+      default() {
+        return {}
+      },
+    },
+    members: {
+      type: Array,
+      default() {
+        return []
+      },
+    },
+    currentMember: {
+      type: Object,
+      default() {
+        return null
+      },
+    },
   },
   data() {
     return {
@@ -328,6 +275,8 @@ export default {
     }
   },
   created() {
+    this.$emit('update:link-bar', [['Settings', 'settings']])
+
     this.UPLOAD_VERSION = 1 << 0
     this.DELETE_VERSION = 1 << 1
     this.EDIT_DETAILS = 1 << 2

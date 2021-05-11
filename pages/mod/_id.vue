@@ -84,7 +84,7 @@
             </nuxt-link>
             <nuxt-link
               v-if="currentMember"
-              :to="'/mod/' + mod.id + '/settings'"
+              :to="'/mod/' + (mod.slug ? mod.slug : mod.id) + '/settings'"
               class="tab"
             >
               <span>Settings</span>
@@ -129,7 +129,14 @@
           </div>
         </div>
         <div class="mod-content">
-          <slot />
+          <NuxtChild
+            :mod="mod"
+            :versions="versions"
+            :featured-versions="featuredVersions"
+            :members="members"
+            :current-member="currentMember"
+            :link-bar.sync="linkBar"
+          />
         </div>
       </div>
       <section class="mod-info">
@@ -280,7 +287,14 @@
                   Alpha
                 </span>
                 <h4 class="title">
-                  <nuxt-link :to="'/mod/' + mod.id + '/version/' + version.id">
+                  <nuxt-link
+                    :to="
+                      '/mod/' +
+                      (mod.slug ? mod.slug : mod.id) +
+                      '/version/' +
+                      version.id
+                    "
+                  >
                     {{ version.name }}
                   </nuxt-link>
                 </h4>
@@ -377,49 +391,65 @@ export default {
     ReportIcon,
     FollowIcon,
   },
-  props: {
-    mod: {
-      type: Object,
-      default() {
-        return {}
-      },
-    },
-    featuredVersions: {
-      type: Array,
-      default() {
-        return []
-      },
-    },
-    versions: {
-      type: Array,
-      default() {
-        return []
-      },
-    },
-    members: {
-      type: Array,
-      default() {
-        return []
-      },
-    },
-    currentMember: {
-      type: Object,
-      default() {
-        return null
-      },
-    },
-    linkBar: {
-      type: Array,
-      default() {
-        return []
-      },
-    },
-    userFollows: {
-      type: Array,
-      default() {
-        return null
-      },
-    },
+  async asyncData(data) {
+    try {
+      const mod = (
+        await axios.get(
+          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
+          data.$auth.headers
+        )
+      ).data
+
+      const [members, versions, featuredVersions, userFollows] = (
+        await Promise.all([
+          axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
+          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
+          axios.get(
+            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
+          ),
+          axios.get(
+            data.$auth.user
+              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
+              : `https://api.modrinth.com`,
+            data.$auth.headers
+          ),
+        ])
+      ).map((it) => it.data)
+
+      const users = (
+        await axios.get(
+          `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
+            members.map((it) => it.user_id)
+          )}`,
+          data.$auth.headers
+        )
+      ).data
+
+      users.forEach((it) => {
+        const index = members.findIndex((x) => x.user_id === it.id)
+        members[index].avatar_url = it.avatar_url
+        members[index].name = it.username
+      })
+
+      const currentMember = data.$auth.user
+        ? members.find((x) => x.user_id === data.$auth.user.id)
+        : null
+
+      return {
+        mod,
+        versions,
+        featuredVersions,
+        members,
+        currentMember,
+        userFollows: userFollows.name ? null : userFollows,
+        linkBar: [],
+      }
+    } catch {
+      data.error({
+        statusCode: 404,
+        message: 'Mod not found',
+      })
+    }
   },
   methods: {
     formatNumber(x) {
@@ -465,6 +495,52 @@ export default {
 
       this.userFollows.splice(this.userFollows.indexOf(this.mod.id), 1)
     },
+  },
+  head() {
+    return {
+      title: this.mod.title + ' - Modrinth',
+      meta: [
+        {
+          hid: 'og:type',
+          name: 'og:type',
+          content: 'website',
+        },
+        {
+          hid: 'og:title',
+          name: 'og:title',
+          content: this.mod.title,
+        },
+        {
+          hid: 'apple-mobile-web-app-title',
+          name: 'apple-mobile-web-app-title',
+          content: this.mod.title,
+        },
+        {
+          hid: 'og:description',
+          name: 'og:description',
+          content: this.mod.description,
+        },
+        {
+          hid: 'description',
+          name: 'description',
+          content:
+            this.mod.description +
+            ' View other minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform supporting both the Forge and Fabric mod loaders.',
+        },
+        {
+          hid: 'og:url',
+          name: 'og:url',
+          content: `https://modrinth.com/mod/${this.mod.id}`,
+        },
+        {
+          hid: 'og:image',
+          name: 'og:image',
+          content: this.mod.icon_url
+            ? this.mod.icon_url
+            : 'https://cdn.modrinth.com/placeholder.png',
+        },
+      ],
+    }
   },
 }
 </script>
