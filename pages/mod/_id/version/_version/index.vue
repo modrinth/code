@@ -125,7 +125,7 @@
           </div>
           <a
             :href="file.url"
-            @click.prevent="downloadFile(file.hashes.sha1, file.url)"
+            @click.prevent="$parent.downloadFile(file.hashes.sha1, file.url)"
           >
             <DownloadIcon />
           </a>
