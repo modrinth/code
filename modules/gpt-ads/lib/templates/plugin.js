@@ -30,6 +30,7 @@ export default async function (ctx, inject) {
   const collapseEmptyDivs =
     config.collapseEmptyDivs ??
     '<%= options.collapseEmptyDivs || false %>' === 'true'
+  const ethicalAds = config.ethicalAds === 'true'
   const GeoEdgeId = config.GeoEdgeId ?? '<%= options.geoEdgeId %>'
   const networkCode = config.networkCode ?? '<%= options.networkCode %>'
   const GPT_LIB_SCRIPT_ID = '<%= options.GPT_LIB_SCRIPT_ID %>'
@@ -53,6 +54,12 @@ export default async function (ctx, inject) {
       ctx.app.head.script.push(script)
     }
   }
+  Vue.component('GptAd', {})
+
+  if (ethicalAds) {
+    return
+  }
+
   const noConsent = !isPersonalizedAdsOn(ctx)
 
   // GeoEdge support

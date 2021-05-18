@@ -71,7 +71,7 @@ export default {
     },
   },
   router: {
-    middleware: ['auth', 'ads_tracking'],
+    middleware: ['auth', 'analytics'],
   },
   /*
    ** Global CSS
@@ -114,17 +114,13 @@ export default {
     '@nuxtjs/style-resources',
     'cookie-universal-nuxt',
     '~/modules/gpt-ads',
-    '~/modules/analytics',
+    // The analytics module is disabled, as we are using our own solution embedded in the middleware.
+    // '~/modules/analytics',
   ],
   ads: {
     // Module options
     ghostMode: true,
     geoEdgeId: '',
-  },
-  analytics: {
-    enabled: false,
-    script_url: '',
-    tracking_code: '',
   },
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',
@@ -176,11 +172,10 @@ export default {
       ghostMode: process.env.ENABLE_ADS == null,
       GeoEdgeId: process.env.GEOEDGE_ID,
       networkCode: process.env.GAM_ID,
+      ethicalAds: process.env.ETHICAL_ADS,
     },
     analytics: {
-      enabled: process.env.ENABLE_ANALYTICS,
-      script_url: process.env.ANALYTICS_URL,
-      token: process.env.ANALYTICS_ID,
+      base_url: process.env.ARIADNE_URL,
     },
   },
 }

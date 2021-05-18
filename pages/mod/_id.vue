@@ -67,6 +67,8 @@
           v-if="mod.status === 'approved' || mod.status === 'unlisted'"
           type="banner"
           small-screen="square"
+          ethical-ads-small
+          ethical-ads-big
         />
         <div class="mod-navigation">
           <div class="tabs">

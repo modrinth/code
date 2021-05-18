@@ -55,7 +55,13 @@
             </div>
           </div>
         </div>
-        <Advertisement type="square" small-screen="square" />
+        <Advertisement
+          type="square"
+          small-screen="square"
+          ethical-ads-big
+          ethical-ads-small
+          ethical-ad-type="image"
+        />
         <m-footer class="footer" hide-small />
       </div>
       <div class="content">

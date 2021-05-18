@@ -64,7 +64,12 @@
           ></pagination>
         </section>
         <div class="results column-grow-4">
-          <Advertisement type="banner" small-screen="square" />
+          <Advertisement
+            type="banner"
+            small-screen="square"
+            ethical-ads-small
+            ethical-ads-big
+          />
           <div v-if="results === null" class="no-results">
             <p>Loading...</p>
           </div>

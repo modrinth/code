@@ -1,6 +1,6 @@
 <template>
-  <div class="ad-wrapper">
-    <div v-if="displayed" class="ad">
+  <div v-if="displayed && !hidden" class="ad-wrapper">
+    <div class="ad">
       <GptAd
         :key="format.adUnit"
         ref="ad_slot"
@@ -10,6 +10,25 @@
       />
     </div>
   </div>
+  <div v-else-if="ethical_ads_on">
+    <div v-if="ethical_ad_display && ethicalAdType === 'text'">
+      <div
+        :class="ethical_ad_style"
+        data-ea-publisher="modrinth-com"
+        :data-ea-type="ethicalAdType"
+        data-ea-manual="true"
+      ></div>
+    </div>
+    <div v-else-if="ethical_ad_display" class="ethical-wrapper">
+      <div
+        :class="ethical_ad_style"
+        data-ea-publisher="modrinth-com"
+        :data-ea-type="ethicalAdType"
+        data-ea-manual="true"
+      ></div>
+    </div>
+  </div>
+  <div v-else></div>
 </template>
 
 <script>
@@ -36,20 +55,59 @@ export default {
       type: String,
       required: true,
     },
+    ethicalAdsBig: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    ethicalAdsSmall: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    ethicalAdType: {
+      type: String,
+      required: false,
+      default: 'text',
+    },
   },
   data() {
     return {
+      isDark: false,
       format: null,
       displayed: false,
       onSmallScreen: false,
       windowResizeListenerDebounce: null,
     }
   },
+  computed: {
+    ethical_ads_on() {
+      return (
+        this.$store.app.$config.ads.ethicalAds === 'true' &&
+        (this.ethicalAdsSmall || this.ethicalAdsBig)
+      )
+    },
+    hidden() {
+      return this.$store.app.$config.ads.ethicalAds === 'true'
+    },
+    ethical_ad_display() {
+      return (
+        (this.onSmallScreen && this.ethicalAdsSmall) ||
+        (!this.onSmallScreen && this.ethicalAdsBig)
+      )
+    },
+    ethical_ad_style() {
+      return {
+        dark: this.isDark,
+        raised: true,
+      }
+    },
+  },
 
   mounted() {
     // Register hook on resize
     window.addEventListener('resize', this.handleWindowResize)
-
+    this.isDark = this.$colorMode.value !== 'light'
     // Find ad
     if (!(this.type in sizes)) {
       console.error('Ad type not recognized.')
@@ -60,6 +118,7 @@ export default {
     this.displayed = true
     if (process.browser) {
       this.handleWindowResize()
+      this.refresh_ad()
     }
   },
   methods: {
@@ -72,8 +131,15 @@ export default {
             this.onSmallScreen = false
             this.format = sizes[this.type]
             this.displayed = true
+            // Refresh ad
+            this.refresh_ad()
           }
           return
+        }
+        if (this.onSmallScreen === false) {
+          // Reload ad
+          this.onSmallScreen = true
+          this.refresh_ad()
         }
         this.onSmallScreen = true
         if (this.smallScreen === 'destroy') {
@@ -84,6 +150,23 @@ export default {
         }
       }, 300)
     },
+    refresh_ad() {
+      if (this.ethical_ads_on && typeof window.ethicalads !== 'undefined') {
+        ethicalads.load()
+      }
+    },
+  },
+  head: {
+    script: [
+      {
+        hid: 'ethical_ads_script',
+        type: 'text/javascript',
+        src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
+        async: true,
+        body: true,
+        defer: true,
+      }, // Insert in body
+    ],
   },
 }
 </script>
@@ -92,6 +175,13 @@ export default {
 .ad-wrapper {
   width: 100%;
   @extend %card;
+  display: flex;
+  flex-direction: row;
+  margin-bottom: var(--spacing-card-md);
+  justify-content: center;
+}
+.ethical-wrapper {
+  width: 100%;
   display: flex;
   flex-direction: row;
   margin-bottom: var(--spacing-card-md);

@@ -63,7 +63,7 @@ export default {
 }
 
 .filter-active {
-  @extend %transparent-clickable.selected;
+  @extend %transparent-clickable, .selected;
   svg {
     color: var(--color-brand-light);
   }
