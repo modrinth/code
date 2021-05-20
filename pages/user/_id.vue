@@ -17,7 +17,7 @@
             </div>
           </div>
           <p v-if="user.bio" class="bio">{{ user.bio }}</p>
-          <div class="buttons">
+          <div v-if="this.$auth.user.id != user.id" class="buttons">
             <nuxt-link
               v-if="this.$auth.user"
               :to="`/report/create?id=${user.id}&t=user`"
