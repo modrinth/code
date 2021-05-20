@@ -78,6 +78,7 @@ export default {
       displayed: false,
       onSmallScreen: false,
       windowResizeListenerDebounce: null,
+      ethicalAdLoad: null,
     }
   },
   computed: {
@@ -151,8 +152,15 @@ export default {
       }, 300)
     },
     refresh_ad() {
-      if (this.ethical_ads_on && typeof window.ethicalads !== 'undefined') {
-        ethicalads.load()
+      if (this.ethical_ads_on) {
+        clearTimeout(this.ethicalAdLoad)
+        this.ethicalAdLoad = setTimeout(() => {
+          if (typeof window.ethicalads === 'undefined') {
+            console.log('EthicalAds are not loaded yet, retrying...')
+            this.refresh_ad()
+          }
+          ethicalads.load()
+        }, 100)
       }
     },
   },
