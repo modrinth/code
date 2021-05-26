@@ -84,7 +84,8 @@ pre {
   border-width: 5px;
   border-radius: 2em;
   border-color: var(--color-brand);
-
+  overflow-x: hidden;
+  
   code {
     line-height: 100%;
     padding: 0.2em;

@@ -23,13 +23,10 @@
         </p>
       </div>
       <div class="right hero-image">
-        <video
-          src="~/assets/images/search.mp4"
-          loading="lazy"
-          loop
-          muted
-          autoplay
-        />
+        <video loading="lazy" loop muted autoplay>
+          <source src="~/assets/images/search.webm" />
+          <source src="~/assets/images/search.mp4" />
+        </video>
       </div>
     </div>
     <div class="default-hero columns">
@@ -64,7 +61,7 @@
             <polyline points="8 6 2 12 8 18"></polyline>
           </svg>
         </div>
-        <img class="char" src="~/assets/images/right-arrow.svg" alt="logo" />
+        <span class="char" alt="logo"><RightArrowIcon /></span>
         <div>
           <h3>Build</h3>
           <svg
@@ -107,7 +104,7 @@
             ></path>
           </svg>
         </div>
-        <img class="char" src="~/assets/images/right-arrow.svg" alt="logo" />
+        <span class="char" alt="logo"><RightArrowIcon /></span>
         <div>
           <h3>Publish</h3>
           <svg
@@ -127,7 +124,7 @@
             />
           </svg>
         </div>
-        <img class="char" src="~/assets/images/right-arrow.svg" alt="logo" />
+        <span class="char" alt="logo"><RightArrowIcon /></span>
         <div>
           <h3>Earn</h3>
           <svg
@@ -163,7 +160,7 @@
       </div>
       <div class="right hero-image less-margin">
         <pre v-highlightjs>
-<code class="javascript">const fetch = require('node-fetch');
+<code class="javascript example-code">const fetch = require('node-fetch');
 fetch('https://api.modrinth.com/api/v1/mod').then(res => res.json()).then(data => {
     console.log(data);
     // hits: [Object {author: "mezz", author_url: …, …}, …]
@@ -180,10 +177,12 @@ fetch('https://api.modrinth.com/api/v1/mod').then(res => res.json()).then(data =
 
 <script>
 import MFooter from '~/components/layout/MFooter'
+import RightArrowIcon from '~/assets/images/right-arrow.svg?inline'
 
 export default {
   components: {
     MFooter,
+    RightArrowIcon,
   },
   auth: false,
   data() {
@@ -360,6 +359,10 @@ export default {
     color: var(--color-text);
     align-self: flex-start;
   }
+}
+
+.example-code {
+  color: #cecece;
 }
 
 .footer {
