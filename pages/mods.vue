@@ -267,12 +267,12 @@
               <ServerSide />
             </SearchFilter>
             <h3>Minecraft Versions</h3>
-            <SearchFilter
-              :active-filters="showVersions"
-              display-name="Include snapshots"
-              facet-name="snapshots"
-              style="margin-bottom: 10px"
-              @toggle="fillInitialVersions"
+            <Checkbox
+              v-model="showSnapshots"
+              label="Include snapshots"
+              style="margin-bottom: 0.5rem"
+              :border="false"
+              @input="reloadVersions"
             />
           </section>
           <multiselect
@@ -318,6 +318,7 @@ import axios from 'axios'
 import SearchResult from '~/components/ui/ProjectCard'
 import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'
+import Checkbox from '~/components/ui/Checkbox'
 
 import MFooter from '~/components/layout/MFooter'
 import TechCategory from '~/assets/images/categories/tech.svg?inline'
@@ -353,6 +354,7 @@ export default {
     Pagination,
     Multiselect,
     SearchFilter,
+    Checkbox,
     TechCategory,
     AdventureCategory,
     CursedCategory,
@@ -381,6 +383,7 @@ export default {
     }
     if (this.$route.query.v)
       this.selectedVersions = this.$route.query.v.split(',')
+    if (this.$route.query.h) this.showSnapshots = this.$route.query.h === 'true'
     if (this.$route.query.e)
       this.selectedEnvironments = this.$route.query.e.split(',')
     if (this.$route.query.s) {
@@ -411,7 +414,7 @@ export default {
       this.currentPage = Math.ceil(this.$route.query.o / this.maxResults) + 1
 
     await Promise.all([
-      this.fillInitialVersions(),
+      this.fillVersions(),
       this.fillInitialLicenses(),
       this.onSearchChange(this.currentPage),
     ])
@@ -424,7 +427,7 @@ export default {
       selectedLicense: '',
       licenses: [],
 
-      showVersions: [],
+      showSnapshots: false,
       selectedVersions: [],
       versions: [],
 
@@ -445,33 +448,26 @@ export default {
       sortType: { display: 'Relevance', name: 'relevance' },
 
       maxResults: 20,
-      firstRun: true,
     }
   },
   methods: {
-    async fillInitialVersions(x) {
+    async fillVersions() {
       try {
-        let url =
-          'https://api.modrinth.com/api/v1/tag/game_version?type=release'
-
-        if (x !== null) {
-          if (!this.showVersions.length > 0 && !this.firstRun) {
-            this.showVersions.push('snapshots')
-
-            url = 'https://api.modrinth.com/api/v1/tag/game_version'
-          } else {
-            this.showVersions = []
-          }
-        }
+        const url = this.showSnapshots
+          ? 'https://api.modrinth.com/api/v1/tag/game_version'
+          : 'https://api.modrinth.com/api/v1/tag/game_version?type=release'
 
         const res = await axios.get(url)
 
         this.versions = res.data
-        this.firstRun = false
       } catch (err) {
         // eslint-disable-next-line no-console
         console.error(err)
       }
+    },
+    async reloadVersions() {
+      this.fillVersions()
+      await this.onSearchChange(1)
     },
     async fillInitialLicenses() {
       const licences = (
@@ -648,6 +644,7 @@ export default {
             url += `&f=${encodeURIComponent(this.facets)}`
           if (this.selectedVersions.length > 0)
             url += `&v=${encodeURIComponent(this.selectedVersions)}`
+          if (this.showSnapshots) url += `&h=true`
           if (this.selectedEnvironments.length > 0)
             url += `&e=${encodeURIComponent(this.selectedEnvironments)}`
           if (this.sortType.name !== 'relevance')

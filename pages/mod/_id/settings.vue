@@ -104,115 +104,85 @@
         </div>
         <h3>Permissions</h3>
         <div class="permissions">
-          <label>
-            <input
-              type="checkbox"
-              :checked="
-                (member.permissions & UPLOAD_VERSION) === UPLOAD_VERSION
-              "
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (currentMember.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
-              "
-              @change="members[index].permissions ^= UPLOAD_VERSION"
-            />
-            Upload Version
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              :checked="
-                (member.permissions & DELETE_VERSION) === DELETE_VERSION
-              "
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (currentMember.permissions & DELETE_VERSION) !== DELETE_VERSION
-              "
-              @change="members[index].permissions ^= DELETE_VERSION"
-            />
-            Delete Version
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              :checked="(member.permissions & EDIT_DETAILS) === EDIT_DETAILS"
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
-              "
-              @change="members[index].permissions ^= EDIT_DETAILS"
-            />
-            Edit Details
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              :checked="(member.permissions & EDIT_BODY) === EDIT_BODY"
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (currentMember.permissions & EDIT_BODY) !== EDIT_BODY
-              "
-              @change="members[index].permissions ^= EDIT_BODY"
-            />
-            Edit Body
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              :checked="
-                (member.permissions & MANAGE_INVITES) === MANAGE_INVITES
-              "
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (currentMember.permissions & MANAGE_INVITES) !== MANAGE_INVITES
-              "
-              @change="members[index].permissions ^= MANAGE_INVITES"
-            />
-            Manage Invites
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              :checked="(member.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (currentMember.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
-              "
-              @change="members[index].permissions ^= REMOVE_MEMBER"
-            />
-            Remove Member
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              :checked="(member.permissions & EDIT_MEMBER) === EDIT_MEMBER"
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
-              "
-              @change="members[index].permissions ^= EDIT_MEMBER"
-            />
-            Edit Member
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              :checked="(member.permissions & DELETE_MOD) === DELETE_MOD"
-              :disabled="
-                member.role === 'Owner' ||
-                (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
-                (currentMember.permissions & DELETE_MOD) !== DELETE_MOD
-              "
-              @change="members[index].permissions ^= DELETE_MOD"
-            />
-            Delete Mod
-          </label>
+          <Checkbox
+            :checked="(member.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+              (currentMember.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
+            "
+            label="Upload Version"
+            @input="members[index].permissions ^= UPLOAD_VERSION"
+          />
+          <Checkbox
+            :checked="(member.permissions & DELETE_VERSION) === DELETE_VERSION"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+              (currentMember.permissions & DELETE_VERSION) !== DELETE_VERSION
+            "
+            label="Delete Version"
+            @input="members[index].permissions ^= DELETE_VERSION"
+          />
+          <Checkbox
+            :checked="(member.permissions & EDIT_DETAILS) === EDIT_DETAILS"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
+            label="Edit Details"
+            @input="members[index].permissions ^= EDIT_DETAILS"
+          />
+          <Checkbox
+            :checked="(member.permissions & EDIT_BODY) === EDIT_BODY"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+              (currentMember.permissions & EDIT_BODY) !== EDIT_BODY
+            "
+            label="Edit Body"
+            @input="members[index].permissions ^= EDIT_BODY"
+          />
+          <Checkbox
+            :checked="(member.permissions & MANAGE_INVITES) === MANAGE_INVITES"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+              (currentMember.permissions & MANAGE_INVITES) !== MANAGE_INVITES
+            "
+            label="Manage Invites"
+            @input="members[index].permissions ^= MANAGE_INVITES"
+          />
+          <Checkbox
+            :checked="(member.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+              (currentMember.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
+            "
+            label="Remove Member"
+            @input="members[index].permissions ^= REMOVE_MEMBER"
+          />
+          <Checkbox
+            :checked="(member.permissions & EDIT_MEMBER) === EDIT_MEMBER"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
+            "
+            label="Edit Member"
+            @input="members[index].permissions ^= EDIT_MEMBER"
+          />
+          <Checkbox
+            :checked="(member.permissions & DELETE_MOD) === DELETE_MOD"
+            :disabled="
+              member.role === 'Owner' ||
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
+              (currentMember.permissions & DELETE_MOD) !== DELETE_MOD
+            "
+            label="Delete Mod"
+            @input="members[index].permissions ^= DELETE_MOD"
+          />
         </div>
         <div class="actions">
           <button
@@ -243,11 +213,12 @@
 import axios from 'axios'
 
 import ConfirmPopup from '~/components/ui/ConfirmPopup'
+import Checkbox from '~/components/ui/Checkbox'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 
 export default {
-  components: { DropdownIcon, ConfirmPopup },
+  components: { DropdownIcon, ConfirmPopup, Checkbox },
   props: {
     mod: {
       type: Object,
