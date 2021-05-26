@@ -437,6 +437,10 @@ export default {
         ? members.find((x) => x.user_id === data.$auth.user.id)
         : null
 
+      if (mod.body_url && !mod.body) {
+        mod.body = (await axios.get(mod.body_url)).data
+      }
+
       return {
         mod,
         versions,
