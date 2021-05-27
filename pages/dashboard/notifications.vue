@@ -65,7 +65,7 @@ export default {
         `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/notifications`,
         data.$auth.headers
       )
-    ).data
+    ).data.sort((a, b) => new Date(b.created) - new Date(a.created))
 
     return {
       notifications,
@@ -94,6 +94,7 @@ export default {
         )
 
         this.notifications.splice(index, 1)
+        this.$store.dispatch('user/fetchNotifications', { force: true })
       } catch (err) {
         this.$notify({
           group: 'main',

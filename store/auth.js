@@ -1,6 +1,5 @@
 export const state = () => ({
   user: null,
-  userFollows: [],
   token: '',
   headers: {},
 })
@@ -8,9 +7,6 @@ export const state = () => ({
 export const mutations = {
   SET_USER(state, user) {
     state.user = user
-  },
-  SET_USER_FOLLOWS(state, follows) {
-    state.userFollows = follows
   },
   SET_TOKEN(state, token) {
     state.token = token
@@ -41,16 +37,5 @@ export const actions = {
     } catch (e) {
       console.error('Request for user info encountered an error: ', e)
     }
-  },
-  async fetchUserFollows({ commit }, { userId, token }) {
-    const follows = await this.$axios.get(
-      `https://api.modrinth.com/api/v1/user/${userId}/follows`,
-      {
-        headers: {
-          Authorization: token,
-        },
-      }
-    )
-    commit('SET_USER_FOLLOWS', follows)
   },
 }

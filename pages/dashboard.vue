@@ -10,6 +10,9 @@
           <nuxt-link :to="'/dashboard/notifications'" class="tab last">
             <NotificationsIcon />
             Notifications
+            <div v-if="this.$user.notifications.count > 0" class="notif-count">
+              {{ this.$user.notifications.count }}
+            </div>
           </nuxt-link>
           <nuxt-link :to="'/dashboard/follows'" class="tab last">
             <FollowIcon />
@@ -87,5 +90,18 @@ export default {
 <style lang="scss" scoped>
 .hideSmall {
   padding-top: 0;
+}
+
+.notif-count {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(180, 180, 180, 0.4);
+  border-radius: 2rem;
+  padding: 0.1rem 0.35rem;
+  margin: 0 0.2rem 0 auto;
+
+  font-size: 0.9rem;
 }
 </style>

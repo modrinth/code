@@ -71,6 +71,7 @@
             ethical-ads-big
           />
           <div v-if="results === null" class="no-results">
+            <LogoAnimated />
             <p>Loading...</p>
           </div>
           <div v-else>
@@ -318,6 +319,7 @@ import axios from 'axios'
 import SearchResult from '~/components/ui/ProjectCard'
 import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'
+import LogoAnimated from '~/components/ui/search/LogoAnimated'
 import Checkbox from '~/components/ui/Checkbox'
 
 import MFooter from '~/components/layout/MFooter'
@@ -373,6 +375,7 @@ export default {
     ServerSide,
     SearchIcon,
     ExitIcon,
+    LogoAnimated,
   },
   async fetch() {
     if (this.$route.query.q) this.query = this.$route.query.q

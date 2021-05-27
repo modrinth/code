@@ -87,6 +87,7 @@ export default {
     '~/plugins/compiled-markdown-directive.js',
     '~/plugins/vue-syntax.js',
     '~/plugins/auth.js',
+    '~/plugins/user.js',
   ],
   /*
    ** Auto import components
