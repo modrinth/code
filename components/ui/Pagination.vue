@@ -10,17 +10,22 @@
     </button>
     <div
       v-for="(item, index) in pages"
-      :key="'page-' + item"
+      :key="'page-' + item + '-' + index"
       :class="{
         'page-number': currentPage !== item,
+        shrink: item > 99,
       }"
       class="page-number-container"
     >
-      <div v-if="pages[index - 1] + 1 !== item && item !== 1" class="has-icon">
+      <div v-if="item == '-'" class="has-icon">
         <GapIcon />
       </div>
       <button
-        :class="{ 'page-number current': currentPage === item }"
+        v-else
+        :class="{
+          'page-number current': currentPage === item,
+          shrink: item > 99,
+        }"
         @click="currentPage !== item ? switchPage(item) : null"
       >
         {{ item }}
@@ -28,7 +33,9 @@
     </div>
 
     <button
-      :class="{ disabled: currentPage === pages[pages.length - 1] }"
+      :class="{
+        disabled: currentPage === pages[pages.length - 1],
+      }"
       class="paginate has-icon"
       aria-label="Next Page"
       @click="
@@ -76,10 +83,11 @@ export default {
 
 <style scoped lang="scss">
 button {
-  min-width: 2rem;
-  padding: 0 0.5rem;
-  height: 2rem;
-  border-radius: 2rem;
+  padding: 0;
+  margin: 0;
+  width: 2em;
+  height: 2em;
+  border-radius: 2em;
   background: transparent;
   &.page-number.current {
     background: var(--color-button-bg-hover);
@@ -100,15 +108,37 @@ button {
 .has-icon {
   display: flex;
   align-items: center;
-  padding: 0 0.5rem;
-  height: 2rem;
+  height: 2em;
   svg {
-    width: 1rem;
+    width: 1em;
   }
 }
 
-.page-number-container {
+.page-number-container,
+button,
+.has-icon {
   display: flex;
-  max-height: 2rem;
+  justify-content: center;
+  align-items: center;
+  height: 2em;
+  width: 2em;
+}
+
+.paginates {
+  height: 2em;
+  margin: 0.5rem 0;
+  > div {
+    margin: 0 0.1em;
+  }
+  font-size: 80%;
+  @media screen and (min-width: 350px) {
+    font-size: 100%;
+  }
+}
+
+.shrink {
+  font-size: 0.9rem;
+  height: 2.225em;
+  width: 2.225em;
 }
 </style>

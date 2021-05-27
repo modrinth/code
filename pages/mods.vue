@@ -613,9 +613,11 @@ export default {
 
         this.currentPage = newPageNumber
         if (pageAmount > 4) {
-          if (this.currentPage + 1 >= pageAmount) {
+          if (this.currentPage + 3 >= pageAmount) {
             this.pages = [
               1,
+              '-',
+              pageAmount - 4,
               pageAmount - 3,
               pageAmount - 2,
               pageAmount - 1,
@@ -624,13 +626,15 @@ export default {
           } else if (this.currentPage > 4) {
             this.pages = [
               1,
+              '-',
               this.currentPage - 1,
               this.currentPage,
               this.currentPage + 1,
+              '-',
               pageAmount,
             ]
           } else {
-            this.pages = [1, 2, 3, 4, pageAmount]
+            this.pages = [1, 2, 3, 4, 5, '-', pageAmount]
           }
         } else {
           this.pages = Array.from({ length: pageAmount }, (_, i) => i + 1)
@@ -716,6 +720,12 @@ export default {
     margin-right: 0.5rem;
     display: flex;
     width: auto;
+    @media screen and (max-width: 350px) {
+      flex-direction: column;
+      .mobile-filters-button {
+        margin: 0.5rem 0 0 0;
+      }
+    }
     .per-page {
       margin-left: 0.5rem;
       display: none;
@@ -739,7 +749,7 @@ export default {
 .search-bottom {
   align-items: center;
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
   background: var(--color-raised-bg);
   border-radius: var(--size-rounded-card);
   padding: 0 1rem;
@@ -752,6 +762,7 @@ export default {
   }
   @media screen and (min-width: 550px) {
     padding: 0.25rem 1rem 0.25rem 1rem;
+    justify-content: flex-end;
     .per-page {
       display: unset;
     }

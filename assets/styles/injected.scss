@@ -25,7 +25,8 @@
   &:focus,
   &:hover,
   &.selected,
-  &.nuxt-link-exact-active {
+  &.nuxt-link-exact-active,
+  &.active-path {
     color: var(--color-transparent-button-text-hover);
     background-color: var(--color-transparent-button-bg-hover);
   }

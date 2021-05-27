@@ -4,16 +4,18 @@
       <section class="navbar columns">
         <section class="logo column">
           <NuxtLink to="/">
+            <ModrinthLogoSmall aria-label="modrinth" class="small-logo" />
             <ModrinthLogo
               v-if="$colorMode.value === 'light'"
               aria-label="modrinth"
+              class="text-logo"
             />
-            <ModrinthLogoWhite v-else aria-label="modrinth" />
+            <ModrinthLogoWhite v-else aria-label="modrinth" class="text-logo" />
           </NuxtLink>
           <span class="badge yellow">Beta</span>
         </section>
         <section class="menu-icon">
-          <button @click="changeTheme">
+          <button class="theme-toggle" @click="changeTheme">
             <MoonIcon v-if="$colorMode.value === 'light'" />
             <SunIcon v-else />
           </button>
@@ -24,11 +26,23 @@
         <section ref="nav" class="right-group columns">
           <section class="column-grow-5 nav">
             <div class="tabs">
-              <NuxtLink to="/mods" class="tab">
+              <NuxtLink
+                to="/mods"
+                class="tab"
+                :class="{
+                  'active-path': this.$route.path.startsWith('/mod'),
+                }"
+              >
                 <span>Mods</span>
               </NuxtLink>
               <div v-if="this.$auth.user" class="section">
-                <NuxtLink to="/dashboard/projects" class="tab">
+                <NuxtLink
+                  to="/dashboard/projects"
+                  class="tab"
+                  :class="{
+                    'active-path': this.$route.path.startsWith('/dashboard'),
+                  }"
+                >
                   <span>Dashboard</span>
                 </NuxtLink>
               </div>
@@ -108,7 +122,12 @@
     </header>
     <main>
       <CookieConsent />
-      <notifications group="main" position="bottom right" />
+      <notifications
+        group="main"
+        position="bottom right"
+        :max="5"
+        :ignore-duplicates="true"
+      />
       <!--<notifications
         group="ads"
         position="bottom right"
@@ -125,6 +144,7 @@ import ClickOutside from 'vue-click-outside'
 
 import ModrinthLogo from '~/assets/images/text-logo.svg?inline'
 import ModrinthLogoWhite from '~/assets/images/text-logo-white.svg?inline'
+import ModrinthLogoSmall from '~/assets/images/logo.svg?inline'
 
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
 
@@ -144,6 +164,7 @@ export default {
   components: {
     ModrinthLogo,
     ModrinthLogoWhite,
+    ModrinthLogoSmall,
     DropdownIcon,
     MoonIcon,
     SunIcon,
@@ -164,7 +185,7 @@ export default {
   },
   computed: {
     authUrl() {
-      return `https://api.modrinth.com/api/v1/auth/init?url=https://modrinth.com${this.$route.fullPath}`
+      return `https://api.modrinth.com/api/v1/auth/init?url=${process.env.domain}${this.$route.fullPath}`
     },
     userUrl() {
       return `/user/${this.$auth.user.id}`
@@ -178,6 +199,11 @@ export default {
       this.$refs.nav.className = 'right-group'
       document.body.style.overflow = 'auto'
     },
+  },
+  beforeCreate() {
+    if (this.$route.query.code) {
+      this.$router.push(this.$route.path)
+    }
   },
   methods: {
     toggleNavBar() {
@@ -198,18 +224,19 @@ export default {
     },
     async logout() {
       this.$cookies.set('auth-token-reset', true)
-      // If users logs out on dashboard, redirect on the home page
+      // If users logs out on dashboard, force redirect on the home page to clear cookies
       if (this.$route.path.startsWith('/dashboard')) {
-        await this.$router.push('/')
+        window.location.href = '/'
       } else {
         await this.$router.go(null)
+
+        this.$notify({
+          group: 'main',
+          title: 'Logged Out',
+          text: 'You have logged out successfully!',
+          type: 'success',
+        })
       }
-      this.$notify({
-        group: 'main',
-        title: 'Logged Out',
-        text: 'You have logged out successfully!',
-        type: 'success',
-      })
     },
     changeTheme() {
       this.$colorMode.preference =
@@ -229,7 +256,10 @@ export default {
     background-color: var(--color-raised-bg);
     max-width: 100vw;
     .navbar {
-      margin: 0 var(--spacing-card-lg);
+      margin: 0 0.5rem;
+      @media screen and (min-width: 450px) {
+        margin: 0 var(--spacing-card-lg);
+      }
       section.logo {
         align-items: center;
         display: flex;
@@ -237,12 +267,28 @@ export default {
         padding: 1rem 0;
         margin-left: 1rem;
         color: var(--color-text-dark);
+        .small-logo {
+          display: block;
+        }
         svg {
+          display: none;
           height: 1.75rem;
           width: auto;
         }
+        @media screen and (min-width: 350px) {
+          .small-logo {
+            display: none;
+          }
+          svg {
+            display: unset;
+          }
+        }
         .badge {
           margin-left: 0.25rem;
+          display: none;
+          @media screen and (min-width: 430px) {
+            display: unset;
+          }
         }
         button {
           background: none;

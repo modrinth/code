@@ -228,4 +228,9 @@ export default {
   @extend %card;
   padding: var(--spacing-card-sm) var(--spacing-card-lg);
 }
+
+a {
+  text-decoration: underline;
+  color: var(--color-link);
+}
 </style>

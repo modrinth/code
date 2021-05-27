@@ -150,15 +150,18 @@ export default {
    */
   build: {
     transpile: ['vue-tooltip', 'vue-notification'],
-    styleResources: {
-      scss: './assets/styles/injected.scss',
-    },
     html: {
       minify: {
         collapseWhitespace: true, // as @dario30186 mentioned
         removeComments: true, // 👈 add this line
       },
     },
+    babel: {
+      plugins: [['@babel/plugin-proposal-private-methods', { loose: true }]],
+    },
+  },
+  styleResources: {
+    scss: './assets/styles/injected.scss',
   },
   loading: {
     color: 'green',
@@ -166,6 +169,7 @@ export default {
   },
   env: {
     version: process.env.VERSION_ID || 'unknown',
+    domain: getDomain(),
   },
   publicRuntimeConfig: {
     ads: {
@@ -178,4 +182,18 @@ export default {
       base_url: process.env.ARIADNE_URL,
     },
   },
+}
+
+function getDomain() {
+  if (process.env.NODE_ENV === 'production') {
+    if (process.env.HEROKU_APP_NAME) {
+      return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
+    } else if (process.env.VERCEL_URL) {
+      return `https://${process.env.VERCEL_URL}`
+    } else {
+      return 'https://modrinth.com'
+    }
+  } else {
+    return 'http://localhost:3000'
+  }
 }

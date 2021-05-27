@@ -9,6 +9,7 @@
             loading="lazy"
           />
         </nuxt-link>
+        <Categories :categories="categories" class="left-categories" />
       </div>
       <div class="info">
         <div class="top">
@@ -40,7 +41,7 @@
                   >Draft</span
                 >
                 <span v-if="status === 'processing'" class="badge yellow">
-                  Processing
+                  Under review
                 </span>
                 <span v-if="status === 'unlisted'" class="badge gray">
                   Unlisted
@@ -99,7 +100,7 @@
               </div>
             </div>
           </div>
-          <Categories :categories="categories" />
+          <Categories :categories="categories" class="right-categories" />
         </div>
       </div>
     </div>
@@ -207,6 +208,7 @@ export default {
 
   @media screen and (min-width: 1024px) {
     flex-direction: row;
+    justify-content: space-between;
   }
 
   .icon {
@@ -278,6 +280,19 @@ export default {
           margin: auto 0;
         }
       }
+    }
+  }
+  .left-categories {
+    display: none;
+  }
+  @media screen and (max-width: 560px) {
+    .left-categories {
+      display: flex;
+      margin: 0 0 0.75rem 0.75rem;
+      width: 7rem;
+    }
+    .right-categories {
+      display: none;
     }
   }
   .buttons {
