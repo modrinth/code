@@ -174,6 +174,9 @@ export default {
     domain: getDomain(),
   },
   publicRuntimeConfig: {
+    axios: {
+      browserBaseURL: process.env.API_URL,
+    },
     ads: {
       ghostMode: process.env.ENABLE_ADS == null,
       GeoEdgeId: process.env.GEOEDGE_ID,
@@ -182,6 +185,11 @@ export default {
     },
     analytics: {
       base_url: process.env.ARIADNE_URL,
+    },
+  },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.API_URL,
     },
   },
 }
