@@ -315,7 +315,6 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
-import axios from 'axios'
 import SearchResult from '~/components/ui/ProjectCard'
 import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'
@@ -457,10 +456,10 @@ export default {
     async fillVersions() {
       try {
         const url = this.showSnapshots
-          ? 'https://api.modrinth.com/api/v1/tag/game_version'
-          : 'https://api.modrinth.com/api/v1/tag/game_version?type=release'
+          ? 'tag/game_version'
+          : 'tag/game_version?type=release'
 
-        const res = await axios.get(url)
+        const res = await this.$axios.get(url)
 
         this.versions = res.data
       } catch (err) {
@@ -473,9 +472,7 @@ export default {
       await this.onSearchChange(1)
     },
     async fillInitialLicenses() {
-      const licences = (
-        await axios.get('https://api.modrinth.com/api/v1/tag/license')
-      ).data
+      const licences = (await this.$axios.get('tag/license')).data
       licences.sort((x, y) => {
         // Custom case for custom, so it goes to the bottom of the list.
         if (x.short === 'custom') return 1
@@ -601,7 +598,7 @@ export default {
           params.push(`offset=${offset}`)
         }
 
-        let url = 'https://api.modrinth.com/api/v1/mod'
+        let url = 'mod'
 
         if (params.length > 0) {
           for (let i = 0; i < params.length; i++) {
@@ -609,7 +606,7 @@ export default {
           }
         }
 
-        const res = await axios.get(url)
+        const res = await this.$axios.get(url)
         this.results = res.data.hits
 
         const pageAmount = Math.ceil(res.data.total_hits / res.data.limit)

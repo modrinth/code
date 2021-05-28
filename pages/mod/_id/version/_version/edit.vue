@@ -102,8 +102,6 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
-
 import Multiselect from 'vue-multiselect'
 
 export default {
@@ -144,7 +142,7 @@ export default {
 
     if (!this.version.changelog && this.version.changelog_url) {
       this.version.changelog = (
-        await axios.get(this.version.changelog_url)
+        await this.$axios.get(this.version.changelog_url)
       ).data
     }
   },
@@ -152,8 +150,8 @@ export default {
     try {
       const [selectableLoaders, selectableVersions] = (
         await Promise.all([
-          axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
-          axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
+          data.$axios.get(`tag/loader`),
+          data.$axios.get(`tag/game_version`),
         ])
       ).map((it) => it.data)
 
@@ -185,8 +183,8 @@ export default {
       this.$nuxt.$loading.start()
 
       try {
-        await axios.patch(
-          `https://api.modrinth.com/api/v1/version/${this.version.id}`,
+        await this.$axios.patch(
+          `version/${this.version.id}`,
           this.version,
           this.$auth.headers
         )

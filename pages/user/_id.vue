@@ -89,7 +89,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import SearchResult from '~/components/ui/ProjectCard'
 import MFooter from '~/components/layout/MFooter'
 
@@ -110,19 +109,13 @@ export default {
   },
   async asyncData(data) {
     try {
-      let res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${data.params.id}`
-      )
+      let res = await data.$axios.get(`user/${data.params.id}`)
       const user = res.data
 
       let mods = []
-      res = await axios.get(
-        `https://api.modrinth.com/api/v1/user/${user.id}/mods`
-      )
+      res = await data.$axios.get(`user/${user.id}/mods`)
       if (res.data) {
-        res = await axios.get(
-          `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`
-        )
+        res = await data.$axios.get(`mods?ids=${JSON.stringify(res.data)}`)
         mods = res.data
       }
 

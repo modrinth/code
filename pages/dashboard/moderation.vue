@@ -87,8 +87,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 import ModCard from '~/components/ui/ProjectCard'
 import Security from '~/assets/images/illustrations/security.svg?inline'
 
@@ -98,19 +96,10 @@ export default {
     Security,
   },
   async asyncData(data) {
-    const mods = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/moderation/mods`,
-        data.$auth.headers
-      )
-    ).data
+    const mods = (await data.$axios.get(`moderation/mods`, data.$auth.headers))
+      .data
 
-    const reports = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/report`,
-        data.$auth.headers
-      )
-    ).data
+    const reports = (await data.$axios.get(`report`, data.$auth.headers)).data
 
     return {
       mods,
@@ -119,8 +108,8 @@ export default {
   },
   methods: {
     async changeModStatus(id, status, index) {
-      await axios.patch(
-        `https://api.modrinth.com/api/v1/mod/${id}`,
+      await this.$axios.patch(
+        `mod/${id}`,
         {
           status,
         },
@@ -130,8 +119,8 @@ export default {
       this.mods.splice(index, 1)
     },
     async deleteReport(index) {
-      await axios.delete(
-        `https://api.modrinth.com/api/v1/report/${this.reports[index].id}`,
+      await this.$axios.delete(
+        `report/${this.reports[index].id}`,
         this.$auth.headers
       )
 

@@ -58,7 +58,7 @@
       </div>
     </div>
     <div
-      v-for="(member, index) in members"
+      v-for="(member, index) in allMembers"
       :key="member.user_id"
       class="member"
       :class="{ open: openTeamMembers.includes(member.user_id) }"
@@ -93,7 +93,7 @@
           <label>
             Role:
             <input
-              v-model="members[index].role"
+              v-model="allMembers[index].role"
               type="text"
               :disabled="
                 member.role === 'Owner' ||
@@ -115,7 +115,7 @@
               (currentMember.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
             "
             label="Upload Version"
-            @input="members[index].permissions ^= UPLOAD_VERSION"
+            @input="allMembers[index].permissions ^= UPLOAD_VERSION"
           />
           <Checkbox
             :value="
@@ -128,7 +128,7 @@
               (currentMember.permissions & DELETE_VERSION) !== DELETE_VERSION
             "
             label="Delete Version"
-            @input="members[index].permissions ^= DELETE_VERSION"
+            @input="allMembers[index].permissions ^= DELETE_VERSION"
           />
           <Checkbox
             :value="
@@ -141,7 +141,7 @@
               (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
             "
             label="Edit Details"
-            @input="members[index].permissions ^= EDIT_DETAILS"
+            @input="allMembers[index].permissions ^= EDIT_DETAILS"
           />
           <Checkbox
             :value="
@@ -154,7 +154,7 @@
               (currentMember.permissions & EDIT_BODY) !== EDIT_BODY
             "
             label="Edit Body"
-            @input="members[index].permissions ^= EDIT_BODY"
+            @input="allMembers[index].permissions ^= EDIT_BODY"
           />
           <Checkbox
             :value="
@@ -167,7 +167,7 @@
               (currentMember.permissions & MANAGE_INVITES) !== MANAGE_INVITES
             "
             label="Manage Invites"
-            @input="members[index].permissions ^= MANAGE_INVITES"
+            @input="allMembers[index].permissions ^= MANAGE_INVITES"
           />
           <Checkbox
             :value="
@@ -180,7 +180,7 @@
               (currentMember.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
             "
             label="Remove Member"
-            @input="members[index].permissions ^= REMOVE_MEMBER"
+            @input="allMembers[index].permissions ^= REMOVE_MEMBER"
           />
           <Checkbox
             :value="
@@ -192,7 +192,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
             "
             label="Edit Member"
-            @input="members[index].permissions ^= EDIT_MEMBER"
+            @input="allMembers[index].permissions ^= EDIT_MEMBER"
           />
           <Checkbox
             :value="
@@ -205,7 +205,7 @@
               (currentMember.permissions & DELETE_MOD) !== DELETE_MOD
             "
             label="Delete Mod"
-            @input="members[index].permissions ^= DELETE_MOD"
+            @input="allMembers[index].permissions ^= DELETE_MOD"
           />
         </div>
         <div class="actions">
@@ -234,8 +234,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 import ConfirmPopup from '~/components/ui/ConfirmPopup'
 import Checkbox from '~/components/ui/Checkbox'
 
@@ -250,7 +248,7 @@ export default {
         return {}
       },
     },
-    members: {
+    allMembers: {
       type: Array,
       default() {
         return []
@@ -286,18 +284,15 @@ export default {
       this.$nuxt.$loading.start()
 
       try {
-        const user = (
-          await axios.get(
-            `https://api.modrinth.com/api/v1/user/${this.currentUsername}`
-          )
-        ).data
+        const user = (await this.$axios.get(`user/${this.currentUsername}`))
+          .data
 
         const data = {
           user_id: user.id,
         }
 
-        await axios.post(
-          `https://api.modrinth.com/api/v1/team/${this.mod.team}/members`,
+        await this.$axios.post(
+          `team/${this.mod.team}/members`,
           data,
           this.$auth.headers
         )
@@ -317,8 +312,8 @@ export default {
       this.$nuxt.$loading.start()
 
       try {
-        await axios.delete(
-          `https://api.modrinth.com/api/v1/team/${this.mod.team}/members/${this.members[index].user_id}`,
+        await this.$axios.delete(
+          `team/${this.mod.team}/members/${this.allMembers[index].user_id}`,
           this.$auth.headers
         )
         await this.$router.go(null)
@@ -338,12 +333,12 @@ export default {
 
       try {
         const data = {
-          permissions: this.members[index].permissions,
-          role: this.members[index].role,
+          permissions: this.allMembers[index].permissions,
+          role: this.allMembers[index].role,
         }
 
-        await axios.patch(
-          `https://api.modrinth.com/api/v1/team/${this.mod.team}/members/${this.members[index].user_id}`,
+        await this.$axios.patch(
+          `team/${this.mod.team}/members/${this.allMembers[index].user_id}`,
           data,
           this.$auth.headers
         )
@@ -363,10 +358,7 @@ export default {
       this.$refs.delete_popup.show()
     },
     async deleteMod() {
-      await axios.delete(
-        `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
-        this.$auth.headers
-      )
+      await this.$axios.delete(`mod/${this.mod.id}`, this.$auth.headers)
       await this.$router.push('/dashboard/projects')
       this.$notify({
         group: 'main',

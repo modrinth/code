@@ -134,6 +134,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
+    baseURL: 'https://api.modrinth.com/api/v1/',
     headers: {
       common: {
         Accept: 'application/json',

@@ -499,7 +499,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
 import FileInput from '~/components/ui/FileInput'
@@ -516,7 +515,7 @@ export default {
     ForgeIcon,
     FabricIcon,
   },
-  async asyncData() {
+  async asyncData(data) {
     const [
       availableCategories,
       availableLoaders,
@@ -525,11 +524,11 @@ export default {
       availableDonationPlatforms,
     ] = (
       await Promise.all([
-        axios.get(`https://api.modrinth.com/api/v1/tag/category`),
-        axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
-        axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
-        axios.get(`https://api.modrinth.com/api/v1/tag/license`),
-        axios.get(`https://api.modrinth.com/api/v1/tag/donation_platform`),
+        data.$axios.get(`tag/category`),
+        data.$axios.get(`tag/loader`),
+        data.$axios.get(`tag/game_version`),
+        data.$axios.get(`tag/license`),
+        data.$axios.get(`tag/donation_platform`),
       ])
     ).map((it) => it.data)
 
@@ -654,8 +653,8 @@ export default {
       }
 
       try {
-        await axios({
-          url: 'https://api.modrinth.com/api/v1/mod',
+        await this.$axios({
+          url: 'mod',
           method: 'POST',
           data: formData,
           headers: {

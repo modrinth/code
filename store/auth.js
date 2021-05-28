@@ -20,7 +20,7 @@ export const actions = {
   async fetchUser({ commit }, { token }) {
     try {
       const user = (
-        await this.$axios.get(`https://api.modrinth.com/api/v1/user`, {
+        await this.$axios.get(`user`, {
           headers: {
             Authorization: token,
           },

@@ -115,7 +115,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import ConfirmPopup from '~/components/ui/ConfirmPopup'
 
 export default {
@@ -167,8 +166,8 @@ export default {
           bio: this.bio,
         }
 
-        await axios.patch(
-          `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}`,
+        await this.$axios.patch(
+          `user/${this.$auth.user.id}`,
           data,
           this.$auth.headers
         )
@@ -191,8 +190,8 @@ export default {
       this.$nuxt.$loading.start()
 
       try {
-        await axios.delete(
-          `https://api.modrinth.com/api/v1/user/${this.$auth.user.id}`,
+        await this.$axios.delete(
+          `user/${this.$auth.user.id}`,
           this.$auth.headers
         )
       } catch (err) {

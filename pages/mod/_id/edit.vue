@@ -297,7 +297,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Multiselect from 'vue-multiselect'
 
 import FileInput from '~/components/ui/FileInput'
@@ -318,15 +317,12 @@ export default {
         availableDonationPlatforms,
       ] = (
         await Promise.all([
-          axios.get(
-            `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-            data.$auth.headers
-          ),
-          axios.get(`https://api.modrinth.com/api/v1/tag/category`),
-          axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
-          axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
-          axios.get(`https://api.modrinth.com/api/v1/tag/license`),
-          axios.get(`https://api.modrinth.com/api/v1/tag/donation_platform`),
+          data.$axios.get(`mod/${data.params.id}`, data.$auth.headers),
+          data.$axios.get(`tag/category`),
+          data.$axios.get(`tag/loader`),
+          data.$axios.get(`tag/game_version`),
+          data.$axios.get(`tag/license`),
+          data.$axios.get(`tag/donation_platform`),
         ])
       ).map((it) => it.data)
 
@@ -337,7 +333,7 @@ export default {
       }
 
       if (mod.body_url && !mod.body) {
-        mod.body = (await axios.get(mod.body_url)).data
+        mod.body = (await data.$axios.get(mod.body_url)).data
       }
 
       const donationPlatforms = []
@@ -445,15 +441,11 @@ export default {
           data.status = 'processing'
         }
 
-        await axios.patch(
-          `https://api.modrinth.com/api/v1/mod/${this.mod.id}`,
-          data,
-          this.$auth.headers
-        )
+        await this.$axios.patch(`mod/${this.mod.id}`, data, this.$auth.headers)
 
         if (this.iconChanged) {
-          await axios.patch(
-            `https://api.modrinth.com/api/v1/mod/${this.mod.id}/icon?ext=${
+          await this.$axios.patch(
+            `mod/${this.mod.id}/icon?ext=${
               this.icon.type.split('/')[this.icon.type.split('/').length - 1]
             }`,
             this.icon,

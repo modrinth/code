@@ -31,9 +31,6 @@ export default {
     },
   },
   layout: 'home',
-  created() {
-    // console.log(this.error)
-  },
 }
 </script>
 

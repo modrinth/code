@@ -119,8 +119,6 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
-
 import Multiselect from 'vue-multiselect'
 import FileInput from '~/components/ui/FileInput'
 
@@ -141,8 +139,8 @@ export default {
     try {
       const [selectableLoaders, selectableVersions] = (
         await Promise.all([
-          axios.get(`https://api.modrinth.com/api/v1/tag/loader`),
-          axios.get(`https://api.modrinth.com/api/v1/tag/game_version`),
+          data.$axios.get(`tag/loader`),
+          data.$axios.get(`tag/game_version`),
         ])
       ).map((it) => it.data)
 
@@ -188,8 +186,8 @@ export default {
       }
       try {
         const data = (
-          await axios({
-            url: 'https://api.modrinth.com/api/v1/version',
+          await this.$axios({
+            url: 'version',
             method: 'POST',
             data: formData,
             headers: {
@@ -225,9 +223,7 @@ export default {
       this.createdVersion.file_parts = newFileParts
     },
     async downloadFile(hash, url) {
-      await axios.get(
-        `https://api.modrinth.com/api/v1/version_file/${hash}/download`
-      )
+      await this.$axios.get(`version_file/${hash}/download`)
 
       const elem = document.createElement('a')
       elem.download = hash

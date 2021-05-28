@@ -137,6 +137,7 @@
             :featured-versions="featuredVersions"
             :members="members"
             :current-member="currentMember"
+            :all-members="allMembers"
             :link-bar.sync="linkBar"
           />
         </div>
@@ -352,7 +353,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import Categories from '~/components/ui/search/Categories'
 import MFooter from '~/components/layout/MFooter'
 
@@ -398,22 +398,17 @@ export default {
   async asyncData(data) {
     try {
       const mod = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/mod/${data.params.id}`,
-          data.$auth.headers
-        )
+        await data.$axios.get(`mod/${data.params.id}`, data.$auth.headers)
       ).data
 
       const [members, versions, featuredVersions, userFollows] = (
         await Promise.all([
-          axios.get(`https://api.modrinth.com/api/v1/team/${mod.team}/members`),
-          axios.get(`https://api.modrinth.com/api/v1/mod/${mod.id}/version`),
-          axios.get(
-            `https://api.modrinth.com/api/v1/mod/${mod.id}/version?featured=true`
-          ),
-          axios.get(
+          data.$axios.get(`team/${mod.team}/members`, data.$auth.headers),
+          data.$axios.get(`mod/${mod.id}/version`),
+          data.$axios.get(`mod/${mod.id}/version?featured=true`),
+          data.$axios.get(
             data.$auth.user
-              ? `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`
+              ? `user/${data.$auth.user.id}/follows`
               : `https://api.modrinth.com`,
             data.$auth.headers
           ),
@@ -421,10 +416,8 @@ export default {
       ).map((it) => it.data)
 
       const users = (
-        await axios.get(
-          `https://api.modrinth.com/api/v1/users?ids=${JSON.stringify(
-            members.map((it) => it.user_id)
-          )}`,
+        await data.$axios.get(
+          `users?ids=${JSON.stringify(members.map((it) => it.user_id))}`,
           data.$auth.headers
         )
       ).data
@@ -440,14 +433,15 @@ export default {
         : null
 
       if (mod.body_url && !mod.body) {
-        mod.body = (await axios.get(mod.body_url)).data
+        mod.body = (await data.$axios.get(mod.body_url)).data
       }
 
       return {
         mod,
         versions,
         featuredVersions,
-        members,
+        members: members.filter((x) => x.accepted),
+        allMembers: members,
         currentMember,
         userFollows: userFollows.name ? null : userFollows,
         linkBar: [],
@@ -477,9 +471,7 @@ export default {
       return file
     },
     async downloadFile(hash, url) {
-      await axios.get(
-        `https://api.modrinth.com/api/v1/version_file/${hash}/download`
-      )
+      await this.$axios.get(`version_file/${hash}/download`)
 
       const elem = document.createElement('a')
       elem.download = hash
@@ -487,8 +479,8 @@ export default {
       elem.click()
     },
     async followMod() {
-      await axios.post(
-        `https://api.modrinth.com/api/v1/mod/${this.mod.id}/follow`,
+      await this.$axios.post(
+        `mod/${this.mod.id}/follow`,
         {},
         this.$auth.headers
       )
@@ -496,10 +488,7 @@ export default {
       this.userFollows.push(this.mod.id)
     },
     async unfollowMod() {
-      await axios.delete(
-        `https://api.modrinth.com/api/v1/mod/${this.mod.id}/follow`,
-        this.$auth.headers
-      )
+      await this.$axios.delete(`mod/${this.mod.id}/follow`, this.$auth.headers)
 
       this.userFollows.splice(this.userFollows.indexOf(this.mod.id), 1)
     },

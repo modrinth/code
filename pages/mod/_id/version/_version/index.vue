@@ -136,8 +136,6 @@
   </div>
 </template>
 <script>
-import axios from 'axios'
-
 import ConfirmPopup from '~/components/ui/ConfirmPopup'
 
 import Categories from '~/components/ui/search/Categories'
@@ -201,11 +199,9 @@ export default {
 
     if (!this.version.changelog && this.version.changelog_url) {
       this.version.changelog = (
-        await axios.get(this.version.changelog_url)
+        await this.$axios.get(this.version.changelog_url)
       ).data
     }
-
-    console.log(this.version)
   },
   data() {
     return {
@@ -229,10 +225,7 @@ export default {
     async deleteFile(hash) {
       this.$nuxt.$loading.start()
 
-      await axios.delete(
-        `https://api.modrinth.com/api/v1/version_file/${hash}`,
-        this.$auth.headers
-      )
+      await this.$axios.delete(`version_file/${hash}`, this.$auth.headers)
 
       await this.$router.go(null)
       this.$nuxt.$loading.finish()
@@ -240,8 +233,8 @@ export default {
     async makePrimary(hash) {
       this.$nuxt.$loading.start()
 
-      await axios.patch(
-        `https://api.modrinth.com/api/v1/version/${this.version.id}`,
+      await this.$axios.patch(
+        `version/${this.version.id}`,
         {
           primary_file: ['sha1', hash],
         },
@@ -273,8 +266,8 @@ export default {
       }
 
       try {
-        await axios({
-          url: `https://api.modrinth.com/api/v1/version/${this.version.id}/file`,
+        await this.$axios({
+          url: `version/${this.version.id}/file`,
           method: 'POST',
           data: formData,
           headers: {
@@ -302,10 +295,7 @@ export default {
     async deleteVersion() {
       this.$nuxt.$loading.start()
 
-      await axios.delete(
-        `https://api.modrinth.com/api/v1/version/${this.version.id}`,
-        this.$auth.headers
-      )
+      await this.$axios.delete(`version/${this.version.id}`, this.$auth.headers)
 
       await this.$router.replace(`/mod/${this.mod.id}`)
       this.$nuxt.$loading.finish()

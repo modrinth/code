@@ -52,7 +52,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
 
 export default {
@@ -61,8 +60,8 @@ export default {
   },
   async asyncData(data) {
     const notifications = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/notifications`,
+      await data.$axios.get(
+        `user/${data.$auth.user.id}/notifications`,
         data.$auth.headers
       )
     ).data.sort((a, b) => new Date(b.created) - new Date(a.created))
@@ -79,17 +78,17 @@ export default {
         if (index) {
           const config = {
             method: notification.actions[index].action_route[0].toLowerCase(),
-            url: `https://api.modrinth.com/api/v1/${notification.actions[index].action_route[1]}`,
+            url: `${notification.actions[index].action_route[1]}`,
             headers: {
               Authorization: this.$auth.token,
             },
           }
 
-          await axios(config)
+          await this.$axios(config)
         }
 
-        await axios.delete(
-          `https://api.modrinth.com/api/v1/notification/${notification.id}`,
+        await this.$axios.delete(
+          `notification/${notification.id}`,
           this.$auth.headers
         )
 

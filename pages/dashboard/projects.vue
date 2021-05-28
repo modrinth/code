@@ -46,7 +46,6 @@
 </template>
 
 <script>
-import axios from 'axios'
 import ModCard from '~/components/ui/ProjectCard'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
 
@@ -56,13 +55,13 @@ export default {
     UpToDate,
   },
   async asyncData(data) {
-    let res = await axios.get(
-      `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/mods`,
+    let res = await data.$axios.get(
+      `user/${data.$auth.user.id}/mods`,
       data.$auth.headers
     )
 
-    res = await axios.get(
-      `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`,
+    res = await data.$axios.get(
+      `mods?ids=${JSON.stringify(res.data)}`,
       data.$auth.headers
     )
 

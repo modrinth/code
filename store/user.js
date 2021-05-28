@@ -24,7 +24,7 @@ export const actions = {
     ) {
       const notifications = (
         await this.$axios.get(
-          `https://api.modrinth.com/api/v1/user/${rootState.auth.user.id}/notifications`,
+          `user/${rootState.auth.user.id}/notifications`,
           rootState.auth.headers
         )
       ).data

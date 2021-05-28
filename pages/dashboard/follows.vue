@@ -46,8 +46,6 @@
 </template>
 
 <script>
-import axios from 'axios'
-
 import ModCard from '~/components/ui/ProjectCard'
 import FollowIcon from '~/assets/images/utils/heart.svg?inline'
 import FollowIllustration from '~/assets/images/illustrations/follow_illustration.svg?inline'
@@ -59,15 +57,13 @@ export default {
     FollowIllustration,
   },
   async asyncData(data) {
-    const res = await axios.get(
-      `https://api.modrinth.com/api/v1/user/${data.$auth.user.id}/follows`,
+    const res = await data.$axios.get(
+      `user/${data.$auth.user.id}/follows`,
       data.$auth.headers
     )
 
     const mods = (
-      await axios.get(
-        `https://api.modrinth.com/api/v1/mods?ids=${JSON.stringify(res.data)}`
-      )
+      await data.$axios.get(`mods?ids=${JSON.stringify(res.data)}`)
     ).data.sort((a, b) => a.title > b.title)
 
     return {
@@ -76,8 +72,8 @@ export default {
   },
   methods: {
     async unfavMod(index) {
-      await axios.delete(
-        `https://api.modrinth.com/api/v1/mod/${this.mods[index].id}/follow`,
+      await this.$axios.delete(
+        `mod/${this.mods[index].id}/follow`,
         this.$auth.headers
       )
 
