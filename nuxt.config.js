@@ -175,7 +175,7 @@ export default {
   },
   publicRuntimeConfig: {
     axios: {
-      browserBaseURL: process.env.BROWSER_BASE_URL,
+      baseURL: process.env.API_URL,
     },
     ads: {
       ghostMode: process.env.ENABLE_ADS == null,
@@ -185,11 +185,6 @@ export default {
     },
     analytics: {
       base_url: process.env.ARIADNE_URL,
-    },
-  },
-  privateRuntimeConfig: {
-    axios: {
-      baseURL: process.env.BASE_URL,
     },
   },
 }

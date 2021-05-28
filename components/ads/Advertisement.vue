@@ -79,6 +79,7 @@ export default {
       onSmallScreen: false,
       windowResizeListenerDebounce: null,
       ethicalAdLoad: null,
+      tries: 0,
     }
   },
   computed: {
@@ -119,7 +120,7 @@ export default {
     this.displayed = true
     if (process.browser) {
       this.handleWindowResize()
-      this.refresh_ad()
+      this.refresh_ad(true)
     }
   },
   methods: {
@@ -133,14 +134,14 @@ export default {
             this.format = sizes[this.type]
             this.displayed = true
             // Refresh ad
-            this.refresh_ad()
+            this.refresh_ad(true)
           }
           return
         }
         if (this.onSmallScreen === false) {
           // Reload ad
           this.onSmallScreen = true
-          this.refresh_ad()
+          this.refresh_ad(true)
         }
         this.onSmallScreen = true
         if (this.smallScreen === 'destroy') {
@@ -151,15 +152,24 @@ export default {
         }
       }, 300)
     },
-    refresh_ad() {
+    refresh_ad(reset = false) {
+      if (reset) {
+        this.tries = 0
+      }
+      if (this.tries >= 3) {
+        // Too many tries, we stop
+        return
+      }
       if (this.ethical_ads_on) {
         clearTimeout(this.ethicalAdLoad)
         this.ethicalAdLoad = setTimeout(() => {
-          if (typeof window.ethicalads === 'undefined') {
+          try {
+            ethicalads.load()
+          } catch (e) {
             console.log('EthicalAds are not loaded yet, retrying...')
             this.refresh_ad()
+            this.tries++
           }
-          ethicalads.load()
         }, 100)
       }
     },
