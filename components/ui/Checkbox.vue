@@ -1,7 +1,7 @@
 <template>
   <div class="checkbox-outer" :class="{ disabled }" @click="toggle">
     <button class="checkbox" :disabled="disabled" :class="{ border }">
-      <CheckIcon v-if="checked" />
+      <CheckIcon v-if="value" />
     </button>
     <p>{{ label }}</p>
   </div>
@@ -11,7 +11,7 @@
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
 
 export default {
-  name: 'SearchCheckbox',
+  name: 'Checkbox',
   components: {
     CheckIcon,
   },
@@ -28,31 +28,26 @@ export default {
       type: Boolean,
       default: true,
     },
-  },
-  data() {
-    return {
-      checked: false,
-    }
+    value: Boolean,
   },
   methods: {
     toggle() {
       if (!this.disabled) {
-        this.checked = !this.checked
-        this.$emit('input', this.checked)
+        this.$emit('input', !this.value)
       }
     },
   },
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .checkbox-outer {
   display: flex;
   align-items: center;
   cursor: pointer;
 
   &.disabled {
-    opacity: 0.5;
+    opacity: 0.6;
     cursor: not-allowed;
 
     button {
@@ -65,11 +60,11 @@ export default {
       }
     }
   }
-}
 
-p {
-  padding: 0.2rem 0rem;
-  margin: 0 0 0 0.5rem;
+  p {
+    padding: 0.2rem 0rem;
+    margin: 0 0 0 0.5rem;
+  }
 }
 
 .checkbox {

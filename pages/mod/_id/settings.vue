@@ -105,7 +105,10 @@
         <h3>Permissions</h3>
         <div class="permissions">
           <Checkbox
-            :checked="(member.permissions & UPLOAD_VERSION) === UPLOAD_VERSION"
+            :value="
+              (member.permissions & UPLOAD_VERSION) === UPLOAD_VERSION ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -115,7 +118,10 @@
             @input="members[index].permissions ^= UPLOAD_VERSION"
           />
           <Checkbox
-            :checked="(member.permissions & DELETE_VERSION) === DELETE_VERSION"
+            :value="
+              (member.permissions & DELETE_VERSION) === DELETE_VERSION ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -125,7 +131,10 @@
             @input="members[index].permissions ^= DELETE_VERSION"
           />
           <Checkbox
-            :checked="(member.permissions & EDIT_DETAILS) === EDIT_DETAILS"
+            :value="
+              (member.permissions & EDIT_DETAILS) === EDIT_DETAILS ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -135,7 +144,10 @@
             @input="members[index].permissions ^= EDIT_DETAILS"
           />
           <Checkbox
-            :checked="(member.permissions & EDIT_BODY) === EDIT_BODY"
+            :value="
+              (member.permissions & EDIT_BODY) === EDIT_BODY ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -145,7 +157,10 @@
             @input="members[index].permissions ^= EDIT_BODY"
           />
           <Checkbox
-            :checked="(member.permissions & MANAGE_INVITES) === MANAGE_INVITES"
+            :value="
+              (member.permissions & MANAGE_INVITES) === MANAGE_INVITES ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -155,7 +170,10 @@
             @input="members[index].permissions ^= MANAGE_INVITES"
           />
           <Checkbox
-            :checked="(member.permissions & REMOVE_MEMBER) === REMOVE_MEMBER"
+            :value="
+              (member.permissions & REMOVE_MEMBER) === REMOVE_MEMBER ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
@@ -165,7 +183,10 @@
             @input="members[index].permissions ^= REMOVE_MEMBER"
           />
           <Checkbox
-            :checked="(member.permissions & EDIT_MEMBER) === EDIT_MEMBER"
+            :value="
+              (member.permissions & EDIT_MEMBER) === EDIT_MEMBER ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
@@ -174,7 +195,10 @@
             @input="members[index].permissions ^= EDIT_MEMBER"
           />
           <Checkbox
-            :checked="(member.permissions & DELETE_MOD) === DELETE_MOD"
+            :value="
+              (member.permissions & DELETE_MOD) === DELETE_MOD ||
+              member.role === 'Owner'
+            "
             :disabled="
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
