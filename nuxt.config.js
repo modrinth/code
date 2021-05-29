@@ -171,7 +171,6 @@ export default {
   },
   env: {
     version: process.env.VERSION_ID || 'unknown',
-    domain: getDomain(),
   },
   publicRuntimeConfig: {
     axios: {
@@ -185,6 +184,9 @@ export default {
     },
     analytics: {
       base_url: process.env.ARIADNE_URL,
+    },
+    utils: {
+      domain: getDomain(),
     },
   },
 }

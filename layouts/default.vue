@@ -199,7 +199,7 @@ export default {
   },
   computed: {
     authUrl() {
-      return `${this.$axios.defaults.baseURL}auth/init?url=${process.env.domain}${this.$route.fullPath}`
+      return `${this.$axios.defaults.baseURL}auth/init?url=${this.$store.app.$config.utils.domain}${this.$route.fullPath}`
     },
     userUrl() {
       return `/user/${this.$auth.user.id}`
