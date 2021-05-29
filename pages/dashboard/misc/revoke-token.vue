@@ -51,11 +51,9 @@
 export default {
   components: {},
   methods: {
-    async logout() {
+    logout() {
       this.$cookies.set('auth-token-reset', true)
-      await this.$router.replace(
-        `auth/init?url=${process.env.domain}${this.$route.fullPath}`
-      )
+      window.location.href = '/'
     },
   },
 }
