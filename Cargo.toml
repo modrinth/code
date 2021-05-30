@@ -1,6 +1,6 @@
 [package]
 name = "labrinth"
-version = "0.1.0"
+version = "0.2.0"
 #Team members, please add your emails and usernames
 authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "Charalampos Fanoulis <yo@fanoulis.dev>", "AppleTheGolden <scotsbox@protonmail.com>"]
 edition = "2018"
@@ -12,11 +12,11 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = "3.1.0"
-actix-rt = "1.1.1"
-actix-files = "0.4.0"
+actix-web = "3.3.2"
+actix-rt = "1.1.0"
+actix-files = "0.5.0"
 actix-multipart = "0.3.0"
-actix-cors = "0.4.1"
+actix-cors = "0.5.4"
 actix-ratelimit = "0.3.0"
 
 meilisearch-sdk = "0.6.0"
@@ -35,6 +35,10 @@ base64 = "0.13.0"
 sha1 = { version = "0.6.0", features = ["std"] }
 sha2 = "0.9.2"
 bitflags = "1.2.1"
+zip = "0.5.12"
+
+validator = { version = "0.13", features = ["derive"] }
+regex = "1.5.4"
 
 gumdrop = "0.8.0"
 dotenv = "0.15"
@@ -52,3 +56,5 @@ sqlx = { version = "0.4.2", features = ["runtime-actix-rustls", "postgres", "chr
 
 sentry = { version = "0.22.0", features = ["log"] }
 sentry-actix = "0.22.0"
+
+cached = "0.23.0"

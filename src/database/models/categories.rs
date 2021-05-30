@@ -2,19 +2,30 @@ use super::ids::*;
 use super::DatabaseError;
 use futures::TryStreamExt;
 
+pub struct ProjectType {
+    pub id: ProjectTypeId,
+    pub name: String,
+}
+
 pub struct Loader {
     pub id: LoaderId,
     pub loader: String,
+    pub icon: String,
+    pub supported_project_types: Vec<String>,
 }
 
 pub struct GameVersion {
     pub id: GameVersionId,
     pub version: String,
+    pub version_type: String,
+    pub date: chrono::DateTime<chrono::Utc>,
 }
 
 pub struct Category {
     pub id: CategoryId,
     pub category: String,
+    pub project_type: String,
+    pub icon: String,
 }
 
 pub struct ReportType {
@@ -36,11 +47,17 @@ pub struct DonationPlatform {
 
 pub struct CategoryBuilder<'a> {
     pub name: Option<&'a str>,
+    pub project_type: Option<&'a ProjectTypeId>,
+    pub icon: Option<&'a str>,
 }
 
 impl Category {
     pub fn builder() -> CategoryBuilder<'static> {
-        CategoryBuilder { name: None }
+        CategoryBuilder {
+            name: None,
+            project_type: None,
+            icon: None,
+        }
     }
 
     pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<CategoryId>, DatabaseError>
@@ -59,7 +76,36 @@ impl Category {
             SELECT id FROM categories
             WHERE category = $1
             ",
-            name
+            name,
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(result.map(|r| CategoryId(r.id)))
+    }
+
+    pub async fn get_id_project<'a, E>(
+        name: &str,
+        project_type: ProjectTypeId,
+        exec: E,
+    ) -> Result<Option<CategoryId>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        if !name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+        {
+            return Err(DatabaseError::InvalidIdentifier(name.to_string()));
+        }
+
+        let result = sqlx::query!(
+            "
+            SELECT id FROM categories
+            WHERE category = $1 AND project_type = $2
+            ",
+            name,
+            project_type as ProjectTypeId
         )
         .fetch_optional(exec)
         .await?;
@@ -84,18 +130,27 @@ impl Category {
         Ok(result.category)
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(exec: E) -> Result<Vec<Category>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
-            SELECT category FROM categories
+            SELECT c.id id, c.category category, c.icon icon, pt.name project_type
+            FROM categories c
+            INNER JOIN project_types pt ON c.project_type = pt.id
             "
         )
         .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|c| c.category)) })
-        .try_collect::<Vec<String>>()
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|c| Category {
+                id: CategoryId(c.id),
+                category: c.category,
+                project_type: c.project_type,
+                icon: c.icon,
+            }))
+        })
+        .try_collect::<Vec<Category>>()
         .await?;
 
         Ok(result)
@@ -133,24 +188,49 @@ impl<'a> CategoryBuilder<'a> {
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
         {
-            Ok(Self { name: Some(name) })
+            Ok(Self {
+                name: Some(name),
+                ..self
+            })
         } else {
             Err(DatabaseError::InvalidIdentifier(name.to_string()))
         }
+    }
+
+    pub fn project_type(
+        self,
+        project_type: &'a ProjectTypeId,
+    ) -> Result<CategoryBuilder<'a>, DatabaseError> {
+        Ok(Self {
+            project_type: Some(project_type),
+            ..self
+        })
+    }
+
+    pub fn icon(self, icon: &'a str) -> Result<CategoryBuilder<'a>, DatabaseError> {
+        Ok(Self {
+            icon: Some(icon),
+            ..self
+        })
     }
 
     pub async fn insert<'b, E>(self, exec: E) -> Result<CategoryId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {
+        let id = *self
+            .project_type
+            .ok_or_else(|| DatabaseError::Other("No project type specified.".to_string()))?;
         let result = sqlx::query!(
             "
-            INSERT INTO categories (category)
-            VALUES ($1)
-            ON CONFLICT (category) DO NOTHING
+            INSERT INTO categories (category, project_type, icon)
+            VALUES ($1, $2, $3)
+            ON CONFLICT (category, project_type, icon) DO NOTHING
             RETURNING id
             ",
-            self.name
+            self.name,
+            id as ProjectTypeId,
+            self.icon
         )
         .fetch_one(exec)
         .await?;
@@ -161,11 +241,17 @@ impl<'a> CategoryBuilder<'a> {
 
 pub struct LoaderBuilder<'a> {
     pub name: Option<&'a str>,
+    pub icon: Option<&'a str>,
+    pub supported_project_types: Option<&'a [ProjectTypeId]>,
 }
 
 impl Loader {
     pub fn builder() -> LoaderBuilder<'static> {
-        LoaderBuilder { name: None }
+        LoaderBuilder {
+            name: None,
+            icon: None,
+            supported_project_types: None,
+        }
     }
 
     pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<LoaderId>, DatabaseError>
@@ -209,24 +295,41 @@ impl Loader {
         Ok(result.loader)
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(exec: E) -> Result<Vec<Loader>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
-            SELECT loader FROM loaders
+            SELECT l.id id, l.loader loader, l.icon icon,
+            STRING_AGG(DISTINCT pt.name, ',') project_types
+            FROM loaders l
+            LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id
+            LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id
+            GROUP BY l.id;
             "
         )
         .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|c| c.loader)) })
-        .try_collect::<Vec<String>>()
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|x| Loader {
+                id: LoaderId(x.id),
+                loader: x.loader,
+                icon: x.icon,
+                supported_project_types: x
+                    .project_types
+                    .unwrap_or_default()
+                    .split(',')
+                    .map(|x| x.to_string())
+                    .collect(),
+            }))
+        })
+        .try_collect::<Vec<_>>()
         .await?;
 
         Ok(result)
     }
 
-    // TODO: remove loaders with mods using them
+    // TODO: remove loaders with projects using them
     pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -259,27 +362,73 @@ impl<'a> LoaderBuilder<'a> {
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
         {
-            Ok(Self { name: Some(name) })
+            Ok(Self {
+                name: Some(name),
+                ..self
+            })
         } else {
             Err(DatabaseError::InvalidIdentifier(name.to_string()))
         }
     }
 
-    pub async fn insert<'b, E>(self, exec: E) -> Result<LoaderId, DatabaseError>
-    where
-        E: sqlx::Executor<'b, Database = sqlx::Postgres>,
-    {
+    pub fn icon(self, icon: &'a str) -> Result<LoaderBuilder<'a>, DatabaseError> {
+        Ok(Self {
+            icon: Some(icon),
+            ..self
+        })
+    }
+
+    pub fn supported_project_types(
+        self,
+        supported_project_types: &'a [ProjectTypeId],
+    ) -> Result<LoaderBuilder<'a>, DatabaseError> {
+        Ok(Self {
+            supported_project_types: Some(supported_project_types),
+            ..self
+        })
+    }
+
+    pub async fn insert(
+        self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<LoaderId, super::DatabaseError> {
         let result = sqlx::query!(
             "
-            INSERT INTO loaders (loader)
-            VALUES ($1)
-            ON CONFLICT (loader) DO NOTHING
+            INSERT INTO loaders (loader, icon)
+            VALUES ($1, $2)
+            ON CONFLICT (loader, icon) DO NOTHING
             RETURNING id
             ",
-            self.name
+            self.name,
+            self.icon
         )
-        .fetch_one(exec)
+        .fetch_one(&mut *transaction)
         .await?;
+
+        if let Some(project_types) = self.supported_project_types {
+            sqlx::query!(
+                "
+                    DELETE FROM loaders_project_types
+                    WHERE joining_loader_id = $1
+                    ",
+                result.id
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            for project_type in project_types {
+                sqlx::query!(
+                    "
+                    INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id)
+                    VALUES ($1, $2)
+                    ",
+                    result.id,
+                    project_type.0,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+        }
 
         Ok(LoaderId(result.id))
     }
@@ -341,19 +490,24 @@ impl GameVersion {
         Ok(result.version)
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<String>, DatabaseError>
+    pub async fn list<'a, E>(exec: E) -> Result<Vec<GameVersion>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
-            SELECT version FROM game_versions
+            SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
             ORDER BY created DESC
             "
         )
         .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
-        .try_collect::<Vec<String>>()
+        .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
+            id: GameVersionId(c.id),
+            version: c.version_,
+            version_type: c.type_,
+            date: c.created
+        })) })
+        .try_collect::<Vec<GameVersion>>()
         .await?;
 
         Ok(result)
@@ -363,7 +517,7 @@ impl GameVersion {
         version_type_option: Option<&str>,
         major_option: Option<bool>,
         exec: E,
-    ) -> Result<Vec<String>, DatabaseError>
+    ) -> Result<Vec<GameVersion>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -373,7 +527,7 @@ impl GameVersion {
             if let Some(major) = major_option {
                 result = sqlx::query!(
                     "
-                    SELECT version FROM game_versions
+                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
                     WHERE major = $1 AND type = $2
                     ORDER BY created DESC
                     ",
@@ -381,35 +535,50 @@ impl GameVersion {
                     version_type
                 )
                 .fetch_many(exec)
-                .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
-                .try_collect::<Vec<String>>()
+                    .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
+                        id: GameVersionId(c.id),
+                        version: c.version_,
+                        version_type: c.type_,
+                        date: c.created
+                    })) })
+                .try_collect::<Vec<GameVersion>>()
                 .await?;
             } else {
                 result = sqlx::query!(
                     "
-                    SELECT version FROM game_versions
+                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
                     WHERE type = $1
                     ORDER BY created DESC
                     ",
                     version_type
                 )
                 .fetch_many(exec)
-                .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
-                .try_collect::<Vec<String>>()
+                    .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
+                        id: GameVersionId(c.id),
+                        version: c.version_,
+                        version_type: c.type_,
+                        date: c.created
+                    })) })
+                .try_collect::<Vec<GameVersion>>()
                 .await?;
             }
         } else if let Some(major) = major_option {
             result = sqlx::query!(
                 "
-                SELECT version FROM game_versions
+                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
                 WHERE major = $1
                 ORDER BY created DESC
                 ",
                 major
             )
             .fetch_many(exec)
-            .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
-            .try_collect::<Vec<String>>()
+                .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
+                    id: GameVersionId(c.id),
+                    version: c.version_,
+                    version_type: c.type_,
+                    date: c.created
+                })) })
+            .try_collect::<Vec<GameVersion>>()
             .await?;
         } else {
             result = Vec::new();
@@ -867,7 +1036,6 @@ impl ReportType {
         Ok(result)
     }
 
-    // TODO: remove loaders with mods using them
     pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
@@ -923,5 +1091,158 @@ impl<'a> ReportTypeBuilder<'a> {
         .await?;
 
         Ok(ReportTypeId(result.id))
+    }
+}
+
+pub struct ProjectTypeBuilder<'a> {
+    pub name: Option<&'a str>,
+}
+
+impl ProjectType {
+    pub fn builder() -> ProjectTypeBuilder<'static> {
+        ProjectTypeBuilder { name: None }
+    }
+
+    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<ProjectTypeId>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        if !name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+        {
+            return Err(DatabaseError::InvalidIdentifier(name.to_string()));
+        }
+
+        let result = sqlx::query!(
+            "
+            SELECT id FROM project_types
+            WHERE name = $1
+            ",
+            name
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(result.map(|r| ProjectTypeId(r.id)))
+    }
+
+    pub async fn get_many_id<'a, E>(
+        names: &Vec<String>,
+        exec: E,
+    ) -> Result<Vec<ProjectType>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let project_types = sqlx::query!(
+            "
+            SELECT id, name FROM project_types
+            WHERE name IN (SELECT * FROM UNNEST($1::varchar[]))
+            ",
+            names
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|x| ProjectType {
+                id: ProjectTypeId(x.id),
+                name: x.name,
+            }))
+        })
+        .try_collect::<Vec<ProjectType>>()
+        .await?;
+
+        Ok(project_types)
+    }
+
+    pub async fn get_name<'a, E>(id: ProjectTypeId, exec: E) -> Result<String, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT name FROM project_types
+            WHERE id = $1
+            ",
+            id as ProjectTypeId
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(result.name)
+    }
+
+    pub async fn list<'a, E>(exec: E) -> Result<Vec<String>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT name FROM project_types
+            "
+        )
+        .fetch_many(exec)
+        .try_filter_map(|e| async { Ok(e.right().map(|c| c.name)) })
+        .try_collect::<Vec<String>>()
+        .await?;
+
+        Ok(result)
+    }
+
+    // TODO: remove loaders with mods using them
+    pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use sqlx::Done;
+
+        let result = sqlx::query!(
+            "
+            DELETE FROM project_types
+            WHERE name = $1
+            ",
+            name
+        )
+        .execute(exec)
+        .await?;
+
+        if result.rows_affected() == 0 {
+            // Nothing was deleted
+            Ok(None)
+        } else {
+            Ok(Some(()))
+        }
+    }
+}
+
+impl<'a> ProjectTypeBuilder<'a> {
+    /// The name of the project type.  Must be ASCII alphanumeric or `-`/`_`
+    pub fn name(self, name: &'a str) -> Result<ProjectTypeBuilder<'a>, DatabaseError> {
+        if name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
+        {
+            Ok(Self { name: Some(name) })
+        } else {
+            Err(DatabaseError::InvalidIdentifier(name.to_string()))
+        }
+    }
+
+    pub async fn insert<'b, E>(self, exec: E) -> Result<ProjectTypeId, DatabaseError>
+    where
+        E: sqlx::Executor<'b, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            INSERT INTO project_types (name)
+            VALUES ($1)
+            ON CONFLICT (name) DO NOTHING
+            RETURNING id
+            ",
+            self.name
+        )
+        .fetch_one(exec)
+        .await?;
+
+        Ok(ProjectTypeId(result.id))
     }
 }

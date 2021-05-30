@@ -76,32 +76,3 @@ impl FileHost for S3Host {
         })
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use crate::file_hosting::s3_host::S3Host;
-    use crate::file_hosting::FileHost;
-
-    #[actix_rt::test]
-    async fn test_file_management() {
-        let s3_host = S3Host::new(
-            &*dotenv::var("S3_BUCKET_NAME").unwrap(),
-            &*dotenv::var("S3_REGION").unwrap(),
-            &*dotenv::var("S3_URL").unwrap(),
-            &*dotenv::var("S3_ACCESS_TOKEN").unwrap(),
-            &*dotenv::var("S3_SECRET").unwrap(),
-        )
-        .unwrap();
-
-        s3_host
-            .upload_file(
-                "text/plain",
-                "test.txt",
-                "test file".to_string().into_bytes(),
-            )
-            .await
-            .unwrap();
-
-        s3_host.delete_file_version("", "test.txt").await.unwrap();
-    }
-}

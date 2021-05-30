@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 pub struct VersionBuilder {
     pub version_id: VersionId,
-    pub mod_id: ModId,
+    pub project_id: ProjectId,
     pub author_id: UserId,
     pub name: String,
     pub version_number: String,
@@ -75,7 +75,7 @@ impl VersionBuilder {
     ) -> Result<VersionId, DatabaseError> {
         let version = Version {
             id: self.version_id,
-            mod_id: self.mod_id,
+            project_id: self.project_id,
             author_id: self.author_id,
             name: self.name,
             version_number: self.version_number,
@@ -95,7 +95,7 @@ impl VersionBuilder {
             SET updated = NOW()
             WHERE id = $1
             ",
-            self.mod_id as ModId,
+            self.project_id as ProjectId,
         )
         .execute(&mut *transaction)
         .await?;
@@ -150,7 +150,7 @@ impl VersionBuilder {
 
 pub struct Version {
     pub id: VersionId,
-    pub mod_id: ModId,
+    pub project_id: ProjectId,
     pub author_id: UserId,
     pub name: String,
     pub version_number: String,
@@ -182,7 +182,7 @@ impl Version {
             )
             ",
             self.id as VersionId,
-            self.mod_id as ModId,
+            self.project_id as ProjectId,
             self.author_id as UserId,
             &self.name,
             &self.version_number,
@@ -359,8 +359,8 @@ impl Version {
         Ok(vec)
     }
 
-    pub async fn get_mod_versions<'a, E>(
-        mod_id: ModId,
+    pub async fn get_project_versions<'a, E>(
+        project_id: ProjectId,
         game_versions: Option<Vec<String>>,
         loaders: Option<Vec<String>>,
         exec: E,
@@ -382,7 +382,7 @@ impl Version {
             ) AS version
             ORDER BY version.date_published ASC
             ",
-            mod_id as ModId,
+            project_id as ProjectId,
             &game_versions.unwrap_or_default(),
             &loaders.unwrap_or_default(),
         )
@@ -417,7 +417,7 @@ impl Version {
         if let Some(row) = result {
             Ok(Some(Version {
                 id,
-                mod_id: ModId(row.mod_id),
+                project_id: ProjectId(row.mod_id),
                 author_id: UserId(row.author_id),
                 name: row.name,
                 version_number: row.version_number,
@@ -450,6 +450,7 @@ impl Version {
                 v.release_channel, v.featured
             FROM versions v
             WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            ORDER BY v.date_published ASC
             ",
             &version_ids_parsed
         )
@@ -457,7 +458,7 @@ impl Version {
         .try_filter_map(|e| async {
             Ok(e.right().map(|v| Version {
                 id: VersionId(v.id),
-                mod_id: ModId(v.mod_id),
+                project_id: ProjectId(v.mod_id),
                 author_id: UserId(v.author_id),
                 name: v.name,
                 version_number: v.version_number,
@@ -480,7 +481,7 @@ impl Version {
         executor: E,
     ) -> Result<Option<QueryVersion>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -566,7 +567,7 @@ impl Version {
 
             Ok(Some(QueryVersion {
                 id: VersionId(v.id),
-                mod_id: ModId(v.mod_id),
+                project_id: ProjectId(v.mod_id),
                 author_id: UserId(v.author_id),
                 name: v.version_name,
                 version_number: v.version_number,
@@ -625,7 +626,8 @@ impl Version {
             LEFT OUTER JOIN hashes h on f.id = h.file_id
             LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
             WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
-            GROUP BY v.id, rc.id;
+            GROUP BY v.id, rc.id
+            ORDER BY v.date_published ASC;
             ",
             &version_ids_parsed
         )
@@ -683,7 +685,7 @@ impl Version {
 
                     QueryVersion {
                         id: VersionId(v.id),
-                        mod_id: ModId(v.mod_id),
+                        project_id: ProjectId(v.mod_id),
                         author_id: UserId(v.author_id),
                         name: v.version_name,
                         version_number: v.version_number,
@@ -727,7 +729,7 @@ pub struct FileHash {
 #[derive(Clone)]
 pub struct QueryVersion {
     pub id: VersionId,
-    pub mod_id: ModId,
+    pub project_id: ProjectId,
     pub author_id: UserId,
     pub name: String,
     pub version_number: String,

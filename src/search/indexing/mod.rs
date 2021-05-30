@@ -2,7 +2,7 @@
 pub mod local_import;
 pub mod queue;
 
-use crate::search::{SearchConfig, UploadSearchMod};
+use crate::search::{SearchConfig, UploadSearchProject};
 use local_import::index_local;
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
@@ -27,14 +27,13 @@ pub enum IndexingError {
     EnvError(#[from] dotenv::Error),
 }
 
-// The chunk size for adding mods to the indexing database. If the request size
+// The chunk size for adding projects to the indexing database. If the request size
 // is too large (>10MiB) then the request fails with an error.  This chunk size
-// assumes a max average size of 1KiB per mod to avoid this cap.
+// assumes a max average size of 1KiB per project to avoid this cap.
 const MEILISEARCH_CHUNK_SIZE: usize = 10000;
 
 #[derive(Debug)]
 pub struct IndexingSettings {
-    pub index_external: bool,
     pub index_local: bool,
 }
 
@@ -42,31 +41,24 @@ impl IndexingSettings {
     #[allow(dead_code)]
     pub fn from_env() -> Self {
         let index_local = true;
-        let index_external = dotenv::var("INDEX_CURSEFORGE")
-            .ok()
-            .and_then(|b| b.parse::<bool>().ok())
-            .unwrap_or(false);
 
-        Self {
-            index_external,
-            index_local,
-        }
+        Self { index_local }
     }
 }
 
-pub async fn index_mods(
+pub async fn index_projects(
     pool: PgPool,
     settings: IndexingSettings,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
-    let mut docs_to_add: Vec<UploadSearchMod> = vec![];
+    let mut docs_to_add: Vec<UploadSearchProject> = vec![];
 
     if settings.index_local {
         docs_to_add.append(&mut index_local(pool.clone()).await?);
     }
     // Write Indices
 
-    add_mods(docs_to_add, config).await?;
+    add_projects(docs_to_add, config).await?;
 
     Ok(())
 }
@@ -74,12 +66,12 @@ pub async fn index_mods(
 pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
     let client = Client::new(&*config.address, &*config.key);
 
-    client.delete_index("relevance_mods").await?;
-    client.delete_index("downloads_mods").await?;
-    client.delete_index("follows_mods").await?;
-    client.delete_index("alphabetically_mods").await?;
-    client.delete_index("updated_mods").await?;
-    client.delete_index("newest_mods").await?;
+    client.delete_index("relevance_projects").await?;
+    client.delete_index("downloads_projects").await?;
+    client.delete_index("follows_projects").await?;
+    client.delete_index("updated_projects").await?;
+    client.delete_index("newest_projects").await?;
+    client.delete_index("alphabetically_projects").await?;
     Ok(())
 }
 
@@ -87,7 +79,7 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
     let client = Client::new(&*config.address, &*config.key);
 
     // Relevance Index
-    update_index(&client, "relevance_mods", {
+    update_index(&client, "relevance_projects", {
         let mut relevance_rules = default_rules();
         relevance_rules.push_back("desc(downloads)".to_string());
         relevance_rules.into()
@@ -95,7 +87,7 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
     .await?;
 
     // Downloads Index
-    update_index(&client, "downloads_mods", {
+    update_index(&client, "downloads_projects", {
         let mut downloads_rules = default_rules();
         downloads_rules.push_front("desc(downloads)".to_string());
         downloads_rules.into()
@@ -103,7 +95,7 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
     .await?;
 
     // Follows Index
-    update_index(&client, "follows_mods", {
+    update_index(&client, "follows_projects", {
         let mut follows_rules = default_rules();
         follows_rules.push_front("desc(follows)".to_string());
         follows_rules.into()
@@ -111,15 +103,15 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
     .await?;
 
     // Alphabetically Index
-    update_index(&client, "alphabetically_mods", {
+    update_index(&client, "alphabetically_projects", {
         let mut alphabetically_rules = default_rules();
         alphabetically_rules.push_front("desc(title)".to_string());
         alphabetically_rules.into()
     })
-        .await?;
+    .await?;
 
     // Updated Index
-    update_index(&client, "updated_mods", {
+    update_index(&client, "updated_projects", {
         let mut updated_rules = default_rules();
         updated_rules.push_front("desc(modified_timestamp)".to_string());
         updated_rules.into()
@@ -127,7 +119,7 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
     .await?;
 
     // Created Index
-    update_index(&client, "newest_mods", {
+    update_index(&client, "newest_projects", {
         let mut newest_rules = default_rules();
         newest_rules.push_front("desc(created_timestamp)".to_string());
         newest_rules.into()
@@ -147,7 +139,7 @@ async fn update_index<'a>(
         Err(meilisearch_sdk::errors::Error::MeiliSearchError {
             error_code: meilisearch_sdk::errors::ErrorCode::IndexNotFound,
             ..
-        }) => client.create_index(name, Some("mod_id")).await?,
+        }) => client.create_index(name, Some("project_id")).await?,
         Err(e) => {
             return Err(IndexingError::IndexDBError(e));
         }
@@ -171,7 +163,7 @@ async fn create_index<'a>(
             ..
         }) => {
             // Only create index and set settings if the index doesn't already exist
-            let index = client.create_index(name, Some("mod_id")).await?;
+            let index = client.create_index(name, Some("project_id")).await?;
 
             index
                 .set_settings(&default_settings().with_ranking_rules(rules()))
@@ -186,72 +178,72 @@ async fn create_index<'a>(
     }
 }
 
-async fn add_to_index(index: Index<'_>, mods: &[UploadSearchMod]) -> Result<(), IndexingError> {
+async fn add_to_index(index: Index<'_>, mods: &[UploadSearchProject]) -> Result<(), IndexingError> {
     for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
-        index.add_documents(chunk, Some("mod_id")).await?;
+        index.add_documents(chunk, Some("project_id")).await?;
     }
     Ok(())
 }
 
-pub async fn add_mods(
-    mods: Vec<UploadSearchMod>,
+pub async fn add_projects(
+    projects: Vec<UploadSearchProject>,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
     let client = Client::new(&*config.address, &*config.key);
 
     // Relevance Index
-    let relevance_index = create_index(&client, "relevance_mods", || {
+    let relevance_index = create_index(&client, "relevance_projects", || {
         let mut relevance_rules = default_rules();
         relevance_rules.push_back("desc(downloads)".to_string());
         relevance_rules.into()
     })
     .await?;
-    add_to_index(relevance_index, &mods).await?;
+    add_to_index(relevance_index, &projects).await?;
 
     // Downloads Index
-    let downloads_index = create_index(&client, "downloads_mods", || {
+    let downloads_index = create_index(&client, "downloads_projects", || {
         let mut downloads_rules = default_rules();
         downloads_rules.push_front("desc(downloads)".to_string());
         downloads_rules.into()
     })
     .await?;
-    add_to_index(downloads_index, &mods).await?;
+    add_to_index(downloads_index, &projects).await?;
 
     // Follows Index
-    let follows_index = create_index(&client, "follows_mods", || {
+    let follows_index = create_index(&client, "follows_projects", || {
         let mut follows_rules = default_rules();
         follows_rules.push_front("desc(follows)".to_string());
         follows_rules.into()
     })
     .await?;
-    add_to_index(follows_index, &mods).await?;
+    add_to_index(follows_index, &projects).await?;
 
     // Alphabetically Index
-    let alphabetically_index = create_index(&client, "alphabetically_mods", || {
+    let alphabetically_index = create_index(&client, "alphabetically_projects", || {
         let mut alphabetically_rules = default_rules();
         alphabetically_rules.push_front("desc(title)".to_string());
         alphabetically_rules.into()
     })
-        .await?;
-    add_to_index(alphabetically_index, &mods).await?;
+    .await?;
+    add_to_index(alphabetically_index, &projects).await?;
 
     // Updated Index
-    let updated_index = create_index(&client, "updated_mods", || {
+    let updated_index = create_index(&client, "updated_projects", || {
         let mut updated_rules = default_rules();
         updated_rules.push_front("desc(modified_timestamp)".to_string());
         updated_rules.into()
     })
     .await?;
-    add_to_index(updated_index, &mods).await?;
+    add_to_index(updated_index, &projects).await?;
 
     // Created Index
-    let newest_index = create_index(&client, "newest_mods", || {
+    let newest_index = create_index(&client, "newest_projects", || {
         let mut newest_rules = default_rules();
         newest_rules.push_front("desc(created_timestamp)".to_string());
         newest_rules.into()
     })
     .await?;
-    add_to_index(newest_index, &mods).await?;
+    add_to_index(newest_index, &projects).await?;
 
     Ok(())
 }
@@ -271,7 +263,7 @@ fn default_rules() -> VecDeque<String> {
 
 fn default_settings() -> Settings {
     let displayed_attributes = vec![
-        "mod_id".to_string(),
+        "project_id".to_string(),
         "slug".to_string(),
         "author".to_string(),
         "title".to_string(),
@@ -280,16 +272,13 @@ fn default_settings() -> Settings {
         "versions".to_string(),
         "downloads".to_string(),
         "follows".to_string(),
-        "page_url".to_string(),
         "icon_url".to_string(),
-        "author_url".to_string(),
         "date_created".to_string(),
         "date_modified".to_string(),
         "latest_version".to_string(),
         "license".to_string(),
         "client_side".to_string(),
         "server_side".to_string(),
-        "host".to_string(),
     ];
 
     let searchable_attributes = vec![
@@ -325,7 +314,7 @@ fn default_settings() -> Settings {
 // This isn't currenly used, but I wrote it and it works, so I'm
 // keeping this mess in case someone needs it in the future.
 #[allow(dead_code)]
-pub fn sort_mods(a: &str, b: &str) -> std::cmp::Ordering {
+pub fn sort_projects(a: &str, b: &str) -> std::cmp::Ordering {
     use std::cmp::Ordering;
 
     let cmp = a.contains('.').cmp(&b.contains('.'));

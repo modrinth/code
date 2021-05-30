@@ -1,23 +1,14 @@
-use super::ApiError;
 use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models::projects::{Project, ProjectStatus};
-use actix_web::{get, web, HttpRequest, HttpResponse};
-use serde::Deserialize;
+use crate::routes::moderation::ResultCount;
+use crate::routes::ApiError;
+use actix_web::web;
+use actix_web::{get, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 
-#[derive(Deserialize)]
-pub struct ResultCount {
-    #[serde(default = "default_count")]
-    pub count: i16,
-}
-
-fn default_count() -> i16 {
-    100
-}
-
-#[get("projects")]
-pub async fn get_projects(
+#[get("mods")]
+pub async fn get_mods(
     req: HttpRequest,
     pool: web::Data<PgPool>,
     count: web::Query<ResultCount>,
@@ -46,7 +37,7 @@ pub async fn get_projects(
     let projects: Vec<Project> = database::Project::get_many_full(project_ids, &**pool)
         .await?
         .into_iter()
-        .map(super::projects::convert_project)
+        .map(crate::routes::projects::convert_project)
         .collect();
 
     Ok(HttpResponse::Ok().json(projects))

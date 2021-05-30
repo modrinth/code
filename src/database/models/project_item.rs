@@ -1,7 +1,11 @@
 use super::ids::*;
-
+use crate::database::cache::project_cache::{get_cache_project, set_cache_project};
+use crate::database::cache::query_project_cache::{
+    get_cache_query_project, set_cache_query_project,
+};
+#[derive(Clone, Debug)]
 pub struct DonationUrl {
-    pub mod_id: ModId,
+    pub project_id: ProjectId,
     pub platform_id: DonationPlatformId,
     pub platform_short: String,
     pub platform_name: String,
@@ -22,7 +26,7 @@ impl DonationUrl {
                 $1, $2, $3
             )
             ",
-            self.mod_id as ModId,
+            self.project_id as ProjectId,
             self.platform_id as DonationPlatformId,
             self.url,
         )
@@ -33,8 +37,9 @@ impl DonationUrl {
     }
 }
 
-pub struct ModBuilder {
-    pub mod_id: ModId,
+pub struct ProjectBuilder {
+    pub project_id: ProjectId,
+    pub project_type_id: ProjectTypeId,
     pub team_id: TeamId,
     pub title: String,
     pub description: String,
@@ -55,13 +60,14 @@ pub struct ModBuilder {
     pub donation_urls: Vec<DonationUrl>,
 }
 
-impl ModBuilder {
+impl ProjectBuilder {
     pub async fn insert(
         self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    ) -> Result<ModId, super::DatabaseError> {
-        let mod_struct = Mod {
-            id: self.mod_id,
+    ) -> Result<ProjectId, super::DatabaseError> {
+        let project_struct = Project {
+            id: self.project_id,
+            project_type: self.project_type_id,
             team_id: self.team_id,
             title: self.title,
             description: self.description,
@@ -83,15 +89,15 @@ impl ModBuilder {
             license: self.license,
             slug: self.slug,
         };
-        mod_struct.insert(&mut *transaction).await?;
+        project_struct.insert(&mut *transaction).await?;
 
         for mut version in self.initial_versions {
-            version.mod_id = self.mod_id;
+            version.project_id = self.project_id;
             version.insert(&mut *transaction).await?;
         }
 
         for mut donation in self.donation_urls {
-            donation.mod_id = self.mod_id;
+            donation.project_id = self.project_id;
             donation.insert(&mut *transaction).await?;
         }
 
@@ -101,19 +107,20 @@ impl ModBuilder {
                 INSERT INTO mods_categories (joining_mod_id, joining_category_id)
                 VALUES ($1, $2)
                 ",
-                self.mod_id as ModId,
+                self.project_id as ProjectId,
                 category as CategoryId,
             )
             .execute(&mut *transaction)
             .await?;
         }
 
-        Ok(self.mod_id)
+        Ok(self.project_id)
     }
 }
-
-pub struct Mod {
-    pub id: ModId,
+#[derive(Clone, Debug)]
+pub struct Project {
+    pub id: ProjectId,
+    pub project_type: ProjectTypeId,
     pub team_id: TeamId,
     pub title: String,
     pub description: String,
@@ -136,7 +143,7 @@ pub struct Mod {
     pub slug: Option<String>,
 }
 
-impl Mod {
+impl Project {
     pub async fn insert(
         &self,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -148,17 +155,17 @@ impl Mod {
                 published, downloads, icon_url, issues_url,
                 source_url, wiki_url, status, discord_url,
                 client_side, server_side, license_url, license,
-                slug
+                slug, project_type
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9,
                 $10, $11, $12, $13,
                 $14, $15, $16, $17,
-                LOWER($18)
+                LOWER($18), $19
             )
             ",
-            self.id as ModId,
+            self.id as ProjectId,
             self.team_id as TeamId,
             &self.title,
             &self.description,
@@ -175,7 +182,8 @@ impl Mod {
             self.server_side as SideTypeId,
             self.license_url.as_ref(),
             self.license as LicenseId,
-            self.slug.as_ref()
+            self.slug.as_ref(),
+            self.project_type as ProjectTypeId
         )
         .execute(&mut *transaction)
         .await?;
@@ -183,13 +191,16 @@ impl Mod {
         Ok(())
     }
 
-    pub async fn get<'a, 'b, E>(id: ModId, executor: E) -> Result<Option<Self>, sqlx::error::Error>
+    pub async fn get<'a, 'b, E>(
+        id: ProjectId,
+        executor: E,
+    ) -> Result<Option<Self>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
-            SELECT title, description, downloads, follows,
+            SELECT project_type, title, description, downloads, follows,
                    icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
@@ -197,14 +208,15 @@ impl Mod {
             FROM mods
             WHERE id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .fetch_optional(executor)
         .await?;
 
         if let Some(row) = result {
-            Ok(Some(Mod {
+            Ok(Some(Project {
                 id,
+                project_type: ProjectTypeId(row.project_type),
                 team_id: TeamId(row.team_id),
                 title: row.title,
                 description: row.description,
@@ -231,16 +243,19 @@ impl Mod {
         }
     }
 
-    pub async fn get_many<'a, E>(mod_ids: Vec<ModId>, exec: E) -> Result<Vec<Mod>, sqlx::Error>
+    pub async fn get_many<'a, E>(
+        project_ids: Vec<ProjectId>,
+        exec: E,
+    ) -> Result<Vec<Project>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::stream::TryStreamExt;
 
-        let mod_ids_parsed: Vec<i64> = mod_ids.into_iter().map(|x| x.0).collect();
-        let mods = sqlx::query!(
+        let project_ids_parsed: Vec<i64> = project_ids.into_iter().map(|x| x.0).collect();
+        let projects = sqlx::query!(
             "
-            SELECT id, title, description, downloads, follows,
+            SELECT id, project_type, title, description, downloads, follows,
                    icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
@@ -248,12 +263,13 @@ impl Mod {
             FROM mods
             WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
             ",
-            &mod_ids_parsed
+            &project_ids_parsed
         )
         .fetch_many(exec)
         .try_filter_map(|e| async {
-            Ok(e.right().map(|m| Mod {
-                id: ModId(m.id),
+            Ok(e.right().map(|m| Project {
+                id: ProjectId(m.id),
+                project_type: ProjectTypeId(m.project_type),
                 team_id: TeamId(m.team_id),
                 title: m.title,
                 description: m.description,
@@ -276,14 +292,14 @@ impl Mod {
                 follows: m.follows,
             }))
         })
-        .try_collect::<Vec<Mod>>()
+        .try_collect::<Vec<Project>>()
         .await?;
 
-        Ok(mods)
+        Ok(projects)
     }
 
     pub async fn remove_full<'a, 'b, E>(
-        id: ModId,
+        id: ProjectId,
         exec: E,
     ) -> Result<Option<()>, sqlx::error::Error>
     where
@@ -293,7 +309,7 @@ impl Mod {
             "
             SELECT team_id FROM mods WHERE id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .fetch_optional(exec)
         .await?;
@@ -309,7 +325,7 @@ impl Mod {
             DELETE FROM mod_follows
             WHERE mod_id = $1
             ",
-            id as ModId
+            id as ProjectId
         )
         .execute(exec)
         .await?;
@@ -319,7 +335,7 @@ impl Mod {
             DELETE FROM mod_follows
             WHERE mod_id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .execute(exec)
         .await?;
@@ -329,7 +345,7 @@ impl Mod {
             DELETE FROM reports
             WHERE mod_id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .execute(exec)
         .await?;
@@ -339,7 +355,7 @@ impl Mod {
             DELETE FROM mods_categories
             WHERE joining_mod_id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .execute(exec)
         .await?;
@@ -349,7 +365,7 @@ impl Mod {
             DELETE FROM mods_donations
             WHERE joining_mod_id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .execute(exec)
         .await?;
@@ -360,7 +376,7 @@ impl Mod {
             SELECT id FROM versions
             WHERE mod_id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .fetch_many(exec)
         .try_filter_map(|e| async { Ok(e.right().map(|c| VersionId(c.id))) })
@@ -376,7 +392,7 @@ impl Mod {
             DELETE FROM mods
             WHERE id = $1
             ",
-            id as ModId,
+            id as ProjectId,
         )
         .execute(exec)
         .await?;
@@ -407,7 +423,7 @@ impl Mod {
     pub async fn get_full_from_slug<'a, 'b, E>(
         slug: &str,
         executor: E,
-    ) -> Result<Option<QueryMod>, sqlx::error::Error>
+    ) -> Result<Option<QueryProject>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -421,49 +437,154 @@ impl Mod {
         .fetch_optional(executor)
         .await?;
 
-        if let Some(mod_id) = id {
-            Mod::get_full(ModId(mod_id.id), executor).await
+        if let Some(project_id) = id {
+            Project::get_full(ProjectId(project_id.id), executor).await
         } else {
             Ok(None)
         }
     }
 
-    pub async fn get_full<'a, 'b, E>(
-        id: ModId,
+    pub async fn get_from_slug<'a, 'b, E>(
+        slug: &str,
         executor: E,
-    ) -> Result<Option<QueryMod>, sqlx::error::Error>
+    ) -> Result<Option<Project>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let id = sqlx::query!(
+            "
+                SELECT id FROM mods
+                WHERE LOWER(slug) = LOWER($1)
+                ",
+            slug
+        )
+        .fetch_optional(executor)
+        .await?;
+
+        if let Some(project_id) = id {
+            Project::get(ProjectId(project_id.id), executor).await
+        } else {
+            Ok(None)
+        }
+    }
+
+    pub async fn get_from_slug_or_project_id<'a, 'b, E>(
+        slug_or_project_id: String,
+        executor: E,
+    ) -> Result<Option<Project>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        // Check in the cache
+        let cached = get_cache_project(slug_or_project_id.clone()).await;
+        if let Some(data) = cached {
+            return Ok(Some(data));
+        }
+        let id_option =
+            crate::models::ids::base62_impl::parse_base62(&*slug_or_project_id.clone()).ok();
+
+        if let Some(id) = id_option {
+            let mut project = Project::get(ProjectId(id as i64), executor).await?;
+
+            if project.is_none() {
+                project = Project::get_from_slug(&slug_or_project_id, executor).await?;
+            }
+            // Cache the response
+            if let Some(data) = project {
+                set_cache_project(slug_or_project_id.clone(), &data).await;
+                Ok(Some(data))
+            } else {
+                Ok(None)
+            }
+        } else {
+            let project = Project::get_from_slug(&slug_or_project_id, executor).await?;
+            // Capture the data, and try to cache it
+            if let Some(data) = project {
+                set_cache_project(slug_or_project_id.clone(), &data).await;
+                Ok(Some(data))
+            } else {
+                Ok(None)
+            }
+        }
+    }
+
+    pub async fn get_full_from_slug_or_project_id<'a, 'b, E>(
+        slug_or_project_id: String,
+        executor: E,
+    ) -> Result<Option<QueryProject>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        // Query cache
+        let cached = get_cache_query_project(slug_or_project_id.clone()).await;
+        if let Some(data) = cached {
+            return Ok(Some(data));
+        }
+        let id_option =
+            crate::models::ids::base62_impl::parse_base62(&*slug_or_project_id.clone()).ok();
+
+        if let Some(id) = id_option {
+            let mut project = Project::get_full(ProjectId(id as i64), executor).await?;
+
+            if project.is_none() {
+                project = Project::get_full_from_slug(&slug_or_project_id, executor).await?;
+            }
+            // Save the variable
+            if let Some(data) = project {
+                set_cache_query_project(slug_or_project_id.clone(), &data).await;
+                Ok(Some(data))
+            } else {
+                Ok(None)
+            }
+        } else {
+            let project = Project::get_full_from_slug(&slug_or_project_id, executor).await?;
+            if let Some(data) = project {
+                set_cache_query_project(slug_or_project_id.clone(), &data).await;
+                Ok(Some(data))
+            } else {
+                Ok(None)
+            }
+        }
+    }
+
+    pub async fn get_full<'a, 'b, E>(
+        id: ProjectId,
+        executor: E,
+    ) -> Result<Option<QueryProject>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         let result = sqlx::query!(
             "
-            SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,
+            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
-            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
+            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
             STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
             LEFT OUTER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
             INNER JOIN licenses l ON m.license = l.id
             WHERE m.id = $1
-            GROUP BY m.id, s.id, cs.id, ss.id, l.id;
+            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id;
             ",
-            id as ModId,
+            id as ProjectId,
         )
             .fetch_optional(executor)
             .await?;
 
         if let Some(m) = result {
-            Ok(Some(QueryMod {
-                inner: Mod {
-                    id: ModId(m.id),
+            Ok(Some(QueryProject {
+                inner: Project {
+                    id: ProjectId(m.id),
+                    project_type: ProjectTypeId(m.project_type),
                     team_id: TeamId(m.team_id),
                     title: m.title.clone(),
                     description: m.description.clone(),
@@ -485,6 +606,7 @@ impl Mod {
                     body: m.body.clone(),
                     follows: m.follows,
                 },
+                project_type: m.project_type_name,
                 categories: m
                     .categories
                     .unwrap_or_default()
@@ -498,11 +620,11 @@ impl Mod {
                     .map(|x| VersionId(x.parse().unwrap_or_default()))
                     .collect(),
                 donation_urls: vec![],
-                status: crate::models::mods::ModStatus::from_str(&m.status_name),
+                status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                 license_id: m.short,
                 license_name: m.license_name,
-                client_side: crate::models::mods::SideType::from_str(&m.client_side_type),
-                server_side: crate::models::mods::SideType::from_str(&m.server_side_type),
+                client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
+                server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
             }))
         } else {
             Ok(None)
@@ -510,42 +632,44 @@ impl Mod {
     }
 
     pub async fn get_many_full<'a, E>(
-        mod_ids: Vec<ModId>,
+        project_ids: Vec<ProjectId>,
         exec: E,
-    ) -> Result<Vec<QueryMod>, sqlx::Error>
+    ) -> Result<Vec<QueryProject>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::TryStreamExt;
 
-        let mod_ids_parsed: Vec<i64> = mod_ids.into_iter().map(|x| x.0).collect();
+        let project_ids_parsed: Vec<i64> = project_ids.into_iter().map(|x| x.0).collect();
         sqlx::query!(
             "
-            SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,
+            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
-            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,
+            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
             STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
             LEFT OUTER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
             INNER JOIN licenses l ON m.license = l.id
             WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))
-            GROUP BY m.id, s.id, cs.id, ss.id, l.id;
+            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id;
             ",
-            &mod_ids_parsed
+            &project_ids_parsed
         )
             .fetch_many(exec)
             .try_filter_map(|e| async {
-                Ok(e.right().map(|m| QueryMod {
-                    inner: Mod {
-                        id: ModId(m.id),
+                Ok(e.right().map(|m| QueryProject {
+                    inner: Project {
+                        id: ProjectId(m.id),
+                        project_type: ProjectTypeId(m.project_type),
                         team_id: TeamId(m.team_id),
                         title: m.title.clone(),
                         description: m.description.clone(),
@@ -567,30 +691,31 @@ impl Mod {
                         body: m.body.clone(),
                         follows: m.follows
                     },
+                    project_type: m.project_type_name,
                     categories: m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
                     versions: m.versions.unwrap_or_default().split(',').map(|x| VersionId(x.parse().unwrap_or_default())).collect(),
                     donation_urls: vec![],
-                    status: crate::models::mods::ModStatus::from_str(&m.status_name),
+                    status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                     license_id: m.short,
                     license_name: m.license_name,
-                    client_side: crate::models::mods::SideType::from_str(&m.client_side_type),
-                    server_side: crate::models::mods::SideType::from_str(&m.server_side_type),
+                    client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
+                    server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
                 }))
             })
-            .try_collect::<Vec<QueryMod>>()
+            .try_collect::<Vec<QueryProject>>()
             .await
     }
 }
-
-pub struct QueryMod {
-    pub inner: Mod,
-
+#[derive(Clone, Debug)]
+pub struct QueryProject {
+    pub inner: Project,
+    pub project_type: String,
     pub categories: Vec<String>,
     pub versions: Vec<VersionId>,
     pub donation_urls: Vec<DonationUrl>,
-    pub status: crate::models::mods::ModStatus,
+    pub status: crate::models::projects::ProjectStatus,
     pub license_id: String,
     pub license_name: String,
-    pub client_side: crate::models::mods::SideType,
-    pub server_side: crate::models::mods::SideType,
+    pub client_side: crate::models::projects::SideType,
+    pub server_side: crate::models::projects::SideType,
 }

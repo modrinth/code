@@ -1,4 +1,4 @@
-use super::{add_mods, IndexingError, UploadSearchMod};
+use super::{add_projects, IndexingError, UploadSearchProject};
 use crate::search::SearchConfig;
 use std::sync::Mutex;
 
@@ -7,7 +7,7 @@ pub struct CreationQueue {
     // and I don't think this can deadlock.  This queue requires fast
     // writes and then a single potentially slower read/write that
     // empties the queue.
-    queue: Mutex<Vec<UploadSearchMod>>,
+    queue: Mutex<Vec<UploadSearchProject>>,
 }
 
 impl CreationQueue {
@@ -17,11 +17,11 @@ impl CreationQueue {
         }
     }
 
-    pub fn add(&self, search_mod: UploadSearchMod) {
+    pub fn add(&self, search_project: UploadSearchProject) {
         // Can only panic if mutex is poisoned
-        self.queue.lock().unwrap().push(search_mod);
+        self.queue.lock().unwrap().push(search_project);
     }
-    pub fn take(&self) -> Vec<UploadSearchMod> {
+    pub fn take(&self) -> Vec<UploadSearchProject> {
         std::mem::replace(&mut *self.queue.lock().unwrap(), Vec::with_capacity(10))
     }
 }
@@ -31,5 +31,5 @@ pub async fn index_queue(
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
     let queue = queue.take();
-    add_mods(queue, config).await
+    add_projects(queue, config).await
 }

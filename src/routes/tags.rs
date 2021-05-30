@@ -1,7 +1,7 @@
 use super::ApiError;
 use crate::auth::check_is_admin_from_headers;
 use crate::database::models;
-use crate::database::models::categories::{DonationPlatform, License, ReportType};
+use crate::database::models::categories::{DonationPlatform, License, ProjectType, ReportType};
 use actix_web::{delete, get, put, web, HttpRequest, HttpResponse};
 use models::categories::{Category, GameVersion, Loader};
 use sqlx::PgPool;
@@ -30,27 +30,55 @@ pub fn config(cfg: &mut web::ServiceConfig) {
     );
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct CategoryData {
+    icon: String,
+    name: String,
+    project_type: String,
+}
+
 // TODO: searching / filtering? Could be used to implement a live
 // searching category list
 #[get("category")]
 pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = Category::list(&**pool).await?;
+    let results = Category::list(&**pool)
+        .await?
+        .into_iter()
+        .map(|x| CategoryData {
+            icon: x.icon,
+            name: x.category,
+            project_type: x.project_type,
+        })
+        .collect::<Vec<_>>();
+
     Ok(HttpResponse::Ok().json(results))
 }
 
-#[put("category/{name}")]
+#[put("category")]
 pub async fn category_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    category: web::Path<(String,)>,
+    new_category: web::Json<CategoryData>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
-    let name = category.into_inner().0;
+    let project_type = crate::database::models::ProjectTypeId::get_id(
+        (&new_category).project_type.clone(),
+        &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInputError("Specified project type does not exist!".to_string())
+    })?;
 
-    let _id = Category::builder().name(&name)?.insert(&**pool).await?;
+    let _id = Category::builder()
+        .name(&new_category.name)?
+        .project_type(&project_type)?
+        .icon(&new_category.icon)?
+        .insert(&**pool)
+        .await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("category/{name}")]
@@ -72,31 +100,56 @@ pub async fn category_delete(
         .map_err(models::DatabaseError::from)?;
 
     if result.is_some() {
-        Ok(HttpResponse::Ok().body(""))
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
 }
 
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LoaderData {
+    icon: String,
+    name: String,
+    supported_project_types: Vec<String>,
+}
+
 #[get("loader")]
 pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = Loader::list(&**pool).await?;
+    let results = Loader::list(&**pool)
+        .await?
+        .into_iter()
+        .map(|x| LoaderData {
+            icon: x.icon,
+            name: x.loader,
+            supported_project_types: x.supported_project_types,
+        })
+        .collect::<Vec<_>>();
     Ok(HttpResponse::Ok().json(results))
 }
 
-#[put("loader/{name}")]
+#[put("loader")]
 pub async fn loader_create(
     req: HttpRequest,
     pool: web::Data<PgPool>,
-    loader: web::Path<(String,)>,
+    new_loader: web::Json<LoaderData>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
-    let name = loader.into_inner().0;
+    let mut transaction = pool.begin().await?;
 
-    let _id = Loader::builder().name(&name)?.insert(&**pool).await?;
+    let project_types =
+        ProjectType::get_many_id(&new_loader.supported_project_types, &mut *transaction).await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    let _id = Loader::builder()
+        .name(&new_loader.name)?
+        .icon(&new_loader.icon)?
+        .supported_project_types(&*project_types.into_iter().map(|x| x.id).collect::<Vec<_>>())?
+        .insert(&mut transaction)
+        .await?;
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("loader/{name}")]
@@ -118,14 +171,21 @@ pub async fn loader_delete(
         .map_err(models::DatabaseError::from)?;
 
     if result.is_some() {
-        Ok(HttpResponse::Ok().body(""))
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
 }
 
-#[derive(serde::Deserialize)]
+#[derive(serde::Serialize)]
 pub struct GameVersionQueryData {
+    pub version: String,
+    pub version_type: String,
+    pub date: chrono::DateTime<chrono::Utc>,
+}
+
+#[derive(serde::Deserialize)]
+pub struct GameVersionQuery {
     #[serde(rename = "type")]
     type_: Option<String>,
     major: Option<bool>,
@@ -134,16 +194,22 @@ pub struct GameVersionQueryData {
 #[get("game_version")]
 pub async fn game_version_list(
     pool: web::Data<PgPool>,
-    query: web::Query<GameVersionQueryData>,
+    query: web::Query<GameVersionQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    if query.type_.is_some() || query.major.is_some() {
-        let results =
-            GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool).await?;
-        Ok(HttpResponse::Ok().json(results))
+    let results: Vec<GameVersionQueryData> = if query.type_.is_some() || query.major.is_some() {
+        GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool).await?
     } else {
-        let results = GameVersion::list(&**pool).await?;
-        Ok(HttpResponse::Ok().json(results))
+        GameVersion::list(&**pool).await?
     }
+    .into_iter()
+    .map(|x| GameVersionQueryData {
+        version: x.version,
+        version_type: x.version_type,
+        date: x.date,
+    })
+    .collect();
+
+    Ok(HttpResponse::Ok().json(results))
 }
 
 #[derive(serde::Deserialize)]
@@ -177,7 +243,7 @@ pub async fn game_version_create(
 
     let _id = builder.insert(&**pool).await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("game_version/{name}")]
@@ -199,7 +265,7 @@ pub async fn game_version_delete(
         .map_err(models::DatabaseError::from)?;
 
     if result.is_some() {
-        Ok(HttpResponse::Ok().body(""))
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
@@ -246,7 +312,7 @@ pub async fn license_create(
         .insert(&**pool)
         .await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("license/{name}")]
@@ -268,7 +334,7 @@ pub async fn license_delete(
         .map_err(models::DatabaseError::from)?;
 
     if result.is_some() {
-        Ok(HttpResponse::Ok().body(""))
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
@@ -315,7 +381,7 @@ pub async fn donation_platform_create(
         .insert(&**pool)
         .await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("donation_platform/{name}")]
@@ -337,7 +403,7 @@ pub async fn donation_platform_delete(
         .map_err(models::DatabaseError::from)?;
 
     if result.is_some() {
-        Ok(HttpResponse::Ok().body(""))
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
@@ -361,7 +427,7 @@ pub async fn report_type_create(
 
     let _id = ReportType::builder().name(&name)?.insert(&**pool).await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("report_type/{name}")]
@@ -383,7 +449,7 @@ pub async fn report_type_delete(
         .map_err(models::DatabaseError::from)?;
 
     if result.is_some() {
-        Ok(HttpResponse::Ok().body(""))
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

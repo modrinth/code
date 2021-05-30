@@ -1,5 +1,5 @@
 use crate::models::error::ApiError;
-use crate::models::mods::SearchRequest;
+use crate::models::projects::SearchRequest;
 use actix_web::http::StatusCode;
 use actix_web::web::HttpResponse;
 use chrono::{DateTime, Utc};
@@ -57,11 +57,11 @@ pub struct SearchConfig {
     pub key: String,
 }
 
-/// A mod document used for uploading mods to meilisearch's indices.
+/// A project document used for uploading projects to meilisearch's indices.
 /// This contains some extra data that is not returned by search results.
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct UploadSearchMod {
-    pub mod_id: String,
+pub struct UploadSearchProject {
+    pub project_id: String,
     pub slug: Option<String>,
     pub author: String,
     pub title: String,
@@ -70,17 +70,15 @@ pub struct UploadSearchMod {
     pub versions: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
-    pub page_url: String,
     pub icon_url: String,
-    pub author_url: String,
     pub latest_version: Cow<'static, str>,
     pub license: String,
     pub client_side: String,
     pub server_side: String,
 
-    /// RFC 3339 formatted creation date of the mod
+    /// RFC 3339 formatted creation date of the project
     pub date_created: DateTime<Utc>,
-    /// Unix timestamp of the creation date of the mod
+    /// Unix timestamp of the creation date of the project
     pub created_timestamp: i64,
     /// RFC 3339 formatted date/time of last major modification (update)
     pub date_modified: DateTime<Utc>,
@@ -92,15 +90,15 @@ pub struct UploadSearchMod {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SearchResults {
-    pub hits: Vec<ResultSearchMod>,
+    pub hits: Vec<ResultSearchProject>,
     pub offset: usize,
     pub limit: usize,
     pub total_hits: usize,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct ResultSearchMod {
-    pub mod_id: String,
+pub struct ResultSearchProject {
+    pub project_id: String,
     pub slug: Option<String>,
     pub author: String,
     pub title: String,
@@ -110,39 +108,34 @@ pub struct ResultSearchMod {
     pub versions: Vec<String>,
     pub downloads: i32,
     pub follows: i32,
-    pub page_url: String,
     pub icon_url: String,
-    pub author_url: String,
-    /// RFC 3339 formatted creation date of the mod
+    /// RFC 3339 formatted creation date of the project
     pub date_created: String,
-    /// RFC 3339 formatted modification date of the mod
+    /// RFC 3339 formatted modification date of the project
     pub date_modified: String,
     pub latest_version: String,
     pub license: String,
     pub client_side: String,
     pub server_side: String,
-
-    /// The host of the mod: Either `modrinth` or `curseforge`
-    pub host: String,
 }
 
-impl Document for UploadSearchMod {
+impl Document for UploadSearchProject {
     type UIDType = String;
 
     fn get_uid(&self) -> &Self::UIDType {
-        &self.mod_id
+        &self.project_id
     }
 }
 
-impl Document for ResultSearchMod {
+impl Document for ResultSearchProject {
     type UIDType = String;
 
     fn get_uid(&self) -> &Self::UIDType {
-        &self.mod_id
+        &self.project_id
     }
 }
 
-pub async fn search_for_mod(
+pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
 ) -> Result<SearchResults, SearchError> {
@@ -160,12 +153,12 @@ pub async fn search_for_mod(
     let limit = info.limit.as_deref().unwrap_or("10").parse()?;
 
     let index = match index {
-        "relevance" => "relevance_mods",
-        "downloads" => "downloads_mods",
-        "follows" => "follows_mods",
-        "alphabetically" => "alphabetically_mods",
-        "updated" => "updated_mods",
-        "newest" => "newest_mods",
+        "relevance" => "relevance_projects",
+        "downloads" => "downloads_projects",
+        "follows" => "follows_projects",
+        "updated" => "updated_projects",
+        "newest" => "newest_projects",
+        "alphabetically" => "alphabetically_projects",
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     };
 
@@ -203,7 +196,7 @@ pub async fn search_for_mod(
         query.with_facet_filters(&why_must_you_do_this);
     }
 
-    let results = query.execute::<ResultSearchMod>().await?;
+    let results = query.execute::<ResultSearchProject>().await?;
 
     Ok(SearchResults {
         hits: results.hits.into_iter().map(|r| r.result).collect(),

@@ -1,12 +1,45 @@
 use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
-use crate::models::ids::{ProjectId, UserId, VersionId};
-use crate::models::reports::{ItemType, Report};
+use crate::models::ids::ReportId;
+use crate::models::projects::{ProjectId, VersionId};
+use crate::models::users::UserId;
 use crate::routes::ApiError;
-use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use actix_web::web;
+use actix_web::{get, post, HttpRequest, HttpResponse};
+use chrono::{DateTime, Utc};
 use futures::StreamExt;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+#[derive(Serialize, Deserialize)]
+pub struct Report {
+    pub id: ReportId,
+    pub report_type: String,
+    pub item_id: String,
+    pub item_type: ItemType,
+    pub reporter: UserId,
+    pub body: String,
+    pub created: DateTime<Utc>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+#[serde(rename_all = "kebab-case")]
+pub enum ItemType {
+    Mod,
+    Version,
+    User,
+    Unknown,
+}
+
+impl ItemType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            ItemType::Mod => "mod",
+            ItemType::Version => "version",
+            ItemType::User => "user",
+            ItemType::Unknown => "unknown",
+        }
+    }
+}
 #[derive(Deserialize)]
 pub struct CreateReport {
     pub report_type: String,
@@ -54,7 +87,7 @@ pub async fn report_create(
     };
 
     match new_report.item_type {
-        ItemType::Project => {
+        ItemType::Mod => {
             report.project_id = Some(
                 serde_json::from_str::<ProjectId>(&*format!("\"{}\"", new_report.item_id))?.into(),
             )
@@ -138,7 +171,7 @@ pub async fn reports(
 
         if let Some(project_id) = x.project_id {
             item_id = serde_json::to_string::<ProjectId>(&project_id.into())?;
-            item_type = ItemType::Project;
+            item_type = ItemType::Mod;
         } else if let Some(version_id) = x.version_id {
             item_id = serde_json::to_string::<VersionId>(&version_id.into())?;
             item_type = ItemType::Version;
@@ -159,25 +192,4 @@ pub async fn reports(
     }
 
     Ok(HttpResponse::Ok().json(reports))
-}
-
-#[delete("report/{id}")]
-pub async fn delete_report(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-    info: web::Path<(crate::models::reports::ReportId,)>,
-) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(req.headers(), &**pool).await?;
-
-    let result = crate::database::models::report_item::Report::remove_full(
-        info.into_inner().0.into(),
-        &**pool,
-    )
-    .await?;
-
-    if result.is_some() {
-        Ok(HttpResponse::NoContent().body(""))
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
 }

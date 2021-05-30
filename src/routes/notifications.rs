@@ -27,8 +27,7 @@ pub async fn notifications_get(
 
     let notifications_data =
         database::models::notification_item::Notification::get_many(notification_ids, &**pool)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+            .await?;
 
     let mut notifications: Vec<Notification> = Vec::new();
 
@@ -52,9 +51,7 @@ pub async fn notification_get(
     let id = info.into_inner().0;
 
     let notification_data =
-        database::models::notification_item::Notification::get(id.into(), &**pool)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        database::models::notification_item::Notification::get(id.into(), &**pool).await?;
 
     if let Some(data) = notification_data {
         if user.id == data.user_id.into() || user.role.is_mod() {
@@ -100,17 +97,13 @@ pub async fn notification_delete(
     let id = info.into_inner().0;
 
     let notification_data =
-        database::models::notification_item::Notification::get(id.into(), &**pool)
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        database::models::notification_item::Notification::get(id.into(), &**pool).await?;
 
     if let Some(data) = notification_data {
         if data.user_id == user.id.into() || user.role.is_mod() {
-            database::models::notification_item::Notification::remove(id.into(), &**pool)
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?;
+            database::models::notification_item::Notification::remove(id.into(), &**pool).await?;
 
-            Ok(HttpResponse::Ok().body(""))
+            Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthenticationError(
                 "You are not authorized to delete this notification!".to_string(),

@@ -11,7 +11,7 @@ pub struct TeamId(pub u64);
 pub const OWNER_ROLE: &str = "Owner";
 
 // TODO: permissions, role names, etc
-/// A team of users who control a mod
+/// A team of users who control a project
 #[derive(Serialize, Deserialize)]
 pub struct Team {
     /// The id of the team
@@ -31,7 +31,7 @@ bitflags::bitflags! {
         const MANAGE_INVITES = 1 << 4;
         const REMOVE_MEMBER = 1 << 5;
         const EDIT_MEMBER = 1 << 6;
-        const DELETE_MOD = 1 << 7;
+        const DELETE_PROJECT = 1 << 7;
         const ALL = 0b11111111;
     }
 }

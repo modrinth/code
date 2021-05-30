@@ -179,7 +179,8 @@ impl Notification {
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id IN (SELECT * FROM UNNEST($1::bigint[]))
-            GROUP BY n.id, n.user_id;
+            GROUP BY n.id, n.user_id
+            ORDER BY n.created DESC;
             ",
             &notification_ids_parsed
         )

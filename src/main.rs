@@ -7,7 +7,7 @@ use env_logger::Env;
 use gumdrop::Options;
 use log::{error, info, warn};
 use rand::Rng;
-use search::indexing::index_mods;
+use search::indexing::index_projects;
 use search::indexing::IndexingSettings;
 use std::sync::Arc;
 
@@ -18,6 +18,7 @@ mod models;
 mod routes;
 mod scheduler;
 mod search;
+mod validate;
 
 #[derive(Debug, Options)]
 struct Config {
@@ -158,13 +159,10 @@ async fn main() -> std::io::Result<()> {
                 return;
             }
             info!("Indexing local database");
-            let settings = IndexingSettings {
-                index_local: true,
-                index_external: false,
-            };
-            let result = index_mods(pool_ref, settings, &thread_search_config).await;
+            let settings = IndexingSettings { index_local: true };
+            let result = index_projects(pool_ref, settings, &thread_search_config).await;
             if let Err(e) = result {
-                warn!("Local mod indexing failed: {:?}", e);
+                warn!("Local project indexing failed: {:?}", e);
             }
             info!("Done indexing local database");
         }
@@ -229,12 +227,12 @@ async fn main() -> std::io::Result<()> {
             if local_skip {
                 return;
             }
-            info!("Indexing created mod queue");
+            info!("Indexing created project queue");
             let result = search::indexing::queue::index_queue(&*queue, &thread_search_config).await;
             if let Err(e) = result {
-                warn!("Indexing created mods failed: {:?}", e);
+                warn!("Indexing created projects failed: {:?}", e);
             }
-            info!("Done indexing created mod queue");
+            info!("Done indexing created project queue");
         }
     });
 
@@ -252,13 +250,12 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .wrap(
-                Cors::new()
+                Cors::default()
                     .allowed_methods(vec!["GET", "POST", "DELETE", "PATCH", "PUT"])
                     .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
                     .allowed_header(http::header::CONTENT_TYPE)
-                    .send_wildcard()
-                    .max_age(3600)
-                    .finish(),
+                    .allow_any_origin()
+                    .max_age(3600),
             )
             .wrap(
                 // This is a hacky workaround to allowing the frontend server-side renderer to have
@@ -297,19 +294,9 @@ async fn main() -> std::io::Result<()> {
             .data(indexing_queue.clone())
             .data(search_config.clone())
             .data(ip_salt.clone())
+            .configure(routes::v1_config)
+            .configure(routes::v2_config)
             .service(routes::index_get)
-            .service(
-                web::scope("/api/v1/")
-                    .configure(routes::auth_config)
-                    .configure(routes::tags_config)
-                    .configure(routes::mods_config)
-                    .configure(routes::versions_config)
-                    .configure(routes::teams_config)
-                    .configure(routes::users_config)
-                    .configure(routes::moderation_config)
-                    .configure(routes::reports_config)
-                    .configure(routes::notifications_config),
-            )
             .service(web::scope("/maven/").configure(routes::maven_config))
             .default_service(web::get().to(routes::not_found))
     })

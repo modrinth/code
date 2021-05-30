@@ -3,74 +3,77 @@ use super::teams::TeamId;
 use super::users::UserId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use validator::Validate;
 
-/// The ID of a specific mod, encoded as base62 for usage in the API
+/// The ID of a specific project, encoded as base62 for usage in the API
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
 #[serde(into = "Base62Id")]
-pub struct ModId(pub u64);
+pub struct ProjectId(pub u64);
 
-/// The ID of a specific version of a mod
+/// The ID of a specific version of a project
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
 #[serde(into = "Base62Id")]
 pub struct VersionId(pub u64);
 
-/// A mod returned from the API
+/// A project returned from the API
 #[derive(Serialize, Deserialize)]
-pub struct Mod {
-    /// The ID of the mod, encoded as a base62 string.
-    pub id: ModId,
-    /// The slug of a mod, used for vanity URLs
+pub struct Project {
+    /// The ID of the project, encoded as a base62 string.
+    pub id: ProjectId,
+    /// The slug of a project, used for vanity URLs
     pub slug: Option<String>,
-    /// The team of people that has ownership of this mod.
+    /// The project type of the project
+    pub project_type: String,
+    /// The team of people that has ownership of this project.
     pub team: TeamId,
-    /// The title or name of the mod.
+    /// The title or name of the project.
     pub title: String,
-    /// A short description of the mod.
+    /// A short description of the project.
     pub description: String,
-    /// A long form description of the mod.
+    /// A long form description of the project.
     pub body: String,
-    /// The link to the long description of the mod. (Deprecated), being replaced by `body`
+    /// The link to the long description of the project. (Deprecated), being replaced by `body`
     pub body_url: Option<String>,
-    /// The date at which the mod was first published.
+    /// The date at which the project was first published.
     pub published: DateTime<Utc>,
-    /// The date at which the mod was first published.
+    /// The date at which the project was first published.
     pub updated: DateTime<Utc>,
-    /// The status of the mod
-    pub status: ModStatus,
-    /// The license of this mod
+    /// The status of the project
+    pub status: ProjectStatus,
+    /// The license of this project
     pub license: License,
 
-    /// The support range for the client mod
+    /// The support range for the client project*
     pub client_side: SideType,
-    /// The support range for the server mod
+    /// The support range for the server project
     pub server_side: SideType,
 
-    /// The total number of downloads the mod has had.
+    /// The total number of downloads the project has had.
     pub downloads: u32,
-    /// The total number of followers this mod has accumulated
+    /// The total number of followers this project has accumulated
     pub followers: u32,
 
-    /// A list of the categories that the mod is in.
+    /// A list of the categories that the project is in.
     pub categories: Vec<String>,
-    /// A list of ids for versions of the mod.
+    /// A list of ids for versions of the project.
     pub versions: Vec<VersionId>,
-    /// The URL of the icon of the mod
+    /// The URL of the icon of the project
     pub icon_url: Option<String>,
-    /// An optional link to where to submit bugs or issues with the mod.
+    /// An optional link to where to submit bugs or issues with the project.
     pub issues_url: Option<String>,
-    /// An optional link to the source code for the mod.
+    /// An optional link to the source code for the project.
     pub source_url: Option<String>,
-    /// An optional link to the mod's wiki page or other relevant information.
+    /// An optional link to the project's wiki page or other relevant information.
     pub wiki_url: Option<String>,
-    /// An optional link to the mod's discord
+    /// An optional link to the project's discord
     pub discord_url: Option<String>,
-    /// An optional list of all donation links the mod has
+    /// An optional list of all donation links the project has
     pub donation_urls: Option<Vec<DonationLink>>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "kebab-case")]
 pub enum SideType {
     Required,
@@ -113,22 +116,23 @@ pub struct License {
     pub url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Validate, Clone)]
 pub struct DonationLink {
     pub id: String,
     pub platform: String,
+    #[validate(url)]
     pub url: String,
 }
 
-/// A status decides the visbility of a mod in search, URLs, and the whole site itself.
-/// Approved - Mod is displayed on search, and accessible by URL
-/// Rejected - Mod is not displayed on search, and not accessible by URL (Temporary state, mod can reapply)
-/// Draft - Mod is not displayed on search, and not accessible by URL
-/// Unlisted - Mod is not displayed on search, but accessible by URL
-/// Processing - Mod is not displayed on search, and not accessible by URL (Temporary state, mod under review)
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+/// A status decides the visbility of a project in search, URLs, and the whole site itself.
+/// Approved - Project is displayed on search, and accessible by URL
+/// Rejected - Project is not displayed on search, and not accessible by URL (Temporary state, project can reapply)
+/// Draft - Project is not displayed on search, and not accessible by URL
+/// Unlisted - Project is not displayed on search, but accessible by URL
+/// Processing - Project is not displayed on search, and not accessible by URL (Temporary state, project under review)
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
 #[serde(rename_all = "lowercase")]
-pub enum ModStatus {
+pub enum ProjectStatus {
     Approved,
     Rejected,
     Draft,
@@ -137,57 +141,57 @@ pub enum ModStatus {
     Unknown,
 }
 
-impl std::fmt::Display for ModStatus {
+impl std::fmt::Display for ProjectStatus {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(fmt, "{}", self.as_str())
     }
 }
 
-impl ModStatus {
-    pub fn from_str(string: &str) -> ModStatus {
+impl ProjectStatus {
+    pub fn from_str(string: &str) -> ProjectStatus {
         match string {
-            "processing" => ModStatus::Processing,
-            "rejected" => ModStatus::Rejected,
-            "approved" => ModStatus::Approved,
-            "draft" => ModStatus::Draft,
-            "unlisted" => ModStatus::Unlisted,
-            _ => ModStatus::Unknown,
+            "processing" => ProjectStatus::Processing,
+            "rejected" => ProjectStatus::Rejected,
+            "approved" => ProjectStatus::Approved,
+            "draft" => ProjectStatus::Draft,
+            "unlisted" => ProjectStatus::Unlisted,
+            _ => ProjectStatus::Unknown,
         }
     }
     pub fn as_str(&self) -> &'static str {
         match self {
-            ModStatus::Approved => "approved",
-            ModStatus::Rejected => "rejected",
-            ModStatus::Draft => "draft",
-            ModStatus::Unlisted => "unlisted",
-            ModStatus::Processing => "processing",
-            ModStatus::Unknown => "unknown",
+            ProjectStatus::Approved => "approved",
+            ProjectStatus::Rejected => "rejected",
+            ProjectStatus::Draft => "draft",
+            ProjectStatus::Unlisted => "unlisted",
+            ProjectStatus::Processing => "processing",
+            ProjectStatus::Unknown => "unknown",
         }
     }
 
     pub fn is_hidden(&self) -> bool {
         match self {
-            ModStatus::Approved => false,
-            ModStatus::Rejected => true,
-            ModStatus::Draft => true,
-            ModStatus::Unlisted => false,
-            ModStatus::Processing => true,
-            ModStatus::Unknown => true,
+            ProjectStatus::Approved => false,
+            ProjectStatus::Rejected => true,
+            ProjectStatus::Draft => true,
+            ProjectStatus::Unlisted => false,
+            ProjectStatus::Processing => true,
+            ProjectStatus::Unknown => true,
         }
     }
 
     pub fn is_searchable(&self) -> bool {
-        matches!(self, ModStatus::Approved)
+        matches!(self, ProjectStatus::Approved)
     }
 }
 
-/// A specific version of a mod
+/// A specific version of a project
 #[derive(Serialize, Deserialize)]
 pub struct Version {
     /// The ID of the version, encoded as a base62 string.
     pub id: VersionId,
-    /// The ID of the mod this version is for.
-    pub mod_id: ModId,
+    /// The ID of the project this version is for.
+    pub project_id: ProjectId,
     /// The ID of the author who published this version
     pub author_id: UserId,
     /// Whether the version is featured or not
@@ -197,9 +201,9 @@ pub struct Version {
     pub name: String,
     /// The version number. Ideally will follow semantic versioning
     pub version_number: String,
-    /// The changelog for this version of the mod.
+    /// The changelog for this version of the project.
     pub changelog: String,
-    /// A link to the changelog for this version of the mod. (Deprecated), being replaced by `changelog`
+    /// A link to the changelog for this version of the project. (Deprecated), being replaced by `changelog`
     pub changelog_url: Option<String>,
     /// The date that this version was published.
     pub date_published: DateTime<Utc>,
@@ -210,15 +214,15 @@ pub struct Version {
 
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
-    /// A list of mods that this version depends on.
+    /// A list of projects that this version depends on.
     pub dependencies: Vec<Dependency>,
-    /// A list of versions of Minecraft that this version of the mod supports.
+    /// A list of versions of Minecraft that this version of the project supports.
     pub game_versions: Vec<GameVersion>,
     /// The loaders that this version works on
-    pub loaders: Vec<ModLoader>,
+    pub loaders: Vec<Loader>,
 }
 
-/// A single mod file, with a url for the file and the file's hash
+/// A single project file, with a url for the file and the file's hash
 #[derive(Serialize, Deserialize)]
 pub struct VersionFile {
     /// A map of hashes of the file.  The key is the hashing algorithm
@@ -310,14 +314,14 @@ impl DependencyType {
 }
 
 /// A specific version of Minecraft
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, PartialEq)]
 #[serde(transparent)]
 pub struct GameVersion(pub String);
 
-/// A mod loader
+/// A project loader
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(transparent)]
-pub struct ModLoader(pub String);
+pub struct Loader(pub String);
 
 // These fields must always succeed parsing; deserialize errors aren't
 // processed correctly (don't return JSON errors)

@@ -3,7 +3,7 @@ use super::ids::*;
 pub struct Report {
     pub id: ReportId,
     pub report_type_id: ReportTypeId,
-    pub mod_id: Option<ModId>,
+    pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
     pub user_id: Option<UserId>,
     pub body: String,
@@ -14,7 +14,7 @@ pub struct Report {
 pub struct QueryReport {
     pub id: ReportId,
     pub report_type: String,
-    pub mod_id: Option<ModId>,
+    pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
     pub user_id: Option<UserId>,
     pub body: String,
@@ -40,7 +40,7 @@ impl Report {
             ",
             self.id as ReportId,
             self.report_type_id as ReportTypeId,
-            self.mod_id.map(|x| x.0 as i64),
+            self.project_id.map(|x| x.0 as i64),
             self.version_id.map(|x| x.0 as i64),
             self.user_id.map(|x| x.0 as i64),
             self.body,
@@ -72,7 +72,7 @@ impl Report {
             Ok(Some(QueryReport {
                 id,
                 report_type: row.name,
-                mod_id: row.mod_id.map(ModId),
+                project_id: row.mod_id.map(ProjectId),
                 version_id: row.version_id.map(VersionId),
                 user_id: row.user_id.map(UserId),
                 body: row.body,
@@ -108,7 +108,7 @@ impl Report {
             Ok(e.right().map(|row| QueryReport {
                 id: ReportId(row.id),
                 report_type: row.name,
-                mod_id: row.mod_id.map(ModId),
+                project_id: row.mod_id.map(ProjectId),
                 version_id: row.version_id.map(VersionId),
                 user_id: row.user_id.map(UserId),
                 body: row.body,

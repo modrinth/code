@@ -38,11 +38,11 @@ macro_rules! generate_ids {
 }
 
 generate_ids!(
-    pub generate_mod_id,
-    ModId,
+    pub generate_project_id,
+    ProjectId,
     8,
     "SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)",
-    ModId
+    ProjectId
 );
 generate_ids!(
     pub generate_version_id,
@@ -115,7 +115,11 @@ pub struct TeamMemberId(pub i64);
 
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
-pub struct ModId(pub i64);
+pub struct ProjectId(pub i64);
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct ProjectTypeId(pub i32);
+
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
 pub struct StatusId(pub i32);
@@ -169,14 +173,14 @@ pub struct NotificationActionId(pub i32);
 
 use crate::models::ids;
 
-impl From<ids::ModId> for ModId {
-    fn from(id: ids::ModId) -> Self {
-        ModId(id.0 as i64)
+impl From<ids::ProjectId> for ProjectId {
+    fn from(id: ids::ProjectId) -> Self {
+        ProjectId(id.0 as i64)
     }
 }
-impl From<ModId> for ids::ModId {
-    fn from(id: ModId) -> Self {
-        ids::ModId(id.0 as u64)
+impl From<ProjectId> for ids::ProjectId {
+    fn from(id: ProjectId) -> Self {
+        ids::ProjectId(id.0 as u64)
     }
 }
 impl From<ids::UserId> for UserId {

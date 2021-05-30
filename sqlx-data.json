@@ -1,5 +1,44 @@
 {
   "db": "PostgreSQL",
+  "002a7e9d3ccfb94348b1e7ad93b923aab9d2c377e41bc2cc22e3a94d799d44de": {
+    "query": "\n        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "project_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "017c9fd0c8103c590489453a25b3317e6790a21f388bcf7ec8c93cd26255f368": {
     "query": "\n            SELECT id, team_id, role, permissions, accepted\n            FROM team_members\n            WHERE (user_id = $1 AND accepted = TRUE)\n            ",
     "describe": {
@@ -51,6 +90,25 @@
       "parameters": {
         "Left": [
           "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "03209c5bda2d704e688439919a7b3903db6ad7caebf7ddafb3ea52d312d47bfb": {
+    "query": "\n            INSERT INTO users (\n                id, github_id, username, name, email,\n                avatar_url, bio, created\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8\n            )\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Timestamptz"
         ]
       },
       "nullable": []
@@ -182,6 +240,27 @@
       "nullable": []
     }
   },
+  "0a1e0cbcdfe68e111326e2dc070e7903d4abb92180c7957f2408b4d6f810c2e5": {
+    "query": "\n        SELECT v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "project_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "0ca11a32b2860e4f5c3d20892a5be3cb419e084f42ba0f98e09b9995027fcc4e": {
     "query": "\n            SELECT id FROM statuses\n            WHERE status = $1\n            ",
     "describe": {
@@ -290,22 +369,64 @@
       ]
     }
   },
-  "1220d15a56dbf823eaa452fbafa17442ab0568bc81a31fa38e16e3df3278e5f9": {
-    "query": "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)",
+  "0fd612828feb009aab2f78fbbb271dcdd9ba2770b7d6f323415b958100cd3fb8": {
+    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read,\n            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY n.id, n.user_id\n            ORDER BY n.created DESC;\n            ",
     "describe": {
       "columns": [
         {
           "ordinal": 0,
-          "name": "exists",
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "text",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "link",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 6,
+          "name": "read",
           "type_info": "Bool"
+        },
+        {
+          "ordinal": 7,
+          "name": "actions",
+          "type_info": "Text"
         }
       ],
       "parameters": {
         "Left": [
-          "Int8"
+          "Int8Array"
         ]
       },
       "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
         null
       ]
     }
@@ -327,6 +448,51 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "155910d402d6cd3440a0fee53259ae3c397c6d1d98f97a38880078bd9192b6fa": {
+    "query": "\n        SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash IN (SELECT * FROM UNNEST($1::bytea[]))\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "hash",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 2,
+          "name": "algorithm",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 4,
+          "name": "project_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "ByteaArray",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
         false
       ]
     }
@@ -499,8 +665,34 @@
       ]
     }
   },
-  "18f9188a2c89707ceea46b1ebc66c0cc09da21240dbf36c1c7c32736aed44a38": {
-    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
+  "19dc22c4d6d14222f8e8bace74c2961761c53b7375460ade15af921754d5d7da": {
+    "query": "\n                    UPDATE mods\n                    SET license = $1\n                    WHERE (id = $2)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "1ab781d26c93aa74bf90b78b74b99e50004d25d42d56b734e5e83f2333d0c0d2": {
+    "query": "\n                UPDATE users\n                SET avatar_url = $1\n                WHERE (id = $2)\n                ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "1b6c38ac65be4d4f10decabf0e80fd45c8e4d15e4f916ac1bdc9348b188fc469": {
+    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,\n            STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,\n            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,\n            STRING_AGG(DISTINCT d.dependency_id || ', ' || d.dependency_type,  ' ,') dependencies\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY v.id, rc.id\n            ORDER BY v.date_published ASC;\n            ",
     "describe": {
       "columns": [
         {
@@ -510,137 +702,77 @@
         },
         {
           "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
+          "name": "mod_id",
+          "type_info": "Int8"
         },
         {
           "ordinal": 2,
-          "name": "description",
-          "type_info": "Varchar"
+          "name": "author_id",
+          "type_info": "Int8"
         },
         {
           "ordinal": 3,
-          "name": "downloads",
-          "type_info": "Int4"
+          "name": "version_name",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 4,
-          "name": "follows",
-          "type_info": "Int4"
+          "name": "version_number",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 5,
-          "name": "icon_url",
+          "name": "changelog",
           "type_info": "Varchar"
         },
         {
           "ordinal": 6,
-          "name": "body",
+          "name": "changelog_url",
           "type_info": "Varchar"
         },
         {
           "ordinal": 7,
-          "name": "body_url",
-          "type_info": "Varchar"
+          "name": "date_published",
+          "type_info": "Timestamptz"
         },
         {
           "ordinal": 8,
-          "name": "published",
-          "type_info": "Timestamptz"
+          "name": "downloads",
+          "type_info": "Int4"
         },
         {
           "ordinal": 9,
-          "name": "updated",
-          "type_info": "Timestamptz"
+          "name": "release_channel",
+          "type_info": "Varchar"
         },
         {
           "ordinal": 10,
-          "name": "status",
-          "type_info": "Int4"
+          "name": "featured",
+          "type_info": "Bool"
         },
         {
           "ordinal": 11,
-          "name": "issues_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 12,
-          "name": "source_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 13,
-          "name": "wiki_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 14,
-          "name": "discord_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 15,
-          "name": "license_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 16,
-          "name": "team_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 17,
-          "name": "client_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 18,
-          "name": "server_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 19,
-          "name": "license",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 20,
-          "name": "slug",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 21,
-          "name": "status_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 22,
-          "name": "client_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 23,
-          "name": "server_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 24,
-          "name": "short",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 25,
-          "name": "license_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 26,
-          "name": "categories",
+          "name": "game_versions",
           "type_info": "Text"
         },
         {
-          "ordinal": 27,
-          "name": "versions",
+          "ordinal": 12,
+          "name": "loaders",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 13,
+          "name": "files",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 14,
+          "name": "hashes",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 15,
+          "name": "dependencies",
           "type_info": "Text"
         }
       ],
@@ -655,43 +787,18 @@
         false,
         false,
         false,
-        true,
         false,
         true,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
         false,
         false,
         false,
         false,
         null,
+        null,
+        null,
+        null,
         null
       ]
-    }
-  },
-  "19dc22c4d6d14222f8e8bace74c2961761c53b7375460ade15af921754d5d7da": {
-    "query": "\n                    UPDATE mods\n                    SET license = $1\n                    WHERE (id = $2)\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      },
-      "nullable": []
     }
   },
   "1c7b0eb4341af5a7942e52f632cf582561f10b4b6a41a082fb8a60f04ac17c6e": {
@@ -845,6 +952,26 @@
       },
       "nullable": [
         null
+      ]
+    }
+  },
+  "21ef50f46b7b3e62b91e7d067c1cb33806e14c33bb76d63c2711f822c44261f6": {
+    "query": "\n            SELECT name FROM project_types pt\n            INNER JOIN mods ON mods.project_type = pt.id\n            WHERE mods.id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
       ]
     }
   },
@@ -1051,14 +1178,622 @@
       "nullable": []
     }
   },
-  "2d5af30eec91c9086fe1beffdb648766986cb3e0ff00c0f3fc96f119f0a67c00": {
-    "query": "\n            SELECT id, title, description, downloads, follows,\n                   icon_url, body, body_url, published,\n                   updated, status,\n                   issues_url, source_url, wiki_url, discord_url, license_url,\n                   team_id, client_side, server_side, license, slug\n            FROM mods\n            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))\n            ",
+  "31853f131eaeb2aaedc2bcc27da387462408409af810337f6a8ef397f674fb44": {
+    "query": "\n        SELECT DISTINCT loaders.loader FROM versions\n        INNER JOIN loaders_versions lv ON lv.version_id = versions.id\n        INNER JOIN loaders ON loaders.id = lv.loader_id\n        WHERE versions.mod_id = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "loader",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "33fc96ac71cfa382991cfb153e89da1e9f43ebf5367c28b30c336b758222307b": {
+    "query": "\n            DELETE FROM loaders_versions\n            WHERE loaders_versions.version_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "365d2cdfdbac0b906580fc28cff69c9c27209c7e120da3d301737ef97ca4d535": {
+    "query": "\n            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,\n            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN project_types pt ON pt.id = m.project_type\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id = $1\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id;\n            ",
     "describe": {
       "columns": [
         {
           "ordinal": 0,
           "name": "id",
           "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "project_type",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 5,
+          "name": "follows",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 6,
+          "name": "icon_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 8,
+          "name": "body_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 9,
+          "name": "published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 10,
+          "name": "updated",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 11,
+          "name": "status",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 12,
+          "name": "issues_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 13,
+          "name": "source_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 14,
+          "name": "wiki_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 15,
+          "name": "discord_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 16,
+          "name": "license_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 17,
+          "name": "team_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 18,
+          "name": "client_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 19,
+          "name": "server_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 20,
+          "name": "license",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 21,
+          "name": "slug",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 22,
+          "name": "status_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 23,
+          "name": "client_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 24,
+          "name": "server_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 25,
+          "name": "short",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 26,
+          "name": "license_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 27,
+          "name": "project_type_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 28,
+          "name": "categories",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 29,
+          "name": "versions",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null
+      ]
+    }
+  },
+  "371048e45dd74c855b84cdb8a6a565ccbef5ad166ec9511ab20621c336446da6": {
+    "query": "\n            UPDATE mods\n            SET follows = follows - 1\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "381974f80a890a59f89c46b0c709e4511c0216eb8059ee47bb1e1456caf68fd7": {
+    "query": "\n                        INSERT INTO dependencies (dependent_id, dependency_id, dependency_type)\n                        VALUES ($1, $2, $3)\n                        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Varchar"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "3831c1b321e47690f1f54597506a0d43362eda9540c56acb19c06532bba50b01": {
+    "query": "\n            SELECT id, user_id, role, permissions, accepted\n            FROM team_members\n            WHERE team_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "role",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "permissions",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 4,
+          "name": "accepted",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "398ac436f5fe2f6a66544204b9ff01ae1ea1204edf03ffc16de657a861cfe0ba": {
+    "query": "\n            DELETE FROM categories\n            WHERE category = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "3b52d9f68ba23d1e3764f8df9f28bcaec0741101f6afd0c7c234b7f1b91054a4": {
+    "query": "\n                    UPDATE team_members\n                    SET accepted = TRUE\n                    WHERE (team_id = $1 AND user_id = $2 AND NOT role = $3)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Text"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "3bdcbfa5abe43cc9b4f996f147277a7f6921cca00f82cad0ef5d85032c761a36": {
+    "query": "\n            DELETE FROM mod_follows\n            WHERE follower_id = $1 AND mod_id = $2\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "3d700aaeb0d5129ac8c297ee0542757435a50a35ec94582d9d6ce67aa5302291": {
+    "query": "\n                    UPDATE mods\n                    SET title = $1\n                    WHERE (id = $2)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "3f2f05653552ce8c1be95ce0a922ab41f52f40f8ff6c91c6621481102c8f35e3": {
+    "query": "\n                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n                        VALUES ($1, $2)\n                        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "3fdece422b1c54bc0853fa3ddbb4c1d1a45ac7723c906544ea9b4f69e5b29dc1": {
+    "query": "\n                    SELECT name FROM side_types\n                    WHERE id = $1\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "413762398111e04074a2d8a1e4e03ed362b9167d397947f8d14e5ae330e3de0b": {
+    "query": "\n                    UPDATE versions\n                    SET downloads = downloads + 1\n                    WHERE id = $1\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "43660c74ef6a72b3fc68006a2f743737f1e4973788a5c954ffeaac151c16d0c1": {
+    "query": "\n                    SELECT status FROM statuses\n                    WHERE id = $1\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "status",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "43b793e2df30a6ace9e037e38bb4ea456656cfbe276c151e3a9e0a408d2c249f": {
+    "query": "\n                    UPDATE versions\n                    SET release_channel = $1\n                    WHERE (id = $2)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "449920c44d498adf8b771973d6034dc97e1c7f3ff4d9d23599af432f294ed564": {
+    "query": "\n            INSERT INTO files (id, version_id, url, filename)\n            VALUES ($1, $2, $3, $4)\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Varchar"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "44bb1034872a80bbea122e04399470fd5f029b819c70cb6e0cb2db6d3193b97e": {
+    "query": "\n                    INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id)\n                    VALUES ($1, $2)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "45f8a06abdd17fc437f5355ad109efcb5d7e247ef397b1a0cd98d7fb6bd9ce17": {
+    "query": "\n                        INSERT INTO mods_categories (joining_mod_id, joining_category_id)\n                        VALUES ($1, $2)\n                        ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int4"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "48294a4e0c594e80fff8d14a705aa7282f55e47cf3772e77f1d4bf4849008b60": {
+    "query": "\n            SELECT follower_id FROM mod_follows\n            WHERE mod_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "follower_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "49b2829b22f6ca82b3f62ea7962d8af22098cfa5a1fc1e06312bf1d3df382280": {
+    "query": "\n            INSERT INTO categories (category, project_type, icon)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (category, project_type, icon) DO NOTHING\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int4",
+          "Varchar"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "4a4b4166248877eefcd63603945fdcd392f76812bdec7c70f8ffeb06ee7e737f": {
+    "query": "\n            SELECT m.id FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id\n            WHERE tm.user_id = $1 AND tm.role = $2\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "4a54d350b4695c32a802675506e85b0506fc62a63ca0ee5f38890824301d6515": {
+    "query": "\n                    UPDATE mods\n                    SET server_side = $1\n                    WHERE (id = $2)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "4b14b5c69f6a0ee4e06e41d7cea425c7c34d6db45895275a2ce8adfa28dc8f72": {
+    "query": "\n            INSERT INTO project_types (name)\n            VALUES ($1)\n            ON CONFLICT (name) DO NOTHING\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "4b305fba5341b183cc07048aef48dc593c7a2fdf7abb82f7440e5a63786ebe7b": {
+    "query": "\n            SELECT id, user_id, role, permissions, accepted\n            FROM team_members\n            WHERE (team_id = $1 AND user_id = $2 AND accepted = TRUE)\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "role",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "permissions",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 4,
+          "name": "accepted",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "4b74531cfe100a37f1ebfe0cee42926055f2c55fe8c8d5e6fff642c722dbb92f": {
+    "query": "\n            SELECT project_type, title, description, downloads, follows,\n                   icon_url, body, body_url, published,\n                   updated, status,\n                   issues_url, source_url, wiki_url, discord_url, license_url,\n                   team_id, client_side, server_side, license, slug\n            FROM mods\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "project_type",
+          "type_info": "Int4"
         },
         {
           "ordinal": 1,
@@ -1163,7 +1898,7 @@
       ],
       "parameters": {
         "Left": [
-          "Int8Array"
+          "Int8"
         ]
       },
       "nullable": [
@@ -1191,428 +1926,6 @@
       ]
     }
   },
-  "2fa070eef3fe8f708a1495104f78eda2bfa0fe19ada2bf66ac35fb2468631774": {
-    "query": "\n            SELECT category FROM categories\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "category",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "3135db1c5309dac7580a731b2829397ae7bdd6c9a67b21e813f26a4f5aa251a9": {
-    "query": "\n                SELECT status FROM statuses\n                WHERE id = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "status",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "31853f131eaeb2aaedc2bcc27da387462408409af810337f6a8ef397f674fb44": {
-    "query": "\n        SELECT DISTINCT loaders.loader FROM versions\n        INNER JOIN loaders_versions lv ON lv.version_id = versions.id\n        INNER JOIN loaders ON loaders.id = lv.loader_id\n        WHERE versions.mod_id = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "loader",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "33fc96ac71cfa382991cfb153e89da1e9f43ebf5367c28b30c336b758222307b": {
-    "query": "\n            DELETE FROM loaders_versions\n            WHERE loaders_versions.version_id = $1\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "371048e45dd74c855b84cdb8a6a565ccbef5ad166ec9511ab20621c336446da6": {
-    "query": "\n            UPDATE mods\n            SET follows = follows - 1\n            WHERE id = $1\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "381974f80a890a59f89c46b0c709e4511c0216eb8059ee47bb1e1456caf68fd7": {
-    "query": "\n                        INSERT INTO dependencies (dependent_id, dependency_id, dependency_type)\n                        VALUES ($1, $2, $3)\n                        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "3831c1b321e47690f1f54597506a0d43362eda9540c56acb19c06532bba50b01": {
-    "query": "\n            SELECT id, user_id, role, permissions, accepted\n            FROM team_members\n            WHERE team_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "user_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "role",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "permissions",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 4,
-          "name": "accepted",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
-  "389088b3ccff3a3c970aba3deef8831cca140b74ffc74e43a1162a9021428820": {
-    "query": "\n        SELECT f.id id, f.version_id version_id, f.filename filename, v.version_number version_number, v.mod_id mod_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "version_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "filename",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "mod_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
-  "398ac436f5fe2f6a66544204b9ff01ae1ea1204edf03ffc16de657a861cfe0ba": {
-    "query": "\n            DELETE FROM categories\n            WHERE category = $1\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "3b52d9f68ba23d1e3764f8df9f28bcaec0741101f6afd0c7c234b7f1b91054a4": {
-    "query": "\n                    UPDATE team_members\n                    SET accepted = TRUE\n                    WHERE (team_id = $1 AND user_id = $2 AND NOT role = $3)\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "3bdcbfa5abe43cc9b4f996f147277a7f6921cca00f82cad0ef5d85032c761a36": {
-    "query": "\n            DELETE FROM mod_follows\n            WHERE follower_id = $1 AND mod_id = $2\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "3d700aaeb0d5129ac8c297ee0542757435a50a35ec94582d9d6ce67aa5302291": {
-    "query": "\n                    UPDATE mods\n                    SET title = $1\n                    WHERE (id = $2)\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "3f2f05653552ce8c1be95ce0a922ab41f52f40f8ff6c91c6621481102c8f35e3": {
-    "query": "\n                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n                        VALUES ($1, $2)\n                        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "413762398111e04074a2d8a1e4e03ed362b9167d397947f8d14e5ae330e3de0b": {
-    "query": "\n                    UPDATE versions\n                    SET downloads = downloads + 1\n                    WHERE id = $1\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "43b793e2df30a6ace9e037e38bb4ea456656cfbe276c151e3a9e0a408d2c249f": {
-    "query": "\n                    UPDATE versions\n                    SET release_channel = $1\n                    WHERE (id = $2)\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "449920c44d498adf8b771973d6034dc97e1c7f3ff4d9d23599af432f294ed564": {
-    "query": "\n            INSERT INTO files (id, version_id, url, filename)\n            VALUES ($1, $2, $3, $4)\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "45f8a06abdd17fc437f5355ad109efcb5d7e247ef397b1a0cd98d7fb6bd9ce17": {
-    "query": "\n                        INSERT INTO mods_categories (joining_mod_id, joining_category_id)\n                        VALUES ($1, $2)\n                        ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "48294a4e0c594e80fff8d14a705aa7282f55e47cf3772e77f1d4bf4849008b60": {
-    "query": "\n            SELECT follower_id FROM mod_follows\n            WHERE mod_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "follower_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "49e36828e3a0214b48234435e34311735ae32e08d8be1270f8f0db4b27e708ba": {
-    "query": "\n            INSERT INTO loaders (loader)\n            VALUES ($1)\n            ON CONFLICT (loader) DO NOTHING\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "4a4b4166248877eefcd63603945fdcd392f76812bdec7c70f8ffeb06ee7e737f": {
-    "query": "\n            SELECT m.id FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id\n            WHERE tm.user_id = $1 AND tm.role = $2\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "4a54d350b4695c32a802675506e85b0506fc62a63ca0ee5f38890824301d6515": {
-    "query": "\n                    UPDATE mods\n                    SET server_side = $1\n                    WHERE (id = $2)\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "4b305fba5341b183cc07048aef48dc593c7a2fdf7abb82f7440e5a63786ebe7b": {
-    "query": "\n            SELECT id, user_id, role, permissions, accepted\n            FROM team_members\n            WHERE (team_id = $1 AND user_id = $2 AND accepted = TRUE)\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "user_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "role",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "permissions",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 4,
-          "name": "accepted",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "4c99c0840159d18e88cd6094a41117258f2337346c145d926b5b610c76b5125f": {
     "query": "\n                SELECT c.category\n                FROM mods_categories mc\n                    INNER JOIN categories c ON mc.joining_category_id=c.id\n                WHERE mc.joining_mod_id = $1\n                ",
     "describe": {
@@ -1630,26 +1943,6 @@
       },
       "nullable": [
         false
-      ]
-    }
-  },
-  "4c9e2190e2a68ffc093a69aaa1fc9384957138f57ac9cd85cbc6179613c13a08": {
-    "query": "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "exists",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        null
       ]
     }
   },
@@ -1674,6 +1967,18 @@
         "Left": [
           "Int8",
           "Varchar"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "4fa53dab6de86711825c032077fbe4985d5edf8aeec9003be900d162f46b3631": {
+    "query": "\n                    DELETE FROM loaders_project_types\n                    WHERE joining_loader_id = $1\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int4"
         ]
       },
       "nullable": []
@@ -1718,116 +2023,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "529f4c62eb8e98909ea7ec504f86647f105b1717990dd0c422919234060dc30f": {
-    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            rc.channel release_channel, v.featured featured,\n            STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,\n            STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,\n            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,\n            STRING_AGG(DISTINCT d.dependency_id || ', ' || d.dependency_type,  ' ,') dependencies\n            FROM versions v\n            INNER JOIN release_channels rc on v.release_channel = rc.id\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY v.id, rc.id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "author_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "changelog",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 9,
-          "name": "release_channel",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 10,
-          "name": "featured",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 11,
-          "name": "game_versions",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 12,
-          "name": "loaders",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 13,
-          "name": "files",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 14,
-          "name": "hashes",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 15,
-          "name": "dependencies",
-          "type_info": "Text"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null,
-        null,
-        null,
-        null
-      ]
     }
   },
   "53a8966ac345cc334ad65ea907be81af74e90b1217696c7eedcf8a8e3fca736e": {
@@ -1905,26 +2100,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "56578cb820533fbc17599ee8744b8f563cf4852e7c62a6a935765d3c60235e7b": {
-    "query": "\n                    SELECT version FROM game_versions\n                    WHERE type = $1\n                    ORDER BY created DESC\n                    ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "version",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
     }
   },
   "57bb3db92e6a8fb8606005be955e2379f13a04f101f91358322a591a860a7f9e": {
@@ -2015,6 +2190,26 @@
       ]
     }
   },
+  "5c3b340d278c356b6bc2cd7110e5093a7d1ad982ae0f468f8fff7c54e4e6603a": {
+    "query": "\n            SELECT id FROM project_types\n            WHERE name = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "5c4262689205aafdd97a74bee0003f39eef0a34c97f97a939c14fb8fe349f7eb": {
     "query": "\n                    UPDATE files\n                    SET is_primary = TRUE\n                    WHERE (id = $1)\n                    ",
     "describe": {
@@ -2077,6 +2272,24 @@
       "nullable": []
     }
   },
+  "5ee2dc5cda9bfc0395da5a4ebf234093e9b8135db5e4a0258b00fa16fb825faa": {
+    "query": "\n            SELECT name FROM project_types\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "5ff8fd471ff62f86aa95e52cee2723b31ec3d7fc53c3ef1454df40eef0ceff53": {
     "query": "\n            SELECT version.id FROM (\n                SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v\n                INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n                INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n                INNER JOIN loaders_versions lv ON lv.version_id = v.id\n                INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n                WHERE v.mod_id = $1\n            ) AS version\n            ORDER BY version.date_published ASC\n            ",
     "describe": {
@@ -2129,188 +2342,6 @@
       ]
     }
   },
-  "6612afe698ec5ad3a9a98294d12fa5b04ccfeac4b31365b3821ac8e2ae6c5768": {
-    "query": "\n            SELECT m.id id, m.title title, m.description description, m.downloads downloads, m.follows follows,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name,\n            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id = $1\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "description",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 4,
-          "name": "follows",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 5,
-          "name": "icon_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "body",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "body_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 8,
-          "name": "published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 9,
-          "name": "updated",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 10,
-          "name": "status",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 11,
-          "name": "issues_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 12,
-          "name": "source_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 13,
-          "name": "wiki_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 14,
-          "name": "discord_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 15,
-          "name": "license_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 16,
-          "name": "team_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 17,
-          "name": "client_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 18,
-          "name": "server_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 19,
-          "name": "license",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 20,
-          "name": "slug",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 21,
-          "name": "status_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 22,
-          "name": "client_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 23,
-          "name": "server_side_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 24,
-          "name": "short",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 25,
-          "name": "license_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 26,
-          "name": "categories",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 27,
-          "name": "versions",
-          "type_info": "Text"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null
-      ]
-    }
-  },
   "67d021f0776276081d3c50ca97afa6b78b98860bf929009e845e9c00a192e3b5": {
     "query": "\n            SELECT id FROM report_types\n            WHERE name = $1\n            ",
     "describe": {
@@ -2348,6 +2379,39 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "6ace87c4d5a960ba70eb057f1fb5672f4af6da433a420260a67ebd5ea2f4cb7f": {
+    "query": "\n        SELECT h.hash hash, h.algorithm algorithm, f.version_id version_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        WHERE h.algorithm = $2 AND h.hash IN (SELECT * FROM UNNEST($1::bytea[]))\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "hash",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 1,
+          "name": "algorithm",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "version_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "ByteaArray",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
         false
       ]
     }
@@ -2404,6 +2468,42 @@
       "nullable": []
     }
   },
+  "6dc7ec051df26915ab8ee824c3caa45dbac2bda5e2e55958e463cdc0f8754ce2": {
+    "query": "\n            SELECT l.id id, l.loader loader, l.icon icon,\n            STRING_AGG(DISTINCT pt.name, ',') project_types\n            FROM loaders l\n            LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id\n            LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id\n            GROUP BY l.id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "loader",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "icon",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "project_types",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        null
+      ]
+    }
+  },
   "6f1fb4c3269b2a8190f328df025be76241eae757d9c4f3e5eb1cc01b191837df": {
     "query": "\n                    DELETE FROM mods_categories\n                    WHERE joining_mod_id = $1\n                    ",
     "describe": {
@@ -2433,6 +2533,86 @@
       "nullable": []
     }
   },
+  "6fd610bfa35eaa849c64f5335dbde91159b22fbdb7bbfa4d41ef251e3a3b0b8e": {
+    "query": "\n            SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,\n                v.changelog, v.changelog_url, v.date_published, v.downloads,\n                v.release_channel, v.featured\n            FROM versions v\n            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            ORDER BY v.date_published ASC\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "author_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "version_number",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "changelog",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "changelog_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "date_published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 9,
+          "name": "release_channel",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 10,
+          "name": "featured",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "70cdf1b4a17405974909d89b1437a8425792d620f9ed67fd8e31e004e4609e83": {
     "query": "\n                    UPDATE users\n                    SET username = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -2446,23 +2626,13 @@
       "nullable": []
     }
   },
-  "71db1bc306ff6da3a92544e1585aa11c5627b50d95b15e794b2fa5dc838ea1a3": {
-    "query": "\n        SELECT mod_id, version_number, author_id\n        FROM versions\n        WHERE id = $1\n        ",
+  "72ad6f4be40d7620a0ec557e3806da41ce95335aeaa910fe35aca2ec7c3f09b6": {
+    "query": "\n                SELECT id FROM users\n                WHERE id = $1\n                ",
     "describe": {
       "columns": [
         {
           "ordinal": 0,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "author_id",
+          "name": "id",
           "type_info": "Int8"
         }
       ],
@@ -2472,23 +2642,8 @@
         ]
       },
       "nullable": [
-        false,
-        false,
         false
       ]
-    }
-  },
-  "7269f523a289e9d0dfe710074492e2eb547359e62d42234abed698871905edd6": {
-    "query": "\n            UPDATE users\n            SET avatar_url = $1\n            WHERE (id = $2)\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8"
-        ]
-      },
-      "nullable": []
     }
   },
   "72c1e6de8f2c8d89be030454eeab6d5c9695164af2ebfb8d7e94b2deee4f130d": {
@@ -2553,68 +2708,6 @@
       ]
     }
   },
-  "73ab32d116e2785332f9c671a61b0173cede5db03ed40b971162283c21b0e9b9": {
-    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read,\n            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY n.id, n.user_id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "user_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "text",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "link",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "created",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 6,
-          "name": "read",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 7,
-          "name": "actions",
-          "type_info": "Text"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        null
-      ]
-    }
-  },
   "73bdd6c9e7cd8c1ed582261aebdee0f8fd2734e712ef288a2608564c918009cb": {
     "query": "\n            DELETE FROM versions WHERE id = $1\n            ",
     "describe": {
@@ -2625,6 +2718,26 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "75a860ca8087536a9fcf932846341c8bd322d314231bb8acac124d1cea93270b": {
+    "query": "\n            SELECT mf.mod_id FROM mod_follows mf\n            WHERE mf.follower_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "mod_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "76db1c204139e18002e5751c3dcefff79791a1dd852b62d34fcf008151e8945a": {
@@ -2657,26 +2770,6 @@
       ]
     }
   },
-  "7826a4f18add285afe556335581474071e601361775ef85c91074d70287392b9": {
-    "query": "\n                SELECT version FROM game_versions\n                WHERE major = $1\n                ORDER BY created DESC\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "version",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bool"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "796f057ea8eb5b01d3eedeee9840fb37464ea567f32871953fb07e14ed86af1c": {
     "query": "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",
     "describe": {
@@ -2695,6 +2788,152 @@
       },
       "nullable": [
         null
+      ]
+    }
+  },
+  "79aa918a1dfb8e7cc958c4b7a75172ddb38fc28a95c881e766ecbcef5fd2475a": {
+    "query": "\n            SELECT id, project_type, title, description, downloads, follows,\n                   icon_url, body, body_url, published,\n                   updated, status,\n                   issues_url, source_url, wiki_url, discord_url, license_url,\n                   team_id, client_side, server_side, license, slug\n            FROM mods\n            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "project_type",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 5,
+          "name": "follows",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 6,
+          "name": "icon_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 8,
+          "name": "body_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 9,
+          "name": "published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 10,
+          "name": "updated",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 11,
+          "name": "status",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 12,
+          "name": "issues_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 13,
+          "name": "source_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 14,
+          "name": "wiki_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 15,
+          "name": "discord_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 16,
+          "name": "license_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 17,
+          "name": "team_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 18,
+          "name": "client_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 19,
+          "name": "server_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 20,
+          "name": "license",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 21,
+          "name": "slug",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true
       ]
     }
   },
@@ -2731,24 +2970,34 @@
       ]
     }
   },
-  "7d760d046292b81a88c5551ce8cde776719ce9d647f04d2928c6f6c122a8ee70": {
-    "query": "\n        SELECT mf.mod_id FROM mod_follows mf\n        WHERE mf.follower_id = $1\n        ",
+  "7a3183f77f403d2272665727affb07775a9304cbe1fb8ee7e603d779edb95d03": {
+    "query": "\n            INSERT INTO mods (\n                id, team_id, title, description, body,\n                published, downloads, icon_url, issues_url,\n                source_url, wiki_url, status, discord_url,\n                client_side, server_side, license_url, license,\n                slug, project_type\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8, $9,\n                $10, $11, $12, $13,\n                $14, $15, $16, $17,\n                LOWER($18), $19\n            )\n            ",
     "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "mod_id",
-          "type_info": "Int8"
-        }
-      ],
+      "columns": [],
       "parameters": {
         "Left": [
-          "Int8"
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Timestamptz",
+          "Int4",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Int4",
+          "Varchar",
+          "Int4",
+          "Int4",
+          "Varchar",
+          "Int4",
+          "Text",
+          "Int4"
         ]
       },
-      "nullable": [
-        false
-      ]
+      "nullable": []
     }
   },
   "7e73d3a17807f57ba6def5ff718e6dcb3a65ef8da653d839560b24635334cf05": {
@@ -2869,6 +3118,18 @@
         false,
         false
       ]
+    }
+  },
+  "87fd169e19ba231c6cf131ad2841d5c3b95adde53e5ed4000f8e7d54c0e87320": {
+    "query": "\n            DELETE FROM project_types\n            WHERE name = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": []
     }
   },
   "89310b2bc5f020744a9a42dae6f15dfebc1544cdd754939f0d09714353f2aa7c": {
@@ -3011,140 +3272,6 @@
       ]
     }
   },
-  "8f02d5c2b9095c21498802f01cefdbc57a5f1c2a7aee717ba19daaffc498c5cd": {
-    "query": "\n            SELECT title, description, downloads, follows,\n                   icon_url, body, body_url, published,\n                   updated, status,\n                   issues_url, source_url, wiki_url, discord_url, license_url,\n                   team_id, client_side, server_side, license, slug\n            FROM mods\n            WHERE id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 1,
-          "name": "description",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 3,
-          "name": "follows",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 4,
-          "name": "icon_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "body",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "body_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "updated",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 9,
-          "name": "status",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 10,
-          "name": "issues_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 11,
-          "name": "source_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 12,
-          "name": "wiki_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 13,
-          "name": "discord_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 14,
-          "name": "license_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 15,
-          "name": "team_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 16,
-          "name": "client_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 17,
-          "name": "server_side",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 18,
-          "name": "license",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 19,
-          "name": "slug",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        true,
-        false,
-        false,
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false,
-        false,
-        true
-      ]
-    }
-  },
   "8f706d78ac4235ea04c59e2c220a4791e1d08fdf287b783b4aaef36fd2445467": {
     "query": "\n            DELETE FROM loaders\n            WHERE loader = $1\n            ",
     "describe": {
@@ -3192,26 +3319,6 @@
       "nullable": []
     }
   },
-  "97143e41c18d191d09d244113b7b6cdf5bd6ab89c62ac46d0980d700ab288f48": {
-    "query": "\n                SELECT name FROM side_types\n                WHERE id = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "name",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int4"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "97690dda7edea8c985891cae5ad405f628ed81e333bc88df5493c928a4324d43": {
     "query": "SELECT EXISTS(SELECT 1 FROM reports WHERE id=$1)",
     "describe": {
@@ -3229,6 +3336,100 @@
       },
       "nullable": [
         null
+      ]
+    }
+  },
+  "9782399687ae7a79ea2931e8d3eb38c5c786240d214ff7fd7d0ae39f2d683108": {
+    "query": "\n            SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n            ORDER BY created DESC\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "98841ab141b5133690c2d1d1a37de982b960a5d75d2aa98565fadb4a1ac206a1": {
+    "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n                    WHERE type = $1\n                    ORDER BY created DESC\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "9985165594f04fb1d68e2e415a996b6553e8b5c91f121df3a9194806df10a197": {
+    "query": "\n            SELECT name FROM side_types\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false
       ]
     }
   },
@@ -3347,86 +3548,6 @@
       ]
     }
   },
-  "a8f8acda6246fe82cc16c8804589102bfb176980fbcb93ca131f524ac395d86a": {
-    "query": "\n            SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,\n                v.changelog, v.changelog_url, v.date_published, v.downloads,\n                v.release_channel, v.featured\n            FROM versions v\n            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "author_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "changelog",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 9,
-          "name": "release_channel",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 10,
-          "name": "featured",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "a90bb6904e1b790c0e29e060dac5ba4c2a6087e07c1197dc1f59f0aff31944c9": {
     "query": "\n                DELETE FROM states\n                WHERE expires < CURRENT_DATE\n                ",
     "describe": {
@@ -3537,6 +3658,47 @@
       ]
     }
   },
+  "aaec67a66b58dec36339c14000b319aed1b0ebb1324fc85e34d14c6430c26657": {
+    "query": "\n            SELECT id FROM categories\n            WHERE category = $1 AND project_type = $2\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "ac2d17b7d7147b14f072c15ffa214c14f32f27ffa6a3c2b2a5f80f3ad49ca5e9": {
+    "query": "\n                    SELECT id FROM users\n                    WHERE LOWER(username) = LOWER($1)\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "ac840a3ba466cfa1f914a1e44fcc9052bd1e0e908140e7147d1ff72d1794cfbf": {
     "query": "\n                            SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)\n                            ",
     "describe": {
@@ -3607,46 +3769,6 @@
       "nullable": []
     }
   },
-  "b3c1b38d2e72c5ec9e6f34d497fb6eb5d01d6cdd07f38ee4a2bbae3b92911df7": {
-    "query": "\n                    SELECT version FROM game_versions\n                    WHERE major = $1 AND type = $2\n                    ORDER BY created DESC\n                    ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "version",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bool",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "b446a7ddda6860b72517501332a51e64e76f6ab6de6527ad86b4c77db71f6037": {
-    "query": "\n            INSERT INTO users (\n                id, github_id, username, name, email,\n                avatar_url, bio, created\n            )\n            VALUES (\n                $1, $2, LOWER($3), $4, $5,\n                $6, $7, $8\n            )\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Text",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Timestamptz"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "b69a6f42965b3e7103fcbf46e39528466926789ff31e9ed2591bb175527ec169": {
     "query": "\n            DELETE FROM users\n            WHERE id = $1\n            ",
     "describe": {
@@ -3694,6 +3816,45 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "b90ec97f24315f2eeb918d4be26b3bfb1191548bb26626eee844314d25a894be": {
+    "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n                    WHERE major = $1 AND type = $2\n                    ORDER BY created DESC\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bool",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "b9399840dbbf807a03d69b7fcb3bd479ef20920ab1e3c91706a1c2c7089f48e7": {
@@ -3869,6 +4030,200 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "bf35a3797ff92917ba3568284b5dbae4ae08eedf3516b39b9a02f8bf03164bc3": {
+    "query": "\n            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,\n            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,\n            m.updated updated, m.status status,\n            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,\n            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,\n            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,\n            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id\n            INNER JOIN project_types pt ON pt.id = m.project_type\n            INNER JOIN statuses s ON s.id = m.status\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN licenses l ON m.license = l.id\n            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))\n            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "project_type",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "description",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 5,
+          "name": "follows",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 6,
+          "name": "icon_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "body",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 8,
+          "name": "body_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 9,
+          "name": "published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 10,
+          "name": "updated",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 11,
+          "name": "status",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 12,
+          "name": "issues_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 13,
+          "name": "source_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 14,
+          "name": "wiki_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 15,
+          "name": "discord_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 16,
+          "name": "license_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 17,
+          "name": "team_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 18,
+          "name": "client_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 19,
+          "name": "server_side",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 20,
+          "name": "license",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 21,
+          "name": "slug",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 22,
+          "name": "status_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 23,
+          "name": "client_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 24,
+          "name": "server_side_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 25,
+          "name": "short",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 26,
+          "name": "license_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 27,
+          "name": "project_type_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 28,
+          "name": "categories",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 29,
+          "name": "versions",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        false,
+        true,
+        true,
+        true,
+        true,
+        true,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null
+      ]
     }
   },
   "bf7f721664f5e0ed41adc41b5483037256635f28ff6c4e5d3cbcec4387f9c8ef": {
@@ -4252,18 +4607,21 @@
       "nullable": []
     }
   },
-  "cc8b672c2733bfd110ed3361c6f477b185b530228c7206cb641dbaa40e41ea9f": {
-    "query": "\n            SELECT loader FROM loaders\n            ",
+  "cc8eeb14e2069b9e4f92b224d42b283e569258d61be3cc3b3f7564f0dadac89b": {
+    "query": "\n            INSERT INTO loaders (loader, icon)\n            VALUES ($1, $2)\n            ON CONFLICT (loader, icon) DO NOTHING\n            RETURNING id\n            ",
     "describe": {
       "columns": [
         {
           "ordinal": 0,
-          "name": "loader",
-          "type_info": "Varchar"
+          "name": "id",
+          "type_info": "Int4"
         }
       ],
       "parameters": {
-        "Left": []
+        "Left": [
+          "Varchar",
+          "Varchar"
+        ]
       },
       "nullable": [
         false
@@ -4342,35 +4700,6 @@
       "nullable": []
     }
   },
-  "ce4e3569e69bb87b28af75f6f836715357b290704896edc661185e6a9c3f778e": {
-    "query": "\n            INSERT INTO mods (\n                id, team_id, title, description, body,\n                published, downloads, icon_url, issues_url,\n                source_url, wiki_url, status, discord_url,\n                client_side, server_side, license_url, license,\n                slug\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8, $9,\n                $10, $11, $12, $13,\n                $14, $15, $16, $17,\n                LOWER($18)\n            )\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Timestamptz",
-          "Int4",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Int4",
-          "Varchar",
-          "Int4",
-          "Int4",
-          "Varchar",
-          "Int4",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "cf031f19c7882833a8a30348ee90175a5d8b1fb7d9645c5deb2dc68c6eb33683": {
     "query": "\n            SELECT id FROM release_channels\n            WHERE channel = $1\n            ",
     "describe": {
@@ -4443,6 +4772,44 @@
       ]
     }
   },
+  "d4f7661c0156b04720d83ec5d76d901dd1dff23b1c93c7e2fde650f43c8ed86a": {
+    "query": "\n                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n                WHERE major = $1\n                ORDER BY created DESC\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bool"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "d5b00d6237b04018822db529995f0b001cd1cabf5ca93b4aff37f12c4feb83f6": {
     "query": "\n            INSERT INTO donation_platforms (short, name)\n            VALUES ($1, $2)\n            ON CONFLICT (short) DO NOTHING\n            RETURNING id\n            ",
     "describe": {
@@ -4481,6 +4848,42 @@
       },
       "nullable": [
         null
+      ]
+    }
+  },
+  "d7744589d9e20c48f6f726a8a540822c1e521b791ebc2fee86a1108d442aedb8": {
+    "query": "\n            SELECT c.id id, c.category category, c.icon icon, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "category",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "icon",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "project_type",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
       ]
     }
   },
@@ -4726,6 +5129,26 @@
       ]
     }
   },
+  "e8dc09a76d69e689d4b97527755aebfc049bbb4d470627a688eb9d56f01f8bd5": {
+    "query": "\n            SELECT name FROM project_types\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int4"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "e925b15ec46f0263c7775ba1ba00ed11cfd6749fa792d4eabed73b619f230585": {
     "query": "\n                    UPDATE mods\n                    SET status = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -4833,18 +5256,65 @@
       "nullable": []
     }
   },
-  "ed4c0b620d01cdcdd0c2b3b5727ae3485d51114ca76e17331cec0d244d7f972d": {
-    "query": "\n            SELECT version FROM game_versions\n            ORDER BY created DESC\n            ",
+  "ef3d43d3424824eed67370f10cc0672581a95a169bf404022cbe3cac0415d99c": {
+    "query": "\n        SELECT f.id id, f.version_id version_id, f.filename filename, v.version_number version_number, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
     "describe": {
       "columns": [
         {
           "ordinal": 0,
-          "name": "version",
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "filename",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_number",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "project_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
+  "ef59f99fc0ab66ff5779d0e71c4a2134e2f26eed002ff9ea5626ea3e23518594": {
+    "query": "\n        SELECT name FROM project_types pt\n        INNER JOIN mods ON mods.project_type = pt.id\n        WHERE mods.id = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "name",
           "type_info": "Varchar"
         }
       ],
       "parameters": {
-        "Left": []
+        "Left": [
+          "Int8"
+        ]
       },
       "nullable": [
         false
@@ -4871,26 +5341,6 @@
       ]
     }
   },
-  "f12ae54acf02e06e9b8774e8c2ea95058a78f6d724645adcd02f9dea6538024f": {
-    "query": "\n            INSERT INTO categories (category)\n            VALUES ($1)\n            ON CONFLICT (category) DO NOTHING\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "f22e9aee090f9952cf795a3540c03b0a5036dab0b740847d05e03d4565756283": {
     "query": "\n            DELETE FROM team_members\n            WHERE user_id = $1\n            ",
     "describe": {
@@ -4901,6 +5351,52 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "f23fcac002c2694e8b8ff96708e4178428d24972a120f068b1897981a1ff988b": {
+    "query": "\n            SELECT id, name FROM project_types\n            WHERE name IN (SELECT * FROM UNNEST($1::varchar[]))\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "name",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "VarcharArray"
+        ]
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
+  "f3a8ad4a802dde0eb9304078e0368066e7d48121dfe73a63b2911b0998840a79": {
+    "query": "\n                SELECT id FROM users\n                WHERE LOWER(username) = LOWER($1)\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "f453b43772c4d2d9d09dc389eb95482cc75e7f0eaf9dc7ff48cf40f22f1497cc": {

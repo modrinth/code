@@ -5,15 +5,15 @@ use thiserror::Error;
 
 pub mod categories;
 pub mod ids;
-pub mod mod_item;
 pub mod notification_item;
+pub mod project_item;
 pub mod report_item;
 pub mod team_item;
 pub mod user_item;
 pub mod version_item;
 
 pub use ids::*;
-pub use mod_item::Mod;
+pub use project_item::Project;
 pub use team_item::Team;
 pub use team_item::TeamMember;
 pub use user_item::User;
@@ -62,7 +62,7 @@ impl ids::ChannelId {
 
 impl ids::StatusId {
     pub async fn get_id<'a, E>(
-        status: &crate::models::mods::ModStatus,
+        status: &crate::models::projects::ProjectStatus,
         exec: E,
     ) -> Result<Option<Self>, DatabaseError>
     where
@@ -84,7 +84,7 @@ impl ids::StatusId {
 
 impl ids::SideTypeId {
     pub async fn get_id<'a, E>(
-        side: &crate::models::mods::SideType,
+        side: &crate::models::projects::SideType,
         exec: E,
     ) -> Result<Option<Self>, DatabaseError>
     where
@@ -120,5 +120,24 @@ impl ids::DonationPlatformId {
         .await?;
 
         Ok(result.map(|r| ids::DonationPlatformId(r.id)))
+    }
+}
+
+impl ids::ProjectTypeId {
+    pub async fn get_id<'a, E>(project_type: String, exec: E) -> Result<Option<Self>, DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        let result = sqlx::query!(
+            "
+            SELECT id FROM project_types
+            WHERE name = $1
+            ",
+            project_type
+        )
+        .fetch_optional(exec)
+        .await?;
+
+        Ok(result.map(|r| ids::ProjectTypeId(r.id)))
     }
 }

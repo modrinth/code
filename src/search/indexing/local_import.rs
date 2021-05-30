@@ -2,32 +2,32 @@ use futures::{StreamExt, TryStreamExt};
 use log::info;
 
 use super::IndexingError;
-use crate::models::mods::SideType;
-use crate::search::UploadSearchMod;
+use crate::models::projects::SideType;
+use crate::search::UploadSearchProject;
 use sqlx::postgres::PgPool;
 use std::borrow::Cow;
 
-// TODO: only loaders for recent versions? For mods that have moved from forge to fabric
-pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingError> {
-    info!("Indexing local mods!");
+// TODO: only loaders for recent versions? For projects that have moved from forge to fabric
+pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, IndexingError> {
+    info!("Indexing local projects!");
 
-    let mut docs_to_add: Vec<UploadSearchMod> = vec![];
+    let mut docs_to_add: Vec<UploadSearchProject> = vec![];
 
-    let mut mods = sqlx::query!(
+    let mut projects = sqlx::query!(
         "
         SELECT m.id, m.title, m.description, m.downloads, m.follows, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.status, m.slug, m.license, m.client_side, m.server_side FROM mods m
         "
     ).fetch(&pool);
 
-    while let Some(result) = mods.next().await {
-        if let Ok(mod_data) = result {
-            let status = crate::models::mods::ModStatus::from_str(
+    while let Some(result) = projects.next().await {
+        if let Ok(project_data) = result {
+            let status = crate::models::projects::ProjectStatus::from_str(
                 &sqlx::query!(
                     "
-                SELECT status FROM statuses
-                WHERE id = $1
-                ",
-                    mod_data.status,
+                    SELECT status FROM statuses
+                    WHERE id = $1
+                    ",
+                    project_data.status,
                 )
                 .fetch_one(&pool)
                 .await?
@@ -46,7 +46,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 WHERE versions.mod_id = $1
                 ORDER BY gv.created ASC
                 ",
-                mod_data.id
+                project_data.id
             )
             .fetch_many(&pool)
             .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
@@ -60,7 +60,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 INNER JOIN loaders ON loaders.id = lv.loader_id
                 WHERE versions.mod_id = $1
                 ",
-                mod_data.id
+                project_data.id
             )
             .fetch_many(&pool)
             .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.loader))) })
@@ -74,7 +74,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                     INNER JOIN categories c ON mc.joining_category_id=c.id
                 WHERE mc.joining_mod_id = $1
                 ",
-                mod_data.id
+                project_data.id
             )
             .fetch_many(&pool)
             .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.category))) })
@@ -90,22 +90,21 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
                 WHERE tm.team_id = $2 AND tm.role = $1
                 ",
                 crate::models::teams::OWNER_ROLE,
-                mod_data.team_id,
+                project_data.team_id,
             )
             .fetch_one(&pool)
             .await?;
 
             let mut icon_url = "".to_string();
 
-            if let Some(url) = mod_data.icon_url {
+            if let Some(url) = project_data.icon_url {
                 icon_url = url;
             }
 
-            let mod_id = crate::models::ids::ModId(mod_data.id as u64);
-            let author_id = crate::models::ids::UserId(user.id as u64);
+            let project_id = crate::models::ids::ProjectId(project_data.id as u64);
 
             // TODO: is this correct? This just gets the latest version of
-            // minecraft that this mod has a version that supports; it doesn't
+            // minecraft that this project has a version that supports; it doesn't
             // take betas or other info into account.
             let latest_version = versions
                 .last()
@@ -116,10 +115,10 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
             let client_side = SideType::from_str(
                 &sqlx::query!(
                     "
-                SELECT name FROM side_types
-                WHERE id = $1
-                ",
-                    mod_data.client_side,
+                    SELECT name FROM side_types
+                    WHERE id = $1
+                    ",
+                    project_data.client_side,
                 )
                 .fetch_one(&pool)
                 .await?
@@ -129,10 +128,10 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
             let server_side = SideType::from_str(
                 &sqlx::query!(
                     "
-                SELECT name FROM side_types
-                WHERE id = $1
-                ",
-                    mod_data.server_side,
+                    SELECT name FROM side_types
+                    WHERE id = $1
+                    ",
+                    project_data.server_side,
                 )
                 .fetch_one(&pool)
                 .await?
@@ -140,33 +139,31 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
             );
 
             let license = crate::database::models::categories::License::get(
-                crate::database::models::LicenseId(mod_data.license),
+                crate::database::models::LicenseId(project_data.license),
                 &pool,
             )
             .await?;
 
-            docs_to_add.push(UploadSearchMod {
-                mod_id: format!("local-{}", mod_id),
-                title: mod_data.title,
-                description: mod_data.description,
+            docs_to_add.push(UploadSearchProject {
+                project_id: format!("local-{}", project_id),
+                title: project_data.title,
+                description: project_data.description,
                 categories,
                 versions,
-                follows: mod_data.follows,
-                downloads: mod_data.downloads,
-                page_url: format!("https://modrinth.com/mod/{}", mod_id),
+                follows: project_data.follows,
+                downloads: project_data.downloads,
                 icon_url,
                 author: user.username,
-                author_url: format!("https://modrinth.com/user/{}", author_id),
-                date_created: mod_data.published,
-                created_timestamp: mod_data.published.timestamp(),
-                date_modified: mod_data.updated,
-                modified_timestamp: mod_data.updated.timestamp(),
+                date_created: project_data.published,
+                created_timestamp: project_data.published.timestamp(),
+                date_modified: project_data.updated,
+                modified_timestamp: project_data.updated.timestamp(),
                 latest_version,
                 license: license.short,
                 client_side: client_side.to_string(),
                 server_side: server_side.to_string(),
                 host: Cow::Borrowed("modrinth"),
-                slug: mod_data.slug,
+                slug: project_data.slug,
             });
         }
     }
@@ -175,10 +172,10 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchMod>, IndexingE
 }
 
 pub async fn query_one(
-    id: crate::database::models::ModId,
+    id: crate::database::models::ProjectId,
     exec: &mut sqlx::PgConnection,
-) -> Result<UploadSearchMod, IndexingError> {
-    let mod_data = sqlx::query!(
+) -> Result<UploadSearchProject, IndexingError> {
+    let project_data = sqlx::query!(
         "
         SELECT m.id, m.title, m.description, m.downloads, m.follows, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.slug, m.license, m.client_side, m.server_side
         FROM mods m
@@ -195,7 +192,7 @@ pub async fn query_one(
         WHERE versions.mod_id = $1
         ORDER BY gv.created ASC
         ",
-        mod_data.id
+        project_data.id
     )
     .fetch_many(&mut *exec)
     .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
@@ -209,7 +206,7 @@ pub async fn query_one(
         INNER JOIN loaders ON loaders.id = lv.loader_id
         WHERE versions.mod_id = $1
         ",
-        mod_data.id
+        project_data.id
     )
     .fetch_many(&mut *exec)
     .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.loader))) })
@@ -223,7 +220,7 @@ pub async fn query_one(
             INNER JOIN categories c ON mc.joining_category_id=c.id
         WHERE mc.joining_mod_id = $1
         ",
-        mod_data.id
+        project_data.id
     )
     .fetch_many(&mut *exec)
     .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.category))) })
@@ -239,22 +236,21 @@ pub async fn query_one(
         WHERE tm.team_id = $2 AND tm.role = $1
         ",
         crate::models::teams::OWNER_ROLE,
-        mod_data.team_id,
+        project_data.team_id,
     )
     .fetch_one(&mut *exec)
     .await?;
 
     let mut icon_url = "".to_string();
 
-    if let Some(url) = mod_data.icon_url {
+    if let Some(url) = project_data.icon_url {
         icon_url = url;
     }
 
-    let mod_id = crate::models::ids::ModId(mod_data.id as u64);
-    let author_id = crate::models::ids::UserId(user.id as u64);
+    let project_id = crate::models::ids::ProjectId(project_data.id as u64);
 
     // TODO: is this correct? This just gets the latest version of
-    // minecraft that this mod has a version that supports; it doesn't
+    // minecraft that this project has a version that supports; it doesn't
     // take betas or other info into account.
     let latest_version = versions
         .last()
@@ -265,10 +261,10 @@ pub async fn query_one(
     let client_side = SideType::from_str(
         &sqlx::query!(
             "
-                SELECT name FROM side_types
-                WHERE id = $1
-                ",
-            mod_data.client_side,
+            SELECT name FROM side_types
+            WHERE id = $1
+            ",
+            project_data.client_side,
         )
         .fetch_one(&mut *exec)
         .await?
@@ -278,10 +274,10 @@ pub async fn query_one(
     let server_side = SideType::from_str(
         &sqlx::query!(
             "
-                SELECT name FROM side_types
-                WHERE id = $1
-                ",
-            mod_data.server_side,
+            SELECT name FROM side_types
+            WHERE id = $1
+            ",
+            project_data.server_side,
         )
         .fetch_one(&mut *exec)
         .await?
@@ -289,32 +285,30 @@ pub async fn query_one(
     );
 
     let license = crate::database::models::categories::License::get(
-        crate::database::models::LicenseId(mod_data.license),
+        crate::database::models::LicenseId(project_data.license),
         &mut *exec,
     )
     .await?;
 
-    Ok(UploadSearchMod {
-        mod_id: format!("local-{}", mod_id),
-        title: mod_data.title,
-        description: mod_data.description,
+    Ok(UploadSearchProject {
+        project_id: format!("local-{}", project_id),
+        title: project_data.title,
+        description: project_data.description,
         categories,
         versions,
-        follows: mod_data.follows,
-        downloads: mod_data.downloads,
-        page_url: format!("https://modrinth.com/mod/{}", mod_id),
+        follows: project_data.follows,
+        downloads: project_data.downloads,
         icon_url,
         author: user.username,
-        author_url: format!("https://modrinth.com/user/{}", author_id),
-        date_created: mod_data.published,
-        created_timestamp: mod_data.published.timestamp(),
-        date_modified: mod_data.updated,
-        modified_timestamp: mod_data.updated.timestamp(),
+        date_created: project_data.published,
+        created_timestamp: project_data.published.timestamp(),
+        date_modified: project_data.updated,
+        modified_timestamp: project_data.updated.timestamp(),
         latest_version,
         license: license.short,
         client_side: client_side.to_string(),
         server_side: server_side.to_string(),
         host: Cow::Borrowed("modrinth"),
-        slug: mod_data.slug,
+        slug: project_data.slug,
     })
 }

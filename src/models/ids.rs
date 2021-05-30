@@ -1,7 +1,7 @@
 use thiserror::Error;
 
-pub use super::mods::{ModId, VersionId};
 pub use super::notifications::NotificationId;
+pub use super::projects::{ProjectId, VersionId};
 pub use super::reports::ReportId;
 pub use super::teams::TeamId;
 pub use super::users::UserId;
@@ -105,7 +105,7 @@ macro_rules! base62_id_impl {
         impl_base62_display!($struct);
     }
 }
-base62_id_impl!(ModId, ModId);
+base62_id_impl!(ProjectId, ProjectId);
 base62_id_impl!(UserId, UserId);
 base62_id_impl!(VersionId, VersionId);
 base62_id_impl!(TeamId, TeamId);

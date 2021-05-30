@@ -1,7 +1,7 @@
 use crate::auth::get_user_from_headers;
 use crate::database::models::notification_item::{NotificationActionBuilder, NotificationBuilder};
 use crate::database::models::TeamMember;
-use crate::models::ids::ModId;
+use crate::models::ids::ProjectId;
 use crate::models::teams::{Permissions, TeamId};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
@@ -76,10 +76,7 @@ pub async fn join_team(
                 "You are already a member of this team".to_string(),
             ));
         }
-        let mut transaction = pool
-            .begin()
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        let mut transaction = pool.begin().await?;
 
         // Edit Team Member to set Accepted to True
         TeamMember::edit_team_member(
@@ -92,17 +89,14 @@ pub async fn join_team(
         )
         .await?;
 
-        transaction
-            .commit()
-            .await
-            .map_err(|e| ApiError::DatabaseError(e.into()))?;
+        transaction.commit().await?;
     } else {
         return Err(ApiError::InvalidInputError(
             "There is no pending request from this team".to_string(),
         ));
     }
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 fn default_role() -> String {
@@ -127,10 +121,7 @@ pub async fn add_team_member(
 ) -> Result<HttpResponse, ApiError> {
     let team_id = info.into_inner().0.into();
 
-    let mut transaction = pool
-        .begin()
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    let mut transaction = pool.begin().await?;
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
     let team_member =
@@ -181,8 +172,7 @@ pub async fn add_team_member(
     }
 
     crate::database::models::User::get(member.user_id, &**pool)
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?
+        .await?
         .ok_or_else(|| ApiError::InvalidInputError("An invalid User ID specified".to_string()))?;
 
     let new_id = crate::database::models::ids::generate_team_member_id(&mut transaction).await?;
@@ -195,8 +185,7 @@ pub async fn add_team_member(
         accepted: false,
     }
     .insert(&mut transaction)
-    .await
-    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    .await?;
 
     let result = sqlx::query!(
         "
@@ -206,17 +195,16 @@ pub async fn add_team_member(
         team_id as crate::database::models::ids::TeamId
     )
     .fetch_one(&**pool)
-    .await
-    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    .await?;
 
     let team: TeamId = team_id.into();
     NotificationBuilder {
         title: "You have been invited to join a team!".to_string(),
         text: format!(
-            "Team invite from {} to join the team for mod {}",
+            "Team invite from {} to join the team for project {}",
             current_user.username, result.title
         ),
-        link: format!("mod/{}", ModId(result.id as u64)),
+        link: format!("project/{}", ProjectId(result.id as u64)),
         actions: vec![
             NotificationActionBuilder {
                 title: "Accept".to_string(),
@@ -234,12 +222,9 @@ pub async fn add_team_member(
     .insert(new_member.user_id.into(), &mut transaction)
     .await?;
 
-    transaction
-        .commit()
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    transaction.commit().await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -262,10 +247,7 @@ pub async fn edit_team_member(
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
     let team_member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool).await?;
 
-    let mut transaction = pool
-        .begin()
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    let mut transaction = pool.begin().await?;
 
     let member = match team_member {
         Some(m) => m,
@@ -306,12 +288,9 @@ pub async fn edit_team_member(
     )
     .await?;
 
-    transaction
-        .commit()
-        .await
-        .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    transaction.commit().await?;
 
-    Ok(HttpResponse::Ok().body(""))
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("{id}/members/{user_id}")]
@@ -371,7 +350,7 @@ pub async fn remove_team_member(
                 "You do not have permission to cancel a team invite".to_string(),
             ));
         }
-        Ok(HttpResponse::Ok().body(""))
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

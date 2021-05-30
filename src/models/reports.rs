@@ -22,7 +22,7 @@ pub struct Report {
 #[derive(Serialize, Deserialize, Clone)]
 #[serde(rename_all = "kebab-case")]
 pub enum ItemType {
-    Mod,
+    Project,
     Version,
     User,
     Unknown,
@@ -31,7 +31,7 @@ pub enum ItemType {
 impl ItemType {
     pub fn as_str(&self) -> &'static str {
         match self {
-            ItemType::Mod => "mod",
+            ItemType::Project => "project",
             ItemType::Version => "version",
             ItemType::User => "user",
             ItemType::Unknown => "unknown",

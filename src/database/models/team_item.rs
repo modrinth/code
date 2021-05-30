@@ -61,7 +61,7 @@ impl TeamBuilder {
     }
 }
 
-/// A team of users who control a mod
+/// A team of users who control a project
 pub struct Team {
     /// The id of the team
     pub id: TeamId,
@@ -412,8 +412,8 @@ impl TeamMember {
         Ok(())
     }
 
-    pub async fn get_from_user_id_mod<'a, 'b, E>(
-        id: ModId,
+    pub async fn get_from_user_id_project<'a, 'b, E>(
+        id: ProjectId,
         user_id: UserId,
         executor: E,
     ) -> Result<Option<Self>, super::DatabaseError>
@@ -426,7 +426,7 @@ impl TeamMember {
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 AND accepted = TRUE
             WHERE m.id = $1
             ",
-            id as ModId,
+            id as ProjectId,
             user_id as UserId
         )
             .fetch_optional(executor)
