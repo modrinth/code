@@ -30,7 +30,9 @@ impl super::Validator for ForgeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<&[u8]>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("META-INF/mods.toml")?;
+        archive.by_name("META-INF/mods.toml").map_err(|_| {
+            ValidationError::InvalidInputError("No mods.toml present for Forge file.".to_string())
+        })?;
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(
@@ -71,7 +73,9 @@ impl super::Validator for LegacyForgeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<&[u8]>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("mcmod.info")?;
+        archive.by_name("mcmod.info").map_err(|_| {
+            ValidationError::InvalidInputError("No mcmod.info present for Forge file.".to_string())
+        })?;
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(

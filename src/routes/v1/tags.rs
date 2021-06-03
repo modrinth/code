@@ -1,5 +1,5 @@
 use crate::auth::check_is_admin_from_headers;
-use crate::database::models::categories::{Category, Loader, ProjectType};
+use crate::database::models::categories::{Category, GameVersion, Loader, ProjectType};
 use crate::routes::ApiError;
 use actix_web::{get, put, web};
 use actix_web::{HttpRequest, HttpResponse};
@@ -78,4 +78,33 @@ pub async fn loader_create(
         .await?;
 
     Ok(HttpResponse::NoContent().body(""))
+}
+
+#[derive(serde::Deserialize)]
+pub struct GameVersionQueryData {
+    #[serde(rename = "type")]
+    type_: Option<String>,
+    major: Option<bool>,
+}
+
+#[get("game_version")]
+pub async fn game_version_list(
+    pool: web::Data<PgPool>,
+    query: web::Query<GameVersionQueryData>,
+) -> Result<HttpResponse, ApiError> {
+    if query.type_.is_some() || query.major.is_some() {
+        let results = GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool)
+            .await?
+            .into_iter()
+            .map(|x| x.version)
+            .collect::<Vec<String>>();
+        Ok(HttpResponse::Ok().json(results))
+    } else {
+        let results = GameVersion::list(&**pool)
+            .await?
+            .into_iter()
+            .map(|x| x.version)
+            .collect::<Vec<String>>();
+        Ok(HttpResponse::Ok().json(results))
+    }
 }

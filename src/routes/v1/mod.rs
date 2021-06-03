@@ -4,6 +4,7 @@ mod moderation;
 mod mods;
 mod reports;
 mod tags;
+mod teams;
 mod users;
 mod versions;
 
@@ -31,7 +32,7 @@ pub fn tags_config(cfg: &mut web::ServiceConfig) {
             .service(tags::loader_list)
             .service(tags::loader_create)
             .service(super::tags::loader_delete)
-            .service(super::tags::game_version_list)
+            .service(tags::game_version_list)
             .service(super::tags::game_version_create)
             .service(super::tags::game_version_delete)
             .service(super::tags::license_create)
@@ -93,14 +94,14 @@ pub fn users_config(cfg: &mut web::ServiceConfig) {
             .service(super::users::user_edit)
             .service(super::users::user_icon_edit)
             .service(super::users::user_notifications)
-            .service(super::users::user_follows),
+            .service(users::user_follows),
     );
 }
 
 pub fn teams_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("team")
-            .service(super::teams::team_members_get)
+            .service(teams::team_members_get)
             .service(super::teams::edit_team_member)
             .service(super::teams::add_team_member)
             .service(super::teams::join_team)

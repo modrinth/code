@@ -8,7 +8,7 @@ pub struct UserId(pub u64);
 
 pub const DELETED_USER: UserId = UserId(127155982985829);
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct User {
     pub id: UserId,
     pub github_id: Option<u64>,
@@ -21,7 +21,7 @@ pub struct User {
     pub role: Role,
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, PartialEq, Eq, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum Role {
     Developer,

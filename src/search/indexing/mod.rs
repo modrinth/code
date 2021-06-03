@@ -264,6 +264,7 @@ fn default_rules() -> VecDeque<String> {
 fn default_settings() -> Settings {
     let displayed_attributes = vec![
         "project_id".to_string(),
+        "project_type".to_string(),
         "slug".to_string(),
         "author".to_string(),
         "title".to_string(),

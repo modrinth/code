@@ -78,7 +78,9 @@ impl super::Validator for PackValidator {
         &self,
         archive: &mut ZipArchive<Cursor<&[u8]>>,
     ) -> Result<ValidationResult, ValidationError> {
-        let mut file = archive.by_name("index.json")?;
+        let mut file = archive.by_name("index.json").map_err(|_| {
+            ValidationError::InvalidInputError("Pack manifest is missing.".to_string())
+        })?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;

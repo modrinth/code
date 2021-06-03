@@ -1,314 +1,165 @@
-use futures::{StreamExt, TryStreamExt};
+use futures::TryStreamExt;
 use log::info;
 
 use super::IndexingError;
-use crate::models::projects::SideType;
+use crate::database::models::ProjectId;
+use crate::models::projects::ProjectStatus;
 use crate::search::UploadSearchProject;
 use sqlx::postgres::PgPool;
-use std::borrow::Cow;
 
 // TODO: only loaders for recent versions? For projects that have moved from forge to fabric
 pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, IndexingError> {
     info!("Indexing local projects!");
-
-    let mut docs_to_add: Vec<UploadSearchProject> = vec![];
-
-    let mut projects = sqlx::query!(
-        "
-        SELECT m.id, m.title, m.description, m.downloads, m.follows, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.status, m.slug, m.license, m.client_side, m.server_side FROM mods m
-        "
-    ).fetch(&pool);
-
-    while let Some(result) = projects.next().await {
-        if let Ok(project_data) = result {
-            let status = crate::models::projects::ProjectStatus::from_str(
-                &sqlx::query!(
-                    "
-                    SELECT status FROM statuses
-                    WHERE id = $1
-                    ",
-                    project_data.status,
-                )
-                .fetch_one(&pool)
-                .await?
-                .status,
-            );
-
-            if !status.is_searchable() {
-                continue;
-            }
-
-            let versions = sqlx::query!(
-                "
-                SELECT DISTINCT gv.version, gv.created FROM versions
-                    INNER JOIN game_versions_versions gvv ON gvv.joining_version_id=versions.id
-                    INNER JOIN game_versions gv ON gvv.game_version_id=gv.id
-                WHERE versions.mod_id = $1
-                ORDER BY gv.created ASC
-                ",
-                project_data.id
-            )
+    Ok(
+        sqlx::query!(
+            "
+            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
+            m.icon_url icon_url, m.published published,
+            m.updated updated,
+            m.team_id team_id, m.license license, m.slug slug,
+            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions
+            FROM mods m
+            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
+            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
+            LEFT OUTER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN statuses s ON s.id = m.status
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
+            INNER JOIN game_versions gv ON gvv.game_version_id = gv.id
+            INNER JOIN loaders_versions lv ON lv.version_id = v.id
+            INNER JOIN loaders lo ON lo.id = lv.loader_id
+            INNER JOIN project_types pt ON pt.id = m.project_type
+            INNER JOIN side_types cs ON m.client_side = cs.id
+            INNER JOIN side_types ss ON m.server_side = ss.id
+            INNER JOIN licenses l ON m.license = l.id
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2
+            INNER JOIN users u ON tm.user_id = u.id
+            WHERE s.status = $1
+            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id, u.id;
+            ",
+            ProjectStatus::Approved.as_str(),
+            crate::models::teams::OWNER_ROLE,
+        )
             .fetch_many(&pool)
-            .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
-            .try_collect::<Vec<String>>()
-            .await?;
+            .try_filter_map(|e| async {
+                Ok(e.right().map(|m| {
+                    let mut categories = m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect::<Vec<String>>();
+                    categories.append(&mut m.loaders.unwrap_or_default().split(',').map(|x| x.to_string()).collect::<Vec<String>>());
 
-            let loaders = sqlx::query!(
-                "
-                SELECT DISTINCT loaders.loader FROM versions
-                INNER JOIN loaders_versions lv ON lv.version_id = versions.id
-                INNER JOIN loaders ON loaders.id = lv.loader_id
-                WHERE versions.mod_id = $1
-                ",
-                project_data.id
-            )
-            .fetch_many(&pool)
-            .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.loader))) })
-            .try_collect::<Vec<Cow<str>>>()
-            .await?;
+                    let versions : Vec<String> = m.versions.unwrap_or_default().split(',').map(|x| x.to_string()).collect::<Vec<String>>();
 
-            let mut categories = sqlx::query!(
-                "
-                SELECT c.category
-                FROM mods_categories mc
-                    INNER JOIN categories c ON mc.joining_category_id=c.id
-                WHERE mc.joining_mod_id = $1
-                ",
-                project_data.id
-            )
-            .fetch_many(&pool)
-            .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.category))) })
-            .try_collect::<Vec<Cow<str>>>()
-            .await?;
+                    let project_id : crate::models::projects::ProjectId = ProjectId(m.id).into();
 
-            categories.extend(loaders);
-
-            let user = sqlx::query!(
-                "
-                SELECT u.id, u.username FROM users u
-                INNER JOIN team_members tm ON tm.user_id = u.id
-                WHERE tm.team_id = $2 AND tm.role = $1
-                ",
-                crate::models::teams::OWNER_ROLE,
-                project_data.team_id,
-            )
-            .fetch_one(&pool)
-            .await?;
-
-            let mut icon_url = "".to_string();
-
-            if let Some(url) = project_data.icon_url {
-                icon_url = url;
-            }
-
-            let project_id = crate::models::ids::ProjectId(project_data.id as u64);
-
-            // TODO: is this correct? This just gets the latest version of
-            // minecraft that this project has a version that supports; it doesn't
-            // take betas or other info into account.
-            let latest_version = versions
-                .last()
-                .cloned()
-                .map(Cow::Owned)
-                .unwrap_or_else(|| Cow::Borrowed(""));
-
-            let client_side = SideType::from_str(
-                &sqlx::query!(
-                    "
-                    SELECT name FROM side_types
-                    WHERE id = $1
-                    ",
-                    project_data.client_side,
-                )
-                .fetch_one(&pool)
-                .await?
-                .name,
-            );
-
-            let server_side = SideType::from_str(
-                &sqlx::query!(
-                    "
-                    SELECT name FROM side_types
-                    WHERE id = $1
-                    ",
-                    project_data.server_side,
-                )
-                .fetch_one(&pool)
-                .await?
-                .name,
-            );
-
-            let license = crate::database::models::categories::License::get(
-                crate::database::models::LicenseId(project_data.license),
-                &pool,
-            )
-            .await?;
-
-            docs_to_add.push(UploadSearchProject {
-                project_id: format!("local-{}", project_id),
-                title: project_data.title,
-                description: project_data.description,
-                categories,
-                versions,
-                follows: project_data.follows,
-                downloads: project_data.downloads,
-                icon_url,
-                author: user.username,
-                date_created: project_data.published,
-                created_timestamp: project_data.published.timestamp(),
-                date_modified: project_data.updated,
-                modified_timestamp: project_data.updated.timestamp(),
-                latest_version,
-                license: license.short,
-                client_side: client_side.to_string(),
-                server_side: server_side.to_string(),
-                host: Cow::Borrowed("modrinth"),
-                slug: project_data.slug,
-            });
-        }
-    }
-
-    Ok(docs_to_add)
+                    UploadSearchProject {
+                        project_id: format!("{}", project_id),
+                        title: m.title,
+                        description: m.description,
+                        categories,
+                        follows: m.follows,
+                        downloads: m.downloads,
+                        icon_url: m.icon_url.unwrap_or_default(),
+                        author: m.username,
+                        date_created: m.published,
+                        created_timestamp: m.published.timestamp(),
+                        date_modified: m.updated,
+                        modified_timestamp: m.updated.timestamp(),
+                        latest_version: versions.last().cloned().unwrap_or_else(|| "None".to_string()),
+                        versions,
+                        license: m.short,
+                        client_side: m.client_side_type,
+                        server_side: m.server_side_type,
+                        slug: m.slug,
+                        project_type: m.project_type_name,
+                    }
+                }))
+            })
+        .try_collect::<Vec<UploadSearchProject>>()
+        .await?
+    )
 }
 
 pub async fn query_one(
-    id: crate::database::models::ProjectId,
+    id: ProjectId,
     exec: &mut sqlx::PgConnection,
 ) -> Result<UploadSearchProject, IndexingError> {
-    let project_data = sqlx::query!(
-        "
-        SELECT m.id, m.title, m.description, m.downloads, m.follows, m.icon_url, m.body_url, m.published, m.updated, m.team_id, m.slug, m.license, m.client_side, m.server_side
-        FROM mods m
-        WHERE id = $1
-        ",
-        id.0,
-    ).fetch_one(&mut *exec).await?;
-
-    let versions = sqlx::query!(
-        "
-        SELECT DISTINCT gv.version, gv.created FROM versions
-            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id=versions.id
-            INNER JOIN game_versions gv ON gvv.game_version_id=gv.id
-        WHERE versions.mod_id = $1
-        ORDER BY gv.created ASC
-        ",
-        project_data.id
-    )
-    .fetch_many(&mut *exec)
-    .try_filter_map(|e| async { Ok(e.right().map(|c| c.version)) })
-    .try_collect::<Vec<String>>()
-    .await?;
-
-    let loaders = sqlx::query!(
-        "
-        SELECT DISTINCT loaders.loader FROM versions
-        INNER JOIN loaders_versions lv ON lv.version_id = versions.id
-        INNER JOIN loaders ON loaders.id = lv.loader_id
-        WHERE versions.mod_id = $1
-        ",
-        project_data.id
-    )
-    .fetch_many(&mut *exec)
-    .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.loader))) })
-    .try_collect::<Vec<Cow<str>>>()
-    .await?;
-
-    let mut categories = sqlx::query!(
-        "
-        SELECT c.category
-        FROM mods_categories mc
-            INNER JOIN categories c ON mc.joining_category_id=c.id
-        WHERE mc.joining_mod_id = $1
-        ",
-        project_data.id
-    )
-    .fetch_many(&mut *exec)
-    .try_filter_map(|e| async { Ok(e.right().map(|c| Cow::Owned(c.category))) })
-    .try_collect::<Vec<Cow<str>>>()
-    .await?;
-
-    categories.extend(loaders);
-
-    let user = sqlx::query!(
-        "
-        SELECT u.id, u.username FROM users u
-        INNER JOIN team_members tm ON tm.user_id = u.id
-        WHERE tm.team_id = $2 AND tm.role = $1
-        ",
-        crate::models::teams::OWNER_ROLE,
-        project_data.team_id,
-    )
-    .fetch_one(&mut *exec)
-    .await?;
-
-    let mut icon_url = "".to_string();
-
-    if let Some(url) = project_data.icon_url {
-        icon_url = url;
-    }
-
-    let project_id = crate::models::ids::ProjectId(project_data.id as u64);
-
-    // TODO: is this correct? This just gets the latest version of
-    // minecraft that this project has a version that supports; it doesn't
-    // take betas or other info into account.
-    let latest_version = versions
-        .last()
-        .cloned()
-        .map(Cow::Owned)
-        .unwrap_or_else(|| Cow::Borrowed(""));
-
-    let client_side = SideType::from_str(
-        &sqlx::query!(
+    let m = sqlx::query!(
             "
-            SELECT name FROM side_types
-            WHERE id = $1
+            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
+            m.icon_url icon_url, m.published published,
+            m.updated updated,
+            m.team_id team_id, m.license license, m.slug slug,
+            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions
+            FROM mods m
+            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
+            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
+            LEFT OUTER JOIN versions v ON v.mod_id = m.id
+            INNER JOIN statuses s ON s.id = m.status
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
+            INNER JOIN game_versions gv ON gvv.game_version_id = gv.id
+            INNER JOIN loaders_versions lv ON lv.version_id = v.id
+            INNER JOIN loaders lo ON lo.id = lv.loader_id
+            INNER JOIN project_types pt ON pt.id = m.project_type
+            INNER JOIN side_types cs ON m.client_side = cs.id
+            INNER JOIN side_types ss ON m.server_side = ss.id
+            INNER JOIN licenses l ON m.license = l.id
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2
+            INNER JOIN users u ON tm.user_id = u.id
+            WHERE m.id = $1
+            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id, u.id;
             ",
-            project_data.client_side,
+            id as ProjectId,
+            crate::models::teams::OWNER_ROLE,
         )
-        .fetch_one(&mut *exec)
-        .await?
-        .name,
+           .fetch_one(exec)
+           .await?;
+
+    let mut categories = m
+        .categories
+        .unwrap_or_default()
+        .split(',')
+        .map(|x| x.to_string())
+        .collect::<Vec<String>>();
+    categories.append(
+        &mut m
+            .loaders
+            .unwrap_or_default()
+            .split(',')
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     );
 
-    let server_side = SideType::from_str(
-        &sqlx::query!(
-            "
-            SELECT name FROM side_types
-            WHERE id = $1
-            ",
-            project_data.server_side,
-        )
-        .fetch_one(&mut *exec)
-        .await?
-        .name,
-    );
+    let versions: Vec<String> = m
+        .versions
+        .unwrap_or_default()
+        .split(',')
+        .map(|x| x.to_string())
+        .collect::<Vec<String>>();
 
-    let license = crate::database::models::categories::License::get(
-        crate::database::models::LicenseId(project_data.license),
-        &mut *exec,
-    )
-    .await?;
+    let project_id: crate::models::projects::ProjectId = ProjectId(m.id).into();
 
     Ok(UploadSearchProject {
-        project_id: format!("local-{}", project_id),
-        title: project_data.title,
-        description: project_data.description,
+        project_id: format!("{}", project_id),
+        title: m.title,
+        description: m.description,
         categories,
+        follows: m.follows,
+        downloads: m.downloads,
+        icon_url: m.icon_url.unwrap_or_default(),
+        author: m.username,
+        date_created: m.published,
+        created_timestamp: m.published.timestamp(),
+        date_modified: m.updated,
+        modified_timestamp: m.updated.timestamp(),
+        latest_version: versions
+            .last()
+            .cloned()
+            .unwrap_or_else(|| "None".to_string()),
         versions,
-        follows: project_data.follows,
-        downloads: project_data.downloads,
-        icon_url,
-        author: user.username,
-        date_created: project_data.published,
-        created_timestamp: project_data.published.timestamp(),
-        date_modified: project_data.updated,
-        modified_timestamp: project_data.updated.timestamp(),
-        latest_version,
-        license: license.short,
-        client_side: client_side.to_string(),
-        server_side: server_side.to_string(),
-        host: Cow::Borrowed("modrinth"),
-        slug: project_data.slug,
+        license: m.short,
+        client_side: m.client_side_type,
+        server_side: m.server_side_type,
+        slug: m.slug,
+        project_type: m.project_type_name,
     })
 }

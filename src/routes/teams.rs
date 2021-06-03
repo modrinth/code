@@ -1,5 +1,6 @@
 use crate::auth::get_user_from_headers;
 use crate::database::models::notification_item::{NotificationActionBuilder, NotificationBuilder};
+use crate::database::models::team_item::QueryTeamMember;
 use crate::database::models::TeamMember;
 use crate::models::ids::ProjectId;
 use crate::models::teams::{Permissions, TeamId};
@@ -10,13 +11,73 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
 #[get("{id}/members")]
+pub async fn team_members_get_project(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let string = info.into_inner().0;
+    let project_data =
+        crate::database::models::Project::get_from_slug_or_project_id(string, &**pool).await?;
+
+    if let Some(project) = project_data {
+        let members_data = TeamMember::get_from_team_full(project.team_id, &**pool).await?;
+
+        let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
+
+        if let Some(user) = current_user {
+            let team_member =
+                TeamMember::get_from_user_id(project.team_id, user.id.into(), &**pool)
+                    .await
+                    .map_err(ApiError::DatabaseError)?;
+
+            if team_member.is_some() {
+                let team_members: Vec<crate::models::teams::TeamMember> = members_data
+                    .into_iter()
+                    .map(|data| convert_team_member(data, false))
+                    .collect();
+
+                return Ok(HttpResponse::Ok().json(team_members));
+            }
+        }
+
+        let team_members: Vec<crate::models::teams::TeamMember> = members_data
+            .into_iter()
+            .filter(|x| x.accepted)
+            .map(|data| convert_team_member(data, true))
+            .collect();
+
+        Ok(HttpResponse::Ok().json(team_members))
+    } else {
+        Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+pub fn convert_team_member(
+    data: QueryTeamMember,
+    override_permissions: bool,
+) -> crate::models::teams::TeamMember {
+    crate::models::teams::TeamMember {
+        team_id: data.team_id.into(),
+        user: super::users::convert_user(data.user),
+        role: data.role,
+        permissions: if override_permissions {
+            None
+        } else {
+            Some(data.permissions)
+        },
+        accepted: data.accepted,
+    }
+}
+
+#[get("{id}/members")]
 pub async fn team_members_get(
     req: HttpRequest,
     info: web::Path<(TeamId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let members_data = TeamMember::get_from_team(id.into(), &**pool).await?;
+    let members_data = TeamMember::get_from_team_full(id.into(), &**pool).await?;
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -28,32 +89,18 @@ pub async fn team_members_get(
         if team_member.is_some() {
             let team_members: Vec<crate::models::teams::TeamMember> = members_data
                 .into_iter()
-                .map(|data| crate::models::teams::TeamMember {
-                    team_id: id,
-                    user_id: data.user_id.into(),
-                    role: data.role,
-                    permissions: Some(data.permissions),
-                    accepted: data.accepted,
-                })
+                .map(|data| convert_team_member(data, false))
                 .collect();
 
             return Ok(HttpResponse::Ok().json(team_members));
         }
     }
 
-    let mut team_members: Vec<crate::models::teams::TeamMember> = Vec::new();
-
-    for team_member in members_data {
-        if team_member.accepted {
-            team_members.push(crate::models::teams::TeamMember {
-                team_id: id,
-                user_id: team_member.user_id.into(),
-                role: team_member.role,
-                permissions: None,
-                accepted: team_member.accepted,
-            })
-        }
-    }
+    let team_members: Vec<crate::models::teams::TeamMember> = members_data
+        .into_iter()
+        .filter(|x| x.accepted)
+        .map(|data| convert_team_member(data, true))
+        .collect();
 
     Ok(HttpResponse::Ok().json(team_members))
 }

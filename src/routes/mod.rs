@@ -54,6 +54,7 @@ pub fn projects_config(cfg: &mut web::ServiceConfig) {
             .service(projects::project_icon_edit)
             .service(projects::project_follow)
             .service(projects::project_unfollow)
+            .service(teams::team_members_get_project)
             .service(web::scope("{project_id}").service(versions::version_list)),
     );
 }

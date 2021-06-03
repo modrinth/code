@@ -1,9 +1,8 @@
 use crate::auth::get_user_from_headers;
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
-use crate::models::ids::ProjectId;
 use crate::models::notifications::Notification;
-use crate::models::projects::ProjectStatus;
+use crate::models::projects::{Project, ProjectStatus};
 use crate::models::users::{Role, UserId};
 use crate::routes::notifications::convert_notification;
 use crate::routes::ApiError;
@@ -75,7 +74,7 @@ pub async fn user_get(
     }
 }
 
-fn convert_user(data: crate::database::models::user_item::User) -> crate::models::users::User {
+pub fn convert_user(data: crate::database::models::user_item::User) -> crate::models::users::User {
     crate::models::users::User {
         id: data.id.into(),
         github_id: data.github_id.map(|i| i as u64),
@@ -114,10 +113,11 @@ pub async fn projects_list(
             User::get_projects(id, ProjectStatus::Approved.as_str(), &**pool).await?
         };
 
-        let response = project_data
+        let response = crate::database::Project::get_many_full(project_data, &**pool)
+            .await?
             .into_iter()
-            .map(|v| v.into())
-            .collect::<Vec<crate::models::ids::ProjectId>>();
+            .map(super::projects::convert_project)
+            .collect::<Vec<Project>>();
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -433,7 +433,7 @@ pub async fn user_follows(
 
         use futures::TryStreamExt;
 
-        let projects: Vec<ProjectId> = sqlx::query!(
+        let project_ids = sqlx::query!(
             "
             SELECT mf.mod_id FROM mod_follows mf
             WHERE mf.follower_id = $1
@@ -441,9 +441,18 @@ pub async fn user_follows(
             id as crate::database::models::ids::UserId,
         )
         .fetch_many(&**pool)
-        .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.mod_id as u64))) })
-        .try_collect::<Vec<ProjectId>>()
+        .try_filter_map(|e| async {
+            Ok(e.right()
+                .map(|m| crate::database::models::ProjectId(m.mod_id)))
+        })
+        .try_collect::<Vec<crate::database::models::ProjectId>>()
         .await?;
+
+        let projects = crate::database::Project::get_many_full(project_ids, &**pool)
+            .await?
+            .into_iter()
+            .map(super::projects::convert_project)
+            .collect::<Vec<Project>>();
 
         Ok(HttpResponse::Ok().json(projects))
     } else {

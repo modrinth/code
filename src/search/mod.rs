@@ -62,16 +62,17 @@ pub struct SearchConfig {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {
     pub project_id: String,
+    pub project_type: String,
     pub slug: Option<String>,
     pub author: String,
     pub title: String,
     pub description: String,
-    pub categories: Vec<Cow<'static, str>>,
+    pub categories: Vec<String>,
     pub versions: Vec<String>,
     pub follows: i32,
     pub downloads: i32,
     pub icon_url: String,
-    pub latest_version: Cow<'static, str>,
+    pub latest_version: String,
     pub license: String,
     pub client_side: String,
     pub server_side: String,
@@ -84,8 +85,6 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
-
-    pub host: Cow<'static, str>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -99,6 +98,7 @@ pub struct SearchResults {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResultSearchProject {
     pub project_id: String,
+    pub project_type: String,
     pub slug: Option<String>,
     pub author: String,
     pub title: String,

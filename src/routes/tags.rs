@@ -41,7 +41,7 @@ pub struct CategoryData {
 // searching category list
 #[get("category")]
 pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = Category::list(&**pool)
+    let mut results = Category::list(&**pool)
         .await?
         .into_iter()
         .map(|x| CategoryData {
@@ -50,6 +50,8 @@ pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiE
             project_type: x.project_type,
         })
         .collect::<Vec<_>>();
+
+    results.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
 
     Ok(HttpResponse::Ok().json(results))
 }
@@ -115,7 +117,7 @@ pub struct LoaderData {
 
 #[get("loader")]
 pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results = Loader::list(&**pool)
+    let mut results = Loader::list(&**pool)
         .await?
         .into_iter()
         .map(|x| LoaderData {
@@ -124,6 +126,9 @@ pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiErr
             supported_project_types: x.supported_project_types,
         })
         .collect::<Vec<_>>();
+
+    results.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
+
     Ok(HttpResponse::Ok().json(results))
 }
 

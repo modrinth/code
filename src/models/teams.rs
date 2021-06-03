@@ -1,5 +1,5 @@
 use super::ids::Base62Id;
-use crate::models::users::UserId;
+use crate::models::users::User;
 use serde::{Deserialize, Serialize};
 
 /// The ID of a team
@@ -47,8 +47,8 @@ impl Default for Permissions {
 pub struct TeamMember {
     /// The ID of the team this team member is a member of
     pub team_id: TeamId,
-    /// The ID of the user associated with the member
-    pub user_id: UserId,
+    /// The user associated with the member
+    pub user: User,
     /// The role of the user in the team
     pub role: String,
     /// A bitset containing the user's permissions in this team
