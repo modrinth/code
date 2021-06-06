@@ -99,6 +99,7 @@ async fn version_create_inner(
     let mut version_builder = None;
 
     let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
+    let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
 
     let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
@@ -192,6 +193,18 @@ async fn version_create_inner(
             .await?
             .expect("Release channel not found in database");
 
+            let project_type = sqlx::query!(
+                "
+                SELECT name FROM project_types pt
+                INNER JOIN mods ON mods.project_type = pt.id
+                WHERE mods.id = $1
+                ",
+                project_id as models::ProjectId,
+            )
+            .fetch_one(&mut *transaction)
+            .await?
+            .name;
+
             let game_versions = version_create_data
                 .game_versions
                 .iter()
@@ -204,13 +217,19 @@ async fn version_create_inner(
                 })
                 .collect::<Result<Vec<models::GameVersionId>, CreateError>>()?;
 
-            let mut loaders = Vec::with_capacity(version_create_data.loaders.len());
-            for l in &version_create_data.loaders {
-                let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
-                    .await?
-                    .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
-                loaders.push(id);
-            }
+            let loaders = version_create_data
+                .loaders
+                .iter()
+                .map(|x| {
+                    all_loaders
+                        .iter()
+                        .find(|y| {
+                            y.loader == x.0 && y.supported_project_types.contains(&project_type)
+                        })
+                        .ok_or_else(|| CreateError::InvalidLoader(x.0.clone()))
+                        .map(|y| y.id)
+                })
+                .collect::<Result<Vec<models::LoaderId>, CreateError>>()?;
 
             let dependencies = version_create_data
                 .dependencies
@@ -245,10 +264,10 @@ async fn version_create_inner(
 
         let project_type = sqlx::query!(
             "
-            SELECT name FROM project_types pt
-            INNER JOIN mods ON mods.project_type = pt.id
-            WHERE mods.id = $1
-            ",
+                SELECT name FROM project_types pt
+                INNER JOIN mods ON mods.project_type = pt.id
+                WHERE mods.id = $1
+                ",
             version.project_id as models::ProjectId,
         )
         .fetch_one(&mut *transaction)

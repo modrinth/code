@@ -64,14 +64,12 @@ pub async fn category_create(
 ) -> Result<HttpResponse, ApiError> {
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
-    let project_type = crate::database::models::ProjectTypeId::get_id(
-        (&new_category).project_type.clone(),
-        &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInputError("Specified project type does not exist!".to_string())
-    })?;
+    let project_type =
+        crate::database::models::ProjectTypeId::get_id(new_category.project_type.clone(), &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInputError("Specified project type does not exist!".to_string())
+            })?;
 
     let _id = Category::builder()
         .name(&new_category.name)?

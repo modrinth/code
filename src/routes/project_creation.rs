@@ -291,6 +291,7 @@ pub async fn project_create_inner(
     let mut versions_map = std::collections::HashMap::new();
 
     let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
+    let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
 
     {
         // The first multipart field must be named "data" and contain a
@@ -365,6 +366,8 @@ pub async fn project_create_inner(
                     project_id,
                     current_user.id,
                     &all_game_versions,
+                    &all_loaders,
+                    &create_data.project_type,
                     transaction,
                 )
                 .await?,
@@ -630,6 +633,8 @@ async fn create_initial_version(
     project_id: ProjectId,
     author: UserId,
     all_game_versions: &[models::categories::GameVersion],
+    all_loaders: &[models::categories::Loader],
+    project_type: &str,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<models::version_item::VersionBuilder, CreateError> {
     if version_data.project_id.is_some() {
@@ -660,13 +665,21 @@ async fn create_initial_version(
         })
         .collect::<Result<Vec<models::GameVersionId>, CreateError>>()?;
 
-    let mut loaders = Vec::with_capacity(version_data.loaders.len());
-    for l in &version_data.loaders {
-        let id = models::categories::Loader::get_id(&l.0, &mut *transaction)
-            .await?
-            .ok_or_else(|| CreateError::InvalidLoader(l.0.clone()))?;
-        loaders.push(id);
-    }
+    let loaders = version_data
+        .loaders
+        .iter()
+        .map(|x| {
+            all_loaders
+                .iter()
+                .find(|y| {
+                    y.loader == x.0
+                        && y.supported_project_types
+                            .contains(&project_type.to_string())
+                })
+                .ok_or_else(|| CreateError::InvalidLoader(x.0.clone()))
+                .map(|y| y.id)
+        })
+        .collect::<Result<Vec<models::LoaderId>, CreateError>>()?;
 
     let dependencies = version_data
         .dependencies

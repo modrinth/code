@@ -71,7 +71,6 @@ pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
     client.delete_index("follows_projects").await?;
     client.delete_index("updated_projects").await?;
     client.delete_index("newest_projects").await?;
-    client.delete_index("alphabetically_projects").await?;
     Ok(())
 }
 
@@ -99,14 +98,6 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
         let mut follows_rules = default_rules();
         follows_rules.push_front("desc(follows)".to_string());
         follows_rules.into()
-    })
-    .await?;
-
-    // Alphabetically Index
-    update_index(&client, "alphabetically_projects", {
-        let mut alphabetically_rules = default_rules();
-        alphabetically_rules.push_front("desc(title)".to_string());
-        alphabetically_rules.into()
     })
     .await?;
 
@@ -218,15 +209,6 @@ pub async fn add_projects(
     .await?;
     add_to_index(follows_index, &projects).await?;
 
-    // Alphabetically Index
-    let alphabetically_index = create_index(&client, "alphabetically_projects", || {
-        let mut alphabetically_rules = default_rules();
-        alphabetically_rules.push_front("desc(title)".to_string());
-        alphabetically_rules.into()
-    })
-    .await?;
-    add_to_index(alphabetically_index, &projects).await?;
-
     // Updated Index
     let updated_index = create_index(&client, "updated_projects", || {
         let mut updated_rules = default_rules();
@@ -305,6 +287,7 @@ fn default_settings() -> Settings {
             String::from("license"),
             String::from("client_side"),
             String::from("server_side"),
+            String::from("project_type"),
         ])
 }
 

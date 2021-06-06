@@ -173,7 +173,7 @@ impl TeamMember {
                         permissions: perms,
                         accepted: m.accepted,
                         user: User {
-                            id: UserId(m.id),
+                            id: UserId(m.user_id),
                             github_id: m.github_id,
                             name: m.user_name,
                             email: m.email,

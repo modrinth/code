@@ -478,12 +478,14 @@ pub async fn user_notifications(
             ));
         }
 
-        let notifications: Vec<Notification> =
+        let mut notifications: Vec<Notification> =
             crate::database::models::notification_item::Notification::get_many_user(id, &**pool)
                 .await?
                 .into_iter()
                 .map(convert_notification)
                 .collect();
+
+        notifications.sort_by(|a, b| b.created.cmp(&a.created));
 
         Ok(HttpResponse::Ok().json(notifications))
     } else {

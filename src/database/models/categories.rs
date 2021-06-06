@@ -1128,7 +1128,7 @@ impl ProjectType {
     }
 
     pub async fn get_many_id<'a, E>(
-        names: &Vec<String>,
+        names: &[String],
         exec: E,
     ) -> Result<Vec<ProjectType>, sqlx::Error>
     where
