@@ -2,12 +2,12 @@
 <template>
   <div class="popup card">
     <div class="consent-container">
-      <div class="h1">Tweak your privacy settings</div>
+      <div class="h1">Privacy settings</div>
       <div>
         Modrinth relies on different providers and in-house tools to allow us to
-        provide custom-tailored experiences, and personalized advertising. You
-        can at any moment change your privacy settings by going to the setting
-        page, or at the footer of any page.
+        provide custom-tailored experiences and personalized advertising. You
+        can change your privacy settings at any time by going to this settings
+        page, via the dashboard or via the footer of any page.
       </div>
       <br class="divider" />
       <div class="toggles">

@@ -6,31 +6,31 @@
       description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
       :has-to-type="true"
       :confirmation-text="mod.title"
-      proceed-label="Delete Mod"
+      proceed-label="Delete mod"
       @proceed="deleteMod"
     />
     <div class="section-header columns">
       <h3 class="column-grow-1">General</h3>
     </div>
     <section>
-      <h3>Edit Mod</h3>
+      <h3>Edit mod</h3>
       <label>
-        <span> This leads you to a page where you can edit your mod. </span>
+        <span>This leads you to a page where you can edit your mod.</span>
         <nuxt-link class="button" to="edit">Edit</nuxt-link>
       </label>
-      <h3>Create Version</h3>
+      <h3>Create version</h3>
       <label>
         <span>
           This leads to a page where you can create a version for your mod.
         </span>
-        <nuxt-link class="button" to="newversion">Create Version</nuxt-link>
+        <nuxt-link class="button" to="newversion">Create version</nuxt-link>
       </label>
-      <h3>Delete Mod</h3>
+      <h3>Delete mod</h3>
       <label>
         <span>
           Clicking on this WILL delete your mod. Do not click on this unless you
           want your mod deleted. If you delete your mod, all versions and any
-          attatched data will be removed from our servers. This may break other
+          attached data will be removed from our servers. This may break other
           projects, so be careful!
         </span>
         <div
@@ -38,7 +38,7 @@
           :disabled="(currentMember.permissions & DELETE_MOD) !== DELETE_MOD"
           @click="showPopup"
         >
-          Delete Mod
+          Delete mod
         </div>
       </label>
     </section>
@@ -114,7 +114,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
               (currentMember.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
             "
-            label="Upload Version"
+            label="Upload version"
             @input="allMembers[index].permissions ^= UPLOAD_VERSION"
           />
           <Checkbox
@@ -127,7 +127,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
               (currentMember.permissions & DELETE_VERSION) !== DELETE_VERSION
             "
-            label="Delete Version"
+            label="Delete version"
             @input="allMembers[index].permissions ^= DELETE_VERSION"
           />
           <Checkbox
@@ -140,7 +140,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
               (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
             "
-            label="Edit Details"
+            label="Edit details"
             @input="allMembers[index].permissions ^= EDIT_DETAILS"
           />
           <Checkbox
@@ -153,7 +153,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
               (currentMember.permissions & EDIT_BODY) !== EDIT_BODY
             "
-            label="Edit Body"
+            label="Edit body"
             @input="allMembers[index].permissions ^= EDIT_BODY"
           />
           <Checkbox
@@ -166,7 +166,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
               (currentMember.permissions & MANAGE_INVITES) !== MANAGE_INVITES
             "
-            label="Manage Invites"
+            label="Manage invites"
             @input="allMembers[index].permissions ^= MANAGE_INVITES"
           />
           <Checkbox
@@ -179,7 +179,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
               (currentMember.permissions & REMOVE_MEMBER) !== REMOVE_MEMBER
             "
-            label="Remove Member"
+            label="Remove member"
             @input="allMembers[index].permissions ^= REMOVE_MEMBER"
           />
           <Checkbox
@@ -191,7 +191,7 @@
               member.role === 'Owner' ||
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
             "
-            label="Edit Member"
+            label="Edit member"
             @input="allMembers[index].permissions ^= EDIT_MEMBER"
           />
           <Checkbox
@@ -204,7 +204,7 @@
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER ||
               (currentMember.permissions & DELETE_MOD) !== DELETE_MOD
             "
-            label="Delete Mod"
+            label="Delete mod"
             @input="allMembers[index].permissions ^= DELETE_MOD"
           />
         </div>
@@ -216,7 +216,7 @@
             "
             @click="removeTeamMember(index)"
           >
-            Remove Member
+            Remove member
           </button>
           <button
             :disabled="
@@ -225,7 +225,7 @@
             "
             @click="updateTeamMember(index)"
           >
-            Save Changes
+            Save changes
           </button>
         </div>
       </div>
@@ -300,7 +300,7 @@ export default {
       } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'An Error Occurred',
+          title: 'An error occurred',
           text: err.response.data.description,
           type: 'error',
         })
@@ -320,7 +320,7 @@ export default {
       } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'An Error Occurred',
+          title: 'An error occurred',
           text: err.response.data.description,
           type: 'error',
         })
@@ -346,7 +346,7 @@ export default {
       } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'An Error Occurred',
+          title: 'An error occurred',
           text: err.response.data.description,
           type: 'error',
         })
@@ -362,7 +362,7 @@ export default {
       await this.$router.push('/dashboard/projects')
       this.$notify({
         group: 'main',
-        title: 'Action Success',
+        title: 'Action success',
         text: 'Your mod has been successfully deleted.',
         type: 'success',
       })

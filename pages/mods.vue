@@ -195,7 +195,7 @@
             </SearchFilter>
             <SearchFilter
               :active-filters="facets"
-              display-name="World Generation"
+              display-name="World generation"
               facet-name="categories:worldgen"
               @toggle="toggleFacet"
             >
@@ -267,7 +267,7 @@
             >
               <ServerSide />
             </SearchFilter>
-            <h3>Minecraft Versions</h3>
+            <h3>Minecraft versions</h3>
             <Checkbox
               v-model="showSnapshots"
               label="Include snapshots"
@@ -276,7 +276,7 @@
               @input="reloadVersions"
             />
           </section>
-          <multiselect
+          <Multiselect
             v-model="selectedVersions"
             :options="versions"
             :loading="versions.length === 0"
@@ -290,7 +290,7 @@
             :hide-selected="true"
             placeholder="Choose versions..."
             @input="onSearchChange(1)"
-          ></multiselect>
+          ></Multiselect>
           <h3>Licenses</h3>
           <Multiselect
             v-model="displayLicense"

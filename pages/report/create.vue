@@ -20,11 +20,11 @@
             mod would be its mod ID, found on the right side of that mod's page
             under "Project ID".
           </span>
-          <input v-model="itemId" type="text" placeholder="Enter the Item ID" />
+          <input v-model="itemId" type="text" placeholder="Enter the item ID" />
         </label>
-        <h3>Item Type</h3>
+        <h3>Item type</h3>
         <label>
-          <span> The type of the item that is being reported </span>
+          <span>The type of the item that is being reported.</span>
           <multiselect
             id="item-type"
             v-model="itemType"
@@ -36,7 +36,7 @@
             placeholder="Choose item type"
           />
         </label>
-        <h3>Report Type</h3>
+        <h3>Report type</h3>
         <label>
           <span>
             The type of report. This is the category that this report falls
@@ -130,7 +130,7 @@ export default {
       } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'An Error Occurred',
+          title: 'An error occurred',
           text: err.response.data.description,
           type: 'error',
         })

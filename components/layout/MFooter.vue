@@ -36,7 +36,7 @@
     </ul>
     <ul>
       <li>
-        <nuxt-link to="/dashboard/privacy">Set privacy preferences</nuxt-link>
+        <nuxt-link to="/dashboard/privacy">Change privacy settings</nuxt-link>
       </li>
     </ul>
     <span> © Guavy LLC </span><br />

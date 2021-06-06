@@ -6,7 +6,7 @@
       title="Are you sure you want to delete your account?"
       description="If you proceed, your user and all attached data will be removed from our
         servers. This cannot be reversed, so be careful!"
-      proceed-label="Delete Account"
+      proceed-label="Delete account"
       :confirmation-text="username"
       :has-to-type="true"
       @proceed="deleteAccount"
@@ -19,8 +19,8 @@
       <h3>Username</h3>
       <label>
         <span>
-          The username used on the Modrinth site to identify yourself. This must
-          be unique.
+          The username used on Modrinth to identify yourself. This must be
+          unique.
         </span>
         <input
           v-model="username"
@@ -40,7 +40,7 @@
       <label>
         <span>
           The email for your account. This is private information which is not
-          displayed in any API routes or your profile. It is also optional.
+          exposed in any API routes or on your profile. It is also optional.
         </span>
         <input v-model="email" type="email" placeholder="Enter your email" />
       </label>
@@ -56,14 +56,15 @@
       <h3>Theme</h3>
       <label>
         <span
-          >Change the global site theme of Modrinth. You can choose from light
-          mode and dark mode. You can switch it using this button or anywhere by
-          accessing the theme switcher in the navigation bar dropdown.</span
+          >Change the global site theme of Modrinth. You can choose between
+          light mode and dark mode. You can switch it using this button or
+          anywhere by accessing the theme switcher in the navigation bar
+          dropdown.</span
         >
         <input
           type="button"
           class="button pad-rem"
-          value="Change Theme"
+          value="Change theme"
           @click="changeTheme"
         />
       </label>
@@ -72,36 +73,37 @@
       <h3>Authorization token</h3>
       <label>
         <span>
-          Your authorization token can be used with the Modrinth API and for the
-          Minotaur Gradle plugin. However, it must be kept secret!
+          Your authorization token can be used with the Modrinth API, the
+          Minotaur Gradle plugin, and other applications that interact with
+          Modrinth's API. Be sure to keep this secret!
         </span>
         <input
           type="button"
           class="button pad-rem"
-          value="Copy to Clipboard"
+          value="Copy to clipboard"
           @click="copyToken"
         />
       </label>
       <h3>Revoke your token</h3>
       <label>
         <span
-          >Beware, this will log you out of Modrinth, and you will have to login
-          again to access Modrinth with a new token.</span
+          >This will log you out of Modrinth, and you will have to log in again
+          to access Modrinth with a new token.</span
         >
         <input
           type="button"
           class="button"
-          value="Revoke Token"
+          value="Revoke token"
           @click="gotoRevoke"
         />
       </label>
       <h3>Delete your account</h3>
       <label>
         <span
-          >Clicking on this WILL delete your user. Do not click on this unless
-          you want your user deleted. If you delete your user, all attached data
-          will be removed from our servers. This cannot be reversed, so be
-          careful!</span
+          >Clicking on this WILL delete your account. Do not click on this
+          unless you want your account deleted. If you delete your account, all
+          attached data, including projects, will be removed from our servers.
+          This cannot be reversed, so be careful!</span
         >
         <input
           value="Delete Account"
@@ -178,7 +180,7 @@ export default {
       } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'An Error Occurred',
+          title: 'An error occurred',
           text: err.response.data.description,
           type: 'error',
         })
@@ -197,7 +199,7 @@ export default {
       } catch (err) {
         this.$notify({
           group: 'main',
-          title: 'An Error Occurred',
+          title: 'An error occurred',
           text: err.response.data.description,
           type: 'error',
         })
