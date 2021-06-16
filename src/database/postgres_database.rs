@@ -11,7 +11,20 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
 
     let database_url = dotenv::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
     let pool = PgPoolOptions::new()
-        .max_connections(20)
+        .min_connections(
+            dotenv::var("DATABASE_MIN_CONNECTIONS")
+                .ok()
+                .map(|x| x.parse::<u32>().ok())
+                .flatten()
+                .unwrap_or(16),
+        )
+        .max_connections(
+            dotenv::var("DATABASE_MAX_CONNECTIONS")
+                .ok()
+                .map(|x| x.parse::<u32>().ok())
+                .flatten()
+                .unwrap_or(16),
+        )
         .connect(&database_url)
         .await?;
 

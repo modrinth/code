@@ -1,4 +1,3 @@
-use crate::auth::{get_user_from_headers, AuthenticationError};
 use crate::database::models;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
@@ -8,13 +7,13 @@ use crate::models::projects::{
 use crate::models::users::UserId;
 use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::{queue::CreationQueue, IndexingError};
+use crate::util::auth::{get_user_from_headers, AuthenticationError};
+use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::Data;
 use actix_web::{post, HttpRequest, HttpResponse};
 use futures::stream::StreamExt;
-use lazy_static::lazy_static;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::sync::Arc;
@@ -36,7 +35,7 @@ pub enum CreateError {
     #[error("Error while parsing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
     #[error("Error while validating input: {0}")]
-    ValidationError(#[from] validator::ValidationErrors),
+    ValidationError(String),
     #[error("Error while uploading file")]
     FileHostingError(#[from] FileHostingError),
     #[error("Error while validating uploaded file: {0}")]
@@ -116,10 +115,6 @@ impl actix_web::ResponseError for CreateError {
     }
 }
 
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_-]*$").unwrap();
-}
-
 fn default_project_type() -> String {
     "mod".to_string()
 }
@@ -134,7 +129,10 @@ struct ProjectCreateData {
     #[serde(default = "default_project_type")]
     /// The project type of this mod
     pub project_type: String,
-    #[validate(length(min = 3, max = 64), regex = "RE_URL_SAFE")]
+    #[validate(
+        length(min = 3, max = 64),
+        regex = "crate::util::validate::RE_URL_SAFE"
+    )]
     #[serde(alias = "mod_slug")]
     /// The slug of a project, used for vanity URLs
     pub slug: String,
@@ -153,6 +151,7 @@ struct ProjectCreateData {
     pub server_side: SideType,
 
     #[validate(length(max = 64))]
+    #[validate]
     /// A list of initial versions to upload with the created project
     pub initial_versions: Vec<InitialVersionData>,
     #[validate(length(max = 3))]
@@ -326,7 +325,9 @@ pub async fn project_create_inner(
         }
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
 
-        create_data.validate()?;
+        create_data
+            .validate()
+            .map_err(|err| CreateError::InvalidInput(validation_errors_to_string(err, None)))?;
 
         let slug_project_id_option: Option<ProjectId> =
             serde_json::from_str(&*format!("\"{}\"", create_data.slug)).ok();
@@ -498,6 +499,12 @@ pub async fn project_create_inner(
             status = ProjectStatus::Draft;
         } else {
             status = ProjectStatus::Processing;
+
+            if project_create_data.initial_versions.is_empty() {
+                return Err(CreateError::InvalidInput(String::from(
+                    "Project submitted for review with no initial versions",
+                )));
+            }
         }
 
         let status_id = models::StatusId::get_id(&status, &mut *transaction)
@@ -590,6 +597,7 @@ pub async fn project_create_inner(
             published: now,
             updated: now,
             status: status.clone(),
+            rejection_data: None,
             license: License {
                 id: project_create_data.license_id.clone(),
                 name: "".to_string(),
@@ -622,6 +630,12 @@ pub async fn project_create_inner(
             )
             .await?;
             indexing_queue.add(index_project);
+
+            if let Ok(webhook_url) = dotenv::var("MODERATION_DISCORD_WEBHOOK") {
+                crate::util::webhook::send_discord_webhook(response.clone(), webhook_url)
+                    .await
+                    .ok();
+            }
         }
 
         Ok(HttpResponse::Ok().json(response))
@@ -643,7 +657,9 @@ async fn create_initial_version(
         )));
     }
 
-    version_data.validate()?;
+    version_data
+        .validate()
+        .map_err(|err| CreateError::ValidationError(validation_errors_to_string(err, None)))?;
 
     // Randomly generate a new id to be used for the version
     let version_id: VersionId = models::generate_version_id(transaction).await?.into();
@@ -684,7 +700,11 @@ async fn create_initial_version(
     let dependencies = version_data
         .dependencies
         .iter()
-        .map(|x| ((x.version_id).into(), x.dependency_type.to_string()))
+        .map(|d| models::version_item::DependencyBuilder {
+            version_id: d.version_id.map(|x| x.into()),
+            project_id: d.project_id.map(|x| x.into()),
+            dependency_type: d.dependency_type.to_string(),
+        })
         .collect::<Vec<_>>();
 
     let version = models::version_item::VersionBuilder {

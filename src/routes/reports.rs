@@ -1,7 +1,7 @@
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::models::ids::{ProjectId, UserId, VersionId};
 use crate::models::reports::{ItemType, Report};
 use crate::routes::ApiError;
+use crate::util::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::Deserialize;

@@ -1,4 +1,3 @@
-use crate::auth::get_user_from_headers;
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
@@ -6,6 +5,8 @@ use crate::models::projects::{Project, ProjectStatus};
 use crate::models::users::{Role, UserId};
 use crate::routes::notifications::convert_notification;
 use crate::routes::ApiError;
+use crate::util::auth::get_user_from_headers;
+use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use lazy_static::lazy_static;
@@ -166,7 +167,9 @@ pub async fn user_edit(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    new_user.validate()?;
+    new_user
+        .validate()
+        .map_err(|err| ApiError::ValidationError(validation_errors_to_string(err, None)))?;
 
     let id_option =
         crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
@@ -396,12 +399,16 @@ pub async fn user_delete(
             ));
         }
 
+        let mut transaction = pool.begin().await?;
+
         let result;
         if &*removal_type.removal_type == "full" {
-            result = crate::database::models::User::remove_full(id, &**pool).await?;
+            result = crate::database::models::User::remove_full(id, &mut transaction).await?;
         } else {
-            result = crate::database::models::User::remove(id, &**pool).await?;
+            result = crate::database::models::User::remove(id, &mut transaction).await?;
         };
+
+        transaction.commit().await?;
 
         if result.is_some() {
             Ok(HttpResponse::NoContent().body(""))

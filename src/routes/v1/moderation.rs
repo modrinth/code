@@ -1,8 +1,8 @@
-use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models::projects::{Project, ProjectStatus};
 use crate::routes::moderation::ResultCount;
 use crate::routes::ApiError;
+use crate::util::auth::check_is_moderator_from_headers;
 use actix_web::web;
 use actix_web::{get, HttpRequest, HttpResponse};
 use sqlx::PgPool;

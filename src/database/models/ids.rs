@@ -113,7 +113,7 @@ pub struct TeamId(pub i64);
 #[sqlx(transparent)]
 pub struct TeamMemberId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, PartialEq)]
 #[sqlx(transparent)]
 pub struct ProjectId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]
@@ -133,7 +133,7 @@ pub struct LicenseId(pub i32);
 #[sqlx(transparent)]
 pub struct DonationPlatformId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, PartialEq)]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]

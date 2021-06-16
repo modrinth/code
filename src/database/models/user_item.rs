@@ -238,10 +238,10 @@ impl User {
         Ok(projects)
     }
 
-    pub async fn remove<'a, 'b, E>(id: UserId, exec: E) -> Result<Option<()>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
+    pub async fn remove(
+        id: UserId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Option<()>, sqlx::error::Error> {
         let deleted_user: UserId = crate::models::users::DELETED_USER.into();
 
         sqlx::query!(
@@ -254,7 +254,7 @@ impl User {
             id as UserId,
             crate::models::teams::OWNER_ROLE
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -266,7 +266,7 @@ impl User {
             deleted_user as UserId,
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         use futures::TryStreamExt;
@@ -277,7 +277,7 @@ impl User {
             ",
             id as UserId,
         )
-        .fetch_many(exec)
+        .fetch_many(&mut *transaction)
         .try_filter_map(|e| async { Ok(e.right().map(|m| m.id as i64)) })
         .try_collect::<Vec<i64>>()
         .await?;
@@ -289,7 +289,7 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -299,7 +299,7 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -309,7 +309,7 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -319,7 +319,7 @@ impl User {
             ",
             &notifications
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -329,7 +329,7 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -339,19 +339,16 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))
     }
 
-    pub async fn remove_full<'a, 'b, E>(
+    pub async fn remove_full(
         id: UserId,
-        exec: E,
-    ) -> Result<Option<()>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Option<()>, sqlx::error::Error> {
         use futures::TryStreamExt;
         let projects: Vec<ProjectId> = sqlx::query!(
             "
@@ -362,13 +359,14 @@ impl User {
             id as UserId,
             crate::models::teams::OWNER_ROLE
         )
-        .fetch_many(exec)
+        .fetch_many(&mut *transaction)
         .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
         .try_collect::<Vec<ProjectId>>()
         .await?;
 
         for project_id in projects {
-            let _result = super::project_item::Project::remove_full(project_id, exec).await?;
+            let _result =
+                super::project_item::Project::remove_full(project_id, transaction).await?;
         }
 
         let notifications: Vec<i64> = sqlx::query!(
@@ -378,7 +376,7 @@ impl User {
             ",
             id as UserId,
         )
-        .fetch_many(exec)
+        .fetch_many(&mut *transaction)
         .try_filter_map(|e| async { Ok(e.right().map(|m| m.id as i64)) })
         .try_collect::<Vec<i64>>()
         .await?;
@@ -390,7 +388,7 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -400,7 +398,7 @@ impl User {
             ",
             &notifications
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         let deleted_user: UserId = crate::models::users::DELETED_USER.into();
@@ -414,7 +412,7 @@ impl User {
             deleted_user as UserId,
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -424,7 +422,7 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -434,7 +432,7 @@ impl User {
             ",
             id as UserId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))

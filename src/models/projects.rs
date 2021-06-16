@@ -12,13 +12,13 @@ use validator::Validate;
 pub struct ProjectId(pub u64);
 
 /// The ID of a specific version of a project
-#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize, Hash)]
 #[serde(from = "Base62Id")]
 #[serde(into = "Base62Id")]
 pub struct VersionId(pub u64);
 
 /// A project returned from the API
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Project {
     /// The ID of the project, encoded as a base62 string.
     pub id: ProjectId,
@@ -40,8 +40,12 @@ pub struct Project {
     pub published: DateTime<Utc>,
     /// The date at which the project was first published.
     pub updated: DateTime<Utc>,
+
     /// The status of the project
     pub status: ProjectStatus,
+    /// The rejection data of the project
+    pub rejection_data: Option<RejectionReason>,
+
     /// The license of this project
     pub license: License,
 
@@ -71,6 +75,12 @@ pub struct Project {
     pub discord_url: Option<String>,
     /// An optional list of all donation links the project has
     pub donation_urls: Option<Vec<DonationLink>>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct RejectionReason {
+    pub reason: String,
+    pub body: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -134,6 +144,7 @@ pub struct DonationLink {
 #[serde(rename_all = "lowercase")]
 pub enum ProjectStatus {
     Approved,
+    Archived,
     Rejected,
     Draft,
     Unlisted,
@@ -155,6 +166,7 @@ impl ProjectStatus {
             "approved" => ProjectStatus::Approved,
             "draft" => ProjectStatus::Draft,
             "unlisted" => ProjectStatus::Unlisted,
+            "archived" => ProjectStatus::Archived,
             _ => ProjectStatus::Unknown,
         }
     }
@@ -166,6 +178,7 @@ impl ProjectStatus {
             ProjectStatus::Unlisted => "unlisted",
             ProjectStatus::Processing => "processing",
             ProjectStatus::Unknown => "unknown",
+            ProjectStatus::Archived => "archived",
         }
     }
 
@@ -177,6 +190,7 @@ impl ProjectStatus {
             ProjectStatus::Unlisted => false,
             ProjectStatus::Processing => true,
             ProjectStatus::Unknown => true,
+            ProjectStatus::Archived => false,
         }
     }
 
@@ -240,9 +254,11 @@ pub struct VersionFile {
 /// version's functionality
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Dependency {
-    /// The filename of the file.
-    pub version_id: VersionId,
-    /// Whether the file is the primary file of a version
+    /// The specific version id that the dependency uses
+    pub version_id: Option<VersionId>,
+    /// The project ID that the dependency is synced with and auto-updated
+    pub project_id: Option<ProjectId>,
+    /// The type of the dependency
     pub dependency_type: DependencyType,
 }
 

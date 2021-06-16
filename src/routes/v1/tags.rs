@@ -1,6 +1,6 @@
-use crate::auth::check_is_admin_from_headers;
 use crate::database::models::categories::{Category, GameVersion, Loader, ProjectType};
 use crate::routes::ApiError;
+use crate::util::auth::check_is_admin_from_headers;
 use actix_web::{get, put, web};
 use actix_web::{HttpRequest, HttpResponse};
 use sqlx::PgPool;

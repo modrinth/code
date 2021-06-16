@@ -1,10 +1,10 @@
-use crate::auth::get_user_from_headers;
 use crate::file_hosting::FileHost;
 use crate::models::ids::{ProjectId, UserId, VersionId};
 use crate::models::projects::{Dependency, GameVersion, Loader, Version, VersionFile, VersionType};
 use crate::models::teams::Permissions;
 use crate::routes::versions::{convert_version, VersionIds, VersionListFilters};
 use crate::routes::ApiError;
+use crate::util::auth::get_user_from_headers;
 use crate::{database, models, Pepper};
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};

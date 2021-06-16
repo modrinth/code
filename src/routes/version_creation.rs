@@ -1,4 +1,3 @@
-use crate::auth::get_user_from_headers;
 use crate::database::models;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{VersionBuilder, VersionFileBuilder};
@@ -8,20 +7,16 @@ use crate::models::projects::{
 };
 use crate::models::teams::Permissions;
 use crate::routes::project_creation::{CreateError, UploadedFile};
+use crate::util::auth::get_user_from_headers;
+use crate::util::validate::validation_errors_to_string;
 use crate::validate::{validate_file, ValidationResult};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
 use actix_web::{post, HttpRequest, HttpResponse};
 use futures::stream::StreamExt;
-use lazy_static::lazy_static;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use validator::Validate;
-
-lazy_static! {
-    static ref RE_URL_SAFE: Regex = Regex::new(r"^[a-zA-Z0-9_\-.]*$").unwrap();
-}
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
 pub struct InitialVersionData {
@@ -29,7 +24,10 @@ pub struct InitialVersionData {
     pub project_id: Option<ProjectId>,
     #[validate(length(min = 1, max = 256))]
     pub file_parts: Vec<String>,
-    #[validate(length(min = 1, max = 64), regex = "RE_URL_SAFE")]
+    #[validate(
+        length(min = 1, max = 64),
+        regex = "crate::util::validate::RE_URL_SAFE"
+    )]
     pub version_number: String,
     #[validate(length(min = 3, max = 256))]
     pub version_title: String,
@@ -127,7 +125,9 @@ async fn version_create_inner(
                 ));
             }
 
-            version_create_data.validate()?;
+            version_create_data.validate().map_err(|err| {
+                CreateError::ValidationError(validation_errors_to_string(err, None))
+            })?;
 
             let project_id: models::ProjectId = version_create_data.project_id.unwrap().into();
 
@@ -234,7 +234,11 @@ async fn version_create_inner(
             let dependencies = version_create_data
                 .dependencies
                 .iter()
-                .map(|x| ((x.version_id).into(), x.dependency_type.to_string()))
+                .map(|d| models::version_item::DependencyBuilder {
+                    version_id: d.version_id.map(|x| x.into()),
+                    project_id: d.project_id.map(|x| x.into()),
+                    dependency_type: d.dependency_type.to_string(),
+                })
                 .collect::<Vec<_>>();
 
             version_builder = Some(VersionBuilder {
@@ -332,9 +336,10 @@ async fn version_create_inner(
     let version_id: VersionId = builder.version_id.into();
 
     NotificationBuilder {
-        title: "A project you followed has been updated!".to_string(),
+        notification_type: Some("project_update".to_string()),
+        title: format!("**{}** has been updated!", result.title),
         text: format!(
-            "Project {} has been updated to version {}",
+            "The project, {}, has released a new version: {}",
             result.title,
             version_data.version_number.clone()
         ),

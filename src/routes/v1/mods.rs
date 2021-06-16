@@ -1,4 +1,3 @@
-use crate::auth::get_user_from_headers;
 use crate::file_hosting::FileHost;
 use crate::models::projects::SearchRequest;
 use crate::routes::project_creation::{project_create_inner, undo_uploads, CreateError};
@@ -6,6 +5,7 @@ use crate::routes::projects::{convert_project, ProjectIds};
 use crate::routes::ApiError;
 use crate::search::indexing::queue::CreationQueue;
 use crate::search::{search_for_project, SearchConfig, SearchError};
+use crate::util::auth::get_user_from_headers;
 use crate::{database, models};
 use actix_multipart::Multipart;
 use actix_web::web;

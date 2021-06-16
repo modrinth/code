@@ -88,6 +88,8 @@ impl ProjectBuilder {
             server_side: self.server_side,
             license: self.license,
             slug: self.slug,
+            rejection_reason: None,
+            rejection_body: None,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -141,6 +143,8 @@ pub struct Project {
     pub server_side: SideTypeId,
     pub license: LicenseId,
     pub slug: Option<String>,
+    pub rejection_reason: Option<String>,
+    pub rejection_body: Option<String>,
 }
 
 impl Project {
@@ -204,7 +208,8 @@ impl Project {
                    icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
-                   team_id, client_side, server_side, license, slug
+                   team_id, client_side, server_side, license, slug,
+                   rejection_reason, rejection_body
             FROM mods
             WHERE id = $1
             ",
@@ -237,6 +242,8 @@ impl Project {
                 slug: row.slug,
                 body: row.body,
                 follows: row.follows,
+                rejection_reason: row.rejection_reason,
+                rejection_body: row.rejection_body,
             }))
         } else {
             Ok(None)
@@ -259,7 +266,8 @@ impl Project {
                    icon_url, body, body_url, published,
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
-                   team_id, client_side, server_side, license, slug
+                   team_id, client_side, server_side, license, slug,
+                   rejection_reason, rejection_body
             FROM mods
             WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
             ",
@@ -290,6 +298,8 @@ impl Project {
                 slug: m.slug,
                 body: m.body,
                 follows: m.follows,
+                rejection_reason: m.rejection_reason,
+                rejection_body: m.rejection_body,
             }))
         })
         .try_collect::<Vec<Project>>()
@@ -298,20 +308,17 @@ impl Project {
         Ok(projects)
     }
 
-    pub async fn remove_full<'a, 'b, E>(
+    pub async fn remove_full(
         id: ProjectId,
-        exec: E,
-    ) -> Result<Option<()>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Option<()>, sqlx::error::Error> {
         let result = sqlx::query!(
             "
             SELECT team_id FROM mods WHERE id = $1
             ",
             id as ProjectId,
         )
-        .fetch_optional(exec)
+        .fetch_optional(&mut *transaction)
         .await?;
 
         let team_id: TeamId = if let Some(id) = result {
@@ -327,7 +334,7 @@ impl Project {
             ",
             id as ProjectId
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -337,7 +344,7 @@ impl Project {
             ",
             id as ProjectId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -347,7 +354,7 @@ impl Project {
             ",
             id as ProjectId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -357,7 +364,7 @@ impl Project {
             ",
             id as ProjectId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -367,7 +374,7 @@ impl Project {
             ",
             id as ProjectId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         use futures::TryStreamExt;
@@ -378,14 +385,23 @@ impl Project {
             ",
             id as ProjectId,
         )
-        .fetch_many(exec)
+        .fetch_many(&mut *transaction)
         .try_filter_map(|e| async { Ok(e.right().map(|c| VersionId(c.id))) })
         .try_collect::<Vec<VersionId>>()
         .await?;
 
         for version in versions {
-            super::Version::remove_full(version, exec).await?;
+            super::Version::remove_full(version, transaction).await?;
         }
+
+        sqlx::query!(
+            "
+            DELETE FROM dependencies WHERE mod_dependency_id = $1
+            ",
+            id as ProjectId,
+        )
+        .execute(&mut *transaction)
+        .await?;
 
         sqlx::query!(
             "
@@ -394,7 +410,7 @@ impl Project {
             ",
             id as ProjectId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -404,7 +420,7 @@ impl Project {
             ",
             team_id as TeamId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -414,7 +430,7 @@ impl Project {
             ",
             team_id as TeamId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         Ok(Some(()))
@@ -552,7 +568,7 @@ impl Project {
         executor: E,
     ) -> Result<Option<QueryProject>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -560,7 +576,7 @@ impl Project {
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
+            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.rejection_reason rejection_reason, m.rejection_body rejection_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
             STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
             FROM mods m
@@ -605,6 +621,8 @@ impl Project {
                     slug: m.slug.clone(),
                     body: m.body.clone(),
                     follows: m.follows,
+                    rejection_reason: m.rejection_reason,
+                    rejection_body: m.rejection_body,
                 },
                 project_type: m.project_type_name,
                 categories: m
@@ -647,7 +665,7 @@ impl Project {
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug,
+            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.rejection_reason rejection_reason, m.rejection_body rejection_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
             STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
             FROM mods m
@@ -689,7 +707,9 @@ impl Project {
                         license: LicenseId(m.license),
                         slug: m.slug.clone(),
                         body: m.body.clone(),
-                        follows: m.follows
+                        follows: m.follows,
+                        rejection_reason: m.rejection_reason,
+                        rejection_body: m.rejection_body,
                     },
                     project_type: m.project_type_name,
                     categories: m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),

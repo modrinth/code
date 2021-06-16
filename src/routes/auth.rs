@@ -1,9 +1,9 @@
-use crate::auth::get_github_user_from_token;
 use crate::database::models::{generate_state_id, User};
 use crate::models::error::ApiError;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::ids::DecodingError;
 use crate::models::users::Role;
+use crate::util::auth::get_github_user_from_token;
 use actix_web::http::StatusCode;
 use actix_web::web::{scope, Data, Query, ServiceConfig};
 use actix_web::{get, HttpResponse};
@@ -32,7 +32,7 @@ pub enum AuthorizationError {
     #[error("Invalid Authentication credentials")]
     InvalidCredentialsError,
     #[error("Authentication Error: {0}")]
-    AuthenticationError(#[from] crate::auth::AuthenticationError),
+    AuthenticationError(#[from] crate::util::auth::AuthenticationError),
     #[error("Error while decoding Base62")]
     DecodingError(#[from] DecodingError),
 }
@@ -129,78 +129,82 @@ pub async fn auth_callback(
     let mut transaction = client.begin().await?;
     let state_id = parse_base62(&*info.state)?;
 
-    let result = sqlx::query!(
+    let result_option = sqlx::query!(
         "
             SELECT url,expires FROM states
             WHERE id = $1
             ",
         state_id as i64
     )
-    .fetch_one(&mut *transaction)
+    .fetch_optional(&mut *transaction)
     .await?;
 
-    let now = Utc::now();
-    let duration = result.expires.signed_duration_since(now);
+    if let Some(result) = result_option {
+        let now = Utc::now();
+        let duration = result.expires.signed_duration_since(now);
 
-    if duration.num_seconds() < 0 {
-        return Err(AuthorizationError::InvalidCredentialsError);
-    }
+        if duration.num_seconds() < 0 {
+            return Err(AuthorizationError::InvalidCredentialsError);
+        }
 
-    sqlx::query!(
-        "
+        sqlx::query!(
+            "
             DELETE FROM states
             WHERE id = $1
             ",
-        state_id as i64
-    )
-    .execute(&mut *transaction)
-    .await?;
-
-    let client_id = dotenv::var("GITHUB_CLIENT_ID")?;
-    let client_secret = dotenv::var("GITHUB_CLIENT_SECRET")?;
-
-    let url = format!(
-        "https://github.com/login/oauth/access_token?client_id={}&client_secret={}&code={}",
-        client_id, client_secret, info.code
-    );
-
-    let token: AccessToken = reqwest::Client::new()
-        .post(&url)
-        .header(reqwest::header::ACCEPT, "application/json")
-        .send()
-        .await?
-        .json()
+            state_id as i64
+        )
+        .execute(&mut *transaction)
         .await?;
 
-    let user = get_github_user_from_token(&*token.access_token).await?;
+        let client_id = dotenv::var("GITHUB_CLIENT_ID")?;
+        let client_secret = dotenv::var("GITHUB_CLIENT_SECRET")?;
 
-    let user_result = User::get_from_github_id(user.id, &mut *transaction).await?;
-    match user_result {
-        Some(x) => info!("{:?}", x.id),
-        None => {
-            let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
+        let url = format!(
+            "https://github.com/login/oauth/access_token?client_id={}&client_secret={}&code={}",
+            client_id, client_secret, info.code
+        );
 
-            User {
-                id: user_id,
-                github_id: Some(user.id as i64),
-                username: user.login,
-                name: user.name,
-                email: user.email,
-                avatar_url: Some(user.avatar_url),
-                bio: user.bio,
-                created: Utc::now(),
-                role: Role::Developer.to_string(),
-            }
-            .insert(&mut transaction)
+        let token: AccessToken = reqwest::Client::new()
+            .post(&url)
+            .header(reqwest::header::ACCEPT, "application/json")
+            .send()
+            .await?
+            .json()
             .await?;
+
+        let user = get_github_user_from_token(&*token.access_token).await?;
+
+        let user_result = User::get_from_github_id(user.id, &mut *transaction).await?;
+        match user_result {
+            Some(x) => info!("{:?}", x.id),
+            None => {
+                let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
+
+                User {
+                    id: user_id,
+                    github_id: Some(user.id as i64),
+                    username: user.login,
+                    name: user.name,
+                    email: user.email,
+                    avatar_url: Some(user.avatar_url),
+                    bio: user.bio,
+                    created: Utc::now(),
+                    role: Role::Developer.to_string(),
+                }
+                .insert(&mut transaction)
+                .await?;
+            }
         }
+
+        transaction.commit().await?;
+
+        let redirect_url = format!("{}?code={}", result.url, token.access_token);
+
+        Ok(HttpResponse::TemporaryRedirect()
+            .header("Location", &*redirect_url)
+            .json(AuthorizationInit { url: redirect_url }))
+    } else {
+        Err(AuthorizationError::InvalidCredentialsError)
     }
-
-    transaction.commit().await?;
-
-    let redirect_url = format!("{}?code={}", result.url, token.access_token);
-
-    Ok(HttpResponse::TemporaryRedirect()
-        .header("Location", &*redirect_url)
-        .json(AuthorizationInit { url: redirect_url }))
 }

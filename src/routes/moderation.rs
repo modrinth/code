@@ -1,7 +1,7 @@
 use super::ApiError;
-use crate::auth::check_is_moderator_from_headers;
 use crate::database;
 use crate::models::projects::{Project, ProjectStatus};
+use crate::util::auth::check_is_moderator_from_headers;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;

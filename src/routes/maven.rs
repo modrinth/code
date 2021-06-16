@@ -1,7 +1,7 @@
-use crate::auth::get_user_from_headers;
 use crate::database;
 use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
+use crate::util::auth::get_user_from_headers;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 use yaserde_derive::YaSerialize;

@@ -55,7 +55,8 @@ pub fn projects_config(cfg: &mut web::ServiceConfig) {
             .service(projects::project_follow)
             .service(projects::project_unfollow)
             .service(teams::team_members_get_project)
-            .service(web::scope("{project_id}").service(versions::version_list)),
+            .service(web::scope("{project_id}").service(versions::version_list))
+            .service(projects::dependency_list),
     );
 }
 
@@ -119,6 +120,7 @@ pub fn teams_config(cfg: &mut web::ServiceConfig) {
 
 pub fn notifications_config(cfg: &mut web::ServiceConfig) {
     cfg.service(notifications::notifications_get);
+    cfg.service(notifications::notification_delete);
 
     cfg.service(
         web::scope("notification")
@@ -152,13 +154,13 @@ pub enum ApiError {
     #[error("Deserialization error: {0}")]
     JsonError(#[from] serde_json::Error),
     #[error("Authentication Error: {0}")]
-    AuthenticationError(#[from] crate::auth::AuthenticationError),
+    AuthenticationError(#[from] crate::util::auth::AuthenticationError),
     #[error("Authentication Error: {0}")]
     CustomAuthenticationError(String),
     #[error("Invalid Input: {0}")]
     InvalidInputError(String),
     #[error("Error while validating input: {0}")]
-    ValidationError(#[from] validator::ValidationErrors),
+    ValidationError(String),
     #[error("Search Error: {0}")]
     SearchError(#[from] meilisearch_sdk::errors::Error),
     #[error("Indexing Error: {0}")]

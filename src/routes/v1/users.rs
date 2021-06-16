@@ -1,8 +1,8 @@
-use crate::auth::get_user_from_headers;
 use crate::database::models::User;
 use crate::models::ids::UserId;
 use crate::models::projects::{ProjectId, ProjectStatus};
 use crate::routes::ApiError;
+use crate::util::auth::get_user_from_headers;
 use actix_web::web;
 use actix_web::{get, HttpRequest, HttpResponse};
 use sqlx::PgPool;

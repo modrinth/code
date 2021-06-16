@@ -1,4 +1,3 @@
-use crate::auth::get_user_from_headers;
 use crate::database::models::notification_item::{NotificationActionBuilder, NotificationBuilder};
 use crate::database::models::team_item::QueryTeamMember;
 use crate::database::models::TeamMember;
@@ -6,6 +5,7 @@ use crate::models::ids::ProjectId;
 use crate::models::teams::{Permissions, TeamId};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
+use crate::util::auth::get_user_from_headers;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
@@ -246,6 +246,7 @@ pub async fn add_team_member(
 
     let team: TeamId = team_id.into();
     NotificationBuilder {
+        notification_type: Some("team_invite".to_string()),
         title: "You have been invited to join a team!".to_string(),
         text: format!(
             "Team invite from {} to join the team for project {}",

@@ -10,11 +10,60 @@ pub struct VersionBuilder {
     pub version_number: String,
     pub changelog: String,
     pub files: Vec<VersionFileBuilder>,
-    pub dependencies: Vec<(VersionId, String)>,
+    pub dependencies: Vec<DependencyBuilder>,
     pub game_versions: Vec<GameVersionId>,
     pub loaders: Vec<LoaderId>,
     pub release_channel: ChannelId,
     pub featured: bool,
+}
+
+pub struct DependencyBuilder {
+    pub project_id: Option<ProjectId>,
+    pub version_id: Option<VersionId>,
+    pub dependency_type: String,
+}
+
+impl DependencyBuilder {
+    pub async fn insert(
+        self,
+        version_id: VersionId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), DatabaseError> {
+        let version_dependency_id = if let Some(project_id) = self.project_id {
+            sqlx::query!(
+                "
+                SELECT version.id id FROM (
+                    SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v
+                    INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT game_version_id FROM game_versions_versions WHERE joining_version_id = $2)
+                    INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT loader_id FROM loaders_versions WHERE version_id = $2)
+                    WHERE v.mod_id = $1
+                ) AS version
+                ORDER BY version.date_published DESC
+                LIMIT 1
+                ",
+                project_id as ProjectId,
+                version_id as VersionId,
+            )
+                .fetch_optional(&mut *transaction).await?.map(|x| VersionId(x.id))
+        } else {
+            self.version_id
+        };
+
+        sqlx::query!(
+            "
+            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id)
+            VALUES ($1, $2, $3, $4)
+            ",
+            version_id as VersionId,
+            self.dependency_type,
+            version_dependency_id.map(|x| x.0),
+            self.project_id.map(|x| x.0),
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        Ok(())
+    }
 }
 
 pub struct VersionFileBuilder {
@@ -105,20 +154,10 @@ impl VersionBuilder {
         }
 
         for dependency in self.dependencies {
-            sqlx::query!(
-                "
-                INSERT INTO dependencies (dependent_id, dependency_id, dependency_type)
-                VALUES ($1, $2, $3)
-                ",
-                self.version_id as VersionId,
-                dependency.0 as VersionId,
-                dependency.1,
-            )
-            .execute(&mut *transaction)
-            .await?;
+            dependency.insert(self.version_id, transaction).await?;
         }
 
-        for loader in self.loaders {
+        for loader in self.loaders.clone() {
             sqlx::query!(
                 "
                 INSERT INTO loaders_versions (loader_id, version_id)
@@ -131,7 +170,7 @@ impl VersionBuilder {
             .await?;
         }
 
-        for game_version in self.game_versions {
+        for game_version in self.game_versions.clone() {
             sqlx::query!(
                 "
                 INSERT INTO game_versions_versions (game_version_id, joining_version_id)
@@ -143,6 +182,42 @@ impl VersionBuilder {
             .execute(&mut *transaction)
             .await?;
         }
+
+        // Sync dependencies
+
+        use futures::stream::TryStreamExt;
+
+        let dependencies = sqlx::query!(
+            "
+            SELECT d.id id
+            FROM versions v
+            INNER JOIN dependencies d ON d.dependent_id = v.id
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT * FROM UNNEST($2::integer[]))
+            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT * FROM UNNEST($3::integer[]))
+            WHERE v.mod_id = $1
+            ",
+            self.project_id as ProjectId,
+            &self.game_versions.iter().map(|x| x.0).collect::<Vec<i32>>(),
+            &self.loaders.iter().map(|x| x.0).collect::<Vec<i32>>(),
+        )
+            .fetch_many(&mut *transaction)
+            .try_filter_map(|e| async {
+                Ok(e.right().map(|d| d.id as i64))
+            })
+            .try_collect::<Vec<i64>>()
+            .await?;
+
+        sqlx::query!(
+            "
+            UPDATE dependencies
+            SET dependency_id = $2
+            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
+            ",
+            &dependencies,
+            self.version_id as VersionId,
+        )
+        .execute(&mut *transaction)
+        .await?;
 
         Ok(self.version_id)
     }
@@ -200,17 +275,17 @@ impl Version {
     }
 
     // TODO: someone verify this
-    pub async fn remove_full<'a, E>(id: VersionId, exec: E) -> Result<Option<()>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
+    pub async fn remove_full(
+        id: VersionId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<Option<()>, sqlx::Error> {
         let result = sqlx::query!(
             "
             SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)
             ",
             id as VersionId,
         )
-        .fetch_one(exec)
+        .fetch_one(&mut *transaction)
         .await?;
 
         if !result.exists.unwrap_or(false) {
@@ -224,7 +299,33 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
+        .await?;
+
+        use futures::TryStreamExt;
+
+        let game_versions: Vec<i32> = sqlx::query!(
+            "
+                SELECT game_version_id id FROM game_versions_versions
+                WHERE joining_version_id = $1
+                ",
+            id as VersionId,
+        )
+        .fetch_many(&mut *transaction)
+        .try_filter_map(|e| async { Ok(e.right().map(|c| c.id)) })
+        .try_collect::<Vec<i32>>()
+        .await?;
+
+        let loaders: Vec<i32> = sqlx::query!(
+            "
+                SELECT loader_id id FROM loaders_versions
+                WHERE version_id = $1
+                ",
+            id as VersionId,
+        )
+        .fetch_many(&mut *transaction)
+        .try_filter_map(|e| async { Ok(e.right().map(|c| c.id)) })
+        .try_collect::<Vec<i32>>()
         .await?;
 
         sqlx::query!(
@@ -234,7 +335,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -244,7 +345,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -254,10 +355,8 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
-
-        use futures::TryStreamExt;
 
         let files = sqlx::query!(
             "
@@ -266,7 +365,7 @@ impl Version {
             ",
             id as VersionId,
         )
-        .fetch_many(exec)
+        .fetch_many(&mut *transaction)
         .try_filter_map(|e| async {
             Ok(e.right().map(|c| VersionFile {
                 id: FileId(c.id),
@@ -301,7 +400,7 @@ impl Version {
             ",
             id as VersionId
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
 
         sqlx::query!(
@@ -311,8 +410,59 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
+
+        // Sync dependencies
+
+        let project_id = sqlx::query!(
+            "
+            SELECT mod_id FROM versions WHERE id = $1
+            ",
+            id as VersionId,
+        )
+        .fetch_one(&mut *transaction)
+        .await?;
+
+        let new_version_id = sqlx::query!(
+            "
+            SELECT v.id id
+            FROM versions v
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT * FROM UNNEST($2::integer[]))
+            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT * FROM UNNEST($3::integer[]))
+            WHERE v.mod_id = $1
+            ORDER BY v.date_published DESC
+            LIMIT 1
+            ",
+            project_id.mod_id,
+            &game_versions,
+            &loaders,
+        )
+            .fetch_optional(&mut *transaction)
+            .await?
+            .map(|x| x.id);
+
+        sqlx::query!(
+            "
+            UPDATE dependencies
+            SET dependency_id = $2
+            WHERE dependency_id = $1
+            ",
+            id as VersionId,
+            new_version_id,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL
+            ",
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        // delete version
 
         sqlx::query!(
             "
@@ -320,43 +470,9 @@ impl Version {
             ",
             id as VersionId,
         )
-        .execute(exec)
+        .execute(&mut *transaction)
         .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM dependencies WHERE dependent_id = $1
-            ",
-            id as VersionId,
-        )
-        .execute(exec)
-        .await?;
-
         Ok(Some(()))
-    }
-
-    pub async fn get_dependencies<'a, E>(
-        id: VersionId,
-        exec: E,
-    ) -> Result<Vec<VersionId>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-    {
-        use futures::stream::TryStreamExt;
-
-        let vec = sqlx::query!(
-            "
-            SELECT dependency_id id FROM dependencies
-            WHERE dependent_id = $1
-            ",
-            id as VersionId,
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|v| VersionId(v.id))) })
-        .try_collect::<Vec<VersionId>>()
-        .await?;
-
-        Ok(vec)
     }
 
     pub async fn get_project_versions<'a, E>(
@@ -491,7 +607,7 @@ impl Version {
             STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
             STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
             STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
-            STRING_AGG(DISTINCT d.dependency_id || ', ' || d.dependency_type,  ' ,') dependencies
+            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type,  ' ,') dependencies
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
@@ -557,11 +673,24 @@ impl Version {
                 .for_each(|f| {
                     let dependency: Vec<&str> = f.split(", ").collect();
 
-                    if dependency.len() >= 2 {
-                        dependencies.push((
-                            VersionId(dependency[0].parse().unwrap_or(0)),
-                            dependency[1].to_string(),
-                        ))
+                    if dependency.len() >= 3 {
+                        dependencies.push(QueryDependency {
+                            project_id: match &*dependency[2] {
+                                "0" => None,
+                                _ => match dependency[2].parse() {
+                                    Ok(x) => Some(ProjectId(x)),
+                                    Err(_) => None,
+                                },
+                            },
+                            version_id: match &*dependency[0] {
+                                "0" => None,
+                                _ => match dependency[0].parse() {
+                                    Ok(x) => Some(VersionId(x)),
+                                    Err(_) => None,
+                                },
+                            },
+                            dependency_type: dependency[1].to_string(),
+                        });
                     }
                 });
 
@@ -615,7 +744,7 @@ impl Version {
             STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
             STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
             STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
-            STRING_AGG(DISTINCT d.dependency_id || ', ' || d.dependency_type,  ' ,') dependencies
+            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type,  ' ,') dependencies
             FROM versions v
             INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
@@ -678,8 +807,28 @@ impl Version {
                     v.dependencies.unwrap_or_default().split(" ,").for_each(|f| {
                         let dependency: Vec<&str> = f.split(", ").collect();
 
-                        if dependency.len() >= 2 {
-                            dependencies.push((VersionId(dependency[0].parse().unwrap_or(0)), dependency[1].to_string()))
+                        if dependency.len() >= 3 {
+                            dependencies.push(QueryDependency {
+                                project_id: match &*dependency[2] {
+                                    "0" => None,
+                                    _ => {
+                                        match dependency[2].parse() {
+                                            Ok(x) => Some(ProjectId(x)),
+                                            Err(_) => None,
+                                        }
+                                    },
+                                },
+                                version_id: match &*dependency[0] {
+                                    "0" => None,
+                                    _ => {
+                                        match dependency[0].parse() {
+                                            Ok(x) => Some(VersionId(x)),
+                                            Err(_) => None,
+                                        }
+                                    },
+                                },
+                                dependency_type: dependency[1].to_string()
+                            });
                         }
                     });
 
@@ -743,7 +892,14 @@ pub struct QueryVersion {
     pub game_versions: Vec<String>,
     pub loaders: Vec<String>,
     pub featured: bool,
-    pub dependencies: Vec<(VersionId, String)>,
+    pub dependencies: Vec<QueryDependency>,
+}
+
+#[derive(Clone)]
+pub struct QueryDependency {
+    pub project_id: Option<ProjectId>,
+    pub version_id: Option<VersionId>,
+    pub dependency_type: String,
 }
 
 #[derive(Clone)]

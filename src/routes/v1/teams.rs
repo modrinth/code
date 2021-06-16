@@ -1,7 +1,7 @@
-use crate::auth::get_user_from_headers;
 use crate::models::teams::{Permissions, TeamId};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
+use crate::util::auth::get_user_from_headers;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

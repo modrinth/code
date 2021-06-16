@@ -1,9 +1,9 @@
 use super::ApiError;
-use crate::auth::get_user_from_headers;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::projects::{GameVersion, Loader};
 use crate::models::teams::Permissions;
+use crate::util::auth::get_user_from_headers;
 use crate::{database, Pepper};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
@@ -118,7 +118,19 @@ async fn download_version_inner(
     pepper: &web::Data<Pepper>,
 ) -> Result<(), ApiError> {
     let real_ip = req.connection_info();
-    let ip_option = real_ip.borrow().remote_addr();
+    let ip_option = if dotenv::var("CLOUDFLARE_INTEGRATION")
+        .ok()
+        .map(|i| i.parse().unwrap())
+        .unwrap_or(false)
+    {
+        if let Some(header) = req.headers().get("CF-Connecting-IP") {
+            header.to_str().ok()
+        } else {
+            real_ip.borrow().remote_addr()
+        }
+    } else {
+        real_ip.borrow().remote_addr()
+    };
 
     if let Some(ip) = ip_option {
         let hash = sha1::Sha1::from(format!("{}{}", ip, pepper.pepper)).hexdigest();

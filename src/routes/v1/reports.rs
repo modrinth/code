@@ -1,8 +1,8 @@
-use crate::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use crate::models::ids::ReportId;
 use crate::models::projects::{ProjectId, VersionId};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
+use crate::util::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use actix_web::web;
 use actix_web::{get, post, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
