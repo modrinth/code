@@ -577,6 +577,8 @@ export default {
 
       donationLinks: [],
       donationPlatforms: [],
+
+      isEditing: true,
     }
   },
   watch: {
@@ -594,6 +596,25 @@ export default {
           this.license_url = `https://cdn.modrinth.com/licenses/${newValue.short}.txt`
       }
     },
+  },
+  mounted() {
+    function preventLeave(e) {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', preventLeave)
+    this.$once('hook:beforeDestroy', () => {
+      window.removeEventListener('beforeunload', preventLeave)
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    if (
+      this.isEditing &&
+      !window.confirm('Are you sure that you want to leave without saving?')
+    ) {
+      return
+    }
+    next()
   },
   methods: {
     async createDraft() {
@@ -672,6 +693,7 @@ export default {
           },
         })
 
+        this.isEditing = false
         await this.$router.replace('/dashboard/projects')
       } catch (err) {
         let description = err.response.data.description

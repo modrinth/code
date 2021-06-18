@@ -145,13 +145,20 @@ table {
     &:first-child {
       text-align: center;
       width: 7%;
-
-      svg {
-        color: var(--color-text);
-
-        &:hover,
-        &:focus {
-          color: var(--color-text-hover);
+      .download {
+        display: flex;
+        align-items: center;
+        height: 2.25rem;
+        width: 2.25rem;
+        border-radius: 2rem;
+        background-color: var(--color-button-bg);
+        margin-right: var(--spacing-card-sm);
+        &:hover {
+          background-color: var(--color-button-bg-hover);
+        }
+        svg {
+          width: 1.25rem;
+          margin: auto;
         }
       }
     }

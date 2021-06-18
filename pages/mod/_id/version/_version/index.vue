@@ -60,7 +60,7 @@
           <a
             v-if="primaryFile"
             :href="primaryFile.url"
-            class="action iconified-button"
+            class="action iconified-button download"
             @click.prevent="
               $parent.downloadFile(primaryFile.hashes.sha1, primaryFile.url)
             "
@@ -333,6 +333,13 @@ export default {
         margin: 0 0 0 0.5rem;
       }
     }
+    .download {
+      background-color: var(--color-brand);
+      color: white;
+      &:hover {
+        background-color: var(--color-brand-hover);
+      }
+    }
   }
 
   .markdown-body {
@@ -408,8 +415,6 @@ export default {
 
     svg {
       padding: 0.25rem;
-      border-radius: 50%;
-      background-color: var(--color-button-bg);
     }
   }
 }

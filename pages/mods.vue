@@ -70,7 +70,7 @@
             ethical-ads-small
             ethical-ads-big
           />
-          <div v-if="results === null" class="no-results">
+          <div v-if="$fetchState.pending" class="no-results">
             <LogoAnimated />
             <p>Loading...</p>
           </div>
@@ -376,6 +376,7 @@ export default {
     ExitIcon,
     LogoAnimated,
   },
+  fetchOnServer: false,
   async fetch() {
     if (this.$route.query.q) this.query = this.$route.query.q
     if (this.$route.query.f) {

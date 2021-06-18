@@ -394,6 +394,8 @@ export default {
       iconChanged: false,
 
       sideTypes: ['Required', 'Optional', 'Unsupported'],
+
+      isEditing: true,
     }
   },
   watch: {
@@ -411,6 +413,25 @@ export default {
           this.license_url = `https://cdn.modrinth.com/licenses/${newValue.short}.txt`
       }
     },
+  },
+  mounted() {
+    function preventLeave(e) {
+      e.preventDefault()
+      e.returnValue = ''
+    }
+    window.addEventListener('beforeunload', preventLeave)
+    this.$once('hook:beforeDestroy', () => {
+      window.removeEventListener('beforeunload', preventLeave)
+    })
+  },
+  beforeRouteLeave(to, from, next) {
+    if (
+      this.isEditing &&
+      !window.confirm('Are you sure that you want to leave without saving?')
+    ) {
+      return
+    }
+    next()
   },
   created() {
     this.$emit('update:link-bar', [['Edit', 'edit']])
@@ -464,6 +485,7 @@ export default {
           )
         }
 
+        this.isEditing = false
         await this.$router.replace(
           `/mod/${this.mod.slug ? this.mod.slug : this.mod.id}`
         )
