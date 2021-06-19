@@ -360,6 +360,7 @@ export default {
         }
       }
 
+      availableLicenses.sort((a, b) => a.name.localeCompare(b.name))
       return {
         mod,
         clientSideType: mod.client_side.charAt(0) + mod.client_side.slice(1),

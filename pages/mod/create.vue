@@ -541,6 +541,7 @@ export default {
       ])
     ).map((it) => it.data)
 
+    availableLicenses.sort((a, b) => a.name.localeCompare(b.name))
     return {
       availableCategories,
       availableLoaders,
