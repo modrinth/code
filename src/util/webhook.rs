@@ -34,13 +34,33 @@ pub async fn send_discord_webhook(
     project: Project,
     webhook_url: String,
 ) -> Result<(), reqwest::Error> {
-    let mut fields = Vec::new();
-
-    fields.push(DiscordEmbedField {
-        name: "id".to_string(),
-        value: project.id.to_string(),
-        inline: true,
-    });
+    let mut fields = vec![
+        DiscordEmbedField {
+            name: "id".to_string(),
+            value: project.id.to_string(),
+            inline: true,
+        },
+        DiscordEmbedField {
+            name: "project_type".to_string(),
+            value: project.project_type.to_string(),
+            inline: true,
+        },
+        DiscordEmbedField {
+            name: "client_side".to_string(),
+            value: project.client_side.to_string(),
+            inline: true,
+        },
+        DiscordEmbedField {
+            name: "server_side".to_string(),
+            value: project.server_side.to_string(),
+            inline: true,
+        },
+        DiscordEmbedField {
+            name: "categories".to_string(),
+            value: project.categories.join(", "),
+            inline: true,
+        },
+    ];
 
     if let Some(slug) = project.slug.clone() {
         fields.push(DiscordEmbedField {
@@ -49,30 +69,6 @@ pub async fn send_discord_webhook(
             inline: true,
         });
     }
-
-    fields.push(DiscordEmbedField {
-        name: "project_type".to_string(),
-        value: project.project_type.to_string(),
-        inline: true,
-    });
-
-    fields.push(DiscordEmbedField {
-        name: "client_side".to_string(),
-        value: project.client_side.to_string(),
-        inline: true,
-    });
-
-    fields.push(DiscordEmbedField {
-        name: "server_side".to_string(),
-        value: project.server_side.to_string(),
-        inline: true,
-    });
-
-    fields.push(DiscordEmbedField {
-        name: "categories".to_string(),
-        value: project.categories.join(", "),
-        inline: true,
-    });
 
     let embed = DiscordEmbed {
         url: format!(

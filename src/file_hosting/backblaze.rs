@@ -19,8 +19,8 @@ impl BackblazeHost {
             .unwrap();
 
         BackblazeHost {
-            authorization_data,
             upload_url_data,
+            authorization_data,
         }
     }
 }

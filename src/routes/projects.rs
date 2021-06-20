@@ -500,6 +500,15 @@ pub async fn project_edit(
                     )
                     .execute(&mut *transaction)
                     .await?;
+
+                    if let Ok(webhook_url) = dotenv::var("MODERATION_DISCORD_WEBHOOK") {
+                        crate::util::webhook::send_discord_webhook(
+                            convert_project(project_item.clone()),
+                            webhook_url,
+                        )
+                        .await
+                        .ok();
+                    }
                 }
 
                 if project_item.status.is_searchable() && !status.is_searchable() {
@@ -510,15 +519,6 @@ pub async fn project_edit(
                             .await?;
 
                     indexing_queue.add(index_project);
-
-                    if let Ok(webhook_url) = dotenv::var("MODERATION_DISCORD_WEBHOOK") {
-                        crate::util::webhook::send_discord_webhook(
-                            convert_project(project_item.clone()),
-                            webhook_url,
-                        )
-                        .await
-                        .ok();
-                    }
                 }
             }
 
@@ -901,8 +901,14 @@ pub async fn project_edit(
                 .await?;
             }
 
-            remove_cache_project(string.clone()).await;
-            remove_cache_query_project(string).await;
+            let id: ProjectId = project_item.inner.id.into();
+            remove_cache_project(id.to_string().clone()).await;
+            remove_cache_query_project(id.to_string()).await;
+
+            if let Some(slug) = project_item.inner.slug {
+                remove_cache_project(slug.clone()).await;
+                remove_cache_query_project(slug).await;
+            }
 
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
@@ -1006,8 +1012,14 @@ pub async fn project_icon_edit(
         .execute(&**pool)
         .await?;
 
-        remove_cache_project(string.clone()).await;
-        remove_cache_query_project(string).await;
+        let id: ProjectId = project_item.id.into();
+        remove_cache_project(id.to_string().clone()).await;
+        remove_cache_query_project(id.to_string()).await;
+
+        if let Some(slug) = project_item.slug {
+            remove_cache_project(slug.clone()).await;
+            remove_cache_query_project(slug).await;
+        }
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -1060,8 +1072,14 @@ pub async fn project_delete(
 
     let result = database::models::Project::remove_full(project.id, &mut transaction).await?;
 
-    remove_cache_project(string.clone()).await;
-    remove_cache_query_project(string).await;
+    let id: ProjectId = project.id.into();
+    remove_cache_project(id.to_string().clone()).await;
+    remove_cache_query_project(id.to_string()).await;
+
+    if let Some(slug) = project.slug {
+        remove_cache_project(slug.clone()).await;
+        remove_cache_query_project(slug).await;
+    }
 
     transaction.commit().await?;
 

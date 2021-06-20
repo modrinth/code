@@ -3,7 +3,6 @@ use crate::models::projects::SearchRequest;
 use crate::routes::project_creation::{project_create_inner, undo_uploads, CreateError};
 use crate::routes::projects::{convert_project, ProjectIds};
 use crate::routes::ApiError;
-use crate::search::indexing::queue::CreationQueue;
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use crate::util::auth::get_user_from_headers;
 use crate::{database, models};
@@ -139,7 +138,6 @@ pub async fn mod_create(
     payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    indexing_queue: Data<Arc<CreationQueue>>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -150,7 +148,6 @@ pub async fn mod_create(
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
-        &***indexing_queue,
     )
     .await;
 

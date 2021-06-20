@@ -76,6 +76,74 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/labrinth-175a4aa21ea52414/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/proc-macro2-7094aab0eee55116/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/sentry-contexts-ca4afd3cc95c36c4/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/ahash-fd8ee5b7c1b91d7e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/async-trait-90a09c9928095b03/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/backtrace-06586d9291523068/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/bitflags-88b50a288ea9b589/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/brotli-sys-48176562eaa37722/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/bzip2-sys-4d892b992243c849/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/const_fn-ea57b975c57c5e0f/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/cookie-6ed23d83ee8e47f9/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/crc-4e3708830692dd8f/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/crc32fast-f112d4af2349618a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/crossbeam-utils-19816821338f7d1e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/crossbeam-utils-f18a9a09c842a116/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/curl-657d7509955d72d2/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/curl-sys-761d48e64c74c759/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/encoding_rs-aeb75e3d7246cd68/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/failure_derive-12bd9e50bb08aa4e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/futures-channel-aaca776527d6f74c/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/futures-core-282be4c3d523964b/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/futures-macro-8bed64c7e4137015/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/futures-task-99072bb77352f68a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/futures-util-c4d95c11dd859bc2/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/generic-array-d9a21e1c138bc88c/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/getrandom-89e095be090a701c/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/hashbrown-26ee980b09e6675a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/httparse-16fab0b2d90ac92a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/indexmap-b9724370d61f58d6/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/isahc-057b5a484e60b032/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/labrinth-14cb10435aa4a1b6/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/lexical-core-5ef649b8d93599c4/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/libc-cf3f1f9dd5a95a85/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/libnghttp2-sys-8190f04f61d0f495/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/libz-sys-90af850d7f9d5980/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/log-a968f45ba0ee21a9/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/maybe-uninit-33854dc1cf68a7c0/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/memchr-e3291fe57535f262/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/mime_guess-f3c3571dd01c3e43/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/miniz_oxide-d683d4a97661215e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/native-tls-6b9be1dfcaa4ca7a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/nom-94cf08cdf587b65f/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/nom-987a3bab8c38ef50/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/num-integer-243211f2ff028008/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/num-traits-56cf536a0a30f2f6/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/openssl-94b1f8d2cb407fd2/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/openssl-sys-2a11a8c4b402d6af/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/pin-project-internal-c5c52fd50d774d21/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/proc-macro-error-3767db49a8a5c3f2/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/proc-macro-error-attr-4fdf86427e6e8f90/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/proc-macro-hack-a3cb2722e7116198/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/proc-macro-nested-c16c856e8deac6ce/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/proc-macro2-9fe81105fb85f6f3/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/radium-f58df3ebc129f1a9/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/ring-351030379c4306a2/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/rustversion-824998a0eae3115a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/ryu-3b42f9ed428b96b3/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/sentry-contexts-a64e54159acab544/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/serde-b1f71e762ff7770a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/serde_derive-24d0f79641168b3d/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/serde_json-9df943a4e8d2dc0f/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/standback-a5d4da630942a108/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/syn-75b29ddcbee36a3c/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/time-fb34c67db59e12cb/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/tokio-b46abfe7007cdc4e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/typenum-66964a7887ae2d1b/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/unicase-f608a6d7b236323a/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/v_escape-2204f60f4b37c849/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/v_htmlescape-2dcc3d8195b1decd/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/value-bag-61e3e358d251e1a5/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/whoami-7d9ebcbbb2371986/out" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

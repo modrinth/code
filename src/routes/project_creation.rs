@@ -6,7 +6,7 @@ use crate::models::projects::{
 };
 use crate::models::users::UserId;
 use crate::routes::version_creation::InitialVersionData;
-use crate::search::indexing::{queue::CreationQueue, IndexingError};
+use crate::search::indexing::IndexingError;
 use crate::util::auth::{get_user_from_headers, AuthenticationError};
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
@@ -207,7 +207,6 @@ pub async fn project_create(
     payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    indexing_queue: Data<Arc<CreationQueue>>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -218,7 +217,6 @@ pub async fn project_create(
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
-        &***indexing_queue,
     )
     .await;
 
@@ -275,7 +273,6 @@ pub async fn project_create_inner(
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
-    indexing_queue: &CreationQueue,
 ) -> Result<HttpResponse, CreateError> {
     // The base URL for files uploaded to backblaze
     let cdn_url = dotenv::var("CDN_URL")?;
@@ -623,14 +620,7 @@ pub async fn project_create_inner(
 
         let _project_id = project_builder.insert(&mut *transaction).await?;
 
-        if status.is_searchable() {
-            let index_project = crate::search::indexing::local_import::query_one(
-                project_id.into(),
-                &mut *transaction,
-            )
-            .await?;
-            indexing_queue.add(index_project);
-
+        if status == ProjectStatus::Processing {
             if let Ok(webhook_url) = dotenv::var("MODERATION_DISCORD_WEBHOOK") {
                 crate::util::webhook::send_discord_webhook(response.clone(), webhook_url)
                     .await
