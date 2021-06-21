@@ -5,7 +5,7 @@
     </div>
     <div v-if="notifications.length !== 0">
       <div
-        v-for="notification in notifications"
+        v-for="(notification, notificationIndex) in notifications"
         :key="notification.id"
         class="notification columns"
       >
@@ -31,15 +31,17 @@
         </div>
         <div v-if="notification.actions.length > 0" class="actions">
           <button
-            v-for="(action, index) in notification.actions"
-            :key="index"
-            @click="performAction(notification, index)"
+            v-for="(action, actionIndex) in notification.actions"
+            :key="actionIndex"
+            @click="performAction(notification, notificationIndex, actionIndex)"
           >
             {{ action.title }}
           </button>
         </div>
         <div v-else class="actions">
-          <button @click="performAction(notification, null)">Dismiss</button>
+          <button @click="performAction(notification, notificationIndex, null)">
+            Dismiss
+          </button>
         </div>
       </div>
     </div>
@@ -71,14 +73,16 @@ export default {
     }
   },
   methods: {
-    async performAction(notification, index) {
+    async performAction(notification, notificationIndex, actionIndex) {
       this.$nuxt.$loading.start()
 
       try {
-        if (typeof index !== 'undefined') {
+        if (actionIndex !== null) {
           const config = {
-            method: notification.actions[index].action_route[0].toLowerCase(),
-            url: `${notification.actions[index].action_route[1]}`,
+            method: notification.actions[
+              actionIndex
+            ].action_route[0].toLowerCase(),
+            url: `${notification.actions[actionIndex].action_route[1]}`,
             headers: {
               Authorization: this.$auth.token,
             },
@@ -92,7 +96,7 @@ export default {
           this.$auth.headers
         )
 
-        this.notifications.splice(index, 1)
+        this.notifications.splice(notificationIndex, 1)
         this.$store.dispatch('user/fetchNotifications', { force: true })
       } catch (err) {
         this.$notify({
