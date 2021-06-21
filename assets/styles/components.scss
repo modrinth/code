@@ -75,9 +75,21 @@
 }
 
 .markdown-body {
+  blockquote,
+  details,
+  dl,
+  ol,
+  p,
+  code,
+  pre,
+  table,
+  ul {
+    margin-top: 0;
+    margin-bottom: 16px;
+  }
+
   p {
     padding: 0;
-    margin: 0;
     line-height: 1.5;
     word-wrap: break-word;
   }
@@ -89,7 +101,6 @@
   }
 
   blockquote {
-    margin: 15px 0;
     padding: 0 1em;
     color: var(--color-text);
     border-left: 0.25em solid var(--color-block-quote);
@@ -105,9 +116,11 @@
   }
 
   pre {
-    padding: 15px 10px;
+    margin-top: 1rem;
+    padding: 14px;
     border-radius: var(--size-rounded-control);
     background-color: var(--color-code-bg);
+    overflow-x: auto;
 
     code {
       font-size: 80%;
@@ -127,6 +140,58 @@
   hr {
     margin: 20px 0;
     color: var(--color-divider);
+  }
+
+  table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow: auto;
+    border-collapse: collapse;
+    line-height: 1.5;
+
+    th {
+      font-weight: 600;
+    }
+
+    td,
+    th {
+      padding: 0.4rem 0.85rem;
+      border: 0.1rem solid var(--color-table-border);
+    }
+
+    tr:nth-child(2n) {
+      background-color: var(--color-table-alternate-row);
+    }
+  }
+
+  details {
+    border: 0.15rem solid var(--color-button-bg);
+    border-radius: var(--size-rounded-control);
+    padding: 0.5rem 0.5rem 0;
+
+    summary {
+      font-weight: bold;
+      margin: -0.5rem -0.5rem 0;
+      padding: 0.5rem 0.8rem;
+      cursor: pointer;
+      background-color: var(--color-button-bg);
+      &:hover {
+        background-color: var(--color-button-bg-hover);
+      }
+    }
+
+    &[open] {
+      padding: 0.5rem;
+
+      summary {
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  > :last-child {
+    margin-bottom: 0 !important;
   }
 }
 
