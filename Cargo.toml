@@ -1,0 +1,6 @@
+[workspace]
+
+members = [
+    "theseus",
+    "theseus_cli"
+]
