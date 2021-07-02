@@ -288,7 +288,7 @@ export default {
   @media screen and (max-width: 560px) {
     .left-categories {
       display: flex;
-      margin: 0 0 0.75rem 0.75rem;
+      margin: 0 0.75rem 0.75rem 0.75rem;
       width: 7rem;
     }
     .right-categories {

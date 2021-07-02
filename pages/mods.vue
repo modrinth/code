@@ -453,6 +453,25 @@ export default {
       maxResults: 20,
     }
   },
+  watch: {
+    async '$route.query'(to, from) {
+      // Detects when the query is removed from the URL
+      if (Object.keys(to).length === 0 && Object.keys(from).length !== 0) {
+        this.query = ''
+        this.displayLicense = ''
+        this.selectedLicense = ''
+        this.showSnapshots = false
+        this.selectedVersions = []
+        this.selectedEnvironments = []
+        this.facets = []
+        this.currentPage = 1
+        this.sortType = { display: 'Relevance', name: 'relevance' }
+        this.maxResults = 20
+
+        await this.onSearchChange(1)
+      }
+    },
+  },
   methods: {
     async fillVersions() {
       try {
@@ -613,7 +632,7 @@ export default {
         const pageAmount = Math.ceil(res.data.total_hits / res.data.limit)
 
         this.currentPage = newPageNumber
-        if (pageAmount > 4) {
+        if (pageAmount > 7) {
           if (this.currentPage + 3 >= pageAmount) {
             this.pages = [
               1,
@@ -657,7 +676,12 @@ export default {
           if (this.maxResults > 20)
             url += `&m=${encodeURIComponent(this.maxResults)}`
 
-          window.history.replaceState(new Date(), 'Mods', url)
+          // Check if URL needs to be changed, ignoring browser `,` to `%2C` changes
+          if (
+            url.replace(/%2C|,/g, '') !==
+            this.$route.fullPath.substring(1).replace(/%2C|,/g, '')
+          )
+            this.$router.replace(url)
         }
       } catch (err) {
         // eslint-disable-next-line no-console
