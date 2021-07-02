@@ -530,9 +530,7 @@ export default {
         {
           hid: 'description',
           name: 'description',
-          content:
-            this.mod.description +
-            ' View other minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform supporting both the Forge and Fabric mod loaders.',
+          content: `${this.mod.title}: ${this.mod.description} View other minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform supporting both the Forge and Fabric mod loaders.`,
         },
         {
           hid: 'og:url',
