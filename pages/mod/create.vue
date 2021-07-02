@@ -12,12 +12,12 @@
           Save draft
         </button>
         <button
-          title="Create"
+          title="Submit for review"
           class="brand-button column"
           :disabled="!this.$nuxt.$loading"
           @click="createMod"
         >
-          Create
+          Submit for review
         </button>
       </header>
       <section class="essentials">

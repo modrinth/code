@@ -31,6 +31,12 @@
             Approve
           </button>
           <button
+            class="button column unlist"
+            @click="changeModStatus(mod.id, 'unlisted', index)"
+          >
+            Unlist
+          </button>
+          <button
             class="button column reject"
             @click="changeModStatus(mod.id, 'rejected', index)"
           >
@@ -53,7 +59,9 @@
           <h5 class="title">
             Report for {{ report.item_type }}
             <nuxt-link
-              :to="report.item_type + '/' + report.item_id.replace(/\W/g, '')"
+              :to="
+                '/' + report.item_type + '/' + report.item_id.replace(/\W/g, '')
+              "
               >{{ report.item_id }}
             </nuxt-link>
           </h5>
