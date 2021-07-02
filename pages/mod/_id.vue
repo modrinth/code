@@ -4,17 +4,20 @@
       <div class="content">
         <div class="header">
           <div class="icon">
-            <img
-              :src="
-                mod.icon_url
-                  ? mod.icon_url
-                  : 'https://cdn.modrinth.com/placeholder.svg?inline'
-              "
-              alt="mod - icon"
-            />
+            <nuxt-link :to="'/mod/' + (mod.slug ? mod.slug : mod.id)">
+              <img
+                :src="
+                  mod.icon_url
+                    ? mod.icon_url
+                    : 'https://cdn.modrinth.com/placeholder.svg?inline'
+                "
+                alt="mod - icon"
+            /></nuxt-link>
           </div>
           <div class="info">
-            <h1 class="title">{{ mod.title }}</h1>
+            <nuxt-link :to="'/mod/' + (mod.slug ? mod.slug : mod.id)">
+              <h1 class="title">{{ mod.title }}</h1>
+            </nuxt-link>
             <p class="description">
               {{ mod.description }}
             </p>
