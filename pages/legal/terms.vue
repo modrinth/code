@@ -149,6 +149,13 @@
           purpose (including commercial purposes).
         </li>
       </ul>
+
+      <h2>11. Project Rules</h2>
+
+      <p>
+        Please read our
+        <nuxt-link to="/legal/rules">Project Rules</nuxt-link>.
+      </p>
     </div>
     <m-footer class="footer" centered />
   </div>
