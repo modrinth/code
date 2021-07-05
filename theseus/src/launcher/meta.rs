@@ -11,6 +11,17 @@ pub enum VersionType {
     OldBeta,
 }
 
+impl VersionType {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            VersionType::Release => "release",
+            VersionType::Snapshot => "snapshot",
+            VersionType::OldAlpha => "old_alpha",
+            VersionType::OldBeta => "old_beta",
+        }
+    }
+}
+
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct Version {
@@ -100,14 +111,22 @@ pub enum Os {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct OsRule {
-    pub name: Os,
+    pub name: Option<Os>,
     pub version: Option<String>,
+    pub arch: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct LibraryRule {
+pub struct FeatureRule {
+    pub is_demo_user: Option<bool>,
+    pub has_custom_resolution: Option<bool>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Rule {
     pub action: RuleAction,
     pub os: Option<OsRule>,
+    pub feature: Option<FeatureRule>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -121,19 +140,44 @@ pub struct Library {
     pub extract: Option<LibraryExtract>,
     pub name: String,
     pub natives: Option<HashMap<Os, String>>,
-    pub rules: Option<Vec<LibraryRule>>,
+    pub rules: Option<Vec<Rule>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum ArgumentValue {
+    Single(String),
+    Many(Vec<String>),
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(untagged)]
+pub enum Argument {
+    Normal(String),
+    Ruled {
+        rules: Vec<Rule>,
+        value: ArgumentValue,
+    },
+}
+
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash)]
+#[serde(rename_all = "snake_case")]
+pub enum ArgumentType {
+    Game,
+    Jvm,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct VersionInfo {
+    pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     pub asset_index: AssetIndex,
     pub assets: String,
     pub downloads: HashMap<DownloadType, Download>,
     pub id: String,
     pub libraries: Vec<Library>,
     pub main_class: String,
-    pub minecraft_arguments: String,
+    pub minecraft_arguments: Option<String>,
     pub minimum_launcher_version: u32,
     pub release_time: DateTime<Utc>,
     pub time: DateTime<Utc>,

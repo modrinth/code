@@ -41,6 +41,7 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/bzip2-sys-75559f3495f10aba/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/crc32fast-f112d4af2349618a/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/miniz_oxide-d683d4a97661215e/out" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/target/debug/build/sys-info-0c720b463af8b14b/out" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />

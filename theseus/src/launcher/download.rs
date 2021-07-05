@@ -1,7 +1,9 @@
 use crate::launcher::meta::{
-    Asset, AssetIndex, AssetsIndex, DownloadType, Library, Os, RuleAction, VersionInfo,
+    Asset, AssetIndex, AssetsIndex, DownloadType, Library, Os, OsRule, RuleAction, VersionInfo,
 };
 use futures::future;
+use regex::Regex;
+use reqwest::{Error, Response};
 use std::fs::File;
 use std::io::{BufReader, Write};
 use std::path::Path;
@@ -33,7 +35,7 @@ pub async fn download_client(client_path: &Path, version_info: &VersionInfo) {
 pub async fn download_assets(
     assets_path: &Path,
     legacy_path: Option<&Path>,
-    meta: AssetIndex,
+    meta: &AssetIndex,
     index: &AssetsIndex,
 ) {
     save_file(
@@ -66,7 +68,7 @@ async fn download_asset(
     ))
     .await;
 
-    let resource_path = assets_path.join(sub_hash).join(&asset.hash);
+    let resource_path = assets_path.join("objects").join(sub_hash).join(&asset.hash);
     save_file(resource_path.as_path(), &resource);
 
     if let Some(legacy_path) = legacy_path {
@@ -87,28 +89,7 @@ pub async fn download_libraries(libraries_path: &Path, natives_path: &Path, libr
 
 async fn download_library(libraries_path: &Path, natives_path: &Path, library: &Library) {
     if let Some(rules) = &library.rules {
-        let mut allowed = true;
-
-        for rule in rules {
-            match rule.action {
-                RuleAction::Allow => {
-                    if let Some(os) = &rule.os {
-                        allowed = os.name == &get_os()
-                    } else {
-                        allowed = true
-                    }
-                }
-                RuleAction::Disallow => {
-                    if let Some(os) = &rule.os {
-                        allowed = os.name != &get_os()
-                    } else {
-                        allowed = false
-                    }
-                }
-            }
-        }
-
-        if !allowed {
+        if !super::rules::parse_rules(rules.as_slice()) {
             return;
         }
     }
@@ -143,14 +124,17 @@ async fn download_library_jar(
     if let Some(library) = &library.downloads.artifact {
         let bytes = download_file(&library.url).await;
 
-        save_file(
-            &libraries_path
-                .join(package)
-                .join(name)
-                .join(version)
-                .join(format!("{}-{}.jar", name, version)),
-            &bytes,
-        );
+        let mut path = libraries_path.to_path_buf();
+
+        for directory in package.split(".") {
+            path.push(directory);
+        }
+
+        path.push(name);
+        path.push(version);
+        path.push(format!("{}-{}.jar", name, version));
+
+        save_file(&path, &bytes);
     }
 }
 
@@ -171,17 +155,21 @@ async fn download_native(
                 let parsed_key = os_key.replace("${arch}", "32");
 
                 if let Some(native) = classifiers.get(&*parsed_key) {
-                    let path = &libraries_path
-                        .join(package)
-                        .join(name)
-                        .join(version)
-                        .join(format!("{}-{}-{}.jar", name, version, parsed_key));
+                    let mut path = libraries_path.to_path_buf();
+
+                    for directory in package.split(".") {
+                        path.push(directory);
+                    }
+
+                    path.push(name);
+                    path.push(version);
+                    path.push(format!("{}-{}-{}.jar", name, version, parsed_key));
 
                     let bytes = download_file(&native.url).await;
 
-                    save_file(path, &bytes);
+                    save_file(&path, &bytes);
 
-                    let file = File::open(path).unwrap();
+                    let file = File::open(&path).unwrap();
                     let reader = BufReader::new(file);
 
                     let mut archive = zip::ZipArchive::new(reader).unwrap();
@@ -199,20 +187,26 @@ fn save_file(path: &Path, bytes: &bytes::Bytes) {
 }
 
 async fn download_file(url: &str) -> bytes::Bytes {
-    reqwest::Client::builder()
+    let client = reqwest::Client::builder()
+        .pool_max_idle_per_host(0)
         .tcp_keepalive(Some(std::time::Duration::from_secs(10)))
         .build()
-        .unwrap()
-        .get(url)
-        .send()
-        .await
-        .unwrap()
-        .bytes()
-        .await
-        .unwrap()
+        .unwrap();
+
+    for attempt in 1..4 {
+        let result = client.get(url).send().await;
+
+        match result {
+            Ok(x) => return x.bytes().await.unwrap(),
+            Err(e) if attempt <= 3 => continue,
+            Err(e) => panic!(e),
+        }
+    }
+
+    unreachable!()
 }
 
-fn get_os() -> Os {
+pub fn get_os() -> Os {
     match std::env::consts::OS {
         "windows" => Os::Windows,
         "macos" => Os::Osx,
