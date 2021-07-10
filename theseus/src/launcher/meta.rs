@@ -119,14 +119,14 @@ pub struct OsRule {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct FeatureRule {
     pub is_demo_user: Option<bool>,
-    pub has_custom_resolution: Option<bool>,
+    pub has_demo_resolution: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Rule {
     pub action: RuleAction,
     pub os: Option<OsRule>,
-    pub feature: Option<FeatureRule>,
+    pub features: Option<FeatureRule>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

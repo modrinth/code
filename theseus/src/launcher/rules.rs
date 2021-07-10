@@ -9,16 +9,16 @@ pub fn parse_rules(rules: &[Rule]) -> bool {
 pub fn parse_rule(rule: &Rule) -> bool {
     let result = if let Some(os) = &rule.os {
         parse_os_rule(os)
-    } else if let Some(feature) = &rule.feature {
+    } else if rule.features.is_some() {
         false
     } else {
         true
     };
 
-    return match rule.action {
+    match rule.action {
         RuleAction::Allow => result,
         RuleAction::Disallow => !result,
-    };
+    }
 }
 
 pub fn parse_os_rule(rule: &OsRule) -> bool {
@@ -42,9 +42,12 @@ pub fn parse_os_rule(rule: &OsRule) -> bool {
         }
     }
     if let Some(version) = &rule.version {
-        let regex = Regex::new(version.as_str()).unwrap();
-        if !regex.is_match(&*sys_info::os_release().unwrap()) {
-            return false;
+        let regex = Regex::new(version.as_str());
+
+        if let Ok(regex) = regex {
+            if !regex.is_match(&*sys_info::os_release().unwrap_or_default()) {
+                return false;
+            }
         }
     }
 

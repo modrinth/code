@@ -1,33 +1,64 @@
+use crate::launcher::auth::provider::Credentials;
 use std::path::Path;
 use std::process::{Command, Stdio};
+use thiserror::Error;
 
-mod args;
+pub mod args;
 pub mod auth;
 pub mod download;
 pub mod java;
 pub mod meta;
-mod rules;
+pub mod rules;
 
-pub async fn launch_minecraft(version_name: &str, root_dir: &Path) {
+#[derive(Error, Debug)]
+pub enum LauncherError {
+    #[error("Failed to violate file checksum at url {url} with hash {hash} after {tries} tries")]
+    ChecksumFailure {
+        hash: String,
+        url: String,
+        tries: u32,
+    },
+    #[error("Invalid input: {0}")]
+    InvalidInput(String),
+    #[error("Error while managing asynchronous tasks")]
+    TaskError(#[from] tokio::task::JoinError),
+    #[error("Error while reading/writing to the disk")]
+    IoError(#[from] std::io::Error),
+    #[error("Error while spawning child process {process}")]
+    ProcessError {
+        inner: std::io::Error,
+        process: String,
+    },
+    #[error("Error while deserializing JSON")]
+    SerdeError(#[from] serde_json::Error),
+    #[error("Unable to fetch {item}")]
+    FetchError { inner: reqwest::Error, item: String },
+    #[error("{0}")]
+    ParseError(String),
+}
+
+pub async fn launch_minecraft(
+    version_name: &str,
+    root_dir: &Path,
+    credentials: &Credentials,
+) -> Result<(), LauncherError> {
     let manifest = meta::fetch_version_manifest().await.unwrap();
 
-    let version = meta::fetch_version_info(
+    let version = download::download_version_info(
+        &*root_dir.join("versions"),
         manifest
             .versions
             .iter()
             .find(|x| x.id == version_name)
-            .unwrap(),
+            .ok_or_else(|| {
+                LauncherError::InvalidInput(format!("Version {} does not exist", version_name))
+            })?,
     )
-    .await
-    .unwrap();
+    .await?;
 
-    //download_minecraft(&version, root_dir).await;
-
-    let auth = auth::login("username", "password", true).await;
+    download_minecraft(&version, root_dir).await?;
 
     let arguments = version.arguments.unwrap();
-
-    let profile = auth.selected_profile.unwrap();
 
     let mut child = Command::new("java")
         .args(args::get_jvm_arguments(
@@ -42,38 +73,47 @@ pub async fn launch_minecraft(version_name: &str, root_dir: &Path) {
                     .join("versions")
                     .join(&version.id)
                     .join(format!("{}.jar", &version.id)),
-            ),
-        ))
+            )?,
+        )?)
         .arg(version.main_class)
         .args(args::get_minecraft_arguments(
             arguments
                 .get(&meta::ArgumentType::Game)
                 .map(|x| x.as_slice()),
             version.minecraft_arguments.as_deref(),
-            &*auth.access_token,
-            &*profile.name,
-            &profile.id,
+            credentials,
             &*version.id,
             &version.asset_index.id,
             root_dir,
             &*root_dir.join("assets"),
             &version.type_,
-        ))
+        )?)
         .current_dir(root_dir)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit())
         .spawn()
-        .unwrap();
+        .map_err(|err| LauncherError::ProcessError {
+            inner: err,
+            process: "minecraft".to_string(),
+        })?;
 
-    child.wait().unwrap();
+    child.wait().map_err(|err| LauncherError::ProcessError {
+        inner: err,
+        process: "minecraft".to_string(),
+    })?;
+
+    Ok(())
 }
 
-pub async fn download_minecraft(version: &meta::VersionInfo, root_dir: &Path) {
-    let assets_dir = meta::fetch_assets_index(&version).await.unwrap();
+pub async fn download_minecraft(
+    version: &meta::VersionInfo,
+    root_dir: &Path,
+) -> Result<(), LauncherError> {
+    let assets_index = download::download_assets_index(&*root_dir.join("assets"), &version).await?;
 
     let legacy_dir = root_dir.join("resources");
 
-    futures::future::join3(
+    let (a, b, c) = futures::future::join3(
         download::download_client(&*root_dir.join("versions"), &version),
         download::download_assets(
             &*root_dir.join("assets"),
@@ -82,8 +122,7 @@ pub async fn download_minecraft(version: &meta::VersionInfo, root_dir: &Path) {
             } else {
                 None
             },
-            &version.asset_index,
-            &assets_dir,
+            &assets_index,
         ),
         download::download_libraries(
             &*root_dir.join("libraries"),
@@ -92,4 +131,10 @@ pub async fn download_minecraft(version: &meta::VersionInfo, root_dir: &Path) {
         ),
     )
     .await;
+
+    a?;
+    b?;
+    c?;
+
+    Ok(())
 }
