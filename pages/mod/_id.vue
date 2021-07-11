@@ -222,10 +222,7 @@
             <div class="info">
               <h4>License</h4>
               <p v-tooltip="mod.license.name" class="value ellipsis">
-                <a
-                  v-if="mod.license.url ? mod.license.url : '#'"
-                  :href="mod.license.url"
-                >
+                <a :href="mod.license.url || null">
                   {{ mod.license.id.toUpperCase() }}</a
                 >
               </p>
