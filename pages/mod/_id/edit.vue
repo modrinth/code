@@ -9,7 +9,11 @@
         Back
       </nuxt-link>
       <button
-        v-if="mod.status === 'rejected' || 'draft' || 'unlisted'"
+        v-if="
+          mod.status === 'rejected' ||
+          mod.status === 'draft' ||
+          mod.status === 'unlisted'
+        "
         title="Submit for approval"
         class="button column"
         :disabled="!this.$nuxt.$loading"
