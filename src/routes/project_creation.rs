@@ -42,7 +42,7 @@ pub enum CreateError {
     FileValidationError(#[from] crate::validate::ValidationError),
     #[error("{}", .0)]
     MissingValueError(String),
-    #[error("Invalid format for project icon: {0}")]
+    #[error("Invalid format for image: {0}")]
     InvalidIconFormat(String),
     #[error("Error with multipart data: {0}")]
     InvalidInput(String),
@@ -150,7 +150,7 @@ struct ProjectCreateData {
     /// The support range for the server project
     pub server_side: SideType,
 
-    #[validate(length(max = 64))]
+    #[validate(length(max = 32))]
     #[validate]
     /// A list of initial versions to upload with the created project
     pub initial_versions: Vec<InitialVersionData>,
@@ -182,6 +182,10 @@ struct ProjectCreateData {
 
     /// The license id that the project follows
     pub license_id: String,
+
+    #[validate(length(max = 64))]
+    /// The multipart names of the gallery items to upload
+    pub gallery_items: Vec<String>,
 }
 
 pub struct UploadedFile {
@@ -285,6 +289,7 @@ pub async fn project_create_inner(
     let project_create_data;
     let mut versions;
     let mut versions_map = std::collections::HashMap::new();
+    let mut gallery_urls = Vec::new();
 
     let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
     let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
@@ -418,6 +423,45 @@ pub async fn project_create_inner(
                 )
                 .await?,
             );
+            continue;
+        }
+
+        if project_create_data
+            .gallery_items
+            .iter()
+            .find(|x| *x == name)
+            .is_some()
+        {
+            let mut data = Vec::new();
+            while let Some(chunk) = field.next().await {
+                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+            }
+
+            const FILE_SIZE_CAP: usize = 5 * (1 << 20);
+
+            if data.len() >= FILE_SIZE_CAP {
+                return Err(CreateError::InvalidInput(String::from(
+                    "Gallery image exceeds the maximum of 5MiB.",
+                )));
+            }
+
+            let hash = sha1::Sha1::from(&data).hexdigest();
+            let (_, file_extension) = super::version_creation::get_name_ext(&content_disposition)?;
+            let content_type = crate::util::ext::get_image_content_type(file_extension)
+                .ok_or_else(|| CreateError::InvalidIconFormat(file_extension.to_string()))?;
+
+            let url = format!("data/{}/images/{}.{}", project_id, hash, file_extension);
+            let upload_data = file_host
+                .upload_file(content_type, &url, data.to_vec())
+                .await?;
+
+            uploaded_files.push(UploadedFile {
+                file_id: upload_data.file_id,
+                file_name: upload_data.file_name.clone(),
+            });
+
+            gallery_urls.push(format!("{}/{}", cdn_url, url));
+
             continue;
         }
 
@@ -578,6 +622,13 @@ pub async fn project_create_inner(
             license: license_id,
             slug: Some(project_create_data.slug),
             donation_urls,
+            gallery_items: gallery_urls
+                .iter()
+                .map(|x| models::project_item::GalleryItem {
+                    project_id: project_id.into(),
+                    image_url: x.to_string(),
+                })
+                .collect(),
         };
 
         let now = chrono::Utc::now();
@@ -616,6 +667,7 @@ pub async fn project_create_inner(
             wiki_url: project_builder.wiki_url.clone(),
             discord_url: project_builder.discord_url.clone(),
             donation_urls: project_create_data.donation_urls.clone(),
+            gallery: gallery_urls,
         };
 
         let _project_id = project_builder.insert(&mut *transaction).await?;
@@ -726,7 +778,7 @@ async fn process_icon_upload(
     mut field: actix_multipart::Field,
     cdn_url: &str,
 ) -> Result<String, CreateError> {
-    if let Some(content_type) = get_image_content_type(file_extension) {
+    if let Some(content_type) = crate::util::ext::get_image_content_type(file_extension) {
         let mut data = Vec::new();
         while let Some(chunk) = field.next().await {
             data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
@@ -754,24 +806,5 @@ async fn process_icon_upload(
         Ok(format!("{}/{}", cdn_url, upload_data.file_name))
     } else {
         Err(CreateError::InvalidIconFormat(file_extension.to_string()))
-    }
-}
-
-pub fn get_image_content_type(extension: &str) -> Option<&'static str> {
-    let content_type = match &*extension {
-        "bmp" => "image/bmp",
-        "gif" => "image/gif",
-        "jpeg" | "jpg" | "jpe" => "image/jpeg",
-        "png" => "image/png",
-        "svg" | "svgz" => "image/svg+xml",
-        "webp" => "image/webp",
-        "rgb" => "image/x-rgb",
-        _ => "",
-    };
-
-    if !content_type.is_empty() {
-        Some(content_type)
-    } else {
-        None
     }
 }

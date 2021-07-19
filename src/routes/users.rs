@@ -286,7 +286,7 @@ pub async fn user_icon_edit(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) = super::project_creation::get_image_content_type(&*ext.ext) {
+    if let Some(content_type) = crate::util::ext::get_image_content_type(&*ext.ext) {
         let cdn_url = dotenv::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let id_option =

@@ -113,5 +113,3 @@ fn game_version_supported(
         }
     }
 }
-
-//todo: fabric/forge validators for 1.8+ respectively

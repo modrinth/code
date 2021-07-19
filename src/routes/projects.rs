@@ -1,6 +1,4 @@
 use crate::database;
-use crate::database::cache::project_cache::remove_cache_project;
-use crate::database::cache::query_project_cache::remove_cache_query_project;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::projects::{
@@ -271,6 +269,11 @@ pub fn convert_project(
                 })
                 .collect(),
         ),
+        gallery: data
+            .gallery_items
+            .into_iter()
+            .map(|x| x.image_url)
+            .collect(),
     }
 }
 
@@ -452,33 +455,13 @@ pub async fn project_edit(
                     ));
                 }
 
-                if status == &ProjectStatus::Processing && project_item.versions.is_empty() {
-                    return Err(ApiError::InvalidInputError(String::from(
-                        "Project submitted for review with no initial versions",
-                    )));
-                }
+                if status == &ProjectStatus::Processing {
+                    if project_item.versions.is_empty() {
+                        return Err(ApiError::InvalidInputError(String::from(
+                            "Project submitted for review with no initial versions",
+                        )));
+                    }
 
-                let status_id = database::models::StatusId::get_id(&status, &mut *transaction)
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::InvalidInputError(
-                            "No database entry for status provided.".to_string(),
-                        )
-                    })?;
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET status = $1
-                    WHERE (id = $2)
-                    ",
-                    status_id as database::models::ids::StatusId,
-                    id as database::models::ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-
-                if project_item.status == ProjectStatus::Processing {
                     sqlx::query!(
                         "
                         UPDATE mods
@@ -510,6 +493,26 @@ pub async fn project_edit(
                         .ok();
                     }
                 }
+
+                let status_id = database::models::StatusId::get_id(&status, &mut *transaction)
+                    .await?
+                    .ok_or_else(|| {
+                        ApiError::InvalidInputError(
+                            "No database entry for status provided.".to_string(),
+                        )
+                    })?;
+
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET status = $1
+                    WHERE (id = $2)
+                    ",
+                    status_id as database::models::ids::StatusId,
+                    id as database::models::ids::ProjectId,
+                )
+                .execute(&mut *transaction)
+                .await?;
 
                 if project_item.status.is_searchable() && !status.is_searchable() {
                     delete_from_index(id.into(), config).await?;
@@ -901,15 +904,6 @@ pub async fn project_edit(
                 .await?;
             }
 
-            let id: ProjectId = project_item.inner.id.into();
-            remove_cache_project(id.to_string().clone()).await;
-            remove_cache_query_project(id.to_string()).await;
-
-            if let Some(slug) = project_item.inner.slug {
-                remove_cache_project(slug.clone()).await;
-                remove_cache_query_project(slug).await;
-            }
-
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
@@ -936,7 +930,7 @@ pub async fn project_icon_edit(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) = super::project_creation::get_image_content_type(&*ext.ext) {
+    if let Some(content_type) = crate::util::ext::get_image_content_type(&*ext.ext) {
         let cdn_url = dotenv::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let string = info.into_inner().0;
@@ -988,7 +982,7 @@ pub async fn project_icon_edit(
             )));
         }
 
-        let hash = sha1::Sha1::from(bytes.clone()).hexdigest();
+        let hash = sha1::Sha1::from(&bytes).hexdigest();
 
         let project_id: ProjectId = project_item.id.into();
 
@@ -1000,6 +994,8 @@ pub async fn project_icon_edit(
             )
             .await?;
 
+        let mut transaction = pool.begin().await?;
+
         sqlx::query!(
             "
             UPDATE mods
@@ -1009,17 +1005,10 @@ pub async fn project_icon_edit(
             format!("{}/{}", cdn_url, upload_data.file_name),
             project_item.id as database::models::ids::ProjectId,
         )
-        .execute(&**pool)
+        .execute(&mut *transaction)
         .await?;
 
-        let id: ProjectId = project_item.id.into();
-        remove_cache_project(id.to_string().clone()).await;
-        remove_cache_query_project(id.to_string()).await;
-
-        if let Some(slug) = project_item.slug {
-            remove_cache_project(slug.clone()).await;
-            remove_cache_query_project(slug).await;
-        }
+        transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -1028,6 +1017,232 @@ pub async fn project_icon_edit(
             ext.ext
         )))
     }
+}
+
+#[delete("{id}/icon")]
+pub async fn delete_project_icon(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let string = info.into_inner().0;
+
+    let project_item =
+        database::models::Project::get_from_slug_or_project_id(string.clone(), &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInputError("The specified project does not exist!".to_string())
+            })?;
+
+    if !user.role.is_mod() {
+        let team_member = database::models::TeamMember::get_from_user_id(
+            project_item.team_id,
+            user.id.into(),
+            &**pool,
+        )
+        .await
+        .map_err(ApiError::DatabaseError)?
+        .ok_or_else(|| {
+            ApiError::InvalidInputError("The specified project does not exist!".to_string())
+        })?;
+
+        if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthenticationError(
+                "You don't have permission to edit this project's icon.".to_string(),
+            ));
+        }
+    }
+
+    if let Some(icon) = project_item.icon_url {
+        let name = icon.split('/').next();
+
+        if let Some(icon_path) = name {
+            file_host.delete_file_version("", icon_path).await?;
+        }
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        UPDATE mods
+        SET icon_url = NULL
+        WHERE (id = $1)
+        ",
+        project_item.id as database::models::ids::ProjectId,
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
+}
+
+#[post("{id}/gallery")]
+pub async fn add_gallery_item(
+    web::Query(ext): web::Query<Extension>,
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+    mut payload: web::Payload,
+) -> Result<HttpResponse, ApiError> {
+    if let Some(content_type) = crate::util::ext::get_image_content_type(&*ext.ext) {
+        let cdn_url = dotenv::var("CDN_URL")?;
+        let user = get_user_from_headers(req.headers(), &**pool).await?;
+        let string = info.into_inner().0;
+
+        let project_item =
+            database::models::Project::get_from_slug_or_project_id(string.clone(), &**pool)
+                .await?
+                .ok_or_else(|| {
+                    ApiError::InvalidInputError("The specified project does not exist!".to_string())
+                })?;
+
+        if !user.role.is_mod() {
+            let team_member = database::models::TeamMember::get_from_user_id(
+                project_item.team_id,
+                user.id.into(),
+                &**pool,
+            )
+            .await
+            .map_err(ApiError::DatabaseError)?
+            .ok_or_else(|| {
+                ApiError::InvalidInputError("The specified project does not exist!".to_string())
+            })?;
+
+            if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
+                return Err(ApiError::CustomAuthenticationError(
+                    "You don't have permission to edit this project's gallery.".to_string(),
+                ));
+            }
+        }
+
+        let mut bytes = web::BytesMut::new();
+        while let Some(item) = payload.next().await {
+            bytes.extend_from_slice(&item.map_err(|_| {
+                ApiError::InvalidInputError("Unable to parse bytes in payload sent!".to_string())
+            })?);
+        }
+
+        const FILE_SIZE_CAP: usize = 5 * (1 << 20);
+
+        if bytes.len() >= FILE_SIZE_CAP {
+            return Err(ApiError::InvalidInputError(String::from(
+                "Gallery image exceeds the maximum of 5MiB.",
+            )));
+        }
+
+        let hash = sha1::Sha1::from(&bytes).hexdigest();
+
+        let id: ProjectId = project_item.id.into();
+        let url = format!("data/{}/images/{}.{}", id, hash, &*ext.ext);
+        file_host
+            .upload_file(content_type, &url, bytes.to_vec())
+            .await?;
+
+        let mut transaction = pool.begin().await?;
+
+        database::models::project_item::GalleryItem {
+            project_id: project_item.id,
+            image_url: format!("{}/{}", cdn_url, url),
+        }
+        .insert(&mut transaction)
+        .await?;
+
+        Ok(HttpResponse::NoContent().body(""))
+    } else {
+        Err(ApiError::InvalidInputError(format!(
+            "Invalid format for gallery image: {}",
+            ext.ext
+        )))
+    }
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct GalleryItem {
+    pub item: String,
+}
+
+#[delete("{id}/gallery")]
+pub async fn delete_gallery_item(
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryItem>,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let string = info.into_inner().0;
+
+    let project_item =
+        database::models::Project::get_from_slug_or_project_id(string.clone(), &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInputError("The specified project does not exist!".to_string())
+            })?;
+
+    if !user.role.is_mod() {
+        let team_member = database::models::TeamMember::get_from_user_id(
+            project_item.team_id,
+            user.id.into(),
+            &**pool,
+        )
+        .await
+        .map_err(ApiError::DatabaseError)?
+        .ok_or_else(|| {
+            ApiError::InvalidInputError("The specified project does not exist!".to_string())
+        })?;
+
+        if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthenticationError(
+                "You don't have permission to edit this project's icon.".to_string(),
+            ));
+        }
+    }
+    let mut transaction = pool.begin().await?;
+
+    let id = sqlx::query!(
+        "
+        SELECT id FROM mods_gallery
+        WHERE image_url = $1
+        ",
+        item.item
+    )
+    .fetch_optional(&mut *transaction)
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInputError(format!(
+            "Gallery item at URL {} is not part of the project's gallery.",
+            item.item
+        ))
+    })?
+    .id;
+
+    let name = item.item.split('/').next();
+
+    if let Some(item_path) = name {
+        file_host.delete_file_version("", item_path).await?;
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        DELETE FROM mods_gallery
+        WHERE id = $1
+        ",
+        id
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[delete("{id}")]
@@ -1071,15 +1286,6 @@ pub async fn project_delete(
     let mut transaction = pool.begin().await?;
 
     let result = database::models::Project::remove_full(project.id, &mut transaction).await?;
-
-    let id: ProjectId = project.id.into();
-    remove_cache_project(id.to_string().clone()).await;
-    remove_cache_query_project(id.to_string()).await;
-
-    if let Some(slug) = project.slug {
-        remove_cache_project(slug.clone()).await;
-        remove_cache_query_project(slug).await;
-    }
 
     transaction.commit().await?;
 

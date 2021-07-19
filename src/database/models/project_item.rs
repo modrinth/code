@@ -1,8 +1,5 @@
 use super::ids::*;
-use crate::database::cache::project_cache::{get_cache_project, set_cache_project};
-use crate::database::cache::query_project_cache::{
-    get_cache_query_project, set_cache_query_project,
-};
+
 #[derive(Clone, Debug)]
 pub struct DonationUrl {
     pub project_id: ProjectId,
@@ -37,6 +34,36 @@ impl DonationUrl {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct GalleryItem {
+    pub project_id: ProjectId,
+    pub image_url: String,
+}
+
+impl GalleryItem {
+    pub async fn insert(
+        &self,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), sqlx::error::Error> {
+        sqlx::query!(
+            "
+            INSERT INTO mods_gallery (
+                mod_id, image_url
+            )
+            VALUES (
+                $1, $2
+            )
+            ",
+            self.project_id as ProjectId,
+            self.image_url,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        Ok(())
+    }
+}
+
 pub struct ProjectBuilder {
     pub project_id: ProjectId,
     pub project_type_id: ProjectTypeId,
@@ -58,6 +85,7 @@ pub struct ProjectBuilder {
     pub license: LicenseId,
     pub slug: Option<String>,
     pub donation_urls: Vec<DonationUrl>,
+    pub gallery_items: Vec<GalleryItem>,
 }
 
 impl ProjectBuilder {
@@ -101,6 +129,11 @@ impl ProjectBuilder {
         for mut donation in self.donation_urls {
             donation.project_id = self.project_id;
             donation.insert(&mut *transaction).await?;
+        }
+
+        for mut gallery in self.gallery_items {
+            gallery.project_id = self.project_id;
+            gallery.insert(&mut *transaction).await?;
         }
 
         for category in self.categories {
@@ -491,11 +524,6 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        // Check in the cache
-        let cached = get_cache_project(slug_or_project_id.clone()).await;
-        if let Some(data) = cached {
-            return Ok(Some(data));
-        }
         let id_option =
             crate::models::ids::base62_impl::parse_base62(&*slug_or_project_id.clone()).ok();
 
@@ -505,22 +533,12 @@ impl Project {
             if project.is_none() {
                 project = Project::get_from_slug(&slug_or_project_id, executor).await?;
             }
-            // Cache the response
-            if let Some(data) = project {
-                set_cache_project(slug_or_project_id.clone(), &data).await;
-                Ok(Some(data))
-            } else {
-                Ok(None)
-            }
+
+            Ok(project)
         } else {
             let project = Project::get_from_slug(&slug_or_project_id, executor).await?;
-            // Capture the data, and try to cache it
-            if let Some(data) = project {
-                set_cache_project(slug_or_project_id.clone(), &data).await;
-                Ok(Some(data))
-            } else {
-                Ok(None)
-            }
+
+            Ok(project)
         }
     }
 
@@ -531,11 +549,6 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        // Query cache
-        let cached = get_cache_query_project(slug_or_project_id.clone()).await;
-        if let Some(data) = cached {
-            return Ok(Some(data));
-        }
         let id_option =
             crate::models::ids::base62_impl::parse_base62(&*slug_or_project_id.clone()).ok();
 
@@ -545,21 +558,11 @@ impl Project {
             if project.is_none() {
                 project = Project::get_full_from_slug(&slug_or_project_id, executor).await?;
             }
-            // Save the variable
-            if let Some(data) = project {
-                set_cache_query_project(slug_or_project_id.clone(), &data).await;
-                Ok(Some(data))
-            } else {
-                Ok(None)
-            }
+
+            Ok(project)
         } else {
             let project = Project::get_full_from_slug(&slug_or_project_id, executor).await?;
-            if let Some(data) = project {
-                set_cache_query_project(slug_or_project_id.clone(), &data).await;
-                Ok(Some(data))
-            } else {
-                Ok(None)
-            }
+            Ok(project)
         }
     }
 
@@ -578,11 +581,15 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.rejection_reason rejection_reason, m.rejection_body rejection_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url, ',') gallery,
+            STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
             LEFT OUTER JOIN versions v ON v.mod_id = m.id
+            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
+            LEFT OUTER JOIN mods_donations md ON md.joining_mod_id = m.id
+            LEFT OUTER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
@@ -637,7 +644,29 @@ impl Project {
                     .split(',')
                     .map(|x| VersionId(x.parse().unwrap_or_default()))
                     .collect(),
-                donation_urls: vec![],
+                donation_urls: m
+                    .donations
+                    .unwrap_or_default()
+                    .split(" ,")
+                    .map(|d| {
+                        let strings: Vec<&str> = d.split(", ").collect();
+                        DonationUrl {
+                            project_id: id,
+                            platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
+                            platform_short: strings[2].to_string(),
+                            platform_name: strings[3].to_string(),
+                            url: strings[1].to_string(),
+                        }
+                    })
+                    .collect(),
+                gallery_items: m
+                    .gallery
+                    .into_iter()
+                    .map(|x| GalleryItem {
+                        project_id: id,
+                        image_url: x,
+                    })
+                    .collect(),
                 status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                 license_id: m.short,
                 license_name: m.license_name,
@@ -667,11 +696,15 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.rejection_reason rejection_reason, m.rejection_body rejection_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url, ',') gallery,
+            STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
             LEFT OUTER JOIN versions v ON v.mod_id = m.id
+            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
+            LEFT OUTER JOIN mods_donations md ON md.joining_mod_id = m.id
+            LEFT OUTER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
@@ -684,9 +717,11 @@ impl Project {
         )
             .fetch_many(exec)
             .try_filter_map(|e| async {
-                Ok(e.right().map(|m| QueryProject {
-                    inner: Project {
-                        id: ProjectId(m.id),
+                Ok(e.right().map(|m| {
+                    let id = m.id;
+                    QueryProject {
+                        inner: Project {
+                        id: ProjectId(id),
                         project_type: ProjectTypeId(m.project_type),
                         team_id: TeamId(m.team_id),
                         title: m.title.clone(),
@@ -714,13 +749,31 @@ impl Project {
                     project_type: m.project_type_name,
                     categories: m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
                     versions: m.versions.unwrap_or_default().split(',').map(|x| VersionId(x.parse().unwrap_or_default())).collect(),
-                    donation_urls: vec![],
+                        donation_urls: m
+                            .donations
+                            .unwrap_or_default()
+                            .split(" ,")
+                            .map(|d| {
+                                let strings: Vec<&str> = d.split(", ").collect();
+                                DonationUrl {
+                                    project_id: ProjectId(id),
+                                    platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
+                                    platform_short: strings[2].to_string(),
+                                    platform_name: strings[3].to_string(),
+                                    url: strings[1].to_string(),
+                                }
+                            })
+                            .collect(),
+                    gallery_items: m.gallery.iter().map(|x| GalleryItem {
+                        project_id:  ProjectId(id),
+                        image_url: x.to_string()
+                    }).collect(),
                     status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                     license_id: m.short,
                     license_name: m.license_name,
                     client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
                     server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
-                }))
+                }}))
             })
             .try_collect::<Vec<QueryProject>>()
             .await
@@ -733,6 +786,7 @@ pub struct QueryProject {
     pub categories: Vec<String>,
     pub versions: Vec<VersionId>,
     pub donation_urls: Vec<DonationUrl>,
+    pub gallery_items: Vec<GalleryItem>,
     pub status: crate::models::projects::ProjectStatus,
     pub license_id: String,
     pub license_name: String,

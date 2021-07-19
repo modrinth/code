@@ -56,5 +56,3 @@ sqlx = { version = "0.4.2", features = ["runtime-actix-rustls", "postgres", "chr
 
 sentry = { version = "0.22.0", features = ["log"] }
 sentry-actix = "0.22.0"
-
-cached = "0.23.0"

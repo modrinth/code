@@ -75,6 +75,9 @@ pub struct Project {
     pub discord_url: Option<String>,
     /// An optional list of all donation links the project has
     pub donation_urls: Option<Vec<DonationLink>>,
+
+    /// A string of URLs to visual content featuring the project
+    pub gallery: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

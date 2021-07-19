@@ -580,7 +580,7 @@ pub async fn upload_file(
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
-    let content_type = project_file_type(file_extension)
+    let content_type = crate::util::ext::project_file_type(file_extension)
         .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
 
     let mut data = Vec::new();
@@ -588,13 +588,13 @@ pub async fn upload_file(
         data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
     }
 
-    // Project file size limit of 25MiB
-    const FILE_SIZE_CAP: usize = 25 * (2 << 30);
+    // Project file size limit of 100MiB
+    const FILE_SIZE_CAP: usize = 100 * (1 << 20);
 
     // TODO: override file size cap for authorized users or projects
     if data.len() >= FILE_SIZE_CAP {
         return Err(CreateError::InvalidInput(
-            String::from("Project file exceeds the maximum of 25MiB. Contact a moderator or admin to request permission to upload larger files.")
+            String::from("Project file exceeds the maximum of 100MiB. Contact a moderator or admin to request permission to upload larger files.")
         ));
     }
 
@@ -647,14 +647,6 @@ pub async fn upload_file(
     });
 
     Ok(())
-}
-
-// Currently we only support jar projects; this may change in the future (datapacks?)
-fn project_file_type(ext: &str) -> Option<&str> {
-    match ext {
-        "jar" => Some("application/java-archive"),
-        _ => None,
-    }
 }
 
 pub fn get_name_ext(

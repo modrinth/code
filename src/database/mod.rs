@@ -1,4 +1,3 @@
-pub mod cache;
 pub mod models;
 mod postgres_database;
 pub use models::Project;
