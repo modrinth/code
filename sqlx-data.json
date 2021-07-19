@@ -1143,6 +1143,48 @@
       "nullable": []
     }
   },
+  "3d384766d179f804c17e03d1917da65cc6043f88971ddc3fd23ba3be00717dfc": {
+    "query": "\n            SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major FROM game_versions gv\n            ORDER BY created DESC\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 4,
+          "name": "major",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "3d700aaeb0d5129ac8c297ee0542757435a50a35ec94582d9d6ce67aa5302291": {
     "query": "\n                    UPDATE mods\n                    SET title = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -1204,6 +1246,51 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "447350097928db863d47d756354cd52668f52f7156dd7f3673a826f7b9aca2fd": {
+    "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv\n                    WHERE major = $1 AND type = $2\n                    ORDER BY created DESC\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 4,
+          "name": "major",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bool",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "449920c44d498adf8b771973d6034dc97e1c7f3ff4d9d23599af432f294ed564": {
@@ -2674,6 +2761,50 @@
       ]
     }
   },
+  "78a60cf0febcc6e35b8ffe38f2c021c13ab660c81c4775bbb26004d30242a1a8": {
+    "query": "\n                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv\n                WHERE major = $1\n                ORDER BY created DESC\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 4,
+          "name": "major",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bool"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "78bf8232ddae2db486b9ff791ea525af1330e6904740b2a943c4ae3466bf02d0": {
     "query": "\n                SELECT game_version_id id FROM game_versions_versions\n                WHERE joining_version_id = $1\n                ",
     "describe": {
@@ -3316,80 +3447,6 @@
       ]
     }
   },
-  "9782399687ae7a79ea2931e8d3eb38c5c786240d214ff7fd7d0ae39f2d683108": {
-    "query": "\n            SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n            ORDER BY created DESC\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "version_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "type_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "created",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
-  "98841ab141b5133690c2d1d1a37de982b960a5d75d2aa98565fadb4a1ac206a1": {
-    "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n                    WHERE type = $1\n                    ORDER BY created DESC\n                    ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "version_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "type_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "created",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "99a1eac69d7f5a5139703df431e6a5c3012a90143a8c635f93632f04d0bc41d4": {
     "query": "\n                    UPDATE mods\n                    SET wiki_url = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -3930,45 +3987,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "b90ec97f24315f2eeb918d4be26b3bfb1191548bb26626eee844314d25a894be": {
-    "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n                    WHERE major = $1 AND type = $2\n                    ORDER BY created DESC\n                    ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "version_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "type_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "created",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bool",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ]
     }
   },
   "b9399840dbbf807a03d69b7fcb3bd479ef20920ab1e3c91706a1c2c7089f48e7": {
@@ -4760,44 +4778,6 @@
       ]
     }
   },
-  "d4f7661c0156b04720d83ec5d76d901dd1dff23b1c93c7e2fde650f43c8ed86a": {
-    "query": "\n                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv\n                WHERE major = $1\n                ORDER BY created DESC\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "version_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "type_",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "created",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bool"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "d5b00d6237b04018822db529995f0b001cd1cabf5ca93b4aff37f12c4feb83f6": {
     "query": "\n            INSERT INTO donation_platforms (short, name)\n            VALUES ($1, $2)\n            ON CONFLICT (short) DO NOTHING\n            RETURNING id\n            ",
     "describe": {
@@ -5543,6 +5523,50 @@
       },
       "nullable": [
         null
+      ]
+    }
+  },
+  "e8ad94314ec2972c3102041b1bf06872c8e4c8a55156a17334a0e317fe41b784": {
+    "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv\n                    WHERE type = $1\n                    ORDER BY created DESC\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "version_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "type_",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 4,
+          "name": "major",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
       ]
     }
   },

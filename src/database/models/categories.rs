@@ -19,6 +19,7 @@ pub struct GameVersion {
     pub version: String,
     pub version_type: String,
     pub date: chrono::DateTime<chrono::Utc>,
+    pub major: bool,
 }
 
 pub struct Category {
@@ -496,7 +497,7 @@ impl GameVersion {
     {
         let result = sqlx::query!(
             "
-            SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
+            SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major FROM game_versions gv
             ORDER BY created DESC
             "
         )
@@ -505,7 +506,8 @@ impl GameVersion {
             id: GameVersionId(c.id),
             version: c.version_,
             version_type: c.type_,
-            date: c.created
+            date: c.created,
+            major: c.major
         })) })
         .try_collect::<Vec<GameVersion>>()
         .await?;
@@ -527,7 +529,7 @@ impl GameVersion {
             if let Some(major) = major_option {
                 result = sqlx::query!(
                     "
-                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
+                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv
                     WHERE major = $1 AND type = $2
                     ORDER BY created DESC
                     ",
@@ -539,14 +541,15 @@ impl GameVersion {
                         id: GameVersionId(c.id),
                         version: c.version_,
                         version_type: c.type_,
-                        date: c.created
+                        date: c.created,
+                        major: c.major,
                     })) })
                 .try_collect::<Vec<GameVersion>>()
                 .await?;
             } else {
                 result = sqlx::query!(
                     "
-                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
+                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv
                     WHERE type = $1
                     ORDER BY created DESC
                     ",
@@ -557,7 +560,8 @@ impl GameVersion {
                         id: GameVersionId(c.id),
                         version: c.version_,
                         version_type: c.type_,
-                        date: c.created
+                        date: c.created,
+                        major: c.major,
                     })) })
                 .try_collect::<Vec<GameVersion>>()
                 .await?;
@@ -565,7 +569,7 @@ impl GameVersion {
         } else if let Some(major) = major_option {
             result = sqlx::query!(
                 "
-                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created FROM game_versions gv
+                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv
                 WHERE major = $1
                 ORDER BY created DESC
                 ",
@@ -576,7 +580,8 @@ impl GameVersion {
                     id: GameVersionId(c.id),
                     version: c.version_,
                     version_type: c.type_,
-                    date: c.created
+                    date: c.created,
+                    major: c.major,
                 })) })
             .try_collect::<Vec<GameVersion>>()
             .await?;

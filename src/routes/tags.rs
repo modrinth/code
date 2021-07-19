@@ -185,6 +185,7 @@ pub struct GameVersionQueryData {
     pub version: String,
     pub version_type: String,
     pub date: chrono::DateTime<chrono::Utc>,
+    pub major: bool,
 }
 
 #[derive(serde::Deserialize)]
@@ -209,6 +210,7 @@ pub async fn game_version_list(
         version: x.version,
         version_type: x.version_type,
         date: x.date,
+        major: x.major,
     })
     .collect();
 

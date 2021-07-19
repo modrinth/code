@@ -626,73 +626,25 @@ impl Version {
             .await?;
 
         if let Some(v) = result {
-            let mut hashes: Vec<(FileId, String, Vec<u8>)> = Vec::new();
-
-            v.hashes.unwrap_or_default().split(" ,").for_each(|f| {
-                let hash: Vec<&str> = f.split(", ").collect();
-
-                if hash.len() >= 3 {
-                    hashes.push((
-                        FileId(hash[2].parse().unwrap_or(0)),
-                        hash[0].to_string(),
-                        hash[1].to_string().into_bytes(),
-                    ));
-                }
-            });
-
-            let mut files = Vec::new();
-
-            v.files.unwrap_or_default().split(" ,").for_each(|f| {
-                let file: Vec<&str> = f.split(", ").collect();
-
-                if file.len() >= 4 {
-                    let file_id = FileId(file[0].parse().unwrap_or(0));
-                    let mut file_hashes = HashMap::new();
-
-                    for hash in &hashes {
-                        if (hash.0).0 == file_id.0 {
-                            file_hashes.insert(hash.1.clone(), hash.2.clone());
-                        }
-                    }
-
-                    files.push(QueryFile {
-                        id: file_id,
-                        url: file[3].to_string(),
-                        filename: file[1].to_string(),
-                        hashes: file_hashes,
-                        primary: file[2].parse().unwrap_or(false),
-                    })
-                }
-            });
-
-            let mut dependencies = Vec::new();
-
-            v.dependencies
+            let hashes: Vec<(FileId, String, Vec<u8>)> = v
+                .hashes
                 .unwrap_or_default()
                 .split(" ,")
-                .for_each(|f| {
-                    let dependency: Vec<&str> = f.split(", ").collect();
+                .map(|f| {
+                    let hash: Vec<&str> = f.split(", ").collect();
 
-                    if dependency.len() >= 3 {
-                        dependencies.push(QueryDependency {
-                            project_id: match &*dependency[2] {
-                                "0" => None,
-                                _ => match dependency[2].parse() {
-                                    Ok(x) => Some(ProjectId(x)),
-                                    Err(_) => None,
-                                },
-                            },
-                            version_id: match &*dependency[0] {
-                                "0" => None,
-                                _ => match dependency[0].parse() {
-                                    Ok(x) => Some(VersionId(x)),
-                                    Err(_) => None,
-                                },
-                            },
-                            dependency_type: dependency[1].to_string(),
-                        });
+                    if hash.len() >= 3 {
+                        Some((
+                            FileId(hash[2].parse().unwrap_or(0)),
+                            hash[0].to_string(),
+                            hash[1].to_string().into_bytes(),
+                        ))
+                    } else {
+                        None
                     }
-                });
+                })
+                .flatten()
+                .collect();
 
             Ok(Some(QueryVersion {
                 id: VersionId(v.id),
@@ -705,7 +657,36 @@ impl Version {
                 date_published: v.date_published,
                 downloads: v.downloads,
                 release_channel: v.release_channel,
-                files,
+                files: v
+                    .files
+                    .unwrap_or_default()
+                    .split(" ,")
+                    .map(|f| {
+                        let file: Vec<&str> = f.split(", ").collect();
+
+                        if file.len() >= 4 {
+                            let file_id = FileId(file[0].parse().unwrap_or(0));
+                            let mut file_hashes = HashMap::new();
+
+                            for hash in &hashes {
+                                if (hash.0).0 == file_id.0 {
+                                    file_hashes.insert(hash.1.clone(), hash.2.clone());
+                                }
+                            }
+
+                            Some(QueryFile {
+                                id: file_id,
+                                url: file[3].to_string(),
+                                filename: file[1].to_string(),
+                                hashes: file_hashes,
+                                primary: file[2].parse().unwrap_or(false),
+                            })
+                        } else {
+                            None
+                        }
+                    })
+                    .flatten()
+                    .collect(),
                 game_versions: v
                     .game_versions
                     .unwrap_or_default()
@@ -719,7 +700,37 @@ impl Version {
                     .map(|x| x.to_string())
                     .collect(),
                 featured: v.featured,
-                dependencies,
+                dependencies: v
+                    .dependencies
+                    .unwrap_or_default()
+                    .split(" ,")
+                    .map(|f| {
+                        let dependency: Vec<&str> = f.split(", ").collect();
+
+                        if dependency.len() >= 3 {
+                            Some(QueryDependency {
+                                project_id: match &*dependency[2] {
+                                    "0" => None,
+                                    _ => match dependency[2].parse() {
+                                        Ok(x) => Some(ProjectId(x)),
+                                        Err(_) => None,
+                                    },
+                                },
+                                version_id: match &*dependency[0] {
+                                    "0" => None,
+                                    _ => match dependency[0].parse() {
+                                        Ok(x) => Some(VersionId(x)),
+                                        Err(_) => None,
+                                    },
+                                },
+                                dependency_type: dependency[1].to_string(),
+                            })
+                        } else {
+                            None
+                        }
+                    })
+                    .flatten()
+                    .collect(),
             }))
         } else {
             Ok(None)
@@ -763,74 +774,19 @@ impl Version {
             .fetch_many(exec)
             .try_filter_map(|e| async {
                 Ok(e.right().map(|v| {
-                    let mut hashes : Vec<(FileId, String, Vec<u8>)>  = Vec::new();
-
-                    v.hashes.unwrap_or_default().split(" ,").for_each(|f| {
+                    let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default().split(" ,").map(|f| {
                         let hash: Vec<&str> = f.split(", ").collect();
 
                         if hash.len() >= 3 {
-                            hashes.push((
+                            Some((
                                 FileId(hash[2].parse().unwrap_or(0)),
                                 hash[0].to_string(),
                                 hash[1].to_string().into_bytes(),
-                            ));
+                            ))
+                        } else {
+                            None
                         }
-                    });
-
-                    let mut files = Vec::new();
-
-                    v.files.unwrap_or_default().split(" ,").for_each(|f| {
-                        let file : Vec<&str> = f.split(", ").collect();
-
-                        if file.len() >= 4 {
-                            let file_id = FileId(file[0].parse().unwrap_or(0));
-                            let mut file_hashes = HashMap::new();
-
-                            for hash in &hashes {
-                                if (hash.0).0 == file_id.0 {
-                                    file_hashes.insert(hash.1.clone(), hash.2.clone());
-                                }
-                            }
-
-                            files.push(QueryFile {
-                                id: file_id,
-                                url: file[3].to_string(),
-                                filename: file[1].to_string(),
-                                hashes: file_hashes,
-                                primary: file[2].parse().unwrap_or(false)
-                            })
-                        }
-                    });
-
-                    let mut dependencies = Vec::new();
-
-                    v.dependencies.unwrap_or_default().split(" ,").for_each(|f| {
-                        let dependency: Vec<&str> = f.split(", ").collect();
-
-                        if dependency.len() >= 3 {
-                            dependencies.push(QueryDependency {
-                                project_id: match &*dependency[2] {
-                                    "0" => None,
-                                    _ => {
-                                        match dependency[2].parse() {
-                                            Ok(x) => Some(ProjectId(x)),
-                                            Err(_) => None,
-                                        }
-                                    },
-                                },
-                                version_id: match &*dependency[0] {
-                                    "0" => None,
-                                    _ => {
-                                        match dependency[0].parse() {
-                                            Ok(x) => Some(VersionId(x)),
-                                            Err(_) => None,
-                                        }
-                                    },
-                                },
-                                dependency_type: dependency[1].to_string()
-                            });
-                        }
-                    });
+                    }).flatten().collect();
 
                     QueryVersion {
                         id: VersionId(v.id),
@@ -843,11 +799,61 @@ impl Version {
                         date_published: v.date_published,
                         downloads: v.downloads,
                         release_channel: v.release_channel,
-                        files,
+                        files: v.files.unwrap_or_default().split(" ,").map(|f| {
+                            let file: Vec<&str> = f.split(", ").collect();
+
+                            if file.len() >= 4 {
+                                let file_id = FileId(file[0].parse().unwrap_or(0));
+                                let mut file_hashes = HashMap::new();
+
+                                for hash in &hashes {
+                                    if (hash.0).0 == file_id.0 {
+                                        file_hashes.insert(hash.1.clone(), hash.2.clone());
+                                    }
+                                }
+
+                                Some(QueryFile {
+                                    id: file_id,
+                                    url: file[3].to_string(),
+                                    filename: file[1].to_string(),
+                                    hashes: file_hashes,
+                                    primary: file[2].parse().unwrap_or(false),
+                                })
+                            } else {
+                                None
+                            }
+                        }).flatten().collect(),
                         game_versions: v.game_versions.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
                         loaders: v.loaders.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
                         featured: v.featured,
-                        dependencies,
+                        dependencies: v.dependencies
+                            .unwrap_or_default()
+                            .split(" ,")
+                            .map(|f| {
+                                let dependency: Vec<&str> = f.split(", ").collect();
+
+                                if dependency.len() >= 3 {
+                                    Some(QueryDependency {
+                                        project_id: match &*dependency[2] {
+                                            "0" => None,
+                                            _ => match dependency[2].parse() {
+                                                Ok(x) => Some(ProjectId(x)),
+                                                Err(_) => None,
+                                            },
+                                        },
+                                        version_id: match &*dependency[0] {
+                                            "0" => None,
+                                            _ => match dependency[0].parse() {
+                                                Ok(x) => Some(VersionId(x)),
+                                                Err(_) => None,
+                                            },
+                                        },
+                                        dependency_type: dependency[1].to_string(),
+                                    })
+                                } else {
+                                    None
+                                }
+                            }).flatten().collect(),
                     }
                 }))
             })
