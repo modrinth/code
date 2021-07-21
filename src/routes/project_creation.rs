@@ -185,7 +185,7 @@ struct ProjectCreateData {
 
     #[validate(length(max = 64))]
     /// The multipart names of the gallery items to upload
-    pub gallery_items: Vec<String>,
+    pub gallery_items: Option<Vec<String>>,
 }
 
 pub struct UploadedFile {
@@ -426,43 +426,45 @@ pub async fn project_create_inner(
             continue;
         }
 
-        if project_create_data
-            .gallery_items
-            .iter()
-            .find(|x| *x == name)
-            .is_some()
-        {
-            let mut data = Vec::new();
-            while let Some(chunk) = field.next().await {
-                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+        if let Some(gallery_items) = &project_create_data.gallery_items {
+            if
+                gallery_items
+                .iter()
+                .find(|x| *x == name)
+                .is_some()
+            {
+                let mut data = Vec::new();
+                while let Some(chunk) = field.next().await {
+                    data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+                }
+
+                const FILE_SIZE_CAP: usize = 5 * (1 << 20);
+
+                if data.len() >= FILE_SIZE_CAP {
+                    return Err(CreateError::InvalidInput(String::from(
+                        "Gallery image exceeds the maximum of 5MiB.",
+                    )));
+                }
+
+                let hash = sha1::Sha1::from(&data).hexdigest();
+                let (_, file_extension) = super::version_creation::get_name_ext(&content_disposition)?;
+                let content_type = crate::util::ext::get_image_content_type(file_extension)
+                    .ok_or_else(|| CreateError::InvalidIconFormat(file_extension.to_string()))?;
+
+                let url = format!("data/{}/images/{}.{}", project_id, hash, file_extension);
+                let upload_data = file_host
+                    .upload_file(content_type, &url, data.to_vec())
+                    .await?;
+
+                uploaded_files.push(UploadedFile {
+                    file_id: upload_data.file_id,
+                    file_name: upload_data.file_name.clone(),
+                });
+
+                gallery_urls.push(format!("{}/{}", cdn_url, url));
+
+                continue;
             }
-
-            const FILE_SIZE_CAP: usize = 5 * (1 << 20);
-
-            if data.len() >= FILE_SIZE_CAP {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Gallery image exceeds the maximum of 5MiB.",
-                )));
-            }
-
-            let hash = sha1::Sha1::from(&data).hexdigest();
-            let (_, file_extension) = super::version_creation::get_name_ext(&content_disposition)?;
-            let content_type = crate::util::ext::get_image_content_type(file_extension)
-                .ok_or_else(|| CreateError::InvalidIconFormat(file_extension.to_string()))?;
-
-            let url = format!("data/{}/images/{}.{}", project_id, hash, file_extension);
-            let upload_data = file_host
-                .upload_file(content_type, &url, data.to_vec())
-                .await?;
-
-            uploaded_files.push(UploadedFile {
-                file_id: upload_data.file_id,
-                file_name: upload_data.file_name.clone(),
-            });
-
-            gallery_urls.push(format!("{}/{}", cdn_url, url));
-
-            continue;
         }
 
         let index = if let Some(i) = versions_map.get(name) {
