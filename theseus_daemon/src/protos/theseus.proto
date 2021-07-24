@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+package theseus;
+
+service Theseus {
+    rpc GetCatalogue(Empty) returns (Catalogue) {};
+
+    rpc Launch(LaunchOptions) returns (Task);
+
+    rpc GetTaskList(Empty) returns (TaskList);
+    rpc GetTaskProgress(Task) returns (TaskProgress);
+    rpc StreamTaskProgress(Task) returns (stream TaskProgress);
+}
+
+message Empty {}
+
+message Catalogue {
+    repeated Version catalogue = 1;
+}
+
+message Version {
+    string id = 1;
+}
+
+message LaunchOptions {
+    string version_id = 1;
+    string username = 2;
+}
+
+message Task {
+    uint64 id = 1;
+    string name = 2;
+}
+
+message TaskList {
+    repeated Task task_list = 1;
+}
+
+message TaskProgress {
+    uint64 finished = 1;
+    uint64 total = 2;
+    optional string message = 3;
+}
