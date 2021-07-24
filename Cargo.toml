@@ -1,6 +1,3 @@
 [workspace]
 
-members = [
-    "theseus",
-    "theseus_cli"
-]
+members = ["theseus", "theseus_be", "theseus_cli"]

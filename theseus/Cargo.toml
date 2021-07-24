@@ -16,7 +16,7 @@ chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 bytes = "1"
 zip = "0.5"
-sha1 = { version = "0.6.0", features = ["std"]}
+sha1 = { version = "0.6.0", features = ["std"] }
 
 regex = "1.5"
 lazy_static = "1.4"
@@ -25,3 +25,5 @@ tokio = { version = "1", features = ["full"] }
 futures = "0.3"
 
 sys-info = "0.9.0"
+
+dunce = "^1.0.2"

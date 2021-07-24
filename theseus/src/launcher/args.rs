@@ -52,7 +52,7 @@ pub fn get_class_paths(
             path.push(format!("{}-{}.jar", name, version));
 
             class_paths.push(
-                std::fs::canonicalize(&path)
+                dunce::canonicalize(&path)
                     .map_err(|_| {
                         LauncherError::InvalidInput(format!(
                             "Library file at path {} does not exist",
@@ -66,7 +66,7 @@ pub fn get_class_paths(
     }
 
     class_paths.push(
-        std::fs::canonicalize(&client_path)
+        dunce::canonicalize(&client_path)
             .map_err(|_| {
                 LauncherError::InvalidInput(format!(
                     "Specified client path {} does not exist",
@@ -97,7 +97,7 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            &*std::fs::canonicalize(natives_path)
+            &*dunce::canonicalize(natives_path)
                 .map_err(|_| LauncherError::InvalidInput(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
@@ -120,7 +120,7 @@ fn parse_jvm_argument(
     Ok(argument
         .replace(
             "${natives_directory}",
-            &*std::fs::canonicalize(natives_path)
+            &*dunce::canonicalize(natives_path)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified natives path {} does not exist",
@@ -208,7 +208,7 @@ fn parse_minecraft_argument(
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &*std::fs::canonicalize(game_directory)
+            &*dunce::canonicalize(game_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified game directory {} does not exist",
@@ -220,7 +220,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${assets_root}",
-            &*std::fs::canonicalize(assets_directory)
+            &*dunce::canonicalize(assets_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified assets directory {} does not exist",
@@ -232,7 +232,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${game_assets}",
-            &*std::fs::canonicalize(assets_directory)
+            &*dunce::canonicalize(assets_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified assets directory {} does not exist",
