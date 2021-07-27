@@ -199,7 +199,11 @@ pub async fn auth_callback(
 
         transaction.commit().await?;
 
-        let redirect_url = format!("{}?code={}", result.url, token.access_token);
+        let redirect_url = if result.url.contains("?") {
+          format!("{}&code={}", result.url, token.access_token)
+        } else {
+          format!("{}?code={}", result.url, token.access_token)
+        };
 
         Ok(HttpResponse::TemporaryRedirect()
             .header("Location", &*redirect_url)
