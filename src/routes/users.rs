@@ -98,7 +98,7 @@ pub async fn projects_list(
     let user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     let id_option =
-        crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
+        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {
@@ -172,7 +172,7 @@ pub async fn user_edit(
         .map_err(|err| ApiError::ValidationError(validation_errors_to_string(err, None)))?;
 
     let id_option =
-        crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
+        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {
@@ -182,17 +182,28 @@ pub async fn user_edit(
             let mut transaction = pool.begin().await?;
 
             if let Some(username) = &new_user.username {
-                sqlx::query!(
-                    "
+                let user_option =
+                    crate::database::models::User::get_id_from_username_or_id(username, &**pool)
+                        .await?;
+
+                if user_option.is_none() {
+                    sqlx::query!(
+                        "
                     UPDATE users
                     SET username = $1
                     WHERE (id = $2)
                     ",
-                    username,
-                    id as crate::database::models::ids::UserId,
-                )
-                .execute(&mut *transaction)
-                .await?;
+                        username,
+                        id as crate::database::models::ids::UserId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                } else {
+                    return Err(ApiError::InvalidInputError(format!(
+                        "Username {} is taken!",
+                        username
+                    )));
+                }
             }
 
             if let Some(name) = &new_user.name {
@@ -289,9 +300,11 @@ pub async fn user_icon_edit(
     if let Some(content_type) = crate::util::ext::get_image_content_type(&*ext.ext) {
         let cdn_url = dotenv::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
-        let id_option =
-            crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
-                .await?;
+        let id_option = crate::database::models::User::get_id_from_username_or_id(
+            &*info.into_inner().0,
+            &**pool,
+        )
+        .await?;
 
         if let Some(id) = id_option {
             if user.id != id.into() && !user.role.is_mod() {
@@ -326,17 +339,17 @@ pub async fn user_icon_edit(
 
             let mut bytes = web::BytesMut::new();
             while let Some(item) = payload.next().await {
-                bytes.extend_from_slice(&item.map_err(|_| {
-                    ApiError::InvalidInputError(
-                        "Unable to parse bytes in payload sent!".to_string(),
-                    )
-                })?);
-            }
-
-            if bytes.len() >= 262144 {
-                return Err(ApiError::InvalidInputError(String::from(
-                    "Icons must be smaller than 256KiB",
-                )));
+                if bytes.len() >= 262144 {
+                    return Err(ApiError::InvalidInputError(String::from(
+                        "Icons must be smaller than 256KiB",
+                    )));
+                } else {
+                    bytes.extend_from_slice(&item.map_err(|_| {
+                        ApiError::InvalidInputError(
+                            "Unable to parse bytes in payload sent!".to_string(),
+                        )
+                    })?);
+                }
             }
 
             let upload_data = file_host
@@ -389,7 +402,7 @@ pub async fn user_delete(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
-        crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
+        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {
@@ -428,7 +441,7 @@ pub async fn user_follows(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
-        crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
+        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {
@@ -475,7 +488,7 @@ pub async fn user_notifications(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
-        crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
+        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {

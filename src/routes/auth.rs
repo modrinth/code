@@ -181,19 +181,48 @@ pub async fn auth_callback(
             None => {
                 let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
 
-                User {
-                    id: user_id,
-                    github_id: Some(user.id as i64),
-                    username: user.login,
-                    name: user.name,
-                    email: user.email,
-                    avatar_url: Some(user.avatar_url),
-                    bio: user.bio,
-                    created: Utc::now(),
-                    role: Role::Developer.to_string(),
+                let mut username_increment: i32 = 0;
+                let mut username = None;
+
+                while username.is_none() {
+                    let test_username = format!(
+                        "{}{}",
+                        &*user.login,
+                        if username_increment > 0 {
+                            username_increment.to_string()
+                        } else {
+                            "".to_string()
+                        }
+                    );
+
+                    let new_id = crate::database::models::User::get_id_from_username_or_id(
+                        &*test_username,
+                        &**client,
+                    )
+                    .await?;
+
+                    if new_id.is_none() {
+                        username = Some(test_username);
+                    } else {
+                        username_increment += 1;
+                    }
                 }
-                .insert(&mut transaction)
-                .await?;
+
+                if let Some(username) = username {
+                    User {
+                        id: user_id,
+                        github_id: Some(user.id as i64),
+                        username,
+                        name: user.name,
+                        email: user.email,
+                        avatar_url: Some(user.avatar_url),
+                        bio: user.bio,
+                        created: Utc::now(),
+                        role: Role::Developer.to_string(),
+                    }
+                    .insert(&mut transaction)
+                    .await?;
+                }
             }
         }
 

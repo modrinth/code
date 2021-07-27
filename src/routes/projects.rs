@@ -2,7 +2,8 @@ use crate::database;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::projects::{
-    DonationLink, License, ProjectId, ProjectStatus, RejectionReason, SearchRequest, SideType,
+    DonationLink, GalleryItem, License, ModeratorMessage, ProjectId, ProjectStatus, SearchRequest,
+    SideType,
 };
 use crate::models::teams::Permissions;
 use crate::routes::ApiError;
@@ -235,10 +236,10 @@ pub fn convert_project(
         published: m.published,
         updated: m.updated,
         status: data.status,
-        rejection_data: if let Some(reason) = m.rejection_reason {
-            Some(RejectionReason {
-                reason,
-                body: m.rejection_body,
+        moderator_message: if let Some(message) = m.moderation_message {
+            Some(ModeratorMessage {
+                message,
+                body: m.moderation_message_body,
             })
         } else {
             None
@@ -272,7 +273,10 @@ pub fn convert_project(
         gallery: data
             .gallery_items
             .into_iter()
-            .map(|x| x.image_url)
+            .map(|x| GalleryItem {
+                url: x.image_url,
+                featured: x.featured,
+            })
             .collect(),
     }
 }
@@ -345,14 +349,14 @@ pub struct EditProject {
         with = "::serde_with::rust::double_option"
     )]
     #[validate(length(max = 2000))]
-    pub rejection_reason: Option<Option<String>>,
+    pub moderation_message: Option<Option<String>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
     #[validate(length(max = 65536))]
-    pub rejection_body: Option<Option<String>>,
+    pub moderation_message_body: Option<Option<String>>,
 }
 
 #[patch("{id}")]
@@ -465,7 +469,7 @@ pub async fn project_edit(
                     sqlx::query!(
                         "
                         UPDATE mods
-                        SET rejection_reason = NULL
+                        SET moderation_message = NULL
                         WHERE (id = $1)
                         ",
                         id as database::models::ids::ProjectId,
@@ -476,7 +480,7 @@ pub async fn project_edit(
                     sqlx::query!(
                         "
                         UPDATE mods
-                        SET rejection_body = NULL
+                        SET moderation_message_body = NULL
                         WHERE (id = $1)
                         ",
                         id as database::models::ids::ProjectId,
@@ -841,10 +845,10 @@ pub async fn project_edit(
                 }
             }
 
-            if let Some(rejection_reason) = &new_project.rejection_reason {
-                if !user.role.is_mod() {
+            if let Some(moderation_message) = &new_project.moderation_message {
+                if !user.role.is_mod() && project_item.status != ProjectStatus::Approved {
                     return Err(ApiError::CustomAuthenticationError(
-                        "You do not have the permissions to edit the rejection reason of this project!"
+                        "You do not have the permissions to edit the moderation message of this project!"
                             .to_string(),
                     ));
                 }
@@ -852,20 +856,20 @@ pub async fn project_edit(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET rejection_reason = $1
+                    SET moderation_message = $1
                     WHERE (id = $2)
                     ",
-                    rejection_reason.as_deref(),
+                    moderation_message.as_deref(),
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
             }
 
-            if let Some(rejection_body) = &new_project.rejection_body {
-                if !user.role.is_mod() {
+            if let Some(moderation_message_body) = &new_project.moderation_message_body {
+                if !user.role.is_mod() && project_item.status != ProjectStatus::Approved {
                     return Err(ApiError::CustomAuthenticationError(
-                        "You do not have the permissions to edit the rejection body of this project!"
+                        "You do not have the permissions to edit the moderation message body of this project!"
                             .to_string(),
                     ));
                 }
@@ -873,10 +877,10 @@ pub async fn project_edit(
                 sqlx::query!(
                     "
                     UPDATE mods
-                    SET rejection_body = $1
+                    SET moderation_message_body = $1
                     WHERE (id = $2)
                     ",
-                    rejection_body.as_deref(),
+                    moderation_message_body.as_deref(),
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)
@@ -971,15 +975,17 @@ pub async fn project_icon_edit(
 
         let mut bytes = web::BytesMut::new();
         while let Some(item) = payload.next().await {
-            bytes.extend_from_slice(&item.map_err(|_| {
-                ApiError::InvalidInputError("Unable to parse bytes in payload sent!".to_string())
-            })?);
-        }
-
-        if bytes.len() >= 262144 {
-            return Err(ApiError::InvalidInputError(String::from(
-                "Icons must be smaller than 256KiB",
-            )));
+            if bytes.len() >= 262144 {
+                return Err(ApiError::InvalidInputError(String::from(
+                    "Icons must be smaller than 256KiB",
+                )));
+            } else {
+                bytes.extend_from_slice(&item.map_err(|_| {
+                    ApiError::InvalidInputError(
+                        "Unable to parse bytes in payload sent!".to_string(),
+                    )
+                })?);
+            }
         }
 
         let hash = sha1::Sha1::from(&bytes).hexdigest();
@@ -1081,10 +1087,16 @@ pub async fn delete_project_icon(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct GalleryCreateQuery {
+    pub featured: bool,
+}
+
 #[post("{id}/gallery")]
 pub async fn add_gallery_item(
     web::Query(ext): web::Query<Extension>,
     req: HttpRequest,
+    web::Query(item): web::Query<GalleryCreateQuery>,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -1123,17 +1135,19 @@ pub async fn add_gallery_item(
 
         let mut bytes = web::BytesMut::new();
         while let Some(item) = payload.next().await {
-            bytes.extend_from_slice(&item.map_err(|_| {
-                ApiError::InvalidInputError("Unable to parse bytes in payload sent!".to_string())
-            })?);
-        }
+            const FILE_SIZE_CAP: usize = 5 * (1 << 20);
 
-        const FILE_SIZE_CAP: usize = 5 * (1 << 20);
-
-        if bytes.len() >= FILE_SIZE_CAP {
-            return Err(ApiError::InvalidInputError(String::from(
-                "Gallery image exceeds the maximum of 5MiB.",
-            )));
+            if bytes.len() >= FILE_SIZE_CAP {
+                return Err(ApiError::InvalidInputError(String::from(
+                    "Gallery image exceeds the maximum of 5MiB.",
+                )));
+            } else {
+                bytes.extend_from_slice(&item.map_err(|_| {
+                    ApiError::InvalidInputError(
+                        "Unable to parse bytes in payload sent!".to_string(),
+                    )
+                })?);
+            }
         }
 
         let hash = sha1::Sha1::from(&bytes).hexdigest();
@@ -1149,6 +1163,7 @@ pub async fn add_gallery_item(
         database::models::project_item::GalleryItem {
             project_id: project_item.id,
             image_url: format!("{}/{}", cdn_url, url),
+            featured: item.featured,
         }
         .insert(&mut transaction)
         .await?;
@@ -1163,14 +1178,93 @@ pub async fn add_gallery_item(
 }
 
 #[derive(Serialize, Deserialize)]
-pub struct GalleryItem {
-    pub item: String,
+pub struct GalleryEditQuery {
+    pub url: String,
+    pub featured: bool,
+}
+
+#[patch("{id}/gallery")]
+pub async fn edit_gallery_item(
+    req: HttpRequest,
+    web::Query(item): web::Query<GalleryEditQuery>,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let string = info.into_inner().0;
+
+    let project_item =
+        database::models::Project::get_from_slug_or_project_id(string.clone(), &**pool)
+            .await?
+            .ok_or_else(|| {
+                ApiError::InvalidInputError("The specified project does not exist!".to_string())
+            })?;
+
+    if !user.role.is_mod() {
+        let team_member = database::models::TeamMember::get_from_user_id(
+            project_item.team_id,
+            user.id.into(),
+            &**pool,
+        )
+        .await
+        .map_err(ApiError::DatabaseError)?
+        .ok_or_else(|| {
+            ApiError::InvalidInputError("The specified project does not exist!".to_string())
+        })?;
+
+        if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
+            return Err(ApiError::CustomAuthenticationError(
+                "You don't have permission to edit this project's gallery.".to_string(),
+            ));
+        }
+    }
+    let mut transaction = pool.begin().await?;
+
+    let id = sqlx::query!(
+        "
+        SELECT id FROM mods_gallery
+        WHERE image_url = $1
+        ",
+        item.url
+    )
+    .fetch_optional(&mut *transaction)
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInputError(format!(
+            "Gallery item at URL {} is not part of the project's gallery.",
+            item.url
+        ))
+    })?
+    .id;
+
+    let mut transaction = pool.begin().await?;
+
+    sqlx::query!(
+        "
+        UPDATE mods_gallery
+        SET featured = $2
+        WHERE id = $1
+        ",
+        id,
+        item.featured
+    )
+    .execute(&mut *transaction)
+    .await?;
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct GalleryDeleteQuery {
+    pub url: String,
 }
 
 #[delete("{id}/gallery")]
 pub async fn delete_gallery_item(
     req: HttpRequest,
-    web::Query(item): web::Query<GalleryItem>,
+    web::Query(item): web::Query<GalleryDeleteQuery>,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
@@ -1199,7 +1293,7 @@ pub async fn delete_gallery_item(
 
         if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
             return Err(ApiError::CustomAuthenticationError(
-                "You don't have permission to edit this project's icon.".to_string(),
+                "You don't have permission to edit this project's gallery.".to_string(),
             ));
         }
     }
@@ -1210,19 +1304,19 @@ pub async fn delete_gallery_item(
         SELECT id FROM mods_gallery
         WHERE image_url = $1
         ",
-        item.item
+        item.url
     )
     .fetch_optional(&mut *transaction)
     .await?
     .ok_or_else(|| {
         ApiError::InvalidInputError(format!(
             "Gallery item at URL {} is not part of the project's gallery.",
-            item.item
+            item.url
         ))
     })?
     .id;
 
-    let name = item.item.split('/').next();
+    let name = item.url.split('/').next();
 
     if let Some(item_path) = name {
         file_host.delete_file_version("", item_path).await?;

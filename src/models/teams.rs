@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 pub struct TeamId(pub u64);
 
 pub const OWNER_ROLE: &str = "Owner";
+pub const DEFAULT_ROLE: &str = "Member";
 
 // TODO: permissions, role names, etc
 /// A team of users who control a project

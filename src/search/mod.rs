@@ -76,6 +76,7 @@ pub struct UploadSearchProject {
     pub license: String,
     pub client_side: String,
     pub server_side: String,
+    pub gallery: Vec<String>,
 
     /// RFC 3339 formatted creation date of the project
     pub date_created: DateTime<Utc>,
@@ -117,6 +118,7 @@ pub struct ResultSearchProject {
     pub license: String,
     pub client_side: String,
     pub server_side: String,
+    pub gallery: Vec<String>,
 }
 
 impl Document for UploadSearchProject {

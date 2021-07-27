@@ -185,7 +185,15 @@ struct ProjectCreateData {
 
     #[validate(length(max = 64))]
     /// The multipart names of the gallery items to upload
-    pub gallery_items: Option<Vec<String>>,
+    pub gallery_items: Option<Vec<NewGalleryItem>>,
+}
+
+#[derive(Serialize, Deserialize, Validate, Clone)]
+pub struct NewGalleryItem {
+    /// The name of the multipart item where the gallery media is located
+    pub item: String,
+    /// Whether the gallery item should show in search or not
+    pub featured: bool,
 }
 
 pub struct UploadedFile {
@@ -427,27 +435,23 @@ pub async fn project_create_inner(
         }
 
         if let Some(gallery_items) = &project_create_data.gallery_items {
-            if
-                gallery_items
-                .iter()
-                .find(|x| *x == name)
-                .is_some()
-            {
+            if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
                 let mut data = Vec::new();
                 while let Some(chunk) = field.next().await {
-                    data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-                }
+                    const FILE_SIZE_CAP: usize = 5 * (1 << 20);
 
-                const FILE_SIZE_CAP: usize = 5 * (1 << 20);
-
-                if data.len() >= FILE_SIZE_CAP {
-                    return Err(CreateError::InvalidInput(String::from(
-                        "Gallery image exceeds the maximum of 5MiB.",
-                    )));
+                    if data.len() >= FILE_SIZE_CAP {
+                        return Err(CreateError::InvalidInput(String::from(
+                            "Gallery image exceeds the maximum of 5MiB.",
+                        )));
+                    } else {
+                        data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+                    }
                 }
 
                 let hash = sha1::Sha1::from(&data).hexdigest();
-                let (_, file_extension) = super::version_creation::get_name_ext(&content_disposition)?;
+                let (_, file_extension) =
+                    super::version_creation::get_name_ext(&content_disposition)?;
                 let content_type = crate::util::ext::get_image_content_type(file_extension)
                     .ok_or_else(|| CreateError::InvalidIconFormat(file_extension.to_string()))?;
 
@@ -461,7 +465,10 @@ pub async fn project_create_inner(
                     file_name: upload_data.file_name.clone(),
                 });
 
-                gallery_urls.push(format!("{}/{}", cdn_url, url));
+                gallery_urls.push(crate::models::projects::GalleryItem {
+                    url,
+                    featured: item.featured,
+                });
 
                 continue;
             }
@@ -628,7 +635,8 @@ pub async fn project_create_inner(
                 .iter()
                 .map(|x| models::project_item::GalleryItem {
                     project_id: project_id.into(),
-                    image_url: x.to_string(),
+                    image_url: x.url.clone(),
+                    featured: x.featured,
                 })
                 .collect(),
         };
@@ -647,7 +655,7 @@ pub async fn project_create_inner(
             published: now,
             updated: now,
             status: status.clone(),
-            rejection_data: None,
+            moderator_message: None,
             license: License {
                 id: project_create_data.license_id.clone(),
                 name: "".to_string(),
@@ -783,13 +791,13 @@ async fn process_icon_upload(
     if let Some(content_type) = crate::util::ext::get_image_content_type(file_extension) {
         let mut data = Vec::new();
         while let Some(chunk) = field.next().await {
-            data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-        }
-
-        if data.len() >= 262144 {
-            return Err(CreateError::InvalidInput(String::from(
-                "Icons must be smaller than 256KiB",
-            )));
+            if data.len() >= 262144 {
+                return Err(CreateError::InvalidInput(String::from(
+                    "Icons must be smaller than 256KiB",
+                )));
+            } else {
+                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+            }
         }
 
         let upload_data = file_host

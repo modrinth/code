@@ -585,17 +585,16 @@ pub async fn upload_file(
 
     let mut data = Vec::new();
     while let Some(chunk) = field.next().await {
-        data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-    }
+        // Project file size limit of 100MiB
+        const FILE_SIZE_CAP: usize = 100 * (1 << 20);
 
-    // Project file size limit of 100MiB
-    const FILE_SIZE_CAP: usize = 100 * (1 << 20);
-
-    // TODO: override file size cap for authorized users or projects
-    if data.len() >= FILE_SIZE_CAP {
-        return Err(CreateError::InvalidInput(
-            String::from("Project file exceeds the maximum of 100MiB. Contact a moderator or admin to request permission to upload larger files.")
-        ));
+        if data.len() >= FILE_SIZE_CAP {
+            return Err(CreateError::InvalidInput(
+                String::from("Project file exceeds the maximum of 100MiB. Contact a moderator or admin to request permission to upload larger files.")
+            ));
+        } else {
+            data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+        }
     }
 
     let validation_result = validate_file(

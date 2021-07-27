@@ -16,7 +16,7 @@ pub async fn mods_list(
     let user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     let id_option =
-        crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
+        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {
@@ -51,7 +51,7 @@ pub async fn user_follows(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
-        crate::database::models::User::get_id_from_username_or_id(info.into_inner().0, &**pool)
+        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {

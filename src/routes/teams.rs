@@ -341,6 +341,66 @@ pub async fn edit_team_member(
     Ok(HttpResponse::NoContent().body(""))
 }
 
+#[derive(Deserialize)]
+pub struct TransferOwnership {
+    pub user_id: UserId,
+}
+
+#[patch("{id}/owner")]
+pub async fn transfer_ownership(
+    req: HttpRequest,
+    info: web::Path<(TeamId,)>,
+    pool: web::Data<PgPool>,
+    new_owner: web::Json<TransferOwnership>,
+) -> Result<HttpResponse, ApiError> {
+    let id = info.into_inner().0;
+
+    let current_user = get_user_from_headers(req.headers(), &**pool).await?;
+    let team_member =
+        TeamMember::get_from_user_id(id.into(), current_user.id.into(), &**pool).await?;
+
+    let member = match team_member {
+        Some(m) => m,
+        None => {
+            return Err(ApiError::CustomAuthenticationError(
+                "You don't have permission to edit members of this team".to_string(),
+            ))
+        }
+    };
+
+    if member.role != crate::models::teams::OWNER_ROLE {
+        return Err(ApiError::CustomAuthenticationError(
+            "You don't have permission to edit the ownership of this team".to_string(),
+        ));
+    }
+
+    let mut transaction = pool.begin().await?;
+
+    TeamMember::edit_team_member(
+        id.into(),
+        current_user.id.into(),
+        None,
+        Some(crate::models::teams::DEFAULT_ROLE.to_string()),
+        None,
+        &mut transaction,
+    )
+    .await?;
+
+    TeamMember::edit_team_member(
+        id.into(),
+        new_owner.user_id.into(),
+        None,
+        Some(crate::models::teams::OWNER_ROLE.to_string()),
+        None,
+        &mut transaction,
+    )
+    .await?;
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
+}
+
 #[delete("{id}/members/{user_id}")]
 pub async fn remove_team_member(
     req: HttpRequest,

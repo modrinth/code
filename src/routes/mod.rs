@@ -52,11 +52,18 @@ pub fn projects_config(cfg: &mut web::ServiceConfig) {
             .service(projects::project_delete)
             .service(projects::project_edit)
             .service(projects::project_icon_edit)
+            .service(projects::delete_project_icon)
+            .service(projects::add_gallery_item)
+            .service(projects::edit_gallery_item)
+            .service(projects::delete_gallery_item)
             .service(projects::project_follow)
             .service(projects::project_unfollow)
             .service(teams::team_members_get_project)
-            .service(web::scope("{project_id}").service(versions::version_list))
-            .service(projects::dependency_list),
+            .service(
+                web::scope("{project_id}")
+                    .service(versions::version_list)
+                    .service(projects::dependency_list),
+            ),
     );
 }
 
@@ -112,6 +119,7 @@ pub fn teams_config(cfg: &mut web::ServiceConfig) {
         web::scope("team")
             .service(teams::team_members_get)
             .service(teams::edit_team_member)
+            .service(teams::transfer_ownership)
             .service(teams::add_team_member)
             .service(teams::join_team)
             .service(teams::remove_team_member),

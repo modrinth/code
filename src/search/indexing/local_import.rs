@@ -18,7 +18,8 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             m.updated updated,
             m.team_id team_id, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions,
+            STRING_AGG(DISTINCT mg.image_url, ',') gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -27,6 +28,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id
             LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id
             LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id
+            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN side_types cs ON m.client_side = cs.id
@@ -43,10 +45,10 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             .fetch_many(&pool)
             .try_filter_map(|e| async {
                 Ok(e.right().map(|m| {
-                    let mut categories = m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect::<Vec<String>>();
-                    categories.append(&mut m.loaders.unwrap_or_default().split(',').map(|x| x.to_string()).collect::<Vec<String>>());
+                    let mut categories = m.categories.map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>()).unwrap_or_default();
+                    categories.append(&mut m.loaders.map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>()).unwrap_or_default());
 
-                    let versions : Vec<String> = m.versions.unwrap_or_default().split(',').map(|x| x.to_string()).collect::<Vec<String>>();
+                    let versions : Vec<String> =  m.versions.map(|x| x.split(',').map(|x| x.to_string()).collect()).unwrap_or_default();
 
                     let project_id : crate::models::projects::ProjectId = ProjectId(m.id).into();
 
@@ -70,6 +72,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
                         server_side: m.server_side_type,
                         slug: m.slug,
                         project_type: m.project_type_name,
+                        gallery: m.gallery.map(|x| x.split(',').map(|x| x.to_string()).collect()).unwrap_or_default()
                     }
                 }))
             })
@@ -89,7 +92,8 @@ pub async fn query_one(
             m.updated updated,
             m.team_id team_id, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions,
+            STRING_AGG(DISTINCT mg.image_url, ',') gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -98,6 +102,7 @@ pub async fn query_one(
             LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id
             LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id
             LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id
+            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN side_types cs ON m.client_side = cs.id
@@ -116,25 +121,19 @@ pub async fn query_one(
 
     let mut categories = m
         .categories
-        .unwrap_or_default()
-        .split(',')
-        .map(|x| x.to_string())
-        .collect::<Vec<String>>();
+        .map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>())
+        .unwrap_or_default();
     categories.append(
         &mut m
             .loaders
-            .unwrap_or_default()
-            .split(',')
-            .map(|x| x.to_string())
-            .collect::<Vec<String>>(),
+            .map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>())
+            .unwrap_or_default(),
     );
 
     let versions: Vec<String> = m
         .versions
-        .unwrap_or_default()
-        .split(',')
-        .map(|x| x.to_string())
-        .collect::<Vec<String>>();
+        .map(|x| x.split(',').map(|x| x.to_string()).collect())
+        .unwrap_or_default();
 
     let project_id: crate::models::projects::ProjectId = ProjectId(m.id).into();
 
@@ -161,5 +160,9 @@ pub async fn query_one(
         server_side: m.server_side_type,
         slug: m.slug,
         project_type: m.project_type_name,
+        gallery: m
+            .gallery
+            .map(|x| x.split(',').map(|x| x.to_string()).collect())
+            .unwrap_or_default(),
     })
 }

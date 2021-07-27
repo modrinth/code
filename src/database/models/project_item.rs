@@ -38,6 +38,7 @@ impl DonationUrl {
 pub struct GalleryItem {
     pub project_id: ProjectId,
     pub image_url: String,
+    pub featured: bool,
 }
 
 impl GalleryItem {
@@ -48,14 +49,15 @@ impl GalleryItem {
         sqlx::query!(
             "
             INSERT INTO mods_gallery (
-                mod_id, image_url
+                mod_id, image_url, featured
             )
             VALUES (
-                $1, $2
+                $1, $2, $3
             )
             ",
             self.project_id as ProjectId,
             self.image_url,
+            self.featured
         )
         .execute(&mut *transaction)
         .await?;
@@ -116,8 +118,8 @@ impl ProjectBuilder {
             server_side: self.server_side,
             license: self.license,
             slug: self.slug,
-            rejection_reason: None,
-            rejection_body: None,
+            moderation_message: None,
+            moderation_message_body: None,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -176,8 +178,8 @@ pub struct Project {
     pub server_side: SideTypeId,
     pub license: LicenseId,
     pub slug: Option<String>,
-    pub rejection_reason: Option<String>,
-    pub rejection_body: Option<String>,
+    pub moderation_message: Option<String>,
+    pub moderation_message_body: Option<String>,
 }
 
 impl Project {
@@ -242,7 +244,7 @@ impl Project {
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
-                   rejection_reason, rejection_body
+                   moderation_message, moderation_message_body
             FROM mods
             WHERE id = $1
             ",
@@ -275,8 +277,8 @@ impl Project {
                 slug: row.slug,
                 body: row.body,
                 follows: row.follows,
-                rejection_reason: row.rejection_reason,
-                rejection_body: row.rejection_body,
+                moderation_message: row.moderation_message,
+                moderation_message_body: row.moderation_message_body,
             }))
         } else {
             Ok(None)
@@ -300,7 +302,7 @@ impl Project {
                    updated, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
-                   rejection_reason, rejection_body
+                   moderation_message, moderation_message_body
             FROM mods
             WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
             ",
@@ -331,8 +333,8 @@ impl Project {
                 slug: m.slug,
                 body: m.body,
                 follows: m.follows,
-                rejection_reason: m.rejection_reason,
-                rejection_body: m.rejection_body,
+                moderation_message: m.moderation_message,
+                moderation_message_body: m.moderation_message_body,
             }))
         })
         .try_collect::<Vec<Project>>()
@@ -589,9 +591,9 @@ impl Project {
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.rejection_reason rejection_reason, m.rejection_body rejection_body,
+            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url, ',') gallery,
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured, ' ,') gallery,
             STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
@@ -638,22 +640,22 @@ impl Project {
                     slug: m.slug.clone(),
                     body: m.body.clone(),
                     follows: m.follows,
-                    rejection_reason: m.rejection_reason,
-                    rejection_body: m.rejection_body,
+                    moderation_message: m.moderation_message,
+                    moderation_message_body: m.moderation_message_body,
                 },
                 project_type: m.project_type_name,
                 categories: m
                     .categories
-                    .unwrap_or_default()
-                    .split(',')
-                    .map(|x| x.to_string())
-                    .collect(),
+                    .map(|x| x.split(',').map(|x| x.to_string()).collect())
+                    .unwrap_or_default(),
                 versions: m
                     .versions
-                    .unwrap_or_default()
-                    .split(',')
-                    .map(|x| VersionId(x.parse().unwrap_or_default()))
-                    .collect(),
+                    .map(|x| {
+                        x.split(',')
+                            .map(|x| VersionId(x.parse().unwrap_or_default()))
+                            .collect()
+                    })
+                    .unwrap_or_default(),
                 donation_urls: m
                     .donations
                     .unwrap_or_default()
@@ -677,11 +679,22 @@ impl Project {
                     .collect(),
                 gallery_items: m
                     .gallery
-                    .into_iter()
-                    .map(|x| GalleryItem {
-                        project_id: id,
-                        image_url: x,
+                    .unwrap_or_default()
+                    .split(" ,")
+                    .map(|d| {
+                        let strings: Vec<&str> = d.split(", ").collect();
+
+                        if strings.len() >= 2 {
+                            Some(GalleryItem {
+                                project_id: id,
+                                image_url: strings[0].to_string(),
+                                featured: strings[1].parse().unwrap_or(false),
+                            })
+                        } else {
+                            None
+                        }
                     })
+                    .flatten()
                     .collect(),
                 status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                 license_id: m.short,
@@ -710,9 +723,9 @@ impl Project {
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
             m.updated updated, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.rejection_reason rejection_reason, m.rejection_body rejection_body,
+            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url, ',') gallery,
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured, ' ,') gallery,
             STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
@@ -759,37 +772,52 @@ impl Project {
                         slug: m.slug.clone(),
                         body: m.body.clone(),
                         follows: m.follows,
-                        rejection_reason: m.rejection_reason,
-                        rejection_body: m.rejection_body,
+                            moderation_message: m.moderation_message,
+                            moderation_message_body: m.moderation_message_body,
                     },
                     project_type: m.project_type_name,
-                    categories: m.categories.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
-                    versions: m.versions.unwrap_or_default().split(',').map(|x| VersionId(x.parse().unwrap_or_default())).collect(),
-                        donation_urls: m
-                            .donations
-                            .unwrap_or_default()
-                            .split(" ,")
-                            .map(|d| {
-                                let strings: Vec<&str> = d.split(", ").collect();
+                    categories: m.categories.map(|x| x.split(',').map(|x| x.to_string()).collect()).unwrap_or_default(),
+                    versions: m.versions.map(|x| x.split(',').map(|x| VersionId(x.parse().unwrap_or_default())).collect()).unwrap_or_default(),
+                    gallery_items: m
+                        .gallery
+                        .unwrap_or_default()
+                        .split(" ,")
+                        .map(|d| {
+                            let strings: Vec<&str> = d.split(", ").collect();
 
-                                if strings.len() >= 3 {
-                                    Some(DonationUrl {
-                                        project_id: ProjectId(id),
-                                        platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                                        platform_short: strings[2].to_string(),
-                                        platform_name: strings[3].to_string(),
-                                        url: strings[1].to_string(),
-                                    })
-                                } else {
-                                    None
-                                }
-                            })
-                            .flatten()
-                            .collect(),
-                    gallery_items: m.gallery.iter().map(|x| GalleryItem {
-                        project_id:  ProjectId(id),
-                        image_url: x.to_string()
-                    }).collect(),
+                            if strings.len() >= 2 {
+                                Some(GalleryItem {
+                                    project_id: ProjectId(id),
+                                    image_url: strings[0].to_string(),
+                                    featured: strings[1].parse().unwrap_or(false)
+                                })
+                            } else {
+                                None
+                            }
+                        })
+                        .flatten()
+                        .collect(),
+                    donation_urls: m
+                        .donations
+                        .unwrap_or_default()
+                        .split(" ,")
+                        .map(|d| {
+                            let strings: Vec<&str> = d.split(", ").collect();
+
+                            if strings.len() >= 3 {
+                                Some(DonationUrl {
+                                    project_id: ProjectId(id),
+                                    platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
+                                    platform_short: strings[2].to_string(),
+                                    platform_name: strings[3].to_string(),
+                                    url: strings[1].to_string(),
+                                })
+                            } else {
+                                None
+                            }
+                        })
+                        .flatten()
+                        .collect(),
                     status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                     license_id: m.short,
                     license_name: m.license_name,

@@ -44,7 +44,7 @@ pub struct Project {
     /// The status of the project
     pub status: ProjectStatus,
     /// The rejection data of the project
-    pub rejection_data: Option<RejectionReason>,
+    pub moderator_message: Option<ModeratorMessage>,
 
     /// The license of this project
     pub license: License,
@@ -77,12 +77,18 @@ pub struct Project {
     pub donation_urls: Option<Vec<DonationLink>>,
 
     /// A string of URLs to visual content featuring the project
-    pub gallery: Vec<String>,
+    pub gallery: Vec<GalleryItem>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct RejectionReason {
-    pub reason: String,
+pub struct GalleryItem {
+    pub url: String,
+    pub featured: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ModeratorMessage {
+    pub message: String,
     pub body: Option<String>,
 }
 
