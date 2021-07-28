@@ -262,6 +262,7 @@ fn default_settings() -> Settings {
         "license".to_string(),
         "client_side".to_string(),
         "server_side".to_string(),
+        "gallery".to_string(),
     ];
 
     let searchable_attributes = vec![
