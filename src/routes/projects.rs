@@ -188,30 +188,36 @@ pub async fn dependency_list(
         )
         .await?;
 
-        let mut response: HashMap<models::projects::VersionId, DependencyInfo> = HashMap::new();
+        let mut response: HashMap<models::projects::VersionId, Vec<DependencyInfo>> =
+            HashMap::new();
 
         for dependency in dependencies {
-            response.insert(
-                dependency.0.into(),
-                DependencyInfo {
-                    project: if let Some(id) = dependency.2 {
-                        projects
-                            .iter()
-                            .find(|x| x.inner.id == id)
-                            .map(|x| convert_project(x.clone()))
-                    } else {
-                        None
-                    },
-                    version: if let Some(id) = dependency.1 {
-                        versions
-                            .iter()
-                            .find(|x| x.id == id)
-                            .map(|x| super::versions::convert_version(x.clone()))
-                    } else {
-                        None
-                    },
+            let deps = response.get_mut(&dependency.0.into());
+
+            let info = DependencyInfo {
+                project: if let Some(id) = dependency.2 {
+                    projects
+                        .iter()
+                        .find(|x| x.inner.id == id)
+                        .map(|x| convert_project(x.clone()))
+                } else {
+                    None
                 },
-            );
+                version: if let Some(id) = dependency.1 {
+                    versions
+                        .iter()
+                        .find(|x| x.id == id)
+                        .map(|x| super::versions::convert_version(x.clone()))
+                } else {
+                    None
+                },
+            };
+
+            if let Some(deps) = deps {
+                deps.push(info);
+            } else {
+                response.insert(dependency.0.into(), vec![info]);
+            }
         }
 
         Ok(HttpResponse::Ok().json(response))
