@@ -131,6 +131,7 @@ pub async fn project_get(
     }
 }
 
+#[derive(Serialize)]
 struct DependencyInfo {
     pub project: Option<models::projects::Project>,
     pub version: Option<models::projects::Version>,
@@ -213,7 +214,7 @@ pub async fn dependency_list(
             );
         }
 
-        Ok(HttpResponse::NotFound().body(""))
+        Ok(HttpResponse::Ok().json(response))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
