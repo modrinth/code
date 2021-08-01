@@ -228,7 +228,7 @@ pub async fn auth_callback(
 
         transaction.commit().await?;
 
-        let redirect_url = if result.url.contains("?") {
+        let redirect_url = if result.url.contains('?') {
             format!("{}&code={}", result.url, token.access_token)
         } else {
             format!("{}?code={}", result.url, token.access_token)

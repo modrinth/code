@@ -16,7 +16,6 @@ use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -133,8 +132,8 @@ pub async fn project_get(
 
 #[derive(Serialize)]
 struct DependencyInfo {
-    pub project: Option<models::projects::Project>,
-    pub version: Option<models::projects::Version>,
+    pub projects: Vec<models::projects::Project>,
+    pub versions: Vec<models::projects::Version>,
 }
 
 #[get("dependencies")]
@@ -177,50 +176,27 @@ pub async fn dependency_list(
         )>>()
         .await?;
 
-        let projects = database::Project::get_many_full(
-            dependencies.iter().map(|x| x.2).flatten().collect(),
-            &**pool,
-        )
-        .await?;
-        let versions = database::Version::get_many_full(
-            dependencies.iter().map(|x| x.1).flatten().collect(),
-            &**pool,
-        )
-        .await?;
+        let (projects_result, versions_result) = futures::join!(
+            database::Project::get_many_full(
+                dependencies.iter().map(|x| x.2).flatten().collect(),
+                &**pool,
+            ),
+            database::Version::get_many_full(
+                dependencies.iter().map(|x| x.1).flatten().collect(),
+                &**pool,
+            )
+        );
 
-        let mut response: HashMap<models::projects::VersionId, Vec<DependencyInfo>> =
-            HashMap::new();
+        let projects = projects_result?
+            .into_iter()
+            .map(convert_project)
+            .collect::<Vec<models::projects::Project>>();
+        let versions = versions_result?
+            .into_iter()
+            .map(super::versions::convert_version)
+            .collect::<Vec<models::projects::Version>>();
 
-        for dependency in dependencies {
-            let deps = response.get_mut(&dependency.0.into());
-
-            let info = DependencyInfo {
-                project: if let Some(id) = dependency.2 {
-                    projects
-                        .iter()
-                        .find(|x| x.inner.id == id)
-                        .map(|x| convert_project(x.clone()))
-                } else {
-                    None
-                },
-                version: if let Some(id) = dependency.1 {
-                    versions
-                        .iter()
-                        .find(|x| x.id == id)
-                        .map(|x| super::versions::convert_version(x.clone()))
-                } else {
-                    None
-                },
-            };
-
-            if let Some(deps) = deps {
-                deps.push(info);
-            } else {
-                response.insert(dependency.0.into(), vec![info]);
-            }
-        }
-
-        Ok(HttpResponse::Ok().json(response))
+        Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
