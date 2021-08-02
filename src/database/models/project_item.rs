@@ -596,19 +596,19 @@ impl Project {
             STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured, ' ,') gallery,
             STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
-            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
-            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
-            LEFT OUTER JOIN versions v ON v.mod_id = m.id
-            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
-            LEFT OUTER JOIN mods_donations md ON md.joining_mod_id = m.id
-            LEFT OUTER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
             INNER JOIN licenses l ON m.license = l.id
+            LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
+            LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+            LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
+            LEFT JOIN categories c ON mc.joining_category_id = c.id
+            LEFT JOIN versions v ON v.mod_id = m.id
+            LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
             WHERE m.id = $1
-            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id;
+            GROUP BY pt.id, s.id, cs.id, ss.id, l.id, m.id;
             ",
             id as ProjectId,
         )
@@ -728,19 +728,19 @@ impl Project {
             STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured, ' ,') gallery,
             STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
-            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
-            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
-            LEFT OUTER JOIN versions v ON v.mod_id = m.id
-            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
-            LEFT OUTER JOIN mods_donations md ON md.joining_mod_id = m.id
-            LEFT OUTER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
             INNER JOIN licenses l ON m.license = l.id
+            LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
+            LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+            LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
+            LEFT JOIN categories c ON mc.joining_category_id = c.id
+            LEFT JOIN versions v ON v.mod_id = m.id
+            LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
             WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))
-            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id;
+            GROUP BY pt.id, s.id, cs.id, ss.id, l.id, m.id;
             ",
             &project_ids_parsed
         )

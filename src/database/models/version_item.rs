@@ -618,7 +618,7 @@ impl Version {
             LEFT OUTER JOIN hashes h on f.id = h.file_id
             LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
             WHERE v.id = $1
-            GROUP BY v.id, rc.id;
+            GROUP BY rc.id, v.id;
             ",
             id as VersionId,
         )
@@ -766,7 +766,7 @@ impl Version {
             LEFT OUTER JOIN hashes h on f.id = h.file_id
             LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
             WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
-            GROUP BY v.id, rc.id
+            GROUP BY rc.id, v.id
             ORDER BY v.date_published ASC;
             ",
             &version_ids_parsed
