@@ -1,4 +1,5 @@
 use super::ids::*;
+use chrono::{DateTime, Utc};
 
 #[derive(Clone, Debug)]
 pub struct DonationUrl {
@@ -39,6 +40,9 @@ pub struct GalleryItem {
     pub project_id: ProjectId,
     pub image_url: String,
     pub featured: bool,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub created: DateTime<Utc>,
 }
 
 impl GalleryItem {
@@ -49,15 +53,17 @@ impl GalleryItem {
         sqlx::query!(
             "
             INSERT INTO mods_gallery (
-                mod_id, image_url, featured
+                mod_id, image_url, featured, title, description
             )
             VALUES (
-                $1, $2, $3
+                $1, $2, $3, $4, $5
             )
             ",
             self.project_id as ProjectId,
             self.image_url,
-            self.featured
+            self.featured,
+            self.title,
+            self.description
         )
         .execute(&mut *transaction)
         .await?;
@@ -593,7 +599,8 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured, ' ,') gallery,
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions,
+            STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, ' ') || ', ' || COALESCE(mg.description, ' ') || ', ' || mg.created, ' ,') gallery,
             STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
@@ -684,11 +691,24 @@ impl Project {
                     .map(|d| {
                         let strings: Vec<&str> = d.split(", ").collect();
 
-                        if strings.len() >= 2 {
+                        if strings.len() >= 5 {
                             Some(GalleryItem {
                                 project_id: id,
                                 image_url: strings[0].to_string(),
                                 featured: strings[1].parse().unwrap_or(false),
+                                title: if strings[2] == " " {
+                                    None
+                                } else {
+                                    Some(strings[2].to_string())
+                                },
+                                description: if strings[3] == " " {
+                                    None
+                                } else {
+                                    Some(strings[3].to_string())
+                                },
+                                created: chrono::DateTime::parse_from_rfc3339(strings[4])
+                                    .map(|x| x.with_timezone(&chrono::Utc))
+                                    .unwrap_or_else(|_| chrono::Utc::now()),
                             })
                         } else {
                             None
@@ -725,7 +745,8 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions, STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured, ' ,') gallery,
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions,
+            STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, ' ') || ', ' || COALESCE(mg.description, ' ') || ', ' || mg.created, ' ,') gallery,
             STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
@@ -785,11 +806,14 @@ impl Project {
                         .map(|d| {
                             let strings: Vec<&str> = d.split(", ").collect();
 
-                            if strings.len() >= 2 {
+                            if strings.len() >= 5 {
                                 Some(GalleryItem {
                                     project_id: ProjectId(id),
                                     image_url: strings[0].to_string(),
-                                    featured: strings[1].parse().unwrap_or(false)
+                                    featured: strings[1].parse().unwrap_or(false),
+                                    title: if strings[2] == " " { None } else { Some(strings[2].to_string()) },
+                                    description: if strings[3] == " " { None } else { Some(strings[3].to_string()) },
+                                    created: chrono::DateTime::parse_from_rfc3339(strings[4]).map(|x| x.with_timezone(&chrono::Utc)).unwrap_or_else(|_| chrono::Utc::now())
                                 })
                             } else {
                                 None

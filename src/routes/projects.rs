@@ -259,6 +259,9 @@ pub fn convert_project(
             .map(|x| GalleryItem {
                 url: x.image_url,
                 featured: x.featured,
+                title: x.title,
+                description: x.description,
+                created: x.created,
             })
             .collect(),
     }
@@ -1070,9 +1073,13 @@ pub async fn delete_project_icon(
     Ok(HttpResponse::NoContent().body(""))
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Validate)]
 pub struct GalleryCreateQuery {
     pub featured: bool,
+    #[validate(url, length(min = 1, max = 255))]
+    pub title: Option<String>,
+    #[validate(url, length(min = 1, max = 2048))]
+    pub description: Option<String>,
 }
 
 #[post("{id}/gallery")]
@@ -1086,6 +1093,9 @@ pub async fn add_gallery_item(
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(content_type) = crate::util::ext::get_image_content_type(&*ext.ext) {
+        item.validate()
+            .map_err(|err| ApiError::ValidationError(validation_errors_to_string(err, None)))?;
+
         let cdn_url = dotenv::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let string = info.into_inner().0;
@@ -1147,9 +1157,14 @@ pub async fn add_gallery_item(
             project_id: project_item.id,
             image_url: format!("{}/{}", cdn_url, url),
             featured: item.featured,
+            title: item.title,
+            description: item.description,
+            created: chrono::Utc::now(),
         }
         .insert(&mut transaction)
         .await?;
+
+        transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
@@ -1160,10 +1175,25 @@ pub async fn add_gallery_item(
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Validate)]
 pub struct GalleryEditQuery {
+    /// The url of the gallery item to edit
     pub url: String,
-    pub featured: bool,
+    pub featured: Option<bool>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    #[validate(url, length(min = 1, max = 255))]
+    pub title: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    #[validate(url, length(min = 1, max = 2048))]
+    pub description: Option<Option<String>>,
 }
 
 #[patch("{id}/gallery")]
@@ -1175,6 +1205,9 @@ pub async fn edit_gallery_item(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
+
+    item.validate()
+        .map_err(|err| ApiError::ValidationError(validation_errors_to_string(err, None)))?;
 
     let project_item =
         database::models::Project::get_from_slug_or_project_id(string.clone(), &**pool)
@@ -1222,17 +1255,45 @@ pub async fn edit_gallery_item(
 
     let mut transaction = pool.begin().await?;
 
-    sqlx::query!(
-        "
-        UPDATE mods_gallery
-        SET featured = $2
-        WHERE id = $1
-        ",
-        id,
-        item.featured
-    )
-    .execute(&mut *transaction)
-    .await?;
+    if let Some(featured) = item.featured {
+        sqlx::query!(
+            "
+            UPDATE mods_gallery
+            SET featured = $2
+            WHERE id = $1
+            ",
+            id,
+            featured
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+    if let Some(title) = item.title {
+        sqlx::query!(
+            "
+            UPDATE mods_gallery
+            SET title = $2
+            WHERE id = $1
+            ",
+            id,
+            title
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
+    if let Some(description) = item.description {
+        sqlx::query!(
+            "
+            UPDATE mods_gallery
+            SET description = $2
+            WHERE id = $1
+            ",
+            id,
+            description
+        )
+        .execute(&mut *transaction)
+        .await?;
+    }
 
     transaction.commit().await?;
 

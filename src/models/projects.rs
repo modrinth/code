@@ -84,6 +84,9 @@ pub struct Project {
 pub struct GalleryItem {
     pub url: String,
     pub featured: bool,
+    pub title: Option<String>,
+    pub description: Option<String>,
+    pub created: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

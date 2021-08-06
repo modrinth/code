@@ -184,6 +184,7 @@ struct ProjectCreateData {
     pub license_id: String,
 
     #[validate(length(max = 64))]
+    #[validate]
     /// The multipart names of the gallery items to upload
     pub gallery_items: Option<Vec<NewGalleryItem>>,
 }
@@ -194,6 +195,12 @@ pub struct NewGalleryItem {
     pub item: String,
     /// Whether the gallery item should show in search or not
     pub featured: bool,
+    #[validate(url, length(min = 1, max = 2048))]
+    /// The title of the gallery item
+    pub title: Option<String>,
+    #[validate(url, length(min = 1, max = 2048))]
+    /// The description of the gallery item
+    pub description: Option<String>,
 }
 
 pub struct UploadedFile {
@@ -468,6 +475,9 @@ pub async fn project_create_inner(
                 gallery_urls.push(crate::models::projects::GalleryItem {
                     url,
                     featured: item.featured,
+                    title: item.title.clone(),
+                    description: item.description.clone(),
+                    created: chrono::Utc::now(),
                 });
 
                 continue;
@@ -637,6 +647,9 @@ pub async fn project_create_inner(
                     project_id: project_id.into(),
                     image_url: x.url.clone(),
                     featured: x.featured,
+                    title: x.title.clone(),
+                    description: x.description.clone(),
+                    created: x.created,
                 })
                 .collect(),
         };
