@@ -162,7 +162,7 @@ impl User {
             SELECT u.id, u.github_id, u.name, u.email,
                 u.avatar_url, u.username, u.bio,
                 u.created, u.role FROM users u
-            WHERE u.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE u.id = ANY($1)
             ",
             &user_ids_parsed
         )
@@ -315,7 +315,7 @@ impl User {
         sqlx::query!(
             "
             DELETE FROM notifications_actions
-             WHERE notification_id IN (SELECT * FROM UNNEST($1::bigint[]))
+             WHERE notification_id = ANY($1)
             ",
             &notifications
         )
@@ -394,7 +394,7 @@ impl User {
         sqlx::query!(
             "
             DELETE FROM notifications_actions
-             WHERE notification_id IN (SELECT * FROM UNNEST($1::bigint[]))
+             WHERE notification_id = ANY($1)
             ",
             &notifications
         )

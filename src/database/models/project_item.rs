@@ -310,7 +310,7 @@ impl Project {
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body
             FROM mods
-            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE id = ANY($1)
             ",
             &project_ids_parsed
         )
@@ -760,7 +760,7 @@ impl Project {
             LEFT JOIN categories c ON mc.joining_category_id = c.id
             LEFT JOIN versions v ON v.mod_id = m.id
             LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
-            WHERE m.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE m.id = ANY($1)
             GROUP BY pt.id, s.id, cs.id, ss.id, l.id, m.id;
             ",
             &project_ids_parsed

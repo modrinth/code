@@ -1142,7 +1142,7 @@ impl ProjectType {
         let project_types = sqlx::query!(
             "
             SELECT id, name FROM project_types
-            WHERE name IN (SELECT * FROM UNNEST($1::varchar[]))
+            WHERE name = ANY($1)
             ",
             names
         )

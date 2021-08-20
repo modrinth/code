@@ -729,11 +729,6 @@ async fn create_initial_version(
     // Randomly generate a new id to be used for the version
     let version_id: VersionId = models::generate_version_id(transaction).await?.into();
 
-    let release_channel =
-        models::ChannelId::get_id(version_data.release_channel.as_str(), &mut *transaction)
-            .await?
-            .expect("Release Channel not found in database");
-
     let game_versions = version_data
         .game_versions
         .iter()
@@ -786,8 +781,8 @@ async fn create_initial_version(
         dependencies,
         game_versions,
         loaders,
-        release_channel,
         featured: version_data.featured,
+        version_type: version_data.release_channel.to_string(),
     };
 
     Ok(version)

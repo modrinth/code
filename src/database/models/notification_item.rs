@@ -183,7 +183,7 @@ impl Notification {
             STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
-            WHERE n.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE n.id = ANY($1)
             GROUP BY n.id, n.user_id
             ORDER BY n.created DESC;
             ",
@@ -319,7 +319,7 @@ impl Notification {
         sqlx::query!(
             "
             DELETE FROM notifications_actions
-            WHERE notification_id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE notification_id = ANY($1)
             ",
             &notification_ids_parsed
         )
@@ -329,7 +329,7 @@ impl Notification {
         sqlx::query!(
             "
             DELETE FROM notifications
-            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE id = ANY($1)
             ",
             &notification_ids_parsed
         )

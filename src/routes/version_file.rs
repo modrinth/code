@@ -377,7 +377,7 @@ pub async fn get_versions_from_hashes(
         "
         SELECT h.hash hash, h.algorithm algorithm, f.version_id version_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        WHERE h.algorithm = $2 AND h.hash IN (SELECT * FROM UNNEST($1::bytea[]))
+        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])
         ",
         hashes_parsed.as_slice(),
         file_data.algorithm
@@ -425,7 +425,7 @@ pub async fn download_files(
         SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash IN (SELECT * FROM UNNEST($1::bytea[]))
+        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])
         ",
         hashes_parsed.as_slice(),
         file_data.algorithm
@@ -476,7 +476,7 @@ pub async fn update_files(
         SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash IN (SELECT * FROM UNNEST($1::bytea[]))
+        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])
         ",
         hashes_parsed.as_slice(),
         update_data.algorithm

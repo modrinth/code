@@ -160,7 +160,7 @@ pub fn convert_version(
         changelog_url: data.changelog_url,
         date_published: data.date_published,
         downloads: data.downloads as u32,
-        version_type: match data.release_channel.as_str() {
+        version_type: match data.version_type.as_str() {
             "release" => VersionType::Release,
             "beta" => VersionType::Beta,
             "alpha" => VersionType::Alpha,
@@ -301,24 +301,13 @@ pub async fn version_edit(
             }
 
             if let Some(version_type) = &new_version.version_type {
-                let channel = database::models::ids::ChannelId::get_id(
-                    version_type.as_str(),
-                    &mut *transaction,
-                )
-                .await?
-                .ok_or_else(|| {
-                    ApiError::InvalidInputError(
-                        "No database entry for version type provided.".to_string(),
-                    )
-                })?;
-
                 sqlx::query!(
                     "
                     UPDATE versions
-                    SET release_channel = $1
+                    SET version_type = $1
                     WHERE (id = $2)
                     ",
-                    channel as database::models::ids::ChannelId,
+                    version_type.as_str(),
                     id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)

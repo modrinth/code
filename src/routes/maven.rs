@@ -95,9 +95,8 @@ pub async fn maven_metadata(
     }
     let version_names = sqlx::query!(
         "
-            SELECT version_number, release_channels.channel channel
+            SELECT version_number, version_type
             FROM versions
-            LEFT JOIN release_channels ON release_channels.id = versions.release_channel
             WHERE mod_id = $1
             ",
         data.inner.id as database::models::ids::ProjectId
@@ -117,7 +116,7 @@ pub async fn maven_metadata(
                 .to_string(),
             release: version_names
                 .iter()
-                .rfind(|x| x.channel == "release")
+                .rfind(|x| x.version_type == "release")
                 .map_or("", |x| &x.version_number)
                 .to_string(),
             versions: Versions {

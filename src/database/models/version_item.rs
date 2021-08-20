@@ -13,7 +13,7 @@ pub struct VersionBuilder {
     pub dependencies: Vec<DependencyBuilder>,
     pub game_versions: Vec<GameVersionId>,
     pub loaders: Vec<LoaderId>,
-    pub release_channel: ChannelId,
+    pub version_type: String,
     pub featured: bool,
 }
 
@@ -132,8 +132,8 @@ impl VersionBuilder {
             changelog_url: None,
             date_published: chrono::Utc::now(),
             downloads: 0,
-            release_channel: self.release_channel,
             featured: self.featured,
+            version_type: self.version_type,
         };
 
         version.insert(&mut *transaction).await?;
@@ -192,8 +192,8 @@ impl VersionBuilder {
             SELECT d.id id
             FROM versions v
             INNER JOIN dependencies d ON d.dependent_id = v.id
-            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT * FROM UNNEST($2::integer[]))
-            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT * FROM UNNEST($3::integer[]))
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id = ANY($2)
+            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id = ANY($3)
             WHERE v.mod_id = $1
             ",
             self.project_id as ProjectId,
@@ -211,9 +211,9 @@ impl VersionBuilder {
             "
             UPDATE dependencies
             SET dependency_id = $2
-            WHERE id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE id = ANY($1::bigint[])
             ",
-            &dependencies,
+            dependencies.as_slice(),
             self.version_id as VersionId,
         )
         .execute(&mut *transaction)
@@ -233,7 +233,7 @@ pub struct Version {
     pub changelog_url: Option<String>,
     pub date_published: chrono::DateTime<chrono::Utc>,
     pub downloads: i32,
-    pub release_channel: ChannelId,
+    pub version_type: String,
     pub featured: bool,
 }
 
@@ -247,7 +247,7 @@ impl Version {
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
                 changelog, changelog_url, date_published,
-                downloads, release_channel, featured
+                downloads, version_type, featured
             )
             VALUES (
                 $1, $2, $3, $4, $5,
@@ -265,7 +265,7 @@ impl Version {
             self.changelog_url.as_ref(),
             self.date_published,
             self.downloads,
-            self.release_channel as ChannelId,
+            &self.version_type,
             self.featured
         )
         .execute(&mut *transaction)
@@ -274,7 +274,6 @@ impl Version {
         Ok(())
     }
 
-    // TODO: someone verify this
     pub async fn remove_full(
         id: VersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
@@ -428,8 +427,8 @@ impl Version {
             "
             SELECT v.id id
             FROM versions v
-            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT * FROM UNNEST($2::integer[]))
-            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT * FROM UNNEST($3::integer[]))
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id = ANY($2)
+            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id = ANY($3)
             WHERE v.mod_id = $1
             ORDER BY v.date_published DESC
             LIMIT 1
@@ -521,7 +520,7 @@ impl Version {
             "
             SELECT v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog, v.changelog_url, v.date_published, v.downloads,
-                v.release_channel, v.featured
+                v.version_type, v.featured
             FROM versions v
             WHERE v.id = $1
             ",
@@ -541,7 +540,7 @@ impl Version {
                 changelog_url: row.changelog_url,
                 date_published: row.date_published,
                 downloads: row.downloads,
-                release_channel: ChannelId(row.release_channel),
+                version_type: row.version_type,
                 featured: row.featured,
             }))
         } else {
@@ -563,9 +562,9 @@ impl Version {
             "
             SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog, v.changelog_url, v.date_published, v.downloads,
-                v.release_channel, v.featured
+                v.version_type, v.featured
             FROM versions v
-            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE v.id = ANY($1)
             ORDER BY v.date_published ASC
             ",
             &version_ids_parsed
@@ -582,8 +581,8 @@ impl Version {
                 changelog_url: v.changelog_url,
                 date_published: v.date_published,
                 downloads: v.downloads,
-                release_channel: ChannelId(v.release_channel),
                 featured: v.featured,
+                version_type: v.version_type,
             }))
         })
         .try_collect::<Vec<Version>>()
@@ -603,13 +602,12 @@ impl Version {
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
-            rc.channel release_channel, v.featured featured,
+            v.version_type version_type, v.featured featured,
             STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
             STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
             STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
             STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type,  ' ,') dependencies
             FROM versions v
-            INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
             LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
@@ -618,7 +616,7 @@ impl Version {
             LEFT OUTER JOIN hashes h on f.id = h.file_id
             LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
             WHERE v.id = $1
-            GROUP BY rc.id, v.id;
+            GROUP BY v.id;
             ",
             id as VersionId,
         )
@@ -656,7 +654,6 @@ impl Version {
                 changelog_url: v.changelog_url,
                 date_published: v.date_published,
                 downloads: v.downloads,
-                release_channel: v.release_channel,
                 files: v
                     .files
                     .unwrap_or_default()
@@ -731,6 +728,7 @@ impl Version {
                     })
                     .flatten()
                     .collect(),
+                version_type: v.version_type,
             }))
         } else {
             Ok(None)
@@ -751,13 +749,12 @@ impl Version {
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
-            rc.channel release_channel, v.featured featured,
+            v.version_type version_type, v.featured featured,
             STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
             STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
             STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
             STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type,  ' ,') dependencies
             FROM versions v
-            INNER JOIN release_channels rc on v.release_channel = rc.id
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
             LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
@@ -765,8 +762,8 @@ impl Version {
             LEFT OUTER JOIN files f on v.id = f.version_id
             LEFT OUTER JOIN hashes h on f.id = h.file_id
             LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
-            WHERE v.id IN (SELECT * FROM UNNEST($1::bigint[]))
-            GROUP BY rc.id, v.id
+            WHERE v.id = ANY($1)
+            GROUP BY v.id
             ORDER BY v.date_published ASC;
             ",
             &version_ids_parsed
@@ -798,7 +795,6 @@ impl Version {
                         changelog_url: v.changelog_url,
                         date_published: v.date_published,
                         downloads: v.downloads,
-                        release_channel: v.release_channel,
                         files: v.files.unwrap_or_default().split(" ,").map(|f| {
                             let file: Vec<&str> = f.split(", ").collect();
 
@@ -854,17 +850,13 @@ impl Version {
                                     None
                                 }
                             }).flatten().collect(),
+                        version_type: v.version_type
                     }
                 }))
             })
             .try_collect::<Vec<QueryVersion>>()
             .await
     }
-}
-
-pub struct ReleaseChannel {
-    pub id: ChannelId,
-    pub channel: String,
 }
 
 pub struct VersionFile {
@@ -893,7 +885,7 @@ pub struct QueryVersion {
     pub date_published: chrono::DateTime<chrono::Utc>,
     pub downloads: i32,
 
-    pub release_channel: String,
+    pub version_type: String,
     pub files: Vec<QueryFile>,
     pub game_versions: Vec<String>,
     pub loaders: Vec<String>,

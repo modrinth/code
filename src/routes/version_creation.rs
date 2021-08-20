@@ -186,13 +186,6 @@ async fn version_create_inner(
 
             let version_id: VersionId = models::generate_version_id(transaction).await?.into();
 
-            let release_channel = models::ChannelId::get_id(
-                version_create_data.release_channel.as_str(),
-                &mut *transaction,
-            )
-            .await?
-            .expect("Release channel not found in database");
-
             let project_type = sqlx::query!(
                 "
                 SELECT name FROM project_types pt
@@ -255,7 +248,7 @@ async fn version_create_inner(
                 dependencies,
                 game_versions,
                 loaders,
-                release_channel,
+                version_type: version_create_data.release_channel.to_string(),
                 featured: version_create_data.featured,
             });
 

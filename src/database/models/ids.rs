@@ -138,9 +138,6 @@ pub struct DonationPlatformId(pub i32);
 pub struct VersionId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
-pub struct ChannelId(pub i32);
-#[derive(Copy, Clone, Debug, Type)]
-#[sqlx(transparent)]
 pub struct GameVersionId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]

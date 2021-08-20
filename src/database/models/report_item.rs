@@ -85,7 +85,7 @@ impl Report {
     }
 
     pub async fn get_many<'a, E>(
-        version_ids: Vec<ReportId>,
+        report_ids: Vec<ReportId>,
         exec: E,
     ) -> Result<Vec<QueryReport>, sqlx::Error>
     where
@@ -93,15 +93,15 @@ impl Report {
     {
         use futures::stream::TryStreamExt;
 
-        let version_ids_parsed: Vec<i64> = version_ids.into_iter().map(|x| x.0).collect();
-        let versions = sqlx::query!(
+        let report_ids_parsed: Vec<i64> = report_ids.into_iter().map(|x| x.0).collect();
+        let reports = sqlx::query!(
             "
             SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created
             FROM reports r
             INNER JOIN report_types rt ON rt.id = r.report_type_id
-            WHERE r.id IN (SELECT * FROM UNNEST($1::bigint[]))
+            WHERE r.id = ANY($1)
             ",
-            &version_ids_parsed
+            &report_ids_parsed
         )
         .fetch_many(exec)
         .try_filter_map(|e| async {
@@ -119,7 +119,7 @@ impl Report {
         .try_collect::<Vec<QueryReport>>()
         .await?;
 
-        Ok(versions)
+        Ok(reports)
     }
 
     pub async fn remove_full<'a, E>(id: ReportId, exec: E) -> Result<Option<()>, sqlx::Error>
