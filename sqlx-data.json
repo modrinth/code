@@ -1057,6 +1057,27 @@
       "nullable": []
     }
   },
+  "4298552497a48adb9ace61c8dcf989c4d35866866b61c0cc4d45909b1d31c660": {
+    "query": "\n        SELECT EXISTS(SELECT 1 FROM hashes h\n        WHERE h.algorithm = $2 AND h.hash = $1)\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text"
+        ]
+      },
+      "nullable": [
+        null
+      ]
+    }
+  },
   "436dbf448697436ec90c30f44b27c92ec626601e7a7a9edb4d11bd916741b60f": {
     "query": "\n        UPDATE mods\n        SET icon_url = NULL\n        WHERE (id = $1)\n        ",
     "describe": {
@@ -5079,6 +5100,26 @@
         null,
         null,
         null
+      ]
+    }
+  },
+  "e29da865af4a0a110275b9756394546a3bb88bff40e18c66029651f515caed98": {
+    "query": "\n            SELECT f.id id FROM files f\n            WHERE f.version_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
       ]
     }
   },

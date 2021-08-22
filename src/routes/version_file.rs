@@ -240,6 +240,26 @@ pub async fn delete_file(
             }
         }
 
+        use futures::stream::TryStreamExt;
+
+        let files = sqlx::query!(
+            "
+            SELECT f.id id FROM files f
+            WHERE f.version_id = $1
+            ",
+            row.version_id
+        )
+        .fetch_many(&**pool)
+        .try_filter_map(|e| async { Ok(e.right().map(|_| ())) })
+        .try_collect::<Vec<()>>()
+        .await?;
+
+        if files.len() < 2 {
+            return Err(ApiError::InvalidInputError(
+                "Versions must have at least one file uploaded to them".to_string(),
+            ));
+        }
+
         let mut transaction = pool.begin().await?;
 
         sqlx::query!(

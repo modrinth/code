@@ -87,7 +87,7 @@ pub async fn version_create(
 async fn version_create_inner(
     req: HttpRequest,
     mut payload: Multipart,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    mut transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, CreateError> {
@@ -289,6 +289,7 @@ async fn version_create_inner(
             version_data.game_versions,
             &all_game_versions,
             false,
+            &mut transaction,
         )
         .await?;
     }
@@ -297,6 +298,12 @@ async fn version_create_inner(
         .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
     let builder = version_builder
         .ok_or_else(|| CreateError::InvalidInput("`data` field is required".to_string()))?;
+
+    if builder.files.is_empty() {
+        return Err(CreateError::InvalidInput(
+            "Versions must have at least one file uploaded to them".to_string(),
+        ));
+    }
 
     let result = sqlx::query!(
         "
@@ -434,7 +441,7 @@ pub async fn upload_file_to_version(
 async fn upload_file_to_version_inner(
     req: HttpRequest,
     mut payload: Multipart,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    mut transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
@@ -536,6 +543,7 @@ async fn upload_file_to_version_inner(
                 .collect(),
             &all_game_versions,
             true,
+            &mut transaction,
         )
         .await?;
     }
@@ -570,6 +578,7 @@ pub async fn upload_file(
     game_versions: Vec<GameVersion>,
     all_game_versions: &[models::categories::GameVersion],
     ignore_primary: bool,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
 
@@ -577,6 +586,7 @@ pub async fn upload_file(
         .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
 
     let mut data = Vec::new();
+    let mut hash = sha1::Sha1::new();
     while let Some(chunk) = field.next().await {
         // Project file size limit of 100MiB
         const FILE_SIZE_CAP: usize = 100 * (1 << 20);
@@ -586,8 +596,30 @@ pub async fn upload_file(
                 String::from("Project file exceeds the maximum of 100MiB. Contact a moderator or admin to request permission to upload larger files.")
             ));
         } else {
-            data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+            let bytes = chunk.map_err(CreateError::MultipartError)?;
+            hash.update(&data);
+            data.append(&mut bytes.to_vec());
         }
+    }
+
+    let hash = hash.digest().to_string();
+    let exists = sqlx::query!(
+        "
+        SELECT EXISTS(SELECT 1 FROM hashes h
+        WHERE h.algorithm = $2 AND h.hash = $1)
+        ",
+        hash.as_bytes(),
+        "sha1"
+    )
+    .fetch_one(&mut *transaction)
+    .await?
+    .exists
+    .unwrap_or(false);
+
+    if exists {
+        return Err(CreateError::InvalidInput(
+            "Duplicate files are not allowed to be uploaded to Modrinth!".to_string(),
+        ));
     }
 
     let validation_result = validate_file(
