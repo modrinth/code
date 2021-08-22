@@ -68,9 +68,10 @@ pub fn validate_file(
     let reader = std::io::Cursor::new(data);
     let mut zip = zip::ZipArchive::new(reader)?;
 
+    let mut visited = false;
     for validator in &VALIDATORS {
-        if validator.get_file_extensions().contains(&file_extension)
-            && validator.get_project_types().contains(&project_type)
+        if
+            validator.get_project_types().contains(&project_type)
             && loaders
                 .iter()
                 .any(|x| validator.get_supported_loaders().contains(&&*x.0))
@@ -80,11 +81,19 @@ pub fn validate_file(
                 validator.get_supported_game_versions(),
             )
         {
-            return validator.validate(&mut zip);
+            if validator.get_file_extensions().contains(&file_extension) {
+                return validator.validate(&mut zip);
+            } else {
+                visited = true;
+            }
         }
     }
 
-    Ok(ValidationResult::Pass)
+    if visited {
+        Err(ValidationError::InvalidInputError(format!("File extension {} is invalid for input file", file_extension)))
+    } else {
+        Ok(ValidationResult::Pass)
+    }
 }
 
 fn game_version_supported(

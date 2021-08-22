@@ -535,7 +535,7 @@ pub async fn project_create_inner(
         let mut categories = Vec::with_capacity(project_create_data.categories.len());
         for category in &project_create_data.categories {
             let id = models::categories::Category::get_id_project(
-                &category,
+                category,
                 project_type_id,
                 &mut *transaction,
             )
