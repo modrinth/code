@@ -3,18 +3,18 @@
     <div class="page-contents">
       <div class="sidebar-l">
         <div v-if="$auth.user != null" class="card page-nav">
-          <nuxt-link :to="'/dashboard/projects'" class="tab last">
+          <nuxt-link :to="'/dashboard/projects'" class="tab">
             <ModIcon />
             My mods
           </nuxt-link>
-          <nuxt-link :to="'/dashboard/notifications'" class="tab last">
+          <nuxt-link :to="'/dashboard/notifications'" class="tab">
             <NotificationsIcon />
             Notifications
             <div v-if="this.$user.notifications.count > 0" class="notif-count">
               {{ this.$user.notifications.count }}
             </div>
           </nuxt-link>
-          <nuxt-link :to="'/dashboard/follows'" class="tab last">
+          <nuxt-link :to="'/dashboard/follows'" class="tab">
             <FollowIcon />
             Followed mods
           </nuxt-link>
@@ -23,26 +23,26 @@
               $auth.user.role === 'admin' || $auth.user.role === 'moderator'
             "
             :to="'/dashboard/moderation'"
-            class="tab last"
+            class="tab"
           >
             <ModerationIcon />
             Moderation
           </nuxt-link>
-          <nuxt-link :to="'/dashboard/settings'" class="tab last">
+          <nuxt-link :to="'/dashboard/settings'" class="tab">
             <SettingsIcon />
             Settings
           </nuxt-link>
-          <nuxt-link :to="'/dashboard/privacy'" class="tab last">
+          <nuxt-link :to="'/dashboard/privacy'" class="tab">
             <ShieldIcon />
             Privacy settings
           </nuxt-link>
         </div>
         <div v-else class="card page-nav">
-          <a :href="authUrl" class="tab last">
+          <a :href="authUrl" class="tab">
             <UserIcon />
             Log in
           </a>
-          <nuxt-link :to="'/dashboard/privacy'" class="tab last">
+          <nuxt-link :to="'/dashboard/privacy'" class="tab">
             <SettingsIcon />
             Privacy settings
           </nuxt-link>

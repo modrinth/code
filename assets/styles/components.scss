@@ -350,9 +350,6 @@
         margin-bottom: 0.5rem;
         @extend %transparent-clickable;
 
-        &.last {
-          margin-bottom: 0;
-        }
         svg {
           color: var(--color-icon);
           margin-right: 5px;
@@ -366,6 +363,10 @@
             color: var(--color-brand-light);
           }
         }
+      }
+      
+      .tab:last-child {
+        margin-bottom: 0;
       }
     }
   }

@@ -221,7 +221,7 @@ export default {
   mounted() {
     this.$emit('update:link-bar', [
       ['Versions', 'versions'],
-      [this.version.name, 'versions/' + this.version.id],
+      [this.version.name, 'version/' + this.version.id],
     ])
   },
   methods: {
