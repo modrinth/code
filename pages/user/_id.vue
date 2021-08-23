@@ -30,6 +30,24 @@
         </div>
         <div class="card stats">
           <div class="stat">
+            <DownloadIcon />
+            <div class="info">
+              <h4>Downloads</h4>
+              <p class="value">
+                {{ sumDownloads() }}
+              </p>
+            </div>
+          </div>
+          <div class="stat">
+            <HeartIcon />
+            <div class="info">
+              <h4>Followers</h4>
+              <p class="value">
+                {{ sumFollowers() }}
+              </p>
+            </div>
+          </div>
+          <div class="stat">
             <CalendarIcon />
             <div class="info">
               <h4>Joined</h4>
@@ -46,12 +64,10 @@
             </div>
           </div>
           <div class="stat">
-            <DownloadIcon />
+            <UserIcon />
             <div class="info">
-              <h4>Downloads</h4>
-              <p class="value">
-                {{ sumDownloads() }}
-              </p>
+              <h4>User ID</h4>
+              <p class="value">{{ user.id }}</p>
             </div>
           </div>
         </div>
@@ -95,6 +111,8 @@ import MFooter from '~/components/layout/MFooter'
 import ReportIcon from '~/assets/images/utils/report.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import HeartIcon from '~/assets/images/utils/heart.svg?inline'
+import UserIcon from '~/assets/images/utils/user.svg?inline'
 import Advertisement from '~/components/ads/Advertisement'
 
 export default {
@@ -106,6 +124,8 @@ export default {
     DownloadIcon,
     MFooter,
     ReportIcon,
+    HeartIcon,
+    UserIcon,
   },
   async asyncData(data) {
     try {
@@ -143,6 +163,15 @@ export default {
 
       return this.formatNumber(sum)
     },
+    sumFollowers() {
+      let sum = 0
+
+      for (const mod of this.mods) {
+        sum += mod.followers
+      }
+
+      return this.formatNumber(sum)
+    },
   },
   head() {
     return {
@@ -173,7 +202,7 @@ export default {
           name: 'description',
           content:
             this.user.bio +
-            ' - View minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform that is compatible with CurseForge too!',
+            ' - View Minecraft mods on Modrinth today! Modrinth is a new and modern Minecraft modding platform.',
         },
         {
           hid: 'og:url',
@@ -230,6 +259,8 @@ export default {
     display: flex;
     flex-wrap: wrap;
     .stat {
+      width: 8.5rem;
+      margin: 0.5rem;
       @extend %stat;
 
       svg {
