@@ -12,11 +12,49 @@ const options = {
     h4: ['id'],
     h5: ['id'],
     h6: ['id'],
+    iframe: ['width', 'height', 'allowfullscreen', 'frameborder'],
+  },
+  onIgnoreTagAttr: (tag, name, value) => {
+    // Allow iframes from acceptable sources
+    if (tag === 'iframe' && name === 'src') {
+      const allowedSources = [
+        {
+          regex: /^https?:\/\/(www\.)?youtube\.com\/embed\/[a-zA-Z0-9_]{11}(\?&autoplay=[0-1]{1})?$/,
+          remove: ['&autoplay=1'], // Prevents autoplay
+        },
+      ]
+
+      for (const source of allowedSources) {
+        if (source.regex.test(value)) {
+          for (const remove of source.remove) {
+            value = value.replace(remove, '')
+          }
+          return name + '="' + xss.escapeAttrValue(value) + '"'
+        }
+      }
+    }
   },
 }
 
 const configuredXss = new xss.FilterXSS(options)
 const headerPrefix = 'user-defined-'
+
+const renderer = {
+  image(href, text) {
+    if (
+      /^https?:\/\/(www\.)?youtube\.com\/watch\?v=[a-zA-Z0-9_]{11}$/.test(href)
+    ) {
+      return `<iframe width="560" height="315" src="https://www.youtube.com/embed/${href.substring(
+        32,
+        43
+      )}" frameborder="0" allowfullscreen></iframe>`
+    } else {
+      return `<img src="${href}" alt="${text}">`
+    }
+  },
+}
+
+marked.use({ renderer })
 
 function compileMarkdown(target, markdown) {
   target.innerHTML = configuredXss.process(marked(markdown, { headerPrefix }))
