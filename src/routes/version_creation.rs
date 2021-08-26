@@ -586,7 +586,6 @@ pub async fn upload_file(
         .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
 
     let mut data = Vec::new();
-    let mut hash = sha1::Sha1::new();
     while let Some(chunk) = field.next().await {
         // Project file size limit of 100MiB
         const FILE_SIZE_CAP: usize = 100 * (1 << 20);
@@ -597,12 +596,11 @@ pub async fn upload_file(
             ));
         } else {
             let bytes = chunk.map_err(CreateError::MultipartError)?;
-            hash.update(&data);
             data.append(&mut bytes.to_vec());
         }
     }
 
-    let hash = hash.digest().to_string();
+    let hash = sha1::Sha1::from(&data).hexdigest();
     let exists = sqlx::query!(
         "
         SELECT EXISTS(SELECT 1 FROM hashes h

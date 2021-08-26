@@ -70,8 +70,7 @@ pub fn validate_file(
 
     let mut visited = false;
     for validator in &VALIDATORS {
-        if
-            validator.get_project_types().contains(&project_type)
+        if validator.get_project_types().contains(&project_type)
             && loaders
                 .iter()
                 .any(|x| validator.get_supported_loaders().contains(&&*x.0))
@@ -90,7 +89,10 @@ pub fn validate_file(
     }
 
     if visited {
-        Err(ValidationError::InvalidInputError(format!("File extension {} is invalid for input file", file_extension)))
+        Err(ValidationError::InvalidInputError(format!(
+            "File extension {} is invalid for input file",
+            file_extension
+        )))
     } else {
         Ok(ValidationResult::Pass)
     }

@@ -220,7 +220,6 @@ pub struct EditVersion {
     #[validate(length(max = 65536))]
     pub changelog: Option<String>,
     pub version_type: Option<models::projects::VersionType>,
-    #[validate(length(min = 1, max = 256))]
     pub dependencies: Option<Vec<Dependency>>,
     pub game_versions: Option<Vec<models::projects::GameVersion>>,
     pub loaders: Option<Vec<models::projects::Loader>>,
