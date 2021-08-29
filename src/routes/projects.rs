@@ -1153,6 +1153,20 @@ pub async fn add_gallery_item(
 
         let mut transaction = pool.begin().await?;
 
+        if item.featured {
+            sqlx::query!(
+                "
+                UPDATE mods_gallery
+                SET featured = $2
+                WHERE mod_id = $1
+                ",
+                project_item.id as database::models::ids::ProjectId,
+                false,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
         database::models::project_item::GalleryItem {
             project_id: project_item.id,
             image_url: format!("{}/{}", cdn_url, url),
@@ -1256,6 +1270,20 @@ pub async fn edit_gallery_item(
     let mut transaction = pool.begin().await?;
 
     if let Some(featured) = item.featured {
+        if featured {
+            sqlx::query!(
+                "
+                UPDATE mods_gallery
+                SET featured = $2
+                WHERE mod_id = $1
+                ",
+                project_item.id as database::models::ids::ProjectId,
+                false,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
         sqlx::query!(
             "
             UPDATE mods_gallery
