@@ -603,10 +603,10 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured,
-            STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
-            STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
-            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
-            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type,  ' ,') dependencies
+            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
+            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
+            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes,
+            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type) dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -627,7 +627,7 @@ impl Version {
             let hashes: Vec<(FileId, String, Vec<u8>)> = v
                 .hashes
                 .unwrap_or_default()
-                .split(" ,")
+                .iter()
                 .map(|f| {
                     let hash: Vec<&str> = f.split(", ").collect();
 
@@ -657,7 +657,7 @@ impl Version {
                 files: v
                     .files
                     .unwrap_or_default()
-                    .split(" ,")
+                    .iter()
                     .map(|f| {
                         let file: Vec<&str> = f.split(", ").collect();
 
@@ -687,20 +687,20 @@ impl Version {
                 game_versions: v
                     .game_versions
                     .unwrap_or_default()
-                    .split(',')
+                    .iter()
                     .map(|x| x.to_string())
                     .collect(),
                 loaders: v
                     .loaders
                     .unwrap_or_default()
-                    .split(',')
+                    .iter()
                     .map(|x| x.to_string())
                     .collect(),
                 featured: v.featured,
                 dependencies: v
                     .dependencies
                     .unwrap_or_default()
-                    .split(" ,")
+                    .iter()
                     .map(|f| {
                         let dependency: Vec<&str> = f.split(", ").collect();
 
@@ -750,10 +750,10 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured,
-            STRING_AGG(DISTINCT gv.version, ',') game_versions, STRING_AGG(DISTINCT l.loader, ',') loaders,
-            STRING_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url, ' ,') files,
-            STRING_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id,  ' ,') hashes,
-            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type,  ' ,') dependencies
+            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
+            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
+            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes,
+            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type) dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -771,7 +771,7 @@ impl Version {
             .fetch_many(exec)
             .try_filter_map(|e| async {
                 Ok(e.right().map(|v| {
-                    let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default().split(" ,").map(|f| {
+                    let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default().iter().map(|f| {
                         let hash: Vec<&str> = f.split(", ").collect();
 
                         if hash.len() >= 3 {
@@ -795,7 +795,7 @@ impl Version {
                         changelog_url: v.changelog_url,
                         date_published: v.date_published,
                         downloads: v.downloads,
-                        files: v.files.unwrap_or_default().split(" ,").map(|f| {
+                        files: v.files.unwrap_or_default().iter().map(|f| {
                             let file: Vec<&str> = f.split(", ").collect();
 
                             if file.len() >= 4 {
@@ -819,12 +819,12 @@ impl Version {
                                 None
                             }
                         }).flatten().collect(),
-                        game_versions: v.game_versions.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
-                        loaders: v.loaders.unwrap_or_default().split(',').map(|x| x.to_string()).collect(),
+                        game_versions: v.game_versions.unwrap_or_default().iter().map(|x| x.to_string()).collect(),
+                        loaders: v.loaders.unwrap_or_default().iter().map(|x| x.to_string()).collect(),
                         featured: v.featured,
                         dependencies: v.dependencies
                             .unwrap_or_default()
-                            .split(" ,")
+                            .iter()
                             .map(|f| {
                                 let dependency: Vec<&str> = f.split(", ").collect();
 

@@ -599,9 +599,9 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions,
-            STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, ' ') || ', ' || COALESCE(mg.description, ' ') || ', ' || mg.created, ' ,') gallery,
-            STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
+            ARRAY_AGG(DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id::text) versions,
+            ARRAY_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, '') || ', ' || COALESCE(mg.description, '') || ', ' || mg.created) gallery,
+            ARRAY_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
@@ -653,12 +653,12 @@ impl Project {
                 project_type: m.project_type_name,
                 categories: m
                     .categories
-                    .map(|x| x.split(',').map(|x| x.to_string()).collect())
+                    .map(|x| x.iter().map(|x| x.to_string()).collect())
                     .unwrap_or_default(),
                 versions: m
                     .versions
                     .map(|x| {
-                        x.split(',')
+                        x.iter()
                             .map(|x| VersionId(x.parse().unwrap_or_default()))
                             .collect()
                     })
@@ -666,7 +666,7 @@ impl Project {
                 donation_urls: m
                     .donations
                     .unwrap_or_default()
-                    .split(" ,")
+                    .iter()
                     .map(|d| {
                         let strings: Vec<&str> = d.split(", ").collect();
 
@@ -687,7 +687,7 @@ impl Project {
                 gallery_items: m
                     .gallery
                     .unwrap_or_default()
-                    .split(" ,")
+                    .iter()
                     .map(|d| {
                         let strings: Vec<&str> = d.split(", ").collect();
 
@@ -696,12 +696,12 @@ impl Project {
                                 project_id: id,
                                 image_url: strings[0].to_string(),
                                 featured: strings[1].parse().unwrap_or(false),
-                                title: if strings[2] == " " {
+                                title: if strings[2] == "" {
                                     None
                                 } else {
                                     Some(strings[2].to_string())
                                 },
-                                description: if strings[3] == " " {
+                                description: if strings[3] == "" {
                                     None
                                 } else {
                                     Some(strings[3].to_string())
@@ -745,9 +745,9 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT v.id::text, ',') versions,
-            STRING_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, ' ') || ', ' || COALESCE(mg.description, ' ') || ', ' || mg.created, ' ,') gallery,
-            STRING_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name, ' ,') donations
+            ARRAY_AGG(DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id::text) versions,
+            ARRAY_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, '') || ', ' || COALESCE(mg.description, '') || ', ' || mg.created) gallery,
+            ARRAY_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
@@ -797,12 +797,12 @@ impl Project {
                             moderation_message_body: m.moderation_message_body,
                     },
                     project_type: m.project_type_name,
-                    categories: m.categories.map(|x| x.split(',').map(|x| x.to_string()).collect()).unwrap_or_default(),
-                    versions: m.versions.map(|x| x.split(',').map(|x| VersionId(x.parse().unwrap_or_default())).collect()).unwrap_or_default(),
+                    categories: m.categories.map(|x| x.iter().map(|x| x.to_string()).collect()).unwrap_or_default(),
+                    versions: m.versions.map(|x| x.iter().map(|x| VersionId(x.parse().unwrap_or_default())).collect()).unwrap_or_default(),
                     gallery_items: m
                         .gallery
                         .unwrap_or_default()
-                        .split(" ,")
+                        .iter()
                         .map(|d| {
                             let strings: Vec<&str> = d.split(", ").collect();
 
@@ -824,7 +824,7 @@ impl Project {
                     donation_urls: m
                         .donations
                         .unwrap_or_default()
-                        .split(" ,")
+                        .iter()
                         .map(|d| {
                             let strings: Vec<&str> = d.split(", ").collect();
 

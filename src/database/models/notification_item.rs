@@ -123,7 +123,7 @@ impl Notification {
         let result = sqlx::query!(
             "
             SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions
+            ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id = $1
@@ -137,7 +137,7 @@ impl Notification {
         if let Some(row) = result {
             let mut actions: Vec<NotificationAction> = Vec::new();
 
-            row.actions.unwrap_or_default().split(" ,").for_each(|x| {
+            row.actions.unwrap_or_default().iter().for_each(|x| {
                 let action: Vec<&str> = x.split(", ").collect();
 
                 if action.len() >= 3 {
@@ -180,7 +180,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions
+            ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id = ANY($1)
@@ -195,7 +195,7 @@ impl Notification {
                 let id = NotificationId(row.id);
                 let mut actions: Vec<NotificationAction> = Vec::new();
 
-                row.actions.unwrap_or_default().split(" ,").for_each(|x| {
+                row.actions.unwrap_or_default().iter().for_each(|x| {
                     let action: Vec<&str> = x.split(", ").collect();
 
                     if action.len() >= 3 {
@@ -238,7 +238,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            STRING_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method,  ' ,') actions
+            ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.user_id = $1
@@ -252,7 +252,7 @@ impl Notification {
                 let id = NotificationId(row.id);
                 let mut actions: Vec<NotificationAction> = Vec::new();
 
-                row.actions.unwrap_or_default().split(" ,").for_each(|x| {
+                row.actions.unwrap_or_default().iter().for_each(|x| {
                     let action: Vec<&str> = x.split(", ").collect();
 
                     if action.len() >= 3 {
