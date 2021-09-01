@@ -153,7 +153,7 @@ pub struct ReportId(pub i64);
 #[sqlx(transparent)]
 pub struct ReportTypeId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Hash, Eq, PartialEq)]
 #[sqlx(transparent)]
 pub struct FileId(pub i64);
 

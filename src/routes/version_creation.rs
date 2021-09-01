@@ -413,6 +413,7 @@ pub async fn upload_file_to_version(
     let result = upload_file_to_version_inner(
         req,
         payload,
+        client,
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
@@ -441,6 +442,7 @@ pub async fn upload_file_to_version(
 async fn upload_file_to_version_inner(
     req: HttpRequest,
     mut payload: Multipart,
+    client: Data<PgPool>,
     mut transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
@@ -453,7 +455,7 @@ async fn upload_file_to_version_inner(
 
     let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
-    let result = models::Version::get_full(version_id, &mut *transaction).await?;
+    let result = models::Version::get_full(version_id, &**client).await?;
 
     let version = match result {
         Some(v) => v,

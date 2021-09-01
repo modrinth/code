@@ -596,53 +596,78 @@ impl Version {
         executor: E,
     ) -> Result<Option<QueryVersion>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
-            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
-            v.version_type version_type, v.featured featured,
-            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
-            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
-            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes,
-            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type) dependencies
-            FROM versions v
-            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
-            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
-            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
-            LEFT OUTER JOIN loaders l on lv.loader_id = l.id
-            LEFT OUTER JOIN files f on v.id = f.version_id
-            LEFT OUTER JOIN hashes h on f.id = h.file_id
-            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
-            WHERE v.id = $1
-            GROUP BY v.id;
-            ",
-            id as VersionId,
-        )
-            .fetch_optional(executor)
-            .await?;
+        let (version, game_versions, loaders, files, hashes, dependencies) = futures::join!(
+            sqlx::query!(
+                "
+                SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
+                v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
+                v.version_type version_type, v.featured featured
+                FROM versions v
+                WHERE v.id = $1
+                GROUP BY v.id;
+                ",
+                id as VersionId,
+            )
+            .fetch_optional(executor),
+            sqlx::query!(
+                "
+                SELECT gv.version game_version
+                FROM game_versions_versions gvv
+                INNER JOIN game_versions gv on gvv.game_version_id = gv.id
+                WHERE gvv.joining_version_id = $1
+                ",
+                id as VersionId,
+            ).fetch_all(executor),
+            sqlx::query!(
+                "
+                SELECT l.loader loader
+                FROM loaders_versions lv
+                INNER JOIN loaders l on lv.loader_id = l.id
+                WHERE lv.version_id = $1
+                ",
+                id as VersionId,
+            ).fetch_all(executor),
+            sqlx::query!(
+                "
+                SELECT id, filename, is_primary, url
+                FROM files
+                WHERE version_id = $1
+                ",
+                id as VersionId,
+            ).fetch_all(executor),
+            sqlx::query!(
+                "
+                SELECT h.algorithm algorithm, encode(h.hash, 'escape') hash, h.file_id file_id
+                FROM files f
+                INNER JOIN hashes h ON h.file_id = f.id
+                WHERE f.version_id = $1
+                ",
+                id as VersionId,
+            ).fetch_all(executor),
+            sqlx::query!(
+                "
+                SELECT dependency_id, mod_dependency_id, dependency_type
+                FROM dependencies
+                WHERE dependent_id = $1
+                ",
+                id as VersionId,
+            ).fetch_all(executor),
+        );
 
-        if let Some(v) = result {
-            let hashes: Vec<(FileId, String, Vec<u8>)> = v
-                .hashes
-                .unwrap_or_default()
-                .iter()
-                .map(|f| {
-                    let hash: Vec<&str> = f.split(", ").collect();
+        if let Some(v) = version? {
+            let mut hashes_map: HashMap<FileId, HashMap<String, Vec<u8>>> = HashMap::new();
 
-                    if hash.len() >= 3 {
-                        Some((
-                            FileId(hash[2].parse().unwrap_or(0)),
-                            hash[0].to_string(),
-                            hash[1].to_string().into_bytes(),
-                        ))
-                    } else {
-                        None
-                    }
-                })
-                .flatten()
-                .collect();
+            for hash in hashes? {
+                let entry = hashes_map
+                    .entry(FileId(hash.file_id))
+                    .or_insert(HashMap::new());
+
+                if let Some(raw_hash) = hash.hash {
+                    entry.insert(hash.algorithm, raw_hash.into_bytes());
+                }
+            }
 
             Ok(Some(QueryVersion {
                 id: VersionId(v.id),
@@ -654,79 +679,26 @@ impl Version {
                 changelog_url: v.changelog_url,
                 date_published: v.date_published,
                 downloads: v.downloads,
-                files: v
-                    .files
-                    .unwrap_or_default()
-                    .iter()
-                    .map(|f| {
-                        let file: Vec<&str> = f.split(", ").collect();
-
-                        if file.len() >= 4 {
-                            let file_id = FileId(file[0].parse().unwrap_or(0));
-                            let mut file_hashes = HashMap::new();
-
-                            for hash in &hashes {
-                                if (hash.0).0 == file_id.0 {
-                                    file_hashes.insert(hash.1.clone(), hash.2.clone());
-                                }
-                            }
-
-                            Some(QueryFile {
-                                id: file_id,
-                                url: file[3].to_string(),
-                                filename: file[1].to_string(),
-                                hashes: file_hashes,
-                                primary: file[2].parse().unwrap_or(false),
-                            })
-                        } else {
-                            None
-                        }
+                files: files?
+                    .into_iter()
+                    .map(|x| QueryFile {
+                        id: FileId(x.id),
+                        url: x.url,
+                        filename: x.filename,
+                        hashes: hashes_map.entry(FileId(x.id)).or_default().clone(),
+                        primary: x.is_primary,
                     })
-                    .flatten()
                     .collect(),
-                game_versions: v
-                    .game_versions
-                    .unwrap_or_default()
-                    .iter()
-                    .map(|x| x.to_string())
-                    .collect(),
-                loaders: v
-                    .loaders
-                    .unwrap_or_default()
-                    .iter()
-                    .map(|x| x.to_string())
-                    .collect(),
+                game_versions: game_versions?.into_iter().map(|x| x.game_version).collect(),
+                loaders: loaders?.into_iter().map(|x| x.loader).collect(),
                 featured: v.featured,
-                dependencies: v
-                    .dependencies
-                    .unwrap_or_default()
-                    .iter()
-                    .map(|f| {
-                        let dependency: Vec<&str> = f.split(", ").collect();
-
-                        if dependency.len() >= 3 {
-                            Some(QueryDependency {
-                                project_id: match &*dependency[1] {
-                                    "0" => None,
-                                    _ => match dependency[1].parse() {
-                                        Ok(x) => Some(ProjectId(x)),
-                                        Err(_) => None,
-                                    },
-                                },
-                                version_id: match &*dependency[0] {
-                                    "0" => None,
-                                    _ => match dependency[0].parse() {
-                                        Ok(x) => Some(VersionId(x)),
-                                        Err(_) => None,
-                                    },
-                                },
-                                dependency_type: dependency[2].to_string(),
-                            })
-                        } else {
-                            None
-                        }
+                dependencies: dependencies?
+                    .into_iter()
+                    .map(|x| QueryDependency {
+                        project_id: x.mod_dependency_id.map(|x| ProjectId(x)),
+                        version_id: x.dependency_id.map(|x| VersionId(x)),
+                        dependency_type: x.dependency_type,
                     })
-                    .flatten()
                     .collect(),
                 version_type: v.version_type,
             }))
@@ -742,120 +714,9 @@ impl Version {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        use futures::stream::TryStreamExt;
-
-        let version_ids_parsed: Vec<i64> = version_ids.into_iter().map(|x| x.0).collect();
-        sqlx::query!(
-            "
-            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
-            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
-            v.version_type version_type, v.featured featured,
-            ARRAY_AGG(DISTINCT gv.version) game_versions, ARRAY_AGG(DISTINCT l.loader) loaders,
-            ARRAY_AGG(DISTINCT f.id || ', ' || f.filename || ', ' || f.is_primary || ', ' || f.url) files,
-            ARRAY_AGG(DISTINCT h.algorithm || ', ' || encode(h.hash, 'escape') || ', ' || h.file_id) hashes,
-            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ', ' || COALESCE(d.mod_dependency_id, 0) || ', ' || d.dependency_type) dependencies
-            FROM versions v
-            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
-            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
-            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
-            LEFT OUTER JOIN loaders l on lv.loader_id = l.id
-            LEFT OUTER JOIN files f on v.id = f.version_id
-            LEFT OUTER JOIN hashes h on f.id = h.file_id
-            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
-            WHERE v.id = ANY($1)
-            GROUP BY v.id
-            ORDER BY v.date_published ASC;
-            ",
-            &version_ids_parsed
-        )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|v| {
-                    let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default().iter().map(|f| {
-                        let hash: Vec<&str> = f.split(", ").collect();
-
-                        if hash.len() >= 3 {
-                            Some((
-                                FileId(hash[2].parse().unwrap_or(0)),
-                                hash[0].to_string(),
-                                hash[1].to_string().into_bytes(),
-                            ))
-                        } else {
-                            None
-                        }
-                    }).flatten().collect();
-
-                    QueryVersion {
-                        id: VersionId(v.id),
-                        project_id: ProjectId(v.mod_id),
-                        author_id: UserId(v.author_id),
-                        name: v.version_name,
-                        version_number: v.version_number,
-                        changelog: v.changelog,
-                        changelog_url: v.changelog_url,
-                        date_published: v.date_published,
-                        downloads: v.downloads,
-                        files: v.files.unwrap_or_default().iter().map(|f| {
-                            let file: Vec<&str> = f.split(", ").collect();
-
-                            if file.len() >= 4 {
-                                let file_id = FileId(file[0].parse().unwrap_or(0));
-                                let mut file_hashes = HashMap::new();
-
-                                for hash in &hashes {
-                                    if (hash.0).0 == file_id.0 {
-                                        file_hashes.insert(hash.1.clone(), hash.2.clone());
-                                    }
-                                }
-
-                                Some(QueryFile {
-                                    id: file_id,
-                                    url: file[3].to_string(),
-                                    filename: file[1].to_string(),
-                                    hashes: file_hashes,
-                                    primary: file[2].parse().unwrap_or(false),
-                                })
-                            } else {
-                                None
-                            }
-                        }).flatten().collect(),
-                        game_versions: v.game_versions.unwrap_or_default().iter().map(|x| x.to_string()).collect(),
-                        loaders: v.loaders.unwrap_or_default().iter().map(|x| x.to_string()).collect(),
-                        featured: v.featured,
-                        dependencies: v.dependencies
-                            .unwrap_or_default()
-                            .iter()
-                            .map(|f| {
-                                let dependency: Vec<&str> = f.split(", ").collect();
-
-                                if dependency.len() >= 3 {
-                                    Some(QueryDependency {
-                                        project_id: match &*dependency[1] {
-                                            "0" => None,
-                                            _ => match dependency[1].parse() {
-                                                Ok(x) => Some(ProjectId(x)),
-                                                Err(_) => None,
-                                            },
-                                        },
-                                        version_id: match &*dependency[0] {
-                                            "0" => None,
-                                            _ => match dependency[0].parse() {
-                                                Ok(x) => Some(VersionId(x)),
-                                                Err(_) => None,
-                                            },
-                                        },
-                                        dependency_type: dependency[2].to_string(),
-                                    })
-                                } else {
-                                    None
-                                }
-                            }).flatten().collect(),
-                        version_type: v.version_type
-                    }
-                }))
-            })
-            .try_collect::<Vec<QueryVersion>>()
+        futures::future::try_join_all(version_ids.into_iter().map(|id| Self::get_full(id, exec)))
             .await
+            .map(|x| x.into_iter().flatten().collect())
     }
 }
 

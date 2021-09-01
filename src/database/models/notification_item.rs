@@ -118,39 +118,32 @@ impl Notification {
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions
-            FROM notifications n
-            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
-            WHERE n.id = $1
-            GROUP BY n.id, n.user_id;
-            ",
-            id as NotificationId,
-        )
-        .fetch_optional(executor)
-        .await?;
+        let (notifications, actions) = futures::join!(
+            sqlx::query!(
+                "
+                SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
+                ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions
+                FROM notifications n
+                LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
+                WHERE n.id = $1
+                GROUP BY n.id, n.user_id;
+                ",
+                id as NotificationId,
+            )
+            .fetch_optional(executor),
+            sqlx::query!(
+                "
+                SELECT id, title, notification_id, action_route, action_route_method
+                FROM notifications_actions
+                WHERE notification_id = $1
+                ",
+                id as NotificationId,
+            ).fetch_all(executor),
+        );
 
-        if let Some(row) = result {
-            let mut actions: Vec<NotificationAction> = Vec::new();
-
-            row.actions.unwrap_or_default().iter().for_each(|x| {
-                let action: Vec<&str> = x.split(", ").collect();
-
-                if action.len() >= 3 {
-                    actions.push(NotificationAction {
-                        id: NotificationActionId(action[0].parse().unwrap_or(0)),
-                        notification_id: id,
-                        title: action[1].to_string(),
-                        action_route_method: action[3].to_string(),
-                        action_route: action[2].to_string(),
-                    });
-                }
-            });
-
+        if let Some(row) = notifications? {
             Ok(Some(Notification {
                 id,
                 user_id: UserId(row.user_id),
@@ -160,7 +153,16 @@ impl Notification {
                 link: row.link,
                 read: row.read,
                 created: row.created,
-                actions,
+                actions: actions?
+                    .into_iter()
+                    .map(|x| NotificationAction {
+                        id: NotificationActionId(x.id),
+                        notification_id: NotificationId(x.notification_id),
+                        title: x.title,
+                        action_route_method: x.action_route_method,
+                        action_route: x.action_route,
+                    })
+                    .collect(),
             }))
         } else {
             Ok(None)
@@ -174,56 +176,9 @@ impl Notification {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        use futures::stream::TryStreamExt;
-
-        let notification_ids_parsed: Vec<i64> = notification_ids.into_iter().map(|x| x.0).collect();
-        sqlx::query!(
-            "
-            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions
-            FROM notifications n
-            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
-            WHERE n.id = ANY($1)
-            GROUP BY n.id, n.user_id
-            ORDER BY n.created DESC;
-            ",
-            &notification_ids_parsed
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|row| {
-                let id = NotificationId(row.id);
-                let mut actions: Vec<NotificationAction> = Vec::new();
-
-                row.actions.unwrap_or_default().iter().for_each(|x| {
-                    let action: Vec<&str> = x.split(", ").collect();
-
-                    if action.len() >= 3 {
-                        actions.push(NotificationAction {
-                            id: NotificationActionId(action[0].parse().unwrap_or(0)),
-                            notification_id: id,
-                            title: action[1].to_string(),
-                            action_route_method: action[3].to_string(),
-                            action_route: action[2].to_string(),
-                        });
-                    }
-                });
-
-                Notification {
-                    id,
-                    user_id: UserId(row.user_id),
-                    notification_type: row.notification_type,
-                    title: row.title,
-                    text: row.text,
-                    link: row.link,
-                    read: row.read,
-                    created: row.created,
-                    actions,
-                }
-            }))
-        })
-        .try_collect::<Vec<Notification>>()
-        .await
+        futures::future::try_join_all(notification_ids.into_iter().map(|id| Self::get(id, exec)))
+            .await
+            .map(|x| x.into_iter().flatten().collect())
     }
 
     pub async fn get_many_user<'a, E>(
@@ -233,54 +188,21 @@ impl Notification {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        use futures::stream::TryStreamExt;
-
-        sqlx::query!(
+        let notification_ids = sqlx::query!(
             "
-            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions
-            FROM notifications n
-            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
-            WHERE n.user_id = $1
-            GROUP BY n.id, n.user_id;
+            SELECT id
+            FROM notifications
+            WHERE user_id = $1
             ",
             user_id as UserId
         )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|row| {
-                let id = NotificationId(row.id);
-                let mut actions: Vec<NotificationAction> = Vec::new();
+        .fetch_all(exec)
+        .await?
+        .into_iter()
+        .map(|x| NotificationId(x.id))
+        .collect();
 
-                row.actions.unwrap_or_default().iter().for_each(|x| {
-                    let action: Vec<&str> = x.split(", ").collect();
-
-                    if action.len() >= 3 {
-                        actions.push(NotificationAction {
-                            id: NotificationActionId(action[0].parse().unwrap_or(0)),
-                            notification_id: id,
-                            title: action[1].to_string(),
-                            action_route_method: action[3].to_string(),
-                            action_route: action[2].to_string(),
-                        });
-                    }
-                });
-
-                Notification {
-                    id,
-                    user_id: UserId(row.user_id),
-                    notification_type: row.notification_type,
-                    title: row.title,
-                    text: row.text,
-                    link: row.link,
-                    read: row.read,
-                    created: row.created,
-                    actions,
-                }
-            }))
-        })
-        .try_collect::<Vec<Notification>>()
-        .await
+        Self::get_many(notification_ids, exec).await
     }
 
     pub async fn remove(

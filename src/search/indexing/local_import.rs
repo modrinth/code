@@ -7,7 +7,7 @@ use crate::models::projects::ProjectStatus;
 use crate::search::UploadSearchProject;
 use sqlx::postgres::PgPool;
 
-// TODO: only loaders for recent versions? For projects that have moved from forge to fabric
+// TODO: Move this away from STRING_AGG to multiple queries - however this may be more efficient?
 pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, IndexingError> {
     info!("Indexing local projects!");
     Ok(
@@ -18,8 +18,8 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             m.updated updated,
             m.team_id team_id, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
-            ARRAY_AGG(DISTINCT c.category) categories, ARRAY_AGG(DISTINCT lo.loader) loaders, ARRAY_AGG(DISTINCT gv.version) versions,
-            ARRAY_AGG(DISTINCT mg.image_url) gallery
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions,
+            STRING_AGG(DISTINCT mg.image_url, ',') gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -45,10 +45,10 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             .fetch_many(&pool)
             .try_filter_map(|e| async {
                 Ok(e.right().map(|m| {
-                    let mut categories = m.categories.map(|x| x.iter().map(|x| x.to_string()).collect::<Vec<String>>()).unwrap_or_default();
-                    categories.append(&mut m.loaders.map(|x| x.iter().map(|x| x.to_string()).collect::<Vec<String>>()).unwrap_or_default());
+                    let mut categories = m.categories.map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>()).unwrap_or_default();
+                    categories.append(&mut m.loaders.map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>()).unwrap_or_default());
 
-                    let versions : Vec<String> =  m.versions.map(|x| x.iter().map(|x| x.to_string()).collect()).unwrap_or_default();
+                    let versions : Vec<String> =  m.versions.map(|x| x.split(',').map(|x| x.to_string()).collect()).unwrap_or_default();
 
                     let project_id : crate::models::projects::ProjectId = ProjectId(m.id).into();
 
@@ -72,12 +72,12 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
                         server_side: m.server_side_type,
                         slug: m.slug,
                         project_type: m.project_type_name,
-                        gallery: m.gallery.map(|x| x.iter().map(|x| x.to_string()).collect()).unwrap_or_default()
+                        gallery: m.gallery.map(|x| x.split(',').map(|x| x.to_string()).collect()).unwrap_or_default()
                     }
                 }))
             })
-        .try_collect::<Vec<UploadSearchProject>>()
-        .await?
+            .try_collect::<Vec<UploadSearchProject>>()
+            .await?
     )
 }
 
@@ -92,8 +92,8 @@ pub async fn query_one(
             m.updated updated,
             m.team_id team_id, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
-            ARRAY_AGG(DISTINCT c.category) categories, ARRAY_AGG(DISTINCT lo.loader) loaders, ARRAY_AGG(DISTINCT gv.version) versions,
-            ARRAY_AGG(DISTINCT mg.image_url) gallery
+            STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions,
+            STRING_AGG(DISTINCT mg.image_url, ',') gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -116,23 +116,23 @@ pub async fn query_one(
             id as ProjectId,
             crate::models::teams::OWNER_ROLE,
         )
-           .fetch_one(exec)
-           .await?;
+        .fetch_one(exec)
+        .await?;
 
     let mut categories = m
         .categories
-        .map(|x| x.iter().map(|x| x.to_string()).collect::<Vec<String>>())
+        .map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>())
         .unwrap_or_default();
     categories.append(
         &mut m
             .loaders
-            .map(|x| x.iter().map(|x| x.to_string()).collect::<Vec<String>>())
+            .map(|x| x.split(',').map(|x| x.to_string()).collect::<Vec<String>>())
             .unwrap_or_default(),
     );
 
     let versions: Vec<String> = m
         .versions
-        .map(|x| x.iter().map(|x| x.to_string()).collect())
+        .map(|x| x.split(',').map(|x| x.to_string()).collect())
         .unwrap_or_default();
 
     let project_id: crate::models::projects::ProjectId = ProjectId(m.id).into();
@@ -162,7 +162,7 @@ pub async fn query_one(
         project_type: m.project_type_name,
         gallery: m
             .gallery
-            .map(|x| x.iter().map(|x| x.to_string()).collect())
+            .map(|x| x.split(',').map(|x| x.to_string()).collect())
             .unwrap_or_default(),
     })
 }

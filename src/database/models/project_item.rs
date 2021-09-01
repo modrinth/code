@@ -589,43 +589,69 @@ impl Project {
         executor: E,
     ) -> Result<Option<QueryProject>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
-            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
-            m.updated updated, m.status status,
-            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            ARRAY_AGG(DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id::text) versions,
-            ARRAY_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, '') || ', ' || COALESCE(mg.description, '') || ', ' || mg.created) gallery,
-            ARRAY_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
-            FROM mods m
-            INNER JOIN project_types pt ON pt.id = m.project_type
-            INNER JOIN statuses s ON s.id = m.status
-            INNER JOIN side_types cs ON m.client_side = cs.id
-            INNER JOIN side_types ss ON m.server_side = ss.id
-            INNER JOIN licenses l ON m.license = l.id
-            LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
-            LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
-            LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON mc.joining_category_id = c.id
-            LEFT JOIN versions v ON v.mod_id = m.id
-            LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
-            WHERE m.id = $1
-            GROUP BY pt.id, s.id, cs.id, ss.id, l.id, m.id;
-            ",
-            id as ProjectId,
-        )
-            .fetch_optional(executor)
-            .await?;
+        let (project, versions, categories, gallery, donations) = futures::join!(
+            sqlx::query!(
+                "
+                SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
+                m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
+                m.updated updated, m.status status,
+                m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
+                m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
+                s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name
+                FROM mods m
+                INNER JOIN project_types pt ON pt.id = m.project_type
+                INNER JOIN statuses s ON s.id = m.status
+                INNER JOIN side_types cs ON m.client_side = cs.id
+                INNER JOIN side_types ss ON m.server_side = ss.id
+                INNER JOIN licenses l ON m.license = l.id
+                WHERE m.id = $1
+                ",
+                id as ProjectId,
+            ).fetch_optional(executor),
+            sqlx::query!(
+                "
+                SELECT id
+                FROM versions
+                WHERE mod_id = $1
+                ",
+                id as ProjectId,
+            ).fetch_all(executor),
+            sqlx::query!(
+                "
+                SELECT c.category category
+                FROM mods_categories mc
+                INNER JOIN categories c ON mc.joining_category_id = c.id
+                WHERE mc.joining_mod_id = $1
+                ",
+                id as ProjectId,
+            ).fetch_all(executor),
+            sqlx::query!(
+                "
+                SELECT image_url, featured, title, description, created
+                FROM mods_gallery
+                WHERE mod_id = $1
+                ",
+                id as ProjectId,
+            ).fetch_all(executor),
+            sqlx::query!(
+                "
+                SELECT md.url url, dp.id platform_id, dp.name dp_name, dp.short short
+                FROM mods_donations md
+                INNER JOIN donation_platforms dp ON md.joining_platform_id = dp.id
+                WHERE md.joining_mod_id = $1
+                ",
+                id as ProjectId,
+            ).fetch_all(executor)
+        );
 
-        if let Some(m) = result {
+        if let Some(m) = project? {
+            let project_id = ProjectId(m.id);
+
             Ok(Some(QueryProject {
                 inner: Project {
-                    id: ProjectId(m.id),
+                    id: project_id,
                     project_type: ProjectTypeId(m.project_type),
                     team_id: TeamId(m.team_id),
                     title: m.title.clone(),
@@ -651,70 +677,28 @@ impl Project {
                     moderation_message_body: m.moderation_message_body,
                 },
                 project_type: m.project_type_name,
-                categories: m
-                    .categories
-                    .map(|x| x.iter().map(|x| x.to_string()).collect())
-                    .unwrap_or_default(),
-                versions: m
-                    .versions
-                    .map(|x| {
-                        x.iter()
-                            .map(|x| VersionId(x.parse().unwrap_or_default()))
-                            .collect()
+                categories: categories?.into_iter().map(|x| x.category).collect(),
+                versions: versions?.into_iter().map(|x| VersionId(x.id)).collect(),
+                donation_urls: donations?
+                    .into_iter()
+                    .map(|x| DonationUrl {
+                        project_id,
+                        platform_id: DonationPlatformId(x.platform_id),
+                        platform_short: x.short,
+                        platform_name: x.dp_name,
+                        url: x.url,
                     })
-                    .unwrap_or_default(),
-                donation_urls: m
-                    .donations
-                    .unwrap_or_default()
-                    .iter()
-                    .map(|d| {
-                        let strings: Vec<&str> = d.split(", ").collect();
-
-                        if strings.len() >= 3 {
-                            Some(DonationUrl {
-                                project_id: id,
-                                platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                                platform_short: strings[2].to_string(),
-                                platform_name: strings[3].to_string(),
-                                url: strings[1].to_string(),
-                            })
-                        } else {
-                            None
-                        }
-                    })
-                    .flatten()
                     .collect(),
-                gallery_items: m
-                    .gallery
-                    .unwrap_or_default()
-                    .iter()
-                    .map(|d| {
-                        let strings: Vec<&str> = d.split(", ").collect();
-
-                        if strings.len() >= 5 {
-                            Some(GalleryItem {
-                                project_id: id,
-                                image_url: strings[0].to_string(),
-                                featured: strings[1].parse().unwrap_or(false),
-                                title: if strings[2] == "" {
-                                    None
-                                } else {
-                                    Some(strings[2].to_string())
-                                },
-                                description: if strings[3] == "" {
-                                    None
-                                } else {
-                                    Some(strings[3].to_string())
-                                },
-                                created: chrono::DateTime::parse_from_rfc3339(strings[4])
-                                    .map(|x| x.with_timezone(&chrono::Utc))
-                                    .unwrap_or_else(|_| chrono::Utc::now()),
-                            })
-                        } else {
-                            None
-                        }
+                gallery_items: gallery?
+                    .into_iter()
+                    .map(|x| GalleryItem {
+                        project_id,
+                        image_url: x.image_url,
+                        featured: x.featured.unwrap_or(false),
+                        title: x.title,
+                        description: x.description,
+                        created: x.created,
                     })
-                    .flatten()
                     .collect(),
                 status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                 license_id: m.short,
@@ -734,123 +718,9 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        use futures::TryStreamExt;
-
-        let project_ids_parsed: Vec<i64> = project_ids.into_iter().map(|x| x.0).collect();
-        sqlx::query!(
-            "
-            SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
-            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
-            m.updated updated, m.status status,
-            m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
-            m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            ARRAY_AGG(DISTINCT c.category) categories, ARRAY_AGG(DISTINCT v.id::text) versions,
-            ARRAY_AGG(DISTINCT mg.image_url || ', ' || mg.featured || ', ' || COALESCE(mg.title, '') || ', ' || COALESCE(mg.description, '') || ', ' || mg.created) gallery,
-            ARRAY_AGG(DISTINCT md.joining_platform_id || ', ' || md.url || ', ' || dp.short || ', ' || dp.name) donations
-            FROM mods m
-            INNER JOIN project_types pt ON pt.id = m.project_type
-            INNER JOIN statuses s ON s.id = m.status
-            INNER JOIN side_types cs ON m.client_side = cs.id
-            INNER JOIN side_types ss ON m.server_side = ss.id
-            INNER JOIN licenses l ON m.license = l.id
-            LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
-            LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
-            LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON mc.joining_category_id = c.id
-            LEFT JOIN versions v ON v.mod_id = m.id
-            LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
-            WHERE m.id = ANY($1)
-            GROUP BY pt.id, s.id, cs.id, ss.id, l.id, m.id;
-            ",
-            &project_ids_parsed
-        )
-            .fetch_many(exec)
-            .try_filter_map(|e| async {
-                Ok(e.right().map(|m| {
-                    let id = m.id;
-                    QueryProject {
-                        inner: Project {
-                        id: ProjectId(id),
-                        project_type: ProjectTypeId(m.project_type),
-                        team_id: TeamId(m.team_id),
-                        title: m.title.clone(),
-                        description: m.description.clone(),
-                        downloads: m.downloads,
-                        body_url: m.body_url.clone(),
-                        icon_url: m.icon_url.clone(),
-                        published: m.published,
-                        updated: m.updated,
-                        issues_url: m.issues_url.clone(),
-                        source_url: m.source_url.clone(),
-                        wiki_url: m.wiki_url.clone(),
-                        license_url: m.license_url.clone(),
-                        discord_url: m.discord_url.clone(),
-                        client_side: SideTypeId(m.client_side),
-                        status: StatusId(m.status),
-                        server_side: SideTypeId(m.server_side),
-                        license: LicenseId(m.license),
-                        slug: m.slug.clone(),
-                        body: m.body.clone(),
-                        follows: m.follows,
-                            moderation_message: m.moderation_message,
-                            moderation_message_body: m.moderation_message_body,
-                    },
-                    project_type: m.project_type_name,
-                    categories: m.categories.map(|x| x.iter().map(|x| x.to_string()).collect()).unwrap_or_default(),
-                    versions: m.versions.map(|x| x.iter().map(|x| VersionId(x.parse().unwrap_or_default())).collect()).unwrap_or_default(),
-                    gallery_items: m
-                        .gallery
-                        .unwrap_or_default()
-                        .iter()
-                        .map(|d| {
-                            let strings: Vec<&str> = d.split(", ").collect();
-
-                            if strings.len() >= 5 {
-                                Some(GalleryItem {
-                                    project_id: ProjectId(id),
-                                    image_url: strings[0].to_string(),
-                                    featured: strings[1].parse().unwrap_or(false),
-                                    title: if strings[2] == " " { None } else { Some(strings[2].to_string()) },
-                                    description: if strings[3] == " " { None } else { Some(strings[3].to_string()) },
-                                    created: chrono::DateTime::parse_from_rfc3339(strings[4]).map(|x| x.with_timezone(&chrono::Utc)).unwrap_or_else(|_| chrono::Utc::now())
-                                })
-                            } else {
-                                None
-                            }
-                        })
-                        .flatten()
-                        .collect(),
-                    donation_urls: m
-                        .donations
-                        .unwrap_or_default()
-                        .iter()
-                        .map(|d| {
-                            let strings: Vec<&str> = d.split(", ").collect();
-
-                            if strings.len() >= 3 {
-                                Some(DonationUrl {
-                                    project_id: ProjectId(id),
-                                    platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                                    platform_short: strings[2].to_string(),
-                                    platform_name: strings[3].to_string(),
-                                    url: strings[1].to_string(),
-                                })
-                            } else {
-                                None
-                            }
-                        })
-                        .flatten()
-                        .collect(),
-                    status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
-                    license_id: m.short,
-                    license_name: m.license_name,
-                    client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
-                    server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
-                }}))
-            })
-            .try_collect::<Vec<QueryProject>>()
+        futures::future::try_join_all(project_ids.into_iter().map(|id| Self::get_full(id, exec)))
             .await
+            .map(|x| x.into_iter().flatten().collect())
     }
 }
 #[derive(Clone, Debug)]
