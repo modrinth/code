@@ -1076,9 +1076,9 @@ pub async fn delete_project_icon(
 #[derive(Serialize, Deserialize, Validate)]
 pub struct GalleryCreateQuery {
     pub featured: bool,
-    #[validate(url, length(min = 1, max = 255))]
+    #[validate(length(min = 1, max = 255))]
     pub title: Option<String>,
-    #[validate(url, length(min = 1, max = 2048))]
+    #[validate(length(min = 1, max = 2048))]
     pub description: Option<String>,
 }
 
