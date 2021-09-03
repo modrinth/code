@@ -1199,14 +1199,14 @@ pub struct GalleryEditQuery {
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(url, length(min = 1, max = 255))]
+    #[validate(length(min = 1, max = 255))]
     pub title: Option<Option<String>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(url, length(min = 1, max = 2048))]
+    #[validate(length(min = 1, max = 2048))]
     pub description: Option<Option<String>>,
 }
 
