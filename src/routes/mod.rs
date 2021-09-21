@@ -18,11 +18,13 @@ mod users;
 mod version_creation;
 mod version_file;
 mod versions;
+mod health;
 
 pub use auth::config as auth_config;
 pub use tags::config as tags_config;
 
 pub use self::index::index_get;
+pub use self::health::health_get;
 pub use self::not_found::not_found;
 use crate::file_hosting::FileHostingError;
 

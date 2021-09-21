@@ -56,3 +56,6 @@ sqlx = { version = "0.4.2", features = ["runtime-actix-rustls", "postgres", "chr
 
 sentry = { version = "0.22.0", features = ["log"] }
 sentry-actix = "0.22.0"
+
+actix-web-prom = {git = "https://github.com/nlopes/actix-web-prom", branch = "master"}
+prometheus = "0.12.0"

@@ -360,6 +360,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "actix-web-prom"
+version = "0.5.1"
+source = "git+https://github.com/nlopes/actix-web-prom?branch=master#05ca96dfb04c9d9c783dc658c7d1e12c1e8b1706"
+dependencies = [
+ "actix-web",
+ "futures",
+ "pin-project 1.0.7",
+ "prometheus",
+]
+
+[[package]]
 name = "actix_derive"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1954,6 +1965,7 @@ dependencies = [
  "actix-ratelimit",
  "actix-rt",
  "actix-web",
+ "actix-web-prom",
  "async-trait",
  "base64 0.13.0",
  "bitflags",
@@ -1966,6 +1978,7 @@ dependencies = [
  "lazy_static",
  "log",
  "meilisearch-sdk",
+ "prometheus",
  "rand 0.7.3",
  "regex",
  "reqwest 0.10.10",
@@ -2563,6 +2576,27 @@ checksum = "f0d8caf72986c1a598726adc988bb5984792ef84f5ee5aa50209145ee8077038"
 dependencies = [
  "unicode-xid",
 ]
+
+[[package]]
+name = "prometheus"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5986aa8d62380092d2f50f8b1cdba9cb9b6731ffd4b25b51fd126b6c3e05b99c"
+dependencies = [
+ "cfg-if 1.0.0",
+ "fnv",
+ "lazy_static",
+ "memchr",
+ "parking_lot",
+ "protobuf",
+ "thiserror",
+]
+
+[[package]]
+name = "protobuf"
+version = "2.25.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "23129d50f2c9355ced935fce8a08bd706ee2e7ce2b3b33bf61dace0e379ac63a"
 
 [[package]]
 name = "quick-error"

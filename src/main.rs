@@ -10,6 +10,11 @@ use rand::Rng;
 use search::indexing::index_projects;
 use search::indexing::IndexingSettings;
 use std::sync::Arc;
+use std::collections::HashMap;
+use std::sync::atomic::Ordering;
+use crate::health::pod::PodInfo;
+use crate::health::scheduler::HealthCounters;
+use actix_web_prom::{PrometheusMetricsBuilder};
 
 mod database;
 mod file_hosting;
@@ -17,6 +22,7 @@ mod models;
 mod routes;
 mod scheduler;
 mod search;
+mod health;
 mod util;
 mod validate;
 
@@ -232,6 +238,7 @@ async fn main() -> std::io::Result<()> {
             if let Err(e) = result {
                 warn!("Indexing created projects failed: {:?}", e);
             }
+            crate::health::SEARCH_READY.store(true, Ordering::Release);
             info!("Done indexing created project queue");
         }
     });
@@ -243,12 +250,29 @@ async fn main() -> std::io::Result<()> {
     };
 
     let store = MemoryStore::new();
+    // Generate pod id
+    let pod = PodInfo::new();
+    // Init prometheus cluster
+    let mut labels = HashMap::new();
+    labels.insert("pod".to_string(), pod.pod_name);
+    labels.insert("node".to_string(), pod.node_name);
 
+    // Get prometheus service
+    let mut prometheus = PrometheusMetricsBuilder::new("api")
+        .endpoint("/metrics")
+        .build()
+        .unwrap();
+    // Get custom service
+    let health = HealthCounters::new();
+    health.register(&mut prometheus);
+    health.schedule(pool.clone(), &mut scheduler);
     info!("Starting Actix HTTP server!");
 
     // Init App
     HttpServer::new(move || {
         App::new()
+            .wrap(prometheus.clone())
+            .wrap(health.clone())
             .wrap(
                 Cors::default()
                     .allowed_methods(vec!["GET", "POST", "DELETE", "PATCH", "PUT"])
@@ -311,6 +335,7 @@ async fn main() -> std::io::Result<()> {
             .configure(routes::v1_config)
             .configure(routes::v2_config)
             .service(routes::index_get)
+            .service(routes::health_get)
             .service(web::scope("/maven/").configure(routes::maven_config))
             .default_service(web::get().to(routes::not_found))
     })
