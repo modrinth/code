@@ -23,7 +23,14 @@
         <span>
           This leads to a page where you can create a version for your mod.
         </span>
-        <nuxt-link class="button" to="newversion">Create version</nuxt-link>
+        <nuxt-link
+          class="button"
+          to="newversion"
+          :disabled="
+            (currentMember.permissions & UPLOAD_VERSION) !== UPLOAD_VERSION
+          "
+          >Create version</nuxt-link
+        >
       </label>
       <h3>Delete mod</h3>
       <label>
@@ -44,7 +51,10 @@
     </section>
     <div class="section-header columns team-invite">
       <h3 class="column-grow-1">Team members</h3>
-      <div class="column">
+      <div
+        v-if="(currentMember.permissions & MANAGE_INVITES) === MANAGE_INVITES"
+        class="column"
+      >
         <input
           id="username"
           v-model="currentUsername"
@@ -355,7 +365,12 @@ export default {
       this.$nuxt.$loading.finish()
     },
     showPopup() {
-      this.$refs.delete_popup.show()
+      if (
+        (this.currentMember.permissions & this.DELETE_MOD) ===
+        this.DELETE_MOD
+      ) {
+        this.$refs.delete_popup.show()
+      }
     },
     async deleteMod() {
       await this.$axios.delete(`mod/${this.mod.id}`, this.$auth.headers)

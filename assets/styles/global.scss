@@ -234,7 +234,7 @@ textarea {
   border: 2px solid transparent;
 
   &:focus,
-  &:hover {
+  &:hover:not([disabled]) {
     background: var(--color-button-bg-hover);
     color: var(--color-text);
     outline: none;
@@ -251,6 +251,13 @@ textarea {
 
   &::placeholder {
     color: var(--color-color-text);
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
   }
 }
 

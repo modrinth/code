@@ -16,7 +16,7 @@
         "
         title="Submit for approval"
         class="button column"
-        :disabled="!this.$nuxt.$loading"
+        :disabled="!$nuxt.$loading"
         @click="saveModReview"
       >
         Submit for approval
@@ -24,7 +24,7 @@
       <button
         title="Save"
         class="brand-button column"
-        :disabled="!this.$nuxt.$loading"
+        :disabled="!$nuxt.$loading"
         @click="saveMod"
       >
         Save
@@ -36,7 +36,14 @@
         <span>
           Be creative. TechCraft v7 won't be searchable and won't be clicked on.
         </span>
-        <input v-model="mod.title" type="text" placeholder="Enter the name" />
+        <input
+          v-model="mod.title"
+          type="text"
+          placeholder="Enter the name"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
+        />
       </label>
       <h3>Summary</h3>
       <label>
@@ -47,6 +54,9 @@
           v-model="mod.description"
           type="text"
           placeholder="Enter the summary"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
       <h3>Categories</h3>
@@ -69,6 +79,9 @@
           :limit="6"
           :hide-selected="true"
           placeholder="Choose categories"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
       <h3>Vanity URL (slug)</h3>
@@ -81,17 +94,23 @@
           v-model="mod.slug"
           type="text"
           placeholder="Enter the vanity URL's last bit"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
     </section>
     <section class="mod-icon rows">
       <h3>Icon</h3>
       <div class="columns row-grow-1">
-        <div class="column-grow-1 rows">
+        <div class="rows row-grow-1">
           <file-input
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="choose-image"
             prompt="Choose an image or drag it here"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
             @change="showPreviewImage"
           />
           <ul class="row-grow-1">
@@ -99,8 +118,23 @@
             <li>Minimum size is 100x100</li>
             <li>Acceptable formats are PNG, JPEG, GIF, and WEBP</li>
           </ul>
+        </div>
+        <div class="rows">
+          <img
+            :src="
+              previewImage
+                ? previewImage
+                : mod.icon_url && !iconChanged
+                ? mod.icon_url
+                : 'https://cdn.modrinth.com/placeholder.svg'
+            "
+            alt="preview-image"
+          />
           <button
-            class="transparent-button"
+            class="button"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
             @click="
               icon = null
               previewImage = null
@@ -110,16 +144,6 @@
             Reset icon
           </button>
         </div>
-        <img
-          :src="
-            previewImage
-              ? previewImage
-              : mod.icon_url && !iconChanged
-              ? mod.icon_url
-              : 'https://cdn.modrinth.com/placeholder.svg'
-          "
-          alt="preview-image"
-        />
       </div>
     </section>
     <section class="game-sides">
@@ -133,25 +157,31 @@
         <div class="labeled-control">
           <h3>Client</h3>
           <Multiselect
-            v-model="clientSideType"
+            v-model="mod.client_side"
             placeholder="Select one"
             :options="sideTypes"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
             :allow-empty="false"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
           />
         </div>
         <div class="labeled-control">
           <h3>Server</h3>
           <Multiselect
-            v-model="serverSideType"
+            v-model="mod.server_side"
             placeholder="Select one"
             :options="sideTypes"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
             :allow-empty="false"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
           />
         </div>
       </div>
@@ -177,7 +207,11 @@
       </span>
       <div class="columns">
         <div class="textarea-wrapper">
-          <textarea id="body" v-model="mod.body"></textarea>
+          <textarea
+            id="body"
+            v-model="mod.body"
+            :disabled="(currentMember.permissions & EDIT_BODY) !== EDIT_BODY"
+          ></textarea>
         </div>
         <div v-compiled-markdown="mod.body" class="markdown-body"></div>
       </div>
@@ -194,6 +228,9 @@
           v-model="mod.issues_url"
           type="url"
           placeholder="Enter a valid URL"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
       <label title="A page/repository containing the source code for your mod.">
@@ -202,6 +239,9 @@
           v-model="mod.source_url"
           type="url"
           placeholder="Enter a valid URL"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
       <label
@@ -212,6 +252,9 @@
           v-model="mod.wiki_url"
           type="url"
           placeholder="Enter a valid URL"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
       <label title="An invitation link to your Discord server.">
@@ -220,6 +263,9 @@
           v-model="mod.discord_url"
           type="url"
           placeholder="Enter a valid URL"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
     </section>
@@ -252,8 +298,18 @@
             :searchable="true"
             :close-on-select="true"
             :show-labels="false"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
           />
-          <input v-model="license_url" type="url" placeholder="License URL" />
+          <input
+            v-model="license_url"
+            type="url"
+            placeholder="License URL"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
+          />
         </div>
       </label>
     </section>
@@ -314,6 +370,8 @@
 <script>
 import Multiselect from 'vue-multiselect'
 
+import getDifferences from '~/libs/getDifferences'
+
 import FileInput from '~/components/ui/FileInput'
 
 export default {
@@ -321,10 +379,27 @@ export default {
     FileInput,
     Multiselect,
   },
+  beforeRouteLeave(to, from, next) {
+    if (
+      this.isEditing &&
+      !window.confirm('Are you sure that you want to leave without saving?')
+    ) {
+      return
+    }
+    next()
+  },
+  props: {
+    currentMember: {
+      type: Object,
+      default() {
+        return null
+      },
+    },
+  },
   async asyncData(data) {
     try {
       const [
-        mod,
+        savedMod,
         availableCategories,
         availableLoaders,
         availableGameVersions,
@@ -341,21 +416,22 @@ export default {
         ])
       ).map((it) => it.data)
 
-      mod.license = {
-        short: mod.license.id,
-        name: mod.license.name,
-        url: mod.license.url,
+      savedMod.license = {
+        short: savedMod.license.id,
+        name: savedMod.license.name,
+        url: savedMod.license.url,
       }
 
-      if (mod.body_url && !mod.body) {
-        mod.body = (await data.$axios.get(mod.body_url)).data
+      if (savedMod.body_url && !savedMod.body) {
+        savedMod.body = (await data.$axios.get(savedMod.body_url)).data
       }
 
+      /*
       const donationPlatforms = []
       const donationLinks = []
 
-      if (mod.donation_urls) {
-        for (const platform of mod.donation_urls) {
+      if (savedMod.donation_urls) {
+        for (const platform of savedMod.donation_urls) {
           donationPlatforms.push({
             short: platform.id,
             name: platform.platform,
@@ -363,24 +439,24 @@ export default {
           donationLinks.push(platform.url)
         }
       }
+      */
 
       availableLicenses.sort((a, b) => a.name.localeCompare(b.name))
       return {
-        mod,
-        clientSideType: mod.client_side.charAt(0) + mod.client_side.slice(1),
-        serverSideType: mod.server_side.charAt(0) + mod.server_side.slice(1),
+        savedMod,
+        mod: { ...savedMod },
         availableCategories,
         availableLoaders,
         availableGameVersions,
         availableLicenses,
         license: {
-          short: mod.license.id,
-          name: mod.license.name,
+          short: savedMod.license.id,
+          name: savedMod.license.name,
         },
-        license_url: mod.license.url,
+        license_url: savedMod.license.url,
         availableDonationPlatforms,
-        donationPlatforms,
-        donationLinks,
+        // donationPlatforms,
+        // donationLinks,
       }
     } catch {
       data.error({
@@ -398,7 +474,7 @@ export default {
       icon: null,
       iconChanged: false,
 
-      sideTypes: ['Required', 'Optional', 'Unsupported'],
+      sideTypes: ['required', 'optional', 'unsupported'],
 
       isEditing: true,
     }
@@ -429,17 +505,17 @@ export default {
       window.removeEventListener('beforeunload', preventLeave)
     })
   },
-  beforeRouteLeave(to, from, next) {
-    if (
-      this.isEditing &&
-      !window.confirm('Are you sure that you want to leave without saving?')
-    ) {
-      return
-    }
-    next()
-  },
   created() {
     this.$emit('update:link-bar', [['Edit', 'edit']])
+
+    this.UPLOAD_VERSION = 1 << 0
+    this.DELETE_VERSION = 1 << 1
+    this.EDIT_DETAILS = 1 << 2
+    this.EDIT_BODY = 1 << 3
+    this.MANAGE_INVITES = 1 << 4
+    this.REMOVE_MEMBER = 1 << 5
+    this.EDIT_MEMBER = 1 << 6
+    this.DELETE_MOD = 1 << 7
   },
   methods: {
     async saveModReview() {
@@ -449,22 +525,27 @@ export default {
     async saveMod() {
       this.$nuxt.$loading.start()
 
+      const modChanges = getDifferences(this.savedMod, this.mod)
+
       try {
         const data = {
-          title: this.mod.title,
-          description: this.mod.description,
-          body: this.mod.body,
-          categories: this.mod.categories,
-          issues_url: this.mod.issues_url,
-          source_url: this.mod.source_url,
-          wiki_url: this.mod.wiki_url,
-          license_url: this.license_url,
-          discord_url: this.mod.discord_url,
-          license_id: this.license.short,
-          client_side: this.clientSideType.toLowerCase(),
-          server_side: this.serverSideType.toLowerCase(),
-          slug: this.mod.slug,
-          license: this.license.short,
+          ...({ title: modChanges.title } || {}),
+          ...({ description: modChanges.description } || {}),
+          ...({ body: modChanges.body } || {}),
+          ...({ categories: modChanges.categories } || {}),
+          ...({ issues_url: modChanges.issues_url } || {}),
+          ...({ source_url: modChanges.source_url } || {}),
+          ...({ wiki_url: modChanges.wiki_url } || {}),
+          ...({ license_url: modChanges.license_url } || {}),
+          ...({ discord_url: modChanges.discord_url } || {}),
+          ...({ license_id: modChanges.license_id } || {}),
+          ...({ client_side: modChanges.client_side } || {}),
+          ...({ server_side: modChanges.server_side } || {}),
+          ...({ slug: modChanges.slug } || {}),
+          ...(modChanges.license
+            ? { license: modChanges.license.short } || {}
+            : {}),
+          /*
           donation_urls: this.donationPlatforms.map((it, index) => {
             return {
               id: it.short,
@@ -472,6 +553,7 @@ export default {
               url: this.donationLinks[index],
             }
           }),
+        */
         }
 
         if (this.isProcessing) {
@@ -491,9 +573,13 @@ export default {
         }
 
         this.isEditing = false
-        await this.$router.replace(
-          `/mod/${this.mod.slug ? this.mod.slug : this.mod.id}`
-        )
+        this.savedMod = this.mod
+
+        this.$notify({
+          group: 'main',
+          title: 'Changes saved',
+          type: 'success',
+        })
       } catch (err) {
         this.$notify({
           group: 'main',
@@ -624,8 +710,9 @@ section.mod-icon {
 
   img {
     align-self: flex-start;
-    max-width: 50%;
+    max-width: 6.08rem;
     margin-left: var(--spacing-card-lg);
+    border-radius: var(--size-rounded-icon);
   }
 }
 
