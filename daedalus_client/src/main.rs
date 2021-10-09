@@ -1,9 +1,10 @@
 use log::{error, info, warn};
 use rusoto_core::credential::StaticProvider;
 use rusoto_core::{HttpClient, Region, RusotoError};
-use rusoto_s3::{S3Client, PutObjectError};
+use rusoto_s3::{PutObjectError, S3Client};
 use rusoto_s3::{PutObjectRequest, S3};
 
+mod fabric;
 mod minecraft;
 
 #[derive(thiserror::Error, Debug)]
@@ -13,10 +14,7 @@ pub enum Error {
     #[error("Error while deserializing JSON")]
     SerdeError(#[from] serde_json::Error),
     #[error("Unable to fetch {item}")]
-    FetchError {
-        inner: reqwest::Error,
-        item: String,
-    },
+    FetchError { inner: reqwest::Error, item: String },
     #[error("Error while managing asynchronous tasks")]
     TaskError(#[from] tokio::task::JoinError),
     #[error("Error while uploading file to S3")]
@@ -34,7 +32,7 @@ async fn main() {
         return;
     }
 
-    minecraft::retrieve_data().await.unwrap();
+    fabric::retrieve_data().await.unwrap();
 }
 
 fn check_env_vars() -> bool {
@@ -96,7 +94,11 @@ lazy_static::lazy_static! {
         );
 }
 
-pub async fn upload_file_to_bucket(path: String, bytes: Vec<u8>, content_type: Option<String>) -> Result<(), Error> {
+pub async fn upload_file_to_bucket(
+    path: String,
+    bytes: Vec<u8>,
+    content_type: Option<String>,
+) -> Result<(), Error> {
     CLIENT
         .put_object(PutObjectRequest {
             bucket: dotenv::var("S3_BUCKET_NAME").unwrap(),
@@ -109,7 +111,7 @@ pub async fn upload_file_to_bucket(path: String, bytes: Vec<u8>, content_type: O
         .await
         .map_err(|err| Error::S3Error {
             inner: err,
-            file: format!("{}/{}", &*dotenv::var("BASE_FOLDER").unwrap(), path)
+            file: format!("{}/{}", &*dotenv::var("BASE_FOLDER").unwrap(), path),
         })?;
 
     Ok(())

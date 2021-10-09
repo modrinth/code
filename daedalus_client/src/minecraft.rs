@@ -6,14 +6,13 @@ use std::time::{Duration, Instant};
 pub async fn retrieve_data() -> Result<(), Error> {
     let old_manifest =
         daedalus::minecraft::fetch_version_manifest(Some(&*crate::format_url(&*format!(
-            "minecraft/v{}/version_manifest.json",
+            "minecraft/v{}/manifest.json",
             daedalus::minecraft::CURRENT_FORMAT_VERSION
         ))))
         .await
         .ok();
 
-    let mut manifest = daedalus::minecraft::fetch_version_manifest(None)
-        .await?;
+    let mut manifest = daedalus::minecraft::fetch_version_manifest(None).await?;
     let cloned_manifest = Arc::new(Mutex::new(manifest.clone()));
 
     let visited_assets_mutex = Arc::new(Mutex::new(Vec::new()));
@@ -44,12 +43,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
             async move {
                 let mut upload_futures = Vec::new();
 
-                let now = Instant::now();
-                let mut version_println = daedalus::minecraft::fetch_version_info(version)
-                    .await
-                    ?;
-                let elapsed = now.elapsed();
-                println!("Version {} Elapsed: {:.2?}", version.id, elapsed);
+                let mut version_info = daedalus::minecraft::fetch_version_info(version).await?;
 
                 let version_path = format!(
                     "minecraft/v{}/versions/{}.json",
@@ -59,9 +53,9 @@ pub async fn retrieve_data() -> Result<(), Error> {
                 let assets_path = format!(
                     "minecraft/v{}/assets/{}.json",
                     daedalus::minecraft::CURRENT_FORMAT_VERSION,
-                    version_println.asset_index.id
+                    version_info.asset_index.id
                 );
-                let assets_index_url = version_println.asset_index.url.clone();
+                let assets_index_url = version_info.asset_index.url.clone();
 
                 {
                     let mut cloned_manifest = match cloned_manifest_mutex.lock() {
@@ -76,10 +70,10 @@ pub async fn retrieve_data() -> Result<(), Error> {
                         .unwrap();
                     cloned_manifest.versions[position].url = format_url(&version_path);
                     cloned_manifest.versions[position].assets_index_sha1 =
-                        Some(version_println.asset_index.sha1.clone());
+                        Some(version_info.asset_index.sha1.clone());
                     cloned_manifest.versions[position].assets_index_url =
                         Some(format_url(&assets_path));
-                    version_println.asset_index.url = format_url(&assets_path);
+                    version_info.asset_index.url = format_url(&assets_path);
                 }
 
                 let mut download_assets = false;
@@ -90,9 +84,9 @@ pub async fn retrieve_data() -> Result<(), Error> {
                         Err(poisoned) => poisoned.into_inner(),
                     };
 
-                    if !visited_assets.contains(&version_println.asset_index.id) {
+                    if !visited_assets.contains(&version_info.asset_index.id) {
                         if let Some(assets_hash) = assets_hash {
-                            if version_println.asset_index.sha1 != assets_hash {
+                            if version_info.asset_index.sha1 != assets_hash {
                                 download_assets = true;
                             }
                         } else {
@@ -101,26 +95,29 @@ pub async fn retrieve_data() -> Result<(), Error> {
                     }
 
                     if download_assets {
-                        visited_assets.push(version_println.asset_index.id.clone());
+                        visited_assets.push(version_info.asset_index.id.clone());
                     }
                 }
 
                 if download_assets {
                     let assets_index =
-                        download_file(&assets_index_url, Some(&version_println.asset_index.sha1))
+                        download_file(&assets_index_url, Some(&version_info.asset_index.sha1))
                             .await?;
 
                     {
-                        upload_futures
-                            .push(upload_file_to_bucket(assets_path, assets_index.to_vec(), Some("application/json".to_string())));
+                        upload_futures.push(upload_file_to_bucket(
+                            assets_path,
+                            assets_index.to_vec(),
+                            Some("application/json".to_string()),
+                        ));
                     }
                 }
 
                 {
                     upload_futures.push(upload_file_to_bucket(
                         version_path,
-                        serde_json::to_vec(&version_println)?,
-                        Some("application/json".to_string())
+                        serde_json::to_vec(&version_info)?,
+                        Some("application/json".to_string()),
                     ));
                 }
 
@@ -154,14 +151,14 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
     upload_file_to_bucket(
         format!(
-            "minecraft/v{}/version_manifest.json",
+            "minecraft/v{}/manifest.json",
             daedalus::minecraft::CURRENT_FORMAT_VERSION
         ),
         serde_json::to_vec(&*match cloned_manifest.lock() {
             Ok(guard) => guard,
             Err(poisoned) => poisoned.into_inner(),
         })?,
-        Some("application/json".to_string())
+        Some("application/json".to_string()),
     )
     .await?;
 

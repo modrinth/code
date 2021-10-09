@@ -69,7 +69,7 @@ pub struct LatestVersion {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-/// Data of all game versions of Minecraft
+/// Data of all game versions of Minecrafat
 pub struct VersionManifest {
     /// A struct containing the latest snapshot and release of the game
     pub latest: LatestVersion,
@@ -181,10 +181,13 @@ pub enum Os {
 #[derive(Serialize, Deserialize, Debug)]
 /// A rule which depends on what OS the user is on
 pub struct OsRule {
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The name of the OS
     pub name: Option<Os>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The version of the OS. This is normally a RegEx
     pub version: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The architecture of the OS
     pub arch: Option<String>,
 }
@@ -192,8 +195,10 @@ pub struct OsRule {
 #[derive(Serialize, Deserialize, Debug)]
 /// A rule which depends on the toggled features of the launcher
 pub struct FeatureRule {
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Whether the user is in demo mode
     pub is_demo_user: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Whether the user is using the demo resolution
     pub has_demo_resolution: Option<bool>,
 }
@@ -203,8 +208,10 @@ pub struct FeatureRule {
 pub struct Rule {
     /// The action the rule takes
     pub action: RuleAction,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The OS rule
     pub os: Option<OsRule>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The feature rule
     pub features: Option<FeatureRule>,
 }
@@ -212,6 +219,7 @@ pub struct Rule {
 #[derive(Serialize, Deserialize, Debug)]
 /// Information delegating the extraction of the library
 pub struct LibraryExtract {
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Files/Folders to be excluded from the extraction of the library
     pub exclude: Option<Vec<String>>,
 }
@@ -219,14 +227,21 @@ pub struct LibraryExtract {
 #[derive(Serialize, Deserialize, Debug)]
 /// A library which the game relies on to run
 pub struct Library {
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The files the library has
-    pub downloads: LibraryDownloads,
+    pub downloads: Option<LibraryDownloads>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Rules of the extraction of the file
     pub extract: Option<LibraryExtract>,
     /// The maven name of the library. The format is `groupId:artifactId:version`
     pub name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// The URL to the repository where the library can be downloaded
+    pub url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Native files that the library relies on
     pub natives: Option<HashMap<Os, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Rules deciding whether the library should be downloaded or not
     pub rules: Option<Vec<Rule>>,
 }
@@ -270,6 +285,7 @@ pub enum ArgumentType {
 #[serde(rename_all = "camelCase")]
 /// Information about a version
 pub struct VersionInfo {
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Arguments passed to the game or JVM
     pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     /// Assets for the game
@@ -284,6 +300,7 @@ pub struct VersionInfo {
     pub libraries: Vec<Library>,
     /// The classpath to the main class to launch the game
     pub main_class: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// (Legacy) Arguments passed to the game
     pub minecraft_arguments: Option<String>,
     /// The minimum version of the Minecraft Launcher that can run this version of the game

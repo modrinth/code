@@ -4,6 +4,8 @@
 
 #![warn(missing_docs, unused_import_braces, missing_debug_implementations)]
 
+/// Models and methods for fetching metadata for the Fabric mod loader
+pub mod fabric;
 /// Models and methods for fetching metadata for Minecraft
 pub mod minecraft;
 
@@ -34,6 +36,32 @@ pub enum Error {
     /// There was an error when managing async tasks
     #[error("Error while managing asynchronous tasks")]
     TaskError(#[from] tokio::task::JoinError),
+    /// Error while parsing input
+    #[error("{0}")]
+    ParseError(String),
+}
+
+/// Converts a maven artifact to a path
+pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
+    let name_items = artifact.split(':').collect::<Vec<&str>>();
+
+    let package = name_items.get(0).ok_or_else(|| {
+        Error::ParseError(format!("Unable to find package for library {}", &artifact))
+    })?;
+    let name = name_items.get(1).ok_or_else(|| {
+        Error::ParseError(format!("Unable to find name for library {}", &artifact))
+    })?;
+    let version = name_items.get(2).ok_or_else(|| {
+        Error::ParseError(format!("Unable to find version for library {}", &artifact))
+    })?;
+
+    Ok(format!(
+        "{}/{}/{}-{}.jar",
+        package.replace(".", "/"),
+        version,
+        name,
+        version
+    ))
 }
 
 /// Downloads a file with retry and checksum functionality
