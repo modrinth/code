@@ -1,18 +1,18 @@
 use crate::scheduler::Scheduler;
 use sqlx::{Pool, Postgres};
 
-use prometheus::{opts, IntGaugeVec};
 use actix_web::dev::{Service, ServiceRequest, ServiceResponse, Transform};
 use actix_web::Error;
+use prometheus::{opts, IntGaugeVec};
 
-use std::pin::Pin;
-use std::future::{Future};
-use std::task::{Context, Poll};
 use futures::future::{ok, Ready};
+use std::future::Future;
+use std::pin::Pin;
+use std::task::{Context, Poll};
 
 use crate::health::pod::PodInfo;
 use actix_web::http::{HeaderName, HeaderValue};
-use actix_web_prom::{PrometheusMetrics};
+use actix_web_prom::PrometheusMetrics;
 
 pub struct HealthCounters {
     pod: PodInfo,
@@ -35,13 +35,16 @@ impl HealthCounters {
     pub fn register(&self, builder: &mut PrometheusMetrics) {
         builder
             .registry
-            .register(Box::new(self.opened_db_conn.clone())).unwrap();
+            .register(Box::new(self.opened_db_conn.clone()))
+            .unwrap();
         builder
             .registry
-            .register(Box::new(self.idle_db_conn.clone())).unwrap();
+            .register(Box::new(self.idle_db_conn.clone()))
+            .unwrap();
         builder
             .registry
-            .register(Box::new(self.current_requests.clone())).unwrap();
+            .register(Box::new(self.current_requests.clone()))
+            .unwrap();
     }
     pub fn schedule(&self, pool: Pool<Postgres>, scheduler: &mut Scheduler) {
         let this = self.clone();
@@ -69,10 +72,10 @@ impl Clone for HealthCounters {
 }
 
 impl<S, B> Transform<S> for HealthCounters
-    where
-        S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-        S::Future: 'static,
-        B: 'static,
+where
+    S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+    S::Future: 'static,
+    B: 'static,
 {
     type Request = ServiceRequest;
     type Response = ServiceResponse<B>;
@@ -82,12 +85,12 @@ impl<S, B> Transform<S> for HealthCounters
     type Future = Ready<Result<Self::Transform, Self::InitError>>;
 
     fn new_transform(&self, service: S) -> Self::Future {
-        ok(MonitoringMiddleware { service, counters: self.clone() })
+        ok(MonitoringMiddleware {
+            service,
+            counters: self.clone(),
+        })
     }
 }
-
-
-
 
 pub struct MonitoringMiddleware<S> {
     service: S,
@@ -95,10 +98,10 @@ pub struct MonitoringMiddleware<S> {
 }
 
 impl<S, B> Service for MonitoringMiddleware<S>
-    where
-        S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
-        S::Future: 'static,
-        B: 'static,
+where
+    S: Service<Request = ServiceRequest, Response = ServiceResponse<B>, Error = Error>,
+    S::Future: 'static,
+    B: 'static,
 {
     type Request = ServiceRequest;
     type Response = ServiceResponse<B>;
@@ -112,7 +115,10 @@ impl<S, B> Service for MonitoringMiddleware<S>
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
         // The request has started.
         let pattern_or_path = req.match_pattern().unwrap_or("unknown".to_string());
-        let counter = self.counters.current_requests.with_label_values(&[&*pattern_or_path,req.method().as_str()]);
+        let counter = self
+            .counters
+            .current_requests
+            .with_label_values(&[&*pattern_or_path, req.method().as_str()]);
         counter.inc();
         let pod = self.counters.pod.clone();
         let fut = self.service.call(req);
@@ -120,7 +126,10 @@ impl<S, B> Service for MonitoringMiddleware<S>
             let mut res: Self::Response = fut.await?;
             // The request finished, remove a counter
             counter.dec();
-            res.headers_mut().insert(HeaderName::from_static("x-server"), HeaderValue::from_str(&*pod.get_id()).unwrap());
+            res.headers_mut().insert(
+                HeaderName::from_static("x-server"),
+                HeaderValue::from_str(&*pod.get_id()).unwrap(),
+            );
             Ok(res)
         })
     }

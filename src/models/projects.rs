@@ -1,6 +1,8 @@
 use super::ids::Base62Id;
 use super::teams::TeamId;
 use super::users::UserId;
+use crate::database::models::project_item::QueryProject;
+use crate::database::models::version_item::QueryVersion;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -80,6 +82,70 @@ pub struct Project {
     pub gallery: Vec<GalleryItem>,
 }
 
+impl From<QueryProject> for Project {
+    fn from(data: QueryProject) -> Self {
+        let m = data.inner;
+        Self {
+            id: m.id.into(),
+            slug: m.slug,
+            project_type: data.project_type,
+            team: m.team_id.into(),
+            title: m.title,
+            description: m.description,
+            body: m.body,
+            body_url: m.body_url,
+            published: m.published,
+            updated: m.updated,
+            status: data.status,
+            moderator_message: if let Some(message) = m.moderation_message {
+                Some(ModeratorMessage {
+                    message,
+                    body: m.moderation_message_body,
+                })
+            } else {
+                None
+            },
+            license: License {
+                id: data.license_id,
+                name: data.license_name,
+                url: m.license_url,
+            },
+            client_side: data.client_side,
+            server_side: data.server_side,
+            downloads: m.downloads as u32,
+            followers: m.follows as u32,
+            categories: data.categories,
+            versions: data.versions.into_iter().map(|v| v.into()).collect(),
+            icon_url: m.icon_url,
+            issues_url: m.issues_url,
+            source_url: m.source_url,
+            wiki_url: m.wiki_url,
+            discord_url: m.discord_url,
+            donation_urls: Some(
+                data.donation_urls
+                    .into_iter()
+                    .map(|d| DonationLink {
+                        id: d.platform_short,
+                        platform: d.platform_name,
+                        url: d.url,
+                    })
+                    .collect(),
+            ),
+            gallery: data
+                .gallery_items
+                .into_iter()
+                .map(|x| GalleryItem {
+                    url: x.image_url,
+                    featured: x.featured,
+                    title: x.title,
+                    description: x.description,
+                    created: x.created,
+                })
+                .collect(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct GalleryItem {
     pub url: String,
@@ -146,7 +212,7 @@ pub struct DonationLink {
     pub url: String,
 }
 
-/// A status decides the visbility of a project in search, URLs, and the whole site itself.
+/// A status decides the visibility of a project in search, URLs, and the whole site itself.
 /// Approved - Project is displayed on search, and accessible by URL
 /// Rejected - Project is not displayed on search, and not accessible by URL (Temporary state, project can reapply)
 /// Draft - Project is not displayed on search, and not accessible by URL
@@ -248,6 +314,61 @@ pub struct Version {
     pub loaders: Vec<Loader>,
 }
 
+impl From<QueryVersion> for Version {
+    fn from(data: QueryVersion) -> Version {
+        Version {
+            id: data.id.into(),
+            project_id: data.project_id.into(),
+            author_id: data.author_id.into(),
+
+            featured: data.featured,
+            name: data.name,
+            version_number: data.version_number,
+            changelog: data.changelog,
+            changelog_url: data.changelog_url,
+            date_published: data.date_published,
+            downloads: data.downloads as u32,
+            version_type: match data.version_type.as_str() {
+                "release" => VersionType::Release,
+                "beta" => VersionType::Beta,
+                "alpha" => VersionType::Alpha,
+                _ => VersionType::Release,
+            },
+
+            files: data
+                .files
+                .into_iter()
+                .map(|f| {
+                    VersionFile {
+                        url: f.url,
+                        filename: f.filename,
+                        // FIXME: Hashes are currently stored as an ascii byte slice instead
+                        // of as an actual byte array in the database
+                        hashes: f
+                            .hashes
+                            .into_iter()
+                            .map(|(k, v)| Some((k, String::from_utf8(v).ok()?)))
+                            .collect::<Option<_>>()
+                            .unwrap_or_default(),
+                        primary: f.primary,
+                    }
+                })
+                .collect(),
+            dependencies: data
+                .dependencies
+                .into_iter()
+                .map(|d| Dependency {
+                    version_id: d.version_id.map(|i| VersionId(i.0 as u64)),
+                    project_id: d.project_id.map(|i| ProjectId(i.0 as u64)),
+                    dependency_type: DependencyType::from_str(d.dependency_type.as_str()),
+                })
+                .collect(),
+            game_versions: data.game_versions.into_iter().map(GameVersion).collect(),
+            loaders: data.loaders.into_iter().map(Loader).collect(),
+        }
+    }
+}
+
 /// A single project file, with a url for the file and the file's hash
 #[derive(Serialize, Deserialize)]
 pub struct VersionFile {
@@ -284,11 +405,7 @@ pub enum VersionType {
 
 impl std::fmt::Display for VersionType {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            VersionType::Release => write!(fmt, "release"),
-            VersionType::Beta => write!(fmt, "beta"),
-            VersionType::Alpha => write!(fmt, "alpha"),
-        }
+        fmt.write_str(self.as_str())
     }
 }
 
@@ -313,11 +430,7 @@ pub enum DependencyType {
 
 impl std::fmt::Display for DependencyType {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            DependencyType::Required => write!(fmt, "required"),
-            DependencyType::Optional => write!(fmt, "optional"),
-            DependencyType::Incompatible => write!(fmt, "incompatible"),
-        }
+        fmt.write_str(self.as_str())
     }
 }
 

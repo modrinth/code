@@ -2,7 +2,7 @@ use crate::file_hosting::FileHost;
 use crate::models::ids::{ProjectId, UserId, VersionId};
 use crate::models::projects::{Dependency, GameVersion, Loader, Version, VersionFile, VersionType};
 use crate::models::teams::Permissions;
-use crate::routes::versions::{convert_version, VersionIds, VersionListFilters};
+use crate::routes::versions::{VersionIds, VersionListFilters};
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
 use crate::{database, models, Pepper};
@@ -91,7 +91,7 @@ pub async fn version_list(
                     .map(|featured| featured == version.featured)
                     .unwrap_or(true)
             })
-            .map(convert_version)
+            .map(Version::from)
             .map(convert_to_legacy)
             .collect::<Vec<_>>();
 
@@ -118,16 +118,14 @@ pub async fn version_list(
                         version.game_versions.contains(&filter.0.version)
                             && version.loaders.contains(&filter.1.loader)
                     })
-                    .map(|version| {
-                        response.push(convert_to_legacy(convert_version(version.clone())))
-                    })
+                    .map(|version| response.push(convert_to_legacy(Version::from(version.clone()))))
                     .unwrap_or(());
             });
 
             if response.is_empty() {
                 versions
                     .into_iter()
-                    .for_each(|version| response.push(convert_to_legacy(convert_version(version))));
+                    .for_each(|version| response.push(convert_to_legacy(Version::from(version))));
             }
         }
 
@@ -154,7 +152,7 @@ pub async fn versions_get(
     let mut versions = Vec::new();
 
     for version_data in versions_data {
-        versions.push(convert_to_legacy(convert_version(version_data)));
+        versions.push(convert_to_legacy(Version::from(version_data)));
     }
 
     Ok(HttpResponse::Ok().json(versions))
@@ -169,7 +167,7 @@ pub async fn version_get(
     let version_data = database::models::Version::get_full(id.into(), &**pool).await?;
 
     if let Some(data) = version_data {
-        Ok(HttpResponse::Ok().json(convert_to_legacy(convert_version(data))))
+        Ok(HttpResponse::Ok().json(convert_to_legacy(Version::from(data))))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
@@ -214,7 +212,7 @@ pub async fn get_version_from_hash(
         .await?;
 
         if let Some(data) = version_data {
-            Ok(HttpResponse::Ok().json(super::versions::convert_version(data)))
+            Ok(HttpResponse::Ok().json(crate::models::projects::Version::from(data)))
         } else {
             Ok(HttpResponse::NotFound().body(""))
         }

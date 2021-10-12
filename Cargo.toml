@@ -59,3 +59,5 @@ sentry-actix = "0.22.0"
 
 actix-web-prom = {git = "https://github.com/nlopes/actix-web-prom", branch = "master"}
 prometheus = "0.12.0"
+
+bytes = "0.5.6"

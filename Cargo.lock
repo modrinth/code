@@ -1969,6 +1969,7 @@ dependencies = [
  "async-trait",
  "base64 0.13.0",
  "bitflags",
+ "bytes 0.5.6",
  "chrono",
  "dotenv",
  "env_logger",

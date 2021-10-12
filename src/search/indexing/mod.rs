@@ -16,7 +16,7 @@ pub enum IndexingError {
     #[error("Error while connecting to the MeiliSearch database")]
     IndexDBError(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
-    SerDeError(#[from] serde_json::Error),
+    SerdeError(#[from] serde_json::Error),
     #[error("Error while parsing a timestamp: {0}")]
     ParseDateError(#[from] chrono::format::ParseError),
     #[error("Database Error: {0}")]
@@ -40,6 +40,7 @@ pub struct IndexingSettings {
 impl IndexingSettings {
     #[allow(dead_code)]
     pub fn from_env() -> Self {
+        //FIXME: what?
         let index_local = true;
 
         Self { index_local }
@@ -64,7 +65,7 @@ pub async fn index_projects(
 }
 
 pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
-    let client = Client::new(&*config.address, &*config.key);
+    let client = config.make_client();
 
     client.delete_index("relevance_projects").await?;
     client.delete_index("downloads_projects").await?;
@@ -74,48 +75,28 @@ pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
     Ok(())
 }
 
+async fn update_index_helper<'a>(
+    client: &'a Client<'a>,
+    name: &'static str,
+    rule: &'static str,
+) -> Result<Index<'a>, IndexingError> {
+    update_index(&client, name, {
+        let mut rules = default_rules();
+        rules.push_back(rule);
+        rules.into()
+    })
+    .await
+}
+
 pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingError> {
-    let client = Client::new(&*config.address, &*config.key);
+    let client = config.make_client();
 
     // Relevance Index
-    update_index(&client, "relevance_projects", {
-        let mut relevance_rules = default_rules();
-        relevance_rules.push_back("desc(downloads)".to_string());
-        relevance_rules.into()
-    })
-    .await?;
-
-    // Downloads Index
-    update_index(&client, "downloads_projects", {
-        let mut downloads_rules = default_rules();
-        downloads_rules.push_front("desc(downloads)".to_string());
-        downloads_rules.into()
-    })
-    .await?;
-
-    // Follows Index
-    update_index(&client, "follows_projects", {
-        let mut follows_rules = default_rules();
-        follows_rules.push_front("desc(follows)".to_string());
-        follows_rules.into()
-    })
-    .await?;
-
-    // Updated Index
-    update_index(&client, "updated_projects", {
-        let mut updated_rules = default_rules();
-        updated_rules.push_front("desc(modified_timestamp)".to_string());
-        updated_rules.into()
-    })
-    .await?;
-
-    // Created Index
-    update_index(&client, "newest_projects", {
-        let mut newest_rules = default_rules();
-        newest_rules.push_front("desc(created_timestamp)".to_string());
-        newest_rules.into()
-    })
-    .await?;
+    update_index_helper(&client, "relevance_projects", "desc(downloads)").await?;
+    update_index_helper(&client, "downloads_projects", "desc(downloads)").await?;
+    update_index_helper(&client, "follows_projects", "desc(follows)").await?;
+    update_index_helper(&client, "updated_projects", "desc(modified_timestamp)").await?;
+    update_index_helper(&client, "newest_projects", "desc(created_timestamp)").await?;
 
     Ok(())
 }
@@ -123,7 +104,7 @@ pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingEr
 async fn update_index<'a>(
     client: &'a Client<'a>,
     name: &'a str,
-    rules: Vec<String>,
+    rules: Vec<&'static str>,
 ) -> Result<Index<'a>, IndexingError> {
     let index = match client.get_index(name).await {
         Ok(index) => index,
@@ -143,8 +124,8 @@ async fn update_index<'a>(
 
 async fn create_index<'a>(
     client: &'a Client<'a>,
-    name: &'a str,
-    rules: impl FnOnce() -> Vec<String>,
+    name: &'static str,
+    rules: impl FnOnce() -> Vec<&'static str>,
 ) -> Result<Index<'a>, IndexingError> {
     match client.get_index(name).await {
         // TODO: update index settings on startup (or delete old indices on startup)
@@ -176,127 +157,109 @@ async fn add_to_index(index: Index<'_>, mods: &[UploadSearchProject]) -> Result<
     Ok(())
 }
 
+async fn create_and_add_to_index<'a>(
+    client: &'a Client<'a>,
+    projects: &'a Vec<UploadSearchProject>,
+    name: &'static str,
+    rule: &'static str,
+) -> Result<(), IndexingError> {
+    let index = create_index(&client, name, || {
+        let mut relevance_rules = default_rules();
+        relevance_rules.push_back(rule);
+        relevance_rules.into()
+    })
+    .await?;
+    add_to_index(index, projects).await?;
+    Ok(())
+}
+
 pub async fn add_projects(
     projects: Vec<UploadSearchProject>,
     config: &SearchConfig,
 ) -> Result<(), IndexingError> {
-    let client = Client::new(&*config.address, &*config.key);
+    let client = config.make_client();
 
-    // Relevance Index
-    let relevance_index = create_index(&client, "relevance_projects", || {
-        let mut relevance_rules = default_rules();
-        relevance_rules.push_back("desc(downloads)".to_string());
-        relevance_rules.into()
-    })
+    create_and_add_to_index(&client, &projects, "relevance_projects", "desc(downloads)").await?;
+    create_and_add_to_index(&client, &projects, "downloads_projects", "desc(downloads)").await?;
+    create_and_add_to_index(&client, &projects, "follows_projects", "desc(follows)").await?;
+    create_and_add_to_index(
+        &client,
+        &projects,
+        "updated_projects",
+        "desc(modified_timestamp)",
+    )
     .await?;
-    add_to_index(relevance_index, &projects).await?;
-
-    // Downloads Index
-    let downloads_index = create_index(&client, "downloads_projects", || {
-        let mut downloads_rules = default_rules();
-        downloads_rules.push_front("desc(downloads)".to_string());
-        downloads_rules.into()
-    })
+    create_and_add_to_index(
+        &client,
+        &projects,
+        "newest_projects",
+        "desc(created_timestamp)",
+    )
     .await?;
-    add_to_index(downloads_index, &projects).await?;
-
-    // Follows Index
-    let follows_index = create_index(&client, "follows_projects", || {
-        let mut follows_rules = default_rules();
-        follows_rules.push_front("desc(follows)".to_string());
-        follows_rules.into()
-    })
-    .await?;
-    add_to_index(follows_index, &projects).await?;
-
-    // Updated Index
-    let updated_index = create_index(&client, "updated_projects", || {
-        let mut updated_rules = default_rules();
-        updated_rules.push_front("desc(modified_timestamp)".to_string());
-        updated_rules.into()
-    })
-    .await?;
-    add_to_index(updated_index, &projects).await?;
-
-    // Created Index
-    let newest_index = create_index(&client, "newest_projects", || {
-        let mut newest_rules = default_rules();
-        newest_rules.push_front("desc(created_timestamp)".to_string());
-        newest_rules.into()
-    })
-    .await?;
-    add_to_index(newest_index, &projects).await?;
 
     Ok(())
 }
 
 //region Utils
-fn default_rules() -> VecDeque<String> {
+fn default_rules() -> VecDeque<&'static str> {
     vec![
-        "typo".to_string(),
-        "words".to_string(),
-        "proximity".to_string(),
-        "attribute".to_string(),
-        "wordsPosition".to_string(),
-        "exactness".to_string(),
+        "typo",
+        "words",
+        "proximity",
+        "attribute",
+        "wordsPosition",
+        "exactness",
     ]
     .into()
 }
 
 fn default_settings() -> Settings {
-    let displayed_attributes = vec![
-        "project_id".to_string(),
-        "project_type".to_string(),
-        "slug".to_string(),
-        "author".to_string(),
-        "title".to_string(),
-        "description".to_string(),
-        "categories".to_string(),
-        "versions".to_string(),
-        "downloads".to_string(),
-        "follows".to_string(),
-        "icon_url".to_string(),
-        "date_created".to_string(),
-        "date_modified".to_string(),
-        "latest_version".to_string(),
-        "license".to_string(),
-        "client_side".to_string(),
-        "server_side".to_string(),
-        "gallery".to_string(),
-    ];
-
-    let searchable_attributes = vec![
-        "title".to_string(),
-        "description".to_string(),
-        "categories".to_string(),
-        "versions".to_string(),
-        "author".to_string(),
-    ];
-
-    let stop_words: Vec<String> = Vec::new();
-    let synonyms: HashMap<String, Vec<String>> = HashMap::new();
-
     Settings::new()
-        .with_displayed_attributes(displayed_attributes)
-        .with_searchable_attributes(searchable_attributes)
-        .with_stop_words(stop_words)
-        .with_synonyms(synonyms)
-        .with_attributes_for_faceting(vec![
-            String::from("categories"),
-            String::from("host"),
-            String::from("versions"),
-            String::from("license"),
-            String::from("client_side"),
-            String::from("server_side"),
-            String::from("project_type"),
-        ])
+        .with_displayed_attributes(DEFAULT_DISPLAYED_ATTRIBUTES)
+        .with_searchable_attributes(DEFAULT_SEARCHABLE_ATTRIBUTES)
+        .with_stop_words(Vec::<String>::new())
+        .with_synonyms(HashMap::<String, Vec<String>>::new())
+        .with_attributes_for_faceting(DEFAULT_ATTRIBUTES_FOR_FACETING)
 }
 
+const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
+    "project_id",
+    "project_type",
+    "slug",
+    "author",
+    "title",
+    "description",
+    "categories",
+    "versions",
+    "downloads",
+    "follows",
+    "icon_url",
+    "date_created",
+    "date_modified",
+    "latest_version",
+    "license",
+    "client_side",
+    "server_side",
+    "gallery",
+];
+
+const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
+    &["title", "description", "categories", "versions", "author"];
+
+const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
+    "categories",
+    "host",
+    "versions",
+    "license",
+    "client_side",
+    "server_side",
+    "project_type",
+];
 //endregion
 
 // This shouldn't be relied on for proper sorting, but it makes an
-// attempt at getting proper sorting for mojang's versions.
-// This isn't currenly used, but I wrote it and it works, so I'm
+// attempt at getting proper sorting for Mojang's versions.
+// This isn't currently used, but I wrote it and it works, so I'm
 // keeping this mess in case someone needs it in the future.
 #[allow(dead_code)]
 pub fn sort_projects(a: &str, b: &str) -> std::cmp::Ordering {
@@ -346,7 +309,7 @@ pub fn sort_projects(a: &str, b: &str) -> std::cmp::Ordering {
             (false, false) => a.0.cmp(&b.0),
             (true, false) => Ordering::Greater,
             (false, true) => Ordering::Less,
-            (true, true) => Ordering::Equal, // unreachable
+            (true, true) => unreachable!(),
         }
     }
 }

@@ -16,13 +16,9 @@ pub use super::users::UserId;
 /// This method panics if `n` is 0 or greater than 11, since a `u64`
 /// can only represent up to 11 character base62 strings
 #[allow(dead_code)]
+#[inline]
 pub fn random_base62(n: usize) -> u64 {
-    use rand::Rng;
-    assert!(n > 0 && n <= 11);
-    let mut rng = rand::thread_rng();
-    // gen_range is [low, high): max value is `MULTIPLES[n] - 1`,
-    // which is n characters long when encoded
-    rng.gen_range(MULTIPLES[n - 1], MULTIPLES[n])
+    random_base62_rng(&mut rand::thread_rng(), n)
 }
 
 /// Generates a random 64 bit integer that is exactly `n` characters
@@ -35,6 +31,8 @@ pub fn random_base62(n: usize) -> u64 {
 pub fn random_base62_rng<R: rand::RngCore>(rng: &mut R, n: usize) -> u64 {
     use rand::Rng;
     assert!(n > 0 && n <= 11);
+    // gen_range is [low, high): max value is `MULTIPLES[n] - 1`,
+    // which is n characters long when encoded
     rng.gen_range(MULTIPLES[n - 1], MULTIPLES[n])
 }
 
@@ -50,7 +48,7 @@ const MULTIPLES: [u64; 12] = [
     62 * 62 * 62 * 62 * 62 * 62 * 62 * 62,
     62 * 62 * 62 * 62 * 62 * 62 * 62 * 62 * 62,
     62 * 62 * 62 * 62 * 62 * 62 * 62 * 62 * 62 * 62,
-    std::u64::MAX,
+    u64::MAX,
 ];
 
 /// An ID encoded as base62 for use in the API.
@@ -63,7 +61,7 @@ pub struct Base62Id(pub u64);
 /// An error decoding a number from base62.
 #[derive(Error, Debug)]
 pub enum DecodingError {
-    /// Encountered a non base62 character in base62 string
+    /// Encountered a non-base62 character in a base62 string
     #[error("Invalid character {0:?} in base62 encoding")]
     InvalidBase62(char),
     /// Encountered integer overflow when decoding a base62 id.
@@ -154,13 +152,8 @@ pub mod base62_impl {
         }
     }
 
-    const BASE62_CHARS: [u8; 62] = [
-        b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7', b'8', b'9', b'A', b'B', b'C', b'D', b'E',
-        b'F', b'G', b'H', b'I', b'J', b'K', b'L', b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T',
-        b'U', b'V', b'W', b'X', b'Y', b'Z', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i',
-        b'j', b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v', b'w', b'x',
-        b'y', b'z',
-    ];
+    const BASE62_CHARS: [u8; 62] =
+        *b"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
     pub fn to_base62(mut num: u64) -> String {
         let length = (num as f64).log(62.0).ceil() as usize;
@@ -189,7 +182,7 @@ pub mod base62_impl {
                 return Err(DecodingError::InvalidBase62(c));
             }
 
-            // We don't want this panicing or wrapping on integer overflow
+            // We don't want this panicking or wrapping on integer overflow
             if let Some(n) = num.checked_mul(62).and_then(|n| n.checked_add(next_digit)) {
                 num = n;
             } else {

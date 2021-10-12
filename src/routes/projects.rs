@@ -2,14 +2,14 @@ use crate::database;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::projects::{
-    DonationLink, GalleryItem, License, ModeratorMessage, ProjectId, ProjectStatus, SearchRequest,
-    SideType,
+    DonationLink, Project, ProjectId, ProjectStatus, SearchRequest, SideType,
 };
 use crate::models::teams::Permissions;
 use crate::routes::ApiError;
 use crate::search::indexing::queue::CreationQueue;
 use crate::search::{search_for_project, SearchConfig, SearchError};
-use crate::util::auth::get_user_from_headers;
+use crate::util::auth::{get_user_from_headers, is_authorized};
+use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::web::Data;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
@@ -48,36 +48,16 @@ pub async fn projects_get(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let mut projects = Vec::new();
-
-    for project_data in projects_data {
-        let mut authorized = !project_data.status.is_hidden();
-
-        if let Some(user) = &user_option {
-            if !authorized {
-                if user.role.is_mod() {
-                    authorized = true;
-                } else {
-                    let user_id: database::models::ids::UserId = user.id.into();
-
-                    let project_exists = sqlx::query!(
-                            "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",
-                            project_data.inner.team_id as database::models::ids::TeamId,
-                            user_id as database::models::ids::UserId,
-                        )
-                        .fetch_one(&**pool)
-                        .await?
-                        .exists;
-
-                    authorized = project_exists.unwrap_or(false);
-                }
+    let projects: Vec<_> = futures::stream::iter(projects_data)
+        .filter_map(|data| async {
+            if is_authorized(&data, &user_option, &pool).await.ok()? {
+                Some(Project::from(data))
+            } else {
+                None
             }
-        }
-
-        if authorized {
-            projects.push(convert_project(project_data));
-        }
-    }
+        })
+        .collect()
+        .await;
 
     Ok(HttpResponse::Ok().json(projects))
 }
@@ -97,37 +77,11 @@ pub async fn project_get(
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if let Some(data) = project_data {
-        let mut authorized = !data.status.is_hidden();
-
-        if let Some(user) = user_option {
-            if !authorized {
-                if user.role.is_mod() {
-                    authorized = true;
-                } else {
-                    let user_id: database::models::ids::UserId = user.id.into();
-
-                    let project_exists = sqlx::query!(
-                        "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",
-                        data.inner.team_id as database::models::ids::TeamId,
-                        user_id as database::models::ids::UserId,
-                    )
-                    .fetch_one(&**pool)
-                    .await?
-                    .exists;
-
-                    authorized = project_exists.unwrap_or(false);
-                }
-            }
+        if is_authorized(&data, &user_option, &pool).await? {
+            return Ok(HttpResponse::Ok().json(Project::from(data)));
         }
-
-        if authorized {
-            return Ok(HttpResponse::Ok().json(convert_project(data)));
-        }
-
-        Ok(HttpResponse::NotFound().body(""))
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
     }
+    Ok(HttpResponse::NotFound().body(""))
 }
 
 #[derive(Serialize)]
@@ -189,81 +143,16 @@ pub async fn dependency_list(
 
         let projects = projects_result?
             .into_iter()
-            .map(convert_project)
-            .collect::<Vec<models::projects::Project>>();
+            .map(models::projects::Project::from)
+            .collect::<Vec<_>>();
         let versions = versions_result?
             .into_iter()
-            .map(super::versions::convert_version)
-            .collect::<Vec<models::projects::Version>>();
+            .map(models::projects::Version::from)
+            .collect::<Vec<_>>();
 
         Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))
     } else {
         Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-pub fn convert_project(
-    data: database::models::project_item::QueryProject,
-) -> models::projects::Project {
-    let m = data.inner;
-
-    models::projects::Project {
-        id: m.id.into(),
-        slug: m.slug,
-        project_type: data.project_type,
-        team: m.team_id.into(),
-        title: m.title,
-        description: m.description,
-        body: m.body,
-        body_url: m.body_url,
-        published: m.published,
-        updated: m.updated,
-        status: data.status,
-        moderator_message: if let Some(message) = m.moderation_message {
-            Some(ModeratorMessage {
-                message,
-                body: m.moderation_message_body,
-            })
-        } else {
-            None
-        },
-        license: License {
-            id: data.license_id,
-            name: data.license_name,
-            url: m.license_url,
-        },
-        client_side: data.client_side,
-        server_side: data.server_side,
-        downloads: m.downloads as u32,
-        followers: m.follows as u32,
-        categories: data.categories,
-        versions: data.versions.into_iter().map(|v| v.into()).collect(),
-        icon_url: m.icon_url,
-        issues_url: m.issues_url,
-        source_url: m.source_url,
-        wiki_url: m.wiki_url,
-        discord_url: m.discord_url,
-        donation_urls: Some(
-            data.donation_urls
-                .into_iter()
-                .map(|d| DonationLink {
-                    id: d.platform_short,
-                    platform: d.platform_name,
-                    url: d.url,
-                })
-                .collect(),
-        ),
-        gallery: data
-            .gallery_items
-            .into_iter()
-            .map(|x| GalleryItem {
-                url: x.image_url,
-                featured: x.featured,
-                title: x.title,
-                description: x.description,
-                created: x.created,
-            })
-            .collect(),
     }
 }
 
@@ -476,7 +365,7 @@ pub async fn project_edit(
 
                     if let Ok(webhook_url) = dotenv::var("MODERATION_DISCORD_WEBHOOK") {
                         crate::util::webhook::send_discord_webhook(
-                            convert_project(project_item.clone()),
+                            Project::from(project_item.clone()),
                             webhook_url,
                         )
                         .await
@@ -959,30 +848,15 @@ pub async fn project_icon_edit(
             }
         }
 
-        let mut bytes = web::BytesMut::new();
-        while let Some(item) = payload.next().await {
-            if bytes.len() >= 262144 {
-                return Err(ApiError::InvalidInputError(String::from(
-                    "Icons must be smaller than 256KiB",
-                )));
-            } else {
-                bytes.extend_from_slice(&item.map_err(|_| {
-                    ApiError::InvalidInputError(
-                        "Unable to parse bytes in payload sent!".to_string(),
-                    )
-                })?);
-            }
-        }
-
+        let bytes =
+            read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
         let hash = sha1::Sha1::from(&bytes).hexdigest();
-
         let project_id: ProjectId = project_item.id.into();
-
         let upload_data = file_host
             .upload_file(
                 content_type,
                 &format!("data/{}/{}.{}", project_id, hash, ext.ext),
-                bytes.to_vec(),
+                bytes.freeze(),
             )
             .await?;
 
@@ -1126,29 +1000,18 @@ pub async fn add_gallery_item(
             }
         }
 
-        let mut bytes = web::BytesMut::new();
-        while let Some(item) = payload.next().await {
-            const FILE_SIZE_CAP: usize = 5 * (1 << 20);
-
-            if bytes.len() >= FILE_SIZE_CAP {
-                return Err(ApiError::InvalidInputError(String::from(
-                    "Gallery image exceeds the maximum of 5MiB.",
-                )));
-            } else {
-                bytes.extend_from_slice(&item.map_err(|_| {
-                    ApiError::InvalidInputError(
-                        "Unable to parse bytes in payload sent!".to_string(),
-                    )
-                })?);
-            }
-        }
-
+        let bytes = read_from_payload(
+            &mut payload,
+            5 * (1 << 20),
+            "Gallery image exceeds the maximum of 5MiB.",
+        )
+        .await?;
         let hash = sha1::Sha1::from(&bytes).hexdigest();
 
         let id: ProjectId = project_item.id.into();
         let url = format!("data/{}/images/{}.{}", id, hash, &*ext.ext);
         file_host
-            .upload_file(content_type, &url, bytes.to_vec())
+            .upload_file(content_type, &url, bytes.freeze())
             .await?;
 
         let mut transaction = pool.begin().await?;

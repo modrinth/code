@@ -13,15 +13,13 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
         .min_connections(
             dotenv::var("DATABASE_MIN_CONNECTIONS")
                 .ok()
-                .map(|x| x.parse::<u32>().ok())
-                .flatten()
+                .and_then(|x| x.parse().ok())
                 .unwrap_or(16),
         )
         .max_connections(
             dotenv::var("DATABASE_MAX_CONNECTIONS")
                 .ok()
-                .map(|x| x.parse::<u32>().ok())
-                .flatten()
+                .and_then(|x| x.parse().ok())
                 .unwrap_or(16),
         )
         .connect(&database_url)
@@ -30,7 +28,8 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
     Ok(pool)
 }
 pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
-    let uri = &*dotenv::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+    let uri = dotenv::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+    let uri = uri.as_str();
     if !Postgres::database_exists(uri).await? {
         info!("Creating database...");
         Postgres::create_database(uri).await?;
@@ -50,7 +49,7 @@ pub async fn run_migrations(uri: &str) -> Result<(), sqlx::Error> {
     let (version, dirty) = conn.version().await?.unwrap_or((0, false));
 
     if dirty {
-        panic!("The database is dirty ! Please check your database status.");
+        panic!("The database is dirty! Please check your database status.");
     }
 
     for migration in migrator.iter() {

@@ -51,5 +51,5 @@ pub fn validation_errors_to_string(errors: ValidationErrors, adder: Option<Strin
         }
     }
 
-    "".to_string()
+    String::new()
 }

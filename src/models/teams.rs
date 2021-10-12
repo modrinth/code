@@ -1,4 +1,5 @@
 use super::ids::Base62Id;
+use crate::database::models::team_item::QueryTeamMember;
 use crate::models::users::User;
 use serde::{Deserialize, Serialize};
 
@@ -56,4 +57,20 @@ pub struct TeamMember {
     pub permissions: Option<Permissions>,
     /// Whether the user has joined the team or is just invited to it
     pub accepted: bool,
+}
+
+impl TeamMember {
+    pub fn from(data: QueryTeamMember, override_permissions: bool) -> Self {
+        Self {
+            team_id: data.team_id.into(),
+            user: data.user.into(),
+            role: data.role,
+            permissions: if override_permissions {
+                None
+            } else {
+                Some(data.permissions)
+            },
+            accepted: data.accepted,
+        }
+    }
 }

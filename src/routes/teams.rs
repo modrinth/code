@@ -1,5 +1,4 @@
 use crate::database::models::notification_item::{NotificationActionBuilder, NotificationBuilder};
-use crate::database::models::team_item::QueryTeamMember;
 use crate::database::models::TeamMember;
 use crate::models::ids::ProjectId;
 use crate::models::teams::{Permissions, TeamId};
@@ -32,41 +31,24 @@ pub async fn team_members_get_project(
                     .map_err(ApiError::DatabaseError)?;
 
             if team_member.is_some() {
-                let team_members: Vec<crate::models::teams::TeamMember> = members_data
+                let team_members: Vec<_> = members_data
                     .into_iter()
-                    .map(|data| convert_team_member(data, false))
+                    .map(|data| crate::models::teams::TeamMember::from(data, false))
                     .collect();
 
                 return Ok(HttpResponse::Ok().json(team_members));
             }
         }
 
-        let team_members: Vec<crate::models::teams::TeamMember> = members_data
+        let team_members: Vec<_> = members_data
             .into_iter()
             .filter(|x| x.accepted)
-            .map(|data| convert_team_member(data, true))
+            .map(|data| crate::models::teams::TeamMember::from(data, true))
             .collect();
 
         Ok(HttpResponse::Ok().json(team_members))
     } else {
         Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-pub fn convert_team_member(
-    data: QueryTeamMember,
-    override_permissions: bool,
-) -> crate::models::teams::TeamMember {
-    crate::models::teams::TeamMember {
-        team_id: data.team_id.into(),
-        user: super::users::convert_user(data.user),
-        role: data.role,
-        permissions: if override_permissions {
-            None
-        } else {
-            Some(data.permissions)
-        },
-        accepted: data.accepted,
     }
 }
 
@@ -87,19 +69,19 @@ pub async fn team_members_get(
             .map_err(ApiError::DatabaseError)?;
 
         if team_member.is_some() {
-            let team_members: Vec<crate::models::teams::TeamMember> = members_data
+            let team_members: Vec<_> = members_data
                 .into_iter()
-                .map(|data| convert_team_member(data, false))
+                .map(|data| crate::models::teams::TeamMember::from(data, false))
                 .collect();
 
             return Ok(HttpResponse::Ok().json(team_members));
         }
     }
 
-    let team_members: Vec<crate::models::teams::TeamMember> = members_data
+    let team_members: Vec<_> = members_data
         .into_iter()
         .filter(|x| x.accepted)
-        .map(|data| convert_team_member(data, true))
+        .map(|data| crate::models::teams::TeamMember::from(data, true))
         .collect();
 
     Ok(HttpResponse::Ok().json(team_members))

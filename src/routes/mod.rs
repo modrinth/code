@@ -1,15 +1,14 @@
-use actix_web::web;
-
 mod v1;
 pub use v1::v1_config;
 
 mod auth;
+mod health;
 mod index;
 mod maven;
 mod moderation;
 mod not_found;
 mod notifications;
-mod project_creation;
+pub(crate) mod project_creation;
 mod projects;
 mod reports;
 mod tags;
@@ -18,15 +17,15 @@ mod users;
 mod version_creation;
 mod version_file;
 mod versions;
-mod health;
 
 pub use auth::config as auth_config;
 pub use tags::config as tags_config;
 
-pub use self::index::index_get;
 pub use self::health::health_get;
+pub use self::index::index_get;
 pub use self::not_found::not_found;
 use crate::file_hosting::FileHostingError;
+use actix_web::web;
 
 pub fn v2_config(cfg: &mut web::ServiceConfig) {
     cfg.service(

@@ -1,6 +1,6 @@
 use super::ApiError;
 use crate::database;
-use crate::models::projects::{Project, ProjectStatus};
+use crate::models::projects::ProjectStatus;
 use crate::util::auth::check_is_moderator_from_headers;
 use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
@@ -43,10 +43,10 @@ pub async fn get_projects(
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 
-    let projects: Vec<Project> = database::Project::get_many_full(project_ids, &**pool)
+    let projects: Vec<_> = database::Project::get_many_full(project_ids, &**pool)
         .await?
         .into_iter()
-        .map(super::projects::convert_project)
+        .map(crate::models::projects::Project::from)
         .collect();
 
     Ok(HttpResponse::Ok().json(projects))

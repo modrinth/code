@@ -1,7 +1,7 @@
 use super::ApiError;
 use crate::database;
 use crate::models;
-use crate::models::projects::{Dependency, DependencyType};
+use crate::models::projects::{Dependency, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::get_user_from_headers;
 use crate::util::validate::validation_errors_to_string;
@@ -55,7 +55,7 @@ pub async fn version_list(
                     .map(|featured| featured == version.featured)
                     .unwrap_or(true)
             })
-            .map(convert_version)
+            .map(Version::from)
             .collect::<Vec<_>>();
 
         versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
@@ -83,14 +83,14 @@ pub async fn version_list(
                         version.game_versions.contains(&filter.0.version)
                             && version.loaders.contains(&filter.1.loader)
                     })
-                    .map(|version| response.push(convert_version(version.clone())))
+                    .map(|version| response.push(Version::from(version.clone())))
                     .unwrap_or(());
             });
 
             if response.is_empty() {
                 versions
                     .into_iter()
-                    .for_each(|version| response.push(convert_version(version)));
+                    .for_each(|version| response.push(Version::from(version)));
             }
         }
 
@@ -119,12 +119,10 @@ pub async fn versions_get(
         .collect();
     let versions_data = database::models::Version::get_many_full(version_ids, &**pool).await?;
 
-    let mut versions = Vec::new();
-
-    for version_data in versions_data {
-        versions.push(convert_version(version_data));
-    }
-
+    let versions = versions_data
+        .into_iter()
+        .map(Version::from)
+        .collect::<Vec<_>>();
     Ok(HttpResponse::Ok().json(versions))
 }
 
@@ -137,74 +135,9 @@ pub async fn version_get(
     let version_data = database::models::Version::get_full(id.into(), &**pool).await?;
 
     if let Some(data) = version_data {
-        Ok(HttpResponse::Ok().json(convert_version(data)))
+        Ok(HttpResponse::Ok().json(models::projects::Version::from(data)))
     } else {
         Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-pub fn convert_version(
-    data: database::models::version_item::QueryVersion,
-) -> models::projects::Version {
-    use models::projects::VersionType;
-
-    models::projects::Version {
-        id: data.id.into(),
-        project_id: data.project_id.into(),
-        author_id: data.author_id.into(),
-
-        featured: data.featured,
-        name: data.name,
-        version_number: data.version_number,
-        changelog: data.changelog,
-        changelog_url: data.changelog_url,
-        date_published: data.date_published,
-        downloads: data.downloads as u32,
-        version_type: match data.version_type.as_str() {
-            "release" => VersionType::Release,
-            "beta" => VersionType::Beta,
-            "alpha" => VersionType::Alpha,
-            _ => VersionType::Release,
-        },
-
-        files: data
-            .files
-            .into_iter()
-            .map(|f| {
-                models::projects::VersionFile {
-                    url: f.url,
-                    filename: f.filename,
-                    // FIXME: Hashes are currently stored as an ascii byte slice instead
-                    // of as an actual byte array in the database
-                    hashes: f
-                        .hashes
-                        .into_iter()
-                        .map(|(k, v)| Some((k, String::from_utf8(v).ok()?)))
-                        .collect::<Option<_>>()
-                        .unwrap_or_else(Default::default),
-                    primary: f.primary,
-                }
-            })
-            .collect(),
-        dependencies: data
-            .dependencies
-            .into_iter()
-            .map(|d| Dependency {
-                version_id: d.version_id.map(|x| x.into()),
-                project_id: d.project_id.map(|x| x.into()),
-                dependency_type: DependencyType::from_str(&*d.dependency_type),
-            })
-            .collect(),
-        game_versions: data
-            .game_versions
-            .into_iter()
-            .map(models::projects::GameVersion)
-            .collect(),
-        loaders: data
-            .loaders
-            .into_iter()
-            .map(models::projects::Loader)
-            .collect(),
     }
 }
 

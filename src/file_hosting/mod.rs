@@ -6,6 +6,7 @@ mod mock;
 mod s3_host;
 
 pub use backblaze::BackblazeHost;
+use bytes::Bytes;
 pub use mock::MockHost;
 use s3::creds::AwsCredsError;
 use s3::S3Error;
@@ -51,7 +52,7 @@ pub trait FileHost {
         &self,
         content_type: &str,
         file_name: &str,
-        file_bytes: Vec<u8>,
+        file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError>;
 
     async fn delete_file_version(

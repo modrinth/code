@@ -8,6 +8,7 @@ use crate::models::users::UserId;
 use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::IndexingError;
 use crate::util::auth::{get_user_from_headers, AuthenticationError};
+use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
@@ -255,7 +256,6 @@ pub async fn project_create(
 
     result
 }
-
 /*
 
 Project Creation Steps:
@@ -449,18 +449,12 @@ pub async fn project_create_inner(
             }
 
             if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
-                let mut data = Vec::new();
-                while let Some(chunk) = field.next().await {
-                    const FILE_SIZE_CAP: usize = 5 * (1 << 20);
-
-                    if data.len() >= FILE_SIZE_CAP {
-                        return Err(CreateError::InvalidInput(String::from(
-                            "Gallery image exceeds the maximum of 5MiB.",
-                        )));
-                    } else {
-                        data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-                    }
-                }
+                let data = read_from_field(
+                    &mut field,
+                    5 * (1 << 20),
+                    "Gallery image exceeds the maximum of 5MiB.",
+                )
+                .await?;
 
                 let hash = sha1::Sha1::from(&data).hexdigest();
                 let (_, file_extension) =
@@ -470,7 +464,7 @@ pub async fn project_create_inner(
 
                 let url = format!("data/{}/images/{}.{}", project_id, hash, file_extension);
                 let upload_data = file_host
-                    .upload_file(content_type, &url, data.to_vec())
+                    .upload_file(content_type, &url, data.freeze())
                     .await?;
 
                 uploaded_files.push(UploadedFile {
@@ -804,22 +798,13 @@ async fn process_icon_upload(
     cdn_url: &str,
 ) -> Result<String, CreateError> {
     if let Some(content_type) = crate::util::ext::get_image_content_type(file_extension) {
-        let mut data = Vec::new();
-        while let Some(chunk) = field.next().await {
-            if data.len() >= 262144 {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Icons must be smaller than 256KiB",
-                )));
-            } else {
-                data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
-            }
-        }
+        let data = read_from_field(&mut field, 262144, "Icons must be smaller than 256KiB").await?;
 
         let upload_data = file_host
             .upload_file(
                 content_type,
                 &format!("data/{}/icon.{}", project_id, file_extension),
-                data,
+                data.freeze(),
             )
             .await?;
 

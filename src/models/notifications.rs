@@ -22,9 +22,37 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
 }
 
+use crate::database::models::notification_item::Notification as DBNotification;
+use crate::database::models::notification_item::NotificationAction as DBNotificationAction;
+
+impl From<DBNotification> for Notification {
+    fn from(notif: DBNotification) -> Self {
+        Self {
+            id: notif.id.into(),
+            user_id: notif.user_id.into(),
+            type_: notif.notification_type,
+            title: notif.title,
+            text: notif.text,
+            link: notif.link,
+            read: notif.read,
+            created: notif.created,
+            actions: notif.actions.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct NotificationAction {
     pub title: String,
     /// The route to call when this notification action is called. Formatted HTTP Method, route
     pub action_route: (String, String),
+}
+
+impl From<DBNotificationAction> for NotificationAction {
+    fn from(act: DBNotificationAction) -> Self {
+        Self {
+            title: act.title,
+            action_route: (act.action_route_method, act.action_route),
+        }
+    }
 }

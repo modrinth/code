@@ -8,6 +8,7 @@ use crate::models::projects::{
 use crate::models::teams::Permissions;
 use crate::routes::project_creation::{CreateError, UploadedFile};
 use crate::util::auth::get_user_from_headers;
+use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{validate_file, ValidationResult};
 use actix_multipart::{Field, Multipart};
@@ -587,20 +588,10 @@ pub async fn upload_file(
     let content_type = crate::util::ext::project_file_type(file_extension)
         .ok_or_else(|| CreateError::InvalidFileType(file_extension.to_string()))?;
 
-    let mut data = Vec::new();
-    while let Some(chunk) = field.next().await {
-        // Project file size limit of 100MiB
-        const FILE_SIZE_CAP: usize = 100 * (1 << 20);
-
-        if data.len() >= FILE_SIZE_CAP {
-            return Err(CreateError::InvalidInput(
-                String::from("Project file exceeds the maximum of 100MiB. Contact a moderator or admin to request permission to upload larger files.")
-            ));
-        } else {
-            let bytes = chunk.map_err(CreateError::MultipartError)?;
-            data.append(&mut bytes.to_vec());
-        }
-    }
+    let data = read_from_field(
+        field, 100 * (1 << 20),
+        "Project file exceeds the maximum of 100MiB. Contact a moderator or admin to request permission to upload larger files."
+    ).await?;
 
     let hash = sha1::Sha1::from(&data).hexdigest();
     let exists = sqlx::query!(
@@ -623,7 +614,7 @@ pub async fn upload_file(
     }
 
     let validation_result = validate_file(
-        data.as_slice(),
+        &data,
         file_extension,
         project_type,
         loaders,
@@ -638,7 +629,7 @@ pub async fn upload_file(
                 "data/{}/versions/{}/{}",
                 project_id, version_number, file_name
             ),
-            data.to_vec(),
+            data.freeze(),
         )
         .await?;
 

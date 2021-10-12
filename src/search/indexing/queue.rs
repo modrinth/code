@@ -16,7 +16,6 @@ impl CreationQueue {
             queue: Mutex::new(Vec::with_capacity(10)),
         }
     }
-
     pub fn add(&self, search_project: UploadSearchProject) {
         // Can only panic if mutex is poisoned
         self.queue.lock().unwrap().push(search_project);
@@ -24,12 +23,8 @@ impl CreationQueue {
     pub fn take(&self) -> Vec<UploadSearchProject> {
         std::mem::replace(&mut *self.queue.lock().unwrap(), Vec::with_capacity(10))
     }
-}
-
-pub async fn index_queue(
-    queue: &CreationQueue,
-    config: &SearchConfig,
-) -> Result<(), IndexingError> {
-    let queue = queue.take();
-    add_projects(queue, config).await
+    pub async fn index(&self, config: &SearchConfig) -> Result<(), IndexingError> {
+        let queue = self.take();
+        add_projects(queue, config).await
+    }
 }

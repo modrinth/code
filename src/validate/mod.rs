@@ -18,9 +18,9 @@ pub enum ValidationError {
     #[error("IO Error: {0}")]
     IoError(#[from] std::io::Error),
     #[error("Error while validating JSON: {0}")]
-    SerDeError(#[from] serde_json::Error),
+    SerdeError(#[from] serde_json::Error),
     #[error("Invalid Input: {0}")]
-    InvalidInputError(String),
+    InvalidInputError(std::borrow::Cow<'static, str>),
 }
 
 #[derive(Eq, PartialEq)]
@@ -28,7 +28,7 @@ pub enum ValidationResult {
     /// File should be marked as primary
     Pass,
     /// File should not be marked primary, the reason for which is inside the String
-    Warning(String),
+    Warning(&'static str),
 }
 
 pub enum SupportedGameVersions {
@@ -39,9 +39,9 @@ pub enum SupportedGameVersions {
 }
 
 pub trait Validator: Sync {
-    fn get_file_extensions<'a>(&self) -> &'a [&'a str];
-    fn get_project_types<'a>(&self) -> &'a [&'a str];
-    fn get_supported_loaders<'a>(&self) -> &'a [&'a str];
+    fn get_file_extensions(&self) -> &[&str];
+    fn get_project_types(&self) -> &[&str];
+    fn get_supported_loaders(&self) -> &[&str];
     fn get_supported_game_versions(&self) -> SupportedGameVersions;
     fn validate(
         &self,
@@ -50,10 +50,10 @@ pub trait Validator: Sync {
 }
 
 static VALIDATORS: [&dyn Validator; 4] = [
-    &PackValidator {},
-    &FabricValidator {},
-    &ForgeValidator {},
-    &LegacyForgeValidator {},
+    &PackValidator,
+    &FabricValidator,
+    &ForgeValidator,
+    &LegacyForgeValidator,
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
@@ -89,10 +89,13 @@ pub fn validate_file(
     }
 
     if visited {
-        Err(ValidationError::InvalidInputError(format!(
-            "File extension {} is invalid for input file",
-            file_extension
-        )))
+        Err(ValidationError::InvalidInputError(
+            format!(
+                "File extension {} is invalid for input file",
+                file_extension
+            )
+            .into(),
+        ))
     } else {
         Ok(ValidationResult::Pass)
     }

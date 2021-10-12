@@ -1,10 +1,10 @@
 use crate::file_hosting::FileHost;
 use crate::models::projects::SearchRequest;
 use crate::routes::project_creation::{project_create_inner, undo_uploads, CreateError};
-use crate::routes::projects::{convert_project, ProjectIds};
+use crate::routes::projects::ProjectIds;
 use crate::routes::ApiError;
 use crate::search::{search_for_project, SearchConfig, SearchError};
-use crate::util::auth::get_user_from_headers;
+use crate::util::auth::{get_user_from_headers, is_authorized};
 use crate::{database, models};
 use actix_multipart::Multipart;
 use actix_web::web;
@@ -98,37 +98,14 @@ pub async fn mods_get(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let mut projects = Vec::new();
+    let mut projects = Vec::with_capacity(projects_data.len());
 
-    for project_data in projects_data {
-        let mut authorized = !project_data.status.is_hidden();
-
-        if let Some(user) = &user_option {
-            if !authorized {
-                if user.role.is_mod() {
-                    authorized = true;
-                } else {
-                    let user_id: database::models::ids::UserId = user.id.into();
-
-                    let project_exists = sqlx::query!(
-                            "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",
-                            project_data.inner.team_id as database::models::ids::TeamId,
-                            user_id as database::models::ids::UserId,
-                        )
-                        .fetch_one(&**pool)
-                        .await?
-                        .exists;
-
-                    authorized = project_exists.unwrap_or(false);
-                }
-            }
-        }
-
-        if authorized {
-            projects.push(convert_project(project_data));
+    // can't use `map` and `collect` here since `is_authorized` must be async
+    for proj in projects_data {
+        if is_authorized(&proj, &user_option, &pool).await? {
+            projects.push(crate::models::projects::Project::from(proj))
         }
     }
-
     Ok(HttpResponse::Ok().json(projects))
 }
 

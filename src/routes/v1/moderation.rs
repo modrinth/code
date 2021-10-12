@@ -34,10 +34,10 @@ pub async fn get_mods(
     .try_collect::<Vec<database::models::ProjectId>>()
     .await?;
 
-    let projects: Vec<Project> = database::Project::get_many_full(project_ids, &**pool)
+    let projects: Vec<_> = database::Project::get_many_full(project_ids, &**pool)
         .await?
         .into_iter()
-        .map(crate::routes::projects::convert_project)
+        .map(Project::from)
         .collect();
 
     Ok(HttpResponse::Ok().json(projects))

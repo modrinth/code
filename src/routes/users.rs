@@ -3,12 +3,11 @@ use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
 use crate::models::projects::{Project, ProjectStatus};
 use crate::models::users::{Role, UserId};
-use crate::routes::notifications::convert_notification;
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
+use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
-use futures::StreamExt;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -42,7 +41,7 @@ pub async fn users_get(
 
     let users_data = User::get_many(user_ids, &**pool).await?;
 
-    let users: Vec<crate::models::users::User> = users_data.into_iter().map(convert_user).collect();
+    let users: Vec<crate::models::users::User> = users_data.into_iter().map(From::from).collect();
 
     Ok(HttpResponse::Ok().json(users))
 }
@@ -68,24 +67,10 @@ pub async fn user_get(
     }
 
     if let Some(data) = user_data {
-        let response = convert_user(data);
+        let response: crate::models::users::User = data.into();
         Ok(HttpResponse::Ok().json(response))
     } else {
         Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-pub fn convert_user(data: crate::database::models::user_item::User) -> crate::models::users::User {
-    crate::models::users::User {
-        id: data.id.into(),
-        github_id: data.github_id.map(|i| i as u64),
-        username: data.username,
-        name: data.name,
-        email: None,
-        avatar_url: data.avatar_url,
-        bio: data.bio,
-        created: data.created,
-        role: Role::from_string(&*data.role),
     }
 }
 
@@ -114,11 +99,11 @@ pub async fn projects_list(
             User::get_projects(id, ProjectStatus::Approved.as_str(), &**pool).await?
         };
 
-        let response = crate::database::Project::get_many_full(project_data, &**pool)
+        let response: Vec<_> = crate::database::Project::get_many_full(project_data, &**pool)
             .await?
             .into_iter()
-            .map(super::projects::convert_project)
-            .collect::<Vec<Project>>();
+            .map(Project::from)
+            .collect();
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -337,26 +322,15 @@ pub async fn user_icon_edit(
                 }
             }
 
-            let mut bytes = web::BytesMut::new();
-            while let Some(item) = payload.next().await {
-                if bytes.len() >= 262144 {
-                    return Err(ApiError::InvalidInputError(String::from(
-                        "Icons must be smaller than 256KiB",
-                    )));
-                } else {
-                    bytes.extend_from_slice(&item.map_err(|_| {
-                        ApiError::InvalidInputError(
-                            "Unable to parse bytes in payload sent!".to_string(),
-                        )
-                    })?);
-                }
-            }
+            let bytes =
+                read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB")
+                    .await?;
 
             let upload_data = file_host
                 .upload_file(
                     content_type,
                     &format!("user/{}/icon.{}", user_id, ext.ext),
-                    bytes.to_vec(),
+                    bytes.freeze(),
                 )
                 .await?;
 
@@ -468,11 +442,11 @@ pub async fn user_follows(
         .try_collect::<Vec<crate::database::models::ProjectId>>()
         .await?;
 
-        let projects = crate::database::Project::get_many_full(project_ids, &**pool)
+        let projects: Vec<_> = crate::database::Project::get_many_full(project_ids, &**pool)
             .await?
             .into_iter()
-            .map(super::projects::convert_project)
-            .collect::<Vec<Project>>();
+            .map(Project::from)
+            .collect();
 
         Ok(HttpResponse::Ok().json(projects))
     } else {
@@ -502,7 +476,7 @@ pub async fn user_notifications(
             crate::database::models::notification_item::Notification::get_many_user(id, &**pool)
                 .await?
                 .into_iter()
-                .map(convert_notification)
+                .map(Into::into)
                 .collect();
 
         notifications.sort_by(|a, b| b.created.cmp(&a.created));

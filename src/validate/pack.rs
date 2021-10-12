@@ -1,4 +1,3 @@
-use crate::models::projects::SideType;
 use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
 use serde::{Deserialize, Serialize};
 use std::io::{Cursor, Read};
@@ -6,28 +5,13 @@ use zip::ZipArchive;
 
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct PackFormat {
-    pub game: String,
+pub struct PackFormat<'a> {
+    pub game: &'a str,
     pub format_version: i32,
-    pub version_id: String,
-    pub name: String,
-    pub summary: Option<String>,
-    pub dependencies: std::collections::HashMap<PackDependency, String>,
-}
-
-#[derive(Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-pub struct PackFile {
-    pub path: String,
-    pub hashes: std::collections::HashMap<String, String>,
-    pub env: Environment,
-    pub downloads: Vec<String>,
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct Environment {
-    pub client: SideType,
-    pub server: SideType,
+    pub version_id: &'a str,
+    pub name: &'a str,
+    pub summary: Option<&'a str>,
+    pub dependencies: std::collections::HashMap<PackDependency, &'a str>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
@@ -40,12 +24,12 @@ pub enum PackDependency {
 
 impl std::fmt::Display for PackDependency {
     fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
-        write!(fmt, "{}", self.as_str())
+        fmt.write_str(self.as_str())
     }
 }
 
 impl PackDependency {
-    // These are constant, so this can remove unneccessary allocations (`to_string`)
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
     pub fn as_str(&self) -> &'static str {
         match self {
             PackDependency::Forge => "forge",
@@ -55,18 +39,18 @@ impl PackDependency {
     }
 }
 
-pub struct PackValidator {}
+pub struct PackValidator;
 
 impl super::Validator for PackValidator {
-    fn get_file_extensions<'a>(&self) -> &'a [&'a str] {
+    fn get_file_extensions(&self) -> &[&str] {
         &["zip"]
     }
 
-    fn get_project_types<'a>(&self) -> &'a [&'a str] {
+    fn get_project_types(&self) -> &[&str] {
         &["modpack"]
     }
 
-    fn get_supported_loaders<'a>(&self) -> &'a [&'a str] {
+    fn get_supported_loaders(&self) -> &[&str] {
         &["forge", "fabric"]
     }
 
@@ -78,20 +62,19 @@ impl super::Validator for PackValidator {
         &self,
         archive: &mut ZipArchive<Cursor<&[u8]>>,
     ) -> Result<ValidationResult, ValidationError> {
-        let mut file = archive.by_name("index.json").map_err(|_| {
-            ValidationError::InvalidInputError("Pack manifest is missing.".to_string())
-        })?;
+        let mut file = archive
+            .by_name("index.json")
+            .map_err(|_| ValidationError::InvalidInputError("Pack manifest is missing.".into()))?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
 
-        let pack: PackFormat = serde_json::from_str(&*contents)?;
+        let pack: PackFormat = serde_json::from_str(&contents)?;
 
-        if pack.game != *"minecraft" {
-            return Err(ValidationError::InvalidInputError(format!(
-                "Game {0} does not exist!",
-                pack.game
-            )));
+        if pack.game != "minecraft" {
+            return Err(ValidationError::InvalidInputError(
+                format!("Game {0} does not exist!", pack.game).into(),
+            ));
         }
 
         Ok(ValidationResult::Pass)

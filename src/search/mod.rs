@@ -17,7 +17,7 @@ pub enum SearchError {
     #[error("MeiliSearch Error: {0}")]
     MeiliSearchError(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
-    SerDeError(#[from] serde_json::Error),
+    SerdeError(#[from] serde_json::Error),
     #[error("Error while parsing an integer: {0}")]
     IntParsingError(#[from] std::num::ParseIntError),
     #[error("Environment Error")]
@@ -31,7 +31,7 @@ impl actix_web::ResponseError for SearchError {
         match self {
             SearchError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             SearchError::MeiliSearchError(..) => StatusCode::BAD_REQUEST,
-            SearchError::SerDeError(..) => StatusCode::BAD_REQUEST,
+            SearchError::SerdeError(..) => StatusCode::BAD_REQUEST,
             SearchError::IntParsingError(..) => StatusCode::BAD_REQUEST,
             SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
         }
@@ -42,7 +42,7 @@ impl actix_web::ResponseError for SearchError {
             error: match self {
                 SearchError::EnvError(..) => "environment_error",
                 SearchError::MeiliSearchError(..) => "meilisearch_error",
-                SearchError::SerDeError(..) => "invalid_input",
+                SearchError::SerdeError(..) => "invalid_input",
                 SearchError::IntParsingError(..) => "invalid_input",
                 SearchError::InvalidIndex(..) => "invalid_input",
             },
@@ -57,7 +57,13 @@ pub struct SearchConfig {
     pub key: String,
 }
 
-/// A project document used for uploading projects to meilisearch's indices.
+impl SearchConfig {
+    pub fn make_client(&self) -> Client {
+        Client::new(self.address.as_str(), self.key.as_str())
+    }
+}
+
+/// A project document used for uploading projects to MeiliSearch's indices.
 /// This contains some extra data that is not returned by search results.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct UploadSearchProject {

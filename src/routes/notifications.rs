@@ -1,6 +1,6 @@
 use crate::database;
 use crate::models::ids::NotificationId;
-use crate::models::notifications::{Notification, NotificationAction};
+use crate::models::notifications::Notification;
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
@@ -20,22 +20,25 @@ pub async fn notifications_get(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&*ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
+    // TODO: this is really confusingly named.
+    use database::models::notification_item::Notification as DBNotification;
+    use database::models::NotificationId as DBNotificationId;
 
-    let notifications_data =
+    let notification_ids: Vec<DBNotificationId> =
+        serde_json::from_str::<Vec<NotificationId>>(ids.ids.as_str())?
+            .into_iter()
+            .map(DBNotificationId::from)
+            .collect();
+
+    let notifications_data: Vec<DBNotification> =
         database::models::notification_item::Notification::get_many(notification_ids, &**pool)
             .await?;
 
-    let mut notifications: Vec<Notification> = Vec::new();
-
-    for notification in notifications_data {
-        if notification.user_id == user.id.into() || user.role.is_mod() {
-            notifications.push(convert_notification(notification));
-        }
-    }
+    let notifications: Vec<Notification> = notifications_data
+        .into_iter()
+        .filter(|n| n.user_id == user.id.into() || user.role.is_mod())
+        .map(Notification::from)
+        .collect();
 
     Ok(HttpResponse::Ok().json(notifications))
 }
@@ -55,35 +58,12 @@ pub async fn notification_get(
 
     if let Some(data) = notification_data {
         if user.id == data.user_id.into() || user.role.is_mod() {
-            Ok(HttpResponse::Ok().json(convert_notification(data)))
+            Ok(HttpResponse::Ok().json(Notification::from(data)))
         } else {
             Ok(HttpResponse::NotFound().body(""))
         }
     } else {
         Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-pub fn convert_notification(
-    notif: database::models::notification_item::Notification,
-) -> Notification {
-    Notification {
-        id: notif.id.into(),
-        user_id: notif.user_id.into(),
-        type_: notif.notification_type,
-        title: notif.title,
-        text: notif.text,
-        link: notif.link,
-        read: notif.read,
-        created: notif.created,
-        actions: notif
-            .actions
-            .into_iter()
-            .map(|x| NotificationAction {
-                title: x.title,
-                action_route: (x.action_route_method, x.action_route),
-            })
-            .collect(),
     }
 }
 

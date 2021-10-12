@@ -1,4 +1,4 @@
-use std::sync::{RwLock, Arc};
+use std::sync::{Arc, RwLock};
 
 #[derive(Clone, Debug)]
 pub struct PodInfo {
@@ -12,7 +12,7 @@ impl PodInfo {
         Self {
             pod_name: dotenv::var("POD_NAME").unwrap_or("DEV".to_string()),
             node_name: dotenv::var("NODE_NAME").unwrap_or("self-hosted".to_string()),
-            pod_id: Arc::new(RwLock::new(None))
+            pod_id: Arc::new(RwLock::new(None)),
         }
     }
     pub fn get_id(&self) -> String {

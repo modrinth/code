@@ -34,9 +34,5 @@ pub async fn delete_file_version(
         .send()
         .await?;
 
-    if response.status().is_success() {
-        Ok(response.json().await?)
-    } else {
-        Err(FileHostingError::BackblazeError(response.json().await?))
-    }
+    super::process_response(response).await
 }

@@ -3,18 +3,18 @@ use chrono::{DateTime, NaiveDateTime, Utc};
 use std::io::Cursor;
 use zip::ZipArchive;
 
-pub struct ForgeValidator {}
+pub struct ForgeValidator;
 
 impl super::Validator for ForgeValidator {
-    fn get_file_extensions<'a>(&self) -> &'a [&'a str] {
+    fn get_file_extensions(&self) -> &[&str] {
         &["jar", "zip"]
     }
 
-    fn get_project_types<'a>(&self) -> &'a [&'a str] {
+    fn get_project_types(&self) -> &[&str] {
         &["mod"]
     }
 
-    fn get_supported_loaders<'a>(&self) -> &'a [&'a str] {
+    fn get_supported_loaders(&self) -> &[&str] {
         &["forge"]
     }
 
@@ -31,12 +31,12 @@ impl super::Validator for ForgeValidator {
         archive: &mut ZipArchive<Cursor<&[u8]>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("META-INF/mods.toml").map_err(|_| {
-            ValidationError::InvalidInputError("No mods.toml present for Forge file.".to_string())
+            ValidationError::InvalidInputError("No mods.toml present for Forge file.".into())
         })?;
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(
-                "Forge mod file is a source file!".to_string(),
+                "Forge mod file is a source file!".into(),
             ));
         }
 
@@ -46,26 +46,26 @@ impl super::Validator for ForgeValidator {
     }
 }
 
-pub struct LegacyForgeValidator {}
+pub struct LegacyForgeValidator;
 
 impl super::Validator for LegacyForgeValidator {
-    fn get_file_extensions<'a>(&self) -> &'a [&'a str] {
+    fn get_file_extensions(&self) -> &[&str] {
         &["jar", "zip"]
     }
 
-    fn get_project_types<'a>(&self) -> &'a [&'a str] {
+    fn get_project_types(&self) -> &[&str] {
         &["mod"]
     }
 
-    fn get_supported_loaders<'a>(&self) -> &'a [&'a str] {
+    fn get_supported_loaders(&self) -> &[&str] {
         &["forge"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Times between versions 1.5.2 to 1.12.2, which all use the legacy way of defining mods
         SupportedGameVersions::Range(
-            DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1366818300, 0), Utc),
-            DateTime::<Utc>::from_utc(NaiveDateTime::from_timestamp(1505810340, 0), Utc),
+            DateTime::from_utc(NaiveDateTime::from_timestamp(1366818300, 0), Utc),
+            DateTime::from_utc(NaiveDateTime::from_timestamp(1505810340, 0), Utc),
         )
     }
 
@@ -74,12 +74,12 @@ impl super::Validator for LegacyForgeValidator {
         archive: &mut ZipArchive<Cursor<&[u8]>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("mcmod.info").map_err(|_| {
-            ValidationError::InvalidInputError("No mcmod.info present for Forge file.".to_string())
+            ValidationError::InvalidInputError("No mcmod.info present for Forge file.".into())
         })?;
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(
-                "Forge mod file is a source file!".to_string(),
+                "Forge mod file is a source file!".into(),
             ));
         }
 

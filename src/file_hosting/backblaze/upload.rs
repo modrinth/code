@@ -1,5 +1,6 @@
 use super::authorization::UploadUrlData;
 use crate::file_hosting::FileHostingError;
+use bytes::Bytes;
 use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -21,7 +22,7 @@ pub async fn upload_file(
     url_data: &UploadUrlData,
     content_type: &str,
     file_name: &str,
-    file_bytes: Vec<u8>,
+    file_bytes: Bytes,
 ) -> Result<UploadFileData, FileHostingError> {
     let response = reqwest::Client::new()
         .post(&url_data.upload_url)
@@ -40,9 +41,5 @@ pub async fn upload_file(
         .send()
         .await?;
 
-    if response.status().is_success() {
-        Ok(response.json().await?)
-    } else {
-        Err(FileHostingError::BackblazeError(response.json().await?))
-    }
+    super::process_response(response).await
 }

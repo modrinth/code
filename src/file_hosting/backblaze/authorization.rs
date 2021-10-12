@@ -44,11 +44,7 @@ pub async fn authorize_account(
         .send()
         .await?;
 
-    if response.status().is_success() {
-        Ok(response.json().await?)
-    } else {
-        Err(FileHostingError::BackblazeError(response.json().await?))
-    }
+    super::process_response(response).await
 }
 
 pub async fn get_upload_url(
@@ -71,9 +67,5 @@ pub async fn get_upload_url(
         .send()
         .await?;
 
-    if response.status().is_success() {
-        Ok(response.json().await?)
-    } else {
-        Err(FileHostingError::BackblazeError(response.json().await?))
-    }
+    super::process_response(response).await
 }
