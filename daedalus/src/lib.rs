@@ -6,6 +6,8 @@
 
 /// Models and methods for fetching metadata for the Fabric mod loader
 pub mod fabric;
+/// Models and methods for fetching metadata for the Forge mod loader
+pub mod forge;
 /// Models and methods for fetching metadata for Minecraft
 pub mod minecraft;
 
@@ -56,18 +58,41 @@ pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
     })?;
 
     Ok(format!(
-        "{}/{}/{}-{}.jar",
+        "{}/{}/{}/{}-{}.jar",
         package.replace(".", "/"),
+        name,
         version,
         name,
         version
     ))
 }
 
+/// Downloads a file from specified mirrors
+pub async fn download_file_mirrors(
+    base: &str,
+    mirrors: &[&str],
+    sha1: Option<&str>,
+) -> Result<bytes::Bytes, Error> {
+    if mirrors.is_empty() {
+        return Err(Error::ParseError("No mirrors provided!".to_string()));
+    }
+
+    for (index, mirror) in mirrors.iter().enumerate() {
+        let result = download_file(&*format!("{}{}", mirror, base), sha1).await;
+
+        if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
+            return result;
+        }
+    }
+
+    unreachable!()
+}
+
 /// Downloads a file with retry and checksum functionality
 pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes, Error> {
     let client = reqwest::Client::builder()
         .tcp_keepalive(Some(std::time::Duration::from_secs(10)))
+        .timeout(std::time::Duration::from_secs(30))
         .build()
         .map_err(|err| Error::FetchError {
             inner: err,

@@ -69,7 +69,7 @@ pub struct LatestVersion {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-/// Data of all game versions of Minecrafat
+/// Data of all game versions of Minecraft
 pub struct VersionManifest {
     /// A struct containing the latest snapshot and release of the game
     pub latest: LatestVersion,
@@ -154,7 +154,7 @@ pub struct LibraryDownloads {
     pub classifiers: Option<HashMap<String, LibraryDownload>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "snake_case")]
 /// The action a rule can follow
 pub enum RuleAction {
@@ -164,7 +164,7 @@ pub enum RuleAction {
     Disallow,
 }
 
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
 #[serde(rename_all = "snake_case")]
 /// An enum representing the different types of operating systems
 pub enum Os {
@@ -178,7 +178,7 @@ pub enum Os {
     Unknown,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// A rule which depends on what OS the user is on
 pub struct OsRule {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -192,7 +192,7 @@ pub struct OsRule {
     pub arch: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// A rule which depends on the toggled features of the launcher
 pub struct FeatureRule {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -203,7 +203,7 @@ pub struct FeatureRule {
     pub has_demo_resolution: Option<bool>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// A rule deciding whether a file is downloaded, an argument is used, etc.
 pub struct Rule {
     /// The action the rule takes
@@ -244,9 +244,12 @@ pub struct Library {
     #[serde(skip_serializing_if = "Option::is_none")]
     /// Rules deciding whether the library should be downloaded or not
     pub rules: Option<Vec<Rule>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// SHA1 Checksums for validating the library's integrity. Only present for forge libraries
+    pub checksums: Option<Vec<String>>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
 /// A container for an argument or multiple arguments
 pub enum ArgumentValue {
@@ -256,7 +259,7 @@ pub enum ArgumentValue {
     Many(Vec<String>),
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(untagged)]
 /// A command line argument passed to a program
 pub enum Argument {
@@ -271,7 +274,7 @@ pub enum Argument {
     },
 }
 
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone, Copy)]
 #[serde(rename_all = "snake_case")]
 /// The type of argument
 pub enum ArgumentType {

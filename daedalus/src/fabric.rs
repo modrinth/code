@@ -20,7 +20,7 @@ pub struct PartialVersionInfo {
     /// The latest time a file in this version was updated
     pub time: DateTime<Utc>,
     /// The classpath to the main class to launch the game
-    pub main_class: String,
+    pub main_class: Option<String>,
     /// Arguments passed to the game or JVM
     pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     /// Libraries that the version depends on
@@ -51,7 +51,11 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
             .into_iter()
             .chain(merge.libraries)
             .collect::<Vec<_>>(),
-        main_class: partial.main_class,
+        main_class: if let Some(main_class) = partial.main_class {
+            main_class
+        } else {
+            merge.main_class
+        },
         minecraft_arguments: merge.minecraft_arguments,
         minimum_launcher_version: merge.minimum_launcher_version,
         release_time: partial.release_time,

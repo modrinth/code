@@ -3,6 +3,13 @@ name = "daedalus"
 version = "0.1.0"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
 edition = "2018"
+license = "MIT"
+description = "Utilities for querying and parsing Minecraft metadata"
+repository = "https://github.com/modrinth/daedalus/"
+include = ["Cargo.toml", "src/**/*.rs", "README.md", "LICENSE"]
+keywords = ["minecraft", "launcher"]
+categories = ["game-development", "api-bindings"]
+readme = "README.md"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
