@@ -1,7 +1,8 @@
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
-use std::sync::{Arc, Mutex};
+use std::sync::{Arc};
 use std::time::{Duration, Instant};
+use futures::lock::Mutex;
 
 pub async fn retrieve_data() -> Result<(), Error> {
     let old_manifest =
@@ -19,10 +20,13 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
     let now = Instant::now();
 
-    let mut versions = manifest
+    let mut version_futures = Vec::new();
+
+    for version in  manifest
         .versions
         .iter_mut()
-        .map(|version| async {
+    {
+        version_futures.push(async {
             let old_version = if let Some(old_manifest) = &old_manifest {
                 old_manifest.versions.iter().find(|x| x.id == version.id)
             } else {
@@ -58,10 +62,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                 let assets_index_url = version_info.asset_index.url.clone();
 
                 {
-                    let mut cloned_manifest = match cloned_manifest_mutex.lock() {
-                        Ok(guard) => guard,
-                        Err(poisoned) => poisoned.into_inner(),
-                    };
+                    let mut cloned_manifest = cloned_manifest_mutex.lock().await;
 
                     let position = cloned_manifest
                         .versions
@@ -79,10 +80,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                 let mut download_assets = false;
 
                 {
-                    let mut visited_assets = match visited_assets_mutex.lock() {
-                        Ok(guard) => guard,
-                        Err(poisoned) => poisoned.into_inner(),
-                    };
+                    let mut visited_assets = visited_assets_mutex.lock().await;
 
                     if !visited_assets.contains(&version_info.asset_index.id) {
                         if let Some(assets_hash) = assets_hash {
@@ -128,12 +126,13 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
                 Ok::<(), Error>(())
             }
-            .await?;
+                .await?;
 
             Ok::<(), Error>(())
         })
-        .peekable();
+    }
 
+    let mut versions = version_futures.into_iter().peekable();
     let mut chunk_index = 0;
     while versions.peek().is_some() {
         let now = Instant::now();
@@ -154,10 +153,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
             "minecraft/v{}/manifest.json",
             daedalus::minecraft::CURRENT_FORMAT_VERSION
         ),
-        serde_json::to_vec(&*match cloned_manifest.lock() {
-            Ok(guard) => guard,
-            Err(poisoned) => poisoned.into_inner(),
-        })?,
+        serde_json::to_vec(&*cloned_manifest.lock().await)?,
         Some("application/json".to_string()),
     )
     .await?;

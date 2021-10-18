@@ -3,9 +3,11 @@ use rusoto_core::credential::StaticProvider;
 use rusoto_core::{HttpClient, Region, RusotoError};
 use rusoto_s3::{PutObjectError, S3Client};
 use rusoto_s3::{PutObjectRequest, S3};
+use std::time::Duration;
 
 mod fabric;
 mod minecraft;
+mod forge;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -32,7 +34,35 @@ async fn main() {
         return;
     }
 
-    fabric::retrieve_data().await.unwrap();
+    let mut timer = tokio::time::interval(Duration::from_secs(10 * 60));
+
+    loop {
+        timer.tick().await;
+        tokio::spawn(
+            async {
+                match fabric::retrieve_data().await {
+                    Ok(..) => {}
+                    Err(err) => error!("{:?}", err)
+                };
+            }
+        );
+        tokio::spawn(
+            async {
+                match minecraft::retrieve_data().await {
+                    Ok(..) => {}
+                    Err(err) => error!("{:?}", err)
+                };
+            }
+        );
+        tokio::spawn(
+            async {
+                match forge::retrieve_data().await {
+                    Ok(..) => {}
+                    Err(err) => error!("{:?}", err)
+                };
+            }
+        );
+    }
 }
 
 fn check_env_vars() -> bool {
