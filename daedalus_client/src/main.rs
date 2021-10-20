@@ -6,8 +6,8 @@ use rusoto_s3::{PutObjectRequest, S3};
 use std::time::Duration;
 
 mod fabric;
-mod minecraft;
 mod forge;
+mod minecraft;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -24,6 +24,12 @@ pub enum Error {
         inner: RusotoError<PutObjectError>,
         file: String,
     },
+    #[error("Error while parsing version as semver: {0}")]
+    SemVerError(#[from] semver::Error),
+    #[error("Error while reading zip file: {0}")]
+    ZipError(#[from] zip::result::ZipError),
+    #[error("Error while reading zip file: {0}")]
+    IoError(#[from] std::io::Error),
 }
 
 #[tokio::main]
@@ -38,30 +44,20 @@ async fn main() {
 
     loop {
         timer.tick().await;
-        tokio::spawn(
-            async {
-                match fabric::retrieve_data().await {
-                    Ok(..) => {}
-                    Err(err) => error!("{:?}", err)
-                };
-            }
-        );
-        tokio::spawn(
-            async {
-                match minecraft::retrieve_data().await {
-                    Ok(..) => {}
-                    Err(err) => error!("{:?}", err)
-                };
-            }
-        );
-        tokio::spawn(
-            async {
-                match forge::retrieve_data().await {
-                    Ok(..) => {}
-                    Err(err) => error!("{:?}", err)
-                };
-            }
-        );
+        tokio::spawn(async {
+            match fabric::retrieve_data().await {
+                Ok(..) => {}
+                Err(err) => error!("{:?}", err),
+            };
+            match minecraft::retrieve_data().await {
+                Ok(..) => {}
+                Err(err) => error!("{:?}", err),
+            };
+            match forge::retrieve_data().await {
+                Ok(..) => {}
+                Err(err) => error!("{:?}", err),
+            };
+        });
     }
 }
 

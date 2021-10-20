@@ -4,12 +4,10 @@
 
 #![warn(missing_docs, unused_import_braces, missing_debug_implementations)]
 
-/// Models and methods for fetching metadata for the Fabric mod loader
-pub mod fabric;
-/// Models and methods for fetching metadata for the Forge mod loader
-pub mod forge;
 /// Models and methods for fetching metadata for Minecraft
 pub mod minecraft;
+/// Models and methods for fetching metadata for Minecraft mod loaders
+pub mod modded;
 
 #[derive(thiserror::Error, Debug)]
 /// An error type representing possible errors when fetching metadata

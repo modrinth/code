@@ -1,8 +1,8 @@
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
-use std::sync::{Arc};
-use std::time::{Duration, Instant};
 use futures::lock::Mutex;
+use std::sync::Arc;
+use std::time::{Duration, Instant};
 
 pub async fn retrieve_data() -> Result<(), Error> {
     let old_manifest =
@@ -22,10 +22,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
     let mut version_futures = Vec::new();
 
-    for version in  manifest
-        .versions
-        .iter_mut()
-    {
+    for version in manifest.versions.iter_mut() {
         version_futures.push(async {
             let old_version = if let Some(old_manifest) = &old_manifest {
                 old_manifest.versions.iter().find(|x| x.id == version.id)
@@ -126,7 +123,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
                 Ok::<(), Error>(())
             }
-                .await?;
+            .await?;
 
             Ok::<(), Error>(())
         })
