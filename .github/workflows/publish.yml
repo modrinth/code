@@ -1,30 +1,19 @@
-name: Publish to crates.io
+name: Code quality
 
 on:
   push:
-    branches: [ master ]
-  pull_request:
+    tags:
+      - 'v*'
 env:
   CARGO_TERM_COLOR: always
 jobs:
-  lint:
+  publish:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Install toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          override: true
-          components: rustfmt, clippy
-      - name: Cache build artifacts
-        id: cache-build
-        uses: actions/cache@v2
-        with:
-          path: target/**
-          key: ${{ runner.os }}-build-cache
-      - name: Annotate commit with clippy warnings
-        uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --all-features
+      - uses: actions/checkout@v1
+      - run: cargo login ${CRATES_IO_TOKEN}
+        working-directory: ./daedalus
+        env:
+          CRATES_IO_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+      - run: cargo publish
+        working-directory: ./daedalus
