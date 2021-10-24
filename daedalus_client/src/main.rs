@@ -34,6 +34,8 @@ pub enum Error {
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+
     if check_env_vars() {
         error!("Some environment variables are missing!");
 

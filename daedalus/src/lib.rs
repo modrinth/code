@@ -90,7 +90,7 @@ pub async fn download_file_mirrors(
 pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes, Error> {
     let client = reqwest::Client::builder()
         .tcp_keepalive(Some(std::time::Duration::from_secs(10)))
-        .timeout(std::time::Duration::from_secs(30))
+        .timeout(std::time::Duration::from_secs(15))
         .build()
         .map_err(|err| Error::FetchError {
             inner: err,

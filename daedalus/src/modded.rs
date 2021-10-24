@@ -10,6 +10,15 @@ pub const CURRENT_FABRIC_FORMAT_VERSION: usize = 0;
 /// The latest version of the format the fabric model structs deserialize to
 pub const CURRENT_FORGE_FORMAT_VERSION: usize = 0;
 
+/// A data variable entry that depends on the side of the installation
+#[derive(Serialize, Deserialize, Debug)]
+pub struct SidedDataEntry {
+    /// The value on the client
+    pub client: String,
+    /// The value on the server
+    pub server: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 /// A partial version returned by fabric meta
@@ -31,6 +40,26 @@ pub struct PartialVersionInfo {
     #[serde(rename = "type")]
     /// The type of version
     pub type_: VersionType,
+    /// (Forge-only)
+    pub data: Option<HashMap<String, SidedDataEntry>>,
+    /// (Forge-only) The list of processors to run after downloading the files
+    pub processors: Option<Vec<Processor>>,
+}
+
+/// A processor to be ran after downloading the files
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Processor {
+    /// Maven coordinates for the JAR library of this processor.
+    pub jar: String,
+    /// Maven coordinates for all the libraries that must be included in classpath when running this processor.
+    pub classpath: Vec<String>,
+    /// Arguments for this processor.
+    pub args: Vec<String>,
+    /// Represents a map of outputs. Keys and values can be data values
+    pub outputs: Option<HashMap<String, String>>,
+    /// Which sides this processor shall be ran on.
+    /// Valid values: client, server, extract
+    pub sides: Option<Vec<String>>,
 }
 
 /// Fetches the version manifest of a game version's URL
@@ -72,7 +101,7 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 /// A manifest containing information about a mod loader's versions
 pub struct Manifest {
@@ -91,7 +120,7 @@ pub enum LoaderType {
     Stable,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 ///  A game version of Minecraft
 pub struct Version {
     /// The minecraft version ID
@@ -100,7 +129,7 @@ pub struct Version {
     pub loaders: HashMap<LoaderType, LoaderVersion>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// A version of a Minecraft mod loader
 pub struct LoaderVersion {
     /// The version ID of the loader

@@ -137,7 +137,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
         let chunk: Vec<_> = versions.by_ref().take(100).collect();
         futures::future::try_join_all(chunk).await?;
 
-        std::thread::sleep(Duration::from_secs(1));
+        tokio::time::sleep(Duration::from_secs(1)).await;
 
         chunk_index += 1;
 
