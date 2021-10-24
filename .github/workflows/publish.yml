@@ -1,4 +1,4 @@
-name: Code quality
+name: Publish to crates.io
 
 on:
   push:
