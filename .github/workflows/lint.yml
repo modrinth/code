@@ -1,4 +1,4 @@
-name: Publish to crates.io
+name: Rust lint
 
 on:
   push:
