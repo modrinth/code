@@ -82,7 +82,7 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
         asset_index: merge.asset_index,
         assets: merge.assets,
         downloads: merge.downloads,
-        id: merge.id,
+        id: partial.id,
         libraries: partial
             .libraries
             .into_iter()

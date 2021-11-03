@@ -2,13 +2,13 @@ use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
 use daedalus::minecraft::Library;
 use daedalus::modded::{LoaderType, LoaderVersion, Manifest, PartialVersionInfo, Version};
-use futures::lock::Mutex;
+use tokio::sync::Mutex;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-pub async fn retrieve_data() -> Result<(), Error> {
+pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
     let mut list = fetch_fabric_versions(None).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&*format!(
         "fabric/v{}/manifest.json",
@@ -22,6 +22,8 @@ pub async fn retrieve_data() -> Result<(), Error> {
     } else {
         Vec::new()
     }));
+
+    let uploaded_files_mutex = Arc::new(Mutex::new(Vec::new()));
 
     if let Some(latest) = list.loader.get(0) {
         let loaders_mutex = Arc::new(Mutex::new(HashMap::new()));
@@ -50,6 +52,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
         for game_version in list.game.iter_mut() {
             let visited_artifacts_mutex = Arc::clone(&visited_artifacts_mutex);
             let loaders_mutex = Arc::clone(&loaders_mutex);
+            let uploaded_files_mutex = Arc::clone(&uploaded_files_mutex);
 
             let versions_mutex = Arc::clone(&versions);
             version_futures.push(async move {
@@ -119,8 +122,9 @@ pub async fn retrieve_data() -> Result<(), Error> {
                                 format!("{}/{}", "maven", artifact_path),
                                 artifact.to_vec(),
                                 Some("application/java-archive".to_string()),
+                                uploaded_files_mutex.as_ref(),
                             )
-                            .await?;
+                                .await?;
 
                             Ok::<Library, Error>(lib)
                         },
@@ -131,8 +135,10 @@ pub async fn retrieve_data() -> Result<(), Error> {
                         "fabric/v{}/versions/{}-{}.json",
                         daedalus::modded::CURRENT_FABRIC_FORMAT_VERSION,
                         version.inherits_from,
-                        loader
+                        &loader
                     );
+
+                    let inherits_from = version.inherits_from.clone();
 
                     upload_file_to_bucket(
                         version_path.clone(),
@@ -146,21 +152,25 @@ pub async fn retrieve_data() -> Result<(), Error> {
                             inherits_from: version.inherits_from,
                             libraries: libs,
                             processors: None,
-                            data: None
+                            data: None,
                         })?,
                         Some("application/json".to_string()),
+                        uploaded_files_mutex.as_ref(),
                     )
                     .await?;
 
                     {
                         let mut loader_version_map = loader_version_mutex.lock().await;
-                        loader_version_map.insert(
-                            type_,
-                            LoaderVersion {
-                                id: loader,
-                                url: format_url(&*version_path),
-                            },
-                        );
+                        async move {
+                            loader_version_map.insert(
+                                type_,
+                                LoaderVersion {
+                                    id: format!("{}-{}", inherits_from, loader),
+                                    url: format_url(&*version_path),
+                                },
+                            );
+                        }
+                        .await;
                     }
 
                     Ok::<(), Error>(())
@@ -190,7 +200,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
             chunk_index += 1;
 
             let elapsed = now.elapsed();
-            println!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
         }
     }
 
@@ -204,8 +214,13 @@ pub async fn retrieve_data() -> Result<(), Error> {
                 game_versions: versions.into_inner(),
             })?,
             Some("application/json".to_string()),
+            uploaded_files_mutex.as_ref(),
         )
         .await?;
+    }
+
+    if let Ok(uploaded_files_mutex) = Arc::try_unwrap(uploaded_files_mutex) {
+        uploaded_files.extend(uploaded_files_mutex.into_inner());
     }
 
     Ok(())

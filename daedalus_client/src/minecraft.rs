@@ -1,10 +1,10 @@
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
-use futures::lock::Mutex;
+use tokio::sync::Mutex;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 
-pub async fn retrieve_data() -> Result<(), Error> {
+pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
     let old_manifest =
         daedalus::minecraft::fetch_version_manifest(Some(&*crate::format_url(&*format!(
             "minecraft/v{}/manifest.json",
@@ -17,6 +17,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
     let cloned_manifest = Arc::new(Mutex::new(manifest.clone()));
 
     let visited_assets_mutex = Arc::new(Mutex::new(Vec::new()));
+    let uploaded_files_mutex = Arc::new(Mutex::new(Vec::new()));
 
     let now = Instant::now();
 
@@ -38,6 +39,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
             let visited_assets_mutex = Arc::clone(&visited_assets_mutex);
             let cloned_manifest_mutex = Arc::clone(&cloned_manifest);
+            let uploaded_files_mutex = Arc::clone(&uploaded_files_mutex);
 
             let assets_hash = old_version.map(|x| x.assets_index_sha1.clone()).flatten();
 
@@ -104,6 +106,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                             assets_path,
                             assets_index.to_vec(),
                             Some("application/json".to_string()),
+                            uploaded_files_mutex.as_ref()
                         ));
                     }
                 }
@@ -113,13 +116,11 @@ pub async fn retrieve_data() -> Result<(), Error> {
                         version_path,
                         serde_json::to_vec(&version_info)?,
                         Some("application/json".to_string()),
+                        uploaded_files_mutex.as_ref()
                     ));
                 }
 
-                let now = Instant::now();
                 futures::future::try_join_all(upload_futures).await?;
-                let elapsed = now.elapsed();
-                println!("Spaces Upload {} Elapsed: {:.2?}", version.id, elapsed);
 
                 Ok::<(), Error>(())
             }
@@ -129,20 +130,22 @@ pub async fn retrieve_data() -> Result<(), Error> {
         })
     }
 
-    let mut versions = version_futures.into_iter().peekable();
-    let mut chunk_index = 0;
-    while versions.peek().is_some() {
-        let now = Instant::now();
+    {
+        let mut versions = version_futures.into_iter().peekable();
+        let mut chunk_index = 0;
+        while versions.peek().is_some() {
+            let now = Instant::now();
 
-        let chunk: Vec<_> = versions.by_ref().take(100).collect();
-        futures::future::try_join_all(chunk).await?;
+            let chunk: Vec<_> = versions.by_ref().take(100).collect();
+            futures::future::try_join_all(chunk).await?;
 
-        tokio::time::sleep(Duration::from_secs(1)).await;
+            tokio::time::sleep(Duration::from_secs(1)).await;
 
-        chunk_index += 1;
+            chunk_index += 1;
 
-        let elapsed = now.elapsed();
-        println!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+            let elapsed = now.elapsed();
+            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+        }
     }
 
     upload_file_to_bucket(
@@ -152,11 +155,16 @@ pub async fn retrieve_data() -> Result<(), Error> {
         ),
         serde_json::to_vec(&*cloned_manifest.lock().await)?,
         Some("application/json".to_string()),
+        uploaded_files_mutex.as_ref()
     )
     .await?;
 
+    if let Ok(uploaded_files_mutex) = Arc::try_unwrap(uploaded_files_mutex) {
+        uploaded_files.extend(uploaded_files_mutex.into_inner());
+    }
+
     let elapsed = now.elapsed();
-    println!("Elapsed: {:.2?}", elapsed);
+    info!("Elapsed: {:.2?}", elapsed);
 
     Ok(())
 }

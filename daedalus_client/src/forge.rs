@@ -2,7 +2,9 @@ use crate::{format_url, upload_file_to_bucket, Error};
 use chrono::{DateTime, Utc};
 use daedalus::download_file;
 use daedalus::minecraft::{Argument, ArgumentType, Library, VersionType};
-use daedalus::modded::{LoaderType, LoaderVersion, Manifest, PartialVersionInfo, Processor, SidedDataEntry};
+use daedalus::modded::{
+    LoaderType, LoaderVersion, Manifest, PartialVersionInfo, Processor, SidedDataEntry,
+};
 use lazy_static::lazy_static;
 use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
@@ -11,20 +13,19 @@ use std::io::Read;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
+use log::info;
 
 lazy_static! {
     static ref FORGE_MANIFEST_V1_QUERY: VersionReq =
         VersionReq::parse(">=8.0.684, <23.5.2851").unwrap();
-
     static ref FORGE_MANIFEST_V2_QUERY_P1: VersionReq =
         VersionReq::parse(">=23.5.2851, <31.2.52").unwrap();
     static ref FORGE_MANIFEST_V2_QUERY_P2: VersionReq =
         VersionReq::parse(">=32.0.1, <37.0.0").unwrap();
-
     static ref FORGE_MANIFEST_V3_QUERY: VersionReq = VersionReq::parse(">=37.0.0").unwrap();
 }
 
-pub async fn retrieve_data() -> Result<(), Error> {
+pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
     let maven_metadata = fetch_maven_metadata(None).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&*format_url(&*format!(
         "forge/v{}/manifest.json",
@@ -40,6 +41,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
     }));
 
     let visited_assets_mutex = Arc::new(Mutex::new(Vec::new()));
+    let uploaded_files_mutex = Arc::new(Mutex::new(Vec::new()));
 
     let mut version_futures = Vec::new();
 
@@ -66,7 +68,11 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
                 let version = Version::parse(&*loader_version)?;
 
-                if FORGE_MANIFEST_V1_QUERY.matches(&version) || FORGE_MANIFEST_V2_QUERY_P1.matches(&version) || FORGE_MANIFEST_V2_QUERY_P2.matches(&version) || FORGE_MANIFEST_V3_QUERY.matches(&version) {
+                if FORGE_MANIFEST_V1_QUERY.matches(&version)
+                    || FORGE_MANIFEST_V2_QUERY_P1.matches(&version)
+                    || FORGE_MANIFEST_V2_QUERY_P2.matches(&version)
+                    || FORGE_MANIFEST_V3_QUERY.matches(&version)
+                {
                     loaders.push((loader_version_full, version))
                 }
             }
@@ -76,6 +82,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
             version_futures.push(async {
                 let versions_mutex = Arc::clone(&versions);
                 let visited_assets = Arc::clone(&visited_assets_mutex);
+                let uploaded_files_mutex = Arc::clone(&uploaded_files_mutex);
                 async move {
                     {
                         if versions_mutex.lock().await.iter().any(|x| {
@@ -89,7 +96,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                         }
                     }
 
-                    println!("installer start {}", loader_version_full.clone());
+                    info!("Forge - Installer Start {}", loader_version_full.clone());
                     let bytes = download_file(&*format!("https://maven.minecraftforge.net/net/minecraftforge/forge/{0}/forge-{0}-installer.jar", loader_version_full), None).await?;
 
                     let reader = std::io::Cursor::new(&*bytes);
@@ -112,7 +119,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
 
                                 bytes::Bytes::from(forge_universal)
                             };
-                            let forge_universal_path = profile.install.file_path.clone();
+                            let forge_universal_path = profile.install.path.clone();
 
                             let now = Instant::now();
                             let libs = futures::future::try_join_all(profile.version_info.libraries.into_iter().map(|mut lib| async {
@@ -151,6 +158,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                                         format!("{}/{}", "maven", artifact_path),
                                         artifact.to_vec(),
                                         Some("application/java-archive".to_string()),
+                                        uploaded_files_mutex.as_ref(),
                                     ).await?;
                                 }
 
@@ -158,7 +166,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                             })).await?;
 
                             let elapsed = now.elapsed();
-                            println!("Elapsed lib DL: {:.2?}", elapsed);
+                            info!("Elapsed lib DL: {:.2?}", elapsed);
 
                             let new_profile = PartialVersionInfo {
                                 id: profile.version_info.id,
@@ -183,6 +191,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                                 version_path.clone(),
                                 serde_json::to_vec(&new_profile)?,
                                 Some("application/json".to_string()),
+                                uploaded_files_mutex.as_ref()
                             ).await?;
 
                             let mut map = HashMap::new();
@@ -243,7 +252,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                                         let artifact_path =
                                             daedalus::get_path_from_artifact(&*lib.name)?;
 
-                                        let artifact_bytes = if &*artifact.url == "" {
+                                        let artifact_bytes = if artifact.url.is_empty() {
                                             forge_universal_bytes.clone().unwrap_or_default()
                                         } else {
                                             daedalus::download_file(
@@ -259,6 +268,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                                             format!("{}/{}", "maven", artifact_path),
                                             artifact_bytes.to_vec(),
                                             Some("application/java-archive".to_string()),
+                                            uploaded_files_mutex.as_ref()
                                         ).await?;
                                     }
                                 }
@@ -267,7 +277,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                             })).await?;
 
                             let elapsed = now.elapsed();
-                            println!("Elapsed lib DL: {:.2?}", elapsed);
+                            info!("Elapsed lib DL: {:.2?}", elapsed);
 
                             let new_profile = PartialVersionInfo {
                                 id: version_info.id,
@@ -292,6 +302,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
                                 version_path.clone(),
                                 serde_json::to_vec(&new_profile)?,
                                 Some("application/json".to_string()),
+                                uploaded_files_mutex.as_ref()
                             ).await?;
 
                             let mut map = HashMap::new();
@@ -318,7 +329,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
         let mut versions_peek = version_futures.into_iter().peekable();
         let mut chunk_index = 0;
         while versions_peek.peek().is_some() {
-            println!("Chunk {} Start", chunk_index);
+            info!("Chunk {} Start", chunk_index);
             let now = Instant::now();
 
             let chunk: Vec<_> = versions_peek.by_ref().take(100).collect();
@@ -329,7 +340,7 @@ pub async fn retrieve_data() -> Result<(), Error> {
             chunk_index += 1;
 
             let elapsed = now.elapsed();
-            println!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
         }
     }
 
@@ -343,8 +354,13 @@ pub async fn retrieve_data() -> Result<(), Error> {
                 game_versions: versions.into_inner(),
             })?,
             Some("application/json".to_string()),
+            uploaded_files_mutex.as_ref()
         )
         .await?;
+    }
+
+    if let Ok(uploaded_files_mutex) = Arc::try_unwrap(uploaded_files_mutex) {
+        uploaded_files.extend(uploaded_files_mutex.into_inner());
     }
 
     Ok(())

@@ -47,15 +47,22 @@ async fn main() {
     loop {
         timer.tick().await;
         tokio::spawn(async {
-            match fabric::retrieve_data().await {
+            let mut uploaded_files = Vec::new();
+
+            match fabric::retrieve_data(&mut uploaded_files).await {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
-            match minecraft::retrieve_data().await {
+            match minecraft::retrieve_data(&mut uploaded_files).await {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
-            match forge::retrieve_data().await {
+            match forge::retrieve_data(&mut uploaded_files).await {
+                Ok(..) => {}
+                Err(err) => error!("{:?}", err),
+            };
+
+            match  purge_digitalocean_cache(uploaded_files).await {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
@@ -97,10 +104,12 @@ fn check_env_vars() -> bool {
     let do_integration = dotenv::var("DO_INTEGRATION")
         .ok()
         .map(|x| x.parse::<bool>().ok())
-        .flatten();
+        .flatten()
+        .unwrap_or(false);
 
-    if do_integration.unwrap_or(false) {
-        failed |= check_var::<bool>("DO_ACCESS_KEY");
+    if do_integration {
+        failed |= check_var::<String>("DO_ACCESS_KEY");
+        failed |= check_var::<String>("DO_ENDPOINT_ID");
     }
 
     failed
@@ -126,11 +135,14 @@ pub async fn upload_file_to_bucket(
     path: String,
     bytes: Vec<u8>,
     content_type: Option<String>,
+    uploaded_files: &tokio::sync::Mutex<Vec<String>>,
 ) -> Result<(), Error> {
+    let key = format!("{}/{}", &*dotenv::var("BASE_FOLDER").unwrap(), path);
+
     CLIENT
         .put_object(PutObjectRequest {
             bucket: dotenv::var("S3_BUCKET_NAME").unwrap(),
-            key: format!("{}/{}", &*dotenv::var("BASE_FOLDER").unwrap(), path),
+            key: key.clone(),
             body: Some(bytes.into()),
             acl: Some("public-read".to_string()),
             content_type,
@@ -142,6 +154,11 @@ pub async fn upload_file_to_bucket(
             file: format!("{}/{}", &*dotenv::var("BASE_FOLDER").unwrap(), path),
         })?;
 
+    {
+        let mut uploaded_files = uploaded_files.lock().await;
+        uploaded_files.push(key);
+    }
+
     Ok(())
 }
 
@@ -152,4 +169,36 @@ pub fn format_url(path: &str) -> String {
         &*dotenv::var("BASE_FOLDER").unwrap(),
         path
     )
+}
+
+#[derive(serde::Serialize)]
+struct PurgeCacheRequest {
+    pub files: Vec<String>,
+}
+
+pub async fn purge_digitalocean_cache(files: Vec<String>) -> Result<(), Error> {
+    if !dotenv::var("DO_INTEGRATION")
+        .ok()
+        .map(|x| x.parse::<bool>().ok())
+        .flatten()
+        .unwrap_or(false) {
+
+        return Ok(())
+    }
+
+    let client = reqwest::Client::new();
+
+    client
+        .delete(&format!(
+            "https://api.digitalocean.com/v2/cdn/endpoints/{}/cache",
+            &*dotenv::var("DO_ENDPOINT_ID").unwrap()
+        ))
+        .header("Authorization", &*format!("Bearer {}", &*dotenv::var("DO_ACCESS_KEY").unwrap()))
+        .json(&PurgeCacheRequest { files })
+        .send().await.map_err(|err| Error::FetchError {
+            inner: err,
+            item: "purging digital ocean cache".to_string()
+        })?;
+
+    Ok(())
 }
