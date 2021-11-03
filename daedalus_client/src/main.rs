@@ -1,4 +1,4 @@
-use log::{error, info, warn};
+use log::{error, warn};
 use rusoto_core::credential::StaticProvider;
 use rusoto_core::{HttpClient, Region, RusotoError};
 use rusoto_s3::{PutObjectError, S3Client};

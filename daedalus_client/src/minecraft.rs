@@ -3,6 +3,7 @@ use daedalus::download_file;
 use tokio::sync::Mutex;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
+use log::info;
 
 pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
     let old_manifest =

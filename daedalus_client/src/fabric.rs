@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
+use log::info;
 
 pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
     let mut list = fetch_fabric_versions(None).await?;
