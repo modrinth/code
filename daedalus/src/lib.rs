@@ -51,17 +51,22 @@ pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
     let name = name_items.get(1).ok_or_else(|| {
         Error::ParseError(format!("Unable to find name for library {}", &artifact))
     })?;
-    let version = name_items.get(2).ok_or_else(|| {
+    let version_ext = name_items.get(2).ok_or_else(|| {
+        Error::ParseError(format!("Unable to find version for library {}", &artifact))
+    })?.split('@').collect::<Vec<&str>>();
+    let version = version_ext.get(0).ok_or_else(|| {
         Error::ParseError(format!("Unable to find version for library {}", &artifact))
     })?;
+    let ext = version_ext.get(1);
 
     Ok(format!(
-        "{}/{}/{}/{}-{}.jar",
+        "{}/{}/{}/{}-{}.{}",
         package.replace(".", "/"),
         name,
         version,
         name,
-        version
+        version,
+        ext.unwrap_or(&"jar")
     ))
 }
 
