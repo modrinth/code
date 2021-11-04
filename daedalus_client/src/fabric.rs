@@ -152,6 +152,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                             type_: version.type_,
                             inherits_from: version.inherits_from,
                             libraries: libs,
+                            minecraft_arguments: version.minecraft_arguments,
                             processors: None,
                             data: None,
                         })?,

@@ -33,6 +33,8 @@ pub struct PartialVersionInfo {
     pub time: DateTime<Utc>,
     /// The classpath to the main class to launch the game
     pub main_class: Option<String>,
+    /// (Legacy) Arguments passed to the game
+    pub minecraft_arguments: Option<String>,
     /// Arguments passed to the game or JVM
     pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     /// Libraries that the version depends on
@@ -72,7 +74,24 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
     VersionInfo {
         arguments: if let Some(partial_args) = partial.arguments {
             if let Some(merge_args) = merge.arguments {
-                Some(partial_args.into_iter().chain(merge_args).collect())
+                let mut new_map = HashMap::new();
+
+                fn add_keys(new_map: &mut HashMap<ArgumentType, Vec<Argument>>, args: HashMap<ArgumentType, Vec<Argument>>) {
+                    for (type_, arguments) in args {
+                        for arg in arguments {
+                            if let Some(vec) = new_map.get_mut(&type_) {
+                                vec.push(arg);
+                            } else {
+                                new_map.insert(type_, vec![arg]);
+                            }
+                        }
+                    }
+                }
+
+                add_keys(&mut new_map, merge_args);
+                add_keys(&mut new_map, partial_args);
+
+                Some(new_map)
             } else {
                 Some(partial_args)
             }
@@ -93,7 +112,7 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
         } else {
             merge.main_class
         },
-        minecraft_arguments: merge.minecraft_arguments,
+        minecraft_arguments: partial.minecraft_arguments,
         minimum_launcher_version: merge.minimum_launcher_version,
         release_time: partial.release_time,
         time: partial.time,
