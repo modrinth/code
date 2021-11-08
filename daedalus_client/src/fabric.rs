@@ -2,12 +2,12 @@ use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
 use daedalus::minecraft::Library;
 use daedalus::modded::{LoaderType, LoaderVersion, Manifest, PartialVersionInfo, Version};
-use tokio::sync::Mutex;
+use log::info;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use log::info;
+use tokio::sync::Mutex;
 
 pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
     let mut list = fetch_fabric_versions(None).await?;
@@ -125,7 +125,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                                 Some("application/java-archive".to_string()),
                                 uploaded_files_mutex.as_ref(),
                             )
-                                .await?;
+                            .await?;
 
                             Ok::<Library, Error>(lib)
                         },

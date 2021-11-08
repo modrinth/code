@@ -76,7 +76,10 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
             if let Some(merge_args) = merge.arguments {
                 let mut new_map = HashMap::new();
 
-                fn add_keys(new_map: &mut HashMap<ArgumentType, Vec<Argument>>, args: HashMap<ArgumentType, Vec<Argument>>) {
+                fn add_keys(
+                    new_map: &mut HashMap<ArgumentType, Vec<Argument>>,
+                    args: HashMap<ArgumentType, Vec<Argument>>,
+                ) {
                     for (type_, arguments) in args {
                         for arg in arguments {
                             if let Some(vec) = new_map.get_mut(&type_) {

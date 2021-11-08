@@ -1,9 +1,9 @@
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
-use tokio::sync::Mutex;
+use log::info;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use log::info;
+use tokio::sync::Mutex;
 
 pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
     let old_manifest =
@@ -107,7 +107,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                             assets_path,
                             assets_index.to_vec(),
                             Some("application/json".to_string()),
-                            uploaded_files_mutex.as_ref()
+                            uploaded_files_mutex.as_ref(),
                         ));
                     }
                 }
@@ -117,7 +117,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                         version_path,
                         serde_json::to_vec(&version_info)?,
                         Some("application/json".to_string()),
-                        uploaded_files_mutex.as_ref()
+                        uploaded_files_mutex.as_ref(),
                     ));
                 }
 
@@ -156,7 +156,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
         ),
         serde_json::to_vec(&*cloned_manifest.lock().await)?,
         Some("application/json".to_string()),
-        uploaded_files_mutex.as_ref()
+        uploaded_files_mutex.as_ref(),
     )
     .await?;
 
