@@ -31,10 +31,13 @@ pub struct PartialVersionInfo {
     pub release_time: DateTime<Utc>,
     /// The latest time a file in this version was updated
     pub time: DateTime<Utc>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The classpath to the main class to launch the game
     pub main_class: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// (Legacy) Arguments passed to the game
     pub minecraft_arguments: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Arguments passed to the game or JVM
     pub arguments: Option<HashMap<ArgumentType, Vec<Argument>>>,
     /// Libraries that the version depends on
@@ -42,8 +45,10 @@ pub struct PartialVersionInfo {
     #[serde(rename = "type")]
     /// The type of version
     pub type_: VersionType,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// (Forge-only)
     pub data: Option<HashMap<String, SidedDataEntry>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// (Forge-only) The list of processors to run after downloading the files
     pub processors: Option<Vec<Processor>>,
 }
@@ -57,8 +62,10 @@ pub struct Processor {
     pub classpath: Vec<String>,
     /// Arguments for this processor.
     pub args: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Represents a map of outputs. Keys and values can be data values
     pub outputs: Option<HashMap<String, String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Which sides this processor shall be ran on.
     /// Valid values: client, server, extract
     pub sides: Option<Vec<String>>,
@@ -120,6 +127,8 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
         release_time: partial.release_time,
         time: partial.time,
         type_: partial.type_,
+        data: partial.data,
+        processors: partial.processors,
     }
 }
 

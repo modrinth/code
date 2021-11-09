@@ -1,3 +1,4 @@
+use crate::modded::{Processor, SidedDataEntry};
 use crate::{download_file, Error};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -51,9 +52,11 @@ pub struct Version {
     pub sha1: String,
     /// Whether the version supports the latest player safety features
     pub compliance_level: u32,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// (Modrinth Provided) The link to the assets index for this version
     /// This is only available when using the Modrinth mirror
     pub assets_index_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// (Modrinth Provided) The SHA1 hash of the assets index for this version
     /// This is only available when using the Modrinth mirror
     pub assets_index_sha1: Option<String>,
@@ -147,8 +150,10 @@ pub struct LibraryDownload {
 #[derive(Serialize, Deserialize, Debug)]
 /// A list of files that should be downloaded for libraries
 pub struct LibraryDownloads {
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The primary library artifact
     pub artifact: Option<LibraryDownload>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// Conditional files that may be needed to be downloaded alongside the library
     /// The HashMap key specifies a classifier as additional information for downloading files
     pub classifiers: Option<HashMap<String, LibraryDownload>>,
@@ -315,6 +320,12 @@ pub struct VersionInfo {
     #[serde(rename = "type")]
     /// The type of version
     pub type_: VersionType,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// (Forge-only)
+    pub data: Option<HashMap<String, SidedDataEntry>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// (Forge-only) The list of processors to run after downloading the files
+    pub processors: Option<Vec<Processor>>,
 }
 
 /// Fetches detailed information about a version from the manifest
