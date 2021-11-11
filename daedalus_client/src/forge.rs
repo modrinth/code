@@ -230,7 +230,16 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                             }).await??;
 
 
-                            let mut libs : Vec<daedalus::minecraft::Library> = profile.libraries.into_iter().chain(version_info.libraries).collect();
+                            let mut libs : Vec<daedalus::minecraft::Library> = version_info.libraries.into_iter().chain(profile.libraries.into_iter().map(|x| Library {
+                                downloads: x.downloads,
+                                extract: x.extract,
+                                name: x.name,
+                                url: x.url,
+                                natives: x.natives,
+                                rules: x.rules,
+                                checksums: x.checksums,
+                                include_in_classpath: false
+                            })).collect();
 
                             let mut local_libs : HashMap<String, bytes::Bytes> = HashMap::new();
 
@@ -286,7 +295,8 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                                                             url: Some("".to_string()),
                                                             natives: None,
                                                             rules: None,
-                                                            checksums: None
+                                                            checksums: None,
+                                                            include_in_classpath: false,
                                                         });
                                                     }
                                                 }
@@ -321,7 +331,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                                                 artifact.url = format_url(&*format!("maven/{}", artifact_path));
                                             }
                                         } else if lib.url.is_some() {
-                                            lib.url = Some(format_url(&*format!("maven/{}", artifact_path)));
+                                            lib.url = Some(format_url("maven/"));
                                         }
 
                                         return Ok::<Library, Error>(lib);

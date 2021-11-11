@@ -252,6 +252,13 @@ pub struct Library {
     #[serde(skip_serializing_if = "Option::is_none")]
     /// SHA1 Checksums for validating the library's integrity. Only present for forge libraries
     pub checksums: Option<Vec<String>>,
+    #[serde(default = "default_include_in_classpath")]
+    /// Whether the library should be included in the classpath at the game's launch
+    pub include_in_classpath: bool,
+}
+
+fn default_include_in_classpath() -> bool {
+    true
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
