@@ -1,7 +1,11 @@
 use crate::launcher::auth::provider::Credentials;
-use crate::launcher::meta::{Argument, ArgumentValue, Library, Os, VersionType};
 use crate::launcher::rules::parse_rules;
 use crate::launcher::LauncherError;
+use daedalus::get_path_from_artifact;
+use daedalus::minecraft::{Argument, ArgumentValue, Library, Os, VersionType};
+use daedalus::modded::SidedDataEntry;
+use std::collections::HashMap;
+use std::io::{BufRead, BufReader};
 use std::path::Path;
 use uuid::Uuid;
 
@@ -13,63 +17,24 @@ pub fn get_class_paths(
     let mut class_paths = Vec::new();
 
     for library in libraries {
-        if library.downloads.artifact.is_some() {
-            if let Some(rules) = &library.rules {
-                if !super::rules::parse_rules(rules.as_slice()) {
-                    continue;
-                }
+        if let Some(rules) = &library.rules {
+            if !super::rules::parse_rules(rules.as_slice()) {
+                continue;
             }
-
-            let name_items = library.name.split(':').collect::<Vec<&str>>();
-
-            let package = name_items.get(0).ok_or_else(|| {
-                LauncherError::ParseError(format!(
-                    "Unable to find package for library {}",
-                    &library.name
-                ))
-            })?;
-            let name = name_items.get(1).ok_or_else(|| {
-                LauncherError::ParseError(format!(
-                    "Unable to find name for library {}",
-                    &library.name
-                ))
-            })?;
-            let version = name_items.get(2).ok_or_else(|| {
-                LauncherError::ParseError(format!(
-                    "Unable to find version for library {}",
-                    &library.name
-                ))
-            })?;
-
-            let mut path = libraries_path.to_path_buf();
-
-            for directory in package.split('.') {
-                path.push(directory);
-            }
-
-            path.push(name);
-            path.push(version);
-            path.push(format!("{}-{}.jar", name, version));
-
-            class_paths.push(
-                std::fs::canonicalize(&path)
-                    .map_err(|_| {
-                        LauncherError::InvalidInput(format!(
-                            "Library file at path {} does not exist",
-                            path.to_string_lossy()
-                        ))
-                    })?
-                    .to_string_lossy()
-                    .to_string(),
-            )
         }
+
+        if !library.include_in_classpath {
+            continue;
+        }
+
+        class_paths.push(get_lib_path(libraries_path, &library.name)?);
     }
 
     class_paths.push(
-        std::fs::canonicalize(&client_path)
+        crate::util::absolute_path(&client_path)
             .map_err(|_| {
                 LauncherError::InvalidInput(format!(
-                    "Specified client path {} does not exist",
+                    "Specified class path {} does not exist",
                     client_path.to_string_lossy()
                 ))
             })?
@@ -81,6 +46,45 @@ pub fn get_class_paths(
         Os::Osx | Os::Linux | Os::Unknown => ":",
         Os::Windows => ";",
     }))
+}
+
+pub fn get_class_paths_jar<T: AsRef<str>>(
+    libraries_path: &Path,
+    libraries: &[T],
+) -> Result<String, LauncherError> {
+    let mut class_paths = Vec::new();
+
+    for library in libraries {
+        class_paths.push(get_lib_path(libraries_path, library)?)
+    }
+
+    Ok(class_paths.join(match super::download::get_os() {
+        Os::Osx | Os::Linux | Os::Unknown => ":",
+        Os::Windows => ";",
+    }))
+}
+
+pub fn get_lib_path<T: AsRef<str>>(libraries_path: &Path, lib: T) -> Result<String, LauncherError> {
+    let mut path = libraries_path.to_path_buf();
+
+    path.push(get_path_from_artifact(lib.as_ref())?);
+
+    let path = crate::util::absolute_path(&path).map_err(|_| {
+        LauncherError::InvalidInput(format!(
+            "Library file at path {} does not exist",
+            path.to_string_lossy()
+        ))
+    })?;
+
+    /*if !path.exists() {
+        if let Some(parent) = &path.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+
+        std::fs::File::create(&path)?;
+    }*/
+
+    Ok(path.to_string_lossy().to_string())
 }
 
 pub fn get_jvm_arguments(
@@ -97,7 +101,7 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            &*std::fs::canonicalize(natives_path)
+            &*crate::util::absolute_path(natives_path)
                 .map_err(|_| LauncherError::InvalidInput(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
@@ -117,10 +121,12 @@ fn parse_jvm_argument(
     natives_path: &Path,
     class_paths: &str,
 ) -> Result<String, LauncherError> {
+    let mut argument = argument.to_string();
+    argument.retain(|c| !c.is_whitespace());
     Ok(argument
         .replace(
             "${natives_directory}",
-            &*std::fs::canonicalize(natives_path)
+            &*crate::util::absolute_path(natives_path)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified natives path {} does not exist",
@@ -208,7 +214,7 @@ fn parse_minecraft_argument(
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &*std::fs::canonicalize(game_directory)
+            &*crate::util::absolute_path(game_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified game directory {} does not exist",
@@ -220,7 +226,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${assets_root}",
-            &*std::fs::canonicalize(assets_directory)
+            &*crate::util::absolute_path(assets_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified assets directory {} does not exist",
@@ -232,7 +238,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${game_assets}",
-            &*std::fs::canonicalize(assets_directory)
+            &*crate::util::absolute_path(assets_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified assets directory {} does not exist",
@@ -280,4 +286,60 @@ where
     }
 
     Ok(())
+}
+
+pub fn get_processor_arguments<T: AsRef<str>>(
+    libraries_path: &Path,
+    arguments: &[T],
+    data: &HashMap<String, SidedDataEntry>,
+) -> Result<Vec<String>, LauncherError> {
+    let mut new_arguments = Vec::new();
+
+    for argument in arguments {
+        let trimmed_arg = &argument.as_ref()[1..argument.as_ref().len() - 1];
+        if argument.as_ref().starts_with('{') {
+            if let Some(entry) = data.get(trimmed_arg) {
+                new_arguments.push(if entry.client.starts_with('[') {
+                    get_lib_path(libraries_path, &entry.client[1..entry.client.len() - 1])?
+                } else {
+                    entry.client.clone()
+                })
+            }
+        } else if argument.as_ref().starts_with('[') {
+            new_arguments.push(get_lib_path(libraries_path, trimmed_arg)?)
+        } else {
+            new_arguments.push(argument.as_ref().to_string())
+        }
+    }
+
+    Ok(new_arguments)
+}
+
+pub async fn get_processor_main_class(path: String) -> Result<Option<String>, LauncherError> {
+    Ok(tokio::task::spawn_blocking(move || {
+        let zipfile = std::fs::File::open(&path)?;
+        let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
+            LauncherError::ProcessorError(format!("Cannot read processor at {}", path))
+        })?;
+
+        let file = archive.by_name("META-INF/MANIFEST.MF").map_err(|_| {
+            LauncherError::ProcessorError(format!("Cannot read processor manifest at {}", path))
+        })?;
+
+        let reader = BufReader::new(file);
+
+        for line in reader.lines() {
+            let mut line = line?;
+            line.retain(|c| !c.is_whitespace());
+
+            if line.starts_with("Main-Class:") {
+                if let Some(class) = line.split(':').nth(1) {
+                    return Ok(Some(class.to_string()));
+                }
+            }
+        }
+
+        Ok::<Option<String>, LauncherError>(None)
+    })
+    .await??)
 }

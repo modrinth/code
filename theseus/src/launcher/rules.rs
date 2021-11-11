@@ -1,5 +1,5 @@
 use crate::launcher::download::get_os;
-use crate::launcher::meta::{OsRule, Rule, RuleAction};
+use daedalus::minecraft::{OsRule, Rule, RuleAction};
 use regex::Regex;
 
 pub fn parse_rules(rules: &[Rule]) -> bool {
@@ -9,10 +9,8 @@ pub fn parse_rules(rules: &[Rule]) -> bool {
 pub fn parse_rule(rule: &Rule) -> bool {
     let result = if let Some(os) = &rule.os {
         parse_os_rule(os)
-    } else if rule.features.is_some() {
-        false
     } else {
-        true
+        rule.features.is_none()
     };
 
     match rule.action {

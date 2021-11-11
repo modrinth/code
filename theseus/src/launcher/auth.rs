@@ -167,12 +167,39 @@ pub mod api {
 }
 
 pub mod provider {
+    use crate::launcher::auth::api::login;
+    use crate::launcher::LauncherError;
     use uuid::Uuid;
 
     #[derive(Debug)]
+    /// The credentials of a user
     pub struct Credentials {
+        /// The user UUID the credentials belong to
         pub id: Uuid,
+        /// The username of the user
         pub username: String,
+        /// The access token associated with the credentials
         pub access_token: String,
+    }
+
+    impl Credentials {
+        /// Gets a credentials instance from a user's login
+        pub async fn from_login(username: &str, password: &str) -> Result<Self, LauncherError> {
+            let login =
+                login(username, password, true)
+                    .await
+                    .map_err(|err| LauncherError::FetchError {
+                        inner: err,
+                        item: "authentication credentials".to_string(),
+                    })?;
+
+            let profile = login.selected_profile.unwrap();
+
+            Ok(Credentials {
+                id: profile.id,
+                username: profile.name,
+                access_token: login.access_token,
+            })
+        }
     }
 }

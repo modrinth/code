@@ -9,6 +9,8 @@ edition = "2018"
 [dependencies]
 thiserror = "1.0"
 
+daedalus = "0.1.6"
+
 reqwest = { version = "0.11", features = ["json"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
@@ -17,6 +19,7 @@ uuid = { version = "0.8", features = ["serde", "v4"] }
 bytes = "1"
 zip = "0.5"
 sha1 = { version = "0.6.0", features = ["std"]}
+path-clean = "0.1.0"
 
 regex = "1.5"
 lazy_static = "1.4"
