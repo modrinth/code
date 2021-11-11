@@ -370,7 +370,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                                     };
 
                                     if res.is_some() {
-                                        lib.url = Some(format_url(&*format!("maven/{}", artifact_path)));
+                                        lib.url = Some(format_url("maven/"));
                                     }
 
                                     res
