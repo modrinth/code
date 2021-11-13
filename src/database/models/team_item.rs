@@ -439,12 +439,11 @@ impl TeamMember {
                 "
                 UPDATE team_members
                 SET permissions = $1
-                WHERE (team_id = $2 AND user_id = $3 AND NOT role = $4)
+                WHERE (team_id = $2 AND user_id = $3)
                 ",
                 permissions.bits() as i64,
                 id as TeamId,
                 user_id as UserId,
-                crate::models::teams::OWNER_ROLE,
             )
             .execute(&mut *transaction)
             .await?;
@@ -455,12 +454,11 @@ impl TeamMember {
                 "
                 UPDATE team_members
                 SET role = $1
-                WHERE (team_id = $2 AND user_id = $3 AND NOT role = $4)
+                WHERE (team_id = $2 AND user_id = $3)
                 ",
                 role,
                 id as TeamId,
                 user_id as UserId,
-                crate::models::teams::OWNER_ROLE,
             )
             .execute(&mut *transaction)
             .await?;
@@ -472,11 +470,10 @@ impl TeamMember {
                     "
                     UPDATE team_members
                     SET accepted = TRUE
-                    WHERE (team_id = $1 AND user_id = $2 AND NOT role = $3)
+                    WHERE (team_id = $1 AND user_id = $2)
                     ",
                     id as TeamId,
                     user_id as UserId,
-                    crate::models::teams::OWNER_ROLE,
                 )
                 .execute(&mut *transaction)
                 .await?;

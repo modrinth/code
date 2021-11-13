@@ -171,21 +171,6 @@
       ]
     }
   },
-  "0739834cfbef869855ed4e1aea7e1f7601f6519867ee48c573ee901c4498e04c": {
-    "query": "\n                UPDATE team_members\n                SET permissions = $1\n                WHERE (team_id = $2 AND user_id = $3 AND NOT role = $4)\n                ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Int8",
-          "Text"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "07ebc9dc82cd012cd4f5880b1eb3d82602c195a3e3ddd557103ee037aa6dad1c": {
     "query": "\n                        INSERT INTO mods_donations (joining_mod_id, joining_platform_id, url)\n                        VALUES ($1, $2, $3)\n                        ",
     "describe": {
@@ -663,6 +648,20 @@
       ]
     }
   },
+  "232d7d0319c20dd5fff29331b067d6c6373bcff761a77958a2bb5f59068a83a5": {
+    "query": "\n                UPDATE team_members\n                SET permissions = $1\n                WHERE (team_id = $2 AND user_id = $3)\n                ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "24e5daad907eec54505274f93952d5c20f4bbdd3f771eb0a2fdfa6324768df39": {
     "query": "\n            SELECT short, name FROM licenses\n            WHERE id = $1\n            ",
     "describe": {
@@ -928,20 +927,6 @@
         "Left": [
           "Int4",
           "Bool"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "3b52d9f68ba23d1e3764f8df9f28bcaec0741101f6afd0c7c234b7f1b91054a4": {
-    "query": "\n                    UPDATE team_members\n                    SET accepted = TRUE\n                    WHERE (team_id = $1 AND user_id = $2 AND NOT role = $3)\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Text"
         ]
       },
       "nullable": []
@@ -2227,21 +2212,6 @@
       "parameters": {
         "Left": [
           "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
-  "6c2299a7b7ab22f83049bc41fb5dd380adea3579e7b00df7d16fb6747a0a7313": {
-    "query": "\n                UPDATE team_members\n                SET role = $1\n                WHERE (team_id = $2 AND user_id = $3 AND NOT role = $4)\n                ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int8",
-          "Int8",
-          "Text"
         ]
       },
       "nullable": []
@@ -4669,6 +4639,20 @@
       "nullable": []
     }
   },
+  "cef01012769dcd499a0d16ce65ffc1e94bce362a7246b6a0a38d133afb90d3b6": {
+    "query": "\n                UPDATE team_members\n                SET role = $1\n                WHERE (team_id = $2 AND user_id = $3)\n                ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "d03630ab0ff37f5f0a8c088558fdc8a1955bad78bea282c40f72d15e5cf77a79": {
     "query": "\n            SELECT v.id id\n            FROM versions v\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id = ANY($2)\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id = ANY($3)\n            WHERE v.mod_id = $1\n            ORDER BY v.date_published DESC\n            LIMIT 1\n            ",
     "describe": {
@@ -4822,6 +4806,19 @@
       "parameters": {
         "Left": [
           "Varchar",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "d3991923355b2e0ed7bbe6c85d9158754d7e7d28f5ac75ee5b4e782dbc5c38a9": {
+    "query": "\n                    UPDATE team_members\n                    SET accepted = TRUE\n                    WHERE (team_id = $1 AND user_id = $2)\n                    ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
           "Int8"
         ]
       },

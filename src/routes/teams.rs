@@ -153,17 +153,13 @@ pub async fn add_team_member(
     let mut transaction = pool.begin().await?;
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
-    let team_member =
-        TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool).await?;
-
-    let member = match team_member {
-        Some(m) => m,
-        None => {
-            return Err(ApiError::CustomAuthenticationError(
-                "You don't have permission to invite users to this team".to_string(),
-            ))
-        }
-    };
+    let member = TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::CustomAuthenticationError(
+                "You don't have permission to edit members of this team".to_string(),
+            )
+        })?;
 
     if !member.permissions.contains(Permissions::MANAGE_INVITES) {
         return Err(ApiError::CustomAuthenticationError(
@@ -277,18 +273,21 @@ pub async fn edit_team_member(
     let user_id = ids.1.into();
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
-    let team_member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool).await?;
+    let member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::CustomAuthenticationError(
+                "You don't have permission to edit members of this team".to_string(),
+            )
+        })?;
 
     let mut transaction = pool.begin().await?;
 
-    let member = match team_member {
-        Some(m) => m,
-        None => {
-            return Err(ApiError::CustomAuthenticationError(
-                "You don't have permission to edit members of this team".to_string(),
-            ))
-        }
-    };
+    if &*member.role == crate::models::teams::OWNER_ROLE {
+        return Err(ApiError::InvalidInputError(
+            "The owner of a team cannot be edited".to_string(),
+        ));
+    }
 
     if !member.permissions.contains(Permissions::EDIT_MEMBER) {
         return Err(ApiError::CustomAuthenticationError(
@@ -340,21 +339,28 @@ pub async fn transfer_ownership(
     let id = info.into_inner().0;
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
-    let team_member =
-        TeamMember::get_from_user_id(id.into(), current_user.id.into(), &**pool).await?;
-
-    let member = match team_member {
-        Some(m) => m,
-        None => {
-            return Err(ApiError::CustomAuthenticationError(
+    let member = TeamMember::get_from_user_id(id.into(), current_user.id.into(), &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::CustomAuthenticationError(
                 "You don't have permission to edit members of this team".to_string(),
-            ))
-        }
-    };
+            )
+        })?;
+    let new_member = TeamMember::get_from_user_id(id.into(), new_owner.user_id.into(), &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInputError("The new owner specified does not exist".to_string())
+        })?;
 
     if member.role != crate::models::teams::OWNER_ROLE {
         return Err(ApiError::CustomAuthenticationError(
             "You don't have permission to edit the ownership of this team".to_string(),
+        ));
+    }
+
+    if !new_member.accepted {
+        return Err(ApiError::InvalidInputError(
+            "You can only transfer ownership to members who are currently in your team".to_string(),
         ));
     }
 
@@ -363,7 +369,7 @@ pub async fn transfer_ownership(
     TeamMember::edit_team_member(
         id.into(),
         current_user.id.into(),
-        Some(Permissions::ALL),
+        None,
         Some(crate::models::teams::DEFAULT_ROLE.to_string()),
         None,
         &mut transaction,
@@ -373,7 +379,7 @@ pub async fn transfer_ownership(
     TeamMember::edit_team_member(
         id.into(),
         new_owner.user_id.into(),
-        None,
+        Some(Permissions::ALL),
         Some(crate::models::teams::OWNER_ROLE.to_string()),
         None,
         &mut transaction,
@@ -396,17 +402,13 @@ pub async fn remove_team_member(
     let user_id = ids.1.into();
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
-    let team_member =
-        TeamMember::get_from_user_id_pending(id, current_user.id.into(), &**pool).await?;
-
-    let member = match team_member {
-        Some(m) => m,
-        None => {
-            return Err(ApiError::CustomAuthenticationError(
-                "You don't have permission to remove members from this team".to_string(),
-            ))
-        }
-    };
+    let member = TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::CustomAuthenticationError(
+                "You don't have permission to edit members of this team".to_string(),
+            )
+        })?;
 
     let delete_member = TeamMember::get_from_user_id_pending(id, user_id, &**pool).await?;
 

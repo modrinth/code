@@ -1,10 +1,10 @@
 use crate::models::projects::SideType;
+use crate::util::validate::validation_errors_to_string;
 use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
 use serde::{Deserialize, Serialize};
 use std::io::{Cursor, Read};
-use zip::ZipArchive;
 use validator::Validate;
-use crate::util::validate::validation_errors_to_string;
+use zip::ZipArchive;
 
 #[derive(Serialize, Deserialize, Validate)]
 #[serde(rename_all = "camelCase")]
@@ -112,9 +112,9 @@ impl super::Validator for PackValidator {
 
         let pack: PackFormat = serde_json::from_str(&contents)?;
 
-        pack
-            .validate()
-            .map_err(|err| ValidationError::InvalidInputError(validation_errors_to_string(err, None).into()))?;
+        pack.validate().map_err(|err| {
+            ValidationError::InvalidInputError(validation_errors_to_string(err, None).into())
+        })?;
 
         if pack.game != "minecraft" {
             return Err(ValidationError::InvalidInputError(
