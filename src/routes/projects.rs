@@ -373,7 +373,7 @@ pub async fn project_edit(
                     }
                 }
 
-                let status_id = database::models::StatusId::get_id(&status, &mut *transaction)
+                let status_id = database::models::StatusId::get_id(status, &mut *transaction)
                     .await?
                     .ok_or_else(|| {
                         ApiError::InvalidInputError(
@@ -423,17 +423,15 @@ pub async fn project_edit(
                 .await?;
 
                 for category in categories {
-                    let category_id = database::models::categories::Category::get_id(
-                        &category,
-                        &mut *transaction,
-                    )
-                    .await?
-                    .ok_or_else(|| {
-                        ApiError::InvalidInputError(format!(
-                            "Category {} does not exist.",
-                            category.clone()
-                        ))
-                    })?;
+                    let category_id =
+                        database::models::categories::Category::get_id(category, &mut *transaction)
+                            .await?
+                            .ok_or_else(|| {
+                                ApiError::InvalidInputError(format!(
+                                    "Category {} does not exist.",
+                                    category.clone()
+                                ))
+                            })?;
 
                     sqlx::query!(
                         "

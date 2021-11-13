@@ -28,7 +28,7 @@ impl super::Validator for ForgeValidator {
 
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<&[u8]>>,
+        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("META-INF/mods.toml").map_err(|_| {
             ValidationError::InvalidInputError("No mods.toml present for Forge file.".into())
@@ -36,7 +36,7 @@ impl super::Validator for ForgeValidator {
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(
-                "Forge mod file is a source file!".into(),
+                "Forge mod file is a source file!",
             ));
         }
 
@@ -71,7 +71,7 @@ impl super::Validator for LegacyForgeValidator {
 
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<&[u8]>>,
+        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("mcmod.info").map_err(|_| {
             ValidationError::InvalidInputError("No mcmod.info present for Forge file.".into())
@@ -79,7 +79,7 @@ impl super::Validator for LegacyForgeValidator {
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(
-                "Forge mod file is a source file!".into(),
+                "Forge mod file is a source file!",
             ));
         }
 

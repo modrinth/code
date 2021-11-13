@@ -10,8 +10,8 @@ pub struct PodInfo {
 impl PodInfo {
     pub fn new() -> Self {
         Self {
-            pod_name: dotenv::var("POD_NAME").unwrap_or("DEV".to_string()),
-            node_name: dotenv::var("NODE_NAME").unwrap_or("self-hosted".to_string()),
+            pod_name: dotenv::var("POD_NAME").unwrap_or_else(|_| "DEV".to_string()),
+            node_name: dotenv::var("NODE_NAME").unwrap_or_else(|_| "self-hosted".to_string()),
             pod_id: Arc::new(RwLock::new(None)),
         }
     }

@@ -80,7 +80,7 @@ async fn update_index_helper<'a>(
     name: &'static str,
     rule: &'static str,
 ) -> Result<Index<'a>, IndexingError> {
-    update_index(&client, name, {
+    update_index(client, name, {
         let mut rules = default_rules();
         rules.push_back(rule);
         rules.into()
@@ -159,11 +159,11 @@ async fn add_to_index(index: Index<'_>, mods: &[UploadSearchProject]) -> Result<
 
 async fn create_and_add_to_index<'a>(
     client: &'a Client<'a>,
-    projects: &'a Vec<UploadSearchProject>,
+    projects: &'a [UploadSearchProject],
     name: &'static str,
     rule: &'static str,
 ) -> Result<(), IndexingError> {
-    let index = create_index(&client, name, || {
+    let index = create_index(client, name, || {
         let mut relevance_rules = default_rules();
         relevance_rules.push_back(rule);
         relevance_rules.into()

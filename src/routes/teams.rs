@@ -218,7 +218,9 @@ pub async fn add_team_member(
 
     let result = sqlx::query!(
         "
-        SELECT m.title, m.id FROM mods m
+        SELECT m.title title, m.id id, pt.name project_type
+        FROM mods m
+        INNER JOIN project_types pt ON pt.id = m.project_type
         WHERE m.team_id = $1
         ",
         team_id as crate::database::models::ids::TeamId
@@ -234,7 +236,7 @@ pub async fn add_team_member(
             "Team invite from {} to join the team for project {}",
             current_user.username, result.title
         ),
-        link: format!("project/{}", ProjectId(result.id as u64)),
+        link: format!("/{}/{}", result.project_type, ProjectId(result.id as u64)),
         actions: vec![
             NotificationActionBuilder {
                 title: "Accept".to_string(),
@@ -361,7 +363,7 @@ pub async fn transfer_ownership(
     TeamMember::edit_team_member(
         id.into(),
         current_user.id.into(),
-        None,
+        Some(Permissions::ALL),
         Some(crate::models::teams::DEFAULT_ROLE.to_string()),
         None,
         &mut transaction,

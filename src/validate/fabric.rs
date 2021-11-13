@@ -28,7 +28,7 @@ impl super::Validator for FabricValidator {
 
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<&[u8]>>,
+        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("fabric.mod.json").map_err(|_| {
             ValidationError::InvalidInputError("No fabric.mod.json present for Fabric file.".into())
@@ -39,7 +39,7 @@ impl super::Validator for FabricValidator {
             .any(|name| name.ends_with("refmap.json") || name.ends_with(".class"))
         {
             return Ok(ValidationResult::Warning(
-                "Fabric mod file is a source file!".into(),
+                "Fabric mod file is a source file!",
             ));
         }
 

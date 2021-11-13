@@ -510,7 +510,7 @@ pub async fn project_create_inner(
             &*project_create_data.project_type,
             version_data.loaders.clone(),
             version_data.game_versions.clone(),
-            &all_game_versions,
+            all_game_versions.clone(),
             false,
             &mut transaction,
         )

@@ -323,8 +323,7 @@ pub async fn user_icon_edit(
             }
 
             let bytes =
-                read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB")
-                    .await?;
+                read_from_payload(&mut payload, 2097152, "Icons must be smaller than 2MiB").await?;
 
             let upload_data = file_host
                 .upload_file(

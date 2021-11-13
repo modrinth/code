@@ -14,6 +14,7 @@ pub struct Loader {
     pub supported_project_types: Vec<String>,
 }
 
+#[derive(Clone)]
 pub struct GameVersion {
     pub id: GameVersionId,
     pub version: String,

@@ -114,7 +114,7 @@ where
 
     fn call(&mut self, req: ServiceRequest) -> Self::Future {
         // The request has started.
-        let pattern_or_path = req.match_pattern().unwrap_or("unknown".to_string());
+        let pattern_or_path = req.match_pattern().unwrap_or_else(|| "unknown".to_string());
         let counter = self
             .counters
             .current_requests

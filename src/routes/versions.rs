@@ -259,8 +259,8 @@ pub async fn version_edit(
                 let builders = dependencies
                     .iter()
                     .map(|x| database::models::version_item::DependencyBuilder {
-                        project_id: x.project_id.clone().map(|x| x.into()),
-                        version_id: x.version_id.clone().map(|x| x.into()),
+                        project_id: x.project_id.map(|x| x.into()),
+                        version_id: x.version_id.map(|x| x.into()),
                         dependency_type: x.dependency_type.to_string(),
                     })
                     .collect::<Vec<database::models::version_item::DependencyBuilder>>();

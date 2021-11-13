@@ -662,7 +662,7 @@ impl Version {
             for hash in hashes? {
                 let entry = hashes_map
                     .entry(FileId(hash.file_id))
-                    .or_insert(HashMap::new());
+                    .or_insert_with(HashMap::new);
 
                 if let Some(raw_hash) = hash.hash {
                     entry.insert(hash.algorithm, raw_hash.into_bytes());
@@ -695,8 +695,8 @@ impl Version {
                 dependencies: dependencies?
                     .into_iter()
                     .map(|x| QueryDependency {
-                        project_id: x.mod_dependency_id.map(|x| ProjectId(x)),
-                        version_id: x.dependency_id.map(|x| VersionId(x)),
+                        project_id: x.mod_dependency_id.map(ProjectId),
+                        version_id: x.dependency_id.map(VersionId),
                         dependency_type: x.dependency_type,
                     })
                     .collect(),

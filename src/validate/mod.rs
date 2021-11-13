@@ -21,6 +21,8 @@ pub enum ValidationError {
     SerdeError(#[from] serde_json::Error),
     #[error("Invalid Input: {0}")]
     InvalidInputError(std::borrow::Cow<'static, str>),
+    #[error("Error while managing threads")]
+    BlockingError,
 }
 
 #[derive(Eq, PartialEq)]
@@ -45,7 +47,7 @@ pub trait Validator: Sync {
     fn get_supported_game_versions(&self) -> SupportedGameVersions;
     fn validate(
         &self,
-        archive: &mut ZipArchive<Cursor<&[u8]>>,
+        archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError>;
 }
 
@@ -57,48 +59,52 @@ static VALIDATORS: [&dyn Validator; 4] = [
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
-pub fn validate_file(
-    data: &[u8],
-    file_extension: &str,
-    project_type: &str,
+pub async fn validate_file(
+    data: bytes::Bytes,
+    file_extension: String,
+    project_type: String,
     loaders: Vec<Loader>,
     game_versions: Vec<GameVersion>,
-    all_game_versions: &[crate::database::models::categories::GameVersion],
+    all_game_versions: Vec<crate::database::models::categories::GameVersion>,
 ) -> Result<ValidationResult, ValidationError> {
-    let reader = std::io::Cursor::new(data);
-    let mut zip = zip::ZipArchive::new(reader)?;
+    Ok(actix_web::web::block(move || {
+        let reader = std::io::Cursor::new(data);
+        let mut zip = zip::ZipArchive::new(reader)?;
 
-    let mut visited = false;
-    for validator in &VALIDATORS {
-        if validator.get_project_types().contains(&project_type)
-            && loaders
-                .iter()
-                .any(|x| validator.get_supported_loaders().contains(&&*x.0))
-            && game_version_supported(
-                &game_versions,
-                all_game_versions,
-                validator.get_supported_game_versions(),
-            )
-        {
-            if validator.get_file_extensions().contains(&file_extension) {
-                return validator.validate(&mut zip);
-            } else {
-                visited = true;
+        let mut visited = false;
+        for validator in &VALIDATORS {
+            if validator.get_project_types().contains(&&*project_type)
+                && loaders
+                    .iter()
+                    .any(|x| validator.get_supported_loaders().contains(&&*x.0))
+                && game_version_supported(
+                    &game_versions,
+                    &all_game_versions,
+                    validator.get_supported_game_versions(),
+                )
+            {
+                if validator.get_file_extensions().contains(&&*file_extension) {
+                    return validator.validate(&mut zip);
+                } else {
+                    visited = true;
+                }
             }
         }
-    }
 
-    if visited {
-        Err(ValidationError::InvalidInputError(
-            format!(
-                "File extension {} is invalid for input file",
-                file_extension
-            )
-            .into(),
-        ))
-    } else {
-        Ok(ValidationResult::Pass)
-    }
+        if visited {
+            Err(ValidationError::InvalidInputError(
+                format!(
+                    "File extension {} is invalid for input file",
+                    file_extension
+                )
+                .into(),
+            ))
+        } else {
+            Ok(ValidationResult::Pass)
+        }
+    })
+    .await
+    .map_err(|_| ValidationError::BlockingError)?)
 }
 
 fn game_version_supported(

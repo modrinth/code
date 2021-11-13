@@ -288,7 +288,7 @@ async fn version_create_inner(
             &*project_type,
             version_data.loaders,
             version_data.game_versions,
-            &all_game_versions,
+            all_game_versions.clone(),
             false,
             &mut transaction,
         )
@@ -308,8 +308,10 @@ async fn version_create_inner(
 
     let result = sqlx::query!(
         "
-        SELECT m.title FROM mods m
-        WHERE id = $1
+        SELECT m.title title, pt.name project_type
+        FROM mods m
+        INNER JOIN project_types pt ON pt.id = m.project_type
+        WHERE m.id = $1
         ",
         builder.project_id as crate::database::models::ids::ProjectId
     )
@@ -344,7 +346,10 @@ async fn version_create_inner(
             result.title,
             version_data.version_number.clone()
         ),
-        link: format!("project/{}/version/{}", project_id, version_id),
+        link: format!(
+            "/{}/{}/version/{}",
+            result.project_type, project_id, version_id
+        ),
         actions: vec![],
     }
     .insert_many(users, &mut *transaction)
@@ -544,7 +549,7 @@ async fn upload_file_to_version_inner(
                 .into_iter()
                 .map(GameVersion)
                 .collect(),
-            &all_game_versions,
+            all_game_versions.clone(),
             true,
             &mut transaction,
         )
@@ -579,7 +584,7 @@ pub async fn upload_file(
     project_type: &str,
     loaders: Vec<Loader>,
     game_versions: Vec<GameVersion>,
-    all_game_versions: &[models::categories::GameVersion],
+    all_game_versions: Vec<models::categories::GameVersion>,
     ignore_primary: bool,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), CreateError> {
@@ -614,13 +619,14 @@ pub async fn upload_file(
     }
 
     let validation_result = validate_file(
-        &data,
-        file_extension,
-        project_type,
+        data.clone().into(),
+        file_extension.to_string(),
+        project_type.to_string(),
         loaders,
         game_versions,
         all_game_versions,
-    )?;
+    )
+    .await?;
 
     let upload_data = file_host
         .upload_file(

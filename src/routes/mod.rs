@@ -129,7 +129,7 @@ pub fn teams_config(cfg: &mut web::ServiceConfig) {
 
 pub fn notifications_config(cfg: &mut web::ServiceConfig) {
     cfg.service(notifications::notifications_get);
-    cfg.service(notifications::notification_delete);
+    cfg.service(notifications::notifications_delete);
 
     cfg.service(
         web::scope("notification")

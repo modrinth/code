@@ -1707,68 +1707,6 @@
       "nullable": []
     }
   },
-  "59db001df11e9730d089eca19a73ca6f934c6fd199e6411955072c767f9a2551": {
-    "query": "\n                SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,\n                ARRAY_AGG(DISTINCT na.id || ', ' || na.title || ', ' || na.action_route || ', ' || na.action_route_method) actions\n                FROM notifications n\n                LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n                WHERE n.id = $1\n                GROUP BY n.id, n.user_id;\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "user_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "text",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "link",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "created",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 5,
-          "name": "read",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 6,
-          "name": "notification_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "actions",
-          "type_info": "TextArray"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        null
-      ]
-    }
-  },
   "5a03c653f1ff3339a01422ee4267a66157e6da9a51cc7d9beb0f87d59c3a444c": {
     "query": "\n            SELECT d.dependent_id, d.dependency_id, d.mod_dependency_id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            WHERE v.mod_id = $1\n            ",
     "describe": {
@@ -2763,26 +2701,6 @@
       ]
     }
   },
-  "7e73d3a17807f57ba6def5ff718e6dcb3a65ef8da653d839560b24635334cf05": {
-    "query": "\n        SELECT m.title FROM mods m\n        WHERE id = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "title",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "7f1696cee355c03f474fda2283669c60046833db88b3e2befd62a1fea7a12c70": {
     "query": "\n                    INSERT INTO downloads (\n                        version_id, identifier\n                    )\n                    VALUES (\n                        $1, $2\n                    )\n                    ",
     "describe": {
@@ -3105,32 +3023,6 @@
       "nullable": []
     }
   },
-  "8c25a870b9306d653caaa4c324122ecd928796107b9d2fcdeaba82c7fcbbbebc": {
-    "query": "\n        SELECT m.title, m.id FROM mods m\n        WHERE m.team_id = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 1,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false
-      ]
-    }
-  },
   "8d491f3ccbddbd1e1bbea62d04090b2214d10182e3bfac7d8374ac183514f352": {
     "query": "\n        SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,\n        m.icon_url icon_url, m.published published,\n        m.updated updated,\n        m.team_id team_id, m.license license, m.slug slug,\n        s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,\n        STRING_AGG(DISTINCT c.category, ',') categories, STRING_AGG(DISTINCT lo.loader, ',') loaders, STRING_AGG(DISTINCT gv.version, ',') versions,\n        STRING_AGG(DISTINCT mg.image_url, ',') gallery\n        FROM mods m\n        LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id\n        LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n        LEFT OUTER JOIN versions v ON v.mod_id = m.id\n        LEFT OUTER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n        LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id\n        LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id\n        LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id\n        LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id\n        INNER JOIN statuses s ON s.id = m.status\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        INNER JOIN side_types cs ON m.client_side = cs.id\n        INNER JOIN side_types ss ON m.server_side = ss.id\n        INNER JOIN licenses l ON m.license = l.id\n        INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2\n        INNER JOIN users u ON tm.user_id = u.id\n        WHERE m.id = $1\n        GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id, u.id;\n        ",
     "describe": {
@@ -3301,6 +3193,38 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "9348309884811e8b22f33786ae7c0f259f37f3c90e545f00761a641570107160": {
+    "query": "\n        SELECT m.title title, m.id id, pt.name project_type\n        FROM mods m\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.team_id = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "project_type",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false
+      ]
     }
   },
   "94a823b6e8b2610d72843008706c448432aab21690b4727aea77ad687a98f634": {
@@ -3867,6 +3791,32 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "adbe17a5ad3cea333b30b5d6111aff713a8f7dc79ded21f5ba942c4f1108aa8f": {
+    "query": "\n        SELECT m.title title, pt.name project_type\n        FROM mods m\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.id = $1\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "project_type",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
         false
       ]
     }
@@ -5639,6 +5589,62 @@
       "nullable": [
         false,
         false
+      ]
+    }
+  },
+  "ea96ab7c1290f4caddcef8ecf2aec0216654faca05ff760ffa553ad3e32827f5": {
+    "query": "\n                SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type\n                FROM notifications n\n                WHERE n.id = $1\n                GROUP BY n.id, n.user_id;\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "text",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "link",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 5,
+          "name": "read",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 6,
+          "name": "notification_type",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true
       ]
     }
   },
