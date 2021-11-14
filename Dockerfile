@@ -24,6 +24,12 @@ RUN cargo build --release
 
 
 FROM debian:bullseye-slim
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates
+
+RUN update-ca-certificates
+
 COPY --from=build /usr/src/labrinth/target/release/labrinth /labrinth/labrinth
 COPY --from=build /usr/src/labrinth/migrations/* /labrinth/migrations/
 COPY --from=build /wait /wait

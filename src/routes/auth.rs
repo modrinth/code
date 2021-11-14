@@ -27,7 +27,7 @@ pub enum AuthorizationError {
     DatabaseError(#[from] crate::database::models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
-    #[error("Error while communicating to GitHub OAuth2: {0}")]
+    #[error("Error while communicating to GitHub OAuth2")]
     GithubError(#[from] reqwest::Error),
     #[error("Invalid Authentication credentials")]
     InvalidCredentialsError,
