@@ -20,6 +20,7 @@ bytes = "1"
 zip = "0.5"
 sha1 = { version = "0.6.0", features = ["std"]}
 path-clean = "0.1.0"
+fs_extra = "1.2.0"
 
 regex = "1.5"
 lazy_static = "1.4"
