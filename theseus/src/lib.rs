@@ -6,4 +6,5 @@
 #![warn(missing_docs, unused_import_braces, missing_debug_implementations)]
 
 pub mod launcher;
+pub mod modpack;
 mod util;

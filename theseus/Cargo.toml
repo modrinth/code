@@ -20,6 +20,7 @@ bytes = "1"
 zip = "0.5"
 sha1 = { version = "0.6.0", features = ["std"]}
 path-clean = "0.1.0"
+fs_extra = "1.2.0"
 
 regex = "1.5"
 lazy_static = "1.4"
@@ -28,3 +29,9 @@ tokio = { version = "1", features = ["full"] }
 futures = "0.3"
 
 sys-info = "0.9.0"
+
+[dev-dependencies]
+argh = "0.1.6"
+
+[[example]]
+name = "download-pack"
