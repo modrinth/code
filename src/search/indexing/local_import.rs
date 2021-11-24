@@ -35,7 +35,7 @@ pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, Index
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
             INNER JOIN licenses l ON m.license = l.id
-            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2 AND tm.accepted = TRUE
             INNER JOIN users u ON tm.user_id = u.id
             WHERE s.status = $1
             GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id, u.id;
@@ -112,7 +112,7 @@ pub async fn query_one(
         INNER JOIN side_types cs ON m.client_side = cs.id
         INNER JOIN side_types ss ON m.server_side = ss.id
         INNER JOIN licenses l ON m.license = l.id
-        INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2
+        INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2 AND tm.accepted = TRUE
         INNER JOIN users u ON tm.user_id = u.id
         WHERE m.id = $1
         GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id, u.id;
