@@ -1,5 +1,3 @@
-pub mod pod;
-pub mod scheduler;
 pub mod status;
 
 use lazy_static::lazy_static;

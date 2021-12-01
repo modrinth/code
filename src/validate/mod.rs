@@ -67,7 +67,7 @@ pub async fn validate_file(
     game_versions: Vec<GameVersion>,
     all_game_versions: Vec<crate::database::models::categories::GameVersion>,
 ) -> Result<ValidationResult, ValidationError> {
-    Ok(actix_web::web::block(move || {
+    let res = actix_web::web::block(move || {
         let reader = std::io::Cursor::new(data);
         let mut zip = zip::ZipArchive::new(reader)?;
 
@@ -103,8 +103,15 @@ pub async fn validate_file(
             Ok(ValidationResult::Pass)
         }
     })
-    .await
-    .map_err(|_| ValidationError::BlockingError)?)
+    .await;
+
+    match res {
+        Ok(x) => Ok(x),
+        Err(err) => match err {
+            actix_web::error::BlockingError::Canceled => Err(ValidationError::BlockingError),
+            actix_web::error::BlockingError::Error(err) => Err(err),
+        },
+    }
 }
 
 fn game_version_supported(

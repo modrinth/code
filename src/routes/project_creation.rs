@@ -196,10 +196,10 @@ pub struct NewGalleryItem {
     pub item: String,
     /// Whether the gallery item should show in search or not
     pub featured: bool,
-    #[validate(url, length(min = 1, max = 2048))]
+    #[validate(length(min = 1, max = 2048))]
     /// The title of the gallery item
     pub title: Option<String>,
-    #[validate(url, length(min = 1, max = 2048))]
+    #[validate(length(min = 1, max = 2048))]
     /// The description of the gallery item
     pub description: Option<String>,
 }
