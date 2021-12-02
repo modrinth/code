@@ -2,14 +2,16 @@
 
 use daedalus::download_file;
 use fs_extra::dir::CopyOptions;
-use std::{borrow::Borrow, convert::TryFrom, env, io, path::Path};
+use serde::Deserialize;
+use std::{convert::TryFrom, env, io, path::Path};
 use tokio::fs;
 use uuid::Uuid;
 use zip::ZipArchive;
 
-use self::manifest::Manifest;
+use self::{manifest::Manifest, pack::Modpack};
 
-pub mod manifest;
+pub mod pack;
+mod manifest;
 
 pub const MANIFEST_PATH: &'static str = "index.json";
 pub const OVERRIDES_PATH: &'static str = "overrides/";
@@ -42,15 +44,20 @@ pub enum ModpackError {
 
     #[error("Error joining futures: {0}")]
     JoinError(#[from] tokio::task::JoinError),
+
+    #[error("Error fetching modloader version: {0}")]
+    VersionError(String),
 }
+
+type ModpackResult<T> = Result<T, ModpackError>;
 
 /// Realise a modpack from a given URL
 pub async fn fetch_modpack(
     url: &str,
     sha1: Option<&str>,
     dest: &Path,
-    side: manifest::ModpackSide,
-) -> Result<(), ModpackError> {
+    side: pack::ModpackSide,
+) -> ModpackResult<()> {
     let bytes = download_file(url, sha1).await?;
     let mut archive = ZipArchive::new(io::Cursor::new(&bytes as &[u8]))?;
     realise_modpack_zip(&mut archive, dest, side).await
@@ -60,8 +67,8 @@ pub async fn fetch_modpack(
 pub async fn realise_modpack_zip(
     archive: &mut ZipArchive<impl io::Read + io::Seek>,
     dest: &Path,
-    side: manifest::ModpackSide,
-) -> Result<(), ModpackError> {
+    side: pack::ModpackSide,
+) -> ModpackResult<()> {
     let tmp = env::temp_dir().join(format!("theseus-{}/", Uuid::new_v4()));
     archive.extract(&tmp)?;
     realise_modpack(&tmp, dest, side).await
@@ -71,8 +78,8 @@ pub async fn realise_modpack_zip(
 pub async fn realise_modpack(
     dir: &Path,
     dest: &Path,
-    side: manifest::ModpackSide,
-) -> Result<(), ModpackError> {
+    side: pack::ModpackSide,
+) -> ModpackResult<()> {
     if dest.is_file() {
         return Err(ModpackError::InvalidDirectory(String::from(
             "Output is not a directory",
@@ -101,11 +108,12 @@ pub async fn realise_modpack(
             "Manifest missing or is not a file",
         )))?;
     let manifest_file = std::fs::File::open(manifest_path)?;
-    let manifest_json: serde_json::Value =
-        serde_json::from_reader(io::BufReader::new(manifest_file))?;
-    let manifest = Manifest::try_from(manifest_json)?;
+    let reader = io::BufReader::new(manifest_file);
+    let mut deserializer = serde_json::Deserializer::from_reader(reader);
+    let manifest = Manifest::deserialize(&mut deserializer)?;
+    let modpack = Modpack::try_from(manifest)?;
 
-    // Realise manifest
-    manifest.download_files(dest, side).await?;
+    // Realise modpack
+    modpack.download_files(dest, side).await?;
     Ok(())
 }
