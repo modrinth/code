@@ -1,5 +1,6 @@
 use daedalus::download_file_mirrors;
 use futures::future;
+use serde::{Deserialize, Serialize};
 use std::{
     collections::HashSet,
     hash::Hash,
@@ -13,7 +14,7 @@ use super::{
 };
 use crate::launcher::ModLoader;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct Modpack {
     pub game: ModpackGame,
     pub version: String,
@@ -96,14 +97,14 @@ impl Modpack {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub enum ModpackGame {
     // TODO: Currently, the launcher does not support specifying mod loader versions, so I just
     // store the loader here.
     Minecraft(String, ModLoader),
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct ModpackFile {
     pub path: PathBuf,
     pub hashes: ModpackFileHashes,
@@ -145,7 +146,8 @@ impl ModpackFile {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Serialize, Clone, Copy, PartialEq, Eq)]
+#[serde(rename_all = "snake_case")]
 pub enum ModpackEnv {
     ClientOnly,
     ServerOnly,
@@ -168,7 +170,7 @@ impl ModpackEnv {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct ModpackFileHashes {
     pub sha1: String,
 }
