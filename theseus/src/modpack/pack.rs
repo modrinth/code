@@ -1,18 +1,25 @@
-use std::path::{Path, PathBuf};
 use daedalus::download_file_mirrors;
 use futures::future;
+use std::{
+    collections::HashSet,
+    hash::Hash,
+    path::{Path, PathBuf},
+};
 use tokio::fs;
 
+use super::{
+    modrinth_api::{self, ModrinthV1},
+    ModpackResult,
+};
 use crate::launcher::ModLoader;
-use super::ModpackResult;
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Modpack {
     pub game: ModpackGame,
     pub version: String,
     pub name: String,
     pub summary: Option<String>,
-    pub files: Vec<ModpackFile>,
+    pub files: HashSet<ModpackFile>,
 }
 
 impl Modpack {
@@ -31,22 +38,84 @@ impl Modpack {
         // TODO Integrate instance format to save other metadata
         Ok(())
     }
+
+    pub fn new(game: ModpackGame, version: &str, name: &str, summary: Option<&str>) -> Self {
+        Self {
+            game,
+            version: String::from(version),
+            name: String::from(name),
+            summary: summary.map(String::from),
+            files: HashSet::new(),
+        }
+    }
+
+    pub async fn add_project(
+        &mut self,
+        project: &str,
+        base_path: &Path,
+        source: Option<&dyn modrinth_api::ModrinthAPI>,
+        channel: Option<&str>,
+    ) -> ModpackResult<()> {
+        let default_api = ModrinthV1(String::from("https://api.modrinth.com"));
+        let channel = channel.unwrap_or("release");
+        let source = source.unwrap_or(&default_api);
+
+        let files = source
+            .get_latest_version(project, channel, &self.game)
+            .await?
+            .into_iter()
+            .map(|mut it: ModpackFile| {
+                it.path = base_path.join(it.path);
+                it
+            });
+
+        self.files.extend(files);
+        Ok(())
+    }
+
+    pub async fn add_version(
+        &mut self,
+        version: &str,
+        base_path: &Path,
+        source: Option<&dyn modrinth_api::ModrinthAPI>,
+    ) -> ModpackResult<()> {
+        let default_api = ModrinthV1(String::from("https://api.modrinth.com"));
+        let source = source.unwrap_or(&default_api);
+
+        let files = source
+            .get_version(version)
+            .await?
+            .into_iter()
+            .map(|mut it: ModpackFile| {
+                it.path = base_path.join(it.path);
+                it
+            });
+
+        self.files.extend(files);
+        Ok(())
+    }
 }
 
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ModpackGame {
     // TODO: Currently, the launcher does not support specifying mod loader versions, so I just
     // store the loader here.
     Minecraft(String, ModLoader),
 }
 
-
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ModpackFile {
     pub path: PathBuf,
     pub hashes: ModpackFileHashes,
     pub env: ModpackEnv,
-    pub downloads: Vec<String>,
+    pub downloads: HashSet<String>,
+}
+
+impl Hash for ModpackFile {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.hashes.sha1.hash(state);
+        self.path.hash(state);
+    }
 }
 
 impl ModpackFile {
@@ -76,11 +145,17 @@ impl ModpackFile {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum ModpackEnv {
     ClientOnly,
     ServerOnly,
     Both,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum ModpackSide {
+    Client,
+    Server,
 }
 
 impl ModpackEnv {
@@ -93,14 +168,59 @@ impl ModpackEnv {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ModpackSide {
-    Client, Server,
-}
-
-
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ModpackFileHashes {
     pub sha1: String,
 }
 
+#[cfg(test)]
+mod tests {
+    use std::{
+        collections::HashSet,
+        path::{Path, PathBuf},
+    };
+
+    use super::*;
+    use crate::launcher::ModLoader;
+
+    #[tokio::test]
+    async fn add_version() -> ModpackResult<()> {
+        const TEST_VERSION: &'static str = "TpnSObJ7";
+        let mut test_pack = Modpack::new(
+            ModpackGame::Minecraft(String::from("1.16.5"), ModLoader::Fabric),
+            "0.1.0",
+            "Example Modpack",
+            None,
+        );
+        test_pack
+            .add_version(TEST_VERSION, Path::new("mods/"), None)
+            .await?;
+
+        assert_eq!(
+            test_pack,
+            Modpack {
+                game: ModpackGame::Minecraft(String::from("1.16.5"), ModLoader::Fabric),
+                version: String::from("0.1.0"),
+                name: String::from("Example Modpack"),
+                summary: None,
+                files: {
+                    let mut files = HashSet::new();
+                    files.insert(ModpackFile {
+                        path: PathBuf::from("mods/gravestones-v1.9.jar"),
+                        hashes: ModpackFileHashes {
+                            sha1: String::from("3f0f6d523d218460310b345be03ab3f1d294e04d"),
+                        },
+                        env: ModpackEnv::Both,
+                        downloads: {
+                            let mut downloads = HashSet::new();
+                            downloads.insert(String::from("https://cdn.modrinth.com/data/ssUbhMkL/versions/v1.9/gravestones-v1.9.jar"));
+                            downloads
+                        }
+                    });
+                    files
+                },
+            },
+        );
+        Ok(())
+    }
+}

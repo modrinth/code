@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use std::path::{Path, PathBuf};
 
 use std::convert::TryFrom;
@@ -11,7 +12,7 @@ use serde::{Deserialize, Serialize};
 
 pub const DEFAULT_FORMAT_VERSION: u32 = 1;
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct Manifest<'a> {
     pub format_version: u32,
@@ -32,7 +33,7 @@ impl TryFrom<Manifest<'_>> for pack::Modpack {
             .files
             .into_iter()
             .map(pack::ModpackFile::try_from)
-            .collect::<ModpackResult<Vec<pack::ModpackFile>>>()?;
+            .collect::<ModpackResult<HashSet<pack::ModpackFile>>>()?;
 
         Ok(Self {
             name: String::from(manifest.name),
@@ -60,7 +61,7 @@ fn get_loader_version(loader: ModLoader, version: &str) -> ModpackResult<String>
         .iter()
         .find(|&it| it.id == version)
         .ok_or(ModpackError::VersionError(format!(
-            "No versions of {:?} exist for Minecraft {}",
+            "No versions of modloader {:?} exist for Minecraft {}",
             loader, version
         )))?
         .loaders[&LoaderType::Latest]
@@ -94,7 +95,7 @@ impl<'a> TryFrom<&'a pack::Modpack> for Manifest<'a> {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct ManifestFile<'a> {
     #[serde(borrow)]
@@ -134,7 +135,7 @@ impl<'a> From<&'a pack::ModpackFile> for ManifestFile<'a> {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ManifestHashes<'a> {
     pub sha1: &'a str,
 }
@@ -153,7 +154,7 @@ impl<'a> From<&'a pack::ModpackFileHashes> for ManifestHashes<'a> {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
 pub struct ManifestEnvs {
     pub client: ManifestEnv,
     pub server: ManifestEnv,
@@ -208,7 +209,7 @@ impl From<pack::ModpackEnv> for ManifestEnvs {
     }
 }
 
-#[derive(Debug, Deserialize, Serialize, PartialEq)]
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(untagged)]
 // HACK: I've tried for hours to get this working zero-copy, but I'm beat. If someone else wants to
 // go through the #<!! of implementing it, be my guest.

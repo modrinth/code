@@ -11,7 +11,8 @@ use zip::ZipArchive;
 use self::{manifest::Manifest, pack::Modpack};
 
 pub mod pack;
-mod manifest;
+pub mod manifest;
+pub mod modrinth_api;
 
 pub const MANIFEST_PATH: &'static str = "index.json";
 pub const OVERRIDES_PATH: &'static str = "overrides/";
@@ -45,8 +46,11 @@ pub enum ModpackError {
     #[error("Error joining futures: {0}")]
     JoinError(#[from] tokio::task::JoinError),
 
-    #[error("Error fetching modloader version: {0}")]
+    #[error("Versioning Error: {0}")]
     VersionError(String),
+
+    #[error("Error downloading file: {0}")]
+    FetchError(#[from] reqwest::Error)
 }
 
 type ModpackResult<T> = Result<T, ModpackError>;
