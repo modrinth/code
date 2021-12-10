@@ -3060,6 +3060,26 @@
       "nullable": []
     }
   },
+  "94ca18bf5244b0add2e6a12edfdc8d67159eed8c5afdf690f9b702faed249a4c": {
+    "query": "\n                SELECT gv.version game_version\n                FROM game_versions_versions gvv\n                INNER JOIN game_versions gv on gvv.game_version_id = gv.id\n                WHERE gvv.joining_version_id = $1\n                ORDER BY gv.created\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "game_version",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "97690dda7edea8c985891cae5ad405f628ed81e333bc88df5493c928a4324d43": {
     "query": "SELECT EXISTS(SELECT 1 FROM reports WHERE id=$1)",
     "describe": {
@@ -4148,6 +4168,18 @@
       "nullable": []
     }
   },
+  "bd0d1da185dc7d21ccbbfde86fc093ce9eda7dd7e07f7a53882d427010fd58ca": {
+    "query": "\n            DELETE FROM dependencies WHERE dependent_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "bdaab7da16d07169c29d96330fcc17ef2fb87fdfbadca23b7289c64420ac3a04": {
     "query": "\n            SELECT id, user_id, role, permissions, accepted\n            FROM team_members\n            WHERE (team_id = $1 AND user_id = $2)\n            ",
     "describe": {
@@ -5176,26 +5208,6 @@
         {
           "ordinal": 0,
           "name": "category",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "dd785c80c372e6d199099e839a481a0cd63de8161a6acd41cf615a6818d1ae38": {
-    "query": "\n                SELECT gv.version game_version\n                FROM game_versions_versions gvv\n                INNER JOIN game_versions gv on gvv.game_version_id = gv.id\n                WHERE gvv.joining_version_id = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "game_version",
           "type_info": "Varchar"
         }
       ],

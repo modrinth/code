@@ -461,6 +461,15 @@ impl Version {
         .execute(&mut *transaction)
         .await?;
 
+        sqlx::query!(
+            "
+            DELETE FROM dependencies WHERE dependent_id = $1
+            ",
+            id as VersionId,
+        )
+            .execute(&mut *transaction)
+            .await?;
+
         // delete version
 
         sqlx::query!(
@@ -617,6 +626,7 @@ impl Version {
                 FROM game_versions_versions gvv
                 INNER JOIN game_versions gv on gvv.game_version_id = gv.id
                 WHERE gvv.joining_version_id = $1
+                ORDER BY gv.created
                 ",
                 id as VersionId,
             ).fetch_all(executor),
