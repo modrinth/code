@@ -1,291 +1,267 @@
-use std::{
-    convert::TryFrom,
-    path::{Path, PathBuf},
-    str::FromStr,
-};
+use std::collections::HashSet;
+use std::path::{Path, PathBuf};
 
-use daedalus::download_file_mirrors;
-use futures::future;
-use tokio::fs;
+use std::convert::TryFrom;
 
 use crate::launcher::ModLoader;
 
-use super::ModpackError;
+use super::pack::ModpackGame;
+use super::{pack, ModpackError, ModpackResult};
+use daedalus::modded::LoaderType;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, PartialEq)]
-pub struct Manifest {
-    format_version: u64,
-    game: ModpackGame,
-    version_id: String,
+pub const DEFAULT_FORMAT_VERSION: u32 = 1;
 
-    name: String,
-    summary: Option<String>,
-
-    files: Vec<ModpackFile>,
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct Manifest<'a> {
+    pub format_version: u32,
+    pub game: &'a str,
+    pub version_id: &'a str,
+    pub name: &'a str,
+    #[serde(borrow)]
+    pub summary: Option<&'a str>,
+    pub files: Vec<ManifestFile<'a>>,
+    pub dependencies: ManifestDeps<'a>,
 }
 
-impl Manifest {
-    /// Download a modpack's files for a given side to a given destination
-    /// Assumes the destination exists and is a directory
-    pub async fn download_files(&self, dest: &Path, side: ModpackSide) -> Result<(), ModpackError> {
-        let handles = self.files.clone().into_iter().map(move |file| {
-            let (dest, side) = (dest.to_owned(), side);
-            tokio::spawn(async move { file.fetch(&dest, side).await })
-        });
-        future::try_join_all(handles)
-            .await?
-            .into_iter()
-            .collect::<Result<_, ModpackError>>()?;
-
-        // TODO Integrate instance format to save other metadata
-        Ok(())
-    }
-}
-
-fn try_get<'r, F, T>(
-    manifest: &'r serde_json::Map<String, serde_json::Value>,
-    field: &str,
-    caster: F,
-) -> Result<T, ModpackError>
-where
-    F: Fn(&'r serde_json::Value) -> Option<T>,
-{
-    manifest
-        .get(field)
-        .and_then(caster)
-        .ok_or(ModpackError::ManifestError(format!(
-            "Invalid or missing field: {}",
-            field
-        )))
-}
-
-impl TryFrom<serde_json::Value> for Manifest {
+impl TryFrom<Manifest<'_>> for pack::Modpack {
     type Error = ModpackError;
 
-    fn try_from(value: serde_json::Value) -> Result<Self, Self::Error> {
-        use ModpackError::ManifestError;
-
-        let value = value.as_object().ok_or(ManifestError(String::from(
-            "Manifest is not a JSON object!",
-        )))?;
-
-        let game = ModpackGame::new(
-            try_get(value, "game", serde_json::Value::as_str)?,
-            try_get(value, "dependencies", serde_json::Value::as_object)?,
-        )?;
-
-        let files = try_get(value, "files", serde_json::Value::as_array)?
-            .iter()
-            .map(|it| -> Result<ModpackFile, ModpackError> {
-                let file = it
-                    .as_object()
-                    .ok_or(ManifestError(String::from("Malformed file: not an object")))?;
-
-                let path = Path::new(try_get(file, "path", serde_json::Value::as_str)?);
-                let hashes = ModpackFileHashes::try_from(try_get(
-                    file,
-                    "hashes",
-                    serde_json::Value::as_object,
-                )?)?;
-                let downloads = try_get(file, "downloads", serde_json::Value::as_array)?
-                    .iter()
-                    .map(serde_json::Value::as_str)
-                    .map(|it| it.map(String::from))
-                    .collect::<Option<Vec<String>>>()
-                    .ok_or(ManifestError(format!(
-                        "Invalid source for path {}",
-                        path.to_str().unwrap_or("?")
-                    )))?;
-                let env: Option<[ModpackEnv; 2]> = if let Some(env) = file.get("env") {
-                    if !env.is_object() {
-                        return Err(ManifestError(String::from(
-                            "Env is provided, but is not an object!",
-                        )));
-                    }
-                    Some([
-                        ModpackEnv::from_str(
-                            env.get("client")
-                                .and_then(serde_json::Value::as_str)
-                                .unwrap_or_default(),
-                        )?,
-                        ModpackEnv::from_str(
-                            env.get("server")
-                                .and_then(serde_json::Value::as_str)
-                                .unwrap_or_default(),
-                        )?,
-                    ])
-                } else {
-                    None
-                };
-
-                ModpackFile::new(path, hashes, env, &downloads)
-            })
-            .collect::<Result<Vec<ModpackFile>, ModpackError>>()?;
+    fn try_from(manifest: Manifest<'_>) -> Result<Self, Self::Error> {
+        let files = manifest
+            .files
+            .into_iter()
+            .map(pack::ModpackFile::try_from)
+            .collect::<ModpackResult<HashSet<pack::ModpackFile>>>()?;
 
         Ok(Self {
-            format_version: try_get(value, "formatVersion", serde_json::Value::as_u64)?,
-            game,
-            version_id: String::from(try_get(value, "versionId", serde_json::Value::as_str)?),
-            name: String::from(try_get(value, "name", serde_json::Value::as_str)?),
-            summary: value
-                .get("summary")
-                .and_then(serde_json::Value::as_str)
-                .map(String::from),
+            name: String::from(manifest.name),
+            version: String::from(manifest.version_id),
+            summary: manifest.summary.map(String::from),
+            game: ModpackGame::from(manifest.dependencies),
             files,
         })
     }
 }
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum ModpackGame {
-    // TODO: Currently, the launcher does not support specifying mod loader versions, so I just
-    // store the loader here.
-    Minecraft(String, ModLoader),
+const MODRINTH_GAMEDATA_URL: &'static str = "https://staging-cdn.modrinth.com/gamedata";
+fn get_loader_version(loader: ModLoader, version: &str) -> ModpackResult<String> {
+    let source = match loader {
+        ModLoader::Vanilla => Err(ModpackError::VersionError(String::from(
+            "Attempted to get mod loader version of Vanilla",
+        ))),
+        ModLoader::Forge => Ok(format!("{}/forge/v0/manifest.json", MODRINTH_GAMEDATA_URL)),
+        ModLoader::Fabric => Ok(format!("{}/fabric/v0/manifest.json", MODRINTH_GAMEDATA_URL)),
+    }?;
+    let manifest = futures::executor::block_on(daedalus::modded::fetch_manifest(&source))?;
+
+    Ok(manifest
+        .game_versions
+        .iter()
+        .find(|&it| it.id == version)
+        .ok_or(ModpackError::VersionError(format!(
+            "No versions of modloader {:?} exist for Minecraft {}",
+            loader, version
+        )))?
+        .loaders[&LoaderType::Latest]
+        .id
+        .clone())
 }
 
-impl ModpackGame {
-    pub fn new(
-        game: &str,
-        deps: &serde_json::Map<String, serde_json::Value>,
-    ) -> Result<Self, ModpackError> {
-        match game {
-            "minecraft" => {
-                let game_version = String::from(
-                    deps.get("minecraft")
-                        .ok_or(ModpackError::ManifestError(String::from(
-                            "No version of minecraft given",
-                        )))?
-                        .as_str()
-                        .unwrap(),
-                );
-
-                // TODO: See comment in ModpackGame, this code was designed specifically to be
-                // easily adapted for versioned modloaders
-                let loader = if let Some(_) = deps.get("fabric-loader") {
-                    ModLoader::Fabric
-                } else if let Some(_) = deps.get("forge") {
-                    ModLoader::Forge
-                } else {
-                    ModLoader::Vanilla
-                };
-
-                Ok(ModpackGame::Minecraft(game_version, loader))
-            }
-            _ => Err(ModpackError::ManifestError(format!(
-                "Invalid game: {}",
-                game
-            ))),
-        }
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct ModpackFile {
-    path: PathBuf,
-    hashes: ModpackFileHashes,
-    envs: Option<[ModpackEnv; 2]>,
-    downloads: Vec<String>,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ModpackSide {
-    Client = 0,
-    Server = 1,
-}
-
-impl ModpackFile {
-    pub fn new(
-        path: &Path,
-        hashes: ModpackFileHashes,
-        envs: Option<[ModpackEnv; 2]>,
-        downloads: &[String],
-    ) -> Result<Self, ModpackError> {
-        if path.is_dir() {
-            return Err(ModpackError::ManifestError(format!(
-                "Modpack file {} is a directory!",
-                path.to_str().unwrap_or("?")
-            )));
-        }
-
-        Ok(Self {
-            path: PathBuf::from(path),
-            hashes,
-            envs,
-            downloads: Vec::from(downloads),
-        })
-    }
-
-    pub async fn fetch(&self, dest: &Path, side: ModpackSide) -> Result<(), ModpackError> {
-        if let Some(envs) = &self.envs {
-            if envs[side as usize] == ModpackEnv::Unsupported
-                || envs[(side as usize + 1) % 2] == ModpackEnv::Required
-            {
-                return Ok(());
-            }
-        }
-
-        let output = dest.join(&self.path);
-
-        // HACK: Since Daedalus appends a file name to all mirrors and the manifest supplies full
-        // URLs, I'm supplying it with an empty string to avoid reinventing the wheel.
-        let bytes = download_file_mirrors(
-            "",
-            &self
-                .downloads
-                .iter()
-                .map(|it| it.as_str())
-                .collect::<Vec<&str>>()
-                .as_slice(),
-            Some(&self.hashes.sha1),
-        )
-        .await?;
-        fs::create_dir_all(output.parent().unwrap()).await?;
-        fs::write(output, bytes).await?;
-        Ok(())
-    }
-}
-
-#[derive(Debug, Clone, PartialEq)]
-pub struct ModpackFileHashes {
-    sha1: String,
-}
-
-impl TryFrom<&serde_json::Map<String, serde_json::Value>> for ModpackFileHashes {
+impl<'a> TryFrom<&'a pack::Modpack> for Manifest<'a> {
     type Error = ModpackError;
 
-    fn try_from(value: &serde_json::Map<String, serde_json::Value>) -> Result<Self, Self::Error> {
-        let sha1 = String::from(try_get(&value, "sha1", serde_json::Value::as_str)?);
-        Ok(Self { sha1 })
+    fn try_from(pack: &'a pack::Modpack) -> Result<Self, Self::Error> {
+        let game_field: &'a str = match pack.game {
+            ModpackGame::Minecraft(..) => "minecraft",
+        };
+
+        let files = pack
+            .files
+            .iter()
+            .map(ManifestFile::from)
+            .collect::<Vec<ManifestFile>>();
+
+        Ok(Manifest {
+            format_version: DEFAULT_FORMAT_VERSION,
+            game: game_field,
+            version_id: &pack.version,
+            name: &pack.name,
+            summary: pack.summary.as_ref().map(String::as_str),
+            files,
+            dependencies: ManifestDeps::try_from(&pack.game)?,
+        })
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum ModpackEnv {
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "camelCase")]
+pub struct ManifestFile<'a> {
+    #[serde(borrow)]
+    pub path: &'a Path,
+    pub hashes: ManifestHashes<'a>,
+    #[serde(default)]
+    pub env: ManifestEnvs,
+    #[serde(borrow)]
+    pub downloads: Vec<&'a str>,
+}
+
+impl TryFrom<ManifestFile<'_>> for pack::ModpackFile {
+    type Error = ModpackError;
+
+    fn try_from(file: ManifestFile<'_>) -> Result<Self, Self::Error> {
+        Ok(Self {
+            path: PathBuf::from(file.path),
+            hashes: pack::ModpackFileHashes::from(file.hashes),
+            env: pack::ModpackEnv::try_from(file.env)?,
+            downloads: file.downloads.into_iter().map(ToOwned::to_owned).collect(),
+        })
+    }
+}
+
+impl<'a> From<&'a pack::ModpackFile> for ManifestFile<'a> {
+    fn from(file: &'a pack::ModpackFile) -> Self {
+        Self {
+            path: file.path.as_path(),
+            hashes: (&file.hashes).into(),
+            env: file.env.into(),
+            downloads: file
+                .downloads
+                .iter()
+                .map(String::as_str)
+                .collect::<Vec<&str>>(),
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+pub struct ManifestHashes<'a> {
+    pub sha1: &'a str,
+}
+
+impl From<ManifestHashes<'_>> for pack::ModpackFileHashes {
+    fn from(hashes: ManifestHashes<'_>) -> Self {
+        Self {
+            sha1: String::from(hashes.sha1),
+        }
+    }
+}
+
+impl<'a> From<&'a pack::ModpackFileHashes> for ManifestHashes<'a> {
+    fn from(hashes: &'a pack::ModpackFileHashes) -> Self {
+        Self { sha1: &hashes.sha1 }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+pub struct ManifestEnvs {
+    pub client: ManifestEnv,
+    pub server: ManifestEnv,
+}
+
+impl Default for ManifestEnvs {
+    fn default() -> Self {
+        Self {
+            client: ManifestEnv::Optional,
+            server: ManifestEnv::Optional,
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(rename_all = "lowercase")]
+pub enum ManifestEnv {
     Required,
     Optional,
     Unsupported,
 }
 
-impl FromStr for ModpackEnv {
-    type Err = ModpackError;
+impl TryFrom<ManifestEnvs> for pack::ModpackEnv {
+    type Error = ModpackError;
 
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        use ModpackEnv::*;
-        match s {
-            "required" => Ok(Required),
-            "optional" => Ok(Optional),
-            "unsupported" => Ok(Unsupported),
-            _ => Err(ModpackError::ManifestError(format!(
-                "Invalid environment support: {}",
-                s
+    fn try_from(envs: ManifestEnvs) -> Result<Self, Self::Error> {
+        use ManifestEnv::*;
+
+        match (envs.client, envs.server) {
+            (Required, Unsupported) => Ok(Self::ClientOnly),
+            (Unsupported, Required) => Ok(Self::ServerOnly),
+            (Optional, Optional) => Ok(Self::Both),
+            _ => Err(ModpackError::FormatError(format!(
+                "Invalid environment specification: {:?}",
+                envs
             ))),
         }
     }
 }
 
-impl Default for ModpackEnv {
-    fn default() -> Self {
-        Self::Optional
+impl From<pack::ModpackEnv> for ManifestEnvs {
+    fn from(envs: pack::ModpackEnv) -> Self {
+        use super::pack::ModpackEnv::*;
+
+        let (client, server) = match envs {
+            ClientOnly => (ManifestEnv::Required, ManifestEnv::Unsupported),
+            ServerOnly => (ManifestEnv::Unsupported, ManifestEnv::Required),
+            Both => (ManifestEnv::Optional, ManifestEnv::Optional),
+        };
+
+        Self { client, server }
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
+#[serde(untagged)]
+// HACK: I've tried for hours to get this working zero-copy, but I'm beat. If someone else wants to
+// go through the #<!! of implementing it, be my guest.
+pub enum ManifestDeps<'a> {
+    MinecraftFabric {
+        minecraft: &'a str,
+        #[serde(rename = "fabric-loader")]
+        fabric_loader: String,
+    },
+    MinecraftForge {
+        minecraft: &'a str,
+        forge: String,
+    },
+    MinecraftVanilla {
+        minecraft: &'a str,
+    },
+}
+
+impl From<ManifestDeps<'_>> for pack::ModpackGame {
+    fn from(deps: ManifestDeps<'_>) -> Self {
+        use ManifestDeps::*;
+
+        match deps {
+            MinecraftVanilla { minecraft } => {
+                Self::Minecraft(String::from(minecraft), ModLoader::Vanilla)
+            }
+            MinecraftFabric { minecraft, .. } => {
+                Self::Minecraft(String::from(minecraft), ModLoader::Fabric)
+            }
+            MinecraftForge { minecraft, .. } => {
+                Self::Minecraft(String::from(minecraft), ModLoader::Forge)
+            }
+        }
+    }
+}
+
+impl<'a> TryFrom<&'a pack::ModpackGame> for ManifestDeps<'a> {
+    type Error = ModpackError;
+
+    fn try_from(game: &'a pack::ModpackGame) -> Result<Self, Self::Error> {
+        use super::pack::ModpackGame::*;
+        Ok(match game {
+            Minecraft(ref ver, ModLoader::Vanilla) => Self::MinecraftVanilla { minecraft: ver },
+            Minecraft(ref ver, loader @ ModLoader::Fabric) => Self::MinecraftFabric {
+                minecraft: ver,
+                fabric_loader: get_loader_version(*loader, ver)?,
+            },
+            Minecraft(ref ver, loader @ ModLoader::Forge) => Self::MinecraftForge {
+                minecraft: ver,
+                forge: get_loader_version(*loader, ver)?,
+            },
+        })
     }
 }
 
@@ -294,7 +270,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn parse_simple() -> Result<(), ModpackError> {
+    fn parse_simple() -> ModpackResult<()> {
         const PACK_JSON: &'static str = r#"
             {
                 "formatVersion": 1,
@@ -309,22 +285,23 @@ mod tests {
         "#;
         let expected_manifest = Manifest {
             format_version: 1,
-            game: ModpackGame::Minecraft(String::from("1.17.1"), ModLoader::Vanilla),
-            version_id: String::from("deadbeef"),
-            name: String::from("Example Pack"),
+            game: "minecraft",
+            version_id: "deadbeef",
+            name: "Example Pack",
             summary: None,
             files: Vec::new(),
+            dependencies: ManifestDeps::MinecraftVanilla {
+                minecraft: "1.17.1",
+            },
         };
-        let manifest_json: serde_json::Value =
-            serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
-        let manifest = Manifest::try_from(manifest_json)?;
+        let manifest: Manifest = serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
 
         assert_eq!(expected_manifest, manifest);
         Ok(())
     }
 
     #[test]
-    fn parse_forge() -> Result<(), ModpackError> {
+    fn parse_forge() -> ModpackResult<()> {
         const PACK_JSON: &'static str = r#"
             {
                 "formatVersion": 1,
@@ -348,33 +325,33 @@ mod tests {
                 }
             }
         "#;
-
         let expected_manifest = Manifest {
             format_version: 1,
-            game: ModpackGame::Minecraft(String::from("1.17.1"), ModLoader::Forge),
-            version_id: String::from("deadbeef"),
-            name: String::from("Example Pack"),
+            game: "minecraft",
+            version_id: "deadbeef",
+            name: "Example Pack",
             summary: None,
-            files: vec![ModpackFile::new(
-                Path::new("mods/testmod.jar"),
-                ModpackFileHashes {
-                    sha1: String::from("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+            files: vec![ManifestFile {
+                path: Path::new("mods/testmod.jar"),
+                hashes: ManifestHashes {
+                    sha1: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 },
-                None,
-                &[String::from("https://example.com/testmod.jar")],
-            )?],
+                env: ManifestEnvs::default(),
+                downloads: vec!["https://example.com/testmod.jar"],
+            }],
+            dependencies: ManifestDeps::MinecraftForge {
+                minecraft: "1.17.1",
+                forge: String::from("37.0.110"),
+            },
         };
-
-        let manifest_json: serde_json::Value =
-            serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
-        let manifest = Manifest::try_from(manifest_json)?;
+        let manifest: Manifest = serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
 
         assert_eq!(expected_manifest, manifest);
         Ok(())
     }
 
     #[test]
-    fn parse_fabric() -> Result<(), ModpackError> {
+    fn parse_fabric() -> ModpackResult<()> {
         const PACK_JSON: &'static str = r#"
             {
                 "formatVersion": 1,
@@ -398,33 +375,33 @@ mod tests {
                 }
             }
         "#;
-
         let expected_manifest = Manifest {
             format_version: 1,
-            game: ModpackGame::Minecraft(String::from("1.17.1"), ModLoader::Fabric),
-            version_id: String::from("deadbeef"),
-            name: String::from("Example Pack"),
+            game: "minecraft",
+            version_id: "deadbeef",
+            name: "Example Pack",
             summary: None,
-            files: vec![ModpackFile::new(
-                Path::new("mods/testmod.jar"),
-                ModpackFileHashes {
-                    sha1: String::from("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
+            files: vec![ManifestFile {
+                path: Path::new("mods/testmod.jar"),
+                hashes: ManifestHashes {
+                    sha1: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
                 },
-                None,
-                &[String::from("https://example.com/testmod.jar")],
-            )?],
+                env: ManifestEnvs::default(),
+                downloads: vec!["https://example.com/testmod.jar"],
+            }],
+            dependencies: ManifestDeps::MinecraftFabric {
+                minecraft: "1.17.1",
+                fabric_loader: String::from("0.9.0"),
+            },
         };
-
-        let manifest_json: serde_json::Value =
-            serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
-        let manifest = Manifest::try_from(manifest_json)?;
+        let manifest: Manifest = serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
 
         assert_eq!(expected_manifest, manifest);
         Ok(())
     }
 
     #[test]
-    fn parse_complete() -> Result<(), ModpackError> {
+    fn parse_complete() -> ModpackResult<()> {
         const PACK_JSON: &'static str = r#"
             {
                 "formatVersion": 1,
@@ -453,28 +430,29 @@ mod tests {
                 }
             }
         "#;
-
         let expected_manifest = Manifest {
             format_version: 1,
-            game: ModpackGame::Minecraft(String::from("1.17.1"), ModLoader::Forge),
-            version_id: String::from("deadbeef"),
-            name: String::from("Example Pack"),
-            summary: Some(String::from("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.")),
-            files: vec![
-                ModpackFile::new(
-                    Path::new("mods/testmod.jar"), 
-                    ModpackFileHashes {
-                        sha1: String::from("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"),
-                    },
-                    Some([ ModpackEnv::Required, ModpackEnv::Unsupported ]),
-                    &[ String::from("https://example.com/testmod.jar") ],
-                )?
-            ],
+            game: "minecraft",
+            version_id: "deadbeef",
+            name: "Example Pack",
+            summary: Some("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
+            files: vec![ManifestFile {
+                path: Path::new("mods/testmod.jar"),
+                hashes: ManifestHashes {
+                    sha1: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+                },
+                env: ManifestEnvs {
+                    client: ManifestEnv::Required,
+                    server: ManifestEnv::Unsupported,
+                },
+                downloads: vec!["https://example.com/testmod.jar"],
+            }],
+            dependencies: ManifestDeps::MinecraftForge {
+                minecraft: "1.17.1",
+                forge: String::from("37.0.110"),
+            },
         };
-
-        let manifest_json: serde_json::Value =
-            serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
-        let manifest = Manifest::try_from(manifest_json)?;
+        let manifest: Manifest = serde_json::from_str(PACK_JSON).expect("Error parsing pack JSON");
 
         assert_eq!(expected_manifest, manifest);
         Ok(())

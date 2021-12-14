@@ -1,4 +1,5 @@
 use daedalus::minecraft::{ArgumentType, VersionInfo};
+use serde::{Deserialize, Serialize};
 use std::path::Path;
 use std::process::{Command, Stdio};
 use thiserror::Error;
@@ -65,7 +66,8 @@ pub async fn fetch_metadata() -> Result<
     Ok((game?, forge?, fabric?))
 }
 
-#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+#[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum ModLoader {
     Vanilla,
     Forge,

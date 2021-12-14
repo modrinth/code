@@ -1,7 +1,7 @@
 use std::{path::PathBuf, time::Instant};
 
 use argh::FromArgs;
-use theseus::modpack::{fetch_modpack, manifest::ModpackSide};
+use theseus::modpack::{fetch_modpack, pack::ModpackSide};
 
 #[derive(FromArgs)]
 /// Simple modpack download

@@ -2,17 +2,25 @@
 
 use daedalus::download_file;
 use fs_extra::dir::CopyOptions;
-use std::{borrow::Borrow, convert::TryFrom, env, io, path::Path};
-use tokio::fs;
+use serde::Deserialize;
+use std::{convert::TryFrom, env, io, path::Path};
+use tokio::{fs, try_join};
 use uuid::Uuid;
 use zip::ZipArchive;
 
-use self::manifest::Manifest;
+use self::{
+    manifest::Manifest,
+    pack::{Modpack, ModpackGame},
+};
 
 pub mod manifest;
+pub mod modrinth_api;
+pub mod pack;
 
+pub const COMPILED_PATH: &'static str = "compiled/";
 pub const MANIFEST_PATH: &'static str = "index.json";
 pub const OVERRIDES_PATH: &'static str = "overrides/";
+pub const PACK_JSON5_PATH: &'static str = "modpack.json5";
 
 #[derive(thiserror::Error, Debug)]
 pub enum ModpackError {
@@ -40,17 +48,31 @@ pub enum ModpackError {
     #[error("Error parsing json: {0}")]
     JsonError(#[from] serde_json::Error),
 
+    #[error("Error parsing json5: {0}")]
+    Json5Error(#[from] json5::Error),
+
     #[error("Error joining futures: {0}")]
     JoinError(#[from] tokio::task::JoinError),
+
+    #[error("Versioning Error: {0}")]
+    VersionError(String),
+
+    #[error("Error downloading file: {0}")]
+    FetchError(#[from] reqwest::Error),
+
+    #[error("Invalid modpack source: {0} (set the WHITELISTED_MODPACK_DOMAINS environment variable to override)")]
+    SourceWhitelistError(String),
 }
+
+type ModpackResult<T> = Result<T, ModpackError>;
 
 /// Realise a modpack from a given URL
 pub async fn fetch_modpack(
     url: &str,
     sha1: Option<&str>,
     dest: &Path,
-    side: manifest::ModpackSide,
-) -> Result<(), ModpackError> {
+    side: pack::ModpackSide,
+) -> ModpackResult<()> {
     let bytes = download_file(url, sha1).await?;
     let mut archive = ZipArchive::new(io::Cursor::new(&bytes as &[u8]))?;
     realise_modpack_zip(&mut archive, dest, side).await
@@ -60,8 +82,8 @@ pub async fn fetch_modpack(
 pub async fn realise_modpack_zip(
     archive: &mut ZipArchive<impl io::Read + io::Seek>,
     dest: &Path,
-    side: manifest::ModpackSide,
-) -> Result<(), ModpackError> {
+    side: pack::ModpackSide,
+) -> ModpackResult<()> {
     let tmp = env::temp_dir().join(format!("theseus-{}/", Uuid::new_v4()));
     archive.extract(&tmp)?;
     realise_modpack(&tmp, dest, side).await
@@ -71,8 +93,8 @@ pub async fn realise_modpack_zip(
 pub async fn realise_modpack(
     dir: &Path,
     dest: &Path,
-    side: manifest::ModpackSide,
-) -> Result<(), ModpackError> {
+    side: pack::ModpackSide,
+) -> ModpackResult<()> {
     if dest.is_file() {
         return Err(ModpackError::InvalidDirectory(String::from(
             "Output is not a directory",
@@ -101,11 +123,66 @@ pub async fn realise_modpack(
             "Manifest missing or is not a file",
         )))?;
     let manifest_file = std::fs::File::open(manifest_path)?;
-    let manifest_json: serde_json::Value =
-        serde_json::from_reader(io::BufReader::new(manifest_file))?;
-    let manifest = Manifest::try_from(manifest_json)?;
+    let reader = io::BufReader::new(manifest_file);
+    let mut deserializer = serde_json::Deserializer::from_reader(reader);
+    let manifest = Manifest::deserialize(&mut deserializer)?;
+    let modpack = Modpack::try_from(manifest)?;
 
-    // Realise manifest
-    manifest.download_files(dest, side).await?;
+    // Realise modpack
+    modpack.download_files(dest, side).await?;
     Ok(())
 }
+
+pub fn to_pack_json5(pack: &Modpack) -> ModpackResult<String> {
+    let json5 = json5::to_string(pack)?;
+    Ok(format!("// This modpack is managed using Theseus. It can be edited using either a Theseus-compatible launcher or manually.\n{}", json5))
+}
+
+lazy_static::lazy_static! {
+    static ref PACK_GITIGNORE: String = format!(r#"
+    {0}
+    "#, COMPILED_PATH);
+}
+
+pub async fn create_modpack(
+    name: &str,
+    game: ModpackGame,
+    summary: Option<&str>,
+) -> ModpackResult<()> {
+    let output_dir = Path::new("./").join(name);
+    let pack = Modpack::new(game, "0.1.0", name, summary);
+
+    try_join!(
+        fs::create_dir(&output_dir),
+        fs::create_dir(output_dir.join(OVERRIDES_PATH)),
+        fs::write(output_dir.join(".gitignore"), PACK_GITIGNORE.as_str()),
+        fs::write(output_dir.join(PACK_JSON5_PATH), to_pack_json5(&pack)?),
+    )?;
+
+    Ok(())
+}
+
+pub async fn compile_modpack(dir: &Path) -> ModpackResult<()> {
+    let result_dir = dir.join(COMPILED_PATH);
+    let pack: Modpack = json5::from_str(&fs::read_to_string(dir.join(PACK_JSON5_PATH)).await?)?;
+
+    if dir.join(OVERRIDES_PATH).exists() {
+        fs_extra::dir::copy(
+            dir.join(OVERRIDES_PATH),
+            result_dir.join(OVERRIDES_PATH),
+            &CopyOptions::new(),
+        )?;
+    }
+    let manifest = Manifest::try_from(&pack)?;
+
+    try_join!(
+        fs::create_dir(&result_dir),
+        fs::write(
+            result_dir.join(MANIFEST_PATH),
+            serde_json::to_string(&manifest)?
+        ),
+    )?;
+
+    Ok(())
+}
+
