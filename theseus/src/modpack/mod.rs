@@ -59,6 +59,9 @@ pub enum ModpackError {
 
     #[error("Error downloading file: {0}")]
     FetchError(#[from] reqwest::Error),
+
+    #[error("Invalid modpack source: {0} (set the WHITELISTED_MODPACK_DOMAINS environment variable to override)")]
+    SourceWhitelistError(String),
 }
 
 type ModpackResult<T> = Result<T, ModpackError>;

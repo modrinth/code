@@ -10,9 +10,17 @@ use tokio::fs;
 
 use super::{
     modrinth_api::{self, ModrinthV1},
-    ModpackResult,
+    ModpackResult, ModpackError,
 };
 use crate::launcher::ModLoader;
+
+pub const MODRINTH_DEFAULT_MODPACK_DOMAINS: &'static [&'static str] = &[
+    "cdn.modrinth.com",
+    "edge.forgecdn.net",
+    "github.com",
+    "raw.githubusercontent.com",
+];
+pub const MODRINTH_MODPACK_DOMAIN_WHITELIST_VAR: &'static str = "WHITELISTED_MODPACK_DOMAINS";
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct Modpack {
@@ -95,6 +103,32 @@ impl Modpack {
         self.files.extend(files);
         Ok(())
     }
+
+    pub async fn add_file(&mut self, source: reqwest::Url, dest: &Path, hashes: Option<ModpackFileHashes>, env: Option<ModpackEnv>) -> ModpackResult<()> {
+        let whitelisted_domains = std::env::var(MODRINTH_MODPACK_DOMAIN_WHITELIST_VAR)
+            .map(|it| serde_json::from_str::<Vec<String>>(&it).ok().unwrap())
+            .unwrap_or(
+                MODRINTH_DEFAULT_MODPACK_DOMAINS
+                    .iter()
+                    .cloned()
+                    .map(String::from)
+                    .collect::<Vec<String>>(),
+            );
+
+        if (whitelisted_domains.iter().find(String::from(source.host_str().unwrap())).is_none()) {
+            return Err(ModpackError::SourceWhitelistError(String::from(source.host_str().unwrap())));
+        }         
+        
+        let file = ModpackFile {
+            path: dest,
+            hashes,
+            env: env.unwrap_or(ModpackEnv::Both),
+            downloads: HashSet::from([String::from(source)])
+        };
+
+        self.files.insert(file);
+        Ok(())
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
@@ -107,7 +141,7 @@ pub enum ModpackGame {
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct ModpackFile {
     pub path: PathBuf,
-    pub hashes: ModpackFileHashes,
+    pub hashes: Option<ModpackFileHashes>,
     pub env: ModpackEnv,
     pub downloads: HashSet<String>,
 }
