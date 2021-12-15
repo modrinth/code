@@ -106,7 +106,7 @@ pub struct PackValidator;
 
 impl super::Validator for PackValidator {
     fn get_file_extensions(&self) -> &[&str] {
-        &["zip"]
+        &["mrpack"]
     }
 
     fn get_project_types(&self) -> &[&str] {
@@ -126,7 +126,7 @@ impl super::Validator for PackValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         let mut file = archive
-            .by_name("index.json")
+            .by_name("modrinth.index.json")
             .map_err(|_| ValidationError::InvalidInputError("Pack manifest is missing.".into()))?;
 
         let mut contents = String::new();
