@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::HashSet,
     hash::Hash,
-    path::{Path, PathBuf},
+    path::{Path, PathBuf}, iter::FromIterator,
 };
 use tokio::fs;
 
@@ -115,15 +115,15 @@ impl Modpack {
                     .collect::<Vec<String>>(),
             );
 
-        if (whitelisted_domains.iter().find(String::from(source.host_str().unwrap())).is_none()) {
+        if (whitelisted_domains.iter().find(|it| it == &source.host_str().unwrap()).is_none()) {
             return Err(ModpackError::SourceWhitelistError(String::from(source.host_str().unwrap())));
         }         
         
         let file = ModpackFile {
-            path: dest,
+            path: PathBuf::from(dest),
             hashes,
             env: env.unwrap_or(ModpackEnv::Both),
-            downloads: HashSet::from([String::from(source)])
+            downloads: HashSet::from_iter([String::from(source)].into_iter().cloned())
         };
 
         self.files.insert(file);
@@ -148,7 +148,9 @@ pub struct ModpackFile {
 
 impl Hash for ModpackFile {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        self.hashes.sha1.hash(state);
+        if let Some(ref hashes) = self.hashes {
+            hashes.sha1.hash(state);
+        }
         self.path.hash(state);
     }
 }
@@ -171,7 +173,7 @@ impl ModpackFile {
                 .map(|it| it.as_str())
                 .collect::<Vec<&str>>()
                 .as_slice(),
-            Some(&self.hashes.sha1),
+            self.hashes.as_ref().map(|it| it.sha1.as_str()),
         )
         .await?;
         fs::create_dir_all(output.parent().unwrap()).await?;

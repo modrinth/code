@@ -60,7 +60,7 @@ struct ModrinthV1ProjectVersionFile<'a> {
 impl From<ModrinthV1ProjectVersionFile<'_>> for ModpackFile {
     fn from(file: ModrinthV1ProjectVersionFile<'_>) -> Self {
         Self {
-            hashes: ModpackFileHashes::from(file.hashes),
+            hashes: Some(ModpackFileHashes::from(file.hashes)),
             downloads: {
                 let mut downloads: HashSet<String> = HashSet::new();
                 downloads.insert(String::from(file.url));

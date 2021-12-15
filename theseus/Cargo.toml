@@ -20,6 +20,7 @@ chrono = { version = "0.4", features = ["serde"] }
 uuid = { version = "0.8", features = ["serde", "v4"] }
 bytes = "1"
 zip = "0.5"
+zip-extensions = "0.6"
 sha1 = { version = "0.6.0", features = ["std"]}
 path-clean = "0.1.0"
 fs_extra = "1.2.0"
