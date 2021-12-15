@@ -18,7 +18,7 @@ pub mod modrinth_api;
 pub mod pack;
 
 pub const COMPILED_PATH: &'static str = "compiled/";
-pub const MANIFEST_PATH: &'static str = "index.json";
+pub const MANIFEST_PATH: &'static str = "modrinth.index.json";
 pub const OVERRIDES_PATH: &'static str = "overrides/";
 pub const PACK_JSON5_PATH: &'static str = "modpack.json5";
 
