@@ -467,8 +467,8 @@ impl Version {
             ",
             id as VersionId,
         )
-            .execute(&mut *transaction)
-            .await?;
+        .execute(&mut *transaction)
+        .await?;
 
         // delete version
 

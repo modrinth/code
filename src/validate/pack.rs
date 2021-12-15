@@ -27,7 +27,7 @@ pub struct PackFormat<'a> {
 pub struct PackFile<'a> {
     pub path: &'a str,
     pub hashes: std::collections::HashMap<FileHash, &'a str>,
-    pub env: std::collections::HashMap<EnvType, SideType>,
+    pub env: Option<std::collections::HashMap<EnvType, SideType>>,
     #[validate(custom(function = "validate_download_url"))]
     pub downloads: Vec<&'a str>,
 }
