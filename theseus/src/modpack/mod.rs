@@ -7,6 +7,7 @@ use std::{convert::TryFrom, env, io, path::Path};
 use tokio::{fs, try_join};
 use uuid::Uuid;
 use zip::ZipArchive;
+use zip_extensions::ZipWriterExtensions;
 
 use self::{
     manifest::Manifest,
@@ -18,6 +19,7 @@ pub mod modrinth_api;
 pub mod pack;
 
 pub const COMPILED_PATH: &'static str = "compiled/";
+pub const COMPILED_ZIP: &'static str = "compiled.mrpack";
 pub const MANIFEST_PATH: &'static str = "modrinth.index.json";
 pub const OVERRIDES_PATH: &'static str = "overrides/";
 pub const PACK_JSON5_PATH: &'static str = "modpack.json5";
@@ -141,7 +143,8 @@ pub fn to_pack_json5(pack: &Modpack) -> ModpackResult<String> {
 lazy_static::lazy_static! {
     static ref PACK_GITIGNORE: String = format!(r#"
     {0}
-    "#, COMPILED_PATH);
+    {1}
+    "#, COMPILED_PATH, COMPILED_ZIP);
 }
 
 pub async fn create_modpack(
@@ -166,6 +169,7 @@ pub async fn compile_modpack(dir: &Path) -> ModpackResult<()> {
     let result_dir = dir.join(COMPILED_PATH);
     let pack: Modpack = json5::from_str(&fs::read_to_string(dir.join(PACK_JSON5_PATH)).await?)?;
 
+    fs::create_dir(&result_dir).await;
     if dir.join(OVERRIDES_PATH).exists() {
         fs_extra::dir::copy(
             dir.join(OVERRIDES_PATH),
@@ -174,15 +178,15 @@ pub async fn compile_modpack(dir: &Path) -> ModpackResult<()> {
         )?;
     }
     let manifest = Manifest::try_from(&pack)?;
+    fs::write(
+        result_dir.join(MANIFEST_PATH),
+        serde_json::to_string(&manifest)?,
+    )
+    .await?;
 
-    try_join!(
-        fs::create_dir(&result_dir),
-        fs::write(
-            result_dir.join(MANIFEST_PATH),
-            serde_json::to_string(&manifest)?
-        ),
-    )?;
+    let result_zip = fs::File::create(dir.join(COMPILED_ZIP)).await?.into_std().await;
+    let mut zip = zip::ZipWriter::new(&result_zip);
+    zip.create_from_directory(&result_dir)?;
 
     Ok(())
 }
-

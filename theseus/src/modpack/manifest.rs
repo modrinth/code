@@ -100,7 +100,7 @@ impl<'a> TryFrom<&'a pack::Modpack> for Manifest<'a> {
 pub struct ManifestFile<'a> {
     #[serde(borrow)]
     pub path: &'a Path,
-    pub hashes: ManifestHashes<'a>,
+    pub hashes: Option<ManifestHashes<'a>>,
     #[serde(default)]
     pub env: ManifestEnvs,
     #[serde(borrow)]
@@ -113,7 +113,7 @@ impl TryFrom<ManifestFile<'_>> for pack::ModpackFile {
     fn try_from(file: ManifestFile<'_>) -> Result<Self, Self::Error> {
         Ok(Self {
             path: PathBuf::from(file.path),
-            hashes: pack::ModpackFileHashes::from(file.hashes),
+            hashes: file.hashes.map(pack::ModpackFileHashes::from),
             env: pack::ModpackEnv::try_from(file.env)?,
             downloads: file.downloads.into_iter().map(ToOwned::to_owned).collect(),
         })
@@ -124,7 +124,7 @@ impl<'a> From<&'a pack::ModpackFile> for ManifestFile<'a> {
     fn from(file: &'a pack::ModpackFile) -> Self {
         Self {
             path: file.path.as_path(),
-            hashes: (&file.hashes).into(),
+            hashes: file.hashes.as_ref().map(ManifestHashes::from),
             env: file.env.into(),
             downloads: file
                 .downloads
