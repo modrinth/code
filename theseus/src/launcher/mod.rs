@@ -20,50 +20,39 @@ pub enum LauncherError {
         url: String,
         tries: u32,
     },
+
     #[error("Failed to run processor: {0}")]
     ProcessorError(String),
+
     #[error("Invalid input: {0}")]
     InvalidInput(String),
+
     #[error("Error while managing asynchronous tasks")]
     TaskError(#[from] tokio::task::JoinError),
+
     #[error("Error while reading/writing to the disk: {0}")]
     IoError(#[from] std::io::Error),
+
     #[error("Error while spawning child process {process}")]
     ProcessError {
         inner: std::io::Error,
         process: String,
     },
+
     #[error("Error while deserializing JSON")]
     SerdeError(#[from] serde_json::Error),
+
     #[error("Unable to fetch {item}")]
     FetchError { inner: reqwest::Error, item: String },
+
     #[error("{0}")]
     ParseError(String),
+
     #[error("Error while fetching metadata: {0}")]
     DaedalusError(#[from] daedalus::Error),
-}
 
-const META_URL: &str = "https://staging-cdn.modrinth.com/gamedata";
-
-pub async fn fetch_metadata() -> Result<
-    (
-        daedalus::minecraft::VersionManifest,
-        daedalus::modded::Manifest,
-        daedalus::modded::Manifest,
-    ),
-    LauncherError,
-> {
-    let (game, forge, fabric) = futures::future::join3(
-        daedalus::minecraft::fetch_version_manifest(Some(&*format!(
-            "{}/minecraft/v0/manifest.json",
-            META_URL
-        ))),
-        daedalus::modded::fetch_manifest(&*format!("{}/forge/v0/manifest.json", META_URL)),
-        daedalus::modded::fetch_manifest(&*format!("{}/fabric/v0/manifest.json", META_URL)),
-    )
-    .await;
-
-    Ok((game?, forge?, fabric?))
+    #[error("Error while reading metadata: {0}")]
+    MetaError(#[from] crate::meta::MetaError),
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
@@ -86,7 +75,7 @@ pub async fn launch_minecraft(
     root_dir: &Path,
     credentials: &Credentials,
 ) -> Result<(), LauncherError> {
-    let (game, forge, fabric) = fetch_metadata().await?;
+    let metadata = crate::meta::Metadata::get().await?;
 
     let versions_path = crate::util::absolute_path(root_dir.join("versions"))?;
     let libraries_path = crate::util::absolute_path(root_dir.join("libraries"))?;
@@ -95,7 +84,9 @@ pub async fn launch_minecraft(
 
     let mut version = download::download_version_info(
         &versions_path,
-        game.versions
+        metadata
+            .minecraft
+            .versions
             .iter()
             .find(|x| x.id == version_name)
             .ok_or_else(|| {
@@ -105,7 +96,8 @@ pub async fn launch_minecraft(
             ModLoader::Vanilla => None,
             ModLoader::Forge | ModLoader::Fabric => {
                 let loaders = if mod_loader.unwrap_or_default() == ModLoader::Forge {
-                    &forge
+                    &metadata
+                        .forge
                         .game_versions
                         .iter()
                         .find(|x| x.id == version_name)
@@ -117,7 +109,8 @@ pub async fn launch_minecraft(
                         })?
                         .loaders
                 } else {
-                    &fabric
+                    &metadata
+                        .fabric
                         .game_versions
                         .iter()
                         .find(|x| x.id == version_name)

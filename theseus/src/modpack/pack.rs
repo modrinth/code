@@ -4,13 +4,14 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::HashSet,
     hash::Hash,
-    path::{Path, PathBuf}, iter::FromIterator,
+    iter::FromIterator,
+    path::{Path, PathBuf},
 };
 use tokio::fs;
 
 use super::{
     modrinth_api::{self, ModrinthV1},
-    ModpackResult, ModpackError,
+    ModpackError, ModpackResult,
 };
 use crate::launcher::ModLoader;
 
@@ -104,7 +105,13 @@ impl Modpack {
         Ok(())
     }
 
-    pub async fn add_file(&mut self, source: reqwest::Url, dest: &Path, hashes: Option<ModpackFileHashes>, env: Option<ModpackEnv>) -> ModpackResult<()> {
+    pub async fn add_file(
+        &mut self,
+        source: reqwest::Url,
+        dest: &Path,
+        hashes: Option<ModpackFileHashes>,
+        env: Option<ModpackEnv>,
+    ) -> ModpackResult<()> {
         let whitelisted_domains = std::env::var(MODRINTH_MODPACK_DOMAIN_WHITELIST_VAR)
             .map(|it| serde_json::from_str::<Vec<String>>(&it).ok().unwrap())
             .unwrap_or(
@@ -115,15 +122,21 @@ impl Modpack {
                     .collect::<Vec<String>>(),
             );
 
-        if (whitelisted_domains.iter().find(|it| it == &source.host_str().unwrap()).is_none()) {
-            return Err(ModpackError::SourceWhitelistError(String::from(source.host_str().unwrap())));
-        }         
-        
+        if whitelisted_domains
+            .iter()
+            .find(|it| it == &source.host_str().unwrap())
+            .is_none()
+        {
+            return Err(ModpackError::SourceWhitelistError(String::from(
+                source.host_str().unwrap(),
+            )));
+        }
+
         let file = ModpackFile {
             path: PathBuf::from(dest),
             hashes,
             env: env.unwrap_or(ModpackEnv::Both),
-            downloads: HashSet::from_iter([String::from(source)].into_iter().cloned())
+            downloads: HashSet::from_iter([String::from(source)].into_iter().cloned()),
         };
 
         self.files.insert(file);

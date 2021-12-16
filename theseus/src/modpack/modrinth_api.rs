@@ -1,13 +1,9 @@
-use std::{
-    collections::HashSet,
-    convert::TryFrom,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashSet, convert::TryFrom, path::PathBuf};
 
 use crate::launcher::ModLoader;
 
 use super::{
-    manifest::{ManifestEnv, ManifestEnvs, ManifestHashes},
+    manifest::{ManifestEnvs, ManifestHashes},
     pack::{ModpackEnv, ModpackFile, ModpackFileHashes, ModpackGame},
     ModpackError, ModpackResult,
 };

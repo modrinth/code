@@ -184,7 +184,10 @@ pub async fn compile_modpack(dir: &Path) -> ModpackResult<()> {
     )
     .await?;
 
-    let result_zip = fs::File::create(dir.join(COMPILED_ZIP)).await?.into_std().await;
+    let result_zip = fs::File::create(dir.join(COMPILED_ZIP))
+        .await?
+        .into_std()
+        .await;
     let mut zip = zip::ZipWriter::new(&result_zip);
     zip.create_from_directory(&result_dir)?;
 
