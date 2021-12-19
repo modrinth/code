@@ -1,15 +1,17 @@
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
-use daedalus::minecraft::Library;
-use daedalus::modded::{LoaderType, LoaderVersion, Manifest, PartialVersionInfo, Version};
+use daedalus::minecraft::{Library, VersionManifest};
+use daedalus::modded::{LoaderVersion, Manifest, PartialVersionInfo, Version};
 use log::info;
 use serde::{Deserialize, Serialize};
-use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
-use tokio::sync::Mutex;
+use tokio::sync::{Mutex, RwLock};
 
-pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
+pub async fn retrieve_data(
+    minecraft_versions: &VersionManifest,
+    uploaded_files: &mut Vec<String>,
+) -> Result<(), Error> {
     let mut list = fetch_fabric_versions(None).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&*format!(
         "fabric/v{}/manifest.json",
@@ -27,24 +29,28 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
     let uploaded_files_mutex = Arc::new(Mutex::new(Vec::new()));
 
     if let Some(latest) = list.loader.get(0) {
-        let loaders_mutex = Arc::new(Mutex::new(HashMap::new()));
+        let loaders_mutex = Arc::new(RwLock::new(Vec::new()));
         let visited_artifacts_mutex = Arc::new(Mutex::new(Vec::new()));
 
         {
-            let mut loaders = loaders_mutex.lock().await;
+            let mut loaders = loaders_mutex.write().await;
 
-            loaders.insert(LoaderType::Latest, latest.version.clone());
+            // for loader in &list.loader {
+            //     loaders.push((Box::new(loader.stable), loader.version.clone()))
+            // }
+
+            loaders.push((Box::new(latest.stable), latest.version.clone()));
 
             if !latest.stable {
                 if let Some(stable) = list.loader.iter().find(|x| x.stable) {
-                    loaders.insert(LoaderType::Stable, stable.version.clone());
+                    loaders.push((Box::new(stable.stable), stable.version.clone()));
                 }
             }
 
             list.loader = list
                 .loader
                 .into_iter()
-                .filter(|x| loaders.values().any(|val| val == &x.version))
+                .filter(|x| loaders.iter().any(|val| val.1 == x.version))
                 .collect();
         }
 
@@ -57,19 +63,16 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
 
             let versions_mutex = Arc::clone(&versions);
             version_futures.push(async move {
-                let loader_version_mutex = Mutex::new(HashMap::new());
+                let loader_version_mutex = Mutex::new(Vec::new());
 
                 let versions =
                     futures::future::try_join_all(
-                        loaders_mutex.lock().await.clone().into_iter().map(
-                            |(type_, loader)| async {
+                        loaders_mutex.read().await.clone().into_iter().map(
+                            |(stable, loader)| async {
                                 {
                                     if versions_mutex.lock().await.iter().any(|x| {
                                         x.id == game_version.version
-                                            && x.loaders
-                                                .get(&type_)
-                                                .map(|x| x.id == loader)
-                                                .unwrap_or(false)
+                                            && x.loaders.iter().any(|x| x.id == loader)
                                     }) {
                                         return Ok(None);
                                     }
@@ -78,8 +81,8 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                                 let version =
                                     fetch_fabric_version(&*game_version.version, &*loader).await?;
 
-                                Ok::<Option<(LoaderType, String, PartialVersionInfo)>, Error>(Some(
-                                    (type_, loader, version),
+                                Ok::<Option<(Box<bool>, String, PartialVersionInfo)>, Error>(Some(
+                                    (stable, loader, version),
                                 ))
                             },
                         ),
@@ -88,7 +91,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                     .into_iter()
                     .flatten();
 
-                futures::future::try_join_all(versions.map(|(type_, loader, version)| async {
+                futures::future::try_join_all(versions.map(|(stable, loader, version)| async {
                     let libs = futures::future::try_join_all(version.libraries.into_iter().map(
                         |mut lib| async {
                             {
@@ -164,13 +167,11 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                     {
                         let mut loader_version_map = loader_version_mutex.lock().await;
                         async move {
-                            loader_version_map.insert(
-                                type_,
-                                LoaderVersion {
-                                    id: format!("{}-{}", inherits_from, loader),
-                                    url: format_url(&*version_path),
-                                },
-                            );
+                            loader_version_map.push(LoaderVersion {
+                                id: format!("{}-{}", inherits_from, loader),
+                                url: format_url(&*version_path),
+                                stable: *stable,
+                            });
                         }
                         .await;
                     }
@@ -207,13 +208,46 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
     }
 
     if let Ok(versions) = Arc::try_unwrap(versions) {
+        let mut versions = versions.into_inner();
+
+        versions.sort_by(|x, y| {
+            minecraft_versions
+                .versions
+                .iter()
+                .position(|z| x.id == z.id)
+                .unwrap_or_default()
+                .cmp(
+                    &minecraft_versions
+                        .versions
+                        .iter()
+                        .position(|z| y.id == z.id)
+                        .unwrap_or_default(),
+                )
+        });
+
+        for version in &mut versions {
+            version.loaders.sort_by(|x, y| {
+                list.loader
+                    .iter()
+                    .position(|z| x.id == z.version)
+                    .unwrap_or_default()
+                    .cmp(
+                        &list
+                            .loader
+                            .iter()
+                            .position(|z| y.id == z.version)
+                            .unwrap_or_default(),
+                    )
+            })
+        }
+
         upload_file_to_bucket(
             format!(
                 "fabric/v{}/manifest.json",
                 daedalus::modded::CURRENT_FABRIC_FORMAT_VERSION,
             ),
             serde_json::to_vec(&Manifest {
-                game_versions: versions.into_inner(),
+                game_versions: versions,
             })?,
             Some("application/json".to_string()),
             uploaded_files_mutex.as_ref(),

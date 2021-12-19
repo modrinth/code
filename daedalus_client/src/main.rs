@@ -30,6 +30,8 @@ pub enum Error {
     ZipError(#[from] zip::result::ZipError),
     #[error("Error while reading zip file: {0}")]
     IoError(#[from] std::io::Error),
+    #[error("Error while obtaining strong reference to Arc")]
+    ArcError,
 }
 
 #[tokio::main]
@@ -49,18 +51,25 @@ async fn main() {
         tokio::spawn(async {
             let mut uploaded_files = Vec::new();
 
-            match fabric::retrieve_data(&mut uploaded_files).await {
-                Ok(..) => {}
-                Err(err) => error!("{:?}", err),
+            let versions = match minecraft::retrieve_data(&mut uploaded_files).await {
+                Ok(res) => Some(res),
+                Err(err) => {
+                    error!("{:?}", err);
+
+                    None
+                }
             };
-            match minecraft::retrieve_data(&mut uploaded_files).await {
-                Ok(..) => {}
-                Err(err) => error!("{:?}", err),
-            };
-            match forge::retrieve_data(&mut uploaded_files).await {
-                Ok(..) => {}
-                Err(err) => error!("{:?}", err),
-            };
+
+            if let Some(manifest) = versions {
+                match fabric::retrieve_data(&manifest, &mut uploaded_files).await {
+                    Ok(..) => {}
+                    Err(err) => error!("{:?}", err),
+                };
+                match forge::retrieve_data(&manifest, &mut uploaded_files).await {
+                    Ok(..) => {}
+                    Err(err) => error!("{:?}", err),
+                };
+            }
 
             match purge_digitalocean_cache(uploaded_files).await {
                 Ok(..) => {}

@@ -112,6 +112,7 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
         assets: merge.assets,
         downloads: merge.downloads,
         id: partial.id,
+        java_version: merge.java_version,
         libraries: partial
             .libraries
             .into_iter()
@@ -140,24 +141,13 @@ pub struct Manifest {
     pub game_versions: Vec<Version>,
 }
 
-#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
-#[serde(rename_all = "camelCase")]
-/// The version type of the loader
-pub enum LoaderType {
-    /// The latest type is for experimental loader versions that may not be ready for normal use
-    Latest,
-    /// The stable type is for the most stable but recent loader version. For the forge mod loader,
-    /// this is never used
-    Stable,
-}
-
 #[derive(Serialize, Deserialize, Debug, Clone)]
 ///  A game version of Minecraft
 pub struct Version {
     /// The minecraft version ID
     pub id: String,
     /// A map that contains loader versions for the game version
-    pub loaders: HashMap<LoaderType, LoaderVersion>,
+    pub loaders: Vec<LoaderVersion>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -167,6 +157,8 @@ pub struct LoaderVersion {
     pub id: String,
     /// The URL of the version's manifest
     pub url: String,
+    /// Whether the loader is stable or not
+    pub stable: bool,
 }
 
 /// Fetches the manifest of a mod loader

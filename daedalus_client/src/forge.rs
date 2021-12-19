@@ -1,10 +1,8 @@
 use crate::{format_url, upload_file_to_bucket, Error};
 use chrono::{DateTime, Utc};
 use daedalus::download_file;
-use daedalus::minecraft::{Argument, ArgumentType, Library, VersionType};
-use daedalus::modded::{
-    LoaderType, LoaderVersion, Manifest, PartialVersionInfo, Processor, SidedDataEntry,
-};
+use daedalus::minecraft::{Argument, ArgumentType, Library, VersionManifest, VersionType};
+use daedalus::modded::{LoaderVersion, Manifest, PartialVersionInfo, Processor, SidedDataEntry};
 use lazy_static::lazy_static;
 use log::info;
 use semver::{Version, VersionReq};
@@ -25,7 +23,10 @@ lazy_static! {
     static ref FORGE_MANIFEST_V3_QUERY: VersionReq = VersionReq::parse(">=37.0.0").unwrap();
 }
 
-pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
+pub async fn retrieve_data(
+    minecraft_versions: &VersionManifest,
+    uploaded_files: &mut Vec<String>,
+) -> Result<(), Error> {
     let maven_metadata = fetch_maven_metadata(None).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&*format_url(&*format!(
         "forge/v{}/manifest.json",
@@ -34,18 +35,20 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
     .await
     .ok();
 
-    let versions = Arc::new(Mutex::new(if let Some(old_manifest) = old_manifest {
+    let old_versions = Arc::new(Mutex::new(if let Some(old_manifest) = old_manifest {
         old_manifest.game_versions
     } else {
         Vec::new()
     }));
+
+    let versions = Arc::new(Mutex::new(Vec::new()));
 
     let visited_assets_mutex = Arc::new(Mutex::new(Vec::new()));
     let uploaded_files_mutex = Arc::new(Mutex::new(Vec::new()));
 
     let mut version_futures = Vec::new();
 
-    for (minecraft_version, loader_versions) in maven_metadata {
+    for (minecraft_version, loader_versions) in maven_metadata.clone() {
         let mut loaders = Vec::new();
 
         for loader_version_full in loader_versions {
@@ -77,22 +80,21 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                 }
             }
         }
-
-        if let Some((loader_version_full, version)) = loaders.into_iter().last() {
-            version_futures.push(async {
-                let versions_mutex = Arc::clone(&versions);
+        version_futures.push(async {
+            let loaders_versions = futures::future::try_join_all(loaders.into_iter().map(|(loader_version_full, version)| async {
+                let versions_mutex = Arc::clone(&old_versions);
                 let visited_assets = Arc::clone(&visited_assets_mutex);
                 let uploaded_files_mutex = Arc::clone(&uploaded_files_mutex);
+                let minecraft_version = minecraft_version.clone();
+
                 async move {
                     {
-                        if versions_mutex.lock().await.iter().any(|x| {
-                            x.id == minecraft_version
-                                && x.loaders
-                                .get(&LoaderType::Latest)
-                                .map(|x| x.id == loader_version_full)
-                                .unwrap_or(false)
-                        }) {
-                            return Ok(());
+                        let versions = versions_mutex.lock().await;
+                        let version = versions.iter().find(|x|
+                            x.id == minecraft_version).map(|x| x.loaders.iter().find(|x| x.id == loader_version_full)).flatten();
+
+                        if let Some(version) = version {
+                            return Ok::<Option<LoaderVersion>, Error>(Some(version.clone()));
                         }
                     }
 
@@ -199,15 +201,11 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                                 uploaded_files_mutex.as_ref()
                             ).await?;
 
-                            let mut map = HashMap::new();
-                            map.insert(LoaderType::Latest, LoaderVersion {
+                            return Ok(Some(LoaderVersion {
                                 id: loader_version_full,
-                                url: format_url(&*version_path)
-                            });
-                            versions_mutex.lock().await.push(daedalus::modded::Version {
-                                id: minecraft_version,
-                                loaders: map
-                            })
+                                url: format_url(&*version_path),
+                                stable: false
+                            }));
                         } else if FORGE_MANIFEST_V2_QUERY_P1.matches(&version) || FORGE_MANIFEST_V2_QUERY_P2.matches(&version) || FORGE_MANIFEST_V3_QUERY.matches(&version) {
                             let mut archive_clone = archive.clone();
                             let mut profile = tokio::task::spawn_blocking(move || {
@@ -342,7 +340,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
 
                                 let artifact_bytes = if let Some(ref mut downloads) = lib.downloads {
                                     if let Some(ref mut artifact) = downloads.artifact {
-                                       let res = if artifact.url.is_empty() {
+                                        let res = if artifact.url.is_empty() {
                                             local_libs.get(&lib.name).cloned()
                                         } else {
                                             Some(daedalus::download_file(
@@ -418,24 +416,25 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
                                 uploaded_files_mutex.as_ref()
                             ).await?;
 
-                            let mut map = HashMap::new();
-                            map.insert(LoaderType::Latest, LoaderVersion {
+                            return Ok(Some(LoaderVersion {
                                 id: loader_version_full,
-                                url: format_url(&*version_path)
-                            });
-                            versions_mutex.lock().await.push(daedalus::modded::Version {
-                                id: minecraft_version,
-                                loaders: map
-                            })
+                                url: format_url(&*version_path),
+                                stable: false
+                            }));
                         }
                     }
 
-                    Ok::<(), Error>(())
-                }.await?;
+                    Ok(None)
+                }.await
+            })).await?.into_iter().flatten().collect();
 
-                Ok::<(), Error>(())
+            versions.lock().await.push(daedalus::modded::Version {
+                id: minecraft_version,
+                loaders: loaders_versions
             });
-        }
+
+            Ok::<(), Error>(())
+        });
     }
 
     {
@@ -458,13 +457,48 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
     }
 
     if let Ok(versions) = Arc::try_unwrap(versions) {
+        let mut versions = versions.into_inner();
+
+        versions.sort_by(|x, y| {
+            minecraft_versions
+                .versions
+                .iter()
+                .position(|z| x.id == z.id)
+                .unwrap_or_default()
+                .cmp(
+                    &minecraft_versions
+                        .versions
+                        .iter()
+                        .position(|z| y.id == z.id)
+                        .unwrap_or_default(),
+                )
+        });
+
+        for version in &mut versions {
+            let loader_versions = maven_metadata.get(&version.id);
+            if let Some(loader_versions) = loader_versions {
+                version.loaders.sort_by(|x, y| {
+                    loader_versions
+                        .iter()
+                        .position(|z| &y.id == z)
+                        .unwrap_or_default()
+                        .cmp(
+                            &loader_versions
+                                .iter()
+                                .position(|z| &x.id == z)
+                                .unwrap_or_default(),
+                        )
+                })
+            }
+        }
+
         upload_file_to_bucket(
             format!(
                 "forge/v{}/manifest.json",
                 daedalus::modded::CURRENT_FORGE_FORMAT_VERSION,
             ),
             serde_json::to_vec(&Manifest {
-                game_versions: versions.into_inner(),
+                game_versions: versions,
             })?,
             Some("application/json".to_string()),
             uploaded_files_mutex.as_ref(),

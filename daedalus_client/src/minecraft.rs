@@ -1,11 +1,12 @@
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::download_file;
+use daedalus::minecraft::VersionManifest;
 use log::info;
 use std::sync::Arc;
 use std::time::{Duration, Instant};
 use tokio::sync::Mutex;
 
-pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error> {
+pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<VersionManifest, Error> {
     let old_manifest =
         daedalus::minecraft::fetch_version_manifest(Some(&*crate::format_url(&*format!(
             "minecraft/v{}/manifest.json",
@@ -167,5 +168,7 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<(), Error
     let elapsed = now.elapsed();
     info!("Elapsed: {:.2?}", elapsed);
 
-    Ok(())
+    Ok(Arc::try_unwrap(cloned_manifest)
+        .map_err(|_| Error::ArcError)?
+        .into_inner())
 }

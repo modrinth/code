@@ -230,6 +230,15 @@ pub struct LibraryExtract {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+/// Information about the java version the game needs
+pub struct JavaVersion {
+    /// The component needed for the Java installation
+    component: String,
+    /// The major Java version number
+    major_version: u32,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
 /// A library which the game relies on to run
 pub struct Library {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -311,6 +320,9 @@ pub struct VersionInfo {
     pub downloads: HashMap<DownloadType, Download>,
     /// The version ID of the version
     pub id: String,
+
+    /// The Java version this version supports
+    pub java_version: JavaVersion,
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
     /// The classpath to the main class to launch the game
