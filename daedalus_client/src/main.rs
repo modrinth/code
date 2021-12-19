@@ -48,34 +48,33 @@ async fn main() {
 
     loop {
         timer.tick().await;
-        tokio::spawn(async {
-            let mut uploaded_files = Vec::new();
 
-            let versions = match minecraft::retrieve_data(&mut uploaded_files).await {
-                Ok(res) => Some(res),
-                Err(err) => {
-                    error!("{:?}", err);
+        let mut uploaded_files = Vec::new();
 
-                    None
-                }
-            };
+        let versions = match minecraft::retrieve_data(&mut uploaded_files).await {
+            Ok(res) => Some(res),
+            Err(err) => {
+                error!("{:?}", err);
 
-            if let Some(manifest) = versions {
-                match fabric::retrieve_data(&manifest, &mut uploaded_files).await {
-                    Ok(..) => {}
-                    Err(err) => error!("{:?}", err),
-                };
-                match forge::retrieve_data(&manifest, &mut uploaded_files).await {
-                    Ok(..) => {}
-                    Err(err) => error!("{:?}", err),
-                };
+                None
             }
+        };
 
-            match purge_digitalocean_cache(uploaded_files).await {
+        if let Some(manifest) = versions {
+            // match fabric::retrieve_data(&manifest, &mut uploaded_files).await {
+            //     Ok(..) => {}
+            //     Err(err) => error!("{:?}", err),
+            // };
+            match forge::retrieve_data(&manifest, &mut uploaded_files).await {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
-        });
+        }
+
+        match purge_digitalocean_cache(uploaded_files).await {
+            Ok(..) => {}
+            Err(err) => error!("{:?}", err),
+        };
     }
 }
 

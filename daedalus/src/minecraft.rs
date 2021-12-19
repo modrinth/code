@@ -233,9 +233,9 @@ pub struct LibraryExtract {
 /// Information about the java version the game needs
 pub struct JavaVersion {
     /// The component needed for the Java installation
-    component: String,
+    pub component: String,
     /// The major Java version number
-    major_version: u32,
+    pub major_version: u32,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
