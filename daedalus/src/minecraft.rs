@@ -230,6 +230,7 @@ pub struct LibraryExtract {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
 /// Information about the java version the game needs
 pub struct JavaVersion {
     /// The component needed for the Java installation
