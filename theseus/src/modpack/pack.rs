@@ -15,13 +15,13 @@ use super::{
 };
 use crate::launcher::ModLoader;
 
-pub const MODRINTH_DEFAULT_MODPACK_DOMAINS: &'static [&'static str] = &[
+pub const MODRINTH_DEFAULT_MODPACK_DOMAINS: &[&str] = &[
     "cdn.modrinth.com",
     "edge.forgecdn.net",
     "github.com",
     "raw.githubusercontent.com",
 ];
-pub const MODRINTH_MODPACK_DOMAIN_WHITELIST_VAR: &'static str = "WHITELISTED_MODPACK_DOMAINS";
+pub const MODRINTH_MODPACK_DOMAIN_WHITELIST_VAR: &str = "WHITELISTED_MODPACK_DOMAINS";
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
 pub struct Modpack {
@@ -114,18 +114,17 @@ impl Modpack {
     ) -> ModpackResult<()> {
         let whitelisted_domains = std::env::var(MODRINTH_MODPACK_DOMAIN_WHITELIST_VAR)
             .map(|it| serde_json::from_str::<Vec<String>>(&it).ok().unwrap())
-            .unwrap_or(
+            .unwrap_or_else(|_| {
                 MODRINTH_DEFAULT_MODPACK_DOMAINS
                     .iter()
                     .cloned()
                     .map(String::from)
-                    .collect::<Vec<String>>(),
-            );
+                    .collect::<Vec<String>>()
+            });
 
-        if whitelisted_domains
+        if !whitelisted_domains
             .iter()
-            .find(|it| it == &source.host_str().unwrap())
-            .is_none()
+            .any(|it| it == source.host_str().unwrap())
         {
             return Err(ModpackError::SourceWhitelistError(String::from(
                 source.host_str().unwrap(),
@@ -136,7 +135,7 @@ impl Modpack {
             path: PathBuf::from(dest),
             hashes,
             env: env.unwrap_or(ModpackEnv::Both),
-            downloads: HashSet::from_iter([String::from(source)].into_iter().cloned()),
+            downloads: HashSet::from_iter([String::from(source)].iter().cloned()),
         };
 
         self.files.insert(file);
@@ -180,8 +179,7 @@ impl ModpackFile {
         // URLs, I'm supplying it with an empty string to avoid reinventing the wheel.
         let bytes = download_file_mirrors(
             "",
-            &self
-                .downloads
+            self.downloads
                 .iter()
                 .map(|it| it.as_str())
                 .collect::<Vec<&str>>()

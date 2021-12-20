@@ -116,10 +116,12 @@ impl ModrinthAPI for ModrinthV1 {
                     && it.game_versions.contains(&game_version.as_str())
                     && it.loaders.contains(&loader_str)
             })
-            .ok_or(ModpackError::VersionError(format!(
-                "Unable to find compatible version of mod {}",
-                project.title
-            )))?;
+            .ok_or_else(|| {
+                ModpackError::VersionError(format!(
+                    "Unable to find compatible version of mod {}",
+                    project.title
+                ))
+            })?;
 
         // Project fields
         let envs = ModpackEnv::try_from(ManifestEnvs {
@@ -135,7 +137,7 @@ impl ModrinthAPI for ModrinthV1 {
             .map(ModpackFile::from)
             .collect::<HashSet<ModpackFile>>();
 
-        let dep_futures = version.dependencies.iter().map(|it| self.get_version(&it));
+        let dep_futures = version.dependencies.iter().map(|it| self.get_version(it));
         let deps = try_join_all(dep_futures)
             .await?
             .into_iter()

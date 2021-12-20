@@ -52,7 +52,10 @@ pub enum LauncherError {
     DaedalusError(#[from] daedalus::Error),
 
     #[error("Error while reading metadata: {0}")]
-    MetaError(#[from] crate::meta::MetaError),
+    MetaError(#[from] crate::data::DataError),
+
+    #[error("Java error: {0}")]
+    JavaError(String),
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
@@ -75,75 +78,91 @@ pub async fn launch_minecraft(
     root_dir: &Path,
     credentials: &Credentials,
 ) -> Result<(), LauncherError> {
-    let metadata = crate::meta::Metadata::get().await?;
+    let metadata = crate::data::Metadata::get().await?;
+    let settings = crate::data::Settings::get().await?;
 
     let versions_path = crate::util::absolute_path(root_dir.join("versions"))?;
     let libraries_path = crate::util::absolute_path(root_dir.join("libraries"))?;
     let assets_path = crate::util::absolute_path(root_dir.join("assets"))?;
     let legacy_assets_path = crate::util::absolute_path(root_dir.join("resources"))?;
 
+    let version = metadata
+        .minecraft
+        .versions
+        .iter()
+        .find(|x| x.id == version_name)
+        .ok_or_else(|| {
+            LauncherError::InvalidInput(format!("Version {} does not exist", version_name))
+        })?;
+
+    let loader_version = match mod_loader.unwrap_or_default() {
+        ModLoader::Vanilla => None,
+        ModLoader::Forge | ModLoader::Fabric => {
+            let loaders = if mod_loader.unwrap_or_default() == ModLoader::Forge {
+                &metadata
+                    .forge
+                    .game_versions
+                    .iter()
+                    .find(|x| x.id == version_name)
+                    .ok_or_else(|| {
+                        LauncherError::InvalidInput(format!(
+                            "Version {} for mod loader Forge does not exist",
+                            version_name
+                        ))
+                    })?
+                    .loaders
+            } else {
+                &metadata
+                    .fabric
+                    .game_versions
+                    .iter()
+                    .find(|x| x.id == version_name)
+                    .ok_or_else(|| {
+                        LauncherError::InvalidInput(format!(
+                            "Version {} for mod loader Fabric does not exist",
+                            version_name
+                        ))
+                    })?
+                    .loaders
+            };
+
+            let loader = if let Some(version) = loaders.iter().find(|x| x.stable) {
+                Some(version.clone())
+            } else {
+                loaders.first().cloned()
+            };
+
+            Some(loader.ok_or_else(|| {
+                LauncherError::InvalidInput(format!(
+                    "No mod loader version found for version {}",
+                    version_name
+                ))
+            })?)
+        }
+    };
+
+    let version_jar_name = if let Some(loader) = &loader_version {
+        loader.id.clone()
+    } else {
+        version.id.clone()
+    };
+
     let mut version = download::download_version_info(
         &versions_path,
-        metadata
-            .minecraft
-            .versions
-            .iter()
-            .find(|x| x.id == version_name)
-            .ok_or_else(|| {
-                LauncherError::InvalidInput(format!("Version {} does not exist", version_name))
-            })?,
-        match mod_loader.unwrap_or_default() {
-            ModLoader::Vanilla => None,
-            ModLoader::Forge | ModLoader::Fabric => {
-                let loaders = if mod_loader.unwrap_or_default() == ModLoader::Forge {
-                    &metadata
-                        .forge
-                        .game_versions
-                        .iter()
-                        .find(|x| x.id == version_name)
-                        .ok_or_else(|| {
-                            LauncherError::InvalidInput(format!(
-                                "Version {} for mod loader Forge does not exist",
-                                version_name
-                            ))
-                        })?
-                        .loaders
-                } else {
-                    &metadata
-                        .fabric
-                        .game_versions
-                        .iter()
-                        .find(|x| x.id == version_name)
-                        .ok_or_else(|| {
-                            LauncherError::InvalidInput(format!(
-                                "Version {} for mod loader Fabric does not exist",
-                                version_name
-                            ))
-                        })?
-                        .loaders
-                };
-
-                let loader = if let Some(version) =
-                    loaders.get(&daedalus::modded::LoaderType::Stable)
-                {
-                    Some(version.clone())
-                } else if let Some(version) = loaders.get(&daedalus::modded::LoaderType::Latest) {
-                    Some(version.clone())
-                } else {
-                    None
-                };
-
-                Some(loader.ok_or_else(|| {
-                    LauncherError::InvalidInput(format!(
-                        "No mod loader version found for version {}",
-                        version_name
-                    ))
-                })?)
-            }
-        }
-        .as_ref(),
+        version,
+        loader_version.as_ref(),
     )
     .await?;
+
+    let java_path = if let Some(java) = &version.java_version {
+        if java.major_version == 17 || java.major_version == 16 {
+            settings.java_17_path.as_deref().ok_or_else(|| LauncherError::JavaError("Please install Java 17 or select your Java 17 installation settings before launching this version!".to_string()))?
+        } else {
+            &settings.java_8_path.as_deref().ok_or_else(|| LauncherError::JavaError("Please install Java 8 or select your Java 8 installation settings before launching this version!".to_string()))?
+        }
+    } else {
+        &settings.java_8_path.as_deref().ok_or_else(|| LauncherError::JavaError("Please install Java 8 or select your Java 8 installation settings before launching this version!".to_string()))?
+    };
 
     let client_path = crate::util::absolute_path(
         root_dir
@@ -249,11 +268,30 @@ pub async fn launch_minecraft(
 
     let arguments = version.arguments.unwrap_or_default();
 
-    let mut child = Command::new("java")
+    let mut command = Command::new(if let Some(wrapper) = &settings.wrapper_command {
+        wrapper.clone()
+    } else {
+        java_path.to_string()
+    });
+
+    if settings.wrapper_command.is_some() {
+        command.arg(java_path);
+    }
+
+    command
         .args(args::get_jvm_arguments(
             arguments.get(&ArgumentType::Jvm).map(|x| x.as_slice()),
             &natives_path,
+            &libraries_path,
             &*args::get_class_paths(&libraries_path, version.libraries.as_slice(), &client_path)?,
+            &version_jar_name,
+            settings.memory,
+            settings
+                .custom_java_args
+                .split(" ")
+                .into_iter()
+                .map(|x| x.to_string())
+                .collect(),
         )?)
         .arg(version.main_class)
         .args(args::get_minecraft_arguments(
@@ -265,15 +303,16 @@ pub async fn launch_minecraft(
             root_dir,
             &assets_path,
             &version.type_,
+            settings.game_resolution,
         )?)
         .current_dir(root_dir)
         .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .spawn()
-        .map_err(|err| LauncherError::ProcessError {
-            inner: err,
-            process: "minecraft".to_string(),
-        })?;
+        .stderr(Stdio::inherit());
+
+    let mut child = command.spawn().map_err(|err| LauncherError::ProcessError {
+        inner: err,
+        process: "minecraft".to_string(),
+    })?;
 
     child.wait().map_err(|err| LauncherError::ProcessError {
         inner: err,

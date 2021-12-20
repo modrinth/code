@@ -1,27 +1,12 @@
+use crate::data::DataError;
+use once_cell::sync;
 use serde::{Deserialize, Serialize};
-use std::io;
-use tokio::sync::RwLockReadGuard;
+use tokio::sync::{RwLock, RwLockReadGuard};
 
 const META_FILE: &str = "meta.json";
-const META_URL: &str = "https://staging-cdn.modrinth.com/gamedata";
+const META_URL: &str = "https://meta.modrinth.com/gamedata";
 
-#[derive(thiserror::Error, Debug)]
-pub enum MetaError {
-    #[error("I/O error while reading metadata: {0}")]
-    IOError(#[from] io::Error),
-
-    #[error("Daedalus error: {0}")]
-    DaedalusError(#[from] daedalus::Error),
-
-    #[error("Attempted to access metadata without initializing it!")]
-    InitializedError,
-
-    #[error("Error while serializing/deserializing JSON")]
-    SerdeError(#[from] serde_json::Error),
-}
-
-use once_cell::sync;
-use tokio::sync::RwLock;
+static METADATA: sync::OnceCell<RwLock<Metadata>> = sync::OnceCell::new();
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Metadata {
@@ -30,10 +15,8 @@ pub struct Metadata {
     pub fabric: daedalus::modded::Manifest,
 }
 
-static METADATA: sync::OnceCell<RwLock<Metadata>> = sync::OnceCell::new();
-
 impl Metadata {
-    pub async fn init() -> Result<(), MetaError> {
+    pub async fn init() -> Result<(), DataError> {
         let meta_path = crate::LAUNCHER_WORK_DIR.join(META_FILE);
 
         if meta_path.exists() {
@@ -63,7 +46,7 @@ impl Metadata {
                         METADATA.get_or_init(|| RwLock::new(new));
                     }
 
-                    Ok::<(), MetaError>(())
+                    Ok::<(), DataError>(())
                 }
                 .await;
 
@@ -75,7 +58,7 @@ impl Metadata {
                     Err(err) => {
                         log::warn!("Unable to fetch launcher metadata: {}", err)
                     }
-                }
+                };
             }
         };
 
@@ -88,7 +71,7 @@ impl Metadata {
         Ok(())
     }
 
-    pub async fn fetch() -> Result<Self, MetaError> {
+    pub async fn fetch() -> Result<Self, DataError> {
         let (game, forge, fabric) = futures::future::join3(
             daedalus::minecraft::fetch_version_manifest(Some(&*format!(
                 "{}/minecraft/v0/manifest.json",
@@ -106,10 +89,10 @@ impl Metadata {
         })
     }
 
-    pub async fn get<'a>() -> Result<RwLockReadGuard<'a, Self>, MetaError> {
+    pub async fn get<'a>() -> Result<RwLockReadGuard<'a, Self>, DataError> {
         Ok(METADATA
             .get()
-            .ok_or_else(|| MetaError::InitializedError)?
+            .ok_or_else(|| DataError::InitializedError("metadata".to_string()))?
             .read()
             .await)
     }

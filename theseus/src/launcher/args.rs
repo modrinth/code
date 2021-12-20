@@ -9,6 +9,13 @@ use std::io::{BufRead, BufReader};
 use std::path::Path;
 use uuid::Uuid;
 
+fn get_cp_separator() -> &'static str {
+    match super::download::get_os() {
+        Os::Osx | Os::Linux | Os::Unknown => ":",
+        Os::Windows => ";",
+    }
+}
+
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
@@ -42,10 +49,7 @@ pub fn get_class_paths(
             .to_string(),
     );
 
-    Ok(class_paths.join(match super::download::get_os() {
-        Os::Osx | Os::Linux | Os::Unknown => ":",
-        Os::Windows => ";",
-    }))
+    Ok(class_paths.join(get_cp_separator()))
 }
 
 pub fn get_class_paths_jar<T: AsRef<str>>(
@@ -90,13 +94,23 @@ pub fn get_lib_path<T: AsRef<str>>(libraries_path: &Path, lib: T) -> Result<Stri
 pub fn get_jvm_arguments(
     arguments: Option<&[Argument]>,
     natives_path: &Path,
+    libraries_path: &Path,
     class_paths: &str,
+    version_name: &str,
+    memory: i32,
+    custom_args: Vec<String>,
 ) -> Result<Vec<String>, LauncherError> {
     let mut parsed_arguments = Vec::new();
 
     if let Some(args) = arguments {
         parse_arguments(args, &mut parsed_arguments, |arg| {
-            parse_jvm_argument(arg, natives_path, class_paths)
+            parse_jvm_argument(
+                arg,
+                natives_path,
+                libraries_path,
+                class_paths,
+                version_name,
+            )
         })?;
     } else {
         parsed_arguments.push(format!(
@@ -113,13 +127,22 @@ pub fn get_jvm_arguments(
         parsed_arguments.push(class_paths.to_string());
     }
 
+    parsed_arguments.push(format!("-Xmx{}M", memory));
+    for arg in custom_args {
+        if !arg.is_empty() {
+            parsed_arguments.push(arg);
+        }
+    }
+
     Ok(parsed_arguments)
 }
 
 fn parse_jvm_argument(
     argument: &str,
     natives_path: &Path,
+    libraries_path: &Path,
     class_paths: &str,
+    version_name: &str,
 ) -> Result<String, LauncherError> {
     let mut argument = argument.to_string();
     argument.retain(|c| !c.is_whitespace());
@@ -136,8 +159,22 @@ fn parse_jvm_argument(
                 .to_string_lossy()
                 .to_string(),
         )
+        .replace(
+            "${library_directory}",
+            &*crate::util::absolute_path(libraries_path)
+                .map_err(|_| {
+                    LauncherError::InvalidInput(format!(
+                        "Specified libraries path {} does not exist",
+                        libraries_path.to_string_lossy()
+                    ))
+                })?
+                .to_string_lossy()
+                .to_string(),
+        )
+        .replace("${classpath_separator}", get_cp_separator())
         .replace("${launcher_name}", "theseus")
         .replace("${launcher_version}", env!("CARGO_PKG_VERSION"))
+        .replace("${version_name}", version_name)
         .replace("${classpath}", class_paths))
 }
 
@@ -151,6 +188,7 @@ pub fn get_minecraft_arguments(
     game_directory: &Path,
     assets_directory: &Path,
     version_type: &VersionType,
+    resolution: (i32, i32),
 ) -> Result<Vec<String>, LauncherError> {
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
@@ -166,6 +204,7 @@ pub fn get_minecraft_arguments(
                 game_directory,
                 assets_directory,
                 version_type,
+                resolution,
             )
         })?;
 
@@ -181,6 +220,7 @@ pub fn get_minecraft_arguments(
             game_directory,
             assets_directory,
             version_type,
+            resolution,
         )?
         .split(' ')
         .into_iter()
@@ -202,6 +242,7 @@ fn parse_minecraft_argument(
     game_directory: &Path,
     assets_directory: &Path,
     version_type: &VersionType,
+    resolution: (i32, i32),
 ) -> Result<String, LauncherError> {
     Ok(argument
         .replace("${auth_access_token}", access_token)
@@ -248,7 +289,9 @@ fn parse_minecraft_argument(
                 .to_string_lossy()
                 .to_string(),
         )
-        .replace("${version_type}", version_type.as_str()))
+        .replace("${version_type}", version_type.as_str())
+        .replace("${resolution_width}", &*resolution.0.to_string())
+        .replace("${resolution_height}", &*resolution.1.to_string()))
 }
 
 fn parse_arguments<F>(

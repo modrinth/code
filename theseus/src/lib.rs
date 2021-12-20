@@ -6,14 +6,13 @@
 #![warn(missing_docs, unused_import_braces, missing_debug_implementations)]
 
 use std::path::Path;
-use std::time::Duration;
 
 lazy_static::lazy_static! {
     pub static ref LAUNCHER_WORK_DIR: &'static Path = Path::new("./launcher");
 }
 
+mod data;
 pub mod launcher;
-mod meta;
 pub mod modpack;
 mod util;
 
@@ -25,13 +24,14 @@ pub enum Error {
     #[error("Modpack error: {0}")]
     ModpackError(#[from] modpack::ModpackError),
 
-    #[error("Meta error: {0}")]
-    DaedalusError(#[from] meta::MetaError),
+    #[error("Data error: {0}")]
+    DaedalusError(#[from] data::DataError),
 }
 
 pub async fn init() -> Result<(), Error> {
     std::fs::create_dir_all(*LAUNCHER_WORK_DIR).expect("Unable to create launcher root directory!");
-    crate::meta::Metadata::init().await?;
+    crate::data::Metadata::init().await?;
+    crate::data::Settings::init().await?;
 
     Ok(())
 }

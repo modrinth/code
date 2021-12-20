@@ -9,8 +9,10 @@ pub fn parse_rules(rules: &[Rule]) -> bool {
 pub fn parse_rule(rule: &Rule) -> bool {
     let result = if let Some(os) = &rule.os {
         parse_os_rule(os)
+    } else if let Some(features) = &rule.features {
+        features.has_demo_resolution.unwrap_or(false)
     } else {
-        rule.features.is_none()
+        true
     };
 
     match rule.action {

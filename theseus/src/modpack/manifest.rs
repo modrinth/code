@@ -7,7 +7,6 @@ use crate::launcher::ModLoader;
 
 use super::pack::ModpackGame;
 use super::{pack, ModpackError, ModpackResult};
-use daedalus::modded::LoaderType;
 use serde::{Deserialize, Serialize};
 
 pub const DEFAULT_FORMAT_VERSION: u32 = 1;
@@ -45,7 +44,7 @@ impl TryFrom<Manifest<'_>> for pack::Modpack {
     }
 }
 
-const MODRINTH_GAMEDATA_URL: &'static str = "https://staging-cdn.modrinth.com/gamedata";
+const MODRINTH_GAMEDATA_URL: &str = "https://staging-cdn.modrinth.com/gamedata";
 fn get_loader_version(loader: ModLoader, version: &str) -> ModpackResult<String> {
     let source = match loader {
         ModLoader::Vanilla => Err(ModpackError::VersionError(String::from(
@@ -60,11 +59,14 @@ fn get_loader_version(loader: ModLoader, version: &str) -> ModpackResult<String>
         .game_versions
         .iter()
         .find(|&it| it.id == version)
-        .ok_or(ModpackError::VersionError(format!(
-            "No versions of modloader {:?} exist for Minecraft {}",
-            loader, version
-        )))?
-        .loaders[&LoaderType::Latest]
+        .map(|x| x.loaders.first())
+        .flatten()
+        .ok_or_else(|| {
+            ModpackError::VersionError(format!(
+                "No versions of modloader {:?} exist for Minecraft {}",
+                loader, version
+            ))
+        })?
         .id
         .clone())
 }
@@ -88,7 +90,7 @@ impl<'a> TryFrom<&'a pack::Modpack> for Manifest<'a> {
             game: game_field,
             version_id: &pack.version,
             name: &pack.name,
-            summary: pack.summary.as_ref().map(String::as_str),
+            summary: pack.summary.as_deref(),
             files,
             dependencies: ManifestDeps::try_from(&pack.game)?,
         })
@@ -333,9 +335,9 @@ mod tests {
             summary: None,
             files: vec![ManifestFile {
                 path: Path::new("mods/testmod.jar"),
-                hashes: ManifestHashes {
+                hashes: Some(ManifestHashes {
                     sha1: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                },
+                }),
                 env: ManifestEnvs::default(),
                 downloads: vec!["https://example.com/testmod.jar"],
             }],
@@ -383,9 +385,9 @@ mod tests {
             summary: None,
             files: vec![ManifestFile {
                 path: Path::new("mods/testmod.jar"),
-                hashes: ManifestHashes {
+                hashes: Some(ManifestHashes {
                     sha1: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                },
+                }),
                 env: ManifestEnvs::default(),
                 downloads: vec!["https://example.com/testmod.jar"],
             }],
@@ -438,9 +440,9 @@ mod tests {
             summary: Some("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."),
             files: vec![ManifestFile {
                 path: Path::new("mods/testmod.jar"),
-                hashes: ManifestHashes {
+                hashes: Some(ManifestHashes {
                     sha1: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-                },
+                }),
                 env: ManifestEnvs {
                     client: ManifestEnv::Required,
                     server: ManifestEnv::Unsupported,

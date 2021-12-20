@@ -18,11 +18,11 @@ pub mod manifest;
 pub mod modrinth_api;
 pub mod pack;
 
-pub const COMPILED_PATH: &'static str = "compiled/";
-pub const COMPILED_ZIP: &'static str = "compiled.mrpack";
-pub const MANIFEST_PATH: &'static str = "modrinth.index.json";
-pub const OVERRIDES_PATH: &'static str = "overrides/";
-pub const PACK_JSON5_PATH: &'static str = "modpack.json5";
+pub const COMPILED_PATH: &str = "compiled/";
+pub const COMPILED_ZIP: &str = "compiled.mrpack";
+pub const MANIFEST_PATH: &str = "modrinth.index.json";
+pub const OVERRIDES_PATH: &str = "overrides/";
+pub const PACK_JSON5_PATH: &str = "modpack.json5";
 
 #[derive(thiserror::Error, Debug)]
 pub enum ModpackError {
@@ -121,9 +121,9 @@ pub async fn realise_modpack(
     // NOTE: I'm using standard files here, since Serde does not support async readers
     let manifest_path = Some(dir.join(MANIFEST_PATH))
         .filter(|it| it.exists() && it.is_file())
-        .ok_or(ModpackError::ManifestError(String::from(
-            "Manifest missing or is not a file",
-        )))?;
+        .ok_or_else(|| {
+            ModpackError::ManifestError(String::from("Manifest missing or is not a file"))
+        })?;
     let manifest_file = std::fs::File::open(manifest_path)?;
     let reader = io::BufReader::new(manifest_file);
     let mut deserializer = serde_json::Deserializer::from_reader(reader);
@@ -169,7 +169,7 @@ pub async fn compile_modpack(dir: &Path) -> ModpackResult<()> {
     let result_dir = dir.join(COMPILED_PATH);
     let pack: Modpack = json5::from_str(&fs::read_to_string(dir.join(PACK_JSON5_PATH)).await?)?;
 
-    fs::create_dir(&result_dir).await;
+    fs::create_dir(&result_dir).await?;
     if dir.join(OVERRIDES_PATH).exists() {
         fs_extra::dir::copy(
             dir.join(OVERRIDES_PATH),
