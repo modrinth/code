@@ -75,7 +75,6 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<VersionMa
                         Some(version_info.asset_index.sha1.clone());
                     cloned_manifest.versions[position].assets_index_url =
                         Some(format_url(&assets_path));
-                    version_info.asset_index.url = format_url(&assets_path);
                 }
 
                 let mut download_assets = false;
