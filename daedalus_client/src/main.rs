@@ -61,10 +61,10 @@ async fn main() {
         };
 
         if let Some(manifest) = versions {
-            // match fabric::retrieve_data(&manifest, &mut uploaded_files).await {
-            //     Ok(..) => {}
-            //     Err(err) => error!("{:?}", err),
-            // };
+            match fabric::retrieve_data(&manifest, &mut uploaded_files).await {
+                Ok(..) => {}
+                Err(err) => error!("{:?}", err),
+            };
             match forge::retrieve_data(&manifest, &mut uploaded_files).await {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),

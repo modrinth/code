@@ -92,6 +92,16 @@ pub async fn retrieve_data(
                     let minecraft_version = minecraft_version.clone();
 
                     async move {
+                        /// These forge versions are not worth supporting!
+                        const WHITELIST : [&str; 1] = [
+                            // Not supported due to `data` field being `[]` even though the type is a map
+                            "1.12.2-14.23.5.2851"
+                        ];
+
+                        if !WHITELIST.contains(&&*loader_version_full) {
+                            return Ok(None);
+                        }
+
                         {
                             let versions = versions_mutex.lock().await;
                             let version = versions.iter().find(|x|
