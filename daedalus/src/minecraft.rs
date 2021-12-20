@@ -323,7 +323,7 @@ pub struct VersionInfo {
     pub id: String,
 
     /// The Java version this version supports
-    pub java_version: JavaVersion,
+    pub java_version: Option<JavaVersion>,
     /// Libraries that the version depends on
     pub libraries: Vec<Library>,
     /// The classpath to the main class to launch the game
