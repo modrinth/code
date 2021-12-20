@@ -27,7 +27,6 @@ pub async fn retrieve_data(
     minecraft_versions: &VersionManifest,
     uploaded_files: &mut Vec<String>,
 ) -> Result<(), Error> {
-    println!("forg");
     let maven_metadata = fetch_maven_metadata(None).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&*format_url(&*format!(
         "forge/v{}/manifest.json",
@@ -98,7 +97,7 @@ pub async fn retrieve_data(
                             "1.12.2-14.23.5.2851"
                         ];
 
-                        if !WHITELIST.contains(&&*loader_version_full) {
+                        if WHITELIST.contains(&&*loader_version_full) {
                             return Ok(None);
                         }
 
