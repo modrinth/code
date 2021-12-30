@@ -4168,18 +4168,6 @@
       "nullable": []
     }
   },
-  "bd0d1da185dc7d21ccbbfde86fc093ce9eda7dd7e07f7a53882d427010fd58ca": {
-    "query": "\n            DELETE FROM dependencies WHERE dependent_id = $1\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "bdaab7da16d07169c29d96330fcc17ef2fb87fdfbadca23b7289c64420ac3a04": {
     "query": "\n            SELECT id, user_id, role, permissions, accepted\n            FROM team_members\n            WHERE (team_id = $1 AND user_id = $2)\n            ",
     "describe": {
@@ -5219,6 +5207,18 @@
       "nullable": [
         false
       ]
+    }
+  },
+  "e1f910af9153befd7faed7ae9db87d2886f211cb43f61b6bb093ac2bfb8a0555": {
+    "query": "\n            DELETE FROM dependencies WHERE dependent_id = $1 AND dependency_id = $1\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
     }
   },
   "e29da865af4a0a110275b9756394546a3bb88bff40e18c66029651f515caed98": {
