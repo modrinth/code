@@ -34,12 +34,17 @@ pub struct PackFile<'a> {
 
 fn validate_download_url(values: &Vec<&str>) -> Result<(), validator::ValidationError> {
     for value in values {
+        let url = url::Url::parse(value)
+            .ok()
+            .ok_or_else(|| validator::ValidationError::new("invalid URL"))?;
+
+        if &url.as_str() != value {
+            return Err(validator::ValidationError::new("invalid URL"));
+        }
+
         let domains = parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").unwrap_or_default();
         if !domains.contains(
-            &url::Url::parse(value)
-                .ok()
-                .ok_or_else(|| validator::ValidationError::new("invalid URL"))?
-                .domain()
+            &url.domain()
                 .ok_or_else(|| validator::ValidationError::new("invalid URL"))?
                 .to_string(),
         ) {

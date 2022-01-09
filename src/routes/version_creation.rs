@@ -633,7 +633,9 @@ pub async fn upload_file(
             content_type,
             &format!(
                 "data/{}/versions/{}/{}",
-                project_id, version_number, file_name
+                project_id,
+                version_number,
+                urlencoding::encode(&file_name)
             ),
             data.freeze(),
         )

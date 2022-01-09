@@ -306,7 +306,6 @@ pub async fn delete_file(
 
 #[derive(Deserialize)]
 pub struct UpdateData {
-    pub hash: (String, String),
     pub loaders: Vec<Loader>,
     pub game_versions: Vec<GameVersion>,
 }

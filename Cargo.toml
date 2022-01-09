@@ -40,6 +40,7 @@ zip = "0.5.12"
 validator = { version = "0.13", features = ["derive"] }
 regex = "1.5.4"
 url = "2.2.2"
+urlencoding = "2.1.0"
 
 gumdrop = "0.8.0"
 dotenv = "0.15"
