@@ -1,3 +1,5 @@
+import { sortRoutes } from '@nuxt/utils'
+
 export default {
   /*
    ** Nuxt target
@@ -14,25 +16,46 @@ export default {
     },
     title: 'Modrinth',
     meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+      {
+        charset: 'utf-8',
+      },
+      {
+        name: 'viewport',
+        content: 'width=device-width, initial-scale=1',
+      },
       {
         hid: 'description',
         name: 'description',
         content:
-          'Modrinth is a mod distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including Forge and Fabric mod loaders.',
+          'Modrinth is a _type distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including Forge and Fabric mod loaders.',
       },
 
-      { hid: 'publisher', name: 'publisher', content: 'Guavy LLC' },
+      {
+        hid: 'publisher',
+        name: 'publisher',
+        content: 'Guavy LLC',
+      },
       {
         hid: 'apple-mobile-web-app-title',
         name: 'apple-mobile-web-app-title',
         content: 'Modrinth',
       },
-      { hid: 'theme-color', name: 'theme-color', content: '#4d9227' },
-      { hid: 'color-scheme', name: 'color-scheme', content: 'light dark' },
+      {
+        hid: 'theme-color',
+        name: 'theme-color',
+        content: '#30b27b',
+      },
+      {
+        hid: 'color-scheme',
+        name: 'color-scheme',
+        content: 'light dark',
+      },
 
-      { hid: 'og:site_name', name: 'og:site_name', content: 'Modrinth' },
+      {
+        hid: 'og:site_name',
+        name: 'og:site_name',
+        content: 'Modrinth',
+      },
       {
         hid: 'og:description',
         name: 'og:description',
@@ -43,22 +66,54 @@ export default {
         name: 'og:title',
         content: 'Modrinth',
       },
-      { hid: 'og:type', name: 'og:type', content: 'website' },
-      { hid: 'og:url', name: 'og:url', content: 'https://www.modrinth.com' },
+      {
+        hid: 'og:type',
+        name: 'og:type',
+        content: 'website',
+      },
+      {
+        hid: 'og:url',
+        name: 'og:url',
+        content: 'https://www.modrinth.com',
+      },
       {
         hid: 'og:image',
         name: 'og:image',
         content: 'https://cdn.modrinth.com/modrinth.png',
       },
-      { hid: 'twitter:card', name: 'twitter:card', content: 'summary' },
-      { hid: 'twitter:site', name: 'twitter:site', content: '@modrinth' },
+      {
+        hid: 'twitter:card',
+        name: 'twitter:card',
+        content: 'summary',
+      },
+      {
+        hid: 'twitter:site',
+        name: 'twitter:site',
+        content: '@modrinth',
+      },
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: '/favicon.ico',
+        media: '(prefers-color-scheme:no-preference)',
+      },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: '/favicon-dark.ico',
+        media: '(prefers-color-scheme:dark)',
+      },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: '/favicon.ico',
+        media: '(prefers-color-scheme:light)',
+      },
       {
         rel: 'stylesheet',
-        href:
-          'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap',
+        href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap',
       },
     ],
     script: [],
@@ -71,6 +126,33 @@ export default {
     },
   },
   router: {
+    extendRoutes(routes, resolve) {
+      routes.splice(
+        routes.findIndex((x) => x.name === 'search'),
+        1
+      )
+
+      routes.push({
+        path: '/search',
+        component: resolve(__dirname, 'pages/search.vue'),
+        name: 'search',
+        chunkName: 'pages/search',
+        children: [
+          {
+            path: '/mods',
+            component: resolve(__dirname, 'pages/search/mods.vue'),
+            name: 'mods',
+          },
+          {
+            path: '/modpacks',
+            component: resolve(__dirname, 'pages/search/modpacks.vue'),
+            name: 'modpacks',
+          },
+        ],
+      })
+
+      sortRoutes(routes)
+    },
     middleware: ['auth', 'analytics'],
   },
   /*
@@ -84,10 +166,10 @@ export default {
   plugins: [
     '~/plugins/vue-tooltip.js',
     '~/plugins/vue-notification.js',
-    '~/plugins/compiled-markdown-directive.js',
+    '~/plugins/xss.js',
     '~/plugins/vue-syntax.js',
     '~/plugins/auth.js',
-    '~/plugins/user.js',
+    '~/plugins/shorthands.js',
   ],
   /*
    ** Auto import components
@@ -113,6 +195,7 @@ export default {
     '@nuxtjs/robots',
     '@nuxtjs/sitemap',
     '@nuxtjs/style-resources',
+    '@nuxtjs/markdownit',
     'cookie-universal-nuxt',
     '~/modules/gpt-ads',
     // The analytics module is disabled, as we are using our own solution embedded in the middleware.
@@ -127,14 +210,21 @@ export default {
     Sitemap: 'https://modrinth.com/sitemap.xml',
   },
   sitemap: {
-    exclude: ['/dashboard/**', '/dashboard', '/mod/create'],
+    exclude: [
+      '/settings/**',
+      '/settings',
+      'notifications',
+      'moderation',
+      'search',
+      '/create/**',
+    ],
   },
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://api.modrinth.com/api/v1/',
+    baseURL: 'https://staging-api.modrinth.com/v2/',
     headers: {
       common: {
         Accept: 'application/json',
@@ -159,11 +249,22 @@ export default {
       },
     },
     babel: {
-      plugins: [['@babel/plugin-proposal-private-methods', { loose: true }]],
+      plugins: [
+        [
+          '@babel/plugin-proposal-private-methods',
+          {
+            loose: true,
+          },
+        ],
+      ],
     },
   },
-  styleResources: {
-    scss: './assets/styles/injected.scss',
+  markdownit: {
+    runtime: true,
+    preset: 'default',
+    html: true,
+    linkify: true,
+    breaks: true,
   },
   loading: {
     color: 'green',
@@ -171,10 +272,11 @@ export default {
   },
   env: {
     version: process.env.VERSION_ID || 'unknown',
+    domain: getDomain(),
   },
   publicRuntimeConfig: {
     axios: {
-      baseURL: process.env.API_URL,
+      browserBaseURL: process.env.BROWSER_BASE_URL,
     },
     ads: {
       ghostMode: process.env.ENABLE_ADS == null,
@@ -185,17 +287,17 @@ export default {
     analytics: {
       base_url: process.env.ARIADNE_URL,
     },
-    utils: {
-      domain: getDomain(),
+  },
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: process.env.BASE_URL,
     },
   },
 }
 
 function getDomain() {
   if (process.env.NODE_ENV === 'production') {
-    if (process.env.HOST_URL) {
-      return process.env.HOST_URL
-    } else if (process.env.HEROKU_APP_NAME) {
+    if (process.env.HEROKU_APP_NAME) {
       return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
     } else if (process.env.VERCEL_URL) {
       return `https://${process.env.VERCEL_URL}`

@@ -1,26 +1,35 @@
 <template>
-  <p
+  <Checkbox
     class="filter"
-    :class="{
-      'filter-active': activeFilters.includes(facetName),
-      cursed: displayName == 'FlameAnvil',
-    }"
-    @click="toggle"
+    :value="activeFilters.includes(facetName)"
+    @input="toggle()"
   >
-    <slot></slot>
-    {{ displayName }}
-  </p>
+    <div class="filter-text">
+      <div v-if="icon" class="icon" v-html="icon"></div>
+      <div v-else class="icon"><slot /></div>
+      <span> {{ displayName }}</span>
+    </div>
+  </Checkbox>
 </template>
 
 <script>
+import Checkbox from '~/components/ui/Checkbox'
+
 export default {
   name: 'SearchFilter',
+  components: {
+    Checkbox,
+  },
   props: {
     facetName: {
       type: String,
       default: '',
     },
     displayName: {
+      type: String,
+      default: '',
+    },
+    icon: {
       type: String,
       default: '',
     },
@@ -39,33 +48,28 @@ export default {
 }
 </script>
 
-<style lang="scss">
-.filter {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 0.4rem 0.3rem;
-  margin: 3px 0 0 0.5rem;
-  font-size: 1rem;
-  letter-spacing: 0.02rem;
-  @extend %transparent-clickable;
+<style lang="scss" scoped>
+.filter ::v-deep {
+  margin-bottom: 0.5rem;
 
-  @media screen and (min-width: 1024px) {
-    padding: 0.2rem 0.3rem;
+  .filter-text {
+    display: flex;
+    align-items: center;
+
+    .icon {
+      height: 1rem;
+
+      svg {
+        margin-right: 0.25rem;
+        width: 1rem;
+        height: 1rem;
+      }
+    }
   }
 
-  svg {
-    color: var(--color-icon);
-    margin-right: 5px;
-    height: 1rem;
-    flex-shrink: 0;
-  }
-}
-
-.filter-active {
-  @extend %transparent-clickable, .selected;
-  svg {
-    color: var(--color-brand-light);
+  span {
+    text-transform: capitalize;
+    user-select: none;
   }
 }
 </style>

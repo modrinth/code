@@ -1,9 +1,10 @@
 <template>
   <div class="checkbox-outer" :class="{ disabled }" @click="toggle">
-    <button class="checkbox" :disabled="disabled" :class="{ border }">
+    <button class="checkbox" :disabled="disabled" :class="{ checked: value }">
       <CheckIcon v-if="value" />
     </button>
-    <p>{{ label }}</p>
+    <p v-if="label">{{ label }}</p>
+    <slot v-else />
   </div>
 </template>
 
@@ -24,11 +25,11 @@ export default {
       type: Boolean,
       default: false,
     },
-    border: {
-      type: Boolean,
-      default: true,
-    },
     value: Boolean,
+    clickEvent: {
+      type: Function,
+      default: () => {},
+    },
   },
   methods: {
     toggle() {
@@ -62,8 +63,9 @@ export default {
   }
 
   p {
+    user-select: none;
     padding: 0.2rem 0rem;
-    margin: 0 0 0 0.5rem;
+    margin: 0;
   }
 }
 
@@ -73,30 +75,22 @@ export default {
   justify-content: center;
   cursor: pointer;
 
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 1rem;
+  height: 1rem;
 
   padding: 0;
-  margin: 0;
+  margin: 0 0.5rem 0 0;
 
-  svg {
-    color: var(--color-brand-light);
-    stroke-width: 0.2rem;
-    height: 1.2rem;
-    width: 1.2rem;
-    flex-shrink: 0;
+  &.checked {
+    background-color: var(--color-brand);
   }
 
-  &.border {
-    width: 1.2rem;
-    height: 1.2rem;
-
-    border: 0.15rem solid var(--color-text);
-
-    svg {
-      height: 0.9rem;
-      width: 0.9rem;
-    }
+  svg {
+    color: var(--color-text-inverted);
+    stroke-width: 0.2rem;
+    height: 0.8rem;
+    width: 0.8rem;
+    flex-shrink: 0;
   }
 }
 </style>

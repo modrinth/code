@@ -176,13 +176,8 @@ export default {
     if (!window.googletag) {
       return
     }
-    const {
-      adUnitPath,
-      divId,
-      sizeMapping,
-      isResponsive,
-      collapseEmptyDiv,
-    } = this
+    const { adUnitPath, divId, sizeMapping, isResponsive, collapseEmptyDiv } =
+      this
 
     // Init Ad slot
     googletag.cmd.push(() => {

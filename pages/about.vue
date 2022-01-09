@@ -1,10 +1,10 @@
 <template>
   <div class="main">
-    <div class="container">
+    <div class="card">
       <h1>About</h1>
       <p>
         Founded in 2020, Modrinth was created to provide modders with an open
-        and intuitive platform to publish their mods on.
+        and intuitive platform to publish their projects on.
       </p>
 
       <p>
@@ -56,17 +56,11 @@
         >.
       </p>
     </div>
-    <m-footer class="footer" centered />
   </div>
 </template>
 
 <script>
-import MFooter from '~/components/layout/MFooter'
-
 export default {
-  components: {
-    MFooter,
-  },
   auth: false,
   head: {
     title: 'About - Modrinth',
@@ -101,11 +95,6 @@ export default {
 .main {
   margin: var(--spacing-card-sm) auto;
   max-width: 800px;
-}
-
-.container {
-  @extend %card;
-  padding: var(--spacing-card-sm) var(--spacing-card-lg);
 }
 
 a {

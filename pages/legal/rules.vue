@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <div class="container">
+    <div class="card">
       <h1>Project Rules</h1>
 
       <p>
@@ -94,17 +94,11 @@
         the Modrinth moderators' discretion.
       </p>
     </div>
-    <m-footer class="footer" centered />
   </div>
 </template>
 
 <script>
-import MFooter from '~/components/layout/MFooter'
-
 export default {
-  components: {
-    MFooter,
-  },
   auth: false,
   head: {
     title: 'Rules - Modrinth',
@@ -139,11 +133,6 @@ export default {
 .main {
   margin: var(--spacing-card-sm) auto;
   max-width: 800px;
-}
-
-.container {
-  @extend %card;
-  padding: var(--spacing-card-sm) var(--spacing-card-lg);
 }
 
 a {

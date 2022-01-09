@@ -1,3 +1,7 @@
 export default function (to, from, savedPosition) {
-  return savedPosition || { x: 0, y: 0 }
+  if (to.name.startsWith('type-id') && !from.name.startsWith('type-id')) {
+    return { x: 0, y: 0 }
+  } else {
+    return savedPosition
+  }
 }

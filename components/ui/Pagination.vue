@@ -2,7 +2,7 @@
   <div v-if="pages.length > 1" class="columns paginates">
     <button
       :class="{ disabled: currentPage === 1 }"
-      class="paginate has-icon"
+      class="left-arrow paginate has-icon"
       aria-label="Previous Page"
       @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
     >
@@ -17,7 +17,7 @@
       }"
       class="page-number-container"
     >
-      <div v-if="item == '-'" class="has-icon">
+      <div v-if="item === '-'" class="has-icon">
         <GapIcon />
       </div>
       <button
@@ -36,7 +36,7 @@
       :class="{
         disabled: currentPage === pages[pages.length - 1],
       }"
-      class="paginate has-icon"
+      class="right-arrow paginate has-icon"
       aria-label="Next Page"
       @click="
         currentPage !== pages[pages.length - 1]
@@ -83,22 +83,27 @@ export default {
 
 <style scoped lang="scss">
 button {
+  box-shadow: var(--shadow-card);
+
   padding: 0;
   margin: 0;
-  width: 2em;
-  height: 2em;
-  border-radius: 2em;
-  background: transparent;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 2rem;
+  background: var(--color-raised-bg);
+
   &.page-number.current {
-    background: var(--color-button-bg-hover);
-    color: var(--color-button-text-hover);
+    background: var(--color-brand);
+    color: var(--color-brand-inverted);
     cursor: default;
   }
+
   &.paginate.disabled {
-    background: none;
-    color: var(--color-button-text-disabled);
+    background-color: var(--color-button-bg);
     cursor: default;
+    color: var(--color-icon);
   }
+
   &:hover {
     background: var(--color-button-bg-active);
     color: var(--color-button-text-active);
@@ -127,8 +132,9 @@ button,
 .paginates {
   height: 2em;
   margin: 0.5rem 0;
-  > div {
-    margin: 0 0.1em;
+  > div,
+  .has-icon {
+    margin: 0 0.5em;
   }
   font-size: 80%;
   @media screen and (min-width: 350px) {
@@ -140,5 +146,13 @@ button,
   font-size: 0.9rem;
   height: 2.225em;
   width: 2.225em;
+}
+
+.left-arrow {
+  margin-left: auto !important;
+}
+
+.right-arrow {
+  margin-right: auto !important;
 }
 </style>

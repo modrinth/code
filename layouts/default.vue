@@ -5,126 +5,132 @@
         <section class="logo column">
           <NuxtLink to="/">
             <ModrinthLogoSmall aria-label="modrinth" class="small-logo" />
-            <ModrinthLogo
-              v-if="$colorMode.value === 'light'"
-              aria-label="modrinth"
-              class="text-logo"
-            />
-            <ModrinthLogoWhite v-else aria-label="modrinth" class="text-logo" />
+            <ModrinthLogo aria-label="modrinth" class="text-logo" />
           </NuxtLink>
-          <span class="badge yellow">Beta</span>
         </section>
         <section class="menu-icon">
-          <button class="theme-toggle" @click="changeTheme">
-            <MoonIcon v-if="$colorMode.value === 'light'" />
-            <SunIcon v-else />
-          </button>
           <button @click="toggleNavBar">
             <HamburgerIcon />
           </button>
         </section>
         <section ref="nav" class="right-group columns">
-          <section class="column-grow-5 nav">
-            <div class="tabs">
-              <NuxtLink
-                to="/mods"
-                class="tab"
-                :class="{
-                  'active-path': this.$route.path.startsWith('/mod'),
-                }"
-              >
+          <section class="nav">
+            <div class="styled-tabs">
+              <NuxtLink to="/mods" class="tab">
                 <span>Mods</span>
               </NuxtLink>
-              <div v-if="this.$auth.user" class="section">
-                <NuxtLink
-                  to="/dashboard/projects"
-                  class="tab"
-                  :class="{
-                    'active-path': this.$route.path.startsWith('/dashboard'),
-                  }"
-                >
-                  <span>Dashboard</span>
-                </NuxtLink>
-              </div>
+              <NuxtLink to="/modpacks" class="tab">
+                <span>Modpacks</span>
+              </NuxtLink>
             </div>
           </section>
-          <section class="column-grow">
-            <template v-if="this.$auth.user">
-              <section class="user-controls">
-                <div
-                  v-click-outside="hideDropdown"
-                  class="dropdown"
-                  :class="{ open: isDropdownOpen }"
-                >
-                  <button class="control" @click="toggleDropdown">
-                    <div class="avatar">
-                      <span>{{ this.$auth.user.username }}</span>
-                      <AvatarIcon
-                        :notif-count="this.$user.notifications.count"
-                        :dropdown-bg="isDropdownOpen"
-                      />
-                    </div>
-                    <DropdownIcon class="dropdown-icon" />
-                  </button>
-                  <div class="content">
-                    <ul v-if="isDropdownOpen" @click="hideDropdown">
-                      <li>
-                        <NuxtLink :to="userUrl">
-                          <UserIcon />
-                          <span>Profile</span>
-                        </NuxtLink>
-                      </li>
-                      <li>
-                        <NuxtLink to="/dashboard/notifications">
-                          <NotificationIcon />
-                          <span>Notifications</span>
-                        </NuxtLink>
-                      </li>
-                      <li>
-                        <NuxtLink to="/dashboard/settings">
-                          <SettingsIcon />
-                          <span>Settings</span>
-                        </NuxtLink>
-                      </li>
-                      <!--<li v-tooltip="'Not implemented yet'" class="hidden">
-                          <NuxtLink :to="userTeamsUrl" disabled>
-                            <UsersIcon />
-                            <span>Teams</span>
-                          </NuxtLink>
-                        </li>-->
-                      <li>
-                        <button @click="changeTheme">
-                          <MoonIcon v-if="$colorMode.value === 'light'" />
-                          <SunIcon v-else />
-                          <span v-if="$colorMode.value === 'light'">
-                            Dark Mode</span
-                          >
-                          <span v-else>Light Mode</span>
-                        </button>
-                      </li>
-                      <hr />
-                      <li>
-                        <button @click="logout">
-                          <LogOutIcon />
-                          <span>Log Out</span>
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+          <section class="column-grow user-outer">
+            <section class="user-controls">
+              <button class="control-button" @click="changeTheme">
+                <MoonIcon v-if="$colorMode.value === 'light'" />
+                <SunIcon v-else />
+              </button>
+              <nuxt-link
+                v-if="$auth.user"
+                to="/create/project"
+                class="control-button"
+              >
+                <PlusIcon />
+              </nuxt-link>
+              <nuxt-link
+                v-if="$auth.user"
+                to="/notifications"
+                class="control-button"
+              >
+                <NotificationIcon />
+                <div v-if="$user.notifications.length > 0" class="bubble">
+                  {{ $user.notifications.length }}
                 </div>
-              </section>
-            </template>
-            <template v-else>
-              <section class="auth-prompt">
-                <a class="desktop-header-mode-switch" @click="changeTheme">
-                  <MoonIcon v-if="$colorMode.value === 'light'" />
-                  <SunIcon v-else />
-                </a>
+              </nuxt-link>
+              <button
+                v-if="!$auth.user"
+                class="theme-mobile-button iconified-button"
+                @click="changeTheme"
+              >
+                <MoonIcon v-if="$colorMode.value === 'light'" />
+                <SunIcon v-else />
+                Change Theme
+              </button>
+              <div
+                v-if="$auth.user"
+                v-click-outside="hideDropdown"
+                class="dropdown"
+                :class="{ open: isDropdownOpen }"
+              >
+                <button class="control" @click="toggleDropdown">
+                  <div class="avatar">
+                    <img :src="$auth.user.avatar_url" class="icon" />
+                    <span>{{ $auth.user.username }}</span>
+                  </div>
+                  <DropdownIcon class="dropdown-icon" />
+                </button>
+                <div class="content">
+                  <ul @click="hideDropdown">
+                    <li>
+                      <NuxtLink :to="`/user/${$auth.user.username}`">
+                        <UserIcon />
+                        <span>Profile</span>
+                      </NuxtLink>
+                    </li>
+                    <li>
+                      <NuxtLink to="/settings">
+                        <SettingsIcon />
+                        <span>Settings</span>
+                      </NuxtLink>
+                    </li>
+                    <li class="hide-desktop">
+                      <NuxtLink to="/notifications">
+                        <NotificationIcon />
+                        <span>Notifications</span>
+                      </NuxtLink>
+                    </li>
+                    <li class="hide-desktop">
+                      <NuxtLink to="/create/project">
+                        <PlusIcon />
+                        <span>Create Project</span>
+                      </NuxtLink>
+                    </li>
+                    <li>
+                      <NuxtLink
+                        v-if="
+                          $auth.user.role === 'moderator' ||
+                          $auth.user.role === 'admin'
+                        "
+                        to="/moderation"
+                      >
+                        <ModerationIcon />
+                        <span>Moderation</span>
+                      </NuxtLink>
+                    </li>
+                    <hr />
+                    <li class="hide-desktop">
+                      <button @click="changeTheme">
+                        <MoonIcon v-if="$colorMode.value === 'light'" />
+                        <SunIcon v-else />
+                        <span>Change Theme</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button @click="logout">
+                        <LogOutIcon />
+                        <span>Log Out</span>
+                      </button>
+                    </li>
+                    <hr class="hide-desktop" />
+                  </ul>
+                </div>
+              </div>
+              <section v-else class="auth-prompt">
                 <a :href="authUrl" class="log-in-button"
                   ><GitHubIcon aria-hidden="true" />Sign In with GitHub</a
                 >
               </section>
-            </template>
+            </section>
           </section>
         </section>
       </section>
@@ -137,14 +143,57 @@
         :max="5"
         :ignore-duplicates="true"
       />
-      <!--<notifications
-        group="ads"
-        position="bottom right"
-        :duration="-1"
-        :ignore-duplicates="true"
-      />-->
       <Nuxt />
     </main>
+    <footer>
+      <div class="logo-info">
+        <ModrinthLogo aria-label="modrinth" class="text-logo" />
+        <p>
+          Modrinth is open source software. You may view the source code at
+          <a
+            target="_blank"
+            href="https://github.com/modrinth/knossos"
+            class="text-link"
+          >
+            our GitHub page</a
+          >
+        </p>
+        <p>modrinth/knossos {{ version }}</p>
+        <p>© Guavy LLC</p>
+      </div>
+      <div class="links">
+        <h4>Legal</h4>
+        <nuxt-link to="/legal/terms">Terms</nuxt-link>
+        <nuxt-link to="/legal/privacy">Privacy</nuxt-link>
+        <nuxt-link to="/legal/rules">Content</nuxt-link>
+        <a
+          target="_blank"
+          href="https://github.com/modrinth/knossos/blob/master/LICENSE.md"
+        >
+          License
+        </a>
+      </div>
+      <div class="links">
+        <h4>Resources</h4>
+        <a target="_blank" href="https://blog.modrinth.com">Blog</a>
+        <a target="_blank" href="https://discord.gg/EUHuJHt">Discord</a>
+        <a target="_blank" href="https://github.com/modrinth/knossos">GitHub</a>
+        <a target="_blank" href="https://docs.modrinth.com">Docs</a>
+      </div>
+      <div class="buttons">
+        <nuxt-link to="/settings/privacy">
+          <button class="iconified-button">
+            <ShieldIcon />
+            Set privacy settings
+          </button>
+        </nuxt-link>
+        <button class="iconified-button" @click="changeTheme">
+          <MoonIcon v-if="$colorMode.value === 'light'" />
+          <SunIcon v-else />
+          Change theme
+        </button>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -152,17 +201,19 @@
 import ClickOutside from 'vue-click-outside'
 
 import ModrinthLogo from '~/assets/images/text-logo.svg?inline'
-import ModrinthLogoWhite from '~/assets/images/text-logo-white.svg?inline'
 import ModrinthLogoSmall from '~/assets/images/logo.svg?inline'
 
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
 
 import NotificationIcon from '~/assets/images/sidebar/notifications.svg?inline'
 import SettingsIcon from '~/assets/images/sidebar/settings.svg?inline'
+import ShieldIcon from '~/assets/images/utils/shield.svg?inline'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 import MoonIcon from '~/assets/images/utils/moon.svg?inline'
 import SunIcon from '~/assets/images/utils/sun.svg?inline'
+import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 
 import UserIcon from '~/assets/images/utils/user.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
@@ -170,12 +221,9 @@ import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
 import CookieConsent from '~/components/ads/CookieConsent'
 
-import AvatarIcon from '~/components/ui/AvatarIcon'
-
 export default {
   components: {
     ModrinthLogo,
-    ModrinthLogoWhite,
     ModrinthLogoSmall,
     DropdownIcon,
     MoonIcon,
@@ -186,8 +234,10 @@ export default {
     NotificationIcon,
     HamburgerIcon,
     CookieConsent,
-    AvatarIcon,
     SettingsIcon,
+    ShieldIcon,
+    ModerationIcon,
+    PlusIcon,
   },
   directives: {
     ClickOutside,
@@ -195,28 +245,29 @@ export default {
   data() {
     return {
       isDropdownOpen: false,
+      version: process.env.version || 'unknown',
     }
+  },
+  async fetch() {
+    await Promise.all([
+      this.$store.dispatch('user/fetchAll', { force: true }),
+      this.$store.dispatch('tag/fetchAllTags'),
+    ])
   },
   computed: {
     authUrl() {
-      return `${this.$axios.defaults.baseURL}auth/init?url=${this.$store.app.$config.utils.domain}${this.$route.path}`
-    },
-    userUrl() {
-      return `/user/${this.$auth.user.id}`
-    },
-    userTeamsUrl() {
-      return `${this.userUrl}/teams`
+      return `${this.$axios.defaults.baseURL}auth/init?url=${process.env.domain}${this.$route.path}`
     },
   },
   watch: {
     $route() {
       this.$refs.nav.className = 'right-group'
+
+      document.documentElement.style.overflow = 'auto'
       document.body.style.overflow = 'auto'
-      this.$store.dispatch('user/fetchNotifications')
+
+      this.$store.dispatch('user/fetchAll')
     },
-  },
-  created() {
-    this.$store.dispatch('user/fetchNotifications', { force: true })
   },
   beforeCreate() {
     if (this.$route.query.code) {
@@ -231,6 +282,9 @@ export default {
         currentlyActive ? '' : ' active'
       }`
       document.body.scrollTop = 0
+
+      document.documentElement.style.overflow =
+        document.documentElement.style.overflow !== 'hidden' ? 'hidden' : 'auto'
       document.body.style.overflow =
         document.body.style.overflow !== 'hidden' ? 'hidden' : 'auto'
     },
@@ -243,7 +297,7 @@ export default {
     async logout() {
       this.$cookies.set('auth-token-reset', true)
       // If users logs out on dashboard, force redirect on the home page to clear cookies
-      if (this.$route.path.startsWith('/dashboard')) {
+      if (this.$route.path.startsWith('/settings')) {
         window.location.href = '/'
       } else {
         await this.$router.go(null)
@@ -266,15 +320,29 @@ export default {
 
 <style lang="scss">
 .layout {
+  min-height: 100vh;
   background-color: var(--color-bg);
   display: block;
 
+  @media screen and (min-width: 1024px) {
+    min-height: calc(100vh - var(--spacing-card-bg));
+  }
+
   .site-header {
-    height: var(--size-navbar-height);
-    background-color: var(--color-raised-bg);
+    margin-top: var(--spacing-card-md);
+    margin-bottom: var(--spacing-card-md);
     max-width: 100vw;
+
+    @media screen and (min-width: 1024px) {
+      border-radius: var(--size-rounded-sm);
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
     .navbar {
       margin: 0 0.5rem;
+      padding: 0 var(--spacing-card-lg);
       @media screen and (min-width: 450px) {
         margin: 0 var(--spacing-card-lg);
       }
@@ -282,9 +350,11 @@ export default {
         align-items: center;
         display: flex;
         justify-content: space-between;
-        padding: 1rem 0;
-        margin-left: 1rem;
         color: var(--color-text-dark);
+        a {
+          align-items: center;
+          display: flex;
+        }
         .small-logo {
           display: block;
         }
@@ -327,15 +397,9 @@ export default {
         margin-right: 1rem;
       }
 
-      .desktop-header-mode-switch {
-        margin-right: 1rem;
-        cursor: pointer;
-      }
-
       section.right-group {
         display: flex;
         flex-grow: 5;
-
         flex-direction: column-reverse;
 
         overflow-y: auto;
@@ -353,101 +417,135 @@ export default {
         }
 
         section.nav {
-          .tabs {
+          flex-grow: 5;
+
+          .styled-tabs {
+            display: flex;
             flex-direction: column;
 
-            .section {
-              border-top: 3px solid var(--color-brand-disabled);
-              margin-top: 0.75rem;
-              padding-top: 0.75rem;
-            }
-            .tab {
-              font-size: var(--font-size-md);
-
-              span {
-                margin: 0 auto;
-              }
+            a {
+              margin-left: auto;
+              margin-right: auto;
             }
           }
         }
+
+        .user-outer {
+          z-index: 20;
+        }
+
         section.user-controls {
           align-items: center;
           display: flex;
+          flex-direction: column-reverse;
           justify-content: space-between;
           position: relative;
           top: 50%;
           transform: translateY(-50%);
           min-width: 12rem;
 
-          width: 13rem;
-          margin: 0 auto;
+          margin: 0.5rem auto;
+
+          .control-button {
+            max-width: 2rem;
+            padding: 0.5rem;
+            background-color: var(--color-raised-bg);
+            border-radius: var(--size-rounded-max);
+            margin: 0 0.5rem 0 0;
+            display: none;
+
+            svg {
+              height: 1rem;
+              width: 1rem;
+            }
+
+            .bubble {
+              position: absolute;
+              margin-left: 0.5rem;
+              bottom: 1rem;
+              border-radius: 0.9rem;
+              height: 0.8rem;
+              padding: 0 0.25rem;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+
+              font-size: 0.6rem;
+              background-color: var(--color-brand);
+              color: var(--color-brand-inverted);
+            }
+          }
+
+          .theme-mobile-button {
+            margin-bottom: 1rem;
+          }
 
           .dropdown {
             position: relative;
             display: inline-block;
             flex-grow: 1;
-            &:hover .control {
-              border-radius: var(--size-rounded-control);
-              background: var(--color-button-bg);
-            }
+
             &.open {
               .control {
-                background: var(--color-button-bg);
-                border-radius: var(--size-rounded-control)
-                  var(--size-rounded-control) 0 0;
-                .dropdown-icon {
-                  transform: rotate(180deg);
-                }
+                //background: var(--color-button-bg);
+                //border-radius: 1.25rem 1.25rem 0 0;
+                //.dropdown-icon {
+                //  transform: rotate(180deg);
+                //}
               }
               .content {
-                display: unset;
+                //display: unset;
               }
             }
             .control {
-              border-radius: var(--size-rounded-control);
+              background-color: var(--color-raised-bg);
+              border-radius: var(--size-rounded-max);
               align-items: center;
               display: flex;
-              padding: 0.3rem 0.75rem;
+              padding: 0.25rem;
               position: relative;
               z-index: 11;
               width: 100%;
+
               .avatar {
                 align-items: center;
                 display: flex;
                 flex-grow: 1;
+
+                img {
+                  height: 1.5rem;
+                  width: 1.5rem;
+                  border-radius: 50%;
+                  margin-left: auto;
+                }
+
                 span {
                   display: block;
                   overflow: hidden;
                   text-overflow: ellipsis;
                   white-space: nowrap;
                   color: var(--color-text-dark);
+                  font-size: var(--font-size-nm);
                   font-weight: var(--font-weight-medium);
+                  margin: 0 auto 0 0.25rem;
                 }
               }
               .dropdown-icon {
-                color: var(--color-text-dark);
+                display: none;
                 transition: 150ms ease transform;
+                margin-right: 0.25rem;
               }
             }
             .content {
               margin: 0 0 0 0;
-              min-width: 10rem;
-              width: 100%;
-              position: fixed;
-              display: none;
             }
             button {
               background-color: transparent;
-              color: var(--color-text-dark);
               margin: 0;
               padding: 0;
               font-weight: var(--font-weight-medium);
             }
             ul {
-              background-color: var(--color-button-bg);
-              border-radius: 0 0 var(--size-rounded-control)
-                var(--size-rounded-control);
-              box-shadow: var(--shadow-dropdown);
               display: flex;
               flex-direction: column;
               margin: 0;
@@ -464,25 +562,31 @@ export default {
               li {
                 margin: 0;
                 &:hover,
-                &:focus,
+                &:focus {
+                  background-color: var(--color-button-bg-hover);
+                  color: var(--color-text-dark);
+                }
                 &:active {
                   background-color: var(--color-button-bg-active);
-                  color: var(--color-text-dark);
                 }
                 a,
                 button {
                   align-items: center;
                   display: flex;
                   padding: 0.75rem 1.5rem;
-                  color: var(--color-text-dark);
                   svg {
                     color: inherit;
                     height: 1rem;
                     width: 1rem;
+                    margin-left: auto;
                   }
                   span {
                     margin-left: 0.5rem;
+                    margin-right: auto;
                   }
+                }
+                button {
+                  width: 100%;
                 }
               }
             }
@@ -493,17 +597,20 @@ export default {
           display: flex;
           align-items: center;
           height: 100%;
+          margin: 1rem 0 0.5rem;
 
           .log-in-button {
             margin: 0 auto;
 
+            display: flex;
+            align-items: center;
+
             text-align: center;
-            border-radius: var(--size-rounded-control);
+            border-radius: var(--size-rounded-max);
             background-color: var(--color-brand);
             white-space: nowrap;
             outline: none;
             color: var(--color-brand-inverted);
-            display: block;
             padding: 0.5rem 0.75rem;
             svg {
               vertical-align: middle;
@@ -511,7 +618,7 @@ export default {
             }
             &:hover,
             &:focus {
-              background-color: var(--color-brand-2);
+              background-color: var(--color-brand-hover);
             }
           }
         }
@@ -542,27 +649,96 @@ export default {
           z-index: unset;
 
           section.nav {
-            .tabs {
+            .styled-tabs {
               flex-direction: unset;
               position: relative;
               top: 50%;
               transform: translateY(-50%);
+              margin-top: 3px;
+              margin-left: 2rem;
 
-              .section {
-                margin-top: unset;
-                padding-top: unset;
-                border-top: unset;
+              a {
+                margin-left: 0;
+              }
 
-                border-left: 3px solid var(--color-brand-disabled);
-                margin-left: 0.75rem;
-                padding-left: 0.75rem;
+              a.tab {
+                padding: 0;
+                margin-right: 1rem;
               }
             }
           }
 
           section.user-controls {
+            display: flex;
+            flex-direction: row;
             width: unset;
             margin: unset;
+
+            .control-button {
+              display: flex;
+            }
+
+            .theme-mobile-button {
+              display: none;
+            }
+
+            .hide-desktop {
+              display: none;
+            }
+
+            .dropdown {
+              &:hover .control {
+                background: var(--color-button-bg-hover);
+              }
+              &.open {
+                .control {
+                  background: var(--color-button-bg);
+                  border-radius: 1.25rem 1.25rem 0 0;
+                  .dropdown-icon {
+                    transform: rotate(180deg);
+                  }
+                }
+                .content {
+                  display: unset;
+                }
+              }
+              ul {
+                background-color: var(--color-button-bg);
+                border-radius: 0 0 var(--size-rounded-control)
+                  var(--size-rounded-control);
+                box-shadow: var(--shadow-dropdown);
+
+                li {
+                  a,
+                  button {
+                    svg {
+                      margin-left: 0;
+                    }
+                    span {
+                      margin-right: 0;
+                    }
+                  }
+                }
+              }
+              .content {
+                width: calc(100% - 7.5rem);
+                position: fixed;
+                display: none;
+              }
+              .control {
+                .avatar {
+                  img {
+                    margin-left: 0;
+                  }
+                  span {
+                    margin-right: 1.5rem;
+                  }
+                }
+                .dropdown-icon {
+                  display: block;
+                }
+              }
+            }
           }
 
           section.auth-prompt {
@@ -570,16 +746,86 @@ export default {
           }
         }
       }
-      @media only screen and (max-width: 1024px) {
-        .desktop-header-mode-switch {
-          display: none;
-        }
-      }
     }
   }
 
   main {
     grid-area: main;
+  }
+
+  footer {
+    margin: 6rem 0 2rem 0;
+    flex-wrap: wrap;
+    text-align: center;
+
+    .logo-info {
+      margin-left: auto;
+      margin-right: auto;
+      max-width: 22rem;
+      margin-bottom: 1rem;
+
+      .text-logo {
+        width: 10rem;
+        height: auto;
+      }
+    }
+
+    .links {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 1rem;
+
+      h4 {
+        color: var(--color-text-dark);
+        margin: 0 0 1rem 0;
+      }
+
+      a {
+        margin: 0 0 1rem 0;
+      }
+    }
+
+    .buttons {
+      margin-left: auto;
+      margin-right: auto;
+
+      button,
+      a {
+        background-color: var(--color-raised-bg);
+
+        margin-bottom: 0.5rem;
+        margin-left: auto;
+        margin-right: auto;
+
+        &:hover,
+        &:focus {
+          background-color: var(--color-button-bg-hover);
+        }
+      }
+    }
+
+    @media screen and (min-width: 1024px) {
+      display: flex;
+      text-align: unset;
+
+      .logo-info {
+        margin-right: 2rem;
+      }
+
+      .links {
+        margin-right: 2rem;
+      }
+
+      .buttons {
+        width: unset;
+        margin-left: 0;
+
+        button,
+        a {
+          margin-right: unset;
+        }
+      }
+    }
   }
 }
 
@@ -597,3 +843,4 @@ export default {
   }
 }
 </style>
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

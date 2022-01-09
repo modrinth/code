@@ -79,8 +79,19 @@ export default {
       onSmallScreen: false,
       windowResizeListenerDebounce: null,
       ethicalAdLoad: null,
-      tries: 0,
     }
+  },
+  head: {
+    script: [
+      {
+        hid: 'ethical_ads_script',
+        type: 'text/javascript',
+        src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
+        async: true,
+        body: true,
+        defer: true,
+      }, // Insert in body
+    ],
   },
   computed: {
     ethical_ads_on() {
@@ -120,7 +131,7 @@ export default {
     this.displayed = true
     if (process.browser) {
       this.handleWindowResize()
-      this.refresh_ad(true)
+      this.refresh_ad()
     }
   },
   methods: {
@@ -134,14 +145,14 @@ export default {
             this.format = sizes[this.type]
             this.displayed = true
             // Refresh ad
-            this.refresh_ad(true)
+            this.refresh_ad()
           }
           return
         }
         if (this.onSmallScreen === false) {
           // Reload ad
           this.onSmallScreen = true
-          this.refresh_ad(true)
+          this.refresh_ad()
         }
         this.onSmallScreen = true
         if (this.smallScreen === 'destroy') {
@@ -152,39 +163,18 @@ export default {
         }
       }, 300)
     },
-    refresh_ad(reset = false) {
-      if (reset) {
-        this.tries = 0
-      }
-      if (this.tries >= 3) {
-        // Too many tries, we stop
-        return
-      }
+    refresh_ad() {
       if (this.ethical_ads_on) {
         clearTimeout(this.ethicalAdLoad)
         this.ethicalAdLoad = setTimeout(() => {
-          try {
-            ethicalads.load()
-          } catch (e) {
+          if (typeof window.ethicalads === 'undefined') {
             console.log('EthicalAds are not loaded yet, retrying...')
             this.refresh_ad()
-            this.tries++
           }
+          ethicalads.load()
         }, 100)
       }
     },
-  },
-  head: {
-    script: [
-      {
-        hid: 'ethical_ads_script',
-        type: 'text/javascript',
-        src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
-        async: true,
-        body: true,
-        defer: true,
-      }, // Insert in body
-    ],
   },
 }
 </script>
@@ -192,7 +182,7 @@ export default {
 <style lang="scss" scoped>
 .ad-wrapper {
   width: 100%;
-  @extend %card;
+  // @extend %card;
   display: flex;
   flex-direction: row;
   margin-bottom: var(--spacing-card-md);

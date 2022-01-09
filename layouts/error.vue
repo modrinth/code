@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <div class="container">
+    <div class="card">
       <NuxtLink to="/">
         <h2>{{ error.message }}</h2>
         <p>
@@ -9,17 +9,12 @@
         </p>
       </NuxtLink>
     </div>
-    <m-footer class="footer" centered />
   </div>
 </template>
 
 <script>
-import MFooter from '~/components/layout/MFooter'
-
 export default {
-  components: {
-    MFooter,
-  },
+  layout: 'home',
   props: {
     error: {
       type: Object,
@@ -30,7 +25,6 @@ export default {
       },
     },
   },
-  layout: 'home',
 }
 </script>
 
@@ -38,10 +32,5 @@ export default {
 .main {
   margin: var(--spacing-card-sm) auto;
   max-width: 800px;
-}
-
-.container {
-  @extend %card;
-  padding: var(--spacing-card-md) var(--spacing-card-lg);
 }
 </style>

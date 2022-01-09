@@ -40,7 +40,7 @@ export default {
   transform: translate(-50%, -50%);
   z-index: 11;
   box-shadow: 0 2px 3px 1px var(--color-button-bg);
-  border-radius: 10px;
+  border-radius: var(--size-rounded-lg);
   max-height: 80%;
   overflow-y: auto;
   background-color: var(--color-raised-bg);

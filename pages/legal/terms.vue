@@ -1,6 +1,6 @@
 <template>
   <div class="main">
-    <div class="container">
+    <div class="card">
       <h1>Terms and Conditions</h1>
 
       <h2>1. Terms</h2>
@@ -157,17 +157,11 @@
         <nuxt-link to="/legal/rules">Project Rules</nuxt-link>.
       </p>
     </div>
-    <m-footer class="footer" centered />
   </div>
 </template>
 
 <script>
-import MFooter from '~/components/layout/MFooter'
-
 export default {
-  components: {
-    MFooter,
-  },
   auth: false,
   head: {
     title: 'Terms - Modrinth',
@@ -202,11 +196,6 @@ export default {
 .main {
   margin: var(--spacing-card-sm) auto;
   max-width: 800px;
-}
-
-.container {
-  @extend %card;
-  padding: var(--spacing-card-sm) var(--spacing-card-lg);
 }
 
 a {

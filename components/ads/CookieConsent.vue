@@ -5,7 +5,7 @@
       class="container"
       :style="{ visibility: shown ? 'visible' : 'hidden' }"
     >
-      <div class="banner">
+      <div class="card banner">
         <span>
           Modrinth uses cookies for various purposes, including advertising.<br />
           We encourage you to review your privacy settings by clicking on the
@@ -24,13 +24,13 @@
 import scopes from '~/privacy-toggles'
 export default {
   name: 'CookieConsent',
-  fetch() {
-    this.checkVisibility()
-  },
   data() {
     return {
       shown: false,
     }
+  },
+  fetch() {
+    this.checkVisibility()
   },
   watch: {
     $route() {
@@ -43,7 +43,7 @@ export default {
 
       this.shown =
         !this.$store.state.consent.is_consent_given &&
-        this.$route.path !== '/dashboard/privacy'
+        this.$route.path !== '/settings/privacy'
     },
     hide() {
       this.$store.commit('consent/set_consent', true)
@@ -57,7 +57,7 @@ export default {
     },
     review() {
       this.shown = false
-      this.$router.push('/dashboard/privacy')
+      this.$router.push('/settings/privacy')
     },
   },
 }
@@ -73,7 +73,6 @@ export default {
   bottom: 0;
   right: 0;
   .banner {
-    @extend %card;
     padding: 1rem;
     font-size: 1.05rem;
     border-radius: 0;

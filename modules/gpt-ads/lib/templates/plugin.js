@@ -67,9 +67,8 @@ export default async function (ctx, inject) {
     // Unfortunately these lines are needed to prevent vue-meta from esacping quotes in the init script
     ctx.app.head.__dangerouslyDisableSanitizersByTagID =
       ctx.app.head.__dangerouslyDisableSanitizersByTagID || {}
-    ctx.app.head.__dangerouslyDisableSanitizersByTagID[
-      GEOEDGE_CONF_SCRIPT_ID
-    ] = ['innerHTML']
+    ctx.app.head.__dangerouslyDisableSanitizersByTagID[GEOEDGE_CONF_SCRIPT_ID] =
+      ['innerHTML']
     const geoEdgeConfig = {
       hid: GEOEDGE_CONF_SCRIPT_ID,
       innerHTML:

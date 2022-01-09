@@ -19,7 +19,9 @@
   }
 }
 .page-container {
-  margin: var(--spacing-card-lg);
+  margin: var(--spacing-card-md);
+  margin-top: 0;
+
   .page-contents {
     display: flex;
     flex-direction: column;
@@ -32,5 +34,28 @@
       margin-left: auto;
       margin-right: auto;
     }
+  }
+}
+
+.normal-page {
+  display: flex;
+  flex-direction: column;
+  margin: 0 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .normal-page {
+    flex-direction: row;
+    margin: 0 auto;
+    max-width: 80rem;
+  }
+
+  .normal-page__sidebar {
+    width: 20rem;
+  }
+
+  .normal-page__content {
+    padding-left: 1rem;
+    width: 60rem;
   }
 }

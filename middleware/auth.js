@@ -37,7 +37,7 @@ export default async function (context) {
 
   if (!context.$auth.user) {
     return context.redirect(
-      `${context.$axios.defaults.baseURL}auth/init?url=${context.store.app.$config.utils.domain}${context.route.fullPath}`
+      `${context.$axios.defaults.baseURL}auth/init?url=${process.env.domain}${context.route.fullPath}`
     )
   }
 }

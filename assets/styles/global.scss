@@ -1,32 +1,36 @@
+html {
+  @extend .light-mode;
+}
+
 .light-mode {
-  --color-icon: #718096;
-  --color-text: #4a5568;
-  --color-text-medium: #2a303d;
+  --color-icon: #6b7280;
+  --color-text: hsl(221, 39%, 11%);
+  --color-text-secondary: hsl(220, 9%, 46%);
+  --color-text-inactive: hsl(215, 14%, 34%);
   --color-text-dark: #1a202c;
   --color-heading: #2c313d;
-  --color-heading-light: #777e8d;
-  --color-bg: #edf2f7;
+  --color-bg: hsl(220, 13%, 91%);
   --color-raised-bg: #ffffff;
-  --color-divider: #eaecef;
+  --color-divider: hsl(220, 13%, 91%);
   --color-divider-dark: #c8cdd3;
 
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-brand: #5da545;
-  --color-brand-hover: #53923e;
-  --color-brand-active: #4b8138;
-  --color-brand-light: #6bac57;
+  --color-brand: #30b27b;
+  --color-brand-hover: #1e9565;
+  --color-brand-active: #177955;
+  --color-brand-light: #30b27b;
   --color-brand-inverted: #ffffff;
-  --color-brand-2: #5fa33b;
-  --color-brand-3: #c5ddb7;
+  --color-brand-2: #30b27b;
+  --color-brand-3: #30b27b;
   --color-brand-disabled: #e2e8f0;
 
-  --color-button-bg: var(--color-bg);
+  --color-button-bg: #e6e7eb;
   --color-button-text: var(--color-text-dark);
-  --color-button-bg-hover: #e0e7ee;
+  --color-button-bg-hover: #d9dce0;
   --color-button-text-hover: #1b1e24;
-  --color-button-bg-active: #d0d7df;
+  --color-button-bg-active: #c3c6cb;
   --color-button-text-active: var(--color-button-text-hover);
   --color-button-bg-disabled: #eceef0;
   --color-button-text-disabled: #9da3ac;
@@ -57,12 +61,12 @@
 
   --color-badge-gray-text: #646161;
   --color-badge-gray-bg: #c8c1c1;
-  --color-badge-red-text: #9b2c2c;
-  --color-badge-red-bg: #fed7d7;
-  --color-badge-green-text: #276749;
-  --color-badge-green-bg: #c6f6d5;
-  --color-badge-yellow-text: #675027;
-  --color-badge-yellow-bg: #f6e8c6;
+  --color-badge-red-text: #6e1931;
+  --color-badge-red-bg: #db3162;
+  --color-badge-green-text: #184e38;
+  --color-badge-green-bg: #24a54e;
+  --color-badge-yellow-text: #755920;
+  --color-badge-yellow-bg: #f7bb43;
 
   --color-block-quote: var(--color-tooltip-bg);
   --color-header-underline: var(--color-tooltip-text);
@@ -70,39 +74,43 @@
 
   --color-table-border: #dfe2e5;
   --color-table-alternate-row: #f6f8fa;
+
+  --shadow-card: 0px 2px 4px 0px hsla(221, 39%, 11%, 0.1),
+    inset 0px -2px 2px 0px hsla(221, 39%, 11%, 0.05);
+  --shadow-image-md: 0px 2px 4px 0px hsla(221, 39%, 11%, 0.2),
+    inset 0px -2px 2px 0px hsla(221, 39%, 11%, 0.1);
 }
 
 .dark-mode {
-  --color-icon: #acacac;
-  --color-text: #cecece;
-  --color-text-medium: #e4e4e4;
-  --color-text-dark: #fbf8ec;
-  --color-heading: #fbf8ec;
-  --color-heading-light: #8a8a8a;
-  --color-bg: #171719;
-  --color-raised-bg: #222224;
-  --color-divider: #49494d;
-  --color-divider-dark: #646468;
+  --color-icon: #96a2b0;
+  --color-text: #b0bac5;
+  --color-text-inactive: #929aa3;
+  --color-text-dark: #ecf9fb;
+  --color-heading: #c4cfdd;
+  --color-bg: #16181c;
+  --color-raised-bg: #26292f;
+  --color-divider: #474b54;
+  --color-divider-dark: #646c75;
 
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-brand: #5da545;
-  --color-brand-hover: #6bac57;
-  --color-brand-active: #7fc46a;
-  --color-brand-light: #6bac57;
-  --color-brand-inverted: #ffffff;
-  --color-brand-2: #438121;
-  --color-brand-3: #344d26;
+  --color-brand: #1bd96a;
+  --color-brand-hover: #30b366;
+  --color-brand-active: #55f5ae;
+  --color-brand-light: #30b27b;
+  --color-brand-inverted: #000;
+  --color-brand-2: #30b27b;
+  --color-brand-3: #30b27b;
   --color-brand-disabled: #414146;
 
-  --color-button-bg: #343438;
+  --color-button-bg: #3e434b;
   --color-button-text: var(--color-text);
-  --color-button-bg-hover: #3a3a3f;
+  --color-button-bg-hover: #494f58;
   --color-button-text-hover: #ffffff;
-  --color-button-bg-active: #49494e;
+  --color-button-bg-active: #616570;
   --color-button-text-active: var(--color-button-text-hover);
-  --color-button-text-disabled: #444444;
+  --color-button-text-disabled: #797979;
   --color-transparent-button-bg-hover: var(--color-button-bg);
   --color-transparent-button-text-hover: var(--color-text-dark);
   --color-transparent-button-bg-active: var(--color-button-bg-hover);
@@ -130,12 +138,12 @@
 
   --color-badge-gray-bg: #646161;
   --color-badge-gray-text: #c8c1c1;
-  --color-badge-red-bg: #9b2c2c;
-  --color-badge-red-text: #fed7d7;
-  --color-badge-green-bg: #276749;
-  --color-badge-green-text: #c6f6d5;
-  --color-badge-yellow-bg: #675027;
-  --color-badge-yellow-text: #f6e8c6;
+  --color-badge-red-text: #bd1a48;
+  --color-badge-red-bg: #db3162;
+  --color-badge-green-text: #1ebb7b;
+  --color-badge-green-bg: #24a54e;
+  --color-badge-yellow-text: #755920;
+  --color-badge-yellow-bg: #f7bb43;
 
   --color-block-quote: var(--color-code-bg);
   --color-header-underline: var(--color-tooltip-text);
@@ -143,6 +151,16 @@
 
   --color-table-border: #4f5864;
   --color-table-alternate-row: #262a30;
+}
+
+.oled-mode {
+  @extend .dark-mode;
+  --color-bg: #000000;
+  --color-raised-bg: #101013;
+
+  --color-button-bg: #222329;
+  --color-button-bg-hover: #2d2d32;
+  --color-button-bg-active: #3c3c40;
 }
 
 body {
@@ -156,7 +174,6 @@ body {
   font-weight: var(--font-weight-medium);
   margin: 0;
   padding: 0;
-  overflow-y: overlay;
 
   // Rounding sizes
   --size-rounded-xs: 0.5rem;
@@ -165,14 +182,15 @@ body {
   --size-rounded-lg: 1.25rem;
 
   --size-rounded-max: 999999999px;
-  --size-rounded-card: 0.5rem;
-  --size-rounded-icon: 0.5rem;
+  --size-rounded-card: 1rem;
+  --size-rounded-icon: 1rem;
   --size-rounded-control: 0.25rem;
   --size-rounded-tooltip: 0.25rem;
 
-  --size-navbar-height: 4rem;
+  --size-navbar-height: 3.5rem;
 
   --spacing-card-lg: 1.5rem;
+  --spacing-card-bg: 1rem;
   --spacing-card-md: 0.75rem;
   --spacing-card-sm: 0.5rem;
 
@@ -225,10 +243,13 @@ button {
   @extend .button;
 }
 
+input {
+  border-radius: 2rem;
+}
+
 input,
 textarea {
   background: var(--color-button-bg);
-  border-radius: var(--size-rounded-control);
   color: var(--color-text);
   padding: 0.5rem 1rem;
   border: 2px solid transparent;
