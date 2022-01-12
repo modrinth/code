@@ -424,8 +424,8 @@ export default {
     },
     showPopup() {
       if (
-        (this.currentMember.permissions & this.DELETE_MOD) ===
-        this.DELETE_MOD
+        (this.currentMember.permissions & this.DELETE_PROJECT) ===
+        this.DELETE_PROJECT
       ) {
         this.$refs.delete_popup.show()
       }

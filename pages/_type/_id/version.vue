@@ -218,7 +218,13 @@
               :hide-selected="true"
               placeholder="Choose mod loaders..."
             />
-            <p v-else class="value">{{ version.loaders.join(',') }}</p>
+            <p v-else class="value">
+              {{
+                version.loaders
+                  .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                  .join(', ')
+              }}
+            </p>
           </div>
           <div v-if="mode === 'version'" class="data">
             <p class="title">Downloads</p>
@@ -251,7 +257,13 @@
               :hide-selected="true"
               placeholder="Choose versions..."
             />
-            <p v-else class="value">{{ version.game_versions.join(',') }}</p>
+            <p v-else class="value">
+              {{
+                version.game_versions
+                  .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                  .join(', ')
+              }}
+            </p>
           </div>
           <div v-if="mode === 'version'" class="data">
             <p class="title">Published</p>
@@ -363,7 +375,7 @@
             <input
               v-model="newDependencyId"
               type="text"
-              :placeholder="`Enter the ${dependencyAddMode} id...`"
+              :placeholder="`Enter the ${dependencyAddMode} ID...`"
             />
             <Multiselect
               v-model="newDependencyType"

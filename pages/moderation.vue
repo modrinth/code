@@ -2,14 +2,14 @@
   <div class="page-container">
     <Popup v-if="currentProject" :show-popup="true">
       <div class="moderation-popup">
-        <h2>Moderation Form</h2>
+        <h2>Moderation form</h2>
         <p>
           Both of these fields are optional, but can be used to communicate
-          problems with a project team members. The body supports markdown
+          problems with a project's team members. The body supports markdown
           formatting!
         </p>
         <div class="status">
-          <span>New Project Status: </span>
+          <span>New project status: </span>
           <Badge
             v-if="currentProject.newStatus === 'approved'"
             color="green"
@@ -18,6 +18,7 @@
           <Badge
             v-else-if="
               currentProject.newStatus === 'processing' ||
+              currentProject.newStatus === 'unlisted' ||
               currentProject.newStatus === 'archived'
             "
             color="yellow"
@@ -59,7 +60,7 @@
             @click="saveProject"
           >
             <CheckIcon />
-            Save project status
+            Confirm
           </button>
         </div>
       </div>
@@ -298,7 +299,7 @@ export default {
 
 <style lang="scss" scoped>
 .moderation-popup {
-  width: 480px;
+  width: auto;
   padding: var(--spacing-card-md) var(--spacing-card-lg);
 
   .status {

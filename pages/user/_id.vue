@@ -47,13 +47,6 @@
               <span class="primary-stat__label">downloads</span>
             </div>
           </div>
-          <div class="stats-block__item primary-stat">
-            <HeartIcon class="primary-stat__icon" />
-            <div class="primary-stat__text">
-              <span class="primary-stat__counter">{{ sumFollows() }}</span>
-              <span class="primary-stat__label">followers of projects</span>
-            </div>
-          </div>
         </div>
       </aside>
     </div>
@@ -130,7 +123,6 @@ import Advertisement from '~/components/ads/Advertisement'
 import ReportIcon from '~/assets/images/utils/report.svg?inline'
 import SunriseIcon from '~/assets/images/utils/sunrise.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download-alt.svg?inline'
-import HeartIcon from '~/assets/images/utils/heart.svg?inline'
 import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
@@ -143,7 +135,6 @@ export default {
     SunriseIcon,
     DownloadIcon,
     ReportIcon,
-    HeartIcon,
     Badge,
     SettingsIcon,
     PlusIcon,
@@ -241,15 +232,6 @@ export default {
 
       for (const projects of this.projects) {
         sum += projects.downloads
-      }
-
-      return this.formatNumber(sum)
-    },
-    sumFollows() {
-      let sum = 0
-
-      for (const projects of this.projects) {
-        sum += projects.followers
       }
 
       return this.formatNumber(sum)

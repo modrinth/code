@@ -137,7 +137,7 @@
         :disabled="(currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS"
       >
         <TrashIcon />
-        Reset icon
+        Reset
       </button>
     </section>
     <section class="card game-sides">
@@ -508,7 +508,7 @@ export default {
     this.MANAGE_INVITES = 1 << 4
     this.REMOVE_MEMBER = 1 << 5
     this.EDIT_MEMBER = 1 << 6
-    this.DELETE_MOD = 1 << 7
+    this.DELETE_PROJECT = 1 << 7
   },
   methods: {
     async saveProjectReview() {

@@ -117,7 +117,7 @@
           "
         >
           <TrashIcon />
-          Reset icon
+          Reset
         </button>
       </section>
       <section class="card game-sides">
@@ -225,8 +225,20 @@
             >
               <td>{{ version.version_title }}</td>
               <td>{{ version.version_number }}</td>
-              <td>{{ version.loaders.join(', ') }}</td>
-              <td>{{ version.game_versions.join(', ') }}</td>
+              <td>
+                {{
+                  version.loaders
+                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                    .join(', ')
+                }}
+              </td>
+              <td>
+                {{
+                  version.game_versions
+                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                    .join(', ')
+                }}
+              </td>
               <td>
                 <VersionBadge
                   v-if="version.release_channel === 'release'"
@@ -393,7 +405,7 @@
                 <input
                   v-model="newDependencyId"
                   type="text"
-                  :placeholder="`Enter the ${dependencyAddMode} id...`"
+                  :placeholder="`Enter the ${dependencyAddMode} ID...`"
                 />
                 <Multiselect
                   v-model="newDependencyType"
@@ -506,7 +518,7 @@
             @click="gallery.push({})"
           >
             <PlusIcon />
-            Add a image
+            Add an image
           </button>
         </div>
         <div v-for="(item, index) in gallery" :key="index" class="gallery-item">
@@ -554,14 +566,14 @@
                 "
               >
                 <TrashIcon />
-                Reset image
+                Reset
               </button>
             </div>
           </div>
           <div class="buttons">
             <button class="iconified-button" @click="gallery.splice(index, 1)">
               <TrashIcon />
-              Remove Gallery Image
+              Remove
             </button>
 
             <hr v-if="gallery.length > 0 && index !== gallery.length - 1" />

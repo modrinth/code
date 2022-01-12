@@ -54,7 +54,7 @@
               >
                 <MoonIcon v-if="$colorMode.value === 'light'" />
                 <SunIcon v-else />
-                Change Theme
+                Change theme
               </button>
               <div
                 v-if="$auth.user"
@@ -92,7 +92,7 @@
                     <li class="hide-desktop">
                       <NuxtLink to="/create/project">
                         <PlusIcon />
-                        <span>Create Project</span>
+                        <span>Create project</span>
                       </NuxtLink>
                     </li>
                     <li>
@@ -112,13 +112,13 @@
                       <button @click="changeTheme">
                         <MoonIcon v-if="$colorMode.value === 'light'" />
                         <SunIcon v-else />
-                        <span>Change Theme</span>
+                        <span>Change theme</span>
                       </button>
                     </li>
                     <li>
                       <button @click="logout">
                         <LogOutIcon />
-                        <span>Log Out</span>
+                        <span>Log out</span>
                       </button>
                     </li>
                     <hr class="hide-desktop" />
@@ -184,7 +184,7 @@
         <nuxt-link to="/settings/privacy">
           <button class="iconified-button">
             <ShieldIcon />
-            Set privacy settings
+            Privacy settings
           </button>
         </nuxt-link>
         <button class="iconified-button" @click="changeTheme">

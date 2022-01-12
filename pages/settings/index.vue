@@ -20,7 +20,7 @@
           "
         >
           <TrashIcon />
-          Reset icon
+          Reset
         </button>
       </div>
       <div class="recap">
@@ -92,11 +92,10 @@
         </label>
         <h3>Theme</h3>
         <label>
-          <span
-            >Change the global site theme of Modrinth. You can switch it here or
-            anywhere by accessing the theme switcher in the navigation bar
-            dropdown.</span
-          >
+          <span>
+            Change the global site theme. It can also be changed between light
+            and dark in the navigation bar.
+          </span>
           <Multiselect
             v-model="$colorMode.preference"
             :options="['light', 'dark', 'oled']"
@@ -145,14 +144,14 @@ export default {
     }
   },
   fetch() {
-    this.$emit('update:action-button', 'Save profile settings')
+    this.$emit('update:action-button', 'Save')
     this.$emit('update:action-button-callback', this.saveChanges)
   },
   head: {
     title: 'Settings - Modrinth',
   },
   created() {
-    this.$emit('update:action-button', 'Save profile settings')
+    this.$emit('update:action-button', 'Save')
     this.$emit('update:action-button-callback', this.saveChanges)
   },
   methods: {

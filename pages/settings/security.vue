@@ -48,7 +48,7 @@
           This cannot be reversed, so be careful!</span
         >
         <input
-          value="Delete Account"
+          value="Delete account"
           type="button"
           class="iconified-button"
           @click="$refs.delete_popup.show()"

@@ -6,7 +6,7 @@
         <h1 v-else>Settings</h1>
         <div class="card styled-tabs">
           <nuxt-link v-if="$auth.user" class="tab" to="/settings" exact
-            ><span>Profile</span></nuxt-link
+            ><span>General</span></nuxt-link
           >
           <nuxt-link v-if="$auth.user" class="tab" to="/settings/follows">
             <span>Followed projects</span>

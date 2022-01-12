@@ -1,6 +1,6 @@
 <template>
   <div class="rows card">
-    <div class="consent-container">
+    <div class="privacy-settings-container">
       <div>
         Modrinth relies on different providers and in-house tools to allow us to
         provide custom-tailored experiences and personalized advertising. You
@@ -32,10 +32,10 @@
     </div>
     <div class="actions">
       <button class="iconified-button" @click="toggleAll(false)">
-        Refuse All
+        Select none
       </button>
       <button class="iconified-button" @click="toggleAll(true)">
-        Accept All
+        Select all
       </button>
     </div>
   </div>
@@ -54,7 +54,7 @@ export default {
     }
   },
   fetch() {
-    this.$emit('update:action-button', 'Confirm my choices')
+    this.$emit('update:action-button', 'Confirm')
     this.$emit('update:action-button-callback', this.confirm)
 
     this.$store.dispatch('consent/loadFromCookies', this.$cookies)
@@ -77,7 +77,7 @@ export default {
     title: 'Privacy Settings - Modrinth',
   },
   created() {
-    this.$emit('update:action-button', 'Confirm my choices')
+    this.$emit('update:action-button', 'Confirm')
     this.$emit('update:action-button-callback', this.confirm)
   },
   options: {
@@ -132,7 +132,7 @@ export default {
   }
 }
 
-.consent-container {
+.privacy-settings-container {
   .divider {
     margin-top: 1rem;
   }
