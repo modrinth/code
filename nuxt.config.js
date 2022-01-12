@@ -115,6 +115,12 @@ export default {
         rel: 'stylesheet',
         href: 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap',
       },
+      {
+        rel: 'search',
+        type: 'application/opensearchdescription+xml',
+        href: '/opensearch.xml',
+        title: 'Modrinth mods',
+      },
     ],
     script: [],
   },
