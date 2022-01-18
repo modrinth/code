@@ -349,16 +349,16 @@ export default {
 .gallery-item {
   display: flex;
   flex-direction: column;
+  padding: 0;
 
   img {
     width: 100%;
-    margin-top: 0.5rem;
+    margin-top: 0;
     margin-bottom: 0;
+    border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
 
     min-height: 10rem;
     object-fit: cover;
-
-    border-radius: var(--size-rounded-card);
   }
 
   .gallery-body {

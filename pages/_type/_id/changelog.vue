@@ -1,6 +1,10 @@
 <template>
   <div class="content card">
-    <div v-for="version in versions" :key="version.id">
+    <ThisOrThat class="filters" v-model="filterMode" :items="filters" />
+    <div
+      v-for="version in versions.filter((x) => x.loaders.includes(filterMode))"
+      :key="version.id"
+    >
       <div class="version-header">
         <span :class="'circle ' + version.version_type" />
         <div class="version-header-text">
@@ -59,10 +63,31 @@
 </template>
 <script>
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import ThisOrThat from '~/components/ui/ThisOrThat'
 
 export default {
   components: {
     DownloadIcon,
+    ThisOrThat,
+  },
+  data() {
+    return {
+      filters: [],
+      filterMode: '',
+    }
+  },
+  fetch() {
+    for (const version of this.versions) {
+      for (const loader of version.loaders) {
+        if (!this.filters.includes(loader)) {
+          this.filters.push(loader)
+        }
+
+        if (this.filterMode === '') {
+          this.filterMode = loader
+        }
+      }
+    }
   },
   auth: false,
   props: {
@@ -91,6 +116,10 @@ export default {
 <style lang="scss" scoped>
 .content {
   max-width: calc(100% - (2 * var(--spacing-card-lg)));
+}
+
+.filters {
+  margin-bottom: 0.5rem;
 }
 
 .version-header {

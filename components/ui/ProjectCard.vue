@@ -69,13 +69,19 @@
           <div v-if="downloads" class="stat">
             <DownloadIcon />
             <p>
-              <strong>{{ formatNumber(downloads) }}</strong> downloads
+              <strong>{{ formatNumber(downloads) }}</strong> download<span
+                v-if="downloads !== '1'"
+                >s</span
+              >
             </p>
           </div>
           <div v-if="follows" class="stat">
             <HeartIcon />
             <p>
-              <strong>{{ formatNumber(follows) }}</strong> followers
+              <strong>{{ formatNumber(follows) }}</strong> follower<span
+                v-if="follows !== '1'"
+                >s</span
+              >
             </p>
           </div>
           <div v-if="status" class="status">

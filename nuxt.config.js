@@ -27,7 +27,7 @@ export default {
         hid: 'description',
         name: 'description',
         content:
-          'Modrinth is a _type distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including Forge and Fabric mod loaders.',
+          'Modrinth is a mod distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including Forge and Fabric mod loaders.',
       },
 
       {
@@ -282,7 +282,7 @@ export default {
   },
   publicRuntimeConfig: {
     axios: {
-      browserBaseURL: process.env.BROWSER_BASE_URL,
+      browserBaseURL: process.env.BASE_URL,
     },
     ads: {
       ghostMode: process.env.ENABLE_ADS == null,

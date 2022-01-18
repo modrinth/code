@@ -652,13 +652,16 @@
           <div class="input-group">
             <Multiselect
               v-model="license"
-              placeholder="Select one"
-              track-by="short"
-              label="name"
-              :searchable="true"
+              placeholder="Choose license..."
+              :loading="$tag.licenses.length === 0"
               :options="$tag.licenses"
+              track-by="short"
+              label="short"
+              :multiple="false"
+              :searchable="true"
               :close-on-select="true"
               :show-labels="false"
+              :allow-empty="false"
             />
             <input v-model="license_url" type="url" placeholder="License URL" />
           </div>

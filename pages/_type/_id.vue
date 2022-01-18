@@ -71,9 +71,13 @@
           <hr />
           <div class="stats">
             <span class="stat">{{ formatNumber(project.downloads) }}</span>
-            <span class="label">downloads</span>
+            <span class="label"
+              >download<span v-if="project.downloads !== 1">s</span></span
+            >
             <span class="stat">{{ formatNumber(project.followers) }}</span>
-            <span class="label">followers</span>
+            <span class="label"
+              >follower<span v-if="project.followers !== 1">s</span></span
+            >
           </div>
           <div class="dates">
             <div class="date">
@@ -89,7 +93,7 @@
               <span class="value">{{ $dayjs(project.updated).fromNow() }}</span>
             </div>
           </div>
-          <hr />
+          <hr v-if="$auth.user" />
           <div class="buttons">
             <nuxt-link
               v-if="$auth.user"
@@ -916,7 +920,7 @@ hr {
     margin-bottom: 0.25rem;
 
     img {
-      border-radius: var(--size-rounded-icon);
+      border-radius: var(--size-rounded-sm);
       height: 50px;
       width: 50px;
     }

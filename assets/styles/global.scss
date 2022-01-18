@@ -2,6 +2,10 @@ html {
   @extend .light-mode;
 }
 
+body {
+  overflow-y: scroll;
+}
+
 .light-mode {
   --color-icon: #6b7280;
   --color-text: hsl(221, 39%, 11%);

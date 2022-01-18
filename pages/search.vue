@@ -14,7 +14,16 @@
           class="sidebar-menu"
           :class="{ 'sidebar-menu_open': sidebarMenuOpen }"
         >
-          <button class="iconified-button" @click="clearFilters">
+          <button
+            :disabled="
+              selectedLicenses.length === 0 &&
+              selectedEnvironments.length === 0 &&
+              selectedVersions.length === 0 &&
+              facets.length === 0
+            "
+            class="iconified-button"
+            @click="clearFilters"
+          >
             <ExitIcon />
             Clear filters
           </button>
@@ -104,17 +113,16 @@
           ></multiselect>
           <h3 class="sidebar-menu-heading">Licenses</h3>
           <Multiselect
-            v-model="displayLicense"
+            v-model="selectedLicenses"
             placeholder="Choose licenses..."
             :loading="$tag.licenses.length === 0"
-            :options="$tag.licenses"
-            track-by="name"
-            label="name"
-            :searchable="false"
-            :close-on-select="true"
+            :options="$tag.licenses.map((x) => x.short.toUpperCase())"
+            :multiple="true"
+            :searchable="true"
+            :close-on-select="false"
             :show-labels="false"
             :allow-empty="true"
-            @input="toggleLicense"
+            @input="onSearchChange(1)"
           />
         </div>
       </section>
@@ -257,8 +265,7 @@ export default {
     return {
       query: '',
 
-      displayLicense: '',
-      selectedLicense: '',
+      selectedLicenses: [],
 
       showSnapshots: false,
       selectedVersions: [],
@@ -291,7 +298,7 @@ export default {
     if (this.$route.query.f) {
       const facets = this.$route.query.f.split(',')
 
-      for (const facet of facets) await this.toggleFacet(facet, false)
+      for (const facet of facets) await this.toggleFacet(facet, true)
     }
     if (this.$route.query.v)
       this.selectedVersions = this.$route.query.v.split(',')
@@ -352,25 +359,10 @@ export default {
     },
   },
   methods: {
-    async toggleLicense(license) {
-      if (this.selectedLicense) {
-        const index = this.facets.indexOf(this.selectedLicense)
-
-        this.facets.splice(index, 1)
-      }
-
-      if (license) {
-        this.selectedLicense = `license:${license.short}`
-        this.facets.push(this.selectedLicense)
-      }
-
-      await this.onSearchChange(1)
-    },
     async clearFilters() {
       for (const facet of [...this.facets]) await this.toggleFacet(facet, true)
 
-      this.displayLicense = null
-      this.selectedLicense = null
+      this.selectedLicenses = []
       this.selectedVersions = []
       this.selectedEnvironments = []
       await this.onSearchChange(1)
@@ -430,6 +422,14 @@ export default {
               versionFacets.push('versions:' + facet)
             }
             formattedFacets.push(versionFacets)
+          }
+
+          if (this.selectedLicenses.length > 0) {
+            const licenseFacets = []
+            for (const facet of this.selectedLicenses) {
+              licenseFacets.push('license:' + facet.toLowerCase())
+            }
+            formattedFacets.push(licenseFacets)
           }
 
           if (this.selectedEnvironments.length > 0) {
