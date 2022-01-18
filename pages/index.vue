@@ -60,18 +60,26 @@ export default {
 
   .cover {
     img {
-      border-radius: var(--size-rounded-lg);
+      border-radius: var(--size-rounded-card);
       width: 100%;
       height: calc(75vh - var(--size-navbar-height));
       object-fit: cover;
       object-position: 10% 12.5%;
+
+      @media screen and (max-width: 1280px) {
+        border-radius: 0;
+      }
+
+      @media screen and (max-width: 750px) {
+        height: calc(75vh);
+      }
     }
 
     .text {
       position: absolute;
       top: calc(10vh + var(--size-navbar-height));
-      width: 30rem;
-      //max-width: 25%;
+      max-width: 30rem;
+      text-shadow: 4px 4px 8px rgba(0, 0, 0, 0.3);
       padding-left: 6rem;
 
       color: #fff;
@@ -97,11 +105,22 @@ export default {
       form {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+        box-sizing: border-box;
+
+        input {
+          box-sizing: content-box;
+        }
 
         .iconified-button {
-          margin-left: 0.25rem;
           padding: 1.25rem 1rem;
         }
+      }
+
+      @media screen and (max-width: 750px) {
+        padding-left: 3rem;
+        max-width: 55%;
       }
     }
   }

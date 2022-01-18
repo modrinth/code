@@ -509,7 +509,7 @@ label {
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
   &:focus {
-    outline: 0;
+    //outline: 0; Bad for accessibility
   }
 }
 

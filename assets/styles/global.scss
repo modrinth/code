@@ -188,6 +188,7 @@ body {
   --size-rounded-tooltip: 0.25rem;
 
   --size-navbar-height: 3.5rem;
+  --size-mobile-navbar-height: 4rem;
 
   --spacing-card-lg: 1.5rem;
   --spacing-card-bg: 1rem;
@@ -258,7 +259,7 @@ textarea {
   &:hover:not([disabled]) {
     background: var(--color-button-bg-hover);
     color: var(--color-text);
-    outline: none;
+    //outline: none; Bad for accessibility
 
     &::placeholder {
       color: var(--color-text);
@@ -296,7 +297,7 @@ textarea {
 
 button {
   padding: 0.5rem 0;
-  outline: none;
+  //outline: none; Bad for accessibility
   color: var(--color-button-text);
   background-color: var(--color-button-bg);
   border: none;

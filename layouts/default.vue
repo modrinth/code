@@ -4,16 +4,10 @@
       <section class="navbar columns">
         <section class="logo column">
           <NuxtLink to="/">
-            <ModrinthLogoSmall aria-label="modrinth" class="small-logo" />
             <ModrinthLogo aria-label="modrinth" class="text-logo" />
           </NuxtLink>
         </section>
-        <section class="menu-icon">
-          <button @click="toggleNavBar">
-            <HamburgerIcon />
-          </button>
-        </section>
-        <section ref="nav" class="right-group columns">
+        <section class="nav-group columns">
           <section class="nav">
             <div class="styled-tabs">
               <NuxtLink to="/mods" class="tab">
@@ -47,92 +41,154 @@
                   {{ $user.notifications.length }}
                 </div>
               </nuxt-link>
-              <button
-                v-if="!$auth.user"
-                class="theme-mobile-button iconified-button"
-                @click="changeTheme"
-              >
-                <MoonIcon v-if="$colorMode.value === 'light'" />
-                <SunIcon v-else />
-                Change theme
-              </button>
-              <div
-                v-if="$auth.user"
-                v-click-outside="hideDropdown"
-                class="dropdown"
-                :class="{ open: isDropdownOpen }"
-              >
-                <button class="control" @click="toggleDropdown">
-                  <div class="avatar">
-                    <img :src="$auth.user.avatar_url" class="icon" />
-                    <span>{{ $auth.user.username }}</span>
-                  </div>
-                  <DropdownIcon class="dropdown-icon" />
+              <div v-if="$auth.user" ref="mobileMenu" class="dropdown">
+                <button class="control">
+                  <img :src="$auth.user.avatar_url" class="user-icon" />
+                  <span class="caret"></span>
                 </button>
-                <div class="content">
-                  <ul @click="hideDropdown">
-                    <li>
-                      <NuxtLink :to="`/user/${$auth.user.username}`">
-                        <UserIcon />
-                        <span>Profile</span>
-                      </NuxtLink>
-                    </li>
-                    <li>
-                      <NuxtLink to="/settings">
-                        <SettingsIcon />
-                        <span>Settings</span>
-                      </NuxtLink>
-                    </li>
-                    <li class="hide-desktop">
-                      <NuxtLink to="/notifications">
-                        <NotificationIcon />
-                        <span>Notifications</span>
-                      </NuxtLink>
-                    </li>
-                    <li class="hide-desktop">
-                      <NuxtLink to="/create/project">
-                        <PlusIcon />
-                        <span>Create project</span>
-                      </NuxtLink>
-                    </li>
-                    <li>
-                      <NuxtLink
-                        v-if="
-                          $auth.user.role === 'moderator' ||
-                          $auth.user.role === 'admin'
-                        "
-                        to="/moderation"
-                      >
-                        <ModerationIcon />
-                        <span>Moderation</span>
-                      </NuxtLink>
-                    </li>
-                    <hr />
-                    <li class="hide-desktop">
-                      <button @click="changeTheme">
-                        <MoonIcon v-if="$colorMode.value === 'light'" />
-                        <SunIcon v-else />
-                        <span>Change theme</span>
-                      </button>
-                    </li>
-                    <li>
-                      <button @click="logout">
-                        <LogOutIcon />
-                        <span>Log out</span>
-                      </button>
-                    </li>
-                    <hr class="hide-desktop" />
-                  </ul>
-                </div>
+                <ul class="content card" @click="removeFocus">
+                  <li>
+                    <NuxtLink
+                      class="item"
+                      :to="`/user/${$auth.user.username}`"
+                      @click="removeFocus"
+                    >
+                      <div class="title profile-link">
+                        <div class="username">@{{ $auth.user.username }}</div>
+                        <div class="prompt">Go to my profile</div>
+                      </div>
+                    </NuxtLink>
+                  </li>
+                  <hr class="divider" />
+                  <li>
+                    <NuxtLink class="item" to="/create/project">
+                      <PlusIcon class="icon" />
+                      <span class="title">Create a project</span>
+                    </NuxtLink>
+                  </li>
+                  <hr class="divider" />
+                  <li>
+                    <NuxtLink class="item" to="/notifications">
+                      <NotificationIcon class="icon" />
+                      <span class="title">Notifications</span>
+                    </NuxtLink>
+                  </li>
+                  <li>
+                    <NuxtLink class="item" to="/settings">
+                      <SettingsIcon class="icon" />
+                      <span class="title">Settings</span>
+                    </NuxtLink>
+                  </li>
+                  <li>
+                    <NuxtLink
+                      v-if="
+                        $auth.user.role === 'moderator' ||
+                        $auth.user.role === 'admin'
+                      "
+                      class="item"
+                      to="/moderation"
+                    >
+                      <ModerationIcon class="icon" />
+                      <span class="title">Moderation</span>
+                    </NuxtLink>
+                  </li>
+                  <li>
+                    <button class="item" @click="changeTheme">
+                      <MoonIcon
+                        v-if="$colorMode.value === 'light'"
+                        class="icon"
+                      />
+                      <SunIcon v-else class="icon" />
+                      <span class="dropdown-item__text">Change theme</span>
+                    </button>
+                  </li>
+                  <hr class="divider" />
+                  <li>
+                    <button class="item" @click="logout">
+                      <LogOutIcon class="icon" />
+                      <span class="dropdown-item__text">Log out</span>
+                    </button>
+                  </li>
+                </ul>
               </div>
               <section v-else class="auth-prompt">
-                <a :href="authUrl" class="log-in-button"
-                  ><GitHubIcon aria-hidden="true" />Sign In with GitHub</a
+                <a :href="authUrl" class="log-in-button">
+                  <GitHubIcon aria-hidden="true" />
+                  Sign in with GitHub</a
                 >
               </section>
             </section>
           </section>
         </section>
+      </section>
+      <section class="mobile-navbar">
+        <NuxtLink to="/" class="tab">
+          <HomeIcon />
+          <span>Home</span>
+        </NuxtLink>
+        <NuxtLink to="/mods" class="tab">
+          <ModIcon />
+          <span>Mods</span>
+        </NuxtLink>
+        <NuxtLink to="/modpacks" class="tab">
+          <ModpackIcon />
+          <span>Modpacks</span>
+        </NuxtLink>
+        <button class="tab" @click="toggleMobileMenu()">
+          <HamburgerIcon />
+          <span>{{ isMobileMenuOpen ? 'Less' : 'More' }}</span>
+        </button>
+      </section>
+      <section ref="mobileMenu" class="mobile-menu">
+        <div class="items-container rows">
+          <NuxtLink
+            v-if="$auth.user"
+            class="item user-item"
+            :to="`/user/${$auth.user.username}`"
+          >
+            <img :src="$auth.user.avatar_url" class="user-icon" />
+            <div class="profile-link">
+              <div class="username">@{{ $auth.user.username }}</div>
+              <div class="prompt">Go to my profile</div>
+            </div>
+          </NuxtLink>
+          <button v-if="$auth.user" class="item log-out" @click="logout">
+            <LogOutIcon class="icon" />
+            <span class="dropdown-item__text">Log out</span>
+          </button>
+          <NuxtLink v-if="$auth.user" class="item" to="/create/project">
+            <PlusIcon class="icon" />
+            <span class="title">Create a project</span>
+          </NuxtLink>
+          <NuxtLink v-if="$auth.user" class="item" to="/settings">
+            <SettingsIcon class="icon" />
+            <span class="title">Settings</span>
+          </NuxtLink>
+          <NuxtLink
+            v-if="
+              $auth.user &&
+              ($auth.user.role === 'moderator' || $auth.user.role === 'admin')
+            "
+            class="item"
+            to="/moderation"
+          >
+            <ModerationIcon class="icon" />
+            <span class="title">Moderation</span>
+          </NuxtLink>
+          <NuxtLink v-if="$auth.user" class="item" to="/notifications">
+            <NotificationIcon class="icon" />
+            <span class="title">Notifications</span>
+          </NuxtLink>
+          <button class="item" @click="changeTheme">
+            <MoonIcon v-if="$colorMode.value === 'light'" class="icon" />
+            <SunIcon v-else class="icon" />
+            <span class="dropdown-item__text">Change theme</span>
+          </button>
+          <a v-if="!$auth.user" :href="authUrl" class="item log-in">
+            <GitHubIcon aria-hidden="true" />
+            Sign in with GitHub</a
+          >
+        </div>
       </section>
     </header>
     <main>
@@ -165,7 +221,7 @@
         <h4>Legal</h4>
         <nuxt-link to="/legal/terms">Terms</nuxt-link>
         <nuxt-link to="/legal/privacy">Privacy</nuxt-link>
-        <nuxt-link to="/legal/rules">Content</nuxt-link>
+        <nuxt-link to="/legal/rules">Rules</nuxt-link>
         <a
           target="_blank"
           href="https://github.com/modrinth/knossos/blob/master/LICENSE.md"
@@ -201,7 +257,6 @@
 import ClickOutside from 'vue-click-outside'
 
 import ModrinthLogo from '~/assets/images/text-logo.svg?inline'
-import ModrinthLogoSmall from '~/assets/images/logo.svg?inline'
 
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
 
@@ -209,29 +264,36 @@ import NotificationIcon from '~/assets/images/sidebar/notifications.svg?inline'
 import SettingsIcon from '~/assets/images/sidebar/settings.svg?inline'
 import ShieldIcon from '~/assets/images/utils/shield.svg?inline'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
+import HomeIcon from '~/assets/images/sidebar/home.svg?inline'
+import ModIcon from '~/assets/images/sidebar/mod.svg?inline'
+import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
 
-import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
+// import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 import MoonIcon from '~/assets/images/utils/moon.svg?inline'
 import SunIcon from '~/assets/images/utils/sun.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 
-import UserIcon from '~/assets/images/utils/user.svg?inline'
+// import UserIcon from '~/assets/images/utils/user.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
 import CookieConsent from '~/components/ads/CookieConsent'
 
+const overflowStyle = 'overlay'
+
 export default {
   components: {
     ModrinthLogo,
-    ModrinthLogoSmall,
-    DropdownIcon,
+    // DropdownIcon,
     MoonIcon,
     SunIcon,
-    UserIcon,
+    // UserIcon,
     LogOutIcon,
     GitHubIcon,
     NotificationIcon,
+    HomeIcon,
+    ModIcon,
+    ModpackIcon,
     HamburgerIcon,
     CookieConsent,
     SettingsIcon,
@@ -246,6 +308,7 @@ export default {
     return {
       isDropdownOpen: false,
       version: process.env.version || 'unknown',
+      isMobileMenuOpen: false,
     }
   },
   async fetch() {
@@ -261,10 +324,12 @@ export default {
   },
   watch: {
     $route() {
-      this.$refs.nav.className = 'right-group'
+      this.$refs.mobileMenu.className = 'mobile-menu'
+      this.isMobileMenuOpen =
+        this.$refs.mobileMenu.className === 'mobile-menu active'
 
-      document.documentElement.style.overflow = 'auto'
-      document.body.style.overflow = 'auto'
+      document.documentElement.style.overflow = overflowStyle
+      document.body.style.overflow = overflowStyle
 
       this.$store.dispatch('user/fetchAll')
     },
@@ -275,24 +340,23 @@ export default {
     }
   },
   methods: {
-    toggleNavBar() {
+    toggleMobileMenu() {
       window.scrollTo(0, 0)
-      const currentlyActive = this.$refs.nav.className === 'right-group active'
-      this.$refs.nav.className = `right-group${
+      const currentlyActive =
+        this.$refs.mobileMenu.className === 'mobile-menu active'
+      this.$refs.mobileMenu.className = `mobile-menu${
         currentlyActive ? '' : ' active'
       }`
       document.body.scrollTop = 0
 
       document.documentElement.style.overflow =
-        document.documentElement.style.overflow !== 'hidden' ? 'hidden' : 'auto'
+        document.documentElement.style.overflow !== 'hidden'
+          ? 'hidden'
+          : overflowStyle
       document.body.style.overflow =
-        document.body.style.overflow !== 'hidden' ? 'hidden' : 'auto'
-    },
-    toggleDropdown() {
-      this.isDropdownOpen = !this.isDropdownOpen
-    },
-    hideDropdown() {
-      this.isDropdownOpen = false
+        document.body.style.overflow !== 'hidden' ? 'hidden' : overflowStyle
+
+      this.isMobileMenuOpen = !currentlyActive
     },
     async logout() {
       this.$cookies.set('auth-token-reset', true)
@@ -314,11 +378,20 @@ export default {
       this.$colorMode.preference =
         this.$colorMode.value === 'dark' ? 'light' : 'dark'
     },
+    removeFocus() {
+      document.activeElement.blur() // This doesn't work, sadly. Help
+    },
   },
 }
 </script>
 
 <style lang="scss">
+html {
+  overflow: auto;
+  //noinspection CssInvalidPropertyValue
+  overflow: overlay;
+}
+
 .layout {
   min-height: 100vh;
   background-color: var(--color-bg);
@@ -326,6 +399,10 @@ export default {
 
   @media screen and (min-width: 1024px) {
     min-height: calc(100vh - var(--spacing-card-bg));
+  }
+
+  @media screen and (max-width: 750px) {
+    margin-bottom: calc(var(--size-mobile-navbar-height) + 2rem);
   }
 
   .site-header {
@@ -341,36 +418,35 @@ export default {
     }
 
     .navbar {
-      margin: 0 0.5rem;
+      margin: 0 var(--spacing-card-lg);
       padding: 0 var(--spacing-card-lg);
-      @media screen and (min-width: 450px) {
-        margin: 0 var(--spacing-card-lg);
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+
+      @media screen and (max-width: 750px) {
+        justify-content: center;
       }
+
       section.logo {
-        align-items: center;
         display: flex;
         justify-content: space-between;
         color: var(--color-text-dark);
+
         a {
           align-items: center;
           display: flex;
         }
+
         .small-logo {
           display: block;
         }
+
         svg {
-          display: none;
           height: 1.75rem;
           width: auto;
         }
-        @media screen and (min-width: 350px) {
-          .small-logo {
-            display: none;
-          }
-          svg {
-            display: unset;
-          }
-        }
+
         .badge {
           margin-left: 0.25rem;
           display: none;
@@ -378,11 +454,13 @@ export default {
             display: unset;
           }
         }
+
         button {
           background: none;
           border: none;
           margin: 0 0 0 0.5rem;
           padding: 0;
+
           svg {
             height: 1.5rem;
             width: 1.5rem;
@@ -390,42 +468,29 @@ export default {
         }
       }
 
-      section.menu-icon {
-        display: flex;
-        margin-left: auto;
-        align-items: center;
-        margin-right: 1rem;
-      }
-
-      section.right-group {
+      section.nav-group {
         display: flex;
         flex-grow: 5;
-        flex-direction: column-reverse;
-
-        overflow-y: auto;
-        position: fixed;
-        width: 100vw;
-        top: var(--size-navbar-height);
-        height: calc(100vh - var(--size-navbar-height));
-        right: -100vw;
-        background-color: var(--color-raised-bg);
-        transition: right 150ms;
-        z-index: 100;
-
-        &.active {
-          right: 0;
-        }
 
         section.nav {
           flex-grow: 5;
 
           .styled-tabs {
             display: flex;
-            flex-direction: column;
+            position: relative;
+            top: 50%;
+            transform: translateY(-50%);
+            margin-top: 3px;
+            margin-left: 2rem;
 
             a {
-              margin-left: auto;
+              margin-left: 0;
               margin-right: auto;
+            }
+
+            a.tab {
+              padding: 0;
+              margin-right: 1rem;
             }
           }
         }
@@ -437,22 +502,30 @@ export default {
         section.user-controls {
           align-items: center;
           display: flex;
-          flex-direction: column-reverse;
+          flex-direction: row;
           justify-content: space-between;
           position: relative;
           top: 50%;
           transform: translateY(-50%);
           min-width: 12rem;
 
-          margin: 0.5rem auto;
-
           .control-button {
+            display: flex;
             max-width: 2rem;
             padding: 0.5rem;
             background-color: var(--color-raised-bg);
             border-radius: var(--size-rounded-max);
             margin: 0 0.5rem 0 0;
-            display: none;
+            box-shadow: inset 0px -1px 1px rgba(17, 24, 39, 0.1);
+
+            &:hover,
+            &:active {
+              background-color: var(--color-button-bg-hover);
+
+              svg {
+                color: var(--color-button-text-hover);
+              }
+            }
 
             svg {
               height: 1rem;
@@ -476,120 +549,108 @@ export default {
             }
           }
 
-          .theme-mobile-button {
-            margin-bottom: 1rem;
+          .hide-desktop {
+            display: none;
           }
 
           .dropdown {
             position: relative;
-            display: inline-block;
-            flex-grow: 1;
 
-            &.open {
-              .control {
-                //background: var(--color-button-bg);
-                //border-radius: 1.25rem 1.25rem 0 0;
-                //.dropdown-icon {
-                //  transform: rotate(180deg);
-                //}
-              }
-              .content {
-                //display: unset;
-              }
-            }
             .control {
-              background-color: var(--color-raised-bg);
-              border-radius: var(--size-rounded-max);
               align-items: center;
+              background: none;
               display: flex;
-              padding: 0.25rem;
-              position: relative;
-              z-index: 11;
-              width: 100%;
-
-              .avatar {
-                align-items: center;
-                display: flex;
-                flex-grow: 1;
-
-                img {
-                  height: 1.5rem;
-                  width: 1.5rem;
-                  border-radius: 50%;
-                  margin-left: auto;
-                }
-
-                span {
-                  display: block;
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                  color: var(--color-text-dark);
-                  font-size: var(--font-size-nm);
-                  font-weight: var(--font-weight-medium);
-                  margin: 0 auto 0 0.25rem;
-                }
-              }
-              .dropdown-icon {
-                display: none;
-                transition: 150ms ease transform;
-                margin-right: 0.25rem;
-              }
-            }
-            .content {
-              margin: 0 0 0 0;
-            }
-            button {
-              background-color: transparent;
-              margin: 0;
+              justify-content: center;
               padding: 0;
-              font-weight: var(--font-weight-medium);
+
+              .user-icon {
+                border-radius: 100%;
+                height: 2rem;
+                outline: 2px solid var(--color-raised-bg);
+                width: 2rem;
+              }
+
+              .caret::after {
+                content: '\23F7';
+                color: inherit;
+                margin-left: 0.25rem;
+              }
             }
-            ul {
-              display: flex;
-              flex-direction: column;
-              margin: 0;
+
+            .content {
+              border: 1px solid var(--color-divider-dark);
               list-style: none;
-              padding: 0.5rem 0;
+              margin: 0.5rem 0 0 0;
+              max-width: 25rem;
+              min-width: 12rem;
+              opacity: 0;
+              padding: 1rem;
+              position: absolute;
+              right: -1rem;
+              transform: scaleY(0.9);
+              transform-origin: top;
+              transition: all 0.1s ease-in-out 0.05s, color 0s ease-in-out 0s,
+                background-color 0s ease-in-out 0s,
+                border-color 0s ease-in-out 0s;
+              visibility: hidden;
+              width: max-content;
               z-index: 1;
-              hr {
+
+              .divider {
                 background-color: var(--color-divider-dark);
                 border: none;
                 color: var(--color-divider-dark);
-                height: 2px;
+                height: 1px;
                 margin: 0.5rem 0;
               }
-              li {
-                margin: 0;
-                &:hover,
-                &:focus {
-                  background-color: var(--color-button-bg-hover);
-                  color: var(--color-text-dark);
+
+              .item {
+                align-items: center;
+                background: none;
+                border-radius: 0.5rem;
+                box-sizing: border-box;
+                color: inherit;
+                display: flex;
+                padding: 0.5rem;
+                width: 100%;
+
+                .icon {
+                  margin-right: 0.5rem;
+                  height: 20px;
+                  width: 20px;
                 }
-                &:active {
-                  background-color: var(--color-button-bg-active);
-                }
-                a,
-                button {
-                  align-items: center;
-                  display: flex;
-                  padding: 0.75rem 1.5rem;
-                  svg {
-                    color: inherit;
-                    height: 1rem;
-                    width: 1rem;
-                    margin-left: auto;
-                  }
-                  span {
-                    margin-left: 0.5rem;
-                    margin-right: auto;
-                  }
-                }
-                button {
-                  width: 100%;
+              }
+
+              .item:hover,
+              .item:focus {
+                background-color: var(--color-bg);
+              }
+
+              .profile-link {
+                .prompt {
+                  margin-top: 0.25rem;
+                  color: var(--color-text-secondary);
                 }
               }
             }
+
+            @media screen and (max-width: 1300px) {
+              .content {
+                margin-right: 1rem;
+              }
+            }
+          }
+
+          .dropdown:hover .user-icon,
+          .dropdown:focus .user-icon,
+          .dropdown:focus-within .user-icon {
+            outline-color: var(--color-raised-bg-hover);
+          }
+
+          .dropdown:hover .content {
+            opacity: 1;
+            transform: scaleY(1);
+            visibility: visible;
           }
         }
 
@@ -597,7 +658,7 @@ export default {
           display: flex;
           align-items: center;
           height: 100%;
-          margin: 1rem 0 0.5rem;
+          margin: 0;
 
           .log-in-button {
             margin: 0 auto;
@@ -609,13 +670,15 @@ export default {
             border-radius: var(--size-rounded-max);
             background-color: var(--color-brand);
             white-space: nowrap;
-            outline: none;
+            //outline: none; Bad for accessibility
             color: var(--color-brand-inverted);
             padding: 0.5rem 0.75rem;
+
             svg {
               vertical-align: middle;
               margin-right: 0.5rem;
             }
+
             &:hover,
             &:focus {
               background-color: var(--color-brand-hover);
@@ -623,128 +686,153 @@ export default {
           }
         }
       }
-      @media screen and (min-width: 1024px) {
-        max-width: 1280px;
-        margin-left: auto;
-        margin-right: auto;
 
-        section.menu-icon {
+      @media screen and (max-width: 750px) {
+        section.nav-group {
           display: none;
+
+          .hide-desktop {
+            display: unset;
+          }
+        }
+      }
+    }
+
+    .mobile-navbar {
+      display: none;
+      width: 100%;
+      height: var(--size-mobile-navbar-height);
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      justify-content: center;
+      align-items: center;
+      background-color: var(--color-raised-bg);
+      box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
+      z-index: 5;
+
+      .tab {
+        background: none;
+        display: flex;
+        flex-grow: 1;
+        flex-basis: 0;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        font-weight: bold;
+        padding: 0;
+        margin: auto;
+        transition: color ease-in-out 0.15s;
+        color: var(--color-text-inactive);
+
+        svg {
+          height: 1.75rem;
+          width: 1.75rem;
+          margin-bottom: 0.25rem;
         }
 
-        section.mobile-header-mode-switch {
-          display: none;
+        &:hover,
+        &:focus {
+          color: var(--color-text);
         }
 
-        section.right-group {
-          flex-direction: unset;
-          overflow-y: unset;
-          position: unset;
-          width: unset;
-          top: unset;
-          height: unset;
-          right: unset;
-          background-color: unset;
-          transition: unset;
-          z-index: unset;
+        &.nuxt-link-exact-active {
+          svg {
+            color: var(--color-brand);
+          }
 
-          section.nav {
-            .styled-tabs {
-              flex-direction: unset;
-              position: relative;
-              top: 50%;
-              transform: translateY(-50%);
-              margin-top: 3px;
-              margin-left: 2rem;
+          color: var(--color-text);
+        }
+      }
 
-              a {
-                margin-left: 0;
-              }
+      @media screen and (max-width: 750px) {
+        display: flex;
+      }
+    }
+  }
 
-              a.tab {
-                padding: 0;
-                margin-right: 1rem;
-              }
+  .mobile-menu {
+    display: none;
+    position: absolute;
+    top: 0;
+    background-color: var(--color-bg);
+    height: calc(100% - var(--size-mobile-navbar-height));
+    width: 100%;
+    z-index: 5;
+
+    .items-container {
+      margin-bottom: 1rem;
+      margin-right: 2rem;
+      margin-left: 2rem;
+
+      button {
+        box-sizing: unset;
+      }
+
+      .item {
+        padding: 1rem 2rem;
+        background-color: var(--color-raised-bg);
+        border-radius: var(--size-rounded-md);
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        column-gap: 0.25rem;
+        width: calc(100% - 4rem);
+        max-width: 18rem;
+
+        &.nuxt-link-exact-active {
+          color: var(--color-button-text-active);
+          svg {
+            color: var(--color-brand);
+          }
+        }
+
+        &.log-in {
+          color: var(--color-brand-inverted);
+          background-color: var(--color-brand);
+        }
+
+        &.log-out {
+          color: white;
+          background-color: var(--color-badge-red-bg);
+        }
+
+        &.user-item {
+          flex-direction: column;
+          row-gap: 0.5rem;
+          //width: 8rem;
+          max-width: 18rem;
+          flex-grow: 0;
+
+          .profile-link {
+            text-align: center;
+
+            .prompt {
+              color: var(--color-text-secondary);
             }
           }
 
-          section.user-controls {
-            display: flex;
-            flex-direction: row;
-            width: unset;
-            margin: unset;
-
-            .control-button {
-              display: flex;
-            }
-
-            .theme-mobile-button {
-              display: none;
-            }
-
-            .hide-desktop {
-              display: none;
-            }
-
-            .dropdown {
-              &:hover .control {
-                background: var(--color-button-bg-hover);
-              }
-              &.open {
-                .control {
-                  background: var(--color-button-bg);
-                  border-radius: 1.25rem 1.25rem 0 0;
-                  .dropdown-icon {
-                    transform: rotate(180deg);
-                  }
-                }
-                .content {
-                  display: unset;
-                }
-              }
-              ul {
-                background-color: var(--color-button-bg);
-                border-radius: 0 0 var(--size-rounded-control)
-                  var(--size-rounded-control);
-                box-shadow: var(--shadow-dropdown);
-
-                li {
-                  a,
-                  button {
-                    svg {
-                      margin-left: 0;
-                    }
-                    span {
-                      margin-right: 0;
-                    }
-                  }
-                }
-              }
-              .content {
-                width: calc(100% - 7.5rem);
-                position: fixed;
-                display: none;
-              }
-              .control {
-                .avatar {
-                  img {
-                    margin-left: 0;
-                  }
-                  span {
-                    margin-right: 1.5rem;
-                  }
-                }
-                .dropdown-icon {
-                  display: block;
-                }
-              }
-            }
-          }
-
-          section.auth-prompt {
-            margin: 0;
+          .user-icon {
+            width: 4rem;
+            height: 4rem;
+            border-radius: var(--size-rounded-max);
           }
         }
+      }
+    }
+
+    div {
+      flex-grow: 1;
+      justify-content: end;
+      align-items: center;
+      row-gap: 1rem;
+    }
+
+    &.active {
+      display: flex;
+
+      @media screen and (min-width: 750px) {
+        display: none;
       }
     }
   }
