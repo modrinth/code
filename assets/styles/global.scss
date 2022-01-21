@@ -146,7 +146,7 @@ body {
   --color-badge-red-bg: #db3162;
   --color-badge-green-text: #1ebb7b;
   --color-badge-green-bg: #24a54e;
-  --color-badge-yellow-text: #755920;
+  --color-badge-yellow-text: #dba22d;
   --color-badge-yellow-bg: #f7bb43;
 
   --color-block-quote: var(--color-code-bg);
@@ -307,7 +307,7 @@ button {
   border: none;
   border-radius: var(--size-rounded-control);
 
-  &:focus,
+  &:focus-visible,
   &:hover {
     background-color: var(--color-button-bg-hover);
     color: var(--color-button-text-hover);

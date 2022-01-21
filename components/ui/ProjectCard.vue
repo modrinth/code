@@ -1,5 +1,5 @@
 <template>
-  <article class="project-card card">
+  <article class="project-card card" :aria-label="name" role="listitem">
     <div class="columns">
       <div class="icon">
         <nuxt-link :to="`/${type}/${id}`">
@@ -26,7 +26,7 @@
               v-if="clientSide === 'optional' && serverSide === 'optional'"
               class="side-descriptor"
             >
-              <InfoIcon />
+              <InfoIcon aria-hidden="true" />
               Universal {{ type }}
             </div>
             <div
@@ -36,7 +36,7 @@
               "
               class="side-descriptor"
             >
-              <InfoIcon />
+              <InfoIcon aria-hidden="true" />
               Client {{ type }}
             </div>
             <div
@@ -46,7 +46,7 @@
               "
               class="side-descriptor"
             >
-              <InfoIcon />
+              <InfoIcon aria-hidden="true" />
               Server {{ type }}
             </div>
           </div>
@@ -56,18 +56,18 @@
           <Categories :categories="categories" class="right-categories" />
           <div class="dates">
             <div class="date">
-              <CalendarIcon />
+              <CalendarIcon aria-hidden="true" />
               Created {{ $dayjs(createdAt).fromNow() }}
             </div>
             <div class="date">
-              <EditIcon />
+              <EditIcon aria-hidden="true" />
               Updated {{ $dayjs(updatedAt).fromNow() }}
             </div>
           </div>
         </div>
         <div class="right-side">
           <div v-if="downloads" class="stat">
-            <DownloadIcon />
+            <DownloadIcon aria-hidden="true" />
             <p>
               <strong>{{ formatNumber(downloads) }}</strong> download<span
                 v-if="downloads !== '1'"
@@ -76,7 +76,7 @@
             </p>
           </div>
           <div v-if="follows" class="stat">
-            <HeartIcon />
+            <HeartIcon aria-hidden="true" />
             <p>
               <strong>{{ formatNumber(follows) }}</strong> follower<span
                 v-if="follows !== '1'"

@@ -16,7 +16,7 @@
           project.slug ? project.slug : project.id
         }/versions`"
       >
-        <BackIcon />
+        <BackIcon aria-hidden="true" />
         Back to list
       </nuxt-link>
     </div>
@@ -25,14 +25,14 @@
         <h2>{{ version.name }}</h2>
 
         <div v-if="version.featured" class="featured">
-          <StarIcon />
+          <StarIcon aria-hidden="true" />
           Featured
         </div>
         <div
           v-else-if="featuredVersions.find((x) => x.id === version.id)"
           class="featured"
         >
-          <StarIcon />
+          <StarIcon aria-hidden="true" />
           Auto-featured
         </div>
       </div>
@@ -41,7 +41,7 @@
           class="action iconified-button brand-button-colors"
           @click="saveEditedVersion"
         >
-          <CheckIcon />
+          <CheckIcon aria-hidden="true" />
           Save
         </button>
         <nuxt-link
@@ -51,7 +51,7 @@
           }/version/${encodeURIComponent(version.version_number)}`"
           class="action iconified-button"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Discard changes
         </nuxt-link>
       </div>
@@ -60,7 +60,7 @@
           class="action iconified-button brand-button-colors"
           @click="createVersion"
         >
-          <CheckIcon />
+          <CheckIcon aria-hidden="true" />
           Save
         </button>
         <nuxt-link
@@ -70,7 +70,7 @@
           }/versions`"
           class="action iconified-button"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Discard version
         </nuxt-link>
       </div>
@@ -79,11 +79,12 @@
           v-if="primaryFile"
           :href="primaryFile.url"
           class="action iconified-button brand-button-colors"
+          :title="`Download ${primaryFile.filename}`"
           @click.prevent="
             $parent.downloadFile(primaryFile.hashes.sha1, primaryFile.url)
           "
         >
-          <DownloadIcon />
+          <DownloadIcon aria-hidden="true" />
           Download
         </a>
         <nuxt-link
@@ -91,7 +92,7 @@
           :to="`/create/report?id=${version.id}&t=version`"
           class="action iconified-button"
         >
-          <ReportIcon />
+          <ReportIcon aria-hidden="true" />
           Report
         </nuxt-link>
         <button
@@ -99,7 +100,7 @@
           class="action iconified-button"
           @click="$refs.delete_version_popup.show()"
         >
-          <TrashIcon />
+          <TrashIcon aria-hidden="true" />
           Delete
         </button>
         <nuxt-link
@@ -110,7 +111,7 @@
           }/version/${encodeURIComponent(version.version_number)}/edit`"
           @click.prevent="mode = 'edit'"
         >
-          <EditIcon />
+          <EditIcon aria-hidden="true" />
           Edit
         </nuxt-link>
       </div>
@@ -409,14 +410,16 @@
             v-if="primaryFile.hashes.sha1 === file.hashes.sha1"
             class="featured"
           >
-            <StarIcon />
+            <StarIcon aria-hidden="true" />
             Primary
           </div>
           <a
             class="action iconified-button"
+            :title="`Download ${file.filename}`"
+            tabindex="0"
             @click.prevent="$parent.downloadFile(file.hashes.sha1, file.url)"
           >
-            <DownloadIcon />
+            <DownloadIcon aria-hidden="true" />
             Download
           </a>
           <button
@@ -427,7 +430,7 @@
               version.files.splice(index, 1)
             "
           >
-            <TrashIcon />
+            <TrashIcon aria-hidden="true" />
             Delete
           </button>
           <button
@@ -437,7 +440,7 @@
             class="action iconified-button"
             @click="primaryFile = file"
           >
-            <StarIcon />
+            <StarIcon aria-hidden="true" />
             Make primary
           </button>
         </div>
@@ -452,7 +455,7 @@
               class="action iconified-button"
               @click="newFiles.splice(index, 1)"
             >
-              <TrashIcon />
+              <TrashIcon aria-hidden="true" />
               Delete
             </button>
           </div>

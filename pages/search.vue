@@ -1,13 +1,13 @@
 <template>
   <div class="normal-page">
-    <aside class="normal-page__sidebar">
-      <section class="card">
+    <aside class="normal-page__sidebar" aria-label="Filters">
+      <section class="card" role="presentation">
         <button
           class="iconified-button sidebar-menu-close-button"
           @click="sidebarMenuOpen = !sidebarMenuOpen"
         >
-          <EyeOffIcon v-if="sidebarMenuOpen" />
-          <EyeIcon v-else />
+          <EyeOffIcon v-if="sidebarMenuOpen" aria-hidden="true" />
+          <EyeIcon v-else aria-hidden="true" />
           {{ sidebarMenuOpen ? 'Hide filters' : 'Show filters' }}
         </button>
         <div
@@ -24,71 +24,78 @@
             class="iconified-button"
             @click="clearFilters"
           >
-            <ExitIcon />
+            <ExitIcon aria-hidden="true" />
             Clear filters
           </button>
-          <h3
-            v-if="
-              $tag.categories.filter((x) => x.project_type === projectType)
-                .length > 0
-            "
-            class="sidebar-menu-heading"
-          >
-            Categories
-          </h3>
-          <SearchFilter
-            v-for="category in $tag.categories.filter(
-              (x) => x.project_type === projectType
-            )"
-            :key="category.name"
-            :active-filters="facets"
-            :display-name="category.name"
-            :facet-name="`categories:${category.name}`"
-            :icon="category.icon"
-            @toggle="toggleFacet"
-          />
-          <h3
-            v-if="
-              $tag.loaders.filter((x) =>
+          <section aria-label="Category filters">
+            <h3
+              v-if="
+                $tag.categories.filter((x) => x.project_type === projectType)
+                  .length > 0
+              "
+              class="sidebar-menu-heading"
+            >
+              Categories
+            </h3>
+            <SearchFilter
+              v-for="category in $tag.categories.filter(
+                (x) => x.project_type === projectType
+              )"
+              :key="category.name"
+              :active-filters="facets"
+              :display-name="category.name"
+              :facet-name="`categories:${category.name}`"
+              :icon="category.icon"
+              @toggle="toggleFacet"
+            />
+          </section>
+          <section aria-label="Loader filters">
+            <h3
+              v-if="
+                $tag.loaders.filter((x) =>
+                  x.supported_project_types.includes(projectType)
+                ).length > 0
+              "
+              class="sidebar-menu-heading"
+            >
+              Loaders
+            </h3>
+            <SearchFilter
+              v-for="loader in $tag.loaders.filter((x) =>
                 x.supported_project_types.includes(projectType)
-              ).length > 0
-            "
-            class="sidebar-menu-heading"
-          >
-            Loaders
-          </h3>
-          <SearchFilter
-            v-for="loader in $tag.loaders.filter((x) =>
-              x.supported_project_types.includes(projectType)
-            )"
-            :key="loader.name"
-            :active-filters="facets"
-            :display-name="loader.name"
-            :facet-name="`categories:${loader.name}`"
-            :icon="loader.icon"
-            @toggle="toggleFacet"
-          />
-          <h3 class="sidebar-menu-heading">Environments</h3>
-          <SearchFilter
-            :active-filters="selectedEnvironments"
-            display-name="Client"
-            facet-name="client"
-            @toggle="toggleEnv"
-          >
-            <ClientSide />
-          </SearchFilter>
-          <SearchFilter
-            :active-filters="selectedEnvironments"
-            display-name="Server"
-            facet-name="server"
-            @toggle="toggleEnv"
-          >
-            <ServerSide />
-          </SearchFilter>
+              )"
+              :key="loader.name"
+              :active-filters="facets"
+              :display-name="loader.name"
+              :facet-name="`categories:${loader.name}`"
+              :icon="loader.icon"
+              @toggle="toggleFacet"
+            />
+          </section>
+          <section aria-label="Environment filters">
+            <h3 class="sidebar-menu-heading">Environments</h3>
+            <SearchFilter
+              :active-filters="selectedEnvironments"
+              display-name="Client"
+              facet-name="client"
+              @toggle="toggleEnv"
+            >
+              <ClientSide aria-hidden="true" />
+            </SearchFilter>
+            <SearchFilter
+              :active-filters="selectedEnvironments"
+              display-name="Server"
+              facet-name="server"
+              @toggle="toggleEnv"
+            >
+              <ServerSide aria-hidden="true" />
+            </SearchFilter>
+          </section>
           <h3 class="sidebar-menu-heading">Minecraft versions</h3>
           <Checkbox
             v-model="showSnapshots"
             label="Include snapshots"
+            description="Include snapshots"
             style="margin-bottom: 0.5rem"
             :border="false"
           />
@@ -132,7 +139,7 @@
       <div class="card search-controls">
         <div class="iconified-input">
           <label class="hidden" for="search">Search Mods</label>
-          <SearchIcon />
+          <SearchIcon aria-hidden="true" />
           <input
             id="search"
             v-model="query"
@@ -191,10 +198,10 @@
           ethical-ads-big
         />
         <div v-if="$fetchState.pending" class="no-results">
-          <LogoAnimated />
+          <LogoAnimated aria-hidden="true" />
           <p>Loading...</p>
         </div>
-        <div v-else>
+        <div v-else role="list" aria-label="Search results">
           <SearchResult
             v-for="result in results"
             :id="result.slug ? result.slug : result.project_id"

@@ -1,9 +1,22 @@
 <template>
-  <div class="checkbox-outer" :class="{ disabled }" @click="toggle">
-    <button class="checkbox" :disabled="disabled" :class="{ checked: value }">
-      <CheckIcon v-if="value" />
+  <div
+    class="checkbox-outer"
+    :class="{ disabled }"
+    role="presentation"
+    @click="toggle"
+  >
+    <button
+      class="checkbox"
+      role="checkbox"
+      :disabled="disabled"
+      :class="{ checked: value }"
+      :aria-label="description"
+      :aria-checked="value"
+    >
+      <CheckIcon v-if="value" aria-hidden="true" />
     </button>
-    <p v-if="label">{{ label }}</p>
+    <!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
+    <p v-if="label" aria-hidden="true">{{ label }}</p>
     <slot v-else />
   </div>
 </template>
@@ -24,6 +37,10 @@ export default {
     disabled: {
       type: Boolean,
       default: false,
+    },
+    description: {
+      type: String,
+      default: '',
     },
     value: Boolean,
     clickEvent: {

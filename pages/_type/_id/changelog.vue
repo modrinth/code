@@ -38,6 +38,7 @@
         <a
           :href="$parent.findPrimary(version).url"
           class="iconified-button download"
+          :title="`Download ${version.name}`"
           @click.prevent="
             $parent.downloadFile(
               $parent.findPrimary(version).hashes.sha1,
@@ -45,7 +46,7 @@
             )
           "
         >
-          <DownloadIcon />
+          <DownloadIcon aria-hidden="true" />
           Download
         </a>
       </div>

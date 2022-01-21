@@ -3,12 +3,16 @@
 .iconified-input {
   align-items: center;
   display: inline-flex;
+  position: relative;
 
   input {
     padding-left: 2rem;
+    width: 100%;
   }
 
   svg {
+    position: absolute;
+    left: 0.6rem;
     height: 1rem;
     z-index: 1;
 
@@ -35,7 +39,7 @@
   border-radius: 2rem;
 
   &:hover,
-  &:focus {
+  &:focus-visible {
     background-color: var(--color-button-bg-hover);
   }
 
@@ -306,7 +310,7 @@
   background-color: var(--color-button-bg);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-nm);
-  &:focus,
+  &:focus-visible,
   &:hover {
     background-color: var(--color-button-bg-hover);
   }
@@ -326,7 +330,7 @@
   color: var(--color-text);
   background-color: transparent;
 
-  &:focus,
+  &:focus-visible,
   &:hover,
   &.selected,
   &.nuxt-link-exact-active,
@@ -349,7 +353,7 @@
   @extend .button;
   color: var(--color-brand-inverted);
   background-color: var(--color-brand);
-  &:focus,
+  &:focus-visible,
   &:hover {
     background-color: var(--color-brand-hover);
     color: var(--color-brand-inverted);
@@ -364,7 +368,7 @@
   box-shadow: inset 0px -1px 1px rgba(0, 0, 0, 0.25);
   color: var(--color-brand-inverted);
   background-color: var(--color-brand);
-  &:focus,
+  &:focus-visible,
   &:hover {
     background-color: var(--color-brand-hover);
     color: var(--color-brand-inverted);

@@ -11,7 +11,7 @@
     <table>
       <thead>
         <tr>
-          <th></th>
+          <th role="presentation"></th>
           <th>Version</th>
           <th>Supports</th>
           <th>Stats</th>
@@ -23,6 +23,7 @@
             <a
               :href="$parent.findPrimary(version).url"
               class="download-button"
+              :title="`Download ${version.name}`"
               @click.prevent="
                 $parent.downloadFile(
                   $parent.findPrimary(version).hashes.sha1,
@@ -30,7 +31,7 @@
                 )
               "
             >
-              <DownloadIcon />
+              <DownloadIcon aria-hidden="true" />
             </a>
           </td>
           <td>

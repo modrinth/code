@@ -2,12 +2,13 @@
   <Checkbox
     class="filter"
     :value="activeFilters.includes(facetName)"
+    :description="displayName"
     @input="toggle()"
   >
     <div class="filter-text">
-      <div v-if="icon" class="icon" v-html="icon"></div>
+      <div v-if="icon" aria-hidden="true" class="icon" v-html="icon"></div>
       <div v-else class="icon"><slot /></div>
-      <span> {{ displayName }}</span>
+      <span aria-hidden="true"> {{ displayName }}</span>
     </div>
   </Checkbox>
 </template>

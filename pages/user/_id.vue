@@ -13,7 +13,7 @@
           :to="`/create/report?id=${user.id}&t=user`"
           class="sidebar__item report-button iconified-button"
         >
-          <ReportIcon />
+          <ReportIcon aria-hidden="true" />
           Report
         </nuxt-link>
         <div class="sidebar__item">
@@ -29,19 +29,19 @@
         <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
         <div class="sidebar__item stats-block">
           <div class="stats-block__item secondary-stat">
-            <SunriseIcon class="secondary-stat__icon" />
+            <SunriseIcon class="secondary-stat__icon" aria-hidden="true" />
             <span class="secondary-stat__text">
               Joined {{ $dayjs(user.created).fromNow() }}
             </span>
           </div>
           <div class="stats-block__item secondary-stat">
-            <UserIcon class="secondary-stat__icon" />
+            <UserIcon class="secondary-stat__icon" aria-hidden="true" />
             <span class="secondary-stat__text">User ID: {{ user.id }}</span>
           </div>
         </div>
         <div class="sidebar__item stats-block">
           <div class="stats-block__item primary-stat">
-            <DownloadIcon class="primary-stat__icon" />
+            <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
             <div class="primary-stat__text">
               <span class="primary-stat__counter">{{ sumDownloads() }}</span>
               <span class="primary-stat__label">downloads</span>
