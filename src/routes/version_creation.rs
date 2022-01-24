@@ -36,8 +36,10 @@ pub struct InitialVersionData {
     pub version_body: Option<String>,
     #[validate(length(min = 0, max = 256))]
     pub dependencies: Vec<Dependency>,
+    #[validate(length(min = 1))]
     pub game_versions: Vec<GameVersion>,
     pub release_channel: VersionType,
+    #[validate(length(min = 1))]
     pub loaders: Vec<Loader>,
     pub featured: bool,
 }

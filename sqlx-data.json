@@ -1792,28 +1792,6 @@
       ]
     }
   },
-  "5b5faec59e516d031aaef88dd991fecddde53c1272d63a4eb43e80f8cedf1f2d": {
-    "query": "\n            SELECT d.id id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id = ANY($2)\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id = ANY($3)\n            WHERE v.mod_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4Array",
-          "Int4Array"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "5c3b340d278c356b6bc2cd7110e5093a7d1ad982ae0f468f8fff7c54e4e6603a": {
     "query": "\n            SELECT id FROM project_types\n            WHERE name = $1\n            ",
     "describe": {
@@ -5792,6 +5770,28 @@
       "parameters": {
         "Left": [
           "Int4"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
+  "f17df1295edfaa1cac400ce705181b14a9e763f5e515c6913d0152717b89ceaa": {
+    "query": "\n            SELECT d.id id\n            FROM versions v\n            INNER JOIN dependencies d ON d.mod_dependency_id = $1\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id = ANY($2)\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id = ANY($3)\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int4Array",
+          "Int4Array"
         ]
       },
       "nullable": [
