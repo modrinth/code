@@ -1461,7 +1461,7 @@ pub async fn delete_from_index(
 
     let indexes: Vec<meilisearch_sdk::indexes::Index> = client.get_indexes().await?;
     for index in indexes {
-        index.delete_document(format!("local-{}", id)).await?;
+        index.delete_document(format!("{}", id)).await?;
     }
 
     Ok(())

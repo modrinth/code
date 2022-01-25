@@ -116,6 +116,37 @@ async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), Versio
         ("3D Shareware v1.34", "3D-Shareware-v1.34"),
     ];
 
+    lazy_static::lazy_static! {
+        /// Mojank for some reason has versions released at the same DateTime. This hardcodes them to fix this,
+        /// as most of our ordering logic is with DateTime
+        static ref HALL_OF_SHAME_2: [(&'static str, chrono::DateTime<chrono::Utc>); 4] = [
+            (
+                "1.4.5",
+                chrono::DateTime::parse_from_rfc3339("2012-12-19T22:00:00+00:00")
+                    .unwrap()
+                    .into(),
+            ),
+            (
+                "1.4.6",
+                chrono::DateTime::parse_from_rfc3339("2012-12-19T22:00:01+00:00")
+                    .unwrap()
+                    .into(),
+            ),
+            (
+                "1.6.3",
+                chrono::DateTime::parse_from_rfc3339("2013-09-13T10:54:41+00:00")
+                    .unwrap()
+                    .into(),
+            ),
+            (
+                "13w37b",
+                chrono::DateTime::parse_from_rfc3339("2013-09-13T10:54:42+00:00")
+                    .unwrap()
+                    .into(),
+            ),
+        ];
+    }
+
     for version in input.versions.into_iter() {
         let mut name = version.id;
         if !name
@@ -143,7 +174,15 @@ async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), Versio
         crate::database::models::categories::GameVersion::builder()
             .version(&name)?
             .version_type(type_)?
-            .created(&version.release_time)
+            .created(
+                if let Some((_, alternate)) =
+                    HALL_OF_SHAME_2.iter().find(|(version, _)| name == *version)
+                {
+                    alternate
+                } else {
+                    &version.release_time
+                },
+            )
             .insert(pool)
             .await?;
     }
