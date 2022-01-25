@@ -561,25 +561,24 @@ impl Project {
     }
 
     pub async fn get_full_from_slug_or_project_id<'a, 'b, E>(
-        slug_or_project_id: String,
+        slug_or_project_id: &str,
         executor: E,
     ) -> Result<Option<QueryProject>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option =
-            crate::models::ids::base62_impl::parse_base62(&*slug_or_project_id.clone()).ok();
+        let id_option = crate::models::ids::base62_impl::parse_base62(slug_or_project_id).ok();
 
         if let Some(id) = id_option {
             let mut project = Project::get_full(ProjectId(id as i64), executor).await?;
 
             if project.is_none() {
-                project = Project::get_full_from_slug(&slug_or_project_id, executor).await?;
+                project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
             }
 
             Ok(project)
         } else {
-            let project = Project::get_full_from_slug(&slug_or_project_id, executor).await?;
+            let project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
             Ok(project)
         }
     }

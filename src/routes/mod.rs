@@ -70,6 +70,8 @@ pub fn projects_config(cfg: &mut web::ServiceConfig) {
 
 pub fn maven_config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven::maven_metadata);
+    cfg.service(maven::version_file_sha512);
+    cfg.service(maven::version_file_sha1);
     cfg.service(maven::version_file);
 }
 

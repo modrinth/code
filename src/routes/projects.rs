@@ -71,8 +71,7 @@ pub async fn project_get(
     let string = info.into_inner().0;
 
     let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(string.clone(), &**pool)
-            .await?;
+        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -251,8 +250,7 @@ pub async fn project_edit(
 
     let string = info.into_inner().0;
     let result =
-        database::models::Project::get_full_from_slug_or_project_id(string.clone(), &**pool)
-            .await?;
+        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool).await?;
 
     if let Some(project_item) = result {
         let id = project_item.inner.id;
