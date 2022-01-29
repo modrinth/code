@@ -104,28 +104,28 @@
             :allow-empty="false"
           />
         </label>
-        <h3>Search Layout</h3>
+        <h3>Legacy search layout</h3>
         <label>
           <span>
-            Sets the sidebar direction for the search page. Enabling this will
-            put the search bar on the right side
+            Sets the sidebar direction for search pages. Enabling this will put
+            the search bar on the right side.
           </span>
           <input
-            v-model="projectLayout"
+            v-model="searchLayout"
             class="switch stylized-toggle"
             type="checkbox"
             @change="changeLayout"
           />
         </label>
-        <h3>Project Layout</h3>
+        <h3>Legacy project layout</h3>
         <label>
           <span>
-            Sets the sidebar direction for project pages. Enabling this will be
-            close to the legacy layout with project information on the right
-            side
+            Sets the sidebar direction for project pages. Enabling this will
+            make projects look closer to the legacy layout, with project
+            information on the right side.
           </span>
           <input
-            v-model="searchLayout"
+            v-model="projectLayout"
             class="switch stylized-toggle"
             type="checkbox"
             @change="changeLayout"
