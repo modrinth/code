@@ -226,7 +226,7 @@
         <p>modrinth/knossos {{ version }}</p>
         <p>© Guavy LLC</p>
       </div>
-      <div class="links" role="region" aria-label="Legal">
+      <div class="links links-1" role="region" aria-label="Legal">
         <h4 aria-hidden="true">Legal</h4>
         <nuxt-link to="/legal/terms">Terms</nuxt-link>
         <nuxt-link to="/legal/privacy">Privacy</nuxt-link>
@@ -238,7 +238,7 @@
           License
         </a>
       </div>
-      <div class="links" role="region" aria-label="Resources">
+      <div class="links links-2" role="region" aria-label="Resources">
         <h4 aria-hidden="true">Resources</h4>
         <a target="_blank" href="https://blog.modrinth.com">Blog</a>
         <a target="_blank" href="https://discord.gg/EUHuJHt">Discord</a>
@@ -275,26 +275,22 @@ import HomeIcon from '~/assets/images/sidebar/home.svg?inline'
 import ModIcon from '~/assets/images/sidebar/mod.svg?inline'
 import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
 
-// import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 import MoonIcon from '~/assets/images/utils/moon.svg?inline'
 import SunIcon from '~/assets/images/utils/sun.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 
-// import UserIcon from '~/assets/images/utils/user.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
 import CookieConsent from '~/components/ads/CookieConsent'
 
-const overflowStyle = 'overlay'
+const overflowStyle = 'scroll'
 
 export default {
   components: {
     ModrinthLogo,
-    // DropdownIcon,
     MoonIcon,
     SunIcon,
-    // UserIcon,
     LogOutIcon,
     GitHubIcon,
     NotificationIcon,
@@ -322,6 +318,7 @@ export default {
     await Promise.all([
       this.$store.dispatch('user/fetchAll', { force: true }),
       this.$store.dispatch('tag/fetchAllTags'),
+      this.$store.dispatch('cosmetics/fetchCosmetics', this.$cookies),
     ])
   },
   computed: {
@@ -335,8 +332,7 @@ export default {
       this.isMobileMenuOpen =
         this.$refs.mobileMenu.className === 'mobile-menu active'
 
-      document.documentElement.style.overflow = overflowStyle
-      document.body.style.overflow = overflowStyle
+      document.body.style.overflowY = overflowStyle
 
       this.$store.dispatch('user/fetchAll')
     },
@@ -356,12 +352,8 @@ export default {
       }`
       document.body.scrollTop = 0
 
-      document.documentElement.style.overflow =
-        document.documentElement.style.overflow !== 'hidden'
-          ? 'hidden'
-          : overflowStyle
-      document.body.style.overflow =
-        document.body.style.overflow !== 'hidden' ? 'hidden' : overflowStyle
+      document.body.style.overflowY =
+        document.body.style.overflowY !== 'hidden' ? 'hidden' : overflowStyle
 
       this.isMobileMenuOpen = !currentlyActive
     },
@@ -393,12 +385,6 @@ export default {
 </script>
 
 <style lang="scss">
-html {
-  overflow: auto;
-  //noinspection CssInvalidPropertyValue
-  overflow: overlay;
-}
-
 .layout {
   min-height: 100vh;
   background-color: var(--color-bg);
@@ -850,14 +836,20 @@ html {
 
   footer {
     margin: 6rem 0 2rem 0;
-    flex-wrap: wrap;
     text-align: center;
+    display: grid;
+    grid-template:
+      'logo-info logo-info' auto
+      'links-1   links-2' auto
+      'buttons buttons' auto
+      / 1fr 1fr;
 
     .logo-info {
       margin-left: auto;
       margin-right: auto;
-      max-width: 22rem;
+      max-width: 20rem;
       margin-bottom: 1rem;
+      grid-area: logo-info;
 
       .text-logo {
         width: 10rem;
@@ -878,11 +870,20 @@ html {
       a {
         margin: 0 0 1rem 0;
       }
+
+      &.links-1 {
+        grid-area: links-1;
+      }
+
+      &.links-2 {
+        grid-area: links-2;
+      }
     }
 
     .buttons {
       margin-left: auto;
       margin-right: auto;
+      grid-area: buttons;
 
       button,
       a {

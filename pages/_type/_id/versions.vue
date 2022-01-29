@@ -71,7 +71,7 @@
                       .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
                       .join(', ') +
                     ' ' +
-                    version.game_versions[version.game_versions.length - 1]
+                    $formatVersion(version.game_versions)
                   }}
                 </p>
                 <p></p>
@@ -96,7 +96,7 @@
                   .join(', ')
               }}
             </p>
-            <p>{{ version.game_versions[version.game_versions.length - 1] }}</p>
+            <p>{{ $formatVersion(version.game_versions) }}</p>
           </td>
           <td>
             <p>

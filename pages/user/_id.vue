@@ -1,21 +1,13 @@
 <template>
   <div class="normal-page">
-    <div>
-      <aside class="card sidebar normal-page__sidebar">
+    <div class="normal-page__sidebar">
+      <aside class="card sidebar">
         <img
           class="sidebar__item profile-picture"
           :src="user.avatar_url"
           :alt="user.username"
         />
         <h1 class="sidebar__item username">{{ user.username }}</h1>
-        <nuxt-link
-          v-if="$auth.user && $auth.user.id !== user.id"
-          :to="`/create/report?id=${user.id}&t=user`"
-          class="sidebar__item report-button iconified-button"
-        >
-          <ReportIcon aria-hidden="true" />
-          Report
-        </nuxt-link>
         <div class="sidebar__item">
           <Badge v-if="user.role === 'admin'" type="admin" color="red" />
           <Badge
@@ -25,6 +17,7 @@
           />
           <Badge v-else type="developer" color="green" />
         </div>
+        <hr class="card-divider" />
         <h3 class="sidebar__item">About me</h3>
         <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
         <div class="sidebar__item stats-block">
@@ -48,6 +41,16 @@
             </div>
           </div>
         </div>
+        <template v-if="$auth.user && $auth.user.id !== user.id">
+          <hr class="card-divider" />
+          <nuxt-link
+            :to="`/create/report?id=${user.id}&t=user`"
+            class="sidebar__item report-button iconified-button"
+          >
+            <ReportIcon aria-hidden="true" />
+            Report
+          </nuxt-link>
+        </template>
       </aside>
     </div>
     <div class="normal-page__content">
@@ -71,7 +74,9 @@
       <div v-if="projects.length > 0">
         <ProjectCard
           v-for="project in selectedProjectType !== 'all'
-            ? projects.filter((x) => x.project_type === selectedProjectType)
+            ? projects.filter(
+                (x) => x.project_type === selectedProjectType.slice(0, -1)
+              )
             : projects"
           :id="project.slug || project.id"
           :key="project.id"
@@ -217,7 +222,7 @@ export default {
       const obj = { all: true }
 
       for (const project of this.projects) {
-        obj[project.project_type] = true
+        obj[project.project_type + 's'] = true
       }
 
       return Object.keys(obj)
@@ -245,6 +250,8 @@ export default {
   align-items: center;
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
 }
 .sidebar__item:not(:last-child) {
   margin: 0 0 0.75rem 0;

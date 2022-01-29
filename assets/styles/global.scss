@@ -2,10 +2,6 @@ html {
   @extend .light-mode;
 }
 
-body {
-  overflow-y: scroll;
-}
-
 .light-mode {
   --color-icon: #6b7280;
   --color-text: hsl(221, 39%, 11%);
@@ -30,7 +26,7 @@ body {
   --color-brand-3: #30b27b;
   --color-brand-disabled: #e2e8f0;
 
-  --color-button-bg: #e6e7eb;
+  --color-button-bg: #e0e0e5;
   --color-button-text: var(--color-text-dark);
   --color-button-bg-hover: #d9dce0;
   --color-button-text-hover: #1b1e24;
@@ -259,24 +255,14 @@ textarea {
   padding: 0.5rem 1rem;
   border: 2px solid transparent;
 
-  &:focus,
-  &:hover:not([disabled]) {
+  &:hover:not([disabled]):not(:focus) {
     background: var(--color-button-bg-hover);
     color: var(--color-text);
-    //outline: none; Bad for accessibility
-
-    &::placeholder {
-      color: var(--color-text);
-    }
   }
 
   &:focus {
     background: var(--color-raised-bg);
     border-color: var(--color-divider-dark);
-  }
-
-  &::placeholder {
-    color: var(--color-color-text);
   }
 
   &:disabled,

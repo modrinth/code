@@ -31,8 +31,6 @@
 
   box-shadow: inset 0px -1px 1px rgba(17, 24, 39, 0.1);
 
-  max-height: 2rem;
-
   color: var(--color-button-text);
   background-color: var(--color-button-bg);
   text-decoration: none;
@@ -385,15 +383,10 @@
 
 .multiselect {
   color: var(--color-text) !important;
+  max-height: 40px;
 
   input {
     background: transparent;
-  }
-
-  &.top-margin {
-    .multiselect__tags {
-      padding-top: 10px;
-    }
   }
 
   .multiselect__tags {
@@ -402,6 +395,7 @@
     border: none;
     cursor: pointer;
     padding-left: 1rem;
+    padding-top: 10px;
 
     &:active,
     &:hover {
@@ -436,6 +430,8 @@
     background: var(--color-dropdown-bg);
     border: none;
     overflow-x: hidden;
+    border-bottom-left-radius: var(--size-rounded-card);
+    border-bottom-right-radius: var(--size-rounded-card);
 
     .multiselect__element {
       .multiselect__option--highlight {
@@ -470,6 +466,10 @@ label {
   span {
     flex: 2;
     padding-right: var(--spacing-card-lg);
+
+    &.no-padding {
+      padding-right: 0;
+    }
   }
 
   input,
@@ -518,8 +518,10 @@ label {
 }
 
 .stylized-toggle {
+  min-height: 32px;
   height: 32px;
   width: 52px;
+  max-width: 52px;
   border-radius: 16px;
   display: inline-block;
   position: relative;
@@ -563,8 +565,14 @@ label {
   height: 1.75rem;
   width: 1.75rem;
   border-radius: 1.5rem;
-  background-color: var(--color-button-bg);
+  color: var(--color-brand-inverted);
+  background-color: var(--color-brand);
   margin-right: var(--spacing-card-sm);
+
+  &:hover {
+    background-color: var(--color-brand-hover);
+  }
+
   svg {
     width: 1.25rem;
     margin: auto;
@@ -681,4 +689,30 @@ label {
   margin-bottom: var(--spacing-card-md);
 
   // box-shadow: var(--shadow-card);
+}
+
+.vue-notification-group {
+  right: 25px !important;
+
+  .vue-notification-template {
+    border-radius: var(--size-rounded-card);
+    margin: 0 0 25px 0;
+
+    .notification-title {
+      font-size: var(--font-size-lg);
+      margin-right: auto;
+    }
+
+    .notification-content {
+      font-size: var(--font-size-md);
+    }
+  }
+}
+
+.card-divider {
+  background-color: var(--color-divider);
+  border: none;
+  color: var(--color-divider);
+  height: 1px;
+  margin: var(--spacing-card-bg) 0;
 }

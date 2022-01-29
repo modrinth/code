@@ -23,29 +23,28 @@
           Reset
         </button>
       </div>
-      <div class="recap">
+      <div class="recap card">
         <section>
-          <h2>Quick recap of you</h2>
+          <h2>Profile Recap</h2>
           <div>
             <Badge
               v-if="$auth.user.role === 'admin'"
-              type="You are an admin"
+              type="Admin"
               color="red"
             />
             <Badge
               v-else-if="$auth.user.role === 'moderator'"
-              type="You are a moderator"
+              type="Moderator"
               color="yellow"
             />
-            <Badge v-else type="You are a developer" color="green" />
+            <Badge v-else type="Developer" color="green" />
             <div class="stat">
               <SunriseIcon />
-              <span>You joined {{ $dayjs($auth.user.created).fromNow() }}</span>
+              <span>Joined {{ $dayjs($auth.user.created).fromNow() }}</span>
             </div>
           </div>
         </section>
         <section>
-          <h2>You have</h2>
           <div class="stat">
             <DownloadIcon />
             <span>
@@ -105,6 +104,33 @@
             :allow-empty="false"
           />
         </label>
+        <h3>Search Layout</h3>
+        <label>
+          <span>
+            Sets the sidebar direction for the search page. Enabling this will
+            put the search bar on the right side
+          </span>
+          <input
+            v-model="projectLayout"
+            class="switch stylized-toggle"
+            type="checkbox"
+            @change="changeLayout"
+          />
+        </label>
+        <h3>Project Layout</h3>
+        <label>
+          <span>
+            Sets the sidebar direction for project pages. Enabling this will be
+            close to the legacy layout with project information on the right
+            side
+          </span>
+          <input
+            v-model="searchLayout"
+            class="switch stylized-toggle"
+            type="checkbox"
+            @change="changeLayout"
+          />
+        </label>
       </section>
     </div>
   </div>
@@ -141,9 +167,14 @@ export default {
     return {
       icon: null,
       previewImage: null,
+      searchLayout: false,
+      projectLayout: false,
     }
   },
   fetch() {
+    this.searchLayout = this.$store.state.cosmetics.searchLayout
+    this.projectLayout = this.$store.state.cosmetics.projectLayout
+
     this.$emit('update:action-button', 'Save')
     this.$emit('update:action-button-callback', this.saveChanges)
   },
@@ -198,6 +229,13 @@ export default {
 
       return this.formatNumber(sum)
     },
+    async changeLayout() {
+      await this.$store.dispatch('cosmetics/save', {
+        searchLayout: this.searchLayout,
+        projectLayout: this.projectLayout,
+        $cookies: this.$cookies,
+      })
+    },
     async saveChanges() {
       this.$nuxt.$loading.start()
       try {
@@ -248,6 +286,10 @@ export default {
 
   @media screen and (min-width: 1024px) {
     flex-direction: row;
+
+    .left-side {
+      margin-right: var(--spacing-card-bg);
+    }
   }
 }
 
@@ -255,8 +297,6 @@ export default {
   min-width: 20rem;
 
   .profile-picture {
-    margin-right: var(--spacing-card-bg);
-
     h3 {
       font-size: var(--font-size-lg);
     }
@@ -277,13 +317,6 @@ export default {
 
   .recap {
     section {
-      padding: var(--spacing-card-md) var(--spacing-card-lg);
-      margin-bottom: 1rem;
-
-      @media screen and (min-width: 1024px) {
-        padding: 0;
-      }
-
       h2 {
         font-size: var(--font-size-lg);
         margin: 0 0 0.5rem 0;
@@ -304,6 +337,7 @@ export default {
 .stat {
   display: flex;
   align-items: center;
+  margin: 0.5rem 0;
 
   svg {
     width: auto;
@@ -315,7 +349,6 @@ export default {
   span {
     strong {
       font-weight: bolder;
-      font-size: var(--font-size-xl);
     }
   }
 }

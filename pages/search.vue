@@ -1,5 +1,10 @@
 <template>
-  <div class="normal-page">
+  <div
+    :class="{
+      'normal-page': true,
+      'alt-layout': $store.state.cosmetics.searchLayout,
+    }"
+  >
     <aside class="normal-page__sidebar" aria-label="Filters">
       <section class="card" role="presentation">
         <button
@@ -133,7 +138,6 @@
           />
         </div>
       </section>
-      <Advertisement type="square" small-screen="destroy" />
     </aside>
     <section class="normal-page__content">
       <div class="card search-controls">
@@ -309,6 +313,8 @@ export default {
     }
     if (this.$route.query.v)
       this.selectedVersions = this.$route.query.v.split(',')
+    if (this.$route.query.l)
+      this.selectedLicenses = this.$route.query.l.split(',')
     if (this.$route.query.h) this.showSnapshots = this.$route.query.h === 'true'
     if (this.$route.query.e)
       this.selectedEnvironments = this.$route.query.e.split(',')
@@ -529,6 +535,8 @@ export default {
             queryItems.push(`f=${encodeURIComponent(this.facets)}`)
           if (this.selectedVersions.length > 0)
             queryItems.push(`v=${encodeURIComponent(this.selectedVersions)}`)
+          if (this.selectedLicenses.length > 0)
+            queryItems.push(`l=${encodeURIComponent(this.selectedLicenses)}`)
           if (this.showSnapshots) url += `h=true`
           if (this.selectedEnvironments.length > 0)
             queryItems.push(
@@ -560,7 +568,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .sidebar-menu {
   display: none;
   margin-top: 1rem;
@@ -577,6 +585,14 @@ export default {
 .search-controls {
   display: flex;
   flex-direction: column;
+
+  .iconified-input {
+    margin-left: 6px;
+
+    input {
+      width: calc(100% + 8px);
+    }
+  }
 }
 
 .search-controls__sorting {

@@ -43,8 +43,9 @@
         </label>
         <h3>Categories</h3>
         <label>
-          <span>
-            Select up to 3 categories that will help others find your project.
+          <span class="no-padding">
+            Select up to 3 categories that will help others <br />
+            find your project.
           </span>
           <multiselect
             id="categories"
@@ -81,7 +82,7 @@
         </label>
         <h3>Project type</h3>
         <label>
-          <span>The project type of your project.</span>
+          <span class="no-padding">The project type of your project.</span>
           <Multiselect
             v-model="projectType"
             placeholder="Select one"
@@ -379,19 +380,6 @@
                 placeholder="Choose versions..."
               />
             </label>
-            <h3>Files</h3>
-            <label>
-              <span>
-                You must upload at least one file, however, you are allowed to
-                upload multiple files.
-              </span>
-              <FileInput
-                accept=".jar,application/java-archive,.zip,application/zip"
-                multiple
-                prompt="Choose files or drag them here"
-                @change="updateVersionFiles"
-              />
-            </label>
           </div>
           <div class="dependencies">
             <h3>Dependencies</h3>
@@ -467,6 +455,35 @@
                     </button>
                   </div>
                 </div>
+              </div>
+            </div>
+          </div>
+          <div class="files">
+            <h3>Files</h3>
+            <SmartFileInput
+              class="file-input"
+              multiple
+              accept=".jar,application/java-archive,.zip,application/zip,.mrpack"
+              prompt="Upload files"
+              @change="
+                (x) =>
+                  x.forEach((y) => versions[currentVersionIndex].files.push(y))
+              "
+            />
+            <div class="uploaded-files">
+              <div
+                v-for="(file, index) in versions[currentVersionIndex].files"
+                :key="index + 'new'"
+                class="file"
+              >
+                <p class="filename">{{ file.name }}</p>
+                <button
+                  class="action iconified-button"
+                  @click="versions[currentVersionIndex].files.splice(index, 1)"
+                >
+                  <TrashIcon aria-hidden="true" />
+                  Delete
+                </button>
               </div>
             </div>
           </div>
@@ -630,7 +647,6 @@
         <div class="title">
           <div class="text">
             <h3>License</h3>
-            <i>— this section is optional</i>
           </div>
         </div>
         <label>
@@ -837,10 +853,18 @@ export default {
     async createProject() {
       this.$nuxt.$loading.start()
 
-      for (const version of this.versions) {
+      for (let i = 0; i < this.versions.length; i++) {
+        const version = this.versions[i]
         if (!version.version_title) {
           version.version_title = version.version_number
         }
+
+        const newFileParts = []
+        for (let j = 0; j < version.files.length; j++) {
+          newFileParts.push(`version-${i}-${j}`)
+        }
+
+        version.file_parts = newFileParts
       }
 
       const formData = new FormData()
@@ -903,11 +927,11 @@ export default {
 
       for (let i = 0; i < this.versions.length; i++) {
         const version = this.versions[i]
-        for (let j = 0; j < version.raw_files.length; j++) {
+        for (let j = 0; j < version.files.length; j++) {
           formData.append(
             `version-${i}-${j}`,
-            new Blob([version.raw_files[j]]),
-            version.raw_files[j].name
+            new Blob([version.files[j]]),
+            version.files[j].name
           )
         }
       }
@@ -939,6 +963,7 @@ export default {
           title: 'An error occurred',
           text: description,
           type: 'error',
+          duration: 10000,
         })
 
         window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -976,21 +1001,9 @@ export default {
       }
     },
 
-    updateVersionFiles(files) {
-      this.versions[this.currentVersionIndex].raw_files = files
-
-      const newFileParts = []
-      for (let i = 0; i < files.length; i++) {
-        newFileParts.push(`version-${this.currentVersionIndex}-${i}`)
-      }
-
-      this.versions[this.currentVersionIndex].file_parts = newFileParts
-    },
-
     createVersion() {
       this.versions.push({
-        raw_files: [],
-        file_parts: [],
+        files: [],
         version_number: '',
         version_title: '',
         version_body: '',
@@ -1125,7 +1138,6 @@ section.project-icon {
   }
 
   .iconified-button {
-    width: 9rem;
     margin-top: 0.5rem;
   }
 }
@@ -1143,6 +1155,10 @@ section.game-sides {
     .labeled-control {
       flex: 2;
       margin-left: var(--spacing-card-lg);
+
+      h3 {
+        margin-bottom: var(--spacing-card-sm);
+      }
     }
   }
 }
@@ -1213,6 +1229,23 @@ section.versions {
       &:last-child {
         display: flex;
       }
+
+      @media screen and (max-width: 800px) {
+        + &:nth-child(4),
+        &:nth-child(3) {
+          display: none;
+        }
+        &:first-child,
+        &:nth-child(5) {
+          width: unset;
+        }
+      }
+
+      @media screen and (max-width: 1024px) {
+        &:nth-child(2) {
+          display: none;
+        }
+      }
     }
 
     th {
@@ -1248,18 +1281,19 @@ section.versions {
       'controls controls' auto
       'main main' auto
       'dependencies dependencies' auto
+      'files files'
       'changelog changelog'
       / 5fr 4fr;
+    column-gap: var(--spacing-card-md);
 
     @media screen and (min-width: 1024px) {
       grid-template:
         'controls controls' auto
         'main dependencies' auto
+        'main files' 1fr
         'changelog changelog'
         / 5fr 4fr;
     }
-
-    column-gap: var(--spacing-card-sm);
 
     .controls {
       grid-area: controls;
@@ -1337,6 +1371,32 @@ section.versions {
             .title {
               margin: 0 0.25rem 0 0;
             }
+          }
+        }
+      }
+    }
+
+    .files {
+      grid-area: files;
+
+      .file-input {
+        margin-top: 1rem;
+      }
+
+      .uploaded-files {
+        .file {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.25rem;
+          flex-wrap: wrap;
+          row-gap: 0.25rem;
+
+          * {
+            margin-left: 0.25rem;
+          }
+          .filename {
+            margin: 0;
+            font-weight: bold;
           }
         }
       }
@@ -1463,6 +1523,10 @@ section.donations {
     span {
       flex: 1;
     }
+  }
+
+  button {
+    margin: 0.5rem 0;
   }
 }
 

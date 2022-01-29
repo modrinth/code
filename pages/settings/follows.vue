@@ -9,7 +9,7 @@
       :created-at="project.published"
       :updated-at="project.updated"
       :description="project.description"
-      :downloads="project.downloads.toString()"
+      :downloads="project.downloads ? project.downloads.toString() : '0'"
       :icon-url="project.icon_url"
       :name="project.title"
       :client-side="project.client_side"

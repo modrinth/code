@@ -25,7 +25,9 @@
         </label>
         <h3>Item type</h3>
         <label>
-          <span>The type of the item that is being reported.</span>
+          <span class="no-padding"
+            >The type of the item that is being reported.</span
+          >
           <multiselect
             id="item-type"
             v-model="itemType"
@@ -39,7 +41,7 @@
         </label>
         <h3>Report type</h3>
         <label>
-          <span>
+          <span class="no-padding">
             The type of report. This is the category that this report falls
             under.
           </span>
@@ -192,22 +194,6 @@ export default {
   }
   .button {
     margin-left: 1rem;
-  }
-}
-
-label {
-  display: flex;
-
-  span {
-    flex: 2;
-    padding-right: var(--spacing-card-lg);
-  }
-
-  input,
-  .multiselect,
-  .input-group {
-    flex: 3;
-    height: fit-content;
   }
 }
 

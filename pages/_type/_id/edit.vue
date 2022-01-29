@@ -5,7 +5,7 @@
       <nuxt-link
         :to="`/${project.project_type}/${
           project.slug ? project.slug : project.id
-        }`"
+        }/settings`"
         class="iconified-button column"
       >
         Back
@@ -65,8 +65,9 @@
       </label>
       <h3>Categories</h3>
       <label>
-        <span>
-          Select up to 3 categories that will help others find your project.
+        <span class="no-padding">
+          Select up to 3 categories that will help others <br />
+          find your project.
         </span>
         <Multiselect
           id="categories"
@@ -298,7 +299,7 @@
             v-model="license"
             placeholder="Select one"
             track-by="short"
-            label="name"
+            label="short"
             :options="$tag.licenses"
             :searchable="true"
             :close-on-select="true"
@@ -616,7 +617,6 @@ label {
 
   span {
     flex: 2;
-    padding-right: var(--spacing-card-lg);
   }
 
   input,
@@ -652,15 +652,29 @@ label {
 .page-contents {
   display: grid;
   grid-template:
-    'header       header       header' auto
-    'essentials   essentials   project-icon' auto
-    'game-sides   game-sides   game-sides' auto
-    'description  description  description' auto
-    'extra-links  extra-links  extra-links' auto
-    'license      license      license' auto
-    'donations    donations    donations' auto
-    'footer       footer       footer' auto
-    / 4fr 1fr 2fr;
+    'header' auto
+    'essentials' auto
+    'project-icon' auto
+    'game-sides' auto
+    'description' auto
+    'extra-links' auto
+    'license' auto
+    'donations' auto
+    'footer' auto
+    / 1fr;
+
+  @media screen and (min-width: 1024px) {
+    grid-template:
+      'header       header       header' auto
+      'essentials   essentials   project-icon' auto
+      'game-sides   game-sides   game-sides' auto
+      'description  description  description' auto
+      'extra-links  extra-links  extra-links' auto
+      'license      license      license' auto
+      'donations    donations    donations' auto
+      'footer       footer       footer' auto
+      / 4fr 1fr 2fr;
+  }
   column-gap: var(--spacing-card-md);
   row-gap: var(--spacing-card-md);
 }
@@ -712,6 +726,10 @@ section.game-sides {
     .labeled-control {
       flex: 2;
       margin-left: var(--spacing-card-lg);
+
+      h3 {
+        margin-bottom: var(--spacing-card-sm);
+      }
     }
   }
 }
@@ -765,6 +783,10 @@ section.donations {
     span {
       flex: 1;
     }
+  }
+
+  button {
+    margin: 0.5rem 0;
   }
 }
 

@@ -112,10 +112,6 @@ export default {
         input {
           box-sizing: content-box;
         }
-
-        .iconified-button {
-          padding: 1.25rem 1rem;
-        }
       }
 
       @media screen and (max-width: 750px) {

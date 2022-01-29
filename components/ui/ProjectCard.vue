@@ -198,8 +198,15 @@ export default {
     },
   },
   methods: {
-    formatNumber(x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    formatNumber(y) {
+      const x = +y
+      if (x >= 1000000) {
+        return (x / 1000000).toFixed(2).toString() + 'M'
+      } else if (x >= 10000) {
+        return (x / 1000).toFixed(1).toString() + 'K'
+      } else {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+      }
     },
   },
 }
@@ -213,7 +220,6 @@ export default {
 .project-card {
   display: flex;
   flex-direction: row;
-  flex-direction: column;
   padding: var(--spacing-card-bg);
   width: calc(100% - 2 * var(--spacing-card-bg));
 
@@ -300,8 +306,9 @@ export default {
           margin-right: 2rem;
 
           svg {
+            width: 1.25rem;
             height: 1.25rem;
-            margin-right: 0.125rem;
+            margin-right: 0.25rem;
           }
         }
       }
@@ -359,6 +366,15 @@ export default {
   @media screen and (max-width: 560px) {
     .card-content {
       flex-direction: column;
+
+      .info {
+        .dates {
+          .date {
+            margin-bottom: 0.5rem;
+          }
+        }
+      }
+
       .right-side {
         padding-top: var(--spacing-card-sm);
 
@@ -366,10 +382,6 @@ export default {
 
         .stat svg {
           margin-left: 0;
-        }
-
-        .buttons {
-          flex-direction: row;
         }
 
         .buttons button,

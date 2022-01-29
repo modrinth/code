@@ -5,6 +5,10 @@
         <h1>Notifications</h1>
 
         <div class="divider card">
+          <ThisOrThat
+            v-model="selectedNotificationType"
+            :items="notificationTypes"
+          />
           <button class="iconified-button" @click="clearNotifications">
             <ClearIcon />
             Clear all
@@ -12,17 +16,21 @@
         </div>
         <div class="notifications">
           <div
-            v-for="notification in $user.notifications"
+            v-for="notification in selectedNotificationType !== 'all'
+              ? $user.notifications.filter(
+                  (x) => x.type === NOTIFICATION_TYPES[selectedNotificationType]
+                )
+              : $user.notifications"
             :key="notification.id"
             class="card notification"
           >
             <div class="icon">
-              <UpdateIcon v-if="notification.type === 'project-update'" />
+              <UpdateIcon v-if="notification.type === 'project_update'" />
               <UsersIcon v-else-if="notification.type === 'team_invite'" />
             </div>
             <div class="text">
               <nuxt-link :to="notification.link" class="top">
-                <h3>{{ notification.title }}</h3>
+                <h3 v-html="$xss($md.render(notification.title))" />
                 <span>
                   Notified {{ $dayjs(notification.created).fromNow() }}</span
                 >
@@ -41,7 +49,7 @@
                 {{ action.title }}
               </button>
               <button
-                v-if="$user.notifications.length === 0"
+                v-if="notification.actions.length === 0"
                 class="iconified-button"
                 @click="performAction(notification, notificationIndex, null)"
               >
@@ -65,20 +73,50 @@ import ClearIcon from '~/assets/images/utils/trash.svg?inline'
 import UpdateIcon from '~/assets/images/utils/updated.svg?inline'
 import UsersIcon from '~/assets/images/utils/users.svg?inline'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
+import ThisOrThat from '~/components/ui/ThisOrThat'
+
+const NOTIFICATION_TYPES = {
+  'Team Invites': 'team_invite',
+  'Project Updates': 'project_update',
+}
 
 export default {
   name: 'Notifications',
   components: {
+    ThisOrThat,
     ClearIcon,
     UpdateIcon,
     UsersIcon,
     UpToDate,
+  },
+  data() {
+    return {
+      selectedNotificationType: 'all',
+    }
   },
   async fetch() {
     await this.$store.dispatch('user/fetchNotifications')
   },
   head: {
     title: 'Notifications - Modrinth',
+  },
+  computed: {
+    notificationTypes() {
+      const obj = { all: true }
+
+      for (const notification of this.$user.notifications) {
+        obj[
+          Object.keys(NOTIFICATION_TYPES).find(
+            (key) => NOTIFICATION_TYPES[key] === notification.type
+          )
+        ] = true
+      }
+
+      return Object.keys(obj)
+    },
+  },
+  created() {
+    this.NOTIFICATION_TYPES = NOTIFICATION_TYPES
   },
   methods: {
     async clearNotifications() {
@@ -142,25 +180,32 @@ h1 {
 }
 
 .divider {
-  button {
-    margin-left: auto;
-  }
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  row-gap: 0.5rem;
 }
 
 .notifications {
   .notification {
     display: flex;
-    max-height: 4rem;
+    flex-wrap: wrap;
     padding: var(--spacing-card-sm) var(--spacing-card-lg);
 
-    .icon svg {
-      height: calc(4rem - var(--spacing-card-sm));
-      width: auto;
-      margin-right: 1rem;
+    .icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      svg {
+        height: calc(3rem - var(--spacing-card-sm));
+        width: auto;
+        margin-right: 1rem;
+      }
     }
 
     .text {
-      max-height: calc(4rem - var(--spacing-card-sm));
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -168,13 +213,18 @@ h1 {
       .top {
         display: flex;
         align-items: baseline;
+        flex-direction: column;
 
-        h3 {
+        h3 ::v-deep {
           font-size: var(--font-size-lg);
           margin: 0 0.5rem 0 0;
 
-          strong {
-            color: var(--color-brand);
+          p {
+            margin: 0;
+
+            strong {
+              color: var(--color-brand);
+            }
           }
         }
       }
@@ -186,6 +236,9 @@ h1 {
     }
 
     .buttons {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
       margin-left: auto;
       text-align: right;
 
@@ -200,6 +253,20 @@ h1 {
 @media screen and (min-width: 1024px) {
   .page-contents {
     max-width: calc(1280px - 20rem) !important;
+  }
+
+  .notifications {
+    .notification {
+      flex-wrap: nowrap;
+
+      .text {
+        flex-direction: column;
+
+        .top {
+          flex-direction: row;
+        }
+      }
+    }
   }
 }
 </style>

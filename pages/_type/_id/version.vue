@@ -14,7 +14,13 @@
         class="iconified-button back-button"
         :to="`/${project.project_type}/${
           project.slug ? project.slug : project.id
-        }/versions`"
+        }/${
+          $nuxt.context.from
+            ? $nuxt.context.from.name === 'type-id-changelog'
+              ? 'changelog'
+              : 'versions'
+            : 'versions'
+        }`"
       >
         <BackIcon aria-hidden="true" />
         Back to list
@@ -125,7 +131,7 @@
           placeholder="Enter the version name..."
         />
         <Checkbox v-model="version.featured" label="Featured" />
-        <hr />
+        <hr class="card-divider" />
       </div>
       <section v-if="mode === 'edit' || mode === 'create'">
         <h3>Changelog</h3>
@@ -158,7 +164,7 @@
               : 'No changelog specified.'
           "
         ></div>
-        <hr />
+        <hr class="card-divider" />
       </section>
       <section>
         <h3>Metadata</h3>
@@ -187,7 +193,8 @@
               class="value"
               type="beta"
               color="yellow"
-            /><VersionBadge
+            />
+            <VersionBadge
               v-else-if="version.version_type === 'alpha'"
               class="value"
               type="alpha"
@@ -259,11 +266,7 @@
               placeholder="Choose versions..."
             />
             <p v-else class="value">
-              {{
-                version.game_versions
-                  .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-                  .join(', ')
-              }}
+              {{ $formatVersion(version.game_versions) }}
             </p>
           </div>
           <div v-if="mode === 'version'" class="data">
@@ -292,7 +295,7 @@
             <p class="value">{{ version.id }}</p>
           </div>
         </div>
-        <hr />
+        <hr class="card-divider" />
       </section>
       <section
         v-if="
@@ -394,7 +397,7 @@
             </button>
           </div>
         </div>
-        <hr />
+        <hr class="card-divider" />
       </section>
       <section
         v-if="version.files.length > 0 || mode === 'edit' || mode === 'create'"
@@ -819,6 +822,8 @@ export default {
           })
         ).data
 
+        this.$emit('update:project', this.versions.concat([data]))
+
         await this.$router.push(
           `/${this.project.project_type}/${
             this.project.slug ? this.project.slug : data.project_id
@@ -850,14 +855,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-hr {
-  background-color: var(--color-divider);
-  border: none;
-  color: var(--color-divider);
-  height: 1px;
-  margin: var(--spacing-card-bg) 0;
-}
-
 .content {
   max-width: calc(100% - (2 * var(--spacing-card-lg)));
 }
@@ -906,6 +903,11 @@ section {
 .data-wrapper {
   display: flex;
   flex-wrap: wrap;
+  flex-direction: column;
+
+  @media screen and (min-width: 800px) {
+    flex-direction: row;
+  }
 
   .data {
     flex-basis: calc(33.333333% - 0.5rem);

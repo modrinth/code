@@ -174,7 +174,6 @@ export default {
     '~/plugins/vue-notification.js',
     '~/plugins/xss.js',
     '~/plugins/vue-syntax.js',
-    '~/plugins/auth.js',
     '~/plugins/shorthands.js',
   ],
   /*
