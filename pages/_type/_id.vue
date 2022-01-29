@@ -770,7 +770,7 @@ export default {
         'content       extra-info' auto
         'content       small-advert' auto
         'content       dummy' 1fr
-        / 1fr calc(100% - 20rem);
+        / 1fr 20rem;
     }
   }
 
