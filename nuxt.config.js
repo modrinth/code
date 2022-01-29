@@ -281,7 +281,7 @@ export default {
   },
   publicRuntimeConfig: {
     axios: {
-      browserBaseURL: process.env.BASE_URL,
+      browserBaseURL: process.env.BROWSER_BASE_URL,
     },
     ads: {
       ghostMode: process.env.ENABLE_ADS == null,
