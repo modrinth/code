@@ -1,3 +1,4 @@
+use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::{QueryFile, QueryVersion};
 use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
@@ -111,6 +112,33 @@ pub async fn maven_metadata(
         .body(yaserde::ser::to_string(&respdata).map_err(ApiError::XmlError)?))
 }
 
+fn find_file<'a>(
+    project_id: &str,
+    project: &QueryProject,
+    version: &'a QueryVersion,
+    file: &str,
+) -> Option<&'a QueryFile> {
+    if let Some(selected_file) = version.files.iter().find(|x| x.filename == file) {
+        return Some(selected_file);
+    }
+
+    let fileext = match project.project_type.as_str() {
+        "mod" => "jar",
+        "modpack" => "mrpack",
+        _ => return None,
+    };
+
+    if file == format!("{}-{}.{}", &project_id, &version.version_number, fileext) {
+        version
+            .files
+            .iter()
+            .find(|x| x.primary)
+            .or_else(|| version.files.iter().last())
+    } else {
+        None
+    }
+}
+
 #[get("maven/modrinth/{id}/{versionnum}/{file}")]
 pub async fn version_file(
     req: HttpRequest,
@@ -120,7 +148,7 @@ pub async fn version_file(
     let project_data =
         database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
 
-    let data = if let Some(data) = project_data {
+    let project = if let Some(data) = project_data {
         data
     } else {
         return Ok(HttpResponse::NotFound().body(""));
@@ -128,13 +156,13 @@ pub async fn version_file(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    if !is_authorized(&data, &user_option, &pool).await? {
+    if !is_authorized(&project, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
     let vid = if let Some(vid) = sqlx::query!(
         "SELECT id FROM versions WHERE mod_id = $1 AND version_number = $2",
-        data.inner.id as database::models::ids::ProjectId,
+        project.inner.id as database::models::ids::ProjectId,
         vnum
     )
     .fetch_optional(&**pool)
@@ -164,26 +192,16 @@ pub async fn version_file(
             group_id: "maven.modrinth".to_string(),
             artifact_id: project_id,
             version: version.version_number,
-            name: data.inner.title,
-            description: data.inner.description,
+            name: project.inner.title,
+            description: project.inner.description,
         };
         return Ok(HttpResponse::Ok()
             .content_type("text/xml")
             .body(yaserde::ser::to_string(&respdata).map_err(ApiError::XmlError)?));
-    } else if let Some(selected_file) = version.files.iter().find(|x| x.filename == file) {
+    } else if let Some(selected_file) = find_file(&project_id, &project, &version, &file) {
         return Ok(HttpResponse::TemporaryRedirect()
-            .header("Location", &*selected_file.url)
+            .header("location", &*selected_file.url)
             .body(""));
-    } else if file == format!("{}-{}.jar", &project_id, &version.version_number) {
-        if let Some(selected_file) = version.files.iter().find(|x| x.primary) {
-            return Ok(HttpResponse::TemporaryRedirect()
-                .header("Location", &*selected_file.url)
-                .body(""));
-        } else if let Some(selected_file) = version.files.iter().last() {
-            return Ok(HttpResponse::TemporaryRedirect()
-                .header("Location", &*selected_file.url)
-                .body(""));
-        }
     }
 
     Ok(HttpResponse::NotFound().body(""))
@@ -198,7 +216,7 @@ pub async fn version_file_sha1(
     let project_data =
         database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
 
-    let data = if let Some(data) = project_data {
+    let project = if let Some(data) = project_data {
         data
     } else {
         return Ok(HttpResponse::NotFound().body(""));
@@ -206,13 +224,13 @@ pub async fn version_file_sha1(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    if !is_authorized(&data, &user_option, &pool).await? {
+    if !is_authorized(&project, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
     let vid = if let Some(vid) = sqlx::query!(
         "SELECT id FROM versions WHERE mod_id = $1 AND version_number = $2",
-        data.inner.id as database::models::ids::ProjectId,
+        project.inner.id as database::models::ids::ProjectId,
         vnum
     )
     .fetch_optional(&**pool)
@@ -232,32 +250,11 @@ pub async fn version_file_sha1(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let selected_file =
-        if let Some(selected_file) = version.files.iter().find(|x| x.filename == file) {
-            selected_file
-        } else if file == format!("{}-{}.jar", &project_id, &version.version_number) {
-            if let Some(selected_file) = version.files.iter().last() {
-                selected_file
-            } else {
-                return Ok(HttpResponse::NotFound().body(""));
-            }
-        } else {
-            return Ok(HttpResponse::NotFound().body(""));
-        };
-
-    let hash_bytes = if let Some(val) = selected_file.hashes.get("sha1") {
-        val
-    } else {
-        return Ok(HttpResponse::NotFound().body(""));
-    };
-
-    let hash_text = if let Some(text) = std::str::from_utf8(hash_bytes).ok() {
-        text.to_string()
-    } else {
-        return Ok(HttpResponse::NotFound().body(""));
-    };
-
-    return Ok(HttpResponse::Ok().body(hash_text));
+    Ok(find_file(&project_id, &project, &version, &file)
+        .and_then(|file| file.hashes.get("sha1"))
+        .and_then(|hash_bytes| std::str::from_utf8(hash_bytes).ok())
+        .map(|hash_str| HttpResponse::Ok().body(hash_str.to_string()))
+        .unwrap_or_else(|| HttpResponse::NotFound().body("")))
 }
 
 #[get("maven/modrinth/{id}/{versionnum}/{file}.sha512")]
@@ -269,7 +266,7 @@ pub async fn version_file_sha512(
     let project_data =
         database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
 
-    let data = if let Some(data) = project_data {
+    let project = if let Some(data) = project_data {
         data
     } else {
         return Ok(HttpResponse::NotFound().body(""));
@@ -277,13 +274,13 @@ pub async fn version_file_sha512(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    if !is_authorized(&data, &user_option, &pool).await? {
+    if !is_authorized(&project, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
     let vid = if let Some(vid) = sqlx::query!(
         "SELECT id FROM versions WHERE mod_id = $1 AND version_number = $2",
-        data.inner.id as database::models::ids::ProjectId,
+        project.inner.id as database::models::ids::ProjectId,
         vnum
     )
     .fetch_optional(&**pool)
@@ -303,30 +300,9 @@ pub async fn version_file_sha512(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let selected_file =
-        if let Some(selected_file) = version.files.iter().find(|x| x.filename == file) {
-            selected_file
-        } else if file == format!("{}-{}.jar", &project_id, &version.version_number) {
-            if let Some(selected_file) = version.files.iter().last() {
-                selected_file
-            } else {
-                return Ok(HttpResponse::NotFound().body(""));
-            }
-        } else {
-            return Ok(HttpResponse::NotFound().body(""));
-        };
-
-    let hash_bytes = if let Some(val) = selected_file.hashes.get("sha512") {
-        val
-    } else {
-        return Ok(HttpResponse::NotFound().body(""));
-    };
-
-    let hash_text = if let Some(text) = std::str::from_utf8(hash_bytes).ok() {
-        text.to_string()
-    } else {
-        return Ok(HttpResponse::NotFound().body(""));
-    };
-
-    return Ok(HttpResponse::Ok().body(hash_text));
+    Ok(find_file(&project_id, &project, &version, &file)
+        .and_then(|file| file.hashes.get("sha512"))
+        .and_then(|hash_bytes| std::str::from_utf8(hash_bytes).ok())
+        .map(|hash_str| HttpResponse::Ok().body(hash_str.to_string()))
+        .unwrap_or_else(|| HttpResponse::NotFound().body("")))
 }
