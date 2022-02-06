@@ -403,7 +403,6 @@ impl TeamMember {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
         let result = sqlx::query!(
             "
             DELETE FROM team_members

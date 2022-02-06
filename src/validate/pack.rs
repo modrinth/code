@@ -4,6 +4,7 @@ use crate::util::validate::validation_errors_to_string;
 use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
 use serde::{Deserialize, Serialize};
 use std::io::{Cursor, Read};
+use std::path::Component;
 use validator::Validate;
 use zip::ZipArchive;
 
@@ -155,6 +156,22 @@ impl super::Validator for PackValidator {
                     "All pack files must provide a SHA1 hash!".into(),
                 ));
             }
+
+            let path = std::path::Path::new(file.path)
+                .components()
+                .next()
+                .ok_or_else(|| {
+                    ValidationError::InvalidInputError("Invalid pack file path!".into())
+                })?;
+
+            match path {
+                Component::CurDir | Component::Normal(_) => {}
+                _ => {
+                    return Err(ValidationError::InvalidInputError(
+                        "Invalid pack file path!".into(),
+                    ))
+                }
+            };
         }
 
         Ok(ValidationResult::Pass)

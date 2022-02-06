@@ -100,20 +100,21 @@ impl Report {
             FROM reports r
             INNER JOIN report_types rt ON rt.id = r.report_type_id
             WHERE r.id = ANY($1)
+            ORDER BY r.created DESC
             ",
             &report_ids_parsed
         )
         .fetch_many(exec)
         .try_filter_map(|e| async {
-            Ok(e.right().map(|row| QueryReport {
-                id: ReportId(row.id),
-                report_type: row.name,
-                project_id: row.mod_id.map(ProjectId),
-                version_id: row.version_id.map(VersionId),
-                user_id: row.user_id.map(UserId),
-                body: row.body,
-                reporter: UserId(row.reporter),
-                created: row.created,
+            Ok(e.right().map(|x| QueryReport {
+                id: ReportId(x.id),
+                report_type: x.name,
+                project_id: x.mod_id.map(ProjectId),
+                version_id: x.version_id.map(VersionId),
+                user_id: x.user_id.map(UserId),
+                body: x.body,
+                reporter: UserId(x.reporter),
+                created: x.created,
             }))
         })
         .try_collect::<Vec<QueryReport>>()

@@ -16,7 +16,7 @@ pub fn project_file_type(ext: &str) -> Option<&str> {
     match ext {
         "jar" => Some("application/java-archive"),
         "zip" => Some("application/zip"),
-        "mrpack" => Some("application/zip"),
+        "mrpack" => Some("application/x-modrinth-modpack+zip"),
         _ => None,
     }
 }

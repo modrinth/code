@@ -53,11 +53,12 @@ pub struct MavenPom {
 #[get("maven/modrinth/{id}/maven-metadata.xml")]
 pub async fn maven_metadata(
     req: HttpRequest,
-    web::Path((project_id,)): web::Path<(String,)>,
+    params: web::Path<(String,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
+    let project_id = params.into_inner().0;
     let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
+        database::models::Project::get_full_from_slug_or_project_id(&*project_id, &**pool).await?;
 
     let data = if let Some(data) = project_data {
         data
@@ -142,9 +143,10 @@ fn find_file<'a>(
 #[get("maven/modrinth/{id}/{versionnum}/{file}")]
 pub async fn version_file(
     req: HttpRequest,
-    web::Path((project_id, vnum, file)): web::Path<(String, String, String)>,
+    params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
+    let (project_id, vnum, file) = params.into_inner();
     let project_data =
         database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
 
@@ -200,7 +202,7 @@ pub async fn version_file(
             .body(yaserde::ser::to_string(&respdata).map_err(ApiError::XmlError)?));
     } else if let Some(selected_file) = find_file(&project_id, &project, &version, &file) {
         return Ok(HttpResponse::TemporaryRedirect()
-            .header("location", &*selected_file.url)
+            .append_header(("location", &*selected_file.url))
             .body(""));
     }
 
@@ -210,9 +212,10 @@ pub async fn version_file(
 #[get("maven/modrinth/{id}/{versionnum}/{file}.sha1")]
 pub async fn version_file_sha1(
     req: HttpRequest,
-    web::Path((project_id, vnum, file)): web::Path<(String, String, String)>,
+    params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
+    let (project_id, vnum, file) = params.into_inner();
     let project_data =
         database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
 
@@ -260,9 +263,10 @@ pub async fn version_file_sha1(
 #[get("maven/modrinth/{id}/{versionnum}/{file}.sha512")]
 pub async fn version_file_sha512(
     req: HttpRequest,
-    web::Path((project_id, vnum, file)): web::Path<(String, String, String)>,
+    params: web::Path<(String, String, String)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
+    let (project_id, vnum, file) = params.into_inner();
     let project_data =
         database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
 

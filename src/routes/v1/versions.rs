@@ -254,7 +254,7 @@ pub async fn download_version(
 
     if let Some(id) = result {
         let real_ip = req.connection_info();
-        let ip_option = real_ip.borrow().remote_addr();
+        let ip_option = real_ip.borrow().peer_addr();
 
         if let Some(ip) = ip_option {
             let hash = sha1::Sha1::from(format!("{}{}", ip, pepper.pepper)).hexdigest();
@@ -312,7 +312,7 @@ pub async fn download_version(
             }
         }
         Ok(HttpResponse::TemporaryRedirect()
-            .header("Location", &*id.url)
+            .append_header(("Location", &*id.url))
             .json(DownloadRedirect { url: id.url }))
     } else {
         Ok(HttpResponse::NotFound().body(""))

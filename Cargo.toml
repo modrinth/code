@@ -12,15 +12,15 @@ path = "src/main.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-actix-web = "3.3.2"
-actix-rt = "1.1.1"
-actix-files = "0.5.0"
-actix-multipart = "0.3.0"
-actix-cors = "0.5.4"
-actix-ratelimit = "0.3.0"
+actix = "0.12.0"
+actix-web = "4.0.0-rc.2"
+actix-rt = "2.6.0"
+tokio-stream = "0.1.8"
+actix-multipart = "0.4.0-beta.13"
+actix-cors = "0.6.0-beta.8"
 
 meilisearch-sdk = "0.6.0"
-reqwest = { version = "0.10.8", features = ["json"] }
+reqwest = { version = "0.11.9", features = ["json"] }
 
 yaserde = "0.6.0"
 yaserde_derive = "0.6.0"
@@ -54,9 +54,8 @@ futures-timer = "3.0.2"
 rust-s3 = "0.26.1"
 async-trait = "0.1.41"
 
-sqlx = { version = "0.4.2", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate"] }
+sqlx = { version = "0.5.10", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate"] }
 
-sentry = { version = "0.22.0", features = ["log"] }
-sentry-actix = "0.22.0"
+bytes = "1.1.0"
 
-bytes = "0.5.6"
+dashmap = "4.0.2"

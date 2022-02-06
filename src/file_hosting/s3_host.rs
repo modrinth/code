@@ -1,6 +1,6 @@
 use crate::file_hosting::{DeleteFileData, FileHost, FileHostingError, UploadFileData};
 use async_trait::async_trait;
-use bytes::{Buf, Bytes};
+use bytes::Bytes;
 use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
@@ -42,14 +42,10 @@ impl FileHost for S3Host {
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
         let content_sha1 = sha1::Sha1::from(&file_bytes).hexdigest();
-        let content_sha512 = format!("{:x}", sha2::Sha512::digest(file_bytes.bytes()));
+        let content_sha512 = format!("{:x}", sha2::Sha512::digest(&*file_bytes));
 
         self.bucket
-            .put_object_with_content_type(
-                format!("/{}", file_name),
-                file_bytes.bytes(),
-                content_type,
-            )
+            .put_object_with_content_type(format!("/{}", file_name), &*file_bytes, content_type)
             .await?;
 
         Ok(UploadFileData {

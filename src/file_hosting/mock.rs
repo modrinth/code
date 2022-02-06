@@ -1,6 +1,6 @@
 use super::{DeleteFileData, FileHost, FileHostingError, UploadFileData};
 use async_trait::async_trait;
-use bytes::{Buf, Bytes};
+use bytes::Bytes;
 use sha2::Digest;
 
 pub struct MockHost(());
@@ -22,10 +22,10 @@ impl FileHost for MockHost {
         let path = std::path::Path::new(&dotenv::var("MOCK_FILE_PATH").unwrap())
             .join(file_name.replace("../", ""));
         std::fs::create_dir_all(path.parent().ok_or(FileHostingError::InvalidFilename)?)?;
-        let content_sha1 = sha1::Sha1::from(file_bytes.bytes()).hexdigest();
-        let content_sha512 = format!("{:x}", sha2::Sha512::digest(file_bytes.bytes()));
+        let content_sha1 = sha1::Sha1::from(&*file_bytes).hexdigest();
+        let content_sha512 = format!("{:x}", sha2::Sha512::digest(&*file_bytes));
 
-        std::fs::write(path, file_bytes.bytes())?;
+        std::fs::write(path, &*file_bytes)?;
         Ok(UploadFileData {
             file_id: String::from("MOCK_FILE_ID"),
             file_name: file_name.to_string(),

@@ -117,7 +117,7 @@ pub async fn init(
     );
 
     Ok(HttpResponse::TemporaryRedirect()
-        .header("Location", &*url)
+        .append_header(("Location", &*url))
         .json(AuthorizationInit { url }))
 }
 
@@ -235,7 +235,7 @@ pub async fn auth_callback(
         };
 
         Ok(HttpResponse::TemporaryRedirect()
-            .header("Location", &*redirect_url)
+            .append_header(("Location", &*redirect_url))
             .json(AuthorizationInit { url: redirect_url }))
     } else {
         Err(AuthorizationError::InvalidCredentialsError)

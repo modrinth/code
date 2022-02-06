@@ -18,8 +18,10 @@ impl Scheduler {
         F: FnMut() -> R + Send + 'static,
         R: std::future::Future<Output = ()> + Send + 'static,
     {
-        let future = time::interval(interval).for_each_concurrent(2, move |_| task());
-        self.arbiter.send(future);
+        let future =
+            IntervalStream::new(time::interval(interval)).for_each_concurrent(2, move |_| task());
+
+        self.arbiter.spawn(future);
     }
 }
 
@@ -72,6 +74,7 @@ pub enum VersionIndexingError {
 
 use crate::util::env::parse_var;
 use serde::Deserialize;
+use tokio_stream::wrappers::IntervalStream;
 
 #[derive(Deserialize)]
 struct InputFormat<'a> {

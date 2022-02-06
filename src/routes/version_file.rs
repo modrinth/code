@@ -105,7 +105,7 @@ pub async fn download_version(
         transaction.commit().await?;
 
         Ok(HttpResponse::TemporaryRedirect()
-            .header("Location", &*id.url)
+            .append_header(("Location", &*id.url))
             .json(DownloadRedirect { url: id.url }))
     } else {
         Ok(HttpResponse::NotFound().body(""))
@@ -128,10 +128,10 @@ async fn download_version_inner(
         if let Some(header) = req.headers().get("CF-Connecting-IP") {
             header.to_str().ok()
         } else {
-            real_ip.borrow().remote_addr()
+            real_ip.borrow().peer_addr()
         }
     } else {
-        real_ip.borrow().remote_addr()
+        real_ip.borrow().peer_addr()
     };
 
     if let Some(ip) = ip_option {

@@ -106,9 +106,7 @@ async fn version_create_inner(
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item.map_err(CreateError::MultipartError)?;
-        let content_disposition = field.content_disposition().ok_or_else(|| {
-            CreateError::MissingValueError("Missing content disposition".to_string())
-        })?;
+        let content_disposition = field.content_disposition().clone();
         let name = content_disposition
             .get_name()
             .ok_or_else(|| CreateError::MissingValueError("Missing content name".to_string()))?;
@@ -511,9 +509,7 @@ async fn upload_file_to_version_inner(
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item.map_err(CreateError::MultipartError)?;
-        let content_disposition = field.content_disposition().ok_or_else(|| {
-            CreateError::MissingValueError("Missing content disposition".to_string())
-        })?;
+        let content_disposition = field.content_disposition().clone();
         let name = content_disposition
             .get_name()
             .ok_or_else(|| CreateError::MissingValueError("Missing content name".to_string()))?;

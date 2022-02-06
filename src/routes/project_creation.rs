@@ -323,9 +323,7 @@ pub async fn project_create_inner(
                 )))
             })?;
 
-        let content_disposition = field.content_disposition().ok_or_else(|| {
-            CreateError::MissingValueError(String::from("Missing content disposition"))
-        })?;
+        let content_disposition = field.content_disposition();
         let name = content_disposition
             .get_name()
             .ok_or_else(|| CreateError::MissingValueError(String::from("Missing content name")))?;
@@ -409,9 +407,7 @@ pub async fn project_create_inner(
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item.map_err(CreateError::MultipartError)?;
-        let content_disposition = field.content_disposition().ok_or_else(|| {
-            CreateError::MissingValueError("Missing content disposition".to_string())
-        })?;
+        let content_disposition = field.content_disposition().clone();
 
         let name = content_disposition
             .get_name()

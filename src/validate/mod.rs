@@ -22,7 +22,7 @@ pub enum ValidationError {
     #[error("Invalid Input: {0}")]
     InvalidInputError(std::borrow::Cow<'static, str>),
     #[error("Error while managing threads")]
-    BlockingError,
+    BlockingError(#[from] actix_web::error::BlockingError),
 }
 
 #[derive(Eq, PartialEq)]
@@ -67,7 +67,7 @@ pub async fn validate_file(
     game_versions: Vec<GameVersion>,
     all_game_versions: Vec<crate::database::models::categories::GameVersion>,
 ) -> Result<ValidationResult, ValidationError> {
-    let res = actix_web::web::block(move || {
+    actix_web::web::block(move || {
         let reader = std::io::Cursor::new(data);
         let mut zip = zip::ZipArchive::new(reader)?;
 
@@ -103,15 +103,7 @@ pub async fn validate_file(
             Ok(ValidationResult::Pass)
         }
     })
-    .await;
-
-    match res {
-        Ok(x) => Ok(x),
-        Err(err) => match err {
-            actix_web::error::BlockingError::Canceled => Err(ValidationError::BlockingError),
-            actix_web::error::BlockingError::Error(err) => Err(err),
-        },
-    }
+    .await?
 }
 
 fn game_version_supported(

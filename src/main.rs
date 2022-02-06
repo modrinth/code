@@ -1,13 +1,13 @@
 use crate::file_hosting::S3Host;
+use crate::ratelimit::errors::ARError;
+use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
+use crate::ratelimit::middleware::RateLimiter;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use actix_cors::Cors;
-use actix_ratelimit::errors::ARError;
-use actix_ratelimit::{MemoryStore, MemoryStoreActor, RateLimiter};
 use actix_web::{http, web, App, HttpServer};
 use env_logger::Env;
 use gumdrop::Options;
 use log::{error, info, warn};
-use rand::Rng;
 use search::indexing::index_projects;
 use search::indexing::IndexingSettings;
 use std::sync::atomic::Ordering;
@@ -17,6 +17,7 @@ mod database;
 mod file_hosting;
 mod health;
 mod models;
+mod ratelimit;
 mod routes;
 mod scheduler;
 mod search;
@@ -88,14 +89,6 @@ async fn main() -> std::io::Result<()> {
     let skip_initial = config.skip_first_index;
     if skip_initial {
         info!("Skipping initial indexing");
-    }
-
-    // DSN is from SENTRY_DSN env variable.
-    // Has no effect if not set.
-    let sentry = sentry::init(());
-    if sentry.is_enabled() {
-        info!("Enabled Sentry integration");
-        std::env::set_var("RUST_BACKTRACE", "1");
     }
 
     database::check_for_migrations()
@@ -266,37 +259,28 @@ async fn main() -> std::io::Result<()> {
                                     header.to_str().map_err(|_| ARError::IdentificationError)?
                                 } else {
                                     connection_info
-                                        .remote_addr()
+                                        .peer_addr()
                                         .ok_or(ARError::IdentificationError)?
                                 }
                             } else {
                                 connection_info
-                                    .remote_addr()
+                                    .peer_addr()
                                     .ok_or(ARError::IdentificationError)?
                             });
-
-                        let ignore_ips =
-                            parse_strings_from_var("RATE_LIMIT_IGNORE_IPS").unwrap_or_default();
-
-                        if ignore_ips.contains(&ip) {
-                            // At an even distribution of numbers, this will allow at the most
-                            // 18000 requests per minute from the frontend, which is reasonable
-                            // (300 requests per second)
-                            let random = rand::thread_rng().gen_range(1, 30);
-                            return Ok(format!("{}-{}", ip, random));
-                        }
 
                         Ok(ip)
                     })
                     .with_interval(std::time::Duration::from_secs(60))
-                    .with_max_requests(300),
+                    .with_max_requests(300)
+                    .with_ignore_ips(
+                        parse_strings_from_var("RATE_LIMIT_IGNORE_IPS").unwrap_or_default(),
+                    ),
             )
-            .wrap(sentry_actix::Sentry::new())
-            .data(pool.clone())
-            .data(file_host.clone())
-            .data(indexing_queue.clone())
-            .data(search_config.clone())
-            .data(ip_salt.clone())
+            .app_data(pool.clone())
+            .app_data(file_host.clone())
+            .app_data(indexing_queue.clone())
+            .app_data(search_config.clone())
+            .app_data(ip_salt.clone())
             .configure(routes::v1_config)
             .configure(routes::v2_config)
             .service(routes::index_get)

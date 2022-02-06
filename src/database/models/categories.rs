@@ -141,6 +141,7 @@ impl Category {
             SELECT c.id id, c.category category, c.icon icon, pt.name project_type
             FROM categories c
             INNER JOIN project_types pt ON c.project_type = pt.id
+            ORDER BY c.id
             "
         )
         .fetch_many(exec)
@@ -162,8 +163,6 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             DELETE FROM categories
@@ -227,7 +226,7 @@ impl<'a> CategoryBuilder<'a> {
             "
             INSERT INTO categories (category, project_type, icon)
             VALUES ($1, $2, $3)
-            ON CONFLICT (category, project_type, icon) DO NOTHING
+            ON CONFLICT (category) DO NOTHING
             RETURNING id
             ",
             self.name,
@@ -336,8 +335,6 @@ impl Loader {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             DELETE FROM loaders
@@ -398,7 +395,7 @@ impl<'a> LoaderBuilder<'a> {
             "
             INSERT INTO loaders (loader, icon)
             VALUES ($1, $2)
-            ON CONFLICT (loader, icon) DO NOTHING
+            ON CONFLICT (loader) DO NOTHING
             RETURNING id
             ",
             self.name,
@@ -597,8 +594,6 @@ impl GameVersion {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             DELETE FROM game_versions
@@ -761,8 +756,6 @@ impl License {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             DELETE FROM licenses
@@ -909,8 +902,6 @@ impl DonationPlatform {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             DELETE FROM donation_platforms
@@ -1046,8 +1037,6 @@ impl ReportType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             DELETE FROM report_types
@@ -1199,8 +1188,6 @@ impl ProjectType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        use sqlx::Done;
-
         let result = sqlx::query!(
             "
             DELETE FROM project_types

@@ -1209,28 +1209,6 @@
       ]
     }
   },
-  "49b2829b22f6ca82b3f62ea7962d8af22098cfa5a1fc1e06312bf1d3df382280": {
-    "query": "\n            INSERT INTO categories (category, project_type, icon)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (category, project_type, icon) DO NOTHING\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int4",
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "4a4b4166248877eefcd63603945fdcd392f76812bdec7c70f8ffeb06ee7e737f": {
     "query": "\n            SELECT m.id FROM mods m\n            INNER JOIN team_members tm ON tm.team_id = m.team_id\n            WHERE tm.user_id = $1 AND tm.role = $2\n            ",
     "describe": {
@@ -2190,68 +2168,6 @@
       ]
     }
   },
-  "7367664a589891e560eef5f80bb82220b438e3344eb60074c6b3174a02a72f4e": {
-    "query": "\n            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            WHERE r.id = ANY($1)\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 4,
-          "name": "user_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 5,
-          "name": "body",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "reporter",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 7,
-          "name": "created",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        true,
-        true,
-        true,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "73bdd6c9e7cd8c1ed582261aebdee0f8fd2734e712ef288a2608564c918009cb": {
     "query": "\n            DELETE FROM versions WHERE id = $1\n            ",
     "describe": {
@@ -2310,6 +2226,28 @@
       "nullable": [
         false,
         false,
+        false
+      ]
+    }
+  },
+  "7795938e2b23d06b32dc6d79f6b2b8e7ed24bbf4fa61cb3000259ba3d2ecbc6f": {
+    "query": "\n            INSERT INTO categories (category, project_type, icon)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (category) DO NOTHING\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int4",
+          "Varchar"
+        ]
+      },
+      "nullable": [
         false
       ]
     }
@@ -2612,6 +2550,42 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "885ca4b21e05079d30dcf3b65619c95b544a10b7b08c3184278a0fe5ebc44b86": {
+    "query": "\n            SELECT c.id id, c.category category, c.icon icon, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ORDER BY c.id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 1,
+          "name": "category",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "icon",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "project_type",
+          "type_info": "Varchar"
+        }
+      ],
+      "parameters": {
+        "Left": []
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "89310b2bc5f020744a9a42dae6f15dfebc1544cdd754939f0d09714353f2aa7c": {
@@ -4133,6 +4107,27 @@
       "nullable": []
     }
   },
+  "bc605f80a615c7d0ca9c8207f8b0c5dc1b8f2ad0f9b3346a00078d59e5e3e253": {
+    "query": "\n            INSERT INTO loaders (loader, icon)\n            VALUES ($1, $2)\n            ON CONFLICT (loader) DO NOTHING\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "bc91841f9672608a28bd45a862919f2bd34fac0b3479e3b4b67a9f6bea2a562a": {
     "query": "\n                    UPDATE mods\n                    SET issues_url = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -4570,27 +4565,6 @@
       "nullable": []
     }
   },
-  "cc8eeb14e2069b9e4f92b224d42b283e569258d61be3cc3b3f7564f0dadac89b": {
-    "query": "\n            INSERT INTO loaders (loader, icon)\n            VALUES ($1, $2)\n            ON CONFLICT (loader, icon) DO NOTHING\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "ccd913bb2f3006ffe881ce2fc4ef1e721d18fe2eed6ac62627046c955129610c": {
     "query": "SELECT EXISTS(SELECT 1 FROM files WHERE id=$1)",
     "describe": {
@@ -4982,36 +4956,62 @@
       ]
     }
   },
-  "d7744589d9e20c48f6f726a8a540822c1e521b791ebc2fee86a1108d442aedb8": {
-    "query": "\n            SELECT c.id id, c.category category, c.icon icon, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ",
+  "d7127fd7f257cc7779841108c75f6fd8b20f9619bef1cacd0fbaf011cf0b25b3": {
+    "query": "\n            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            WHERE r.id = ANY($1)\n            ORDER BY r.created DESC\n            ",
     "describe": {
       "columns": [
         {
           "ordinal": 0,
           "name": "id",
-          "type_info": "Int4"
+          "type_info": "Int8"
         },
         {
           "ordinal": 1,
-          "name": "category",
+          "name": "name",
           "type_info": "Varchar"
         },
         {
           "ordinal": 2,
-          "name": "icon",
-          "type_info": "Varchar"
+          "name": "mod_id",
+          "type_info": "Int8"
         },
         {
           "ordinal": 3,
-          "name": "project_type",
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 4,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 5,
+          "name": "body",
           "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "reporter",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 7,
+          "name": "created",
+          "type_info": "Timestamptz"
         }
       ],
       "parameters": {
-        "Left": []
+        "Left": [
+          "Int8Array"
+        ]
       },
       "nullable": [
         false,
+        false,
+        true,
+        true,
+        true,
         false,
         false,
         false
