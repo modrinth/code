@@ -10,7 +10,7 @@ mod versions;
 
 pub fn v1_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/api/v1/")
+        web::scope("api/v1")
             .configure(super::auth_config)
             .configure(tags_config)
             .configure(mods_config)
@@ -25,7 +25,7 @@ pub fn v1_config(cfg: &mut web::ServiceConfig) {
 
 pub fn tags_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/tag/")
+        web::scope("tag")
             .service(tags::category_list)
             .service(tags::category_create)
             .service(super::tags::category_delete)

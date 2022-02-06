@@ -29,7 +29,7 @@ use actix_web::web;
 
 pub fn v2_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/v2/")
+        web::scope("v2")
             .configure(auth_config)
             .configure(tags_config)
             .configure(projects_config)

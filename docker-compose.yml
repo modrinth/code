@@ -5,17 +5,17 @@ services:
     volumes:
       - db-data:/var/lib/postgresql/data
     ports:
-      - 5432:5432
+      - "5432:5432"
     environment:
       POSTGRES_DB: postgres
       POSTGRES_USER: labrinth
       POSTGRES_PASSWORD: labrinth
       POSTGRES_HOST_AUTH_METHOD: trust
   meilisearch:
-    image: getmeili/meilisearch
+    image: getmeili/meilisearch:v0.19.0
     restart: on-failure
     ports:
-      - 7700:7700
+      - "7700:7700"
     volumes:
       - meilisearch-data:/data.ms
     environment:

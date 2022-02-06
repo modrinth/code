@@ -247,9 +247,6 @@ async fn main() -> std::io::Result<()> {
                     .max_age(3600),
             )
             .wrap(
-                // This is a hacky workaround to allowing the frontend server-side renderer to have
-                // an unlimited rate limit, since there is no current way with this library to
-                // have dynamic rate-limit max requests
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
                     .with_identifier(|req| {
                         let connection_info = req.connection_info();
@@ -276,11 +273,11 @@ async fn main() -> std::io::Result<()> {
                         parse_strings_from_var("RATE_LIMIT_IGNORE_IPS").unwrap_or_default(),
                     ),
             )
-            .app_data(pool.clone())
-            .app_data(file_host.clone())
-            .app_data(indexing_queue.clone())
-            .app_data(search_config.clone())
-            .app_data(ip_salt.clone())
+            .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(file_host.clone()))
+            .app_data(web::Data::new(indexing_queue.clone()))
+            .app_data(web::Data::new(search_config.clone()))
+            .app_data(web::Data::new(ip_salt.clone()))
             .configure(routes::v1_config)
             .configure(routes::v2_config)
             .service(routes::index_get)
