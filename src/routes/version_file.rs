@@ -379,7 +379,7 @@ pub struct FileHashes {
 }
 
 // under /api/v2/version_files
-#[post("/")]
+#[post("")]
 pub async fn get_versions_from_hashes(
     pool: web::Data<PgPool>,
     file_data: web::Json<FileHashes>,
@@ -418,7 +418,12 @@ pub async fn get_versions_from_hashes(
                 .clone()
                 .into_iter()
                 .find(|x| x.id.0 == row.version_id)
-                .map(|v| (row.hash, crate::models::projects::Version::from(v)))
+                .map(|v| {
+                    (
+                        hex::encode(row.hash),
+                        crate::models::projects::Version::from(v),
+                    )
+                })
         })
         .collect();
     Ok(HttpResponse::Ok().json(response))
@@ -463,7 +468,7 @@ pub async fn download_files(
             &pepper,
         )
         .await?;
-        response.insert(row.hash, row.url);
+        response.insert(hex::encode(row.hash), row.url);
     }
 
     Ok(HttpResponse::Ok().json(response))
@@ -540,7 +545,7 @@ pub async fn update_files(
     for row in &result {
         if let Some(version) = versions.iter().find(|x| x.id.0 == row.version_id) {
             response.insert(
-                row.hash.clone(),
+                hex::encode(&row.hash),
                 models::projects::Version::from(version.clone()),
             );
         }

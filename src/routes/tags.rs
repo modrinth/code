@@ -8,7 +8,7 @@ use sqlx::PgPool;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
-        web::scope("/tag/")
+        web::scope("tag")
             .service(category_list)
             .service(category_create)
             .service(category_delete)

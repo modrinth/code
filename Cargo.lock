@@ -1653,6 +1653,7 @@ dependencies = [
  "futures",
  "futures-timer",
  "gumdrop",
+ "hex",
  "lazy_static",
  "log",
  "meilisearch-sdk",
