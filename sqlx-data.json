@@ -2230,28 +2230,6 @@
       ]
     }
   },
-  "7795938e2b23d06b32dc6d79f6b2b8e7ed24bbf4fa61cb3000259ba3d2ecbc6f": {
-    "query": "\n            INSERT INTO categories (category, project_type, icon)\n            VALUES ($1, $2, $3)\n            ON CONFLICT (category) DO NOTHING\n            RETURNING id\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Int4",
-          "Varchar"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "78a60cf0febcc6e35b8ffe38f2c021c13ab660c81c4775bbb26004d30242a1a8": {
     "query": "\n                SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv\n                WHERE major = $1\n                ORDER BY created DESC\n                ",
     "describe": {
@@ -2796,6 +2774,28 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "8bb8be81029b47af0c2a200647abcabb79cb88a41e53467ad3b52d714c83fdf9": {
+    "query": "\n            INSERT INTO categories (category, project_type, icon)\n            VALUES ($1, $2, $3)\n            RETURNING id\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int4",
+          "Varchar"
+        ]
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "8f706d78ac4235ea04c59e2c220a4791e1d08fdf287b783b4aaef36fd2445467": {

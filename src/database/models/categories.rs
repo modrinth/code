@@ -226,7 +226,6 @@ impl<'a> CategoryBuilder<'a> {
             "
             INSERT INTO categories (category, project_type, icon)
             VALUES ($1, $2, $3)
-            ON CONFLICT (category) DO NOTHING
             RETURNING id
             ",
             self.name,

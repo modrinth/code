@@ -1,7 +1,7 @@
 use actix_web::{get, HttpResponse};
 use serde_json::json;
 
-#[get("/")]
+#[get("")]
 pub async fn index_get() -> HttpResponse {
     let data = json!({
         "name": "modrinth-labrinth",

@@ -280,10 +280,17 @@ pub async fn edit_team_member(
                 "You don't have permission to edit members of this team".to_string(),
             )
         })?;
+    let edit_member_db = TeamMember::get_from_user_id(id, user_id, &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::CustomAuthenticationError(
+                "You don't have permission to edit members of this team".to_string(),
+            )
+        })?;
 
     let mut transaction = pool.begin().await?;
 
-    if &*member.role == crate::models::teams::OWNER_ROLE {
+    if &*edit_member_db.role == crate::models::teams::OWNER_ROLE {
         return Err(ApiError::InvalidInputError(
             "The owner of a team cannot be edited".to_string(),
         ));

@@ -8,13 +8,12 @@ use actix_web::http::StatusCode;
 use actix_web::web::{scope, Data, Query, ServiceConfig};
 use actix_web::{get, HttpResponse};
 use chrono::Utc;
-use log::info;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
 
 pub fn config(cfg: &mut ServiceConfig) {
-    cfg.service(scope("/auth/").service(auth_callback).service(init));
+    cfg.service(scope("auth").service(auth_callback).service(init));
 }
 
 #[derive(Error, Debug)]
@@ -177,7 +176,7 @@ pub async fn auth_callback(
 
         let user_result = User::get_from_github_id(user.id, &mut *transaction).await?;
         match user_result {
-            Some(x) => info!("{:?}", x.id),
+            Some(_) => {}
             None => {
                 let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
 

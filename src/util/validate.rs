@@ -21,10 +21,10 @@ pub fn validation_errors_to_string(errors: ValidationErrors, adder: Option<Strin
                     validation_errors_to_string(*errors.clone(), Some(format!("of item {}", field)))
                 }
                 ValidationErrorsKind::List(list) => {
-                    if let Some(errors) = list.get(&0) {
+                    if let Some((index, errors)) = list.iter().next() {
                         output.push_str(&*validation_errors_to_string(
                             *errors.clone(),
-                            Some(format!("of list {} with index 0", field)),
+                            Some(format!("of list {} with index {}", index, field)),
                         ));
                     }
 
