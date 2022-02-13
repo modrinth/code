@@ -240,10 +240,9 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .wrap(
                 Cors::default()
-                    .allowed_methods(["GET", "POST", "DELETE", "PATCH", "PUT"])
-                    .allowed_headers([http::header::AUTHORIZATION, http::header::ACCEPT])
-                    .allowed_header(http::header::CONTENT_TYPE)
                     .allow_any_origin()
+                    .allow_any_header()
+                    .allow_any_method()
                     .max_age(3600),
             )
             .wrap(
