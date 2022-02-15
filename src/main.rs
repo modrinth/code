@@ -243,7 +243,8 @@ async fn main() -> std::io::Result<()> {
                     .allow_any_origin()
                     .allow_any_header()
                     .allow_any_method()
-                    .max_age(3600),
+                    .max_age(3600)
+                    .send_wildcard(),
             )
             .wrap(
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())

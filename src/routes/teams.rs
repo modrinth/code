@@ -280,7 +280,7 @@ pub async fn edit_team_member(
                 "You don't have permission to edit members of this team".to_string(),
             )
         })?;
-    let edit_member_db = TeamMember::get_from_user_id(id, user_id, &**pool)
+    let edit_member_db = TeamMember::get_from_user_id_pending(id, user_id, &**pool)
         .await?
         .ok_or_else(|| {
             ApiError::CustomAuthenticationError(
