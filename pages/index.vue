@@ -348,7 +348,7 @@ export default {
 
         svg {
           color: var(--color-brand);
-          width: fit-content;
+          width: 36rem;
           height: unset;
         }
 
