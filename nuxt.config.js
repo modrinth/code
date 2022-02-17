@@ -229,7 +229,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://api.modrinth.com/v2/',
+    baseURL: 'https://staging-api.modrinth.com/v2/',
     headers: {
       common: {
         Accept: 'application/json',
