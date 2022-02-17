@@ -69,7 +69,7 @@
           <div v-if="downloads" class="stat">
             <DownloadIcon aria-hidden="true" />
             <p>
-              <strong>{{ formatNumber(downloads) }}</strong> download<span
+              <strong>{{ $formatNumber(downloads) }}</strong> download<span
                 v-if="downloads !== '1'"
                 >s</span
               >
@@ -78,7 +78,7 @@
           <div v-if="follows" class="stat">
             <HeartIcon aria-hidden="true" />
             <p>
-              <strong>{{ formatNumber(follows) }}</strong> follower<span
+              <strong>{{ $formatNumber(follows) }}</strong> follower<span
                 v-if="follows !== '1'"
                 >s</span
               >
@@ -197,18 +197,6 @@ export default {
       default: '',
     },
   },
-  methods: {
-    formatNumber(y) {
-      const x = +y
-      if (x >= 1000000) {
-        return (x / 1000000).toFixed(2).toString() + 'M'
-      } else if (x >= 10000) {
-        return (x / 1000).toFixed(1).toString() + 'K'
-      } else {
-        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-      }
-    },
-  },
 }
 </script>
 
@@ -315,7 +303,7 @@ export default {
     }
 
     .right-side {
-      min-width: 8.75rem;
+      min-width: 12rem;
       text-align: right;
 
       .stat {

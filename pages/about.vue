@@ -49,11 +49,7 @@
       <p>
         Documentation for the Modrinth API (Labrinth) can be found on the GitHub
         repository's wiki
-        <a
-          target="_blank"
-          href="https://github.com/modrinth/labrinth/wiki/API-Documentation"
-          >here</a
-        >.
+        <a target="_blank" href="https://docs.modrinth.com">here</a>.
       </p>
     </div>
   </div>

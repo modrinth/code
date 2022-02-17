@@ -208,9 +208,6 @@ export default {
         this.previewImage = event.target.result
       }
     },
-    formatNumber(x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    },
     sumDownloads() {
       let sum = 0
 
@@ -218,7 +215,7 @@ export default {
         sum += projects.downloads
       }
 
-      return this.formatNumber(sum)
+      return this.$formatNumber(sum)
     },
     sumFollows() {
       let sum = 0
@@ -227,7 +224,7 @@ export default {
         sum += projects.followers
       }
 
-      return this.formatNumber(sum)
+      return this.$formatNumber(sum)
     },
     async changeLayout() {
       await this.$store.dispatch('cosmetics/save', {

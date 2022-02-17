@@ -11,4 +11,4 @@ components/ui/search/LogoAnimated.vue <br />
 assets/images/landing.svg <br />
 
 ## Logo Licenses
-All rights reserved. ©2020-2021 Guavy LLC
+All rights reserved. ©2020-2022 Rinth, Inc.

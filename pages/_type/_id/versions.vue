@@ -76,7 +76,7 @@
                 </p>
                 <p></p>
                 <p>
-                  <strong>{{ $parent.formatNumber(version.downloads) }}</strong>
+                  <strong>{{ $formatNumber(version.downloads) }}</strong>
                   downloads
                 </p>
                 <p>
@@ -100,7 +100,7 @@
           </td>
           <td>
             <p>
-              <span>{{ $parent.formatNumber(version.downloads) }}</span>
+              <span>{{ $formatNumber(version.downloads) }}</span>
               downloads
             </p>
             <p>
@@ -176,7 +176,7 @@ table {
   tr {
     td:nth-child(2) {
       padding-right: 2rem;
-      min-width: 13.875rem;
+      min-width: 16rem;
       .top {
         font-weight: bold;
       }

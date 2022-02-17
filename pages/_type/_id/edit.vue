@@ -525,11 +525,17 @@ export default {
           description: this.newProject.description,
           body: this.newProject.body,
           categories: this.newProject.categories,
-          issues_url: this.newProject.issues_url,
-          source_url: this.newProject.source_url,
-          wiki_url: this.newProject.wiki_url,
+          issues_url: this.newProject.issues_url
+            ? this.newProject.issues_url
+            : null,
+          source_url: this.newProject.source_url
+            ? this.newProject.source_url
+            : null,
+          wiki_url: this.newProject.wiki_url ? this.newProject.wiki_url : null,
           license_url: this.license_url,
-          discord_url: this.newProject.discord_url,
+          discord_url: this.newProject.discord_url
+            ? this.newProject.discord_url
+            : null,
           license_id: this.license.short,
           client_side: this.clientSideType.toLowerCase(),
           server_side: this.serverSideType.toLowerCase(),

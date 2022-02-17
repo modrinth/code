@@ -229,9 +229,6 @@ export default {
     },
   },
   methods: {
-    formatNumber(x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    },
     sumDownloads() {
       let sum = 0
 
@@ -239,7 +236,7 @@ export default {
         sum += projects.downloads
       }
 
-      return this.formatNumber(sum)
+      return this.$formatNumber(sum)
     },
   },
 }

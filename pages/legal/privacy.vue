@@ -19,22 +19,23 @@
       <p>We are a Data Controller of your information.</p>
 
       <p>
-        Guavy LLC legal basis for collecting and using the personal information
-        described in this Privacy Policy depends on the Personal Information we
-        collect and the specific context in which we collect the information:
+        Rinth, Inc. legal basis for collecting and using the personal
+        information described in this Privacy Policy depends on the Personal
+        Information we collect and the specific context in which we collect the
+        information:
       </p>
       <ul>
-        <li>Guavy LLC needs to perform a contract with you</li>
-        <li>You have given Guavy LLC permission to do so</li>
+        <li>Rinth, Inc. needs to perform a contract with you</li>
+        <li>You have given Rinth, Inc. permission to do so</li>
         <li>
-          Processing your personal information is in Guavy LLC legitimate
+          Processing your personal information is in Rinth, Inc. legitimate
           interests
         </li>
-        <li>Guavy LLC needs to comply with the law</li>
+        <li>Rinth, Inc. needs to comply with the law</li>
       </ul>
 
       <p>
-        Guavy LLC will retain your personal information only for as long as is
+        Rinth, Inc. will retain your personal information only for as long as is
         necessary for the purposes set out in this Privacy Policy. We will
         retain and use your information to the extent necessary to comply with
         our legal obligations, resolve disputes, and enforce our policies.

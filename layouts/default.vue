@@ -149,54 +149,56 @@
         </button>
       </section>
       <section ref="mobileMenu" class="mobile-menu">
-        <div class="items-container rows">
-          <NuxtLink
-            v-if="$auth.user"
-            class="item user-item"
-            :to="`/user/${$auth.user.username}`"
-          >
-            <img :src="$auth.user.avatar_url" class="user-icon" />
-            <div class="profile-link">
-              <div class="username">@{{ $auth.user.username }}</div>
-              <div class="prompt">Go to my profile</div>
-            </div>
-          </NuxtLink>
-          <button v-if="$auth.user" class="item log-out" @click="logout">
-            <LogOutIcon class="icon" />
-            <span class="dropdown-item__text">Log out</span>
-          </button>
-          <NuxtLink v-if="$auth.user" class="item" to="/create/project">
-            <PlusIcon class="icon" />
-            <span class="title">Create a project</span>
-          </NuxtLink>
-          <NuxtLink v-if="$auth.user" class="item" to="/settings">
-            <SettingsIcon class="icon" />
-            <span class="title">Settings</span>
-          </NuxtLink>
-          <NuxtLink
-            v-if="
-              $auth.user &&
-              ($auth.user.role === 'moderator' || $auth.user.role === 'admin')
-            "
-            class="item"
-            to="/moderation"
-          >
-            <ModerationIcon class="icon" />
-            <span class="title">Moderation</span>
-          </NuxtLink>
-          <NuxtLink v-if="$auth.user" class="item" to="/notifications">
-            <NotificationIcon class="icon" />
-            <span class="title">Notifications</span>
-          </NuxtLink>
-          <button class="item" @click="changeTheme">
-            <MoonIcon v-if="$colorMode.value === 'light'" class="icon" />
-            <SunIcon v-else class="icon" />
-            <span class="dropdown-item__text">Change theme</span>
-          </button>
-          <a v-if="!$auth.user" :href="authUrl" class="item log-in">
-            <GitHubIcon aria-hidden="true" />
-            Sign in with GitHub</a
-          >
+        <div class="mobile-menu-wrapper">
+          <div class="items-container rows">
+            <NuxtLink
+              v-if="$auth.user"
+              class="item user-item"
+              :to="`/user/${$auth.user.username}`"
+            >
+              <img :src="$auth.user.avatar_url" class="user-icon" />
+              <div class="profile-link">
+                <div class="username">@{{ $auth.user.username }}</div>
+                <div class="prompt">Go to my profile</div>
+              </div>
+            </NuxtLink>
+            <button v-if="$auth.user" class="item log-out" @click="logout">
+              <LogOutIcon class="icon" />
+              <span class="dropdown-item__text">Log out</span>
+            </button>
+            <NuxtLink v-if="$auth.user" class="item" to="/create/project">
+              <PlusIcon class="icon" />
+              <span class="title">Create a project</span>
+            </NuxtLink>
+            <NuxtLink v-if="$auth.user" class="item" to="/settings">
+              <SettingsIcon class="icon" />
+              <span class="title">Settings</span>
+            </NuxtLink>
+            <NuxtLink
+              v-if="
+                $auth.user &&
+                ($auth.user.role === 'moderator' || $auth.user.role === 'admin')
+              "
+              class="item"
+              to="/moderation"
+            >
+              <ModerationIcon class="icon" />
+              <span class="title">Moderation</span>
+            </NuxtLink>
+            <NuxtLink v-if="$auth.user" class="item" to="/notifications">
+              <NotificationIcon class="icon" />
+              <span class="title">Notifications</span>
+            </NuxtLink>
+            <button class="item" @click="changeTheme">
+              <MoonIcon v-if="$colorMode.value === 'light'" class="icon" />
+              <SunIcon v-else class="icon" />
+              <span class="dropdown-item__text">Change theme</span>
+            </button>
+            <a v-if="!$auth.user" :href="authUrl" class="item log-in">
+              <GitHubIcon aria-hidden="true" />
+              Sign in with GitHub</a
+            >
+          </div>
         </div>
       </section>
     </header>
@@ -224,7 +226,7 @@
           >
         </p>
         <p>modrinth/knossos {{ version }}</p>
-        <p>© Guavy LLC</p>
+        <p>© Rinth, Inc.</p>
       </div>
       <div class="links links-1" role="region" aria-label="Legal">
         <h4 aria-hidden="true">Legal</h4>
@@ -753,62 +755,68 @@ export default {
     width: 100%;
     z-index: 5;
 
-    .items-container {
-      margin-bottom: 1rem;
-      margin-right: 2rem;
-      margin-left: 2rem;
+    .mobile-menu-wrapper {
+      overflow-y: auto;
 
-      button {
-        box-sizing: unset;
+      @media screen and (min-height: 605px) {
+        margin-top: auto;
       }
 
-      .item {
-        padding: 1rem 2rem;
-        background-color: var(--color-raised-bg);
-        border-radius: var(--size-rounded-md);
-        align-items: center;
-        justify-content: center;
-        display: flex;
-        column-gap: 0.25rem;
-        width: calc(100% - 4rem);
-        max-width: 18rem;
+      .items-container {
+        margin: 1rem 2rem;
 
-        &.nuxt-link-exact-active {
-          color: var(--color-button-text-active);
-          svg {
-            color: var(--color-brand);
-          }
+        button {
+          box-sizing: unset;
         }
 
-        &.log-in {
-          color: var(--color-brand-inverted);
-          background-color: var(--color-brand);
-        }
-
-        &.log-out {
-          color: white;
-          background-color: var(--color-badge-red-bg);
-        }
-
-        &.user-item {
-          flex-direction: column;
-          row-gap: 0.5rem;
-          //width: 8rem;
+        .item {
+          padding: 1rem 2rem;
+          background-color: var(--color-raised-bg);
+          border-radius: var(--size-rounded-md);
+          align-items: center;
+          justify-content: center;
+          display: flex;
+          column-gap: 0.25rem;
+          width: calc(100% - 4rem);
           max-width: 18rem;
-          flex-grow: 0;
 
-          .profile-link {
-            text-align: center;
-
-            .prompt {
-              color: var(--color-text-secondary);
+          &.nuxt-link-exact-active {
+            color: var(--color-button-text-active);
+            svg {
+              color: var(--color-brand);
             }
           }
 
-          .user-icon {
-            width: 4rem;
-            height: 4rem;
-            border-radius: var(--size-rounded-max);
+          &.log-in {
+            color: var(--color-brand-inverted);
+            background-color: var(--color-brand);
+          }
+
+          &.log-out {
+            color: white;
+            background-color: var(--color-badge-red-bg);
+          }
+
+          &.user-item {
+            flex-direction: column;
+            row-gap: 0.5rem;
+            //width: 8rem;
+            max-width: 18rem;
+            flex-grow: 0;
+
+            .profile-link {
+              text-align: center;
+
+              .prompt {
+                color: var(--color-text-secondary);
+              }
+            }
+
+            .user-icon {
+              width: 4rem;
+              height: 4rem;
+              border-radius: var(--size-rounded-max);
+            }
           }
         }
       }

@@ -33,7 +33,7 @@ export default {
       {
         hid: 'publisher',
         name: 'publisher',
-        content: 'Guavy LLC',
+        content: 'Rinth, Inc.',
       },
       {
         hid: 'apple-mobile-web-app-title',
@@ -229,7 +229,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://staging-api.modrinth.com/v2/',
+    baseURL: 'https://api.modrinth.com/v2/',
     headers: {
       common: {
         Accept: 'application/json',

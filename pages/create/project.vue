@@ -505,7 +505,7 @@
               >
                 <textarea
                   id="body"
-                  v-model="versions[currentVersionIndex].changelog"
+                  v-model="versions[currentVersionIndex].version_body"
                 />
               </div>
               <div
@@ -513,8 +513,10 @@
                 v-highlightjs
                 class="markdown-body"
                 v-html="
-                  versions[currentVersionIndex].changelog
-                    ? $xss($md.render(versions[currentVersionIndex].changelog))
+                  versions[currentVersionIndex].version_body
+                    ? $xss(
+                        $md.render(versions[currentVersionIndex].version_body)
+                      )
                     : 'No changelog specified.'
                 "
               ></div>

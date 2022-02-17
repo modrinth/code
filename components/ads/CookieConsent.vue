@@ -70,12 +70,13 @@ export default {
 
   z-index: 20;
   position: fixed;
-  bottom: 0;
+  bottom: 4rem;
   right: 0;
   .banner {
     padding: 1rem;
     font-size: 1.05rem;
     border-radius: 0;
+    margin-bottom: 0;
   }
   .actions {
     display: flex;
@@ -85,6 +86,14 @@ export default {
 
     .btn {
       margin-right: 0.5rem;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    bottom: 0;
+
+    .banner {
+      margin-bottom: 0;
     }
   }
 

@@ -74,11 +74,11 @@
         <Categories :categories="project.categories" class="categories" />
         <hr class="card-divider" />
         <div class="stats">
-          <span class="stat">{{ formatNumber(project.downloads) }}</span>
+          <span class="stat">{{ $formatNumber(project.downloads) }}</span>
           <span class="label"
             >download<span v-if="project.downloads !== 1">s</span></span
           >
-          <span class="stat">{{ formatNumber(project.followers) }}</span>
+          <span class="stat">{{ $formatNumber(project.followers) }}</span>
           <span class="label"
             >follower<span v-if="project.followers !== 1">s</span></span
           >
@@ -666,9 +666,6 @@ export default {
     }
   },
   methods: {
-    formatNumber(x) {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    },
     findPrimary(version) {
       let file = version.files.find((x) => x.primary)
 

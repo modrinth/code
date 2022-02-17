@@ -236,7 +236,7 @@
           </div>
           <div v-if="mode === 'version'" class="data">
             <p class="title">Downloads</p>
-            <p class="value">{{ $parent.formatNumber(version.downloads) }}</p>
+            <p class="value">{{ $formatNumber(version.downloads) }}</p>
           </div>
           <div class="data">
             <p class="title">Version number</p>

@@ -2,6 +2,16 @@ export default ({ store }, inject) => {
   inject('user', store.state.user)
   inject('tag', store.state.tag)
   inject('auth', store.state.auth)
+  inject('formatNumber', (number) => {
+    const x = +number
+    if (x >= 1000000) {
+      return (x / 1000000).toFixed(2).toString() + 'M'
+    } else if (x >= 10000) {
+      return (x / 1000).toFixed(1).toString() + 'K'
+    } else {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    }
+  })
   inject('formatVersion', (versionArray) => {
     const allVersions = store.state.tag.gameVersions.slice().reverse()
     const allReleases = allVersions.filter((x) => x.version_type === 'release')
