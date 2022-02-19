@@ -10,9 +10,13 @@
       <div class="text">
         <h1>Discover, Play, and Create Minecraft content</h1>
         <h3>
-          Find enjoyable and quality content through our open-source modding
-          platform built for the community. Create stuff, get
-          paid<sup>WIP</sup>, and deploy your project with our fully documented
+          Find enjoyable, quality content through our
+          <a href="https://github.com/modrinth" target="_blank">open-source</a>
+          modding platform built for the community. Create stuff, get
+          paid<sup>WIP</sup>, and deploy your project with our
+          <a href="https://docs.modrinth.com" target="_blank"
+            >fully documented</a
+          >
           API!
         </h3>
         <form action="/mods">
@@ -53,11 +57,11 @@
           />
         </div>
         <div class="text-container">
-          <h3 class="subheader">Fast and Powerful Search</h3>
-          <h1>Find What You Want, Quickly and Easily</h1>
+          <h3 class="subheader">Fast and powerful search</h3>
+          <h1>Find what you want, quickly and easily</h1>
           <p>
             We are invested in making it extremely simple to find what you want
-            to play. Our search is adaptable, customizable and easy to use!
+            to play. Our search is adaptable, customizable, and easy to use!
             Whether you're a power user or someone who just discovered the world
             of Minecraft modding, we've got you covered.
           </p>
@@ -66,18 +70,23 @@
       <div class="point left">
         <div class="text-container">
           <div>
-            <h3 class="subheader">Packed with Features</h3>
-            <h1>A Constantly Evolving Platform</h1>
+            <h3 class="subheader">Packed with features</h3>
+            <h1>Constantly evolving and improving</h1>
             <p>
-              We are always adding new features and making Modrinth have the
-              best user experience. Right now, we're working on finally paying
-              out creators on our site. If you have any more feature ideas, feel
-              free to join our discord!
+              We are always adding new features and working towards making
+              Modrinth have the friendliest user experience possible. Right now,
+              we're working on finally paying out creators on our site. If you
+              have any more feature ideas, feel free to join our
+              <a href="https://discord.gg/EUHuJHt" target="_blank">Discord</a>!
             </p>
             <div class="features">
               <div class="feature completed">
                 <CheckIcon />
-                <p>Open Source</p>
+                <p>
+                  <a href="https://github.com/modrinth" target="_blank">
+                    100% open source
+                  </a>
+                </p>
               </div>
               <div class="feature completed">
                 <CheckIcon />
@@ -85,27 +94,31 @@
               </div>
               <div class="feature completed">
                 <CheckIcon />
-                <p>Project Gallery</p>
+                <p>Mods and modpacks</p>
               </div>
               <div class="feature completed">
                 <CheckIcon />
-                <p>Robust Team Management</p>
+                <p>Customizable project pages</p>
               </div>
               <div class="feature completed">
                 <CheckIcon />
-                <p>Completely documented API</p>
+                <p>Robust team management</p>
               </div>
               <div class="feature completed">
                 <CheckIcon />
-                <p>Dependency Management</p>
+                <p>
+                  <a href="https://docs.modrinth.com" target="_blank">
+                    Completely documented API
+                  </a>
+                </p>
               </div>
               <div class="feature completed">
                 <CheckIcon />
-                <p>Modpacks</p>
+                <p>Dependency management</p>
               </div>
               <div class="feature in-progress">
                 <InProgressIcon />
-                <p>Creator Payouts</p>
+                <p>Creator payouts</p>
               </div>
               <div class="feature in-progress">
                 <InProgressIcon />
@@ -117,11 +130,11 @@
               </div>
               <div class="feature in-progress">
                 <InProgressIcon />
-                <p>In-house auth</p>
+                <p>In-house authentication</p>
               </div>
               <div class="feature in-progress">
                 <InProgressIcon />
-                <p>Comments</p>
+                <p>Project comments</p>
               </div>
             </div>
           </div>
@@ -171,14 +184,16 @@
           </div>
         </div>
         <div class="text-container">
-          <h3 class="subheader">Simple to Integrate</h3>
-          <h1>An Open-Source API for Everyone to Use</h1>
+          <h3 class="subheader">Simple to integrate</h3>
+          <h1>An open-source API for everyone to use</h1>
           <p>
             We have created an open source modding platform for the community.
             We're committed to open source so the community can trust us as
             their modding platform. Our API is
-            <a href="https://docs.modrinth.com">fully documented</a> so anyone
-            can use it. We will never add restrictions on our API!
+            <a href="https://docs.modrinth.com" target="_blank"
+              >fully documented</a
+            >
+            so anyone can use it. We will never add restrictions on our API!
           </p>
         </div>
       </div>
@@ -252,6 +267,10 @@ export default {
         font-size: var(--font-size-lg);
         font-weight: normal;
         margin-bottom: 1rem;
+
+        a {
+          text-decoration: underline;
+        }
       }
 
       form {

@@ -134,7 +134,7 @@ button,
   margin: 0.5rem 0;
   > div,
   .has-icon {
-    margin: 0 0.5em;
+    margin: 0 0.3em;
   }
   font-size: 80%;
   @media screen and (min-width: 350px) {
