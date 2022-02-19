@@ -283,6 +283,7 @@ async fn main() -> std::io::Result<()> {
             .service(routes::index_get)
             .service(routes::health_get)
             .service(web::scope("maven").configure(routes::maven_config))
+            .service(web::scope("updates").configure(routes::updates))
             .default_service(web::get().to(routes::not_found))
     })
     .bind(dotenv::var("BIND_ADDR").unwrap())?

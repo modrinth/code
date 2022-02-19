@@ -13,6 +13,7 @@ mod projects;
 mod reports;
 mod tags;
 mod teams;
+mod updates;
 mod users;
 mod version_creation;
 mod version_file;
@@ -73,6 +74,10 @@ pub fn maven_config(cfg: &mut web::ServiceConfig) {
     cfg.service(maven::version_file_sha512);
     cfg.service(maven::version_file_sha1);
     cfg.service(maven::version_file);
+}
+
+pub fn updates(cfg: &mut web::ServiceConfig) {
+    cfg.service(updates::forge_updates);
 }
 
 pub fn versions_config(cfg: &mut web::ServiceConfig) {
