@@ -38,7 +38,7 @@ impl Settings {
 
         if settings_path.exists() {
             let settings_data = std::fs::read_to_string(settings_path)
-                .map(|x| serde_json::from_str::<Settings>(&*x).ok())
+                .map(|x| serde_json::from_str::<Settings>(&x).ok())
                 .ok()
                 .flatten();
 
@@ -52,7 +52,7 @@ impl Settings {
 
             std::fs::write(
                 Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
-                &*serde_json::to_string(&new)?,
+                &serde_json::to_string(&new)?,
             )?;
 
             SETTINGS.get_or_init(|| RwLock::new(new));

@@ -108,7 +108,7 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            &*crate::util::absolute_path(natives_path)
+            &crate::util::absolute_path(natives_path)
                 .map_err(|_| LauncherError::InvalidInput(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
@@ -153,7 +153,7 @@ fn parse_jvm_argument(
         )
         .replace(
             "${library_directory}",
-            &*crate::util::absolute_path(libraries_path)
+            &crate::util::absolute_path(libraries_path)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified libraries path {} does not exist",
@@ -240,14 +240,14 @@ fn parse_minecraft_argument(
         .replace("${auth_access_token}", access_token)
         .replace("${auth_session}", access_token)
         .replace("${auth_player_name}", username)
-        .replace("${auth_uuid}", &*uuid.to_hyphenated().to_string())
+        .replace("${auth_uuid}", &uuid.to_hyphenated().to_string())
         .replace("${user_properties}", "{}")
         .replace("${user_type}", "mojang")
         .replace("${version_name}", version)
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &*crate::util::absolute_path(game_directory)
+            &crate::util::absolute_path(game_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified game directory {} does not exist",
@@ -259,7 +259,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${assets_root}",
-            &*crate::util::absolute_path(assets_directory)
+            &crate::util::absolute_path(assets_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified assets directory {} does not exist",
@@ -271,7 +271,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${game_assets}",
-            &*crate::util::absolute_path(assets_directory)
+            &crate::util::absolute_path(assets_directory)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified assets directory {} does not exist",
@@ -282,8 +282,8 @@ fn parse_minecraft_argument(
                 .to_string(),
         )
         .replace("${version_type}", version_type.as_str())
-        .replace("${resolution_width}", &*resolution.0.to_string())
-        .replace("${resolution_height}", &*resolution.1.to_string()))
+        .replace("${resolution_width}", &resolution.0.to_string())
+        .replace("${resolution_height}", &resolution.1.to_string()))
 }
 
 fn parse_arguments<F>(

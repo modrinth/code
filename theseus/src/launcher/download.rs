@@ -270,7 +270,7 @@ pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes
 
                 if let Ok(bytes) = bytes {
                     if let Some(sha1) = sha1 {
-                        if &*get_hash(bytes.clone()).await? != sha1 {
+                        if &get_hash(bytes.clone()).await? != sha1 {
                             if attempt <= 3 {
                                 continue;
                             } else {

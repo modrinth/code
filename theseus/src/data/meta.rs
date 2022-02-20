@@ -73,12 +73,12 @@ impl Metadata {
 
     pub async fn fetch() -> Result<Self, DataError> {
         let (game, forge, fabric) = futures::future::join3(
-            daedalus::minecraft::fetch_version_manifest(Some(&*format!(
+            daedalus::minecraft::fetch_version_manifest(Some(&format!(
                 "{}/minecraft/v0/manifest.json",
                 META_URL
             ))),
-            daedalus::modded::fetch_manifest(&*format!("{}/forge/v0/manifest.json", META_URL)),
-            daedalus::modded::fetch_manifest(&*format!("{}/fabric/v0/manifest.json", META_URL)),
+            daedalus::modded::fetch_manifest(&format!("{}/forge/v0/manifest.json", META_URL)),
+            daedalus::modded::fetch_manifest(&format!("{}/fabric/v0/manifest.json", META_URL)),
         )
         .await;
 
