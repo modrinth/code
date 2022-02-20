@@ -28,42 +28,35 @@ pub trait ModrinthAPI {
 pub struct ModrinthV1(pub String);
 
 #[derive(Debug, Deserialize)]
-struct ModrinthV1Project<'a> {
-    title: &'a str,
-    client_side: &'a str,
-    server_side: &'a str,
+struct ModrinthV1Project {
+    title: String,
+    client_side: String,
+    server_side: String,
 }
 
 #[derive(Debug, Deserialize)]
-struct ModrinthV1ProjectVersion<'a> {
-    #[serde(borrow)]
-    dependencies: HashSet<&'a str>,
-    #[serde(borrow)]
-    game_versions: HashSet<&'a str>,
-    version_type: &'a str,
-    files: Vec<ModrinthV1ProjectVersionFile<'a>>,
-    #[serde(borrow)]
-    loaders: HashSet<&'a str>,
+struct ModrinthV1ProjectVersion {
+    dependencies: HashSet<String>,
+    game_versions: HashSet<String>,
+    version_type: String,
+    files: Vec<ModrinthV1ProjectVersionFile>,
+    loaders: HashSet<String>,
 }
 
 #[derive(Clone, Debug, Deserialize)]
-struct ModrinthV1ProjectVersionFile<'a> {
-    hashes: ManifestHashes<'a>,
-    url: &'a str,
-    filename: &'a str,
+struct ModrinthV1ProjectVersionFile {
+    hashes: ManifestHashes,
+    url: String,
+    filename: String,
 }
 
-impl From<ModrinthV1ProjectVersionFile<'_>> for ModpackFile {
-    fn from(file: ModrinthV1ProjectVersionFile<'_>) -> Self {
+impl From<ModrinthV1ProjectVersionFile> for ModpackFile {
+    fn from(file: ModrinthV1ProjectVersionFile) -> Self {
         Self {
             hashes: Some(ModpackFileHashes::from(file.hashes)),
-            downloads: {
-                let mut downloads: HashSet<String> = HashSet::new();
-                downloads.insert(String::from(file.url));
-                downloads
-            },
+            downloads: HashSet::from([file.url]),
             path: PathBuf::from(file.filename),
-            // WARNING: Since the sidedness of version 1 API requests is unknown, the environemnt is
+            // WARNING: Since the sidedness of version 1 API requests is unknown, the environment is
             // set here as both.
             env: ModpackEnv::Both,
         }
@@ -78,10 +71,11 @@ impl ModrinthAPI for ModrinthV1 {
         channel: &str,
         game: &ModpackGame,
     ) -> ModpackResult<HashSet<ModpackFile>> {
+        let domain = &self.0;
         // Fetch metadata
         let (project_json, versions_json): (Bytes, Bytes) = try_join!(
-            try_get_json(format!("{}/api/v1/mod/{}", self.0, project)),
-            try_get_json(format!("{}/api/v1/mod/{}/version", self.0, project)),
+            try_get_json(format!("{domain}/api/v1/mod/{project}")),
+            try_get_json(format!("{domain}/api/v1/mod/{project}/version")),
         )?;
 
         let (mut project_deserializer, mut versions_deserializer) = (
@@ -113,8 +107,8 @@ impl ModrinthAPI for ModrinthV1 {
                     ModLoader::Vanilla => unreachable!(),
                 };
                 it.version_type == channel
-                    && it.game_versions.contains(&game_version.as_str())
-                    && it.loaders.contains(&loader_str)
+                    && it.game_versions.contains(game_version)
+                    && it.loaders.contains(loader_str)
             })
             .ok_or_else(|| {
                 ModpackError::VersionError(format!(
@@ -125,8 +119,8 @@ impl ModrinthAPI for ModrinthV1 {
 
         // Project fields
         let envs = ModpackEnv::try_from(ManifestEnvs {
-            client: serde_json::from_str(project.client_side)?,
-            server: serde_json::from_str(project.server_side)?,
+            client: serde_json::from_str(&project.client_side)?,
+            server: serde_json::from_str(&project.server_side)?,
         })?;
 
         // Conversions
@@ -155,7 +149,8 @@ impl ModrinthAPI for ModrinthV1 {
     }
 
     async fn get_version(&self, version: &str) -> ModpackResult<HashSet<ModpackFile>> {
-        let version_json = try_get_json(format!("{}/api/v1/version/{}", self.0, version)).await?;
+        let domain = &self.0;
+        let version_json = try_get_json(format!("{domain}/api/v1/version/{version}")).await?;
         let mut version_deserializer = serde_json::Deserializer::from_slice(&version_json);
         let version = ModrinthV1ProjectVersion::deserialize(&mut version_deserializer)?;
         let base_path = PathBuf::from("mods/");
@@ -164,7 +159,7 @@ impl ModrinthAPI for ModrinthV1 {
             .files
             .into_iter()
             .map(ModpackFile::from)
-            .collect::<HashSet<ModpackFile>>())
+            .collect::<HashSet<_>>())
     }
 }
 

@@ -144,6 +144,7 @@ impl Modpack {
 }
 
 #[derive(Debug, Deserialize, Serialize, Clone, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum ModpackGame {
     // TODO: Currently, the launcher does not support specifying mod loader versions, so I just
     // store the loader here.
@@ -256,9 +257,9 @@ mod tests {
                     let mut files = HashSet::new();
                     files.insert(ModpackFile {
                         path: PathBuf::from("mods/gravestones-v1.9.jar"),
-                        hashes: ModpackFileHashes {
+                        hashes: Some(ModpackFileHashes {
                             sha1: String::from("3f0f6d523d218460310b345be03ab3f1d294e04d"),
-                        },
+                        }),
                         env: ModpackEnv::Both,
                         downloads: {
                             let mut downloads = HashSet::new();

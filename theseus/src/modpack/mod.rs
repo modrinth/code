@@ -2,7 +2,6 @@
 
 use daedalus::download_file;
 use fs_extra::dir::CopyOptions;
-use serde::Deserialize;
 use std::{convert::TryFrom, env, io, path::Path};
 use tokio::{fs, try_join};
 use uuid::Uuid;
@@ -23,6 +22,10 @@ pub const COMPILED_ZIP: &str = "compiled.mrpack";
 pub const MANIFEST_PATH: &str = "modrinth.index.json";
 pub const OVERRIDES_PATH: &str = "overrides/";
 pub const PACK_JSON5_PATH: &str = "modpack.json5";
+const PACK_GITIGNORE: &'static str = const_format::formatcp!(r#"
+{COMPILED_PATH}
+{COMPILED_ZIP}
+"#);
 
 #[derive(thiserror::Error, Debug)]
 pub enum ModpackError {
@@ -86,7 +89,8 @@ pub async fn realise_modpack_zip(
     dest: &Path,
     side: pack::ModpackSide,
 ) -> ModpackResult<()> {
-    let tmp = env::temp_dir().join(format!("theseus-{}/", Uuid::new_v4()));
+    let mut tmp = env::temp_dir();
+    tmp.push(format!("theseus-{}/", Uuid::new_v4()));
     archive.extract(&tmp)?;
     realise_modpack(&tmp, dest, side).await
 }
@@ -102,7 +106,7 @@ pub async fn realise_modpack(
             "Output is not a directory",
         )));
     }
-    if dest.exists() && std::fs::read_dir(dest).map_or(false, |it| it.count() != 0) {
+    if std::fs::read_dir(dest).map_or(false, |it| it.count() != 0) {
         return Err(ModpackError::InvalidDirectory(String::from(
             "Output directory is non-empty",
         )));
@@ -112,22 +116,22 @@ pub async fn realise_modpack(
     }
 
     // Copy overrides
-    let overrides = Some(dir.join(OVERRIDES_PATH)).filter(|it| it.exists() && it.is_dir());
-    if let Some(overrides) = overrides {
+    let overrides = dir.join(OVERRIDES_PATH);
+    if overrides.is_dir() {
         fs_extra::dir::copy(overrides, dest, &CopyOptions::new())?;
     }
 
     // Parse manifest
     // NOTE: I'm using standard files here, since Serde does not support async readers
     let manifest_path = Some(dir.join(MANIFEST_PATH))
-        .filter(|it| it.exists() && it.is_file())
+        .filter(|it| it.is_file())
         .ok_or_else(|| {
             ModpackError::ManifestError(String::from("Manifest missing or is not a file"))
         })?;
     let manifest_file = std::fs::File::open(manifest_path)?;
     let reader = io::BufReader::new(manifest_file);
-    let mut deserializer = serde_json::Deserializer::from_reader(reader);
-    let manifest = Manifest::deserialize(&mut deserializer)?;
+
+    let manifest: Manifest = serde_json::from_reader(reader)?;
     let modpack = Modpack::try_from(manifest)?;
 
     // Realise modpack
@@ -137,14 +141,7 @@ pub async fn realise_modpack(
 
 pub fn to_pack_json5(pack: &Modpack) -> ModpackResult<String> {
     let json5 = json5::to_string(pack)?;
-    Ok(format!("// This modpack is managed using Theseus. It can be edited using either a Theseus-compatible launcher or manually.\n{}", json5))
-}
-
-lazy_static::lazy_static! {
-    static ref PACK_GITIGNORE: String = format!(r#"
-    {0}
-    {1}
-    "#, COMPILED_PATH, COMPILED_ZIP);
+    Ok(format!("// This modpack is managed using Theseus. It can be edited using either a Theseus-compatible launcher or manually.\n{json5}"))
 }
 
 pub async fn create_modpack(
@@ -158,7 +155,7 @@ pub async fn create_modpack(
     try_join!(
         fs::create_dir(&output_dir),
         fs::create_dir(output_dir.join(OVERRIDES_PATH)),
-        fs::write(output_dir.join(".gitignore"), PACK_GITIGNORE.as_str()),
+        fs::write(output_dir.join(".gitignore"), PACK_GITIGNORE),
         fs::write(output_dir.join(PACK_JSON5_PATH), to_pack_json5(&pack)?),
     )?;
 
@@ -177,7 +174,7 @@ pub async fn compile_modpack(dir: &Path) -> ModpackResult<()> {
             &CopyOptions::new(),
         )?;
     }
-    let manifest = Manifest::try_from(&pack)?;
+    let manifest = Manifest::try_from(pack)?;
     fs::write(
         result_dir.join(MANIFEST_PATH),
         serde_json::to_string(&manifest)?,
