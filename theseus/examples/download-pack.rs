@@ -45,7 +45,7 @@ pub async fn main() {
     );
 
     let start = Instant::now();
-    fetch_modpack(&args.url, args.hash.as_deref(), &dest, ModpackSide::Client).await;
+    fetch_modpack(&args.url, args.hash.as_deref(), &dest, ModpackSide::Client).await.unwrap();
     let end = start.elapsed();
 
     println!("Download completed in {} seconds", end.as_secs_f32());
