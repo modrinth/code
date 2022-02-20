@@ -33,6 +33,16 @@ pub struct Modpack {
 }
 
 impl Modpack {
+    pub fn new(game: ModpackGame, version: &str, name: &str, summary: Option<&str>) -> Self {
+        Self {
+            game,
+            version: String::from(version),
+            name: String::from(name),
+            summary: summary.map(String::from),
+            files: HashSet::new(),
+        }
+    }
+
     /// Download a modpack's files for a given side to a given destination
     /// Assumes the destination exists and is a directory
     pub async fn download_files(&self, dest: &Path, side: ModpackSide) -> ModpackResult<()> {
@@ -47,16 +57,6 @@ impl Modpack {
 
         // TODO Integrate instance format to save other metadata
         Ok(())
-    }
-
-    pub fn new(game: ModpackGame, version: &str, name: &str, summary: Option<&str>) -> Self {
-        Self {
-            game,
-            version: String::from(version),
-            name: String::from(name),
-            summary: summary.map(String::from),
-            files: HashSet::new(),
-        }
     }
 
     pub async fn add_project(

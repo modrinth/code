@@ -53,7 +53,7 @@ fn get_loader_version(loader: ModLoader, version: &str) -> ModpackResult<String>
     }?;
     let manifest = futures::executor::block_on(daedalus::modded::fetch_manifest(&source))?;
 
-    Ok(manifest
+    let version = manifest
         .game_versions
         .iter()
         .find(|&it| it.id == version)
@@ -63,8 +63,8 @@ fn get_loader_version(loader: ModLoader, version: &str) -> ModpackResult<String>
             ModpackError::VersionError(format!(
                 "No versions of modloader {loader:?} exist for Minecraft {version}",
             ))
-        })?
-        .id)
+        })?;
+    Ok(version.id.clone())
 }
 
 impl TryFrom<pack::Modpack> for Manifest {
@@ -79,20 +79,20 @@ impl TryFrom<pack::Modpack> for Manifest {
             files,
         } = pack;
 
-        let game = match game {
+        let game_name = match &game {
             ModpackGame::Minecraft(..) => "minecraft".into(),
         };
 
-        let files: Vec<_> = pack.files.into_iter().map(ManifestFile::from).collect();
+        let files: Vec<_> = files.into_iter().map(ManifestFile::from).collect();
 
         Ok(Manifest {
             format_version: DEFAULT_FORMAT_VERSION,
-            game,
+            game: game_name,
             version_id: version,
             name,
             summary,
             files,
-            dependencies: ManifestDeps::try_from(pack.game)?,
+            dependencies: ManifestDeps::try_from(game)?,
         })
     }
 }
@@ -240,12 +240,12 @@ impl TryFrom<pack::ModpackGame> for ManifestDeps {
         Ok(match game {
             Minecraft(minecraft, ModLoader::Vanilla) => Self::MinecraftVanilla { minecraft },
             Minecraft(minecraft, ModLoader::Fabric) => Self::MinecraftFabric {
-                minecraft,
                 fabric_loader: get_loader_version(ModLoader::Fabric, &minecraft)?,
+                minecraft,
             },
             Minecraft(minecraft, ModLoader::Forge) => Self::MinecraftForge {
-                minecraft,
                 forge: get_loader_version(ModLoader::Fabric, &minecraft)?,
+                minecraft,
             },
         })
     }

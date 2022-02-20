@@ -1,4 +1,6 @@
-use crate::data::DataError;
+use std::path::Path;
+
+use crate::{data::DataError, LAUNCHER_WORK_DIR};
 use once_cell::sync;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{RwLock, RwLockReadGuard};
@@ -32,7 +34,7 @@ impl Default for Settings {
 
 impl Settings {
     pub async fn init() -> Result<(), DataError> {
-        let settings_path = crate::LAUNCHER_WORK_DIR.join(SETTINGS_FILE);
+        let settings_path = Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE);
 
         if settings_path.exists() {
             let settings_data = std::fs::read_to_string(settings_path)
@@ -49,7 +51,7 @@ impl Settings {
             let new = Self::default();
 
             std::fs::write(
-                crate::LAUNCHER_WORK_DIR.join(SETTINGS_FILE),
+                Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
                 &*serde_json::to_string(&new)?,
             )?;
 
@@ -60,8 +62,8 @@ impl Settings {
     }
 
     pub async fn load() -> Result<(), DataError> {
-        let new = serde_json::from_str::<Settings>(&*std::fs::read_to_string(
-            crate::LAUNCHER_WORK_DIR.join(SETTINGS_FILE),
+        let new = serde_json::from_str::<Settings>(&std::fs::read_to_string(
+            Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
         )?)?;
 
         let write = &mut *SETTINGS
@@ -79,8 +81,8 @@ impl Settings {
         let settings = Self::get().await?;
 
         std::fs::write(
-            crate::LAUNCHER_WORK_DIR.join(SETTINGS_FILE),
-            &*serde_json::to_string(&*settings)?,
+            Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
+            &serde_json::to_string(&*settings)?,
         )?;
 
         Ok(())

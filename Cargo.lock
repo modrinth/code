@@ -1191,6 +1191,7 @@ dependencies = [
  "futures",
  "json5",
  "log",
+ "once_cell",
  "path-clean",
  "regex",
  "reqwest",

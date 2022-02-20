@@ -21,21 +21,19 @@ pub fn get_class_paths(
     libraries: &[Library],
     client_path: &Path,
 ) -> Result<String, LauncherError> {
-    let mut class_paths = Vec::new();
-
-    for library in libraries {
+    let mut class_paths = libraries.iter().filter_map(|library| {
         if let Some(rules) = &library.rules {
             if !super::rules::parse_rules(rules.as_slice()) {
-                continue;
+                return None;
             }
         }
 
         if !library.include_in_classpath {
-            continue;
+            return None;
         }
 
-        class_paths.push(get_lib_path(libraries_path, &library.name)?);
-    }
+        Some(get_lib_path(libraries_path, &library.name))
+    }).collect::<Result<Vec<_>, _>>()?;
 
     class_paths.push(
         crate::util::absolute_path(&client_path)
@@ -56,19 +54,14 @@ pub fn get_class_paths_jar<T: AsRef<str>>(
     libraries_path: &Path,
     libraries: &[T],
 ) -> Result<String, LauncherError> {
-    let mut class_paths = Vec::new();
+    let class_paths = libraries.iter().map(|library| {
+        get_lib_path(libraries_path, library.as_ref())
+    }).collect::<Result<Vec<_>, _>>()?;
 
-    for library in libraries {
-        class_paths.push(get_lib_path(libraries_path, library)?)
-    }
-
-    Ok(class_paths.join(match super::download::get_os() {
-        Os::Osx | Os::Linux | Os::Unknown => ":",
-        Os::Windows => ";",
-    }))
+    Ok(class_paths.join(get_cp_separator()))
 }
 
-pub fn get_lib_path<T: AsRef<str>>(libraries_path: &Path, lib: T) -> Result<String, LauncherError> {
+pub fn get_lib_path(libraries_path: &Path, lib: &str) -> Result<String, LauncherError> {
     let mut path = libraries_path.to_path_buf();
 
     path.push(get_path_from_artifact(lib.as_ref())?);
@@ -105,7 +98,7 @@ pub fn get_jvm_arguments(
     if let Some(args) = arguments {
         parse_arguments(args, &mut parsed_arguments, |arg| {
             parse_jvm_argument(
-                arg,
+                arg.to_string(),
                 natives_path,
                 libraries_path,
                 class_paths,
@@ -138,18 +131,17 @@ pub fn get_jvm_arguments(
 }
 
 fn parse_jvm_argument(
-    argument: &str,
+    mut argument: String,
     natives_path: &Path,
     libraries_path: &Path,
     class_paths: &str,
     version_name: &str,
 ) -> Result<String, LauncherError> {
-    let mut argument = argument.to_string();
     argument.retain(|c| !c.is_whitespace());
     Ok(argument
         .replace(
             "${natives_directory}",
-            &*crate::util::absolute_path(natives_path)
+            &crate::util::absolute_path(natives_path)
                 .map_err(|_| {
                     LauncherError::InvalidInput(format!(
                         "Specified natives path {} does not exist",
@@ -196,8 +188,8 @@ pub fn get_minecraft_arguments(
         parse_arguments(arguments, &mut parsed_arguments, |arg| {
             parse_minecraft_argument(
                 arg,
-                &*credentials.access_token,
-                &*credentials.username,
+                &credentials.access_token,
+                &credentials.username,
                 &credentials.id,
                 version,
                 asset_index_name,
@@ -212,8 +204,8 @@ pub fn get_minecraft_arguments(
     } else if let Some(legacy_arguments) = legacy_arguments {
         Ok(parse_minecraft_argument(
             legacy_arguments,
-            &*credentials.access_token,
-            &*credentials.username,
+            &credentials.access_token,
+            &credentials.username,
             &credentials.id,
             version,
             asset_index_name,
