@@ -14,7 +14,7 @@ export default {
     htmlAttrs: {
       lang: 'en',
     },
-    title: 'Modrinth',
+    title: 'Modrinth: Download and publish Minecraft Mods',
     meta: [
       {
         charset: 'utf-8',
@@ -27,7 +27,7 @@ export default {
         hid: 'description',
         name: 'description',
         content:
-          'Modrinth is a mod distribution platform. Modrinth is modern, easy to use, and built for modders. Modrinth currently supports Minecraft, including Forge and Fabric mod loaders.',
+          'Download Minecraft Fabric and Forge mods on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
       },
 
       {
@@ -79,7 +79,7 @@ export default {
       {
         hid: 'og:image',
         name: 'og:image',
-        content: 'https://cdn.modrinth.com/modrinth.png',
+        content: 'https://cdn.modrinth.com/modrinth-new.png',
       },
       {
         hid: 'twitter:card',
@@ -218,11 +218,13 @@ export default {
     exclude: [
       '/settings/**',
       '/settings',
-      'notifications',
-      'moderation',
-      'search',
+      '/notifications',
+      '/moderation',
+      '/search',
+      '/search/**',
       '/create/**',
     ],
+    routes: ['mods', 'modpacks'],
   },
   /*
    ** Axios module configuration

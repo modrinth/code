@@ -13,9 +13,9 @@
               <NuxtLink to="/mods" class="tab">
                 <span>Mods</span>
               </NuxtLink>
-              <NuxtLink to="/modpacks" class="tab">
+              <!--              <NuxtLink to="/modpacks" class="tab">
                 <span>Modpacks</span>
-              </NuxtLink>
+              </NuxtLink>-->
             </div>
           </section>
           <section class="column-grow user-outer" aria-label="Account links">

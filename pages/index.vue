@@ -75,8 +75,9 @@
             <p>
               We are always adding new features and working towards making
               Modrinth have the friendliest user experience possible. Right now,
-              we're working on finally paying out creators on our site. If you
-              have any more feature ideas, feel free to join our
+              we're working on finishing modpacks and finally paying out
+              creators on our site. If you have any more feature ideas, feel
+              free to join our
               <a href="https://discord.gg/EUHuJHt" target="_blank">Discord</a>!
             </p>
             <div class="features">
@@ -91,10 +92,6 @@
               <div class="feature completed">
                 <CheckIcon />
                 <p>Real-time search</p>
-              </div>
-              <div class="feature completed">
-                <CheckIcon />
-                <p>Mods and modpacks</p>
               </div>
               <div class="feature completed">
                 <CheckIcon />
@@ -115,6 +112,10 @@
               <div class="feature completed">
                 <CheckIcon />
                 <p>Dependency management</p>
+              </div>
+              <div class="feature in-progress">
+                <InProgressIcon />
+                <p>Modpacks</p>
               </div>
               <div class="feature in-progress">
                 <InProgressIcon />
@@ -236,14 +237,10 @@ export default {
       width: 100%;
       height: 40rem;
       object-fit: cover;
-      object-position: 10% 12.5%;
+      object-position: 15% 12.5%;
 
       @media screen and (max-width: 1280px) {
         border-radius: 0;
-      }
-
-      @media screen and (max-width: 750px) {
-        height: calc(75vh);
       }
     }
 
@@ -304,18 +301,9 @@ export default {
 
       &.left {
         flex-direction: column;
-
-        .text-container {
-          padding-left: 3rem;
-          //padding-right: 0;
-        }
       }
 
       .text-container {
-        //mobile:
-        padding-left: 3rem;
-        padding-right: 3rem;
-
         .subheader {
           margin: 0;
           color: var(--color-brand);

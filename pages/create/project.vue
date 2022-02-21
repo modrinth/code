@@ -22,6 +22,19 @@
         </button>
       </header>
       <section class="card essentials">
+        <h3>Project type</h3>
+        <label>
+          <span class="no-padding">The project type of your project.</span>
+          <Multiselect
+            v-model="projectType"
+            placeholder="Select one"
+            :options="projectTypes"
+            :searchable="false"
+            :close-on-select="true"
+            :show-labels="false"
+            :allow-empty="false"
+          />
+        </label>
         <h3>Name</h3>
         <label>
           <span>
@@ -78,19 +91,6 @@
             v-model="slug"
             type="text"
             placeholder="Enter the vanity URL slug"
-          />
-        </label>
-        <h3>Project type</h3>
-        <label>
-          <span class="no-padding">The project type of your project.</span>
-          <Multiselect
-            v-model="projectType"
-            placeholder="Select one"
-            :options="projectTypes"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
-            :allow-empty="false"
           />
         </label>
       </section>
