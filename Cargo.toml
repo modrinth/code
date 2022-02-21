@@ -51,7 +51,7 @@ lazy_static = "1.4.0"
 
 futures = "0.3.6"
 futures-timer = "3.0.2"
-rust-s3 = "0.26.1"
+rust-s3 = "0.29.0"
 async-trait = "0.1.41"
 
 sqlx = { version = "0.5.10", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate"] }

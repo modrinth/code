@@ -4,7 +4,7 @@ use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
 use crate::ratelimit::middleware::RateLimiter;
 use crate::util::env::{parse_strings_from_var, parse_var};
 use actix_cors::Cors;
-use actix_web::{http, web, App, HttpServer};
+use actix_web::{web, App, HttpServer};
 use env_logger::Env;
 use gumdrop::Options;
 use log::{error, info, warn};
@@ -246,33 +246,33 @@ async fn main() -> std::io::Result<()> {
                     .max_age(3600)
                     .send_wildcard(),
             )
-            // .wrap(
-            //     RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
-            //         .with_identifier(|req| {
-            //             let connection_info = req.connection_info();
-            //             let ip =
-            //                 String::from(if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
-            //                     if let Some(header) = req.headers().get("CF-Connecting-IP") {
-            //                         header.to_str().map_err(|_| ARError::IdentificationError)?
-            //                     } else {
-            //                         connection_info
-            //                             .peer_addr()
-            //                             .ok_or(ARError::IdentificationError)?
-            //                     }
-            //                 } else {
-            //                     connection_info
-            //                         .peer_addr()
-            //                         .ok_or(ARError::IdentificationError)?
-            //                 });
-            //
-            //             Ok(ip)
-            //         })
-            //         .with_interval(std::time::Duration::from_secs(60))
-            //         .with_max_requests(300)
-            //         .with_ignore_ips(
-            //             parse_strings_from_var("RATE_LIMIT_IGNORE_IPS").unwrap_or_default(),
-            //         ),
-            // )
+            .wrap(
+                RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
+                    .with_identifier(|req| {
+                        let connection_info = req.connection_info();
+                        let ip =
+                            String::from(if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
+                                if let Some(header) = req.headers().get("CF-Connecting-IP") {
+                                    header.to_str().map_err(|_| ARError::IdentificationError)?
+                                } else {
+                                    connection_info
+                                        .peer_addr()
+                                        .ok_or(ARError::IdentificationError)?
+                                }
+                            } else {
+                                connection_info
+                                    .peer_addr()
+                                    .ok_or(ARError::IdentificationError)?
+                            });
+
+                        Ok(ip)
+                    })
+                    .with_interval(std::time::Duration::from_secs(60))
+                    .with_max_requests(300)
+                    .with_ignore_ips(
+                        parse_strings_from_var("RATE_LIMIT_IGNORE_IPS").unwrap_or_default(),
+                    ),
+            )
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(file_host.clone()))
             .app_data(web::Data::new(indexing_queue.clone()))

@@ -24,8 +24,13 @@ impl S3Host {
                 region: bucket_region.to_string(),
                 endpoint: url.to_string(),
             },
-            Credentials::new(Some(access_token), Some(secret), None, None, None)?,
-        )?;
+            Credentials::new(Some(access_token), Some(secret), None, None, None).map_err(|_| {
+                FileHostingError::S3Error("Error while creating credentials".to_string())
+            })?,
+        )
+        .map_err(|_| {
+            FileHostingError::S3Error("Error while creating Bucket instance".to_string())
+        })?;
 
         bucket.add_header("x-amz-acl", "public-read");
 
@@ -46,7 +51,10 @@ impl FileHost for S3Host {
 
         self.bucket
             .put_object_with_content_type(format!("/{}", file_name), &*file_bytes, content_type)
-            .await?;
+            .await
+            .map_err(|_| {
+                FileHostingError::S3Error("Error while uploading file to S3".to_string())
+            })?;
 
         Ok(UploadFileData {
             file_id: file_name.to_string(),
@@ -65,7 +73,12 @@ impl FileHost for S3Host {
         file_id: &str,
         file_name: &str,
     ) -> Result<DeleteFileData, FileHostingError> {
-        self.bucket.delete_object(format!("/{}", file_name)).await?;
+        self.bucket
+            .delete_object(format!("/{}", file_name))
+            .await
+            .map_err(|_| {
+                FileHostingError::S3Error("Error while deleting file from S3".to_string())
+            })?;
 
         Ok(DeleteFileData {
             file_id: file_id.to_string(),
