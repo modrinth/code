@@ -1116,21 +1116,6 @@
       ]
     }
   },
-  "449920c44d498adf8b771973d6034dc97e1c7f3ff4d9d23599af432f294ed564": {
-    "query": "\n            INSERT INTO files (id, version_id, url, filename)\n            VALUES ($1, $2, $3, $4)\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "44bb1034872a80bbea122e04399470fd5f029b819c70cb6e0cb2db6d3193b97e": {
     "query": "\n                    INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id)\n                    VALUES ($1, $2)\n                    ",
     "describe": {
@@ -5775,6 +5760,22 @@
       "nullable": [
         false
       ]
+    }
+  },
+  "f17dbcc3021d4144f56e9a3bbbf4e0a0087af90e202b9b9d81f1f3622be00e36": {
+    "query": "\n            INSERT INTO files (id, version_id, url, filename, is_primary)\n            VALUES ($1, $2, $3, $4, $5)\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Varchar",
+          "Bool"
+        ]
+      },
+      "nullable": []
     }
   },
   "f17df1295edfaa1cac400ce705181b14a9e763f5e515c6913d0152717b89ceaa": {

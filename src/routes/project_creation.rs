@@ -507,7 +507,8 @@ pub async fn project_create_inner(
             version_data.loaders.clone(),
             version_data.game_versions.clone(),
             all_game_versions.clone(),
-            false,
+            version_data.primary_file.is_some(),
+            version_data.primary_file.as_deref() == Some(name),
             &mut transaction,
         )
         .await?;

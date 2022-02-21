@@ -83,13 +83,14 @@ impl VersionFileBuilder {
 
         sqlx::query!(
             "
-            INSERT INTO files (id, version_id, url, filename)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO files (id, version_id, url, filename, is_primary)
+            VALUES ($1, $2, $3, $4, $5)
             ",
             file_id as FileId,
             version_id as VersionId,
             self.url,
             self.filename,
+            self.primary
         )
         .execute(&mut *transaction)
         .await?;

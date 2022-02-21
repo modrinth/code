@@ -42,6 +42,7 @@ pub struct InitialVersionData {
     #[validate(length(min = 1))]
     pub loaders: Vec<Loader>,
     pub featured: bool,
+    pub primary_file: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -289,7 +290,8 @@ async fn version_create_inner(
             version_data.loaders,
             version_data.game_versions,
             all_game_versions.clone(),
-            false,
+            version_data.primary_file.is_some(),
+            version_data.primary_file.as_deref() == Some(name),
             &mut transaction,
         )
         .await?;
@@ -549,6 +551,7 @@ async fn upload_file_to_version_inner(
                 .collect(),
             all_game_versions.clone(),
             true,
+            false,
             &mut transaction,
         )
         .await?;
@@ -584,6 +587,7 @@ pub async fn upload_file(
     game_versions: Vec<GameVersion>,
     all_game_versions: Vec<models::categories::GameVersion>,
     ignore_primary: bool,
+    force_primary: bool,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<(), CreateError> {
     let (file_name, file_extension) = get_name_ext(content_disposition)?;
@@ -662,9 +666,10 @@ pub async fn upload_file(
                 hash: upload_data.content_sha512.into_bytes(),
             },
         ],
-        primary: validation_result == ValidationResult::Pass
+        primary: (validation_result == ValidationResult::Pass
             && version_files.iter().all(|x| !x.primary)
-            && !ignore_primary,
+            && !ignore_primary)
+            || force_primary,
     });
 
     Ok(())
