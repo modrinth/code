@@ -5,11 +5,7 @@
 
 #![warn(missing_docs, unused_import_braces, missing_debug_implementations)]
 
-use std::path::Path;
-
-lazy_static::lazy_static! {
-    pub static ref LAUNCHER_WORK_DIR: &'static Path = Path::new("./launcher");
-}
+static LAUNCHER_WORK_DIR: &'static str = "./launcher";
 
 mod data;
 pub mod launcher;
@@ -29,7 +25,7 @@ pub enum Error {
 }
 
 pub async fn init() -> Result<(), Error> {
-    std::fs::create_dir_all(*LAUNCHER_WORK_DIR).expect("Unable to create launcher root directory!");
+    std::fs::create_dir_all(LAUNCHER_WORK_DIR).expect("Unable to create launcher root directory!");
     crate::data::Metadata::init().await?;
     crate::data::Settings::init().await?;
 

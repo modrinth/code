@@ -9,30 +9,35 @@ use futures::future;
 use std::fs::File;
 use std::io::Write;
 use std::path::Path;
+use std::time::Duration;
 
 pub async fn download_version_info(
     client_path: &Path,
     version: &Version,
     loader_version: Option<&LoaderVersion>,
 ) -> Result<VersionInfo, LauncherError> {
-    let id = loader_version.map(|x| &x.id).unwrap_or(&version.id);
+    let id = match loader_version {
+        Some(x) => &x.id,
+        None => &version.id,
+    };
 
-    let path = &*client_path.join(id).join(format!("{}.json", id));
+    let mut path = client_path.join(id);
+    path.push(id);
+    path.set_extension("json");
 
     if path.exists() {
-        Ok(serde_json::from_str(&std::fs::read_to_string(path)?)?)
+        let contents = std::fs::read_to_string(path)?;
+        Ok(serde_json::from_str(&contents)?)
     } else {
         let mut info = fetch_version_info(version).await?;
 
         if let Some(loader_version) = loader_version {
-            let partial = fetch_partial_version(&*loader_version.url).await?;
-
+            let partial = fetch_partial_version(&loader_version.url).await?;
             info = merge_partial_version(partial, info);
-
             info.id = loader_version.id.clone();
         }
-
-        save_file(path, &bytes::Bytes::from(serde_json::to_string(&info)?))?;
+        let info_s = serde_json::to_string(&info)?;
+        save_file(&path, &bytes::Bytes::from(info_s))?;
 
         Ok(info)
     }
@@ -42,22 +47,21 @@ pub async fn download_client(
     client_path: &Path,
     version_info: &VersionInfo,
 ) -> Result<(), LauncherError> {
+    let version = &version_info.id;
     let client_download = version_info
         .downloads
         .get(&DownloadType::Client)
         .ok_or_else(|| {
             LauncherError::InvalidInput(format!(
-                "Version {} does not have any client downloads",
-                &version_info.id
+                "Version {version} does not have any client downloads"
             ))
         })?;
 
-    let path = &*client_path
-        .join(&version_info.id)
-        .join(format!("{}.jar", &version_info.id));
+    let mut path = client_path.join(version);
+    path.push(version);
+    path.set_extension("jar");
 
-    save_and_download_file(path, &client_download.url, Some(&client_download.sha1)).await?;
-
+    save_and_download_file(&path, &client_download.url, Some(&client_download.sha1)).await?;
     Ok(())
 }
 
@@ -65,16 +69,15 @@ pub async fn download_assets_index(
     assets_path: &Path,
     version: &VersionInfo,
 ) -> Result<AssetsIndex, LauncherError> {
-    let path = &*assets_path
-        .join("indexes")
-        .join(format!("{}.json", &version.asset_index.id));
+    let path = assets_path.join(format!("indexes/{}.json", &version.asset_index.id));
 
     if path.exists() {
-        Ok(serde_json::from_str(&std::fs::read_to_string(path)?)?)
+        let content = std::fs::read_to_string(path)?;
+        Ok(serde_json::from_str(&content)?)
     } else {
         let index = fetch_assets_index(version).await?;
 
-        save_file(path, &bytes::Bytes::from(serde_json::to_string(&index)?))?;
+        save_file(&path, &bytes::Bytes::from(serde_json::to_string(&index)?))?;
 
         Ok(index)
     }
@@ -89,7 +92,7 @@ pub async fn download_assets(
         index
             .objects
             .iter()
-            .map(|x| download_asset(assets_path, legacy_path, x.0, x.1)),
+            .map(|(name, asset)| download_asset(assets_path, legacy_path, name, asset)),
     )
     .await
     .into_iter()
@@ -104,23 +107,20 @@ async fn download_asset(
     name: &str,
     asset: &Asset,
 ) -> Result<(), LauncherError> {
-    let sub_hash = &&asset.hash[..2];
+    let hash = &asset.hash;
+    let sub_hash = &hash[..2];
 
-    let resource_path = assets_path.join("objects").join(sub_hash).join(&asset.hash);
+    let mut resource_path = assets_path.join("objects");
+    resource_path.push(sub_hash);
+    resource_path.push(hash);
 
-    let resource = save_and_download_file(
-        &*resource_path,
-        &format!(
-            "https://resources.download.minecraft.net/{}/{}",
-            sub_hash, asset.hash
-        ),
-        Some(&*asset.hash),
-    )
-    .await?;
+    let url = format!("https://resources.download.minecraft.net/{sub_hash}/{hash}");
+
+    let resource = save_and_download_file(&resource_path, &url, Some(hash)).await?;
 
     if let Some(legacy_path) = legacy_path {
         let resource_path =
-            legacy_path.join(name.replace('/', &*std::path::MAIN_SEPARATOR.to_string()));
+            legacy_path.join(name.replace('/', &std::path::MAIN_SEPARATOR.to_string()));
         save_file(resource_path.as_path(), &resource)?;
     }
 
@@ -135,7 +135,7 @@ pub async fn download_libraries(
     future::join_all(
         libraries
             .iter()
-            .map(|x| download_library(libraries_path, natives_path, x)),
+            .map(|library| download_library(libraries_path, natives_path, library)),
     )
     .await
     .into_iter()
@@ -150,19 +150,16 @@ async fn download_library(
     library: &Library,
 ) -> Result<(), LauncherError> {
     if let Some(rules) = &library.rules {
-        if !super::rules::parse_rules(rules.as_slice()) {
+        if !super::rules::parse_rules(rules) {
             return Ok(());
         }
     }
 
-    let (a, b) = future::join(
+    future::try_join(
         download_library_jar(libraries_path, library),
         download_native(natives_path, library),
     )
-    .await;
-
-    a?;
-    b?;
+    .await?;
 
     Ok(())
 }
@@ -171,55 +168,53 @@ async fn download_library_jar(
     libraries_path: &Path,
     library: &Library,
 ) -> Result<(), LauncherError> {
-    let mut path = libraries_path.to_path_buf();
-    path.push(get_path_from_artifact(&*library.name)?);
+    let artifact_path = get_path_from_artifact(&library.name)?;
+    let path = libraries_path.join(&artifact_path);
 
     if let Some(downloads) = &library.downloads {
         if let Some(library) = &downloads.artifact {
-            save_and_download_file(&*path, &library.url, Some(&library.sha1)).await?;
+            save_and_download_file(&path, &library.url, Some(&library.sha1)).await?;
         }
     } else {
-        save_and_download_file(
-            &*path,
-            &format!(
-                "{}{}",
-                library
-                    .url
-                    .as_deref()
-                    .unwrap_or("https://libraries.minecraft.net/"),
-                get_path_from_artifact(&*library.name)?
-            ),
-            None,
-        )
-        .await?;
+        let url = format!(
+            "{}{artifact_path}",
+            library
+                .url
+                .as_deref()
+                .unwrap_or("https://libraries.minecraft.net/"),
+        );
+        save_and_download_file(&path, &url, None).await?;
     }
 
     Ok(())
 }
 
 async fn download_native(natives_path: &Path, library: &Library) -> Result<(), LauncherError> {
-    if let Some(natives) = &library.natives {
-        if let Some(os_key) = natives.get(&get_os()) {
-            if let Some(downloads) = &library.downloads {
-                if let Some(classifiers) = &downloads.classifiers {
-                    #[cfg(target_pointer_width = "64")]
-                    let parsed_key = os_key.replace("${arch}", "64");
-                    #[cfg(target_pointer_width = "32")]
-                    let parsed_key = os_key.replace("${arch}", "32");
+    use daedalus::minecraft::LibraryDownload;
+    use std::collections::HashMap;
 
-                    if let Some(native) = classifiers.get(&*parsed_key) {
-                        let file = download_file(&native.url, Some(&native.sha1)).await?;
+    // Try blocks in stable Rust when?
+    let optional_cascade = || -> Option<(&String, &HashMap<String, LibraryDownload>)> {
+        let os_key = library.natives.as_ref()?.get(&get_os())?;
+        let classifiers = library.downloads.as_ref()?.classifiers.as_ref()?;
+        Some((os_key, classifiers))
+    };
 
-                        let reader = std::io::Cursor::new(&*file);
+    if let Some((os_key, classifiers)) = optional_cascade() {
+        #[cfg(target_pointer_width = "64")]
+        let parsed_key = os_key.replace("${arch}", "64");
+        #[cfg(target_pointer_width = "32")]
+        let parsed_key = os_key.replace("${arch}", "32");
 
-                        let mut archive = zip::ZipArchive::new(reader).unwrap();
-                        archive.extract(natives_path).unwrap();
-                    }
-                }
-            }
+        if let Some(native) = classifiers.get(&parsed_key) {
+            let file = download_file(&native.url, Some(&native.sha1)).await?;
+
+            let reader = std::io::Cursor::new(&file);
+
+            let mut archive = zip::ZipArchive::new(reader).unwrap();
+            archive.extract(natives_path).unwrap();
         }
     }
-
     Ok(())
 }
 
@@ -228,27 +223,23 @@ async fn save_and_download_file(
     url: &str,
     sha1: Option<&str>,
 ) -> Result<bytes::Bytes, LauncherError> {
-    let read = std::fs::read(path).ok().map(bytes::Bytes::from);
-
-    if let Some(bytes) = read {
-        Ok(bytes)
-    } else {
-        let file = download_file(url, sha1).await?;
-
-        save_file(path, &file)?;
-
-        Ok(file)
+    match std::fs::read(path) {
+        Ok(bytes) => Ok(bytes::Bytes::from(bytes)),
+        Err(_) => {
+            let file = download_file(url, sha1).await?;
+            save_file(path, &file)?;
+            Ok(file)
+        }
     }
 }
 
-fn save_file(path: &Path, bytes: &bytes::Bytes) -> Result<(), std::io::Error> {
+fn save_file(path: &Path, bytes: &bytes::Bytes) -> std::io::Result<()> {
     if let Some(parent) = path.parent() {
         std::fs::create_dir_all(parent)?;
     }
 
     let mut file = File::create(path)?;
     file.write_all(bytes)?;
-
     Ok(())
 }
 
@@ -263,7 +254,7 @@ pub fn get_os() -> Os {
 
 pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes, LauncherError> {
     let client = reqwest::Client::builder()
-        .tcp_keepalive(Some(std::time::Duration::from_secs(10)))
+        .tcp_keepalive(Some(Duration::from_secs(10)))
         .build()
         .map_err(|err| LauncherError::FetchError {
             inner: err,
@@ -279,7 +270,7 @@ pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes
 
                 if let Ok(bytes) = bytes {
                     if let Some(sha1) = sha1 {
-                        if &*get_hash(bytes.clone()).await? != sha1 {
+                        if &get_hash(bytes.clone()).await? != sha1 {
                             if attempt <= 3 {
                                 continue;
                             } else {
@@ -311,12 +302,11 @@ pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes
             }
         }
     }
-
     unreachable!()
 }
 
 /// Computes a checksum of the input bytes
-pub async fn get_hash(bytes: bytes::Bytes) -> Result<String, LauncherError> {
+async fn get_hash(bytes: bytes::Bytes) -> Result<String, LauncherError> {
     let hash = tokio::task::spawn_blocking(|| sha1::Sha1::from(bytes).hexdigest()).await?;
 
     Ok(hash)

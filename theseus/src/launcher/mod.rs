@@ -259,7 +259,7 @@ pub async fn launch_minecraft(
 
                 if !child.status.success() {
                     return Err(LauncherError::ProcessorError(
-                        String::from_utf8_lossy(&*child.stderr).to_string(),
+                        String::from_utf8_lossy(&child.stderr).to_string(),
                     ));
                 }
             }
@@ -283,7 +283,7 @@ pub async fn launch_minecraft(
             arguments.get(&ArgumentType::Jvm).map(|x| x.as_slice()),
             &natives_path,
             &libraries_path,
-            &*args::get_class_paths(&libraries_path, version.libraries.as_slice(), &client_path)?,
+            &args::get_class_paths(&libraries_path, version.libraries.as_slice(), &client_path)?,
             &version_jar_name,
             settings.memory,
             settings
@@ -298,7 +298,7 @@ pub async fn launch_minecraft(
             arguments.get(&ArgumentType::Game).map(|x| x.as_slice()),
             version.minecraft_arguments.as_deref(),
             credentials,
-            &*version.id,
+            &version.id,
             &version.asset_index.id,
             root_dir,
             &assets_path,

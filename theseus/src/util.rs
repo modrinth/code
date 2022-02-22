@@ -3,6 +3,7 @@ use std::{env, io};
 
 use path_clean::PathClean;
 
+// https://stackoverflow.com/a/54817755
 pub fn absolute_path(path: impl AsRef<Path>) -> io::Result<PathBuf> {
     let path = path.as_ref();
 

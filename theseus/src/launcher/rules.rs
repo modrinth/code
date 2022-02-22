@@ -45,7 +45,7 @@ pub fn parse_os_rule(rule: &OsRule) -> bool {
         let regex = Regex::new(version.as_str());
 
         if let Ok(regex) = regex {
-            if !regex.is_match(&*sys_info::os_release().unwrap_or_default()) {
+            if !regex.is_match(&sys_info::os_release().unwrap_or_default()) {
                 return false;
             }
         }
