@@ -37,7 +37,7 @@ pub enum SupportedGameVersions {
     All,
     PastDate(DateTime<Utc>),
     Range(DateTime<Utc>, DateTime<Utc>),
-    Custom(Vec<GameVersion>),
+    #[allow(dead_code)] Custom(Vec<GameVersion>),
 }
 
 pub trait Validator: Sync {

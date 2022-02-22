@@ -1,16 +1,14 @@
 use super::ApiError;
 use crate::database::models::version_item::QueryVersion;
 use crate::file_hosting::FileHost;
-use crate::models;
+use crate::{models, database};
 use crate::models::projects::{GameVersion, Loader, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::get_user_from_headers;
 use crate::util::routes::ok_or_not_found;
-use crate::{database, Pepper};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use std::borrow::Borrow;
 use std::collections::HashMap;
 use std::sync::Arc;
 
@@ -70,11 +68,9 @@ pub struct DownloadRedirect {
 // under /api/v1/version_file/{hash}/download
 #[get("{version_id}/download")]
 pub async fn download_version(
-    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     algorithm: web::Query<Algorithm>,
-    pepper: web::Data<Pepper>,
 ) -> Result<HttpResponse, ApiError> {
     let hash = info.into_inner().0.to_lowercase();
     let mut transaction = pool.begin().await?;
@@ -93,15 +89,6 @@ pub async fn download_version(
     .await?;
 
     if let Some(id) = result {
-        download_version_inner(
-            database::models::VersionId(id.version_id),
-            database::models::ProjectId(id.project_id),
-            &req,
-            &mut transaction,
-            &pepper,
-        )
-        .await?;
-
         transaction.commit().await?;
 
         Ok(HttpResponse::TemporaryRedirect()
@@ -110,84 +97,6 @@ pub async fn download_version(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
-}
-
-async fn download_version_inner(
-    version_id: database::models::VersionId,
-    project_id: database::models::ProjectId,
-    req: &HttpRequest,
-    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
-    pepper: &web::Data<Pepper>,
-) -> Result<(), ApiError> {
-    let real_ip = req.connection_info();
-    let ip_option = if dotenv::var("CLOUDFLARE_INTEGRATION")
-        .ok()
-        .map(|i| i.parse().unwrap())
-        .unwrap_or(false)
-    {
-        if let Some(header) = req.headers().get("CF-Connecting-IP") {
-            header.to_str().ok()
-        } else {
-            real_ip.borrow().peer_addr()
-        }
-    } else {
-        real_ip.borrow().peer_addr()
-    };
-
-    if let Some(ip) = ip_option {
-        let hash = sha1::Sha1::from(format!("{}{}", ip, pepper.pepper)).hexdigest();
-
-        let download_exists = sqlx::query!(
-                "SELECT EXISTS(SELECT 1 FROM downloads WHERE version_id = $1 AND date > (CURRENT_DATE - INTERVAL '30 minutes ago') AND identifier = $2)",
-                version_id as database::models::VersionId,
-                hash,
-            )
-            .fetch_one(&mut *transaction)
-            .await
-            ?
-            .exists.unwrap_or(false);
-
-        if !download_exists {
-            sqlx::query!(
-                "
-                    INSERT INTO downloads (
-                        version_id, identifier
-                    )
-                    VALUES (
-                        $1, $2
-                    )
-                    ",
-                version_id as database::models::VersionId,
-                hash
-            )
-            .execute(&mut *transaction)
-            .await?;
-
-            sqlx::query!(
-                "
-                    UPDATE versions
-                    SET downloads = downloads + 1
-                    WHERE id = $1
-                    ",
-                version_id as database::models::VersionId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-
-            sqlx::query!(
-                "
-                    UPDATE mods
-                    SET downloads = downloads + 1
-                    WHERE id = $1
-                    ",
-                project_id as database::models::ProjectId,
-            )
-            .execute(&mut *transaction)
-            .await?;
-        }
-    }
-
-    Ok(())
 }
 
 // under /api/v1/version_file/{hash}
@@ -431,10 +340,8 @@ pub async fn get_versions_from_hashes(
 
 #[post("download")]
 pub async fn download_files(
-    req: HttpRequest,
     pool: web::Data<PgPool>,
     file_data: web::Json<FileHashes>,
-    pepper: web::Data<Pepper>,
 ) -> Result<HttpResponse, ApiError> {
     let hashes_parsed: Vec<Vec<u8>> = file_data
         .hashes
@@ -457,19 +364,10 @@ pub async fn download_files(
     .fetch_all(&mut *transaction)
     .await?;
 
-    let mut response = HashMap::new();
-
-    for row in result {
-        download_version_inner(
-            database::models::VersionId(row.version_id),
-            database::models::ProjectId(row.project_id),
-            &req,
-            &mut transaction,
-            &pepper,
-        )
-        .await?;
-        response.insert(hex::encode(row.hash), row.url);
-    }
+    let response = result
+        .into_iter()
+        .map(|row| (hex::encode(row.hash), row.url))
+        .collect::<HashMap<String, String>>();
 
     Ok(HttpResponse::Ok().json(response))
 }

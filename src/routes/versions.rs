@@ -4,6 +4,7 @@ use crate::models;
 use crate::models::projects::{Dependency, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::get_user_from_headers;
+use crate::util::guards::admin_key_guard;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
@@ -418,6 +419,49 @@ pub async fn version_edit(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
+}
+
+// This is an internal route, cannot be used without key
+#[patch("{version_id}/_count-download", guard = "admin_key_guard")]
+pub async fn version_count_patch(
+    info: web::Path<(models::ids::VersionId,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let version = info.into_inner().0;
+    let version = database::models::ids::VersionId::from(version);
+
+    futures::future::try_join(
+        sqlx::query!(
+            "UPDATE versions
+             SET downloads = downloads + 1
+             WHERE (id = $1)",
+            version as database::models::ids::VersionId
+        )
+        .execute(pool.as_ref()),
+        async {
+            let project_id = sqlx::query!(
+                "SELECT mod_id FROM versions
+                 WHERE (id = $1)",
+                version as database::models::ids::VersionId
+            )
+            .fetch_one(pool.as_ref())
+            .await?
+            .mod_id;
+
+            sqlx::query!(
+                "UPDATE mods
+                 SET downloads = downloads + 1
+                 WHERE (id = $1)",
+                project_id
+            )
+            .execute(pool.as_ref())
+            .await
+        },
+    )
+    .await
+    .map_err(ApiError::SqlxDatabaseError)?;
+
+    Ok(HttpResponse::Ok().body(""))
 }
 
 #[delete("{version_id}")]

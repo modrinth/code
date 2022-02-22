@@ -10,7 +10,6 @@ use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use std::borrow::Borrow;
 use std::sync::Arc;
 
 /// A specific version of a mod
@@ -230,11 +229,9 @@ pub struct DownloadRedirect {
 #[allow(clippy::await_holding_refcell_ref)]
 #[get("{version_id}/download")]
 pub async fn download_version(
-    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
     algorithm: web::Query<Algorithm>,
-    pepper: web::Data<Pepper>,
 ) -> Result<HttpResponse, ApiError> {
     let hash = info.into_inner().0;
 
@@ -253,64 +250,6 @@ pub async fn download_version(
     .map_err(|e| ApiError::DatabaseError(e.into()))?;
 
     if let Some(id) = result {
-        let real_ip = req.connection_info();
-        let ip_option = real_ip.borrow().peer_addr();
-
-        if let Some(ip) = ip_option {
-            let hash = sha1::Sha1::from(format!("{}{}", ip, pepper.pepper)).hexdigest();
-
-            let download_exists = sqlx::query!(
-                "SELECT EXISTS(SELECT 1 FROM downloads WHERE version_id = $1 AND date > (CURRENT_DATE - INTERVAL '30 minutes ago') AND identifier = $2)",
-                id.version_id,
-                hash,
-            )
-                .fetch_one(&**pool)
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?
-                .exists.unwrap_or(false);
-
-            if !download_exists {
-                sqlx::query!(
-                    "
-                    INSERT INTO downloads (
-                        version_id, identifier
-                    )
-                    VALUES (
-                        $1, $2
-                    )
-                    ",
-                    id.version_id,
-                    hash
-                )
-                .execute(&**pool)
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-                sqlx::query!(
-                    "
-                    UPDATE versions
-                    SET downloads = downloads + 1
-                    WHERE id = $1
-                    ",
-                    id.version_id,
-                )
-                .execute(&**pool)
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?;
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET downloads = downloads + 1
-                    WHERE id = $1
-                    ",
-                    id.mod_id,
-                )
-                .execute(&**pool)
-                .await
-                .map_err(|e| ApiError::DatabaseError(e.into()))?;
-            }
-        }
         Ok(HttpResponse::TemporaryRedirect()
             .append_header(("Location", &*id.url))
             .json(DownloadRedirect { url: id.url }))

@@ -65,6 +65,8 @@ async fn main() -> std::io::Result<()> {
         }
     }
 
+    info!("Starting Labrinth on {}", dotenv::var("BIND_ADDR").unwrap());
+
     let search_config = search::SearchConfig {
         address: dotenv::var("MEILISEARCH_ADDR").unwrap(),
         key: dotenv::var("MEILISEARCH_KEY").unwrap(),
@@ -163,22 +165,6 @@ async fn main() -> std::io::Result<()> {
         info!("Deleting old records from temporary tables");
 
         async move {
-            let downloads_result = sqlx::query!(
-                "
-                DELETE FROM downloads
-                WHERE date < (CURRENT_DATE - INTERVAL '30 minutes ago')
-                "
-            )
-            .execute(&pool_ref)
-            .await;
-
-            if let Err(e) = downloads_result {
-                warn!(
-                    "Deleting old records from temporary table downloads failed: {:?}",
-                    e
-                );
-            }
-
             let states_result = sqlx::query!(
                 "
                 DELETE FROM states
@@ -319,6 +305,7 @@ fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
+    failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
     failed |= check_var::<String>("DATABASE_URL");
     failed |= check_var::<String>("MEILISEARCH_ADDR");
     failed |= check_var::<String>("MEILISEARCH_KEY");

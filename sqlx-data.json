@@ -95,6 +95,18 @@
       "nullable": []
     }
   },
+  "02e0ebc0921f232ef2b199f8dbdfb5cd465855a85bcb0387069d74dc341a94a5": {
+    "query": "UPDATE versions\n             SET downloads = downloads + 1\n             WHERE (id = $1)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
   "03209c5bda2d704e688439919a7b3903db6ad7caebf7ddafb3ea52d312d47bfb": {
     "query": "\n            INSERT INTO users (\n                id, github_id, username, name, email,\n                avatar_url, bio, created\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8\n            )\n            ",
     "describe": {
@@ -133,6 +145,18 @@
       "parameters": {
         "Left": [
           "Varchar",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "0483c9cf29bccba550dae1c602db928b83b77bca3007f0bba67f297797c8ceef": {
+    "query": "UPDATE mods\n                 SET downloads = downloads + 1\n                 WHERE (id = $1)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
           "Int8"
         ]
       },
@@ -1026,18 +1050,6 @@
       "nullable": []
     }
   },
-  "413762398111e04074a2d8a1e4e03ed362b9167d397947f8d14e5ae330e3de0b": {
-    "query": "\n                    UPDATE versions\n                    SET downloads = downloads + 1\n                    WHERE id = $1\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "4298552497a48adb9ace61c8dcf989c4d35866866b61c0cc4d45909b1d31c660": {
     "query": "\n        SELECT EXISTS(SELECT 1 FROM hashes h\n        WHERE h.algorithm = $2 AND h.hash = $1)\n        ",
     "describe": {
@@ -1653,6 +1665,26 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "59fd3b8da460fd1d81f3a1756fec609b05ce5d9eab035aa940d77753a341b599": {
+    "query": "SELECT mod_id FROM versions\n                 WHERE (id = $1)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "mod_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "5a03c653f1ff3339a01422ee4267a66157e6da9a51cc7d9beb0f87d59c3a444c": {
@@ -2401,19 +2433,6 @@
       "nullable": [
         false
       ]
-    }
-  },
-  "7f1696cee355c03f474fda2283669c60046833db88b3e2befd62a1fea7a12c70": {
-    "query": "\n                    INSERT INTO downloads (\n                        version_id, identifier\n                    )\n                    VALUES (\n                        $1, $2\n                    )\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar"
-        ]
-      },
-      "nullable": []
     }
   },
   "8129255d25bf0624d83f50558b668ed7b7f9c264e380d276522fc82bc871939b": {
@@ -4080,18 +4099,6 @@
       "nullable": []
     }
   },
-  "bc41b72640b63a9eb09ed92adc119b7119a7173d758d9541e06672c4b2f977d7": {
-    "query": "\n                    UPDATE mods\n                    SET downloads = downloads + 1\n                    WHERE id = $1\n                    ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "bc605f80a615c7d0ca9c8207f8b0c5dc1b8f2ad0f9b3346a00078d59e5e3e253": {
     "query": "\n            INSERT INTO loaders (loader, icon)\n            VALUES ($1, $2)\n            ON CONFLICT (loader) DO NOTHING\n            RETURNING id\n            ",
     "describe": {
@@ -4424,27 +4431,6 @@
       },
       "nullable": [
         false
-      ]
-    }
-  },
-  "c6cec0987be23419fc721799df8063594458f0d63abd32550c2a2196f40487b7": {
-    "query": "SELECT EXISTS(SELECT 1 FROM downloads WHERE version_id = $1 AND date > (CURRENT_DATE - INTERVAL '30 minutes ago') AND identifier = $2)",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "exists",
-          "type_info": "Bool"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Text"
-        ]
-      },
-      "nullable": [
-        null
       ]
     }
   },
@@ -5930,18 +5916,6 @@
       ]
     }
   },
-  "fa911efc808e726c13659d3ce6baf61dc562e6f1e73fd65537a4ab1dad17120e": {
-    "query": "\n            DELETE FROM downloads\n            WHERE downloads.version_id = $1\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "fb955ca41b95120f66c98c0b528b1db10c4be4a55e9641bb104d772e390c9bb7": {
     "query": "SELECT EXISTS(SELECT 1 FROM notifications WHERE id=$1)",
     "describe": {
@@ -6001,16 +5975,6 @@
       "nullable": [
         false
       ]
-    }
-  },
-  "fe73b6928f13955840e8df248688908fb6d82dd1d35dc803676639a6e0864ed5": {
-    "query": "\n                DELETE FROM downloads\n                WHERE date < (CURRENT_DATE - INTERVAL '30 minutes ago')\n                ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": []
-      },
-      "nullable": []
     }
   }
 }

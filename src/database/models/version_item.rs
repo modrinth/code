@@ -347,16 +347,6 @@ impl Version {
         .execute(&mut *transaction)
         .await?;
 
-        sqlx::query!(
-            "
-            DELETE FROM downloads
-            WHERE downloads.version_id = $1
-            ",
-            id as VersionId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
         let files = sqlx::query!(
             "
             SELECT files.id, files.url, files.filename, files.is_primary FROM files
