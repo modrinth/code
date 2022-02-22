@@ -48,6 +48,8 @@
       <sourceFolder url="file://$MODULE_DIR$/target/debug/build/memoffset-235ac8b3550fb50a/out" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/theseus/examples" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
+      <excludeFolder url="file://$MODULE_DIR$/theseus_gui/.svelte-kit" />
+      <excludeFolder url="file://$MODULE_DIR$/theseus_gui/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
