@@ -1,9 +1,11 @@
 use std::io;
 
 pub use meta::Metadata;
+pub use profiles::{Profile, Profiles};
 pub use settings::Settings;
 
 mod meta;
+pub mod profiles;
 mod settings;
 
 #[derive(thiserror::Error, Debug)]
