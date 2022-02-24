@@ -159,6 +159,7 @@ pub struct ModpackFile {
     pub downloads: HashSet<String>,
 }
 
+#[allow(clippy::derive_hash_xor_eq)]
 impl Hash for ModpackFile {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         if let Some(ref hashes) = self.hashes {

@@ -5,42 +5,34 @@ pub struct Profiles {}
 
 // TODO: possibly add defaults to some of these values
 
-#[records::record]
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct Profile {
-    java: JavaSettings,
-    memory: MemorySettings,
-    resolution: Option<WindowSettings>,
-    hooks: ProfileHooks,
+    pub java: JavaSettings,
+    pub memory: MemorySettings,
+    pub resolution: Option<WindowSize>,
+    pub hooks: ProfileHooks,
 }
 
-#[records::record]
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct JavaSettings {
-    install: PathBuf,
-    extra_arguments: Option<Vec<String>>,
+    pub install: PathBuf,
+    pub extra_arguments: Option<Vec<String>>,
 }
 
-#[records::record]
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct MemorySettings {
-    minimum: Option<String>,
-    maximum: String,
+    pub minimum: Option<String>,
+    pub maximum: String,
 }
 
-#[records::record]
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
-pub struct WindowSettings {
-    width: u16,
-    height: u16,
-}
+pub struct WindowSize(u16, u16);
 
-#[records::record]
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq)]
 pub struct ProfileHooks {
-    pre_launch: Option<Vec<String>>,
-    wrapper: Option<String>,
-    post_exit: Option<Vec<String>>,
+    pub pre_launch: Option<Vec<String>>,
+    pub wrapper: Option<String>,
+    pub post_exit: Option<Vec<String>>,
 }
 
 #[cfg(test)]
@@ -64,10 +56,7 @@ mod tests {
 		"maximum": "8192k",
 		"minimum": None as Option<u16>,
 	    },
-	    "resolution": {
-		"width": 1920u16,
-		"height": 1080u16,
-	    },
+	    "resolution": (1920u16, 1080u16),
 	    "hooks": {
 		"pre_launch": None as Option<Vec<String>>,
 		"wrapper": None as Option<String>,

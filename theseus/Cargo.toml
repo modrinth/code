@@ -9,7 +9,6 @@ edition = "2018"
 [dependencies]
 thiserror = "1.0"
 async-trait = "0.1.51"
-records = "0.2.0"
 
 daedalus = "0.1.12"
 

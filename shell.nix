@@ -2,6 +2,6 @@
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    rustc cargo openssl pkg-config
+    rustc cargo clippy openssl pkg-config
   ];
 }
