@@ -332,12 +332,6 @@
               :href="findPrimary(version).url"
               class="download"
               :title="`Download ${version.name}`"
-              @click.prevent="
-                downloadFile(
-                  findPrimary(version).hashes.sha1,
-                  findPrimary(version).url
-                )
-              "
             >
               <DownloadIcon aria-hidden="true" />
             </a>
@@ -419,7 +413,7 @@
           </div>
           <div class="info">
             <div class="key">Project ID</div>
-            <div class="value">
+            <div class="value lowercase">
               {{ project.id }}
             </div>
           </div>
@@ -678,14 +672,6 @@ export default {
       }
 
       return file
-    },
-    async downloadFile(hash, url) {
-      await this.$axios.get(`version_file/${hash}/download`)
-
-      const elem = document.createElement('a')
-      elem.download = hash
-      elem.href = url
-      elem.click()
     },
     async clearMessage() {
       this.$nuxt.$loading.start()
@@ -987,6 +973,10 @@ export default {
     .value {
       width: 50%;
       text-transform: capitalize;
+
+      &.lowercase {
+        text-transform: none;
+      }
     }
     .uppercase {
       text-transform: uppercase;

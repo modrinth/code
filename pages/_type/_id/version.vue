@@ -86,9 +86,6 @@
           :href="primaryFile.url"
           class="action iconified-button brand-button-colors"
           :title="`Download ${primaryFile.filename}`"
-          @click.prevent="
-            $parent.downloadFile(primaryFile.hashes.sha1, primaryFile.url)
-          "
         >
           <DownloadIcon aria-hidden="true" />
           Download
@@ -353,6 +350,9 @@
                   Version {{ dependency.version.version_number }} is
                   {{ dependency.dependency_type }}
                 </p>
+                <p v-else>
+                  {{ dependency.dependency_type }}
+                </p>
               </nuxt-link>
               <div class="bottom">
                 <button
@@ -417,10 +417,10 @@
             Primary
           </div>
           <a
+            :href="file.url"
             class="action iconified-button"
             :title="`Download ${file.filename}`"
             tabindex="0"
-            @click.prevent="$parent.downloadFile(file.hashes.sha1, file.url)"
           >
             <DownloadIcon aria-hidden="true" />
             Download
@@ -822,12 +822,16 @@ export default {
           })
         ).data
 
-        this.$emit('update:project', this.versions.concat([data]))
+        const newProject = JSON.parse(JSON.stringify(this.project))
+        newProject.versions = newProject.versions.concat([data])
+
+        await this.$emit('update:project', newProject)
+        await this.$emit('update:versions', this.versions.concat([data]))
 
         await this.$router.push(
           `/${this.project.project_type}/${
-            this.project.slug ? this.project.slug : data.project_id
-          }/version/${encodeURIComponent(data.version_number)}`
+            this.project.slug ? this.project.slug : this.project.project_id
+          }/version/${encodeURIComponent(this.version.version_number)}`
         )
       } catch (err) {
         this.$notify({
@@ -942,12 +946,16 @@ section {
 .dependencies {
   display: flex;
   flex-wrap: wrap;
+  column-gap: 2rem;
+  row-gap: 1rem;
 
   .dependency {
     align-items: center;
     display: flex;
-    flex-basis: 33.333333%;
-    margin-bottom: 0.5rem;
+
+    @media screen and (min-width: 800px) {
+      flex-basis: 30%;
+    }
 
     .icon {
       width: 3rem;

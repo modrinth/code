@@ -24,12 +24,6 @@
               :href="$parent.findPrimary(version).url"
               class="download-button"
               :title="`Download ${version.name}`"
-              @click.prevent="
-                $parent.downloadFile(
-                  $parent.findPrimary(version).hashes.sha1,
-                  $parent.findPrimary(version).url
-                )
-              "
             >
               <DownloadIcon aria-hidden="true" />
             </a>
