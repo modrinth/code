@@ -1,11 +1,13 @@
 use crate::file_hosting::FileHost;
 use crate::models::ids::{ProjectId, UserId, VersionId};
-use crate::models::projects::{Dependency, GameVersion, Loader, Version, VersionFile, VersionType};
+use crate::models::projects::{
+    Dependency, GameVersion, Loader, Version, VersionFile, VersionType,
+};
 use crate::models::teams::Permissions;
 use crate::routes::versions::{VersionIds, VersionListFilters};
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
-use crate::{database, models, Pepper};
+use crate::{database, models};
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -60,7 +62,9 @@ pub async fn version_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result = database::models::Project::get_from_slug_or_project_id(string, &**pool).await?;
+    let result =
+        database::models::Project::get_from_slug_or_project_id(string, &**pool)
+            .await?;
 
     if let Some(project) = result {
         let id = project.id;
@@ -79,7 +83,9 @@ pub async fn version_list(
         )
         .await?;
 
-        let mut versions = database::models::Version::get_many_full(version_ids, &**pool).await?;
+        let mut versions =
+            database::models::Version::get_many_full(version_ids, &**pool)
+                .await?;
 
         let mut response = versions
             .iter()
@@ -97,11 +103,19 @@ pub async fn version_list(
         versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
 
         // Attempt to populate versions with "auto featured" versions
-        if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
-            let loaders = database::models::categories::Loader::list(&**pool).await?;
+        if response.is_empty()
+            && !versions.is_empty()
+            && filters.featured.unwrap_or(false)
+        {
+            let loaders =
+                database::models::categories::Loader::list(&**pool).await?;
             let game_versions =
-                database::models::categories::GameVersion::list_filter(None, Some(true), &**pool)
-                    .await?;
+                database::models::categories::GameVersion::list_filter(
+                    None,
+                    Some(true),
+                    &**pool,
+                )
+                .await?;
 
             let mut joined_filters = Vec::new();
             for game_version in &game_versions {
@@ -117,14 +131,18 @@ pub async fn version_list(
                         version.game_versions.contains(&filter.0.version)
                             && version.loaders.contains(&filter.1.loader)
                     })
-                    .map(|version| response.push(convert_to_legacy(Version::from(version.clone()))))
+                    .map(|version| {
+                        response.push(convert_to_legacy(Version::from(
+                            version.clone(),
+                        )))
+                    })
                     .unwrap_or(());
             });
 
             if response.is_empty() {
-                versions
-                    .into_iter()
-                    .for_each(|version| response.push(convert_to_legacy(Version::from(version))));
+                versions.into_iter().for_each(|version| {
+                    response.push(convert_to_legacy(Version::from(version)))
+                });
             }
         }
 
@@ -142,11 +160,13 @@ pub async fn versions_get(
     ids: web::Query<VersionIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let version_ids = serde_json::from_str::<Vec<models::ids::VersionId>>(&*ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
-    let versions_data = database::models::Version::get_many_full(version_ids, &**pool).await?;
+    let version_ids =
+        serde_json::from_str::<Vec<models::ids::VersionId>>(&*ids.ids)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
+    let versions_data =
+        database::models::Version::get_many_full(version_ids, &**pool).await?;
 
     let mut versions = Vec::new();
 
@@ -163,7 +183,8 @@ pub async fn version_get(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let version_data = database::models::Version::get_full(id.into(), &**pool).await?;
+    let version_data =
+        database::models::Version::get_full(id.into(), &**pool).await?;
 
     if let Some(data) = version_data {
         Ok(HttpResponse::Ok().json(convert_to_legacy(Version::from(data))))
@@ -211,7 +232,8 @@ pub async fn get_version_from_hash(
         .await?;
 
         if let Some(data) = version_data {
-            Ok(HttpResponse::Ok().json(crate::models::projects::Version::from(data)))
+            Ok(HttpResponse::Ok()
+                .json(crate::models::projects::Version::from(data)))
         } else {
             Ok(HttpResponse::NotFound().body(""))
         }
@@ -287,25 +309,28 @@ pub async fn delete_file(
 
     if let Some(row) = result {
         if !user.role.is_mod() {
-            let team_member = database::models::TeamMember::get_from_user_id_version(
-                database::models::ids::VersionId(row.version_id),
-                user.id.into(),
-                &**pool,
-            )
-            .await
-            .map_err(ApiError::DatabaseError)?
-            .ok_or_else(|| {
-                ApiError::CustomAuthenticationError(
-                    "You don't have permission to delete this file!".to_string(),
+            let team_member =
+                database::models::TeamMember::get_from_user_id_version(
+                    database::models::ids::VersionId(row.version_id),
+                    user.id.into(),
+                    &**pool,
                 )
-            })?;
+                .await
+                .map_err(ApiError::DatabaseError)?
+                .ok_or_else(|| {
+                    ApiError::CustomAuthenticationError(
+                        "You don't have permission to delete this file!"
+                            .to_string(),
+                    )
+                })?;
 
             if !team_member
                 .permissions
                 .contains(Permissions::DELETE_VERSION)
             {
                 return Err(ApiError::CustomAuthenticationError(
-                    "You don't have permission to delete this file!".to_string(),
+                    "You don't have permission to delete this file!"
+                        .to_string(),
                 ));
             }
         }

@@ -151,18 +151,6 @@
       "nullable": []
     }
   },
-  "0483c9cf29bccba550dae1c602db928b83b77bca3007f0bba67f297797c8ceef": {
-    "query": "UPDATE mods\n                 SET downloads = downloads + 1\n                 WHERE (id = $1)",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": []
-    }
-  },
   "04dcb2565608e296502694efc0c59bc77c41175ef65c830f2fef745773f18c86": {
     "query": "\n                        UPDATE mods\n                        SET moderation_message_body = NULL\n                        WHERE (id = $1)\n                        ",
     "describe": {
@@ -861,6 +849,27 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "331041c6a4f27f4a6ac2873332074c0127e7368c8ab803843760530d29aaef08": {
+    "query": "SELECT id FROM versions\n         WHERE (version_number = $1 AND mod_id = $2)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "33fc96ac71cfa382991cfb153e89da1e9f43ebf5367c28b30c336b758222307b": {
@@ -1665,26 +1674,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "59fd3b8da460fd1d81f3a1756fec609b05ce5d9eab035aa940d77753a341b599": {
-    "query": "SELECT mod_id FROM versions\n                 WHERE (id = $1)",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "mod_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
     }
   },
   "5a03c653f1ff3339a01422ee4267a66157e6da9a51cc7d9beb0f87d59c3a444c": {
@@ -3210,6 +3199,18 @@
       "parameters": {
         "Left": [
           "Varchar",
+          "Int8"
+        ]
+      },
+      "nullable": []
+    }
+  },
+  "9bb993b9b743c3e6d3c8a9e4753983239b056cb9d4ec26e5fc8c6d4a5122e512": {
+    "query": "UPDATE mods\n             SET downloads = downloads + 1\n             WHERE (id = $1)",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
           "Int8"
         ]
       },
