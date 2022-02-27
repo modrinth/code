@@ -34,7 +34,10 @@ pub struct InitialVersionData {
     pub version_title: String,
     #[validate(length(max = 65536))]
     pub version_body: Option<String>,
-    #[validate(length(min = 0, max = 256))]
+    #[validate(
+        length(min = 0, max = 256),
+        custom(function = "crate::util::validate::validate_deps")
+    )]
     pub dependencies: Vec<Dependency>,
     #[validate(length(min = 1))]
     pub game_versions: Vec<GameVersion>,
@@ -630,22 +633,24 @@ pub async fn upload_file(
     )
     .await?;
 
+    let file_name_encode = format!(
+        "data/{}/versions/{}/{}",
+        project_id,
+        version_number,
+        urlencoding::encode(file_name)
+    );
+    let file_name = format!(
+        "data/{}/versions/{}/{}",
+        project_id, version_number, &file_name
+    );
+
     let upload_data = file_host
-        .upload_file(
-            content_type,
-            &format!(
-                "data/{}/versions/{}/{}",
-                project_id,
-                version_number,
-                urlencoding::encode(&file_name)
-            ),
-            data.freeze(),
-        )
+        .upload_file(content_type, &file_name, data.freeze())
         .await?;
 
     uploaded_files.push(UploadedFile {
         file_id: upload_data.file_id,
-        file_name: upload_data.file_name.clone(),
+        file_name: file_name_encode,
     });
 
     // TODO: Malware scan + file validation

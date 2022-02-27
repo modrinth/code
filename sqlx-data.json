@@ -639,27 +639,6 @@
       "nullable": []
     }
   },
-  "22f3f089050594199c3a3265da8ca68264a7457ae6ec4aef3644035a2022a830": {
-    "query": "\n                SELECT version.id id FROM (\n                    SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v\n                    INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT game_version_id FROM game_versions_versions WHERE joining_version_id = $2)\n                    INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT loader_id FROM loaders_versions WHERE version_id = $2)\n                    WHERE v.mod_id = $1\n                ) AS version\n                ORDER BY version.date_published DESC\n                LIMIT 1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "232d7d0319c20dd5fff29331b067d6c6373bcff761a77958a2bb5f59068a83a5": {
     "query": "\n                UPDATE team_members\n                SET permissions = $1\n                WHERE (team_id = $2 AND user_id = $3)\n                ",
     "describe": {
@@ -1939,6 +1918,27 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "62416ea5972daa46ff2d077f631a8a30d9ec922056cf7ff1b0d74d9511010c96": {
+    "query": "\n                    SELECT version.id id FROM (\n                        SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v\n                        INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT game_version_id FROM game_versions_versions WHERE joining_version_id = $2)\n                        INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT loader_id FROM loaders_versions WHERE version_id = $2)\n                        WHERE v.mod_id = $1\n                    ) AS version\n                    ORDER BY version.date_published DESC\n                    LIMIT 1\n                    ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
     }
   },
   "6326543f7cbd0ce03bbfe234ee82ca1b61d411589dc2d61753598679942cfdd8": {

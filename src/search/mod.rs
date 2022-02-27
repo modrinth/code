@@ -1,7 +1,7 @@
 use crate::models::error::ApiError;
 use crate::models::projects::SearchRequest;
 use actix_web::http::StatusCode;
-use actix_web::web::HttpResponse;
+use actix_web::HttpResponse;
 use chrono::{DateTime, Utc};
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::document::Document;

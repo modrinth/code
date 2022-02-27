@@ -1,3 +1,4 @@
+use itertools::Itertools;
 use lazy_static::lazy_static;
 use regex::Regex;
 use validator::{ValidationErrors, ValidationErrorsKind};
@@ -52,4 +53,27 @@ pub fn validation_errors_to_string(errors: ValidationErrors, adder: Option<Strin
     }
 
     String::new()
+}
+
+pub fn validate_deps(
+    values: &[crate::models::projects::Dependency],
+) -> Result<(), validator::ValidationError> {
+    if values
+        .iter()
+        .duplicates_by(|x| {
+            format!(
+                "{}-{}",
+                x.version_id
+                    .unwrap_or(crate::models::projects::VersionId(0)),
+                x.project_id
+                    .unwrap_or(crate::models::projects::ProjectId(0))
+            )
+        })
+        .next()
+        .is_some()
+    {
+        return Err(validator::ValidationError::new("duplicate dependency"));
+    }
+
+    Ok(())
 }

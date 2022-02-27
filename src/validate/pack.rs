@@ -33,7 +33,7 @@ pub struct PackFile<'a> {
     pub downloads: Vec<&'a str>,
 }
 
-fn validate_download_url(values: &Vec<&str>) -> Result<(), validator::ValidationError> {
+fn validate_download_url(values: &[&str]) -> Result<(), validator::ValidationError> {
     for value in values {
         let url = url::Url::parse(value)
             .ok()

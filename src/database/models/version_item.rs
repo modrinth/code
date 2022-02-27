@@ -29,25 +29,30 @@ impl DependencyBuilder {
         version_id: VersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
-        let version_dependency_id = if let Some(project_id) = self.project_id {
-            sqlx::query!(
-                "
-                SELECT version.id id FROM (
-                    SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v
-                    INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT game_version_id FROM game_versions_versions WHERE joining_version_id = $2)
-                    INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT loader_id FROM loaders_versions WHERE version_id = $2)
-                    WHERE v.mod_id = $1
-                ) AS version
-                ORDER BY version.date_published DESC
-                LIMIT 1
-                ",
-                project_id as ProjectId,
-                version_id as VersionId,
-            )
-                .fetch_optional(&mut *transaction).await?.map(|x| VersionId(x.id))
-        } else {
-            self.version_id
-        };
+        let (version_dependency_id, project_dependency_id): (Option<VersionId>, Option<ProjectId>) =
+            if self.version_id.is_some() {
+                (self.version_id, None)
+            } else if let Some(project_id) = self.project_id {
+                let version_id = sqlx::query!(
+                    "
+                    SELECT version.id id FROM (
+                        SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v
+                        INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id IN (SELECT game_version_id FROM game_versions_versions WHERE joining_version_id = $2)
+                        INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id IN (SELECT loader_id FROM loaders_versions WHERE version_id = $2)
+                        WHERE v.mod_id = $1
+                    ) AS version
+                    ORDER BY version.date_published DESC
+                    LIMIT 1
+                    ",
+                    project_id as ProjectId,
+                    version_id as VersionId,
+                )
+                .fetch_optional(&mut *transaction).await?.map(|x| VersionId(x.id));
+
+                (version_id, Some(project_id))
+            } else {
+                (None, None)
+            };
 
         sqlx::query!(
             "
@@ -57,7 +62,7 @@ impl DependencyBuilder {
             version_id as VersionId,
             self.dependency_type,
             version_dependency_id.map(|x| x.0),
-            self.project_id.map(|x| x.0),
+            project_dependency_id.map(|x| x.0),
         )
         .execute(&mut *transaction)
         .await?;

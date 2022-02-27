@@ -202,25 +202,23 @@ impl actix_web::ResponseError for ApiError {
         }
     }
 
-    fn error_response(&self) -> actix_web::web::HttpResponse {
-        actix_web::web::HttpResponse::build(self.status_code()).json(
-            crate::models::error::ApiError {
-                error: match self {
-                    ApiError::EnvError(..) => "environment_error",
-                    ApiError::SqlxDatabaseError(..) => "database_error",
-                    ApiError::DatabaseError(..) => "database_error",
-                    ApiError::AuthenticationError(..) => "unauthorized",
-                    ApiError::CustomAuthenticationError(..) => "unauthorized",
-                    ApiError::XmlError(..) => "xml_error",
-                    ApiError::JsonError(..) => "json_error",
-                    ApiError::SearchError(..) => "search_error",
-                    ApiError::IndexingError(..) => "indexing_error",
-                    ApiError::FileHostingError(..) => "file_hosting_error",
-                    ApiError::InvalidInputError(..) => "invalid_input",
-                    ApiError::ValidationError(..) => "invalid_input",
-                },
-                description: &self.to_string(),
+    fn error_response(&self) -> actix_web::HttpResponse {
+        actix_web::HttpResponse::build(self.status_code()).json(crate::models::error::ApiError {
+            error: match self {
+                ApiError::EnvError(..) => "environment_error",
+                ApiError::SqlxDatabaseError(..) => "database_error",
+                ApiError::DatabaseError(..) => "database_error",
+                ApiError::AuthenticationError(..) => "unauthorized",
+                ApiError::CustomAuthenticationError(..) => "unauthorized",
+                ApiError::XmlError(..) => "xml_error",
+                ApiError::JsonError(..) => "json_error",
+                ApiError::SearchError(..) => "search_error",
+                ApiError::IndexingError(..) => "indexing_error",
+                ApiError::FileHostingError(..) => "file_hosting_error",
+                ApiError::InvalidInputError(..) => "invalid_input",
+                ApiError::ValidationError(..) => "invalid_input",
             },
-        )
+            description: &self.to_string(),
+        })
     }
 }

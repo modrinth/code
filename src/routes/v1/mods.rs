@@ -56,7 +56,7 @@ pub async fn mod_search(
             .hits
             .into_iter()
             .map(|x| ResultSearchMod {
-                mod_id: format!("local-{}", x.project_id.clone()),
+                mod_id: format!("local-{}", x.project_id),
                 slug: x.slug,
                 author: x.author.clone(),
                 title: x.title,

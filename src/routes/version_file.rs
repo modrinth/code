@@ -1,11 +1,11 @@
 use super::ApiError;
 use crate::database::models::version_item::QueryVersion;
 use crate::file_hosting::FileHost;
-use crate::{models, database};
 use crate::models::projects::{GameVersion, Loader, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::get_user_from_headers;
 use crate::util::routes::ok_or_not_found;
+use crate::{database, models};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;

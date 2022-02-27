@@ -26,20 +26,20 @@ pub enum ARError {
 }
 
 impl ResponseError for ARError {
-    fn error_response(&self) -> actix_web::web::HttpResponse {
+    fn error_response(&self) -> actix_web::HttpResponse {
         match self {
             Self::LimitedError {
                 max_requests,
                 remaining,
                 reset,
             } => {
-                let mut response = actix_web::web::HttpResponse::TooManyRequests();
+                let mut response = actix_web::HttpResponse::TooManyRequests();
                 response.insert_header(("x-ratelimit-limit", max_requests.to_string()));
                 response.insert_header(("x-ratelimit-remaining", remaining.to_string()));
                 response.insert_header(("x-ratelimit-reset", reset.to_string()));
                 response.body(self.to_string())
             }
-            _ => actix_web::web::HttpResponse::build(self.status_code()).body(self.to_string()),
+            _ => actix_web::HttpResponse::build(self.status_code()).body(self.to_string()),
         }
     }
 }
