@@ -1655,38 +1655,6 @@
       "nullable": []
     }
   },
-  "5a03c653f1ff3339a01422ee4267a66157e6da9a51cc7d9beb0f87d59c3a444c": {
-    "query": "\n            SELECT d.dependent_id, d.dependency_id, d.mod_dependency_id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            WHERE v.mod_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "dependent_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "dependency_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "mod_dependency_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        true,
-        true
-      ]
-    }
-  },
   "5a13a79ebb1ab975f88b58e6deaba9685fe16e242c0fa4a5eea54f12f9448e6b": {
     "query": "\n            DELETE FROM reports\n            WHERE version_id = $1\n            ",
     "describe": {
@@ -2420,6 +2388,32 @@
         ]
       },
       "nullable": [
+        false
+      ]
+    }
+  },
+  "7eab623af88469235cad7cdf0b37bdf51eade3f5e1de25c63a8e08e55722003f": {
+    "query": "\n            SELECT d.dependency_id, vd.mod_id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            INNER JOIN versions vd ON d.dependency_id = vd.id\n            WHERE v.mod_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "dependency_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        true,
         false
       ]
     }

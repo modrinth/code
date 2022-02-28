@@ -300,7 +300,8 @@ impl Project {
     {
         use futures::stream::TryStreamExt;
 
-        let project_ids_parsed: Vec<i64> = project_ids.into_iter().map(|x| x.0).collect();
+        let project_ids_parsed: Vec<i64> =
+            project_ids.into_iter().map(|x| x.0).collect();
         let projects = sqlx::query!(
             "
             SELECT id, project_type, title, description, downloads, follows,
@@ -542,19 +543,24 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option =
-            crate::models::ids::base62_impl::parse_base62(&*slug_or_project_id.clone()).ok();
+        let id_option = crate::models::ids::base62_impl::parse_base62(
+            &*slug_or_project_id.clone(),
+        )
+        .ok();
 
         if let Some(id) = id_option {
-            let mut project = Project::get(ProjectId(id as i64), executor).await?;
+            let mut project =
+                Project::get(ProjectId(id as i64), executor).await?;
 
             if project.is_none() {
-                project = Project::get_from_slug(&slug_or_project_id, executor).await?;
+                project = Project::get_from_slug(&slug_or_project_id, executor)
+                    .await?;
             }
 
             Ok(project)
         } else {
-            let project = Project::get_from_slug(&slug_or_project_id, executor).await?;
+            let project =
+                Project::get_from_slug(&slug_or_project_id, executor).await?;
 
             Ok(project)
         }
@@ -567,18 +573,25 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option = crate::models::ids::base62_impl::parse_base62(slug_or_project_id).ok();
+        let id_option =
+            crate::models::ids::base62_impl::parse_base62(slug_or_project_id)
+                .ok();
 
         if let Some(id) = id_option {
-            let mut project = Project::get_full(ProjectId(id as i64), executor).await?;
+            let mut project =
+                Project::get_full(ProjectId(id as i64), executor).await?;
 
             if project.is_none() {
-                project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
+                project =
+                    Project::get_full_from_slug(slug_or_project_id, executor)
+                        .await?;
             }
 
             Ok(project)
         } else {
-            let project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
+            let project =
+                Project::get_full_from_slug(slug_or_project_id, executor)
+                    .await?;
             Ok(project)
         }
     }
@@ -676,8 +689,14 @@ impl Project {
                     moderation_message_body: m.moderation_message_body,
                 },
                 project_type: m.project_type_name,
-                categories: categories?.into_iter().map(|x| x.category).collect(),
-                versions: versions?.into_iter().map(|x| VersionId(x.id)).collect(),
+                categories: categories?
+                    .into_iter()
+                    .map(|x| x.category)
+                    .collect(),
+                versions: versions?
+                    .into_iter()
+                    .map(|x| VersionId(x.id))
+                    .collect(),
                 donation_urls: donations?
                     .into_iter()
                     .map(|x| DonationUrl {
@@ -699,11 +718,17 @@ impl Project {
                         created: x.created,
                     })
                     .collect(),
-                status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
+                status: crate::models::projects::ProjectStatus::from_str(
+                    &m.status_name,
+                ),
                 license_id: m.short,
                 license_name: m.license_name,
-                client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
-                server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
+                client_side: crate::models::projects::SideType::from_str(
+                    &m.client_side_type,
+                ),
+                server_side: crate::models::projects::SideType::from_str(
+                    &m.server_side_type,
+                ),
             }))
         } else {
             Ok(None)
@@ -717,9 +742,11 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        futures::future::try_join_all(project_ids.into_iter().map(|id| Self::get_full(id, exec)))
-            .await
-            .map(|x| x.into_iter().flatten().collect())
+        futures::future::try_join_all(
+            project_ids.into_iter().map(|id| Self::get_full(id, exec)),
+        )
+        .await
+        .map(|x| x.into_iter().flatten().collect())
     }
 }
 #[derive(Clone, Debug)]

@@ -18,8 +18,8 @@ impl Scheduler {
         F: FnMut() -> R + Send + 'static,
         R: std::future::Future<Output = ()> + Send + 'static,
     {
-        let future =
-            IntervalStream::new(time::interval(interval)).for_each_concurrent(2, move |_| task());
+        let future = IntervalStream::new(time::interval(interval))
+            .for_each_concurrent(2, move |_| task());
 
         self.arbiter.spawn(future);
     }
@@ -38,8 +38,9 @@ pub fn schedule_versions(
     pool: sqlx::Pool<sqlx::Postgres>,
     skip_initial: bool,
 ) {
-    let version_index_interval =
-        std::time::Duration::from_secs(parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800));
+    let version_index_interval = std::time::Duration::from_secs(
+        parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800),
+    );
 
     let mut skip = skip_initial;
     scheduler.run(version_index_interval, move || {
@@ -90,11 +91,15 @@ struct VersionFormat<'a> {
     release_time: chrono::DateTime<chrono::Utc>,
 }
 
-async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), VersionIndexingError> {
-    let input = reqwest::get("https://launchermeta.mojang.com/mc/game/version_manifest.json")
-        .await?
-        .json::<InputFormat>()
-        .await?;
+async fn update_versions(
+    pool: &sqlx::Pool<sqlx::Postgres>,
+) -> Result<(), VersionIndexingError> {
+    let input = reqwest::get(
+        "https://launchermeta.mojang.com/mc/game/version_manifest.json",
+    )
+    .await?
+    .json::<InputFormat>()
+    .await?;
 
     let mut skipped_versions_count = 0u32;
 
@@ -156,7 +161,8 @@ async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), Versio
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
         {
-            if let Some((_, alternate)) = HALL_OF_SHAME.iter().find(|(version, _)| name == *version)
+            if let Some((_, alternate)) =
+                HALL_OF_SHAME.iter().find(|(version, _)| name == *version)
             {
                 name = String::from(*alternate);
             } else {

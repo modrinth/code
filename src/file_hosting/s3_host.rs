@@ -1,4 +1,6 @@
-use crate::file_hosting::{DeleteFileData, FileHost, FileHostingError, UploadFileData};
+use crate::file_hosting::{
+    DeleteFileData, FileHost, FileHostingError, UploadFileData,
+};
 use async_trait::async_trait;
 use bytes::Bytes;
 use s3::bucket::Bucket;
@@ -24,12 +26,23 @@ impl S3Host {
                 region: bucket_region.to_string(),
                 endpoint: url.to_string(),
             },
-            Credentials::new(Some(access_token), Some(secret), None, None, None).map_err(|_| {
-                FileHostingError::S3Error("Error while creating credentials".to_string())
+            Credentials::new(
+                Some(access_token),
+                Some(secret),
+                None,
+                None,
+                None,
+            )
+            .map_err(|_| {
+                FileHostingError::S3Error(
+                    "Error while creating credentials".to_string(),
+                )
             })?,
         )
         .map_err(|_| {
-            FileHostingError::S3Error("Error while creating Bucket instance".to_string())
+            FileHostingError::S3Error(
+                "Error while creating Bucket instance".to_string(),
+            )
         })?;
 
         bucket.add_header("x-amz-acl", "public-read");
@@ -47,13 +60,20 @@ impl FileHost for S3Host {
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
         let content_sha1 = sha1::Sha1::from(&file_bytes).hexdigest();
-        let content_sha512 = format!("{:x}", sha2::Sha512::digest(&*file_bytes));
+        let content_sha512 =
+            format!("{:x}", sha2::Sha512::digest(&*file_bytes));
 
         self.bucket
-            .put_object_with_content_type(format!("/{}", file_name), &*file_bytes, content_type)
+            .put_object_with_content_type(
+                format!("/{}", file_name),
+                &*file_bytes,
+                content_type,
+            )
             .await
             .map_err(|_| {
-                FileHostingError::S3Error("Error while uploading file to S3".to_string())
+                FileHostingError::S3Error(
+                    "Error while uploading file to S3".to_string(),
+                )
             })?;
 
         Ok(UploadFileData {
@@ -77,7 +97,9 @@ impl FileHost for S3Host {
             .delete_object(format!("/{}", file_name))
             .await
             .map_err(|_| {
-                FileHostingError::S3Error("Error while deleting file from S3".to_string())
+                FileHostingError::S3Error(
+                    "Error while deleting file from S3".to_string(),
+                )
             })?;
 
         Ok(DeleteFileData {

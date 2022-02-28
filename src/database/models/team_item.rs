@@ -32,7 +32,8 @@ impl TeamBuilder {
         .await?;
 
         for member in self.members {
-            let team_member_id = generate_team_member_id(&mut *transaction).await?;
+            let team_member_id =
+                generate_team_member_id(&mut *transaction).await?;
             let team_member = TeamMember {
                 id: team_member_id,
                 team_id,

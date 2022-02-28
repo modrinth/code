@@ -1,6 +1,8 @@
 use crate::file_hosting::FileHost;
 use crate::models::projects::SearchRequest;
-use crate::routes::project_creation::{project_create_inner, undo_uploads, CreateError};
+use crate::routes::project_creation::{
+    project_create_inner, undo_uploads, CreateError,
+};
 use crate::routes::projects::ProjectIds;
 use crate::routes::ApiError;
 use crate::search::{search_for_project, SearchConfig, SearchError};
@@ -89,12 +91,14 @@ pub async fn mods_get(
     ids: web::Query<ProjectIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let project_ids = serde_json::from_str::<Vec<models::ids::ProjectId>>(&*ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
+    let project_ids =
+        serde_json::from_str::<Vec<models::ids::ProjectId>>(&*ids.ids)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
 
-    let projects_data = database::models::Project::get_many_full(project_ids, &**pool).await?;
+    let projects_data =
+        database::models::Project::get_many_full(project_ids, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 

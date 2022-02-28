@@ -62,7 +62,10 @@ impl Category {
         }
     }
 
-    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<CategoryId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<CategoryId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -115,7 +118,10 @@ impl Category {
         Ok(result.map(|r| CategoryId(r.id)))
     }
 
-    pub async fn get_name<'a, E>(id: CategoryId, exec: E) -> Result<String, DatabaseError>
+    pub async fn get_name<'a, E>(
+        id: CategoryId,
+        exec: E,
+    ) -> Result<String, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -159,7 +165,10 @@ impl Category {
         Ok(result)
     }
 
-    pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    pub async fn remove<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -184,7 +193,10 @@ impl Category {
 
 impl<'a> CategoryBuilder<'a> {
     /// The name of the category.  Must be ASCII alphanumeric or `-`/`_`
-    pub fn name(self, name: &'a str) -> Result<CategoryBuilder<'a>, DatabaseError> {
+    pub fn name(
+        self,
+        name: &'a str,
+    ) -> Result<CategoryBuilder<'a>, DatabaseError> {
         if name
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
@@ -208,20 +220,26 @@ impl<'a> CategoryBuilder<'a> {
         })
     }
 
-    pub fn icon(self, icon: &'a str) -> Result<CategoryBuilder<'a>, DatabaseError> {
+    pub fn icon(
+        self,
+        icon: &'a str,
+    ) -> Result<CategoryBuilder<'a>, DatabaseError> {
         Ok(Self {
             icon: Some(icon),
             ..self
         })
     }
 
-    pub async fn insert<'b, E>(self, exec: E) -> Result<CategoryId, DatabaseError>
+    pub async fn insert<'b, E>(
+        self,
+        exec: E,
+    ) -> Result<CategoryId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {
-        let id = *self
-            .project_type
-            .ok_or_else(|| DatabaseError::Other("No project type specified.".to_string()))?;
+        let id = *self.project_type.ok_or_else(|| {
+            DatabaseError::Other("No project type specified.".to_string())
+        })?;
         let result = sqlx::query!(
             "
             INSERT INTO categories (category, project_type, icon)
@@ -254,7 +272,10 @@ impl Loader {
         }
     }
 
-    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<LoaderId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<LoaderId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -278,7 +299,10 @@ impl Loader {
         Ok(result.map(|r| LoaderId(r.id)))
     }
 
-    pub async fn get_name<'a, E>(id: LoaderId, exec: E) -> Result<String, DatabaseError>
+    pub async fn get_name<'a, E>(
+        id: LoaderId,
+        exec: E,
+    ) -> Result<String, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -330,7 +354,10 @@ impl Loader {
     }
 
     // TODO: remove loaders with projects using them
-    pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    pub async fn remove<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -355,7 +382,10 @@ impl Loader {
 
 impl<'a> LoaderBuilder<'a> {
     /// The name of the loader.  Must be ASCII alphanumeric or `-`/`_`
-    pub fn name(self, name: &'a str) -> Result<LoaderBuilder<'a>, DatabaseError> {
+    pub fn name(
+        self,
+        name: &'a str,
+    ) -> Result<LoaderBuilder<'a>, DatabaseError> {
         if name
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
@@ -369,7 +399,10 @@ impl<'a> LoaderBuilder<'a> {
         }
     }
 
-    pub fn icon(self, icon: &'a str) -> Result<LoaderBuilder<'a>, DatabaseError> {
+    pub fn icon(
+        self,
+        icon: &'a str,
+    ) -> Result<LoaderBuilder<'a>, DatabaseError> {
         Ok(Self {
             icon: Some(icon),
             ..self
@@ -471,7 +504,10 @@ impl GameVersion {
         Ok(result.map(|r| GameVersionId(r.id)))
     }
 
-    pub async fn get_name<'a, E>(id: GameVersionId, exec: E) -> Result<String, DatabaseError>
+    pub async fn get_name<'a, E>(
+        id: GameVersionId,
+        exec: E,
+    ) -> Result<String, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -589,7 +625,10 @@ impl GameVersion {
         Ok(result)
     }
 
-    pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    pub async fn remove<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -614,7 +653,10 @@ impl GameVersion {
 
 impl<'a> GameVersionBuilder<'a> {
     /// The game version.  Spaces must be replaced with '_' for it to be valid
-    pub fn version(self, version: &'a str) -> Result<GameVersionBuilder<'a>, DatabaseError> {
+    pub fn version(
+        self,
+        version: &'a str,
+    ) -> Result<GameVersionBuilder<'a>, DatabaseError> {
         if version
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
@@ -645,14 +687,20 @@ impl<'a> GameVersionBuilder<'a> {
         }
     }
 
-    pub fn created(self, created: &'a chrono::DateTime<chrono::Utc>) -> GameVersionBuilder<'a> {
+    pub fn created(
+        self,
+        created: &'a chrono::DateTime<chrono::Utc>,
+    ) -> GameVersionBuilder<'a> {
         Self {
             date: Some(created),
             ..self
         }
     }
 
-    pub async fn insert<'b, E>(self, exec: E) -> Result<GameVersionId, DatabaseError>
+    pub async fn insert<'b, E>(
+        self,
+        exec: E,
+    ) -> Result<GameVersionId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {
@@ -690,7 +738,10 @@ impl License {
         LicenseBuilder::default()
     }
 
-    pub async fn get_id<'a, E>(id: &str, exec: E) -> Result<Option<LicenseId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        id: &str,
+        exec: E,
+    ) -> Result<Option<LicenseId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -707,7 +758,10 @@ impl License {
         Ok(result.map(|r| LicenseId(r.id)))
     }
 
-    pub async fn get<'a, E>(id: LicenseId, exec: E) -> Result<License, DatabaseError>
+    pub async fn get<'a, E>(
+        id: LicenseId,
+        exec: E,
+    ) -> Result<License, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -751,7 +805,10 @@ impl License {
         Ok(result)
     }
 
-    pub async fn remove<'a, E>(short: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    pub async fn remove<'a, E>(
+        short: &str,
+        exec: E,
+    ) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -776,7 +833,10 @@ impl License {
 
 impl<'a> LicenseBuilder<'a> {
     /// The license's short name/abbreviation.  Spaces must be replaced with '_' for it to be valid
-    pub fn short(self, short: &'a str) -> Result<LicenseBuilder<'a>, DatabaseError> {
+    pub fn short(
+        self,
+        short: &'a str,
+    ) -> Result<LicenseBuilder<'a>, DatabaseError> {
         if short
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
@@ -791,14 +851,20 @@ impl<'a> LicenseBuilder<'a> {
     }
 
     /// The license's long name
-    pub fn name(self, name: &'a str) -> Result<LicenseBuilder<'a>, DatabaseError> {
+    pub fn name(
+        self,
+        name: &'a str,
+    ) -> Result<LicenseBuilder<'a>, DatabaseError> {
         Ok(Self {
             name: Some(name),
             ..self
         })
     }
 
-    pub async fn insert<'b, E>(self, exec: E) -> Result<LicenseId, DatabaseError>
+    pub async fn insert<'b, E>(
+        self,
+        exec: E,
+    ) -> Result<LicenseId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {
@@ -874,7 +940,9 @@ impl DonationPlatform {
         })
     }
 
-    pub async fn list<'a, E>(exec: E) -> Result<Vec<DonationPlatform>, DatabaseError>
+    pub async fn list<'a, E>(
+        exec: E,
+    ) -> Result<Vec<DonationPlatform>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -897,7 +965,10 @@ impl DonationPlatform {
         Ok(result)
     }
 
-    pub async fn remove<'a, E>(short: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    pub async fn remove<'a, E>(
+        short: &str,
+        exec: E,
+    ) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -922,7 +993,10 @@ impl DonationPlatform {
 
 impl<'a> DonationPlatformBuilder<'a> {
     /// The donation platform short name.  Spaces must be replaced with '_' for it to be valid
-    pub fn short(self, short: &'a str) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
+    pub fn short(
+        self,
+        short: &'a str,
+    ) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
         if short
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
@@ -937,14 +1011,20 @@ impl<'a> DonationPlatformBuilder<'a> {
     }
 
     /// The donation platform long name
-    pub fn name(self, name: &'a str) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
+    pub fn name(
+        self,
+        name: &'a str,
+    ) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
         Ok(Self {
             name: Some(name),
             ..self
         })
     }
 
-    pub async fn insert<'b, E>(self, exec: E) -> Result<DonationPlatformId, DatabaseError>
+    pub async fn insert<'b, E>(
+        self,
+        exec: E,
+    ) -> Result<DonationPlatformId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {
@@ -974,7 +1054,10 @@ impl ReportType {
         ReportTypeBuilder { name: None }
     }
 
-    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<ReportTypeId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<ReportTypeId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -998,7 +1081,10 @@ impl ReportType {
         Ok(result.map(|r| ReportTypeId(r.id)))
     }
 
-    pub async fn get_name<'a, E>(id: ReportTypeId, exec: E) -> Result<String, DatabaseError>
+    pub async fn get_name<'a, E>(
+        id: ReportTypeId,
+        exec: E,
+    ) -> Result<String, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -1032,7 +1118,10 @@ impl ReportType {
         Ok(result)
     }
 
-    pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    pub async fn remove<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -1057,7 +1146,10 @@ impl ReportType {
 
 impl<'a> ReportTypeBuilder<'a> {
     /// The name of the report type.  Must be ASCII alphanumeric or `-`/`_`
-    pub fn name(self, name: &'a str) -> Result<ReportTypeBuilder<'a>, DatabaseError> {
+    pub fn name(
+        self,
+        name: &'a str,
+    ) -> Result<ReportTypeBuilder<'a>, DatabaseError> {
         if name
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
@@ -1068,7 +1160,10 @@ impl<'a> ReportTypeBuilder<'a> {
         }
     }
 
-    pub async fn insert<'b, E>(self, exec: E) -> Result<ReportTypeId, DatabaseError>
+    pub async fn insert<'b, E>(
+        self,
+        exec: E,
+    ) -> Result<ReportTypeId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {
@@ -1097,7 +1192,10 @@ impl ProjectType {
         ProjectTypeBuilder { name: None }
     }
 
-    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<ProjectTypeId>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<ProjectTypeId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -1148,7 +1246,10 @@ impl ProjectType {
         Ok(project_types)
     }
 
-    pub async fn get_name<'a, E>(id: ProjectTypeId, exec: E) -> Result<String, DatabaseError>
+    pub async fn get_name<'a, E>(
+        id: ProjectTypeId,
+        exec: E,
+    ) -> Result<String, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -1183,7 +1284,10 @@ impl ProjectType {
     }
 
     // TODO: remove loaders with mods using them
-    pub async fn remove<'a, E>(name: &str, exec: E) -> Result<Option<()>, DatabaseError>
+    pub async fn remove<'a, E>(
+        name: &str,
+        exec: E,
+    ) -> Result<Option<()>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -1208,7 +1312,10 @@ impl ProjectType {
 
 impl<'a> ProjectTypeBuilder<'a> {
     /// The name of the project type.  Must be ASCII alphanumeric or `-`/`_`
-    pub fn name(self, name: &'a str) -> Result<ProjectTypeBuilder<'a>, DatabaseError> {
+    pub fn name(
+        self,
+        name: &'a str,
+    ) -> Result<ProjectTypeBuilder<'a>, DatabaseError> {
         if name
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
@@ -1219,7 +1326,10 @@ impl<'a> ProjectTypeBuilder<'a> {
         }
     }
 
-    pub async fn insert<'b, E>(self, exec: E) -> Result<ProjectTypeId, DatabaseError>
+    pub async fn insert<'b, E>(
+        self,
+        exec: E,
+    ) -> Result<ProjectTypeId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {

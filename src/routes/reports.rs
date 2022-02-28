@@ -1,7 +1,9 @@
 use crate::models::ids::{ProjectId, UserId, VersionId};
 use crate::models::reports::{ItemType, Report};
 use crate::routes::ApiError;
-use crate::util::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::util::auth::{
+    check_is_moderator_from_headers, get_user_from_headers,
+};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::Deserialize;
@@ -23,24 +25,31 @@ pub async fn report_create(
 ) -> Result<HttpResponse, ApiError> {
     let mut transaction = pool.begin().await?;
 
-    let current_user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+    let current_user =
+        get_user_from_headers(req.headers(), &mut *transaction).await?;
 
     let mut bytes = web::BytesMut::new();
     while let Some(item) = body.next().await {
         bytes.extend_from_slice(&item.map_err(|_| {
-            ApiError::InvalidInputError("Error while parsing request payload!".to_string())
+            ApiError::InvalidInputError(
+                "Error while parsing request payload!".to_string(),
+            )
         })?);
     }
     let new_report: CreateReport = serde_json::from_slice(bytes.as_ref())?;
 
-    let id = crate::database::models::generate_report_id(&mut transaction).await?;
+    let id =
+        crate::database::models::generate_report_id(&mut transaction).await?;
     let report_type = crate::database::models::categories::ReportType::get_id(
         &*new_report.report_type,
         &mut *transaction,
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(format!("Invalid report type: {}", new_report.report_type))
+        ApiError::InvalidInputError(format!(
+            "Invalid report type: {}",
+            new_report.report_type
+        ))
     })?;
     let mut report = crate::database::models::report_item::Report {
         id,
@@ -56,17 +65,29 @@ pub async fn report_create(
     match new_report.item_type {
         ItemType::Project => {
             report.project_id = Some(
-                serde_json::from_str::<ProjectId>(&*format!("\"{}\"", new_report.item_id))?.into(),
+                serde_json::from_str::<ProjectId>(&*format!(
+                    "\"{}\"",
+                    new_report.item_id
+                ))?
+                .into(),
             )
         }
         ItemType::Version => {
             report.version_id = Some(
-                serde_json::from_str::<VersionId>(&*format!("\"{}\"", new_report.item_id))?.into(),
+                serde_json::from_str::<VersionId>(&*format!(
+                    "\"{}\"",
+                    new_report.item_id
+                ))?
+                .into(),
             )
         }
         ItemType::User => {
             report.user_id = Some(
-                serde_json::from_str::<UserId>(&*format!("\"{}\"", new_report.item_id))?.into(),
+                serde_json::from_str::<UserId>(&*format!(
+                    "\"{}\"",
+                    new_report.item_id
+                ))?
+                .into(),
             )
         }
         ItemType::Unknown => {
@@ -127,8 +148,10 @@ pub async fn reports(
     .try_collect::<Vec<crate::database::models::ids::ReportId>>()
     .await?;
 
-    let query_reports =
-        crate::database::models::report_item::Report::get_many(report_ids, &**pool).await?;
+    let query_reports = crate::database::models::report_item::Report::get_many(
+        report_ids, &**pool,
+    )
+    .await?;
 
     let mut reports = Vec::new();
 

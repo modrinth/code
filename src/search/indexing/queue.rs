@@ -21,9 +21,15 @@ impl CreationQueue {
         self.queue.lock().unwrap().push(search_project);
     }
     pub fn take(&self) -> Vec<UploadSearchProject> {
-        std::mem::replace(&mut *self.queue.lock().unwrap(), Vec::with_capacity(10))
+        std::mem::replace(
+            &mut *self.queue.lock().unwrap(),
+            Vec::with_capacity(10),
+        )
     }
-    pub async fn index(&self, config: &SearchConfig) -> Result<(), IndexingError> {
+    pub async fn index(
+        &self,
+        config: &SearchConfig,
+    ) -> Result<(), IndexingError> {
         let queue = self.take();
         add_projects(queue, config).await
     }

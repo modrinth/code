@@ -128,25 +128,28 @@ pub async fn delete_file(
 
     if let Some(row) = result {
         if !user.role.is_mod() {
-            let team_member = database::models::TeamMember::get_from_user_id_version(
-                database::models::ids::VersionId(row.version_id),
-                user.id.into(),
-                &**pool,
-            )
-            .await
-            .map_err(ApiError::DatabaseError)?
-            .ok_or_else(|| {
-                ApiError::CustomAuthenticationError(
-                    "You don't have permission to delete this file!".to_string(),
+            let team_member =
+                database::models::TeamMember::get_from_user_id_version(
+                    database::models::ids::VersionId(row.version_id),
+                    user.id.into(),
+                    &**pool,
                 )
-            })?;
+                .await
+                .map_err(ApiError::DatabaseError)?
+                .ok_or_else(|| {
+                    ApiError::CustomAuthenticationError(
+                        "You don't have permission to delete this file!"
+                            .to_string(),
+                    )
+                })?;
 
             if !team_member
                 .permissions
                 .contains(Permissions::DELETE_VERSION)
             {
                 return Err(ApiError::CustomAuthenticationError(
-                    "You don't have permission to delete this file!".to_string(),
+                    "You don't have permission to delete this file!"
+                        .to_string(),
                 ));
             }
         }
@@ -167,7 +170,8 @@ pub async fn delete_file(
 
         if files.len() < 2 {
             return Err(ApiError::InvalidInputError(
-                "Versions must have at least one file uploaded to them".to_string(),
+                "Versions must have at least one file uploaded to them"
+                    .to_string(),
             ));
         }
 
@@ -269,7 +273,9 @@ pub async fn get_update_from_hash(
         .await?;
 
         if let Some(version_id) = version_ids.last() {
-            let version_data = database::models::Version::get_full(*version_id, &**pool).await?;
+            let version_data =
+                database::models::Version::get_full(*version_id, &**pool)
+                    .await?;
 
             ok_or_not_found::<QueryVersion, Version>(version_data)
         } else {
@@ -436,12 +442,15 @@ pub async fn update_files(
         }
     }
 
-    let versions = database::models::Version::get_many_full(version_ids, &**pool).await?;
+    let versions =
+        database::models::Version::get_many_full(version_ids, &**pool).await?;
 
     let mut response = HashMap::new();
 
     for row in &result {
-        if let Some(version) = versions.iter().find(|x| x.id.0 == row.version_id) {
+        if let Some(version) =
+            versions.iter().find(|x| x.id.0 == row.version_id)
+        {
             response.insert(
                 hex::encode(&row.hash),
                 models::projects::Version::from(version.clone()),

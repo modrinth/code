@@ -1,7 +1,9 @@
 use crate::models::projects::SideType;
 use crate::util::env::parse_strings_from_var;
 use crate::util::validate::validation_errors_to_string;
-use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
+use crate::validate::{
+    SupportedGameVersions, ValidationError, ValidationResult,
+};
 use serde::{Deserialize, Serialize};
 use std::io::{Cursor, Read};
 use std::path::Component;
@@ -33,7 +35,9 @@ pub struct PackFile<'a> {
     pub downloads: Vec<&'a str>,
 }
 
-fn validate_download_url(values: &[&str]) -> Result<(), validator::ValidationError> {
+fn validate_download_url(
+    values: &[&str],
+) -> Result<(), validator::ValidationError> {
     for value in values {
         let url = url::Url::parse(value)
             .ok()
@@ -43,7 +47,8 @@ fn validate_download_url(values: &[&str]) -> Result<(), validator::ValidationErr
             return Err(validator::ValidationError::new("invalid URL"));
         }
 
-        let domains = parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").unwrap_or_default();
+        let domains = parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS")
+            .unwrap_or_default();
         if !domains.contains(
             &url.domain()
                 .ok_or_else(|| validator::ValidationError::new("invalid URL"))?
@@ -131,9 +136,12 @@ impl super::Validator for PackValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        let mut file = archive
-            .by_name("modrinth.index.json")
-            .map_err(|_| ValidationError::InvalidInputError("Pack manifest is missing.".into()))?;
+        let mut file =
+            archive.by_name("modrinth.index.json").map_err(|_| {
+                ValidationError::InvalidInputError(
+                    "Pack manifest is missing.".into(),
+                )
+            })?;
 
         let mut contents = String::new();
         file.read_to_string(&mut contents)?;
@@ -141,7 +149,9 @@ impl super::Validator for PackValidator {
         let pack: PackFormat = serde_json::from_str(&contents)?;
 
         pack.validate().map_err(|err| {
-            ValidationError::InvalidInputError(validation_errors_to_string(err, None).into())
+            ValidationError::InvalidInputError(
+                validation_errors_to_string(err, None).into(),
+            )
         })?;
 
         if pack.game != "minecraft" {
@@ -161,7 +171,9 @@ impl super::Validator for PackValidator {
                 .components()
                 .next()
                 .ok_or_else(|| {
-                    ValidationError::InvalidInputError("Invalid pack file path!".into())
+                    ValidationError::InvalidInputError(
+                        "Invalid pack file path!".into(),
+                    )
                 })?;
 
             match path {

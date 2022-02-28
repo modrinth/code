@@ -1,6 +1,8 @@
 use super::ApiError;
 use crate::database::models;
-use crate::database::models::categories::{DonationPlatform, License, ProjectType, ReportType};
+use crate::database::models::categories::{
+    DonationPlatform, License, ProjectType, ReportType,
+};
 use crate::util::auth::check_is_admin_from_headers;
 use actix_web::{delete, get, put, web, HttpRequest, HttpResponse};
 use models::categories::{Category, GameVersion, Loader};
@@ -40,7 +42,9 @@ pub struct CategoryData {
 // TODO: searching / filtering? Could be used to implement a live
 // searching category list
 #[get("category")]
-pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+pub async fn category_list(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
     let mut results = Category::list(&**pool)
         .await?
         .into_iter()
@@ -64,12 +68,16 @@ pub async fn category_create(
 ) -> Result<HttpResponse, ApiError> {
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
-    let project_type =
-        crate::database::models::ProjectTypeId::get_id(new_category.project_type.clone(), &**pool)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInputError("Specified project type does not exist!".to_string())
-            })?;
+    let project_type = crate::database::models::ProjectTypeId::get_id(
+        new_category.project_type.clone(),
+        &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInputError(
+            "Specified project type does not exist!".to_string(),
+        )
+    })?;
 
     let _id = Category::builder()
         .name(&new_category.name)?
@@ -90,7 +98,8 @@ pub async fn category_delete(
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
     let name = category.into_inner().0;
-    let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
+    let mut transaction =
+        pool.begin().await.map_err(models::DatabaseError::from)?;
 
     let result = Category::remove(&name, &mut transaction).await?;
 
@@ -114,7 +123,9 @@ pub struct LoaderData {
 }
 
 #[get("loader")]
-pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+pub async fn loader_list(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
     let mut results = Loader::list(&**pool)
         .await?
         .into_iter()
@@ -140,13 +151,18 @@ pub async fn loader_create(
 
     let mut transaction = pool.begin().await?;
 
-    let project_types =
-        ProjectType::get_many_id(&new_loader.supported_project_types, &mut *transaction).await?;
+    let project_types = ProjectType::get_many_id(
+        &new_loader.supported_project_types,
+        &mut *transaction,
+    )
+    .await?;
 
     let _id = Loader::builder()
         .name(&new_loader.name)?
         .icon(&new_loader.icon)?
-        .supported_project_types(&*project_types.into_iter().map(|x| x.id).collect::<Vec<_>>())?
+        .supported_project_types(
+            &*project_types.into_iter().map(|x| x.id).collect::<Vec<_>>(),
+        )?
         .insert(&mut transaction)
         .await?;
 
@@ -164,7 +180,8 @@ pub async fn loader_delete(
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
     let name = loader.into_inner().0;
-    let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
+    let mut transaction =
+        pool.begin().await.map_err(models::DatabaseError::from)?;
 
     let result = Loader::remove(&name, &mut transaction).await?;
 
@@ -200,8 +217,11 @@ pub async fn game_version_list(
     pool: web::Data<PgPool>,
     query: web::Query<GameVersionQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let results: Vec<GameVersionQueryData> = if query.type_.is_some() || query.major.is_some() {
-        GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool).await?
+    let results: Vec<GameVersionQueryData> = if query.type_.is_some()
+        || query.major.is_some()
+    {
+        GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool)
+            .await?
     } else {
         GameVersion::list(&**pool).await?
     }
@@ -260,7 +280,8 @@ pub async fn game_version_delete(
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
     let name = game_version.into_inner().0;
-    let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
+    let mut transaction =
+        pool.begin().await.map_err(models::DatabaseError::from)?;
 
     let result = GameVersion::remove(&name, &mut transaction).await?;
 
@@ -283,7 +304,9 @@ pub struct LicenseQueryData {
 }
 
 #[get("license")]
-pub async fn license_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+pub async fn license_list(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
     let results: Vec<LicenseQueryData> = License::list(&**pool)
         .await?
         .into_iter()
@@ -329,7 +352,8 @@ pub async fn license_delete(
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
     let name = license.into_inner().0;
-    let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
+    let mut transaction =
+        pool.begin().await.map_err(models::DatabaseError::from)?;
 
     let result = License::remove(&name, &mut transaction).await?;
 
@@ -352,15 +376,18 @@ pub struct DonationPlatformQueryData {
 }
 
 #[get("donation_platform")]
-pub async fn donation_platform_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
-    let results: Vec<DonationPlatformQueryData> = DonationPlatform::list(&**pool)
-        .await?
-        .into_iter()
-        .map(|x| DonationPlatformQueryData {
-            short: x.short,
-            name: x.name,
-        })
-        .collect();
+pub async fn donation_platform_list(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let results: Vec<DonationPlatformQueryData> =
+        DonationPlatform::list(&**pool)
+            .await?
+            .into_iter()
+            .map(|x| DonationPlatformQueryData {
+                short: x.short,
+                name: x.name,
+            })
+            .collect();
     Ok(HttpResponse::Ok().json(results))
 }
 
@@ -398,7 +425,8 @@ pub async fn donation_platform_delete(
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
     let name = loader.into_inner().0;
-    let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
+    let mut transaction =
+        pool.begin().await.map_err(models::DatabaseError::from)?;
 
     let result = DonationPlatform::remove(&name, &mut transaction).await?;
 
@@ -415,7 +443,9 @@ pub async fn donation_platform_delete(
 }
 
 #[get("report_type")]
-pub async fn report_type_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+pub async fn report_type_list(
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
     let results = ReportType::list(&**pool).await?;
     Ok(HttpResponse::Ok().json(results))
 }
@@ -444,7 +474,8 @@ pub async fn report_type_delete(
     check_is_admin_from_headers(req.headers(), &**pool).await?;
 
     let name = report_type.into_inner().0;
-    let mut transaction = pool.begin().await.map_err(models::DatabaseError::from)?;
+    let mut transaction =
+        pool.begin().await.map_err(models::DatabaseError::from)?;
 
     let result = ReportType::remove(&name, &mut transaction).await?;
 

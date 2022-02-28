@@ -1,4 +1,6 @@
-use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
+use crate::validate::{
+    SupportedGameVersions, ValidationError, ValidationResult,
+};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -31,7 +33,9 @@ impl super::Validator for ForgeValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("META-INF/mods.toml").map_err(|_| {
-            ValidationError::InvalidInputError("No mods.toml present for Forge file.".into())
+            ValidationError::InvalidInputError(
+                "No mods.toml present for Forge file.".into(),
+            )
         })?;
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
@@ -64,8 +68,14 @@ impl super::Validator for LegacyForgeValidator {
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Times between versions 1.5.2 to 1.12.2, which all use the legacy way of defining mods
         SupportedGameVersions::Range(
-            DateTime::from_utc(NaiveDateTime::from_timestamp(1366818300, 0), Utc),
-            DateTime::from_utc(NaiveDateTime::from_timestamp(1505810340, 0), Utc),
+            DateTime::from_utc(
+                NaiveDateTime::from_timestamp(1366818300, 0),
+                Utc,
+            ),
+            DateTime::from_utc(
+                NaiveDateTime::from_timestamp(1505810340, 0),
+                Utc,
+            ),
         )
     }
 
@@ -74,7 +84,9 @@ impl super::Validator for LegacyForgeValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("mcmod.info").map_err(|_| {
-            ValidationError::InvalidInputError("No mcmod.info present for Forge file.".into())
+            ValidationError::InvalidInputError(
+                "No mcmod.info present for Forge file.".into(),
+            )
         })?;
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {

@@ -42,7 +42,10 @@ impl User {
 
         Ok(())
     }
-    pub async fn get<'a, 'b, E>(id: UserId, executor: E) -> Result<Option<Self>, sqlx::error::Error>
+    pub async fn get<'a, 'b, E>(
+        id: UserId,
+        executor: E,
+    ) -> Result<Option<Self>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -150,13 +153,17 @@ impl User {
         }
     }
 
-    pub async fn get_many<'a, E>(user_ids: Vec<UserId>, exec: E) -> Result<Vec<User>, sqlx::Error>
+    pub async fn get_many<'a, E>(
+        user_ids: Vec<UserId>,
+        exec: E,
+    ) -> Result<Vec<User>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::stream::TryStreamExt;
 
-        let user_ids_parsed: Vec<i64> = user_ids.into_iter().map(|x| x.0).collect();
+        let user_ids_parsed: Vec<i64> =
+            user_ids.into_iter().map(|x| x.0).collect();
         let users = sqlx::query!(
             "
             SELECT u.id, u.github_id, u.name, u.email,
@@ -365,8 +372,11 @@ impl User {
         .await?;
 
         for project_id in projects {
-            let _result =
-                super::project_item::Project::remove_full(project_id, transaction).await?;
+            let _result = super::project_item::Project::remove_full(
+                project_id,
+                transaction,
+            )
+            .await?;
         }
 
         let notifications: Vec<i64> = sqlx::query!(
@@ -445,7 +455,8 @@ impl User {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option = crate::models::ids::base62_impl::parse_base62(username_or_id).ok();
+        let id_option =
+            crate::models::ids::base62_impl::parse_base62(username_or_id).ok();
 
         if let Some(id) = id_option {
             let id = UserId(id as i64);

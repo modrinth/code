@@ -38,14 +38,26 @@ pub enum AuthorizationError {
 impl actix_web::ResponseError for AuthorizationError {
     fn status_code(&self) -> StatusCode {
         match self {
-            AuthorizationError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            AuthorizationError::SqlxDatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            AuthorizationError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            AuthorizationError::EnvError(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
+            AuthorizationError::SqlxDatabaseError(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
+            AuthorizationError::DatabaseError(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             AuthorizationError::SerDeError(..) => StatusCode::BAD_REQUEST,
-            AuthorizationError::GithubError(..) => StatusCode::FAILED_DEPENDENCY,
-            AuthorizationError::InvalidCredentialsError => StatusCode::UNAUTHORIZED,
+            AuthorizationError::GithubError(..) => {
+                StatusCode::FAILED_DEPENDENCY
+            }
+            AuthorizationError::InvalidCredentialsError => {
+                StatusCode::UNAUTHORIZED
+            }
             AuthorizationError::DecodingError(..) => StatusCode::BAD_REQUEST,
-            AuthorizationError::AuthenticationError(..) => StatusCode::UNAUTHORIZED,
+            AuthorizationError::AuthenticationError(..) => {
+                StatusCode::UNAUTHORIZED
+            }
         }
     }
 
@@ -57,9 +69,13 @@ impl actix_web::ResponseError for AuthorizationError {
                 AuthorizationError::DatabaseError(..) => "database_error",
                 AuthorizationError::SerDeError(..) => "invalid_input",
                 AuthorizationError::GithubError(..) => "github_error",
-                AuthorizationError::InvalidCredentialsError => "invalid_credentials",
+                AuthorizationError::InvalidCredentialsError => {
+                    "invalid_credentials"
+                }
                 AuthorizationError::DecodingError(..) => "decoding_error",
-                AuthorizationError::AuthenticationError(..) => "authentication_error",
+                AuthorizationError::AuthenticationError(..) => {
+                    "authentication_error"
+                }
             },
             description: &self.to_string(),
         })
@@ -174,11 +190,14 @@ pub async fn auth_callback(
 
         let user = get_github_user_from_token(&*token.access_token).await?;
 
-        let user_result = User::get_from_github_id(user.id, &mut *transaction).await?;
+        let user_result =
+            User::get_from_github_id(user.id, &mut *transaction).await?;
         match user_result {
             Some(_) => {}
             None => {
-                let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
+                let user_id =
+                    crate::database::models::generate_user_id(&mut transaction)
+                        .await?;
 
                 let mut username_increment: i32 = 0;
                 let mut username = None;

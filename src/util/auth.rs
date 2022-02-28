@@ -58,7 +58,8 @@ where
 {
     let github_user = get_github_user_from_token(access_token).await?;
 
-    let res = models::User::get_from_github_id(github_user.id, executor).await?;
+    let res =
+        models::User::get_from_github_id(github_user.id, executor).await?;
 
     match res {
         Some(result) => Ok(User {

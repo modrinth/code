@@ -67,10 +67,14 @@ impl actix_web::ResponseError for CreateError {
     fn status_code(&self) -> StatusCode {
         match self {
             CreateError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::SqlxDatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::SqlxDatabaseError(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             CreateError::DatabaseError(..) => StatusCode::INTERNAL_SERVER_ERROR,
             CreateError::IndexingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            CreateError::FileHostingError(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            CreateError::FileHostingError(..) => {
+                StatusCode::INTERNAL_SERVER_ERROR
+            }
             CreateError::SerDeError(..) => StatusCode::BAD_REQUEST,
             CreateError::MultipartError(..) => StatusCode::BAD_REQUEST,
             CreateError::MissingValueError(..) => StatusCode::BAD_REQUEST,
@@ -81,7 +85,9 @@ impl actix_web::ResponseError for CreateError {
             CreateError::InvalidCategory(..) => StatusCode::BAD_REQUEST,
             CreateError::InvalidFileType(..) => StatusCode::BAD_REQUEST,
             CreateError::Unauthorized(..) => StatusCode::UNAUTHORIZED,
-            CreateError::CustomAuthenticationError(..) => StatusCode::UNAUTHORIZED,
+            CreateError::CustomAuthenticationError(..) => {
+                StatusCode::UNAUTHORIZED
+            }
             CreateError::SlugCollision => StatusCode::BAD_REQUEST,
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
@@ -297,17 +303,21 @@ pub async fn project_create_inner(
     let cdn_url = dotenv::var("CDN_URL")?;
 
     // The currently logged in user
-    let current_user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+    let current_user =
+        get_user_from_headers(req.headers(), &mut *transaction).await?;
 
-    let project_id: ProjectId = models::generate_project_id(transaction).await?.into();
+    let project_id: ProjectId =
+        models::generate_project_id(transaction).await?.into();
 
     let project_create_data;
     let mut versions;
     let mut versions_map = std::collections::HashMap::new();
     let mut gallery_urls = Vec::new();
 
-    let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
-    let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
+    let all_game_versions =
+        models::categories::GameVersion::list(&mut *transaction).await?;
+    let all_loaders =
+        models::categories::Loader::list(&mut *transaction).await?;
 
     {
         // The first multipart field must be named "data" and contain a
@@ -324,9 +334,9 @@ pub async fn project_create_inner(
             })?;
 
         let content_disposition = field.content_disposition();
-        let name = content_disposition
-            .get_name()
-            .ok_or_else(|| CreateError::MissingValueError(String::from("Missing content name")))?;
+        let name = content_disposition.get_name().ok_or_else(|| {
+            CreateError::MissingValueError(String::from("Missing content name"))
+        })?;
 
         if name != "data" {
             return Err(CreateError::InvalidInput(String::from(
@@ -336,19 +346,22 @@ pub async fn project_create_inner(
 
         let mut data = Vec::new();
         while let Some(chunk) = field.next().await {
-            data.extend_from_slice(&chunk.map_err(CreateError::MultipartError)?);
+            data.extend_from_slice(
+                &chunk.map_err(CreateError::MultipartError)?,
+            );
         }
         let create_data: ProjectCreateData = serde_json::from_slice(&data)?;
 
-        create_data
-            .validate()
-            .map_err(|err| CreateError::InvalidInput(validation_errors_to_string(err, None)))?;
+        create_data.validate().map_err(|err| {
+            CreateError::InvalidInput(validation_errors_to_string(err, None))
+        })?;
 
         let slug_project_id_option: Option<ProjectId> =
             serde_json::from_str(&*format!("\"{}\"", create_data.slug)).ok();
 
         if let Some(slug_project_id) = slug_project_id_option {
-            let slug_project_id: models::ids::ProjectId = slug_project_id.into();
+            let slug_project_id: models::ids::ProjectId =
+                slug_project_id.into();
             let results = sqlx::query!(
                 "
                 SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
@@ -393,15 +406,17 @@ pub async fn project_create_inner(
         project_create_data = create_data;
     }
 
-    let project_type_id =
-        models::ProjectTypeId::get_id(project_create_data.project_type.clone(), &mut *transaction)
-            .await?
-            .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Project Type {} does not exist.",
-                    project_create_data.project_type.clone()
-                ))
-            })?;
+    let project_type_id = models::ProjectTypeId::get_id(
+        project_create_data.project_type.clone(),
+        &mut *transaction,
+    )
+    .await?
+    .ok_or_else(|| {
+        CreateError::InvalidInput(format!(
+            "Project Type {} does not exist.",
+            project_create_data.project_type.clone()
+        ))
+    })?;
 
     let mut icon_url = None;
 
@@ -409,9 +424,9 @@ pub async fn project_create_inner(
         let mut field: Field = item.map_err(CreateError::MultipartError)?;
         let content_disposition = field.content_disposition().clone();
 
-        let name = content_disposition
-            .get_name()
-            .ok_or_else(|| CreateError::MissingValueError("Missing content name".to_string()))?;
+        let name = content_disposition.get_name().ok_or_else(|| {
+            CreateError::MissingValueError("Missing content name".to_string())
+        })?;
 
         let (file_name, file_extension) =
             super::version_creation::get_name_ext(&content_disposition)?;
@@ -454,11 +469,21 @@ pub async fn project_create_inner(
 
                 let hash = sha1::Sha1::from(&data).hexdigest();
                 let (_, file_extension) =
-                    super::version_creation::get_name_ext(&content_disposition)?;
-                let content_type = crate::util::ext::get_image_content_type(file_extension)
-                    .ok_or_else(|| CreateError::InvalidIconFormat(file_extension.to_string()))?;
+                    super::version_creation::get_name_ext(
+                        &content_disposition,
+                    )?;
+                let content_type =
+                    crate::util::ext::get_image_content_type(file_extension)
+                        .ok_or_else(|| {
+                            CreateError::InvalidIconFormat(
+                                file_extension.to_string(),
+                            )
+                        })?;
 
-                let url = format!("data/{}/images/{}.{}", project_id, hash, file_extension);
+                let url = format!(
+                    "data/{}/images/{}.{}",
+                    project_id, hash, file_extension
+                );
                 let upload_data = file_host
                     .upload_file(content_type, &url, data.freeze())
                     .await?;
@@ -491,7 +516,8 @@ pub async fn project_create_inner(
 
         // `index` is always valid for these lists
         let created_version = versions.get_mut(index).unwrap();
-        let version_data = project_create_data.initial_versions.get(index).unwrap();
+        let version_data =
+            project_create_data.initial_versions.get(index).unwrap();
 
         // Upload the new jar file
         super::version_creation::upload_file(
@@ -529,7 +555,8 @@ pub async fn project_create_inner(
         }
 
         // Convert the list of category names to actual categories
-        let mut categories = Vec::with_capacity(project_create_data.categories.len());
+        let mut categories =
+            Vec::with_capacity(project_create_data.categories.len());
         for category in &project_create_data.categories {
             let id = models::categories::Category::get_id_project(
                 category,
@@ -568,44 +595,58 @@ pub async fn project_create_inner(
         let status_id = models::StatusId::get_id(&status, &mut *transaction)
             .await?
             .ok_or_else(|| {
-                CreateError::InvalidInput(format!("Status {} does not exist.", status.clone()))
+                CreateError::InvalidInput(format!(
+                    "Status {} does not exist.",
+                    status.clone()
+                ))
             })?;
-        let client_side_id =
-            models::SideTypeId::get_id(&project_create_data.client_side, &mut *transaction)
-                .await?
-                .ok_or_else(|| {
-                    CreateError::InvalidInput(
-                        "Client side type specified does not exist.".to_string(),
-                    )
-                })?;
+        let client_side_id = models::SideTypeId::get_id(
+            &project_create_data.client_side,
+            &mut *transaction,
+        )
+        .await?
+        .ok_or_else(|| {
+            CreateError::InvalidInput(
+                "Client side type specified does not exist.".to_string(),
+            )
+        })?;
 
-        let server_side_id =
-            models::SideTypeId::get_id(&project_create_data.server_side, &mut *transaction)
-                .await?
-                .ok_or_else(|| {
-                    CreateError::InvalidInput(
-                        "Server side type specified does not exist.".to_string(),
-                    )
-                })?;
+        let server_side_id = models::SideTypeId::get_id(
+            &project_create_data.server_side,
+            &mut *transaction,
+        )
+        .await?
+        .ok_or_else(|| {
+            CreateError::InvalidInput(
+                "Server side type specified does not exist.".to_string(),
+            )
+        })?;
 
-        let license_id =
-            models::categories::License::get_id(&project_create_data.license_id, &mut *transaction)
-                .await?
-                .ok_or_else(|| {
-                    CreateError::InvalidInput("License specified does not exist.".to_string())
-                })?;
+        let license_id = models::categories::License::get_id(
+            &project_create_data.license_id,
+            &mut *transaction,
+        )
+        .await?
+        .ok_or_else(|| {
+            CreateError::InvalidInput(
+                "License specified does not exist.".to_string(),
+            )
+        })?;
         let mut donation_urls = vec![];
 
         if let Some(urls) = &project_create_data.donation_urls {
             for url in urls {
-                let platform_id = models::DonationPlatformId::get_id(&url.id, &mut *transaction)
-                    .await?
-                    .ok_or_else(|| {
-                        CreateError::InvalidInput(format!(
-                            "Donation platform {} does not exist.",
-                            url.id.clone()
-                        ))
-                    })?;
+                let platform_id = models::DonationPlatformId::get_id(
+                    &url.id,
+                    &mut *transaction,
+                )
+                .await?
+                .ok_or_else(|| {
+                    CreateError::InvalidInput(format!(
+                        "Donation platform {} does not exist.",
+                        url.id.clone()
+                    ))
+                })?;
 
                 donation_urls.push(models::project_item::DonationUrl {
                     project_id: project_id.into(),
@@ -695,9 +736,12 @@ pub async fn project_create_inner(
 
         if status == ProjectStatus::Processing {
             if let Ok(webhook_url) = dotenv::var("MODERATION_DISCORD_WEBHOOK") {
-                crate::util::webhook::send_discord_webhook(response.clone(), webhook_url)
-                    .await
-                    .ok();
+                crate::util::webhook::send_discord_webhook(
+                    response.clone(),
+                    webhook_url,
+                )
+                .await
+                .ok();
             }
         }
 
@@ -720,12 +764,13 @@ async fn create_initial_version(
         )));
     }
 
-    version_data
-        .validate()
-        .map_err(|err| CreateError::ValidationError(validation_errors_to_string(err, None)))?;
+    version_data.validate().map_err(|err| {
+        CreateError::ValidationError(validation_errors_to_string(err, None))
+    })?;
 
     // Randomly generate a new id to be used for the version
-    let version_id: VersionId = models::generate_version_id(transaction).await?.into();
+    let version_id: VersionId =
+        models::generate_version_id(transaction).await?.into();
 
     let game_versions = version_data
         .game_versions
@@ -794,8 +839,15 @@ async fn process_icon_upload(
     mut field: actix_multipart::Field,
     cdn_url: &str,
 ) -> Result<String, CreateError> {
-    if let Some(content_type) = crate::util::ext::get_image_content_type(file_extension) {
-        let data = read_from_field(&mut field, 262144, "Icons must be smaller than 256KiB").await?;
+    if let Some(content_type) =
+        crate::util::ext::get_image_content_type(file_extension)
+    {
+        let data = read_from_field(
+            &mut field,
+            262144,
+            "Icons must be smaller than 256KiB",
+        )
+        .await?;
 
         let upload_data = file_host
             .upload_file(

@@ -36,9 +36,9 @@ impl MemoryStore {
     pub fn with_capacity(capacity: usize) -> Self {
         debug!("Creating new MemoryStore");
         MemoryStore {
-            inner: Arc::new(DashMap::<String, (usize, Duration)>::with_capacity(
-                capacity,
-            )),
+            inner: Arc::new(
+                DashMap::<String, (usize, Duration)>::with_capacity(capacity),
+            ),
         }
     }
 }
@@ -74,10 +74,18 @@ impl Supervised for MemoryStoreActor {
 
 impl Handler<ActorMessage> for MemoryStoreActor {
     type Result = ActorResponse;
-    fn handle(&mut self, msg: ActorMessage, ctx: &mut Self::Context) -> Self::Result {
+    fn handle(
+        &mut self,
+        msg: ActorMessage,
+        ctx: &mut Self::Context,
+    ) -> Self::Result {
         match msg {
             ActorMessage::Set { key, value, expiry } => {
-                debug!("Inserting key {} with expiry {}", &key, &expiry.as_secs());
+                debug!(
+                    "Inserting key {} with expiry {}",
+                    &key,
+                    &expiry.as_secs()
+                );
                 let future_key = String::from(&key);
                 let now = SystemTime::now();
                 let now = now.duration_since(UNIX_EPOCH).unwrap();
@@ -85,7 +93,10 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                 ctx.notify_later(ActorMessage::Remove(future_key), expiry);
                 ActorResponse::Set(Box::pin(future::ready(Ok(()))))
             }
-            ActorMessage::Update { key, value } => match self.inner.get_mut(&key) {
+            ActorMessage::Update { key, value } => match self
+                .inner
+                .get_mut(&key)
+            {
                 Some(mut c) => {
                     let val_mut: &mut (usize, Duration) = c.value_mut();
                     if val_mut.0 > value {
@@ -98,7 +109,9 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                 }
                 None => {
                     return ActorResponse::Update(Box::pin(future::ready(Err(
-                        ARError::ReadWriteError("memory store: read failed!".to_string()),
+                        ARError::ReadWriteError(
+                            "memory store: read failed!".to_string(),
+                        ),
                     ))))
                 }
             },
@@ -107,9 +120,11 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                     let val = match self.inner.get(&key) {
                         Some(c) => c,
                         None => {
-                            return ActorResponse::Get(Box::pin(future::ready(Err(
-                                ARError::ReadWriteError("memory store: read failed!".to_string()),
-                            ))))
+                            return ActorResponse::Get(Box::pin(future::ready(
+                                Err(ARError::ReadWriteError(
+                                    "memory store: read failed!".to_string(),
+                                )),
+                            )))
                         }
                     };
                     let val = val.value().0;
@@ -122,14 +137,17 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                 let c = match self.inner.get(&key) {
                     Some(d) => d,
                     None => {
-                        return ActorResponse::Expire(Box::pin(future::ready(Err(
-                            ARError::ReadWriteError("memory store: read failed!".to_string()),
-                        ))))
+                        return ActorResponse::Expire(Box::pin(future::ready(
+                            Err(ARError::ReadWriteError(
+                                "memory store: read failed!".to_string(),
+                            )),
+                        )))
                     }
                 };
                 let dur = c.value().1;
                 let now = SystemTime::now().duration_since(UNIX_EPOCH).unwrap();
-                let res = dur.checked_sub(now).unwrap_or_else(|| Duration::new(0, 0));
+                let res =
+                    dur.checked_sub(now).unwrap_or_else(|| Duration::new(0, 0));
                 ActorResponse::Expire(Box::pin(future::ready(Ok(res))))
             }
             ActorMessage::Remove(key) => {
@@ -137,9 +155,11 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                 let val = match self.inner.remove::<String>(&key) {
                     Some(c) => c,
                     None => {
-                        return ActorResponse::Remove(Box::pin(future::ready(Err(
-                            ARError::ReadWriteError("memory store: remove failed!".to_string()),
-                        ))))
+                        return ActorResponse::Remove(Box::pin(future::ready(
+                            Err(ARError::ReadWriteError(
+                                "memory store: remove failed!".to_string(),
+                            )),
+                        )))
                     }
                 };
                 let val = val.1;

@@ -51,7 +51,8 @@ pub struct Pepper {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenv::dotenv().ok();
-    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info"))
+        .init();
 
     let config = Config::parse_args_default_or_exit();
 
@@ -102,37 +103,40 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Database connection failed");
 
-    let storage_backend = dotenv::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
+    let storage_backend =
+        dotenv::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
 
-    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> = match storage_backend.as_str() {
-        "backblaze" => Arc::new(
-            file_hosting::BackblazeHost::new(
-                &dotenv::var("BACKBLAZE_KEY_ID").unwrap(),
-                &dotenv::var("BACKBLAZE_KEY").unwrap(),
-                &dotenv::var("BACKBLAZE_BUCKET_ID").unwrap(),
-            )
-            .await,
-        ),
-        "s3" => Arc::new(
-            S3Host::new(
-                &*dotenv::var("S3_BUCKET_NAME").unwrap(),
-                &*dotenv::var("S3_REGION").unwrap(),
-                &*dotenv::var("S3_URL").unwrap(),
-                &*dotenv::var("S3_ACCESS_TOKEN").unwrap(),
-                &*dotenv::var("S3_SECRET").unwrap(),
-            )
-            .unwrap(),
-        ),
-        "local" => Arc::new(file_hosting::MockHost::new()),
-        _ => panic!("Invalid storage backend specified. Aborting startup!"),
-    };
+    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
+        match storage_backend.as_str() {
+            "backblaze" => Arc::new(
+                file_hosting::BackblazeHost::new(
+                    &dotenv::var("BACKBLAZE_KEY_ID").unwrap(),
+                    &dotenv::var("BACKBLAZE_KEY").unwrap(),
+                    &dotenv::var("BACKBLAZE_BUCKET_ID").unwrap(),
+                )
+                .await,
+            ),
+            "s3" => Arc::new(
+                S3Host::new(
+                    &*dotenv::var("S3_BUCKET_NAME").unwrap(),
+                    &*dotenv::var("S3_REGION").unwrap(),
+                    &*dotenv::var("S3_URL").unwrap(),
+                    &*dotenv::var("S3_ACCESS_TOKEN").unwrap(),
+                    &*dotenv::var("S3_SECRET").unwrap(),
+                )
+                .unwrap(),
+            ),
+            "local" => Arc::new(file_hosting::MockHost::new()),
+            _ => panic!("Invalid storage backend specified. Aborting startup!"),
+        };
 
     let mut scheduler = scheduler::Scheduler::new();
 
     // The interval in seconds at which the local database is indexed
     // for searching.  Defaults to 1 hour if unset.
-    let local_index_interval =
-        std::time::Duration::from_secs(parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600));
+    let local_index_interval = std::time::Duration::from_secs(
+        parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
+    );
 
     let mut skip = skip_initial;
     let pool_ref = pool.clone();
@@ -150,7 +154,8 @@ async fn main() -> std::io::Result<()> {
             }
             info!("Indexing local database");
             let settings = IndexingSettings { index_local: true };
-            let result = index_projects(pool_ref, settings, &search_config_ref).await;
+            let result =
+                index_projects(pool_ref, settings, &search_config_ref).await;
             if let Err(e) = result {
                 warn!("Local project indexing failed: {:?}", e);
             }
@@ -185,7 +190,8 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    let indexing_queue = Arc::new(search::indexing::queue::CreationQueue::new());
+    let indexing_queue =
+        Arc::new(search::indexing::queue::CreationQueue::new());
 
     let mut skip = skip_initial;
     let queue_ref = indexing_queue.clone();
@@ -214,7 +220,10 @@ async fn main() -> std::io::Result<()> {
     scheduler::schedule_versions(&mut scheduler, pool.clone(), skip_initial);
 
     let ip_salt = Pepper {
-        pepper: crate::models::ids::Base62Id(crate::models::ids::random_base62(11)).to_string(),
+        pepper: crate::models::ids::Base62Id(
+            crate::models::ids::random_base62(11),
+        )
+        .to_string(),
     };
 
     let store = MemoryStore::new();
@@ -236,10 +245,16 @@ async fn main() -> std::io::Result<()> {
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
                     .with_identifier(|req| {
                         let connection_info = req.connection_info();
-                        let ip =
-                            String::from(if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
-                                if let Some(header) = req.headers().get("CF-Connecting-IP") {
-                                    header.to_str().map_err(|_| ARError::IdentificationError)?
+                        let ip = String::from(
+                            if parse_var("CLOUDFLARE_INTEGRATION")
+                                .unwrap_or(false)
+                            {
+                                if let Some(header) =
+                                    req.headers().get("CF-Connecting-IP")
+                                {
+                                    header.to_str().map_err(|_| {
+                                        ARError::IdentificationError
+                                    })?
                                 } else {
                                     connection_info
                                         .peer_addr()
@@ -249,14 +264,16 @@ async fn main() -> std::io::Result<()> {
                                 connection_info
                                     .peer_addr()
                                     .ok_or(ARError::IdentificationError)?
-                            });
+                            },
+                        );
 
                         Ok(ip)
                     })
                     .with_interval(std::time::Duration::from_secs(60))
                     .with_max_requests(300)
                     .with_ignore_ips(
-                        parse_strings_from_var("RATE_LIMIT_IGNORE_IPS").unwrap_or_default(),
+                        parse_strings_from_var("RATE_LIMIT_IGNORE_IPS")
+                            .unwrap_or_default(),
                     ),
             )
             .app_data(web::Data::new(pool.clone()))

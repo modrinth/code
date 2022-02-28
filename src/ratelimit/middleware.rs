@@ -95,7 +95,9 @@ where
     }
 
     /// Function to get the identifier for the client request
-    pub fn with_identifier<F: Fn(&ServiceRequest) -> Result<String, ARError> + 'static>(
+    pub fn with_identifier<
+        F: Fn(&ServiceRequest) -> Result<String, ARError> + 'static,
+    >(
         mut self,
         identifier: F,
     ) -> Self {
@@ -108,7 +110,8 @@ impl<T, S, B> Transform<S, ServiceRequest> for RateLimiter<T>
 where
     T: Handler<ActorMessage> + Send + Sync + 'static,
     T::Context: ToEnvelope<T, ActorMessage>,
-    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = AWError> + 'static,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = AWError>
+        + 'static,
     S::Future: 'static,
     B: 'static,
 {
@@ -141,23 +144,29 @@ where
     // Exists here for the sole purpose of knowing the max_requests and interval from RateLimiter
     max_requests: usize,
     interval: u64,
-    identifier: Rc<Box<dyn Fn(&ServiceRequest) -> Result<String, ARError> + 'static>>,
+    identifier:
+        Rc<Box<dyn Fn(&ServiceRequest) -> Result<String, ARError> + 'static>>,
     ignore_ips: Vec<String>,
 }
 
 impl<T, S, B> Service<ServiceRequest> for RateLimitMiddleware<S, T>
 where
     T: Handler<ActorMessage> + 'static,
-    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = AWError> + 'static,
+    S: Service<ServiceRequest, Response = ServiceResponse<B>, Error = AWError>
+        + 'static,
     S::Future: 'static,
     B: 'static,
     T::Context: ToEnvelope<T, ActorMessage>,
 {
     type Response = ServiceResponse<B>;
     type Error = S::Error;
-    type Future = Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
+    type Future =
+        Pin<Box<dyn Future<Output = Result<Self::Response, Self::Error>>>>;
 
-    fn poll_ready(&self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+    fn poll_ready(
+        &self,
+        cx: &mut Context<'_>,
+    ) -> Poll<Result<(), Self::Error>> {
         self.service.borrow_mut().poll_ready(cx)
     }
 
@@ -185,9 +194,15 @@ where
                     if let Some(c) = opt {
                         // Existing entry in store
                         let expiry = store
-                            .send(ActorMessage::Expire(String::from(&identifier)))
+                            .send(ActorMessage::Expire(String::from(
+                                &identifier,
+                            )))
                             .await
-                            .map_err(|_| ARError::ReadWriteError("Setting timeout".to_string()))?;
+                            .map_err(|_| {
+                                ARError::ReadWriteError(
+                                    "Setting timeout".to_string(),
+                                )
+                            })?;
                         let reset: Duration = match expiry {
                             ActorResponse::Expire(dur) => dur.await?,
                             _ => unreachable!(),
@@ -209,7 +224,9 @@ where
                                 })
                                 .await
                                 .map_err(|_| {
-                                    ARError::ReadWriteError("Decrementing ratelimit".to_string())
+                                    ARError::ReadWriteError(
+                                        "Decrementing ratelimit".to_string(),
+                                    )
                                 })?;
                             let updated_value: usize = match res {
                                 ActorResponse::Update(c) => c.await?,
@@ -222,15 +239,23 @@ where
                             // Safe unwraps, since usize is always convertible to string
                             headers.insert(
                                 HeaderName::from_static("x-ratelimit-limit"),
-                                HeaderValue::from_str(max_requests.to_string().as_str())?,
+                                HeaderValue::from_str(
+                                    max_requests.to_string().as_str(),
+                                )?,
                             );
                             headers.insert(
-                                HeaderName::from_static("x-ratelimit-remaining"),
-                                HeaderValue::from_str(updated_value.to_string().as_str())?,
+                                HeaderName::from_static(
+                                    "x-ratelimit-remaining",
+                                ),
+                                HeaderValue::from_str(
+                                    updated_value.to_string().as_str(),
+                                )?,
                             );
                             headers.insert(
                                 HeaderName::from_static("x-ratelimit-reset"),
-                                HeaderValue::from_str(reset.as_secs().to_string().as_str())?,
+                                HeaderValue::from_str(
+                                    reset.as_secs().to_string().as_str(),
+                                )?,
                             );
                             Ok(res)
                         }
@@ -245,7 +270,9 @@ where
                             })
                             .await
                             .map_err(|_| {
-                                ARError::ReadWriteError("Creating store entry".to_string())
+                                ARError::ReadWriteError(
+                                    "Creating store entry".to_string(),
+                                )
                             })?;
                         match res {
                             ActorResponse::Set(c) => c.await?,
@@ -257,15 +284,24 @@ where
                         // Safe unwraps, since usize is always convertible to string
                         headers.insert(
                             HeaderName::from_static("x-ratelimit-limit"),
-                            HeaderValue::from_str(max_requests.to_string().as_str()).unwrap(),
+                            HeaderValue::from_str(
+                                max_requests.to_string().as_str(),
+                            )
+                            .unwrap(),
                         );
                         headers.insert(
                             HeaderName::from_static("x-ratelimit-remaining"),
-                            HeaderValue::from_str(current_value.to_string().as_str()).unwrap(),
+                            HeaderValue::from_str(
+                                current_value.to_string().as_str(),
+                            )
+                            .unwrap(),
                         );
                         headers.insert(
                             HeaderName::from_static("x-ratelimit-reset"),
-                            HeaderValue::from_str(interval.as_secs().to_string().as_str()).unwrap(),
+                            HeaderValue::from_str(
+                                interval.as_secs().to_string().as_str(),
+                            )
+                            .unwrap(),
                         );
                         Ok(res)
                     }

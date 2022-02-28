@@ -5,7 +5,8 @@ use sqlx::{Connection, PgConnection, Postgres};
 
 pub async fn connect() -> Result<PgPool, sqlx::Error> {
     info!("Initializing database connection");
-    let database_url = dotenv::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+    let database_url =
+        dotenv::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
     let pool = PgPoolOptions::new()
         .min_connections(
             dotenv::var("DATABASE_MIN_CONNECTIONS")

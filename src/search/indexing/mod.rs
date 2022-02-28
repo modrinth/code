@@ -88,15 +88,25 @@ async fn update_index_helper<'a>(
     .await
 }
 
-pub async fn reconfigure_indices(config: &SearchConfig) -> Result<(), IndexingError> {
+pub async fn reconfigure_indices(
+    config: &SearchConfig,
+) -> Result<(), IndexingError> {
     let client = config.make_client();
 
     // Relevance Index
-    update_index_helper(&client, "relevance_projects", "desc(downloads)").await?;
-    update_index_helper(&client, "downloads_projects", "desc(downloads)").await?;
+    update_index_helper(&client, "relevance_projects", "desc(downloads)")
+        .await?;
+    update_index_helper(&client, "downloads_projects", "desc(downloads)")
+        .await?;
     update_index_helper(&client, "follows_projects", "desc(follows)").await?;
-    update_index_helper(&client, "updated_projects", "desc(modified_timestamp)").await?;
-    update_index_helper(&client, "newest_projects", "desc(created_timestamp)").await?;
+    update_index_helper(
+        &client,
+        "updated_projects",
+        "desc(modified_timestamp)",
+    )
+    .await?;
+    update_index_helper(&client, "newest_projects", "desc(created_timestamp)")
+        .await?;
 
     Ok(())
 }
@@ -150,7 +160,10 @@ async fn create_index<'a>(
     }
 }
 
-async fn add_to_index(index: Index<'_>, mods: &[UploadSearchProject]) -> Result<(), IndexingError> {
+async fn add_to_index(
+    index: Index<'_>,
+    mods: &[UploadSearchProject],
+) -> Result<(), IndexingError> {
     for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
         index.add_documents(chunk, Some("project_id")).await?;
     }
@@ -179,9 +192,27 @@ pub async fn add_projects(
 ) -> Result<(), IndexingError> {
     let client = config.make_client();
 
-    create_and_add_to_index(&client, &projects, "relevance_projects", "desc(downloads)").await?;
-    create_and_add_to_index(&client, &projects, "downloads_projects", "desc(downloads)").await?;
-    create_and_add_to_index(&client, &projects, "follows_projects", "desc(follows)").await?;
+    create_and_add_to_index(
+        &client,
+        &projects,
+        "relevance_projects",
+        "desc(downloads)",
+    )
+    .await?;
+    create_and_add_to_index(
+        &client,
+        &projects,
+        "downloads_projects",
+        "desc(downloads)",
+    )
+    .await?;
+    create_and_add_to_index(
+        &client,
+        &projects,
+        "follows_projects",
+        "desc(follows)",
+    )
+    .await?;
     create_and_add_to_index(
         &client,
         &projects,

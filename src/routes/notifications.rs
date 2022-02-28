@@ -31,8 +31,11 @@ pub async fn notifications_get(
             .collect();
 
     let notifications_data: Vec<DBNotification> =
-        database::models::notification_item::Notification::get_many(notification_ids, &**pool)
-            .await?;
+        database::models::notification_item::Notification::get_many(
+            notification_ids,
+            &**pool,
+        )
+        .await?;
 
     let notifications: Vec<Notification> = notifications_data
         .into_iter()
@@ -54,7 +57,11 @@ pub async fn notification_get(
     let id = info.into_inner().0;
 
     let notification_data =
-        database::models::notification_item::Notification::get(id.into(), &**pool).await?;
+        database::models::notification_item::Notification::get(
+            id.into(),
+            &**pool,
+        )
+        .await?;
 
     if let Some(data) = notification_data {
         if user.id == data.user_id.into() || user.role.is_mod() {
@@ -78,21 +85,29 @@ pub async fn notification_delete(
     let id = info.into_inner().0;
 
     let notification_data =
-        database::models::notification_item::Notification::get(id.into(), &**pool).await?;
+        database::models::notification_item::Notification::get(
+            id.into(),
+            &**pool,
+        )
+        .await?;
 
     if let Some(data) = notification_data {
         if data.user_id == user.id.into() || user.role.is_mod() {
             let mut transaction = pool.begin().await?;
 
-            database::models::notification_item::Notification::remove(id.into(), &mut transaction)
-                .await?;
+            database::models::notification_item::Notification::remove(
+                id.into(),
+                &mut transaction,
+            )
+            .await?;
 
             transaction.commit().await?;
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
             Err(ApiError::CustomAuthenticationError(
-                "You are not authorized to delete this notification!".to_string(),
+                "You are not authorized to delete this notification!"
+                    .to_string(),
             ))
         }
     } else {
@@ -108,18 +123,23 @@ pub async fn notifications_delete(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    let notification_ids = serde_json::from_str::<Vec<NotificationId>>(&*ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
+    let notification_ids =
+        serde_json::from_str::<Vec<NotificationId>>(&*ids.ids)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
 
     let mut transaction = pool.begin().await?;
 
     let notifications_data =
-        database::models::notification_item::Notification::get_many(notification_ids, &**pool)
-            .await?;
+        database::models::notification_item::Notification::get_many(
+            notification_ids,
+            &**pool,
+        )
+        .await?;
 
-    let mut notifications: Vec<database::models::ids::NotificationId> = Vec::new();
+    let mut notifications: Vec<database::models::ids::NotificationId> =
+        Vec::new();
 
     for notification in notifications_data {
         if notification.user_id == user.id.into() || user.role.is_mod() {
@@ -127,8 +147,11 @@ pub async fn notifications_delete(
         }
     }
 
-    database::models::notification_item::Notification::remove_many(notifications, &mut transaction)
-        .await?;
+    database::models::notification_item::Notification::remove_many(
+        notifications,
+        &mut transaction,
+    )
+    .await?;
 
     transaction.commit().await?;
 

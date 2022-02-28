@@ -29,18 +29,20 @@ pub async fn team_members_get(
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
     let members_data =
-        crate::database::models::TeamMember::get_from_team(id.into(), &**pool).await?;
+        crate::database::models::TeamMember::get_from_team(id.into(), &**pool)
+            .await?;
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if let Some(user) = current_user {
-        let team_member = crate::database::models::TeamMember::get_from_user_id(
-            id.into(),
-            user.id.into(),
-            &**pool,
-        )
-        .await
-        .map_err(ApiError::DatabaseError)?;
+        let team_member =
+            crate::database::models::TeamMember::get_from_user_id(
+                id.into(),
+                user.id.into(),
+                &**pool,
+            )
+            .await
+            .map_err(ApiError::DatabaseError)?;
 
         if team_member.is_some() {
             let team_members: Vec<TeamMember> = members_data

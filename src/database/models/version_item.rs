@@ -29,11 +29,13 @@ impl DependencyBuilder {
         version_id: VersionId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), DatabaseError> {
-        let (version_dependency_id, project_dependency_id): (Option<VersionId>, Option<ProjectId>) =
-            if self.version_id.is_some() {
-                (self.version_id, None)
-            } else if let Some(project_id) = self.project_id {
-                let version_id = sqlx::query!(
+        let (version_dependency_id, project_dependency_id): (
+            Option<VersionId>,
+            Option<ProjectId>,
+        ) = if self.version_id.is_some() {
+            (self.version_id, None)
+        } else if let Some(project_id) = self.project_id {
+            let version_id = sqlx::query!(
                     "
                     SELECT version.id id FROM (
                         SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v
@@ -49,10 +51,10 @@ impl DependencyBuilder {
                 )
                 .fetch_optional(&mut *transaction).await?.map(|x| VersionId(x.id));
 
-                (version_id, Some(project_id))
-            } else {
-                (None, None)
-            };
+            (version_id, Some(project_id))
+        } else {
+            (None, None)
+        };
 
         sqlx::query!(
             "
@@ -561,7 +563,8 @@ impl Version {
     {
         use futures::stream::TryStreamExt;
 
-        let version_ids_parsed: Vec<i64> = version_ids.into_iter().map(|x| x.0).collect();
+        let version_ids_parsed: Vec<i64> =
+            version_ids.into_iter().map(|x| x.0).collect();
         let versions = sqlx::query!(
             "
             SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
@@ -662,7 +665,8 @@ impl Version {
         );
 
         if let Some(v) = version? {
-            let mut hashes_map: HashMap<FileId, HashMap<String, Vec<u8>>> = HashMap::new();
+            let mut hashes_map: HashMap<FileId, HashMap<String, Vec<u8>>> =
+                HashMap::new();
 
             for hash in hashes? {
                 let entry = hashes_map
@@ -690,11 +694,17 @@ impl Version {
                         id: FileId(x.id),
                         url: x.url,
                         filename: x.filename,
-                        hashes: hashes_map.entry(FileId(x.id)).or_default().clone(),
+                        hashes: hashes_map
+                            .entry(FileId(x.id))
+                            .or_default()
+                            .clone(),
                         primary: x.is_primary,
                     })
                     .collect(),
-                game_versions: game_versions?.into_iter().map(|x| x.game_version).collect(),
+                game_versions: game_versions?
+                    .into_iter()
+                    .map(|x| x.game_version)
+                    .collect(),
                 loaders: loaders?.into_iter().map(|x| x.loader).collect(),
                 featured: v.featured,
                 dependencies: dependencies?
@@ -719,9 +729,11 @@ impl Version {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        futures::future::try_join_all(version_ids.into_iter().map(|id| Self::get_full(id, exec)))
-            .await
-            .map(|x| x.into_iter().flatten().collect())
+        futures::future::try_join_all(
+            version_ids.into_iter().map(|id| Self::get_full(id, exec)),
+        )
+        .await
+        .map(|x| x.into_iter().flatten().collect())
     }
 }
 

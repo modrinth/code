@@ -58,7 +58,11 @@ pub async fn maven_metadata(
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
     let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&*project_id, &**pool).await?;
+        database::models::Project::get_full_from_slug_or_project_id(
+            &*project_id,
+            &**pool,
+        )
+        .await?;
 
     let data = if let Some(data) = project_data {
         data
@@ -119,7 +123,9 @@ fn find_file<'a>(
     version: &'a QueryVersion,
     file: &str,
 ) -> Option<&'a QueryFile> {
-    if let Some(selected_file) = version.files.iter().find(|x| x.filename == file) {
+    if let Some(selected_file) =
+        version.files.iter().find(|x| x.filename == file)
+    {
         return Some(selected_file);
     }
 
@@ -129,7 +135,9 @@ fn find_file<'a>(
         _ => return None,
     };
 
-    if file == format!("{}-{}.{}", &project_id, &version.version_number, fileext) {
+    if file
+        == format!("{}-{}.{}", &project_id, &version.version_number, fileext)
+    {
         version
             .files
             .iter()
@@ -148,7 +156,11 @@ pub async fn version_file(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
+        database::models::Project::get_full_from_slug_or_project_id(
+            &project_id,
+            &**pool,
+        )
+        .await?;
 
     let project = if let Some(data) = project_data {
         data
@@ -175,9 +187,11 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let version = if let Some(version) =
-        database::models::Version::get_full(database::models::ids::VersionId(vid.id), &**pool)
-            .await?
+    let version = if let Some(version) = database::models::Version::get_full(
+        database::models::ids::VersionId(vid.id),
+        &**pool,
+    )
+    .await?
     {
         version
     } else {
@@ -197,10 +211,12 @@ pub async fn version_file(
             name: project.inner.title,
             description: project.inner.description,
         };
-        return Ok(HttpResponse::Ok()
-            .content_type("text/xml")
-            .body(yaserde::ser::to_string(&respdata).map_err(ApiError::XmlError)?));
-    } else if let Some(selected_file) = find_file(&project_id, &project, &version, &file) {
+        return Ok(HttpResponse::Ok().content_type("text/xml").body(
+            yaserde::ser::to_string(&respdata).map_err(ApiError::XmlError)?,
+        ));
+    } else if let Some(selected_file) =
+        find_file(&project_id, &project, &version, &file)
+    {
         return Ok(HttpResponse::TemporaryRedirect()
             .append_header(("location", &*selected_file.url))
             .body(""));
@@ -217,7 +233,11 @@ pub async fn version_file_sha1(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
+        database::models::Project::get_full_from_slug_or_project_id(
+            &project_id,
+            &**pool,
+        )
+        .await?;
 
     let project = if let Some(data) = project_data {
         data
@@ -244,9 +264,11 @@ pub async fn version_file_sha1(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let version = if let Some(version) =
-        database::models::Version::get_full(database::models::ids::VersionId(vid.id), &**pool)
-            .await?
+    let version = if let Some(version) = database::models::Version::get_full(
+        database::models::ids::VersionId(vid.id),
+        &**pool,
+    )
+    .await?
     {
         version
     } else {
@@ -268,7 +290,11 @@ pub async fn version_file_sha512(
 ) -> Result<HttpResponse, ApiError> {
     let (project_id, vnum, file) = params.into_inner();
     let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(&project_id, &**pool).await?;
+        database::models::Project::get_full_from_slug_or_project_id(
+            &project_id,
+            &**pool,
+        )
+        .await?;
 
     let project = if let Some(data) = project_data {
         data
@@ -295,9 +321,11 @@ pub async fn version_file_sha512(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let version = if let Some(version) =
-        database::models::Version::get_full(database::models::ids::VersionId(vid.id), &**pool)
-            .await?
+    let version = if let Some(version) = database::models::Version::get_full(
+        database::models::ids::VersionId(vid.id),
+        &**pool,
+    )
+    .await?
     {
         version
     } else {

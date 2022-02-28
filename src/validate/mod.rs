@@ -114,20 +114,24 @@ fn game_version_supported(
 ) -> bool {
     match supported_game_versions {
         SupportedGameVersions::All => true,
-        SupportedGameVersions::PastDate(date) => game_versions.iter().any(|x| {
-            all_game_versions
-                .iter()
-                .find(|y| y.version == x.0)
-                .map(|x| x.date > date)
-                .unwrap_or(false)
-        }),
-        SupportedGameVersions::Range(before, after) => game_versions.iter().any(|x| {
-            all_game_versions
-                .iter()
-                .find(|y| y.version == x.0)
-                .map(|x| x.date > before && x.date < after)
-                .unwrap_or(false)
-        }),
+        SupportedGameVersions::PastDate(date) => {
+            game_versions.iter().any(|x| {
+                all_game_versions
+                    .iter()
+                    .find(|y| y.version == x.0)
+                    .map(|x| x.date > date)
+                    .unwrap_or(false)
+            })
+        }
+        SupportedGameVersions::Range(before, after) => {
+            game_versions.iter().any(|x| {
+                all_game_versions
+                    .iter()
+                    .find(|y| y.version == x.0)
+                    .map(|x| x.date > before && x.date < after)
+                    .unwrap_or(false)
+            })
+        }
         SupportedGameVersions::Custom(versions) => {
             versions.iter().any(|x| game_versions.contains(x))
         }

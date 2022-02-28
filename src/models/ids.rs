@@ -127,7 +127,10 @@ pub mod base62_impl {
             impl<'de> Visitor<'de> for Base62Visitor {
                 type Value = Base62Id;
 
-                fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                fn expecting(
+                    &self,
+                    formatter: &mut std::fmt::Formatter,
+                ) -> std::fmt::Result {
                     formatter.write_str("a base62 string id")
                 }
 
@@ -183,7 +186,9 @@ pub mod base62_impl {
             }
 
             // We don't want this panicking or wrapping on integer overflow
-            if let Some(n) = num.checked_mul(62).and_then(|n| n.checked_add(next_digit)) {
+            if let Some(n) =
+                num.checked_mul(62).and_then(|n| n.checked_add(next_digit))
+            {
                 num = n;
             } else {
                 return Err(DecodingError::Overflow);

@@ -7,7 +7,9 @@ use crate::search::UploadSearchProject;
 use sqlx::postgres::PgPool;
 
 // TODO: Move this away from STRING_AGG to multiple queries - however this may be more efficient?
-pub async fn index_local(pool: PgPool) -> Result<Vec<UploadSearchProject>, IndexingError> {
+pub async fn index_local(
+    pool: PgPool,
+) -> Result<Vec<UploadSearchProject>, IndexingError> {
     info!("Indexing local projects!");
     Ok(
         sqlx::query!(

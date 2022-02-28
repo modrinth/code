@@ -20,9 +20,11 @@ pub async fn forge_updates(
 
     let (id,) = info.into_inner();
 
-    let project = database::models::Project::get_full_from_slug_or_project_id(&id, &**pool)
-        .await?
-        .ok_or_else(|| ApiError::InvalidInputError(ERROR.to_string()))?;
+    let project = database::models::Project::get_full_from_slug_or_project_id(
+        &id, &**pool,
+    )
+    .await?
+    .ok_or_else(|| ApiError::InvalidInputError(ERROR.to_string()))?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -38,7 +40,8 @@ pub async fn forge_updates(
     )
     .await?;
 
-    let mut versions = database::models::Version::get_many_full(version_ids, &**pool).await?;
+    let mut versions =
+        database::models::Version::get_many_full(version_ids, &**pool).await?;
     versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
 
     #[derive(Serialize)]
@@ -48,7 +51,11 @@ pub async fn forge_updates(
     }
 
     let mut response = ForgeUpdates {
-        homepage: format!("{}/mod/{}", dotenv::var("SITE_URL").unwrap_or_default(), id),
+        homepage: format!(
+            "{}/mod/{}",
+            dotenv::var("SITE_URL").unwrap_or_default(),
+            id
+        ),
         promos: HashMap::new(),
     };
 

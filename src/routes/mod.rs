@@ -187,38 +187,62 @@ pub enum ApiError {
 impl actix_web::ResponseError for ApiError {
     fn status_code(&self) -> actix_web::http::StatusCode {
         match self {
-            ApiError::EnvError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::DatabaseError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::SqlxDatabaseError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::AuthenticationError(..) => actix_web::http::StatusCode::UNAUTHORIZED,
-            ApiError::CustomAuthenticationError(..) => actix_web::http::StatusCode::UNAUTHORIZED,
-            ApiError::XmlError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
+            ApiError::EnvError(..) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
+            ApiError::DatabaseError(..) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
+            ApiError::SqlxDatabaseError(..) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
+            ApiError::AuthenticationError(..) => {
+                actix_web::http::StatusCode::UNAUTHORIZED
+            }
+            ApiError::CustomAuthenticationError(..) => {
+                actix_web::http::StatusCode::UNAUTHORIZED
+            }
+            ApiError::XmlError(..) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
             ApiError::JsonError(..) => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::SearchError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::IndexingError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::FileHostingError(..) => actix_web::http::StatusCode::INTERNAL_SERVER_ERROR,
-            ApiError::InvalidInputError(..) => actix_web::http::StatusCode::BAD_REQUEST,
-            ApiError::ValidationError(..) => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::SearchError(..) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
+            ApiError::IndexingError(..) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
+            ApiError::FileHostingError(..) => {
+                actix_web::http::StatusCode::INTERNAL_SERVER_ERROR
+            }
+            ApiError::InvalidInputError(..) => {
+                actix_web::http::StatusCode::BAD_REQUEST
+            }
+            ApiError::ValidationError(..) => {
+                actix_web::http::StatusCode::BAD_REQUEST
+            }
         }
     }
 
     fn error_response(&self) -> actix_web::HttpResponse {
-        actix_web::HttpResponse::build(self.status_code()).json(crate::models::error::ApiError {
-            error: match self {
-                ApiError::EnvError(..) => "environment_error",
-                ApiError::SqlxDatabaseError(..) => "database_error",
-                ApiError::DatabaseError(..) => "database_error",
-                ApiError::AuthenticationError(..) => "unauthorized",
-                ApiError::CustomAuthenticationError(..) => "unauthorized",
-                ApiError::XmlError(..) => "xml_error",
-                ApiError::JsonError(..) => "json_error",
-                ApiError::SearchError(..) => "search_error",
-                ApiError::IndexingError(..) => "indexing_error",
-                ApiError::FileHostingError(..) => "file_hosting_error",
-                ApiError::InvalidInputError(..) => "invalid_input",
-                ApiError::ValidationError(..) => "invalid_input",
+        actix_web::HttpResponse::build(self.status_code()).json(
+            crate::models::error::ApiError {
+                error: match self {
+                    ApiError::EnvError(..) => "environment_error",
+                    ApiError::SqlxDatabaseError(..) => "database_error",
+                    ApiError::DatabaseError(..) => "database_error",
+                    ApiError::AuthenticationError(..) => "unauthorized",
+                    ApiError::CustomAuthenticationError(..) => "unauthorized",
+                    ApiError::XmlError(..) => "xml_error",
+                    ApiError::JsonError(..) => "json_error",
+                    ApiError::SearchError(..) => "search_error",
+                    ApiError::IndexingError(..) => "indexing_error",
+                    ApiError::FileHostingError(..) => "file_hosting_error",
+                    ApiError::InvalidInputError(..) => "invalid_input",
+                    ApiError::ValidationError(..) => "invalid_input",
+                },
+                description: &self.to_string(),
             },
-            description: &self.to_string(),
-        })
+        )
     }
 }

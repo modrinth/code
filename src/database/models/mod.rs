@@ -83,7 +83,10 @@ impl ids::SideTypeId {
 }
 
 impl ids::DonationPlatformId {
-    pub async fn get_id<'a, E>(id: &str, exec: E) -> Result<Option<Self>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        id: &str,
+        exec: E,
+    ) -> Result<Option<Self>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -102,7 +105,10 @@ impl ids::DonationPlatformId {
 }
 
 impl ids::ProjectTypeId {
-    pub async fn get_id<'a, E>(project_type: String, exec: E) -> Result<Option<Self>, DatabaseError>
+    pub async fn get_id<'a, E>(
+        project_type: String,
+        exec: E,
+    ) -> Result<Option<Self>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {

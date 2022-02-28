@@ -20,8 +20,10 @@ pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    Ok(HttpResponse::Ok()
-        .json(get_user_from_headers(req.headers(), &mut *pool.acquire().await?).await?))
+    Ok(HttpResponse::Ok().json(
+        get_user_from_headers(req.headers(), &mut *pool.acquire().await?)
+            .await?,
+    ))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -41,7 +43,8 @@ pub async fn users_get(
 
     let users_data = User::get_many(user_ids, &**pool).await?;
 
-    let users: Vec<crate::models::users::User> = users_data.into_iter().map(From::from).collect();
+    let users: Vec<crate::models::users::User> =
+        users_data.into_iter().map(From::from).collect();
 
     Ok(HttpResponse::Ok().json(users))
 }
@@ -52,7 +55,8 @@ pub async fn user_get(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
-    let id_option: Option<UserId> = serde_json::from_str(&*format!("\"{}\"", string)).ok();
+    let id_option: Option<UserId> =
+        serde_json::from_str(&*format!("\"{}\"", string)).ok();
 
     let mut user_data;
 
@@ -82,9 +86,11 @@ pub async fn projects_list(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let id_option =
-        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+    let id_option = crate::database::models::User::get_id_from_username_or_id(
+        &*info.into_inner().0,
+        &**pool,
+    )
+    .await?;
 
     if let Some(id) = id_option {
         let user_id: UserId = id.into();
@@ -93,17 +99,24 @@ pub async fn projects_list(
             if current_user.role.is_mod() || current_user.id == user_id {
                 User::get_projects_private(id, &**pool).await?
             } else {
-                User::get_projects(id, ProjectStatus::Approved.as_str(), &**pool).await?
+                User::get_projects(
+                    id,
+                    ProjectStatus::Approved.as_str(),
+                    &**pool,
+                )
+                .await?
             }
         } else {
-            User::get_projects(id, ProjectStatus::Approved.as_str(), &**pool).await?
+            User::get_projects(id, ProjectStatus::Approved.as_str(), &**pool)
+                .await?
         };
 
-        let response: Vec<_> = crate::database::Project::get_many_full(project_data, &**pool)
-            .await?
-            .into_iter()
-            .map(Project::from)
-            .collect();
+        let response: Vec<_> =
+            crate::database::Project::get_many_full(project_data, &**pool)
+                .await?
+                .into_iter()
+                .map(Project::from)
+                .collect();
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -152,13 +165,15 @@ pub async fn user_edit(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    new_user
-        .validate()
-        .map_err(|err| ApiError::ValidationError(validation_errors_to_string(err, None)))?;
+    new_user.validate().map_err(|err| {
+        ApiError::ValidationError(validation_errors_to_string(err, None))
+    })?;
 
-    let id_option =
-        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+    let id_option = crate::database::models::User::get_id_from_username_or_id(
+        &*info.into_inner().0,
+        &**pool,
+    )
+    .await?;
 
     if let Some(id) = id_option {
         let user_id: UserId = id.into();
@@ -168,8 +183,10 @@ pub async fn user_edit(
 
             if let Some(username) = &new_user.username {
                 let user_option =
-                    crate::database::models::User::get_id_from_username_or_id(username, &**pool)
-                        .await?;
+                    crate::database::models::User::get_id_from_username_or_id(
+                        username, &**pool,
+                    )
+                    .await?;
 
                 if user_option.is_none() {
                     sqlx::query!(
@@ -282,19 +299,23 @@ pub async fn user_icon_edit(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) = crate::util::ext::get_image_content_type(&*ext.ext) {
+    if let Some(content_type) =
+        crate::util::ext::get_image_content_type(&*ext.ext)
+    {
         let cdn_url = dotenv::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
-        let id_option = crate::database::models::User::get_id_from_username_or_id(
-            &*info.into_inner().0,
-            &**pool,
-        )
-        .await?;
+        let id_option =
+            crate::database::models::User::get_id_from_username_or_id(
+                &*info.into_inner().0,
+                &**pool,
+            )
+            .await?;
 
         if let Some(id) = id_option {
             if user.id != id.into() && !user.role.is_mod() {
                 return Err(ApiError::CustomAuthenticationError(
-                    "You don't have permission to edit this user's icon.".to_string(),
+                    "You don't have permission to edit this user's icon."
+                        .to_string(),
                 ));
             }
 
@@ -322,8 +343,12 @@ pub async fn user_icon_edit(
                 }
             }
 
-            let bytes =
-                read_from_payload(&mut payload, 2097152, "Icons must be smaller than 2MiB").await?;
+            let bytes = read_from_payload(
+                &mut payload,
+                2097152,
+                "Icons must be smaller than 2MiB",
+            )
+            .await?;
 
             let upload_data = file_host
                 .upload_file(
@@ -374,9 +399,11 @@ pub async fn user_delete(
     removal_type: web::Query<RemovalType>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option =
-        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+    let id_option = crate::database::models::User::get_id_from_username_or_id(
+        &*info.into_inner().0,
+        &**pool,
+    )
+    .await?;
 
     if let Some(id) = id_option {
         if !user.role.is_mod() && user.id != id.into() {
@@ -389,9 +416,15 @@ pub async fn user_delete(
 
         let result;
         if &*removal_type.removal_type == "full" {
-            result = crate::database::models::User::remove_full(id, &mut transaction).await?;
+            result = crate::database::models::User::remove_full(
+                id,
+                &mut transaction,
+            )
+            .await?;
         } else {
-            result = crate::database::models::User::remove(id, &mut transaction).await?;
+            result =
+                crate::database::models::User::remove(id, &mut transaction)
+                    .await?;
         };
 
         transaction.commit().await?;
@@ -413,9 +446,11 @@ pub async fn user_follows(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option =
-        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+    let id_option = crate::database::models::User::get_id_from_username_or_id(
+        &*info.into_inner().0,
+        &**pool,
+    )
+    .await?;
 
     if let Some(id) = id_option {
         if !user.role.is_mod() && user.id != id.into() {
@@ -441,11 +476,12 @@ pub async fn user_follows(
         .try_collect::<Vec<crate::database::models::ProjectId>>()
         .await?;
 
-        let projects: Vec<_> = crate::database::Project::get_many_full(project_ids, &**pool)
-            .await?
-            .into_iter()
-            .map(Project::from)
-            .collect();
+        let projects: Vec<_> =
+            crate::database::Project::get_many_full(project_ids, &**pool)
+                .await?
+                .into_iter()
+                .map(Project::from)
+                .collect();
 
         Ok(HttpResponse::Ok().json(projects))
     } else {
@@ -460,9 +496,11 @@ pub async fn user_notifications(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option =
-        crate::database::models::User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+    let id_option = crate::database::models::User::get_id_from_username_or_id(
+        &*info.into_inner().0,
+        &**pool,
+    )
+    .await?;
 
     if let Some(id) = id_option {
         if !user.role.is_mod() && user.id != id.into() {
