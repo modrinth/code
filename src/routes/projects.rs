@@ -112,7 +112,7 @@ pub async fn dependency_list(
 
         let dependencies = sqlx::query!(
             "
-            SELECT d.dependency_id, vd.mod_id
+            SELECT d.dependency_id, vd.mod_id, d.mod_dependency_id
             FROM versions v
             INNER JOIN dependencies d ON d.dependent_id = v.id
             INNER JOIN versions vd ON d.dependency_id = vd.id
@@ -126,18 +126,31 @@ pub async fn dependency_list(
                 (
                     x.dependency_id.map(database::models::VersionId),
                     database::models::ProjectId(x.mod_id),
+                    x.mod_dependency_id.map(database::models::ProjectId),
                 )
             }))
         })
         .try_collect::<Vec<(
             Option<database::models::VersionId>,
             database::models::ProjectId,
+            Option<database::models::ProjectId>,
         )>>()
         .await?;
 
         let (projects_result, versions_result) = futures::join!(
             database::Project::get_many_full(
-                dependencies.iter().map(|x| x.1).collect(),
+                dependencies
+                    .iter()
+                    .map(|x| if x.0.is_none() {
+                        if let Some(mod_dependency_id) = x.2 {
+                            mod_dependency_id
+                        } else {
+                            x.1
+                        }
+                    } else {
+                        x.1
+                    })
+                    .collect(),
                 &**pool,
             ),
             database::Version::get_many_full(
@@ -146,14 +159,20 @@ pub async fn dependency_list(
             )
         );
 
-        let projects = projects_result?
+        let mut projects = projects_result?
             .into_iter()
             .map(models::projects::Project::from)
             .collect::<Vec<_>>();
-        let versions = versions_result?
+        let mut versions = versions_result?
             .into_iter()
             .map(models::projects::Version::from)
             .collect::<Vec<_>>();
+
+        projects.sort_by(|a, b| b.published.cmp(&a.published));
+        projects.dedup_by(|a, b| a.id == b.id);
+
+        versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+        versions.dedup_by(|a, b| a.id == b.id);
 
         Ok(HttpResponse::Ok().json(DependencyInfo { projects, versions }))
     } else {

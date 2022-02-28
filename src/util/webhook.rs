@@ -72,8 +72,9 @@ pub async fn send_discord_webhook(
 
     let embed = DiscordEmbed {
         url: format!(
-            "{}/mod/{}",
+            "{}/{}/{}",
             dotenv::var("SITE_URL").unwrap_or_default(),
+            project.project_type,
             project
                 .clone()
                 .slug
@@ -82,7 +83,7 @@ pub async fn send_discord_webhook(
         title: project.title,
         description: project.description,
         timestamp: project.published,
-        color: 0x5DA545,
+        color: 0x1bd96a,
         fields,
         image: DiscordEmbedImage {
             url: project.icon_url,

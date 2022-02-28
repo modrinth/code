@@ -675,30 +675,29 @@ pub async fn upload_file(
     )
     .await?;
 
-    let file_name_encode = format!(
+    let file_path_encode = format!(
         "data/{}/versions/{}/{}",
         project_id,
         version_number,
         urlencoding::encode(file_name)
     );
-    let file_name = format!(
+    let file_path = format!(
         "data/{}/versions/{}/{}",
         project_id, version_number, &file_name
     );
 
     let upload_data = file_host
-        .upload_file(content_type, &file_name, data.freeze())
+        .upload_file(content_type, &file_path, data.freeze())
         .await?;
 
     uploaded_files.push(UploadedFile {
         file_id: upload_data.file_id,
-        file_name: file_name_encode,
+        file_name: file_path,
     });
 
-    // TODO: Malware scan + file validation
     version_files.push(models::version_item::VersionFileBuilder {
         filename: file_name.to_string(),
-        url: format!("{}/{}", cdn_url, upload_data.file_name),
+        url: format!("{}/{}", cdn_url, file_path_encode),
         hashes: vec![
             models::version_item::HashBuilder {
                 algorithm: "sha1".to_string(),
