@@ -654,6 +654,12 @@ export default {
         dependency.project = this.dependencies.projects.find(
           (x) => x.id === dependency.version.project_id
         )
+
+        if (!dependency.project) {
+          dependency.project = this.dependencies.projects.find(
+            (x) => x.id === dependency.project_id
+          )
+        }
       }
     },
     async addDependency() {
