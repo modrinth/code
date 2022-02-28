@@ -648,11 +648,11 @@ export default {
       }
 
       for (const dependency of this.version.dependencies) {
-        dependency.project = this.dependencies.projects.find(
-          (x) => x.id === dependency.project_id
-        )
         dependency.version = this.dependencies.versions.find(
           (x) => x.id === dependency.version_id
+        )
+        dependency.project = this.dependencies.projects.find(
+          (x) => x.id === dependency.version.project_id
         )
       }
     },
