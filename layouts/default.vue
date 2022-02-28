@@ -139,10 +139,10 @@
           <ModIcon />
           <span>Mods</span>
         </NuxtLink>
-        <NuxtLink to="/modpacks" class="tab">
+        <!--        <NuxtLink to="/modpacks" class="tab">
           <ModpackIcon />
           <span>Modpacks</span>
-        </NuxtLink>
+        </NuxtLink>-->
         <button class="tab" @click="toggleMobileMenu()">
           <HamburgerIcon />
           <span>{{ isMobileMenuOpen ? 'Less' : 'More' }}</span>

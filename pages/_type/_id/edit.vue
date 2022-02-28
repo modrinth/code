@@ -125,17 +125,17 @@
         accept="image/png,image/jpeg,image/gif,image/webp"
         class="choose-image"
         prompt="Choose image or drag it here"
-        @change="showPreviewImage"
         :disabled="(currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS"
+        @change="showPreviewImage"
       />
       <button
         class="iconified-button"
+        :disabled="(currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS"
         @click="
           icon = null
           previewImage = null
           iconChanged = true
         "
-        :disabled="(currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS"
       >
         <TrashIcon />
         Reset
@@ -570,7 +570,12 @@ export default {
           )
         }
 
-        this.$emit('update:featuredVersions', this.newProject)
+        this.newProject.license = {
+          id: this.newProject.license.short,
+          url: this.newProject.license.url,
+        }
+
+        this.$emit('update:project', this.newProject)
 
         this.isEditing = false
 
