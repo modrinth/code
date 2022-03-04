@@ -4,7 +4,10 @@
       <div class="profile-picture card">
         <h3>Profile picture</h3>
         <div class="uploader">
-          <img :src="previewImage ? previewImage : $auth.user.avatar_url" />
+          <img
+            :src="previewImage ? previewImage : $auth.user.avatar_url"
+            @click="developerMode++"
+          />
           <file-input
             accept="image/png,image/jpeg,image/gif,image/webp"
             class="choose-image"
@@ -131,6 +134,24 @@
             @change="changeLayout"
           />
         </label>
+        <section v-if="developerMode > 6">
+          <h3>Developer options</h3>
+          <label>
+            <span>
+              Set the API endpoint. This value is not stored, and is intended
+              for temporary usage.</span
+            >
+            <Multiselect
+              v-model="apiEndpoint"
+              :options="['production', 'staging']"
+              :searchable="false"
+              :close-on-select="true"
+              :show-labels="false"
+              :allow-empty="false"
+              @input="changeApiEndpoint()"
+            />
+          </label>
+        </section>
       </section>
     </div>
   </div>
@@ -169,6 +190,8 @@ export default {
       previewImage: null,
       searchLayout: false,
       projectLayout: false,
+      apiEndpoint: this.getApiEndpoint(),
+      developerMode: 0,
     }
   },
   fetch() {
@@ -198,6 +221,17 @@ export default {
         default:
           this.$colorMode.preference = shift ? 'oled' : 'dark'
       }
+    },
+    changeApiEndpoint() {
+      const subdomain =
+        this.apiEndpoint === 'production' ? 'api' : 'staging-api'
+      this.$axios.defaults.baseURL =
+        'https://' + subdomain + '.modrinth.com/v2/'
+    },
+    getApiEndpoint() {
+      return this.$axios.defaults.baseURL === 'https://api.modrinth.com/v2/'
+        ? 'production'
+        : 'staging'
     },
     showPreviewImage(files) {
       const reader = new FileReader()

@@ -639,7 +639,7 @@ label {
       color: var(--color-text);
 
       span::before {
-        background-color: var(--color-brand-disabled);
+        background-color: var(--tab-underline-hovered);
       }
     }
 

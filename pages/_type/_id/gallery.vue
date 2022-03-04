@@ -1,5 +1,50 @@
 <template>
   <div>
+    <div
+      v-if="expandedGalleryItem != null"
+      class="expanded-image-modal"
+      @click="expandedGalleryItem = null"
+    >
+      <div class="content" @click.stop="">
+        <button class="close circle-button" @click="expandedGalleryItem = null">
+          <CrossIcon aria-hidden="true" />
+        </button>
+
+        <img
+          class="image"
+          :src="
+            expandedGalleryItem.url
+              ? expandedGalleryItem.url
+              : 'https://cdn.modrinth.com/placeholder-banner.svg'
+          "
+          :alt="
+            expandedGalleryItem.title
+              ? expandedGalleryItem.title
+              : 'gallery-image'
+          "
+        />
+
+        <div class="footer">
+          <div class="description">
+            <h2 v-if="expandedGalleryItem.title">
+              {{ expandedGalleryItem.title }}
+            </h2>
+            <p v-if="expandedGalleryItem.description">
+              {{ expandedGalleryItem.description }}
+            </p>
+          </div>
+
+          <div v-if="gallery.length > 1" class="buttons">
+            <button class="previous circle-button" @click="previousImage()">
+              <LeftArrowIcon aria-hidden="true" />
+            </button>
+            <button class="next circle-button" @click="nextImage()">
+              <RightArrowIcon aria-hidden="true" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="buttons">
       <button
         v-if="currentMember"
@@ -47,14 +92,16 @@
         :key="index"
         class="card gallery-item"
       >
-        <img
-          :src="
-            item.url
-              ? item.url
-              : 'https://cdn.modrinth.com/placeholder-banner.svg'
-          "
-          :alt="item.title ? item.title : 'gallery-image'"
-        />
+        <a class="gallery-thumbnail" @click="expandImage(item, index)">
+          <img
+            :src="
+              item.url
+                ? item.url
+                : 'https://cdn.modrinth.com/placeholder-banner.svg'
+            "
+            :alt="item.title ? item.title : 'gallery-image'"
+          />
+        </a>
         <div class="gallery-body">
           <div v-if="editGalleryIndexes.includes(index)" class="gallery-info">
             <input
@@ -172,6 +219,8 @@ import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import CrossIcon from '~/assets/images/utils/x.svg?inline'
+import RightArrowIcon from '~/assets/images/utils/right-arrow.svg?inline'
+import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
 
@@ -188,6 +237,8 @@ export default {
     CheckIcon,
     SmartFileInput,
     CrossIcon,
+    RightArrowIcon,
+    LeftArrowIcon,
   },
   auth: false,
   beforeRouteLeave(to, from, next) {
@@ -215,6 +266,8 @@ export default {
       newGalleryItems: [],
       editGalleryIndexes: [],
       deleteGalleryUrls: [],
+      expandedGalleryItem: null,
+      expandedGalleryIndex: 0,
     }
   },
   fetch() {
@@ -308,11 +361,136 @@ export default {
       this.deleteGalleryUrls = []
       this.gallery = JSON.parse(JSON.stringify(this.project.gallery))
     },
+    nextImage() {
+      this.expandedGalleryIndex++
+      if (this.expandedGalleryIndex >= this.gallery.length) {
+        this.expandedGalleryIndex = 0
+      }
+      this.expandedGalleryItem = this.gallery[this.expandedGalleryIndex]
+    },
+    previousImage() {
+      this.expandedGalleryIndex--
+      if (this.expandedGalleryIndex < 0) {
+        this.expandedGalleryIndex = this.gallery.length - 1
+      }
+      this.expandedGalleryItem = this.gallery[this.expandedGalleryIndex]
+    },
+    expandImage(item, index) {
+      this.expandedGalleryItem = item
+      this.expandedGalleryIndex = index
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.expanded-image-modal {
+  position: fixed;
+  z-index: 20;
+  overflow: auto;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .content {
+    position: relative;
+    width: auto;
+    height: auto;
+    max-height: 96vh;
+    max-width: 96vw;
+    background-color: var(--color-raised-bg);
+    overflow: auto;
+    border-radius: var(--size-rounded-card);
+    display: flex;
+    flex-direction: column;
+
+    .close {
+      position: absolute;
+      top: 0.5rem;
+      right: 0.5rem;
+    }
+
+    .next {
+      top: 20rem;
+      right: 0.5rem;
+    }
+
+    .previous {
+      top: 20rem;
+      left: 0.5rem;
+    }
+
+    .circle-button {
+      padding: 0.5rem;
+      line-height: 1;
+      display: flex;
+      max-width: 2rem;
+      background-color: var(--color-raised-bg);
+      border-radius: var(--size-rounded-max);
+      margin: 0 0.5rem 0 0;
+      box-shadow: inset 0px -1px 1px rgb(17 24 39 / 10%);
+
+      &:hover,
+      &:active {
+        background-color: var(--color-button-bg-hover) !important;
+
+        svg {
+          color: var(--color-button-text-hover) !important;
+        }
+      }
+
+      svg {
+        height: 1rem;
+        width: 1rem;
+      }
+    }
+
+    .image {
+      object-fit: contain;
+      max-height: 80vh;
+      max-width: 80vw;
+    }
+
+    .footer {
+      display: flex;
+      flex-direction: row;
+      margin: 0.5rem 0.75rem 0.75rem 0.75rem;
+
+      .buttons {
+        display: flex;
+        flex-direction: row;
+        flex-grow: 0;
+        align-items: center;
+
+        .circle-button {
+          background-color: var(--color-button-bg);
+        }
+      }
+
+      .description {
+        flex-grow: 1;
+        width: min-content;
+
+        h2 {
+          margin-bottom: 0.25rem;
+          font-size: 1.25rem;
+        }
+
+        p {
+          margin: 0;
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+
 .buttons {
   display: flex;
 
@@ -386,6 +564,18 @@ export default {
 
       p {
         margin: 0 0 0.5rem 0;
+      }
+    }
+  }
+
+  .gallery-thumbnail {
+    cursor: pointer;
+
+    img {
+      transition: filter 0.25s ease-in-out;
+
+      &:hover {
+        filter: brightness(0.7);
       }
     }
   }
