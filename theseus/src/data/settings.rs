@@ -1,4 +1,5 @@
-use std::path::Path;
+use super::profiles::*;
+use std::path::{Path, PathBuf};
 
 use crate::{data::DataError, LAUNCHER_WORK_DIR};
 use once_cell::sync;
@@ -8,26 +9,27 @@ use tokio::sync::{RwLock, RwLockReadGuard};
 const SETTINGS_FILE: &str = "settings.json";
 
 static SETTINGS: sync::OnceCell<RwLock<Settings>> = sync::OnceCell::new();
+pub const FORMAT_VERSION: u32 = 1;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
 pub struct Settings {
-    pub memory: i32,
-    pub game_resolution: (i32, i32),
-    pub custom_java_args: String,
-    pub java_8_path: Option<String>,
-    pub java_17_path: Option<String>,
-    pub wrapper_command: Option<String>,
+    pub memory: MemorySettings,
+    pub game_resolution: WindowSize,
+    pub custom_java_args: Vec<String>,
+    pub java_8_path: Option<PathBuf>,
+    pub java_17_path: Option<PathBuf>,
+    pub hooks: ProfileHooks,
 }
 
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            memory: 2048,
-            game_resolution: (854, 480),
-            custom_java_args: "".to_string(),
+            memory: MemorySettings::default(),
+            game_resolution: WindowSize::default(),
+            custom_java_args: Vec::new(),
             java_8_path: None,
             java_17_path: None,
-            wrapper_command: None,
+            hooks: ProfileHooks::default(),
         }
     }
 }

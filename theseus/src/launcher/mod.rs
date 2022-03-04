@@ -147,12 +147,8 @@ pub async fn launch_minecraft(
         version.id.clone()
     };
 
-    let mut version = download::download_version_info(
-        &versions_path,
-        version,
-        loader_version.as_ref(),
-    )
-    .await?;
+    let mut version =
+        download::download_version_info(&versions_path, version, loader_version.as_ref()).await?;
 
     let java_path = if let Some(java) = &version.java_version {
         if java.major_version == 17 || java.major_version == 16 {
@@ -268,13 +264,13 @@ pub async fn launch_minecraft(
 
     let arguments = version.arguments.unwrap_or_default();
 
-    let mut command = Command::new(if let Some(wrapper) = &settings.wrapper_command {
+    let mut command = Command::new(if let Some(wrapper) = &settings.hooks.wrapper {
         wrapper.clone()
     } else {
-        java_path.to_string()
+        String::from(java_path.to_string_lossy())
     });
 
-    if settings.wrapper_command.is_some() {
+    if settings.hooks.wrapper.is_some() {
         command.arg(java_path);
     }
 
@@ -286,12 +282,7 @@ pub async fn launch_minecraft(
             &args::get_class_paths(&libraries_path, version.libraries.as_slice(), &client_path)?,
             &version_jar_name,
             settings.memory,
-            settings
-                .custom_java_args
-                .split(" ")
-                .into_iter()
-                .map(|x| x.to_string())
-                .collect(),
+            settings.custom_java_args.iter().map(String::from).collect(),
         )?)
         .arg(version.main_class)
         .args(args::get_minecraft_arguments(

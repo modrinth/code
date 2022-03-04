@@ -15,6 +15,8 @@ pub struct Profile {
     pub hooks: ProfileHooks,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(tag = "type")]
 pub enum IconPath {
     Launcher(String),
     Custom(PathBuf),
@@ -37,25 +39,52 @@ pub struct JavaSettings {
     pub extra_arguments: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
 pub struct MemorySettings {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub minimum: Option<String>,
-    pub maximum: String,
+    pub minimum: Option<u32>,
+    pub maximum: u32,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
-pub struct WindowSize(u16, u16);
+impl Default for MemorySettings {
+    fn default() -> Self {
+        Self {
+            minimum: None,
+            maximum: 2048,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Copy, Debug)]
+pub struct WindowSize(pub u16, pub u16);
+
+impl Default for WindowSize {
+    fn default() -> Self {
+        Self(854, 480)
+    }
+}
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ProfileHooks {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub pre_launch: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub pre_launch: Vec<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wrapper: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub post_exit: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    pub post_exit: Vec<String>,
 }
+
+impl Default for ProfileHooks {
+    fn default() -> Self {
+        Self {
+            pre_launch: Vec::new(),
+            wrapper: None,
+            post_exit: Vec::new(),
+        }
+    }
+}
+
+impl Profile {}
 
 #[cfg(test)]
 mod tests {
@@ -81,13 +110,13 @@ mod tests {
             },
             memory: MemorySettings {
                 minimum: None,
-                maximum: String::from("8192k"),
+                maximum: 8192,
             },
             resolution: Some(WindowSize(1920, 1080)),
             hooks: ProfileHooks {
-                pre_launch: None,
+                pre_launch: Vec::new(),
                 wrapper: None,
-                post_exit: None,
+                post_exit: Vec::new(),
             },
         };
         let json = serde_json::json!({
@@ -104,7 +133,7 @@ mod tests {
               "install": "/usr/bin/java",
             },
             "memory": {
-              "maximum": "8192k",
+              "maximum": 8192u32,
             },
             "resolution": (1920u16, 1080u16),
             "hooks": {},
