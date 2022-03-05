@@ -1,34 +1,34 @@
-use daedalus::modded::Version as LoaderVersion;
+use super::DataError;
+use daedalus::{minecraft::JavaVersion, modded::Version};
+use futures::TryFutureExt;
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+};
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
+pub const SUPPORTED_ICON_FORMATS: &[&'static str] = &[
+    "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb", "mp4",
+];
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub metadata: Metadata,
     pub java: JavaSettings,
     pub memory: MemorySettings,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub resolution: Option<WindowSize>,
+    pub resolution: WindowSize,
     pub hooks: ProfileHooks,
-}
-
-#[derive(Serialize, Deserialize, Clone, Debug)]
-#[serde(tag = "type")]
-pub enum IconPath {
-    Launcher(String),
-    Custom(PathBuf),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Metadata {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub icon: Option<IconPath>,
+    pub icon: Option<PathBuf>,
     pub path: PathBuf,
-    pub version: LoaderVersion,
+    pub version: Version,
     pub format_version: u32,
 }
 
@@ -66,25 +66,156 @@ impl Default for WindowSize {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ProfileHooks {
-    #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub pre_launch: Vec<String>,
+    #[serde(skip_serializing_if = "HashSet::is_empty", default)]
+    pub pre_launch: HashSet<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wrapper: Option<String>,
-    #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub post_exit: Vec<String>,
+    #[serde(skip_serializing_if = "HashSet::is_empty", default)]
+    pub post_exit: HashSet<String>,
 }
 
 impl Default for ProfileHooks {
     fn default() -> Self {
         Self {
-            pre_launch: Vec::new(),
+            pre_launch: HashSet::<String>::new(),
             wrapper: None,
-            post_exit: Vec::new(),
+            post_exit: HashSet::<String>::new(),
         }
     }
 }
 
-impl Profile {}
+impl Profile {
+    pub async fn new(name: String, version: Version, path: PathBuf) -> Result<Self, DataError> {
+        let version_id = version.id.clone();
+        let (settings, version_info) = futures::try_join! {
+            super::Settings::get(),
+            super::Metadata::get()
+                .and_then(|manifest| async move {
+                    let manifest = manifest
+                        .minecraft
+                        .versions
+                        .iter()
+                        .find(|it| it.id == version_id)
+                        .unwrap();
+                    Ok(daedalus::minecraft::fetch_version_info(manifest).await?)
+                }),
+        }?;
+
+        let java_install = match version_info.java_version {
+            Some(JavaVersion { major_version, .. }) if major_version >= 16 => {
+                settings.java_17_path.as_ref()
+            }
+            _ => settings.java_8_path.as_ref(),
+        }
+        .filter(|it| it.exists())
+        .ok_or(DataError::JavaError)?;
+
+        Ok(Self {
+            metadata: Metadata {
+                name,
+                icon: None,
+                path,
+                version,
+                format_version: CURRENT_FORMAT_VERSION,
+            },
+            java: JavaSettings {
+                install: java_install.clone(),
+                extra_arguments: settings.custom_java_args.clone(),
+            },
+            memory: settings.memory.clone(),
+            resolution: settings.game_resolution.clone(),
+            hooks: settings.hooks.clone(),
+        })
+    }
+
+    pub async fn run(&self) {
+        todo!()
+    }
+
+    pub async fn halt(&self) {
+        todo!()
+    }
+
+    // TODO: deduplicate these builder methods
+    // They are flat like this in order to allow builder-style usage
+    pub fn with_name(&mut self, name: String) -> &mut Self {
+        self.metadata.name = name;
+        self
+    }
+
+    pub async fn with_icon(&mut self, icon: &Path) -> Result<&mut Self, DataError> {
+        let ext = icon
+            .extension()
+            .and_then(std::ffi::OsStr::to_str)
+            .unwrap_or("");
+        if !SUPPORTED_ICON_FORMATS.contains(&ext) {
+            Err(DataError::FormatError(format!(
+                "Unsupported image type: {ext}"
+            )))
+        } else {
+            let new_path = self.metadata.path.join(format!("icon.{ext}"));
+            tokio::fs::copy(icon, &new_path).await?;
+
+            self.metadata.icon = Some(new_path);
+            Ok(self)
+        }
+    }
+
+    pub fn with_version(&mut self, version: Version) -> &mut Self {
+        self.metadata.version = version;
+        self
+    }
+
+    pub fn with_java_install(&mut self, path: PathBuf) -> &mut Self {
+        self.java.install = path;
+        self
+    }
+
+    pub fn with_java_args(&mut self, args: Vec<String>) -> &mut Self {
+        self.java.extra_arguments = args;
+        self
+    }
+
+    pub fn with_minimum_memory(&mut self, memory: u32) -> &mut Self {
+        self.memory.minimum = Some(memory);
+        self
+    }
+
+    pub fn with_maximum_memory(&mut self, memory: u32) -> &mut Self {
+        self.memory.maximum = memory;
+        self
+    }
+
+    pub fn with_resolution(&mut self, resolution: WindowSize) -> &mut Self {
+        self.resolution = resolution;
+        self
+    }
+
+    pub fn with_pre_launch(&mut self, hook: String) -> &mut Self {
+        self.hooks.pre_launch.insert(hook);
+        self
+    }
+
+    pub fn without_pre_launch(&mut self, hook: &str) -> &mut Self {
+        self.hooks.pre_launch.remove(hook);
+        self
+    }
+
+    pub fn with_post_exit(&mut self, hook: String) -> &mut Self {
+        self.hooks.post_exit.insert(hook);
+        self
+    }
+
+    pub fn without_post_exit(&mut self, hook: &str) -> &mut Self {
+        self.hooks.post_exit.remove(hook);
+        self
+    }
+
+    pub fn with_wrapper(&mut self, wrapper: Option<String>) -> &mut Self {
+        self.hooks.wrapper = wrapper;
+        self
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -98,7 +229,7 @@ mod tests {
                 name: String::from("Example Pack"),
                 icon: None,
                 path: PathBuf::from("/tmp/nunya/beeswax"),
-                version: LoaderVersion {
+                version: Version {
                     id: String::from("1.18.2"),
                     loaders: Vec::new(),
                 },
@@ -112,11 +243,11 @@ mod tests {
                 minimum: None,
                 maximum: 8192,
             },
-            resolution: Some(WindowSize(1920, 1080)),
+            resolution: WindowSize(1920, 1080),
             hooks: ProfileHooks {
-                pre_launch: Vec::new(),
+                pre_launch: HashSet::new(),
                 wrapper: None,
-                post_exit: Vec::new(),
+                post_exit: HashSet::new(),
             },
         };
         let json = serde_json::json!({

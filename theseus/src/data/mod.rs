@@ -16,6 +16,12 @@ pub enum DataError {
     #[error("Daedalus error: {0}")]
     DaedalusError(#[from] daedalus::Error),
 
+    #[error("File format error: {0}")]
+    FormatError(String),
+
+    #[error("Missing or unspecified Java installation")]
+    JavaError,
+
     #[error("Attempted to access {0} without initializing it!")]
     InitializedError(String),
 

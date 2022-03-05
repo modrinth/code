@@ -22,7 +22,8 @@ impl Metadata {
         let meta_path = Path::new(LAUNCHER_WORK_DIR).join(META_FILE);
 
         if meta_path.exists() {
-            let meta_data = std::fs::read_to_string(meta_path).ok()
+            let meta_data = std::fs::read_to_string(meta_path)
+                .ok()
                 .and_then(|x| serde_json::from_str::<Metadata>(&x).ok());
 
             if let Some(metadata) = meta_data {

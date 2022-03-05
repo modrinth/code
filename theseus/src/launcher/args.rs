@@ -262,7 +262,7 @@ fn parse_minecraft_argument(
                     ))
                 })?
                 .to_string_lossy()
-                .to_string(),
+                .to_owned(),
         )
         .replace(
             "${assets_root}",
@@ -274,7 +274,7 @@ fn parse_minecraft_argument(
                     ))
                 })?
                 .to_string_lossy()
-                .to_string(),
+                .to_owned(),
         )
         .replace(
             "${game_assets}",
@@ -286,7 +286,7 @@ fn parse_minecraft_argument(
                     ))
                 })?
                 .to_string_lossy()
-                .to_string(),
+                .to_owned(),
         )
         .replace("${version_type}", version_type.as_str())
         .replace("${resolution_width}", &resolution.0.to_string())

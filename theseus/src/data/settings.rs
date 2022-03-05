@@ -7,6 +7,7 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::{RwLock, RwLockReadGuard};
 
 const SETTINGS_FILE: &str = "settings.json";
+const ICONS_PATH: &str = "icons";
 
 static SETTINGS: sync::OnceCell<RwLock<Settings>> = sync::OnceCell::new();
 pub const FORMAT_VERSION: u32 = 1;
@@ -19,6 +20,7 @@ pub struct Settings {
     pub java_8_path: Option<PathBuf>,
     pub java_17_path: Option<PathBuf>,
     pub hooks: ProfileHooks,
+    pub icon_path: PathBuf,
 }
 
 impl Default for Settings {
@@ -30,6 +32,7 @@ impl Default for Settings {
             java_8_path: None,
             java_17_path: None,
             hooks: ProfileHooks::default(),
+            icon_path: Path::new(LAUNCHER_WORK_DIR).join(ICONS_PATH),
         }
     }
 }

@@ -1,7 +1,6 @@
 use crate::launcher::LauncherError;
 use std::process::Command;
 
-
 pub fn check_java() -> Result<String, LauncherError> {
     let child = Command::new("java")
         .arg("-version")
