@@ -115,7 +115,7 @@ pub async fn dependency_list(
             SELECT d.dependency_id, vd.mod_id, d.mod_dependency_id
             FROM versions v
             INNER JOIN dependencies d ON d.dependent_id = v.id
-            INNER JOIN versions vd ON d.dependency_id = vd.id
+            LEFT JOIN versions vd ON d.dependency_id = vd.id
             WHERE v.mod_id = $1
             ",
             id as database::models::ProjectId
@@ -125,14 +125,18 @@ pub async fn dependency_list(
             Ok(e.right().map(|x| {
                 (
                     x.dependency_id.map(database::models::VersionId),
-                    database::models::ProjectId(x.mod_id),
+                    if x.mod_id == 0 {
+                        None
+                    } else {
+                        Some(database::models::ProjectId(x.mod_id))
+                    },
                     x.mod_dependency_id.map(database::models::ProjectId),
                 )
             }))
         })
         .try_collect::<Vec<(
             Option<database::models::VersionId>,
-            database::models::ProjectId,
+            Option<database::models::ProjectId>,
             Option<database::models::ProjectId>,
         )>>()
         .await?;
@@ -143,13 +147,14 @@ pub async fn dependency_list(
                     .iter()
                     .map(|x| if x.0.is_none() {
                         if let Some(mod_dependency_id) = x.2 {
-                            mod_dependency_id
+                            Some(mod_dependency_id)
                         } else {
                             x.1
                         }
                     } else {
                         x.1
                     })
+                    .flatten()
                     .collect(),
                 &**pool,
             ),
