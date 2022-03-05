@@ -118,7 +118,7 @@ import Badge from '~/components/ui/Badge'
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import EditIcon from '~/assets/images/utils/updated.svg?inline'
-import DownloadIcon from '~/assets/images/utils/download-alt.svg?inline'
+import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import HeartIcon from '~/assets/images/utils/heart.svg?inline'
 
 export default {

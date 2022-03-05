@@ -165,7 +165,7 @@ import Badge from '~/components/ui/Badge'
 import HeartIcon from '~/assets/images/utils/heart.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 import SunriseIcon from '~/assets/images/utils/sunrise.svg?inline'
-import DownloadIcon from '~/assets/images/utils/download-alt.svg?inline'
+import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 
 export default {
   components: {
