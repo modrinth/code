@@ -45,7 +45,7 @@
         </div>
       </div>
     </div>
-    <div class="buttons">
+    <div class="card buttons">
       <button
         v-if="currentMember"
         class="iconified-button"
@@ -495,13 +495,7 @@ export default {
   display: flex;
 
   button {
-    background-color: var(--color-raised-bg);
     margin-right: 0.5rem;
-    margin-bottom: var(--spacing-card-md);
-
-    &:hover {
-      background-color: var(--color-button-bg);
-    }
 
     &.brand-button-colors {
       background-color: var(--color-brand);

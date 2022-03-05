@@ -142,7 +142,7 @@
     <section class="normal-page__content">
       <div class="card search-controls">
         <div class="iconified-input">
-          <label class="hidden" for="search">Search Mods</label>
+          <label class="hidden" for="search">Search</label>
           <SearchIcon aria-hidden="true" />
           <input
             id="search"

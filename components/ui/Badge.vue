@@ -55,7 +55,7 @@ export default {
     color: var(--color-badge-green-text);
 
     .circle {
-      background-color: var(--color-badge-green-bg);
+      background-color: var(--color-brand);
     }
   }
 

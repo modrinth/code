@@ -1,87 +1,77 @@
 <template>
-  <div class="content card">
-    <ThisOrThat class="filters" v-model="filterMode" :items="filters" />
-    <div
-      v-for="version in versions.filter((x) => x.loaders.includes(filterMode))"
-      :key="version.id"
-    >
-      <div class="version-header">
-        <span :class="'circle ' + version.version_type" />
-        <div class="version-header-text">
-          <h2 class="name">
-            <nuxt-link
-              :to="`/${project.project_type}/${
-                project.slug ? project.slug : project.id
-              }/version/${encodeURIComponent(version.version_number)}`"
-              >{{ version.name }}</nuxt-link
+  <div class="content">
+    <VersionFilterControl
+      class="card"
+      :versions="versions"
+      @updateVersions="updateVersions"
+    />
+    <div class="card">
+      <div v-for="version in filteredVersions" :key="version.id">
+        <div class="version-header">
+          <span :class="'circle ' + version.version_type" />
+          <div class="version-header-text">
+            <h2 class="name">
+              <nuxt-link
+                :to="`/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/version/${encodeURIComponent(version.version_number)}`"
+                >{{ version.name }}</nuxt-link
+              >
+            </h2>
+            <span v-if="members.find((x) => x.user.id === version.author_id)">
+              by
+              <nuxt-link
+                class="text-link"
+                :to="
+                  '/user/' +
+                  members.find((x) => x.user.id === version.author_id).user
+                    .username
+                "
+                >{{
+                  members.find((x) => x.user.id === version.author_id).user
+                    .username
+                }}</nuxt-link
+              >
+            </span>
+            <span>
+              on
+              {{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
             >
-          </h2>
-          <span v-if="members.find((x) => x.user.id === version.author_id)">
-            by
-            <nuxt-link
-              class="text-link"
-              :to="
-                '/user/' +
-                members.find((x) => x.user.id === version.author_id).user
-                  .username
-              "
-              >{{
-                members.find((x) => x.user.id === version.author_id).user
-                  .username
-              }}</nuxt-link
-            >
-          </span>
-          <span>
-            on {{ $dayjs(version.date_published).format('MMM D, YYYY') }}</span
+          </div>
+          <a
+            :href="$parent.findPrimary(version).url"
+            class="iconified-button download"
+            :title="`Download ${version.name}`"
           >
+            <DownloadIcon aria-hidden="true" />
+            Download
+          </a>
         </div>
-        <a
-          :href="$parent.findPrimary(version).url"
-          class="iconified-button download"
-          :title="`Download ${version.name}`"
-        >
-          <DownloadIcon aria-hidden="true" />
-          Download
-        </a>
+        <div
+          v-highlightjs
+          :class="'markdown-body ' + version.version_type"
+          v-html="
+            version.changelog
+              ? $xss($md.render(version.changelog))
+              : 'No changelog specified.'
+          "
+        />
       </div>
-      <div
-        v-highlightjs
-        :class="'markdown-body ' + version.version_type"
-        v-html="
-          version.changelog
-            ? $xss($md.render(version.changelog))
-            : 'No changelog specified.'
-        "
-      />
     </div>
   </div>
 </template>
 <script>
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
-import ThisOrThat from '~/components/ui/ThisOrThat'
+import VersionFilterControl from '~/components/ui/VersionFilterControl'
 
 export default {
   components: {
     DownloadIcon,
-    ThisOrThat,
+    VersionFilterControl,
   },
   data() {
     return {
-      filters: [],
-      filterMode: '',
-    }
-  },
-  fetch() {
-    for (const version of this.versions) {
-      for (const loader of version.loaders) {
-        if (!this.filters.includes(loader)) {
-          this.filters.push(loader)
-        }
-
-        if (this.filterMode === '') {
-          this.filterMode = loader
-        }
-      }
+      filteredVersions: this.versions,
     }
   },
   auth: false,
@@ -105,18 +95,15 @@ export default {
       },
     },
   },
+  methods: {
+    updateVersions(updatedVersions) {
+      this.filteredVersions = updatedVersions
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-.content {
-  max-width: calc(100% - (2 * var(--spacing-card-lg)));
-}
-
-.filters {
-  margin-bottom: 1rem;
-}
-
 .version-header {
   display: flex;
   align-items: center;

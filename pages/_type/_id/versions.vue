@@ -1,124 +1,134 @@
 <template>
-  <div class="content card">
-    <nuxt-link
-      v-if="currentMember"
-      to="version/create"
-      class="iconified-button new-version"
-    >
-      <UploadIcon />
-      Upload
-    </nuxt-link>
-    <table>
-      <thead>
-        <tr>
-          <th role="presentation"></th>
-          <th>Version</th>
-          <th>Supports</th>
-          <th>Stats</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="version in versions" :key="version.id">
-          <td>
-            <a
-              :href="$parent.findPrimary(version).url"
-              class="download-button"
-              :title="`Download ${version.name}`"
-            >
-              <DownloadIcon aria-hidden="true" />
-            </a>
-          </td>
-          <td>
-            <div class="info">
-              <div class="top">
-                <nuxt-link
-                  :to="`/${project.project_type}/${
-                    project.slug ? project.slug : project.id
-                  }/version/${encodeURIComponent(version.version_number)}`"
-                >
-                  {{ version.name }}
-                </nuxt-link>
+  <div class="content">
+    <div class="card" v-if="currentMember">
+      <nuxt-link to="version/create" class="iconified-button new-version">
+        <UploadIcon />
+        Upload
+      </nuxt-link>
+    </div>
+    <VersionFilterControl
+      class="card"
+      :versions="versions"
+      @updateVersions="updateVersions"
+    />
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th role="presentation"></th>
+            <th>Version</th>
+            <th>Supports</th>
+            <th>Stats</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="version in filteredVersions" :key="version.id">
+            <td>
+              <a
+                :href="$parent.findPrimary(version).url"
+                class="download-button"
+                :class="version.version_type"
+                :title="`Download ${version.name}`"
+              >
+                <DownloadIcon aria-hidden="true" />
+              </a>
+            </td>
+            <td>
+              <div class="info">
+                <div class="top">
+                  <nuxt-link
+                    :to="`/${project.project_type}/${
+                      project.slug ? project.slug : project.id
+                    }/version/${encodeURIComponent(version.version_number)}`"
+                  >
+                    {{ version.name }}
+                  </nuxt-link>
+                </div>
+                <div class="bottom">
+                  <VersionBadge
+                    v-if="version.version_type === 'release'"
+                    type="release"
+                    color="green"
+                  />
+                  <VersionBadge
+                    v-else-if="version.version_type === 'beta'"
+                    type="beta"
+                    color="yellow"
+                  />
+                  <VersionBadge
+                    v-else-if="version.version_type === 'alpha'"
+                    type="alpha"
+                    color="red"
+                  />
+                  <span class="divider" />
+                  <span class="version_number">{{
+                    version.version_number
+                  }}</span>
+                </div>
+                <div class="mobile-info">
+                  <p>
+                    {{
+                      version.loaders
+                        .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                        .join(', ') +
+                      ' ' +
+                      $formatVersion(version.game_versions)
+                    }}
+                  </p>
+                  <p></p>
+                  <p>
+                    <strong>{{ $formatNumber(version.downloads) }}</strong>
+                    downloads
+                  </p>
+                  <p>
+                    Published on
+                    <strong>{{
+                      $dayjs(version.date_published).format('MMM D, YYYY')
+                    }}</strong>
+                  </p>
+                </div>
               </div>
-              <div class="bottom">
-                <VersionBadge
-                  v-if="version.version_type === 'release'"
-                  type="release"
-                  color="green"
-                />
-                <VersionBadge
-                  v-else-if="version.version_type === 'beta'"
-                  type="beta"
-                  color="yellow"
-                />
-                <VersionBadge
-                  v-else-if="version.version_type === 'alpha'"
-                  type="alpha"
-                  color="red"
-                />
-                <span class="divider" />
-                <span class="version_number">{{ version.version_number }}</span>
-              </div>
-              <div class="mobile-info">
-                <p>
-                  {{
-                    version.loaders
-                      .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-                      .join(', ') +
-                    ' ' +
-                    $formatVersion(version.game_versions)
-                  }}
-                </p>
-                <p></p>
-                <p>
-                  <strong>{{ $formatNumber(version.downloads) }}</strong>
-                  downloads
-                </p>
-                <p>
-                  Published on
-                  <strong>{{
-                    $dayjs(version.date_published).format('MMM D, YYYY')
-                  }}</strong>
-                </p>
-              </div>
-            </div>
-          </td>
-          <td>
-            <p>
-              {{
-                version.loaders
-                  .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-                  .join(', ')
-              }}
-            </p>
-            <p>{{ $formatVersion(version.game_versions) }}</p>
-          </td>
-          <td>
-            <p>
-              <span>{{ $formatNumber(version.downloads) }}</span>
-              downloads
-            </p>
-            <p>
-              Published on
-              <span>{{
-                $dayjs(version.date_published).format('MMM D, YYYY')
-              }}</span>
-            </p>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+            </td>
+            <td>
+              <p>
+                {{
+                  version.loaders
+                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                    .join(', ')
+                }}
+              </p>
+              <p>{{ $formatVersion(version.game_versions) }}</p>
+            </td>
+            <td>
+              <p>
+                <span>{{ $formatNumber(version.downloads) }}</span>
+                downloads
+              </p>
+              <p>
+                Published on
+                <span>{{
+                  $dayjs(version.date_published).format('MMM D, YYYY')
+                }}</span>
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 <script>
 import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import VersionBadge from '~/components/ui/Badge'
+import VersionFilterControl from '~/components/ui/VersionFilterControl'
 
 export default {
   components: {
     UploadIcon,
     DownloadIcon,
     VersionBadge,
+    VersionFilterControl,
   },
   auth: false,
   props: {
@@ -141,14 +151,20 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      filteredVersions: this.versions,
+    }
+  },
+  methods: {
+    updateVersions(updatedVersions) {
+      this.filteredVersions = updatedVersions
+    },
+  },
 }
 </script>
 
 <style lang="scss" scoped>
-.content {
-  max-width: calc(100% - (2 * var(--spacing-card-lg)));
-}
-
 .new-version {
   max-width: 5.25rem;
 }
