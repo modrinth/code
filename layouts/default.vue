@@ -83,6 +83,12 @@
                     </NuxtLink>
                   </li>
                   <li>
+                    <NuxtLink class="item" to="/settings/follows">
+                      <HeartIcon class="icon" />
+                      <span class="title">Following</span>
+                    </NuxtLink>
+                  </li>
+                  <li>
                     <NuxtLink class="item" to="/settings">
                       <SettingsIcon class="icon" />
                       <span class="title">Settings</span>
@@ -185,6 +191,10 @@
               <ModerationIcon class="icon" />
               <span class="title">Moderation</span>
             </NuxtLink>
+            <NuxtLink v-if="$auth.user" class="item" to="/settings/follows">
+              <HeartIcon class="icon" />
+              <span class="title">Following</span>
+            </NuxtLink>
             <NuxtLink v-if="$auth.user" class="item" to="/notifications">
               <NotificationIcon class="icon" />
               <span class="title">Notifications</span>
@@ -276,12 +286,13 @@ import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
 import HomeIcon from '~/assets/images/sidebar/home.svg?inline'
 import ModIcon from '~/assets/images/sidebar/mod.svg?inline'
 // import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
-
 import MoonIcon from '~/assets/images/utils/moon.svg?inline'
+
 import SunIcon from '~/assets/images/utils/sun.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
-
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
+import HeartIcon from '~/assets/images/utils/heart.svg?inline'
+
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 
 import CookieConsent from '~/components/ads/CookieConsent'
@@ -305,6 +316,7 @@ export default {
     ShieldIcon,
     ModerationIcon,
     PlusIcon,
+    HeartIcon,
   },
   directives: {
     ClickOutside,
@@ -704,7 +716,7 @@ export default {
       align-items: center;
       background-color: var(--color-raised-bg);
       box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
-      z-index: 5;
+      z-index: 6;
 
       .tab {
         background: none;
@@ -756,11 +768,9 @@ export default {
     z-index: 5;
 
     .mobile-menu-wrapper {
+      max-height: calc(100vh - var(--size-mobile-navbar-height));
       overflow-y: auto;
-
-      @media screen and (min-height: 605px) {
-        margin-top: auto;
-      }
+      margin-top: auto;
 
       .items-container {
         margin: 1rem 2rem;
