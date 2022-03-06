@@ -384,10 +384,13 @@
 
 .multiselect {
   color: var(--color-text) !important;
-  max-height: 40px;
 
   input {
     background: transparent;
+  }
+
+  input::placeholder {
+    color: var(--color-text);
   }
 
   .multiselect__tags {
