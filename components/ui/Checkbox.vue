@@ -84,6 +84,30 @@ export default {
     padding: 0.2rem 0rem;
     margin: 0;
   }
+
+  &:focus-visible,
+  &:hover {
+    color: var(--color-heading);
+
+    button {
+      background-color: var(--color-button-bg-hover);
+
+      &.checked {
+        background-color: var(--color-brand-hover);
+      }
+    }
+  }
+  &:active {
+    color: var(--color-text-dark);
+
+    button {
+      background-color: var(--color-button-bg-active);
+
+      &.checked {
+        background-color: var(--color-brand-active);
+      }
+    }
+  }
 }
 
 .checkbox {

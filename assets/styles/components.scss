@@ -39,6 +39,12 @@
   &:hover,
   &:focus-visible {
     background-color: var(--color-button-bg-hover);
+    color: var(--color-button-text-hover);
+  }
+
+  &:active, {
+    background-color: var(--color-button-bg-active);
+    color: var(--color-button-text-active);
   }
 
   svg {
@@ -464,6 +470,15 @@
       background: var(--color-button-bg-hover);
     }
   }
+
+  &.multiselect--disabled {
+    background: none;
+
+    .multiselect__current,
+    .multiselect__select {
+      background: none;
+    }
+  }
 }
 
 label {
@@ -582,6 +597,10 @@ label {
 
   &:hover {
     background-color: var(--color-brand-hover);
+  }
+
+  &:active {
+    background-color: var(--color-brand-active);
   }
 
   svg {

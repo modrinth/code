@@ -502,6 +502,10 @@ export default {
       &:hover {
         background-color: var(--color-brand-hover);
       }
+
+      &:active {
+        background-color: var(--color-brand-active);
+      }
     }
   }
 }

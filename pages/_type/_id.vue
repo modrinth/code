@@ -891,6 +891,10 @@ export default {
       background-color: var(--color-brand-hover);
     }
 
+    &:active {
+      background-color: var(--color-brand-active);
+    }
+
     svg {
       width: 1.5rem;
       margin: auto;

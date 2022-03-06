@@ -533,12 +533,14 @@ export default {
             box-shadow: inset 0px -1px 1px rgba(17, 24, 39, 0.1);
 
             &:hover,
-            &:active {
+            &:focus-visible {
               background-color: var(--color-button-bg-hover);
+              color: var(--color-button-text-hover);
+            }
 
-              svg {
-                color: var(--color-button-text-hover);
-              }
+            &:active {
+              background-color: var(--color-button-bg-active);
+              color: var(--color-button-text-active);
             }
 
             svg {
@@ -696,6 +698,10 @@ export default {
             &:hover,
             &:focus {
               background-color: var(--color-brand-hover);
+            }
+
+            &:active {
+              background-color: var(--color-brand-active);
             }
           }
         }

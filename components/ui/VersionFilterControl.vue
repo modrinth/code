@@ -5,22 +5,29 @@
   >
     <Multiselect
       v-if="getValidLoaders().length > 1"
-      v-model="selectedLoaders"
+      v-model="selectedLoader"
       :options="getValidLoaders()"
-      :multiple="true"
+      :multiple="false"
       :searchable="true"
       :show-no-results="false"
-      :close-on-select="false"
+      :close-on-select="true"
       :clear-search-on-select="false"
       :show-labels="false"
-      :selectable="() => selectedLoaders.length <= 6"
-      placeholder="Filter loaders..."
+      :allow-empty="false"
+      :disabled="getValidLoaders().length === 1"
+      placeholder="Filter loader..."
       @input="updateVersionFilters()"
     ></Multiselect>
     <Multiselect
       v-if="getValidVersions().length > 1"
       v-model="selectedGameVersions"
-      :options="getValidVersions()"
+      :options="
+        showSnapshots
+          ? getValidVersions().map((x) => x.version)
+          : getValidVersions()
+              .filter((it) => it.version_type === 'release')
+              .map((x) => x.version)
+      "
       :multiple="true"
       :searchable="true"
       :show-no-results="false"
@@ -39,7 +46,6 @@
       v-model="showSnapshots"
       label="Include snapshots"
       description="Include snapshots"
-      style="margin-bottom: 0.5rem"
       :border="false"
     />
   </div>
@@ -68,19 +74,25 @@ export default {
       cachedValidVersions: null,
       cachedValidLoaders: null,
       selectedGameVersions: [],
-      selectedLoaders: [],
+      selectedLoader: this.getDefaultLoader(),
     }
   },
   methods: {
+    getDefaultLoader() {
+      const loaders = this.getValidLoaders()
+      if (loaders.includes('fabric')) {
+        return 'fabric'
+      } else {
+        return loaders[0]
+      }
+    },
     getValidVersions() {
       if (!this.cachedValidVersions) {
-        this.cachedValidVersions = this.$tag.gameVersions
-          .map((x) => x.version)
-          .filter((gameVer) =>
-            this.versions.some((projVer) =>
-              projVer.game_versions.includes(gameVer)
-            )
+        this.cachedValidVersions = this.$tag.gameVersions.filter((gameVer) =>
+          this.versions.some((projVer) =>
+            projVer.game_versions.includes(gameVer.version)
           )
+        )
       }
       return this.cachedValidVersions
     },
@@ -104,10 +116,7 @@ export default {
             this.selectedGameVersions.some((gameVersion) =>
               projectVersion.game_versions.includes(gameVersion)
             )) &&
-          (this.selectedLoaders.length === 0 ||
-            this.selectedLoaders.some((loader) =>
-              projectVersion.loaders.includes(loader)
-            ))
+          projectVersion.loaders.includes(this.selectedLoader)
       )
       this.$emit('updateVersions', temp)
     },
@@ -124,11 +133,12 @@ export default {
   flex-wrap: wrap;
 
   .multiselect {
-    flex-grow: 1;
+    flex: 1;
+    min-width: fit-content;
   }
 
   .checkbox-outer {
-    margin-bottom: 0 !important;
+    min-width: fit-content;
   }
 }
 </style>
