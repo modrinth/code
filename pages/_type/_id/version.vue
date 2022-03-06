@@ -251,22 +251,36 @@
             <p v-else class="value">{{ version.version_number }}</p>
           </div>
           <div class="data">
-            <p class="title">Game versions</p>
-            <multiselect
-              v-if="mode === 'edit' || mode === 'create'"
-              v-model="version.game_versions"
-              :options="$tag.gameVersions.map((it) => it.version)"
-              :loading="$tag.gameVersions.length === 0"
-              :multiple="true"
-              :searchable="true"
-              :show-no-results="false"
-              :close-on-select="false"
-              :clear-on-select="false"
-              :show-labels="false"
-              :limit="6"
-              :hide-selected="true"
-              placeholder="Choose versions..."
-            />
+            <p class="title">Minecraft versions</p>
+            <div v-if="mode === 'edit' || mode === 'create'">
+              <multiselect
+                v-model="version.game_versions"
+                :options="
+                  showSnapshots
+                    ? $tag.gameVersions.map((x) => x.version)
+                    : $tag.gameVersions
+                        .filter((it) => it.version_type === 'release')
+                        .map((x) => x.version)
+                "
+                :loading="$tag.gameVersions.length === 0"
+                :multiple="true"
+                :searchable="true"
+                :show-no-results="false"
+                :close-on-select="false"
+                :clear-on-select="false"
+                :show-labels="false"
+                :limit="6"
+                :hide-selected="true"
+                placeholder="Choose versions..."
+              />
+              <Checkbox
+                v-model="showSnapshots"
+                label="Include snapshots"
+                description="Include snapshots"
+                style="margin-top: 0.5rem"
+                :border="false"
+              />
+            </div>
             <p v-else class="value">
               {{ $formatVersion(version.game_versions) }}
             </p>
@@ -580,6 +594,7 @@ export default {
 
       newFiles: [],
       deleteFiles: [],
+      showSnapshots: false,
     }
   },
   async fetch() {
