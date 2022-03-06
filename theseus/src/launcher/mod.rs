@@ -1,8 +1,9 @@
 use daedalus::minecraft::{ArgumentType, VersionInfo};
+use daedalus::modded::LoaderVersion;
 use serde::{Deserialize, Serialize};
-use std::path::Path;
-use std::process::{Command, Stdio};
+use std::{path::Path, process::Stdio};
 use thiserror::Error;
+use tokio::process::{Child, Command};
 
 pub use crate::launcher::auth::provider::Credentials;
 
@@ -14,7 +15,7 @@ mod rules;
 
 #[derive(Error, Debug)]
 pub enum LauncherError {
-    #[error("Failed to violate file checksum at url {url} with hash {hash} after {tries} tries")]
+    #[error("Failed to validate file checksum at url {url} with hash {hash} after {tries} tries")]
     ChecksumFailure {
         hash: String,
         url: String,
@@ -56,6 +57,9 @@ pub enum LauncherError {
 
     #[error("Java error: {0}")]
     JavaError(String),
+
+    #[error("Command exited with non-zero exit code: {0}")]
+    ExitError(i32),
 }
 
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
@@ -73,6 +77,188 @@ impl Default for ModLoader {
 }
 
 pub async fn launch_minecraft(
+    game_version: &str,
+    loader_version: &Option<LoaderVersion>,
+    root_dir: &Path,
+    java: &Path,
+    java_args: &Vec<String>,
+    wrapper: &Option<String>,
+    memory: &crate::data::profiles::MemorySettings,
+    resolution: &crate::data::profiles::WindowSize,
+    credentials: &crate::launcher::Credentials,
+) -> Result<Child, LauncherError> {
+    let (metadata, settings) = futures::try_join! {
+        crate::data::Metadata::get(),
+        crate::data::Settings::get(),
+    }?;
+    let root_dir = crate::util::absolute_path(root_dir)?;
+    let metadata_dir = &settings.metadata_dir;
+
+    let (versions_path, libraries_path, assets_path, legacy_assets_path, natives_path) = (
+        metadata_dir.join("versions"),
+        metadata_dir.join("libraries"),
+        metadata_dir.join("assets"),
+        metadata_dir.join("resources"),
+        metadata_dir.join("natives"),
+    );
+
+    let version = metadata
+        .minecraft
+        .versions
+        .iter()
+        .find(|it| it.id == game_version)
+        .ok_or(LauncherError::InvalidInput(format!(
+            "Invalid game version: {game_version}",
+        )))?;
+
+    let version_jar = loader_version
+        .clone()
+        .map_or(String::from(game_version), |it| it.id.clone());
+    let mut version =
+        download::download_version_info(&versions_path, version, loader_version.as_ref()).await?;
+    let client_path = versions_path
+        .join(&version.id)
+        .join(format!("{}.jar", &version.id));
+    let version_natives_path = natives_path.join(&version.id);
+
+    download_minecraft(
+        &version,
+        &versions_path,
+        &assets_path,
+        &legacy_assets_path,
+        &libraries_path,
+        &version_natives_path,
+    )
+    .await?;
+
+    if let Some(processors) = &version.processors {
+        if let Some(ref mut data) = version.data {
+            data.insert(
+                "SIDE".to_string(),
+                daedalus::modded::SidedDataEntry {
+                    client: "client".to_string(),
+                    server: "".to_string(),
+                },
+            );
+            data.insert(
+                "MINECRAFT_JAR".to_string(),
+                daedalus::modded::SidedDataEntry {
+                    client: client_path.to_string_lossy().to_string(),
+                    server: "".to_string(),
+                },
+            );
+            data.insert(
+                "MINECRAFT_VERSION".to_string(),
+                daedalus::modded::SidedDataEntry {
+                    client: game_version.to_string(),
+                    server: "".to_string(),
+                },
+            );
+            data.insert(
+                "ROOT".to_string(),
+                daedalus::modded::SidedDataEntry {
+                    client: root_dir.to_string_lossy().to_string(),
+                    server: "".to_string(),
+                },
+            );
+            data.insert(
+                "LIBRARY_DIR".to_string(),
+                daedalus::modded::SidedDataEntry {
+                    client: libraries_path.to_string_lossy().to_string(),
+                    server: "".to_string(),
+                },
+            );
+
+            for processor in processors {
+                if let Some(sides) = &processor.sides {
+                    if !sides.contains(&"client".to_string()) {
+                        continue;
+                    }
+                }
+
+                let mut cp = processor.classpath.clone();
+                cp.push(processor.jar.clone());
+
+                let child = Command::new("java")
+                    .arg("-cp")
+                    .arg(args::get_class_paths_jar(&libraries_path, &cp)?)
+                    .arg(
+                        args::get_processor_main_class(args::get_lib_path(
+                            &libraries_path,
+                            &processor.jar,
+                        )?)
+                        .await?
+                        .ok_or_else(|| {
+                            LauncherError::ProcessorError(format!(
+                                "Could not find processor main class for {}",
+                                processor.jar
+                            ))
+                        })?,
+                    )
+                    .args(args::get_processor_arguments(
+                        &libraries_path,
+                        &processor.args,
+                        data,
+                    )?)
+                    .output()
+                    .await
+                    .map_err(|err| LauncherError::ProcessError {
+                        inner: err,
+                        process: "java".to_string(),
+                    })?;
+
+                if !child.status.success() {
+                    return Err(LauncherError::ProcessorError(
+                        String::from_utf8_lossy(&child.stderr).to_string(),
+                    ));
+                }
+            }
+        }
+    }
+
+    let mut command = match wrapper {
+        Some(hook) => {
+            let mut cmd = Command::new(hook);
+            cmd.arg(java);
+            cmd
+        }
+        None => Command::new(java.to_string_lossy().to_string()),
+    };
+
+    let arguments = version.arguments.unwrap_or_default();
+    command
+        .args(args::get_jvm_arguments(
+            arguments.get(&ArgumentType::Jvm).map(|x| x.as_slice()),
+            &version_natives_path,
+            &libraries_path,
+            &args::get_class_paths(&libraries_path, version.libraries.as_slice(), &client_path)?,
+            &version_jar,
+            *memory,
+            java_args.clone(),
+        )?)
+        .arg(version.main_class)
+        .args(args::get_minecraft_arguments(
+            arguments.get(&ArgumentType::Game).map(|x| x.as_slice()),
+            version.minecraft_arguments.as_deref(),
+            credentials,
+            &version.id,
+            &version.asset_index.id,
+            &root_dir,
+            &assets_path,
+            &version.type_,
+            *resolution,
+        )?)
+        .current_dir(root_dir)
+        .stdout(Stdio::inherit())
+        .stderr(Stdio::inherit());
+
+    command.spawn().map_err(|err| LauncherError::ProcessError {
+        inner: err,
+        process: "minecraft".to_string(),
+    })
+}
+
+pub async fn launch_minecraft_old(
     version_name: &str,
     mod_loader: Option<ModLoader>,
     root_dir: &Path,
@@ -248,6 +434,7 @@ pub async fn launch_minecraft(
                         data,
                     )?)
                     .output()
+                    .await
                     .map_err(|err| LauncherError::ProcessError {
                         inner: err,
                         process: "java".to_string(),
@@ -305,10 +492,13 @@ pub async fn launch_minecraft(
         process: "minecraft".to_string(),
     })?;
 
-    child.wait().map_err(|err| LauncherError::ProcessError {
-        inner: err,
-        process: "minecraft".to_string(),
-    })?;
+    child
+        .wait()
+        .await
+        .map_err(|err| LauncherError::ProcessError {
+            inner: err,
+            process: "minecraft".to_string(),
+        })?;
 
     Ok(())
 }

@@ -8,6 +8,7 @@ use tokio::sync::{RwLock, RwLockReadGuard};
 
 const SETTINGS_FILE: &str = "settings.json";
 const ICONS_PATH: &str = "icons";
+const METADATA_DIR: &str = "meta";
 
 static SETTINGS: sync::OnceCell<RwLock<Settings>> = sync::OnceCell::new();
 pub const FORMAT_VERSION: u32 = 1;
@@ -21,6 +22,7 @@ pub struct Settings {
     pub java_17_path: Option<PathBuf>,
     pub hooks: ProfileHooks,
     pub icon_path: PathBuf,
+    pub metadata_dir: PathBuf,
 }
 
 impl Default for Settings {
@@ -33,6 +35,7 @@ impl Default for Settings {
             java_17_path: None,
             hooks: ProfileHooks::default(),
             icon_path: Path::new(LAUNCHER_WORK_DIR).join(ICONS_PATH),
+            metadata_dir: Path::new(LAUNCHER_WORK_DIR).join(METADATA_DIR),
         }
     }
 }

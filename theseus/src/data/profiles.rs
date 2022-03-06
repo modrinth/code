@@ -1,11 +1,12 @@
 use super::DataError;
-use daedalus::{minecraft::JavaVersion, modded::Version};
+use daedalus::{minecraft::JavaVersion, modded::LoaderVersion};
 use futures::TryFutureExt;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashSet,
     path::{Path, PathBuf},
 };
+use tokio::process::{Child, Command};
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -28,7 +29,9 @@ pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<PathBuf>,
     pub path: PathBuf,
-    pub version: Version,
+    pub game_version: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
 }
 
@@ -85,19 +88,21 @@ impl Default for ProfileHooks {
 }
 
 impl Profile {
-    pub async fn new(name: String, version: Version, path: PathBuf) -> Result<Self, DataError> {
-        let version_id = version.id.clone();
+    pub async fn new(name: String, version: String, path: PathBuf) -> Result<Self, DataError> {
+        let version_id = version.clone();
         let (settings, version_info) = futures::try_join! {
             super::Settings::get(),
             super::Metadata::get()
                 .and_then(|manifest| async move {
-                    let manifest = manifest
+                    let version = manifest
                         .minecraft
                         .versions
                         .iter()
                         .find(|it| it.id == version_id)
-                        .unwrap();
-                    Ok(daedalus::minecraft::fetch_version_info(manifest).await?)
+                        .ok_or(DataError::FormatError(
+                            format!("invalid version: {version_id}"))
+                        )?;
+                    Ok(daedalus::minecraft::fetch_version_info(version).await?)
                 }),
         }?;
 
@@ -115,7 +120,8 @@ impl Profile {
                 name,
                 icon: None,
                 path,
-                version,
+                game_version: version,
+                loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
             },
             java: JavaSettings {
@@ -128,12 +134,64 @@ impl Profile {
         })
     }
 
-    pub async fn run(&self) {
-        todo!()
+    pub async fn run(
+        &self,
+        credentials: crate::launcher::Credentials,
+    ) -> Result<Child, crate::launcher::LauncherError> {
+        for hook in &self.hooks.pre_launch {
+            // TODO: hook parameters
+            let mut cmd = hook.split(' ');
+            let result = Command::new(cmd.next().unwrap())
+                .args(&cmd.collect::<Vec<&str>>())
+                .spawn()?
+                .wait()
+                .await?;
+
+            if !result.success() {
+                return Err(crate::launcher::LauncherError::ExitError(
+                    result.code().unwrap_or(-1),
+                ));
+            }
+        }
+
+        crate::launcher::launch_minecraft(
+            &self.metadata.game_version,
+            &self.metadata.loader_version,
+            &self.metadata.path,
+            &self.java.install,
+            &self.java.extra_arguments,
+            &self.hooks.wrapper,
+            &self.memory,
+            &self.resolution,
+            &credentials,
+        )
+        .await
     }
 
-    pub async fn halt(&self) {
-        todo!()
+    pub async fn kill(&self, running: &mut Child) -> Result<(), crate::launcher::LauncherError> {
+        running.kill().await;
+        self.wait_for(running).await
+    }
+
+    pub async fn wait_for(
+        &self,
+        running: &mut Child,
+    ) -> Result<(), crate::launcher::LauncherError> {
+        let result =
+            running
+                .wait()
+                .await
+                .map_err(|err| crate::launcher::LauncherError::ProcessError {
+                    inner: err,
+                    process: String::from("minecraft"),
+                })?;
+
+        match result.success() {
+            false => Err(crate::launcher::LauncherError::ExitError(
+                result.code().unwrap_or(-1),
+            )),
+            true => Ok(()),
+        }
     }
 
     // TODO: deduplicate these builder methods
@@ -161,8 +219,13 @@ impl Profile {
         }
     }
 
-    pub fn with_version(&mut self, version: Version) -> &mut Self {
-        self.metadata.version = version;
+    pub fn with_game_version(&mut self, version: String) -> &mut Self {
+        self.metadata.game_version = version;
+        self
+    }
+
+    pub fn with_loader_version(&mut self, version: Option<LoaderVersion>) -> &mut Self {
+        self.metadata.loader_version = version;
         self
     }
 
@@ -229,10 +292,8 @@ mod tests {
                 name: String::from("Example Pack"),
                 icon: None,
                 path: PathBuf::from("/tmp/nunya/beeswax"),
-                version: Version {
-                    id: String::from("1.18.2"),
-                    loaders: Vec::new(),
-                },
+                game_version: String::from("1.18.2"),
+                loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
             },
             java: JavaSettings {
@@ -254,10 +315,7 @@ mod tests {
             "metadata": {
                 "name": "Example Pack",
                 "path": "/tmp/nunya/beeswax",
-                "version": {
-                    "id": "1.18.2",
-                    "loaders": [],
-                },
+                "game_version": "1.18.2",
                 "format_version": 1u32,
             },
             "java": {
