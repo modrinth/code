@@ -1,6 +1,10 @@
 <template>
-  <div class="card search-controls">
+  <div
+    v-if="getValidLoaders().length > 1 || getValidVersions().length > 1"
+    class="card search-controls"
+  >
     <Multiselect
+      v-if="getValidLoaders().length > 1"
       v-model="selectedLoaders"
       :options="getValidLoaders()"
       :multiple="true"
@@ -14,6 +18,7 @@
       @input="updateVersionFilters()"
     ></Multiselect>
     <Multiselect
+      v-if="getValidVersions().length > 1"
       v-model="selectedGameVersions"
       :options="getValidVersions()"
       :multiple="true"
@@ -27,6 +32,10 @@
       @input="updateVersionFilters()"
     ></Multiselect>
     <Checkbox
+      v-if="
+        getValidVersions().length > 1 &&
+        getValidVersions().some((v) => v.version_type !== 'release')
+      "
       v-model="showSnapshots"
       label="Include snapshots"
       description="Include snapshots"

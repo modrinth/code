@@ -10,7 +10,7 @@
         <div class="version-header">
           <span :class="'circle ' + version.version_type" />
           <div class="version-header-text">
-            <h2 class="name">
+            <h2 class="name title-link">
               <nuxt-link
                 :to="`/${project.project_type}/${
                   project.slug ? project.slug : project.id

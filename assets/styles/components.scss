@@ -81,6 +81,13 @@
   text-decoration: underline;
 }
 
+.title-link {
+  &:hover {
+    color: var(--color-link);
+  }
+  text-decoration: underline;
+}
+
 .markdown-body {
   blockquote,
   details,

@@ -45,9 +45,8 @@
         </div>
       </div>
     </div>
-    <div class="card buttons">
+    <div v-if="currentMember" class="card buttons">
       <button
-        v-if="currentMember"
         class="iconified-button"
         @click="
           newGalleryItems.push({

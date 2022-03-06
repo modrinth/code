@@ -340,7 +340,7 @@
                 :to="`/${project.project_type}/${
                   project.slug ? project.slug : project.id
                 }/version/${encodeURIComponent(version.version_number)}`"
-                class="top"
+                class="top title-link"
               >
                 {{ version.name }}
               </nuxt-link>
@@ -380,10 +380,12 @@
           :key="member.user.id"
           class="team-member columns"
         >
-          <img :src="member.avatar_url" alt="profile-picture" />
+          <nuxt-link :to="'/user/' + member.user.username" class="name">
+            <img :src="member.avatar_url" alt="profile-picture" />
+          </nuxt-link>
           <div class="member-info">
             <nuxt-link :to="'/user/' + member.user.username" class="name">
-              <p>{{ member.name }}</p>
+              <p class="title-link">{{ member.name }}</p>
             </nuxt-link>
             <p class="role">{{ member.role }}</p>
           </div>
