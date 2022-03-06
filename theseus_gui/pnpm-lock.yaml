@@ -4,6 +4,7 @@ specifiers:
   '@fontsource/inter': ^4.5.4
   '@iconify-json/carbon': ^1.1.1
   '@iconify-json/heroicons-outline': ^1.1.1
+  '@iconify-json/heroicons-solid': ^1.1.1
   '@iconify-json/lucide': ^1.1.5
   '@sveltejs/adapter-static': next
   '@sveltejs/kit': next
@@ -38,6 +39,7 @@ dependencies:
   '@fontsource/inter': 4.5.4
   '@iconify-json/carbon': 1.1.1
   '@iconify-json/heroicons-outline': 1.1.1
+  '@iconify-json/heroicons-solid': 1.1.1
   '@iconify-json/lucide': 1.1.5
   '@tauri-apps/api': 1.0.0-rc.1
   autoprefixer: 10.4.2_postcss@8.4.7
@@ -236,6 +238,12 @@ packages:
 
   /@iconify-json/heroicons-outline/1.1.1:
     resolution: {integrity: sha512-Jy/aFbNQdszRxzhBvHB2AVu/IeMcK/YG3qJVf3XeqvBvhcPq/rWFEmo7jshzBclR/wbt9ylcBEUY1qRFcCXS9Q==}
+    dependencies:
+      '@iconify/types': 1.0.12
+    dev: false
+
+  /@iconify-json/heroicons-solid/1.1.1:
+    resolution: {integrity: sha512-yTq+PjF543FEp37gqLLQLMGBhZXaHJOY8wLPsWyQZzIDJ9h773ofvp32fgMh9YlgQT4MaeDH2VULvFBBCRmJgQ==}
     dependencies:
       '@iconify/types': 1.0.12
     dev: false

@@ -1,5 +1,6 @@
 <script lang="ts">
     import IconPlayFilled from "virtual:icons/carbon/play-filled-alt"
+    import IconBadgeCheck from "virtual:icons/heroicons-solid/badge-check"
 
     export let title: string;
     export let id: string;
@@ -10,7 +11,7 @@
 
 <a class="instance" href="/library/instance/{id}"
    style:background-image="linear-gradient(5deg, hsla(0,0%,0%,0.8) 0%, hsla(0,0%,0%,0) 100%), url('{image}')">
-    <div class="instance__version">{version}</div>
+    <div class="instance__version">{version}{#if modpack}<IconBadgeCheck />{/if}</div>
     <div class="instance__title">{title}</div>
     <button class="play-button">
        <IconPlayFilled />
@@ -42,6 +43,12 @@
         &__version {
             color: var(--color-text);
             font-size: var(--font-size-sm);
+            display: flex;
+            align-items: center;
+            grid-gap: 0.15rem;
+            :global(svg) {
+                margin-bottom: 0.05rem;
+            }
         }
 
         &:hover .play-button {

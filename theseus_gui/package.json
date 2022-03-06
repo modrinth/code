@@ -33,6 +33,7 @@
     "@fontsource/inter": "^4.5.4",
     "@iconify-json/carbon": "^1.1.1",
     "@iconify-json/heroicons-outline": "^1.1.1",
+    "@iconify-json/heroicons-solid": "^1.1.1",
     "@iconify-json/lucide": "^1.1.5",
     "@tauri-apps/api": "^1.0.0-rc.1",
     "autoprefixer": "^10.4.2",
