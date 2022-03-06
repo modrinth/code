@@ -5,7 +5,7 @@ html {
 .light-mode {
   --color-icon: #6b7280;
   --color-text: hsl(221, 39%, 11%);
-  --color-text-secondary: hsl(220, 9%, 46%);
+  --color-text-secondary: var(--color-icon);
   --color-text-inactive: hsl(215, 14%, 34%);
   --color-text-dark: #1a202c;
   --color-heading: #2c313d;
@@ -130,7 +130,7 @@ html {
   --shadow-dropdown-strong: 3px 3px 20px hsla(0, 0%, 0%, 0.15);
   --shadow-tooltip: 0.2rem 0.2rem 10px rgba(0, 0, 0, 0.15);
 
-  --color-link: #4793d9;
+  --color-link: #74b6f3;
 
   --color-badge-gray-bg: #646161;
   --color-badge-gray-text: #c8c1c1;

@@ -51,8 +51,13 @@
                 </div>
               </nuxt-link>
               <div v-if="$auth.user" ref="mobileMenu" class="dropdown">
-                <button class="control">
-                  <img :src="$auth.user.avatar_url" class="user-icon" />
+                <button class="control" value="Profile Dropdown">
+                  <img
+                    :src="$auth.user.avatar_url"
+                    class="user-icon"
+                    aria-hidden="true"
+                    alt="Your avatar"
+                  />
                   <DropdownIcon class="caret" />
                 </button>
                 <ul class="content card" @click="removeFocus">
