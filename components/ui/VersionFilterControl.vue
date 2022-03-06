@@ -65,14 +65,13 @@ export default {
   methods: {
     getValidVersions() {
       if (!this.cachedValidVersions) {
-        const temp = new Set()
-        for (const version of this.versions) {
-          version.game_versions.forEach((v) => {
-            temp.add(v)
-          })
-        }
-        this.cachedValidVersions = Array.from(temp)
-        this.cachedValidVersions.sort().reverse()
+        this.cachedValidVersions = this.$tag.gameVersions
+          .map((x) => x.version)
+          .filter((gameVer) =>
+            this.versions.some((projVer) =>
+              projVer.game_versions.includes(gameVer)
+            )
+          )
       }
       return this.cachedValidVersions
     },
