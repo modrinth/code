@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "dev": "tauri dev",
+    "dev": "tauri dev; kill $(lsof -t -i:3000)",
     "dev:web": "svelte-kit dev",
     "tauri": "tauri",
     "build": "tauri build",
@@ -10,14 +10,16 @@
     "check": "cargo check --manifest-path src-tauri/Cargo.toml && svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
-    "@tauri-apps/cli": "^1.0.0-rc.5",
     "@sveltejs/adapter-static": "next",
     "@sveltejs/kit": "next",
+    "@tauri-apps/cli": "^1.0.0-rc.5",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-svelte3": "^3.2.1",
+    "postcss": "^8.4.7",
+    "postcss-load-config": "^3.1.3",
     "prettier": "^2.5.1",
     "prettier-plugin-svelte": "^2.5.0",
     "svelte": "^3.46.0",
@@ -28,6 +30,20 @@
   },
   "type": "module",
   "dependencies": {
-    "@tauri-apps/api": "^1.0.0-rc.1"
+    "@fontsource/inter": "^4.5.4",
+    "@iconify-json/carbon": "^1.1.1",
+    "@iconify-json/heroicons-outline": "^1.1.1",
+    "@iconify-json/lucide": "^1.1.5",
+    "@tauri-apps/api": "^1.0.0-rc.1",
+    "autoprefixer": "^10.4.2",
+    "cssnano": "^5.1.0",
+    "postcss-extend-rule": "^4.0.0",
+    "postcss-import": "^14.0.2",
+    "postcss-media-minmax": "^5.0.0",
+    "postcss-nested": "^5.0.6",
+    "postcss-preset-env": "^7.4.2",
+    "sanitize.css": "^13.0.0",
+    "svrollbar": "^0.10.4",
+    "unplugin-icons": "^0.13.2"
   }
 }

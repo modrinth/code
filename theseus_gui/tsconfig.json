@@ -28,8 +28,13 @@
 		"allowJs": true,
 		"checkJs": true,
 		"paths": {
-			"$lib": ["src/lib"],
-			"$lib/*": ["src/lib/*"]
+			"$assets/*": ["src/assets/*"],
+			"$components/*": ["src/components/*"],
+			"$lib/*": ["src/lib/*"],
+			"$stores/*": ["src/stores/*"],
+			"$styles/*": ["src/styles/*"],
+			"$generated/*": ["src/generated/*"],
+			"$lib":["src/lib"],
 		}
 	},
 	"include": [
@@ -37,5 +42,6 @@
 		"src/**/*.js",
 		"src/**/*.ts",
 		"src/**/*.svelte"
-	]
+	],
+	"extends": "./.svelte-kit/tsconfig.json"
 }
