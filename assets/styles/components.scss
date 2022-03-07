@@ -166,6 +166,14 @@
 
   a {
     color: var(--color-link);
+
+    &:focus-visible,
+    &:hover {
+      color: var(--color-link-hover);
+    }
+    &:active {
+      color: var(--color-link-active);
+    }
   }
 
   img {
@@ -431,6 +439,8 @@
 
 .multiselect--above .multiselect__content-wrapper {
   border-top: none !important;
+  border-top-left-radius: var(--size-rounded-card) !important;
+  border-top-right-radius: var(--size-rounded-card) !important;
 }
 
 .multiselect {
@@ -479,12 +489,6 @@
       color: var(--color-text);
       font-size: 16px;
       line-height: 20px;
-    }
-  }
-  .multiselect--above {
-    .multiselect__content-wrapper {
-      border-top-left-radius: var(--size-rounded-card);
-      border-top-right-radius: var(--size-rounded-card);
     }
   }
   .multiselect__content-wrapper {
