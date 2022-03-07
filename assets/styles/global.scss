@@ -30,7 +30,7 @@ html {
   --color-button-text-hover: #1b1e24;
   --color-button-bg-active: #c3c6cb;
   --color-button-text-active: var(--color-button-text-hover);
-  --color-button-bg-disabled: #eceef0;
+  --color-button-bg-disabled: #cacdd2;
   --color-button-text-disabled: #9da3ac;
   --color-transparent-button-bg-hover: var(--color-button-bg);
   --color-transparent-button-text-hover: var(--color-text-dark);
@@ -55,7 +55,12 @@ html {
   --shadow-dropdown-strong: 3px 3px 10px hsla(0, 0%, 0%, 0.3);
   --shadow-tooltip: 0.2rem 0.2rem 10px rgba(0, 0, 0, 0.15);
 
+  --color-grey-link: var(--color-text);
+  --color-grey-link-hover: var(--color-heading);
+  --color-grey-link-active: var(--color-text-dark);
   --color-link: #2089ff;
+  --color-link-hover: #1a76e7;
+  --color-link-active: #146fd7;
 
   --color-badge-gray-text: #646161;
   --color-badge-gray-bg: #c8c1c1;
@@ -106,7 +111,8 @@ html {
   --color-button-text-hover: #ffffff;
   --color-button-bg-active: #616570;
   --color-button-text-active: var(--color-button-text-hover);
-  --color-button-text-disabled: #797979;
+  --color-button-bg-disabled: #3a434d;
+  --color-button-text-disabled: #555d65;
   --color-transparent-button-bg-hover: var(--color-button-bg);
   --color-transparent-button-text-hover: var(--color-text-dark);
   --color-transparent-button-bg-active: var(--color-button-bg-hover);
@@ -131,6 +137,8 @@ html {
   --shadow-tooltip: 0.2rem 0.2rem 10px rgba(0, 0, 0, 0.15);
 
   --color-link: #74b6f3;
+  --color-link-hover: #92c0f5;
+  --color-link-active: #b5d5fd;
 
   --color-badge-gray-bg: #646161;
   --color-badge-gray-text: #c8c1c1;
@@ -253,12 +261,14 @@ textarea {
 
   &:hover:not([disabled]):not(:focus) {
     background: var(--color-button-bg-hover);
-    color: var(--color-text);
+    color: var(--color-button-text-hover);
+    border-color: var(--color-divider-dark);
   }
 
   &:focus {
-    background: var(--color-raised-bg);
-    border-color: var(--color-divider-dark);
+    outline: none !important;
+    border-color: var(--color-brand);
+    color: var(--color-button-text-active);
   }
 
   &:disabled,

@@ -107,7 +107,7 @@
             :allow-empty="false"
           />
         </label>
-        <h3>Legacy search layout</h3>
+        <h3>Search sidebar on right side</h3>
         <label>
           <span>
             Sets the sidebar direction for search pages. Enabling this will put
@@ -120,7 +120,7 @@
             @change="changeLayout"
           />
         </label>
-        <h3>Legacy project layout</h3>
+        <h3>Project sidebar on right side</h3>
         <label>
           <span>
             Sets the sidebar direction for project pages. Enabling this will

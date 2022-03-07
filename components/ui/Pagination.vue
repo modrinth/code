@@ -99,13 +99,20 @@ button {
   }
 
   &.paginate.disabled {
-    background-color: var(--color-button-bg);
+    background-color: transparent;
     cursor: default;
-    color: var(--color-icon);
+    color: var(--color-button-text-disabled);
+    box-shadow: inset 0 0 0 1px var(--color-button-bg-disabled);
   }
 
+  &:focus-visible,
   &:hover {
-    background: var(--color-button-bg-active);
+    background-color: var(--color-button-bg-hover);
+    color: var(--color-button-text-hover);
+  }
+
+  &:active {
+    background-color: var(--color-button-bg-active);
     color: var(--color-button-text-active);
   }
 }

@@ -436,7 +436,7 @@ export default {
 
   @media screen and (min-width: 1200px) {
     .points {
-      border-radius: var(--spacing-card-lg);
+      border-radius: var(--size-rounded-card);
       .point {
         flex-direction: row;
 

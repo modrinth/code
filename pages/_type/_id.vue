@@ -929,11 +929,19 @@ export default {
       line-height: 2rem;
     }
 
+    &:focus-visible,
     &:hover {
       svg,
       img,
       span {
-        color: var(--color-link);
+        color: var(--color-heading);
+      }
+    }
+    &:active {
+      svg,
+      img,
+      span {
+        color: var(--color-text-dark);
       }
     }
 

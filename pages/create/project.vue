@@ -1526,10 +1526,6 @@ section.donations {
       flex: 1;
     }
   }
-
-  button {
-    margin: 0.5rem 0;
-  }
 }
 
 .footer {

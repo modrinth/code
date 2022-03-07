@@ -18,7 +18,10 @@
               <nuxt-link :to="`/${type}/${id}`">{{ name }}</nuxt-link>
             </h2>
             <p v-if="author" class="author">
-              by <nuxt-link :to="'/user/' + author">{{ author }}</nuxt-link>
+              by
+              <nuxt-link class="title-link" :to="'/user/' + author">{{
+                author
+              }}</nuxt-link>
             </p>
           </div>
           <div class="side-type">
@@ -253,10 +256,6 @@ export default {
         .author {
           margin: auto 0 0 0;
           color: var(--color-text);
-
-          a {
-            text-decoration: underline;
-          }
         }
       }
 
