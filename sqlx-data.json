@@ -3764,38 +3764,6 @@
       "nullable": []
     }
   },
-  "b464a2ca83b073d251ae2a5bd3ed94167c2dfc2046b38b6ef3aa30c46aaf5ad9": {
-    "query": "\n            SELECT d.dependency_id, vd.mod_id, d.mod_dependency_id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            LEFT JOIN versions vd ON d.dependency_id = vd.id\n            WHERE v.mod_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "dependency_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "mod_dependency_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        true,
-        false,
-        true
-      ]
-    }
-  },
   "b69a6f42965b3e7103fcbf46e39528466926789ff31e9ed2591bb175527ec169": {
     "query": "\n            DELETE FROM users\n            WHERE id = $1\n            ",
     "describe": {

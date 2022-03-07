@@ -15,7 +15,7 @@ use actix_web::web::Data;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
-use sqlx::PgPool;
+use sqlx::{PgPool, Row};
 use std::sync::Arc;
 use validator::Validate;
 
@@ -110,7 +110,8 @@ pub async fn dependency_list(
 
         use futures::stream::TryStreamExt;
 
-        let dependencies = sqlx::query!(
+        //TODO: This query is not checked at compile time! Once SQLX parses this query correctly, please use the query! macro instead
+        let dependencies = sqlx::query(
             "
             SELECT d.dependency_id, vd.mod_id, d.mod_dependency_id
             FROM versions v
@@ -118,19 +119,18 @@ pub async fn dependency_list(
             LEFT JOIN versions vd ON d.dependency_id = vd.id
             WHERE v.mod_id = $1
             ",
-            id as database::models::ProjectId
         )
+        .bind(id as database::models::ProjectId)
         .fetch_many(&**pool)
         .try_filter_map(|e| async {
             Ok(e.right().map(|x| {
                 (
-                    x.dependency_id.map(database::models::VersionId),
-                    if x.mod_id == 0 {
-                        None
-                    } else {
-                        Some(database::models::ProjectId(x.mod_id))
-                    },
-                    x.mod_dependency_id.map(database::models::ProjectId),
+                    x.get::<Option<i64>, usize>(0)
+                        .map(database::models::VersionId),
+                    x.get::<Option<i64>, usize>(1)
+                        .map(database::models::ProjectId),
+                    x.get::<Option<i64>, usize>(2)
+                        .map(database::models::ProjectId),
                 )
             }))
         })
