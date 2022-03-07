@@ -78,7 +78,7 @@ fn main() {
       let event_name = event.menu_item_id();
       match event_name {
         "Learn More" => {
-          let url = "https://github.com/probablykasper/tauri-template".to_string();
+          let url = "https://modrinth.com".to_string();
           shell::open(&event.window().shell_scope(), url, None).unwrap();
         }
         _ => {}
