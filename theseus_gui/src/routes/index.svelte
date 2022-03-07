@@ -16,7 +16,7 @@ import CardRow from "../components/components/CardRow.svelte";
     {/each}
 </CardRow>
 
-<CardRow title="Most played">
+<CardRow title="New releases">
     {#each Array(5) as _, i}
         <Instance title="New Caves" id="234" version="1.18.2" image="https://i.ibb.co/8KDxBwq/patchnotes-cavesandcliffs.jpg" />
     {/each}
