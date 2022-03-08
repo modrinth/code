@@ -9,6 +9,8 @@ pnpm install # Install dependencies
 pnpm dev # Start dev server
 ```
 
+> If after quitting the dev process, you find that the SvelteKit process is still running (or preventing you from restarting the dev command), run `pnpm kill:dev`
+
 ## Building
 
 ```bash
