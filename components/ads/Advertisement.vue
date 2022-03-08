@@ -1,16 +1,5 @@
 <template>
-  <div v-if="displayed && !hidden" class="ad-wrapper">
-    <div class="ad">
-      <GptAd
-        :key="format.adUnit"
-        ref="ad_slot"
-        :ad-unit="format.adUnit"
-        :size="format.size"
-        :is-responsive="true"
-      />
-    </div>
-  </div>
-  <div v-else-if="ethical_ads_on">
+  <div v-if="ethical_ads_on">
     <div v-if="ethical_ad_display && ethicalAdType === 'text'">
       <div
         :class="ethical_ad_style"

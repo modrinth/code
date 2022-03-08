@@ -202,9 +202,6 @@ export default {
     '@nuxtjs/style-resources',
     '@nuxtjs/markdownit',
     'cookie-universal-nuxt',
-    '~/modules/gpt-ads',
-    // The analytics module is disabled, as we are using our own solution embedded in the middleware.
-    // '~/modules/analytics',
   ],
   ads: {
     // Module options
@@ -286,9 +283,6 @@ export default {
       browserBaseURL: process.env.BROWSER_BASE_URL,
     },
     ads: {
-      ghostMode: process.env.ENABLE_ADS == null,
-      GeoEdgeId: process.env.GEOEDGE_ID,
-      networkCode: process.env.GAM_ID,
       ethicalAds: process.env.ETHICAL_ADS,
     },
     analytics: {

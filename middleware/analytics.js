@@ -1,21 +1,17 @@
-import axios from 'axios'
 export default function (context) {
+  if (process.client && context.from.path === context.route.path) {
+    return
+  }
+
   if (context.$config.analytics.base_url == null) {
     return
   }
-  let domain = ''
-  if (process.server) {
-    domain = context.req.headers.host
-  } else {
-    domain = location.host
-  }
-  const url = context.$config.analytics.base_url + '/register/visit'
-  const path = context.route.path.split('?')[0]
+
   setTimeout(() => {
-    axios
-      .post(url, {
-        path,
-        domain,
+    context.$axios
+      .post(`${context.$config.analytics.base_url}/register/visit`, {
+        path: context.route.path,
+        domain: process.server ? context.req.headers.host : location.host,
         consent: false,
       })
       .then(() => {})
