@@ -1,7 +1,8 @@
 {
   "scripts": {
-    "dev": "tauri dev; pnpm kill-port 3000",
+    "dev": "tauri dev",
     "dev:web": "svelte-kit dev",
+    "kill:web": "kill-port 3000",
     "tauri": "tauri",
     "build": "tauri build",
     "build:web": "svelte-kit build",
