@@ -671,9 +671,12 @@ export default {
         dependency.version = this.dependencies.versions.find(
           (x) => x.id === dependency.version_id
         )
-        dependency.project = this.dependencies.projects.find(
-          (x) => x.id === dependency.version.project_id
-        )
+
+        if (dependency.version) {
+          dependency.project = this.dependencies.projects.find(
+            (x) => x.id === dependency.version.project_id
+          )
+        }
 
         if (!dependency.project) {
           dependency.project = this.dependencies.projects.find(
