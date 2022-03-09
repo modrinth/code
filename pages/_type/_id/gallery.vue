@@ -6,10 +6,6 @@
       @click="expandedGalleryItem = null"
     >
       <div class="content" @click.stop="">
-        <button class="close circle-button" @click="expandedGalleryItem = null">
-          <CrossIcon aria-hidden="true" />
-        </button>
-
         <img
           class="image"
           :src="
@@ -24,23 +20,36 @@
           "
         />
 
-        <div class="footer">
-          <div class="description">
-            <h2 v-if="expandedGalleryItem.title">
-              {{ expandedGalleryItem.title }}
-            </h2>
-            <p v-if="expandedGalleryItem.description">
-              {{ expandedGalleryItem.description }}
-            </p>
-          </div>
-
-          <div v-if="gallery.length > 1" class="buttons">
-            <button class="previous circle-button" @click="previousImage()">
-              <LeftArrowIcon aria-hidden="true" />
-            </button>
-            <button class="next circle-button" @click="nextImage()">
-              <RightArrowIcon aria-hidden="true" />
-            </button>
+        <div class="floating">
+          <h2 v-if="expandedGalleryItem.title">
+            {{ expandedGalleryItem.title }}
+          </h2>
+          <div class="controls">
+            <div v-if="gallery.length > 1" class="buttons">
+              <button
+                class="close circle-button"
+                @click="expandedGalleryItem = null"
+              >
+                <CrossIcon aria-hidden="true" />
+              </button>
+              <a
+                class="open circle-button"
+                target="_blank"
+                :href="
+                  expandedGalleryItem.url
+                    ? expandedGalleryItem.url
+                    : 'https://cdn.modrinth.com/placeholder-banner.svg'
+                "
+              >
+                <ExternalIcon aria-hidden="true" />
+              </a>
+              <button class="previous circle-button" @click="previousImage()">
+                <LeftArrowIcon aria-hidden="true" />
+              </button>
+              <button class="next circle-button" @click="nextImage()">
+                <RightArrowIcon aria-hidden="true" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -222,6 +231,7 @@ import RightArrowIcon from '~/assets/images/utils/right-arrow.svg?inline'
 import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
+import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 
 import SmartFileInput from '~/components/ui/SmartFileInput'
 import Checkbox from '~/components/ui/Checkbox'
@@ -238,6 +248,7 @@ export default {
     CrossIcon,
     RightArrowIcon,
     LeftArrowIcon,
+    ExternalIcon,
   },
   auth: false,
   beforeRouteLeave(to, from, next) {
@@ -271,6 +282,22 @@ export default {
   },
   fetch() {
     this.gallery = JSON.parse(JSON.stringify(this.project.gallery))
+  },
+  mounted() {
+    this._keyListener = function (e) {
+      if (this.expandedGalleryItem) {
+        e.preventDefault()
+        if (e.key === 'Escape') {
+          this.expandedGalleryItem = null
+        } else if (e.key === 'ArrowLeft') {
+          this.previousImage()
+        } else if (e.key === 'ArrowRight') {
+          this.nextImage()
+        }
+      }
+    }
+
+    document.addEventListener('keydown', this._keyListener.bind(this))
   },
   methods: {
     showPreviewImage(files, index) {
@@ -399,48 +426,36 @@ export default {
 
   .content {
     position: relative;
-    width: auto;
-    height: auto;
-    max-height: 96vh;
-    max-width: 96vw;
-    background-color: var(--color-raised-bg);
-    overflow: auto;
-    border-radius: var(--size-rounded-card);
-    display: flex;
-    flex-direction: column;
-
-    .close {
-      position: absolute;
-      top: 0.5rem;
-      right: 0.5rem;
-    }
-
-    .next {
-      top: 20rem;
-      right: 0.5rem;
-    }
-
-    .previous {
-      top: 20rem;
-      left: 0.5rem;
-    }
+    width: calc(100vw - 2 * var(--spacing-card-lg));
+    height: calc(100vh - 2 * var(--spacing-card-lg));
 
     .circle-button {
       padding: 0.5rem;
       line-height: 1;
       display: flex;
       max-width: 2rem;
-      background-color: var(--color-raised-bg);
+      background-color: var(--color-button-bg);
       border-radius: var(--size-rounded-max);
-      margin: 0 0.5rem 0 0;
+      margin: 0;
       box-shadow: inset 0px -1px 1px rgb(17 24 39 / 10%);
 
-      &:hover,
-      &:active {
+      &:not(:last-child) {
+        margin-right: 0.5rem;
+      }
+
+      &:hover {
         background-color: var(--color-button-bg-hover) !important;
 
         svg {
           color: var(--color-button-text-hover) !important;
+        }
+      }
+
+      &:active {
+        background-color: var(--color-button-bg-active) !important;
+
+        svg {
+          color: var(--color-button-text-active) !important;
         }
       }
 
@@ -451,40 +466,37 @@ export default {
     }
 
     .image {
-      object-fit: contain;
-      max-height: 80vh;
-      max-width: 80vw;
+      object-fit: cover;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: auto;
+      height: calc(100vh - 2 * var(--spacing-card-lg));
+      max-width: calc(100vw - 2 * var(--spacing-card-lg));
+      border-radius: var(--size-rounded-card);
     }
 
-    .footer {
+    .floating {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, 0);
+      bottom: var(--spacing-card-md);
       display: flex;
-      flex-direction: row;
-      margin: 0.5rem 0.75rem 0.75rem 0.75rem;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-card-sm);
 
-      .buttons {
-        display: flex;
-        flex-direction: row;
-        flex-grow: 0;
-        align-items: center;
-
-        .circle-button {
-          background-color: var(--color-button-bg);
-        }
+      h2 {
+        margin-bottom: 0.25rem;
+        font-size: 1.25rem;
+        text-shadow: 1px 1px 10px #000000d4;
+        text-align: center;
       }
-
-      .description {
-        flex-grow: 1;
-        width: min-content;
-
-        h2 {
-          margin-bottom: 0.25rem;
-          font-size: 1.25rem;
-        }
-
-        p {
-          margin: 0;
-          font-size: 1rem;
-        }
+      .controls {
+        background-color: var(--color-raised-bg);
+        padding: var(--spacing-card-md);
+        border-radius: var(--size-rounded-card);
       }
     }
   }

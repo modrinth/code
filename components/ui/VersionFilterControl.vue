@@ -58,6 +58,7 @@
       @click="
         selectedLoader = getDefaultLoader()
         selectedGameVersions = []
+        updateVersionFilters()
       "
     >
       <CrossIcon />
