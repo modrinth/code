@@ -1,21 +1,34 @@
 use super::DataError;
 use daedalus::{minecraft::JavaVersion, modded::LoaderVersion};
-use futures::TryFutureExt;
+use futures::*;
+use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     path::{Path, PathBuf},
+    sync::Arc,
 };
-use tokio::process::{Child, Command};
+use tokio::{
+    fs,
+    process::{Child, Command},
+    sync::{Mutex, RwLock, RwLockReadGuard},
+};
+
+static PROFILES: OnceCell<RwLock<Profiles>> = OnceCell::new();
+pub const PROFILE_JSON_PATH: &str = "profile.json";
+pub struct Profiles(HashMap<PathBuf, Profile>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
 pub const SUPPORTED_ICON_FORMATS: &[&'static str] = &[
-    "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb", "mp4",
+    "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
+    "mp4",
 ];
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
+    #[serde(skip)]
+    pub path: PathBuf,
     pub metadata: Metadata,
     pub java: JavaSettings,
     pub memory: MemorySettings,
@@ -28,7 +41,6 @@ pub struct Metadata {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<PathBuf>,
-    pub path: PathBuf,
     pub game_version: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
@@ -88,9 +100,13 @@ impl Default for ProfileHooks {
 }
 
 impl Profile {
-    pub async fn new(name: String, version: String, path: PathBuf) -> Result<Self, DataError> {
+    pub async fn new(
+        name: String,
+        version: String,
+        path: PathBuf,
+    ) -> Result<Self, DataError> {
         let version_id = version.clone();
-        let (settings, version_info) = futures::try_join! {
+        let (settings, version_info) = try_join! {
             super::Settings::get(),
             super::Metadata::get()
                 .and_then(|manifest| async move {
@@ -116,10 +132,10 @@ impl Profile {
         .ok_or(DataError::JavaError)?;
 
         Ok(Self {
+            path: path.clone(),
             metadata: Metadata {
                 name,
                 icon: None,
-                path,
                 game_version: version,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
@@ -143,6 +159,7 @@ impl Profile {
             let mut cmd = hook.split(' ');
             let result = Command::new(cmd.next().unwrap())
                 .args(&cmd.collect::<Vec<&str>>())
+                .current_dir(&self.path)
                 .spawn()?
                 .wait()
                 .await?;
@@ -157,7 +174,7 @@ impl Profile {
         crate::launcher::launch_minecraft(
             &self.metadata.game_version,
             &self.metadata.loader_version,
-            &self.metadata.path,
+            &self.path,
             &self.java.install,
             &self.java.extra_arguments,
             &self.hooks.wrapper,
@@ -168,7 +185,10 @@ impl Profile {
         .await
     }
 
-    pub async fn kill(&self, running: &mut Child) -> Result<(), crate::launcher::LauncherError> {
+    pub async fn kill(
+        &self,
+        running: &mut Child,
+    ) -> Result<(), crate::launcher::LauncherError> {
         running.kill().await;
         self.wait_for(running).await
     }
@@ -177,14 +197,12 @@ impl Profile {
         &self,
         running: &mut Child,
     ) -> Result<(), crate::launcher::LauncherError> {
-        let result =
-            running
-                .wait()
-                .await
-                .map_err(|err| crate::launcher::LauncherError::ProcessError {
-                    inner: err,
-                    process: String::from("minecraft"),
-                })?;
+        let result = running.wait().await.map_err(|err| {
+            crate::launcher::LauncherError::ProcessError {
+                inner: err,
+                process: String::from("minecraft"),
+            }
+        })?;
 
         match result.success() {
             false => Err(crate::launcher::LauncherError::ExitError(
@@ -201,21 +219,35 @@ impl Profile {
         self
     }
 
-    pub async fn with_icon(&mut self, icon: &Path) -> Result<&mut Self, DataError> {
+    pub async fn with_icon(
+        &mut self,
+        icon: &Path,
+        icon_name: &str,
+        overwrite: bool,
+    ) -> Result<&mut Self, DataError> {
         let ext = icon
             .extension()
             .and_then(std::ffi::OsStr::to_str)
             .unwrap_or("");
-        if !SUPPORTED_ICON_FORMATS.contains(&ext) {
+        let settings = super::Settings::get().await?;
+
+        if SUPPORTED_ICON_FORMATS.contains(&ext) {
+            let new_path =
+                settings.icon_path.join(format!("{icon_name}.{ext}"));
+
+            if new_path.exists() && !overwrite {
+                return Err(DataError::IconOverwrite(String::from(
+                    new_path.to_string_lossy(),
+                )));
+            }
+
+            fs::copy(icon, &new_path).await?;
+            self.metadata.icon = Some(new_path);
+            Ok(self)
+        } else {
             Err(DataError::FormatError(format!(
                 "Unsupported image type: {ext}"
             )))
-        } else {
-            let new_path = self.metadata.path.join(format!("icon.{ext}"));
-            tokio::fs::copy(icon, &new_path).await?;
-
-            self.metadata.icon = Some(new_path);
-            Ok(self)
         }
     }
 
@@ -224,7 +256,10 @@ impl Profile {
         self
     }
 
-    pub fn with_loader_version(&mut self, version: Option<LoaderVersion>) -> &mut Self {
+    pub fn with_loader_version(
+        &mut self,
+        version: Option<LoaderVersion>,
+    ) -> &mut Self {
         self.metadata.loader_version = version;
         self
     }
@@ -280,6 +315,81 @@ impl Profile {
     }
 }
 
+impl Profiles {
+    pub async fn init() -> Result<(), DataError> {
+        let settings = super::Settings::get().await?;
+        let profiles = Arc::new(Mutex::new(HashMap::new()));
+
+        let futures = settings.profiles.clone().into_iter().map(|path| async {
+            let profiles = Arc::clone(&profiles);
+            tokio::spawn(async move {
+                let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
+                let mut profile = serde_json::from_slice::<Profile>(&json)?;
+                profile.path = path.clone();
+
+                let mut profiles = profiles.lock().await;
+                profiles.insert(PathBuf::from(path), profile);
+                Ok(()) as Result<_, DataError>
+            })
+            .await
+            .unwrap()
+        });
+        futures::future::try_join_all(futures).await?;
+
+        PROFILES.get_or_init(|| {
+            RwLock::new(Profiles(
+                Arc::try_unwrap(profiles).unwrap().into_inner(),
+            ))
+        });
+        Ok(())
+    }
+
+    pub async fn insert(profile: Profile) -> Result<(), DataError> {
+        let mut profiles = PROFILES.get().unwrap().write().await;
+        let path = profile.path.clone();
+
+        profiles.0.insert(path, profile);
+        Ok(())
+    }
+
+    pub async fn remove(path: &Path) -> Result<Option<Profile>, DataError> {
+        let mut profiles = PROFILES.get().unwrap().write().await;
+        Ok(profiles.0.remove(path))
+    }
+
+    pub async fn save() -> Result<(), DataError> {
+        let profiles = Self::get().await?;
+
+        let futures = profiles.0.clone().into_iter().map(|(path, profile)| {
+            tokio::spawn(async move {
+                let json = tokio::task::spawn_blocking(move || {
+                    serde_json::to_vec(&profile)
+                })
+                .await
+                .unwrap()?;
+
+                fs::write(path, json).await?;
+                Ok(()) as Result<(), DataError>
+            })
+        });
+        futures::future::try_join_all(futures)
+            .await
+            .unwrap()
+            .into_iter()
+            .collect::<Result<_, DataError>>()?;
+
+        Ok(())
+    }
+
+    pub async fn get<'a>() -> Result<RwLockReadGuard<'a, Self>, DataError> {
+        Ok(PROFILES
+            .get()
+            .ok_or_else(|| DataError::InitializedError("profiles".to_string()))?
+            .read()
+            .await)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -288,10 +398,10 @@ mod tests {
     #[test]
     fn profile_test() -> Result<(), serde_json::Error> {
         let profile = Profile {
+            path: PathBuf::from("/tmp/nunya/beeswax"),
             metadata: Metadata {
                 name: String::from("Example Pack"),
                 icon: None,
-                path: PathBuf::from("/tmp/nunya/beeswax"),
                 game_version: String::from("1.18.2"),
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
@@ -312,9 +422,9 @@ mod tests {
             },
         };
         let json = serde_json::json!({
+            "path": "/tmp/nunya/beeswax",
             "metadata": {
                 "name": "Example Pack",
-                "path": "/tmp/nunya/beeswax",
                 "game_version": "1.18.2",
                 "format_version": 1u32,
             },

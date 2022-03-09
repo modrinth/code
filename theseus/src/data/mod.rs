@@ -1,7 +1,7 @@
 use std::io;
 
 pub use meta::Metadata;
-pub use profiles::Profile;
+pub use profiles::{Profile, Profiles};
 pub use settings::Settings;
 
 mod meta;
@@ -21,6 +21,9 @@ pub enum DataError {
 
     #[error("Missing or unspecified Java installation")]
     JavaError,
+
+    #[error("Icon already exists (set overwrite to true to override)")]
+    IconOverwrite(String),
 
     #[error("Attempted to access {0} without initializing it!")]
     InitializedError(String),

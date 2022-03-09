@@ -23,6 +23,7 @@ pub struct Settings {
     pub hooks: ProfileHooks,
     pub icon_path: PathBuf,
     pub metadata_dir: PathBuf,
+    pub profiles: Vec<PathBuf>,
 }
 
 impl Default for Settings {
@@ -36,6 +37,7 @@ impl Default for Settings {
             hooks: ProfileHooks::default(),
             icon_path: Path::new(LAUNCHER_WORK_DIR).join(ICONS_PATH),
             metadata_dir: Path::new(LAUNCHER_WORK_DIR).join(METADATA_DIR),
+            profiles: Vec::new(),
         }
     }
 }

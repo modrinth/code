@@ -25,9 +25,13 @@ pub enum Error {
 }
 
 pub async fn init() -> Result<(), Error> {
-    std::fs::create_dir_all(LAUNCHER_WORK_DIR).expect("Unable to create launcher root directory!");
-    crate::data::Metadata::init().await?;
-    crate::data::Settings::init().await?;
+    std::fs::create_dir_all(LAUNCHER_WORK_DIR)
+        .expect("Unable to create launcher root directory!");
+
+    use crate::data::*;
+    Metadata::init().await?;
+    Settings::init().await?;
+    Profiles::init().await?;
 
     Ok(())
 }
