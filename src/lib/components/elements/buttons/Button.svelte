@@ -7,8 +7,10 @@
     export let value: string;
 
     export let size: 'sm' | 'md' | 'lg' = 'md'
+    export let color: 'outline' | 'primary' | 'danger';
 
     let className = `btn btn--${size}`;
+    className += color && (` btn--${color}`)
 </script>
 
 {#if as === 'button'}
@@ -313,11 +315,11 @@
     */
   }
 
-  .btn--large {
+  .btn--lg {
     /* padding: $em-spacer-6 1.5em; */
-    font-size: inherit;
     /* line-height: $lh-default; */
 
+    font-size: var(--font-2);
     border-radius: 0.5em;
   }
 
