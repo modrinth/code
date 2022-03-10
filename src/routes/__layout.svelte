@@ -1,9 +1,9 @@
 <script lang="ts">
-    import "$lib/styles/variables.postcss";
-    import "../lib/styles/themes/old.postcss";
-    import Sidebar from "./_docs/Sidebar.svelte";
+    import "$lib/styles/variables.postcss"
+    import "$lib/styles/themes.postcss"
+    import "./_docs/prism-one-dark.css"
+    import Sidebar from "./_docs/Sidebar.svelte"
 </script>
-
 
 <div class="app">
     <Sidebar />
@@ -22,14 +22,23 @@
     .app {
         display: grid;
         min-height: 100vh;
-        grid-template-columns: 250px 1fr;
-        @media(width <= 500px) {
+        --sidebar-size: 250px;
+        padding-left: var(--sidebar-size);
+        @media (width <= 500px) {
             display: flex;
             flex-direction: column;
         }
+        overflow: hidden;
 
         &__content {
-            padding: 1rem max(10vw, 1rem);
+            padding: 1rem max(8vw, 1rem);
+            max-width: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            :global(a) {
+                color: hsl(216, 50%, 50%);
+            }
         }
     }
 </style>

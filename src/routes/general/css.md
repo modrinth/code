@@ -1,3 +1,20 @@
+<svelte:head>
+    <title>CSS - Kleos</title>
+</svelte:head>
+
+# CSS Configuration
+
+Use [PostCSS](https://postcss.org/) to process your css in components and `.postcss` files.
+
+Install PostCSS with:
+
+```bash
+pnpx svelte-add@latest postcss
+```
+
+This is the recommended `postcss.config.cjs` setup:
+
+```js
 const config = {
   plugins: [
     require('postcss-import'),
@@ -13,3 +30,4 @@ const config = {
 };
 
 module.exports = config;
+```
