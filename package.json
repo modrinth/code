@@ -1,6 +1,6 @@
 {
-  "name": "naxos",
-  "version": "0.0.1",
+  "name": "kelos",
+  "version": "0.0.1-alpha",
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
@@ -17,16 +17,26 @@
     "@sveltejs/kit": "next",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
+    "autoprefixer": "^10.4.2",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-svelte3": "^3.2.1",
+    "postcss": "^8.4.8",
+    "postcss-extend-rule": "^4.0.0",
+    "postcss-import": "^14.0.2",
+    "postcss-load-config": "^3.1.1",
+    "postcss-nested": "^5.0.6",
+    "postcss-preset-env": "^7.4.2",
+    "postcss-strip-inline-comments": "^0.1.5",
     "prettier": "^2.5.1",
     "prettier-plugin-svelte": "^2.5.0",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.6",
     "svelte-preprocess": "^4.10.1",
+    "svelte2tsx": "^0.5.5",
     "tslib": "^2.3.1",
     "typescript": "~4.6.2"
   },
-  "type": "module"
+  "type": "module",
+  "svelte": "index.js"
 }

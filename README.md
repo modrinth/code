@@ -1,40 +1,65 @@
-# create-svelte
+# Kleos
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+*The Modrinth component library, in Svelte*
 
-## Creating a project
+---
 
-If you're seeing this, you've probably already done this step. Congrats!
+### ⚠️ Currently in-progress ⚠️
+
+When creating a component, start with [GitHub's Primer styles](https://github.com/primer/css/tree/main/src) for that component, and go from there. Global variables and colors are incomplete and currently identical to Primers'.
+
+#### Components
+
+- [ ] Button
+- [ ] Select menu
+- [ ] Checkboxes
+- [ ] Text input
+- [ ] Pagination
+- [ ] Link
+- [ ] Blankslate
+- [ ] Breadcrumbs
+- [ ] Markdown
+- [ ] Textarea
+- [ ] Select
+
+...and others
+
+## Using
+
+Install the package:
 
 ```bash
-# create a new project in the current directory
-npm init svelte@next
-
-# create a new project in my-app
-npm init svelte@next my-app
+npm install kleos # or pnpm inst...
 ```
 
-> Note: the `@next` is temporary
+Import a component:
+```svelte
+<script>
+    import { Button } from "kleos"
+</script>
+
+<Button> Click me! </Button>
+```
 
 ## Developing
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+The library lives in the `src/lib` folder, and the documentation lives in the `src/routes` folder.
 
 ```bash
-npm run dev
+pnpm install # Install dependencies
+pnpm dev # Run dev server
+```
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+## Packaging
+
+```bash
+pnpm package
 ```
 
 ## Building
 
-To create a production version of your app:
+To build the documentation site, run:
 
 ```bash
-npm run build
+pnpm build
 ```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
