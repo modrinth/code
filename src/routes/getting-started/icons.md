@@ -1,3 +1,7 @@
+<script>
+      import IconHeart from 'virtual:icons/heroicons-outline/heart'
+</script>
+
 <svelte:head>
     <title>Icons - Kleos</title>
 </svelte:head>
@@ -54,6 +58,10 @@ Import an icon in the `<script>` tag of your component:
 
 Then use the icon as if it were a Svelte component:
 
+> The `height` and `width` props are optional, and take CSS compatible values
+
 ```html
-<IconHeart />
+That's lovely <IconHeart height="14px" />!
 ```
+
+That's lovely <IconHeart height="14px" />!

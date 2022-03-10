@@ -2,8 +2,8 @@
     <div class="section">
         <span class="section__title">Getting started</span>
         <a href="/" class="section__link">Introduction</a>
-        <a href="/general/icons" class="section__link">Using Icons</a>
-        <a href="/general/css" class="section__link">CSS configuration</a>
+        <a href="/getting-started/icons" class="section__link">Using Icons</a>
+        <a href="/getting-started/css" class="section__link">CSS configuration</a>
     </div>
 
     <div class="section">

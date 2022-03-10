@@ -1,7 +1,8 @@
 <script lang="ts">
     import "$lib/styles/variables.postcss"
     import "$lib/styles/themes.postcss"
-    import "./_docs/prism-one-dark.css"
+    import "./_docs/styles/prism-one-dark.css"
+    import "./_docs/styles/gh-markdown.css"
     import Sidebar from "./_docs/Sidebar.svelte"
 </script>
 
@@ -31,13 +32,21 @@
         overflow: hidden;
 
         &__content {
-            padding: 1rem max(8vw, 1rem);
+            padding: 5rem max(8vw, 1rem);
             max-width: 100%;
             overflow-x: hidden;
             overflow-y: auto;
 
             :global(a) {
                 color: hsl(216, 50%, 50%);
+            }
+
+            :global(h1) {
+                font-size: 54px;
+            }
+
+            :global(p) {
+                line-height: 1.5;
             }
         }
     }
