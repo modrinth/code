@@ -1,4 +1,4 @@
-# Kleos
+# Omorphia
 
 *The Modrinth component library, in Svelte*
 
@@ -29,13 +29,13 @@ When creating a component, start with [GitHub's Primer styles](https://github.co
 Install the package:
 
 ```bash
-npm install kleos # or pnpm inst...
+npm install omorphia # or pnpm inst...
 ```
 
 Import a component:
 ```svelte
 <script>
-    import { Button } from "kleos"
+    import { Button } from "omorphia"
 </script>
 
 <Button> Click me! </Button>

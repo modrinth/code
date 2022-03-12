@@ -1,9 +1,11 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@iconify-json/carbon': ^1.1.1
   '@iconify-json/heroicons-outline': ^1.1.1
   '@iconify-json/lucide': ^1.1.7
-  '@sveltejs/adapter-auto': next
+  '@poppanator/sveltekit-svg': ^0.3.1
+  '@sveltejs/adapter-static': ^1.0.0-next.29
   '@sveltejs/kit': next
   '@typescript-eslint/eslint-plugin': ^5.10.1
   '@typescript-eslint/parser': ^5.10.1
@@ -31,9 +33,11 @@ specifiers:
   unplugin-icons: ^0.13.3
 
 devDependencies:
+  '@iconify-json/carbon': 1.1.1
   '@iconify-json/heroicons-outline': 1.1.1
   '@iconify-json/lucide': 1.1.7
-  '@sveltejs/adapter-auto': 1.0.0-next.31
+  '@poppanator/sveltekit-svg': 0.3.1_svelte@3.46.4
+  '@sveltejs/adapter-static': 1.0.0-next.29
   '@sveltejs/kit': 1.0.0-next.295_svelte@3.46.4
   '@typescript-eslint/eslint-plugin': 5.14.0_e3f5f4efe2bd492e36eb6c1c619dfc98
   '@typescript-eslint/parser': 5.14.0_eslint@7.32.0+typescript@4.6.2
@@ -214,8 +218,10 @@ packages:
     resolution: {integrity: sha512-ZnQMnLV4e7hDlUvw8H+U8ASL02SS2Gn6+9Ac3wGGLIe7+je2AeAOxPY+izIPJDfFDb7eDjev0Us8MO1iFRN8hA==}
     dev: true
 
-  /@iarna/toml/2.2.5:
-    resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
+  /@iconify-json/carbon/1.1.1:
+    resolution: {integrity: sha512-ClOYc+82CKlDAKH1tfDTJTzNz4oHhYD04ALA5uemw9PdWXg05yIJb9bxWjSz4UgdUbH5N/yd8s9hNPI3h6jnlg==}
+    dependencies:
+      '@iconify/types': 1.0.12
     dev: true
 
   /@iconify-json/heroicons-outline/1.1.1:
@@ -268,6 +274,15 @@ packages:
       fastq: 1.13.0
     dev: true
 
+  /@poppanator/sveltekit-svg/0.3.1_svelte@3.46.4:
+    resolution: {integrity: sha512-atwGnEYD3S18hrwvM4S55sAB2EKzbvLPVBWoL9KSVqPgbSfRvKQb6aBrA7gWOQVz3uoCwDujUvvlbxvzYxmthw==}
+    peerDependencies:
+      svelte: 3.x
+    dependencies:
+      svelte: 3.46.4
+      svgo: 2.8.0
+    dev: true
+
   /@rollup/pluginutils/4.2.0:
     resolution: {integrity: sha512-2WUyJNRkyH5p487pGnn4tWAsxhEFKN/pT8CMgHshd5H+IXkOnKvKZwsz5ZWz+YCXkleZRAU5kwbfgF8CPfDRqA==}
     engines: {node: '>= 8.0.0'}
@@ -276,32 +291,10 @@ packages:
       picomatch: 2.3.1
     dev: true
 
-  /@sveltejs/adapter-auto/1.0.0-next.31:
-    resolution: {integrity: sha512-N1ZFGxulcSAOJrtdFR567diwbWKUvLrHZiUE9TiEvIahnndeRa50MF9LDg/CuIvpa6fHqz5K827XXrADlPAr9g==}
+  /@sveltejs/adapter-static/1.0.0-next.29:
+    resolution: {integrity: sha512-0hjGnfT3BRyoHnzJ2w0/xL+xICRpKneDTm45ZzggiRrc0r71WJfF6toGeg8N4QUQnj8EJ3Itm453gsS1kt7VUQ==}
     dependencies:
-      '@sveltejs/adapter-cloudflare': 1.0.0-next.15
-      '@sveltejs/adapter-netlify': 1.0.0-next.50
-      '@sveltejs/adapter-vercel': 1.0.0-next.46
-    dev: true
-
-  /@sveltejs/adapter-cloudflare/1.0.0-next.15:
-    resolution: {integrity: sha512-kq3vNFpKmRVgAOfz4HrcleBnUADs++dfVF8S61EAFqNTEvGtOVdJKLql66Pe/uxlY0VxAp1dplxtEDf4/R70lQ==}
-    dependencies:
-      esbuild: 0.14.25
-    dev: true
-
-  /@sveltejs/adapter-netlify/1.0.0-next.50:
-    resolution: {integrity: sha512-lpHvjcHiC77SPyLp7OjhenJF9KYfKsXlmUua7icNh0Hc8SKtRQf0dn+a1Zy77AslikvOX7/4HZE8zPIyIvYYqw==}
-    dependencies:
-      '@iarna/toml': 2.2.5
-      esbuild: 0.14.25
       tiny-glob: 0.2.9
-    dev: true
-
-  /@sveltejs/adapter-vercel/1.0.0-next.46:
-    resolution: {integrity: sha512-6Rwf3kZF6uX2JxDMoYgZWZe5TjVTTWZa57VukdNGjnlAT3CrfsEOBWyskX/8hx7AiYX5fucZaAtYPNZpUmueIA==}
-    dependencies:
-      esbuild: 0.14.25
     dev: true
 
   /@sveltejs/kit/1.0.0-next.295_svelte@3.46.4:

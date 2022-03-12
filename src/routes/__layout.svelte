@@ -1,12 +1,14 @@
 <script lang="ts">
     import "$lib/styles/variables.postcss"
     import "$lib/styles/themes.postcss"
-    import "./_docs/styles/prism-one-dark.css"
-    import "./_docs/styles/gh-markdown.css"
-    import Sidebar from "./_docs/Sidebar.svelte"
+    import "./_internal/styles/prism-one-dark.css"
+    import "./_internal/styles/gh-markdown.css"
+    import Sidebar from "./_internal/components/Sidebar.svelte"
+    import Header from './_internal/components/Header.svelte'
 </script>
 
 <div class="app">
+    <Header />
     <Sidebar />
     <main class="app__content">
         <slot />
@@ -18,28 +20,34 @@
         margin: 0;
         font-size: var(--body-font-size);
         font-family: var(--body-font);
+        overflow-y: scroll;
+        --accent-color: hsl(331, 60%, 45%);
+        --accent-color-transparent: hsla(331, 60%, 45%, 0.15);
     }
 
     .app {
         display: grid;
         min-height: 100vh;
-        --sidebar-size: 250px;
-        padding-left: var(--sidebar-size);
+        overflow: hidden;
+        --sidebar-width: 250px;
+        --header-height: 56px;
         @media (width <= 500px) {
             display: flex;
             flex-direction: column;
         }
-        overflow: hidden;
+
+        :global(a) {
+            color: var(--accent-color);
+            &:hover {
+                text-decoration: underline;
+            }
+        }
 
         &__content {
-            padding: 5rem max(8vw, 1rem);
-            max-width: 100%;
+            padding: var(--header-height) 0 0 var(--sidebar-width);
             overflow-x: hidden;
             overflow-y: auto;
-
-            :global(a) {
-                color: hsl(216, 50%, 50%);
-            }
+            background-color: hsl(220, 13%, 91%);
 
             :global(h1) {
                 font-size: 54px;

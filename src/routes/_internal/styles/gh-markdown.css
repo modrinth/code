@@ -365,3 +365,20 @@ pre code, pre tt {
     background-color: transparent;
     border: none;
 }
+
+/* Custom styles */
+
+h1 {
+    font-weight: 600;
+}
+
+h2 {
+    font-weight: 500;
+}
+
+blockquote {
+    border-left: 4px solid var(--accent-color);
+    padding: 15px 15px;
+    color: unset;
+    background-color: var(--accent-color-transparent);
+}

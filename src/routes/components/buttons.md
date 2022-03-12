@@ -1,12 +1,10 @@
+---
+title: Buttons
+---
+
 <script lang="ts">
     import Button from "$lib/components/elements/buttons/Button.svelte"
 </script>
-
-<svelte:head>
-    <title>Buttons - Kleos</title>
-</svelte:head>
-
-# Buttons
 
 <Button>Eat cake</Button>
 

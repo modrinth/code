@@ -1,0 +1,79 @@
+<script lang="ts">
+    import OmorphiaLogo from '../assets/omorphia.svg'
+    import IconLogoGithub from 'virtual:icons/carbon/logo-github'
+    import IconChat from 'virtual:icons/heroicons-outline/chat-alt-2'
+    import { onMount } from 'svelte'
+
+    let headerElement
+
+    onMount(() => {
+        let lastScrollTop: number
+        window.addEventListener('scroll', function () {
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop
+            if (scrollTop > lastScrollTop) {
+                headerElement.style.top = 'calc(var(--header-height) * -1)'
+            } else {
+                headerElement.style.top = '0'
+            }
+            lastScrollTop = scrollTop
+        })
+    })
+</script>
+
+<header class="header" bind:this={headerElement}>
+    <OmorphiaLogo height="32px" width="auto"/>
+    <div class="header__title">Omorphia</div>
+    <div class="header__links">
+        <a href="https://modrinth.com">Modrinth.com</a>
+        <span class="spacer-dot"></span>
+        <a href="https://rewrite.modrinth.com/discord"><IconChat /></a>
+        <a href="https://github.com/modrinth/omorphia"><IconLogoGithub /></a>
+    </div>
+</header>
+
+
+<style lang="postcss">
+    .header {
+        display: flex;
+        grid-gap: 10px;
+        align-items: center;
+        padding: 0 32px;
+        position: fixed;
+        height: var(--header-height);
+        left: 0;
+        right: 0;
+        top: 0;
+        z-index: 10;
+        background-color: hsl(0, 0%, 100%);
+        box-shadow: hsla(221, 39%, 11%, 0.2) 0 2px 4px 0, hsla(221, 39%, 11%, 0.05) 0 -2px 2px 0 inset;
+        transition: top 0.3s ease-in-out;
+
+        &__title {
+            font-size: 20px;
+            font-weight: 600;
+        }
+
+        &__links {
+            margin-left: auto;
+            display: flex;
+            grid-gap: 16px;
+            align-items: center;
+
+            :global(svg) {
+                height: 22px;
+                width: auto;
+            }
+
+            a:not(:hover) {
+                color: unset;
+            }
+        }
+    }
+
+    .spacer-dot {
+        background-color: hsla(0, 0%, 0%, 0.2);
+        border-radius: 999px;
+        width: 5px;
+        aspect-ratio: 1 / 1;
+    }
+</style>

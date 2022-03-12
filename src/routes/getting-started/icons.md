@@ -1,12 +1,10 @@
+---
+title: Icons
+---
+
 <script>
       import IconHeart from 'virtual:icons/heroicons-outline/heart'
 </script>
-
-<svelte:head>
-    <title>Icons - Kleos</title>
-</svelte:head>
-
-# Icons
 
 Use [unplugin-icons](https://github.com/antfu/unplugin-icons) to import icons as Svelte components.
 

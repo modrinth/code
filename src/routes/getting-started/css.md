@@ -1,8 +1,6 @@
-<svelte:head>
-    <title>CSS - Kleos</title>
-</svelte:head>
-
-# CSS Configuration
+---
+title: CSS Configuration
+---
 
 Use [PostCSS](https://postcss.org/) to process your css in components and `.postcss` files.
 

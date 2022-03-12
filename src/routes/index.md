@@ -1,30 +1,28 @@
-<svelte:head>
-    <title>Introduction - Kleos</title>
-</svelte:head>
+---
+title: Introduction
+---
 
-# Introduction
+## What is Omorphia?
 
-> Kleos is in early development, and not ready for use in any application. Contribute to it on [GitHub](https://github.com/modrinth/kleos).
+> Omorphia is in early development, and not ready for use in any application. Contribute to it on [GitHub](https://github.com/modrinth/omorphia).
 
-### What is Kleos?
-
-Kleos is Modrinth's style and reusable component library for use in all of its frontend applications, including [knossos](https://github.com/modrinth/knossos) (modrinth.com), [theseus](https://github.com/modrinth/theseus) (launcher), and planned projects such as Modrinth's in-house auth and ad-server.
+Omorphia is Modrinth's style and reusable component library for use in all of its frontend applications, including [knossos](https://github.com/modrinth/knossos) (modrinth.com), [theseus](https://github.com/modrinth/theseus) (launcher), and planned projects such as Modrinth's in-house auth and ad-server.
 
 It uses [Svelte](https://svelte.dev/) to deliver the best performance with the least boilerplate.
 
-### Getting started
+## Getting started
 
-Adding Kleos to your project is as easy as:
+Adding Omorphia to your project is as easy as:
 
 ```bash
-pnpm add kleos
+pnpm add omorphia
 ```
 
-#### Components
+### Components
 
 Import a component with:
 ```js
-import { Button } from "kleos"
+import { Button } from "omorphia"
 ```
 
 Then, use it in your HTML:
@@ -35,8 +33,8 @@ Then, use it in your HTML:
 
 For more information on each component, check out the pages on the sidebar navigation.
 
-> To get Svelte language support in your code editor, [use this list.](https://sveltesociety.dev/tools#editor-support)
+> To get Svelte language support in your code editor, [use this list of extensions.](https://sveltesociety.dev/tools#editor-support)
 
-#### Icons, Styles, and more
+### Using icons and styles
 
 Follow the guides on the sidebar to learn how to use [icons](/getting-started/icons) and general concepts.

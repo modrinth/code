@@ -9,6 +9,10 @@ const config = defineConfig({
 
   remarkPlugins: [],
   rehypePlugins: [],
+
+  layout: {
+    _: "./src/routes/_internal/layout/page.svelte",
+  }
 });
 
 export default config;
