@@ -34,14 +34,13 @@ jobs:
 
       - name: Package
         run: |
-          pnpm version patch
+          pnpm version patch --commit-hooks false --git-tag-version false
           pnpm package
 
       - name: Publish
         run: |
           cd package
           pnpm publish --no-git-checks --tag alpha
-
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
