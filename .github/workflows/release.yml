@@ -38,6 +38,7 @@ jobs:
       - name: Publish
         run: |
           cd package
+          pnpm version patch
           pnpm publish --no-git-checks
 
         env:

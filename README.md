@@ -4,7 +4,7 @@
 
 ---
 
-### ⚠️ Currently in-progress ⚠️
+### ⚠️ Currently in-progress: Not accepting contributions currently.
 
 When creating a component, start with [GitHub's Primer styles](https://github.com/primer/css/tree/main/src) for that component, and go from there. Global variables and colors are incomplete and currently identical to Primers'.
 
