@@ -21,10 +21,12 @@
 </script>
 
 <header class="header" bind:this={headerElement}>
-    <OmorphiaLogo height="32px" width="auto"/>
+    <OmorphiaLogo height="32px" width="32px"/>
     <div class="header__title">Omorphia</div>
     <div class="header__links">
         <a href="https://modrinth.com">Modrinth.com</a>
+        <span class="spacer-dot"></span>
+        <a href="https://www.npmjs.com/package/omorphia">NPM</a>
         <span class="spacer-dot"></span>
         <a href="https://rewrite.modrinth.com/discord"><IconChat /></a>
         <a href="https://github.com/modrinth/omorphia"><IconLogoGithub /></a>

@@ -1,41 +1,18 @@
 name: Deploy
-on:
-  push:
-    branches:
-      - main
+
+on: push
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-
-      - uses: pnpm/action-setup@v2.1.0
+      - uses: actions/checkout@v2
+      - name: Wait for CF Pages
+        id: cf-pages
+        uses: WalshyDev/cf-pages-await@v1
         with:
-          version: 6.32.0
-
-      - name: Setup Node
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-
-      - name: Cache pnpm modules
-        uses: actions/cache@v2
-        with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-
-
-      - name: Install dependencies
-        run: pnpm install
-
-      - name: Build
-        run: pnpm build
-
-      - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@v4.2.5
-        with:
-          branch: gh-pages
-          folder: build
+          accountEmail: ${{ secrets.CF_ACCOUNT_EMAIL  }}
+          apiKey: ${{ secrets.CF_API_KEY  }}
+          accountId: '9ddae624c98677d68d93df6e524a6061'
+          project: 'knossos'
+          githubToken: ${{ secrets.GITHUB_TOKEN }}

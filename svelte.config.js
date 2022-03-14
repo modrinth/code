@@ -1,6 +1,6 @@
 import {mdsvex} from 'mdsvex';
 import mdsvexConfig from './mdsvex.config.js';
-import adapter from '@sveltejs/adapter-static';
+import adapter from '@sveltejs/adapter-auto';
 import preprocess from 'svelte-preprocess';
 import Icons from 'unplugin-icons/vite';
 import svelteSvg from '@poppanator/sveltekit-svg';
@@ -17,20 +17,13 @@ const config = {
     ],
 
     kit: {
-        adapter: adapter({
-            pages: 'build',
-            assets: 'build',
-            fallback: null
-        }),
-        ...(process.env.NODE_ENV !== 'development' ? ({
-            paths: {
-                base: '/omorphia'
-            } }) : ({})),
+        adapter: adapter(),
         vite: {
             plugins: [
                 svelteSvg(),
                 Icons({
                     compiler: 'svelte',
+                    defaultClass: 'icon',
                 }),
             ],
         },

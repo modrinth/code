@@ -23,15 +23,18 @@
 
 {#if count > 1}
     <div class="pagination">
-        <Button icon={IconArrowLeft} color="raised" on:click={() => dispatch('change', page - 1)} disabled={page <= 1} title="Last page"/>
+        <Button color="raised" on:click={() => dispatch('change', page - 1)} disabled={page <= 1} title="Last page"><IconArrowLeft height="20px" />
+        </Button>
         {#each options as option}
             {#if option === '-'}
                 <IconMinus class="pagination__dash" />
             {:else}
-                <Button label={option} color={option === page ? 'brand' : 'raised'} on:click={() => dispatch('change', option)} evenPadding={true} />
+                <Button color={option === page ? 'primary' : 'raised'} on:click={() => dispatch('change', option)} evenPadding={true}>{option}</Button>
             {/if}
         {/each}
-        <Button icon={IconArrowRight} color="raised" on:click={() => dispatch('change', page + 1)} disabled={page >= count} title="Next page" />
+        <Button color="raised" on:click={() => dispatch('change', page + 1)} disabled={page >= count} title="Next page">
+            <IconArrowRight height="20px" />
+        </Button>
     </div>
 {/if}
 

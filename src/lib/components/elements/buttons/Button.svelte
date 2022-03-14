@@ -7,7 +7,7 @@
     export let value: string;
 
     export let size: 'sm' | 'md' | 'lg' = 'md'
-    export let color: 'outline' | 'primary' | 'danger';
+    export let color: 'raised' | 'primary' | 'danger';
 
     let className = `btn btn--${size}`;
     className += color && (` btn--${color}`)
@@ -33,7 +33,9 @@
   /* Base button styles */
   .btn {
       position: relative;
-      display: inline-block;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       padding: 5px var(--spacer-3);
       font-size: var(--body-font-size);
       font-weight: var(--font-weight-semibold);
@@ -62,11 +64,9 @@
           opacity: 0.75;
       }
 
-      /*
     .icon {
-      margin-right: $spacer-1;
+      margin-right: var(--spacer-1);
       color: var(--color-fg-muted);
-      vertical-align: text-bottom;
 
       &:only-child {
         margin-right: 0;
@@ -82,10 +82,9 @@
     }
 
     .dropdown-caret {
-      margin-left: $spacer-1;
+      margin-left: var(--spacer-1);
       opacity: 0.8;
     }
-  */
   }
 
   /* Default button */
@@ -124,7 +123,7 @@
       background-color: var(--color-btn-bg);
       border-color: var(--color-btn-border);
 
-      .octicon {
+      :global(.icon) {
         color: var(--color-primer-fg-disabled);
       }
     }
@@ -166,7 +165,7 @@
       background-color: var(--color-btn-primary-disabled-bg);
       border-color: var(--color-btn-primary-disabled-border);
 
-      .octicon {
+      :global(.icon) {
         color: var(--color-btn-primary-disabled-text);
       }
     }
@@ -183,7 +182,7 @@
       background-color: var(--color-btn-primary-counter-bg);
     }
 
-    .octicon {
+    :global(.icon) {
       color: var(--color-btn-primary-icon);
     }
   }
@@ -203,7 +202,7 @@
         background-color: var(--color-btn-outline-hover-counter-bg);
       }
 
-      .octicon {
+      :global(.icon) {
         color: inherit;
       }
     }
@@ -245,7 +244,7 @@
   .btn--danger {
     color: var(--color-btn-danger-text);
 
-    .octicon {
+    :global(.icon) {
       color: var(--color-btn-danger-icon);
     }
 
@@ -260,7 +259,7 @@
         background-color: var(--color-btn-danger-hover-counter-bg);
       }
 
-      .octicon {
+      :global(.icon) {
         color: var(--color-btn-danger-hover-icon);
       }
     }
@@ -286,7 +285,7 @@
         background-color: var(--color-btn-danger-disabled-counter-bg);
       }
 
-      .octicon {
+      :global(.icon) {
         color: var(--color-btn-danger-disabled-text);
       }
     }
@@ -306,21 +305,12 @@
   .btn--sm {
     padding: 3px 12px;
     font-size: var(--font-0);
-    line-height: 20px;
-
-      /*
-    .octicon {
-      vertical-align: text-top;
-    }
-    */
   }
 
   .btn--lg {
-    /* padding: $em-spacer-6 1.5em; */
-    /* line-height: $lh-default; */
-
-    font-size: var(--font-2);
-    border-radius: 0.5em;
+    font-size: var(--font-size-large);
+    padding: 8px 16px;
+    border-radius: var(--radii-3);
   }
 
   /* Full-width button */

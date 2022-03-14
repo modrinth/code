@@ -1,6 +1,7 @@
 {
   "name": "omorphia",
   "version": "0.0.1-alpha",
+  "description": "A beautiful Svelte component & style library",
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build",
@@ -17,7 +18,6 @@
     "@iconify-json/heroicons-outline": "^1.1.1",
     "@iconify-json/lucide": "^1.1.7",
     "@poppanator/sveltekit-svg": "^0.3.1",
-    "@sveltejs/adapter-static": "^1.0.0-next.29",
     "@sveltejs/kit": "next",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
@@ -45,5 +45,23 @@
     "unplugin-icons": "^0.13.3"
   },
   "type": "module",
-  "svelte": "index.js"
+  "svelte": "index.js",
+  "dependencies": {
+    "@sveltejs/adapter-auto": "^1.0.0-next.31"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/modrinth/omorphia.git"
+  },
+  "keywords": [
+    "UI",
+    "framework",
+    "components",
+    "library"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/modrinth/omorphia/issues"
+  },
+  "homepage": "https://omorphia.modrinth.com"
 }

@@ -1,4 +1,4 @@
-.light-theme {
+.theme-light {
     --color-canvas-default-transparent: rgba(255, 255, 255, 0);
     --color-page-header-bg: #f6f8fa;
     --color-marketing-icon-primary: #218bff;
@@ -426,7 +426,7 @@
     --color-scale-coral-9: #510901;
 }
 
-.dark-theme {
+.theme-dark {
     --color-canvas-default-transparent: rgba(255, 255, 255, 0);
     --color-page-header-bg: #f6f8fa;
     --color-marketing-icon-primary: #218bff;
@@ -1283,11 +1283,11 @@
 }
 
 [data-color-mode=light] {
-    @extend .light-theme;
+    @extend .theme-light;
 }
 
 [data-color-mode=dark] {
-    @extend .dark-theme;
+    @extend .theme-dark;
 }
 
 [data-color-mode=dark-dimmed] {
