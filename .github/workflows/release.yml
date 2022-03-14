@@ -39,7 +39,11 @@ jobs:
         run: |
           cd package
           pnpm version patch
-          pnpm publish --no-git-checks
+          pnpm publish --no-git-checks --tag alpha
 
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - uses: EndBug/add-and-commit@v9 # You can change this to use a specific version.
+        with:
+          message: 'Bump package version'
