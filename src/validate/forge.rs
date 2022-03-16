@@ -83,11 +83,11 @@ impl super::Validator for LegacyForgeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("mcmod.info").map_err(|_| {
-            ValidationError::InvalidInputError(
-                "No mcmod.info present for Forge file.".into(),
-            )
-        })?;
+        if archive.by_name("mcmod.info").is_err() {
+            return Ok(ValidationResult::Warning(
+                "Forge mod file does not contain mcmod.info!",
+            ));
+        };
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(

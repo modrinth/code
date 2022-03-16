@@ -96,17 +96,24 @@ struct DependencyInfo {
 
 #[get("dependencies")]
 pub async fn dependency_list(
+    req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
     let result =
-        database::models::Project::get_from_slug_or_project_id(string, &**pool)
+        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool)
             .await?;
 
+    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+
     if let Some(project) = result {
-        let id = project.id;
+        if !is_authorized(&project, &user_option, &pool).await? {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
+
+        let id = project.inner.id;
 
         use futures::stream::TryStreamExt;
 

@@ -494,7 +494,7 @@ pub async fn project_create_inner(
                 });
 
                 gallery_urls.push(crate::models::projects::GalleryItem {
-                    url,
+                    url: format!("{}/{}", cdn_url, url),
                     featured: item.featured,
                     title: item.title.clone(),
                     description: item.description.clone(),

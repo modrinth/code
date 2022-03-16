@@ -4,7 +4,7 @@ use crate::database::models as db_models;
 use crate::models;
 use crate::models::projects::{Dependency, Version};
 use crate::models::teams::Permissions;
-use crate::util::auth::get_user_from_headers;
+use crate::util::auth::{get_user_from_headers, is_authorized};
 use crate::util::guards::admin_key_guard;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
@@ -21,6 +21,7 @@ pub struct VersionListFilters {
 
 #[get("version")]
 pub async fn version_list(
+    req: HttpRequest,
     info: web::Path<(String,)>,
     web::Query(filters): web::Query<VersionListFilters>,
     pool: web::Data<PgPool>,
@@ -28,11 +29,17 @@ pub async fn version_list(
     let string = info.into_inner().0;
 
     let result =
-        database::models::Project::get_from_slug_or_project_id(string, &**pool)
+        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool)
             .await?;
 
+    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+
     if let Some(project) = result {
-        let id = project.id;
+        if !is_authorized(&project, &user_option, &pool).await? {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
+
+        let id = project.inner.id;
 
         let version_ids = database::models::Version::get_project_versions(
             id,
