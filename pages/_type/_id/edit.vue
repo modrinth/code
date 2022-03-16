@@ -34,7 +34,7 @@
       </button>
     </header>
     <section class="card essentials">
-      <h3>Name</h3>
+      <h3>Name<span class="required">*</span></h3>
       <label>
         <span>
           Be creative! Generic project names will be harder to search for.
@@ -48,7 +48,7 @@
           "
         />
       </label>
-      <h3>Summary</h3>
+      <h3>Summary<span class="required">*</span></h3>
       <label>
         <span>
           Give a short description of your project that will appear on search
@@ -93,7 +93,7 @@
           "
         />
       </label>
-      <h3>Vanity URL (slug)</h3>
+      <h3>Vanity URL (slug)<span class="required">*</span></h3>
       <label>
         <span>
           Set this to something that will looks nice in your project's URL.
@@ -146,7 +146,7 @@
       <div class="columns">
         <span> Let others know what environments your project supports. </span>
         <div class="labeled-control">
-          <h3>Client</h3>
+          <h3>Client<span class="required">*</span></h3>
           <Multiselect
             v-model="clientSideType"
             placeholder="Select one"
@@ -161,7 +161,7 @@
           />
         </div>
         <div class="labeled-control">
-          <h3>Server</h3>
+          <h3>Server<span class="required">*</span></h3>
           <Multiselect
             v-model="serverSideType"
             placeholder="Select one"
@@ -276,7 +276,7 @@
     </section>
     <section class="card license">
       <div class="title">
-        <h3>License</h3>
+        <h3>License<span class="required">*</span></h3>
       </div>
       <label>
         <span>
@@ -811,5 +811,9 @@ section.donations {
 
 .card {
   margin-bottom: 0;
+}
+
+.required {
+  color: var(--color-badge-red-bg);
 }
 </style>

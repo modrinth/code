@@ -22,7 +22,7 @@
         </button>
       </header>
       <section class="card essentials">
-        <h3>Project type</h3>
+        <h3>Project type<span class="required">*</span></h3>
         <label>
           <span class="no-padding">The project type of your project.</span>
           <Multiselect
@@ -35,14 +35,14 @@
             :allow-empty="false"
           />
         </label>
-        <h3>Name</h3>
+        <h3>Name<span class="required">*</span></h3>
         <label>
           <span>
             Be creative! Generic project names will be harder to search for.
           </span>
           <input v-model="name" type="text" placeholder="Enter the name" />
         </label>
-        <h3>Summary</h3>
+        <h3>Summary<span class="required">*</span></h3>
         <label>
           <span>
             Give a short description of your project that will appear on search
@@ -81,7 +81,7 @@
             placeholder="Choose categories"
           />
         </label>
-        <h3>Vanity URL (slug)</h3>
+        <h3>Vanity URL (slug)<span class="required">*</span></h3>
         <label>
           <span>
             Set this to something that will looks nice in your project's URL.
@@ -128,7 +128,7 @@
             Let others know what environments your project supports.
           </span>
           <div class="labeled-control">
-            <h3>Client</h3>
+            <h3>Client<span class="required">*</span></h3>
             <Multiselect
               v-model="clientSideType"
               placeholder="Select one"
@@ -140,7 +140,7 @@
             />
           </div>
           <div class="labeled-control">
-            <h3>Server</h3>
+            <h3>Server<span class="required">*</span></h3>
             <Multiselect
               v-model="serverSideType"
               placeholder="Select one"
@@ -276,6 +276,9 @@
             </tr>
           </tbody>
         </table>
+        <div v-if="versions.length === 0" class="no-versions-warning">
+          At least 1 version is required.
+        </div>
         <hr v-if="currentVersionIndex !== -1" />
         <div v-if="currentVersionIndex !== -1" class="new-version">
           <div class="controls">
@@ -307,7 +310,7 @@
                 placeholder="Enter the name"
               />
             </label>
-            <h3>Number</h3>
+            <h3>Number<span class="required">*</span></h3>
             <label>
               <span>
                 This is how your version will appear in project lists and URLs.
@@ -318,7 +321,7 @@
                 placeholder="Enter the number"
               />
             </label>
-            <h3>Channel</h3>
+            <h3>Channel<span class="required">*</span></h3>
             <label>
               <span>
                 It is important to notify everyone whether the version is stable
@@ -334,7 +337,7 @@
                 :allow-empty="false"
               />
             </label>
-            <h3>Mod loaders</h3>
+            <h3>Mod loaders<span class="required">*</span></h3>
             <label>
               <span> Mark all mod loaders this version works with. </span>
               <multiselect
@@ -360,7 +363,7 @@
                 placeholder="Choose mod loaders..."
               />
             </label>
-            <h3>Minecraft versions</h3>
+            <h3>Minecraft versions<span class="required">*</span></h3>
             <label>
               <span>
                 Mark all Minecraft version this project's version supports.
@@ -459,7 +462,7 @@
             </div>
           </div>
           <div class="files">
-            <h3>Files</h3>
+            <h3>Files<span class="required">*</span></h3>
             <SmartFileInput
               class="file-input"
               multiple
@@ -648,7 +651,7 @@
       <section class="card license">
         <div class="title">
           <div class="text">
-            <h3>License</h3>
+            <h3>License<span class="required">*</span></h3>
           </div>
         </div>
         <label>
@@ -1277,6 +1280,12 @@ section.versions {
     margin: 0.5rem 0;
   }
 
+  .no-versions-warning {
+    @extend .required;
+    text-align: center;
+    padding: 1rem;
+  }
+
   .new-version {
     display: grid;
     grid-template:
@@ -1538,5 +1547,9 @@ section.donations {
 
 .card {
   margin-bottom: 0;
+}
+
+.required {
+  color: var(--color-badge-red-bg);
 }
 </style>
