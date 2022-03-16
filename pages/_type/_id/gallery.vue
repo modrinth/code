@@ -5,9 +5,10 @@
       class="expanded-image-modal"
       @click="expandedGalleryItem = null"
     >
-      <div class="content" @click.stop="">
+      <div class="content">
         <img
           class="image"
+          :class="{ 'zoomed-in': zoomedIn }"
           :src="
             expandedGalleryItem.url
               ? expandedGalleryItem.url
@@ -18,12 +19,18 @@
               ? expandedGalleryItem.title
               : 'gallery-image'
           "
+          @click.stop=""
         />
 
         <div class="floating">
-          <h2 v-if="expandedGalleryItem.title">
-            {{ expandedGalleryItem.title }}
-          </h2>
+          <div class="text">
+            <h2 v-if="expandedGalleryItem.title">
+              {{ expandedGalleryItem.title }}
+            </h2>
+            <p v-if="expandedGalleryItem.description">
+              {{ expandedGalleryItem.description }}
+            </p>
+          </div>
           <div class="controls">
             <div v-if="gallery.length > 1" class="buttons">
               <button
@@ -43,6 +50,10 @@
               >
                 <ExternalIcon aria-hidden="true" />
               </a>
+              <button class="circle-button" @click="zoomedIn = !zoomedIn">
+                <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+                <ContractIcon v-else aria-hidden="true" />
+              </button>
               <button class="previous circle-button" @click="previousImage()">
                 <LeftArrowIcon aria-hidden="true" />
               </button>
@@ -232,6 +243,8 @@ import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import ExternalIcon from '~/assets/images/utils/external.svg?inline'
+import ExpandIcon from '~/assets/images/utils/expand.svg?inline'
+import ContractIcon from '~/assets/images/utils/contract.svg?inline'
 
 import SmartFileInput from '~/components/ui/SmartFileInput'
 import Checkbox from '~/components/ui/Checkbox'
@@ -249,6 +262,8 @@ export default {
     RightArrowIcon,
     LeftArrowIcon,
     ExternalIcon,
+    ExpandIcon,
+    ContractIcon,
   },
   auth: false,
   beforeRouteLeave(to, from, next) {
@@ -278,6 +293,7 @@ export default {
       deleteGalleryUrls: [],
       expandedGalleryItem: null,
       expandedGalleryIndex: 0,
+      zoomedIn: false,
     }
   },
   fetch() {
@@ -404,6 +420,7 @@ export default {
     expandImage(item, index) {
       this.expandedGalleryItem = item
       this.expandedGalleryIndex = index
+      this.zoomedIn = false
     },
   },
 }
@@ -466,37 +483,69 @@ export default {
     }
 
     .image {
-      object-fit: cover;
       position: absolute;
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
-      width: auto;
-      height: calc(100vh - 2 * var(--spacing-card-lg));
       max-width: calc(100vw - 2 * var(--spacing-card-lg));
+      max-height: calc(100vh - 2 * var(--spacing-card-lg));
       border-radius: var(--size-rounded-card);
-    }
 
+      &.zoomed-in {
+        object-fit: cover;
+        width: auto;
+        height: calc(100vh - 2 * var(--spacing-card-lg));
+        max-width: calc(100vw - 2 * var(--spacing-card-lg));
+      }
+    }
     .floating {
       position: absolute;
       left: 50%;
-      transform: translate(-50%, 0);
+      transform: translateX(-50%);
       bottom: var(--spacing-card-md);
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: var(--spacing-card-sm);
+      transition: opacity 0.25s ease-in-out;
+      opacity: 1;
+      padding: 2rem 2rem 0 2rem;
 
-      h2 {
-        margin-bottom: 0.25rem;
-        font-size: 1.25rem;
+      &:not(&:hover) {
+        opacity: 0.4;
+        .text {
+          transform: translateY(2.5rem) scale(0.8);
+          opacity: 0;
+        }
+        .controls {
+          transform: translateY(0.25rem) scale(0.9);
+        }
+      }
+
+      .text {
+        display: flex;
+        flex-direction: column;
+        max-width: 40rem;
+        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
         text-shadow: 1px 1px 10px #000000d4;
-        text-align: center;
+        margin-bottom: 0.25rem;
+        gap: 0.5rem;
+
+        h2 {
+          font-size: 1.25rem;
+          text-align: center;
+          margin: 0;
+        }
+
+        p {
+          margin: 0;
+        }
       }
       .controls {
         background-color: var(--color-raised-bg);
         padding: var(--spacing-card-md);
         border-radius: var(--size-rounded-card);
+        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
       }
     }
   }
