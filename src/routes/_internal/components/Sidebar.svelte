@@ -1,3 +1,7 @@
+<script lang="ts">
+    const components = ['button', 'pagination', 'link']
+</script>
+
 <nav class="sidebar">
     <div class="section">
         <span class="section__title">Getting started</span>
@@ -8,7 +12,7 @@
 
     <div class="section">
         <span class="section__title">Components</span>
-        {#each ['buttons', 'pagination'] as component}
+        {#each components as component}
             <a href="/components/{component}" class="section__link">{component}</a>
         {/each}
     </div>

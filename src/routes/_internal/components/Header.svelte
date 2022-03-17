@@ -10,9 +10,9 @@
         let lastScrollTop: number
         window.addEventListener('scroll', function () {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop
-            if (scrollTop > lastScrollTop) {
+            if (scrollTop > lastScrollTop && headerElement) {
                 headerElement.style.top = 'calc(var(--header-height) * -1)'
-            } else {
+            } else if (headerElement) {
                 headerElement.style.top = '0'
             }
             lastScrollTop = scrollTop

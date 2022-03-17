@@ -1,9 +1,10 @@
 ---
-title: Buttons
+title: Button
+component: Button
 ---
 
 <script lang="ts">
-    import Button from "$lib/components/elements/buttons/Button.svelte"
+    import Button from "$lib/components/Button.svelte";
 </script>
 
 <Button>Eat cake</Button>

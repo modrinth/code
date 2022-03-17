@@ -4,7 +4,7 @@
     import IconArrowRight from 'virtual:icons/heroicons-outline/arrow-right'
     import IconArrowLeft from 'virtual:icons/heroicons-outline/arrow-left'
     import IconMinus from 'virtual:icons/heroicons-outline/minus'
-    import Button from "./buttons/Button.svelte";
+    import Button from "./Button.svelte";
     import { createEventDispatcher } from 'svelte'
 
     export let page: number;
