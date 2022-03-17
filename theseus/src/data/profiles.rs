@@ -1,4 +1,5 @@
 use super::DataError;
+use crate::launcher::ModLoader;
 use daedalus::{minecraft::JavaVersion, modded::LoaderVersion};
 use futures::*;
 use once_cell::sync::OnceCell;
@@ -16,7 +17,9 @@ use tokio::{
 
 static PROFILES: OnceCell<RwLock<Profiles>> = OnceCell::new();
 pub const PROFILE_JSON_PATH: &str = "profile.json";
-pub struct Profiles(HashMap<PathBuf, Profile>);
+
+#[derive(Debug)]
+pub struct Profiles(pub HashMap<PathBuf, Profile>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -42,6 +45,8 @@ pub struct Metadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<PathBuf>,
     pub game_version: String,
+    #[serde(default)]
+    pub loader: ModLoader,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
@@ -49,7 +54,7 @@ pub struct Metadata {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JavaSettings {
-    pub install: PathBuf,
+    pub install: Option<PathBuf>,
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     pub extra_arguments: Vec<String>,
 }
@@ -105,8 +110,14 @@ impl Profile {
         version: String,
         path: PathBuf,
     ) -> Result<Self, DataError> {
+        if name.trim().is_empty() {
+            return Err(DataError::FormatError(String::from(
+                "Empty name for instance!",
+            )));
+        }
+
         let version_id = version.clone();
-        let (settings, version_info) = try_join! {
+        let (settings, version_info) = tokio::try_join! {
             super::Settings::get(),
             super::Metadata::get()
                 .and_then(|manifest| async move {
@@ -116,8 +127,9 @@ impl Profile {
                         .iter()
                         .find(|it| it.id == version_id)
                         .ok_or(DataError::FormatError(
-                            format!("invalid version: {version_id}"))
+                            format!("invalid or unknown version: {version_id}"))
                         )?;
+
                     Ok(daedalus::minecraft::fetch_version_info(version).await?)
                 }),
         }?;
@@ -128,20 +140,20 @@ impl Profile {
             }
             _ => settings.java_8_path.as_ref(),
         }
-        .filter(|it| it.exists())
-        .ok_or(DataError::JavaError)?;
+        .filter(|it| it.exists());
 
         Ok(Self {
-            path: path.clone(),
+            path: path.canonicalize()?,
             metadata: Metadata {
                 name,
                 icon: None,
                 game_version: version,
+                loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
             },
             java: JavaSettings {
-                install: java_install.clone(),
+                install: java_install.cloned(),
                 extra_arguments: settings.custom_java_args.clone(),
             },
             memory: settings.memory.clone(),
@@ -152,8 +164,9 @@ impl Profile {
 
     pub async fn run(
         &self,
-        credentials: crate::launcher::Credentials,
+        credentials: &crate::launcher::Credentials,
     ) -> Result<Child, crate::launcher::LauncherError> {
+        use crate::launcher::LauncherError;
         for hook in &self.hooks.pre_launch {
             // TODO: hook parameters
             let mut cmd = hook.split(' ');
@@ -165,22 +178,34 @@ impl Profile {
                 .await?;
 
             if !result.success() {
-                return Err(crate::launcher::LauncherError::ExitError(
+                return Err(LauncherError::ExitError(
                     result.code().unwrap_or(-1),
                 ));
             }
+        }
+
+        let java_install = self.java.install.as_ref().ok_or(
+            LauncherError::JavaError(String::from(
+                "No Java installation associated with this profile!",
+            )),
+        )?;
+        if !java_install.exists() {
+            return Err(LauncherError::JavaError(format!(
+                "No Java install found at {}",
+                java_install.display()
+            )));
         }
 
         crate::launcher::launch_minecraft(
             &self.metadata.game_version,
             &self.metadata.loader_version,
             &self.path,
-            &self.java.install,
+            &java_install,
             &self.java.extra_arguments,
             &self.hooks.wrapper,
             &self.memory,
             &self.resolution,
-            &credentials,
+            credentials,
         )
         .await
     }
@@ -189,7 +214,7 @@ impl Profile {
         &self,
         running: &mut Child,
     ) -> Result<(), crate::launcher::LauncherError> {
-        running.kill().await;
+        running.kill().await?;
         self.wait_for(running).await
     }
 
@@ -222,27 +247,18 @@ impl Profile {
     pub async fn with_icon(
         &mut self,
         icon: &Path,
-        icon_name: &str,
-        overwrite: bool,
     ) -> Result<&mut Self, DataError> {
         let ext = icon
             .extension()
             .and_then(std::ffi::OsStr::to_str)
             .unwrap_or("");
-        let settings = super::Settings::get().await?;
 
         if SUPPORTED_ICON_FORMATS.contains(&ext) {
-            let new_path =
-                settings.icon_path.join(format!("{icon_name}.{ext}"));
+            let file_name = format!("icon.{ext}");
+            fs::copy(icon, &self.path.join(&file_name)).await?;
+            self.metadata.icon =
+                Some(Path::new(&format!("./{file_name}")).to_owned());
 
-            if new_path.exists() && !overwrite {
-                return Err(DataError::IconOverwrite(String::from(
-                    new_path.to_string_lossy(),
-                )));
-            }
-
-            fs::copy(icon, &new_path).await?;
-            self.metadata.icon = Some(new_path);
             Ok(self)
         } else {
             Err(DataError::FormatError(format!(
@@ -256,16 +272,18 @@ impl Profile {
         self
     }
 
-    pub fn with_loader_version(
+    pub fn with_loader(
         &mut self,
+        loader: ModLoader,
         version: Option<LoaderVersion>,
     ) -> &mut Self {
+        self.metadata.loader = loader;
         self.metadata.loader_version = version;
         self
     }
 
     pub fn with_java_install(&mut self, path: PathBuf) -> &mut Self {
-        self.java.install = path;
+        self.java.install = Some(path);
         self
     }
 
@@ -323,12 +341,10 @@ impl Profiles {
         let futures = settings.profiles.clone().into_iter().map(|path| async {
             let profiles = Arc::clone(&profiles);
             tokio::spawn(async move {
-                let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
-                let mut profile = serde_json::from_slice::<Profile>(&json)?;
-                profile.path = path.clone();
-
                 let mut profiles = profiles.lock().await;
-                profiles.insert(PathBuf::from(path), profile);
+                let profile = Self::read_profile_from_dir(path.clone()).await?;
+
+                profiles.insert(path, profile);
                 Ok(()) as Result<_, DataError>
             })
             .await
@@ -345,15 +361,31 @@ impl Profiles {
     }
 
     pub async fn insert(profile: Profile) -> Result<(), DataError> {
-        let mut profiles = PROFILES.get().unwrap().write().await;
-        let path = profile.path.clone();
+        let mut profiles = PROFILES
+            .get()
+            .ok_or_else(|| {
+                DataError::InitializedError(String::from("profiles"))
+            })?
+            .write()
+            .await;
 
-        profiles.0.insert(path, profile);
+        super::Settings::get_mut()
+            .await?
+            .profiles
+            .insert(profile.path.clone());
+        profiles.0.insert(profile.path.clone(), profile);
         Ok(())
+    }
+
+    pub async fn insert_from(path: PathBuf) -> Result<(), DataError> {
+        Self::read_profile_from_dir(path)
+            .and_then(Self::insert)
+            .await
     }
 
     pub async fn remove(path: &Path) -> Result<Option<Profile>, DataError> {
         let mut profiles = PROFILES.get().unwrap().write().await;
+        super::Settings::get_mut().await?.profiles.remove(path);
         Ok(profiles.0.remove(path))
     }
 
@@ -363,12 +395,13 @@ impl Profiles {
         let futures = profiles.0.clone().into_iter().map(|(path, profile)| {
             tokio::spawn(async move {
                 let json = tokio::task::spawn_blocking(move || {
-                    serde_json::to_vec(&profile)
+                    serde_json::to_vec_pretty(&profile)
                 })
                 .await
                 .unwrap()?;
 
-                fs::write(path, json).await?;
+                let profile_json_path = path.join(PROFILE_JSON_PATH);
+                fs::write(profile_json_path, json).await?;
                 Ok(()) as Result<(), DataError>
             })
         });
@@ -388,6 +421,15 @@ impl Profiles {
             .read()
             .await)
     }
+
+    async fn read_profile_from_dir(
+        path: PathBuf,
+    ) -> Result<Profile, DataError> {
+        let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
+        let mut profile = serde_json::from_slice::<Profile>(&json)?;
+        profile.path = path.clone();
+        Ok(profile)
+    }
 }
 
 #[cfg(test)]
@@ -403,6 +445,7 @@ mod tests {
                 name: String::from("Example Pack"),
                 icon: None,
                 game_version: String::from("1.18.2"),
+                loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
             },

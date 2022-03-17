@@ -78,8 +78,14 @@ impl Metadata {
                 "{}/minecraft/v0/manifest.json",
                 META_URL
             ))),
-            daedalus::modded::fetch_manifest(&format!("{}/forge/v0/manifest.json", META_URL)),
-            daedalus::modded::fetch_manifest(&format!("{}/fabric/v0/manifest.json", META_URL)),
+            daedalus::modded::fetch_manifest(&format!(
+                "{}/forge/v0/manifest.json",
+                META_URL
+            )),
+            daedalus::modded::fetch_manifest(&format!(
+                "{}/fabric/v0/manifest.json",
+                META_URL
+            )),
         )
         .await;
 
@@ -91,10 +97,12 @@ impl Metadata {
     }
 
     pub async fn get<'a>() -> Result<RwLockReadGuard<'a, Self>, DataError> {
-        Ok(METADATA
+        let res = METADATA
             .get()
             .ok_or_else(|| DataError::InitializedError("metadata".to_string()))?
             .read()
-            .await)
+            .await;
+
+        Ok(res)
     }
 }

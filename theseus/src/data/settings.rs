@@ -1,10 +1,13 @@
 use super::profiles::*;
-use std::path::{Path, PathBuf};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+};
 
 use crate::{data::DataError, LAUNCHER_WORK_DIR};
 use once_cell::sync;
 use serde::{Deserialize, Serialize};
-use tokio::sync::{RwLock, RwLockReadGuard};
+use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 
 const SETTINGS_FILE: &str = "settings.json";
 const ICONS_PATH: &str = "icons";
@@ -23,7 +26,8 @@ pub struct Settings {
     pub hooks: ProfileHooks,
     pub icon_path: PathBuf,
     pub metadata_dir: PathBuf,
-    pub profiles: Vec<PathBuf>,
+    pub profiles: HashSet<PathBuf>,
+    pub version: u32,
 }
 
 impl Default for Settings {
@@ -37,7 +41,8 @@ impl Default for Settings {
             hooks: ProfileHooks::default(),
             icon_path: Path::new(LAUNCHER_WORK_DIR).join(ICONS_PATH),
             metadata_dir: Path::new(LAUNCHER_WORK_DIR).join(METADATA_DIR),
-            profiles: Vec::new(),
+            profiles: HashSet::new(),
+            version: FORMAT_VERSION,
         }
     }
 }
@@ -99,10 +104,17 @@ impl Settings {
     }
 
     pub async fn get<'a>() -> Result<RwLockReadGuard<'a, Self>, DataError> {
-        Ok(SETTINGS
+        Ok(Self::get_or_uninit::<'a>()?.read().await)
+    }
+
+    pub async fn get_mut<'a>() -> Result<RwLockWriteGuard<'a, Self>, DataError>
+    {
+        Ok(Self::get_or_uninit::<'a>()?.write().await)
+    }
+
+    fn get_or_uninit<'a>() -> Result<&'a RwLock<Self>, DataError> {
+        SETTINGS
             .get()
-            .ok_or_else(|| DataError::InitializedError("settings".to_string()))?
-            .read()
-            .await)
+            .ok_or_else(|| DataError::InitializedError("settings".to_string()))
     }
 }

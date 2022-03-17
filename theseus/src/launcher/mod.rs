@@ -8,9 +8,8 @@ use tokio::process::{Child, Command};
 pub use crate::launcher::auth::provider::Credentials;
 
 mod args;
-mod auth;
+pub mod auth;
 mod download;
-mod java;
 mod rules;
 
 #[derive(Error, Debug)]
@@ -62,6 +61,7 @@ pub enum LauncherError {
     ExitError(i32),
 }
 
+// TODO: this probably should be in crate::data
 #[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
 #[serde(rename_all = "lowercase")]
 pub enum ModLoader {
@@ -76,6 +76,18 @@ impl Default for ModLoader {
     }
 }
 
+impl std::fmt::Display for ModLoader {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let repr = match self {
+            &Self::Vanilla => "Vanilla",
+            &Self::Forge => "Forge",
+            &Self::Fabric => "Fabric",
+        };
+
+        f.write_str(repr)
+    }
+}
+
 pub async fn launch_minecraft(
     game_version: &str,
     loader_version: &Option<LoaderVersion>,
@@ -85,16 +97,22 @@ pub async fn launch_minecraft(
     wrapper: &Option<String>,
     memory: &crate::data::profiles::MemorySettings,
     resolution: &crate::data::profiles::WindowSize,
-    credentials: &crate::launcher::Credentials,
+    credentials: &Credentials,
 ) -> Result<Child, LauncherError> {
     let (metadata, settings) = futures::try_join! {
         crate::data::Metadata::get(),
         crate::data::Settings::get(),
     }?;
-    let root_dir = crate::util::absolute_path(root_dir)?;
+    let root_dir = root_dir.canonicalize()?;
     let metadata_dir = &settings.metadata_dir;
 
-    let (versions_path, libraries_path, assets_path, legacy_assets_path, natives_path) = (
+    let (
+        versions_path,
+        libraries_path,
+        assets_path,
+        legacy_assets_path,
+        natives_path,
+    ) = (
         metadata_dir.join("versions"),
         metadata_dir.join("libraries"),
         metadata_dir.join("assets"),
@@ -107,18 +125,26 @@ pub async fn launch_minecraft(
         .versions
         .iter()
         .find(|it| it.id == game_version)
-        .ok_or(LauncherError::InvalidInput(format!(
-            "Invalid game version: {game_version}",
-        )))?;
+        .ok_or_else(|| {
+            LauncherError::InvalidInput(format!(
+                "Invalid game version: {game_version}",
+            ))
+        })?;
 
     let version_jar = loader_version
-        .clone()
-        .map_or(String::from(game_version), |it| it.id.clone());
-    let mut version =
-        download::download_version_info(&versions_path, version, loader_version.as_ref()).await?;
+        .as_ref()
+        .map_or(version.id.clone(), |it| it.id.clone());
+
+    let mut version = download::download_version_info(
+        &versions_path,
+        version,
+        loader_version.as_ref(),
+    )
+    .await?;
+
     let client_path = versions_path
         .join(&version.id)
-        .join(format!("{}.jar", &version.id));
+        .join(format!("{}.jar", &version_jar));
     let version_natives_path = natives_path.join(&version.id);
 
     download_minecraft(
@@ -216,6 +242,7 @@ pub async fn launch_minecraft(
         }
     }
 
+    let arguments = version.arguments.unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
             let mut cmd = Command::new(hook);
@@ -225,13 +252,16 @@ pub async fn launch_minecraft(
         None => Command::new(java.to_string_lossy().to_string()),
     };
 
-    let arguments = version.arguments.unwrap_or_default();
     command
         .args(args::get_jvm_arguments(
             arguments.get(&ArgumentType::Jvm).map(|x| x.as_slice()),
             &version_natives_path,
             &libraries_path,
-            &args::get_class_paths(&libraries_path, version.libraries.as_slice(), &client_path)?,
+            &args::get_class_paths(
+                &libraries_path,
+                version.libraries.as_slice(),
+                &client_path,
+            )?,
             &version_jar,
             *memory,
             java_args.clone(),
@@ -258,251 +288,6 @@ pub async fn launch_minecraft(
     })
 }
 
-pub async fn launch_minecraft_old(
-    version_name: &str,
-    mod_loader: Option<ModLoader>,
-    root_dir: &Path,
-    credentials: &Credentials,
-) -> Result<(), LauncherError> {
-    let metadata = crate::data::Metadata::get().await?;
-    let settings = crate::data::Settings::get().await?;
-
-    let versions_path = crate::util::absolute_path(root_dir.join("versions"))?;
-    let libraries_path = crate::util::absolute_path(root_dir.join("libraries"))?;
-    let assets_path = crate::util::absolute_path(root_dir.join("assets"))?;
-    let legacy_assets_path = crate::util::absolute_path(root_dir.join("resources"))?;
-
-    let version = metadata
-        .minecraft
-        .versions
-        .iter()
-        .find(|x| x.id == version_name)
-        .ok_or_else(|| {
-            LauncherError::InvalidInput(format!("Version {} does not exist", version_name))
-        })?;
-
-    let loader_version = match mod_loader.unwrap_or_default() {
-        ModLoader::Vanilla => None,
-        ModLoader::Forge | ModLoader::Fabric => {
-            let loaders = if mod_loader.unwrap_or_default() == ModLoader::Forge {
-                &metadata
-                    .forge
-                    .game_versions
-                    .iter()
-                    .find(|x| x.id == version_name)
-                    .ok_or_else(|| {
-                        LauncherError::InvalidInput(format!(
-                            "Version {} for mod loader Forge does not exist",
-                            version_name
-                        ))
-                    })?
-                    .loaders
-            } else {
-                &metadata
-                    .fabric
-                    .game_versions
-                    .iter()
-                    .find(|x| x.id == version_name)
-                    .ok_or_else(|| {
-                        LauncherError::InvalidInput(format!(
-                            "Version {} for mod loader Fabric does not exist",
-                            version_name
-                        ))
-                    })?
-                    .loaders
-            };
-
-            let loader = if let Some(version) = loaders.iter().find(|x| x.stable) {
-                Some(version.clone())
-            } else {
-                loaders.first().cloned()
-            };
-
-            Some(loader.ok_or_else(|| {
-                LauncherError::InvalidInput(format!(
-                    "No mod loader version found for version {}",
-                    version_name
-                ))
-            })?)
-        }
-    };
-
-    let version_jar_name = if let Some(loader) = &loader_version {
-        loader.id.clone()
-    } else {
-        version.id.clone()
-    };
-
-    let mut version =
-        download::download_version_info(&versions_path, version, loader_version.as_ref()).await?;
-
-    let java_path = if let Some(java) = &version.java_version {
-        if java.major_version == 17 || java.major_version == 16 {
-            settings.java_17_path.as_deref().ok_or_else(|| LauncherError::JavaError("Please install Java 17 or select your Java 17 installation settings before launching this version!".to_string()))?
-        } else {
-            &settings.java_8_path.as_deref().ok_or_else(|| LauncherError::JavaError("Please install Java 8 or select your Java 8 installation settings before launching this version!".to_string()))?
-        }
-    } else {
-        &settings.java_8_path.as_deref().ok_or_else(|| LauncherError::JavaError("Please install Java 8 or select your Java 8 installation settings before launching this version!".to_string()))?
-    };
-
-    let client_path = crate::util::absolute_path(
-        root_dir
-            .join("versions")
-            .join(&version.id)
-            .join(format!("{}.jar", &version.id)),
-    )?;
-    let natives_path = crate::util::absolute_path(root_dir.join("natives").join(&version.id))?;
-
-    download_minecraft(
-        &version,
-        &versions_path,
-        &assets_path,
-        &legacy_assets_path,
-        &libraries_path,
-        &natives_path,
-    )
-    .await?;
-
-    if let Some(processors) = &version.processors {
-        if let Some(ref mut data) = version.data {
-            data.insert(
-                "SIDE".to_string(),
-                daedalus::modded::SidedDataEntry {
-                    client: "client".to_string(),
-                    server: "".to_string(),
-                },
-            );
-            data.insert(
-                "MINECRAFT_JAR".to_string(),
-                daedalus::modded::SidedDataEntry {
-                    client: client_path.to_string_lossy().to_string(),
-                    server: "".to_string(),
-                },
-            );
-            data.insert(
-                "MINECRAFT_VERSION".to_string(),
-                daedalus::modded::SidedDataEntry {
-                    client: version_name.to_string(),
-                    server: "".to_string(),
-                },
-            );
-            data.insert(
-                "ROOT".to_string(),
-                daedalus::modded::SidedDataEntry {
-                    client: root_dir.to_string_lossy().to_string(),
-                    server: "".to_string(),
-                },
-            );
-            data.insert(
-                "LIBRARY_DIR".to_string(),
-                daedalus::modded::SidedDataEntry {
-                    client: libraries_path.to_string_lossy().to_string(),
-                    server: "".to_string(),
-                },
-            );
-
-            for processor in processors {
-                if let Some(sides) = &processor.sides {
-                    if !sides.contains(&"client".to_string()) {
-                        continue;
-                    }
-                }
-
-                let mut cp = processor.classpath.clone();
-                cp.push(processor.jar.clone());
-
-                let child = Command::new("java")
-                    .arg("-cp")
-                    .arg(args::get_class_paths_jar(&libraries_path, &cp)?)
-                    .arg(
-                        args::get_processor_main_class(args::get_lib_path(
-                            &libraries_path,
-                            &processor.jar,
-                        )?)
-                        .await?
-                        .ok_or_else(|| {
-                            LauncherError::ProcessorError(format!(
-                                "Could not find processor main class for {}",
-                                processor.jar
-                            ))
-                        })?,
-                    )
-                    .args(args::get_processor_arguments(
-                        &libraries_path,
-                        &processor.args,
-                        data,
-                    )?)
-                    .output()
-                    .await
-                    .map_err(|err| LauncherError::ProcessError {
-                        inner: err,
-                        process: "java".to_string(),
-                    })?;
-
-                if !child.status.success() {
-                    return Err(LauncherError::ProcessorError(
-                        String::from_utf8_lossy(&child.stderr).to_string(),
-                    ));
-                }
-            }
-        }
-    }
-
-    let arguments = version.arguments.unwrap_or_default();
-
-    let mut command = Command::new(if let Some(wrapper) = &settings.hooks.wrapper {
-        wrapper.clone()
-    } else {
-        String::from(java_path.to_string_lossy())
-    });
-
-    if settings.hooks.wrapper.is_some() {
-        command.arg(java_path);
-    }
-
-    command
-        .args(args::get_jvm_arguments(
-            arguments.get(&ArgumentType::Jvm).map(|x| x.as_slice()),
-            &natives_path,
-            &libraries_path,
-            &args::get_class_paths(&libraries_path, version.libraries.as_slice(), &client_path)?,
-            &version_jar_name,
-            settings.memory,
-            settings.custom_java_args.iter().map(String::from).collect(),
-        )?)
-        .arg(version.main_class)
-        .args(args::get_minecraft_arguments(
-            arguments.get(&ArgumentType::Game).map(|x| x.as_slice()),
-            version.minecraft_arguments.as_deref(),
-            credentials,
-            &version.id,
-            &version.asset_index.id,
-            root_dir,
-            &assets_path,
-            &version.type_,
-            settings.game_resolution,
-        )?)
-        .current_dir(root_dir)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
-
-    let mut child = command.spawn().map_err(|err| LauncherError::ProcessError {
-        inner: err,
-        process: "minecraft".to_string(),
-    })?;
-
-    child
-        .wait()
-        .await
-        .map_err(|err| LauncherError::ProcessError {
-            inner: err,
-            process: "minecraft".to_string(),
-        })?;
-
-    Ok(())
-}
-
 pub async fn download_minecraft(
     version: &VersionInfo,
     versions_dir: &Path,
@@ -511,7 +296,8 @@ pub async fn download_minecraft(
     libraries_dir: &Path,
     natives_dir: &Path,
 ) -> Result<(), LauncherError> {
-    let assets_index = download::download_assets_index(assets_dir, version).await?;
+    let assets_index =
+        download::download_assets_index(assets_dir, version).await?;
 
     let (a, b, c) = futures::future::join3(
         download::download_client(versions_dir, version),
@@ -524,7 +310,11 @@ pub async fn download_minecraft(
             },
             &assets_index,
         ),
-        download::download_libraries(libraries_dir, natives_dir, version.libraries.as_slice()),
+        download::download_libraries(
+            libraries_dir,
+            natives_dir,
+            version.libraries.as_slice(),
+        ),
     )
     .await;
 

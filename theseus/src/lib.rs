@@ -3,11 +3,11 @@
 //! Theseus is a library which provides utilities for launching minecraft, creating Modrinth mod packs,
 //! and launching Modrinth mod packs
 
-#![warn(missing_docs, unused_import_braces, missing_debug_implementations)]
+#![warn(unused_import_braces, missing_debug_implementations)]
 
 static LAUNCHER_WORK_DIR: &'static str = "./launcher";
 
-mod data;
+pub mod data;
 pub mod launcher;
 pub mod modpack;
 mod util;
@@ -33,5 +33,12 @@ pub async fn init() -> Result<(), Error> {
     Settings::init().await?;
     Profiles::init().await?;
 
+    Ok(())
+}
+
+pub async fn save() -> Result<(), Error> {
+    use crate::data::*;
+    Settings::save().await?;
+    Profiles::save().await?;
     Ok(())
 }
