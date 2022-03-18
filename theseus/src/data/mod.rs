@@ -7,6 +7,7 @@ pub use settings::Settings;
 mod meta;
 pub mod profiles;
 mod settings;
+pub mod versions;
 
 #[derive(thiserror::Error, Debug)]
 pub enum DataError {

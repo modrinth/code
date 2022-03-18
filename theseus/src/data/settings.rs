@@ -97,7 +97,7 @@ impl Settings {
 
         std::fs::write(
             Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
-            &serde_json::to_string(&*settings)?,
+            &serde_json::to_string_pretty(&*settings)?,
         )?;
 
         Ok(())
