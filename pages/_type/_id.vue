@@ -565,9 +565,18 @@ export default {
             `project/${data.params.id}/members`,
             data.$auth.headers
           ),
-          data.$axios.get(`project/${data.params.id}/dependencies`),
-          data.$axios.get(`project/${data.params.id}/version`),
-          data.$axios.get(`project/${data.params.id}/version?featured=true`),
+          data.$axios.get(
+            `project/${data.params.id}/dependencies`,
+            data.$auth.headers
+          ),
+          data.$axios.get(
+            `project/${data.params.id}/version`,
+            data.$auth.headers
+          ),
+          data.$axios.get(
+            `project/${data.params.id}/version?featured=true`,
+            data.$auth.headers
+          ),
         ])
       ).map((it) => it.data)
 
