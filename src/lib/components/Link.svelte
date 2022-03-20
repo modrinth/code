@@ -6,6 +6,10 @@
 
 <style lang="postcss">
     a {
-        color: blue;
+        color: var(--color-link);
+
+        &:hover {
+            text-decoration: underline;
+        }
     }
 </style>

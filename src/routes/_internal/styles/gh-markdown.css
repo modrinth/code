@@ -198,6 +198,7 @@ blockquote > :last-child {
 table {
     padding: 0;
 }
+
 table tr {
     border-top: 1px solid #cccccc;
     background-color: white;
@@ -341,24 +342,13 @@ pre code {
     background: transparent;
 }
 
-.highlight pre {
-    background-color: #f8f8f8;
-    border: 1px solid #cccccc;
-    font-size: 13px;
-    line-height: 19px;
-    overflow: auto;
-    padding: 6px 10px;
-    border-radius: 3px;
-}
-
 pre {
     background-color: #f8f8f8;
-    border: 1px solid #cccccc;
     font-size: 13px;
     line-height: 19px;
     overflow: auto;
     padding: 6px 10px;
-    border-radius: 3px;
+    border-radius: var(--rounded-sm) !important;
 }
 
 pre code, pre tt {
@@ -367,7 +357,6 @@ pre code, pre tt {
 }
 
 /* Custom styles */
-
 h1 {
     font-weight: 600;
 }

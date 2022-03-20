@@ -1,5 +1,5 @@
 <script lang="ts">
-    const components = ['button', 'pagination', 'link']
+    const components = ['Button', 'Pagination', 'Link', 'NavRow', 'Badge', 'Avatar'].sort()
 </script>
 
 <nav class="sidebar">
@@ -43,7 +43,6 @@
             }
 
             &__link {
-                text-transform: capitalize;
                 color: hsl(216, 10%, 90%);
                 text-decoration: none;
 

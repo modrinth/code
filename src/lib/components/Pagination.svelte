@@ -1,5 +1,5 @@
 <script lang="ts">
-    // TODO: Modify to match new button props
+    // TODO: Fix mobile support, currently just cuts off buttons
 
     import IconArrowRight from 'virtual:icons/heroicons-outline/arrow-right'
     import IconArrowLeft from 'virtual:icons/heroicons-outline/arrow-left'

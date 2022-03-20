@@ -1,323 +1,145 @@
 <script lang="ts">
-    export let as: 'button' | 'a' | 'summary' | 'input'  = 'button'
+    import { classCombine } from '$lib/utils/classCombine'
+
+    // The element to be styled as a button
+    export let as: 'button' | 'a' | 'summary' | 'input' = 'button'
     export let href: string
     if (href) as = 'a'
 
     // Use `value` if the button is an `<input`>
-    export let value: string;
+    export let value: string
 
     export let size: 'sm' | 'md' | 'lg' = 'md'
-    export let color: 'raised' | 'primary' | 'danger';
+    export let color: 'raised' | 'primary' | 'primary-light' | 'danger'| 'danger-light' | 'transparent'
 
-    let className = `btn btn--${size}`;
-    className += color && (` btn--${color}`)
+    // Show notification badge in the upper right of button
+    export let badge = false
+
+    export let disabled = false
+
+    let className: string
+    $: className = classCombine(['button', `button--size-${size}`, `button--color-${color}`, badge && 'has-badge'])
 </script>
 
 {#if as === 'button'}
-    <button class={className}>
-        <slot />
+    <button class={className} {disabled}>
+        <slot/>
     </button>
 {:else if as === 'a'}
-    <a class={className} {href}>
-        <slot />
+    <a class={className} {href} {disabled}>
+        <slot/>
     </a>
 {:else if as === 'summary'}
-    <summary class={className}>
-        <slot />
+    <summary class={className} {disabled}>
+        <slot/>
     </summary>
 {:else if as === 'input'}
-    <input class={className} {value} />
+    <input class={className} {value} {disabled}/>
 {/if}
 
 <style lang="postcss">
-  /* Base button styles */
-  .btn {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 5px var(--spacer-3);
-      font-size: var(--body-font-size);
-      font-weight: var(--font-weight-semibold);
-      line-height: 20px; /* Specifically not inherit our `<body>` default */
-      white-space: nowrap;
-      vertical-align: middle;
-      cursor: pointer;
-      user-select: none;
-      border: var(--border-width) var(--border-style);
-      border-radius: var(--radii-2);
-      appearance: none; /* Corrects inability to style clickable `input` types in iOS. */
+    .button {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        padding: 0.25rem 1rem;
+        grid-gap: 0.4rem;
+        cursor: pointer;
+        position: relative;
 
-      &:hover {
-          text-decoration: none;
-      }
+        box-shadow: var(--shadow-inset-sm);
 
-      &:disabled,
-      &.disabled,
-      &[aria-disabled='true'] {
-          cursor: default;
-      }
+        background-color: var(--color-button-bg);
+        border-radius: var(--rounded);
+        transition: opacity 0.5s ease-in-out, filter 0.5s ease-in-out;
 
-      i {
-          font-style: normal;
-          font-weight: var(--font-weight-semibold);
-          opacity: 0.75;
-      }
+        &:hover {
+            background-color: var(--color-button-bg-hover);
+        }
 
-    .icon {
-      margin-right: var(--spacer-1);
-      color: var(--color-fg-muted);
+        &--color {
+            &-raised {
+                background-color: var(--color-raised-bg);
 
-      &:only-child {
-        margin-right: 0;
-      }
+                &:hover {
+                    background-color: var(--color-raised-bg-hover);
+                }
+            }
+
+            &-primary {
+                background-color: var(--color-brand);
+                color: var(--color-brand-contrast);
+
+                &:hover {
+                    background-color: var(--color-brand-dark);
+                }
+            }
+
+            &-primary-light {
+                background-color: var(--color-brand-light);
+                transition: filter 0s ease-in-out;
+
+                &:hover {
+                    background-color: var(--color-brand-light);
+                    filter: brightness(0.9);
+                }
+            }
+
+            &-transparent {
+                background-color: transparent;
+                box-shadow: none;
+            }
+
+            &-danger {
+                background-color: var(--color-badge-red-dot);
+                color: var(--color-brand-contrast);
+
+                &:hover {
+                    background-color: var(--color-badge-red-text);
+                }
+            }
+
+            &-danger-light {
+                color: var(--color-danger-text);
+                transition: filter 0s ease-in-out;
+
+                &:hover {
+                    filter: brightness(0.9);
+                }
+            }
+        }
+
+        &:disabled {
+            opacity: 50%;
+            cursor: not-allowed;
+            filter: grayscale(50%);
+
+            /* Not ideal, but preventing events being fired needs to be implemented */
+            pointer-events: none;
+        }
+
+        &--pad-even {
+            padding: 0.5rem;
+            font-size: 1rem;
+            line-height: 0;
+            min-width: 2rem;
+            min-height: 2rem;
+            justify-content: center;
+        }
+
+        &.is-iconified {
+            padding: 0.25rem 0.75rem;
+        }
+
+        &.has-badge::after {
+            content: '';
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: var(--rounded-max);
+            background-color: var(--color-brand);
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+        }
     }
-
-    .Counter {
-      margin-left: 2px;
-      color: inherit;
-      text-shadow: none;
-      vertical-align: top;
-      background-color: var(--color-btn-counter-bg);
-    }
-
-    .dropdown-caret {
-      margin-left: var(--spacer-1);
-      opacity: 0.8;
-    }
-  }
-
-  /* Default button */
-  .btn {
-    color: var(--color-btn-text);
-    background-color: var(--color-btn-bg);
-    border-color: var(--color-btn-border);
-    box-shadow: var(--color-btn-shadow), var(--color-btn-inset-shadow);
-    transition: 0.2s cubic-bezier(0.3, 0, 0.5, 1);
-    transition-property: color, background-color, border-color;
-
-    &:hover,
-    &.hover,
-    [open] > & {
-      background-color: var(--color-btn-hover-bg);
-      border-color: var(--color-btn-hover-border);
-      transition-duration: 0.1s;
-    }
-
-    &:active {
-      background-color: var(--color-btn-active-bg);
-      border-color: var(--color-btn-active-border);
-      transition: none;
-    }
-
-    &.selected,
-    &[aria-selected='true'] {
-      background-color: var(--color-btn-selected-bg);
-      box-shadow: var(--color-primer-shadow-inset);
-    }
-
-    &:disabled,
-    &.disabled,
-    &[aria-disabled='true'] {
-      color: var(--color-primer-fg-disabled);
-      background-color: var(--color-btn-bg);
-      border-color: var(--color-btn-border);
-
-      :global(.icon) {
-        color: var(--color-primer-fg-disabled);
-      }
-    }
-
-    /* Keep :focus after :disabled. Allows to see the focus ring even on disabled buttons */
-    &:focus,
-    &.focus {
-      border-color: var(--color-btn-focus-border);
-      outline: none;
-      box-shadow: var(--color-btn-focus-shadow);
-    }
-  }
-
-  /* Primary button */
-  .btn--primary {
-    color: var(--color-btn-primary-text);
-    background-color: var(--color-btn-primary-bg);
-    border-color: var(--color-btn-primary-border);
-    box-shadow: var(--color-btn-primary-shadow), var(--color-btn-primary-inset-shadow);
-
-    &:hover,
-    &.hover,
-    [open] > & {
-      background-color: var(--color-btn-primary-hover-bg);
-      border-color: var(--color-btn-primary-hover-border);
-    }
-
-    &:active,
-    &.selected,
-    &[aria-selected='true'] {
-      background-color: var(--color-btn-primary-selected-bg);
-      box-shadow: var(--color-btn-primary-selected-shadow);
-    }
-
-    &:disabled,
-    &.disabled,
-    &[aria-disabled='true'] {
-      color: var(--color-btn-primary-disabled-text);
-      background-color: var(--color-btn-primary-disabled-bg);
-      border-color: var(--color-btn-primary-disabled-border);
-
-      :global(.icon) {
-        color: var(--color-btn-primary-disabled-text);
-      }
-    }
-
-    &:focus,
-    &.focus {
-      background-color: var(--color-btn-primary-focus-bg);
-      border-color: var(--color-btn-primary-focus-border);
-      box-shadow: var(--color-btn-primary-focus-shadow);
-    }
-
-    .Counter {
-      color: inherit;
-      background-color: var(--color-btn-primary-counter-bg);
-    }
-
-    :global(.icon) {
-      color: var(--color-btn-primary-icon);
-    }
-  }
-
-  /* Outline button */
-  .btn--outline {
-    color: var(--color-btn-outline-text);
-
-    &:hover,
-    [open] > & {
-      color: var(--color-btn-outline-hover-text);
-      background-color: var(--color-btn-outline-hover-bg);
-      border-color: var(--color-btn-outline-hover-border);
-      box-shadow: var(--color-btn-outline-hover-shadow), var(--color-btn-outline-hover-inset-shadow);
-
-      .Counter {
-        background-color: var(--color-btn-outline-hover-counter-bg);
-      }
-
-      :global(.icon) {
-        color: inherit;
-      }
-    }
-
-    &:active,
-    &.selected,
-    &[aria-selected='true'] {
-      color: var(--color-btn-outline-selected-text);
-      background-color: var(--color-btn-outline-selected-bg);
-      border-color: var(--color-btn-outline-selected-border);
-      box-shadow: var(--color-btn-outline-selected-shadow);
-    }
-
-    &:disabled,
-    &.disabled,
-    &[aria-disabled='true'] {
-      color: var(--color-btn-outline-disabled-text);
-      background-color: var(--color-btn-outline-disabled-bg);
-      border-color: var(--color-btn-border);
-      box-shadow: none;
-
-      .Counter {
-        background-color: var(--color-btn-outline-disabled-counter-bg);
-      }
-    }
-
-    &:focus {
-      border-color: var(--color-btn-outline-focus-border);
-      box-shadow: var(--color-btn-outline-focus-shadow);
-    }
-
-    .Counter {
-      color: inherit;
-      background-color: var(--color-btn-outline-counter-bg);
-    }
-  }
-
-  /* Danger button */
-  .btn--danger {
-    color: var(--color-btn-danger-text);
-
-    :global(.icon) {
-      color: var(--color-btn-danger-icon);
-    }
-
-    &:hover,
-    [open] > & {
-      color: var(--color-btn-danger-hover-text);
-      background-color: var(--color-btn-danger-hover-bg);
-      border-color: var(--color-btn-danger-hover-border);
-      box-shadow: var(--color-btn-danger-hover-shadow), var(--color-btn-danger-hover-inset-shadow);
-
-      .Counter {
-        background-color: var(--color-btn-danger-hover-counter-bg);
-      }
-
-      :global(.icon) {
-        color: var(--color-btn-danger-hover-icon);
-      }
-    }
-
-    &:active,
-    &.selected,
-    &[aria-selected='true'] {
-      color: var(--color-btn-danger-selected-text);
-      background-color: var(--color-btn-danger-selected-bg);
-      border-color: var(--color-btn-danger-selected-border);
-      box-shadow: var(--color-btn-danger-selected-shadow);
-    }
-
-    &:disabled,
-    &.disabled,
-    &[aria-disabled='true'] {
-      color: var(--color-btn-danger-disabled-text);
-      background-color: var(--color-btn-danger-disabled-bg);
-      border-color: var(--color-btn-border);
-      box-shadow: none;
-
-      .Counter {
-        background-color: var(--color-btn-danger-disabled-counter-bg);
-      }
-
-      :global(.icon) {
-        color: var(--color-btn-danger-disabled-text);
-      }
-    }
-
-    &:focus {
-      border-color: var(--color-btn-danger-focus-border);
-      box-shadow: var(--color-btn-danger-focus-shadow);
-    }
-
-    .Counter {
-      color: inherit;
-      background-color: var(--color-btn-danger-counter-bg);
-    }
-  }
-
-  /* Sizes */
-  .btn--sm {
-    padding: 3px 12px;
-    font-size: var(--font-0);
-  }
-
-  .btn--lg {
-    font-size: var(--font-size-large);
-    padding: 8px 16px;
-    border-radius: var(--radii-3);
-  }
-
-  /* Full-width button */
-  /* These buttons expand to the full width of their parent container */
-  .btn-block {
-    display: block;
-    width: 100%;
-    text-align: center;
-  }
 </style>

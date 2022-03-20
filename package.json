@@ -38,8 +38,8 @@
     "postcss-nested": "^5.0.6",
     "postcss-preset-env": "^7.4.2",
     "postcss-strip-inline-comments": "^0.1.5",
-    "prettier": "^2.5.1",
-    "prettier-plugin-svelte": "^2.5.0",
+    "prism-svelte": "^0.5.0",
+    "prismjs": "^1.27.0",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.6",
     "svelte-preprocess": "^4.10.1",
@@ -65,5 +65,8 @@
   "bugs": {
     "url": "https://github.com/modrinth/omorphia/issues"
   },
-  "homepage": "https://omorphia.modrinth.com"
+  "homepage": "https://omorphia.modrinth.com",
+  "dependencies": {
+    "sanitize.css": "^13.0.0"
+  }
 }

@@ -3,15 +3,18 @@
     import { page } from '$app/stores'
     import { onMount } from 'svelte'
 
-    export let title
-    export let component
+    export let componentName = $page.url.pathname.includes('components') ? $page.url.pathname.replace('/components/', '') : undefined
+
+    export let title = ''
+    if (!title && componentName) title = componentName
+
     let pageUrl = `https://github.com/modrinth/omorphia/edit/main/src/routes/${$page.url.pathname.replace('/', '') || 'index'}.md`
 
     let api
 
     onMount(async () => {
-        if (component) {
-            api = (await import(`../../../lib/components/${component}.svelte?raw&api`)).default
+        if (componentName) {
+            api = (await import(`../../../lib/components/${componentName}.svelte?raw&api`)).default
         }
     })
 </script>
@@ -27,7 +30,7 @@
         Edit this page on GitHub</a>
     <slot/>
 
-    {#if component && api}
+    {#if componentName && api}
         <div class="extra-info">
             {#if api.data.length > 0}
                 <h2>Properties</h2>
@@ -38,7 +41,6 @@
                         <th>Type</th>
                         <th>Default</th>
                         <th>Description</th>
-                        <th>Read only</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -46,9 +48,8 @@
                         <tr>
                             <td>{prop.name}</td>
                             <td>{prop.type.type}</td>
-                            <td>{prop.defaultValue}</td>
-                            <td>{prop.description?.replace('null', '') || ''}</td>
-                            <td>{prop.readonly}</td>
+                            <td>{prop.defaultValue ?? ''}</td>
+                            <td>{prop.readonly ? '[Read only] ' : ''}{prop.description?.replace('null', '') || ''}</td>
                         </tr>
                     {/each}
                     </tbody>
@@ -94,6 +95,9 @@
                     </tbody>
                 </table>
             {/if}
+
+            <h2>Import</h2>
+            <pre class="language-js"><code class="language-js"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> {componentName} <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"omorphia"</span></code></pre>
         </div>
     {/if}
 </article>
@@ -101,7 +105,7 @@
 <style lang="postcss">
     article {
         max-width: 800px;
-        padding: 5rem max(8vw, 1rem);
+        padding: 5rem 1rem;
     }
 
     .edit-link {
@@ -109,28 +113,30 @@
         align-items: center;
         grid-gap: 8px;
         margin-bottom: 54px;
+        color: var(--accent-color);
     }
 
     .extra-info {
-        margin-top: 48px;
+        margin-top: 64px;
     }
 
     .api-table {
         border-collapse: collapse;
+        margin-top: -6px;
+    }
 
-        tr {
-            background-color: transparent;
-            border: none;
-        }
+    .api-table tr {
+        background-color: transparent;
+        border: none;
+    }
 
-        tbody {
-            border: 2px solid grey;
-        }
+    .api-table tbody {
+        border: 2px solid grey;
+    }
 
-        th {
-            text-transform: uppercase;
-            font-size: 12.5px;
-            border: none;
-        }
+    .api-table th {
+        text-transform: uppercase;
+        font-size: 12.5px;
+        border: none;
     }
 </style>

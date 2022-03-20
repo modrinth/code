@@ -1,6 +1,5 @@
 <script lang="ts">
-    import "$lib/styles/variables.postcss"
-    import "$lib/styles/themes.postcss"
+    import "$lib/styles.postcss"
     import "./_internal/styles/prism-one-dark.css"
     import "./_internal/styles/gh-markdown.css"
     import Sidebar from "./_internal/components/Sidebar.svelte"
@@ -21,8 +20,8 @@
         font-size: var(--body-font-size);
         font-family: var(--body-font);
         overflow-y: scroll;
-        --accent-color: hsl(331, 60%, 45%);
-        --accent-color-transparent: hsla(331, 60%, 45%, 0.15);
+        --accent-color: hsl(331, 80%, 45%);
+        --accent-color-transparent: hsla(331, 80%, 45%, 0.15);
     }
 
     .app {
@@ -34,13 +33,6 @@
         @media (width <= 500px) {
             display: flex;
             flex-direction: column;
-        }
-
-        :global(a) {
-            color: var(--accent-color);
-            &:hover {
-                text-decoration: underline;
-            }
         }
 
         &__content {
@@ -55,6 +47,16 @@
 
             :global(p) {
                 line-height: 1.5;
+            }
+        }
+
+        @layer base {
+            :global(a) {
+                color: var(--accent-color);
+
+                &:hover {
+                    text-decoration: underline;
+                }
             }
         }
     }
