@@ -22,19 +22,19 @@
 </script>
 
 {#if as === 'button'}
-    <button class={className} {disabled}>
+    <button class={className} {disabled} on:click>
         <slot/>
     </button>
 {:else if as === 'a'}
-    <a class={className} {href} {disabled}>
+    <a class={className} {href} {disabled} on:click>
         <slot/>
     </a>
 {:else if as === 'summary'}
-    <summary class={className} {disabled}>
+    <summary class={className} {disabled} on:click>
         <slot/>
     </summary>
 {:else if as === 'input'}
-    <input class={className} {value} {disabled}/>
+    <input class={className} {value} {disabled} on:click/>
 {/if}
 
 <style lang="postcss">

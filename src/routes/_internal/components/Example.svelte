@@ -17,6 +17,8 @@
 
 <style lang="postcss">
     .example {
+        margin-bottom: 32px;
+
         &__preview {
             padding: 16px;
             border-radius: var(--rounded-sm-top);

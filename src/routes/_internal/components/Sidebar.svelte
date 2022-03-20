@@ -1,5 +1,5 @@
 <script lang="ts">
-    const components = ['Button', 'Pagination', 'Link', 'NavRow', 'Badge', 'Avatar'].sort()
+    const components = ['Button', 'Pagination', 'Link', 'NavRow', 'Badge', 'Avatar', 'Chips'].sort()
 </script>
 
 <nav class="sidebar">
