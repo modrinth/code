@@ -124,7 +124,9 @@ impl ProfileInit {
                 if !confirm_async(
                     String::from("Do you wish to continue"),
                     false,
-                ) {
+                )
+                .await?
+                {
                     eyre::bail!("Aborted!");
                 }
             }

@@ -341,6 +341,7 @@ impl Profiles {
         let futures = settings.profiles.clone().into_iter().map(|path| async {
             let profiles = Arc::clone(&profiles);
             tokio::spawn(async move {
+                // TODO: handle missing profiles
                 let mut profiles = profiles.lock().await;
                 let profile = Self::read_profile_from_dir(path.clone()).await?;
 
