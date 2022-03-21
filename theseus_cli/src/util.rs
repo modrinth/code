@@ -13,7 +13,7 @@ pub fn prompt(prompt: &str) -> Result<String> {
 
     let mut buf = String::new();
     io::stdin().read_line(&mut buf)?;
-    Ok(buf)
+    Ok(buf.trim_end().to_string())
 }
 
 pub async fn prompt_async(text: String) -> Result<String> {

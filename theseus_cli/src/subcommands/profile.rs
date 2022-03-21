@@ -165,7 +165,7 @@ impl ProfileInit {
                     prompt_async(format!("Game version (default: {default})"))
                         .await?;
 
-                if res.trim().is_empty() {
+                if res.is_empty() {
                     String::from(default)
                 } else {
                     res
