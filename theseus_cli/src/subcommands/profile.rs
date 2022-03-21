@@ -115,13 +115,19 @@ impl ProfileInit {
                 !self.path.join(PROFILE_JSON_PATH).exists(),
                 "Profile already exists! Perhaps you want `profile add` instead?"
             );
-            ensure!(
-                ReadDirStream::new(fs::read_dir(&self.path).await?)
-                    .next()
-                    .await
-                    .is_none(),
-                "Attempted to create profile in non-empty directory!"
-            );
+            if ReadDirStream::new(fs::read_dir(&self.path).await?)
+                .next()
+                .await
+                .is_some()
+            {
+                warn!("You are trying to create a profile in a non-empty directory. If this is an instance from another launcher, please be sure to properly fill the profile.json fields!");
+                if !confirm_async(
+                    String::from("Do you wish to continue"),
+                    false,
+                ) {
+                    eyre::bail!("Aborted!");
+                }
+            }
         } else {
             fs::create_dir_all(&self.path).await?;
         }
