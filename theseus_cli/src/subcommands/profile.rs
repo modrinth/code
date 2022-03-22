@@ -145,15 +145,12 @@ impl ProfileInit {
             Some(name) => name.clone(),
             None => {
                 let default = self.path.file_name().unwrap().to_string_lossy();
-                let res =
-                    prompt_async(format!("Instance name (default: {default})"))
-                        .await?;
 
-                if res.trim().is_empty() {
-                    String::from(default)
-                } else {
-                    res
-                }
+                prompt_async(
+                    String::from("Instance name"),
+                    Some(default.into_owned()),
+                )
+                .await?
             }
         };
 
@@ -161,15 +158,12 @@ impl ProfileInit {
             Some(version) => version.clone(),
             None => {
                 let default = &metadata.minecraft.latest.release;
-                let res =
-                    prompt_async(format!("Game version (default: {default})"))
-                        .await?;
 
-                if res.is_empty() {
-                    String::from(default)
-                } else {
-                    res
-                }
+                prompt_async(
+                    String::from("Game version"),
+                    Some(default.clone()),
+                )
+                .await?
             }
         };
 
@@ -196,18 +190,13 @@ impl ProfileInit {
         let loader = if loader != ModLoader::Vanilla {
             let version = match &self.loader_version {
                 Some(version) => String::from(version),
-                None => {
-                    let res = prompt_async(
-                        "Modloader version (latest, stable, or a version ID. Default: latest)".to_owned()
-                    )
-                    .await?;
-
-                    if res.is_empty() {
-                        String::from("latest")
-                    } else {
-                        res
-                    }
-                }
+                None => prompt_async(
+                    String::from(
+                        "Modloader version (latest, stable, or a version ID)",
+                    ),
+                    Some(String::from("latest")),
+                )
+                .await?,
             };
 
             let filter = |it: &LoaderVersion| match version.as_str() {
@@ -242,9 +231,12 @@ impl ProfileInit {
 
         let icon = match &self.icon {
             Some(icon) => Some(icon.clone()),
-            None => Some(prompt_async("Icon (optional)".to_owned()).await?)
-                .filter(|it| !it.trim().is_empty())
-                .map(PathBuf::from),
+            None => Some(
+                prompt_async("Icon (optional)".to_owned(), Some(String::new()))
+                    .await?,
+            )
+            .filter(|it| !it.trim().is_empty())
+            .map(PathBuf::from),
         };
 
         // We don't really care if the profile already is managed, as getting this far means that the user probably wanted to re-create a profile

@@ -1,23 +1,32 @@
-use dialoguer::{Confirm, Select};
+use dialoguer::{Confirm, Input, Select};
 use eyre::Result;
-use std::{
-    io::{self, Write},
-    path::Path,
-};
+use std::{borrow::Cow, path::Path};
 
 // Prompting helpers
-pub fn prompt(prompt: &str) -> Result<String> {
-    print_prompt(prompt);
-    print!(": ");
-    io::stdout().flush()?;
+pub fn prompt(prompt: &str, default: Option<String>) -> Result<String> {
+    let prompt = match default {
+        Some(ref default) => {
+            Cow::Owned(format!("{prompt} (default: {default})"))
+        }
+        None => Cow::Borrowed(prompt),
+    };
+    print_prompt(&prompt);
 
-    let mut buf = String::new();
-    io::stdin().read_line(&mut buf)?;
-    Ok(buf.trim_end().to_string())
+    let mut input = Input::<String>::new();
+    input.with_prompt("").show_default(false);
+
+    if let Some(default) = default {
+        input.default(default);
+    }
+
+    Ok(input.interact_text()?.trim().to_owned())
 }
 
-pub async fn prompt_async(text: String) -> Result<String> {
-    tokio::task::spawn_blocking(move || prompt(&text)).await?
+pub async fn prompt_async(
+    text: String,
+    default: Option<String>,
+) -> Result<String> {
+    tokio::task::spawn_blocking(move || prompt(&text, default)).await?
 }
 
 // Selection helpers
@@ -25,7 +34,7 @@ pub fn select(prompt: &str, choices: &[&str]) -> Result<usize> {
     print_prompt(prompt);
 
     let res = Select::new().items(choices).default(0).interact()?;
-    println!("> {}", choices[res]);
+    eprintln!("> {}", choices[res]);
     Ok(res)
 }
 
