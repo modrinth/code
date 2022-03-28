@@ -1,6 +1,6 @@
 use super::DataError;
 use crate::launcher::ModLoader;
-use daedalus::{minecraft::JavaVersion, modded::LoaderVersion};
+use daedalus::modded::LoaderVersion;
 use futures::*;
 use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
@@ -33,10 +33,14 @@ pub struct Profile {
     #[serde(skip)]
     pub path: PathBuf,
     pub metadata: Metadata,
-    pub java: JavaSettings,
-    pub memory: MemorySettings,
-    pub resolution: WindowSize,
-    pub hooks: ProfileHooks,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub java: Option<JavaSettings>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub memory: Option<MemorySettings>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub resolution: Option<WindowSize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub hooks: Option<ProfileHooks>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -54,9 +58,10 @@ pub struct Metadata {
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JavaSettings {
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub install: Option<PathBuf>,
-    #[serde(skip_serializing_if = "Vec::is_empty", default)]
-    pub extra_arguments: Vec<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub extra_arguments: Option<Vec<String>>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Copy, Debug)]
@@ -116,32 +121,6 @@ impl Profile {
             )));
         }
 
-        let version_id = version.clone();
-        let (settings, version_info) = tokio::try_join! {
-            super::Settings::get(),
-            super::Metadata::get()
-                .and_then(|manifest| async move {
-                    let version = manifest
-                        .minecraft
-                        .versions
-                        .iter()
-                        .find(|it| it.id == version_id)
-                        .ok_or(DataError::FormatError(
-                            format!("invalid or unknown version: {version_id}"))
-                        )?;
-
-                    Ok(daedalus::minecraft::fetch_version_info(version).await?)
-                }),
-        }?;
-
-        let java_install = match version_info.java_version {
-            Some(JavaVersion { major_version, .. }) if major_version >= 16 => {
-                settings.java_17_path.as_ref()
-            }
-            _ => settings.java_8_path.as_ref(),
-        }
-        .filter(|it| it.exists());
-
         Ok(Self {
             path: path.canonicalize()?,
             metadata: Metadata {
@@ -152,13 +131,10 @@ impl Profile {
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
             },
-            java: JavaSettings {
-                install: java_install.cloned(),
-                extra_arguments: settings.custom_java_args.clone(),
-            },
-            memory: settings.memory.clone(),
-            resolution: settings.game_resolution.clone(),
-            hooks: settings.hooks.clone(),
+            java: None,
+            memory: None,
+            resolution: None,
+            hooks: None,
         })
     }
 
@@ -167,7 +143,28 @@ impl Profile {
         credentials: &crate::launcher::Credentials,
     ) -> Result<Child, crate::launcher::LauncherError> {
         use crate::launcher::LauncherError;
-        for hook in &self.hooks.pre_launch {
+        let (settings, version_info) = tokio::try_join! {
+            super::Settings::get(),
+            super::Metadata::get()
+                .and_then(|manifest| async move {
+                    let version = manifest
+                        .minecraft
+                        .versions
+                        .iter()
+                        .find(|it| it.id == self.metadata.game_version.as_ref())
+                        .ok_or_else(|| DataError::FormatError(format!(
+                            "invalid or unknown version: {}",
+                            self.metadata.game_version
+                        )))?;
+
+                    Ok(daedalus::minecraft::fetch_version_info(version)
+                       .await?)
+                })
+        }?;
+
+        let ref pre_launch_hooks =
+            self.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
+        for hook in pre_launch_hooks.iter() {
             // TODO: hook parameters
             let mut cmd = hook.split(' ');
             let result = Command::new(cmd.next().unwrap())
@@ -184,27 +181,60 @@ impl Profile {
             }
         }
 
-        let java_install = self.java.install.as_ref().ok_or(
-            LauncherError::JavaError(String::from(
-                "No Java installation associated with this profile!",
-            )),
-        )?;
+        let java_install = match self.java {
+            Some(JavaSettings {
+                install: Some(ref install),
+                ..
+            }) => install,
+            _ => if version_info
+                .java_version
+                .as_ref()
+                .filter(|it| it.major_version >= 16)
+                .is_some()
+            {
+                settings.java_17_path.as_ref()
+            } else {
+                settings.java_8_path.as_ref()
+            }
+            .ok_or_else(|| {
+                LauncherError::JavaError(format!(
+                    "No Java installed for version {}",
+                    version_info.java_version.map_or(8, |it| it.major_version),
+                ))
+            })?,
+        };
+
         if !java_install.exists() {
             return Err(LauncherError::JavaError(format!(
-                "No Java install found at {}",
+                "Could not find java install: {}",
                 java_install.display()
             )));
         }
+
+        let java_args = &self
+            .java
+            .as_ref()
+            .and_then(|it| it.extra_arguments.as_ref())
+            .unwrap_or(&settings.custom_java_args);
+
+        let wrapper = self
+            .hooks
+            .as_ref()
+            .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
+
+        let ref memory = self.memory.unwrap_or(settings.memory);
+        let ref resolution =
+            self.resolution.unwrap_or(settings.game_resolution);
 
         crate::launcher::launch_minecraft(
             &self.metadata.game_version,
             &self.metadata.loader_version,
             &self.path,
             &java_install,
-            &self.java.extra_arguments,
-            &self.hooks.wrapper,
-            &self.memory,
-            &self.resolution,
+            &java_args,
+            &wrapper,
+            memory,
+            resolution,
             credentials,
         )
         .await
@@ -282,53 +312,32 @@ impl Profile {
         self
     }
 
-    pub fn with_java_install(&mut self, path: PathBuf) -> &mut Self {
-        self.java.install = Some(path);
+    pub fn with_java_settings(
+        &mut self,
+        settings: Option<JavaSettings>,
+    ) -> &mut Self {
+        self.java = settings;
         self
     }
 
-    pub fn with_java_args(&mut self, args: Vec<String>) -> &mut Self {
-        self.java.extra_arguments = args;
+    pub fn with_memory(
+        &mut self,
+        settings: Option<MemorySettings>,
+    ) -> &mut Self {
+        self.memory = settings;
         self
     }
 
-    pub fn with_minimum_memory(&mut self, memory: u32) -> &mut Self {
-        self.memory.minimum = Some(memory);
-        self
-    }
-
-    pub fn with_maximum_memory(&mut self, memory: u32) -> &mut Self {
-        self.memory.maximum = memory;
-        self
-    }
-
-    pub fn with_resolution(&mut self, resolution: WindowSize) -> &mut Self {
+    pub fn with_resolution(
+        &mut self,
+        resolution: Option<WindowSize>,
+    ) -> &mut Self {
         self.resolution = resolution;
         self
     }
 
-    pub fn with_pre_launch(&mut self, hook: String) -> &mut Self {
-        self.hooks.pre_launch.insert(hook);
-        self
-    }
-
-    pub fn without_pre_launch(&mut self, hook: &str) -> &mut Self {
-        self.hooks.pre_launch.remove(hook);
-        self
-    }
-
-    pub fn with_post_exit(&mut self, hook: String) -> &mut Self {
-        self.hooks.post_exit.insert(hook);
-        self
-    }
-
-    pub fn without_post_exit(&mut self, hook: &str) -> &mut Self {
-        self.hooks.post_exit.remove(hook);
-        self
-    }
-
-    pub fn with_wrapper(&mut self, wrapper: Option<String>) -> &mut Self {
-        self.hooks.wrapper = wrapper;
+    pub fn with_hooks(&mut self, hooks: Option<ProfileHooks>) -> &mut Self {
+        self.hooks = hooks;
         self
     }
 }
@@ -385,9 +394,10 @@ impl Profiles {
     }
 
     pub async fn remove(path: &Path) -> Result<Option<Profile>, DataError> {
+        let path = path.canonicalize()?;
         let mut profiles = PROFILES.get().unwrap().write().await;
-        super::Settings::get_mut().await?.profiles.remove(path);
-        Ok(profiles.0.remove(path))
+        super::Settings::get_mut().await?.profiles.remove(&path);
+        Ok(profiles.0.remove(&path))
     }
 
     pub async fn save() -> Result<(), DataError> {

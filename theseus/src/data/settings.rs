@@ -17,6 +17,7 @@ static SETTINGS: sync::OnceCell<RwLock<Settings>> = sync::OnceCell::new();
 pub const FORMAT_VERSION: u32 = 1;
 
 #[derive(Clone, Serialize, Deserialize, Debug)]
+#[serde(default)]
 pub struct Settings {
     pub memory: MemorySettings,
     pub game_resolution: WindowSize,
@@ -27,6 +28,7 @@ pub struct Settings {
     pub icon_path: PathBuf,
     pub metadata_dir: PathBuf,
     pub profiles: HashSet<PathBuf>,
+    pub max_concurrent_downloads: usize,
     pub version: u32,
 }
 
@@ -42,6 +44,7 @@ impl Default for Settings {
             icon_path: Path::new(LAUNCHER_WORK_DIR).join(ICONS_PATH),
             metadata_dir: Path::new(LAUNCHER_WORK_DIR).join(METADATA_DIR),
             profiles: HashSet::new(),
+            max_concurrent_downloads: 32,
             version: FORMAT_VERSION,
         }
     }
@@ -65,10 +68,14 @@ impl Settings {
         if SETTINGS.get().is_none() {
             let new = Self::default();
 
-            std::fs::write(
+            tokio::fs::rename(SETTINGS_FILE, format!("{SETTINGS_FILE}.bak"))
+                .await?;
+
+            tokio::fs::write(
                 Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
                 &serde_json::to_string(&new)?,
-            )?;
+            )
+            .await?;
 
             SETTINGS.get_or_init(|| RwLock::new(new));
         }
@@ -81,7 +88,7 @@ impl Settings {
             Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
         )?)?;
 
-        let write = &mut *SETTINGS
+        let mut write = SETTINGS
             .get()
             .ok_or_else(|| DataError::InitializedError("settings".to_string()))?
             .write()

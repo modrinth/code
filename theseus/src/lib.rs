@@ -30,15 +30,24 @@ pub async fn init() -> Result<(), Error> {
 
     use crate::data::*;
     Metadata::init().await?;
+
     Settings::init().await?;
-    Profiles::init().await?;
+
+    tokio::try_join! {
+        launcher::init_download_semaphore(),
+        Profiles::init(),
+    }?;
 
     Ok(())
 }
 
 pub async fn save() -> Result<(), Error> {
     use crate::data::*;
-    Settings::save().await?;
-    Profiles::save().await?;
+
+    tokio::try_join! {
+        Settings::save(),
+        Profiles::save(),
+    }?;
+
     Ok(())
 }

@@ -2,12 +2,13 @@ use dialoguer::{Confirm, Input, Select};
 use eyre::Result;
 use std::{borrow::Cow, path::Path};
 
+// TODO: make primarily async to avoid copies
+
 // Prompting helpers
 pub fn prompt(prompt: &str, default: Option<String>) -> Result<String> {
-    let prompt = match default {
-        Some(ref default) => {
-            Cow::Owned(format!("{prompt} (default: {default})"))
-        }
+    let prompt = match default.as_deref() {
+        Some("") => Cow::Owned(format!("{prompt} (optional)")),
+        Some(default) => Cow::Owned(format!("{prompt} (default: {default})")),
         None => Cow::Borrowed(prompt),
     };
     print_prompt(&prompt);

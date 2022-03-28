@@ -12,6 +12,8 @@ pub mod auth;
 mod download;
 mod rules;
 
+pub(crate) use download::init as init_download_semaphore;
+
 #[derive(Error, Debug)]
 pub enum LauncherError {
     #[error("Failed to validate file checksum at url {url} with hash {hash} after {tries} tries")]
@@ -242,7 +244,7 @@ pub async fn launch_minecraft(
         }
     }
 
-    let arguments = version.arguments.unwrap_or_default();
+    let arguments = version.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
             let mut cmd = Command::new(hook);
@@ -266,7 +268,7 @@ pub async fn launch_minecraft(
             *memory,
             java_args.clone(),
         )?)
-        .arg(version.main_class)
+        .arg(version.main_class.clone())
         .args(args::get_minecraft_arguments(
             arguments.get(&ArgumentType::Game).map(|x| x.as_slice()),
             version.minecraft_arguments.as_deref(),
@@ -278,13 +280,13 @@ pub async fn launch_minecraft(
             &version.type_,
             *resolution,
         )?)
-        .current_dir(root_dir)
+        .current_dir(root_dir.clone())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
 
     command.spawn().map_err(|err| LauncherError::ProcessError {
         inner: err,
-        process: "minecraft".to_string(),
+        process: format!("minecraft-{} @ {}", &version.id, root_dir.display()),
     })
 }
 

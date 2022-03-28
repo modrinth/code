@@ -232,8 +232,7 @@ impl ProfileInit {
         let icon = match &self.icon {
             Some(icon) => Some(icon.clone()),
             None => Some(
-                prompt_async("Icon (optional)".to_owned(), Some(String::new()))
-                    .await?,
+                prompt_async("Icon".to_owned(), Some(String::new())).await?,
             )
             .filter(|it| !it.trim().is_empty())
             .map(PathBuf::from),
@@ -331,8 +330,11 @@ impl ProfileRemove {
         let profile = self.profile.canonicalize()?;
         info!("Removing profile {} from Theseus", self.profile.display());
         if confirm_async(String::from("Do you wish to continue"), true).await? {
-            Profiles::remove(&profile).await?;
-            success!("Profile removed!");
+            if Profiles::remove(&profile).await?.is_none() {
+                warn!("Profile was not managed by Theseus!");
+            } else {
+                success!("Profile removed!");
+            }
         } else {
             error!("Aborted!");
         }

@@ -1,4 +1,7 @@
-use crate::launcher::LauncherError;
+use crate::{
+    data::{DataError, Settings},
+    launcher::LauncherError,
+};
 use daedalus::get_path_from_artifact;
 use daedalus::minecraft::{
     fetch_assets_index, fetch_version_info, Asset, AssetsIndex, DownloadType,
@@ -10,12 +13,26 @@ use daedalus::modded::{
 use futures::future;
 use std::path::Path;
 use std::time::Duration;
-use tokio::{fs::File, io::AsyncWriteExt, sync::Semaphore};
+use tokio::{
+    fs::File,
+    io::AsyncWriteExt,
+    sync::{OnceCell, Semaphore},
+};
 
-// TODO: unhardcode
-const MAX_OPEN: usize = 32;
-static DOWNLOADS_SEMAPHORE: Semaphore = Semaphore::const_new(MAX_OPEN);
-static WRITE_SEMAPHORE: Semaphore = Semaphore::const_new(MAX_OPEN);
+static DOWNLOADS_SEMAPHORE: OnceCell<Semaphore> = OnceCell::const_new();
+
+pub async fn init() -> Result<(), DataError> {
+    DOWNLOADS_SEMAPHORE
+        .get_or_try_init(|| async {
+            let settings = Settings::get().await?;
+            Ok::<_, DataError>(Semaphore::new(
+                settings.max_concurrent_downloads,
+            ))
+        })
+        .await?;
+
+    Ok(())
+}
 
 pub async fn download_version_info(
     client_path: &Path,
@@ -248,7 +265,12 @@ async fn save_and_download_file(
 }
 
 async fn save_file(path: &Path, bytes: &bytes::Bytes) -> std::io::Result<()> {
-    let _save_permit = WRITE_SEMAPHORE.acquire().await.unwrap();
+    let _save_permit = DOWNLOADS_SEMAPHORE
+        .get()
+        .expect("File operation semaphore not initialized!")
+        .acquire()
+        .await
+        .unwrap();
     if let Some(parent) = path.parent() {
         tokio::fs::create_dir_all(parent).await?;
     }
@@ -271,7 +293,13 @@ pub async fn download_file(
     url: &str,
     sha1: Option<&str>,
 ) -> Result<bytes::Bytes, LauncherError> {
-    let _download_permit = DOWNLOADS_SEMAPHORE.acquire().await.unwrap();
+    let _download_permit = DOWNLOADS_SEMAPHORE
+        .get()
+        .expect("File operation semaphore not initialized!")
+        .acquire()
+        .await
+        .unwrap();
+
     let client = reqwest::Client::builder()
         .tcp_keepalive(Some(Duration::from_secs(10)))
         .build()
