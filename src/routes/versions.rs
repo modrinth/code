@@ -450,6 +450,13 @@ pub async fn version_edit(
             }
 
             if let Some(downloads) = &new_version.downloads {
+                if !user.role.is_mod() {
+                    return Err(ApiError::CustomAuthentication(
+                        "You don't have permission to set the downloads of this mod"
+                            .to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE versions
