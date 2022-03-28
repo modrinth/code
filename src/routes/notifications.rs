@@ -105,7 +105,7 @@ pub async fn notification_delete(
 
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthenticationError(
+            Err(ApiError::CustomAuthentication(
                 "You are not authorized to delete this notification!"
                     .to_string(),
             ))

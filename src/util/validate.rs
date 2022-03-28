@@ -34,7 +34,7 @@ pub fn validation_errors_to_string(
                             *errors.clone(),
                             Some(format!(
                                 "of list {} with index {}",
-                                index, field
+                                field, index
                             )),
                         ));
                     }

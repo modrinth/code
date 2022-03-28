@@ -107,13 +107,11 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                     let new_val = val_mut.0;
                     ActorResponse::Update(Box::pin(future::ready(Ok(new_val))))
                 }
-                None => {
-                    return ActorResponse::Update(Box::pin(future::ready(Err(
-                        ARError::ReadWriteError(
-                            "memory store: read failed!".to_string(),
-                        ),
-                    ))))
-                }
+                None => ActorResponse::Update(Box::pin(future::ready(Err(
+                    ARError::ReadWrite(
+                        "memory store: read failed!".to_string(),
+                    ),
+                )))),
             },
             ActorMessage::Get(key) => {
                 if self.inner.contains_key(&key) {
@@ -121,7 +119,7 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                         Some(c) => c,
                         None => {
                             return ActorResponse::Get(Box::pin(future::ready(
-                                Err(ARError::ReadWriteError(
+                                Err(ARError::ReadWrite(
                                     "memory store: read failed!".to_string(),
                                 )),
                             )))
@@ -138,7 +136,7 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                     Some(d) => d,
                     None => {
                         return ActorResponse::Expire(Box::pin(future::ready(
-                            Err(ARError::ReadWriteError(
+                            Err(ARError::ReadWrite(
                                 "memory store: read failed!".to_string(),
                             )),
                         )))
@@ -156,7 +154,7 @@ impl Handler<ActorMessage> for MemoryStoreActor {
                     Some(c) => c,
                     None => {
                         return ActorResponse::Remove(Box::pin(future::ready(
-                            Err(ARError::ReadWriteError(
+                            Err(ARError::ReadWrite(
                                 "memory store: remove failed!".to_string(),
                             )),
                         )))

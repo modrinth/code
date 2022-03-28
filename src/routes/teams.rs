@@ -38,7 +38,7 @@ pub async fn team_members_get_project(
                 &**pool,
             )
             .await
-            .map_err(ApiError::DatabaseError)?;
+            .map_err(ApiError::Database)?;
 
             if team_member.is_some() {
                 let team_members: Vec<_> = members_data
@@ -80,7 +80,7 @@ pub async fn team_members_get(
         let team_member =
             TeamMember::get_from_user_id(id.into(), user.id.into(), &**pool)
                 .await
-                .map_err(ApiError::DatabaseError)?;
+                .map_err(ApiError::Database)?;
 
         if team_member.is_some() {
             let team_members: Vec<_> = members_data
@@ -119,7 +119,7 @@ pub async fn join_team(
 
     if let Some(member) = member {
         if member.accepted {
-            return Err(ApiError::InvalidInputError(
+            return Err(ApiError::InvalidInput(
                 "You are already a member of this team".to_string(),
             ));
         }
@@ -138,7 +138,7 @@ pub async fn join_team(
 
         transaction.commit().await?;
     } else {
-        return Err(ApiError::InvalidInputError(
+        return Err(ApiError::InvalidInput(
             "There is no pending request from this team".to_string(),
         ));
     }
@@ -175,26 +175,26 @@ pub async fn add_team_member(
         TeamMember::get_from_user_id(team_id, current_user.id.into(), &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::CustomAuthenticationError(
+                ApiError::CustomAuthentication(
                     "You don't have permission to edit members of this team"
                         .to_string(),
                 )
             })?;
 
     if !member.permissions.contains(Permissions::MANAGE_INVITES) {
-        return Err(ApiError::CustomAuthenticationError(
+        return Err(ApiError::CustomAuthentication(
             "You don't have permission to invite users to this team"
                 .to_string(),
         ));
     }
     if !member.permissions.contains(new_member.permissions) {
-        return Err(ApiError::InvalidInputError(
+        return Err(ApiError::InvalidInput(
             "The new member has permissions that you don't have".to_string(),
         ));
     }
 
     if new_member.role == crate::models::teams::OWNER_ROLE {
-        return Err(ApiError::InvalidInputError(
+        return Err(ApiError::InvalidInput(
             "The `Owner` role is restricted to one person".to_string(),
         ));
     }
@@ -207,11 +207,11 @@ pub async fn add_team_member(
 
     if let Some(req) = request {
         if req.accepted {
-            return Err(ApiError::InvalidInputError(
+            return Err(ApiError::InvalidInput(
                 "The user is already a member of that team".to_string(),
             ));
         } else {
-            return Err(ApiError::InvalidInputError(
+            return Err(ApiError::InvalidInput(
                 "There is already a pending member request for this user"
                     .to_string(),
             ));
@@ -221,9 +221,7 @@ pub async fn add_team_member(
     crate::database::models::User::get(member.user_id, &**pool)
         .await?
         .ok_or_else(|| {
-            ApiError::InvalidInputError(
-                "An invalid User ID specified".to_string(),
-            )
+            ApiError::InvalidInput("An invalid User ID specified".to_string())
         })?;
 
     let new_id =
@@ -312,7 +310,7 @@ pub async fn edit_team_member(
         TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::CustomAuthenticationError(
+                ApiError::CustomAuthentication(
                     "You don't have permission to edit members of this team"
                         .to_string(),
                 )
@@ -321,7 +319,7 @@ pub async fn edit_team_member(
         TeamMember::get_from_user_id_pending(id, user_id, &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::CustomAuthenticationError(
+                ApiError::CustomAuthentication(
                     "You don't have permission to edit members of this team"
                         .to_string(),
                 )
@@ -330,13 +328,13 @@ pub async fn edit_team_member(
     let mut transaction = pool.begin().await?;
 
     if &*edit_member_db.role == crate::models::teams::OWNER_ROLE {
-        return Err(ApiError::InvalidInputError(
+        return Err(ApiError::InvalidInput(
             "The owner of a team cannot be edited".to_string(),
         ));
     }
 
     if !member.permissions.contains(Permissions::EDIT_MEMBER) {
-        return Err(ApiError::CustomAuthenticationError(
+        return Err(ApiError::CustomAuthentication(
             "You don't have permission to edit members of this team"
                 .to_string(),
         ));
@@ -344,7 +342,7 @@ pub async fn edit_team_member(
 
     if let Some(new_permissions) = edit_member.permissions {
         if !member.permissions.contains(new_permissions) {
-            return Err(ApiError::InvalidInputError(
+            return Err(ApiError::InvalidInput(
                 "The new permissions have permissions that you don't have"
                     .to_string(),
             ));
@@ -352,7 +350,7 @@ pub async fn edit_team_member(
     }
 
     if edit_member.role.as_deref() == Some(crate::models::teams::OWNER_ROLE) {
-        return Err(ApiError::InvalidInputError(
+        return Err(ApiError::InvalidInput(
             "The `Owner` role is restricted to one person".to_string(),
         ));
     }
@@ -394,7 +392,7 @@ pub async fn transfer_ownership(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::CustomAuthenticationError(
+        ApiError::CustomAuthentication(
             "You don't have permission to edit members of this team"
                 .to_string(),
         )
@@ -406,20 +404,20 @@ pub async fn transfer_ownership(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(
+        ApiError::InvalidInput(
             "The new owner specified does not exist".to_string(),
         )
     })?;
 
     if member.role != crate::models::teams::OWNER_ROLE {
-        return Err(ApiError::CustomAuthenticationError(
+        return Err(ApiError::CustomAuthentication(
             "You don't have permission to edit the ownership of this team"
                 .to_string(),
         ));
     }
 
     if !new_member.accepted {
-        return Err(ApiError::InvalidInputError(
+        return Err(ApiError::InvalidInput(
             "You can only transfer ownership to members who are currently in your team".to_string(),
         ));
     }
@@ -466,7 +464,7 @@ pub async fn remove_team_member(
         TeamMember::get_from_user_id(id, current_user.id.into(), &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::CustomAuthenticationError(
+                ApiError::CustomAuthentication(
                     "You don't have permission to edit members of this team"
                         .to_string(),
                 )
@@ -478,7 +476,7 @@ pub async fn remove_team_member(
     if let Some(delete_member) = delete_member {
         if delete_member.role == crate::models::teams::OWNER_ROLE {
             // The owner cannot be removed from a team
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "The owner can't be removed from a team".to_string(),
             ));
         }
@@ -492,7 +490,7 @@ pub async fn remove_team_member(
             {
                 TeamMember::delete(id, user_id, &**pool).await?;
             } else {
-                return Err(ApiError::CustomAuthenticationError(
+                return Err(ApiError::CustomAuthentication(
                     "You do not have permission to remove a member from this team".to_string(),
                 ));
             }
@@ -505,7 +503,7 @@ pub async fn remove_team_member(
             // permission can remove it.
             TeamMember::delete(id, user_id, &**pool).await?;
         } else {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You do not have permission to cancel a team invite"
                     .to_string(),
             ));

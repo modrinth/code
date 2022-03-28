@@ -28,9 +28,10 @@ pub async fn version_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result =
-        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool)
-            .await?;
+    let result = database::models::Project::get_full_from_slug_or_project_id(
+        &string, &**pool,
+    )
+    .await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -187,6 +188,7 @@ pub struct EditVersion {
     pub loaders: Option<Vec<models::projects::Loader>>,
     pub featured: Option<bool>,
     pub primary_file: Option<(String, String)>,
+    pub downloads: Option<u32>,
 }
 
 #[patch("{id}")]
@@ -199,7 +201,7 @@ pub async fn version_edit(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
     new_version.validate().map_err(|err| {
-        ApiError::ValidationError(validation_errors_to_string(err, None))
+        ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
     let version_id = info.into_inner().0;
@@ -227,7 +229,7 @@ pub async fn version_edit(
 
         if let Some(perms) = permissions {
             if !perms.contains(Permissions::UPLOAD_VERSION) {
-                return Err(ApiError::CustomAuthenticationError(
+                return Err(ApiError::CustomAuthentication(
                     "You do not have the permissions to edit this version!"
                         .to_string(),
                 ));
@@ -321,7 +323,7 @@ pub async fn version_edit(
                         )
                         .await?
                         .ok_or_else(|| {
-                            ApiError::InvalidInputError(
+                            ApiError::InvalidInput(
                                 "No database entry for game version provided."
                                     .to_string(),
                             )
@@ -358,7 +360,7 @@ pub async fn version_edit(
                         )
                         .await?
                         .ok_or_else(|| {
-                            ApiError::InvalidInputError(
+                            ApiError::InvalidInput(
                                 "No database entry for loader provided."
                                     .to_string(),
                             )
@@ -404,7 +406,7 @@ pub async fn version_edit(
                 .fetch_optional(&**pool)
                 .await?
                 .ok_or_else(|| {
-                    ApiError::InvalidInputError(format!(
+                    ApiError::InvalidInput(format!(
                         "Specified file with hash {} does not exist.",
                         primary_file.1.clone()
                     ))
@@ -447,10 +449,38 @@ pub async fn version_edit(
                 .await?;
             }
 
+            if let Some(downloads) = &new_version.downloads {
+                sqlx::query!(
+                    "
+                    UPDATE versions
+                    SET downloads = $1
+                    WHERE (id = $2)
+                    ",
+                    *downloads as i32,
+                    id as database::models::ids::VersionId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+
+                let diff = *downloads - (version_item.downloads as u32);
+
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET downloads = downloads + $1
+                    WHERE (id = $2)
+                    ",
+                    diff as i32,
+                    version_item.project_id as database::models::ids::ProjectId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthenticationError(
+            Err(ApiError::CustomAuthentication(
                 "You do not have permission to edit this version!".to_string(),
             ))
         }
@@ -503,7 +533,7 @@ pub async fn version_count_patch(
         .execute(pool.as_ref()),
     )
     .await
-    .map_err(ApiError::SqlxDatabaseError)?;
+    .map_err(ApiError::SqlxDatabase)?;
 
     Ok(HttpResponse::Ok().body(""))
 }
@@ -524,9 +554,9 @@ pub async fn version_delete(
             &**pool,
         )
         .await
-        .map_err(ApiError::DatabaseError)?
+        .map_err(ApiError::Database)?
         .ok_or_else(|| {
-            ApiError::InvalidInputError(
+            ApiError::InvalidInput(
                 "You do not have permission to delete versions in this team".to_string(),
             )
         })?;
@@ -535,7 +565,7 @@ pub async fn version_delete(
             .permissions
             .contains(Permissions::DELETE_VERSION)
         {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You do not have permission to delete versions in this team"
                     .to_string(),
             ));

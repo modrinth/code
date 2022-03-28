@@ -8,23 +8,24 @@ use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
 use meilisearch_sdk::settings::Settings;
 use sqlx::postgres::PgPool;
-use std::collections::{HashMap, VecDeque};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum IndexingError {
     #[error("Error while connecting to the MeiliSearch database")]
-    IndexDBError(#[from] meilisearch_sdk::errors::Error),
+    Indexing(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
-    SerdeError(#[from] serde_json::Error),
+    Serde(#[from] serde_json::Error),
     #[error("Error while parsing a timestamp: {0}")]
-    ParseDateError(#[from] chrono::format::ParseError),
+    ParseDate(#[from] chrono::format::ParseError),
     #[error("Database Error: {0}")]
-    SqlxError(#[from] sqlx::error::Error),
+    Sqlx(#[from] sqlx::error::Error),
     #[error("Database Error: {0}")]
-    DatabaseError(#[from] crate::database::models::DatabaseError),
+    Database(#[from] crate::database::models::DatabaseError),
     #[error("Environment Error")]
-    EnvError(#[from] dotenv::Error),
+    Env(#[from] dotenv::Error),
+    #[error("Error while awaiting index creation task")]
+    Task,
 }
 
 // The chunk size for adding projects to the indexing database. If the request size
@@ -57,8 +58,8 @@ pub async fn index_projects(
     if settings.index_local {
         docs_to_add.append(&mut index_local(pool.clone()).await?);
     }
-    // Write Indices
 
+    // Write Indices
     add_projects(docs_to_add, config).await?;
 
     Ok(())
@@ -67,122 +68,91 @@ pub async fn index_projects(
 pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
     let client = config.make_client();
 
-    client.delete_index("relevance_projects").await?;
-    client.delete_index("downloads_projects").await?;
-    client.delete_index("follows_projects").await?;
-    client.delete_index("updated_projects").await?;
-    client.delete_index("newest_projects").await?;
-    Ok(())
-}
-
-async fn update_index_helper<'a>(
-    client: &'a Client<'a>,
-    name: &'static str,
-    rule: &'static str,
-) -> Result<Index<'a>, IndexingError> {
-    update_index(client, name, {
-        let mut rules = default_rules();
-        rules.push_back(rule);
-        rules.into()
-    })
-    .await
-}
-
-pub async fn reconfigure_indices(
-    config: &SearchConfig,
-) -> Result<(), IndexingError> {
-    let client = config.make_client();
-
-    // Relevance Index
-    update_index_helper(&client, "relevance_projects", "desc(downloads)")
-        .await?;
-    update_index_helper(&client, "downloads_projects", "desc(downloads)")
-        .await?;
-    update_index_helper(&client, "follows_projects", "desc(follows)").await?;
-    update_index_helper(
-        &client,
-        "updated_projects",
-        "desc(modified_timestamp)",
-    )
-    .await?;
-    update_index_helper(&client, "newest_projects", "desc(created_timestamp)")
-        .await?;
+    client.delete_index("projects").await?;
+    client.delete_index("projects_filtered").await?;
 
     Ok(())
 }
 
-async fn update_index<'a>(
-    client: &'a Client<'a>,
-    name: &'a str,
-    rules: Vec<&'static str>,
-) -> Result<Index<'a>, IndexingError> {
-    let index = match client.get_index(name).await {
-        Ok(index) => index,
-        Err(meilisearch_sdk::errors::Error::MeiliSearchError {
-            error_code: meilisearch_sdk::errors::ErrorCode::IndexNotFound,
-            ..
-        }) => client.create_index(name, Some("project_id")).await?,
-        Err(e) => {
-            return Err(IndexingError::IndexDBError(e));
-        }
-    };
-    index
-        .set_settings(&default_settings().with_ranking_rules(rules))
-        .await?;
-    Ok(index)
-}
-
-async fn create_index<'a>(
-    client: &'a Client<'a>,
+async fn create_index(
+    client: &Client,
     name: &'static str,
-    rules: impl FnOnce() -> Vec<&'static str>,
-) -> Result<Index<'a>, IndexingError> {
+    custom_rules: Option<&'static [&'static str]>,
+) -> Result<Index, IndexingError> {
+    client
+        .delete_index(name)
+        .await?
+        .wait_for_completion(client, None, None)
+        .await?;
+
     match client.get_index(name).await {
         // TODO: update index settings on startup (or delete old indices on startup)
-        Ok(index) => Ok(index),
-        Err(meilisearch_sdk::errors::Error::MeiliSearchError {
-            error_code: meilisearch_sdk::errors::ErrorCode::IndexNotFound,
-            ..
-        }) => {
+        Ok(index) => {
+            index
+                .set_settings(&default_settings())
+                .await?
+                .wait_for_completion(client, None, None)
+                .await?;
+
+            Ok(index)
+        }
+        Err(meilisearch_sdk::errors::Error::Meilisearch(
+            meilisearch_sdk::errors::MeilisearchError {
+                error_code: meilisearch_sdk::errors::ErrorCode::IndexNotFound,
+                ..
+            },
+        )) => {
             // Only create index and set settings if the index doesn't already exist
-            let index = client.create_index(name, Some("project_id")).await?;
+            let task = client.create_index(name, Some("project_id")).await?;
+            let task = task.wait_for_completion(client, None, None).await?;
+            let index = task
+                .try_make_index(client)
+                .map_err(|_| IndexingError::Task)?;
+
+            let mut settings = default_settings();
+
+            if let Some(custom_rules) = custom_rules {
+                settings = settings.with_ranking_rules(custom_rules);
+            }
 
             index
-                .set_settings(&default_settings().with_ranking_rules(rules()))
+                .set_settings(&settings)
+                .await?
+                .wait_for_completion(client, None, None)
                 .await?;
 
             Ok(index)
         }
         Err(e) => {
             log::warn!("Unhandled error while creating index: {}", e);
-            Err(IndexingError::IndexDBError(e))
+            Err(IndexingError::Indexing(e))
         }
     }
 }
 
 async fn add_to_index(
-    index: Index<'_>,
+    client: &Client,
+    index: Index,
     mods: &[UploadSearchProject],
 ) -> Result<(), IndexingError> {
     for chunk in mods.chunks(MEILISEARCH_CHUNK_SIZE) {
-        index.add_documents(chunk, Some("project_id")).await?;
+        index
+            .add_documents(chunk, Some("project_id"))
+            .await?
+            .wait_for_completion(client, None, None)
+            .await?;
     }
     Ok(())
 }
 
-async fn create_and_add_to_index<'a>(
-    client: &'a Client<'a>,
-    projects: &'a [UploadSearchProject],
+async fn create_and_add_to_index(
+    client: &Client,
+    projects: &[UploadSearchProject],
     name: &'static str,
-    rule: &'static str,
+    custom_rules: Option<&'static [&'static str]>,
 ) -> Result<(), IndexingError> {
-    let index = create_index(client, name, || {
-        let mut relevance_rules = default_rules();
-        relevance_rules.push_back(rule);
-        relevance_rules.into()
-    })
-    .await?;
-    add_to_index(index, projects).await?;
+    let index = create_index(client, name, custom_rules).await?;
+    add_to_index(client, index, projects).await?;
     Ok(())
 }
 
@@ -192,65 +162,32 @@ pub async fn add_projects(
 ) -> Result<(), IndexingError> {
     let client = config.make_client();
 
+    create_and_add_to_index(&client, &projects, "projects", None).await?;
+
     create_and_add_to_index(
         &client,
         &projects,
-        "relevance_projects",
-        "desc(downloads)",
-    )
-    .await?;
-    create_and_add_to_index(
-        &client,
-        &projects,
-        "downloads_projects",
-        "desc(downloads)",
-    )
-    .await?;
-    create_and_add_to_index(
-        &client,
-        &projects,
-        "follows_projects",
-        "desc(follows)",
-    )
-    .await?;
-    create_and_add_to_index(
-        &client,
-        &projects,
-        "updated_projects",
-        "desc(modified_timestamp)",
-    )
-    .await?;
-    create_and_add_to_index(
-        &client,
-        &projects,
-        "newest_projects",
-        "desc(created_timestamp)",
+        "projects_filtered",
+        Some(&[
+            "sort",
+            "words",
+            "typo",
+            "proximity",
+            "attribute",
+            "exactness",
+        ]),
     )
     .await?;
 
     Ok(())
 }
 
-//region Utils
-fn default_rules() -> VecDeque<&'static str> {
-    vec![
-        "typo",
-        "words",
-        "proximity",
-        "attribute",
-        "wordsPosition",
-        "exactness",
-    ]
-    .into()
-}
-
 fn default_settings() -> Settings {
     Settings::new()
         .with_displayed_attributes(DEFAULT_DISPLAYED_ATTRIBUTES)
         .with_searchable_attributes(DEFAULT_SEARCHABLE_ATTRIBUTES)
-        .with_stop_words(Vec::<String>::new())
-        .with_synonyms(HashMap::<String, Vec<String>>::new())
-        .with_attributes_for_faceting(DEFAULT_ATTRIBUTES_FOR_FACETING)
+        .with_sortable_attributes(DEFAULT_SORTABLE_ATTRIBUTES)
+        .with_filterable_attributes(DEFAULT_ATTRIBUTES_FOR_FACETING)
 }
 
 const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
@@ -275,72 +212,22 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
-    &["title", "description", "categories", "versions", "author"];
+    &["title", "description", "author"];
 
 const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "categories",
-    "host",
     "versions",
     "license",
     "client_side",
     "server_side",
     "project_type",
+    "downloads",
+    "follows",
+    "author",
+    "title",
+    "date_created",
+    "date_modified",
 ];
-//endregion
 
-// This shouldn't be relied on for proper sorting, but it makes an
-// attempt at getting proper sorting for Mojang's versions.
-// This isn't currently used, but I wrote it and it works, so I'm
-// keeping this mess in case someone needs it in the future.
-#[allow(dead_code)]
-pub fn sort_projects(a: &str, b: &str) -> std::cmp::Ordering {
-    use std::cmp::Ordering;
-
-    let cmp = a.contains('.').cmp(&b.contains('.'));
-    if cmp != Ordering::Equal {
-        return cmp;
-    }
-    let mut a = a.split(&['.', '-'] as &[char]);
-    let mut b = b.split(&['.', '-'] as &[char]);
-    let a = (a.next(), a.next(), a.next(), a.next());
-    let b = (b.next(), b.next(), b.next(), b.next());
-    if a.0 == b.0 {
-        let cmp =
-            a.1.map(|s| s.chars().all(|c| c.is_ascii_digit()))
-                .cmp(&b.1.map(|s| s.chars().all(|c| c.is_ascii_digit())));
-        if cmp != Ordering::Equal {
-            return cmp;
-        }
-        if a.1 == b.1 {
-            let cmp =
-                a.2.map(|s| s.chars().all(|c| c.is_ascii_digit()))
-                    .unwrap_or(true)
-                    .cmp(
-                        &b.2.map(|s| s.chars().all(|c| c.is_ascii_digit()))
-                            .unwrap_or(true),
-                    );
-            if cmp != Ordering::Equal {
-                return cmp;
-            }
-            if a.2 == b.2 {
-                match (a.3.is_some(), b.3.is_some()) {
-                    (false, false) => Ordering::Equal,
-                    (false, true) => Ordering::Greater,
-                    (true, false) => Ordering::Less,
-                    (true, true) => a.3.cmp(&b.3),
-                }
-            } else {
-                a.2.cmp(&b.2)
-            }
-        } else {
-            a.1.cmp(&b.1)
-        }
-    } else {
-        match (a.0 == Some("1"), b.0 == Some("1")) {
-            (false, false) => a.0.cmp(&b.0),
-            (true, false) => Ordering::Greater,
-            (false, true) => Ordering::Less,
-            (true, true) => unreachable!(),
-        }
-    }
-}
+const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =
+    &["downloads", "follows", "date_created", "date_modified"];

@@ -33,7 +33,7 @@ impl super::Validator for ForgeValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("META-INF/mods.toml").map_err(|_| {
-            ValidationError::InvalidInputError(
+            ValidationError::InvalidInput(
                 "No mods.toml present for Forge file.".into(),
             )
         })?;

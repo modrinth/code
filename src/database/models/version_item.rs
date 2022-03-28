@@ -460,7 +460,7 @@ impl Version {
 
         sqlx::query!(
             "
-            DELETE FROM dependencies WHERE dependent_id = $1 AND dependency_id = $1
+            DELETE FROM dependencies WHERE dependent_id = $1
             ",
             id as VersionId,
         )

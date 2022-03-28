@@ -42,7 +42,7 @@ pub async fn team_members_get(
                 &**pool,
             )
             .await
-            .map_err(ApiError::DatabaseError)?;
+            .map_err(ApiError::Database)?;
 
         if team_member.is_some() {
             let team_members: Vec<TeamMember> = members_data

@@ -14,15 +14,15 @@ mod pack;
 #[derive(Error, Debug)]
 pub enum ValidationError {
     #[error("Unable to read Zip Archive: {0}")]
-    ZipError(#[from] zip::result::ZipError),
+    Zip(#[from] zip::result::ZipError),
     #[error("IO Error: {0}")]
-    IoError(#[from] std::io::Error),
+    Io(#[from] std::io::Error),
     #[error("Error while validating JSON: {0}")]
-    SerdeError(#[from] serde_json::Error),
+    SerDe(#[from] serde_json::Error),
     #[error("Invalid Input: {0}")]
-    InvalidInputError(std::borrow::Cow<'static, str>),
+    InvalidInput(std::borrow::Cow<'static, str>),
     #[error("Error while managing threads")]
-    BlockingError(#[from] actix_web::error::BlockingError),
+    Blocking(#[from] actix_web::error::BlockingError),
 }
 
 #[derive(Eq, PartialEq)]
@@ -93,7 +93,7 @@ pub async fn validate_file(
         }
 
         if visited {
-            Err(ValidationError::InvalidInputError(
+            Err(ValidationError::InvalidInput(
                 format!(
                     "File extension {} is invalid for input file",
                     file_extension

@@ -24,12 +24,12 @@ pub async fn forge_updates(
         &id, &**pool,
     )
     .await?
-    .ok_or_else(|| ApiError::InvalidInputError(ERROR.to_string()))?;
+    .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if !is_authorized(&project, &user_option, &pool).await? {
-        return Err(ApiError::InvalidInputError(ERROR.to_string()));
+        return Err(ApiError::InvalidInput(ERROR.to_string()));
     }
 
     let version_ids = database::models::Version::get_project_versions(

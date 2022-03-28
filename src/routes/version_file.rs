@@ -135,9 +135,9 @@ pub async fn delete_file(
                     &**pool,
                 )
                 .await
-                .map_err(ApiError::DatabaseError)?
+                .map_err(ApiError::Database)?
                 .ok_or_else(|| {
-                    ApiError::CustomAuthenticationError(
+                    ApiError::CustomAuthentication(
                         "You don't have permission to delete this file!"
                             .to_string(),
                     )
@@ -147,7 +147,7 @@ pub async fn delete_file(
                 .permissions
                 .contains(Permissions::DELETE_VERSION)
             {
-                return Err(ApiError::CustomAuthenticationError(
+                return Err(ApiError::CustomAuthentication(
                     "You don't have permission to delete this file!"
                         .to_string(),
                 ));
@@ -169,7 +169,7 @@ pub async fn delete_file(
         .await?;
 
         if files.len() < 2 {
-            return Err(ApiError::InvalidInputError(
+            return Err(ApiError::InvalidInput(
                 "Versions must have at least one file uploaded to them"
                     .to_string(),
             ));

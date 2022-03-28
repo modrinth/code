@@ -64,7 +64,7 @@ pub async fn report_create(
     let mut bytes = web::BytesMut::new();
     while let Some(item) = body.next().await {
         bytes.extend_from_slice(&item.map_err(|_| {
-            ApiError::InvalidInputError(
+            ApiError::InvalidInput(
                 "Error while parsing request payload!".to_string(),
             )
         })?);
@@ -79,7 +79,7 @@ pub async fn report_create(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(format!(
+        ApiError::InvalidInput(format!(
             "Invalid report type: {}",
             new_report.report_type
         ))
@@ -124,7 +124,7 @@ pub async fn report_create(
             )
         }
         ItemType::Unknown => {
-            return Err(ApiError::InvalidInputError(format!(
+            return Err(ApiError::InvalidInput(format!(
                 "Invalid report item type: {}",
                 new_report.item_type.as_str()
             )))

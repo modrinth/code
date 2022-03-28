@@ -1,4 +1,5 @@
 //! Errors that can occur during middleware processing stage
+use crate::models::error::ApiError;
 use actix_web::ResponseError;
 use log::*;
 use thiserror::Error;
@@ -11,14 +12,14 @@ use thiserror::Error;
 pub enum ARError {
     /// Read/Write error on store
     #[error("read/write operatiion failed: {0}")]
-    ReadWriteError(String),
+    ReadWrite(String),
 
     /// Identifier error
     #[error("client identification failed")]
-    IdentificationError,
+    Identification,
     /// Limited Error
     #[error("You are being ratelimited. Please wait {reset} seconds. {remaining}/{max_requests} remaining.")]
-    LimitedError {
+    Limited {
         max_requests: usize,
         remaining: usize,
         reset: u64,
@@ -28,7 +29,7 @@ pub enum ARError {
 impl ResponseError for ARError {
     fn error_response(&self) -> actix_web::HttpResponse {
         match self {
-            Self::LimitedError {
+            Self::Limited {
                 max_requests,
                 remaining,
                 reset,
@@ -44,10 +45,17 @@ impl ResponseError for ARError {
                 ));
                 response
                     .insert_header(("x-ratelimit-reset", reset.to_string()));
-                response.body(self.to_string())
+                response.json(ApiError {
+                    error: "ratelimit_error",
+                    description: &self.to_string(),
+                })
             }
-            _ => actix_web::HttpResponse::build(self.status_code())
-                .body(self.to_string()),
+            _ => actix_web::HttpResponse::build(self.status_code()).json(
+                ApiError {
+                    error: "ratelimit_error",
+                    description: &self.to_string(),
+                },
+            ),
         }
     }
 }

@@ -12,15 +12,15 @@ use thiserror::Error;
 #[derive(Error, Debug)]
 pub enum AuthenticationError {
     #[error("An unknown database error occurred")]
-    SqlxDatabaseError(#[from] sqlx::Error),
+    Sqlx(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
-    DatabaseError(#[from] crate::database::models::DatabaseError),
+    Database(#[from] crate::database::models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
-    SerdeError(#[from] serde_json::Error),
+    SerDe(#[from] serde_json::Error),
     #[error("Error while communicating to GitHub OAuth2: {0}")]
-    GithubError(#[from] reqwest::Error),
+    Github(#[from] reqwest::Error),
     #[error("Invalid Authentication Credentials")]
-    InvalidCredentialsError,
+    InvalidCredentials,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -73,7 +73,7 @@ where
             created: result.created,
             role: Role::from_string(&result.role),
         }),
-        None => Err(AuthenticationError::InvalidCredentialsError),
+        None => Err(AuthenticationError::InvalidCredentials),
     }
 }
 pub async fn get_user_from_headers<'a, 'b, E>(
@@ -85,9 +85,9 @@ where
 {
     let token = headers
         .get("Authorization")
-        .ok_or(AuthenticationError::InvalidCredentialsError)?
+        .ok_or(AuthenticationError::InvalidCredentials)?
         .to_str()
-        .map_err(|_| AuthenticationError::InvalidCredentialsError)?;
+        .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
     Ok(get_user_from_token(token, executor).await?)
 }
@@ -104,7 +104,7 @@ where
     if user.role.is_mod() {
         Ok(user)
     } else {
-        Err(AuthenticationError::InvalidCredentialsError)
+        Err(AuthenticationError::InvalidCredentials)
     }
 }
 
@@ -119,7 +119,7 @@ where
 
     match user.role {
         Role::Admin => Ok(user),
-        _ => Err(AuthenticationError::InvalidCredentialsError),
+        _ => Err(AuthenticationError::InvalidCredentials),
     }
 }
 

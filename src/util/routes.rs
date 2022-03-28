@@ -15,10 +15,10 @@ pub async fn read_from_payload(
     let mut bytes = BytesMut::new();
     while let Some(item) = payload.next().await {
         if bytes.len() >= cap {
-            return Err(ApiError::InvalidInputError(String::from(err_msg)));
+            return Err(ApiError::InvalidInput(String::from(err_msg)));
         } else {
             bytes.extend_from_slice(&item.map_err(|_| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "Unable to parse bytes in payload sent!".to_string(),
                 )
             })?);

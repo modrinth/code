@@ -19,61 +19,51 @@ pub fn config(cfg: &mut ServiceConfig) {
 #[derive(Error, Debug)]
 pub enum AuthorizationError {
     #[error("Environment Error")]
-    EnvError(#[from] dotenv::Error),
+    Env(#[from] dotenv::Error),
     #[error("An unknown database error occured: {0}")]
-    SqlxDatabaseError(#[from] sqlx::Error),
+    SqlxDatabase(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
-    DatabaseError(#[from] crate::database::models::DatabaseError),
+    Database(#[from] crate::database::models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
-    SerDeError(#[from] serde_json::Error),
+    SerDe(#[from] serde_json::Error),
     #[error("Error while communicating to GitHub OAuth2")]
-    GithubError(#[from] reqwest::Error),
+    Github(#[from] reqwest::Error),
     #[error("Invalid Authentication credentials")]
-    InvalidCredentialsError,
+    InvalidCredentials,
     #[error("Authentication Error: {0}")]
-    AuthenticationError(#[from] crate::util::auth::AuthenticationError),
+    Authentication(#[from] crate::util::auth::AuthenticationError),
     #[error("Error while decoding Base62")]
-    DecodingError(#[from] DecodingError),
+    Decoding(#[from] DecodingError),
 }
 impl actix_web::ResponseError for AuthorizationError {
     fn status_code(&self) -> StatusCode {
         match self {
-            AuthorizationError::EnvError(..) => {
+            AuthorizationError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            AuthorizationError::SqlxDatabase(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            AuthorizationError::SqlxDatabaseError(..) => {
+            AuthorizationError::Database(..) => {
                 StatusCode::INTERNAL_SERVER_ERROR
             }
-            AuthorizationError::DatabaseError(..) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-            AuthorizationError::SerDeError(..) => StatusCode::BAD_REQUEST,
-            AuthorizationError::GithubError(..) => {
-                StatusCode::FAILED_DEPENDENCY
-            }
-            AuthorizationError::InvalidCredentialsError => {
-                StatusCode::UNAUTHORIZED
-            }
-            AuthorizationError::DecodingError(..) => StatusCode::BAD_REQUEST,
-            AuthorizationError::AuthenticationError(..) => {
-                StatusCode::UNAUTHORIZED
-            }
+            AuthorizationError::SerDe(..) => StatusCode::BAD_REQUEST,
+            AuthorizationError::Github(..) => StatusCode::FAILED_DEPENDENCY,
+            AuthorizationError::InvalidCredentials => StatusCode::UNAUTHORIZED,
+            AuthorizationError::Decoding(..) => StatusCode::BAD_REQUEST,
+            AuthorizationError::Authentication(..) => StatusCode::UNAUTHORIZED,
         }
     }
 
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
-                AuthorizationError::EnvError(..) => "environment_error",
-                AuthorizationError::SqlxDatabaseError(..) => "database_error",
-                AuthorizationError::DatabaseError(..) => "database_error",
-                AuthorizationError::SerDeError(..) => "invalid_input",
-                AuthorizationError::GithubError(..) => "github_error",
-                AuthorizationError::InvalidCredentialsError => {
-                    "invalid_credentials"
-                }
-                AuthorizationError::DecodingError(..) => "decoding_error",
-                AuthorizationError::AuthenticationError(..) => {
+                AuthorizationError::Env(..) => "environment_error",
+                AuthorizationError::SqlxDatabase(..) => "database_error",
+                AuthorizationError::Database(..) => "database_error",
+                AuthorizationError::SerDe(..) => "invalid_input",
+                AuthorizationError::Github(..) => "github_error",
+                AuthorizationError::InvalidCredentials => "invalid_credentials",
+                AuthorizationError::Decoding(..) => "decoding_error",
+                AuthorizationError::Authentication(..) => {
                     "authentication_error"
                 }
             },
@@ -159,7 +149,7 @@ pub async fn auth_callback(
         let duration = result.expires.signed_duration_since(now);
 
         if duration.num_seconds() < 0 {
-            return Err(AuthorizationError::InvalidCredentialsError);
+            return Err(AuthorizationError::InvalidCredentials);
         }
 
         sqlx::query!(
@@ -256,6 +246,6 @@ pub async fn auth_callback(
             .append_header(("Location", &*redirect_url))
             .json(AuthorizationInit { url: redirect_url }))
     } else {
-        Err(AuthorizationError::InvalidCredentialsError)
+        Err(AuthorizationError::InvalidCredentials)
     }
 }

@@ -31,8 +31,6 @@ struct Config {
 
     #[options(no_short, help = "Skip indexing on startup")]
     skip_first_index: bool,
-    #[options(no_short, help = "Reset the settings of the indices")]
-    reconfigure_indices: bool,
     #[options(no_short, help = "Reset the documents in the indices")]
     reset_indices: bool,
 
@@ -76,12 +74,6 @@ async fn main() -> std::io::Result<()> {
     if config.reset_indices {
         info!("Resetting indices");
         search::indexing::reset_indices(&search_config)
-            .await
-            .unwrap();
-        return Ok(());
-    } else if config.reconfigure_indices {
-        info!("Reconfiguring indices");
-        search::indexing::reconfigure_indices(&search_config)
             .await
             .unwrap();
         return Ok(());
@@ -252,18 +244,18 @@ async fn main() -> std::io::Result<()> {
                                 if let Some(header) =
                                     req.headers().get("CF-Connecting-IP")
                                 {
-                                    header.to_str().map_err(|_| {
-                                        ARError::IdentificationError
-                                    })?
+                                    header
+                                        .to_str()
+                                        .map_err(|_| ARError::Identification)?
                                 } else {
                                     connection_info
                                         .peer_addr()
-                                        .ok_or(ARError::IdentificationError)?
+                                        .ok_or(ARError::Identification)?
                                 }
                             } else {
                                 connection_info
                                     .peer_addr()
-                                    .ok_or(ARError::IdentificationError)?
+                                    .ok_or(ARError::Identification)?
                             },
                         );
 

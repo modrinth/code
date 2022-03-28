@@ -475,13 +475,14 @@ pub struct Loader(pub String);
 #[derive(Serialize, Deserialize)]
 pub struct SearchRequest {
     pub query: Option<String>,
-    /// Must match a json 2 deep array of strings `[["categories:misc"]]`
-    // TODO: We may want to have a better representation of this, so that
-    // we are less likely to break backwards compatibility
-    pub facets: Option<String>,
-    pub filters: Option<String>,
-    pub version: Option<String>,
     pub offset: Option<String>,
     pub index: Option<String>,
     pub limit: Option<String>,
+
+    pub new_filters: Option<String>,
+
+    // Deprecated values below. WILL BE REMOVED V3!
+    pub facets: Option<String>,
+    pub filters: Option<String>,
+    pub version: Option<String>,
 }

@@ -15,13 +15,13 @@ pub mod indexing;
 #[derive(Error, Debug)]
 pub enum SearchError {
     #[error("MeiliSearch Error: {0}")]
-    MeiliSearchError(#[from] meilisearch_sdk::errors::Error),
+    MeiliSearch(#[from] meilisearch_sdk::errors::Error),
     #[error("Error while serializing or deserializing JSON: {0}")]
-    SerdeError(#[from] serde_json::Error),
+    Serde(#[from] serde_json::Error),
     #[error("Error while parsing an integer: {0}")]
-    IntParsingError(#[from] std::num::ParseIntError),
+    IntParsing(#[from] std::num::ParseIntError),
     #[error("Environment Error")]
-    EnvError(#[from] dotenv::Error),
+    Env(#[from] dotenv::Error),
     #[error("Invalid index to sort by: {0}")]
     InvalidIndex(String),
 }
@@ -29,10 +29,10 @@ pub enum SearchError {
 impl actix_web::ResponseError for SearchError {
     fn status_code(&self) -> StatusCode {
         match self {
-            SearchError::EnvError(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            SearchError::MeiliSearchError(..) => StatusCode::BAD_REQUEST,
-            SearchError::SerdeError(..) => StatusCode::BAD_REQUEST,
-            SearchError::IntParsingError(..) => StatusCode::BAD_REQUEST,
+            SearchError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            SearchError::MeiliSearch(..) => StatusCode::BAD_REQUEST,
+            SearchError::Serde(..) => StatusCode::BAD_REQUEST,
+            SearchError::IntParsing(..) => StatusCode::BAD_REQUEST,
             SearchError::InvalidIndex(..) => StatusCode::BAD_REQUEST,
         }
     }
@@ -40,10 +40,10 @@ impl actix_web::ResponseError for SearchError {
     fn error_response(&self) -> HttpResponse {
         HttpResponse::build(self.status_code()).json(ApiError {
             error: match self {
-                SearchError::EnvError(..) => "environment_error",
-                SearchError::MeiliSearchError(..) => "meilisearch_error",
-                SearchError::SerdeError(..) => "invalid_input",
-                SearchError::IntParsingError(..) => "invalid_input",
+                SearchError::Env(..) => "environment_error",
+                SearchError::MeiliSearch(..) => "meilisearch_error",
+                SearchError::Serde(..) => "invalid_input",
+                SearchError::IntParsing(..) => "invalid_input",
                 SearchError::InvalidIndex(..) => "invalid_input",
             },
             description: &self.to_string(),
@@ -149,62 +149,85 @@ pub async fn search_for_project(
 ) -> Result<SearchResults, SearchError> {
     let client = Client::new(&*config.address, &*config.key);
 
-    let filters: Cow<_> =
-        match (info.filters.as_deref(), info.version.as_deref()) {
-            (Some(f), Some(v)) => format!("({}) AND ({})", f, v).into(),
-            (Some(f), None) => f.into(),
-            (None, Some(v)) => v.into(),
-            (None, None) => "".into(),
-        };
-
     let offset = info.offset.as_deref().unwrap_or("0").parse()?;
     let index = info.index.as_deref().unwrap_or("relevance");
     let limit = info.limit.as_deref().unwrap_or("10").parse()?;
 
-    let index = match index {
-        "relevance" => "relevance_projects",
-        "downloads" => "downloads_projects",
-        "follows" => "follows_projects",
-        "updated" => "updated_projects",
-        "newest" => "newest_projects",
+    let sort = match index {
+        "relevance" => ("projects", ["downloads:desc"]),
+        "downloads" => ("projects_filtered", ["downloads:desc"]),
+        "follows" => ("projects_filtered", ["follows:desc"]),
+        "updated" => ("projects_filtered", ["date_created:desc"]),
+        "newest" => ("projects_filtered", ["date_modified:desc"]),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     };
 
-    let meilisearch_index = client.get_index(index).await?;
-    let mut query = meilisearch_index.search();
+    let meilisearch_index = client.get_index(sort.0).await?;
 
-    query.with_limit(min(100, limit)).with_offset(offset);
+    let mut filter_string = String::new();
 
-    if let Some(search) = info.query.as_deref() {
-        if !search.is_empty() {
-            query.with_query(search);
+    let results = {
+        let mut query = meilisearch_index.search();
+
+        query
+            .with_limit(min(100, limit))
+            .with_offset(offset)
+            .with_query(info.query.as_deref().unwrap_or_default())
+            .with_sort(&sort.1);
+
+        if let Some(new_filters) = info.new_filters.as_deref() {
+            query.with_filter(new_filters);
+        } else {
+            let facets = if let Some(facets) = &info.facets {
+                Some(serde_json::from_str::<Vec<Vec<&str>>>(facets)?)
+            } else {
+                None
+            };
+
+            let filters: Cow<_> =
+                match (info.filters.as_deref(), info.version.as_deref()) {
+                    (Some(f), Some(v)) => format!("({}) AND ({})", f, v).into(),
+                    (Some(f), None) => f.into(),
+                    (None, Some(v)) => v.into(),
+                    (None, None) => "".into(),
+                };
+
+            if let Some(facets) = facets {
+                filter_string.push('(');
+                for (index, facet_list) in facets.iter().enumerate() {
+                    filter_string.push('(');
+
+                    for (facet_index, facet) in facet_list.iter().enumerate() {
+                        filter_string.push_str(&facet.replace(':', " = "));
+
+                        if facet_index != (facet_list.len() - 1) {
+                            filter_string.push_str(" OR ")
+                        }
+                    }
+
+                    filter_string.push(')');
+
+                    if index != (facets.len() - 1) {
+                        filter_string.push_str(" AND ")
+                    }
+                }
+                filter_string.push(')');
+
+                if !filters.is_empty() {
+                    filter_string.push_str(&format!(" AND ({})", filter_string))
+                }
+            } else {
+                filter_string.push_str(&*filters);
+            }
+
+            println!("{}", filter_string);
+            if !filter_string.is_empty() {
+                query.with_filter(&filter_string);
+            }
         }
-    }
 
-    if !filters.is_empty() {
-        query.with_filters(&filters);
-    }
-
-    // So the meilisearch sdk's lifetimes are... broken, to say the least
-    // They are overspecified and almost always wrong, and would generally
-    // just be better if they didn't specify them at all.
-
-    // They also decided to have this take a &[&[&str]], which is impossible
-    // to construct efficiently.  Instead it should take impl Iterator<Item=&[&str]>,
-    // &[impl AsRef<[&str]>], or one of many other proper solutions to that issue.
-
-    let why_meilisearch;
-    let why_must_you_do_this;
-    if let Some(facets) = &info.facets {
-        why_meilisearch = serde_json::from_str::<Vec<Vec<&str>>>(facets)?;
-        why_must_you_do_this = why_meilisearch
-            .iter()
-            .map(|v| v as &[_])
-            .collect::<Vec<&[_]>>();
-        query.with_facet_filters(&why_must_you_do_this);
-    }
-
-    let results = query.execute::<ResultSearchProject>().await?;
+        query.execute::<ResultSearchProject>().await?
+    };
 
     Ok(SearchResults {
         hits: results.hits.into_iter().map(|r| r.result).collect(),

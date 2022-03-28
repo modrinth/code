@@ -295,7 +295,7 @@ Get logged in user
 pub async fn project_create_inner(
     req: HttpRequest,
     mut payload: Multipart,
-    mut transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, CreateError> {
@@ -535,7 +535,7 @@ pub async fn project_create_inner(
             all_game_versions.clone(),
             version_data.primary_file.is_some(),
             version_data.primary_file.as_deref() == Some(name),
-            &mut transaction,
+            transaction,
         )
         .await?;
     }

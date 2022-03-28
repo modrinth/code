@@ -166,7 +166,7 @@ pub async fn user_edit(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
     new_user.validate().map_err(|err| {
-        ApiError::ValidationError(validation_errors_to_string(err, None))
+        ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
     let id_option = crate::database::models::User::get_id_from_username_or_id(
@@ -201,7 +201,7 @@ pub async fn user_edit(
                     .execute(&mut *transaction)
                     .await?;
                 } else {
-                    return Err(ApiError::InvalidInputError(format!(
+                    return Err(ApiError::InvalidInput(format!(
                         "Username {} is taken!",
                         username
                     )));
@@ -252,7 +252,7 @@ pub async fn user_edit(
 
             if let Some(role) = &new_user.role {
                 if !user.role.is_mod() {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the role of this user!"
                             .to_string(),
                     ));
@@ -276,7 +276,7 @@ pub async fn user_edit(
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthenticationError(
+            Err(ApiError::CustomAuthentication(
                 "You do not have permission to edit this user!".to_string(),
             ))
         }
@@ -313,7 +313,7 @@ pub async fn user_icon_edit(
 
         if let Some(id) = id_option {
             if user.id != id.into() && !user.role.is_mod() {
-                return Err(ApiError::CustomAuthenticationError(
+                return Err(ApiError::CustomAuthentication(
                     "You don't have permission to edit this user's icon."
                         .to_string(),
                 ));
@@ -374,7 +374,7 @@ pub async fn user_icon_edit(
             Ok(HttpResponse::NotFound().body(""))
         }
     } else {
-        Err(ApiError::InvalidInputError(format!(
+        Err(ApiError::InvalidInput(format!(
             "Invalid format for user icon: {}",
             ext.ext
         )))
@@ -407,24 +407,18 @@ pub async fn user_delete(
 
     if let Some(id) = id_option {
         if !user.role.is_mod() && user.id != id.into() {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You do not have permission to delete this user!".to_string(),
             ));
         }
 
         let mut transaction = pool.begin().await?;
 
-        let result;
-        if &*removal_type.removal_type == "full" {
-            result = crate::database::models::User::remove_full(
-                id,
-                &mut transaction,
-            )
-            .await?;
+        let result = if &*removal_type.removal_type == "full" {
+            crate::database::models::User::remove_full(id, &mut transaction)
+                .await?
         } else {
-            result =
-                crate::database::models::User::remove(id, &mut transaction)
-                    .await?;
+            crate::database::models::User::remove(id, &mut transaction).await?
         };
 
         transaction.commit().await?;
@@ -454,7 +448,7 @@ pub async fn user_follows(
 
     if let Some(id) = id_option {
         if !user.role.is_mod() && user.id != id.into() {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You do not have permission to see the projects this user follows!".to_string(),
             ));
         }
@@ -504,7 +498,7 @@ pub async fn user_notifications(
 
     if let Some(id) = id_option {
         if !user.role.is_mod() && user.id != id.into() {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You do not have permission to see the notifications of this user!".to_string(),
             ));
         }

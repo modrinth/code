@@ -28,7 +28,7 @@ macro_rules! generate_ids {
 
                 retry_count += 1;
                 if retry_count > ID_RETRY_COUNT {
-                    return Err(DatabaseError::RandomIdError);
+                    return Err(DatabaseError::RandomId);
                 }
             }
 

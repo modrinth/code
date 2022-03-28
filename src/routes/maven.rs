@@ -114,7 +114,7 @@ pub async fn maven_metadata(
 
     Ok(HttpResponse::Ok()
         .content_type("text/xml")
-        .body(yaserde::ser::to_string(&respdata).map_err(ApiError::XmlError)?))
+        .body(yaserde::ser::to_string(&respdata).map_err(ApiError::Xml)?))
 }
 
 fn find_file<'a>(
@@ -211,9 +211,9 @@ pub async fn version_file(
             name: project.inner.title,
             description: project.inner.description,
         };
-        return Ok(HttpResponse::Ok().content_type("text/xml").body(
-            yaserde::ser::to_string(&respdata).map_err(ApiError::XmlError)?,
-        ));
+        return Ok(HttpResponse::Ok()
+            .content_type("text/xml")
+            .body(yaserde::ser::to_string(&respdata).map_err(ApiError::Xml)?));
     } else if let Some(selected_file) =
         find_file(&project_id, &project, &version, &file)
     {

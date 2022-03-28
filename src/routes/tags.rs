@@ -74,7 +74,7 @@ pub async fn category_create(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(
+        ApiError::InvalidInput(
             "Specified project type does not exist!".to_string(),
         )
     })?;

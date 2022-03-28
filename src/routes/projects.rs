@@ -102,9 +102,10 @@ pub async fn dependency_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result =
-        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool)
-            .await?;
+    let result = database::models::Project::get_full_from_slug_or_project_id(
+        &string, &**pool,
+    )
+    .await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -152,7 +153,7 @@ pub async fn dependency_list(
             database::Project::get_many_full(
                 dependencies
                     .iter()
-                    .map(|x| if x.0.is_none() {
+                    .filter_map(|x| if x.0.is_none() {
                         if let Some(mod_dependency_id) = x.2 {
                             Some(mod_dependency_id)
                         } else {
@@ -161,12 +162,11 @@ pub async fn dependency_list(
                     } else {
                         x.1
                     })
-                    .flatten()
                     .collect(),
                 &**pool,
             ),
             database::Version::get_many_full(
-                dependencies.iter().map(|x| x.0).flatten().collect(),
+                dependencies.iter().filter_map(|x| x.0).collect(),
                 &**pool,
             )
         );
@@ -282,7 +282,7 @@ pub async fn project_edit(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
     new_project.validate().map_err(|err| {
-        ApiError::ValidationError(validation_errors_to_string(err, None))
+        ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
     let string = info.into_inner().0;
@@ -315,7 +315,7 @@ pub async fn project_edit(
 
             if let Some(title) = &new_project.title {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the title of this project!"
                             .to_string(),
                     ));
@@ -336,7 +336,7 @@ pub async fn project_edit(
 
             if let Some(description) = &new_project.description {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the description of this project!"
                             .to_string(),
                     ));
@@ -357,7 +357,7 @@ pub async fn project_edit(
 
             if let Some(status) = &new_project.status {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the status of this project!"
                             .to_string(),
                     ));
@@ -367,7 +367,7 @@ pub async fn project_edit(
                     || status == &ProjectStatus::Approved)
                     && !user.role.is_mod()
                 {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You don't have permission to set this status"
                             .to_string(),
                     ));
@@ -375,7 +375,7 @@ pub async fn project_edit(
 
                 if status == &ProjectStatus::Processing {
                     if project_item.versions.is_empty() {
-                        return Err(ApiError::InvalidInputError(String::from(
+                        return Err(ApiError::InvalidInput(String::from(
                             "Project submitted for review with no initial versions",
                         )));
                     }
@@ -420,7 +420,7 @@ pub async fn project_edit(
                 )
                 .await?
                 .ok_or_else(|| {
-                    ApiError::InvalidInputError(
+                    ApiError::InvalidInput(
                         "No database entry for status provided.".to_string(),
                     )
                 })?;
@@ -457,7 +457,7 @@ pub async fn project_edit(
 
             if let Some(categories) = &new_project.categories {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the categories of this project!"
                             .to_string(),
                     ));
@@ -481,7 +481,7 @@ pub async fn project_edit(
                         )
                         .await?
                         .ok_or_else(|| {
-                            ApiError::InvalidInputError(format!(
+                            ApiError::InvalidInput(format!(
                                 "Category {} does not exist.",
                                 category.clone()
                             ))
@@ -502,7 +502,7 @@ pub async fn project_edit(
 
             if let Some(issues_url) = &new_project.issues_url {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the issues URL of this project!"
                             .to_string(),
                     ));
@@ -523,7 +523,7 @@ pub async fn project_edit(
 
             if let Some(source_url) = &new_project.source_url {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the source URL of this project!"
                             .to_string(),
                     ));
@@ -544,7 +544,7 @@ pub async fn project_edit(
 
             if let Some(wiki_url) = &new_project.wiki_url {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the wiki URL of this project!"
                             .to_string(),
                     ));
@@ -565,7 +565,7 @@ pub async fn project_edit(
 
             if let Some(license_url) = &new_project.license_url {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the license URL of this project!"
                             .to_string(),
                     ));
@@ -586,7 +586,7 @@ pub async fn project_edit(
 
             if let Some(discord_url) = &new_project.discord_url {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the discord URL of this project!"
                             .to_string(),
                     ));
@@ -607,7 +607,7 @@ pub async fn project_edit(
 
             if let Some(slug) = &new_project.slug {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the slug of this project!"
                             .to_string(),
                     ));
@@ -629,7 +629,7 @@ pub async fn project_edit(
                         .await?;
 
                         if results.exists.unwrap_or(true) {
-                            return Err(ApiError::InvalidInputError(
+                            return Err(ApiError::InvalidInput(
                                 "Slug collides with other project's id!"
                                     .to_string(),
                             ));
@@ -652,7 +652,7 @@ pub async fn project_edit(
 
             if let Some(new_side) = &new_project.client_side {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the side type of this mod!"
                             .to_string(),
                     ));
@@ -680,7 +680,7 @@ pub async fn project_edit(
 
             if let Some(new_side) = &new_project.server_side {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the side type of this project!"
                             .to_string(),
                     ));
@@ -708,7 +708,7 @@ pub async fn project_edit(
 
             if let Some(license) = &new_project.license_id {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the license of this project!"
                             .to_string(),
                     ));
@@ -736,7 +736,7 @@ pub async fn project_edit(
 
             if let Some(donations) = &new_project.donation_urls {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the donation links of this project!"
                             .to_string(),
                     ));
@@ -760,7 +760,7 @@ pub async fn project_edit(
                         )
                         .await?
                         .ok_or_else(|| {
-                            ApiError::InvalidInputError(format!(
+                            ApiError::InvalidInput(format!(
                                 "Platform {} does not exist.",
                                 donation.id.clone()
                             ))
@@ -784,7 +784,7 @@ pub async fn project_edit(
                 if !user.role.is_mod()
                     && project_item.status != ProjectStatus::Approved
                 {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the moderation message of this project!"
                             .to_string(),
                     ));
@@ -809,7 +809,7 @@ pub async fn project_edit(
                 if !user.role.is_mod()
                     && project_item.status != ProjectStatus::Approved
                 {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the moderation message body of this project!"
                             .to_string(),
                     ));
@@ -830,7 +830,7 @@ pub async fn project_edit(
 
             if let Some(body) = &new_project.body {
                 if !perms.contains(Permissions::EDIT_BODY) {
-                    return Err(ApiError::CustomAuthenticationError(
+                    return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the body of this project!"
                             .to_string(),
                     ));
@@ -852,7 +852,7 @@ pub async fn project_edit(
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
-            Err(ApiError::CustomAuthenticationError(
+            Err(ApiError::CustomAuthentication(
                 "You do not have permission to edit this project!".to_string(),
             ))
         }
@@ -889,7 +889,7 @@ pub async fn project_icon_edit(
             )
             .await?
             .ok_or_else(|| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "The specified project does not exist!".to_string(),
                 )
             })?;
@@ -901,15 +901,15 @@ pub async fn project_icon_edit(
                 &**pool,
             )
             .await
-            .map_err(ApiError::DatabaseError)?
+            .map_err(ApiError::Database)?
             .ok_or_else(|| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "The specified project does not exist!".to_string(),
                 )
             })?;
 
             if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
-                return Err(ApiError::CustomAuthenticationError(
+                return Err(ApiError::CustomAuthentication(
                     "You don't have permission to edit this project's icon."
                         .to_string(),
                 ));
@@ -958,7 +958,7 @@ pub async fn project_icon_edit(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::InvalidInputError(format!(
+        Err(ApiError::InvalidInput(format!(
             "Invalid format for project icon: {}",
             ext.ext
         )))
@@ -981,7 +981,7 @@ pub async fn delete_project_icon(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(
+        ApiError::InvalidInput(
             "The specified project does not exist!".to_string(),
         )
     })?;
@@ -993,15 +993,15 @@ pub async fn delete_project_icon(
             &**pool,
         )
         .await
-        .map_err(ApiError::DatabaseError)?
+        .map_err(ApiError::Database)?
         .ok_or_else(|| {
-            ApiError::InvalidInputError(
+            ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             )
         })?;
 
         if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You don't have permission to edit this project's icon."
                     .to_string(),
             ));
@@ -1057,7 +1057,7 @@ pub async fn add_gallery_item(
         crate::util::ext::get_image_content_type(&*ext.ext)
     {
         item.validate().map_err(|err| {
-            ApiError::ValidationError(validation_errors_to_string(err, None))
+            ApiError::Validation(validation_errors_to_string(err, None))
         })?;
 
         let cdn_url = dotenv::var("CDN_URL")?;
@@ -1071,7 +1071,7 @@ pub async fn add_gallery_item(
             )
             .await?
             .ok_or_else(|| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "The specified project does not exist!".to_string(),
                 )
             })?;
@@ -1083,15 +1083,15 @@ pub async fn add_gallery_item(
                 &**pool,
             )
             .await
-            .map_err(ApiError::DatabaseError)?
+            .map_err(ApiError::Database)?
             .ok_or_else(|| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "The specified project does not exist!".to_string(),
                 )
             })?;
 
             if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
-                return Err(ApiError::CustomAuthenticationError(
+                return Err(ApiError::CustomAuthentication(
                     "You don't have permission to edit this project's gallery."
                         .to_string(),
                 ));
@@ -1143,7 +1143,7 @@ pub async fn add_gallery_item(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::InvalidInputError(format!(
+        Err(ApiError::InvalidInput(format!(
             "Invalid format for gallery image: {}",
             ext.ext
         )))
@@ -1182,7 +1182,7 @@ pub async fn edit_gallery_item(
     let string = info.into_inner().0;
 
     item.validate().map_err(|err| {
-        ApiError::ValidationError(validation_errors_to_string(err, None))
+        ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
     let project_item = database::models::Project::get_from_slug_or_project_id(
@@ -1191,7 +1191,7 @@ pub async fn edit_gallery_item(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(
+        ApiError::InvalidInput(
             "The specified project does not exist!".to_string(),
         )
     })?;
@@ -1203,15 +1203,15 @@ pub async fn edit_gallery_item(
             &**pool,
         )
         .await
-        .map_err(ApiError::DatabaseError)?
+        .map_err(ApiError::Database)?
         .ok_or_else(|| {
-            ApiError::InvalidInputError(
+            ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             )
         })?;
 
         if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You don't have permission to edit this project's gallery."
                     .to_string(),
             ));
@@ -1229,7 +1229,7 @@ pub async fn edit_gallery_item(
     .fetch_optional(&mut *transaction)
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(format!(
+        ApiError::InvalidInput(format!(
             "Gallery item at URL {} is not part of the project's gallery.",
             item.url
         ))
@@ -1319,7 +1319,7 @@ pub async fn delete_gallery_item(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(
+        ApiError::InvalidInput(
             "The specified project does not exist!".to_string(),
         )
     })?;
@@ -1331,15 +1331,15 @@ pub async fn delete_gallery_item(
             &**pool,
         )
         .await
-        .map_err(ApiError::DatabaseError)?
+        .map_err(ApiError::Database)?
         .ok_or_else(|| {
-            ApiError::InvalidInputError(
+            ApiError::InvalidInput(
                 "The specified project does not exist!".to_string(),
             )
         })?;
 
         if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You don't have permission to edit this project's gallery."
                     .to_string(),
             ));
@@ -1357,7 +1357,7 @@ pub async fn delete_gallery_item(
     .fetch_optional(&mut *transaction)
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(format!(
+        ApiError::InvalidInput(format!(
             "Gallery item at URL {} is not part of the project's gallery.",
             item.url
         ))
@@ -1403,7 +1403,7 @@ pub async fn project_delete(
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInputError(
+        ApiError::InvalidInput(
             "The specified project does not exist!".to_string(),
         )
     })?;
@@ -1416,9 +1416,9 @@ pub async fn project_delete(
                 &**pool,
             )
             .await
-            .map_err(ApiError::DatabaseError)?
+            .map_err(ApiError::Database)?
             .ok_or_else(|| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "The specified project does not exist!".to_string(),
                 )
             })?;
@@ -1427,7 +1427,7 @@ pub async fn project_delete(
             .permissions
             .contains(Permissions::DELETE_PROJECT)
         {
-            return Err(ApiError::CustomAuthenticationError(
+            return Err(ApiError::CustomAuthentication(
                 "You don't have permission to delete this project!".to_string(),
             ));
         }
@@ -1463,7 +1463,7 @@ pub async fn project_follow(
         database::models::Project::get_from_slug_or_project_id(string, &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "The specified project does not exist!".to_string(),
                 )
             })?;
@@ -1512,7 +1512,7 @@ pub async fn project_follow(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::InvalidInputError(
+        Err(ApiError::InvalidInput(
             "You are already following this project!".to_string(),
         ))
     }
@@ -1531,7 +1531,7 @@ pub async fn project_unfollow(
         database::models::Project::get_from_slug_or_project_id(string, &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::InvalidInputError(
+                ApiError::InvalidInput(
                     "The specified project does not exist!".to_string(),
                 )
             })?;
@@ -1580,7 +1580,7 @@ pub async fn project_unfollow(
 
         Ok(HttpResponse::NoContent().body(""))
     } else {
-        Err(ApiError::InvalidInputError(
+        Err(ApiError::InvalidInput(
             "You are not following this project!".to_string(),
         ))
     }

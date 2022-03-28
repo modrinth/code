@@ -24,16 +24,16 @@ pub use version_item::VersionFile;
 #[derive(Error, Debug)]
 pub enum DatabaseError {
     #[error("Error while interacting with the database: {0}")]
-    DatabaseError(#[from] sqlx::error::Error),
+    Database(#[from] sqlx::error::Error),
     #[error("Error while trying to generate random ID")]
-    RandomIdError,
+    RandomId,
     #[error(
         "Invalid identifier: Category/version names must contain only ASCII \
              alphanumeric characters or '_-'."
     )]
     InvalidIdentifier(String),
     #[error("Invalid permissions bitflag!")]
-    BitflagError,
+    Bitflag,
     #[error("A database request failed")]
     Other(String),
 }

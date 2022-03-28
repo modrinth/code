@@ -4,6 +4,7 @@ version = "0.2.0"
 #Team members, please add your emails and usernames
 authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "Charalampos Fanoulis <yo@fanoulis.dev>", "AppleTheGolden <scotsbox@protonmail.com>"]
 edition = "2018"
+license = "AGPL-3.0"
 
 [[bin]]
 name = "labrinth"
@@ -19,7 +20,7 @@ tokio-stream = "0.1.8"
 actix-multipart = "0.4.0"
 actix-cors = "0.6.0"
 
-meilisearch-sdk = "0.6.0"
+meilisearch-sdk = "0.15.0"
 reqwest = { version = "0.11.9", features = ["json"] }
 
 yaserde = "0.6.0"

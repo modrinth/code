@@ -138,7 +138,7 @@ impl super::Validator for PackValidator {
     ) -> Result<ValidationResult, ValidationError> {
         let mut file =
             archive.by_name("modrinth.index.json").map_err(|_| {
-                ValidationError::InvalidInputError(
+                ValidationError::InvalidInput(
                     "Pack manifest is missing.".into(),
                 )
             })?;
@@ -149,20 +149,20 @@ impl super::Validator for PackValidator {
         let pack: PackFormat = serde_json::from_str(&contents)?;
 
         pack.validate().map_err(|err| {
-            ValidationError::InvalidInputError(
+            ValidationError::InvalidInput(
                 validation_errors_to_string(err, None).into(),
             )
         })?;
 
         if pack.game != "minecraft" {
-            return Err(ValidationError::InvalidInputError(
+            return Err(ValidationError::InvalidInput(
                 format!("Game {0} does not exist!", pack.game).into(),
             ));
         }
 
         for file in pack.files {
             if file.hashes.get(&FileHash::Sha1).is_none() {
-                return Err(ValidationError::InvalidInputError(
+                return Err(ValidationError::InvalidInput(
                     "All pack files must provide a SHA1 hash!".into(),
                 ));
             }
@@ -171,7 +171,7 @@ impl super::Validator for PackValidator {
                 .components()
                 .next()
                 .ok_or_else(|| {
-                    ValidationError::InvalidInputError(
+                    ValidationError::InvalidInput(
                         "Invalid pack file path!".into(),
                     )
                 })?;
@@ -179,7 +179,7 @@ impl super::Validator for PackValidator {
             match path {
                 Component::CurDir | Component::Normal(_) => {}
                 _ => {
-                    return Err(ValidationError::InvalidInputError(
+                    return Err(ValidationError::InvalidInput(
                         "Invalid pack file path!".into(),
                     ))
                 }

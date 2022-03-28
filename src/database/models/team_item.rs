@@ -124,7 +124,7 @@ impl TeamMember {
                         accepted: m.accepted,
                     })))
                 } else {
-                    Ok(Some(Err(super::DatabaseError::BitflagError)))
+                    Ok(Some(Err(super::DatabaseError::Bitflag)))
                 }
             } else {
                 Ok(None)
@@ -186,7 +186,7 @@ impl TeamMember {
                         },
                     })))
                 } else {
-                    Ok(Some(Err(super::DatabaseError::BitflagError)))
+                    Ok(Some(Err(super::DatabaseError::Bitflag)))
                 }
             } else {
                 Ok(None)
@@ -234,7 +234,7 @@ impl TeamMember {
                         accepted: m.accepted,
                     })))
                 } else {
-                    Ok(Some(Err(super::DatabaseError::BitflagError)))
+                    Ok(Some(Err(super::DatabaseError::Bitflag)))
                 }
             } else {
                 Ok(None)
@@ -282,7 +282,7 @@ impl TeamMember {
                         accepted: m.accepted,
                     })))
                 } else {
-                    Ok(Some(Err(super::DatabaseError::BitflagError)))
+                    Ok(Some(Err(super::DatabaseError::Bitflag)))
                 }
             } else {
                 Ok(None)
@@ -326,7 +326,7 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
-                    .ok_or(super::DatabaseError::BitflagError)?,
+                    .ok_or(super::DatabaseError::Bitflag)?,
                 accepted: m.accepted,
             }))
         } else {
@@ -362,7 +362,7 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
-                    .ok_or(super::DatabaseError::BitflagError)?,
+                    .ok_or(super::DatabaseError::Bitflag)?,
                 accepted: m.accepted,
             }))
         } else {
@@ -510,7 +510,7 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
-                    .ok_or(super::DatabaseError::BitflagError)?,
+                    .ok_or(super::DatabaseError::Bitflag)?,
                 accepted: m.accepted,
             }))
         } else {
@@ -546,7 +546,7 @@ impl TeamMember {
                 user_id,
                 role: m.role,
                 permissions: Permissions::from_bits(m.permissions as u64)
-                    .ok_or(super::DatabaseError::BitflagError)?,
+                    .ok_or(super::DatabaseError::Bitflag)?,
                 accepted: m.accepted,
             }))
         } else {

@@ -269,7 +269,7 @@ pub async fn download_version(
     )
     .fetch_optional(&**pool)
     .await
-    .map_err(|e| ApiError::DatabaseError(e.into()))?;
+    .map_err(|e| ApiError::Database(e.into()))?;
 
     if let Some(id) = result {
         Ok(HttpResponse::TemporaryRedirect()
@@ -316,9 +316,9 @@ pub async fn delete_file(
                     &**pool,
                 )
                 .await
-                .map_err(ApiError::DatabaseError)?
+                .map_err(ApiError::Database)?
                 .ok_or_else(|| {
-                    ApiError::CustomAuthenticationError(
+                    ApiError::CustomAuthentication(
                         "You don't have permission to delete this file!"
                             .to_string(),
                     )
@@ -328,7 +328,7 @@ pub async fn delete_file(
                 .permissions
                 .contains(Permissions::DELETE_VERSION)
             {
-                return Err(ApiError::CustomAuthenticationError(
+                return Err(ApiError::CustomAuthentication(
                     "You don't have permission to delete this file!"
                         .to_string(),
                 ));

@@ -33,7 +33,7 @@ impl super::Validator for FabricValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("fabric.mod.json").map_err(|_| {
-            ValidationError::InvalidInputError(
+            ValidationError::InvalidInput(
                 "No fabric.mod.json present for Fabric file.".into(),
             )
         })?;

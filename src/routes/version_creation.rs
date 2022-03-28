@@ -103,7 +103,7 @@ pub async fn version_create(
 async fn version_create_inner(
     req: HttpRequest,
     mut payload: Multipart,
-    mut transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, CreateError> {
@@ -322,7 +322,7 @@ async fn version_create_inner(
             all_game_versions.clone(),
             version_data.primary_file.is_some(),
             version_data.primary_file.as_deref() == Some(name),
-            &mut transaction,
+            transaction,
         )
         .await?;
     }
@@ -486,7 +486,7 @@ async fn upload_file_to_version_inner(
     req: HttpRequest,
     mut payload: Multipart,
     client: Data<PgPool>,
-    mut transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
@@ -597,7 +597,7 @@ async fn upload_file_to_version_inner(
             all_game_versions.clone(),
             true,
             false,
-            &mut transaction,
+            transaction,
         )
         .await?;
     }
