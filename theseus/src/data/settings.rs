@@ -52,7 +52,8 @@ impl Settings {
         let settings_path = LAUNCHER_WORK_DIR.join(SETTINGS_FILE);
 
         if settings_path.exists() {
-            let settings_data = std::fs::read_to_string(settings_path)
+            let settings_data = tokio::fs::read_to_string(settings_path)
+                .await
                 .map(|x| serde_json::from_str::<Settings>(&x).ok())
                 .ok()
                 .flatten();
@@ -64,9 +65,6 @@ impl Settings {
 
         if SETTINGS.get().is_none() {
             let new = Self::default();
-
-            tokio::fs::rename(SETTINGS_FILE, format!("{SETTINGS_FILE}.bak"))
-                .await?;
 
             tokio::fs::write(
                 LAUNCHER_WORK_DIR.join(SETTINGS_FILE),

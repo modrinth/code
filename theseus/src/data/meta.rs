@@ -20,9 +20,10 @@ impl Metadata {
         let meta_path = LAUNCHER_WORK_DIR.join(META_FILE);
 
         if meta_path.exists() {
-            let meta_data = std::fs::read_to_string(meta_path)
+            let meta_data = tokio::fs::read_to_string(meta_path)
+                .await
                 .ok()
-                .and_then(|x| serde_json::from_str::<Metadata>(&x).ok());
+                .and_then(|it| serde_json::from_str::<Metadata>(&it).ok());
 
             if let Some(metadata) = meta_data {
                 METADATA.get_or_init(|| RwLock::new(metadata));
