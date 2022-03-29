@@ -1,8 +1,5 @@
 use super::profiles::*;
-use std::{
-    collections::HashSet,
-    path::{Path, PathBuf},
-};
+use std::{collections::HashSet, path::PathBuf};
 
 use crate::{data::DataError, LAUNCHER_WORK_DIR};
 use once_cell::sync;
@@ -41,8 +38,8 @@ impl Default for Settings {
             java_8_path: None,
             java_17_path: None,
             hooks: ProfileHooks::default(),
-            icon_path: Path::new(LAUNCHER_WORK_DIR).join(ICONS_PATH),
-            metadata_dir: Path::new(LAUNCHER_WORK_DIR).join(METADATA_DIR),
+            icon_path: LAUNCHER_WORK_DIR.join(ICONS_PATH),
+            metadata_dir: LAUNCHER_WORK_DIR.join(METADATA_DIR),
             profiles: HashSet::new(),
             max_concurrent_downloads: 32,
             version: FORMAT_VERSION,
@@ -52,7 +49,7 @@ impl Default for Settings {
 
 impl Settings {
     pub async fn init() -> Result<(), DataError> {
-        let settings_path = Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE);
+        let settings_path = LAUNCHER_WORK_DIR.join(SETTINGS_FILE);
 
         if settings_path.exists() {
             let settings_data = std::fs::read_to_string(settings_path)
@@ -72,7 +69,7 @@ impl Settings {
                 .await?;
 
             tokio::fs::write(
-                Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
+                LAUNCHER_WORK_DIR.join(SETTINGS_FILE),
                 &serde_json::to_string(&new)?,
             )
             .await?;
@@ -85,7 +82,7 @@ impl Settings {
 
     pub async fn load() -> Result<(), DataError> {
         let new = serde_json::from_str::<Settings>(&std::fs::read_to_string(
-            Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
+            LAUNCHER_WORK_DIR.join(SETTINGS_FILE),
         )?)?;
 
         let mut write = SETTINGS
@@ -103,7 +100,7 @@ impl Settings {
         let settings = Self::get().await?;
 
         std::fs::write(
-            Path::new(LAUNCHER_WORK_DIR).join(SETTINGS_FILE),
+            LAUNCHER_WORK_DIR.join(SETTINGS_FILE),
             &serde_json::to_string_pretty(&*settings)?,
         )?;
 

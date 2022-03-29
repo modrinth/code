@@ -5,7 +5,10 @@
 
 #![warn(unused_import_braces, missing_debug_implementations)]
 
-static LAUNCHER_WORK_DIR: &'static str = "./launcher";
+// TODO: make non-hardcoded
+lazy_static::lazy_static! {
+    static ref LAUNCHER_WORK_DIR: std::path::PathBuf = dirs::config_dir().expect("Could not find config dir").join("theseus");
+}
 
 pub mod data;
 pub mod launcher;
@@ -25,7 +28,8 @@ pub enum Error {
 }
 
 pub async fn init() -> Result<(), Error> {
-    std::fs::create_dir_all(LAUNCHER_WORK_DIR)
+    tokio::fs::create_dir_all(LAUNCHER_WORK_DIR.as_path())
+        .await
         .expect("Unable to create launcher root directory!");
 
     use crate::data::*;
