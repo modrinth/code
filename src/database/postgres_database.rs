@@ -1,3 +1,4 @@
+use std::time::Duration;
 use log::info;
 use sqlx::migrate::MigrateDatabase;
 use sqlx::postgres::{PgPool, PgPoolOptions};
@@ -12,7 +13,7 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
             dotenv::var("DATABASE_MIN_CONNECTIONS")
                 .ok()
                 .and_then(|x| x.parse().ok())
-                .unwrap_or(16),
+                .unwrap_or(0),
         )
         .max_connections(
             dotenv::var("DATABASE_MAX_CONNECTIONS")
@@ -20,6 +21,7 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
                 .and_then(|x| x.parse().ok())
                 .unwrap_or(16),
         )
+        .max_lifetime(Some(Duration::from_secs(60 * 60)))
         .connect(&database_url)
         .await?;
 
