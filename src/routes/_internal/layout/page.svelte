@@ -1,22 +1,18 @@
 <script lang="ts">
     import IconPencil from 'virtual:icons/heroicons-outline/pencil'
     import { page } from '$app/stores'
-    import { onMount } from 'svelte'
 
-    export let componentName = $page.url.pathname.includes('components') ? $page.url.pathname.replace('/components/', '') : undefined
+    export let fileName = $page.url.pathname.substring($page.url.pathname.lastIndexOf('/') + 1)
 
     export let title = ''
-    if (!title && componentName) title = componentName
+    if (!title) title = fileName
 
-    let pageUrl = `https://github.com/modrinth/omorphia/edit/main/src/routes/${$page.url.pathname.replace('/', '') || 'index'}.md`
+    let editUrl = `https://github.com/modrinth/omorphia/edit/main/src/routes/${$page.url.pathname.replace('/', '') || 'index'}.md`
 
     let api
-
-    onMount(async () => {
-        if (componentName) {
-            api = (await import(`../../../lib/components/${componentName}.svelte?raw&api`)).default
-        }
-    })
+    if ($page.url.pathname.includes('components')) {
+        import(`../../../lib/components/${title}.svelte?raw&sveld`).then(output => api = output.default)
+    }
 </script>
 
 <svelte:head>
@@ -25,14 +21,14 @@
 
 <article>
     {#if title}<h1>{title}</h1>{/if}
-    <a class="edit-link" href={pageUrl}>
+    <a class="edit-link" href={editUrl}>
         <IconPencil/>
         Edit this page on GitHub</a>
     <slot/>
 
-    {#if componentName && api}
+    {#if api}
         <div class="extra-info">
-            {#if api.data.length > 0}
+            {#if api.props.length > 0}
                 <h2>Properties</h2>
                 <table class="api-table">
                     <thead>
@@ -44,12 +40,12 @@
                     </tr>
                     </thead>
                     <tbody>
-                    {#each api.data as prop}
+                    {#each api.props as prop}
                         <tr>
                             <td>{prop.name}</td>
-                            <td>{prop.type.type}</td>
-                            <td>{prop.defaultValue ?? ''}</td>
-                            <td>{prop.readonly ? '[Read only] ' : ''}{prop.description?.replace('null', '') || ''}</td>
+                            <td><code>{prop.type ?? ''}</code></td>
+                            <td>{prop.value ?? ''}</td>
+                            <td>{prop.constant ? '[Read only] ' : ''}{prop.description?.replace('null', '') || ''}</td>
                         </tr>
                     {/each}
                     </tbody>
@@ -82,22 +78,19 @@
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Description</th>
+                        <th>Fallback</th>
                     </tr>
                     </thead>
                     <tbody>
                     {#each api.slots as slot}
                         <tr>
                             <td>{slot.name}</td>
-                            <td>{slot.description?.replace('null', '') || ''}</td>
+                            <td>{slot.fallback}</td>
                         </tr>
                     {/each}
                     </tbody>
                 </table>
             {/if}
-
-            <h2>Import</h2>
-            <pre class="language-js"><code class="language-js"><span class="token keyword">import</span> <span class="token punctuation">&#123;</span> {componentName} <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">"omorphia"</span></code></pre>
         </div>
     {/if}
 </article>

@@ -8,7 +8,7 @@
 
     onMount(() => {
         let lastScrollTop: number
-        window.addEventListener('scroll', function () {
+        window.addEventListener('scroll', () => {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop
             if (scrollTop > lastScrollTop && headerElement) {
                 headerElement.style.top = 'calc(var(--header-height) * -1)'

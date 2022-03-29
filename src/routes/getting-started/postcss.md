@@ -1,13 +1,26 @@
+---
+title: PostCSS Configuration
+---
+
+Use [PostCSS](https://postcss.org/) to process your css in components and `.postcss` files.
+
+Install PostCSS with:
+
+```bash
+pnpx svelte-add@latest postcss
+```
+
+This is the recommended `postcss.config.cjs` setup:
+
+```js
 const config = {
   plugins: [
-    require('postcss-import-ext-glob'),
     require('postcss-import'),
     require('postcss-strip-inline-comments'),
-    require('postcss-extend-rule'),
     require('postcss-nested'),
     require('postcss-preset-env'),
-    require('postcss-pxtorem'),
     require('autoprefixer'),
+    require('postcss-extend-rule'),
     process.env.NODE_ENV === 'development' && require('cssnano')({
       preset: 'default',
     })
@@ -15,3 +28,4 @@ const config = {
 };
 
 module.exports = config;
+```

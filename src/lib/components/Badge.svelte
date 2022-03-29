@@ -1,6 +1,6 @@
 <script lang="ts">
     export let label = ''
-    // Supports `green`, `yellow`, `red`, & `gray`
+    /** Supports `green`, `yellow`, `red`, & `gray` */
     export let color = 'gray'
 </script>
 

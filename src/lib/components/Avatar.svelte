@@ -2,7 +2,8 @@
     import { onMount } from 'svelte'
     import { classCombine } from '$lib/utils/classCombine'
 
-    export let src: string | null
+    /** Optional, as a default icon will be substituted if no image was specified */
+    export let src: string | undefined
     export let size: 'xs' | 'sm' | 'md' | 'lg'
     export let circle = false
     export let floatUp = false
@@ -85,6 +86,7 @@
 
         &--float-up {
             margin-top: calc(var(--size) * (-2 / 3));
+            z-index: 1;
         }
 
         &--circle {

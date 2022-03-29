@@ -1,34 +1,39 @@
 <script lang="ts">
-    import "$lib/styles.postcss"
-    import "./_internal/styles/prism-one-dark.css"
-    import "./_internal/styles/gh-markdown.css"
-    import Sidebar from "./_internal/components/Sidebar.svelte"
+    import '$lib/styles.postcss'
+    import './_internal/styles/prism-one-dark.css'
+    import './_internal/styles/gh-markdown.postcss'
+    import Sidebar from './_internal/components/Sidebar.svelte'
     import Header from './_internal/components/Header.svelte'
 </script>
 
 <div class="app">
-    <Header />
-    <Sidebar />
+    <Header/>
+    <Sidebar/>
     <main class="app__content">
-        <slot />
+        <slot/>
     </main>
 </div>
 
 <style lang="postcss">
-    :global(body) {
-        margin: 0;
-        font-size: var(--body-font-size);
-        font-family: var(--body-font);
-        overflow-y: scroll;
-        --accent-color: hsl(331, 80%, 45%);
-        --accent-color-transparent: hsla(331, 80%, 45%, 0.15);
+    :global {
+        html {
+            overflow-y: scroll;
+        }
+
+        body {
+            margin: 0;
+            font-size: var(--body-font-size);
+            font-family: var(--body-font);
+            --accent-color: hsl(331, 80%, 45%);
+            --accent-color-transparent: hsla(331, 80%, 45%, 0.15);
+        }
     }
 
     .app {
         display: grid;
         min-height: 100vh;
         overflow: hidden;
-        --sidebar-width: 250px;
+        --sidebar-width: 325px;
         --header-height: 56px;
         @media (width <= 500px) {
             display: flex;
@@ -41,21 +46,21 @@
             overflow-y: auto;
             background-color: hsl(220, 13%, 91%);
 
-            :global(h1) {
-                font-size: 54px;
-            }
+            :global {
+                a:not(.example__preview *) {
+                    color: var(--accent-color);
 
-            :global(p) {
-                line-height: 1.5;
-            }
-        }
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
 
-        @layer base {
-            :global(a) {
-                color: var(--accent-color);
+                h1:not(.example__preview *) {
+                    font-size: 54px;
+                }
 
-                &:hover {
-                    text-decoration: underline;
+                p:not(.example__preview *) {
+                    line-height: 1.5;
                 }
             }
         }

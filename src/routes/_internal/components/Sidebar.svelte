@@ -1,5 +1,11 @@
 <script lang="ts">
-    const components = ['Button', 'Pagination', 'Link', 'NavRow', 'Badge', 'Avatar', 'Chips'].sort()
+    const components = Object.keys(import.meta.glob('../../components/**'))
+        .map(it => it.replace('../../components/', '').replace('.md', ''))
+        .sort();
+
+    const classes = Object.keys(import.meta.glob('../../classes/**'))
+        .map(it => it.replace('../../classes/', '').replace('.md', ''))
+        .sort();
 </script>
 
 <nav class="sidebar">
@@ -7,13 +13,21 @@
         <span class="section__title">Getting started</span>
         <a href="/" class="section__link">Introduction</a>
         <a href="/getting-started/icons" class="section__link">Using Icons</a>
-        <a href="/getting-started/css" class="section__link">CSS configuration</a>
+        <a href="/getting-started/postcss" class="section__link">PostCSS config</a>
+        <a href="/getting-started/css" class="section__link">Writing CSS</a>
     </div>
 
     <div class="section">
         <span class="section__title">Components</span>
         {#each components as component}
             <a href="/components/{component}" class="section__link">{component}</a>
+        {/each}
+    </div>
+
+    <div class="section">
+        <span class="section__title">Classes</span>
+        {#each classes as page}
+            <a href="/classes/{page}" class="section__link">{page}</a>
         {/each}
     </div>
 </nav>
@@ -25,7 +39,7 @@
         grid-gap: 2rem;
         background-color: hsl(220, 15%, 40%);
         color: hsl(216, 10%, 80%);
-        padding: 5.5rem 1.5rem 1.5rem;
+        padding: 5.5rem 2rem 2rem;
         height: 100vh;
         width: calc(var(--sidebar-width) - 3rem);
         position: fixed;

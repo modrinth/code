@@ -20,8 +20,9 @@
     "@iconify-json/heroicons-outline": "^1.1.1",
     "@iconify-json/lucide": "^1.1.7",
     "@poppanator/sveltekit-svg": "^0.3.1",
-    "@sveltejs/adapter-auto": "^1.0.0-next.33",
+    "@sveltejs/adapter-static": "^1.0.0-next.29",
     "@sveltejs/kit": "next",
+    "@types/prismjs": "^1.26.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
     "autoprefixer": "^10.4.2",
@@ -30,21 +31,22 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-svelte3": "^3.2.1",
     "mdsvex": "^0.10.5",
+    "mdsvexamples": "^0.0.8",
     "nodemon": "^2.0.15",
     "postcss": "^8.4.8",
     "postcss-extend-rule": "^4.0.0",
     "postcss-import": "^14.0.2",
+    "postcss-import-ext-glob": "^2.0.1",
     "postcss-load-config": "^3.1.1",
     "postcss-nested": "^5.0.6",
     "postcss-preset-env": "^7.4.2",
+    "postcss-pxtorem": "^6.0.0",
     "postcss-strip-inline-comments": "^0.1.5",
-    "prism-svelte": "^0.5.0",
-    "prismjs": "^1.27.0",
+    "sveld": "^0.13.4",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.6",
     "svelte-preprocess": "^4.10.1",
     "svelte2tsx": "^0.5.5",
-    "sveltedoc-parser": "^4.2.1",
     "tslib": "^2.3.1",
     "typescript": "~4.6.2",
     "unplugin-icons": "^0.13.3"
@@ -67,6 +69,8 @@
   },
   "homepage": "https://omorphia.modrinth.com",
   "dependencies": {
-    "sanitize.css": "^13.0.0"
+    "sanitize.css": "^13.0.0",
+    "svelte-use-click-outside": "^1.0.0",
+    "throttle-debounce": "^3.0.1"
   }
 }

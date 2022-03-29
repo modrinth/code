@@ -1,3 +1,14 @@
 {
+	"paths": {
+		"omorphia/*": [
+			"src/lib/*"
+		],
+		"omorphia": [
+			"src/lib"
+		],
+		"$routes/*": [
+			"src/routes/*"
+		]
+	},
 	"extends": "./.svelte-kit/tsconfig.json"
 }

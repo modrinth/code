@@ -27,7 +27,6 @@
     <Button
       color={isSelected ? 'primary-light' : undefined}
       on:click={() => {
-        console.log(option)
         isSelected && !neverEmpty
           ? selected = null
           : selected = option

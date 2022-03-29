@@ -22,15 +22,14 @@ pnpm add omorphia
 
 ### Components
 
-Import a component with:
-```js
-import { Button } from "omorphia"
-```
+Use a component by importing from `omorphia`. For example, use the [Button component](/components/Button) like so:
 
-Then, use it in your HTML:
+```svelte example
+<script lang="ts">
+    import Button from "omorphia/components/Button.svelte"
+</script>
 
-```html
-<Button color="primary">Click me!</Button>
+<Button color="primary">I'm a button!</Button>
 ```
 
 For more information on each component, check out the pages on the sidebar navigation.

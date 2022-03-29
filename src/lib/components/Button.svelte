@@ -1,18 +1,18 @@
 <script lang="ts">
     import { classCombine } from '$lib/utils/classCombine'
 
-    // The element to be styled as a button
+    /** The element to be styled as a button */
     export let as: 'button' | 'a' | 'summary' | 'input' = 'button'
-    export let href: string
+    export let href = ''
     if (href) as = 'a'
 
-    // Use `value` if the button is an `<input`>
-    export let value: string
+    /** Use `value` if the button is an `<input`> */
+    export let value = ''
 
     export let size: 'sm' | 'md' | 'lg' = 'md'
     export let color: 'raised' | 'primary' | 'primary-light' | 'danger'| 'danger-light' | 'transparent'
 
-    // Show notification badge in the upper right of button
+    /** Show notification badge in the upper right of button */
     export let badge = false
 
     export let disabled = false

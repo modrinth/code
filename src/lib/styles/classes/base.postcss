@@ -1,0 +1,26 @@
+.base {
+    display: flex;
+    justify-content: center;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-standard);
+    font-size: var(--font-size-nm);
+    font-weight: var(--font-weight-regular);
+    padding: 1rem;
+
+    scrollbar-color: var(--color-scrollbar) var(--color-bg);
+
+    &::-webkit-scrollbar {
+        width: 14px;
+    }
+
+    &::-webkit-scrollbar-track {
+        background-color: var(--color-bg);
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--color-scrollbar);
+        border-radius: 999px;
+        border: 3px solid var(--color-bg);
+    }
+}
