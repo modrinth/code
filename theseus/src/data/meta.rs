@@ -22,7 +22,8 @@ impl Metadata {
         let meta_path = Path::new(LAUNCHER_WORK_DIR).join(META_FILE);
 
         if meta_path.exists() {
-            let meta_data = std::fs::read_to_string(meta_path).ok()
+            let meta_data = std::fs::read_to_string(meta_path)
+                .ok()
                 .and_then(|x| serde_json::from_str::<Metadata>(&x).ok());
 
             if let Some(metadata) = meta_data {
@@ -77,8 +78,14 @@ impl Metadata {
                 "{}/minecraft/v0/manifest.json",
                 META_URL
             ))),
-            daedalus::modded::fetch_manifest(&format!("{}/forge/v0/manifest.json", META_URL)),
-            daedalus::modded::fetch_manifest(&format!("{}/fabric/v0/manifest.json", META_URL)),
+            daedalus::modded::fetch_manifest(&format!(
+                "{}/forge/v0/manifest.json",
+                META_URL
+            )),
+            daedalus::modded::fetch_manifest(&format!(
+                "{}/fabric/v0/manifest.json",
+                META_URL
+            )),
         )
         .await;
 
@@ -90,10 +97,12 @@ impl Metadata {
     }
 
     pub async fn get<'a>() -> Result<RwLockReadGuard<'a, Self>, DataError> {
-        Ok(METADATA
+        let res = METADATA
             .get()
             .ok_or_else(|| DataError::InitializedError("metadata".to_string()))?
             .read()
-            .await)
+            .await;
+
+        Ok(res)
     }
 }

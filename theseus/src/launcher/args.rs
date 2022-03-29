@@ -1,3 +1,4 @@
+use crate::data::profiles::*;
 use crate::launcher::auth::provider::Credentials;
 use crate::launcher::rules::parse_rules;
 use crate::launcher::LauncherError;
@@ -21,19 +22,22 @@ pub fn get_class_paths(
     libraries: &[Library],
     client_path: &Path,
 ) -> Result<String, LauncherError> {
-    let mut class_paths = libraries.iter().filter_map(|library| {
-        if let Some(rules) = &library.rules {
-            if !super::rules::parse_rules(rules.as_slice()) {
+    let mut class_paths = libraries
+        .iter()
+        .filter_map(|library| {
+            if let Some(rules) = &library.rules {
+                if !super::rules::parse_rules(rules.as_slice()) {
+                    return None;
+                }
+            }
+
+            if !library.include_in_classpath {
                 return None;
             }
-        }
 
-        if !library.include_in_classpath {
-            return None;
-        }
-
-        Some(get_lib_path(libraries_path, &library.name))
-    }).collect::<Result<Vec<_>, _>>()?;
+            Some(get_lib_path(libraries_path, &library.name))
+        })
+        .collect::<Result<Vec<_>, _>>()?;
 
     class_paths.push(
         crate::util::absolute_path(&client_path)
@@ -54,9 +58,10 @@ pub fn get_class_paths_jar<T: AsRef<str>>(
     libraries_path: &Path,
     libraries: &[T],
 ) -> Result<String, LauncherError> {
-    let class_paths = libraries.iter().map(|library| {
-        get_lib_path(libraries_path, library.as_ref())
-    }).collect::<Result<Vec<_>, _>>()?;
+    let class_paths = libraries
+        .iter()
+        .map(|library| get_lib_path(libraries_path, library.as_ref()))
+        .collect::<Result<Vec<_>, _>>()?;
 
     Ok(class_paths.join(get_cp_separator()))
 }
@@ -90,7 +95,7 @@ pub fn get_jvm_arguments(
     libraries_path: &Path,
     class_paths: &str,
     version_name: &str,
-    memory: i32,
+    memory: MemorySettings,
     custom_args: Vec<String>,
 ) -> Result<Vec<String>, LauncherError> {
     let mut parsed_arguments = Vec::new();
@@ -120,7 +125,10 @@ pub fn get_jvm_arguments(
         parsed_arguments.push(class_paths.to_string());
     }
 
-    parsed_arguments.push(format!("-Xmx{}M", memory));
+    if let Some(minimum) = memory.minimum {
+        parsed_arguments.push(format!("-Xms{minimum}M"));
+    }
+    parsed_arguments.push(format!("-Xmx{}M", memory.maximum));
     for arg in custom_args {
         if !arg.is_empty() {
             parsed_arguments.push(arg);
@@ -148,8 +156,7 @@ fn parse_jvm_argument(
                         natives_path.to_string_lossy()
                     ))
                 })?
-                .to_string_lossy()
-                .to_string(),
+                .to_string_lossy(),
         )
         .replace(
             "${library_directory}",
@@ -180,7 +187,7 @@ pub fn get_minecraft_arguments(
     game_directory: &Path,
     assets_directory: &Path,
     version_type: &VersionType,
-    resolution: (i32, i32),
+    resolution: WindowSize,
 ) -> Result<Vec<String>, LauncherError> {
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
@@ -234,7 +241,7 @@ fn parse_minecraft_argument(
     game_directory: &Path,
     assets_directory: &Path,
     version_type: &VersionType,
-    resolution: (i32, i32),
+    resolution: WindowSize,
 ) -> Result<String, LauncherError> {
     Ok(argument
         .replace("${auth_access_token}", access_token)
@@ -255,7 +262,7 @@ fn parse_minecraft_argument(
                     ))
                 })?
                 .to_string_lossy()
-                .to_string(),
+                .to_owned(),
         )
         .replace(
             "${assets_root}",
@@ -267,7 +274,7 @@ fn parse_minecraft_argument(
                     ))
                 })?
                 .to_string_lossy()
-                .to_string(),
+                .to_owned(),
         )
         .replace(
             "${game_assets}",
@@ -279,7 +286,7 @@ fn parse_minecraft_argument(
                     ))
                 })?
                 .to_string_lossy()
-                .to_string(),
+                .to_owned(),
         )
         .replace("${version_type}", version_type.as_str())
         .replace("${resolution_width}", &resolution.0.to_string())

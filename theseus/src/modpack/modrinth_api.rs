@@ -21,7 +21,10 @@ pub trait ModrinthAPI {
         channel: &str,
         game: &ModpackGame,
     ) -> ModpackResult<HashSet<ModpackFile>>;
-    async fn get_version(&self, version: &str) -> ModpackResult<HashSet<ModpackFile>>;
+    async fn get_version(
+        &self,
+        version: &str,
+    ) -> ModpackResult<HashSet<ModpackFile>>;
 }
 
 #[derive(Debug)]
@@ -93,6 +96,8 @@ impl ModrinthAPI for ModrinthV1 {
                 String::from("Modrinth V1 does not support vanilla projects"),
             )),
             ModpackGame::Minecraft(ref version, ref loader) => Ok((version, loader)),
+            // This guard is here for when Modrinth does support other games.
+            #[allow(unreachable_patterns)]
             _ => Err(ModpackError::VersionError(String::from(
                 "Attempted to use Modrinth API V1 to install a non-Minecraft project!",
             ))),
@@ -131,7 +136,8 @@ impl ModrinthAPI for ModrinthV1 {
             .map(ModpackFile::from)
             .collect::<HashSet<ModpackFile>>();
 
-        let dep_futures = version.dependencies.iter().map(|it| self.get_version(it));
+        let dep_futures =
+            version.dependencies.iter().map(|it| self.get_version(it));
         let deps = try_join_all(dep_futures)
             .await?
             .into_iter()
@@ -148,12 +154,17 @@ impl ModrinthAPI for ModrinthV1 {
             .collect())
     }
 
-    async fn get_version(&self, version: &str) -> ModpackResult<HashSet<ModpackFile>> {
+    async fn get_version(
+        &self,
+        version: &str,
+    ) -> ModpackResult<HashSet<ModpackFile>> {
         let domain = &self.0;
-        let version_json = try_get_json(format!("{domain}/api/v1/version/{version}")).await?;
-        let mut version_deserializer = serde_json::Deserializer::from_slice(&version_json);
-        let version = ModrinthV1ProjectVersion::deserialize(&mut version_deserializer)?;
-        let base_path = PathBuf::from("mods/");
+        let version_json =
+            try_get_json(format!("{domain}/api/v1/version/{version}")).await?;
+        let mut version_deserializer =
+            serde_json::Deserializer::from_slice(&version_json);
+        let version =
+            ModrinthV1ProjectVersion::deserialize(&mut version_deserializer)?;
 
         Ok(version
             .files

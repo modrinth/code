@@ -22,10 +22,12 @@ pub const COMPILED_ZIP: &str = "compiled.mrpack";
 pub const MANIFEST_PATH: &str = "modrinth.index.json";
 pub const OVERRIDES_PATH: &str = "overrides/";
 pub const PACK_JSON5_PATH: &str = "modpack.json5";
-const PACK_GITIGNORE: &'static str = const_format::formatcp!(r#"
+const PACK_GITIGNORE: &'static str = const_format::formatcp!(
+    r#"
 {COMPILED_PATH}
 {COMPILED_ZIP}
-"#);
+"#
+);
 
 #[derive(thiserror::Error, Debug)]
 pub enum ModpackError {
