@@ -1,4 +1,6 @@
 <script lang="ts">
+    // TODO: Make square icon `md` more rounded
+
     import { onMount } from 'svelte'
     import { classCombine } from '$lib/utils/classCombine'
 

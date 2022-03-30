@@ -1,8 +1,9 @@
 <script lang="ts">
     import IconPencil from 'virtual:icons/heroicons-outline/pencil'
     import { page } from '$app/stores'
+    import COMPONENT_API from '../../../generated/COMPONENT_API.json'
 
-    export let fileName = $page.url.pathname.substring($page.url.pathname.lastIndexOf('/') + 1)
+    export let fileName = $page.url.pathname.substring($page.url.pathname.lastIndexOf('/') + 1).replace('.html', '')
 
     export let title = ''
     if (!title) title = fileName
@@ -14,7 +15,7 @@
         if (import.meta.env.DEV) {
             import(`../../../lib/components/${title}.svelte?raw&sveld`).then(output => api = output.default)
         } else {
-            fetch('/_app/COMPONENT_API.json').then(res => res.json()).then(output => api = output[`${title}.svelte`])
+            api = COMPONENT_API[`${title}.svelte`]
         }
     }
 </script>

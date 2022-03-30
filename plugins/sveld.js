@@ -20,7 +20,7 @@ export default function sveld() {
             }
         },
         // This generates a `COMPONENT_API.json` with sveld in the `/_app` folder on build, which is used by the docs about components (only when built statically)
-        async generateBundle(options, bundle) {
+        async buildStart() {
             const output = {};
 
             const componentFiles = await fs.readdir(path.resolve('./src/lib/components'))
@@ -31,11 +31,13 @@ export default function sveld() {
                 output[fileName] = await parseRaw(raw, filePath)
             }
 
-            this.emitFile({
-                type: 'asset',
-                fileName: 'COMPONENT_API.json',
-                source: JSON.stringify(output),
-            })
+            try {
+                await fs.mkdir(path.resolve('./src/generated'))
+            } catch {
+                // Do nothing, directory already exists
+            }
+
+            await fs.writeFile(path.resolve('./src/generated/COMPONENT_API.json'), JSON.stringify(output))
         },
     }
 }

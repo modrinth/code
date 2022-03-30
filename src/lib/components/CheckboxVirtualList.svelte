@@ -1,4 +1,6 @@
 <script lang="ts">
+    // TODO: Add fade out styling on top and bottom
+
     import Checkbox from './Checkbox.svelte'
     import type { SvelteComponent } from 'svelte'
     import VirtualList from 'svelte-tiny-virtual-list'
