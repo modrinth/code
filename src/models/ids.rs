@@ -33,7 +33,7 @@ pub fn random_base62_rng<R: rand::RngCore>(rng: &mut R, n: usize) -> u64 {
     assert!(n > 0 && n <= 11);
     // gen_range is [low, high): max value is `MULTIPLES[n] - 1`,
     // which is n characters long when encoded
-    rng.gen_range(MULTIPLES[n - 1], MULTIPLES[n])
+    rng.gen_range(MULTIPLES[n - 1]..MULTIPLES[n])
 }
 
 const MULTIPLES: [u64; 12] = [

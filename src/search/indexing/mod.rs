@@ -17,7 +17,7 @@ pub enum IndexingError {
     #[error("Error while serializing or deserializing JSON: {0}")]
     Serde(#[from] serde_json::Error),
     #[error("Error while parsing a timestamp: {0}")]
-    ParseDate(#[from] chrono::format::ParseError),
+    ParseDate(#[from] time::error::Error),
     #[error("Database Error: {0}")]
     Sqlx(#[from] sqlx::error::Error),
     #[error("Database Error: {0}")]

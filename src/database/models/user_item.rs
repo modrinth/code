@@ -1,4 +1,5 @@
 use super::ids::{ProjectId, UserId};
+use time::OffsetDateTime;
 
 pub struct User {
     pub id: UserId,
@@ -8,7 +9,7 @@ pub struct User {
     pub email: Option<String>,
     pub avatar_url: Option<String>,
     pub bio: Option<String>,
-    pub created: chrono::DateTime<chrono::Utc>,
+    pub created: OffsetDateTime,
     pub role: String,
 }
 

@@ -2,6 +2,7 @@ use super::{DeleteFileData, FileHost, FileHostingError, UploadFileData};
 use async_trait::async_trait;
 use bytes::Bytes;
 use sha2::Digest;
+use time::OffsetDateTime;
 
 pub struct MockHost(());
 
@@ -38,7 +39,7 @@ impl FileHost for MockHost {
             content_sha1,
             content_md5: None,
             content_type: content_type.to_string(),
-            upload_timestamp: chrono::Utc::now().timestamp_millis() as u64,
+            upload_timestamp: OffsetDateTime::now_utc().unix_timestamp() as u64,
         })
     }
 

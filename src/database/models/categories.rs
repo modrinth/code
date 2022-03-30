@@ -1,6 +1,7 @@
 use super::ids::*;
 use super::DatabaseError;
 use futures::TryStreamExt;
+use time::OffsetDateTime;
 
 pub struct ProjectType {
     pub id: ProjectTypeId,
@@ -19,7 +20,7 @@ pub struct GameVersion {
     pub id: GameVersionId,
     pub version: String,
     pub version_type: String,
-    pub date: chrono::DateTime<chrono::Utc>,
+    pub date: OffsetDateTime,
     pub major: bool,
 }
 
@@ -469,7 +470,7 @@ impl<'a> LoaderBuilder<'a> {
 pub struct GameVersionBuilder<'a> {
     pub version: Option<&'a str>,
     pub version_type: Option<&'a str>,
-    pub date: Option<&'a chrono::DateTime<chrono::Utc>>,
+    pub date: Option<&'a OffsetDateTime>,
 }
 
 impl GameVersion {
@@ -689,7 +690,7 @@ impl<'a> GameVersionBuilder<'a> {
 
     pub fn created(
         self,
-        created: &'a chrono::DateTime<chrono::Utc>,
+        created: &'a OffsetDateTime,
     ) -> GameVersionBuilder<'a> {
         Self {
             date: Some(created),
@@ -718,7 +719,7 @@ impl<'a> GameVersionBuilder<'a> {
             ",
             self.version,
             self.version_type,
-            self.date.map(chrono::DateTime::naive_utc),
+            self.date.map(|x| time::PrimitiveDateTime::new(x.date(), x.time())),
         )
         .fetch_one(exec)
         .await?;

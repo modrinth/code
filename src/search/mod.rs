@@ -2,13 +2,13 @@ use crate::models::error::ApiError;
 use crate::models::projects::SearchRequest;
 use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
-use chrono::{DateTime, Utc};
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::document::Document;
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::cmp::min;
 use thiserror::Error;
+use time::OffsetDateTime;
 
 pub mod indexing;
 
@@ -84,12 +84,15 @@ pub struct UploadSearchProject {
     pub server_side: String,
     pub gallery: Vec<String>,
 
+    #[serde(with = "crate::util::time_ser")]
     /// RFC 3339 formatted creation date of the project
-    pub date_created: DateTime<Utc>,
+    pub date_created: OffsetDateTime,
     /// Unix timestamp of the creation date of the project
     pub created_timestamp: i64,
+
+    #[serde(with = "crate::util::time_ser")]
     /// RFC 3339 formatted date/time of last major modification (update)
-    pub date_modified: DateTime<Utc>,
+    pub date_modified: OffsetDateTime,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
 }

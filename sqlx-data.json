@@ -3256,6 +3256,50 @@
       ]
     }
   },
+  "9f1f1039e8e360092e046b219fe6861368f5b4a338041d426ef689981f0cb9df": {
+    "query": "\n                SELECT id, filename, is_primary, url, size\n                FROM files\n                WHERE version_id = $1\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "filename",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "is_primary",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 3,
+          "name": "url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "size",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "a39ce28b656032f862b205cffa393a76b989f4803654a615477a94fda5f57354": {
     "query": "\n            DELETE FROM states\n            WHERE id = $1\n            ",
     "describe": {
@@ -3492,6 +3536,23 @@
         true,
         true
       ]
+    }
+  },
+  "a82ece911fac855366bd25f1379778a803e61ab87da096f0ab9f6db3eaa521d4": {
+    "query": "\n            INSERT INTO files (id, version_id, url, filename, is_primary, size)\n            VALUES ($1, $2, $3, $4, $5, $6)\n            ",
+    "describe": {
+      "columns": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Varchar",
+          "Varchar",
+          "Bool",
+          "Int4"
+        ]
+      },
+      "nullable": []
     }
   },
   "a8f22bd234488500b06855c8258e1e290696adba0766b46640bf87d91b150518": {
@@ -4775,44 +4836,6 @@
       "nullable": []
     }
   },
-  "d5807cb9a5766acc832b8715aab2b692a99e249a73974f0945710b1b394b1d74": {
-    "query": "\n                SELECT id, filename, is_primary, url\n                FROM files\n                WHERE version_id = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "filename",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "is_primary",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 3,
-          "name": "url",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "d5a496a0e17c5784f98ca2067bff996b23bb0a798609c4d4928df8080e4e1758": {
     "query": "\n            SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,\n                v.changelog, v.changelog_url, v.date_published, v.downloads,\n                v.version_type, v.featured\n            FROM versions v\n            WHERE v.id = ANY($1)\n            ORDER BY v.date_published ASC\n            ",
     "describe": {
@@ -5741,22 +5764,6 @@
       "nullable": [
         false
       ]
-    }
-  },
-  "f17dbcc3021d4144f56e9a3bbbf4e0a0087af90e202b9b9d81f1f3622be00e36": {
-    "query": "\n            INSERT INTO files (id, version_id, url, filename, is_primary)\n            VALUES ($1, $2, $3, $4, $5)\n            ",
-    "describe": {
-      "columns": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar",
-          "Bool"
-        ]
-      },
-      "nullable": []
     }
   },
   "f17df1295edfaa1cac400ce705181b14a9e763f5e515c6913d0152717b89ceaa": {

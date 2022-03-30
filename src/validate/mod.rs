@@ -2,9 +2,9 @@ use crate::models::projects::{GameVersion, Loader};
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
 use crate::validate::pack::PackValidator;
-use chrono::{DateTime, Utc};
 use std::io::Cursor;
 use thiserror::Error;
+use time::OffsetDateTime;
 use zip::ZipArchive;
 
 mod fabric;
@@ -35,8 +35,8 @@ pub enum ValidationResult {
 
 pub enum SupportedGameVersions {
     All,
-    PastDate(DateTime<Utc>),
-    Range(DateTime<Utc>, DateTime<Utc>),
+    PastDate(OffsetDateTime),
+    Range(OffsetDateTime, OffsetDateTime),
     #[allow(dead_code)]
     Custom(Vec<GameVersion>),
 }

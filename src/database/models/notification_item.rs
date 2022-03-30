@@ -1,5 +1,6 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
+use time::OffsetDateTime;
 
 pub struct NotificationBuilder {
     pub notification_type: Option<String>,
@@ -22,7 +23,7 @@ pub struct Notification {
     pub text: String,
     pub link: String,
     pub read: bool,
-    pub created: chrono::DateTime<chrono::Utc>,
+    pub created: OffsetDateTime,
     pub actions: Vec<NotificationAction>,
 }
 
@@ -71,7 +72,7 @@ impl NotificationBuilder {
                 text: self.text.clone(),
                 link: self.link.clone(),
                 read: false,
-                created: chrono::Utc::now(),
+                created: OffsetDateTime::now_utc(),
                 actions,
             }
             .insert(&mut *transaction)

@@ -1,7 +1,7 @@
 use super::ids::Base62Id;
 use super::users::UserId;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
@@ -18,7 +18,8 @@ pub struct Notification {
     pub text: String,
     pub link: String,
     pub read: bool,
-    pub created: DateTime<Utc>,
+    #[serde(with = "crate::util::time_ser")]
+    pub created: OffsetDateTime,
     pub actions: Vec<NotificationAction>,
 }
 

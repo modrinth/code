@@ -20,6 +20,7 @@ use actix_web::{post, HttpRequest, HttpResponse};
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
+use time::OffsetDateTime;
 use validator::Validate;
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
@@ -398,7 +399,7 @@ async fn version_create_inner(
         version_number: builder.version_number.clone(),
         changelog: builder.changelog.clone(),
         changelog_url: None,
-        date_published: chrono::Utc::now(),
+        date_published: OffsetDateTime::now_utc(),
         downloads: 0,
         version_type: version_data.release_channel,
         files: builder
@@ -422,6 +423,7 @@ async fn version_create_inner(
                 url: file.url.clone(),
                 filename: file.filename.clone(),
                 primary: file.primary,
+                size: file.size,
             })
             .collect::<Vec<_>>(),
         dependencies: version_data.dependencies,
@@ -719,6 +721,7 @@ pub async fn upload_file(
             && version_files.iter().all(|x| !x.primary)
             && !ignore_primary)
             || force_primary,
+        size: upload_data.content_length,
     });
 
     Ok(())

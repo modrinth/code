@@ -7,6 +7,7 @@ use s3::bucket::Bucket;
 use s3::creds::Credentials;
 use s3::region::Region;
 use sha2::Digest;
+use time::OffsetDateTime;
 
 pub struct S3Host {
     bucket: Bucket,
@@ -84,7 +85,7 @@ impl FileHost for S3Host {
             content_sha1,
             content_md5: None,
             content_type: content_type.to_string(),
-            upload_timestamp: chrono::Utc::now().timestamp_millis() as u64,
+            upload_timestamp: OffsetDateTime::now_utc().unix_timestamp() as u64,
         })
     }
 

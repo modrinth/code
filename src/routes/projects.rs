@@ -17,6 +17,7 @@ use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::{PgPool, Row};
 use std::sync::Arc;
+use time::OffsetDateTime;
 use validator::Validate;
 
 #[get("search")]
@@ -1134,7 +1135,7 @@ pub async fn add_gallery_item(
             featured: item.featured,
             title: item.title,
             description: item.description,
-            created: chrono::Utc::now(),
+            created: OffsetDateTime::now_utc(),
         }
         .insert(&mut transaction)
         .await?;

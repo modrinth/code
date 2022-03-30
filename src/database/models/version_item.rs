@@ -1,6 +1,7 @@
 use super::ids::*;
 use super::DatabaseError;
 use std::collections::HashMap;
+use time::OffsetDateTime;
 
 pub struct VersionBuilder {
     pub version_id: VersionId,
@@ -78,6 +79,7 @@ pub struct VersionFileBuilder {
     pub filename: String,
     pub hashes: Vec<HashBuilder>,
     pub primary: bool,
+    pub size: u32,
 }
 
 impl VersionFileBuilder {
@@ -90,14 +92,15 @@ impl VersionFileBuilder {
 
         sqlx::query!(
             "
-            INSERT INTO files (id, version_id, url, filename, is_primary)
-            VALUES ($1, $2, $3, $4, $5)
+            INSERT INTO files (id, version_id, url, filename, is_primary, size)
+            VALUES ($1, $2, $3, $4, $5, $6)
             ",
             file_id as FileId,
             version_id as VersionId,
             self.url,
             self.filename,
-            self.primary
+            self.primary,
+            self.size as i32
         )
         .execute(&mut *transaction)
         .await?;
@@ -138,7 +141,7 @@ impl VersionBuilder {
             version_number: self.version_number,
             changelog: self.changelog,
             changelog_url: None,
-            date_published: chrono::Utc::now(),
+            date_published: OffsetDateTime::now_utc(),
             downloads: 0,
             featured: self.featured,
             version_type: self.version_type,
@@ -238,7 +241,7 @@ pub struct Version {
     pub version_number: String,
     pub changelog: String,
     pub changelog_url: Option<String>,
-    pub date_published: chrono::DateTime<chrono::Utc>,
+    pub date_published: OffsetDateTime,
     pub downloads: i32,
     pub version_type: String,
     pub featured: bool,
@@ -639,7 +642,7 @@ impl Version {
             ).fetch_all(executor),
             sqlx::query!(
                 "
-                SELECT id, filename, is_primary, url
+                SELECT id, filename, is_primary, url, size
                 FROM files
                 WHERE version_id = $1
                 ",
@@ -699,6 +702,7 @@ impl Version {
                             .or_default()
                             .clone(),
                         primary: x.is_primary,
+                        size: x.size as u32,
                     })
                     .collect(),
                 game_versions: game_versions?
@@ -760,7 +764,7 @@ pub struct QueryVersion {
     pub version_number: String,
     pub changelog: String,
     pub changelog_url: Option<String>,
-    pub date_published: chrono::DateTime<chrono::Utc>,
+    pub date_published: OffsetDateTime,
     pub downloads: i32,
 
     pub version_type: String,
@@ -785,4 +789,5 @@ pub struct QueryFile {
     pub filename: String,
     pub hashes: HashMap<String, Vec<u8>>,
     pub primary: bool,
+    pub size: u32,
 }

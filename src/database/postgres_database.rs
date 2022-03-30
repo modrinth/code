@@ -1,8 +1,8 @@
-use std::time::Duration;
 use log::info;
 use sqlx::migrate::MigrateDatabase;
 use sqlx::postgres::{PgPool, PgPoolOptions};
 use sqlx::{Connection, PgConnection, Postgres};
+use std::time::Duration;
 
 pub async fn connect() -> Result<PgPool, sqlx::Error> {
     info!("Initializing database connection");

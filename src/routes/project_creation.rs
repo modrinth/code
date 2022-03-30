@@ -19,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
+use time::OffsetDateTime;
 use validator::Validate;
 
 #[derive(Error, Debug)]
@@ -498,7 +499,7 @@ pub async fn project_create_inner(
                     featured: item.featured,
                     title: item.title.clone(),
                     description: item.description.clone(),
-                    created: chrono::Utc::now(),
+                    created: OffsetDateTime::now_utc(),
                 });
 
                 continue;
@@ -693,7 +694,7 @@ pub async fn project_create_inner(
                 .collect(),
         };
 
-        let now = chrono::Utc::now();
+        let now = OffsetDateTime::now_utc();
 
         let response = crate::models::projects::Project {
             id: project_id,

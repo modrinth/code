@@ -1,5 +1,5 @@
 use super::ids::*;
-use chrono::{DateTime, Utc};
+use time::OffsetDateTime;
 
 #[derive(Clone, Debug)]
 pub struct DonationUrl {
@@ -42,7 +42,7 @@ pub struct GalleryItem {
     pub featured: bool,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub created: DateTime<Utc>,
+    pub created: OffsetDateTime,
 }
 
 impl GalleryItem {
@@ -109,8 +109,8 @@ impl ProjectBuilder {
             description: self.description,
             body: self.body,
             body_url: None,
-            published: chrono::Utc::now(),
-            updated: chrono::Utc::now(),
+            published: time::OffsetDateTime::now_utc(),
+            updated: time::OffsetDateTime::now_utc(),
             status: self.status,
             downloads: 0,
             follows: 0,
@@ -169,8 +169,8 @@ pub struct Project {
     pub description: String,
     pub body: String,
     pub body_url: Option<String>,
-    pub published: chrono::DateTime<chrono::Utc>,
-    pub updated: chrono::DateTime<chrono::Utc>,
+    pub published: time::OffsetDateTime,
+    pub updated: time::OffsetDateTime,
     pub status: StatusId,
     pub downloads: i32,
     pub follows: i32,

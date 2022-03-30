@@ -33,6 +33,7 @@ pub struct PackFile<'a> {
     pub env: Option<std::collections::HashMap<EnvType, SideType>>,
     #[validate(custom(function = "validate_download_url"))]
     pub downloads: Vec<&'a str>,
+    pub file_size: u32,
 }
 
 fn validate_download_url(
@@ -164,6 +165,12 @@ impl super::Validator for PackValidator {
             if file.hashes.get(&FileHash::Sha1).is_none() {
                 return Err(ValidationError::InvalidInput(
                     "All pack files must provide a SHA1 hash!".into(),
+                ));
+            }
+
+            if file.hashes.get(&FileHash::Sha512).is_none() {
+                return Err(ValidationError::InvalidInput(
+                    "All pack files must provide a SHA512 hash!".into(),
                 ));
             }
 

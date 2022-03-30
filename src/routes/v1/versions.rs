@@ -9,10 +9,10 @@ use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
 use crate::{database, models};
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
+use time::OffsetDateTime;
 
 /// A specific version of a mod
 #[derive(Serialize, Deserialize)]
@@ -25,7 +25,8 @@ pub struct LegacyVersion {
     pub version_number: String,
     pub changelog: String,
     pub changelog_url: Option<String>,
-    pub date_published: DateTime<Utc>,
+    #[serde(with = "crate::util::time_ser")]
+    pub date_published: OffsetDateTime,
     pub downloads: u32,
     pub version_type: VersionType,
     pub files: Vec<VersionFile>,

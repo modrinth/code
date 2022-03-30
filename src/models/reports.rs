@@ -1,7 +1,7 @@
 use super::ids::Base62Id;
 use crate::models::ids::UserId;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
@@ -16,7 +16,8 @@ pub struct Report {
     pub item_type: ItemType,
     pub reporter: UserId,
     pub body: String,
-    pub created: DateTime<Utc>,
+    #[serde(with = "crate::util::time_ser")]
+    pub created: OffsetDateTime,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

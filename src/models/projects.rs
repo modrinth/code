@@ -3,8 +3,8 @@ use super::teams::TeamId;
 use super::users::UserId;
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::QueryVersion;
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 use validator::Validate;
 
 /// The ID of a specific project, encoded as base62 for usage in the API
@@ -38,10 +38,14 @@ pub struct Project {
     pub body: String,
     /// The link to the long description of the project. (Deprecated), being replaced by `body`
     pub body_url: Option<String>,
+
     /// The date at which the project was first published.
-    pub published: DateTime<Utc>,
+    #[serde(with = "crate::util::time_ser")]
+    pub published: OffsetDateTime,
+
+    #[serde(with = "crate::util::time_ser")]
     /// The date at which the project was first published.
-    pub updated: DateTime<Utc>,
+    pub updated: OffsetDateTime,
 
     /// The status of the project
     pub status: ProjectStatus,
@@ -152,7 +156,8 @@ pub struct GalleryItem {
     pub featured: bool,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub created: DateTime<Utc>,
+    #[serde(with = "crate::util::time_ser")]
+    pub created: OffsetDateTime,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -297,8 +302,10 @@ pub struct Version {
     pub changelog: String,
     /// A link to the changelog for this version of the project. (Deprecated), being replaced by `changelog`
     pub changelog_url: Option<String>,
+
+    #[serde(with = "crate::util::time_ser")]
     /// The date that this version was published.
-    pub date_published: DateTime<Utc>,
+    pub date_published: OffsetDateTime,
     /// The number of downloads this specific version has had.
     pub downloads: u32,
     /// The type of the release - `Alpha`, `Beta`, or `Release`.
@@ -351,6 +358,7 @@ impl From<QueryVersion> for Version {
                             .collect::<Option<_>>()
                             .unwrap_or_default(),
                         primary: f.primary,
+                        size: f.size,
                     }
                 })
                 .collect(),
@@ -387,6 +395,8 @@ pub struct VersionFile {
     pub filename: String,
     /// Whether the file is the primary file of a version
     pub primary: bool,
+    /// The size in bytes of the file
+    pub size: u32,
 }
 
 /// A dependency which describes what versions are required, break support, or are optional to the

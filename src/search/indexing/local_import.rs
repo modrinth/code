@@ -68,9 +68,9 @@ pub async fn index_local(
                         icon_url: m.icon_url.unwrap_or_default(),
                         author: m.username,
                         date_created: m.published,
-                        created_timestamp: m.published.timestamp(),
+                        created_timestamp: m.published.unix_timestamp(),
                         date_modified: m.updated,
-                        modified_timestamp: m.updated.timestamp(),
+                        modified_timestamp: m.updated.unix_timestamp(),
                         latest_version: versions.last().cloned().unwrap_or_else(|| "None".to_string()),
                         versions,
                         license: m.short,
@@ -142,9 +142,9 @@ pub async fn query_one(
         icon_url: m.icon_url.unwrap_or_default(),
         author: m.username,
         date_created: m.published,
-        created_timestamp: m.published.timestamp(),
+        created_timestamp: m.published.unix_timestamp(),
         date_modified: m.updated,
-        modified_timestamp: m.updated.timestamp(),
+        modified_timestamp: m.updated.unix_timestamp(),
         latest_version: versions
             .last()
             .cloned()

@@ -7,10 +7,10 @@ use crate::util::auth::{
 };
 use actix_web::web;
 use actix_web::{get, post, HttpRequest, HttpResponse};
-use chrono::{DateTime, Utc};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
+use time::OffsetDateTime;
 
 #[derive(Serialize, Deserialize)]
 pub struct Report {
@@ -20,7 +20,8 @@ pub struct Report {
     pub item_type: ItemType,
     pub reporter: UserId,
     pub body: String,
-    pub created: DateTime<Utc>,
+    #[serde(with = "crate::util::time_ser")]
+    pub created: OffsetDateTime,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -92,7 +93,7 @@ pub async fn report_create(
         user_id: None,
         body: new_report.body.clone(),
         reporter: current_user.id.into(),
-        created: chrono::Utc::now(),
+        created: OffsetDateTime::now_utc(),
     };
 
     match new_report.item_type {
@@ -141,7 +142,7 @@ pub async fn report_create(
         item_type: new_report.item_type.clone(),
         reporter: current_user.id,
         body: new_report.body.clone(),
-        created: chrono::Utc::now(),
+        created: OffsetDateTime::now_utc(),
     }))
 }
 

@@ -1,4 +1,3 @@
-use actix_rt::time;
 use actix_rt::Arbiter;
 use futures::StreamExt;
 
@@ -18,7 +17,7 @@ impl Scheduler {
         F: FnMut() -> R + Send + 'static,
         R: std::future::Future<Output = ()> + Send + 'static,
     {
-        let future = IntervalStream::new(time::interval(interval))
+        let future = IntervalStream::new(actix_rt::time::interval(interval))
             .for_each_concurrent(2, move |_| task());
 
         self.arbiter.spawn(future);
@@ -75,6 +74,8 @@ pub enum VersionIndexingError {
 
 use crate::util::env::parse_var;
 use serde::Deserialize;
+use time::Format::Rfc3339;
+use time::OffsetDateTime;
 use tokio_stream::wrappers::IntervalStream;
 
 #[derive(Deserialize)]
@@ -87,8 +88,8 @@ struct VersionFormat<'a> {
     id: String,
     #[serde(rename = "type")]
     type_: std::borrow::Cow<'a, str>,
-    #[serde(rename = "releaseTime")]
-    release_time: chrono::DateTime<chrono::Utc>,
+    #[serde(rename = "releaseTime", with = "crate::util::time_ser")]
+    release_time: OffsetDateTime,
 }
 
 async fn update_versions(
@@ -127,30 +128,26 @@ async fn update_versions(
     lazy_static::lazy_static! {
         /// Mojank for some reason has versions released at the same DateTime. This hardcodes them to fix this,
         /// as most of our ordering logic is with DateTime
-        static ref HALL_OF_SHAME_2: [(&'static str, chrono::DateTime<chrono::Utc>); 4] = [
+        static ref HALL_OF_SHAME_2: [(&'static str, OffsetDateTime); 4] = [
             (
                 "1.4.5",
-                chrono::DateTime::parse_from_rfc3339("2012-12-19T22:00:00+00:00")
+                OffsetDateTime::parse("2012-12-19T22:00:00+00:00", Rfc3339)
                     .unwrap()
-                    .into(),
             ),
             (
                 "1.4.6",
-                chrono::DateTime::parse_from_rfc3339("2012-12-19T22:00:01+00:00")
+                OffsetDateTime::parse("2012-12-19T22:00:01+00:00", Rfc3339)
                     .unwrap()
-                    .into(),
             ),
             (
                 "1.6.3",
-                chrono::DateTime::parse_from_rfc3339("2013-09-13T10:54:41+00:00")
+                OffsetDateTime::parse("2013-09-13T10:54:41+00:00", Rfc3339)
                     .unwrap()
-                    .into(),
             ),
             (
                 "13w37b",
-                chrono::DateTime::parse_from_rfc3339("2013-09-13T10:54:42+00:00")
+                OffsetDateTime::parse("2013-09-13T10:54:42+00:00", Rfc3339)
                     .unwrap()
-                    .into(),
             ),
         ];
     }

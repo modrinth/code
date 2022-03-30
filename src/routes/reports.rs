@@ -8,6 +8,7 @@ use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
+use time::OffsetDateTime;
 
 #[derive(Deserialize)]
 pub struct CreateReport {
@@ -59,7 +60,7 @@ pub async fn report_create(
         user_id: None,
         body: new_report.body.clone(),
         reporter: current_user.id.into(),
-        created: chrono::Utc::now(),
+        created: OffsetDateTime::now_utc(),
     };
 
     match new_report.item_type {
@@ -108,7 +109,7 @@ pub async fn report_create(
         item_type: new_report.item_type.clone(),
         reporter: current_user.id,
         body: new_report.body.clone(),
-        created: chrono::Utc::now(),
+        created: OffsetDateTime::now_utc(),
     }))
 }
 

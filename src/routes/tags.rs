@@ -7,6 +7,7 @@ use crate::util::auth::check_is_admin_from_headers;
 use actix_web::{delete, get, put, web, HttpRequest, HttpResponse};
 use models::categories::{Category, GameVersion, Loader};
 use sqlx::PgPool;
+use time::OffsetDateTime;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -201,7 +202,8 @@ pub async fn loader_delete(
 pub struct GameVersionQueryData {
     pub version: String,
     pub version_type: String,
-    pub date: chrono::DateTime<chrono::Utc>,
+    #[serde(with = "crate::util::time_ser")]
+    pub date: OffsetDateTime,
     pub major: bool,
 }
 
@@ -241,7 +243,7 @@ pub async fn game_version_list(
 pub struct GameVersionData {
     #[serde(rename = "type")]
     type_: String,
-    date: Option<chrono::DateTime<chrono::Utc>>,
+    date: Option<OffsetDateTime>,
 }
 
 #[put("game_version/{name}")]

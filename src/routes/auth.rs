@@ -7,10 +7,10 @@ use crate::util::auth::get_github_user_from_token;
 use actix_web::http::StatusCode;
 use actix_web::web::{scope, Data, Query, ServiceConfig};
 use actix_web::{get, HttpResponse};
-use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
+use time::OffsetDateTime;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(scope("auth").service(auth_callback).service(init));
@@ -145,10 +145,10 @@ pub async fn auth_callback(
     .await?;
 
     if let Some(result) = result_option {
-        let now = Utc::now();
-        let duration = result.expires.signed_duration_since(now);
+        let now = OffsetDateTime::now_utc();
+        let duration = now - result.expires;
 
-        if duration.num_seconds() < 0 {
+        if duration.whole_seconds() < 0 {
             return Err(AuthorizationError::InvalidCredentials);
         }
 
@@ -225,7 +225,7 @@ pub async fn auth_callback(
                         email: user.email,
                         avatar_url: Some(user.avatar_url),
                         bio: user.bio,
-                        created: Utc::now(),
+                        created: OffsetDateTime::now_utc(),
                         role: Role::Developer.to_string(),
                     }
                     .insert(&mut transaction)
