@@ -268,7 +268,7 @@ export default {
     preset: 'default',
     html: true,
     linkify: true,
-    breaks: true,
+    breaks: false,
   },
   loading: {
     color: 'green',
