@@ -3,7 +3,7 @@
     import IconMoon from 'virtual:icons/heroicons-outline/moon'
     import IconSun from 'virtual:icons/heroicons-outline/sun'
 
-    let theme = 'light'
+    let theme = 'dark'
     let background: 'var(--color-raised-bg)' | 'var(--color-bg)' = 'var(--color-bg)'
 </script>
 
@@ -51,6 +51,7 @@
         &__code {
             margin: 0;
             border-radius: var(--rounded-sm-bottom) !important;
+            background: hsl(220, 13%, 22%);
         }
     }
 </style>

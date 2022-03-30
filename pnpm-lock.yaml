@@ -7,7 +7,6 @@ specifiers:
   '@poppanator/sveltekit-svg': ^0.3.1
   '@sveltejs/adapter-static': ^1.0.0-next.29
   '@sveltejs/kit': next
-  '@types/prismjs': ^1.26.0
   '@typescript-eslint/eslint-plugin': ^5.10.1
   '@typescript-eslint/parser': ^5.10.1
   autoprefixer: ^10.4.2
@@ -15,6 +14,7 @@ specifiers:
   eslint: ^7.32.0
   eslint-config-prettier: ^8.3.0
   eslint-plugin-svelte3: ^3.2.1
+  lodash.uniqueid: ^4.0.1
   mdsvex: ^0.10.5
   mdsvexamples: ^0.0.8
   nodemon: ^2.0.15
@@ -32,6 +32,7 @@ specifiers:
   svelte: ^3.44.0
   svelte-check: ^2.2.6
   svelte-preprocess: ^4.10.1
+  svelte-tiny-virtual-list: ^2.0.0
   svelte-use-click-outside: ^1.0.0
   svelte2tsx: ^0.5.5
   throttle-debounce: ^3.0.1
@@ -40,7 +41,9 @@ specifiers:
   unplugin-icons: ^0.13.3
 
 dependencies:
+  lodash.uniqueid: 4.0.1
   sanitize.css: 13.0.0
+  svelte-tiny-virtual-list: 2.0.0
   svelte-use-click-outside: 1.0.0
   throttle-debounce: 3.0.1
 
@@ -51,7 +54,6 @@ devDependencies:
   '@poppanator/sveltekit-svg': 0.3.1_svelte@3.46.4
   '@sveltejs/adapter-static': 1.0.0-next.29
   '@sveltejs/kit': 1.0.0-next.303_svelte@3.46.4
-  '@types/prismjs': 1.26.0
   '@typescript-eslint/eslint-plugin': 5.14.0_e3f5f4efe2bd492e36eb6c1c619dfc98
   '@typescript-eslint/parser': 5.14.0_eslint@7.32.0+typescript@4.6.2
   autoprefixer: 10.4.2_postcss@8.4.8
@@ -408,10 +410,6 @@ packages:
 
   /@types/node/17.0.21:
     resolution: {integrity: sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==}
-    dev: true
-
-  /@types/prismjs/1.26.0:
-    resolution: {integrity: sha512-ZTaqn/qSqUuAq1YwvOFQfVW1AR/oQJlLSZVustdjwI+GZ8kr0MSHBj0tsXPW1EqHubx50gtBEjbPGsdZwQwCjQ==}
     dev: true
 
   /@types/pug/2.0.6:
@@ -2095,6 +2093,10 @@ packages:
     resolution: {integrity: sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=}
     dev: true
 
+  /lodash.uniqueid/4.0.1:
+    resolution: {integrity: sha1-MmjyanyI5PSxdY1nknGBTjH6WyY=}
+    dev: false
+
   /lower-case/2.0.2:
     resolution: {integrity: sha512-7fm3l3NAF9WfN6W3JOmf5drwpVqX78JtoGJ3A6W0a6ZnldM41w2fV5D490psKFTpMds8TJse/eHLFFsNHHjHgg==}
     dependencies:
@@ -3602,6 +3604,10 @@ packages:
       svelte: 3.46.4
       typescript: 4.6.2
     dev: true
+
+  /svelte-tiny-virtual-list/2.0.0:
+    resolution: {integrity: sha512-6HxqgUaBICWV/Mm/x1Mr1L6G6EYJM3rcYhRWqYzKpv59e3s9rWifOwP7fLNKtblr16l2Gec0iBtUCOCPiYDmeQ==}
+    dev: false
 
   /svelte-use-click-outside/1.0.0:
     resolution: {integrity: sha512-tOWeMPxeIoW9RshS0WbogRhdYdbxcJV0ebkzSh1lwR7Ihl0hSZMmB4YyCHHoXJK4xcbxCCFh0AnQ1vkzGZfLVQ==}

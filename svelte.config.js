@@ -22,6 +22,10 @@ const config = {
 
     kit: {
         adapter: adapter(),
+        prerender: {
+            default: true,
+            onError: 'continue',
+        },
         vite: {
             plugins: [
                 svelteSvg(),
@@ -31,34 +35,6 @@ const config = {
                 }),
                 examples,
                 sveld(),
-                // {
-                //     name: "sveltedoc-parser",
-                //     async transform(src, id) {
-                //         const query = id.split('?')[1]
-                //
-                //         if ((query || '').includes('raw&api')) {
-                //             const raw = JSON.parse(src.split('export default ')[1])
-                //
-                //             let {code} = await svelte.preprocess(raw, sveltePreprocess(), {
-                //                 filename: id
-                //             })
-                //
-                //             const data = await parse({
-                //                 fileContent: code,
-                //                 encoding: 'ascii',
-                //                 features: ['data', 'computed', 'events', 'slots'],
-                //                 ignoredVisibilities: ['private'],
-                //                 includeSourceLocations: true,
-                //                 version: 3
-                //             })
-                //
-                //             return {
-                //                 code: `export default ${JSON.stringify(data)}`,
-                //                 map: null
-                //             }
-                //         }
-                //     }
-                // },
             ],
 
             resolve: {
@@ -68,6 +44,12 @@ const config = {
                     omorphia: path.resolve('./src/lib'),
                 },
             },
+
+            build: {
+                rollupOptions: {
+                    external: '/_app/COMPONENT_API.json'
+                }
+            }
         },
     },
 };

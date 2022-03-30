@@ -22,7 +22,6 @@
     "@poppanator/sveltekit-svg": "^0.3.1",
     "@sveltejs/adapter-static": "^1.0.0-next.29",
     "@sveltejs/kit": "next",
-    "@types/prismjs": "^1.26.0",
     "@typescript-eslint/eslint-plugin": "^5.10.1",
     "@typescript-eslint/parser": "^5.10.1",
     "autoprefixer": "^10.4.2",
@@ -69,7 +68,9 @@
   },
   "homepage": "https://omorphia.modrinth.com",
   "dependencies": {
+    "lodash.uniqueid": "^4.0.1",
     "sanitize.css": "^13.0.0",
+    "svelte-tiny-virtual-list": "^2.0.0",
     "svelte-use-click-outside": "^1.0.0",
     "throttle-debounce": "^3.0.1"
   }

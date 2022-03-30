@@ -13,8 +13,8 @@
             label: 'Button'
         },
         {
-            href: '/Link',
-            label: 'Link'
+            href: '/Chips',
+            label: 'Chips'
         },
         {
             href: '/NavRow',

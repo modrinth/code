@@ -11,7 +11,11 @@
 
     let api
     if ($page.url.pathname.includes('components')) {
-        import(`../../../lib/components/${title}.svelte?raw&sveld`).then(output => api = output.default)
+        if (import.meta.env.DEV) {
+            import(`../../../lib/components/${title}.svelte?raw&sveld`).then(output => api = output.default)
+        } else {
+            fetch('/_app/COMPONENT_API.json').then(res => res.json()).then(output => api = output[`${title}.svelte`])
+        }
     }
 </script>
 
@@ -42,9 +46,9 @@
                     <tbody>
                     {#each api.props as prop}
                         <tr>
-                            <td>{prop.name}</td>
+                            <td><code>{prop.name}</code></td>
                             <td><code>{prop.type ?? ''}</code></td>
-                            <td>{prop.value ?? ''}</td>
+                            <td><code>{prop.value ?? ''}</code></td>
                             <td>{prop.constant ? '[Read only] ' : ''}{prop.description?.replace('null', '') || ''}</td>
                         </tr>
                     {/each}
@@ -64,7 +68,7 @@
                     <tbody>
                     {#each api.events as event}
                         <tr>
-                            <td>{event.name}</td>
+                            <td><code>{event.name}</code></td>
                             <td>{!!event.parent}</td>
                             <td>{event.description?.replace('null', '') || ''}</td>
                         </tr>
@@ -84,8 +88,8 @@
                     <tbody>
                     {#each api.slots as slot}
                         <tr>
-                            <td>{slot.name}</td>
-                            <td>{slot.fallback}</td>
+                            <td><code>{slot.name}</code></td>
+                            <td>{slot.fallback ?? 'None'}</td>
                         </tr>
                     {/each}
                     </tbody>

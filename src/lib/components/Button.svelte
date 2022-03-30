@@ -1,4 +1,7 @@
 <script lang="ts">
+    // TODO: sizes
+    // TODO: icon only buttons should have uniform padding
+
     import { classCombine } from '$lib/utils/classCombine'
 
     /** The element to be styled as a button */
