@@ -36,6 +36,7 @@
             flex-wrap: wrap;
             position: relative;
             justify-content: flex-start;
+            z-index: 1;
 
             &__options {
                 position: absolute;

@@ -6,11 +6,13 @@
     import Header from './_internal/components/Header.svelte'
 </script>
 
-<div class="app">
+<div class="app theme-light">
     <Header/>
     <Sidebar/>
     <main class="app__content">
-        <slot/>
+        <article>
+            <slot />
+        </article>
     </main>
 </div>
 
@@ -24,43 +26,36 @@
             margin: 0;
             font-size: var(--body-font-size);
             font-family: var(--body-font);
+
             --accent-color: hsl(331, 80%, 45%);
             --accent-color-transparent: hsla(331, 80%, 45%, 0.15);
         }
     }
 
     .app {
-        display: grid;
+        display: flex;
+        flex-direction: column;
         min-height: 100vh;
         overflow: hidden;
-        --sidebar-width: 325px;
-        --header-height: 56px;
-        @media (width <= 500px) {
-            display: flex;
-            flex-direction: column;
-        }
+        background-color: var(--color-bg);
+
+        --sidebar-width: 275px;
 
         &__content {
-            padding: var(--header-height) 0 0 var(--sidebar-width);
+            @media (--md) {
+                padding-left: var(--sidebar-width);
+            }
             overflow-x: hidden;
             overflow-y: auto;
-            background-color: hsl(220, 13%, 91%);
 
-            :global {
-                a:not(.example__preview *) {
-                    color: var(--accent-color);
+            article {
+                max-width: 800px;
+                padding-block: 140px 64px;
+                padding-inline: 24px;
 
-                    &:hover {
-                        text-decoration: underline;
-                    }
-                }
-
-                h1:not(.example__preview *) {
-                    font-size: 54px;
-                }
-
-                p:not(.example__preview *) {
-                    line-height: 1.5;
+                @media (--sm) {
+                    padding-inline: 48px;
+                    padding-block: 140px 24px;
                 }
             }
         }

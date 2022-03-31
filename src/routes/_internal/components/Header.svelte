@@ -21,15 +21,19 @@
 </script>
 
 <header class="header" bind:this={headerElement}>
-    <OmorphiaLogo height="32px" width="32px"/>
+    <OmorphiaLogo class="header__logo"/>
     <div class="header__title">Omorphia</div>
     <div class="header__links">
-        <a href="https://modrinth.com">Modrinth.com</a>
-        <span class="spacer-dot"></span>
+        <a class="hide-sm" href="https://modrinth.com">Modrinth.com</a>
+        <span class="spacer-dot hide-sm"></span>
         <a href="https://www.npmjs.com/package/omorphia">NPM</a>
         <span class="spacer-dot"></span>
-        <a href="https://rewrite.modrinth.com/discord"><IconChat /></a>
-        <a href="https://github.com/modrinth/omorphia"><IconLogoGithub /></a>
+        <a href="https://rewrite.modrinth.com/discord">
+            <IconChat/>
+        </a>
+        <a href="https://github.com/modrinth/omorphia">
+            <IconLogoGithub/>
+        </a>
     </div>
 </header>
 
@@ -39,7 +43,8 @@
         display: flex;
         grid-gap: 10px;
         align-items: center;
-        padding: 0 32px;
+        flex-wrap: wrap;
+        padding: 16px 24px;
         position: fixed;
         height: var(--header-height);
         left: 0;
@@ -50,6 +55,16 @@
         box-shadow: hsla(221, 39%, 11%, 0.2) 0 2px 4px 0, hsla(221, 39%, 11%, 0.05) 0 -2px 2px 0 inset;
         transition: top 0.3s ease-in-out;
 
+        @media (--sm) {
+            padding: 10px 32px;
+        }
+
+        :global(&__logo) {
+            max-width: 32px;
+            min-width: 32px;
+            aspect-ratio: 1 / 1;
+        }
+
         &__title {
             font-size: 20px;
             font-weight: 600;
@@ -57,17 +72,30 @@
 
         &__links {
             margin-left: auto;
-            display: flex;
             grid-gap: 16px;
             align-items: center;
+            justify-content: center;
+            display: flex;
 
             :global(svg) {
                 height: 22px;
                 width: auto;
             }
 
-            a:not(:hover) {
-                color: unset;
+            .hide-sm {
+                display: none;
+
+                @media (--sm) {
+                    display: flex;
+                }
+            }
+
+            a {
+                text-decoration: none;
+
+                &:not(:hover) {
+                    color: unset;
+                }
             }
         }
     }

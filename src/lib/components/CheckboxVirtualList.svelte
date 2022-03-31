@@ -43,16 +43,3 @@
         </Checkbox>
     </div>
 </VirtualList>
-
-<style lang="postcss">
-    .checkbox-list {
-        display: flex;
-        flex-direction: column;
-
-        &.wrap {
-            flex-direction: row;
-            flex-wrap: wrap;
-            grid-gap: 2rem;
-        }
-    }
-</style>

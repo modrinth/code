@@ -14,5 +14,5 @@ jobs:
           accountEmail: ${{ secrets.CF_ACCOUNT_EMAIL  }}
           apiKey: ${{ secrets.CF_API_KEY  }}
           accountId: '9ddae624c98677d68d93df6e524a6061'
-          project: 'knossos'
+          project: 'omorphia'
           githubToken: ${{ secrets.GITHUB_TOKEN }}

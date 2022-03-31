@@ -61,8 +61,13 @@
     }
 
     &:where(h1) {
-        font-size: 28px;
+        font-size: 40px;
         color: black;
+        font-weight: 600;
+
+        @media (--md) {
+            font-size: 54px;
+        }
     }
 
     &:where(h2) {
@@ -356,12 +361,6 @@
         border: none;
     }
 
-    &:where(/* Custom styles */
-
-    h1) {
-        font-weight: 600;
-    }
-
     &:where(h2) {
         font-weight: 500;
     }
@@ -374,10 +373,14 @@
     }
 
     &:where(a) {
-        color: var(--accent-color)
+        color: var(--accent-color);
+
+        &:hover {
+            text-decoration: underline;
+        }
     }
 
     &:where(p) {
-        line-height: 150%;
+        line-height: 1.5;
     }
 }
