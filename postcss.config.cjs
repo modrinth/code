@@ -8,7 +8,16 @@ const config = {
     require('postcss-preset-env')({
       features: {
         'custom-media-queries': {
-          importFrom: './src/lib/styles/variables/queries.postcss'
+          importFrom: [
+            {
+              customMedia: {
+                  '--sm': '(min-width: 544px)',
+                  '--md': '(min-width: 768px)',
+                  '--lg': '(min-width: 1012px)',
+                  '--xl': '(min-width: 1280px)',
+              },
+            },
+          ]
         }
       }
     }),
