@@ -1,6 +1,6 @@
 ```svelte example
 <script lang="ts">
-    import CheckboxVirtualList from "omorphia/components/CheckboxVirtualList.svelte";
+    import { CheckboxVirtualList } from "omorphia";
     import IconStar from 'virtual:icons/heroicons-outline/star'
     import uniqueId from 'lodash.uniqueid'
     

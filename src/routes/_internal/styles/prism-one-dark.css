@@ -119,7 +119,8 @@ pre[class*="language-"] {
 .token.symbol,
 .token.deleted,
 .token.important {
-	color: hsl(355, 65%, 65%);
+	color: hsl(355, 65%, 65%) !important;
+	display: unset;
 }
 
 .token.selector,

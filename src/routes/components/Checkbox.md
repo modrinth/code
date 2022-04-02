@@ -2,7 +2,7 @@
 
 ```svelte example
 <script lang="ts">
-    import Checkbox from "omorphia/components/Checkbox.svelte";
+    import { Checkbox } from "omorphia";
 </script>
 
 <Checkbox>Extra components</Checkbox>
@@ -12,7 +12,7 @@
 
 ```svelte example
 <script lang="ts">
-    import Checkbox from "omorphia/components/Checkbox.svelte";
+    import { Checkbox } from "omorphia";
     import IconCarrot from 'virtual:icons/lucide/carrot'
 </script>
 

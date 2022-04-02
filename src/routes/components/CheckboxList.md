@@ -1,6 +1,6 @@
 ```svelte example
 <script lang="ts">
-    import CheckboxList from "omorphia/components/CheckboxList.svelte";
+    import { CheckboxList } from "omorphia";
     import IconSquare from 'virtual:icons/lucide/square'
     import IconCircle from 'virtual:icons/lucide/circle'
     import IconTriangle from 'virtual:icons/lucide/triangle'

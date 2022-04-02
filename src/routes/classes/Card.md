@@ -14,9 +14,9 @@
 
 ```svelte example
 <script lang="ts">
-    import Button from "omorphia/components/Button.svelte";
+    import { Button } from "omorphia";
     import IconPencil from 'virtual:icons/heroicons-outline/pencil'
-    import Avatar from "omorphia/components/Avatar.svelte";
+    import { Avatar } from "omorphia";
 </script>
 
 <div class="card">

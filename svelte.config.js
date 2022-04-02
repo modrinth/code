@@ -32,6 +32,7 @@ const config = {
                 Icons({
                     compiler: 'svelte',
                     defaultClass: 'icon',
+                    scale: 1.1428, // 1.1428rem = 16px when root size is 14px
                 }),
                 examples,
                 sveld(),
@@ -39,9 +40,9 @@ const config = {
 
             resolve: {
                 alias: {
-                    $lib: path.resolve('./src/lib'),
+                    $package: path.resolve('./src/package'),
                     $routes: path.resolve('./src/routes'),
-                    omorphia: path.resolve('./src/lib'),
+                    omorphia: path.resolve('./src/package'),
                 },
             },
 

@@ -32,7 +32,7 @@
         width="100%"
         {height}
         itemCount={options.length}
-        itemSize={30}>
+        itemSize={26}>
     <div slot="item" let:index let:style {style} style:padding-bottom={(options.length) - 1 === index ? '2.5rem' : ''}>
         {@const option = options[index]}
         <Checkbox checked={value.includes(option.value)} on:change={(e) => handleChange(e, option.value)}>

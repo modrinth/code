@@ -11,7 +11,7 @@
         window.addEventListener('scroll', () => {
             let scrollTop = window.pageYOffset || document.documentElement.scrollTop
             if (scrollTop > lastScrollTop && headerElement) {
-                headerElement.style.top = 'calc(var(--header-height) * -1)'
+                headerElement.style.top = '-100%'
             } else if (headerElement) {
                 headerElement.style.top = '0'
             }
@@ -46,7 +46,6 @@
         flex-wrap: wrap;
         padding: 16px 24px;
         position: fixed;
-        height: var(--header-height);
         left: 0;
         right: 0;
         top: 0;
@@ -54,6 +53,10 @@
         background-color: hsl(0, 0%, 100%);
         box-shadow: hsla(221, 39%, 11%, 0.2) 0 2px 4px 0, hsla(221, 39%, 11%, 0.05) 0 -2px 2px 0 inset;
         transition: top 0.3s ease-in-out;
+
+        @media not (--sm) {
+            top: 0 !important;
+        }
 
         @media (--sm) {
             padding: 10px 32px;

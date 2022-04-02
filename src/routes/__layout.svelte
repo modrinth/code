@@ -1,5 +1,5 @@
 <script lang="ts">
-    import '$lib/styles.postcss'
+    import '$package/styles.postcss'
     import './_internal/styles/prism-one-dark.css'
     import './_internal/styles/gh-markdown.postcss'
     import Sidebar from './_internal/components/Sidebar.svelte'

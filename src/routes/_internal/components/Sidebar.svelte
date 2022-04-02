@@ -3,11 +3,11 @@
 
     const components = Object.keys(import.meta.glob('../../components/**'))
         .map(it => it.replace('../../components/', '').replace('.md', ''))
-        .sort();
+        .sort()
 
     const classes = Object.keys(import.meta.glob('../../classes/**'))
         .map(it => it.replace('../../classes/', '').replace('.md', ''))
-        .sort();
+        .sort()
 
     let slideIn = false
 </script>
@@ -19,6 +19,8 @@
         <a href="/getting-started/icons" class="section__link">Using Icons</a>
         <a href="/getting-started/postcss" class="section__link">PostCSS config</a>
         <a href="/getting-started/css" class="section__link">Writing CSS</a>
+        <a href="/getting-started/illustrations" class="section__link">Illustrations</a>
+        <a href="/getting-started/utils" class="section__link">Built-in utilities</a>
     </div>
 
     <div class="section">
@@ -35,12 +37,17 @@
         {/each}
     </div>
 
-    <button class="sidebar__toggle" on:click={() => slideIn = !slideIn}><IconMenu /></button>
+    <button class="sidebar__toggle" on:click={() => slideIn = !slideIn}>
+        <IconMenu/>
+    </button>
 </nav>
 
 <style lang="postcss">
     :root {
         --sidebar-color: hsl(220, 15%, 40%);
+        --title-color: hsl(216, 10%, 80%);
+        --link-color: hsl(216, 10%, 90%);
+        --scrollbar-thumb-color: hsl(216, 10%, 70%);
     }
 
     .sidebar {
@@ -48,7 +55,7 @@
         flex-direction: column;
         grid-gap: 2rem;
         background-color: var(--sidebar-color);
-        color: hsl(216, 10%, 80%);
+        color: var(--title-color);
         height: 100vh;
         max-height: 100vh;
         overflow-y: auto;
@@ -58,9 +65,23 @@
         left: -100%;
         top: 0;
         z-index: 5;
-        padding: 88px 32px 32px;
+        padding: 88px 32px;
         transition: left 0.2s ease-in-out;
         box-shadow: 2px 0px 4px hsla(221, 39%, 11%, 0.2);
+
+        &:after {
+            content: "";
+            position: fixed;
+            z-index: 1;
+            bottom: 0;
+            left: 0;
+            pointer-events: none;
+            background-image: linear-gradient(to bottom,
+            transparent,
+            var(--sidebar-color) 90%);
+            width: var(--sidebar-width);
+            height: 88px;
+        }
 
         @media (--md) {
             left: 0;
@@ -78,7 +99,7 @@
             }
 
             &__link {
-                color: hsl(216, 10%, 90%);
+                color: var(--link-color);
                 text-decoration: none;
 
                 &:hover {
@@ -99,7 +120,7 @@
             border-radius: var(--rounded);
             color: white;
             box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-            transition: left 0.2s cubic-bezier(.38,.52,.37,1.27);
+            transition: left 0.2s cubic-bezier(.38, .52, .37, 1.27);
 
             :global(.icon) {
                 width: 32px;
@@ -117,6 +138,22 @@
             .sidebar__toggle {
                 left: calc(32px + min(70vw, var(--sidebar-width)))
             }
+        }
+
+        scrollbar-color: var(--scrollbar-thumb-color) var(--sidebar-color);
+
+        &::-webkit-scrollbar {
+            width: 14px;
+        }
+
+        &::-webkit-scrollbar-track {
+            background-color: var(--sidebar-color);
+        }
+
+        &::-webkit-scrollbar-thumb {
+            background-color: var(--scrollbar-thumb-color);
+            border-radius: 999px;
+            border: 3px solid var(--sidebar-color);
         }
     }
 </style>

@@ -14,7 +14,7 @@
     let api
     if ($page.url.pathname.includes('components')) {
         if (import.meta.env.DEV) {
-            import(`../../../lib/components/${title}.svelte?raw&sveld`).then(output => api = output.default)
+            import(`../../../package/components/${title}.svelte?raw&sveld`).then(output => api = output.default)
         } else {
             api = COMPONENT_API[`${title}.svelte`]
         }

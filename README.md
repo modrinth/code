@@ -4,46 +4,13 @@
 
 ---
 
-### ⚠️ Currently in-progress: Not accepting contributions currently.
+### ⚠️ In-progress: Not accepting contributions currently.
 
-When creating a component, start with [GitHub's Primer styles](https://github.com/primer/css/tree/main/src) for that component, and go from there. Global variables and colors are incomplete and currently identical to Primers'.
-
-#### Components
-
-- [ ] Button
-- [ ] Select menu
-- [ ] Checkboxes
-- [ ] Text input
-- [ ] Pagination
-- [ ] Link
-- [ ] Blankslate
-- [ ] Breadcrumbs
-- [ ] Markdown
-- [ ] Textarea
-- [ ] Select
-
-...and others
-
-## Using
-
-Install the package:
-
-```bash
-npm install omorphia # or pnpm inst...
-```
-
-Import a component:
-```svelte
-<script>
-    import { Button } from "omorphia"
-</script>
-
-<Button> Click me! </Button>
-```
+Learn more at [omorphia.modrinth.com.](https://omorphia.modrinth.com)
 
 ## Developing
 
-The library lives in the `src/lib` folder, and the documentation lives in the `src/routes` folder.
+The library lives in the `src/package` folder, and the documentation lives in the `src/routes` folder.
 
 ```bash
 pnpm install # Install dependencies

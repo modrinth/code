@@ -2,7 +2,7 @@
 
 ```svelte example
 <script lang="ts">
-    import Chips from "omorphia/components/Chips.svelte";
+    import { Chips } from "omorphia";
 </script>
 
 <Chips options={[
@@ -22,7 +22,7 @@
 
 ```svelte example
 <script lang="ts">
-    import Chips from "omorphia/components/Chips.svelte";
+    import { Chips } from "omorphia";
 
     let foo = 'modpack'
 </script>

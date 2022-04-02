@@ -3,7 +3,7 @@
     // TODO: icon only buttons should have uniform padding
     // TODO: Could be a class
 
-    import { classCombine } from '$lib/utils/classCombine'
+    import { classCombine } from '$package/utils/classCombine'
 
     /** The element to be styled as a button */
     export let as: 'button' | 'a' | 'summary' | 'input' = 'button'
@@ -47,7 +47,7 @@
         justify-content: flex-start;
         align-items: center;
         padding: 0.25rem 1rem;
-        grid-gap: 0.4rem;
+        grid-gap: 14px;
         cursor: pointer;
         position: relative;
 
@@ -104,7 +104,8 @@
             }
 
             &-danger-light {
-                color: var(--color-danger-text);
+                background-color: var(--color-popup-danger-bg);
+                color: var(--color-popup-danger-text);
                 transition: filter 0s ease-in-out;
 
                 &:hover {
@@ -131,10 +132,6 @@
             justify-content: center;
         }
 
-        &.is-iconified {
-            padding: 0.25rem 0.75rem;
-        }
-
         &.has-badge::after {
             content: '';
             width: 0.5rem;
@@ -144,6 +141,11 @@
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
+        }
+
+        /* Only child doesn't work as intended because text is passed through as `innerText` */
+        :global(.icon:only-child) {
+            margin: 4px -6px;
         }
     }
 </style>

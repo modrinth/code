@@ -1,6 +1,6 @@
 ```svelte example
 <script lang="ts">
-    import Select from "omorphia/components/Select.svelte";
+    import { Select } from "omorphia";
     
     let sortMethod = "downloads"
 </script>

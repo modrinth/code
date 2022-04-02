@@ -1,10 +1,13 @@
 {
 	"paths": {
 		"omorphia/*": [
-			"src/lib/*"
+			"src/package/*"
 		],
 		"omorphia": [
-			"src/lib"
+			"src/package"
+		],
+		"$package/*": [
+			"src/package/*"
 		],
 		"$routes/*": [
 			"src/routes/*"

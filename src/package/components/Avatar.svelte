@@ -2,7 +2,7 @@
     // TODO: Make square icon `md` more rounded
 
     import { onMount } from 'svelte'
-    import { classCombine } from '$lib/utils/classCombine'
+    import { classCombine } from '$package/utils/classCombine'
 
     /** Optional, as a default icon will be substituted if no image was specified */
     export let src: string | undefined

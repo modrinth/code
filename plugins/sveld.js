@@ -23,10 +23,10 @@ export default function sveld() {
         async buildStart() {
             const output = {};
 
-            const componentFiles = await fs.readdir(path.resolve('./src/lib/components'))
+            const componentFiles = await fs.readdir(path.resolve('./src/package/components'))
 
             for (const fileName of componentFiles) {
-                const filePath = path.resolve('./src/lib/components', fileName)
+                const filePath = path.resolve('./src/package/components', fileName)
                 const raw = (await fs.readFile(filePath)).toString()
                 output[fileName] = await parseRaw(raw, filePath)
             }

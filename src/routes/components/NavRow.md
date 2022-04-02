@@ -2,7 +2,7 @@
 
 ```svelte example
 <script lang="ts">
-    import NavRow from "omorphia/components/NavRow.svelte";
+    import { NavRow } from "omorphia";
 </script>
 
 <NavRow

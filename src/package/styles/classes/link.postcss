@@ -1,0 +1,26 @@
+.link {
+    color: var(--color-link);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    line-height: 100%;
+
+    &:hover {
+        text-decoration: underline;
+    }
+}
+
+.link-group {
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    grid-gap: 0.75rem;
+
+    .link {
+        color: var(--color-text);
+
+        &:hover {
+            color: var(--color-link);
+
+        }
+    }
+}

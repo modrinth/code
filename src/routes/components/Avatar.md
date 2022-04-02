@@ -2,7 +2,7 @@ Avatars are used for project icons and user profile pictures. Low resolution ima
 
 ```svelte example
 <script lang="ts">
-    import Avatar from "omorphia/components/Avatar.svelte";
+    import { Avatar } from "omorphia";
 </script>
 
 <Avatar size="lg" circle src="https://avatars3.githubusercontent.com/u/44736536?v=4" />

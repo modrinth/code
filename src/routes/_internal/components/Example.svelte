@@ -1,5 +1,5 @@
 <script lang="ts">
-    import Button from '$lib/components/Button.svelte'
+    import { Button } from 'omorphia/'
     import IconMoon from 'virtual:icons/heroicons-outline/moon'
     import IconSun from 'virtual:icons/heroicons-outline/sun'
 
@@ -9,7 +9,10 @@
 
 <div class="example">
     <div class="example__preview theme-{theme} base" style:background={background}>
-        <div class="example__preview__options">
+        <slot name="example"/>
+    </div>
+    <div class="example__source">
+        <div class="example__source__options">
             <Button color="primary-light" on:click={() => theme === 'light' ? theme = 'dark' : theme = 'light'}>
                 {#if theme === 'light'}
                     <IconMoon/>
@@ -18,9 +21,8 @@
                 {/if}
             </Button>
         </div>
-        <slot name="example"/>
+        <pre class="example__source__code language-svelte"><slot name="code"/></pre>
     </div>
-    <pre class="example__code language-svelte"><slot name="code"/></pre>
 </div>
 
 <style lang="postcss">
@@ -37,6 +39,10 @@
             position: relative;
             justify-content: flex-start;
             z-index: 1;
+        }
+
+        &__source {
+            position: relative;
 
             &__options {
                 position: absolute;
@@ -45,14 +51,17 @@
                 padding: 8px;
                 display: flex;
                 justify-content: flex-end;
-                z-index: 100;
-            }
-        }
 
-        &__code {
-            margin: 0;
-            border-radius: var(--rounded-sm-bottom) !important;
-            background: hsl(220, 13%, 22%);
+                :global(button) {
+                    color: black;
+                }
+            }
+
+            &__code {
+                margin: 0;
+                border-radius: var(--rounded-sm-bottom) !important;
+                background: hsl(220, 13%, 22%);
+            }
         }
     }
 </style>
