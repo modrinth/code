@@ -1,27 +1,23 @@
 import adapter from '@sveltejs/adapter-static';
-import preprocess from 'svelte-preprocess';
 import path from "path";
-import Icons from 'unplugin-icons/vite';
+import { preprocess, plugins } from 'omorphia/config/svelte.config'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-    preprocess: preprocess({
-        postcss: true,
-    }),
+    preprocess,
     kit: {
         adapter: adapter({
             fallback: '200.html',
         }),
         vite: {
             plugins: [
-                Icons({
-                    compiler: 'svelte',
-                }),
+                ...plugins,
             ],
             resolve: {
                 alias: {
                     $assets: path.resolve('./src/assets'),
                     $components: path.resolve('./src/components'),
+                    $layout: path.resolve('./src/layout'),
                     $lib: path.resolve('./src/lib'),
                     $stores: path.resolve('./src/stores'),
                     $styles: path.resolve('./src/styles'),

@@ -14,7 +14,7 @@
     <Svrollbar {viewport} {contents} />
 </div>
 
-<style>
+<style lang="postcss">
     .page {
         position: relative;
         width: 100%;
@@ -38,11 +38,15 @@
         /* hide scrollbar */
         -ms-overflow-style: none;
         scrollbar-width: none;
-    }
 
-    .viewport::-webkit-scrollbar {
-        /* hide scrollbar */
-        display: none;
+        &::-webkit-scrollbar {
+            /* hide scrollbar */
+            display: none;
+        }
+
+        .contents {
+            height: 100%;
+        }
     }
 
     :global(.v-thumb) {

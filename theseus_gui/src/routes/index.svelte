@@ -1,7 +1,7 @@
 <script lang="ts">
 
-import Instance from "../components/components/Instance.svelte";
-import CardRow from "../components/components/CardRow.svelte";
+import Instance from "$components/Instance.svelte";
+import CardRow from "$components/CardRow.svelte";
 </script>
 
 <CardRow title="Jump back in">

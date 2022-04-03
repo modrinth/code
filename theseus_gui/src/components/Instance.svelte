@@ -9,7 +9,7 @@
     export let image: string;
 </script>
 
-<a class="instance" href="/library/instance/{id}"
+<a class="instance" href="/library/instance/{id}/settings"
    style:background-image="linear-gradient(5deg, hsla(0,0%,0%,0.8) 0%, hsla(0,0%,0%,0) 100%), url('{image}')">
     <div class="instance__version">{version}{#if modpack}<IconBadgeCheck />{/if}</div>
     <div class="instance__title">{title}</div>
