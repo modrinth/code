@@ -30,6 +30,7 @@
 		"paths": {
 			"$assets/*": ["src/assets/*"],
 			"$components/*": ["src/components/*"],
+			"$layout/*": ["src/components/*"],
 			"$lib/*": ["src/lib/*"],
 			"$stores/*": ["src/stores/*"],
 			"$styles/*": ["src/styles/*"],

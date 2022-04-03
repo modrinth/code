@@ -23,7 +23,7 @@
     <div class="breadcrumbs">
         {#each path as crumb, index}
             {#if index !== 0}
-                <div class="breadcrumbs__separator"><IconCaretRight /></div>
+                <IconCaretRight />
             {/if}
             <a class="breadcrumbs__crumb" href={crumb}>{crumb || 'home'}</a>
         {/each}
@@ -51,12 +51,13 @@
         display: flex;
         grid-gap: 0.25rem;
         text-transform: capitalize;
+        align-items: center;
 
         &__crumb:hover {
             text-decoration: underline;
         }
 
-        &__separator {
+        :global(.icon) {
             color: var(--color-text-lightest)
         }
     }

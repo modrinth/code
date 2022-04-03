@@ -1,17 +1,13 @@
 <script lang="ts">
     import '@fontsource/inter'
-    import Sidebar from '$lib/../components/layout/Sidebar.svelte'
-    import StatusBar from "../components/layout/StatusBar.svelte";
-    import Page from "../components/layout/Page.svelte";
+    import 'omorphia/styles.postcss'
+    import '$styles/global.postcss'
+    import Sidebar from '$layout/Sidebar.svelte'
+    import StatusBar from "$layout/StatusBar.svelte";
+    import Page from "$layout/Page.svelte";
 </script>
 
-<svelte:head>
-    <style lang="postcss">
-        @import "../styles/global.postcss";
-    </style>
-</svelte:head>
-
-<div class="app">
+<div class="app base theme-dark">
     <Sidebar />
     <StatusBar />
     <Page>
