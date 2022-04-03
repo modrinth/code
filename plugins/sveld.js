@@ -1,8 +1,8 @@
 import {ComponentParser} from 'sveld'
-import sveltePreprocess from 'svelte-preprocess'
 import * as svelte from 'svelte/compiler'
 import fs from 'fs/promises'
 import path from 'path'
+import {preprocess} from "../src/package/config/svelte.config.js";
 
 export default function sveld() {
     return {
@@ -43,7 +43,7 @@ export default function sveld() {
 }
 
 async function parseRaw(raw, filePath) {
-    let { code } = await svelte.preprocess(raw, sveltePreprocess({ postcss: true }), {
+    let { code } = await svelte.preprocess(raw, preprocess, {
         filename: filePath
     })
     return new ComponentParser({

@@ -1,22 +1,17 @@
 import {mdsvex} from 'mdsvex';
 import mdsvexConfig from './mdsvex.config.js';
 import adapter from '@sveltejs/adapter-static';
-import preprocess from 'svelte-preprocess';
-import sveltePreprocess from 'svelte-preprocess';
-import Icons from 'unplugin-icons/vite';
-import svelteSvg from '@poppanator/sveltekit-svg';
 import examples from 'mdsvexamples/vite'
 import sveld from './plugins/sveld.js'
 import path from "path";
+import { preprocess, plugins } from './src/package/config/svelte.config.js'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     extensions: ['.svelte', ...mdsvexConfig.extensions],
 
     preprocess: [
-        preprocess({
-            postcss: true,
-        }),
+        preprocess,
         mdsvex(mdsvexConfig),
     ],
 
@@ -28,12 +23,7 @@ const config = {
         },
         vite: {
             plugins: [
-                svelteSvg(),
-                Icons({
-                    compiler: 'svelte',
-                    defaultClass: 'icon',
-                    scale: 1.1428, // 1.1428rem = 16px when root size is 14px
-                }),
+                ...plugins,
                 examples,
                 sveld(),
             ],
@@ -52,6 +42,9 @@ const config = {
                 }
             }
         },
+        files: {
+            lib: 'src/package',
+        }
     },
 };
 

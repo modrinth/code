@@ -3,7 +3,7 @@
     // TODO: icon only buttons should have uniform padding
     // TODO: Could be a class
 
-    import { classCombine } from '$package/utils/classCombine'
+    import { classCombine } from '../utils/classCombine'
 
     /** The element to be styled as a button */
     export let as: 'button' | 'a' | 'summary' | 'input' = 'button'
