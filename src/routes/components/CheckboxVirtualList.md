@@ -2,7 +2,7 @@
 <script lang="ts">
     import { CheckboxVirtualList } from "omorphia";
     import IconStar from 'virtual:icons/heroicons-outline/star'
-    import uniqueId from 'lodash.uniqueid'
+    import { uniqueId } from 'omorphia/utils/uniqueId'
     
     let options = Array(100).fill({})
         .map(option => ({

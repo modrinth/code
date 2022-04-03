@@ -14,7 +14,7 @@
     export let value = ''
 
     export let size: 'sm' | 'md' | 'lg' = 'md'
-    export let color: 'raised' | 'primary' | 'primary-light' | 'danger'| 'danger-light' | 'transparent'
+    export let color: '' | 'raised' | 'primary' | 'primary-light' | 'danger'| 'danger-light' | 'transparent' = ''
 
     /** Show notification badge in the upper right of button */
     export let badge = false

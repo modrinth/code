@@ -39,6 +39,7 @@
             position: relative;
             justify-content: flex-start;
             z-index: 1;
+            padding: 16px;
         }
 
         &__source {

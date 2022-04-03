@@ -1,5 +1,5 @@
 <script lang="ts">
-    import uniqueId from 'lodash.uniqueid'
+    import { uniqueId } from '../utils/uniqueId'
     import IconCheck from 'virtual:icons/heroicons-outline/check'
 
     export let checked = false;

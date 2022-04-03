@@ -61,7 +61,6 @@
     "cssnano": "^5.1.1",
     "highlight.js": "^11.5.0",
     "insane": "^2.6.2",
-    "lodash.uniqueid": "^4.0.1",
     "marked": "^4.0.12",
     "postcss": "^8.4.8",
     "postcss-easy-import": "^4.0.0",

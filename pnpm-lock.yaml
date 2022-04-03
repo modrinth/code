@@ -17,7 +17,6 @@ specifiers:
   eslint-plugin-svelte3: ^3.2.1
   highlight.js: ^11.5.0
   insane: ^2.6.2
-  lodash.uniqueid: ^4.0.1
   marked: ^4.0.12
   mdsvex: ^0.10.5
   mdsvexamples: ^0.0.8
@@ -55,7 +54,6 @@ dependencies:
   cssnano: 5.1.1_postcss@8.4.8
   highlight.js: 11.5.0
   insane: 2.6.2
-  lodash.uniqueid: 4.0.1
   marked: 4.0.12
   postcss: 8.4.8
   postcss-easy-import: 4.0.0_postcss@8.4.8
@@ -2131,10 +2129,6 @@ packages:
 
   /lodash.uniq/4.5.0:
     resolution: {integrity: sha1-0CJTc662Uq3BvILklFM5qEJ1R3M=}
-    dev: false
-
-  /lodash.uniqueid/4.0.1:
-    resolution: {integrity: sha1-MmjyanyI5PSxdY1nknGBTjH6WyY=}
     dev: false
 
   /lodash/4.17.21:

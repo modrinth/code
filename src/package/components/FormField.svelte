@@ -1,5 +1,5 @@
 <script lang="ts">
-    import uniqueId from 'lodash.uniqueid'
+    import { uniqueId } from '../utils/uniqueId'
 
     export let required = false;
     export let label: string;
