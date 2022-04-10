@@ -1,5 +1,3 @@
-use std::path::Path;
-
 use crate::{data::DataError, LAUNCHER_WORK_DIR};
 use once_cell::sync;
 use serde::{Deserialize, Serialize};
@@ -19,12 +17,13 @@ pub struct Metadata {
 
 impl Metadata {
     pub async fn init() -> Result<(), DataError> {
-        let meta_path = Path::new(LAUNCHER_WORK_DIR).join(META_FILE);
+        let meta_path = LAUNCHER_WORK_DIR.join(META_FILE);
 
         if meta_path.exists() {
-            let meta_data = std::fs::read_to_string(meta_path)
+            let meta_data = tokio::fs::read_to_string(meta_path)
+                .await
                 .ok()
-                .and_then(|x| serde_json::from_str::<Metadata>(&x).ok());
+                .and_then(|it| serde_json::from_str::<Metadata>(&it).ok());
 
             if let Some(metadata) = meta_data {
                 METADATA.get_or_init(|| RwLock::new(metadata));
@@ -37,7 +36,7 @@ impl Metadata {
                     let new = Self::fetch().await?;
 
                     std::fs::write(
-                        Path::new(LAUNCHER_WORK_DIR).join(META_FILE),
+                        LAUNCHER_WORK_DIR.join(META_FILE),
                         &serde_json::to_string(&new)?,
                     )?;
 
