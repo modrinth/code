@@ -891,14 +891,14 @@ export default {
             },
           ],
           categories: this.categories,
-          issues_url: this.issues_url,
-          source_url: this.source_url,
-          wiki_url: this.wiki_url,
+          issues_url: this.issues_url ? this.issues_url : null,
+          source_url: this.source_url ? this.source_url : null,
+          wiki_url: this.wiki_url ? this.wiki_url : null,
           discord_url: this.discord_url,
           client_side: this.clientSideType.toLowerCase(),
           server_side: this.serverSideType.toLowerCase(),
           license_id: this.license ? this.license.short : 'arr',
-          license_url: this.license_url,
+          license_url: this.license_url ? this.license_url : null,
           is_draft: this.draft,
           donation_urls: this.donationPlatforms.map((it, index) => {
             return {

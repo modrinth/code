@@ -773,7 +773,8 @@ export default {
           await Promise.all([
             this.$axios.get(`version/${this.version.id}`, this.$auth.headers),
             this.$axios.get(
-              `project/${this.version.project_id}/version?featured=true`
+              `project/${this.version.project_id}/version?featured=true`,
+              this.$auth.headers
             ),
           ])
         ).map((it) => it.data)
