@@ -9,6 +9,7 @@ use tokio::sync::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 const SETTINGS_FILE: &str = "settings.json";
 const ICONS_PATH: &str = "icons";
 const METADATA_DIR: &str = "meta";
+const SETTINGS_PATH_ENV: &str = "THESEUS_CONFIG_DIR";
 
 static SETTINGS: sync::OnceCell<RwLock<Settings>> = sync::OnceCell::new();
 pub const FORMAT_VERSION: u32 = 1;
@@ -49,7 +50,8 @@ impl Default for Settings {
 
 impl Settings {
     pub async fn init() -> Result<(), DataError> {
-        let settings_path = LAUNCHER_WORK_DIR.join(SETTINGS_FILE);
+        let settings_path = std::env::var_os(SETTINGS_PATH_ENV)
+            .map_or(LAUNCHER_WORK_DIR.join(SETTINGS_FILE), PathBuf::from);
 
         if settings_path.exists() {
             let settings_data = tokio::fs::read_to_string(settings_path)
