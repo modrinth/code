@@ -54,7 +54,7 @@ impl Settings {
             .map_or(LAUNCHER_WORK_DIR.join(SETTINGS_FILE), PathBuf::from);
 
         if settings_path.exists() {
-            let settings_data = tokio::fs::read_to_string(settings_path)
+            let settings_data = tokio::fs::read_to_string(&settings_path)
                 .await
                 .map(|x| serde_json::from_str::<Settings>(&x).ok())
                 .ok()
