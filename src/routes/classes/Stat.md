@@ -1,6 +1,6 @@
 ### Single Example
 
-```svelte example
+```svelte example raised
 <script>
     import IconStar from 'virtual:icons/heroicons-outline/star'
 </script>
@@ -13,7 +13,7 @@
 
 ### Group Example
 
-```svelte example
+```svelte example raised
 <script>
     import IconDownload from 'virtual:icons/heroicons-outline/download'
     import IconHeart from 'virtual:icons/heroicons-outline/heart'

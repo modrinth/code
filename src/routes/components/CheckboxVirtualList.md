@@ -1,4 +1,4 @@
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { CheckboxVirtualList } from "omorphia";
     import IconStar from 'virtual:icons/heroicons-outline/star'

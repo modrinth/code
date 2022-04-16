@@ -1,4 +1,4 @@
-```svelte example
+```svelte example raised
   <div class="info-table">
     <span class="info-table__label">License</span>
     <a href="#mit" class="link">MIT</a>

@@ -1,6 +1,6 @@
 ### Simple example
 
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { Chips } from "omorphia";
 </script>
@@ -20,7 +20,7 @@
 
 ### Force an option to be selected with `neverEmpty`
 
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { Chips } from "omorphia";
 

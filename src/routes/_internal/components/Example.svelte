@@ -1,10 +1,12 @@
 <script lang="ts">
-    import { Button } from 'omorphia/'
+    import { Button } from 'omorphia'
     import IconMoon from 'virtual:icons/heroicons-outline/moon'
     import IconSun from 'virtual:icons/heroicons-outline/sun'
 
-    let theme = 'dark'
-    let background: 'var(--color-raised-bg)' | 'var(--color-bg)' = 'var(--color-bg)'
+    export let meta: { raised: boolean };
+
+    let theme = 'light'
+    let background = meta.raised ? 'var(--color-raised-bg)' : 'var(--color-bg)'
 </script>
 
 <div class="example">

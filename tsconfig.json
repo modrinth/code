@@ -1,17 +1,21 @@
 {
-	"paths": {
-		"omorphia/*": [
-			"src/package/*"
-		],
-		"omorphia": [
-			"src/package"
-		],
-		"$package/*": [
-			"src/package/*"
-		],
-		"$routes/*": [
-			"src/routes/*"
-		]
-	},
+  "compilerOptions": {
+    "paths": {
+      "omorphia/*": [
+        "src/package/*"
+      ],
+      "omorphia": [
+        "src/package"
+      ],
+      "$package/*": [
+        "src/package/*"
+      ],
+      "$routes/*": [
+        "src/routes/*"
+      ],
+      "$lib":["src/package"],
+      "$lib/*":["src/package/*"]
+    }
+  },
 	"extends": "./.svelte-kit/tsconfig.json"
 }

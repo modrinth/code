@@ -1,6 +1,6 @@
 Avatars are used for project icons and user profile pictures. Low resolution images are rendered pixelated to preserve pixel art.
 
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { Avatar } from "omorphia";
 </script>

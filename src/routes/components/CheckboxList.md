@@ -1,4 +1,4 @@
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { CheckboxList } from "omorphia";
     import IconSquare from 'virtual:icons/lucide/square'

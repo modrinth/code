@@ -1,4 +1,4 @@
-```svelte example
+```svelte example raised
 <div class="card">
     Some words could go here.
     

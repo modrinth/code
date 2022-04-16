@@ -1,4 +1,4 @@
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { Badge } from "omorphia";
 </script>

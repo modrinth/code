@@ -8,7 +8,16 @@ const config = defineConfig({
     dashes: 'oldschool',
   },
 
-  remarkPlugins: [[examples, { ExampleComponent: '$routes/_internal/components/Example.svelte' }]],
+  remarkPlugins: [
+    [
+      examples,
+      {
+        defaults: {
+          Wrapper: '$routes/_internal/components/Example.svelte'
+        }
+      }
+    ]
+  ],
   rehypePlugins: [],
 
   layout: {

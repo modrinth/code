@@ -1,4 +1,4 @@
-```svelte example
+```svelte example raised
 <script>
     import { Button } from 'omorphia'
     import IconHeartSolid from 'virtual:icons/heroicons-solid/heart'

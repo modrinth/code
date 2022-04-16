@@ -19,7 +19,7 @@ specifiers:
   insane: ^2.6.2
   marked: ^4.0.12
   mdsvex: ^0.10.5
-  mdsvexamples: ^0.0.8
+  mdsvexamples: 0.3.0
   nodemon: ^2.0.15
   postcss: ^8.4.8
   postcss-easy-import: ^4.0.0
@@ -73,14 +73,14 @@ dependencies:
 
 devDependencies:
   '@sveltejs/adapter-static': 1.0.0-next.29
-  '@sveltejs/kit': 1.0.0-next.304_svelte@3.46.4
+  '@sveltejs/kit': 1.0.0-next.314_svelte@3.46.4
   '@typescript-eslint/eslint-plugin': 5.14.0_e3f5f4efe2bd492e36eb6c1c619dfc98
   '@typescript-eslint/parser': 5.14.0_eslint@7.32.0+typescript@4.6.2
   eslint: 7.32.0
   eslint-config-prettier: 8.5.0_eslint@7.32.0
   eslint-plugin-svelte3: 3.4.1_eslint@7.32.0+svelte@3.46.4
   mdsvex: 0.10.5_svelte@3.46.4
-  mdsvexamples: 0.0.8
+  mdsvexamples: 0.3.0
   nodemon: 2.0.15
   sveld: 0.13.4_4db7643ceec6f88f007a3dfc606d2828
   svelte: 3.46.4
@@ -358,8 +358,8 @@ packages:
       tiny-glob: 0.2.9
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.304_svelte@3.46.4:
-    resolution: {integrity: sha512-3+bCoDsF2Omolx51lK6+4Zgr8NYge8USxKpZpAg8OfonEW8L4GToyV4g+udLMCI3CC4QEw3eS1RFUj9UxLf2NQ==}
+  /@sveltejs/kit/1.0.0-next.314_svelte@3.46.4:
+    resolution: {integrity: sha512-EkXjEd30XO8+AydBLARxAtI6Ak8V0KFSEJ07sNsrkGq9J70sWPL7yGenhGaeq6S852XZAqeyWd6uGQZmQLR4Wg==}
     engines: {node: '>=14.13'}
     hasBin: true
     peerDependencies:
@@ -2193,14 +2193,14 @@ packages:
       vfile-message: 2.0.4
     dev: true
 
-  /mdsvexamples/0.0.8:
-    resolution: {integrity: sha512-BFyJeke4r/PbWWk4+jXVXjuR0/YNMJK10rXjRGarmr7+bqg3kIlfTFjew/uMx9KBYchWLaJlnVQPrh5nQN5/lg==}
+  /mdsvexamples/0.3.0:
+    resolution: {integrity: sha512-d662JjeT0Vw+XPwc2u+DAnGq+x8JMNJa17vMQpT+uvHJpkBs5Uszm0oDoU3LHmI1ZVB/Hq17HVrr0N/IUFQUJg==}
     dependencies:
       abstract-syntax-tree: 2.20.5
       prism-svelte: 0.5.0
       prismjs: 1.27.0
       unist-util-visit: 4.1.0
-      unplugin: 0.5.2
+      unplugin: 0.6.2
       upath: 2.0.1
     transitivePeerDependencies:
       - esbuild
@@ -3903,8 +3903,8 @@ packages:
       webpack-virtual-modules: 0.4.3
     dev: false
 
-  /unplugin/0.5.2:
-    resolution: {integrity: sha512-3SPYtus/56cxyD4jfjrnqCvb6jPxvdqJNaRXnEaG2BhNEMaoygu/39AG+LwKmiIUzj4XHyitcfZ7scGlWfEigA==}
+  /unplugin/0.6.2:
+    resolution: {integrity: sha512-+QONc2uBFQbeo4x5mlJHjTKjR6pmuchMpGVrWhwdGFFMb4ttFZ4E9KqhOOrNcm3Q8NNyB1vJ4s5e36IZC7UWYw==}
     peerDependencies:
       esbuild: '>=0.13'
       rollup: ^2.50.0

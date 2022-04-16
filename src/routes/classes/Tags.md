@@ -1,4 +1,4 @@
-```svelte example
+```svelte example raised
 <script>
     import IconCarrot from 'virtual:icons/lucide/carrot'
     import IconGlobe from 'virtual:icons/heroicons-outline/globe'

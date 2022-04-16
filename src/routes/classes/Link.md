@@ -1,12 +1,12 @@
 ### Single example
 
-```svelte example
+```svelte example raised
 <a class="link" href="#place"> Go somewhere! </a>
 ```
 
 ### Group example
 
-```svelte example
+```svelte example raised
 <script>
   import IconIssues from 'virtual:icons/heroicons-outline/exclamation'
   import IconCode from 'virtual:icons/heroicons-outline/code'

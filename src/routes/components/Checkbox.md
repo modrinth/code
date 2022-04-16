@@ -1,6 +1,6 @@
 ### Text-only Example
 
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { Checkbox } from "omorphia";
 </script>
@@ -10,7 +10,7 @@
 
 ### Text with Icon Example
 
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { Checkbox } from "omorphia";
     import IconCarrot from 'virtual:icons/lucide/carrot'

@@ -24,7 +24,7 @@
 
         body {
             margin: 0;
-            font-size: var(--body-font-size);
+            font-size: var(--font-size);
             font-family: var(--body-font);
 
             --accent-color: hsl(331, 80%, 45%);
