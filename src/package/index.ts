@@ -18,8 +18,9 @@ export { default as Pagination } from './components/Pagination.svelte';
 
 export { default as Select } from './components/Select.svelte';
 
-export { default as TextInput } from './components/TextInput.svelte';
+export { default as Slider } from './components/Slider.svelte';
 
+export { default as TextInput } from './components/TextInput.svelte';
 
 
 
