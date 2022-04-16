@@ -19,7 +19,7 @@ specifiers:
   insane: ^2.6.2
   marked: ^4.0.12
   mdsvex: ^0.10.5
-  mdsvexamples: 0.3.0
+  mdsvexamples: ^0.3.0
   nodemon: ^2.0.15
   postcss: ^8.4.8
   postcss-easy-import: ^4.0.0
