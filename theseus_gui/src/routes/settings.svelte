@@ -5,15 +5,10 @@
 <script lang="ts">
     import { Checkbox, FormField, TextInput, Button } from "omorphia"
     import GlobalSettings from "$components/GlobalSettings.svelte"
-    import TitledSection from "$components/TitledSection.svelte"
-
-    export let overrideGlobalSettings = false
 </script>
 
 <div class="section">
-    <TitledSection title="Override global settings" toggleable=true>
-        <GlobalSettings />
-    </TitledSection>
+    <GlobalSettings />
 </div>
 
 <style lang="postcss">

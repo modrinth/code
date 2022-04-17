@@ -35,7 +35,7 @@
     "@iconify-json/heroicons-solid": "^1.1.1",
     "@iconify-json/lucide": "^1.1.5",
     "@tauri-apps/api": "^1.0.0-rc.1",
-    "omorphia": "0.0.15",
+    "omorphia": "0.0.17",
     "svrollbar": "^0.10.4",
     "unplugin-icons": "^0.13.2"
   }

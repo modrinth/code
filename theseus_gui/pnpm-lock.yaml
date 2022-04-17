@@ -16,7 +16,7 @@ specifiers:
   eslint-config-prettier: ^8.3.0
   eslint-plugin-svelte3: ^3.2.1
   kill-port-process: ^3.0.1
-  omorphia: 0.0.15
+  omorphia: 0.0.17
   prettier: ^2.5.1
   prettier-plugin-svelte: ^2.5.0
   svelte: ^3.46.0
@@ -33,13 +33,13 @@ dependencies:
   '@iconify-json/heroicons-solid': 1.1.1
   '@iconify-json/lucide': 1.1.5
   '@tauri-apps/api': 1.0.0-rc.1
-  omorphia: 0.0.15_svelte@3.46.4
+  omorphia: 0.0.17_svelte@3.46.4
   svrollbar: 0.10.4
   unplugin-icons: 0.13.2
 
 devDependencies:
   '@sveltejs/adapter-static': 1.0.0-next.29
-  '@sveltejs/kit': 1.0.0-next.304_svelte@3.46.4
+  '@sveltejs/kit': 1.0.0-next.314_svelte@3.46.4
   '@tauri-apps/cli': 1.0.0-rc.5
   '@typescript-eslint/eslint-plugin': 5.12.1_78ba2542c270c83b2a80bb1c125195b6
   '@typescript-eslint/parser': 5.12.1_eslint@7.32.0+typescript@4.5.5
@@ -300,8 +300,8 @@ packages:
       tiny-glob: 0.2.9
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.304_svelte@3.46.4:
-    resolution: {integrity: sha512-3+bCoDsF2Omolx51lK6+4Zgr8NYge8USxKpZpAg8OfonEW8L4GToyV4g+udLMCI3CC4QEw3eS1RFUj9UxLf2NQ==}
+  /@sveltejs/kit/1.0.0-next.314_svelte@3.46.4:
+    resolution: {integrity: sha512-EkXjEd30XO8+AydBLARxAtI6Ak8V0KFSEJ07sNsrkGq9J70sWPL7yGenhGaeq6S852XZAqeyWd6uGQZmQLR4Wg==}
     engines: {node: '>=14.13'}
     hasBin: true
     peerDependencies:
@@ -1992,8 +1992,8 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: false
 
-  /omorphia/0.0.15_svelte@3.46.4:
-    resolution: {integrity: sha512-j06eroREjaoF1A/etxvxAOahV2MqW2/36IOrjdB+UQzlAflsBXkSPNXb1e7GUHANP3GUobhvUyg6IBFOXf/R6g==}
+  /omorphia/0.0.17_svelte@3.46.4:
+    resolution: {integrity: sha512-MeOhG4VT7GHt/rNB37Fj2YSkVV813ZMgjImOtPilwxE9NNyJp220JU5Cy4/BxCRpdF2GOuokZPPIK+RO6mWRYA==}
     dependencies:
       '@iconify-json/carbon': 1.1.1
       '@iconify-json/heroicons-outline': 1.1.1
