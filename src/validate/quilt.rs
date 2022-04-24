@@ -5,9 +5,9 @@ use std::io::Cursor;
 use time::OffsetDateTime;
 use zip::ZipArchive;
 
-pub struct FabricValidator;
+pub struct QuiltValidator;
 
-impl super::Validator for FabricValidator {
+impl super::Validator for QuiltValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["jar", "zip"]
     }
@@ -23,7 +23,7 @@ impl super::Validator for FabricValidator {
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         // Time since release of 18w49a, the first fabric version
         SupportedGameVersions::PastDate(OffsetDateTime::from_unix_timestamp(
-            1543969469,
+            1646070100,
         ))
     }
 
@@ -31,9 +31,9 @@ impl super::Validator for FabricValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("fabric.mod.json").map_err(|_| {
+        archive.by_name("quilt.mod.json").map_err(|_| {
             ValidationError::InvalidInput(
-                "No fabric.mod.json present for Fabric file.".into(),
+                "No quilt.mod.json present for Quilt file.".into(),
             )
         })?;
 
@@ -41,7 +41,7 @@ impl super::Validator for FabricValidator {
             name.ends_with("refmap.json") || name.ends_with(".class")
         }) {
             return Ok(ValidationResult::Warning(
-                "Fabric mod file is a source file!",
+                "Quilt mod file is a source file!",
             ));
         }
 

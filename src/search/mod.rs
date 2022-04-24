@@ -223,7 +223,6 @@ pub async fn search_for_project(
                 filter_string.push_str(&*filters);
             }
 
-            println!("{}", filter_string);
             if !filter_string.is_empty() {
                 query.with_filter(&filter_string);
             }

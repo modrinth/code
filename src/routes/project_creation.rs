@@ -373,7 +373,23 @@ pub async fn project_create_inner(
             .await
             .map_err(|e| CreateError::DatabaseError(e.into()))?;
 
-            if results.exists.unwrap_or(true) {
+            if results.exists.unwrap_or(false) {
+                return Err(CreateError::SlugCollision);
+            }
+        }
+
+        {
+            let results = sqlx::query!(
+                "
+                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = $1)
+                ",
+                create_data.slug
+            )
+            .fetch_one(&mut *transaction)
+            .await
+            .map_err(|e| CreateError::DatabaseError(e.into()))?;
+
+            if results.exists.unwrap_or(false) {
                 return Err(CreateError::SlugCollision);
             }
         }

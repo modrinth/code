@@ -640,6 +640,28 @@
       ]
     }
   },
+  "20c6f94eae9260fc3f91de3e4a42c544e0b5c01227854956d04db7641c03c1b8": {
+    "query": "\n            SELECT d.id id\n            FROM dependencies d\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = d.dependent_id AND gvv.game_version_id = ANY($2)\n            INNER JOIN loaders_versions lv ON lv.version_id = d.dependent_id AND lv.loader_id = ANY($3)\n            WHERE d.mod_dependency_id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int4"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int4Array",
+          "Int4Array"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "2162043897db26d0b55a0652c1a6db66c555f1d148ce69bd0bd0d2122de1bd6a": {
     "query": "\n            DELETE FROM mods_gallery\n            WHERE mod_id = $1\n            ",
     "describe": {
@@ -3016,6 +3038,26 @@
       },
       "nullable": [
         false
+      ]
+    }
+  },
+  "96587afb05c9d308d665e76dabab497b39cc7993b6fececed7dc9677d159abb3": {
+    "query": "\n                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = $1)\n                ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "exists",
+          "type_info": "Bool"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      },
+      "nullable": [
+        null
       ]
     }
   },
@@ -5759,28 +5801,6 @@
       "parameters": {
         "Left": [
           "Int4"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
-  "f17df1295edfaa1cac400ce705181b14a9e763f5e515c6913d0152717b89ceaa": {
-    "query": "\n            SELECT d.id id\n            FROM versions v\n            INNER JOIN dependencies d ON d.mod_dependency_id = $1\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id = ANY($2)\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id = ANY($3)\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int4Array",
-          "Int4Array"
         ]
       },
       "nullable": [

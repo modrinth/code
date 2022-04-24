@@ -31,11 +31,11 @@ impl super::Validator for ForgeValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("META-INF/mods.toml").map_err(|_| {
-            ValidationError::InvalidInput(
-                "No mods.toml present for Forge file.".into(),
-            )
-        })?;
+        if archive.by_name("META-INF/mods.toml").is_err() {
+            return Ok(ValidationResult::Warning(
+                "No mods.toml present for Forge file.",
+            ));
+        }
 
         if !archive.file_names().any(|name| name.ends_with(".class")) {
             return Ok(ValidationResult::Warning(

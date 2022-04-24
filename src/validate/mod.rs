@@ -2,6 +2,7 @@ use crate::models::projects::{GameVersion, Loader};
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
 use crate::validate::pack::PackValidator;
+use crate::validate::quilt::QuiltValidator;
 use std::io::Cursor;
 use thiserror::Error;
 use time::OffsetDateTime;
@@ -10,6 +11,7 @@ use zip::ZipArchive;
 mod fabric;
 mod forge;
 mod pack;
+mod quilt;
 
 #[derive(Error, Debug)]
 pub enum ValidationError {
@@ -52,11 +54,12 @@ pub trait Validator: Sync {
     ) -> Result<ValidationResult, ValidationError>;
 }
 
-static VALIDATORS: [&dyn Validator; 4] = [
+static VALIDATORS: [&dyn Validator; 5] = [
     &PackValidator,
     &FabricValidator,
     &ForgeValidator,
     &LegacyForgeValidator,
+    &QuiltValidator,
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file

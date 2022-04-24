@@ -201,10 +201,10 @@ impl VersionBuilder {
         let dependencies = sqlx::query!(
             "
             SELECT d.id id
-            FROM versions v
-            INNER JOIN dependencies d ON d.mod_dependency_id = $1
-            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id AND gvv.game_version_id = ANY($2)
-            INNER JOIN loaders_versions lv ON lv.version_id = v.id AND lv.loader_id = ANY($3)
+            FROM dependencies d
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = d.dependent_id AND gvv.game_version_id = ANY($2)
+            INNER JOIN loaders_versions lv ON lv.version_id = d.dependent_id AND lv.loader_id = ANY($3)
+            WHERE d.mod_dependency_id = $1
             ",
             self.project_id as ProjectId,
             &self.game_versions.iter().map(|x| x.0).collect::<Vec<i32>>(),
