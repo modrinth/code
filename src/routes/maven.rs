@@ -4,7 +4,7 @@ use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
 use crate::{database, util::auth::is_authorized};
-use actix_web::{get, web, HttpRequest, HttpResponse};
+use actix_web::{get, route, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
 use yaserde_derive::YaSerialize;
 
@@ -148,7 +148,11 @@ fn find_file<'a>(
     }
 }
 
-#[get("maven/modrinth/{id}/{versionnum}/{file}")]
+#[route(
+    "maven/modrinth/{id}/{versionnum}/{file}",
+    method = "GET",
+    method = "HEAD"
+)]
 pub async fn version_file(
     req: HttpRequest,
     params: web::Path<(String, String, String)>,
