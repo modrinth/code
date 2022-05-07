@@ -1,12 +1,12 @@
 <script lang="ts">
-    import { SvelteComponent } from 'svelte'
     import { page } from "$app/stores";
 
     export let items: {
         label: string,
         /** Page href, without slash prefix */
         href: string,
-        icon: SvelteComponent
+        /** An icon, as a svelte component */
+        icon: any, // `SvelteComponentDev` has type errors
     }[];
 
     /** Path level in URL, zero-indexed */
