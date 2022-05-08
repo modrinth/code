@@ -7,7 +7,7 @@
 </script>
 
 <div class="section">
-    <TitledSection title="Override global settings" toggleable=true>
+    <TitledSection title="Override global settings" toggleable={true}>
         <GlobalSettings />
     </TitledSection>
 </div>

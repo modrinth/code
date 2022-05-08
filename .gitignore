@@ -11,3 +11,4 @@ theseus_cli/launcher
 theseus_cli/foo
 .DS_Store
 .pnpm-debug.log
+generated/

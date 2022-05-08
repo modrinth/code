@@ -34,7 +34,7 @@
 			"$lib/*": ["src/lib/*"],
 			"$stores/*": ["src/stores/*"],
 			"$styles/*": ["src/styles/*"],
-			"$generated/*": ["src/generated/*"],
+			"$generated/*": ["generated/*"],
 			"$lib":["src/lib"],
 		}
 	},

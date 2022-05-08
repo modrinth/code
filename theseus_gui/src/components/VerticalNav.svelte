@@ -20,7 +20,7 @@
 
 <div class="vertical-nav">
     {#each items as item (item.href)}
-        <a class="nav-item" href="/{item.href}" class:active={path[level] === item.href}>
+        <a class="nav-item" href="/{item.href}" class:active={path[level] === item.href} sveltekit:prefetch>
             <svelte:component this={item.icon} />
             {item.label}
         </a>
