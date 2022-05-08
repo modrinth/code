@@ -1,6 +1,4 @@
 <script lang="ts">
-    import type { SvelteComponent } from 'svelte';
-
     export let value: number;
     export let min: number;
     export let max: number;

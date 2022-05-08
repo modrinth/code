@@ -18,14 +18,16 @@
 </script>
 
 <div class="button-group">
-    <Button>Default button</Button>
-    <Button color="raised">Raised button</Button>
-    <Button color="primary">Primary button</Button>
-    <Button color="primary-light">Light primary button</Button>
-    <Button color="danger">Danger button</Button>
-    <Button color="danger-light">Light danger button</Button>
-    <Button color="transparent">Transparent button</Button>
-    <Button disabled>Disabled button</Button>
+    <Button>Default</Button>
+    <Button color="raised">Raised</Button>
+    <Button color="primary">Primary</Button>
+    <Button color="primary-light">Light primary</Button>
+    <Button color="secondary">Secondary</Button>
+    <Button color="tertiary">Tertiary</Button>
+    <Button color="danger">Danger</Button>
+    <Button color="danger-light">Light danger</Button>
+    <Button color="transparent">Transparent</Button>
+    <Button disabled>Disabled</Button>
 </div>
 ```
 
