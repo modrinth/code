@@ -27,7 +27,7 @@
     "mdsvexamples": "^0.3.0",
     "nodemon": "^2.0.15",
     "sveld": "^0.13.4",
-    "svelte": "^3.44.0",
+    "svelte": "^3.48.0",
     "svelte-check": "^2.2.6",
     "svelte-preprocess": "^4.10.1",
     "svelte2tsx": "^0.5.5",
@@ -53,6 +53,7 @@
   "homepage": "https://omorphia.modrinth.com",
   "dependencies": {
     "@iconify-json/carbon": "^1.1.1",
+    "@iconify-json/fa-regular": "^1.1.1",
     "@iconify-json/heroicons-outline": "^1.1.1",
     "@iconify-json/heroicons-solid": "^1.1.1",
     "@iconify-json/lucide": "^1.1.7",

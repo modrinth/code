@@ -24,7 +24,7 @@ pnpm add omorphia
 
 Use a component by importing from `omorphia`. For example, use the [Button component](/components/Button) like so:
 
-```svelte example
+```svelte example raised
 <script lang="ts">
     import { Button } from "omorphia"
 </script>

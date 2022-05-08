@@ -80,7 +80,7 @@ import { page } from '$app/stores';
       height: 100vh;
       max-height: 100vh;
       overflow-y: auto;
-      grid-gap: 16px;
+      grid-gap: 40px;
       display: flex;
       flex-direction: column;
 

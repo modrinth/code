@@ -2,7 +2,7 @@
 title: Configure
 ---
 
-To make use of the built-in icons, styles, and plugins in omorphia, you will need to update the config files.
+To make use of the built-in icons, styles, and plugins in omorphia, you will need to update your project's config files.
 
 ## SvelteKit 
 

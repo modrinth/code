@@ -2,64 +2,26 @@
 title: Icons
 ---
 
-<script>
-      import IconHeart from 'virtual:icons/heroicons-outline/heart'
-</script>
-
-Use [unplugin-icons](https://github.com/antfu/unplugin-icons) to import icons as Svelte components.
-
-## Installation
-
-Install the package with:
-
-```bash
-pnpm add -D unplugin-icons
-```
-
-Import the plugin in your `svelte.config.js` file:
-
-```js
-import Icons from 'unplugin-icons/vite';
-
-const config = {
-    kit: {
-        vite: {
-            plugins: [
-                Icons({
-                    compiler: 'svelte',
-                }),
-            ],
-        },
-    },
-};
-```
-
 ## Choosing icons
 
-`heroicons-outline` is the most used icon pack, and should be preferred above all others. If you can't find a good icon, or are looking for an alternative, use `lucide`, `fa-regular` (FontAwesome), `heroicons-solid`, and `carbon`, in that order. [Browse icons...](https://icones.js.org/collection/heroicons-outline)
+The follwing icon packs are included with omorphia:
 
-To install an icon pack, run:
+`heroicons-outline` `lucide` `fa-regular` `heroicons-solid` `carbon`
 
-```bash
-pnpm add -D @iconify-json/heroicons-outline
-```
-
-Replacing `heroicons-outline`, with the pack you are trying to install.
+Aim to find icons from `heroicons-outline` first, and then from the following packs if you can't find what you are looking for. [Browse icons...](https://icones.js.org/collection/heroicons-outline)
 
 ## Using icons
 
-Import an icon in the `<script>` tag of your component:
-
-```js
-  import IconHeart from 'virtual:icons/heroicons-outline/heart'
-```
+Import an icon in the `<script>` tag of your component.
 
 Then use the icon as if it were a Svelte component:
 
 > The `height` and `width` props are optional, and take CSS compatible values
 
-```html
-That's lovely <IconHeart height="14px" />!
-```
+```svelte example
+<script lang="ts">
+    import IconHeart from 'virtual:icons/heroicons-outline/heart'
+</script>
 
-That's lovely <IconHeart height="14px" />!
+<p> That's lovely <IconHeart height="14px" />! </p>
+```

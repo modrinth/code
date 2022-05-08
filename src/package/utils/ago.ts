@@ -1,6 +1,6 @@
 /**
  * Human readable elapsed or remaining time (example: 3 minutes ago)
- * @author github.com/victornpb
+ * @author https://github.com/victornpb
  * @see https://stackoverflow.com/a/67338038/938822
  */
 export function ago(
