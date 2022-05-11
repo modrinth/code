@@ -1,6 +1,7 @@
 mod v1;
 pub use v1::v1_config;
 
+mod admin;
 mod auth;
 mod health;
 mod index;
@@ -87,7 +88,6 @@ pub fn versions_config(cfg: &mut web::ServiceConfig) {
         web::scope("version")
             .service(versions::version_get)
             .service(versions::version_delete)
-            .service(versions::version_count_patch)
             .service(version_creation::upload_file_to_version)
             .service(versions::version_edit),
     );

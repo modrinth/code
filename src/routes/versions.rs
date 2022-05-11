@@ -1,11 +1,9 @@
 use super::ApiError;
 use crate::database;
-use crate::database::models as db_models;
 use crate::models;
 use crate::models::projects::{Dependency, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::{get_user_from_headers, is_authorized};
-use crate::util::guards::admin_key_guard;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
@@ -494,55 +492,6 @@ pub async fn version_edit(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
-}
-
-// This is an internal route, cannot be used without key
-#[patch(
-    "{project_id}/{version_name}/_count-download",
-    guard = "admin_key_guard"
-)]
-pub async fn version_count_patch(
-    info: web::Path<(models::ids::ProjectId, String)>,
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
-    let (project, version_name) = info.into_inner();
-    let project = db_models::ids::ProjectId::from(project);
-
-    let version = sqlx::query!(
-        "SELECT id FROM versions
-         WHERE (version_number = $1 AND mod_id = $2)",
-        version_name,
-        project as db_models::ids::ProjectId
-    )
-    .fetch_optional(pool.as_ref())
-    .await?;
-    let version = match version {
-        Some(version) => db_models::ids::VersionId(version.id),
-        _ => {
-            return Ok(HttpResponse::NotFound().body("Could not find version!"))
-        }
-    };
-
-    futures::future::try_join(
-        sqlx::query!(
-            "UPDATE versions
-             SET downloads = downloads + 1
-             WHERE (id = $1)",
-            version as db_models::ids::VersionId
-        )
-        .execute(pool.as_ref()),
-        sqlx::query!(
-            "UPDATE mods
-             SET downloads = downloads + 1
-             WHERE (id = $1)",
-            project as db_models::ids::ProjectId
-        )
-        .execute(pool.as_ref()),
-    )
-    .await
-    .map_err(ApiError::SqlxDatabase)?;
-
-    Ok(HttpResponse::Ok().body(""))
 }
 
 #[delete("{version_id}")]

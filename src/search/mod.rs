@@ -160,8 +160,8 @@ pub async fn search_for_project(
         "relevance" => ("projects", ["downloads:desc"]),
         "downloads" => ("projects_filtered", ["downloads:desc"]),
         "follows" => ("projects_filtered", ["follows:desc"]),
-        "updated" => ("projects_filtered", ["date_created:desc"]),
-        "newest" => ("projects_filtered", ["date_modified:desc"]),
+        "updated" => ("projects_filtered", ["date_created:asc"]),
+        "newest" => ("projects_filtered", ["date_modified:asc"]),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     };
 
