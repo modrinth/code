@@ -40,7 +40,8 @@ pub fn v2_config(cfg: &mut web::ServiceConfig) {
             .configure(users_config)
             .configure(moderation_config)
             .configure(reports_config)
-            .configure(notifications_config),
+            .configure(notifications_config)
+            .configure(admin_config),
     );
 }
 
@@ -154,6 +155,13 @@ pub fn reports_config(cfg: &mut web::ServiceConfig) {
     cfg.service(reports::reports);
     cfg.service(reports::report_create);
     cfg.service(reports::delete_report);
+}
+
+pub fn admin_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("admin")
+            .service(admin::count_download)
+    );
 }
 
 #[derive(thiserror::Error, Debug)]

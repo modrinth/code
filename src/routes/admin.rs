@@ -11,7 +11,7 @@ pub struct DownloadBody {
 
 // This is an internal route, cannot be used without key
 #[patch("/_count-download", guard = "admin_key_guard")]
-pub async fn version_count_patch(
+pub async fn count_download(
     pool: web::Data<PgPool>,
     download_body: web::Json<DownloadBody>,
 ) -> Result<HttpResponse, ApiError> {
