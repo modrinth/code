@@ -27,6 +27,7 @@ pub struct PackFormat<'a> {
 }
 
 #[derive(Serialize, Deserialize, Validate)]
+#[serde(rename_all = "camelCase")]
 pub struct PackFile<'a> {
     pub path: &'a str,
     pub hashes: std::collections::HashMap<FileHash, &'a str>,

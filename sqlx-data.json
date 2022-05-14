@@ -877,6 +877,27 @@
       "nullable": []
     }
   },
+  "331041c6a4f27f4a6ac2873332074c0127e7368c8ab803843760530d29aaef08": {
+    "query": "SELECT id FROM versions\n         WHERE (version_number = $1 AND mod_id = $2)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "33a965c7dc615d3b701c05299889357db8dd36d378850625d2602ba471af4885": {
     "query": "\n                    UPDATE mods\n                    SET downloads = downloads + $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
