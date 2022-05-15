@@ -145,12 +145,13 @@ pub async fn auth_callback(
     .await?;
 
     if let Some(result) = result_option {
-        let now = OffsetDateTime::now_utc();
-        let duration = now - result.expires;
-
-        if duration.whole_seconds() < 0 {
-            return Err(AuthorizationError::InvalidCredentials);
-        }
+        // let now = OffsetDateTime::now_utc();
+        // TODO: redo this condition later..
+        // let duration = now - result.expires;
+        //
+        // if duration.whole_seconds() < 0 {
+        //     return Err(AuthorizationError::InvalidCredentials);
+        // }
 
         sqlx::query!(
             "

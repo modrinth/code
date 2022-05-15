@@ -445,14 +445,14 @@ pub async fn project_edit(
                 } else if !project_item.status.is_searchable()
                     && status.is_searchable()
                 {
-                    let index_project =
-                        crate::search::indexing::local_import::query_one(
-                            id,
-                            &mut *transaction,
-                        )
-                        .await?;
-
-                    indexing_queue.add(index_project);
+                    // let index_project =
+                    //     crate::search::indexing::local_import::query_one(
+                    //         id,
+                    //         &mut *transaction,
+                    //     )
+                    //     .await?;
+                    //
+                    // indexing_queue.add(index_project);
                 }
             }
 

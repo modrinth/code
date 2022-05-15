@@ -877,27 +877,6 @@
       "nullable": []
     }
   },
-  "331041c6a4f27f4a6ac2873332074c0127e7368c8ab803843760530d29aaef08": {
-    "query": "SELECT id FROM versions\n         WHERE (version_number = $1 AND mod_id = $2)",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "33a965c7dc615d3b701c05299889357db8dd36d378850625d2602ba471af4885": {
     "query": "\n                    UPDATE mods\n                    SET downloads = downloads + $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -4469,6 +4448,33 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "c265db2e2cc1ba34ca1f30a9401018eb7760c8f0bafb1e3a7576e62bc9d3f83a": {
+    "query": "SELECT id, mod_id FROM versions\n         WHERE (version_number = $1 AND mod_id = $2)",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Text",
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false
+      ]
     }
   },
   "c3dcb5a8b798ea6c0922698a007dbc8ab549f5f85bad780da59163f4d6371238": {
