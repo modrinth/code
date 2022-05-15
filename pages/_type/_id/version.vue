@@ -763,9 +763,11 @@ export default {
 
         this.version.primary_file = ['sha1', this.primaryFile.hashes.sha1]
 
+        const copyVersion = JSON.parse(JSON.stringify(this.version))
+        delete copyVersion.downloads
         await this.$axios.patch(
           `version/${this.version.id}`,
-          this.version,
+          copyVersion,
           this.$auth.headers
         )
 
