@@ -158,10 +158,7 @@ pub fn reports_config(cfg: &mut web::ServiceConfig) {
 }
 
 pub fn admin_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(
-        web::scope("admin")
-            .service(admin::count_download)
-    );
+    cfg.service(web::scope("admin").service(admin::count_download));
 }
 
 #[derive(thiserror::Error, Debug)]

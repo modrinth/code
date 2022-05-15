@@ -1393,7 +1393,7 @@ dependencies = [
 
 [[package]]
 name = "labrinth"
-version = "0.2.0"
+version = "2.3.0"
 dependencies = [
  "actix",
  "actix-cors",
