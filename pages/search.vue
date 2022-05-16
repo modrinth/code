@@ -141,6 +141,28 @@
       </section>
     </aside>
     <section class="normal-page__content">
+      <div v-if="projectType === 'modpack'" class="card warning">
+        Modpack support is currently in alpha, and you may encounter issues. Our
+        documentation includes instructions on
+        <a
+          href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
+          target="_blank"
+          >playing modpacks</a
+        >
+        with
+        <a href="https://atlauncher.com/about" target="_blank">ATLauncher</a>
+        and <a href="https://multimc.org/" target="_blank">MultiMC</a>. Pack
+        creators can reference our documentation on
+        <a
+          href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/"
+          target="_blank"
+          >creating modpacks</a
+        >. Join us on
+        <a href="https://rewrite.modrinth.com/discord" target="_blank"
+          >Discord</a
+        >
+        for support.
+      </div>
       <div class="card search-controls">
         <div class="iconified-input">
           <label class="hidden" for="search">Search</label>
@@ -600,6 +622,19 @@ export default {
 
 .sidebar-menu-heading {
   margin: 1.5rem 0 0.5rem 0;
+}
+
+.warning {
+  padding: 1.5rem;
+  line-height: 1.5;
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning-text);
+
+  a {
+    /* Uses active color to increase contrast */
+    color: var(--color-link-active);
+    text-decoration: underline;
+  }
 }
 
 .search-controls {

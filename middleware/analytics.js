@@ -1,4 +1,6 @@
 export default function (context) {
+  // Temporary disable analytics
+  /*
   if (process.client && context.from.path === context.route.path) {
     return
   }
@@ -19,4 +21,5 @@ export default function (context) {
         console.error('An error occurred while registering the visit: ', e)
       })
   })
+  */
 }

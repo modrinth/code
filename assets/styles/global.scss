@@ -71,6 +71,9 @@ html {
   --color-badge-yellow-text: #755920;
   --color-badge-yellow-bg: #f7bb43;
 
+  --color-warning-text: hsl(358, 57%, 20%);
+  --color-warning-bg: hsl(358, 57%, 80%);
+
   --color-block-quote: var(--color-tooltip-bg);
   --color-header-underline: var(--color-tooltip-text);
   --color-hr: var(--color-text);
@@ -148,6 +151,9 @@ html {
   --color-badge-green-bg: #24a54e;
   --color-badge-yellow-text: #dba22d;
   --color-badge-yellow-bg: #f7bb43;
+
+  --color-warning-text: hsl(358, 57%, 85%);
+  --color-warning-bg: hsl(358, 57%, 25%);
 
   --color-block-quote: var(--color-code-bg);
   --color-header-underline: var(--color-tooltip-text);

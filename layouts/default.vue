@@ -13,9 +13,9 @@
               <NuxtLink to="/mods" class="tab">
                 <span>Mods</span>
               </NuxtLink>
-              <!--              <NuxtLink to="/modpacks" class="tab">
+              <NuxtLink to="/modpacks" class="tab tab--alpha">
                 <span>Modpacks</span>
-              </NuxtLink>-->
+              </NuxtLink>
             </div>
           </section>
           <section class="column-grow user-outer" aria-label="Account links">
@@ -505,6 +505,18 @@ export default {
             a.tab {
               padding: 0;
               margin-right: 1rem;
+              display: flex;
+              align-items: flex-start;
+
+              &--alpha::after {
+                content: 'Alpha';
+                background-color: var(--color-warning-bg);
+                color: var(--color-warning-text);
+                border-radius: 1rem;
+                padding: 0.25rem 0.5rem;
+                margin-left: 0.4rem;
+                font-size: 0.7rem;
+              }
             }
           }
         }

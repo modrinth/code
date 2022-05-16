@@ -18,12 +18,20 @@ export default {
         return []
       },
     },
+    type: {
+      type: String,
+      required: true,
+    },
   },
   computed: {
     categoriesFiltered() {
       return this.$tag.categories
         .concat(this.$tag.loaders)
-        .filter((x) => this.categories.includes(x.name))
+        .filter(
+          (x) =>
+            this.categories.includes(x.name) &&
+            (!x.project_type || x.project_type === this.type)
+        )
     },
   },
 }

@@ -56,7 +56,11 @@
           <p class="description">
             {{ description }}
           </p>
-          <Categories :categories="categories" class="right-categories" />
+          <Categories
+            :categories="categories"
+            :type="type"
+            class="right-categories"
+          />
           <div class="dates">
             <div class="date">
               <CalendarIcon aria-hidden="true" />

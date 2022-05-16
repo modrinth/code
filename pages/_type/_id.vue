@@ -71,7 +71,11 @@
         <p class="description">
           {{ project.description }}
         </p>
-        <Categories :categories="project.categories" class="categories" />
+        <Categories
+          :categories="project.categories"
+          :type="project.project_type"
+          class="categories"
+        />
         <hr class="card-divider" />
         <div class="stats">
           <span class="stat">{{ $formatNumber(project.downloads) }}</span>
