@@ -114,8 +114,6 @@ export default {
         ] = true
       }
 
-      console.log(obj)
-
       return Object.keys(obj)
     },
   },
