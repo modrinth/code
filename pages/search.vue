@@ -158,9 +158,7 @@
           target="_blank"
           >creating modpacks</a
         >. Join us on
-        <a href="https://rewrite.modrinth.com/discord" target="_blank"
-          >Discord</a
-        >
+        <a href="https://discord.gg/EUHuJHt" target="_blank">Discord</a>
         for support.
       </div>
       <div class="card search-controls">
