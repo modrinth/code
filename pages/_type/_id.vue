@@ -433,6 +433,19 @@
       />
       <div class="content">
         <div class="project-main">
+          <div v-if="project.project_type === 'modpack'" class="card warning">
+            To install this modpack, visit
+            <a
+              href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
+              target="_blank"
+              >our documentation</a
+            >
+            which provides instructions on using
+            <a href="https://atlauncher.com/about" target="_blank"
+              >ATLauncher</a
+            >
+            and <a href="https://multimc.org/" target="_blank">MultiMC</a>.
+          </div>
           <div class="card styled-tabs">
             <nuxt-link
               :to="`/${project.project_type}/${
@@ -833,6 +846,7 @@ export default {
       font-size: var(--font-size-lg);
       font-weight: bold;
     }
+
     .label {
       margin-right: 0.125rem;
     }
@@ -840,6 +854,7 @@ export default {
 
   .dates {
     margin: 0.75rem 0;
+
     .date {
       color: var(--color-text-secondary);
       font-size: var(--font-size-nm);
@@ -890,6 +905,7 @@ export default {
   display: flex;
   flex-direction: row;
   margin-top: var(--spacing-card-md);
+
   .download {
     display: flex;
     align-items: center;
@@ -915,9 +931,11 @@ export default {
 
     flex-shrink: 0;
   }
+
   .info {
     display: flex;
     flex-direction: column;
+
     .top {
       font-weight: bold;
     }
@@ -950,6 +968,7 @@ export default {
         color: var(--color-heading);
       }
     }
+
     &:active {
       svg,
       img,
@@ -974,12 +993,15 @@ export default {
     height: 50px;
     width: 50px;
   }
+
   .member-info {
     overflow: hidden;
     margin: auto 0 auto 0.5rem;
+
     .name {
       font-weight: bold;
     }
+
     p {
       font-size: var(--font-size-sm);
       margin: 0.2rem 0;
@@ -997,6 +1019,7 @@ export default {
       color: var(--color-text-secondary);
       width: 40%;
     }
+
     .value {
       width: 50%;
       text-transform: capitalize;
@@ -1005,6 +1028,7 @@ export default {
         text-transform: none;
       }
     }
+
     .uppercase {
       text-transform: uppercase;
     }

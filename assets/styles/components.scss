@@ -113,6 +113,7 @@
   &:hover {
     color: var(--color-link-hover);
   }
+
   &:active {
     color: var(--color-link-active);
   }
@@ -125,6 +126,7 @@
   &:hover {
     color: var(--color-heading);
   }
+
   &:active {
     color: var(--color-text-dark);
   }
@@ -171,6 +173,7 @@
     &:hover {
       color: var(--color-link-hover);
     }
+
     &:active {
       color: var(--color-link-active);
     }
@@ -242,6 +245,7 @@
       padding: 0.5rem 0.8rem;
       cursor: pointer;
       background-color: var(--color-button-bg);
+
       &:hover {
         background-color: var(--color-button-bg-hover);
       }
@@ -366,13 +370,16 @@
   background-color: var(--color-button-bg);
   font-weight: var(--font-weight-medium);
   font-size: var(--font-size-nm);
+
   &:focus-visible,
   &:hover {
     background-color: var(--color-button-bg-hover);
   }
+
   &:active {
     background-color: var(--color-button-bg-active);
   }
+
   &:disabled,
   &[disabled] {
     background-color: transparent;
@@ -411,11 +418,13 @@
   @extend .button;
   color: var(--color-brand-inverted);
   background-color: var(--color-brand);
+
   &:focus-visible,
   &:hover {
     background-color: var(--color-brand-hover);
     color: var(--color-brand-inverted);
   }
+
   &:active {
     background-color: var(--color-brand-active);
     color: var(--color-brand-inverted);
@@ -426,11 +435,13 @@
   box-shadow: inset 0px -1px 1px rgba(0, 0, 0, 0.25);
   color: var(--color-brand-inverted);
   background-color: var(--color-brand);
+
   &:focus-visible,
   &:hover {
     background-color: var(--color-brand-hover);
     color: var(--color-brand-inverted);
   }
+
   &:active {
     background-color: var(--color-brand-active);
     color: var(--color-brand-inverted);
@@ -470,27 +481,33 @@
         background: var(--color-button-bg-hover);
       }
     }
+
     .multiselect__single {
       background: transparent;
     }
+
     .multiselect__tag {
       border-radius: 2rem;
       color: var(--color-text-dark);
       background: transparent;
       border: 2px solid var(--color-brand);
     }
+
     .multiselect__tag-icon {
       background: transparent;
+
       &:after {
         color: var(--color-text-dark);
       }
     }
+
     .multiselect__placeholder {
       color: var(--color-text);
       font-size: 16px;
       line-height: 20px;
     }
   }
+
   .multiselect__content-wrapper {
     background: var(--color-dropdown-bg);
     border: none;
@@ -503,6 +520,7 @@
         background: var(--color-button-bg-active);
         color: var(--color-text-dark);
       }
+
       .multiselect__option--selected {
         background: var(--color-brand);
         font-weight: bold;
@@ -510,6 +528,7 @@
       }
     }
   }
+
   .multiselect__spinner {
     background: var(--color-dropdown-bg);
 
@@ -557,6 +576,7 @@ label {
     height: fit-content;
     flex: 1;
   }
+
   input[type='button']:hover {
     cursor: pointer;
   }
@@ -566,6 +586,7 @@ label {
     height: fit-content;
     flex: 1;
   }
+
   div:hover {
     cursor: pointer;
   }
@@ -586,6 +607,7 @@ label {
   appearance: none;
   -webkit-tap-highlight-color: transparent;
   cursor: pointer;
+
   &:focus {
     //outline: 0; Bad for accessibility
   }
@@ -616,17 +638,21 @@ label {
     box-shadow: 0 1px 2px rgba(44, 44, 44, 0.2);
     transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
   }
+
   &:checked {
     background: var(--color-brand);
     border: 2px solid var(--color-brand);
+
     &:after {
       transform: translatex(20px);
     }
   }
+
   &:hover &:focus {
     background: var(--color-button-bg);
     border: 2px solid var(--color-button-bg);
   }
+
   &:hover:checked &:focus:checked {
     background: var(--color-brand);
     border: 2px solid var(--color-brand);
@@ -655,6 +681,7 @@ label {
     width: 1.25rem;
     margin: auto;
   }
+
   flex-shrink: 0;
 }
 
@@ -743,16 +770,19 @@ label {
   width: 100%;
   justify-content: center;
   align-items: center;
+
   .icon {
     width: 8rem;
     height: 8rem;
     margin: 1.5rem 0;
   }
+
   .text {
     margin-bottom: 2rem;
     font-size: 1.25rem;
     text-align: center;
   }
+
   .link {
     text-decoration: underline;
   }
@@ -768,6 +798,20 @@ label {
   margin-bottom: var(--spacing-card-md);
 
   // box-shadow: var(--shadow-card);
+
+  &.warning {
+    padding: 1.5rem;
+    line-height: 1.5;
+    background-color: var(--color-warning-bg);
+    color: var(--color-warning-text);
+    min-height: 0;
+
+    a {
+      /* Uses active color to increase contrast */
+      color: var(--color-link-active);
+      text-decoration: underline;
+    }
+  }
 }
 
 .vue-notification-group {

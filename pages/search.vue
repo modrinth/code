@@ -624,19 +624,6 @@ export default {
   margin: 1.5rem 0 0.5rem 0;
 }
 
-.warning {
-  padding: 1.5rem;
-  line-height: 1.5;
-  background-color: var(--color-warning-bg);
-  color: var(--color-warning-text);
-
-  a {
-    /* Uses active color to increase contrast */
-    color: var(--color-link-active);
-    text-decoration: underline;
-  }
-}
-
 .search-controls {
   display: flex;
   flex-direction: row;
