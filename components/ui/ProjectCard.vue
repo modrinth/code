@@ -9,7 +9,11 @@
             loading="lazy"
           />
         </nuxt-link>
-        <Categories :categories="categories" class="left-categories" />
+        <Categories
+          :categories="categories"
+          :type="type"
+          class="left-categories"
+        />
       </div>
       <div class="card-content">
         <div class="info">
@@ -19,9 +23,9 @@
             </h2>
             <p v-if="author" class="author">
               by
-              <nuxt-link class="title-link" :to="'/user/' + author">{{
-                author
-              }}</nuxt-link>
+              <nuxt-link class="title-link" :to="'/user/' + author"
+                >{{ author }}
+              </nuxt-link>
             </p>
           </div>
           <div class="side-type">

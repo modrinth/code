@@ -104,7 +104,9 @@ export default {
     notificationTypes() {
       const obj = { all: true }
 
-      for (const notification of this.$user.notifications) {
+      for (const notification of this.$user.notifications.filter(
+        (it) => it.type !== null
+      )) {
         obj[
           Object.keys(NOTIFICATION_TYPES).find(
             (key) => NOTIFICATION_TYPES[key] === notification.type
