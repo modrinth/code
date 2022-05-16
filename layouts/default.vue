@@ -150,10 +150,10 @@
           <ModIcon />
           <span>Mods</span>
         </NuxtLink>
-        <!--        <NuxtLink to="/modpacks" class="tab">
+        <NuxtLink to="/modpacks" class="tab">
           <ModpackIcon />
           <span>Modpacks</span>
-        </NuxtLink>-->
+        </NuxtLink>
         <button class="tab" @click="toggleMobileMenu()">
           <HamburgerIcon />
           <span>{{ isMobileMenuOpen ? 'Less' : 'More' }}</span>
@@ -290,7 +290,7 @@ import ShieldIcon from '~/assets/images/utils/shield.svg?inline'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
 import HomeIcon from '~/assets/images/sidebar/home.svg?inline'
 import ModIcon from '~/assets/images/sidebar/mod.svg?inline'
-// import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
+import ModpackIcon from '~/assets/images/sidebar/modpack.svg?inline'
 import MoonIcon from '~/assets/images/utils/moon.svg?inline'
 
 import SunIcon from '~/assets/images/utils/sun.svg?inline'
@@ -315,7 +315,7 @@ export default {
     NotificationIcon,
     HomeIcon,
     ModIcon,
-    // ModpackIcon,
+    ModpackIcon,
     HamburgerIcon,
     CookieConsent,
     SettingsIcon,
