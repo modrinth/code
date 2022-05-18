@@ -2,6 +2,12 @@
   <div class="layout">
     <header class="site-header" role="presentation">
       <section class="navbar columns" role="navigation">
+        <section class="skip column" role="presentation">
+          <a href="#main">Skip to Main Content</a>
+          <a v-if="registeredSkipLink" :href="registeredSkipLink.id">{{
+            registeredSkipLink.text
+          }}</a>
+        </section>
         <section class="logo column" role="presentation">
           <NuxtLink to="/" aria-label="Modrinth home page">
             <ModrinthLogo aria-hidden="true" class="text-logo" />
@@ -225,7 +231,7 @@
         :max="5"
         :ignore-duplicates="true"
       />
-      <Nuxt />
+      <Nuxt id="main" />
     </main>
     <footer>
       <div class="logo-info" role="region" aria-label="Modrinth information">
@@ -333,6 +339,7 @@ export default {
       isDropdownOpen: false,
       version: process.env.version || 'unknown',
       isMobileMenuOpen: false,
+      registeredSkipLink: null,
     }
   },
   async fetch() {
@@ -362,6 +369,11 @@ export default {
     if (this.$route.query.code) {
       this.$router.push(this.$route.path)
     }
+  },
+  created() {
+    this.$nuxt.$on('registerSkipLink', (data) => {
+      this.registeredSkipLink = data
+    })
   },
   methods: {
     toggleMobileMenu() {
@@ -406,6 +418,30 @@ export default {
 </script>
 
 <style lang="scss">
+.skip a {
+  clip: rect(1px, 1px, 1px, 1px);
+  height: 1px;
+  overflow: hidden;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.skip a:focus {
+  clip: auto;
+  height: auto;
+  overflow: auto;
+  position: absolute;
+  width: auto;
+  padding: 0.5rem 0.75rem;
+  background-color: var(--color-brand);
+  color: var(--color-brand-inverted);
+  border-radius: var(--size-rounded-max);
+  margin: 0 0.5rem 0 0;
+  box-shadow: inset 0px -1px 1px rgba(17, 24, 39, 0.1);
+  z-index: 1;
+}
+
 .layout {
   min-height: 100vh;
   background-color: var(--color-bg);
