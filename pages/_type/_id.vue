@@ -731,7 +731,7 @@ export default {
 
       try {
         await this.$axios.patch(
-          `project/${this.currentProject.id}`,
+          `project/${this.project.id}`,
           {
             status: 'processing',
           },
