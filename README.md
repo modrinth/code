@@ -1,12 +1,14 @@
 # Omorphia
 
-*The Modrinth component library, in Svelte*
+_The Modrinth component library, in Svelte_
 
 ---
 
 ### ⚠️ In-progress: Not accepting contributions currently.
 
 Learn more at [omorphia.modrinth.com.](https://omorphia.modrinth.com)
+
+Requires Node v16.5+.
 
 ## Developing
 
