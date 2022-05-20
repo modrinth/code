@@ -3,16 +3,16 @@ name: Deploy
 on: push
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Wait for CF Pages
-        id: cf-pages
-        uses: WalshyDev/cf-pages-await@v1
-        with:
-          accountEmail: ${{ secrets.CF_ACCOUNT_EMAIL  }}
-          apiKey: ${{ secrets.CF_API_KEY  }}
-          accountId: '9ddae624c98677d68d93df6e524a6061'
-          project: 'omorphia'
-          githubToken: ${{ secrets.GITHUB_TOKEN }}
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+            - name: Wait for CF Pages
+              id: cf-pages
+              uses: WalshyDev/cf-pages-await@v1
+              with:
+                  accountEmail: ${{ secrets.CF_ACCOUNT_EMAIL  }}
+                  apiKey: ${{ secrets.CF_API_KEY  }}
+                  accountId: '9ddae624c98677d68d93df6e524a6061'
+                  project: 'omorphia'
+                  githubToken: ${{ secrets.GITHUB_TOKEN }}

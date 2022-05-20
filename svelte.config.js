@@ -1,19 +1,16 @@
-import {mdsvex} from 'mdsvex';
+import { mdsvex } from 'mdsvex';
 import mdsvexConfig from './mdsvex.config.js';
 import adapter from '@sveltejs/adapter-static';
-import examples from 'mdsvexamples/vite'
-import sveld from './plugins/sveld.js'
-import path from "path";
-import { preprocess, plugins } from './src/package/config/svelte.config.js'
+import examples from 'mdsvexamples/vite';
+import sveld from './plugins/sveld.js';
+import path from 'path';
+import { preprocess, plugins } from './src/package/config/svelte.config.js';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     extensions: ['.svelte', ...mdsvexConfig.extensions],
 
-    preprocess: [
-        preprocess,
-        mdsvex(mdsvexConfig),
-    ],
+    preprocess: [preprocess, mdsvex(mdsvexConfig)],
 
     kit: {
         adapter: adapter(),
@@ -38,13 +35,13 @@ const config = {
 
             build: {
                 rollupOptions: {
-                    external: '/_app/COMPONENT_API.json'
-                }
-            }
+                    external: '/_app/COMPONENT_API.json',
+                },
+            },
         },
         files: {
             lib: 'src/package',
-        }
+        },
     },
 };
 

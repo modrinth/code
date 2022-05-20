@@ -4,11 +4,11 @@
     import IconSquare from 'virtual:icons/lucide/square'
     import IconCircle from 'virtual:icons/lucide/circle'
     import IconTriangle from 'virtual:icons/lucide/triangle'
-    
+
     let selected = []
 </script>
 
-<CheckboxList 
+<CheckboxList
     bind:value={selected}
     options={[
         {
@@ -26,7 +26,7 @@
             icon: IconSquare,
             value: 'SQU',
         },
-    ]} 
+    ]}
 />
 
 Selected: {selected}

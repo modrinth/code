@@ -17,15 +17,16 @@ const config = {
                                 '--xl': '(min-width: 1280px)',
                             },
                         },
-                    ]
-                }
-            }
+                    ],
+                },
+            },
         }),
         require('postcss-pxtorem'),
         require('autoprefixer'),
-        process.env.NODE_ENV === 'development' && require('cssnano')({
-            preset: 'default',
-        })
+        process.env.NODE_ENV === 'development' &&
+            require('cssnano')({
+                preset: 'default',
+            }),
     ],
 };
 

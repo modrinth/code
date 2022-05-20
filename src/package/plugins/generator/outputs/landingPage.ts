@@ -1,7 +1,5 @@
 import { fetch } from 'undici';
 import { promises as fs } from 'fs';
-import sharp from 'sharp';
-import FastAverageColor from 'fast-average-color';
 import cliProgress from 'cli-progress';
 
 export async function landingPage(API_URL: string) {

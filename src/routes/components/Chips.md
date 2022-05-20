@@ -17,7 +17,6 @@
 />
 ```
 
-
 ### Force an option to be selected with `neverEmpty`
 
 ```svelte example raised

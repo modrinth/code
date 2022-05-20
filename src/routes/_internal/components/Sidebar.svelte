@@ -28,6 +28,7 @@ import { page } from '$app/stores';
       <a href="/getting-started/css" class="section__link">Writing CSS</a>
       <a href="/getting-started/illustrations" class="section__link">Illustrations</a>
       <a href="/getting-started/utils" class="section__link">Built-in utilities</a>
+      <a href="/getting-started/generator" class="section__link">Generator plugin</a>
     </div>
 
     <div class="section">

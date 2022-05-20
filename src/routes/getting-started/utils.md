@@ -12,10 +12,10 @@ TODO
 
 ### Parsers
 
-- sanitize
-- markdown
-- markdownInline
-- markdownXSS
+-   sanitize
+-   markdown
+-   markdownInline
+-   markdownXSS
 
 ### Markdown
 
