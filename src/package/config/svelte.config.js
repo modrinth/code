@@ -4,6 +4,7 @@ import svelteSvg from '@poppanator/sveltekit-svg';
 
 export const preprocess = sveltePreprocess({
     postcss: true,
+    preserve: ['ld+json'],
 });
 
 export const plugins = [

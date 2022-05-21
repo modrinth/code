@@ -4,10 +4,6 @@ title: Introduction
 
 ## What is Omorphia?
 
-<!--
-> Omorphia is in early development, and not ready for use in any application. Contribute to it on [GitHub](https://github.com/modrinth/omorphia).
--->
-
 Omorphia is Modrinth's style and reusable component library for use in all of its frontend applications, including [knossos](https://github.com/modrinth/knossos) (modrinth.com), [theseus](https://github.com/modrinth/theseus) (launcher), and planned projects such as Modrinth's in-house auth and ad-server.
 
 It uses [Svelte](https://svelte.dev/) to deliver the best performance with the least boilerplate.
