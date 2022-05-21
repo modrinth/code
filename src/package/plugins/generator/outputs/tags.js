@@ -19,16 +19,16 @@ export async function tags(API_URL) {
     ]);
     progressBar.update(4);
 
-    // Delete icons from original arrays
-    categories = categories.map(({ icon, ...rest }) => rest);
-    loaders = loaders.map(({ icon, ...rest }) => rest);
-    progressBar.increment();
-
     // Create single object with icons
     const tagIcons = {
         ...categories.reduce((a, v) => ({ ...a, [v.name]: v.icon }), {}),
         ...loaders.reduce((a, v) => ({ ...a, [v.name]: v.icon }), {}),
     };
+    progressBar.increment();
+
+    // Delete icons from original arrays
+    categories = categories.map(({ icon, ...rest }) => rest);
+    loaders = loaders.map(({ icon, ...rest }) => rest);
     progressBar.increment();
 
     // Set project types

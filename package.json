@@ -8,8 +8,6 @@
         "package": "svelte-kit package",
         "preview": "svelte-kit preview",
         "prepare": "svelte-kit sync",
-        "generate": "node scripts/generate.cjs",
-        "generate:watch": "nodemon --watch app --watch libs app/server.js",
         "check": "svelte-check --tsconfig ./tsconfig.json",
         "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
         "lint": "prettier --ignore-path .gitignore --check --plugin-search-dir=. . && eslint --ignore-path .gitignore .",

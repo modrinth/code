@@ -4,10 +4,10 @@ import { projectColors } from './outputs/projectColors.js';
 import { gameVersions } from './outputs/gameVersions.js';
 import { tags } from './outputs/tags.js';
 
-const API_URL = 'https://api.modrinth.com/v2/'; //TODO Remove
-process.env.VITE_API_URL || process.env?.NODE_ENV === 'development'
-    ? 'https://staging-api.modrinth.com/v2/'
-    : 'https://api.modrinth.com/v2/';
+const API_URL =
+    process.env.VITE_API_URL || process.env?.NODE_ENV === 'development'
+        ? 'https://staging-api.modrinth.com/v2/'
+        : 'https://api.modrinth.com/v2/';
 
 // Time to live: 7 days
 const TTL = 7 * 24 * 60 * 60 * 1000;
@@ -33,6 +33,7 @@ export default function Generator(options) {
                     )
                 );
             }
+
             // Don't generate if the last generation was less than TTL and the options are the same
             if (
                 state?.lastGenerated &&
