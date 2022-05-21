@@ -40,7 +40,7 @@ marked.setOptions({
 function sanitize(html: string): string {
     return insane(html, {
         allowedAttributes: {
-            a: ['href', 'name', 'target', 'title', 'rel'],
+            a: ['href', 'target', 'title', 'rel'],
             iframe: ['allowfullscreen', 'src', 'width', 'height'],
             img: ['src', 'width', 'height', 'alt'],
             h1: ['id'],
@@ -121,14 +121,22 @@ function sanitize(html: string): string {
     });
 }
 
-export function markdown(markdown: string): string {
-    return marked.parse(markdown);
-}
-
 export function markdownInline(markdown: string): string {
-    return marked.parseInline(markdown);
+    return insane(
+        marked.parseInline(markdown),
+        {
+            allowedAttributes: {
+                a: ['href', 'target', 'title', 'rel'],
+            },
+            allowedClasses: {},
+            allowedSchemes: ['http', 'https', 'mailto'],
+            allowedTags: ['a', 'b', 'br', 'code', 'em', 'i', 'strike', 'strong', 'sub', 'sup', 'u'],
+            transformText: null,
+        },
+        true
+    );
 }
 
-export function markdownXSS(markdown: string): string {
+export function markdown(markdown: string): string {
     return sanitize(marked.parse(markdown));
 }

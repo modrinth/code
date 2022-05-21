@@ -5,6 +5,7 @@
             "omorphia": ["src/package"],
             "$package/*": ["src/package/*"],
             "$routes/*": ["src/routes/*"],
+            "$generated/*": ["generated/*"],
             "$lib": ["src/package"],
             "$lib/*": ["src/package/*"]
         },

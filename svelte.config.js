@@ -5,6 +5,7 @@ import examples from 'mdsvexamples/vite';
 import sveld from './plugins/sveld.js';
 import path from 'path';
 import { preprocess, plugins } from './src/package/config/svelte.config.js';
+import Generator from './src/package/plugins/generator/index.js';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -20,6 +21,9 @@ const config = {
         },
         vite: {
             plugins: [
+                Generator({
+                    gameVersions: true,
+                }),
                 ...plugins,
                 examples,
                 sveld(),
@@ -29,6 +33,7 @@ const config = {
                 alias: {
                     $package: path.resolve('./src/package'),
                     $routes: path.resolve('./src/routes'),
+                    $generated: path.resolve('./generated'),
                     omorphia: path.resolve('./src/package'),
                 },
             },
@@ -36,6 +41,12 @@ const config = {
             build: {
                 rollupOptions: {
                     external: '/_app/COMPONENT_API.json',
+                },
+            },
+
+            server: {
+                fs: {
+                    allow: ['generated'],
                 },
             },
         },

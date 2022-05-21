@@ -1,35 +1,38 @@
 <script lang="ts">
-    import { Button } from 'omorphia'
-    import IconMoon from 'virtual:icons/heroicons-outline/moon'
-    import IconSun from 'virtual:icons/heroicons-outline/sun'
+    import { Button } from 'omorphia';
+    import IconMoon from 'virtual:icons/heroicons-outline/moon';
+    import IconSun from 'virtual:icons/heroicons-outline/sun';
 
     export let meta: { raised: boolean };
 
-    let theme = 'light'
-    let background = meta.raised ? 'var(--color-raised-bg)' : 'var(--color-bg)'
+    let theme = 'light';
+    let background = meta.raised ? 'var(--color-raised-bg)' : 'var(--color-bg)';
 </script>
 
 <div class="example">
-    <div class="example__preview theme-{theme} base" style:background={background}>
-        <slot name="example"/>
+    <div class="example__preview theme-{theme} base" style:background>
+        <slot name="example" />
     </div>
     <div class="example__source">
         <div class="example__source__options">
-            <Button color="primary-light" on:click={() => theme === 'light' ? theme = 'dark' : theme = 'light'}>
+            <Button
+                color="primary-light"
+                on:click={() => (theme === 'light' ? (theme = 'dark') : (theme = 'light'))}
+            >
                 {#if theme === 'light'}
-                    <IconMoon/>
+                    <IconMoon />
                 {:else}
-                    <IconSun/>
+                    <IconSun />
                 {/if}
             </Button>
         </div>
-        <pre class="example__source__code language-svelte"><slot name="code"/></pre>
+        <pre class="example__source__code language-svelte"><slot name="code" /></pre>
     </div>
 </div>
 
 <style lang="postcss">
     .example {
-        margin-bottom: 32px;
+        margin: 15px 0 32px;
 
         &__preview {
             border-radius: var(--rounded-sm-top);

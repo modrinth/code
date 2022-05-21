@@ -2,20 +2,19 @@ import { fetch } from 'undici';
 import { promises as fs } from 'fs';
 import cliProgress from 'cli-progress';
 
-export async function landingPage(API_URL: string) {
+export async function landingPage(API_URL) {
     const progressBar = new cliProgress.SingleBar({
         format: 'Generating landing page   | {bar} | {percentage}% || {value}/{total} mods',
         barCompleteChar: '\u2588',
         barIncompleteChar: '\u2591',
         hideCursor: true,
     });
-
     progressBar.start(100, 0);
 
     // Fetch top 100 mods
-    const response = (await (
+    const response = await (
         await fetch(API_URL + 'search?limit=100&facets=[["project_type:mod"]]')
-    ).json()) as Record<string, any>;
+    ).json();
 
     // Simplified array with the format: ['id', 'slug', 'icon_extension']
     const compressed = response.hits
@@ -37,6 +36,5 @@ export async function landingPage(API_URL: string) {
             random: Math.random(),
         })
     );
-
     progressBar.stop();
 }

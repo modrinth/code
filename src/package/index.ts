@@ -23,3 +23,9 @@ export { default as Select } from './components/Select.svelte';
 export { default as Slider } from './components/Slider.svelte';
 
 export { default as TextInput } from './components/TextInput.svelte';
+
+/* UTILITIES */
+export { ago } from './utils/ago';
+export { Permissions } from './utils/permissions';
+export { formatVersions } from './utils/versions';
+export { markdown, markdownInline } from './utils/parse';

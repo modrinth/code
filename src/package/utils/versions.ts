@@ -79,8 +79,7 @@ export function formatVersions(versionArray: string[]): string {
     return output.join(', ');
 }
 
-export const getPrimary = (files: Version['files']) =>
-    files.find((file) => file.primary) || files[0];
+export const getPrimary = (files) => files.find((file) => file.primary) || files[0];
 
 export function downloadUrl(file): string {
     return import.meta.env.VITE_API_URL + `version_file/${file?.hashes.sha1}/download`;

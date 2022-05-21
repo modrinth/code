@@ -4,9 +4,7 @@ _The Modrinth component library, in Svelte_
 
 ---
 
-### ⚠️ In-progress: Not accepting contributions currently.
-
-Learn more at [omorphia.modrinth.com.](https://omorphia.modrinth.com)
+Read the documentation at [omorphia.modrinth.com.](https://omorphia.modrinth.com)
 
 Requires Node v16.5+.
 

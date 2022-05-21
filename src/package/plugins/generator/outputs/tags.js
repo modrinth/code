@@ -1,31 +1,27 @@
 import { fetch } from 'undici';
 import { promises as fs } from 'fs';
 import cliProgress from 'cli-progress';
-
-export async function tags(API_URL: string) {
+export async function tags(API_URL) {
     const progressBar = new cliProgress.SingleBar({
         format: 'Generating tags           | {bar} | {percentage}%',
         barCompleteChar: '\u2588',
         barIncompleteChar: '\u2591',
         hideCursor: true,
     });
-
     progressBar.start(7, 0);
 
     // eslint-disable-next-line prefer-const
-    let [categories, loaders, licenses, donationPlatforms]: any = await Promise.all([
+    let [categories, loaders, licenses, donationPlatforms] = await Promise.all([
         await (await fetch(API_URL + 'tag/category')).json(),
         await (await fetch(API_URL + 'tag/loader')).json(),
         await (await fetch(API_URL + 'tag/license')).json(),
         await (await fetch(API_URL + 'tag/donation_platform')).json(),
     ]);
-
     progressBar.update(4);
 
     // Delete icons from original arrays
     categories = categories.map(({ icon, ...rest }) => rest);
     loaders = loaders.map(({ icon, ...rest }) => rest);
-
     progressBar.increment();
 
     // Create single object with icons
@@ -33,7 +29,6 @@ export async function tags(API_URL: string) {
         ...categories.reduce((a, v) => ({ ...a, [v.name]: v.icon }), {}),
         ...loaders.reduce((a, v) => ({ ...a, [v.name]: v.icon }), {}),
     };
-
     progressBar.increment();
 
     // Set project types

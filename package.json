@@ -83,5 +83,8 @@
         "throttle-debounce": "^3.0.1",
         "undici": "^5.2.0",
         "unplugin-icons": "^0.13.3"
+    },
+    "engines": {
+        "node": ">=16.5.0"
     }
 }
