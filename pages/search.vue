@@ -337,6 +337,11 @@ export default {
 
       for (const facet of facets) await this.toggleFacet(facet, true)
     }
+    if (this.$route.query.g) {
+      const orFacets = this.$route.query.g.split(',')
+
+      for (const orFacet of orFacets) await this.toggleOrFacet(orFacet, true)
+    }
     if (this.$route.query.v)
       this.selectedVersions = this.$route.query.v.split(',')
     if (this.$route.query.l)
@@ -586,6 +591,8 @@ export default {
           if (offset > 0) queryItems.push(`o=${offset}`)
           if (this.facets.length > 0)
             queryItems.push(`f=${encodeURIComponent(this.facets)}`)
+          if (this.orFacets.length > 0)
+            queryItems.push(`g=${encodeURIComponent(this.orFacets)}`)
           if (this.selectedVersions.length > 0)
             queryItems.push(`v=${encodeURIComponent(this.selectedVersions)}`)
           if (this.selectedLicenses.length > 0)
