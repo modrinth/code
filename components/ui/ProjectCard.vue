@@ -362,6 +362,7 @@ export default {
   @media screen and (max-width: 560px) {
     .card-content {
       flex-direction: column;
+      margin-left: 0.75rem;
 
       .info {
         .dates {
@@ -390,7 +391,7 @@ export default {
 
     .left-categories {
       display: flex;
-      margin: 0 0 0.75rem 0.75rem;
+      margin: 0 0 0.75rem 0;
       width: 7rem;
     }
 
