@@ -114,7 +114,7 @@
                 <p>Dependency management</p>
               </div>
               <div class="feature in-progress">
-                <InProgressIcon />
+                <CheckIcon />
                 <p>Modpacks</p>
               </div>
               <div class="feature in-progress">
