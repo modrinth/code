@@ -47,6 +47,7 @@
             loop
             muted
             src="~/assets/images/search.mp4"
+            playsinline
           />
           <video
             v-else
@@ -54,6 +55,7 @@
             loop
             muted
             src="~/assets/images/search-dark.mp4"
+            playsinline
           />
         </div>
         <div class="text-container">
