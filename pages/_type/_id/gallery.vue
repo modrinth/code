@@ -22,7 +22,7 @@
           @click.stop=""
         />
 
-        <div class="floating">
+        <div class="floating" @click.stop="">
           <div class="text">
             <h2 v-if="expandedGalleryItem.title">
               {{ expandedGalleryItem.title }}
@@ -532,12 +532,14 @@ export default {
         gap: 0.5rem;
 
         h2 {
+          color: var(--dark-color-text-dark);
           font-size: 1.25rem;
           text-align: center;
           margin: 0;
         }
 
         p {
+          color: var(--dark-color-text);
           margin: 0;
         }
       }

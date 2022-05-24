@@ -1,5 +1,7 @@
 html {
   @extend .light-mode;
+  --dark-color-text: #b0bac5;
+  --dark-color-text-dark: #ecf9fb;
 }
 
 .light-mode {
@@ -89,9 +91,9 @@ html {
 
 .dark-mode {
   --color-icon: #96a2b0;
-  --color-text: #b0bac5;
+  --color-text: var(--dark-color-text);
   --color-text-inactive: #929aa3;
-  --color-text-dark: #ecf9fb;
+  --color-text-dark: var(--dark-color-text-dark);
   --color-heading: #c4cfdd;
   --color-bg: #16181c;
   --color-raised-bg: #26292f;
