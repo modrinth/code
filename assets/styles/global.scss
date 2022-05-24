@@ -260,6 +260,10 @@ input {
   border-radius: 2rem;
 }
 
+pre {
+  font-weight: var(--font-weight-regular);
+}
+
 input,
 textarea {
   background: var(--color-button-bg);
