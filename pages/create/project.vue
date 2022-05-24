@@ -467,7 +467,7 @@
               class="file-input"
               multiple
               accept=".jar,application/java-archive,.zip,application/zip,.mrpack"
-              prompt="Upload files"
+              prompt="Choose files or drag them here"
               @change="
                 (x) =>
                   x.forEach((y) => versions[currentVersionIndex].files.push(y))

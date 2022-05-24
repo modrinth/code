@@ -1,8 +1,10 @@
 <template>
   <div class="columns">
-    <label class="iconified-button" @drop.prevent="addFile" @dragover.prevent>
-      <UploadIcon />
-      {{ prompt }}
+    <label class="button" @drop.prevent="addFile" @dragover.prevent>
+      <span>
+        <UploadIcon />
+        {{ prompt }}
+      </span>
       <input
         type="file"
         :multiple="multiple"
@@ -67,6 +69,27 @@ export default {
 <style lang="scss" scoped>
 label {
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--spacing-card-sm) var(--spacing-card-md);
+  margin-bottom: var(--spacing-card-sm);
+}
+
+span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.5rem;
+  border: 2px dashed var(--color-divider-dark);
+  border-radius: var(--size-rounded-control);
+  padding: var(--spacing-card-md) var(--spacing-card-lg);
+
+  svg {
+    height: 1.25rem;
+  }
 }
 
 input {

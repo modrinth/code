@@ -213,19 +213,21 @@
           </div>
         </div>
         <div class="gallery-bottom">
+          <SmartFileInput
+            accept="image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp"
+            prompt="Choose image or drag it here"
+            @change="(files) => showPreviewImage(files, index)"
+          />
           <div class="gallery-buttons">
-            <SmartFileInput
-              accept="image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp"
-              prompt="Upload"
-              @change="(files) => showPreviewImage(files, index)"
-            />
-            <button
-              class="iconified-button"
-              @click="newGalleryItems.splice(index, 1)"
-            >
-              <TrashIcon />
-              Delete
-            </button>
+            <div class="delete-button-container">
+              <button
+                class="iconified-button"
+                @click="newGalleryItems.splice(index, 1)"
+              >
+                <TrashIcon />
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -609,11 +611,11 @@ export default {
     }
 
     .textarea-wrapper {
-      width: 14rem;
+      width: 100%;
     }
 
     input {
-      width: calc(14rem - 2rem - 4px);
+      width: calc(100% - 2rem - 4px);
       margin: 0 0 0.25rem;
     }
 
