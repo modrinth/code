@@ -9,11 +9,12 @@
       class="checkbox"
       role="checkbox"
       :disabled="disabled"
-      :class="{ checked: value }"
+      :class="{ checked: value, collapsing: collapsingToggleStyle }"
       :aria-label="description"
       :aria-checked="value"
     >
-      <CheckIcon v-if="value" aria-hidden="true" />
+      <CheckIcon v-if="value && !collapsingToggleStyle" aria-hidden="true" />
+      <DropdownIcon v-else-if="collapsingToggleStyle" aria-hidden="true" />
     </button>
     <!-- aria-hidden is set so screenreaders only use the <button>'s aria-label -->
     <p v-if="label" aria-hidden="true">{{ label }}</p>
@@ -23,11 +24,13 @@
 
 <script>
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
+import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 
 export default {
   name: 'Checkbox',
   components: {
     CheckIcon,
+    DropdownIcon,
   },
   props: {
     label: {
@@ -46,6 +49,10 @@ export default {
     clickEvent: {
       type: Function,
       default: () => {},
+    },
+    collapsingToggleStyle: {
+      type: Boolean,
+      default: false,
     },
   },
   methods: {
@@ -89,6 +96,10 @@ export default {
   &:hover {
     color: var(--color-heading);
 
+    .checkbox.collapsing svg {
+      color: var(--color-heading);
+    }
+
     button {
       background-color: var(--color-button-bg-hover);
 
@@ -97,8 +108,13 @@ export default {
       }
     }
   }
+
   &:active {
     color: var(--color-text-dark);
+
+    .checkbox.collapsing svg {
+      color: var(--color-text-dark);
+    }
 
     button {
       background-color: var(--color-button-bg-active);
@@ -132,6 +148,23 @@ export default {
     height: 0.8rem;
     width: 0.8rem;
     flex-shrink: 0;
+  }
+
+  &.collapsing {
+    background-color: transparent !important;
+
+    svg {
+      color: inherit;
+      height: 1rem;
+      width: 1rem;
+      transition: transform 0.25s ease-in-out;
+    }
+
+    &.checked {
+      svg {
+        transform: rotate(180deg);
+      }
+    }
   }
 }
 </style>

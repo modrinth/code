@@ -67,15 +67,33 @@
               Loaders
             </h3>
             <SearchFilter
-              v-for="loader in $tag.loaders.filter((x) =>
-                x.supported_project_types.includes(projectType)
-              )"
+              v-for="loader in $tag.loaders.filter((x) => {
+                if (
+                  !showAllLoaders &&
+                  x.name !== 'forge' &&
+                  x.name !== 'fabric' &&
+                  x.name !== 'quilt'
+                ) {
+                  return false
+                }
+                return x.supported_project_types.includes(projectType)
+              })"
               :key="loader.name"
               :active-filters="orFacets"
-              :display-name="loader.name"
+              :display-name="
+                loader.name === 'modloader' ? 'ModLoader' : loader.name
+              "
               :facet-name="`categories:${loader.name}`"
               :icon="loader.icon"
               @toggle="toggleOrFacet"
+            />
+            <Checkbox
+              v-model="showAllLoaders"
+              :label="showAllLoaders ? 'Less' : 'More'"
+              description="Show all loaders"
+              style="margin-bottom: 0.5rem"
+              :border="false"
+              :collapsing-toggle-style="true"
             />
           </section>
           <section aria-label="Environment filters">
@@ -326,6 +344,7 @@ export default {
       maxResults: 20,
 
       sidebarMenuOpen: false,
+      showAllLoaders: false,
 
       skipLink: '#search-results',
     }

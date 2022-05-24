@@ -3,7 +3,10 @@
     <span
       v-for="category in categoriesFiltered"
       :key="category.name"
-      v-html="category.icon + category.name"
+      v-html="
+        category.icon +
+        (category.name === 'modloader' ? 'ModLoader' : category.name)
+      "
     />
   </div>
 </template>
