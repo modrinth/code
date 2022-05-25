@@ -49,6 +49,8 @@
     <a class={className} {href} {disabled} {title} {target} on:click>
         <slot />
     </a>
+{:else if as === 'input'}
+    <input class={className} {value} {disabled} {title} on:click />
 {:else}
     <svelte:element this={as} class={className} {disabled} {title} on:click>
         <slot />

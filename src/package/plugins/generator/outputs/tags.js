@@ -19,10 +19,15 @@ export async function tags(API_URL) {
     ]);
     progressBar.update(4);
 
+    const tagIconReducer = (a, v) => ({
+        ...a,
+        [v.name]: v.icon.replace('<svg', '<svg class="icon"'),
+    });
+
     // Create single object with icons
     const tagIcons = {
-        ...categories.reduce((a, v) => ({ ...a, [v.name]: v.icon }), {}),
-        ...loaders.reduce((a, v) => ({ ...a, [v.name]: v.icon }), {}),
+        ...categories.reduce(tagIconReducer, {}),
+        ...loaders.reduce(tagIconReducer, {}),
     };
     progressBar.increment();
 

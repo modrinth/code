@@ -42,13 +42,16 @@ export default function Generator(options) {
             ) {
                 return;
             }
-            if (options.landingPage) await landingPage(API_URL);
-            if (options.projectColors) await projectColors(API_URL);
-            if (options.gameVersions) await gameVersions(API_URL);
+
             if (options.tags) await tags(API_URL);
+            if (options.landingPage) await landingPage(API_URL);
+            if (options.gameVersions) await gameVersions(API_URL);
+            if (options.projectColors) await projectColors(API_URL);
+
             // Write new state
             state.lastGenerated = new Date().toISOString();
             state.options = options;
+
             await fs.writeFile('./generated/state.json', JSON.stringify(state, null, 2));
         },
     };
