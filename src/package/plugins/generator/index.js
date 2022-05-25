@@ -5,7 +5,7 @@ import { gameVersions } from './outputs/gameVersions.js';
 import { tags } from './outputs/tags.js';
 
 const API_URL =
-    process.env.VITE_API_URL || process.env?.NODE_ENV === 'development'
+    process.env.VITE_API_URL && process.env.VITE_API_URL === 'https://staging-api.modrinth.com/v2/'
         ? 'https://staging-api.modrinth.com/v2/'
         : 'https://api.modrinth.com/v2/';
 

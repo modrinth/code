@@ -30,6 +30,12 @@
 
     export let disabled = false;
 
+    /**  Hover title for accessibility */
+    export let title = '';
+
+    /**  Link target */
+    export let target = '';
+
     let className: string;
     $: className = classCombine([
         'button',
@@ -40,11 +46,11 @@
 </script>
 
 {#if as === 'a'}
-    <a class={className} {href} {disabled} on:click>
+    <a class={className} {href} {disabled} {title} {target} on:click>
         <slot />
     </a>
 {:else}
-    <svelte:element this={as} class={className} {disabled} on:click>
+    <svelte:element this={as} class={className} {disabled} {title} on:click>
         <slot />
     </svelte:element>
 {/if}
