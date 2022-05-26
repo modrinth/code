@@ -2,7 +2,7 @@
     import type { SvelteComponent } from 'svelte';
 
     export let placeholder = '';
-    export let icon: SvelteComponent;
+    export let icon: SvelteComponent = undefined;
     export let value = '';
     export let multiline = false;
     export let id: string = undefined;
@@ -50,7 +50,7 @@
         }
 
         input.has-icon {
-          padding-left: 40px;
+            padding-left: 40px;
         }
     }
 </style>

@@ -25,7 +25,7 @@ export default function sveld() {
 
             const componentFiles = await fs.readdir(path.resolve('./src/package/components'));
 
-            for (const fileName of componentFiles) {
+            for (const fileName of componentFiles.filter((name) => name.endsWith('.svelte'))) {
                 const filePath = path.resolve('./src/package/components', fileName);
                 const raw = (await fs.readFile(filePath)).toString();
                 output[fileName] = await parseRaw(raw, filePath);

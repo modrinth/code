@@ -1,42 +1,41 @@
 <script lang="ts">
-    import OmorphiaLogo from '../assets/omorphia.svg'
-    import IconLogoGithub from 'virtual:icons/carbon/logo-github'
-    import IconChat from 'virtual:icons/heroicons-outline/chat-alt-2'
-    import { onMount } from 'svelte'
+    import OmorphiaLogo from '../assets/omorphia.svg';
+    import IconLogoGithub from 'virtual:icons/carbon/logo-github';
+    import IconChat from 'virtual:icons/heroicons-outline/chat-alt-2';
+    import { onMount } from 'svelte';
 
-    let headerElement
+    let headerElement;
 
     onMount(() => {
-        let lastScrollTop: number
+        let lastScrollTop: number;
         window.addEventListener('scroll', () => {
-            let scrollTop = window.pageYOffset || document.documentElement.scrollTop
+            let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollTop > lastScrollTop && headerElement) {
-                headerElement.style.top = '-100%'
+                headerElement.style.top = '-100%';
             } else if (headerElement) {
-                headerElement.style.top = '0'
+                headerElement.style.top = '0';
             }
-            lastScrollTop = scrollTop
-        })
-    })
+            lastScrollTop = scrollTop;
+        });
+    });
 </script>
 
 <header class="header" bind:this={headerElement}>
-    <OmorphiaLogo class="header__logo"/>
+    <OmorphiaLogo class="header__logo" />
     <div class="header__title">Omorphia</div>
     <div class="header__links">
         <a class="hide-sm" href="https://modrinth.com">Modrinth.com</a>
-        <span class="spacer-dot hide-sm"></span>
+        <span class="spacer-dot hide-sm" />
         <a href="https://www.npmjs.com/package/omorphia">NPM</a>
-        <span class="spacer-dot"></span>
+        <span class="spacer-dot" />
         <a href="https://rewrite.modrinth.com/discord">
-            <IconChat/>
+            <IconChat />
         </a>
         <a href="https://github.com/modrinth/omorphia">
-            <IconLogoGithub/>
+            <IconLogoGithub />
         </a>
     </div>
 </header>
-
 
 <style lang="postcss">
     .header {
@@ -51,7 +50,8 @@
         top: 0;
         z-index: 10;
         background-color: hsl(0, 0%, 100%);
-        box-shadow: hsla(221, 39%, 11%, 0.2) 0 2px 4px 0, hsla(221, 39%, 11%, 0.05) 0 -2px 2px 0 inset;
+        box-shadow: hsla(221, 39%, 11%, 0.2) 0 2px 4px 0,
+            hsla(221, 39%, 11%, 0.05) 0 -2px 2px 0 inset;
         transition: top 0.3s ease-in-out;
 
         @media not (--sm) {

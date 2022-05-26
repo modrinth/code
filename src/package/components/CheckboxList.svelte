@@ -1,32 +1,30 @@
 <script lang="ts">
-    import Checkbox from './Checkbox.svelte'
-    import type { SvelteComponent } from 'svelte'
+    import Checkbox from './Checkbox.svelte';
+    import type { Option } from './types';
 
-    interface Option {
-        label: string;
-        /** The element that will be in the `value` array while the option is checked */
-        value: string | number;
-        icon: SvelteComponent;
-    }
+    export let value = [];
+    export let options: Option[] = [];
 
-    export let value = []
-    export let options: Option[] = []
+    /** Wrap the options horizontally */
+    export let wrap = false;
 
     const handleChange = (e, key) => {
         if (e.target.checked) {
-            if (!value) value = []
-            value = [key, ...value]
+            if (!value) value = [];
+            value = [key, ...value];
         } else {
-            value = value.filter((it) => key !== it)
+            value = value.filter((it) => key !== it);
         }
-    }
+    };
 </script>
 
-<div class="checkbox-list">
+<div class="checkbox-list" class:wrap>
     {#each options as option}
         <Checkbox on:change={(e) => handleChange(e, option.value)}>
-            {#if option.icon}
-                <svelte:component this={option.icon}/>
+            {#if option.icon && typeof option.icon === 'string'}
+                {@html option.icon}
+            {:else if option.icon}
+                <svelte:component this={option.icon} />
             {/if}
             {option.label}
         </Checkbox>

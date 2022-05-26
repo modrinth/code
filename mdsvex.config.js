@@ -1,5 +1,6 @@
 import { defineMDSveXConfig as defineConfig } from 'mdsvex';
 import examples from 'mdsvexamples';
+import path from 'path';
 
 const config = defineConfig({
     extensions: ['.svelte.md', '.md', '.svx'],
@@ -13,7 +14,7 @@ const config = defineConfig({
             examples,
             {
                 defaults: {
-                    Wrapper: '$routes/_internal/components/Example.svelte',
+                    Wrapper: path.resolve('./src/docs/components/Example.svelte'),
                 },
             },
         ],
@@ -21,7 +22,7 @@ const config = defineConfig({
     rehypePlugins: [],
 
     layout: {
-        _: './src/routes/_internal/layout/page.svelte',
+        _: './src/docs/layout/page.svelte',
     },
 });
 

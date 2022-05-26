@@ -1,14 +1,14 @@
 <script lang="ts">
-    import '$package/styles.postcss'
-    import './_internal/styles/prism-one-dark.css'
-    import './_internal/styles/gh-markdown.postcss'
-    import Sidebar from './_internal/components/Sidebar.svelte'
-    import Header from './_internal/components/Header.svelte'
+    import '$package/styles.postcss';
+    import '../docs/styles/prism-one-dark.css';
+    import '../docs/styles/gh-markdown.postcss';
+    import Sidebar from '../docs/components/Sidebar.svelte';
+    import Header from '../docs/components/Header.svelte';
 </script>
 
 <div class="app theme-light">
-    <Header/>
-    <Sidebar/>
+    <Header />
+    <Sidebar />
     <main class="app__content">
         <article>
             <slot />

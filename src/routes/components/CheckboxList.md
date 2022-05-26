@@ -26,6 +26,10 @@
             icon: IconSquare,
             value: 'SQU',
         },
+        {
+            label: 'Blank',
+            value: 'BLA',
+        },
     ]}
 />
 
