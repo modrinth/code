@@ -10,7 +10,6 @@ use gumdrop::Options;
 use log::{error, info, warn};
 use search::indexing::index_projects;
 use search::indexing::IndexingSettings;
-use std::sync::atomic::Ordering;
 use std::sync::Arc;
 
 mod database;
@@ -182,33 +181,6 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    let indexing_queue =
-        Arc::new(search::indexing::queue::CreationQueue::new());
-
-    let mut skip = skip_initial;
-    let queue_ref = indexing_queue.clone();
-    let search_config_ref = search_config.clone();
-    scheduler.run(std::time::Duration::from_secs(15 * 60), move || {
-        let queue_ref = queue_ref.clone();
-        let search_config_ref = search_config_ref.clone();
-        let local_skip = skip;
-        if skip {
-            skip = false;
-        }
-        async move {
-            if local_skip {
-                return;
-            }
-            info!("Indexing created project queue");
-            let result = queue_ref.index(&search_config_ref).await;
-            if let Err(e) = result {
-                warn!("Indexing created projects failed: {:?}", e);
-            }
-            crate::health::SEARCH_READY.store(true, Ordering::Release);
-            info!("Done indexing created project queue");
-        }
-    });
-
     scheduler::schedule_versions(&mut scheduler, pool.clone(), skip_initial);
 
     let ip_salt = Pepper {
@@ -270,7 +242,6 @@ async fn main() -> std::io::Result<()> {
             )
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(file_host.clone()))
-            .app_data(web::Data::new(indexing_queue.clone()))
             .app_data(web::Data::new(search_config.clone()))
             .app_data(web::Data::new(ip_salt.clone()))
             .configure(routes::v1_config)

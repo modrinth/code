@@ -166,7 +166,7 @@ pub struct ModeratorMessage {
     pub body: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
 #[serde(rename_all = "kebab-case")]
 pub enum SideType {
     Required,
@@ -368,6 +368,7 @@ impl From<QueryVersion> for Version {
                 .map(|d| Dependency {
                     version_id: d.version_id.map(|i| VersionId(i.0 as u64)),
                     project_id: d.project_id.map(|i| ProjectId(i.0 as u64)),
+                    file_name: d.file_name,
                     dependency_type: DependencyType::from_str(
                         d.dependency_type.as_str(),
                     ),
@@ -399,7 +400,7 @@ pub struct VersionFile {
     pub size: u32,
 }
 
-/// A dependency which describes what versions are required, break support, or are optional to the
+/// A dendency which describes what versions are required, break support, or are optional to the
 /// version's functionality
 #[derive(Serialize, Deserialize, Clone)]
 pub struct Dependency {
@@ -407,6 +408,8 @@ pub struct Dependency {
     pub version_id: Option<VersionId>,
     /// The project ID that the dependency is synced with and auto-updated
     pub project_id: Option<ProjectId>,
+    /// The filename of the dependency. Used exclusively for external mods on modpacks
+    pub file_name: Option<String>,
     /// The type of the dependency
     pub dependency_type: DependencyType,
 }

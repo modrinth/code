@@ -1,12 +1,13 @@
 use crate::database::models;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
-    VersionBuilder, VersionFileBuilder,
+    DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
 use crate::file_hosting::FileHost;
+use crate::models::pack::PackFileHash;
 use crate::models::projects::{
-    Dependency, GameVersion, Loader, ProjectId, Version, VersionFile,
-    VersionId, VersionType,
+    Dependency, DependencyType, GameVersion, Loader, ProjectId, Version,
+    VersionFile, VersionId, VersionType,
 };
 use crate::models::teams::Permissions;
 use crate::routes::project_creation::{CreateError, UploadedFile};
@@ -171,7 +172,7 @@ async fn version_create_inner(
             // Check whether there is already a version of this project with the
             // same version number
             let results = sqlx::query!(
-                "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number=$1) AND (mod_id=$2))",
+                "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number = $1) AND (mod_id = $2))",
                 version_create_data.version_number,
                 project_id as models::ProjectId,
             )
@@ -262,6 +263,7 @@ async fn version_create_inner(
                     version_id: d.version_id.map(|x| x.into()),
                     project_id: d.project_id.map(|x| x.into()),
                     dependency_type: d.dependency_type.to_string(),
+                    file_name: None,
                 })
                 .collect::<Vec<_>>();
 
@@ -313,6 +315,7 @@ async fn version_create_inner(
             file_host,
             uploaded_files,
             &mut version.files,
+            &mut version.dependencies,
             &cdn_url,
             &content_disposition,
             version.project_id.into(),
@@ -579,11 +582,23 @@ async fn upload_file_to_version_inner(
             ))
         })?;
 
+        let mut dependencies = version
+            .dependencies
+            .iter()
+            .map(|x| models::version_item::DependencyBuilder {
+                project_id: x.project_id,
+                version_id: x.version_id,
+                file_name: None,
+                dependency_type: x.dependency_type.clone(),
+            })
+            .collect();
+
         upload_file(
             &mut field,
             file_host,
             uploaded_files,
             &mut file_builders,
+            &mut dependencies,
             &cdn_url,
             &content_disposition,
             project_id,
@@ -625,6 +640,7 @@ pub async fn upload_file(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
     version_files: &mut Vec<models::version_item::VersionFileBuilder>,
+    dependencies: &mut Vec<models::version_item::DependencyBuilder>,
     cdn_url: &str,
     content_disposition: &actix_web::http::header::ContentDisposition,
     project_id: crate::models::ids::ProjectId,
@@ -680,6 +696,66 @@ pub async fn upload_file(
     )
     .await?;
 
+    if let ValidationResult::PassWithPackData(ref data) = validation_result {
+        if dependencies.is_empty() {
+            let hashes: Vec<Vec<u8>> = data
+                .files
+                .iter()
+                .filter_map(|x| x.hashes.get(&PackFileHash::Sha1))
+                .map(|x| x.as_bytes().to_vec())
+                .collect();
+
+            let res = sqlx::query!(
+                    "
+                    SELECT v.id version_id, v.mod_id project_id, h.hash hash FROM hashes h
+                    INNER JOIN files f on h.file_id = f.id
+                    INNER JOIN versions v on f.version_id = v.id
+                    WHERE h.algorithm = 'sha1' AND h.hash = ANY($1)
+                    ",
+                    &*hashes
+                )
+                .fetch_all(&mut *transaction).await?;
+
+            for file in &data.files {
+                if let Some(dep) = res.iter().find(|x| {
+                    x.hash.as_deref()
+                        == file
+                            .hashes
+                            .get(&PackFileHash::Sha1)
+                            .map(|x| x.as_bytes())
+                }) {
+                    if let Some(project_id) = dep.project_id {
+                        if let Some(version_id) = dep.version_id {
+                            dependencies.push(DependencyBuilder {
+                                project_id: Some(models::ProjectId(project_id)),
+                                version_id: Some(models::VersionId(version_id)),
+                                file_name: None,
+                                dependency_type: DependencyType::Required
+                                    .to_string(),
+                            });
+                        }
+                    }
+                } else {
+                    if let Some(first_download) = file.downloads.first() {
+                        dependencies.push(DependencyBuilder {
+                            project_id: None,
+                            version_id: None,
+                            file_name: Some(
+                                first_download
+                                    .rsplit('/')
+                                    .next()
+                                    .unwrap_or(first_download)
+                                    .to_string(),
+                            ),
+                            dependency_type: DependencyType::Required
+                                .to_string(),
+                        });
+                    }
+                }
+            }
+        }
+    }
+
     let file_path_encode = format!(
         "data/{}/versions/{}/{}",
         project_id,
@@ -700,6 +776,20 @@ pub async fn upload_file(
         file_name: file_path,
     });
 
+    let sha1_bytes = upload_data.content_sha1.into_bytes();
+    let sha512_bytes = upload_data.content_sha512.into_bytes();
+
+    if version_files.iter().any(|x| {
+        x.hashes
+            .iter()
+            .any(|y| y.hash == sha1_bytes || y.hash == sha512_bytes)
+    }) {
+        return Err(CreateError::InvalidInput(
+            "Duplicate files are not allowed to be uploaded to Modrinth!"
+                .to_string(),
+        ));
+    }
+
     version_files.push(models::version_item::VersionFileBuilder {
         filename: file_name.to_string(),
         url: format!("{}/{}", cdn_url, file_path_encode),
@@ -708,16 +798,16 @@ pub async fn upload_file(
                 algorithm: "sha1".to_string(),
                 // This is an invalid cast - the database expects the hash's
                 // bytes, but this is the string version.
-                hash: upload_data.content_sha1.into_bytes(),
+                hash: sha1_bytes,
             },
             models::version_item::HashBuilder {
                 algorithm: "sha512".to_string(),
                 // This is an invalid cast - the database expects the hash's
                 // bytes, but this is the string version.
-                hash: upload_data.content_sha512.into_bytes(),
+                hash: sha512_bytes,
             },
         ],
-        primary: (validation_result == ValidationResult::Pass
+        primary: (validation_result.is_passed()
             && version_files.iter().all(|x| !x.primary)
             && !ignore_primary)
             || force_primary,

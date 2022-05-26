@@ -14,11 +14,11 @@ path = "src/main.rs"
 
 [dependencies]
 actix = "0.13.0"
-actix-web = "4.0.1"
+actix-web = { git = "https://github.com/modrinth/actix-web", rev = "88c7c18" }
 actix-rt = "2.7.0"
 tokio-stream = "0.1.8"
-actix-multipart = "0.4.0"
-actix-cors = "0.6.1"
+actix-multipart = { git = "https://github.com/modrinth/actix-web", rev = "88c7c18" }
+actix-cors = { git = "https://github.com/modrinth/actix-extras.git", rev = "34d301f" }
 
 meilisearch-sdk = "0.15.0"
 reqwest = { version = "0.11.10", features = ["json"] }

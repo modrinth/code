@@ -56,12 +56,15 @@ pub async fn send_discord_webhook(
             value: project.server_side.to_string(),
             inline: true,
         },
-        DiscordEmbedField {
+    ];
+
+    if !project.categories.is_empty() {
+        fields.push(DiscordEmbedField {
             name: "categories",
             value: project.categories.join(", "),
             inline: true,
-        },
-    ];
+        });
+    }
 
     if let Some(ref slug) = project.slug {
         fields.push(DiscordEmbedField {

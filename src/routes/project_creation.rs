@@ -17,6 +17,7 @@ use actix_web::{post, HttpRequest, HttpResponse};
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
+use std::collections::HashSet;
 use std::sync::Arc;
 use thiserror::Error;
 use time::OffsetDateTime;
@@ -357,6 +358,12 @@ pub async fn project_create_inner(
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
 
+        let mut uniq = HashSet::new();
+        create_data
+            .initial_versions
+            .iter()
+            .all(|x| uniq.insert(x.version_number.clone()));
+
         let slug_project_id_option: Option<ProjectId> =
             serde_json::from_str(&*format!("\"{}\"", create_data.slug)).ok();
 
@@ -542,6 +549,7 @@ pub async fn project_create_inner(
             file_host,
             uploaded_files,
             &mut created_version.files,
+            &mut created_version.dependencies,
             &cdn_url,
             &content_disposition,
             project_id,
@@ -824,6 +832,7 @@ async fn create_initial_version(
             version_id: d.version_id.map(|x| x.into()),
             project_id: d.project_id.map(|x| x.into()),
             dependency_type: d.dependency_type.to_string(),
+            file_name: None,
         })
         .collect::<Vec<_>>();
 

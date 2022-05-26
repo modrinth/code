@@ -6,12 +6,10 @@ use crate::models::projects::{
 };
 use crate::models::teams::Permissions;
 use crate::routes::ApiError;
-use crate::search::indexing::queue::CreationQueue;
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use crate::util::auth::{get_user_from_headers, is_authorized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::web::Data;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
@@ -278,7 +276,6 @@ pub async fn project_edit(
     pool: web::Data<PgPool>,
     config: web::Data<SearchConfig>,
     new_project: web::Json<EditProject>,
-    indexing_queue: Data<Arc<CreationQueue>>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
@@ -442,17 +439,6 @@ pub async fn project_edit(
                     && !status.is_searchable()
                 {
                     delete_from_index(id.into(), config).await?;
-                } else if !project_item.status.is_searchable()
-                    && status.is_searchable()
-                {
-                    // let index_project =
-                    //     crate::search::indexing::local_import::query_one(
-                    //         id,
-                    //         &mut *transaction,
-                    //     )
-                    //     .await?;
-                    //
-                    // indexing_queue.add(index_project);
                 }
             }
 

@@ -1,6 +1,5 @@
 /// This module is used for the indexing from any source.
 pub mod local_import;
-pub mod queue;
 
 use crate::search::{SearchConfig, UploadSearchProject};
 use local_import::index_local;

@@ -21,6 +21,7 @@ pub struct VersionBuilder {
 pub struct DependencyBuilder {
     pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
+    pub file_name: Option<String>,
     pub dependency_type: String,
 }
 
@@ -59,13 +60,14 @@ impl DependencyBuilder {
 
         sqlx::query!(
             "
-            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id)
-            VALUES ($1, $2, $3, $4)
+            INSERT INTO dependencies (dependent_id, dependency_type, dependency_id, mod_dependency_id, dependency_file_name)
+            VALUES ($1, $2, $3, $4, $5)
             ",
             version_id as VersionId,
             self.dependency_type,
             version_dependency_id.map(|x| x.0),
             project_dependency_id.map(|x| x.0),
+            self.file_name,
         )
         .execute(&mut *transaction)
         .await?;
@@ -455,7 +457,7 @@ impl Version {
 
         sqlx::query!(
             "
-            DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL
+            DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL AND dependency_file_name = NULL
             ",
         )
         .execute(&mut *transaction)
@@ -659,7 +661,7 @@ impl Version {
             ).fetch_all(executor),
             sqlx::query!(
                 "
-                SELECT dependency_id, mod_dependency_id, dependency_type
+                SELECT dependency_id, mod_dependency_id, dependency_file_name, dependency_type
                 FROM dependencies
                 WHERE dependent_id = $1
                 ",
@@ -716,6 +718,7 @@ impl Version {
                     .map(|x| QueryDependency {
                         project_id: x.mod_dependency_id.map(ProjectId),
                         version_id: x.dependency_id.map(VersionId),
+                        file_name: x.dependency_file_name,
                         dependency_type: x.dependency_type,
                     })
                     .collect(),
@@ -779,6 +782,7 @@ pub struct QueryVersion {
 pub struct QueryDependency {
     pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
+    pub file_name: Option<String>,
     pub dependency_type: String,
 }
 

@@ -1,6 +1,8 @@
+use crate::models::pack::PackFormat;
 use crate::models::projects::{GameVersion, Loader};
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
+use crate::validate::liteloader::LiteLoaderValidator;
 use crate::validate::pack::PackValidator;
 use crate::validate::quilt::QuiltValidator;
 use std::io::Cursor;
@@ -10,6 +12,7 @@ use zip::ZipArchive;
 
 mod fabric;
 mod forge;
+mod liteloader;
 mod pack;
 mod quilt;
 
@@ -29,10 +32,22 @@ pub enum ValidationError {
 
 #[derive(Eq, PartialEq)]
 pub enum ValidationResult {
+    /// File should be marked as primary with pack file data
+    PassWithPackData(PackFormat),
     /// File should be marked as primary
     Pass,
     /// File should not be marked primary, the reason for which is inside the String
     Warning(&'static str),
+}
+
+impl ValidationResult {
+    pub fn is_passed(&self) -> bool {
+        match self {
+            ValidationResult::PassWithPackData(_) => true,
+            ValidationResult::Pass => true,
+            ValidationResult::Warning(_) => false,
+        }
+    }
 }
 
 pub enum SupportedGameVersions {
@@ -54,12 +69,13 @@ pub trait Validator: Sync {
     ) -> Result<ValidationResult, ValidationError>;
 }
 
-static VALIDATORS: [&dyn Validator; 5] = [
+static VALIDATORS: [&dyn Validator; 6] = [
     &PackValidator,
     &FabricValidator,
     &ForgeValidator,
     &LegacyForgeValidator,
     &QuiltValidator,
+    &LiteLoaderValidator,
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
