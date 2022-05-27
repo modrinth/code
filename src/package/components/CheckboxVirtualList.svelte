@@ -31,7 +31,7 @@
     >
         {@const option = options[index]}
         <Checkbox
-            checked={value.includes(option.value)}
+            checked={value && value.includes(option.value)}
             on:change={(e) => handleChange(e, option.value)}
         >
             {#if option.icon && typeof option.icon === 'string'}

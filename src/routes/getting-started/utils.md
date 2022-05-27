@@ -33,7 +33,7 @@ The `markdownInline` parser is perfect for translations and short bios. It doesn
 
 ```svelte example raised
 <script lang="ts">
-  import { markdownInline } from "omorphia"
+  import { markdownInline } from "omorphia/utils"
 
   const source = "This is some **bolded** and *italicized* text."
 </script>
@@ -45,7 +45,7 @@ The `markdownInline` parser is perfect for translations and short bios. It doesn
 
 ```svelte example raised
 <script lang="ts">
-  import { ago } from 'omorphia';
+  import { ago } from 'omorphia/utils';
 </script>
 
 <p>Something happened {ago(Date.now())}.</p>
@@ -59,7 +59,7 @@ The `markdownInline` parser is perfect for translations and short bios. It doesn
 The `Permissions` class provides an easy way to manage user permissions.
 
 ```ts
-import { Permissions } from 'omorphia';
+import { Permissions } from 'omorphia/utils';
 
 const adminLevel = new Permissions('ALL');
 const memberLevel = new Permissions(member.permissions); /* `member` from API */
@@ -76,7 +76,7 @@ The `formatVersions` function provides an easy way to parse a project's versions
 
 ```svelte example raised
 <script lang="ts">
-  import { formatVersions } from 'omorphia';
+  import { formatVersions } from 'omorphia/utils';
 </script>
 
 <p>{formatVersions(["1.18", "1.18.1", "1.18.2", "1.17.1"])}</p>
