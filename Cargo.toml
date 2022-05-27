@@ -61,4 +61,3 @@ sqlx = { version = "0.5.11", features = ["runtime-actix-rustls", "postgres", "ti
 bytes = "1.1.0"
 
 dashmap = "5.2.0"
-hex = "0.4.3"

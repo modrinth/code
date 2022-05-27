@@ -1,5 +1,5 @@
 use super::ApiError;
-use crate::database::models::version_item::QueryVersion;
+use crate::database::models::{version_item::QueryVersion, DatabaseError};
 use crate::file_hosting::FileHost;
 use crate::models::projects::{GameVersion, Loader, Version};
 use crate::models::teams::Permissions;
@@ -326,7 +326,7 @@ pub async fn get_versions_from_hashes(
     )
     .await?;
 
-    let response: Vec<_> = result
+    let response: Result<HashMap<String, Version>, ApiError> = result
         .into_iter()
         .filter_map(|row| {
             versions_data
@@ -334,14 +334,21 @@ pub async fn get_versions_from_hashes(
                 .into_iter()
                 .find(|x| x.id.0 == row.version_id)
                 .map(|v| {
-                    (
-                        hex::encode(row.hash),
-                        crate::models::projects::Version::from(v),
-                    )
+                    if let Ok(parsed_hash) = String::from_utf8(row.hash) {
+                        Ok((
+                            parsed_hash,
+                            crate::models::projects::Version::from(v),
+                        ))
+                    } else {
+                        Err(ApiError::Database(DatabaseError::Other(format!(
+                            "Could not parse hash for version {}",
+                            row.version_id
+                        ))))
+                    }
                 })
         })
         .collect();
-    Ok(HttpResponse::Ok().json(response))
+    Ok(HttpResponse::Ok().json(response?))
 }
 
 #[post("download")]
@@ -372,10 +379,19 @@ pub async fn download_files(
 
     let response = result
         .into_iter()
-        .map(|row| (hex::encode(row.hash), row.url))
-        .collect::<HashMap<String, String>>();
+        .map(|row| {
+            if let Ok(parsed_hash) = String::from_utf8(row.hash) {
+                Ok((parsed_hash, row.url))
+            } else {
+                Err(ApiError::Database(DatabaseError::Other(format!(
+                    "Could not parse hash for version {}",
+                    row.version_id
+                ))))
+            }
+        })
+        .collect::<Result<HashMap<String, String>, ApiError>>();
 
-    Ok(HttpResponse::Ok().json(response))
+    Ok(HttpResponse::Ok().json(response?))
 }
 
 #[derive(Deserialize)]
@@ -451,10 +467,17 @@ pub async fn update_files(
         if let Some(version) =
             versions.iter().find(|x| x.id.0 == row.version_id)
         {
-            response.insert(
-                hex::encode(&row.hash),
-                models::projects::Version::from(version.clone()),
-            );
+            if let Ok(parsed_hash) = String::from_utf8(row.hash.clone()) {
+                response.insert(
+                    parsed_hash,
+                    models::projects::Version::from(version.clone()),
+                );
+            } else {
+                return Err(ApiError::Database(DatabaseError::Other(format!(
+                    "Could not parse hash for version {}",
+                    row.version_id
+                ))));
+            }
         }
     }
 
