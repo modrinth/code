@@ -1,1 +1,1 @@
-export declare function tags(API_URL: string): Promise<void>;
+export declare function tags(API_URL: string): Promise<void>

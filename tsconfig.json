@@ -1,16 +1,16 @@
 {
-    "compilerOptions": {
-        "paths": {
-            "omorphia/*": ["src/package/*"],
-            "omorphia": ["src/package"],
-            "$package/*": ["src/package/*"],
-            "$routes/*": ["src/routes/*"],
-            "$generated/*": ["generated/*"],
-            "$lib": ["src/package"],
-            "$lib/*": ["src/package/*"]
-        },
-        "resolveJsonModule": true,
-        "esModuleInterop": true
-    },
-    "extends": "./.svelte-kit/tsconfig.json"
+	"compilerOptions": {
+		"paths": {
+			"omorphia/*": ["src/package/*"],
+			"omorphia": ["src/package"],
+			"$package/*": ["src/package/*"],
+			"$routes/*": ["src/routes/*"],
+			"$generated/*": ["generated/*"],
+			"$lib": ["src/package"],
+			"$lib/*": ["src/package/*"]
+		},
+		"resolveJsonModule": true,
+		"esModuleInterop": true
+	},
+	"extends": "./.svelte-kit/tsconfig.json"
 }

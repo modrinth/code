@@ -1,1 +1,1 @@
-export declare function projectColors(API_URL: string): Promise<void>;
+export declare function projectColors(API_URL: string): Promise<void>

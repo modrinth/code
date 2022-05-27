@@ -1,10 +1,10 @@
 export default function Generator(options: PluginOptions): {
-    name: string;
-    buildStart(): Promise<void>;
-};
+	name: string
+	buildStart(): Promise<void>
+}
 export interface PluginOptions {
-    projectColors: boolean;
-    landingPage: boolean;
-    gameVersions: boolean;
-    tags: boolean;
+	projectColors: boolean
+	landingPage: boolean
+	gameVersions: boolean
+	tags: boolean
 }

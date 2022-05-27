@@ -6,33 +6,33 @@ The generator plugin creates static files from API responses to increase perform
 
 ### Current options
 
--   `projectColors` (false) generates colors for every project
--   `tags` (false) copies & parses tags from API
--   `gameVersions` copes game versions from API
--   `landingPage` gets icon urls for top 100 mods
+- `projectColors` (false) generates colors for every project
+- `tags` (false) copies & parses tags from API
+- `gameVersions` copes game versions from API
+- `landingPage` gets icon urls for top 100 mods
 
 > All options are disabled by default
 
 ## Configuration
 
 ```js
-import Generator from 'omorphia/plugins/generator';
+import Generator from 'omorphia/plugins/generator'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-    kit: {
-        vite: {
-            plugins: [
-                Generator({
-                    projectColors: true,
-                    tags: true,
-                    gameVersions: true,
-                    landingPage: true,
-                }),
-            ],
-        },
-    },
-};
+	kit: {
+		vite: {
+			plugins: [
+				Generator({
+					projectColors: true,
+					tags: true,
+					gameVersions: true,
+					landingPage: true,
+				}),
+			],
+		},
+	},
+}
 
-export default config;
+export default config
 ```

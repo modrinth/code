@@ -59,14 +59,14 @@ The `markdownInline` parser is perfect for translations and short bios. It doesn
 The `Permissions` class provides an easy way to manage user permissions.
 
 ```ts
-import { Permissions } from 'omorphia/utils';
+import { Permissions } from 'omorphia/utils'
 
-const adminLevel = new Permissions('ALL');
-const memberLevel = new Permissions(member.permissions); /* `member` from API */
-const userLevel = new Permissions(0);
+const adminLevel = new Permissions('ALL')
+const memberLevel = new Permissions(member.permissions) /* `member` from API */
+const userLevel = new Permissions(0)
 
 if (memberLevel.data.uploadVersions) {
-    console.log('Can upload versions!');
+	console.log('Can upload versions!')
 }
 ```
 

@@ -1,101 +1,101 @@
 .card {
-    --padding: 1rem;
+	--padding: 1rem;
 
-    display: flex;
-    flex-direction: column;
-    position: relative;
+	display: flex;
+	flex-direction: column;
+	position: relative;
 
-    background-color: var(--color-raised-bg);
-    border-radius: var(--rounded-lg);
-    overflow: hidden;
-    box-shadow: var(--shadow-raised), var(--shadow-inset);
+	background-color: var(--color-raised-bg);
+	border-radius: var(--rounded-lg);
+	overflow: hidden;
+	box-shadow: var(--shadow-raised), var(--shadow-inset);
 
-    padding: var(--padding);
-    grid-gap: 1rem;
-    max-width: 100%;
+	padding: var(--padding);
+	grid-gap: 1rem;
+	max-width: 100%;
 
-    .profile-picture {
-        z-index: 1;
-    }
+	.profile-picture {
+		z-index: 1;
+	}
 
-    &--gap {
-        &-compressed {
-            grid-gap: 0.6rem;
-        }
+	&--gap {
+		&-compressed {
+			grid-gap: 0.6rem;
+		}
 
-        &-none {
-            grid-gap: 0;
-        }
-    }
+		&-none {
+			grid-gap: 0;
+		}
+	}
 
-    &--pad {
-        &-top {
-            padding-top: 2.5rem;
-        }
-    }
+	&--pad {
+		&-top {
+			padding-top: 2.5rem;
+		}
+	}
 
-    &--overflow-visible {
-        overflow: visible;
-    }
+	&--overflow-visible {
+		overflow: visible;
+	}
 
-    &__banner {
-        --inverse-padding: calc(var(--padding) * -1);
-        margin: var(--inverse-padding) var(--inverse-padding) 0 var(--inverse-padding);
-        z-index: 0;
-        background-color: var(--color-divider);
+	&__banner {
+		--inverse-padding: calc(var(--padding) * -1);
+		margin: var(--inverse-padding) var(--inverse-padding) 0 var(--inverse-padding);
+		z-index: 0;
+		background-color: var(--color-divider);
 
-        &:-moz-loading {
-            visibility: hidden;
-        }
+		&:-moz-loading {
+			visibility: hidden;
+		}
 
-        &--short {
-            height: 6.5rem;
-            object-fit: cover;
-            object-position: center;
-        }
+		&--short {
+			height: 6.5rem;
+			object-fit: cover;
+			object-position: center;
+		}
 
-        &--dark {
-            filter: brightness(0.7);
-        }
-    }
+		&--dark {
+			filter: brightness(0.7);
+		}
+	}
 
-    &__overlay {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
+	&__overlay {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
 
-        display: flex;
-        flex-direction: column;
-        align-items: flex-end;
-        grid-gap: 0.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-end;
+		grid-gap: 0.5rem;
 
-        z-index: 1;
+		z-index: 1;
 
-        &--row {
-            flex-direction: row;
-        }
-    }
+		&--row {
+			flex-direction: row;
+		}
+	}
 
-    &--row {
-        flex-direction: row;
-        align-items: center;
-    }
+	&--row {
+		flex-direction: row;
+		align-items: center;
+	}
 
-    &--strip {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-    }
+	&--strip {
+		flex-direction: row;
+		justify-content: space-between;
+		align-items: center;
+	}
 
-    &--pad-x {
-        --padding: 1rem 1.3rem;
-    }
+	&--pad-x {
+		--padding: 1rem 1.3rem;
+	}
 
-    &.markdown {
-        --padding: 1.5rem;
-    }
+	&.markdown {
+		--padding: 1.5rem;
+	}
 
-    p {
-        line-height: 130%;
-    }
+	p {
+		line-height: 130%;
+	}
 }
