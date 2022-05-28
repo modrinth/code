@@ -11,13 +11,14 @@ export async function tags(API_URL) {
 	progressBar.start(7, 0)
 
 	// eslint-disable-next-line prefer-const
-	let [categories, loaders, licenses, donationPlatforms] = await Promise.all([
+	let [categories, loaders, licenses, donationPlatforms, reportTypes] = await Promise.all([
 		await (await fetch(API_URL + 'tag/category')).json(),
 		await (await fetch(API_URL + 'tag/loader')).json(),
 		await (await fetch(API_URL + 'tag/license')).json(),
 		await (await fetch(API_URL + 'tag/donation_platform')).json(),
+    await (await fetch(API_URL + 'tag/report_type')).json(),
 	])
-	progressBar.update(4)
+	progressBar.update(5)
 
 	const tagIconReducer = (a, v) => ({
 		...a,
@@ -42,7 +43,7 @@ export async function tags(API_URL) {
 	// Write JSON file
 	await fs.writeFile(
 		'./generated/tags.json',
-		JSON.stringify({ categories, loaders, projectTypes, licenses, donationPlatforms, tagIcons })
+		JSON.stringify({ categories, loaders, projectTypes, licenses, donationPlatforms, reportTypes, tagIcons })
 	)
 	progressBar.increment()
 
