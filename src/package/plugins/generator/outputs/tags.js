@@ -16,7 +16,7 @@ export async function tags(API_URL) {
 		await (await fetch(API_URL + 'tag/loader')).json(),
 		await (await fetch(API_URL + 'tag/license')).json(),
 		await (await fetch(API_URL + 'tag/donation_platform')).json(),
-    await (await fetch(API_URL + 'tag/report_type')).json(),
+		await (await fetch(API_URL + 'tag/report_type')).json(),
 	])
 	progressBar.update(5)
 
