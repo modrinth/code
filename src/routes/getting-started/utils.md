@@ -14,7 +14,7 @@ The `markdown` parser is designed for bodies of markdown text and supports image
 
 ```svelte example
 <script lang="ts">
-  import { markdown } from "omorphia"
+  import { markdown } from "omorphia/utils"
 
   const source = '## Example markdown \n\
   This is **some** *text*! \n\

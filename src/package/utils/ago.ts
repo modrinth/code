@@ -35,6 +35,12 @@ export function ago(
 		if (diffAbs >= interval.ge) {
 			const x = Math.round(Math.abs(diff) / interval.divisor)
 			const isFuture = diff < 0
+			if (
+				typeof navigator !== 'undefined' &&
+				(navigator.language === 'zh-CN' || navigator.language === 'zh')
+			) {
+				return chs_format(x, isFuture, interval.unit as Unit)
+			}
 			return interval.unit ? rft.format(isFuture ? x : -x, interval.unit as Unit) : interval.text
 		}
 	}
@@ -55,3 +61,54 @@ type Unit =
 	| 'months'
 	| 'year'
 	| 'years'
+
+type ChsUnit = '秒' | '分' | '小时' | '天' | '周' | '月' | '年'
+
+/**
+ * Convert unit to chinese unit
+ * @param unit
+ * @returns {ChsUnit}
+ */
+function convertUnitToChsUnit(unit: Unit): ChsUnit {
+	switch (unit) {
+		case 'second':
+		case 'seconds':
+			return '秒'
+		case 'minute':
+		case 'minutes':
+			return '分'
+		case 'hour':
+		case 'hours':
+			return '小时'
+		case 'day':
+		case 'days':
+			return '天'
+		case 'week':
+		case 'weeks':
+			return '周'
+		case 'month':
+		case 'months':
+			return '月'
+		case 'year':
+		case 'years':
+			return '年'
+	}
+}
+
+/**
+ * The default converter provided by js does not conform to Chinese typography.
+ * @param value date value
+ * @param isFuture
+ * @param unit
+ * @returns {string}
+ */
+function chs_format(value: number, isFuture: boolean, unit: Unit): string {
+	const chsUnit = convertUnitToChsUnit(unit)
+	let quantifier = ''
+	switch (chsUnit) {
+		case '月':
+		case '小时':
+			quantifier = '个'
+	}
+	return `${value} ${quantifier}${chsUnit}${isFuture ? '后' : '前'}`
+}
