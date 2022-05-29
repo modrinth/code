@@ -28,8 +28,6 @@ export function ago(
 		{ ge: 30 * SECOND, divisor: SECOND, unit: 'seconds' },
 		{ ge: 0, divisor: 1, text: 'just now' },
 	]
-	// must get language from browser
-	const firstLanguage = navigator.language
 	const now = typeof nowDate === 'object' ? nowDate.getTime() : new Date(nowDate).getTime()
 	const diff = now - (typeof date === 'object' ? date : new Date(date)).getTime()
 	const diffAbs = Math.abs(diff)
@@ -37,7 +35,10 @@ export function ago(
 		if (diffAbs >= interval.ge) {
 			const x = Math.round(Math.abs(diff) / interval.divisor)
 			const isFuture = diff < 0
-			if (firstLanguage === 'zh-CN' || firstLanguage === 'zh') {
+			if (
+				typeof navigator !== 'undefined' &&
+				(navigator.language === 'zh-CN' || navigator.language === 'zh')
+			) {
 				return chs_format(x, isFuture, interval.unit as Unit)
 			}
 			return interval.unit ? rft.format(isFuture ? x : -x, interval.unit as Unit) : interval.text
