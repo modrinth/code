@@ -100,7 +100,7 @@
           </span>
           <Multiselect
             v-model="$colorMode.preference"
-            :options="['light', 'dark', 'oled']"
+            :options="['system', 'light', 'dark', 'oled']"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
