@@ -661,8 +661,8 @@ pub async fn upload_file(
         })?;
 
     let data = read_from_field(
-        field, 100 * (1 << 20),
-        "Project file exceeds the maximum of 100MiB. Contact a moderator or admin to request permission to upload larger files."
+        field, 500 * (1 << 20),
+        "Project file exceeds the maximum of 500MiB. Contact a moderator or admin to request permission to upload larger files."
     ).await?;
 
     let hash = sha1::Sha1::from(&data).hexdigest();
