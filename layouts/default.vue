@@ -246,7 +246,7 @@
             our GitHub page</a
           >
         </p>
-        <p>modrinth/knossos {{ version }}</p>
+        <p>{{ owner }}/{{ slug }} {{ branch }}@{{ hash.substring(0, 7) }}</p>
         <p>© Rinth, Inc.</p>
       </div>
       <div class="links links-1" role="region" aria-label="Legal">
@@ -337,7 +337,10 @@ export default {
   data() {
     return {
       isDropdownOpen: false,
-      version: process.env.version || 'unknown',
+      owner: process.env.owner || 'modrinth',
+      slug: process.env.slug || 'knossos',
+      branch: process.env.branch || 'master',
+      hash: process.env.hash || 'unknown',
       isMobileMenuOpen: false,
       registeredSkipLink: null,
     }

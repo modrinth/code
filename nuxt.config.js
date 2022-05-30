@@ -275,7 +275,10 @@ export default {
     height: '2px',
   },
   env: {
-    version: process.env.VERSION_ID || 'unknown',
+    owner: process.env.VERCEL_GIT_REPO_OWNER || 'modrinth',
+    slug: process.env.VERCEL_GIT_REPO_SLUG || 'knossos',
+    branch: process.env.VERCEL_GIT_COMMIT_REF || 'master',
+    hash: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
     domain: getDomain(),
   },
   publicRuntimeConfig: {
