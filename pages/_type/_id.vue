@@ -88,12 +88,18 @@
           >
         </div>
         <div class="dates">
-          <div class="date">
+          <div
+            v-tooltip="$dayjs(createdAt).format('MMMM D, YYYY [at] h:mm:ss A')"
+            class="date"
+          >
             <CalendarIcon aria-hidden="true" />
             <span class="label">Created</span>
             <span class="value">{{ $dayjs(project.published).fromNow() }}</span>
           </div>
-          <div class="date">
+          <div
+            v-tooltip="$dayjs(updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')"
+            class="date"
+          >
             <UpdateIcon aria-hidden="true" />
             <span class="label">Updated</span>
             <span class="value">{{ $dayjs(project.updated).fromNow() }}</span>

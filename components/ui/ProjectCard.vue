@@ -66,11 +66,21 @@
             class="right-categories"
           />
           <div class="dates">
-            <div class="date">
+            <div
+              v-tooltip="
+                $dayjs(createdAt).format('MMMM D, YYYY [at] h:mm:ss A')
+              "
+              class="date"
+            >
               <CalendarIcon aria-hidden="true" />
               Created {{ $dayjs(createdAt).fromNow() }}
             </div>
-            <div class="date">
+            <div
+              v-tooltip="
+                $dayjs(updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')
+              "
+              class="date"
+            >
               <EditIcon aria-hidden="true" />
               Updated {{ $dayjs(updatedAt).fromNow() }}
             </div>
