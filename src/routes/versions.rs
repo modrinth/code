@@ -258,7 +258,9 @@ pub async fn version_edit(
                     .fetch_one(&mut *transaction)
                     .await?;
 
-                if results.exists.unwrap_or(true) {
+                if results.exists.unwrap_or(true)
+                    && &version_item.version_number != number
+                {
                     return Err(ApiError::InvalidInput(
                         "A version with that version_number already exists"
                             .to_string(),
