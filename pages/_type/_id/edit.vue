@@ -484,7 +484,9 @@ export default {
 
       switch (newValue.short) {
         case 'custom':
-          this.license_url = ''
+          if (oldValue === null || oldValue.short !== '') {
+            this.license_url = ''
+          }
           break
         default:
           this.license_url = `https://cdn.modrinth.com/licenses/${newValue.short}.txt`
