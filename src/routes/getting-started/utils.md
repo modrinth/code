@@ -58,16 +58,22 @@ The `markdownInline` parser is perfect for translations and short bios. It doesn
 
 The `Permissions` class provides an easy way to manage user permissions.
 
-```ts
+```svelte example raised
+<script lang="ts">
 import { Permissions } from 'omorphia/utils'
 
-const adminLevel = new Permissions('ALL')
-const memberLevel = new Permissions(member.permissions) /* `member` from API */
-const userLevel = new Permissions(0)
+const permissions = new Permissions(128) // Can be integer or 'ALL'
+</script>
 
-if (memberLevel.data.uploadVersions) {
-	console.log('Can upload versions!')
-}
+<p>
+  <input type="checkbox" bind:checked={permissions.uploadVersions} id="ex-1"/>
+  <label for="ex-1">Can edit versions</label><br>
+  <input type="checkbox" bind:checked={permissions.deleteProject} id="ex-2"/>
+  <label for="ex-2">Can delete project</label><br><br>
+
+  Integer: {permissions.toInteger()}<br>
+  Can access settings page: {permissions.settingsPage}
+</p>
 ```
 
 ## Versions
