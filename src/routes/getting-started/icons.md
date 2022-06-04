@@ -20,8 +20,8 @@ Then use the icon as if it were a Svelte component:
 
 ```svelte example
 <script lang="ts">
-    import IconHeart from 'virtual:icons/heroicons-outline/heart'
+	import IconHeart from 'virtual:icons/heroicons-outline/heart'
 </script>
 
-<p> That's lovely <IconHeart height="14px" />! </p>
+<p>That's lovely <IconHeart height="14px" />!</p>
 ```

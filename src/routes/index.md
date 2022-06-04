@@ -22,7 +22,7 @@ Use a component by importing from `omorphia`. For example, use the [Button compo
 
 ```svelte example raised
 <script lang="ts">
-    import { Button } from "omorphia"
+	import { Button } from 'omorphia'
 </script>
 
 <Button color="primary">I'm a button!</Button>

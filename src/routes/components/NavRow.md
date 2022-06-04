@@ -2,25 +2,25 @@
 
 ```svelte example raised
 <script lang="ts">
-    import { NavRow } from "omorphia";
+	import { NavRow } from 'omorphia'
 </script>
 
 <NavRow
-    level={1}
-    links={[
-        {
-            href: '/Button',
-            label: 'Button'
-        },
-        {
-            href: '/Chips',
-            label: 'Chips'
-        },
-        {
-            href: '/NavRow',
-            label: 'NavRow'
-        }
-    ]}>
-    Click for fun
+	level={1}
+	links={[
+		{
+			href: '/Button',
+			label: 'Button',
+		},
+		{
+			href: '/Chips',
+			label: 'Chips',
+		},
+		{
+			href: '/NavRow',
+			label: 'NavRow',
+		},
+	]}>
+	Click for fun
 </NavRow>
 ```

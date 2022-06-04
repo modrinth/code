@@ -14,7 +14,7 @@ Import the SVG in the `<script>` of your svelte file, and treat the illustration
 
 ```svelte
 <script>
-    import NoData from '$assets/images/illustrations/undraw_no_data.svg'
+	import NoData from '$assets/images/illustrations/undraw_no_data.svg'
 </script>
 
 <NoData />

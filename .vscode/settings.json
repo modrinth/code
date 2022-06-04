@@ -1,4 +1,19 @@
 {
+	"prettier.endOfLine": "lf",
+	"cSpell.words": ["unplugin"],
+	"gitlens.showWelcomeOnInstall": false,
+	"gitlens.showWhatsNewAfterUpgrades": false,
+	"gitlens.plusFeatures.enabled": false,
+	"gitlens.currentLine.enabled": false,
+	"gitlens.currentLine.pullRequests.enabled": false,
+	"gitlens.currentLine.scrollable": true,
+	"gitlens.codeLens.enabled": false,
+	"gitlens.hovers.enabled": false,
+	"svelte.enable-ts-plugin": true,
+	"svelte.ask-to-enable-ts-plugin": false,
+	"yaml.schemas": {
+		"https://json.schemastore.org/github-workflow.json": "file:///Users/sha/Code/Modrinth/knossos/.github/workflows/deploy.yml"
+	},
 	"editor.formatOnSave": true,
 	"editor.defaultFormatter": "esbenp.prettier-vscode",
 	"editor.formatOnPaste": true,

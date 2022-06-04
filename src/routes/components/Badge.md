@@ -1,6 +1,6 @@
 ```svelte example raised
 <script lang="ts">
-    import { Badge } from "omorphia";
+	import { Badge } from 'omorphia'
 </script>
 
 <Badge color="red" label="Tomato" />

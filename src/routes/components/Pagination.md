@@ -2,7 +2,7 @@ Use pagination to show a set of page numbers and navigation directions to move t
 
 ```svelte example
 <script lang="ts">
-    import { Pagination } from "omorphia"
+	import { Pagination } from 'omorphia'
 </script>
 
 <Pagination page={20} count={50} />

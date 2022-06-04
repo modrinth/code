@@ -14,16 +14,17 @@ The `markdown` parser is designed for bodies of markdown text and supports image
 
 ```svelte example
 <script lang="ts">
-  import { markdown } from "omorphia/utils"
+	import { markdown } from 'omorphia/utils'
 
-  const source = '## Example markdown \n\
+	const source =
+		'## Example markdown \n\
   This is **some** *text*! \n\
   #### An image \n\
   <img src="https://cdn.modrinth.com/data/YL57xq9U/images/d382106b9a2b943d06107c31c139c77849f1a0e8.png" />'
 </script>
 
 <div class="card markdown">
-  {@html markdown(source)}
+	{@html markdown(source)}
 </div>
 ```
 
@@ -33,9 +34,9 @@ The `markdownInline` parser is perfect for translations and short bios. It doesn
 
 ```svelte example raised
 <script lang="ts">
-  import { markdownInline } from "omorphia/utils"
+	import { markdownInline } from 'omorphia/utils'
 
-  const source = "This is some **bolded** and *italicized* text."
+	const source = 'This is some **bolded** and *italicized* text.'
 </script>
 
 <p>{@html markdownInline(source)}</p>
@@ -45,7 +46,7 @@ The `markdownInline` parser is perfect for translations and short bios. It doesn
 
 ```svelte example raised
 <script lang="ts">
-  import { ago } from 'omorphia/utils';
+	import { ago } from 'omorphia/utils'
 </script>
 
 <p>Something happened {ago(Date.now())}.</p>
@@ -60,19 +61,19 @@ The `Permissions` class provides an easy way to manage user permissions.
 
 ```svelte example raised
 <script lang="ts">
-import { Permissions } from 'omorphia/utils'
+	import { Permissions } from 'omorphia/utils'
 
-const permissions = new Permissions(128) // Can be integer or 'ALL'
+	const permissions = new Permissions(128) // Can be integer or 'ALL'
 </script>
 
 <p>
-  <input type="checkbox" bind:checked={permissions.uploadVersions} id="ex-1"/>
-  <label for="ex-1">Can edit versions</label><br>
-  <input type="checkbox" bind:checked={permissions.deleteProject} id="ex-2"/>
-  <label for="ex-2">Can delete project</label><br><br>
+	<input type="checkbox" bind:checked={permissions.uploadVersions} id="ex-1" />
+	<label for="ex-1">Can edit versions</label><br />
+	<input type="checkbox" bind:checked={permissions.deleteProject} id="ex-2" />
+	<label for="ex-2">Can delete project</label><br /><br />
 
-  Integer: {permissions.toInteger()}<br>
-  Can access settings page: {permissions.settingsPage}
+	Integer: {permissions.toInteger()}<br />
+	Can access settings page: {permissions.settingsPage}
 </p>
 ```
 
@@ -82,8 +83,8 @@ The `formatVersions` function provides an easy way to parse a project's versions
 
 ```svelte example raised
 <script lang="ts">
-  import { formatVersions } from 'omorphia/utils';
+	import { formatVersions } from 'omorphia/utils'
 </script>
 
-<p>{formatVersions(["1.18", "1.18.1", "1.18.2", "1.17.1"])}</p>
+<p>{formatVersions(['1.18', '1.18.1', '1.18.2', '1.17.1'])}</p>
 ```

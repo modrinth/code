@@ -43,7 +43,15 @@ export async function tags(API_URL) {
 	// Write JSON file
 	await fs.writeFile(
 		'./generated/tags.json',
-		JSON.stringify({ categories, loaders, projectTypes, licenses, donationPlatforms, reportTypes, tagIcons })
+		JSON.stringify({
+			categories,
+			loaders,
+			projectTypes,
+			licenses,
+			donationPlatforms,
+			reportTypes,
+			tagIcons,
+		})
 	)
 	progressBar.increment()
 
