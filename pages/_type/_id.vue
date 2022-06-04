@@ -212,7 +212,8 @@
             project.issues_url ||
             project.source_url ||
             project.wiki_url ||
-            project.discord_url
+            project.discord_url ||
+            project.donation_urls.length > 0
           "
         >
           <h3 class="card-header">External resources</h3>
