@@ -72,11 +72,12 @@ pub fn validate_deps(
         .iter()
         .duplicates_by(|x| {
             format!(
-                "{}-{}",
+                "{}-{}-{}",
                 x.version_id
                     .unwrap_or(crate::models::projects::VersionId(0)),
                 x.project_id
-                    .unwrap_or(crate::models::projects::ProjectId(0))
+                    .unwrap_or(crate::models::projects::ProjectId(0)),
+                x.file_name.as_deref().unwrap_or_default()
             )
         })
         .next()

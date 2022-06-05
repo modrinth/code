@@ -31,17 +31,19 @@ impl super::Validator for PackValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        let mut file =
-            archive.by_name("modrinth.index.json").map_err(|_| {
-                ValidationError::InvalidInput(
-                    "Pack manifest is missing.".into(),
-                )
-            })?;
+        let pack: PackFormat = {
+            let mut file =
+                archive.by_name("modrinth.index.json").map_err(|_| {
+                    ValidationError::InvalidInput(
+                        "Pack manifest is missing.".into(),
+                    )
+                })?;
 
-        let mut contents = String::new();
-        file.read_to_string(&mut contents)?;
+            let mut contents = String::new();
+            file.read_to_string(&mut contents)?;
 
-        let pack: PackFormat = serde_json::from_str(&contents)?;
+            serde_json::from_str(&contents)?
+        };
 
         pack.validate().map_err(|err| {
             ValidationError::InvalidInput(
@@ -87,6 +89,17 @@ impl super::Validator for PackValidator {
             };
         }
 
-        Ok(ValidationResult::PassWithPackData(pack))
+        Ok(ValidationResult::PassWithPackDataAndFiles {
+            format: pack,
+            files: archive
+                .file_names()
+                .filter(|x| {
+                    x.starts_with("overrides/mods")
+                        || x.starts_with("client-overrides/mods")
+                        || x.starts_with("server-overrides/mods")
+                })
+                .flat_map(|x| x.rsplit('/').next().map(|x| x.to_string()))
+                .collect::<Vec<String>>(),
+        })
     }
 }

@@ -696,9 +696,13 @@ pub async fn upload_file(
     )
     .await?;
 
-    if let ValidationResult::PassWithPackData(ref data) = validation_result {
+    if let ValidationResult::PassWithPackDataAndFiles {
+        ref format,
+        ref files,
+    } = validation_result
+    {
         if dependencies.is_empty() {
-            let hashes: Vec<Vec<u8>> = data
+            let hashes: Vec<Vec<u8>> = format
                 .files
                 .iter()
                 .filter_map(|x| x.hashes.get(&PackFileHash::Sha1))
@@ -716,7 +720,7 @@ pub async fn upload_file(
                 )
                 .fetch_all(&mut *transaction).await?;
 
-            for file in &data.files {
+            for file in &format.files {
                 if let Some(dep) = res.iter().find(|x| {
                     x.hash.as_deref()
                         == file
@@ -735,23 +739,29 @@ pub async fn upload_file(
                             });
                         }
                     }
-                } else {
-                    if let Some(first_download) = file.downloads.first() {
-                        dependencies.push(DependencyBuilder {
-                            project_id: None,
-                            version_id: None,
-                            file_name: Some(
-                                first_download
-                                    .rsplit('/')
-                                    .next()
-                                    .unwrap_or(first_download)
-                                    .to_string(),
-                            ),
-                            dependency_type: DependencyType::Required
+                } else if let Some(first_download) = file.downloads.first() {
+                    dependencies.push(DependencyBuilder {
+                        project_id: None,
+                        version_id: None,
+                        file_name: Some(
+                            first_download
+                                .rsplit('/')
+                                .next()
+                                .unwrap_or(first_download)
                                 .to_string(),
-                        });
-                    }
+                        ),
+                        dependency_type: DependencyType::Required.to_string(),
+                    });
                 }
+            }
+
+            for file in files {
+                dependencies.push(DependencyBuilder {
+                    project_id: None,
+                    version_id: None,
+                    file_name: Some(file.to_string()),
+                    dependency_type: DependencyType::Required.to_string(),
+                });
             }
         }
     }

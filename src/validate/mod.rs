@@ -33,7 +33,10 @@ pub enum ValidationError {
 #[derive(Eq, PartialEq)]
 pub enum ValidationResult {
     /// File should be marked as primary with pack file data
-    PassWithPackData(PackFormat),
+    PassWithPackDataAndFiles {
+        format: PackFormat,
+        files: Vec<String>,
+    },
     /// File should be marked as primary
     Pass,
     /// File should not be marked primary, the reason for which is inside the String
@@ -43,7 +46,7 @@ pub enum ValidationResult {
 impl ValidationResult {
     pub fn is_passed(&self) -> bool {
         match self {
-            ValidationResult::PassWithPackData(_) => true,
+            ValidationResult::PassWithPackDataAndFiles { .. } => true,
             ValidationResult::Pass => true,
             ValidationResult::Warning(_) => false,
         }
