@@ -1,7 +1,7 @@
 .markdown {
 	display: flex;
 	flex-direction: column;
-	grid-gap: 1rem;
+	gap: 1rem;
 
 	blockquote,
 	details,
@@ -54,7 +54,7 @@
 	}
 
 	code {
-		padding: 0.2rem 0.4rem;
+		padding: 0.25rem 0.5rem;
 		font-size: 80%;
 		border-radius: var(--rounded-sm);
 		background-color: var(--color-code-bg);
@@ -65,12 +65,13 @@
 		padding: 1rem;
 		border-radius: var(--rounded-sm);
 		overflow-x: auto;
+		background-color: var(--color-code-bg);
 
 		code {
 			font-size: 80%;
 			padding: 0;
 			border-radius: 0;
-			background-color: unset;
+			background-color: unset !important;
 		}
 	}
 
@@ -93,8 +94,8 @@
 
 		td,
 		th {
-			padding: 0.4rem 0.85rem;
-			border: 0.1rem solid var(--color-table-border);
+			padding: 0.5rem 0.85rem;
+			border: 0var (--unit-3) solid var(--color-table-border);
 		}
 
 		tr:nth-child(2n) {

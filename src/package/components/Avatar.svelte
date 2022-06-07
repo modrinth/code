@@ -68,7 +68,7 @@
 
 		&--size {
 			&-xs {
-				--size: 2.25rem;
+				--size: 2.5rem;
 				box-shadow: var(--shadow-inset), var(--shadow-raised);
 			}
 

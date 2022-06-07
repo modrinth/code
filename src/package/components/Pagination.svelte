@@ -54,17 +54,24 @@
 	.pagination {
 		align-self: center;
 		display: flex;
-		grid-gap: 0.5rem;
+		gap: 0.5rem;
 		align-items: center;
+
+		:global(.button) {
+			box-shadow: var(--shadow-inset-sm), var(--shadow-raised);
+		}
+
+		:global(.icon) {
+			width: 1rem;
+			aspect-ratio: 1 / 1;
+		}
 
 		:global(&__dash) {
 			margin: 0 0.5rem;
-			width: 1rem;
-			height: 1rem;
 		}
 
 		@media (width <= 500px) {
-			grid-gap: 0.25rem;
+			gap: 0.25rem;
 
 			:global(> *:nth-child(4)),
 			:global(> *:nth-child(6)) {

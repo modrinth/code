@@ -31,19 +31,19 @@
 
 <style lang="postcss">
 	.example {
-		margin: 15px 0 32px;
+		margin: 1rem 0 2rem;
 
 		&__preview {
 			border-radius: var(--rounded-sm-top);
 			border: solid 2px hsl(0, 0%, 20%);
 			border-bottom: none;
 			display: flex;
-			grid-gap: 16px;
+			gap: 1rem;
 			flex-wrap: wrap;
 			position: relative;
 			justify-content: flex-start;
 			z-index: 1;
-			padding: 16px;
+			padding: 1rem;
 		}
 
 		&__source {
@@ -53,7 +53,7 @@
 				position: absolute;
 				top: 0;
 				right: 0;
-				padding: 8px;
+				padding: 0.5rem;
 				display: flex;
 				justify-content: flex-end;
 

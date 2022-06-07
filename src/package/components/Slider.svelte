@@ -15,7 +15,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: 8px;
+		gap: 0.5rem;
 
 		.slider-input {
 			-webkit-appearance: none;
@@ -35,7 +35,7 @@
 				-webkit-appearance: none;
 				appearance: none;
 				width: 0.5rem;
-				height: 1.25rem;
+				height: 0.5rem;
 				border-radius: var(--rounded-sm);
 				background-color: var(--color-brand);
 

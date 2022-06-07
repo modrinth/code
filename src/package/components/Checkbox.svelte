@@ -25,16 +25,16 @@
 
 		display: inline-flex;
 		align-items: center;
-		grid-gap: 0.5rem;
+		gap: 0.5rem;
 
 		&__label {
 			display: flex;
 			align-items: center;
-			gap: 8px;
+			gap: 0.5rem;
 
 			> :global(.icon) {
-				width: 1.1rem;
-				margin-right: -0.1rem;
+				width: 1var (--unit-3);
+				margin-right: -0var (--unit-3);
 			}
 
 			&__box {

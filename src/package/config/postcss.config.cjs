@@ -2,10 +2,10 @@ const config = {
 	plugins: [
 		require('postcss-import-ext-glob'),
 		require('postcss-import'),
-		require('postcss-strip-inline-comments'),
 		require('postcss-extend-rule'),
 		require('postcss-nested'),
 		require('postcss-preset-env')({
+			stage: 1,
 			features: {
 				'custom-media-queries': {
 					importFrom: [
@@ -22,10 +22,16 @@ const config = {
 			},
 		}),
 		require('postcss-pxtorem'),
-		require('autoprefixer'),
 		process.env.NODE_ENV === 'development' &&
 			require('cssnano')({
-				preset: 'default',
+				preset: [
+					'default',
+					{
+						discardComments: {
+							removeAll: true,
+						},
+					},
+				],
 			}),
 	],
 }

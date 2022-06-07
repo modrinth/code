@@ -40,7 +40,7 @@
 		&.wrap {
 			flex-direction: row;
 			flex-wrap: wrap;
-			grid-gap: 2rem;
+			gap: 2rem;
 		}
 	}
 </style>

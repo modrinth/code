@@ -40,10 +40,10 @@
 <style lang="postcss">
 	.header {
 		display: flex;
-		grid-gap: 10px;
+		gap: 0.5rem;
 		align-items: center;
 		flex-wrap: wrap;
-		padding: 16px 24px;
+		padding: 1rem 1.5rem;
 		position: fixed;
 		left: 0;
 		right: 0;
@@ -58,12 +58,12 @@
 		}
 
 		@media (--sm) {
-			padding: 10px 32px;
+			padding: 12px 2rem;
 		}
 
 		:global(&__logo) {
-			max-width: 32px;
-			min-width: 32px;
+			max-width: 2rem;
+			min-width: 2rem;
 			aspect-ratio: 1 / 1;
 		}
 
@@ -74,7 +74,7 @@
 
 		&__links {
 			margin-left: auto;
-			grid-gap: 16px;
+			gap: 1rem;
 			align-items: center;
 			justify-content: center;
 			display: flex;
@@ -104,7 +104,7 @@
 
 	.spacer-dot {
 		background-color: hsla(0, 0%, 0%, 0.2);
-		border-radius: 999px;
+		border-radius: var(--rounded-max);
 		width: 5px;
 		aspect-ratio: 1 / 1;
 	}

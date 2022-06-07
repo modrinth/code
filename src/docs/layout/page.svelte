@@ -2,6 +2,7 @@
 	import IconPencil from 'virtual:icons/heroicons-outline/pencil'
 	import { page } from '$app/stores'
 	import COMPONENT_API from '../../generated/COMPONENT_API.json'
+	import { markdownInline } from 'omorphia/utils'
 
 	export let fileName = $page.url.pathname
 		.substring($page.url.pathname.lastIndexOf('/') + 1)
@@ -57,9 +58,10 @@
 							<td><code>{prop.name}</code></td>
 							<td><code>{prop.type ?? ''}</code></td>
 							<td><code>{prop.value ?? ''}</code></td>
-							<td
-								>{prop.constant ? '[Read only] ' : ''}{prop.description?.replace('null', '') ||
-									''}</td>
+							<td>
+								{prop.constant ? '[Read only] ' : ''}
+								{@html markdownInline(prop.description?.replace('null', '') || '')}
+							</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -112,13 +114,13 @@
 	.edit-link {
 		display: flex;
 		align-items: center;
-		grid-gap: 8px;
+		gap: 0.5rem;
 		margin-bottom: 54px;
 		color: var(--accent-color);
 	}
 
 	.extra-info {
-		margin-top: 64px;
+		margin-top: 4rem;
 	}
 
 	.api-table {

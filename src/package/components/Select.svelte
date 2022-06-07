@@ -1,5 +1,6 @@
 <script lang="ts">
 	import IconChevronDown from 'virtual:icons/lucide/chevron-down'
+	import IconCheck from 'virtual:icons/heroicons-outline/check'
 	import { debounce } from 'throttle-debounce'
 	import { clickOutside } from 'svelte-use-click-outside'
 	import { onMount } from 'svelte'
@@ -11,12 +12,20 @@
 
 	export let options: Option[] = []
 	export let value: string | number
-	export let selected: Option = options.find((option) => option.value === (value || ''))
+	export let selected: Option
 	export let color = ''
 	export let label = ''
 	export let icon = null
 
 	let open = false
+
+	$: if (options) {
+		setSelected()
+	}
+
+	function setSelected() {
+		selected = options.find((option) => option.value === (value || ''))
+	}
 
 	$: if (selected) {
 		value = selected.value
@@ -88,14 +97,14 @@
 
 <div
 	class="select select--color-{color}"
-	class:is-open={open}
-	class:select--opens-up={shouldOpenUp}
+	class:select--opens-up={false}
 	use:clickOutside={() => {
 		open = false
 	}}
 	bind:this={element}
 	tabindex="0"
-	on:keydown={keydown}>
+	on:keydown={keydown}
+	on:click>
 	<div
 		class="select__input"
 		on:click={() => {
@@ -104,18 +113,17 @@
 		{#if icon}
 			<svelte:component this={icon} />
 		{/if}
-		<span class="select__input__value" style:min-width="{minWidth}px"
-			>{label || selected?.label || value || 'Choose...'}</span>
-		{#if !icon}
-			<div class="select__input__arrow">
-				<slot name="expandIcon">
-					<IconChevronDown />
-				</slot>
-			</div>
-		{/if}
+		<span class="select__input__value" style:min-width="{minWidth + 16 + 8}px">
+			{label || selected?.label || value || 'Choose...'}
+		</span>
+		<div class="select__input__arrow">
+			<slot name="expandIcon">
+				<IconChevronDown />
+			</slot>
+		</div>
 	</div>
 	{#if open}
-		<ul class="select__options">
+		<ul class="select__options" style:--selected-index={options.indexOf(selected)}>
 			{#each options as option (option.value)}
 				<li
 					on:click={() => {
@@ -124,6 +132,9 @@
 					}}
 					class:is-selected={selected?.value === option.value}>
 					{option.label || option.value}
+					{#if selected?.value === option.value}
+						<IconCheck />
+					{/if}
 				</li>
 			{/each}
 		</ul>
@@ -145,8 +156,8 @@
 			width: 100%;
 			justify-content: space-between;
 			align-items: center;
-			padding: 0.25rem 0.9rem;
-			grid-gap: 0.4rem;
+			padding: 0.25rem 1rem;
+			gap: 0.5rem;
 			background-color: var(--color-button-bg);
 			box-shadow: var(--shadow-inset-sm);
 			border-radius: var(--rounded);
@@ -160,38 +171,32 @@
 			padding: 0;
 			margin: 0;
 			position: absolute;
-			top: 100%;
+			top: calc(100% * -1 * var(--selected-index));
 			background-color: var(--color-button-bg);
-			border-radius: var(--rounded-bottom);
+			border-radius: var(--rounded);
 			box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+			border: var(--border-width) solid var(--color-tertiary);
 			overflow: hidden;
-			border-top: 0.1rem solid var(--color-divider);
 			z-index: 5;
 
 			li {
 				padding: 0.25rem 1rem;
 
 				&:hover {
-					background-color: var(--color-button-bg-hover);
+					background-color: var(--color-brand-dark);
+					color: var(--color-brand-dark-contrast);
 				}
 
 				&.is-selected {
-					background-color: var(--color-brand-dark);
-					color: var(--color-brand-contrast);
+					background-color: var(--color-brand-light);
+					color: var(--color-text);
 					cursor: default;
-				}
-			}
-		}
+					display: flex;
+					align-items: center;
+					gap: 0.5rem;
 
-		&.is-open {
-			z-index: 10;
-
-			.select__input {
-				border-radius: var(--rounded-top);
-				box-shadow: none;
-
-				&__arrow {
-					transform: rotate(180deg);
+					:global(.icon) {
+					}
 				}
 			}
 		}
@@ -209,11 +214,7 @@
 				border-radius: var(--rounded-top);
 				box-shadow: none;
 				border-top: none;
-				border-bottom: 0.1rem solid var(--color-divider);
-			}
-
-			&.is-open .select__input {
-				border-radius: var(--rounded-bottom);
+				border-bottom: var(--border-width) solid var(--color-divider);
 			}
 		}
 	}

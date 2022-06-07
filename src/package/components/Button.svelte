@@ -61,11 +61,14 @@
 		display: flex;
 		justify-content: flex-start;
 		align-items: center;
-		padding: 0.25rem 1rem;
-		grid-gap: 14px;
+		justify-content: center;
+		padding: 0.5rem 1rem;
+		min-width: 2rem;
+		gap: 0.5rem;
 		cursor: pointer;
 		position: relative;
 		white-space: nowrap;
+		line-height: 100%;
 
 		color: var(--color-bg-contrast);
 
@@ -73,15 +76,21 @@
 		background-color: var(--color-button-bg);
 
 		border-radius: var(--rounded);
-		transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out;
+		transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out;
 
 		&:hover {
 			filter: brightness(0.85);
 		}
 
+		&:active {
+			transform: scale(0.95);
+			filter: brightness(0.8);
+		}
+
 		&--color {
 			&-raised {
 				background-color: var(--color-raised-bg);
+				box-shadow: var(--shadow-inset-sm), var(--shadow-raised);
 			}
 
 			&-primary {
@@ -145,11 +154,6 @@
 			position: absolute;
 			top: 0.5rem;
 			right: 0.5rem;
-		}
-
-		/* Only child doesn't work as intended because text is passed through as `innerText` */
-		:global(.icon:only-child) {
-			margin: 4px -7px;
 		}
 	}
 </style>

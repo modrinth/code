@@ -1,5 +1,5 @@
 import { fetch } from 'undici'
-import { promises as fs, createWriteStream } from 'fs'
+import { createWriteStream } from 'fs'
 import cliProgress from 'cli-progress'
 import Jimp from 'jimp'
 import { getAverageColor } from 'fast-average-color-node'

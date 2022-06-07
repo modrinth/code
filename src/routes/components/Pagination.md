@@ -5,5 +5,5 @@ Use pagination to show a set of page numbers and navigation directions to move t
 	import { Pagination } from 'omorphia'
 </script>
 
-<Pagination page={20} count={50} />
+<Pagination page={20} count={500} />
 ```

@@ -13,8 +13,8 @@
 		font-weight: var(--font-weight-bold);
 		display: inline;
 		position: relative;
-		padding-left: 0.9rem;
-		line-height: 1rem;
+		padding-left: 1rem;
+		line-height: 1em;
 
 		&--color-green {
 			color: var(--color-badge-green-text);
@@ -40,7 +40,7 @@
 			content: '';
 			display: inline-block;
 			width: 0.5rem;
-			height: 0.5rem;
+			aspect-ratio: 1 / 1;
 			border-radius: 50%;
 			background-color: var(--color-dot);
 			position: absolute;

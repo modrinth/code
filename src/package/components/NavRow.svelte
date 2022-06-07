@@ -7,6 +7,7 @@
 	}
 
 	export let links: Link[]
+	/** Query param name to use (to not use queries, leave this prop blank) */
 	export let query = ''
 
 	export let resetScroll = false
@@ -52,7 +53,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		grid-gap: 1rem;
+		gap: 1rem;
 		flex-wrap: wrap;
 
 		&__link {
@@ -67,10 +68,10 @@
 					content: '';
 					display: block;
 					position: absolute;
-					bottom: -0.1rem;
+					bottom: -0var (--unit-3);
 					width: 100%;
 					border-radius: var(--rounded-max);
-					height: 0.2rem;
+					height: 0.25rem;
 					background-color: var(--color-brand);
 				}
 			}

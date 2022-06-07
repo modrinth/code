@@ -10,8 +10,8 @@
 		{ value: '', label: 'Relevance' },
 		{ value: 'downloads', label: 'Downloads' },
 		{ value: 'follows', label: 'Followers' },
-		{ value: 'newest', label: 'Recently' },
-		{ value: 'updated', label: 'Recently updated really fast whoot' },
+		{ value: 'newest', label: 'Recently created' },
+		{ value: 'updated', label: 'Recently updated' },
 	]}
 	bind:value={sortMethod} />
 ```

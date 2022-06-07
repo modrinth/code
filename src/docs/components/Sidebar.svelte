@@ -25,7 +25,7 @@
 			<a href="/" class="section__link">Introduction</a>
 			<a href="/getting-started/configure" class="section__link">Configure</a>
 			<a href="/getting-started/icons" class="section__link">Using Icons</a>
-			<!-- <a href="/getting-started/css" class="section__link">Writing CSS</a> -->
+			<a href="/getting-started/css" class="section__link">Writing CSS</a>
 			<a href="/getting-started/illustrations" class="section__link">Illustrations</a>
 			<a href="/getting-started/utils" class="section__link">Built-in utilities</a>
 			<a href="/getting-started/generator" class="section__link">Generator plugin</a>
@@ -77,18 +77,18 @@
 
 		&__content {
 			mask-image: linear-gradient(to bottom, transparent, hsla(0, 0%, 0%, 1) 5% 95%, transparent);
-			padding: 88px 32px 32px;
+			padding: 88px 2rem 2rem;
 			height: 100vh;
 			max-height: 100vh;
 			overflow-y: auto;
-			grid-gap: 40px;
+			gap: 2.5rem;
 			display: flex;
 			flex-direction: column;
 
 			.section {
 				display: flex;
 				flex-direction: column;
-				grid-gap: 0.5rem;
+				gap: 0.5rem;
 
 				&__title {
 					text-transform: uppercase;
@@ -109,9 +109,9 @@
 
 		&__toggle {
 			position: fixed;
-			left: 16px;
-			bottom: 16px;
-			padding: 8px;
+			left: 1rem;
+			bottom: 1rem;
+			padding: 0.5rem;
 			aspect-ratio: 1 / 1;
 			background-color: var(--accent-color);
 			z-index: 20;
@@ -121,7 +121,7 @@
 			transition: left 0.2s cubic-bezier(0.38, 0.52, 0.37, 1.27);
 
 			:global(.icon) {
-				width: 32px;
+				width: 2rem;
 				height: auto;
 			}
 
@@ -134,14 +134,14 @@
 			left: 0;
 
 			.sidebar__toggle {
-				left: calc(32px + min(70vw, var(--sidebar-width)));
+				left: calc(2rem + min(70vw, var(--sidebar-width)));
 			}
 		}
 
 		scrollbar-color: var(--scrollbar-thumb-color) var(--sidebar-color);
 
 		&::-webkit-scrollbar {
-			width: 14px;
+			width: 1rem;
 		}
 
 		&::-webkit-scrollbar-track {
@@ -150,7 +150,7 @@
 
 		&::-webkit-scrollbar-thumb {
 			background-color: var(--scrollbar-thumb-color);
-			border-radius: 999px;
+			border-radius: var(--rounded-max);
 			border: 3px solid var(--sidebar-color);
 		}
 	}

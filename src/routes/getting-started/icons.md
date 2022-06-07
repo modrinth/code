@@ -16,12 +16,12 @@ Import an icon in the `<script>` tag of your component.
 
 Then use the icon as if it were a Svelte component:
 
-> The `height` and `width` props are optional, and take CSS compatible values
+> You can style the icon with the `.icon` class. Note, you will have to use the `:global(.icon)` selector in Svelte components.
 
 ```svelte example
 <script lang="ts">
 	import IconHeart from 'virtual:icons/heroicons-outline/heart'
 </script>
 
-<p>That's lovely <IconHeart height="14px" />!</p>
+<p>That's lovely! <IconHeart /></p>
 ```

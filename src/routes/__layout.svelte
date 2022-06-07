@@ -50,12 +50,12 @@
 
 			article {
 				max-width: 800px;
-				padding-block: 140px 64px;
+				padding-block: 9rem 4rem;
 				padding-inline: 24px;
 
 				@media (--sm) {
 					padding-inline: 48px;
-					padding-block: 140px 24px;
+					padding-block: 9rem 24px;
 				}
 			}
 		}

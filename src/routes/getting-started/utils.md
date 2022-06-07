@@ -12,13 +12,14 @@ The `markdown` parser is designed for bodies of markdown text and supports image
 
 > Use the `.markdown` class on the element containing your parsed markdown.
 
-```svelte example
+````svelte example
 <script lang="ts">
 	import { markdown } from 'omorphia/utils'
 
 	const source =
 		'## Example markdown \n\
   This is **some** *text*! \n\
+  `console.log("test")` \n\
   #### An image \n\
   <img src="https://cdn.modrinth.com/data/YL57xq9U/images/d382106b9a2b943d06107c31c139c77849f1a0e8.png" />'
 </script>
@@ -26,7 +27,10 @@ The `markdown` parser is designed for bodies of markdown text and supports image
 <div class="card markdown">
 	{@html markdown(source)}
 </div>
-```
+<div class="card markdown">
+	{@html markdown('test\n```js\nconsole.log("test")\n```')}
+</div>
+````
 
 ### Inline parser
 
