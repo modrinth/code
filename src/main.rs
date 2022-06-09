@@ -253,9 +253,8 @@ async fn main() -> std::io::Result<()> {
                     })
                     .with_interval(std::time::Duration::from_secs(60))
                     .with_max_requests(300)
-                    .with_ignore_ips(
-                        parse_strings_from_var("RATE_LIMIT_IGNORE_IPS")
-                            .unwrap_or_default(),
+                    .with_ignore_key(
+                        dotenv::var("RATE_LIMIT_IGNORE_KEY").ok(),
                     ),
             )
             .app_data(web::Data::new(pool.clone()))
@@ -292,11 +291,6 @@ fn check_env_vars() -> bool {
         check
     }
 
-    if parse_strings_from_var("RATE_LIMIT_IGNORE_IPS").is_none() {
-        warn!("Variable `RATE_LIMIT_IGNORE_IPS` missing in dotenv or not a json array of strings");
-        failed |= true;
-    }
-
     if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
         warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
         failed |= true;
@@ -305,6 +299,7 @@ fn check_env_vars() -> bool {
     failed |= check_var::<String>("SITE_URL");
     failed |= check_var::<String>("CDN_URL");
     failed |= check_var::<String>("LABRINTH_ADMIN_KEY");
+    failed |= check_var::<String>("RATE_LIMIT_IGNORE_KEY");
     failed |= check_var::<String>("DATABASE_URL");
     failed |= check_var::<String>("MEILISEARCH_ADDR");
     failed |= check_var::<String>("MEILISEARCH_KEY");

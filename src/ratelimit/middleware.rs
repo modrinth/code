@@ -30,7 +30,7 @@ where
     max_requests: usize,
     store: Addr<T>,
     identifier: RateLimiterIdentifier,
-    ignore_ips: Vec<String>,
+    ignore_key: Option<String>,
 }
 
 impl<T> RateLimiter<T>
@@ -51,7 +51,7 @@ where
             max_requests: 0,
             store,
             identifier: Rc::new(Box::new(identifier)),
-            ignore_ips: Vec::new(),
+            ignore_key: None
         }
     }
 
@@ -67,9 +67,9 @@ where
         self
     }
 
-    /// Sets IPs that should be ignored by the ratelimiter
-    pub fn with_ignore_ips(mut self, ignore_ips: Vec<String>) -> Self {
-        self.ignore_ips = ignore_ips;
+    /// Sets key which can be used to bypass rate-limiter
+    pub fn with_ignore_key(mut self, ignore_key: Option<String>) -> Self {
+        self.ignore_key = ignore_key;
         self
     }
 
@@ -107,7 +107,7 @@ where
             max_requests: self.max_requests,
             interval: self.interval.as_secs(),
             identifier: self.identifier.clone(),
-            ignore_ips: self.ignore_ips.clone(),
+            ignore_key: self.ignore_key.clone(),
         })
     }
 }
@@ -124,7 +124,7 @@ where
     max_requests: usize,
     interval: u64,
     identifier: RateLimiterIdentifier,
-    ignore_ips: Vec<String>,
+    ignore_key: Option<String>,
 }
 
 impl<T, S, B> Service<ServiceRequest> for RateLimitMiddleware<S, T>
@@ -154,14 +154,20 @@ where
         let max_requests = self.max_requests;
         let interval = Duration::from_secs(self.interval);
         let identifier = self.identifier.clone();
-        let ignore_ips = self.ignore_ips.clone();
+        let ignore_key = self.ignore_key.clone();
         Box::pin(async move {
             let identifier: String = (identifier)(&req)?;
-            if ignore_ips.contains(&identifier) {
-                let fut = srv.call(req);
-                let res = fut.await?;
-                return Ok(res);
+
+            if let Some(ignore_key) = ignore_key {
+                if let Some(key) = req.headers().get("x-ratelimit-key") {
+                    if key.to_str().ok().unwrap_or_default() == &*ignore_key {
+                        let fut = srv.call(req);
+                        let res = fut.await?;
+                        return Ok(res);
+                    }
+                }
             }
+
             let remaining: ActorResponse = store
                 .send(ActorMessage::Get(String::from(&identifier)))
                 .await
