@@ -295,6 +295,11 @@ export default {
   privateRuntimeConfig: {
     axios: {
       baseURL: process.env.BASE_URL,
+      headers: {
+        common: {
+          'x-ratelimit-key': process.env.RATE_LIMIT_IGNORE_KEY,
+        },
+      },
     },
   },
 }
