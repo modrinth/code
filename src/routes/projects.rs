@@ -39,7 +39,7 @@ pub async fn projects_get(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let project_ids =
-        serde_json::from_str::<Vec<models::ids::ProjectId>>(&*ids.ids)?
+        serde_json::from_str::<Vec<ProjectId>>(&*ids.ids)?
             .into_iter()
             .map(|x| x.into())
             .collect();
