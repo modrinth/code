@@ -133,7 +133,7 @@ pub struct LicenseId(pub i32);
 #[sqlx(transparent)]
 pub struct DonationPlatformId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq)]
+#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash)]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]

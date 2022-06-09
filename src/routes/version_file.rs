@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
 #[derive(Deserialize)]
 pub struct Algorithm {
@@ -428,9 +429,10 @@ pub async fn update_files(
         .fetch_all(&mut *transaction)
         .await?;
 
-    let mut version_ids = Vec::new();
+    let version_ids: RwLock<HashMap<database::models::VersionId, Vec<u8>>> =
+        RwLock::new(HashMap::new());
 
-    for row in &result {
+    futures::future::try_join_all(result.into_iter().map(|row| async {
         let updated_versions = database::models::Version::get_project_versions(
             database::models::ProjectId(row.project_id),
             Some(
@@ -454,28 +456,40 @@ pub async fn update_files(
         .await?;
 
         if let Some(latest_version) = updated_versions.last() {
-            version_ids.push(*latest_version);
-        }
-    }
+            let mut version_ids = version_ids.write().await;
 
-    let versions =
-        database::models::Version::get_many_full(version_ids, &**pool).await?;
+            version_ids.insert(*latest_version, row.hash);
+        }
+
+        Ok::<(), ApiError>(())
+    }))
+    .await?;
+
+    let version_ids = version_ids.into_inner();
+
+    let versions = database::models::Version::get_many_full(
+        version_ids.keys().copied().collect(),
+        &**pool,
+    )
+    .await?;
 
     let mut response = HashMap::new();
 
-    for row in &result {
-        if let Some(version) =
-            versions.iter().find(|x| x.id.0 == row.version_id)
-        {
-            if let Ok(parsed_hash) = String::from_utf8(row.hash.clone()) {
+    for version in versions {
+        let hash = version_ids.get(&version.id);
+
+        if let Some(hash) = hash {
+            if let Ok(parsed_hash) = String::from_utf8(hash.clone()) {
                 response.insert(
                     parsed_hash,
-                    models::projects::Version::from(version.clone()),
+                    models::projects::Version::from(version),
                 );
             } else {
+                let version_id: models::projects::VersionId = version.id.into();
+
                 return Err(ApiError::Database(DatabaseError::Other(format!(
                     "Could not parse hash for version {}",
-                    row.version_id
+                    version_id
                 ))));
             }
         }
