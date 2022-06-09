@@ -733,7 +733,7 @@ impl Version {
                                         Err(_) => None,
                                     },
                                 },
-                                file_name: if dependency[2] == " " { None } else { Some(dependency[4].to_string())},
+                                file_name: if dependency[2] == " " { None } else { Some(dependency[2].to_string())},
                                 dependency_type: dependency[3].to_string(),
                             })
                         } else {
@@ -859,7 +859,7 @@ impl Version {
                                                 Err(_) => None,
                                             },
                                         },
-                                        file_name: if dependency[2] == " " { None } else { Some(dependency[4].to_string())},
+                                        file_name: if dependency[2] == " " { None } else { Some(dependency[2].to_string())},
                                         dependency_type: dependency[3].to_string(),
                                     })
                                 } else {
