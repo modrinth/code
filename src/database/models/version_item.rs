@@ -616,9 +616,9 @@ impl Version {
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured,
             STRING_AGG(DISTINCT gv.version, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,
-            STRING_AGG(DISTINCT f.id || ' |||| ' || f.filename || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url, ' ~~~~ ') files,
+            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,
             STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,
-            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || COALESCE(d.dependency_file_name, ' ') || ' |||| ' || d.dependency_type,  ' ~~~~ ') dependencies
+            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -679,17 +679,18 @@ impl Version {
 
                             for hash in &hashes {
                                 if (hash.0).0 == file_id.0 {
-                                    file_hashes.insert(hash.1.clone(), hash.2.clone());
+                                    file_hashes
+                                        .insert(hash.1.clone(), hash.2.clone());
                                 }
                             }
 
                             Some(QueryFile {
                                 id: file_id,
-                                url: file[4].to_string(),
-                                filename: file[1].to_string(),
+                                url: file[3].to_string(),
+                                filename: file[4].to_string(),
                                 hashes: file_hashes,
-                                primary: file[2].parse().unwrap_or(false),
-                                size: file[3].parse().unwrap_or(0)
+                                primary: file[1].parse().unwrap_or(false),
+                                size: file[2].parse().unwrap_or(0),
                             })
                         } else {
                             None
@@ -733,8 +734,12 @@ impl Version {
                                         Err(_) => None,
                                     },
                                 },
-                                file_name: if dependency[2] == " " { None } else { Some(dependency[2].to_string())},
-                                dependency_type: dependency[3].to_string(),
+                                file_name: if dependency[3] == " " {
+                                    None
+                                } else {
+                                    Some(dependency[3].to_string())
+                                },
+                                dependency_type: dependency[2].to_string(),
                             })
                         } else {
                             None
@@ -758,16 +763,17 @@ impl Version {
     {
         use futures::stream::TryStreamExt;
 
-        let version_ids_parsed: Vec<i64> = version_ids.into_iter().map(|x| x.0).collect();
+        let version_ids_parsed: Vec<i64> =
+            version_ids.into_iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured,
             STRING_AGG(DISTINCT gv.version, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,
-            STRING_AGG(DISTINCT f.id || ' |||| ' || f.filename || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url, ' ~~~~ ') files,
+            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,
             STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,
-            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || COALESCE(d.dependency_file_name, ' ') || ' |||| ' || d.dependency_type,  ' ~~~~ ') dependencies
+            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -824,11 +830,11 @@ impl Version {
 
                                 Some(QueryFile {
                                     id: file_id,
-                                    url: file[4].to_string(),
-                                    filename: file[1].to_string(),
+                                    url: file[3].to_string(),
+                                    filename: file[4].to_string(),
                                     hashes: file_hashes,
-                                    primary: file[2].parse().unwrap_or(false),
-                                    size: file[3].parse().unwrap_or(0)
+                                    primary: file[1].parse().unwrap_or(false),
+                                    size: file[2].parse().unwrap_or(0),
                                 })
                             } else {
                                 None
@@ -859,8 +865,12 @@ impl Version {
                                                 Err(_) => None,
                                             },
                                         },
-                                        file_name: if dependency[2] == " " { None } else { Some(dependency[2].to_string())},
-                                        dependency_type: dependency[3].to_string(),
+                                        file_name: if dependency[3] == " " {
+                                            None
+                                        } else {
+                                            Some(dependency[3].to_string())
+                                        },
+                                        dependency_type: dependency[2].to_string(),
                                     })
                                 } else {
                                     None

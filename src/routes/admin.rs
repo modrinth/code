@@ -1,9 +1,11 @@
 use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
 use crate::util::guards::admin_key_guard;
+use crate::DownloadQueue;
 use actix_web::{patch, web, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
+use std::sync::Arc;
 
 #[derive(Deserialize)]
 pub struct DownloadBody {
@@ -17,6 +19,7 @@ pub struct DownloadBody {
 pub async fn count_download(
     pool: web::Data<PgPool>,
     download_body: web::Json<DownloadBody>,
+    download_queue: web::Data<Arc<DownloadQueue>>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id: crate::database::models::ids::ProjectId =
         download_body.hash.into();
@@ -49,27 +52,12 @@ pub async fn count_download(
         ));
     };
 
-    let mut transaction = pool.begin().await?;
-
-    sqlx::query!(
-        "UPDATE versions
-         SET downloads = downloads + 1
-         WHERE (id = $1)",
-        version_id
-    )
-    .execute(&mut *transaction)
-    .await?;
-
-    sqlx::query!(
-        "UPDATE mods
-         SET downloads = downloads + 1
-         WHERE (id = $1)",
-        project_id
-    )
-    .execute(&mut *transaction)
-    .await?;
-
-    transaction.commit().await?;
+    download_queue
+        .add(
+            crate::database::models::ProjectId(project_id),
+            crate::database::models::VersionId(version_id),
+        )
+        .await;
 
     Ok(HttpResponse::Ok().body(""))
 }

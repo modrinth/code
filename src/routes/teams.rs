@@ -20,7 +20,7 @@ pub async fn team_members_get_project(
     let string = info.into_inner().0;
     let project_data =
         crate::database::models::Project::get_from_slug_or_project_id(
-            string, &**pool,
+            &string, &**pool,
         )
         .await?;
 

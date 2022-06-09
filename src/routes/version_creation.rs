@@ -756,12 +756,14 @@ pub async fn upload_file(
             }
 
             for file in files {
-                dependencies.push(DependencyBuilder {
-                    project_id: None,
-                    version_id: None,
-                    file_name: Some(file.to_string()),
-                    dependency_type: DependencyType::Required.to_string(),
-                });
+                if !file.is_empty() {
+                    dependencies.push(DependencyBuilder {
+                        project_id: None,
+                        version_id: None,
+                        file_name: Some(file.to_string()),
+                        dependency_type: DependencyType::Required.to_string(),
+                    });
+                }
             }
         }
     }

@@ -169,8 +169,8 @@ pub struct Project {
     pub description: String,
     pub body: String,
     pub body_url: Option<String>,
-    pub published: time::OffsetDateTime,
-    pub updated: time::OffsetDateTime,
+    pub published: OffsetDateTime,
+    pub updated: OffsetDateTime,
     pub status: StatusId,
     pub downloads: i32,
     pub follows: i32,
@@ -537,30 +537,29 @@ impl Project {
     }
 
     pub async fn get_from_slug_or_project_id<'a, 'b, E>(
-        slug_or_project_id: String,
+        slug_or_project_id: &str,
         executor: E,
     ) -> Result<Option<Project>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option = crate::models::ids::base62_impl::parse_base62(
-            &*slug_or_project_id.clone(),
-        )
-        .ok();
+        let id_option =
+            crate::models::ids::base62_impl::parse_base62(slug_or_project_id)
+                .ok();
 
         if let Some(id) = id_option {
             let mut project =
                 Project::get(ProjectId(id as i64), executor).await?;
 
             if project.is_none() {
-                project = Project::get_from_slug(&slug_or_project_id, executor)
+                project = Project::get_from_slug(slug_or_project_id, executor)
                     .await?;
             }
 
             Ok(project)
         } else {
             let project =
-                Project::get_from_slug(&slug_or_project_id, executor).await?;
+                Project::get_from_slug(slug_or_project_id, executor).await?;
 
             Ok(project)
         }
@@ -612,8 +611,8 @@ impl Project {
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
             STRING_AGG(DISTINCT c.category, ' ~~~~ ') categories, STRING_AGG(DISTINCT v.id::text, ' ~~~~ ') versions,
-            STRING_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ') || ' |||| ' || mg.created, ' ~~~~ ') gallery,
-            STRING_AGG(DISTINCT md.joining_platform_id || ' |||| ' || md.url || ' |||| ' || dp.short || ' |||| ' || dp.name, ' ~~~~ ') donations
+            STRING_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' '), ' ~~~~ ') gallery,
+            STRING_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url, ' ~~~~ ') donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
@@ -685,10 +684,12 @@ impl Project {
                         if strings.len() >= 3 {
                             Some(DonationUrl {
                                 project_id: id,
-                                platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                                platform_short: strings[2].to_string(),
-                                platform_name: strings[3].to_string(),
-                                url: strings[1].to_string(),
+                                platform_id: DonationPlatformId(
+                                    strings[0].parse().unwrap_or(0),
+                                ),
+                                platform_short: strings[1].to_string(),
+                                platform_name: strings[2].to_string(),
+                                url: strings[3].to_string(),
                             })
                         } else {
                             None
@@ -708,17 +709,21 @@ impl Project {
                                 project_id: id,
                                 image_url: strings[0].to_string(),
                                 featured: strings[1].parse().unwrap_or(false),
-                                title: if strings[2] == " " {
-                                    None
-                                } else {
-                                    Some(strings[2].to_string())
-                                },
-                                description: if strings[3] == " " {
+                                title: if strings[3] == " " {
                                     None
                                 } else {
                                     Some(strings[3].to_string())
                                 },
-                                created: OffsetDateTime::parse(strings[4], time::Format::Rfc3339).unwrap_or_else(|_| OffsetDateTime::now_utc())
+                                description: if strings[4] == " " {
+                                    None
+                                } else {
+                                    Some(strings[4].to_string())
+                                },
+                                created: OffsetDateTime::parse(
+                                    strings[2],
+                                    time::Format::Rfc3339,
+                                )
+                                .unwrap_or_else(|_| OffsetDateTime::now_utc()),
                             })
                         } else {
                             None
@@ -726,11 +731,17 @@ impl Project {
                     })
                     .flatten()
                     .collect(),
-                status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
+                status: crate::models::projects::ProjectStatus::from_str(
+                    &m.status_name,
+                ),
                 license_id: m.short,
                 license_name: m.license_name,
-                client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
-                server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
+                client_side: crate::models::projects::SideType::from_str(
+                    &m.client_side_type,
+                ),
+                server_side: crate::models::projects::SideType::from_str(
+                    &m.server_side_type,
+                ),
             }))
         } else {
             Ok(None)
@@ -746,7 +757,8 @@ impl Project {
     {
         use futures::TryStreamExt;
 
-        let project_ids_parsed: Vec<i64> = project_ids.into_iter().map(|x| x.0).collect();
+        let project_ids_parsed: Vec<i64> =
+            project_ids.into_iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
@@ -756,8 +768,8 @@ impl Project {
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
             STRING_AGG(DISTINCT c.category, ' ~~~~ ') categories, STRING_AGG(DISTINCT v.id::text, ' ~~~~ ') versions,
-            STRING_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ') || ' |||| ' || mg.created, ' ~~~~ ') gallery,
-            STRING_AGG(DISTINCT md.joining_platform_id || ' |||| ' || md.url || ' |||| ' || dp.short || ' |||| ' || dp.name, ' ~~~~ ') donations
+            STRING_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' '), ' ~~~~ ') gallery,
+            STRING_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url, ' ~~~~ ') donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
@@ -821,9 +833,9 @@ impl Project {
                                         project_id: ProjectId(id),
                                         image_url: strings[0].to_string(),
                                         featured: strings[1].parse().unwrap_or(false),
-                                        title: if strings[2] == " " { None } else { Some(strings[2].to_string()) },
-                                        description: if strings[3] == " " { None } else { Some(strings[3].to_string()) },
-                                        created: OffsetDateTime::parse(strings[4], time::Format::Rfc3339).unwrap_or_else(|_| OffsetDateTime::now_utc())
+                                        title: if strings[3] == " " { None } else { Some(strings[3].to_string()) },
+                                        description: if strings[4] == " " { None } else { Some(strings[4].to_string()) },
+                                        created: OffsetDateTime::parse(strings[2], time::Format::Rfc3339).unwrap_or_else(|_| OffsetDateTime::now_utc())
                                     })
                                 } else {
                                     None
@@ -842,9 +854,9 @@ impl Project {
                                     Some(DonationUrl {
                                         project_id: ProjectId(id),
                                         platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                                        platform_short: strings[2].to_string(),
-                                        platform_name: strings[3].to_string(),
-                                        url: strings[1].to_string(),
+                                        platform_short: strings[1].to_string(),
+                                        platform_name: strings[2].to_string(),
+                                        url: strings[3].to_string(),
                                     })
                                 } else {
                                     None

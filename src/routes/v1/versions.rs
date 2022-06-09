@@ -63,9 +63,10 @@ pub async fn version_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result =
-        database::models::Project::get_from_slug_or_project_id(string, &**pool)
-            .await?;
+    let result = database::models::Project::get_from_slug_or_project_id(
+        &string, &**pool,
+    )
+    .await?;
 
     if let Some(project) = result {
         let id = project.id;
@@ -161,11 +162,10 @@ pub async fn versions_get(
     ids: web::Query<VersionIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let version_ids =
-        serde_json::from_str::<Vec<models::ids::VersionId>>(&*ids.ids)?
-            .into_iter()
-            .map(|x| x.into())
-            .collect();
+    let version_ids = serde_json::from_str::<Vec<VersionId>>(&*ids.ids)?
+        .into_iter()
+        .map(|x| x.into())
+        .collect();
     let versions_data =
         database::models::Version::get_many_full(version_ids, &**pool).await?;
 
@@ -180,7 +180,7 @@ pub async fn versions_get(
 
 #[get("{version_id}")]
 pub async fn version_get(
-    info: web::Path<(models::ids::VersionId,)>,
+    info: web::Path<(VersionId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;

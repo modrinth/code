@@ -135,7 +135,7 @@ pub async fn is_authorized(
             if user.role.is_mod() {
                 authorized = true;
             } else {
-                let user_id: database::models::ids::UserId = user.id.into();
+                let user_id: models::ids::UserId = user.id.into();
 
                 let project_exists = sqlx::query!(
                     "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",

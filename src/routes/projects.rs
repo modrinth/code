@@ -38,11 +38,10 @@ pub async fn projects_get(
     web::Query(ids): web::Query<ProjectIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let project_ids =
-        serde_json::from_str::<Vec<ProjectId>>(&*ids.ids)?
-            .into_iter()
-            .map(|x| x.into())
-            .collect();
+    let project_ids = serde_json::from_str::<Vec<ProjectId>>(&*ids.ids)?
+        .into_iter()
+        .map(|x| x.into())
+        .collect();
 
     let projects_data =
         database::models::Project::get_many_full(project_ids, &**pool).await?;
@@ -871,8 +870,7 @@ pub async fn project_icon_edit(
 
         let project_item =
             database::models::Project::get_from_slug_or_project_id(
-                string.clone(),
-                &**pool,
+                &string, &**pool,
             )
             .await?
             .ok_or_else(|| {
@@ -963,8 +961,7 @@ pub async fn delete_project_icon(
     let string = info.into_inner().0;
 
     let project_item = database::models::Project::get_from_slug_or_project_id(
-        string.clone(),
-        &**pool,
+        &string, &**pool,
     )
     .await?
     .ok_or_else(|| {
@@ -1053,8 +1050,7 @@ pub async fn add_gallery_item(
 
         let project_item =
             database::models::Project::get_from_slug_or_project_id(
-                string.clone(),
-                &**pool,
+                &string, &**pool,
             )
             .await?
             .ok_or_else(|| {
@@ -1173,8 +1169,7 @@ pub async fn edit_gallery_item(
     })?;
 
     let project_item = database::models::Project::get_from_slug_or_project_id(
-        string.clone(),
-        &**pool,
+        &string, &**pool,
     )
     .await?
     .ok_or_else(|| {
@@ -1301,8 +1296,7 @@ pub async fn delete_gallery_item(
     let string = info.into_inner().0;
 
     let project_item = database::models::Project::get_from_slug_or_project_id(
-        string.clone(),
-        &**pool,
+        &string, &**pool,
     )
     .await?
     .ok_or_else(|| {
@@ -1385,8 +1379,7 @@ pub async fn project_delete(
     let string = info.into_inner().0;
 
     let project = database::models::Project::get_from_slug_or_project_id(
-        string.clone(),
-        &**pool,
+        &string, &**pool,
     )
     .await?
     .ok_or_else(|| {
@@ -1446,14 +1439,15 @@ pub async fn project_follow(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    let result =
-        database::models::Project::get_from_slug_or_project_id(string, &**pool)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
-            })?;
+    let result = database::models::Project::get_from_slug_or_project_id(
+        &string, &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "The specified project does not exist!".to_string(),
+        )
+    })?;
 
     let user_id: database::models::ids::UserId = user.id.into();
     let project_id: database::models::ids::ProjectId = result.id;
@@ -1514,14 +1508,15 @@ pub async fn project_unfollow(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    let result =
-        database::models::Project::get_from_slug_or_project_id(string, &**pool)
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
-            })?;
+    let result = database::models::Project::get_from_slug_or_project_id(
+        &string, &**pool,
+    )
+    .await?
+    .ok_or_else(|| {
+        ApiError::InvalidInput(
+            "The specified project does not exist!".to_string(),
+        )
+    })?;
 
     let user_id: database::models::ids::UserId = user.id.into();
     let project_id = result.id;
