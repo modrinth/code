@@ -1,9 +1,8 @@
 <script lang="ts">
 	import IconChevronDown from 'virtual:icons/lucide/chevron-down'
 	import IconCheck from 'virtual:icons/heroicons-outline/check'
-	import { debounce } from 'throttle-debounce'
 	import { clickOutside } from 'svelte-use-click-outside'
-	import { onMount } from 'svelte'
+	import { fade } from 'svelte/transition'
 
 	interface Option {
 		label: string
@@ -54,43 +53,29 @@
 		...options.map((it) => getTextWidth(String(it.label || it.value), '16px Inter'))
 	)
 
-	let shouldOpenUp = false
 	let element: HTMLElement
 
-	const checkShouldOpenUp = debounce(100, false, () => {
-		if (element) {
-			const bounding = element.getBoundingClientRect()
-
-			shouldOpenUp =
-				bounding.bottom + 32 * options.length + 16 >
-				(window.innerHeight || document.documentElement.clientHeight)
-		}
-	})
-
-	onMount(() => {
-		checkShouldOpenUp()
-		window.addEventListener('resize', checkShouldOpenUp)
-	})
+	function selectOption(option: Option) {
+		selected = option
+		open = false
+		element.focus()
+	}
 
 	function keydown(event: KeyboardEvent) {
-		if ((event.key === ' ' || event.key === 'Enter') && !open) {
-			open = true
-		} else if (event.key === 'ArrowUp') {
-			if (selected) {
-				const index = options.findIndex((option) => option.value === selected.value)
-				if (index > 0) {
-					selected = options[index - 1]
-				}
+		if (event.key === ' ' || event.key === 'Enter') {
+			event.preventDefault()
+
+			if (!open) {
+				open = true
+				// Needs delay before trying to move focus
+				setTimeout(() => element.children[1].children[0].focus(), 0)
+			} else {
+				const option = options.find(
+					({ label }) => label === document.activeElement.innerHTML.trim()
+				)
+				selectOption(option)
+				open = false
 			}
-		} else if (event.key === 'ArrowDown') {
-			if (selected) {
-				const index = options.findIndex((option) => option.value === selected.value)
-				if (index < options.length - 1) {
-					selected = options[index + 1]
-				}
-			}
-		} else if ((event.key === 'Escape' || event.key === 'Enter') && open) {
-			open = false
 		}
 	}
 </script>
@@ -108,12 +93,12 @@
 	<div
 		class="select__input"
 		on:click={() => {
-			open = !open
+			open = true
 		}}>
 		{#if icon}
 			<svelte:component this={icon} />
 		{/if}
-		<span class="select__input__value" style:min-width="{minWidth + 16 + 8}px">
+		<span class="select__input__value" style:min-width="{minWidth}px">
 			{label || selected?.label || value || 'Choose...'}
 		</span>
 		<div class="select__input__arrow">
@@ -123,21 +108,23 @@
 		</div>
 	</div>
 	{#if open}
-		<ul class="select__options" style:--selected-index={options.indexOf(selected)}>
+		<div
+			transition:fade={{ duration: 70 }}
+			class="select__options"
+			style:--selected-index={options.indexOf(selected)}>
 			{#each options as option (option.value)}
-				<li
-					on:click={() => {
-						selected = option
-						open = false
-					}}
-					class:is-selected={selected?.value === option.value}>
+				{@const isSelected = selected?.value === option.value}
+				<button
+					on:click={() => selectOption(option)}
+					class:is-selected={isSelected}
+					tabindex={isSelected ? -1 : 0}>
 					{option.label || option.value}
 					{#if selected?.value === option.value}
 						<IconCheck />
 					{/if}
-				</li>
+				</button>
 			{/each}
-		</ul>
+		</div>
 	{/if}
 </div>
 
@@ -174,29 +161,29 @@
 			top: calc(100% * -1 * var(--selected-index));
 			background-color: var(--color-button-bg);
 			border-radius: var(--rounded);
-			box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-			border: var(--border-width) solid var(--color-tertiary);
+			box-shadow: var(--shadow-inset-sm), var(--shadow-floating), 0 0 0 1px var(--color-tertiary);
+			/* border: var(--border-width) solid var(--color-tertiary); */
 			overflow: hidden;
 			z-index: 5;
 
-			li {
+			button {
 				padding: 0.25rem 1rem;
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
 
-				&:hover {
+				&:hover,
+				&:focus {
 					background-color: var(--color-brand-dark);
 					color: var(--color-brand-dark-contrast);
+					outline: none;
+					border-radius: 0;
 				}
 
 				&.is-selected {
 					background-color: var(--color-brand-light);
 					color: var(--color-text);
 					cursor: default;
-					display: flex;
-					align-items: center;
-					gap: 0.5rem;
-
-					:global(.icon) {
-					}
 				}
 			}
 		}

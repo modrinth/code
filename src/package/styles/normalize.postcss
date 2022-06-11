@@ -26,18 +26,23 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 [tabindex='0']:focus-visible {
-	outline: 0.25rem solid hsla(290, 100%, 40%, 0.5);
+	outline: 0.25rem solid hsla(290, 100%, 75%, 1);
+	border-radius: 0.25rem;
+}
+
+:where(a) {
 	border-radius: 0.25rem;
 }
 
 input,
 button,
 a {
-	outline: 0.25rem solid hsla(155, 58%, 44%, 0);
+	outline: 0 solid hsla(290, 100%, 40%, 0);
 	transition: outline 0.2s ease-in-out;
 }
 
-input[type='text']:focus-visible {
+input[type='text']:focus-visible,
+input[type='textarea']:focus-visible {
 	outline: 0.25rem solid hsla(155, 58%, 44%, 0.7);
 }
 

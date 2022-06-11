@@ -39,7 +39,6 @@
 			box-shadow: var(--shadow-inset-sm);
 			background-color: var(--color-button-bg);
 			border: none;
-			padding: 0.25rem 1rem;
 			width: 100%;
 			max-width: 100%;
 
@@ -48,8 +47,13 @@
 			}
 		}
 
+		input {
+			padding: 0.25rem 1rem;
+		}
+
 		textarea {
 			min-height: 2.5rem;
+			padding: 0.5rem 1rem;
 		}
 
 		:global(.icon) {

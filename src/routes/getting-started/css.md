@@ -6,7 +6,7 @@ title: Writing CSS
 
 ### Avoid inconsistent CSS units
 
-Prefer using `rem` units, using only whole and half units, eg. `2rem` or `1.5rem`. If you need a specific pixel (`px`) measurement, use `px` and add comment explaining why you used it. The one exception is that `0.25` is allowed.
+Prefer using `rem` units, using only whole and half units, eg. `2rem` or `1.5rem`. If you need a specific pixel (`px`) measurement, use `px` and add comment explaining why you used it. The one exception is that `0.25rem` is allowed.
 
 > Using `rem` units lets you change the scale of the UI by simply changing the body font size.
 
