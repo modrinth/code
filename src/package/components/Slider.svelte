@@ -6,7 +6,7 @@
 </script>
 
 <div class="slider">
-	<input class="slider-input" type="range" name={id} {min} {max} bind:value />
+	<input class="slider__input" type="range" {id} {min} {max} bind:value />
 	<span>{value}</span>
 </div>
 
@@ -17,7 +17,7 @@
 		align-items: center;
 		gap: 0.5rem;
 
-		.slider-input {
+		&__input {
 			-webkit-appearance: none;
 			appearance: none;
 			border-radius: var(--rounded-sm);

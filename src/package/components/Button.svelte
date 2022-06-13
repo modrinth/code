@@ -1,7 +1,7 @@
 <script lang="ts">
 	// TODO: sizes
 	// TODO: icon only buttons should have uniform padding
-
+	import { createEventDispatcher } from 'svelte'
 	import { classCombine } from '../utils/classCombine'
 
 	/** The element to be styled as a button */
@@ -42,16 +42,22 @@
 		`button--color-${color}`,
 		badge && 'has-badge',
 	])
+
+	const dispatch = createEventDispatcher()
+
+	function dispatchClick() {
+		if (!disabled) dispatch('click')
+	}
 </script>
 
 {#if as === 'a'}
-	<a class={className} {href} {disabled} {title} {target} on:click>
+	<a class={className} {href} {disabled} {title} {target} on:click={dispatchClick}>
 		<slot />
 	</a>
 {:else if as === 'input'}
-	<input class={className} {value} {disabled} {title} on:click />
+	<input class={className} {value} {disabled} {title} on:click={dispatchClick} />
 {:else}
-	<svelte:element this={as} class={className} {disabled} {title} on:click>
+	<svelte:element this={as} class={className} {disabled} {title} on:click={dispatchClick}>
 		<slot />
 	</svelte:element>
 {/if}
@@ -76,13 +82,14 @@
 		background-color: var(--color-button-bg);
 
 		border-radius: var(--rounded);
-		transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out;
+		transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+			outline 0.2s ease-in-out;
 
-		&:hover:not(&--color-transparent) {
+		&:hover:not(&--color-transparent, &:disabled) {
 			filter: brightness(0.85);
 		}
 
-		&:active:not(&--color-transparent) {
+		&:active:not(&--color-transparent, &:disabled) {
 			transform: scale(0.95);
 			filter: brightness(0.8);
 		}
@@ -140,9 +147,6 @@
 			opacity: 50%;
 			cursor: not-allowed;
 			filter: grayscale(50%);
-
-			/* Not ideal, but preventing events being fired needs to be implemented */
-			pointer-events: none;
 		}
 
 		&--pad-even {

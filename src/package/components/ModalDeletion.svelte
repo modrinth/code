@@ -6,6 +6,7 @@
 	import IconExclamation from 'virtual:icons/heroicons-outline/exclamation'
 	import IconTrash from 'virtual:icons/heroicons-outline/trash'
 	import { markdown } from '../utils'
+	import Field from './Field.svelte'
 
 	export let key: string
 	export let type: 'project' | 'version' | 'account' | 'image'
@@ -22,10 +23,12 @@
 		</div>
 	{/if}
 	{@html markdown($t(`modal.deletion.${type}.description`))}
-	<span class="verify-label">{@html $t('modal.deletion.generic.verify', { values: { key } })}</span>
-	<TextInput
-		placeholder={$t('modal.deletion.generic.placeholder', { values: { key } })}
-		bind:value={keyInput} />
+	<Field label={$t('modal.deletion.generic.verify', { values: { key } })} let:id>
+		<TextInput
+			placeholder={$t('modal.deletion.generic.placeholder', { values: { key } })}
+			bind:value={keyInput}
+			{id} />
+	</Field>
 	<Button color="danger" slot="button" disabled={key !== keyInput}>
 		<IconTrash />
 		{$t(`modal.deletion.${type}.action`)}
@@ -49,13 +52,5 @@
 			height: 1.5rem;
 			width: 1.5rem;
 		}
-	}
-
-	.verify-label {
-		font-weight: var(--font-weight-bold);
-	}
-
-	:global(i) {
-		font-weight: var(--font-weight-normal);
 	}
 </style>

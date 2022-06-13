@@ -12,7 +12,7 @@ export { default as CheckboxVirtualList } from './components/CheckboxVirtualList
 
 export { default as Chips } from './components/Chips.svelte'
 
-export { default as FormField } from './components/FormField.svelte'
+export { default as Field } from './components/Field.svelte'
 
 export { default as Modal } from './components/Modal.svelte'
 

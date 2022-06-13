@@ -48,7 +48,8 @@
 		stroke-linejoin="round"
 		stroke-miterlimit="1.5"
 		clip-rule="evenodd"
-		viewBox="0 0 104 104">
+		viewBox="0 0 104 104"
+		aria-hidden="true">
 		<path fill="none" d="M0 0h103.4v103.4H0z" />
 		<path
 			fill="none"

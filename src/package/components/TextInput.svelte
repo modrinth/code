@@ -11,9 +11,9 @@
 
 <div class="text-input" class:fill>
 	{#if multiline}
-		<textarea name={id} {placeholder} bind:value />
+		<textarea {id} {placeholder} bind:value />
 	{:else}
-		<input type="text" name={id} {placeholder} bind:value class:has-icon={icon} />
+		<input type="text" {id} {placeholder} bind:value class:has-icon={icon} />
 		{#if icon}
 			<svelte:component this={icon} />
 		{/if}

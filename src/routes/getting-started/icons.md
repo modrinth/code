@@ -6,7 +6,7 @@ title: Icons
 
 The follwing icon packs are included with omorphia:
 
-`heroicons-outline` `lucide` `fa-regular` `heroicons-solid` `carbon`
+`heroicons-outline` `lucide` `fa-regular` `heroicons-solid` `carbon` `simple-icons`
 
 Aim to find icons from `heroicons-outline` first, and then from the following packs if you can't find what you are looking for. [Browse icons...](https://icones.js.org/collection/heroicons-outline)
 

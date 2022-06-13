@@ -68,7 +68,7 @@
 			if (!open) {
 				open = true
 				// Needs delay before trying to move focus
-				setTimeout(() => element.children[1].children[0].focus(), 0)
+				setTimeout(() => (element.children[1].children[0] as HTMLButtonElement).focus(), 0)
 			} else {
 				const option = options.find(
 					({ label }) => label === document.activeElement.innerHTML.trim()
@@ -112,12 +112,15 @@
 			transition:fade={{ duration: 70 }}
 			class="select__options"
 			style:--selected-index={options.indexOf(selected)}>
-			{#each options as option (option.value)}
+			{#each options as option, index (option.value)}
 				{@const isSelected = selected?.value === option.value}
 				<button
 					on:click={() => selectOption(option)}
 					class:is-selected={isSelected}
-					tabindex={isSelected ? -1 : 0}>
+					tabindex={isSelected ? -1 : 0}
+					on:focusout={() => {
+						if (index + 1 === options.length) open = false
+					}}>
 					{option.label || option.value}
 					{#if selected?.value === option.value}
 						<IconCheck />
