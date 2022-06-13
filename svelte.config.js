@@ -6,6 +6,7 @@ import sveld from './plugins/sveld.js'
 import path from 'path'
 import { preprocess, plugins } from './src/package/config/svelte.config.js'
 import Generator from './src/package/plugins/generator/index.js'
+import precompileIntl from 'svelte-intl-precompile/sveltekit-plugin'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -27,6 +28,7 @@ const config = {
 				...plugins,
 				examples,
 				sveld(),
+				precompileIntl('locales'),
 			],
 
 			resolve: {

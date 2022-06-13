@@ -78,11 +78,11 @@
 		border-radius: var(--rounded);
 		transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out;
 
-		&:hover {
+		&:hover:not(&--color-transparent) {
 			filter: brightness(0.85);
 		}
 
-		&:active {
+		&:active:not(&--color-transparent) {
 			transform: scale(0.95);
 			filter: brightness(0.8);
 		}
@@ -114,6 +114,15 @@
 			&-transparent {
 				background-color: transparent;
 				box-shadow: none;
+				filter: brightness(1) !important;
+
+				&:hover {
+					background-image: linear-gradient(rgba(0, 0, 0, 0.1) 0 0);
+				}
+
+				&:active {
+					background-image: linear-gradient(rgba(0, 0, 0, 0.2) 0 0);
+				}
 			}
 
 			&-danger {
@@ -122,8 +131,8 @@
 			}
 
 			&-danger-light {
-				background-color: var(--color-popup-danger-bg);
-				color: var(--color-popup-danger-text);
+				background-color: var(--color-danger-bg);
+				color: var(--color-danger-text);
 			}
 		}
 

@@ -1,8 +1,6 @@
 ```svelte example raised
 <script lang="ts">
-	import { FormField } from 'omorphia'
-	import { Slider } from 'omorphia'
-	import { TextInput } from 'omorphia'
+	import { FormField, Slider, TextInput } from 'omorphia'
 </script>
 
 <FormField label="Favorite number">

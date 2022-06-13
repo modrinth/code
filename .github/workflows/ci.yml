@@ -1,0 +1,24 @@
+name: CI
+
+on: push
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Run build
+        run: VITE_API_URL="https://staging-api.modrinth.com/v2/" pnpm build
+      - name: Run lint
+        run: pnpm lint
+      - name: Run check
+        run: pnpm check

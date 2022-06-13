@@ -14,6 +14,10 @@ export { default as Chips } from './components/Chips.svelte'
 
 export { default as FormField } from './components/FormField.svelte'
 
+export { default as Modal } from './components/Modal.svelte'
+
+export { default as ModalDeletion } from './components/ModalDeletion.svelte'
+
 export { default as NavRow } from './components/NavRow.svelte'
 
 export { default as Pagination } from './components/Pagination.svelte'

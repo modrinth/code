@@ -1,3 +1,13 @@
+<script context="module" lang="ts">
+	import { addMessages, init } from 'svelte-intl-precompile'
+	import en from '$locales/en'
+	addMessages('en', en)
+	init({
+		initialLocale: 'en',
+		fallbackLocale: 'en',
+	})
+</script>
+
 <script lang="ts">
 	import '$package/styles.postcss'
 	import '../docs/styles/prism-one-dark.css'

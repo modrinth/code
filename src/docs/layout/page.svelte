@@ -19,7 +19,7 @@
 	let api
 	if ($page.url.pathname.includes('components')) {
 		if (import.meta.env.DEV) {
-			import(`../../../package/components/${title}.svelte?raw&sveld`).then(
+			import(`../../package/components/${title}.svelte?raw&sveld`).then(
 				(output) => (api = output.default)
 			)
 		} else {
