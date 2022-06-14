@@ -65,7 +65,6 @@
 <style lang="postcss">
 	.button {
 		display: flex;
-		justify-content: flex-start;
 		align-items: center;
 		justify-content: center;
 		padding: 0.5rem 1rem;
@@ -73,7 +72,6 @@
 		gap: 0.5rem;
 		cursor: pointer;
 		position: relative;
-		white-space: nowrap;
 		line-height: 100%;
 
 		color: var(--color-bg-contrast);

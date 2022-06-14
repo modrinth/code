@@ -18,7 +18,13 @@
 	function close() {
 		open = false
 	}
+
+	function trigger() {
+		open = !open
+	}
 </script>
+
+<slot name="trigger" {trigger} />
 
 {#if open}
 	<div
@@ -130,6 +136,7 @@
 			display: flex;
 			justify-content: flex-end;
 			gap: 1rem;
+			flex-wrap: wrap;
 		}
 	}
 </style>

@@ -16,7 +16,9 @@
 	let keyInput = ''
 </script>
 
-<Modal title={$t(`modal.deletion.${type}.title`)} bind:open>
+<Modal title={$t(`modal.deletion.${type}.title`)} bind:open let:trigger>
+	<slot slot="trigger" name="trigger" {trigger} />
+
 	{#if type === 'account' || 'project'}
 		<div class="important-banner">
 			<IconExclamation /><span>{$t('modal.deletion.generic.important')}</span>
@@ -29,6 +31,7 @@
 			bind:value={keyInput}
 			{id} />
 	</Field>
+
 	<Button color="danger" slot="button" disabled={key !== keyInput}>
 		<IconTrash />
 		{$t(`modal.deletion.${type}.action`)}
