@@ -511,7 +511,7 @@
             </button>
           </div>
         </div>
-        <SmartFileInput
+        <StatelessFileInput
           v-if="mode === 'edit' || mode === 'create'"
           multiple
           class="choose-files"
@@ -527,7 +527,7 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import ConfirmPopup from '~/components/ui/ConfirmPopup'
-import SmartFileInput from '~/components/ui/SmartFileInput'
+import StatelessFileInput from '~/components/ui/StatelessFileInput'
 
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
@@ -557,7 +557,7 @@ export default {
     CheckIcon,
     Multiselect,
     PlusIcon,
-    SmartFileInput,
+    StatelessFileInput,
     InfoIcon,
   },
   beforeRouteLeave(to, from, next) {
