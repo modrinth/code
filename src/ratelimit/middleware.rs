@@ -51,7 +51,7 @@ where
             max_requests: 0,
             store,
             identifier: Rc::new(Box::new(identifier)),
-            ignore_key: None
+            ignore_key: None,
         }
     }
 

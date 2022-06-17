@@ -1,3 +1,16 @@
+ /*!
+This auth module is primarily for use within the main website. Applications interacting with the
+authenticated API (a very small portion - notifications, private projects, editing/creating projects
+and versions) should either retrieve the Modrinth GitHub token through the site, or create a personal
+app token for use with Modrinth.
+
+JUst as a summary: Don't implement this flow in your application! Instead, use a personal access token
+or create your own GitHub OAuth2 application.
+
+This system will be revisited and allow easier interaction with the authenticated API once we roll
+out our own authentication system.
+*/
+
 use crate::database::models::{generate_state_id, User};
 use crate::models::error::ApiError;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
@@ -11,6 +24,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
 use time::OffsetDateTime;
+use crate::parse_strings_from_var;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(scope("auth").service(auth_callback).service(init));
@@ -34,6 +48,8 @@ pub enum AuthorizationError {
     Authentication(#[from] crate::util::auth::AuthenticationError),
     #[error("Error while decoding Base62")]
     Decoding(#[from] DecodingError),
+    #[error("Invalid callback URL specified")]
+    Url,
 }
 impl actix_web::ResponseError for AuthorizationError {
     fn status_code(&self) -> StatusCode {
@@ -50,6 +66,7 @@ impl actix_web::ResponseError for AuthorizationError {
             AuthorizationError::InvalidCredentials => StatusCode::UNAUTHORIZED,
             AuthorizationError::Decoding(..) => StatusCode::BAD_REQUEST,
             AuthorizationError::Authentication(..) => StatusCode::UNAUTHORIZED,
+            AuthorizationError::Url => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -65,7 +82,8 @@ impl actix_web::ResponseError for AuthorizationError {
                 AuthorizationError::Decoding(..) => "decoding_error",
                 AuthorizationError::Authentication(..) => {
                     "authentication_error"
-                }
+                },
+                AuthorizationError::Url => "url_error",
             },
             description: &self.to_string(),
         })
@@ -96,6 +114,16 @@ pub async fn init(
     Query(info): Query<AuthorizationInit>,
     client: Data<PgPool>,
 ) -> Result<HttpResponse, AuthorizationError> {
+    let url = url::Url::parse(&info.url).map_err(|_| AuthorizationError::Url)?;
+
+    let allowed_callback_urls = parse_strings_from_var("ALLOWED_CALLBACK_URLS")
+        .unwrap_or_default();
+
+    let domain = url.domain().ok_or(AuthorizationError::Url)?;
+    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x)) {
+        return Err(AuthorizationError::Url);
+    }
+
     let mut transaction = client.begin().await?;
 
     let state = generate_state_id(&mut transaction).await?;
@@ -136,7 +164,7 @@ pub async fn auth_callback(
 
     let result_option = sqlx::query!(
         "
-            SELECT url,expires FROM states
+            SELECT url, expires FROM states
             WHERE id = $1
             ",
         state_id as i64
@@ -145,13 +173,11 @@ pub async fn auth_callback(
     .await?;
 
     if let Some(result) = result_option {
-        // let now = OffsetDateTime::now_utc();
-        // TODO: redo this condition later..
-        // let duration = now - result.expires;
-        //
-        // if duration.whole_seconds() < 0 {
-        //     return Err(AuthorizationError::InvalidCredentials);
-        // }
+        let duration = result.expires - OffsetDateTime::now_utc();
+
+        if duration.whole_seconds() < 0 {
+            return Err(AuthorizationError::InvalidCredentials);
+        }
 
         sqlx::query!(
             "

@@ -662,6 +662,32 @@
       "nullable": []
     }
   },
+  "2278a7db5eb0474576fa9c86ba97bd6bf13864b3f9ce55ed2ab0cb94edbadaf5": {
+    "query": "\n            SELECT url, expires FROM states\n            WHERE id = $1\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "expires",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
   "232d7d0319c20dd5fff29331b067d6c6373bcff761a77958a2bb5f59068a83a5": {
     "query": "\n                UPDATE team_members\n                SET permissions = $1\n                WHERE (team_id = $2 AND user_id = $3)\n                ",
     "describe": {
@@ -772,50 +798,6 @@
       "nullable": []
     }
   },
-  "2c7c46497580e96c2ede1a696c960a8f53af9b8d0fc995484618b9090add8890": {
-    "query": "\n                SELECT id, title, notification_id, action_route, action_route_method\n                FROM notifications_actions\n                WHERE notification_id = $1\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "notification_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "action_route",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "action_route_method",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "2d2e5b06be5125226ed9e4d7b7b5f99043db73537f2199f2146bdcd56091ae75": {
     "query": "\n                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted)\n                VALUES ($1, $2, $3, $4, $5, $6)\n                ",
     "describe": {
@@ -858,6 +840,68 @@
       "nullable": []
     }
   },
+  "35b728453ade9cd9c535411fff194105c05726cea29446c3532aec9bfa4ffd2d": {
+    "query": "\n            SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,\n            STRING_AGG(DISTINCT na.id || ' |||| ' || na.title || ' |||| ' || na.action_route || ' |||| ' || na.action_route_method,  ' ~~~~ ') actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.id = $1\n            GROUP BY n.id, n.user_id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "text",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "link",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 5,
+          "name": "read",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 6,
+          "name": "notification_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "actions",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        null
+      ]
+    }
+  },
   "371048e45dd74c855b84cdb8a6a565ccbef5ad166ec9511ab20621c336446da6": {
     "query": "\n            UPDATE mods\n            SET follows = follows - 1\n            WHERE id = $1\n            ",
     "describe": {
@@ -868,6 +912,74 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "375d3e7221ca352efc3bec374b9924c864c1ea5808e99ee6b89e4dcb0d39ba7a": {
+    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,\n            STRING_AGG(DISTINCT na.id || ' |||| ' || na.title || ' |||| ' || na.action_route || ' |||| ' || na.action_route_method,  ' ~~~~ ') actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.id = ANY($1)\n            GROUP BY n.id, n.user_id\n            ORDER BY n.created DESC;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "text",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "link",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 6,
+          "name": "read",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 7,
+          "name": "notification_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 8,
+          "name": "actions",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        null
+      ]
     }
   },
   "3831c1b321e47690f1f54597506a0d43362eda9540c56acb19c06532bba50b01": {
@@ -1313,116 +1425,6 @@
       "nullable": []
     }
   },
-  "4e40451ec96cf4fa3a806fc71ffa953c087457e3778c25c30dcd664b04e496c6": {
-    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            v.version_type version_type, v.featured featured,\n            STRING_AGG(DISTINCT gv.version, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,\n            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,\n            STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,\n            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies\n            FROM versions v\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n            WHERE v.id = ANY($1)\n            GROUP BY v.id\n            ORDER BY v.date_published ASC;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "author_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "changelog",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 9,
-          "name": "version_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 10,
-          "name": "featured",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 11,
-          "name": "game_versions",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 12,
-          "name": "loaders",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 13,
-          "name": "files",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 14,
-          "name": "hashes",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 15,
-          "name": "dependencies",
-          "type_info": "Text"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null,
-        null,
-        null,
-        null
-      ]
-    }
-  },
   "4e9f9eafbfd705dfc94571018cb747245a98ea61bad3fae4b3ce284229d99955": {
     "query": "\n                    UPDATE mods\n                    SET description = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -1714,6 +1716,34 @@
       ]
     }
   },
+  "57ff857e0d7f6deab7da6e806b83c61648809c8820cf1a46e833ff97583fe888": {
+    "query": "\n            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.date_published FROM versions v\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id\n            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n            WHERE v.mod_id = $1\n            ORDER BY v.date_published, v.id ASC\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "date_published",
+          "type_info": "Timestamptz"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "VarcharArray",
+          "VarcharArray"
+        ]
+      },
+      "nullable": [
+        false,
+        false
+      ]
+    }
+  },
   "5917ab5017e27be2c4c5231426b19c3b37fd171ff47f97a0cb4e2094a0234298": {
     "query": "\n            SELECT id, name FROM project_types\n            WHERE name = ANY($1)\n            ",
     "describe": {
@@ -1936,28 +1966,6 @@
       "nullable": []
     }
   },
-  "5ff8fd471ff62f86aa95e52cee2723b31ec3d7fc53c3ef1454df40eef0ceff53": {
-    "query": "\n            SELECT version.id FROM (\n                SELECT DISTINCT ON(v.id) v.id, v.date_published FROM versions v\n                INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n                INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n                INNER JOIN loaders_versions lv ON lv.version_id = v.id\n                INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n                WHERE v.mod_id = $1\n            ) AS version\n            ORDER BY version.date_published ASC\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "VarcharArray",
-          "VarcharArray"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "6131d32a65f5e04775308386812f25c6d8464582678536a392a4a3737667f363": {
     "query": "\n            SELECT id, short, name FROM licenses\n            ",
     "describe": {
@@ -2019,116 +2027,6 @@
       },
       "nullable": [
         false
-      ]
-    }
-  },
-  "62ebb6f33a26f05f28b3d175ef19cb247c7c7f1ac0fce2fae15e6787b33a1b96": {
-    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            v.version_type version_type, v.featured featured,\n            STRING_AGG(DISTINCT gv.version, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,\n            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,\n            STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,\n            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies\n            FROM versions v\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n            WHERE v.id = $1\n            GROUP BY v.id;\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "mod_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "author_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_name",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "version_number",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 5,
-          "name": "changelog",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 6,
-          "name": "changelog_url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 7,
-          "name": "date_published",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 8,
-          "name": "downloads",
-          "type_info": "Int4"
-        },
-        {
-          "ordinal": 9,
-          "name": "version_type",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 10,
-          "name": "featured",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 11,
-          "name": "game_versions",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 12,
-          "name": "loaders",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 13,
-          "name": "files",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 14,
-          "name": "hashes",
-          "type_info": "Text"
-        },
-        {
-          "ordinal": 15,
-          "name": "dependencies",
-          "type_info": "Text"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        false,
-        false,
-        false,
-        false,
-        null,
-        null,
-        null,
-        null,
-        null
       ]
     }
   },
@@ -2999,26 +2897,6 @@
       "nullable": []
     }
   },
-  "7be4ba7c3dd53abd79715b9a9ead6b8815a2e4994f6887ac853f832c5ca17150": {
-    "query": "\n            SELECT id\n            FROM notifications\n            WHERE user_id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false
-      ]
-    }
-  },
   "7c61fee015231f0a97c25d24f2c6be24821e39e330ab82344ad3b985d0d2aaea": {
     "query": "\n        SELECT id FROM mods_gallery\n        WHERE image_url = $1\n        ",
     "describe": {
@@ -3427,6 +3305,116 @@
       ]
     }
   },
+  "8c65c87d288ca385eee56f98a0880eac5bf73d2760af70b7d660ded5f7a619f2": {
+    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            v.version_type version_type, v.featured featured,\n            STRING_AGG(DISTINCT gv.version || ' |||| ' || gv.created, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,\n            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,\n            STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,\n            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies\n            FROM versions v\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n            WHERE v.id = ANY($1)\n            GROUP BY v.id\n            ORDER BY v.date_published ASC;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "author_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "version_number",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "changelog",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "changelog_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "date_published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 9,
+          "name": "version_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 10,
+          "name": "featured",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "game_versions",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 12,
+          "name": "loaders",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 13,
+          "name": "files",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 14,
+          "name": "hashes",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 15,
+          "name": "dependencies",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  },
   "8f706d78ac4235ea04c59e2c220a4791e1d08fdf287b783b4aaef36fd2445467": {
     "query": "\n            DELETE FROM loaders\n            WHERE loader = $1\n            ",
     "describe": {
@@ -3695,6 +3683,116 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "a007ddf78c7bcbac5e511d15d0f130ecb5527fefcdce02972ede5b5cd2b10630": {
+    "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,\n            v.version_type version_type, v.featured featured,\n            STRING_AGG(DISTINCT gv.version || ' |||| ' || gv.created, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,\n            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,\n            STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,\n            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies\n            FROM versions v\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n            WHERE v.id = $1\n            GROUP BY v.id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "mod_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "author_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_name",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "version_number",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "changelog",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 6,
+          "name": "changelog_url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 7,
+          "name": "date_published",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 8,
+          "name": "downloads",
+          "type_info": "Int4"
+        },
+        {
+          "ordinal": 9,
+          "name": "version_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 10,
+          "name": "featured",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 11,
+          "name": "game_versions",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 12,
+          "name": "loaders",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 13,
+          "name": "files",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 14,
+          "name": "hashes",
+          "type_info": "Text"
+        },
+        {
+          "ordinal": 15,
+          "name": "dependencies",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        false,
+        false,
+        false,
+        false,
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
     }
   },
   "a39ce28b656032f862b205cffa393a76b989f4803654a615477a94fda5f57354": {
@@ -4719,6 +4817,74 @@
       ]
     }
   },
+  "c83cef31a25dd3037fa6049da572301e3e85871dcc3a1de8acb395d34fa0cf74": {
+    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,\n            STRING_AGG(DISTINCT na.id || ' |||| ' || na.title || ' |||| ' || na.action_route || ' |||| ' || na.action_route_method,  ' ~~~~ ') actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.user_id = $1\n            GROUP BY n.id, n.user_id;\n            ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 1,
+          "name": "user_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "title",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "text",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 4,
+          "name": "link",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 5,
+          "name": "created",
+          "type_info": "Timestamptz"
+        },
+        {
+          "ordinal": 6,
+          "name": "read",
+          "type_info": "Bool"
+        },
+        {
+          "ordinal": 7,
+          "name": "notification_type",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 8,
+          "name": "actions",
+          "type_info": "Text"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        false,
+        true,
+        null
+      ]
+    }
+  },
   "c9d63ed46799db7c30a7e917d97a5d4b2b78b0234cce49e136fa57526b38c1ca": {
     "query": "\n            SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)\n            ",
     "describe": {
@@ -5681,62 +5847,6 @@
       ]
     }
   },
-  "ea96ab7c1290f4caddcef8ecf2aec0216654faca05ff760ffa553ad3e32827f5": {
-    "query": "\n                SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type\n                FROM notifications n\n                WHERE n.id = $1\n                GROUP BY n.id, n.user_id;\n                ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "user_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 1,
-          "name": "title",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "text",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "link",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 4,
-          "name": "created",
-          "type_info": "Timestamptz"
-        },
-        {
-          "ordinal": 5,
-          "name": "read",
-          "type_info": "Bool"
-        },
-        {
-          "ordinal": 6,
-          "name": "notification_type",
-          "type_info": "Varchar"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true
-      ]
-    }
-  },
   "ebef881a0dae70e990814e567ed3de9565bb29b772782bc974c953af195fd6d7": {
     "query": "\n            SELECT n.id FROM notifications n\n            WHERE n.user_id = $1\n            ",
     "describe": {
@@ -5955,32 +6065,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "f7bea04e8e279e27a24de1bdf3c413daa8677994df5131494b28691ed6611efc": {
-    "query": "\n            SELECT url,expires FROM states\n            WHERE id = $1\n            ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 1,
-          "name": "expires",
-          "type_info": "Timestamptz"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      },
-      "nullable": [
-        false,
-        false
-      ]
     }
   },
   "f8c00875a7450c74423f9913cc3500898e9fcb6aa7eb8fc2f6fd16dc560773de": {

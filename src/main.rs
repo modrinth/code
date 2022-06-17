@@ -253,9 +253,7 @@ async fn main() -> std::io::Result<()> {
                     })
                     .with_interval(std::time::Duration::from_secs(60))
                     .with_max_requests(300)
-                    .with_ignore_key(
-                        dotenv::var("RATE_LIMIT_IGNORE_KEY").ok(),
-                    ),
+                    .with_ignore_key(dotenv::var("RATE_LIMIT_IGNORE_KEY").ok()),
             )
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(file_host.clone()))
@@ -293,6 +291,11 @@ fn check_env_vars() -> bool {
 
     if parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").is_none() {
         warn!("Variable `WHITELISTED_MODPACK_DOMAINS` missing in dotenv or not a json array of strings");
+        failed |= true;
+    }
+
+    if parse_strings_from_var("ALLOWED_CALLBACK_URLS").is_none() {
+        warn!("Variable `ALLOWED_CALLBACK_URLS` missing in dotenv or not a json array of strings");
         failed |= true;
     }
 

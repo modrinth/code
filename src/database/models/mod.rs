@@ -2,6 +2,7 @@
 // TODO: remove attr once routes are created
 
 use thiserror::Error;
+use time::OffsetDateTime;
 
 pub mod categories;
 pub mod ids;
@@ -124,4 +125,12 @@ impl ids::ProjectTypeId {
 
         Ok(result.map(|r| ids::ProjectTypeId(r.id)))
     }
+}
+
+pub fn convert_postgres_date(input: &str) -> OffsetDateTime {
+    OffsetDateTime::parse(
+        format!("{}:00Z", input.replace(' ', "T")),
+        time::Format::Rfc3339,
+    )
+    .unwrap_or_else(|_| OffsetDateTime::now_utc())
 }

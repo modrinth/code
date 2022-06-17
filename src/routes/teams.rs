@@ -385,18 +385,29 @@ pub async fn transfer_ownership(
     let id = info.into_inner().0;
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
-    let member = TeamMember::get_from_user_id(
-        id.into(),
-        current_user.id.into(),
-        &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::CustomAuthentication(
-            "You don't have permission to edit members of this team"
-                .to_string(),
+
+    if !current_user.role.is_mod() {
+        let member = TeamMember::get_from_user_id(
+            id.into(),
+            current_user.id.into(),
+            &**pool,
         )
-    })?;
+        .await?
+        .ok_or_else(|| {
+            ApiError::CustomAuthentication(
+                "You don't have permission to edit members of this team"
+                    .to_string(),
+            )
+        })?;
+
+        if member.role != crate::models::teams::OWNER_ROLE {
+            return Err(ApiError::CustomAuthentication(
+                "You don't have permission to edit the ownership of this team"
+                    .to_string(),
+            ));
+        }
+    }
+
     let new_member = TeamMember::get_from_user_id(
         id.into(),
         new_owner.user_id.into(),
@@ -408,13 +419,6 @@ pub async fn transfer_ownership(
             "The new owner specified does not exist".to_string(),
         )
     })?;
-
-    if member.role != crate::models::teams::OWNER_ROLE {
-        return Err(ApiError::CustomAuthentication(
-            "You don't have permission to edit the ownership of this team"
-                .to_string(),
-        ));
-    }
 
     if !new_member.accepted {
         return Err(ApiError::InvalidInput(

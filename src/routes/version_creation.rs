@@ -35,7 +35,7 @@ pub struct InitialVersionData {
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
     pub version_number: String,
-    #[validate(length(min = 3, max = 256))]
+    #[validate(length(min = 1, max = 256))]
     #[serde(alias = "name")]
     pub version_title: String,
     #[validate(length(max = 65536))]
@@ -639,11 +639,11 @@ pub async fn upload_file(
     field: &mut Field,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
-    version_files: &mut Vec<models::version_item::VersionFileBuilder>,
-    dependencies: &mut Vec<models::version_item::DependencyBuilder>,
+    version_files: &mut Vec<VersionFileBuilder>,
+    dependencies: &mut Vec<DependencyBuilder>,
     cdn_url: &str,
     content_disposition: &actix_web::http::header::ContentDisposition,
-    project_id: crate::models::ids::ProjectId,
+    project_id: ProjectId,
     version_number: &str,
     project_type: &str,
     loaders: Vec<Loader>,

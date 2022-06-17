@@ -1,4 +1,5 @@
 use super::ids::*;
+use crate::database::models::convert_postgres_date;
 use time::OffsetDateTime;
 
 #[derive(Clone, Debug)]
@@ -719,11 +720,7 @@ impl Project {
                                 } else {
                                     Some(strings[4].to_string())
                                 },
-                                created: OffsetDateTime::parse(
-                                    strings[2],
-                                    time::Format::Rfc3339,
-                                )
-                                .unwrap_or_else(|_| OffsetDateTime::now_utc()),
+                                created: convert_postgres_date(strings[2]),
                             })
                         } else {
                             None
@@ -835,7 +832,7 @@ impl Project {
                                         featured: strings[1].parse().unwrap_or(false),
                                         title: if strings[3] == " " { None } else { Some(strings[3].to_string()) },
                                         description: if strings[4] == " " { None } else { Some(strings[4].to_string()) },
-                                        created: OffsetDateTime::parse(strings[2], time::Format::Rfc3339).unwrap_or_else(|_| OffsetDateTime::now_utc())
+                                        created: convert_postgres_date(strings[2])
                                     })
                                 } else {
                                     None

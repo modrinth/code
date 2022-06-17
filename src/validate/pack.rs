@@ -20,7 +20,7 @@ impl super::Validator for PackValidator {
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
-        &["forge", "fabric"]
+        &["forge", "fabric", "quilt"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {

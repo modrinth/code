@@ -303,7 +303,7 @@ pub async fn get_versions_from_hashes(
     let hashes_parsed: Vec<Vec<u8>> = file_data
         .hashes
         .iter()
-        .map(|x| x.as_bytes().to_vec())
+        .map(|x| x.to_lowercase().as_bytes().to_vec())
         .collect();
 
     let result = sqlx::query!(
@@ -360,7 +360,7 @@ pub async fn download_files(
     let hashes_parsed: Vec<Vec<u8>> = file_data
         .hashes
         .iter()
-        .map(|x| x.as_bytes().to_vec())
+        .map(|x| x.to_lowercase().as_bytes().to_vec())
         .collect();
 
     let mut transaction = pool.begin().await?;
@@ -411,7 +411,7 @@ pub async fn update_files(
     let hashes_parsed: Vec<Vec<u8>> = update_data
         .hashes
         .iter()
-        .map(|x| x.as_bytes().to_vec())
+        .map(|x| x.to_lowercase().as_bytes().to_vec())
         .collect();
 
     let mut transaction = pool.begin().await?;
