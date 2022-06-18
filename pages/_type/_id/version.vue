@@ -616,7 +616,6 @@ export default {
       mode: 'version',
       primaryFile: {},
       version: {},
-      popup_data: null,
 
       changelogViewMode: 'source',
 
@@ -652,7 +651,19 @@ export default {
     }
   },
   methods: {
+    reset() {
+      this.changelogViewMode = 'source'
+      this.dependencyAddMode = 'project'
+      this.newDependencyId = ''
+      this.newDependencyType = 'required'
+
+      this.primaryFile = {}
+      this.version = {}
+      this.newFiles = []
+      this.deleteFiles = []
+    },
     async setVersion() {
+      this.reset()
       const path = this.$route.name.split('-')
       this.mode = path[path.length - 1]
 
@@ -687,11 +698,8 @@ export default {
         )
 
       this.version = JSON.parse(JSON.stringify(this.version))
-      this.primaryFile = this.version.files.find((file) => file.primary)
-
-      if (!this.primaryFile) {
-        this.primaryFile = this.version.files[0]
-      }
+      this.primaryFile =
+        this.version.files.find((file) => file.primary) ?? this.version.files[0]
 
       if (!this.version.changelog && this.version.changelog_url) {
         this.version.changelog = (
@@ -845,10 +853,7 @@ export default {
 
       const formData = new FormData()
 
-      const fileParts = []
-      for (let i = 0; i < this.newFiles.length; i++) {
-        fileParts.push(this.newFiles[i].name.concat('-' + i))
-      }
+      const fileParts = this.newFiles.map((f, idx) => `${f.name}-${idx}`)
 
       const newVersion = {
         project_id: this.version.project_id,
