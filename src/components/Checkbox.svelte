@@ -33,8 +33,9 @@
 			gap: 0.5rem;
 
 			> :global(.icon) {
-				width: 1var (--unit-3);
-				margin-right: -0var (--unit-3);
+				/* Icon on checkbox helps to be a little larger than normal icons 16px -> 18px */
+				width: 18px;
+				margin-right: -2px;
 			}
 
 			&__box {

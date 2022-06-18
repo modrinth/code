@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte'
+	import type { SvelteComponent } from 'svelte/internal'
 
 	export let placeholder = ''
 	export let icon: SvelteComponent = undefined

@@ -3,7 +3,6 @@
 	import Button from './Button.svelte'
 	import { classCombine } from '../utils/classCombine'
 	import IconX from 'virtual:icons/heroicons-outline/x'
-	import { t } from 'svelte-intl-precompile'
 
 	export let open = false
 
@@ -15,8 +14,11 @@
 	/** If enabled, clicking outside the modal with close it */
 	export let dismissable = true
 
+	export let data: Record<string, any> = {}
+
 	function close() {
 		open = false
+		data = {}
 	}
 
 	function trigger() {
@@ -48,7 +50,7 @@
 
 		<div class="modal__buttons">
 			<Button on:click={close}><IconX /> Cancel</Button>
-			<slot name="button" />
+			<slot name="button" {close} />
 		</div>
 	</div>
 {/if}

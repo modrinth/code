@@ -68,7 +68,7 @@
 					content: '';
 					display: block;
 					position: absolute;
-					bottom: -0var (--unit-3);
+					bottom: -1px;
 					width: 100%;
 					border-radius: var(--rounded-max);
 					height: 0.25rem;

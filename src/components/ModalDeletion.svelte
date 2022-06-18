@@ -7,16 +7,19 @@
 	import IconTrash from 'virtual:icons/heroicons-outline/trash'
 	import { markdown } from '../utils'
 	import Field from './Field.svelte'
+	import { createEventDispatcher } from 'svelte'
 
 	export let key: string
 	export let type: 'project' | 'version' | 'account' | 'image'
 
 	export let open = false
 
-	let keyInput = ''
+	let data: { key?: string } = {}
+
+	const dispatch = createEventDispatcher()
 </script>
 
-<Modal title={$t(`modal.deletion.${type}.title`)} bind:open let:trigger>
+<Modal title={$t(`modal.deletion.${type}.title`)} bind:open let:trigger bind:data>
 	<slot slot="trigger" name="trigger" {trigger} />
 
 	{#if type === 'account' || 'project'}
@@ -28,11 +31,19 @@
 	<Field label={$t('modal.deletion.generic.verify', { values: { key } })} let:id>
 		<TextInput
 			placeholder={$t('modal.deletion.generic.placeholder', { values: { key } })}
-			bind:value={keyInput}
+			bind:value={data.key}
 			{id} />
 	</Field>
 
-	<Button color="danger" slot="button" disabled={key !== keyInput}>
+	<Button
+		color="danger"
+		slot="button"
+		disabled={key !== data.key}
+		let:close
+		on:click={() => {
+			dispatch('deletion')
+			close()
+		}}>
 		<IconTrash />
 		{$t(`modal.deletion.${type}.action`)}
 	</Button>

@@ -21,14 +21,16 @@ The `markdown` parser is designed for bodies of markdown text and supports image
   This is **some** *text*! \n\
   `console.log("test")` \n\
   #### An image \n\
-  <img src="https://cdn.modrinth.com/data/YL57xq9U/images/d382106b9a2b943d06107c31c139c77849f1a0e8.png" />'
+  ![](https://cdn.modrinth.com/data/YL57xq9U/images/d382106b9a2b943d06107c31c139c77849f1a0e8.png)'
 </script>
-
 <div class="card markdown">
 	{@html markdown(source)}
-</div>
-<div class="card markdown">
-	{@html markdown('test\n```js\nconsole.log("test")\n```')}
+  {@html markdown(
+` | Syntax      | Description |
+  | ----------- | ----------- |
+  | Header      | Title       |
+  | Paragraph   | Text        |`)}
+  {@html markdown('```js\nconsole.log("test")\n```')}
 </div>
 ````
 

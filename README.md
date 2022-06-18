@@ -21,8 +21,8 @@ pnpm dev # Run dev server
 
 > Replace `ComponentName` with your component name in the steps below
 
-1. Create a `ComponentName.svelte` file in `package/components`
-2. Add an export for your component in [./package/index.ts](./package/index.ts)
+1. Create a `ComponentName.svelte` file in `src/components`
+2. Add an export for your component in [./src/index.ts](./src/index.ts)
    ```
    export { default as ComponentName } from './components/ComponentName.svelte'
    ```
