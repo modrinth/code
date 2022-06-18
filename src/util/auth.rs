@@ -14,7 +14,7 @@ pub enum AuthenticationError {
     #[error("An unknown database error occurred")]
     Sqlx(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
-    Database(#[from] crate::database::models::DatabaseError),
+    Database(#[from] models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
     #[error("Error while communicating to GitHub OAuth2: {0}")]

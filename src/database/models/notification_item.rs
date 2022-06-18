@@ -118,8 +118,8 @@ impl Notification {
         id: NotificationId,
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
-        where
-            E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
         let result = sqlx::query!(
             "
@@ -138,19 +138,24 @@ impl Notification {
         if let Some(row) = result {
             let mut actions: Vec<NotificationAction> = Vec::new();
 
-            row.actions.unwrap_or_default().split(" ~~~~ ").for_each(|x| {
-                let action: Vec<&str> = x.split(" |||| ").collect();
+            row.actions
+                .unwrap_or_default()
+                .split(" ~~~~ ")
+                .for_each(|x| {
+                    let action: Vec<&str> = x.split(" |||| ").collect();
 
-                if action.len() >= 3 {
-                    actions.push(NotificationAction {
-                        id: NotificationActionId(action[0].parse().unwrap_or(0)),
-                        notification_id: id,
-                        title: action[1].to_string(),
-                        action_route_method: action[3].to_string(),
-                        action_route: action[2].to_string(),
-                    });
-                }
-            });
+                    if action.len() >= 3 {
+                        actions.push(NotificationAction {
+                            id: NotificationActionId(
+                                action[0].parse().unwrap_or(0),
+                            ),
+                            notification_id: id,
+                            title: action[1].to_string(),
+                            action_route_method: action[3].to_string(),
+                            action_route: action[2].to_string(),
+                        });
+                    }
+                });
 
             Ok(Some(Notification {
                 id,
@@ -172,12 +177,13 @@ impl Notification {
         notification_ids: Vec<NotificationId>,
         exec: E,
     ) -> Result<Vec<Notification>, sqlx::Error>
-        where
-            E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::stream::TryStreamExt;
 
-        let notification_ids_parsed: Vec<i64> = notification_ids.into_iter().map(|x| x.0).collect();
+        let notification_ids_parsed: Vec<i64> =
+            notification_ids.into_iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
@@ -231,8 +237,8 @@ impl Notification {
         user_id: UserId,
         exec: E,
     ) -> Result<Vec<Notification>, sqlx::Error>
-        where
-            E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
         use futures::stream::TryStreamExt;
 

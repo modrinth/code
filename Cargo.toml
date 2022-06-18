@@ -1,6 +1,6 @@
 [package]
 name = "labrinth"
-version = "2.4.2"
+version = "2.4.3"
 #Team members, please add your emails and usernames
 authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "Charalampos Fanoulis <yo@fanoulis.dev>", "AppleTheGolden <scotsbox@protonmail.com>"]
 edition = "2018"

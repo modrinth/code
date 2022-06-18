@@ -34,12 +34,17 @@ pub async fn get_version_from_hash(
 
     let result = sqlx::query!(
         "
-        SELECT f.version_id version_id FROM hashes h
+        SELECT f.version_id version_id
+        FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        WHERE h.algorithm = $2 AND h.hash = $1
+        INNER JOIN versions v on f.version_id = v.id
+        INNER JOIN mods m on v.mod_id = m.id
+        INNER JOIN statuses s on m.status = s.id
+        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3
         ",
         hash.as_bytes(),
-        algorithm.algorithm
+        algorithm.algorithm,
+        models::projects::ProjectStatus::Rejected.to_string()
     )
     .fetch_optional(&**pool)
     .await?;
@@ -81,10 +86,13 @@ pub async fn download_version(
         SELECT f.url url, f.id id, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash = $1
+        INNER JOIN mods m on v.mod_id = m.id
+        INNER JOIN statuses s on m.status = s.id
+        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3
         ",
         hash.as_bytes(),
-        algorithm.algorithm
+        algorithm.algorithm,
+        models::projects::ProjectStatus::Rejected.to_string()
     )
     .fetch_optional(&mut *transaction)
     .await?;
@@ -242,10 +250,13 @@ pub async fn get_update_from_hash(
         SELECT v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash = $1
+        INNER JOIN mods m on v.mod_id = m.id
+        INNER JOIN statuses s on m.status = s.id
+        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3
         ",
         hash.as_bytes(),
-        algorithm.algorithm
+        algorithm.algorithm,
+        models::projects::ProjectStatus::Rejected.to_string()
     )
     .fetch_optional(&**pool)
     .await?;
@@ -310,10 +321,14 @@ pub async fn get_versions_from_hashes(
         "
         SELECT h.hash hash, h.algorithm algorithm, f.version_id version_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])
+        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN mods m on v.mod_id = m.id
+        INNER JOIN statuses s on m.status = s.id
+        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3
         ",
         hashes_parsed.as_slice(),
-        file_data.algorithm
+        file_data.algorithm,
+        models::projects::ProjectStatus::Rejected.to_string()
     )
     .fetch_all(&**pool)
     .await?;
@@ -370,10 +385,13 @@ pub async fn download_files(
         SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])
+        INNER JOIN mods m on v.mod_id = m.id
+        INNER JOIN statuses s on m.status = s.id
+        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3
         ",
         hashes_parsed.as_slice(),
-        file_data.algorithm
+        file_data.algorithm,
+        models::projects::ProjectStatus::Rejected.to_string()
     )
     .fetch_all(&mut *transaction)
     .await?;
@@ -421,10 +439,13 @@ pub async fn update_files(
         SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])
+        INNER JOIN mods m on v.mod_id = m.id
+        INNER JOIN statuses s on m.status = s.id
+        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3
         ",
         hashes_parsed.as_slice(),
-        update_data.algorithm
+        update_data.algorithm,
+        models::projects::ProjectStatus::Rejected.to_string()
     )
         .fetch_all(&mut *transaction)
         .await?;

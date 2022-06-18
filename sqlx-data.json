@@ -1,44 +1,5 @@
 {
   "db": "PostgreSQL",
-  "002a7e9d3ccfb94348b1e7ad93b923aab9d2c377e41bc2cc22e3a94d799d44de": {
-    "query": "\n        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 1,
-          "name": "id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 2,
-          "name": "version_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 3,
-          "name": "project_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ]
-    }
-  },
   "017c9fd0c8103c590489453a25b3317e6790a21f388bcf7ec8c93cd26255f368": {
     "query": "\n            SELECT id, team_id, role, permissions, accepted\n            FROM team_members\n            WHERE (user_id = $1 AND accepted = TRUE)\n            ",
     "describe": {
@@ -198,6 +159,28 @@
       "nullable": []
     }
   },
+  "091f325c84d0cf6dfe6933567c58fea815912ba613ffb3536466770d71ea613e": {
+    "query": "\n        SELECT f.version_id version_id\n        FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v on f.version_id = v.id\n        INNER JOIN mods m on v.mod_id = m.id\n        INNER JOIN statuses s on m.status = s.id\n        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "version_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "0a1a470c12b84c7e171f0f51e8e541e9abe8bbee17fc441a5054e1dfd5607c05": {
     "query": "\n                    UPDATE versions\n                    SET name = $1\n                    WHERE (id = $2)\n                    ",
     "describe": {
@@ -209,27 +192,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "0a1e0cbcdfe68e111326e2dc070e7903d4abb92180c7957f2408b4d6f810c2e5": {
-    "query": "\n        SELECT v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = $1\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "project_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "Bytea",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false
-      ]
     }
   },
   "0ca11a32b2860e4f5c3d20892a5be3cb419e084f42ba0f98e09b9995027fcc4e": {
@@ -760,6 +722,46 @@
       "nullable": []
     }
   },
+  "292da3eec2cc7d7eb635fa123be1b1387e9e91466f007e10101053fdb9874e3f": {
+    "query": "\n        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m on v.mod_id = m.id\n        INNER JOIN statuses s on m.status = s.id\n        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 2,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 3,
+          "name": "project_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ]
+    }
+  },
   "29e657d26f0fb24a766f5b5eb6a94d01d1616884d8ca10e91536e974d5b585a6": {
     "query": "\n                INSERT INTO loaders_versions (loader_id, version_id)\n                VALUES ($1, $2)\n                ",
     "describe": {
@@ -1049,6 +1051,40 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "3b1fba1ce47e94c0301c8a234bc7609e3c62fc02acd1485283c0f824cff2d69b": {
+    "query": "\n        SELECT h.hash hash, h.algorithm algorithm, f.version_id version_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m on v.mod_id = m.id\n        INNER JOIN statuses s on m.status = s.id\n        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "hash",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 1,
+          "name": "algorithm",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 2,
+          "name": "version_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "ByteaArray",
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false
+      ]
     }
   },
   "3bdcbfa5abe43cc9b4f996f147277a7f6921cca00f82cad0ef5d85032c761a36": {
@@ -1436,51 +1472,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "4ed40527a52e96490066653f3838c763180835a14c6f8dc6a5e54667d9d7ffef": {
-    "query": "\n        SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "url",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 1,
-          "name": "hash",
-          "type_info": "Bytea"
-        },
-        {
-          "ordinal": 2,
-          "name": "algorithm",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 3,
-          "name": "version_id",
-          "type_info": "Int8"
-        },
-        {
-          "ordinal": 4,
-          "name": "project_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "ByteaArray",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ]
     }
   },
   "4f307a8851b0cab7870798ba017955c8ebaba7444791dd65ffebcbac32d3585d": {
@@ -2699,6 +2690,28 @@
       "nullable": []
     }
   },
+  "740424ba1af7b0cf85d6031365d2c026e0b0003fb618bb82eeebcdad9599774a": {
+    "query": "\n        SELECT v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m on v.mod_id = m.id\n        INNER JOIN statuses s on m.status = s.id\n        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "project_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "Bytea",
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false
+      ]
+    }
+  },
   "75a860ca8087536a9fcf932846341c8bd322d314231bb8acac124d1cea93270b": {
     "query": "\n            SELECT mf.mod_id FROM mod_follows mf\n            WHERE mf.follower_id = $1\n            ",
     "describe": {
@@ -3670,6 +3683,52 @@
         ]
       },
       "nullable": []
+    }
+  },
+  "9b231e09e8a1e56cca49bf82f9a605e3d13b9e6a1cfc6357b5f544d3d9a89dfd": {
+    "query": "\n        SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m on v.mod_id = m.id\n        INNER JOIN statuses s on m.status = s.id\n        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3\n        ",
+    "describe": {
+      "columns": [
+        {
+          "ordinal": 0,
+          "name": "url",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 1,
+          "name": "hash",
+          "type_info": "Bytea"
+        },
+        {
+          "ordinal": 2,
+          "name": "algorithm",
+          "type_info": "Varchar"
+        },
+        {
+          "ordinal": 3,
+          "name": "version_id",
+          "type_info": "Int8"
+        },
+        {
+          "ordinal": 4,
+          "name": "project_id",
+          "type_info": "Int8"
+        }
+      ],
+      "parameters": {
+        "Left": [
+          "ByteaArray",
+          "Text",
+          "Text"
+        ]
+      },
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ]
     }
   },
   "9ceca63fb11f35f09f77bb9db175a1ac74dfcc2200c8134866922742fbbedea3": {
@@ -5999,39 +6058,6 @@
         ]
       },
       "nullable": []
-    }
-  },
-  "f30bff55ee84fb390c6c240d5a46826f8e2481b701d956f38b484f140f23e2dc": {
-    "query": "\n        SELECT h.hash hash, h.algorithm algorithm, f.version_id version_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[])\n        ",
-    "describe": {
-      "columns": [
-        {
-          "ordinal": 0,
-          "name": "hash",
-          "type_info": "Bytea"
-        },
-        {
-          "ordinal": 1,
-          "name": "algorithm",
-          "type_info": "Varchar"
-        },
-        {
-          "ordinal": 2,
-          "name": "version_id",
-          "type_info": "Int8"
-        }
-      ],
-      "parameters": {
-        "Left": [
-          "ByteaArray",
-          "Text"
-        ]
-      },
-      "nullable": [
-        false,
-        false,
-        false
-      ]
     }
   },
   "f3a8ad4a802dde0eb9304078e0368066e7d48121dfe73a63b2911b0998840a79": {

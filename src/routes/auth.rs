@@ -1,4 +1,4 @@
- /*!
+/*!
 This auth module is primarily for use within the main website. Applications interacting with the
 authenticated API (a very small portion - notifications, private projects, editing/creating projects
 and versions) should either retrieve the Modrinth GitHub token through the site, or create a personal
@@ -16,6 +16,7 @@ use crate::models::error::ApiError;
 use crate::models::ids::base62_impl::{parse_base62, to_base62};
 use crate::models::ids::DecodingError;
 use crate::models::users::Role;
+use crate::parse_strings_from_var;
 use crate::util::auth::get_github_user_from_token;
 use actix_web::http::StatusCode;
 use actix_web::web::{scope, Data, Query, ServiceConfig};
@@ -24,7 +25,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
 use time::OffsetDateTime;
-use crate::parse_strings_from_var;
 
 pub fn config(cfg: &mut ServiceConfig) {
     cfg.service(scope("auth").service(auth_callback).service(init));
@@ -82,7 +82,7 @@ impl actix_web::ResponseError for AuthorizationError {
                 AuthorizationError::Decoding(..) => "decoding_error",
                 AuthorizationError::Authentication(..) => {
                     "authentication_error"
-                },
+                }
                 AuthorizationError::Url => "url_error",
             },
             description: &self.to_string(),
@@ -114,13 +114,16 @@ pub async fn init(
     Query(info): Query<AuthorizationInit>,
     client: Data<PgPool>,
 ) -> Result<HttpResponse, AuthorizationError> {
-    let url = url::Url::parse(&info.url).map_err(|_| AuthorizationError::Url)?;
+    let url =
+        url::Url::parse(&info.url).map_err(|_| AuthorizationError::Url)?;
 
-    let allowed_callback_urls = parse_strings_from_var("ALLOWED_CALLBACK_URLS")
-        .unwrap_or_default();
+    let allowed_callback_urls =
+        parse_strings_from_var("ALLOWED_CALLBACK_URLS").unwrap_or_default();
 
     let domain = url.domain().ok_or(AuthorizationError::Url)?;
-    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x)) {
+    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x))
+        || domain == "modrinth.com"
+    {
         return Err(AuthorizationError::Url);
     }
 
