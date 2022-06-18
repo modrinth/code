@@ -22,16 +22,6 @@ export default function Generator(options) {
 			} catch {
 				// File doesn't exist, create folder
 				await fs.mkdir('./generated', { recursive: true })
-				await fs.writeFile(
-					'./generated/state.json',
-					JSON.stringify(
-						{
-							options,
-						},
-						null,
-						2
-					)
-				)
 			}
 
 			// Don't generate if the last generation was less than TTL and the options are the same
@@ -43,16 +33,16 @@ export default function Generator(options) {
 				return
 			}
 
-			if (options.tags) await tags(API_URL)
-			if (options.landingPage) await landingPage(API_URL)
-			if (options.gameVersions) await gameVersions(API_URL)
-			if (options.projectColors) await projectColors(API_URL)
-
 			// Write new state
 			state.lastGenerated = new Date().toISOString()
 			state.options = options
 
 			await fs.writeFile('./generated/state.json', JSON.stringify(state, null, 2))
+
+			if (options.tags) await tags(API_URL)
+			if (options.landingPage) await landingPage(API_URL)
+			if (options.gameVersions) await gameVersions(API_URL)
+			if (options.projectColors) await projectColors(API_URL)
 		},
 	}
 }

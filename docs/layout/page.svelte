@@ -12,14 +12,14 @@
 
 	export let description = 'Learn about Omorphia, the component & style library'
 
-	let editUrl = `https://github.com/modrinth/omorphia/edit/main/src/routes/${
+	let editUrl = `https://github.com/modrinth/omorphia/edit/main/docs/routes/${
 		$page.url.pathname.replace('/', '') || 'index'
 	}.md`
 
 	let api
 	if ($page.url.pathname.includes('components')) {
 		if (import.meta.env.DEV) {
-			import(`../../package/components/${title}.svelte?raw&sveld`).then(
+			import(`../../src/components/${title}.svelte?raw&sveld`).then(
 				(output) => (api = output.default)
 			)
 		} else {

@@ -3,12 +3,12 @@
 
 	import IconMenu from 'virtual:icons/lucide/menu'
 
-	const components = Object.keys(import.meta.glob('../../routes/components/**'))
-		.map((it) => it.replace('../../routes/components/', '').replace('.md', ''))
+	const components = Object.keys(import.meta.glob('../routes/components/**'))
+		.map((it) => it.replace('../routes/components/', '').replace('.md', ''))
 		.sort()
 
-	const classes = Object.keys(import.meta.glob('../../routes/classes/**'))
-		.map((it) => it.replace('../../routes/classes/', '').replace('.md', ''))
+	const classes = Object.keys(import.meta.glob('../routes/classes/**'))
+		.map((it) => it.replace('../routes/classes/', '').replace('.md', ''))
 		.sort()
 
 	let slideIn = false

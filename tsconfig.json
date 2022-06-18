@@ -1,13 +1,12 @@
 {
 	"compilerOptions": {
 		"paths": {
-			"omorphia/*": ["src/package/*"],
-			"omorphia": ["src/package"],
-			"$package/*": ["src/package/*"],
-			"$routes/*": ["src/routes/*"],
+			"omorphia/utils": ["package/utils"],
+			"omorphia/*": ["package/*"],
+			"omorphia": ["package"],
 			"$generated/*": ["generated/*"],
-			"$lib": ["src/package"],
-			"$lib/*": ["src/package/*"]
+			"$lib": ["src"],
+			"$lib/*": ["src/*"]
 		},
 		"resolveJsonModule": true,
 		"esModuleInterop": true

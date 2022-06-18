@@ -2,7 +2,7 @@ import { ComponentParser } from 'sveld'
 import * as svelte from 'svelte/compiler'
 import fs from 'fs/promises'
 import path from 'path'
-import { preprocess } from '../src/package/config/svelte.config.js'
+import { preprocess } from '../../src/config/svelte.config.js'
 
 export default function sveld() {
 	return {
@@ -23,21 +23,21 @@ export default function sveld() {
 		async buildStart() {
 			const output = {}
 
-			const componentFiles = await fs.readdir(path.resolve('./src/package/components'))
+			const componentFiles = await fs.readdir(path.resolve('./src/components'))
 
 			for (const fileName of componentFiles.filter((name) => name.endsWith('.svelte'))) {
-				const filePath = path.resolve('./src/package/components', fileName)
+				const filePath = path.resolve('./src/components', fileName)
 				const raw = (await fs.readFile(filePath)).toString()
 				output[fileName] = await parseRaw(raw, filePath)
 			}
 
 			try {
-				await fs.mkdir(path.resolve('./src/generated'))
+				await fs.mkdir(path.resolve('./generated'))
 			} catch {
 				// Do nothing, directory already exists
 			}
 
-			await fs.writeFile(path.resolve('./src/generated/COMPONENT_API.json'), JSON.stringify(output))
+			await fs.writeFile(path.resolve('./generated/COMPONENT_API.json'), JSON.stringify(output))
 		},
 	}
 }

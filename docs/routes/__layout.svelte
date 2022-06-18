@@ -9,11 +9,11 @@
 </script>
 
 <script lang="ts">
-	import '$package/styles.postcss'
-	import '../docs/styles/prism-one-dark.css'
-	import '../docs/styles/gh-markdown.postcss'
-	import Sidebar from '../docs/components/Sidebar.svelte'
-	import Header from '../docs/components/Header.svelte'
+	import 'omorphia/styles.postcss'
+	import '../styles/prism-one-dark.css'
+	import '../styles/gh-markdown.postcss'
+	import Sidebar from '../components/Sidebar.svelte'
+	import Header from '../components/Header.svelte'
 </script>
 
 <div class="app theme-light">

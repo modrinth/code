@@ -14,7 +14,7 @@ const config = defineConfig({
 			examples,
 			{
 				defaults: {
-					Wrapper: path.resolve('./src/docs/components/Example.svelte'),
+					Wrapper: path.resolve('./docs/components/Example.svelte'),
 				},
 			},
 		],
@@ -22,7 +22,7 @@ const config = defineConfig({
 	rehypePlugins: [],
 
 	layout: {
-		_: './src/docs/layout/page.svelte',
+		_: './docs/layout/page.svelte',
 	},
 })
 

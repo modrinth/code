@@ -2,10 +2,10 @@ import { mdsvex } from 'mdsvex'
 import mdsvexConfig from './mdsvex.config.js'
 import adapter from '@sveltejs/adapter-static'
 import examples from 'mdsvexamples/vite'
-import sveld from './plugins/sveld.js'
+import sveld from './docs/plugins/sveld.js'
 import path from 'path'
-import { preprocess, plugins } from './src/package/config/svelte.config.js'
-import Generator from './src/package/plugins/generator/index.js'
+import { preprocess, plugins } from './src/config/svelte.config.js'
+import Generator from './src/plugins/generator/index.js'
 import precompileIntl from 'svelte-intl-precompile/sveltekit-plugin'
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -33,10 +33,8 @@ const config = {
 
 			resolve: {
 				alias: {
-					$package: path.resolve('./src/package'),
-					$routes: path.resolve('./src/routes'),
 					$generated: path.resolve('./generated'),
-					omorphia: path.resolve('./src/package'),
+					omorphia: path.resolve('./src'),
 				},
 			},
 
@@ -48,12 +46,18 @@ const config = {
 
 			server: {
 				fs: {
-					allow: ['generated'],
+					allow: ['generated', 'docs'],
 				},
 			},
 		},
 		files: {
-			lib: 'src/package',
+			assets: 'docs/static',
+			hooks: 'docs/hooks',
+			lib: 'src',
+			params: 'docs/params',
+			routes: 'docs/routes',
+			serviceWorker: 'docs/service-worker',
+			template: 'docs/app.html',
 		},
 	},
 }
