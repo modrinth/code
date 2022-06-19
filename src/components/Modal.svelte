@@ -7,7 +7,7 @@
 	export let open = false
 
 	/** Set the width of the modal */
-	export let size: 'md' | 'lg' = 'md'
+	export let size: 'sm' | 'md' | 'lg' = 'md'
 
 	export let title = ''
 
@@ -39,12 +39,14 @@
 	<div
 		class={classCombine(['modal', `modal--size-${size}`, 'card'])}
 		transition:fly={{ y: 400, duration: 250 }}>
-		<div class="modal__top">
-			<h2 class="title-secondary">{title}</h2>
-			<Button title="Close" color="transparent" on:click={close}>
-				<IconX width={20} />
-			</Button>
-		</div>
+		{#if title}
+			<div class="modal__top">
+				<h2 class="title-secondary">{title}</h2>
+				<Button title="Close" color="transparent" on:click={close}>
+					<IconX width={20} />
+				</Button>
+			</div>
+		{/if}
 
 		<slot />
 
@@ -83,6 +85,9 @@
 		overflow-y: auto;
 
 		&--size {
+			&-sm {
+				max-width: 450px;
+			}
 			&-md {
 				max-width: 600px;
 			}
