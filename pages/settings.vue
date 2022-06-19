@@ -17,61 +17,16 @@
           <nuxt-link class="tab" to="/settings/privacy">
             <span>Privacy</span>
           </nuxt-link>
-          <button
-            v-if="actionButton"
-            class="iconified-button brand-button-colors right"
-            @click="actionButtonCallback"
-          >
-            <CheckIcon />
-            {{ actionButton }}
-          </button>
         </div>
-        <NuxtChild
-          :action-button.sync="actionButton"
-          :action-button-callback.sync="actionButtonCallback"
-        />
+        <NuxtChild />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
-
 export default {
   name: 'Settings',
-  components: {
-    CheckIcon,
-  },
-  data() {
-    return {
-      actionButton: '',
-    }
-  },
-  watch: {
-    '$route.path': {
-      handler() {
-        this.actionButton = ''
-        this.actionButtonCallback = () => {}
-      },
-    },
-  },
-  methods: {
-    actionButtonCallback() {},
-    changeTheme() {
-      const shift = event.shiftKey
-      switch (this.$colorMode.preference) {
-        case 'dark':
-          this.$colorMode.preference = shift ? 'light' : 'oled'
-          break
-        case 'oled':
-          this.$colorMode.preference = shift ? 'dark' : 'light'
-          break
-        default:
-          this.$colorMode.preference = shift ? 'oled' : 'dark'
-      }
-    },
-  },
 }
 </script>
 

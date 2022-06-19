@@ -2,7 +2,7 @@
   <div class="columns">
     <label class="button" @drop.prevent="addFile" @dragover.prevent>
       <span>
-        <UploadIcon />
+        <UploadIcon v-if="showIcon" />
         {{ prompt }}
       </span>
       <input
@@ -36,6 +36,14 @@ export default {
       type: String,
       default: null,
     },
+    maxSize: {
+      type: Number,
+      default: null,
+    },
+    showIcon: {
+      type: Boolean,
+      default: true,
+    },
   },
   data() {
     return {
@@ -46,7 +54,26 @@ export default {
     onChange(files, shouldNotReset) {
       if (!shouldNotReset) this.files = files.target.files
 
-      this.$emit('change', this.files)
+      this.files = [...this.files].filter((file) => {
+        if (this.maxSize === null) {
+          return true
+        } else if (file.size > this.maxSize) {
+          console.log('File size: ' + file.size + ', max size: ' + this.maxSize)
+          alert(
+            'File ' +
+              file.name +
+              ' is too big! Must be less than ' +
+              this.$formatBytes(this.maxSize)
+          )
+          return false
+        } else {
+          return true
+        }
+      })
+
+      if (this.files.length > 0) {
+        this.$emit('change', this.files)
+      }
     },
     addFile(e) {
       const droppedFiles = e.dataTransfer.files
@@ -74,7 +101,6 @@ label {
   justify-content: center;
   text-align: center;
   padding: var(--spacing-card-sm) var(--spacing-card-md);
-  margin-bottom: var(--spacing-card-sm);
 }
 
 span {
@@ -94,5 +120,18 @@ span {
 
 input {
   display: none;
+}
+
+.known-error label {
+  border-color: var(--color-badge-red-bg) !important;
+  background-color: var(--color-warning-bg) !important;
+
+  span {
+    border-color: var(--color-badge-red-bg);
+  }
+
+  &::placeholder {
+    color: var(--color-warning-text);
+  }
 }
 </style>

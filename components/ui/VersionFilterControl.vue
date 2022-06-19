@@ -6,9 +6,8 @@
     <Multiselect
       v-if="getValidLoaders().length > 1"
       v-model="selectedLoader"
-      :options="
-        getValidLoaders().map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-      "
+      :options="getValidLoaders()"
+      :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
       :multiple="false"
       :searchable="false"
       :show-no-results="false"
@@ -60,7 +59,7 @@
         updateVersionFilters()
       "
     >
-      <CrossIcon />
+      <ClearIcon />
       Clear filters
     </button>
   </div>
@@ -69,14 +68,14 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import Checkbox from '~/components/ui/Checkbox'
-import CrossIcon from '~/assets/images/utils/x.svg?inline'
+import ClearIcon from '~/assets/images/utils/clear.svg?inline'
 
 export default {
   name: 'VersionFilterControl',
   components: {
     Multiselect,
     Checkbox,
-    CrossIcon,
+    ClearIcon,
   },
   props: {
     versions: {
@@ -123,9 +122,10 @@ export default {
         (projectVersion) =>
           (this.selectedGameVersions.length === 0 ||
             this.selectedGameVersions.some((gameVersion) =>
-              projectVersion.game_versions.includes(gameVersion.toLowerCase())
+              projectVersion.game_versions.includes(gameVersion)
             )) &&
-          projectVersion.loaders.includes(this.selectedLoader.toLowerCase())
+          (this.selectedLoader === null ||
+            projectVersion.loaders.includes(this.selectedLoader))
       )
       this.$emit('updateVersions', temp)
     },

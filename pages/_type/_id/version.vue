@@ -42,49 +42,52 @@
           Auto-featured
         </div>
       </div>
-      <div v-if="mode === 'edit'" class="buttons">
-        <button
-          class="action iconified-button brand-button-colors"
-          @click="saveEditedVersion"
-        >
-          <CheckIcon aria-hidden="true" />
-          Save
-        </button>
+      <div v-if="mode === 'edit'" class="header-buttons buttons">
         <nuxt-link
           v-if="$auth.user"
           :to="`/${project.project_type}/${
             project.slug ? project.slug : project.id
           }/version/${encodeURIComponent(version.version_number)}`"
-          class="action iconified-button"
+          class="iconified-button"
         >
-          <TrashIcon aria-hidden="true" />
-          Discard changes
+          <CrossIcon aria-hidden="true" />
+          Cancel
         </nuxt-link>
-      </div>
-      <div v-else-if="mode === 'create'" class="buttons">
         <button
-          class="action iconified-button brand-button-colors"
-          @click="createVersion"
+          class="iconified-button brand-button-colors"
+          @click="saveEditedVersion"
         >
-          <CheckIcon aria-hidden="true" />
+          <SaveIcon aria-hidden="true" />
           Save
         </button>
+      </div>
+      <div v-else-if="mode === 'create'" class="header-buttons buttons">
         <nuxt-link
           v-if="$auth.user"
           :to="`/${project.project_type}/${
             project.slug ? project.slug : project.id
           }/versions`"
-          class="action iconified-button"
+          class="iconified-button"
         >
-          <TrashIcon aria-hidden="true" />
-          Discard version
+          <CrossIcon aria-hidden="true" />
+          Cancel
         </nuxt-link>
+        <button
+          class="iconified-button brand-button-colors"
+          @click="createVersion"
+        >
+          <CheckIcon aria-hidden="true" />
+          Create
+        </button>
       </div>
       <div v-else class="buttons">
         <a
           v-if="primaryFile"
+          v-tooltip="
+            primaryFile.filename + ' (' + $formatBytes(primaryFile.size) + ')'
+          "
           :href="primaryFile.url"
-          class="action iconified-button brand-button-colors"
+          class="bold-button iconified-button brand-button-colors"
           :title="`Download ${primaryFile.filename}`"
         >
           <DownloadIcon aria-hidden="true" />
@@ -124,6 +127,7 @@
       >
         <input
           v-model="version.name"
+          class="full-width-input"
           type="text"
           placeholder="Enter the version name..."
         />
@@ -179,6 +183,9 @@
               class="input"
               placeholder="Select one"
               :options="['release', 'beta', 'alpha']"
+              :custom-label="
+                (value) => value.charAt(0).toUpperCase() + value.slice(1)
+              "
               :searchable="false"
               :close-on-select="true"
               :show-labels="false"
@@ -217,6 +224,12 @@
                   )
                   .map((it) => it.name)
               "
+              :custom-label="
+                (value) =>
+                  value === 'modloader'
+                    ? 'Risugami\'s ModLoader'
+                    : value.charAt(0).toUpperCase() + value.slice(1)
+              "
               :loading="$tag.loaders.length === 0"
               :multiple="true"
               :searchable="false"
@@ -231,7 +244,11 @@
             <p v-else class="value">
               {{
                 version.loaders
-                  .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                  .map((x) =>
+                    x.toLowerCase() === 'modloader'
+                      ? "Risugami's ModLoader"
+                      : x.charAt(0).toUpperCase() + x.slice(1)
+                  )
                   .join(', ')
               }}
             </p>
@@ -381,7 +398,7 @@
                   class="iconified-button"
                   @click="version.dependencies.splice(index, 1)"
                 >
-                  <TrashIcon /> Delete
+                  <TrashIcon /> Remove
                 </button>
               </div>
             </div>
@@ -401,13 +418,19 @@
               v-model="newDependencyId"
               type="text"
               oninput="this.value = this.value.replace(' ', '')"
-              :placeholder="`Enter the ${dependencyAddMode} ID...`"
+              :placeholder="`Enter the ${dependencyAddMode} ID${
+                dependencyAddMode === 'project' ? '/slug' : ''
+              }`"
+              @keyup.enter="addDependency"
             />
             <Multiselect
               v-model="newDependencyType"
               class="input"
               placeholder="Select one"
               :options="['required', 'optional', 'incompatible']"
+              :custom-label="
+                (value) => value.charAt(0).toUpperCase() + value.slice(1)
+              "
               :searchable="false"
               :close-on-select="true"
               :show-labels="false"
@@ -415,7 +438,7 @@
             />
             <button class="iconified-button" @click="addDependency">
               <PlusIcon />
-              Add dependency
+              Add
             </button>
           </div>
         </div>
@@ -456,7 +479,9 @@
           :key="file.hashes.sha1"
           class="file"
         >
-          <p class="filename">{{ file.filename }}</p>
+          <p class="filename">
+            {{ file.filename }}
+          </p>
           <div
             v-if="primaryFile.hashes.sha1 === file.hashes.sha1"
             class="featured"
@@ -473,6 +498,7 @@
             <DownloadIcon aria-hidden="true" />
             Download
           </a>
+          <p v-if="mode === 'version'">({{ $formatBytes(file.size) }})</p>
           <button
             v-if="mode === 'edit'"
             class="action iconified-button"
@@ -482,7 +508,7 @@
             "
           >
             <TrashIcon aria-hidden="true" />
-            Delete
+            Remove
           </button>
           <button
             v-if="
@@ -507,7 +533,7 @@
               @click="newFiles.splice(index, 1)"
             >
               <TrashIcon aria-hidden="true" />
-              Delete
+              Remove
             </button>
           </div>
         </div>
@@ -517,6 +543,7 @@
           class="choose-files"
           accept=".jar,application/java-archive,.zip,application/zip,.mrpack"
           prompt="Choose files or drag them here"
+          :max-size="524288000"
           @change="(x) => x.forEach((y) => newFiles.push(y))"
         />
       </section>
@@ -531,7 +558,9 @@ import StatelessFileInput from '~/components/ui/StatelessFileInput'
 
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg?inline'
 import EditIcon from '~/assets/images/utils/edit.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import ReportIcon from '~/assets/images/utils/report.svg?inline'
@@ -556,7 +585,9 @@ export default {
     StarIcon,
     CheckIcon,
     Multiselect,
+    SaveIcon,
     PlusIcon,
+    CrossIcon,
     StatelessFileInput,
     InfoIcon,
   },
@@ -951,21 +982,21 @@ section {
   }
 }
 
+.header-buttons {
+  justify-content: right;
+}
+
 .buttons {
   display: flex;
   flex-wrap: wrap;
   row-gap: 0.5rem;
 
-  .brand-button-colors {
+  .bold-button {
     font-weight: bold;
   }
 
   @media screen and (min-width: 1024px) {
     margin-left: auto;
-  }
-
-  .action:not(:first-child) {
-    margin: 0 0 0 0.5rem;
   }
 }
 
@@ -1005,8 +1036,7 @@ section {
 
       input {
         margin: 0;
-        height: 1.25rem;
-        width: calc(100% - 2.25rem);
+        width: 100%;
       }
     }
   }
@@ -1128,5 +1158,10 @@ section {
   width: calc(100% - var(--spacing-card-lg) - var(--spacing-card-md));
   min-height: 10rem;
   display: block;
+}
+
+.full-width-input {
+  width: 100%;
+  margin-bottom: 0.5rem;
 }
 </style>

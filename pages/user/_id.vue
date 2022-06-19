@@ -20,6 +20,14 @@
         <hr class="card-divider" />
         <h3 class="sidebar__item">About me</h3>
         <span v-if="user.bio" class="sidebar__item bio">{{ user.bio }}</span>
+        <a
+          :href="githubUrl"
+          target="_blank"
+          class="sidebar__item report-button iconified-button"
+        >
+          <GitHubIcon aria-hidden="true" />
+          View GitHub profile
+        </a>
         <div class="sidebar__item stats-block">
           <div class="stats-block__item secondary-stat">
             <SunriseIcon class="secondary-stat__icon" aria-hidden="true" />
@@ -125,6 +133,7 @@ import ThisOrThat from '~/components/ui/ThisOrThat'
 import Badge from '~/components/ui/Badge'
 import Advertisement from '~/components/ads/Advertisement'
 
+import GitHubIcon from '~/assets/images/utils/github.svg?inline'
 import ReportIcon from '~/assets/images/utils/report.svg?inline'
 import SunriseIcon from '~/assets/images/utils/sunrise.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
@@ -139,6 +148,7 @@ export default {
     ProjectCard,
     SunriseIcon,
     DownloadIcon,
+    GitHubIcon,
     ReportIcon,
     Badge,
     SettingsIcon,
@@ -160,10 +170,17 @@ export default {
         ])
       ).map((it) => it.data)
 
+      const githubUrl = (
+        await (
+          await fetch(`https://api.github.com/user/` + user.github_id)
+        ).json()
+      ).html_url
+
       return {
         selectedProjectType: 'all',
         user,
         projects,
+        githubUrl,
       }
     } catch {
       data.error({

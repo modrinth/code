@@ -56,6 +56,21 @@
                   {{ $user.notifications.length }}
                 </div>
               </nuxt-link>
+              <nuxt-link
+                v-if="
+                  $auth.user &&
+                  ($auth.user.role === 'moderator' ||
+                    $auth.user.role === 'admin')
+                "
+                to="/moderation"
+                class="control-button"
+                title="Moderation"
+              >
+                <ModerationIcon aria-hidden="true" />
+                <div v-if="moderationNotifications > 0" class="bubble">
+                  {{ moderationNotifications }}
+                </div>
+              </nuxt-link>
               <div v-if="$auth.user" ref="mobileMenu" class="dropdown">
                 <button class="control" value="Profile Dropdown">
                   <img
@@ -230,6 +245,7 @@
         position="bottom right"
         :max="5"
         :ignore-duplicates="true"
+        :duration="10000"
       />
       <Nuxt id="main" />
     </main>
@@ -237,16 +253,23 @@
       <div class="logo-info" role="region" aria-label="Modrinth information">
         <ModrinthLogo aria-hidden="true" class="text-logo" />
         <p>
-          Modrinth is open source software. You may view the source code at
+          Modrinth is
           <a
             target="_blank"
-            href="https://github.com/modrinth/knossos"
+            href="https://github.com/modrinth"
             class="text-link"
           >
-            our GitHub page</a
+            open source</a
+          >.
+        </p>
+        <p>
+          {{ owner }}/{{ slug }} {{ branch }}@<a
+            target="_blank"
+            :href="'https://github.com/' + owner + '/' + slug + '/tree/' + hash"
+            class="text-link"
+            >{{ hash.substring(0, 7) }}</a
           >
         </p>
-        <p>{{ owner }}/{{ slug }} {{ branch }}@{{ hash.substring(0, 7) }}</p>
         <p>© Rinth, Inc.</p>
       </div>
       <div class="links links-1" role="region" aria-label="Legal">
@@ -343,6 +366,7 @@ export default {
       hash: process.env.hash || 'unknown',
       isMobileMenuOpen: false,
       registeredSkipLink: null,
+      moderationNotifications: 0,
     }
   },
   async fetch() {
@@ -351,6 +375,19 @@ export default {
       this.$store.dispatch('tag/fetchAllTags'),
       this.$store.dispatch('cosmetics/fetchCosmetics', this.$cookies),
     ])
+    if (
+      (this.$auth.user && this.$auth.user.role === 'moderator') ||
+      this.$auth.user.role === 'admin'
+    ) {
+      const [projects, reports] = (
+        await Promise.all([
+          this.$axios.get(`moderation/projects`, this.$auth.headers),
+          this.$axios.get(`report`, this.$auth.headers),
+        ])
+      ).map((it) => it.data)
+
+      this.moderationNotifications = projects.length + reports.length
+    }
   },
   computed: {
     authUrl() {
@@ -415,6 +452,16 @@ export default {
     },
     removeFocus() {
       document.activeElement.blur() // This doesn't work, sadly. Help
+    },
+    async getModerationCount() {
+      const [projects, reports] = (
+        await Promise.all([
+          this.$axios.get(`moderation/projects`, this.$auth.headers),
+          this.$axios.get(`report`, this.$auth.headers),
+        ])
+      ).map((it) => it.data)
+
+      return projects.length + reports.length
     },
   },
 }

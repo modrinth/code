@@ -271,7 +271,7 @@ export default {
     breaks: false,
   },
   loading: {
-    color: 'green',
+    color: '#1bd96a',
     height: '2px',
   },
   env: {

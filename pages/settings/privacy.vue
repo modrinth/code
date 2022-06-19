@@ -1,5 +1,26 @@
 <template>
   <div class="rows card">
+    <div class="header">
+      <h2 class="title">Privacy settings</h2>
+      <div class="controls">
+        <button class="iconified-button" @click="toggleAll(false)">
+          <DenyIcon />
+          Deny all
+        </button>
+        <button class="iconified-button" @click="toggleAll(true)">
+          <AllowIcon />
+          Allow all
+        </button>
+        <button
+          class="brand-button-colors iconified-button"
+          title="Confirm privacy settings"
+          @click="confirm()"
+        >
+          <SaveIcon />
+          Save changes
+        </button>
+      </div>
+    </div>
     <div class="privacy-settings-container">
       <div>
         Modrinth relies on different providers and in-house tools to allow us to
@@ -30,23 +51,23 @@
         </div>
       </div>
     </div>
-    <div class="actions">
-      <button class="iconified-button" @click="toggleAll(false)">
-        Select none
-      </button>
-      <button class="iconified-button" @click="toggleAll(true)">
-        Select all
-      </button>
-    </div>
   </div>
 </template>
 
 <script>
 import toggles from '@/privacy-toggles'
+import DenyIcon from '~/assets/images/utils/clear.svg?inline'
+import AllowIcon from '~/assets/images/utils/check-circle.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
 
 export default {
   auth: false,
   name: 'Privacy',
+  components: {
+    DenyIcon,
+    AllowIcon,
+    SaveIcon,
+  },
   data: () => {
     const settings = toggles.settings
     return {
@@ -54,9 +75,6 @@ export default {
     }
   },
   fetch() {
-    this.$emit('update:action-button', 'Confirm')
-    this.$emit('update:action-button-callback', this.confirm)
-
     this.$store.dispatch('consent/loadFromCookies', this.$cookies)
     if (this.$store.state.consent.is_consent_given) {
       Object.keys(toggles.settings).forEach((key) => {
@@ -76,10 +94,6 @@ export default {
   head: {
     title: 'Privacy Settings - Modrinth',
   },
-  created() {
-    this.$emit('update:action-button', 'Confirm')
-    this.$emit('update:action-button-callback', this.confirm)
-  },
   options: {
     auth: false,
   },
@@ -91,6 +105,7 @@ export default {
       }
 
       this.$forceUpdate()
+      this.confirm()
     },
     confirm() {
       this.$store.commit('consent/set_consent', true)
@@ -171,6 +186,24 @@ export default {
         margin-right: 1rem;
       }
     }
+  }
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+  grid-area: header;
+
+  .title {
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
   }
 }
 </style>

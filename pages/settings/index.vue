@@ -1,180 +1,144 @@
 <template>
   <div class="edit-page">
-    <div class="left-side">
-      <div class="profile-picture card">
-        <h3>Profile picture</h3>
-        <div class="uploader">
-          <img
-            :src="previewImage ? previewImage : $auth.user.avatar_url"
-            @click="developerMode++"
-          />
-          <file-input
-            accept="image/png,image/jpeg,image/gif,image/webp"
-            class="choose-image"
-            prompt="Choose image or drag it here"
-            @change="showPreviewImage"
-          />
+    <section class="card account-settings">
+      <div class="header">
+        <h2 class="title">Account settings</h2>
+        <div class="controls">
+          <button
+            class="brand-button-colors iconified-button"
+            title="Save account settings changes"
+            @click="saveChanges()"
+          >
+            <SaveIcon />
+            Save changes
+          </button>
         </div>
-        <button
-          class="iconified-button"
-          @click="
-            icon = null
-            previewImage = null
-          "
-        >
-          <TrashIcon />
-          Reset
-        </button>
       </div>
-      <div class="recap card">
-        <section>
-          <h2>Profile Recap</h2>
-          <div>
-            <Badge
-              v-if="$auth.user.role === 'admin'"
-              type="Admin"
-              color="red"
+      <div class="left-side">
+        <h3>Profile picture</h3>
+        <div class="profile-picture">
+          <img :src="previewImage ? previewImage : $auth.user.avatar_url" />
+          <div class="uploader">
+            <SmartFileInput
+              :show-icon="false"
+              :max-size="2097152"
+              accept="image/png,image/jpeg,image/gif,image/webp"
+              class="choose-image"
+              prompt="Choose image or drag it here"
+              @change="showPreviewImage"
             />
-            <Badge
-              v-else-if="$auth.user.role === 'moderator'"
-              type="Moderator"
-              color="yellow"
-            />
-            <Badge v-else type="Developer" color="green" />
-            <div class="stat">
-              <SunriseIcon />
-              <span>Joined {{ $dayjs($auth.user.created).fromNow() }}</span>
-            </div>
+            <button
+              class="iconified-button"
+              @click="
+                icon = null
+                previewImage = null
+              "
+            >
+              <TrashIcon />
+              Reset
+            </button>
           </div>
-        </section>
-        <section>
-          <div class="stat">
-            <DownloadIcon />
-            <span>
-              <strong>{{ sumDownloads() }}</strong> downloads
-            </span>
-          </div>
-          <div class="stat">
-            <HeartIcon />
-            <span>
-              <strong>{{ sumFollows() }}</strong> followers of projects
-            </span>
-          </div>
-        </section>
+        </div>
       </div>
-    </div>
-    <div class="right-side">
-      <section class="card">
-        <h3>Username</h3>
+      <div class="right-side">
         <label>
           <span>
-            The username used on Modrinth to identify yourself. This must be
-            unique.
+            <h3>Username</h3>
+            <span>This must be unique.</span>
           </span>
+
           <input
             v-model="username"
             type="text"
             placeholder="Enter your username"
           />
         </label>
-        <h3>Email</h3>
         <label>
           <span>
-            The email for your account. This is private information which is not
-            exposed in any API routes or on your profile. It is also optional.
+            <h3>Email (optional)</h3>
+            <span>This is kept private.</span>
           </span>
           <input v-model="email" type="email" placeholder="Enter your email" />
         </label>
-        <h3>Bio</h3>
         <label>
           <span>
-            A description of yourself which other users can see on your profile.
+            <h3>Bio</h3>
+            <span>Describe yourself to other users!</span>
           </span>
           <input v-model="bio" type="text" placeholder="Enter your bio" />
         </label>
-        <h3>Theme</h3>
-        <label>
+      </div>
+    </section>
+    <section class="card">
+      <div class="header">
+        <h2 class="title">Display settings</h2>
+      </div>
+      <label>
+        <span>
+          <h3>Theme</h3>
+          <span>Change the global site theme.</span>
+        </span>
+        <Multiselect
+          v-model="$colorMode.preference"
+          :options="['system', 'light', 'dark', 'oled']"
+          :custom-label="
+            (value) =>
+              value === 'oled'
+                ? 'OLED'
+                : value.charAt(0).toUpperCase() + value.slice(1)
+          "
+          :searchable="false"
+          :close-on-select="true"
+          :show-labels="false"
+          :allow-empty="false"
+        />
+      </label>
+      <label>
+        <span>
+          <h3>Search sidebar on the right</h3>
           <span>
-            Change the global site theme. It can also be changed between light
-            and dark in the navigation bar.
+            Enabling this will put the search page's filters sidebar on the
+            right side.
           </span>
-          <Multiselect
-            v-model="$colorMode.preference"
-            :options="['system', 'light', 'dark', 'oled']"
-            :searchable="false"
-            :close-on-select="true"
-            :show-labels="false"
-            :allow-empty="false"
-          />
-        </label>
-        <h3>Search sidebar on right side</h3>
-        <label>
+        </span>
+        <input
+          v-model="searchLayout"
+          class="switch stylized-toggle"
+          type="checkbox"
+          @change="changeLayout"
+        />
+      </label>
+      <label>
+        <span>
+          <h3>Project sidebar on the right</h3>
+
           <span>
-            Sets the sidebar direction for search pages. Enabling this will put
-            the search bar on the right side.
+            Enabling this will put the project pages' info sidebars on the right
+            side.
           </span>
-          <input
-            v-model="searchLayout"
-            class="switch stylized-toggle"
-            type="checkbox"
-            @change="changeLayout"
-          />
-        </label>
-        <h3>Project sidebar on right side</h3>
-        <label>
-          <span>
-            Sets the sidebar direction for project pages. Enabling this will
-            make projects look closer to the legacy layout, with project
-            information on the right side.
-          </span>
-          <input
-            v-model="projectLayout"
-            class="switch stylized-toggle"
-            type="checkbox"
-            @change="changeLayout"
-          />
-        </label>
-        <section v-if="developerMode > 6">
-          <h3>Developer options</h3>
-          <label>
-            <span>
-              Set the API endpoint. This value is not stored, and is intended
-              for temporary usage.</span
-            >
-            <Multiselect
-              v-model="apiEndpoint"
-              :options="['production', 'staging']"
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-              :allow-empty="false"
-              @input="changeApiEndpoint()"
-            />
-          </label>
-        </section>
-      </section>
-    </div>
+        </span>
+        <input
+          v-model="projectLayout"
+          class="switch stylized-toggle"
+          type="checkbox"
+          @change="changeLayout"
+        />
+      </label>
+    </section>
   </div>
 </template>
 
 <script>
 import Multiselect from 'vue-multiselect'
-import FileInput from '~/components/ui/FileInput'
-import Badge from '~/components/ui/Badge'
-
-import HeartIcon from '~/assets/images/utils/heart.svg?inline'
+import SmartFileInput from '~/components/ui/SmartFileInput'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
-import SunriseIcon from '~/assets/images/utils/sunrise.svg?inline'
-import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
 
 export default {
   components: {
     TrashIcon,
-    SunriseIcon,
-    DownloadIcon,
-    HeartIcon,
-    Badge,
-    FileInput,
+    SaveIcon,
+    SmartFileInput,
     Multiselect,
   },
   asyncData(ctx) {
@@ -190,23 +154,14 @@ export default {
       previewImage: null,
       searchLayout: false,
       projectLayout: false,
-      apiEndpoint: this.getApiEndpoint(),
-      developerMode: 0,
     }
   },
   fetch() {
     this.searchLayout = this.$store.state.cosmetics.searchLayout
     this.projectLayout = this.$store.state.cosmetics.projectLayout
-
-    this.$emit('update:action-button', 'Save')
-    this.$emit('update:action-button-callback', this.saveChanges)
   },
   head: {
     title: 'Settings - Modrinth',
-  },
-  created() {
-    this.$emit('update:action-button', 'Save')
-    this.$emit('update:action-button-callback', this.saveChanges)
   },
   methods: {
     changeTheme() {
@@ -221,17 +176,6 @@ export default {
         default:
           this.$colorMode.preference = shift ? 'oled' : 'dark'
       }
-    },
-    changeApiEndpoint() {
-      const subdomain =
-        this.apiEndpoint === 'production' ? 'api' : 'staging-api'
-      this.$axios.defaults.baseURL =
-        'https://' + subdomain + '.modrinth.com/v2/'
-    },
-    getApiEndpoint() {
-      return this.$axios.defaults.baseURL === 'https://api.modrinth.com/v2/'
-        ? 'production'
-        : 'staging'
     },
     showPreviewImage(files) {
       const reader = new FileReader()
@@ -311,76 +255,72 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.edit-page {
-  display: flex;
-  flex-direction: column;
+.account-settings {
+  display: grid;
+  grid-template: 'header header' auto 'left-side left-side' auto 'right-side right-side' auto;
 
   @media screen and (min-width: 1024px) {
-    flex-direction: row;
-
-    .left-side {
-      margin-right: var(--spacing-card-bg);
-    }
+    grid-template:
+      'header header' auto
+      'left-side right-side' auto;
   }
-}
 
-.left-side {
-  min-width: 20rem;
+  .left-side {
+    grid-area: left-side;
+    min-width: 20rem;
 
-  .profile-picture {
-    h3 {
-      font-size: var(--font-size-lg);
-    }
-
-    .uploader {
-      margin: 1rem 0;
-      text-align: center;
+    .profile-picture {
+      display: flex;
+      flex-direction: row;
+      gap: 0.5rem;
+      align-items: center;
 
       img {
         box-shadow: var(--shadow-card);
-
         border-radius: var(--size-rounded-md);
-        width: 8rem;
+        width: 10rem;
+        height: 10rem;
+        object-fit: contain;
         margin-bottom: 0.5rem;
       }
-    }
-  }
 
-  .recap {
-    section {
-      h2 {
-        font-size: var(--font-size-lg);
-        margin: 0 0 0.5rem 0;
-      }
-
-      .version-badge {
-        text-transform: none;
-        margin-bottom: 0.25rem;
-
-        &::first-letter {
-          text-transform: uppercase;
+      .uploader {
+        text-align: center;
+        .iconified-button {
+          margin-top: 0.5rem;
         }
       }
     }
   }
+  .right-side {
+    grid-area: right-side;
+    margin-left: var(--spacing-card-lg);
+  }
 }
 
-.stat {
+.card span {
+  margin-bottom: 1rem;
+}
+
+label {
+  align-items: center;
+}
+
+.header {
   display: flex;
   align-items: center;
-  margin: 0.5rem 0;
+  padding-bottom: 1rem;
+  grid-area: header;
 
-  svg {
-    width: auto;
-    height: 1.25rem;
-
-    margin-right: 0.25rem;
+  .title {
+    flex-grow: 1;
+    margin: 0;
   }
 
-  span {
-    strong {
-      font-weight: bolder;
-    }
+  .controls {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
   }
 }
 </style>

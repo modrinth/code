@@ -12,12 +12,17 @@
     />
 
     <section class="card">
-      <h3>Authorization token</h3>
+      <div class="header">
+        <h2 class="title">Security settings</h2>
+      </div>
       <label>
         <span>
-          Your authorization token can be used with the Modrinth API, the
-          Minotaur Gradle plugin, and other applications that interact with
-          Modrinth's API. Be sure to keep this secret!
+          <h3>Authorization token</h3>
+          <span>
+            Your authorization token can be used with the Modrinth API, the
+            Minotaur Gradle plugin, and other applications that interact with
+            Modrinth's API. Be sure to keep this secret!
+          </span>
         </span>
         <input
           type="button"
@@ -26,12 +31,14 @@
           @click="copyToken"
         />
       </label>
-      <h3>Revoke your token</h3>
       <label>
-        <span
-          >This will log you out of Modrinth, and you will have to log in again
-          to access Modrinth with a new token.</span
-        >
+        <span>
+          <h3>Revoke your token</h3>
+          <span
+            >This will log you out of Modrinth, and you will have to log in
+            again to access Modrinth with a new token.</span
+          >
+        </span>
         <input
           type="button"
           class="iconified-button"
@@ -39,14 +46,16 @@
           @click="$router.replace('/settings/revoke-token')"
         />
       </label>
-      <h3>Delete your account</h3>
       <label>
-        <span
-          >Clicking on this WILL delete your account. Do not click on this
-          unless you want your account deleted. If you delete your account, all
-          attached data, including projects, will be removed from our servers.
-          This cannot be reversed, so be careful!</span
-        >
+        <span>
+          <h3>Delete your account</h3>
+          <span
+            >Clicking on this WILL delete your account. Do not click on this
+            unless you want your account deleted. If you delete your account,
+            all attached data, including projects, will be removed from our
+            servers. This cannot be reversed, so be careful!</span
+          >
+        </span>
         <input
           value="Delete account"
           type="button"
@@ -96,3 +105,26 @@ export default {
   },
 }
 </script>
+<style lang="scss" scoped>
+.card span {
+  margin-bottom: 1rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 1rem;
+  grid-area: header;
+
+  .title {
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  .controls {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+  }
+}
+</style>

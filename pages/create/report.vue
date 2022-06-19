@@ -9,29 +9,36 @@
           :disabled="!$nuxt.$loading"
           @click="createReport"
         >
-          <PlusIcon />
-          Create
+          <CheckIcon />
+          Submit
         </button>
       </header>
       <section class="card info">
-        <h3>Item ID</h3>
         <label>
           <span>
-            The ID of the item you are reporting. For example, the item ID of a
-            project would be its project ID, found on the right side of that
-            project's page under "Project ID".
+            <h3>Item ID</h3>
+            <span>
+              The ID of the item you are reporting. For example, the item ID of
+              a project would be its project ID, found on the right side of that
+              project's page under "Project ID".
+            </span>
           </span>
           <input v-model="itemId" type="text" placeholder="Enter the item ID" />
         </label>
-        <h3>Item type</h3>
         <label>
-          <span class="no-padding"
-            >The type of the item that is being reported.</span
-          >
+          <span>
+            <h3>Item type</h3>
+            <span class="no-padding"
+              >The type of the item that is being reported.</span
+            >
+          </span>
           <multiselect
             id="item-type"
             v-model="itemType"
             :options="['project', 'version', 'user']"
+            :custom-label="
+              (value) => value.charAt(0).toUpperCase() + value.slice(1)
+            "
             :multiple="false"
             :searchable="false"
             :show-no-results="false"
@@ -39,16 +46,21 @@
             placeholder="Choose item type"
           />
         </label>
-        <h3>Report type</h3>
         <label>
-          <span class="no-padding">
-            The type of report. This is the category that this report falls
-            under.
+          <span>
+            <h3>Report type</h3>
+            <span class="no-padding">
+              The type of report. This is the category that this report falls
+              under.
+            </span>
           </span>
           <multiselect
             id="report-type"
             v-model="reportType"
             :options="reportTypes"
+            :custom-label="
+              (value) => value.charAt(0).toUpperCase() + value.slice(1)
+            "
             :multiple="false"
             :searchable="false"
             :show-no-results="false"
@@ -68,13 +80,13 @@
         </h3>
         <span>
           You can type the of the long form of your description here. This
-          editor supports markdown. You can find the syntax
+          editor supports
           <a
             href="https://guides.github.com/features/mastering-markdown/"
             target="_blank"
             rel="noopener noreferrer"
             class="text-link"
-            >here</a
+            >Markdown</a
           >.
         </span>
         <ThisOrThat
@@ -102,13 +114,13 @@
 import Multiselect from 'vue-multiselect'
 import ThisOrThat from '~/components/ui/ThisOrThat'
 
-import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import CheckIcon from '~/assets/images/utils/check.svg?inline'
 
 export default {
   components: {
     Multiselect,
     ThisOrThat,
-    PlusIcon,
+    CheckIcon,
   },
   async asyncData(data) {
     const reportTypes = (await data.$axios.get(`tag/report_type`)).data
@@ -260,5 +272,13 @@ section.description {
 
 .card {
   margin-bottom: 0;
+}
+
+.card span {
+  margin-bottom: 1rem;
+}
+
+label {
+  align-items: center;
 }
 </style>

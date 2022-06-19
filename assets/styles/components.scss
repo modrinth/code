@@ -454,6 +454,15 @@
   border-top-right-radius: var(--size-rounded-card) !important;
 }
 
+.known-error .multiselect__tags {
+  border-color: var(--color-badge-red-bg) !important;
+  background-color: var(--color-warning-bg) !important;
+
+  &::placeholder {
+    color: var(--color-warning-text);
+  }
+}
+
 .multiselect {
   color: var(--color-text) !important;
 
@@ -554,6 +563,7 @@ label {
 
   @media screen and (min-width: 1024px) {
     flex-direction: row;
+    align-items: center;
   }
 
   span {
@@ -814,6 +824,26 @@ label {
   }
 }
 
+.vue-notification {
+  background: #44A4FC;
+  border-left: 5px solid #44A4FC;
+
+  &.success {
+    background: #68CD86;
+    border-left-color: #68CD86;
+  }
+
+  &.warn {
+    background: #ffb648;
+    border-left-color: #ffb648;
+  }
+
+  &.error {
+    background: #E54D42;
+    border-left-color: #E54D42;
+  }
+}
+
 .vue-notification-group {
   right: 25px !important;
 
@@ -838,4 +868,18 @@ label {
   color: var(--color-divider);
   height: 1px;
   margin: var(--spacing-card-bg) 0;
+}
+
+input.known-error,
+textarea.known-error {
+  border-color: var(--color-badge-red-bg) !important;
+  background-color: var(--color-warning-bg) !important;
+
+  &::placeholder {
+    color: var(--color-warning-text);
+  }
+}
+
+.known-errors {
+  color: var(--color-badge-red-bg);
 }

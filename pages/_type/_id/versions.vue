@@ -1,9 +1,12 @@
 <template>
   <div class="content">
-    <div class="card" v-if="currentMember">
-      <nuxt-link to="version/create" class="iconified-button new-version">
-        <UploadIcon />
-        Upload
+    <div v-if="currentMember" class="card header-buttons">
+      <nuxt-link
+        to="version/create"
+        class="brand-button-colors iconified-button"
+      >
+        <PlusIcon />
+        Create a version
       </nuxt-link>
     </div>
     <VersionFilterControl
@@ -11,7 +14,7 @@
       :versions="versions"
       @updateVersions="updateVersions"
     />
-    <div class="card">
+    <div v-if="versions.length > 0" class="card">
       <table>
         <thead>
           <tr>
@@ -25,6 +28,12 @@
           <tr v-for="version in filteredVersions" :key="version.id">
             <td>
               <a
+                v-tooltip="
+                  $parent.findPrimary(version).filename +
+                  ' (' +
+                  $formatBytes($parent.findPrimary(version).size) +
+                  ')'
+                "
                 :href="$parent.findPrimary(version).url"
                 class="download-button"
                 :class="version.version_type"
@@ -69,7 +78,11 @@
                   <p>
                     {{
                       version.loaders
-                        .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                        .map((x) =>
+                          x.toLowerCase() === 'modloader'
+                            ? 'ModLoader'
+                            : x.charAt(0).toUpperCase() + x.slice(1)
+                        )
                         .join(', ') +
                       ' ' +
                       $formatVersion(version.game_versions)
@@ -93,7 +106,11 @@
               <p>
                 {{
                   version.loaders
-                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                    .map((x) =>
+                      x.toLowerCase() === 'modloader'
+                        ? 'ModLoader'
+                        : x.charAt(0).toUpperCase() + x.slice(1)
+                    )
                     .join(', ')
                 }}
               </p>
@@ -118,14 +135,14 @@
   </div>
 </template>
 <script>
-import UploadIcon from '~/assets/images/utils/upload.svg?inline'
+import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import VersionBadge from '~/components/ui/Badge'
 import VersionFilterControl from '~/components/ui/VersionFilterControl'
 
 export default {
   components: {
-    UploadIcon,
+    PlusIcon,
     DownloadIcon,
     VersionBadge,
     VersionFilterControl,
@@ -165,10 +182,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.new-version {
-  max-width: 5.25rem;
-}
-
 table {
   border-collapse: separate;
   border-spacing: 0 0.75rem;
@@ -248,5 +261,10 @@ table {
   .mobile-info {
     display: none;
   }
+}
+
+.header-buttons {
+  display: flex;
+  justify-content: right;
 }
 </style>

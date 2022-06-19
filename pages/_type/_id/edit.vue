@@ -1,46 +1,77 @@
 <template>
   <div class="page-contents">
-    <header class="card columns">
-      <h3 class="column-grow-1">Edit project</h3>
-      <nuxt-link
-        :to="`/${project.project_type}/${
-          project.slug ? project.slug : project.id
-        }/settings`"
-        class="iconified-button column"
-      >
-        Back
-      </nuxt-link>
-      <button
-        v-if="
-          project.status === 'rejected' ||
-          project.status === 'draft' ||
-          project.status === 'unlisted'
-        "
-        title="Submit for approval"
-        class="iconified-button column"
-        :disabled="!$nuxt.$loading"
-        @click="saveProjectReview"
-      >
-        Submit for approval
-      </button>
-      <button
-        title="Save"
-        class="iconified-button brand-button-colors column"
-        :disabled="!$nuxt.$loading"
-        @click="saveProject"
-      >
-        <CheckIcon />
-        Save
-      </button>
+    <header class="card">
+      <div class="columns">
+        <h3 class="column-grow-1">Edit project</h3>
+        <nuxt-link
+          :to="`/${project.project_type}/${
+            project.slug ? project.slug : project.id
+          }/settings`"
+          class="iconified-button column"
+        >
+          <CrossIcon />
+          Cancel
+        </nuxt-link>
+        <button
+          v-if="
+            project.status === 'rejected' ||
+            project.status === 'draft' ||
+            project.status === 'unlisted'
+          "
+          title="Submit for review"
+          class="iconified-button column"
+          :disabled="!$nuxt.$loading"
+          @click="saveProjectReview"
+        >
+          <CheckIcon />
+          Submit for review
+        </button>
+        <button
+          title="Save"
+          class="iconified-button brand-button-colors column"
+          :disabled="!$nuxt.$loading"
+          @click="saveProjectNotForReview"
+        >
+          <SaveIcon />
+          Save changes
+        </button>
+      </div>
+      <div v-if="showKnownErrors" class="known-errors">
+        <ul>
+          <li v-if="newProject.title === ''">Your project must have a name.</li>
+          <li v-if="newProject.description === ''">
+            Your project must have a summary.
+          </li>
+          <li v-if="newProject.slug === ''">
+            Your project must have a vanity URL.
+          </li>
+          <li v-if="!savingAsDraft && newProject.body === ''">
+            Your project must have a body to submit for review.
+          </li>
+          <li v-if="!savingAsDraft && project.versions.length < 1">
+            Your project must have at least one version to submit for review.
+          </li>
+          <li
+            v-if="
+              license === null || license_url === null || license_url === ''
+            "
+          >
+            Your project must have a license.
+          </li>
+        </ul>
+      </div>
     </header>
     <section class="card essentials">
-      <h3>Name<span class="required">*</span></h3>
       <label>
         <span>
-          Be creative! Generic project names will be harder to search for.
+          <h3>Name<span class="required">*</span></h3>
+          <span>
+            Be creative! Generic project names will be harder to search for.
+          </span>
         </span>
         <input
           v-model="newProject.title"
+          :class="{ 'known-error': newProject.title === '' && showKnownErrors }"
           type="text"
           placeholder="Enter the name"
           :disabled="
@@ -48,14 +79,19 @@
           "
         />
       </label>
-      <h3>Summary<span class="required">*</span></h3>
       <label>
         <span>
-          Give a short description of your project that will appear on search
-          pages.
+          <h3>Summary<span class="required">*</span></h3>
+          <span>
+            Give a short description of your project that will appear on search
+            pages.
+          </span>
         </span>
         <input
           v-model="newProject.description"
+          :class="{
+            'known-error': newProject.description === '' && showKnownErrors,
+          }"
           type="text"
           placeholder="Enter the summary"
           :disabled="
@@ -63,11 +99,13 @@
           "
         />
       </label>
-      <h3>Categories</h3>
       <label>
-        <span class="no-padding">
-          Select up to 3 categories that will help others <br />
-          find your project.
+        <span>
+          <h3>Categories</h3>
+          <span class="no-padding">
+            Select up to 3 categories that will help others <br />
+            find your project.
+          </span>
         </span>
         <Multiselect
           id="categories"
@@ -76,6 +114,9 @@
             $tag.categories
               .filter((x) => x.project_type === project.project_type)
               .map((it) => it.name)
+          "
+          :custom-label="
+            (value) => value.charAt(0).toUpperCase() + value.slice(1)
           "
           :loading="$tag.categories.length === 0"
           :multiple="true"
@@ -93,23 +134,28 @@
           "
         />
       </label>
-      <h3>Vanity URL (slug)<span class="required">*</span></h3>
-      <label>
+      <label class="vertical-input">
         <span>
-          Set this to something that will looks nice in your project's URL.
+          <h3>Vanity URL (slug)<span class="required">*</span></h3>
+          <span class="slug-description"
+            >https://modrinth.com/{{ newProject.project_type.toLowerCase() }}/{{
+              newProject.slug ? newProject.slug : 'your-slug'
+            }}
+          </span>
         </span>
         <input
           id="name"
           v-model="newProject.slug"
+          :class="{ 'known-error': newProject.slug === '' && showKnownErrors }"
           type="text"
-          placeholder="Enter the vanity URL slug"
+          placeholder="Enter the vanity URL"
           :disabled="
             (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
           "
         />
       </label>
     </section>
-    <section class="card project-icon rows">
+    <section class="card project-icon">
       <h3>Icon</h3>
       <img
         :src="
@@ -121,7 +167,9 @@
         "
         alt="preview-image"
       />
-      <file-input
+      <SmartFileInput
+        :max-size="262144"
+        :show-icon="false"
         accept="image/png,image/jpeg,image/gif,image/webp"
         class="choose-image"
         prompt="Choose image or drag it here"
@@ -142,15 +190,22 @@
       </button>
     </section>
     <section class="card game-sides">
-      <h3>Supported environments</h3>
       <div class="columns">
-        <span> Let others know what environments your project supports. </span>
+        <div>
+          <h3>Supported environments</h3>
+          <span>
+            Let others know what environments your project supports.
+          </span>
+        </div>
         <div class="labeled-control">
           <h3>Client<span class="required">*</span></h3>
           <Multiselect
             v-model="clientSideType"
             placeholder="Select one"
             :options="sideTypes"
+            :custom-label="
+              (value) => value.charAt(0).toUpperCase() + value.slice(1)
+            "
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -166,6 +221,9 @@
             v-model="serverSideType"
             placeholder="Select one"
             :options="sideTypes"
+            :custom-label="
+              (value) => value.charAt(0).toUpperCase() + value.slice(1)
+            "
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
@@ -183,19 +241,20 @@
           for="body"
           title="You can type an extended description of your project here."
         >
-          Description
+          Body<span class="required">*</span>
         </label>
       </h3>
       <span>
         You can type an extended description of your mod here. This editor
-        supports Markdown. Its syntax can be found
+        supports
         <a
+          class="text-link"
           href="https://guides.github.com/features/mastering-markdown/"
           target="_blank"
           rel="noopener noreferrer"
-          class="text-link"
-          >here</a
-        >.
+          >Markdown</a
+        >. HTML can also be used inside your description, not including styles,
+        scripts, and iframes (though YouTube iframes are allowed).
       </span>
       <ThisOrThat
         v-model="bodyViewMode"
@@ -207,6 +266,9 @@
           <textarea
             id="body"
             v-model="newProject.body"
+            :class="{
+              'known-error': newProject.body === '' && showKnownErrors,
+            }"
             :disabled="(currentMember.permissions & EDIT_BODY) !== EDIT_BODY"
           />
         </div>
@@ -297,10 +359,11 @@
         <div class="input-group">
           <Multiselect
             v-model="license"
-            placeholder="Select one"
+            placeholder="Choose license..."
             track-by="short"
             label="short"
             :options="$tag.licenses"
+            :custom-label="(value) => value.short.toUpperCase()"
             :searchable="true"
             :close-on-select="true"
             :show-labels="false"
@@ -365,7 +428,7 @@
           "
         >
           <TrashIcon />
-          Remove Link
+          Remove link
         </button>
         <hr
           v-if="
@@ -381,21 +444,25 @@
 <script>
 import Multiselect from 'vue-multiselect'
 
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg?inline'
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
+import TrashIcon from '~/assets/images/utils/trash.svg?inline'
 
-import FileInput from '~/components/ui/FileInput'
 import ThisOrThat from '~/components/ui/ThisOrThat'
+import SmartFileInput from '~/components/ui/SmartFileInput'
 
 export default {
   components: {
-    FileInput,
+    SmartFileInput,
     ThisOrThat,
     Multiselect,
-    TrashIcon,
+    CrossIcon,
     CheckIcon,
     PlusIcon,
+    SaveIcon,
+    TrashIcon,
   },
   beforeRouteLeave(to, from, next) {
     if (
@@ -444,6 +511,9 @@ export default {
 
       isEditing: true,
       bodyViewMode: 'source',
+
+      showKnownErrors: false,
+      savingAsDraft: false,
     }
   },
   fetch() {
@@ -514,9 +584,38 @@ export default {
     this.DELETE_PROJECT = 1 << 7
   },
   methods: {
+    checkFields() {
+      const reviewConditions =
+        this.newProject.body !== '' && this.newProject.versions.length > 0
+      if (
+        this.newProject.name !== '' &&
+        this.newProject.description !== '' &&
+        this.newProject.slug !== '' &&
+        this.license.short !== null &&
+        this.license_url !== null &&
+        this.license_url !== ''
+      ) {
+        if (this.savingAsDraft) {
+          return true
+        } else if (reviewConditions) {
+          return true
+        }
+      }
+      this.showKnownErrors = true
+      return false
+    },
     async saveProjectReview() {
-      this.isProcessing = true
-      await this.saveProject()
+      this.savingAsDraft = false
+      if (this.checkFields()) {
+        this.isProcessing = true
+        await this.saveProject()
+      }
+    },
+    async saveProjectNotForReview() {
+      this.savingAsDraft = true
+      if (this.checkFields()) {
+        await this.saveProject()
+      }
     },
     async saveProject() {
       this.$nuxt.$loading.start()
@@ -709,6 +808,15 @@ header {
 
 section.essentials {
   grid-area: essentials;
+  label {
+    margin-bottom: 0.5rem;
+  }
+
+  @media screen and (min-width: 1024px) {
+    input {
+      margin-left: 1.5rem;
+    }
+  }
 }
 
 section.project-icon {
@@ -716,12 +824,11 @@ section.project-icon {
 
   img {
     max-width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     border-radius: var(--size-rounded-lg);
   }
 
   .iconified-button {
-    width: 9rem;
     margin-top: 0.5rem;
   }
 }
@@ -732,12 +839,11 @@ section.game-sides {
   .columns {
     flex-wrap: wrap;
 
-    span {
+    div {
       flex: 2;
     }
 
     .labeled-control {
-      flex: 2;
       margin-left: var(--spacing-card-lg);
 
       h3 {
@@ -817,5 +923,16 @@ section.donations {
 
 .required {
   color: var(--color-badge-red-bg);
+}
+
+.vertical-input {
+  flex-direction: column;
+  justify-content: left;
+  align-items: unset;
+  gap: 0.5rem;
+
+  input {
+    margin-left: 0 !important;
+  }
 }
 </style>

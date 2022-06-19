@@ -1,30 +1,61 @@
 <template>
   <div class="page-container">
     <div class="page-contents">
-      <header class="card columns">
-        <h3 class="column-grow-1">Create a project</h3>
-        <button
-          title="Save draft"
-          class="iconified-button column"
-          :disabled="!$nuxt.$loading"
-          @click="createDraft"
-        >
-          Save draft
-        </button>
-        <button
-          title="Submit for review"
-          class="iconified-button brand-button-colors column"
-          :disabled="!$nuxt.$loading"
-          @click="createProject"
-        >
-          <CheckIcon />
-          Submit for review
-        </button>
+      <header class="card">
+        <div class="columns">
+          <h3 class="column-grow-1">Create a project</h3>
+          <button
+            title="Save draft"
+            class="iconified-button column"
+            :disabled="!$nuxt.$loading"
+            @click="createDraft"
+          >
+            <SaveIcon />
+            Save as a draft
+          </button>
+          <button
+            title="Submit for review"
+            class="iconified-button brand-button-colors column"
+            :disabled="!$nuxt.$loading"
+            @click="createProjectForReview"
+          >
+            <CheckIcon />
+            Submit for review
+          </button>
+        </div>
+        <div v-if="showKnownErrors" class="known-errors">
+          <ul>
+            <li v-if="name === ''">Your project must have a name.</li>
+            <li v-if="description === ''">Your project must have a summary.</li>
+            <li v-if="slug === ''">Your project must have a vanity URL.</li>
+            <li v-if="!savingAsDraft && body === ''">
+              Your project must have a body.
+            </li>
+            <li v-if="!savingAsDraft && versions.length < 1">
+              Your project must have at least one version.
+            </li>
+            <li
+              v-if="
+                license === null || license_url === null || license_url === ''
+              "
+            >
+              Your project must have a license.
+            </li>
+            <li v-if="currentVersionIndex !== -1">
+              You must finish editing your versions
+            </li>
+            <li v-if="currentGalleryIndex !== -1">
+              You must finish editing your gallery images
+            </li>
+          </ul>
+        </div>
       </header>
       <section class="card essentials">
-        <h3>Project type<span class="required">*</span></h3>
         <label>
-          <span class="no-padding">The project type of your project.</span>
+          <span>
+            <h3>Type<span class="required">*</span></h3>
+            <span class="no-padding">The type of project of your project.</span>
+          </span>
           <Multiselect
             v-model="projectType"
             placeholder="Select one"
@@ -35,30 +66,42 @@
             :allow-empty="false"
           />
         </label>
-        <h3>Name<span class="required">*</span></h3>
         <label>
           <span>
-            Be creative! Generic project names will be harder to search for.
+            <h3>Name<span class="required">*</span></h3>
+            <span>
+              Be creative! Generic project names will be harder to search for.
+            </span>
           </span>
-          <input v-model="name" type="text" placeholder="Enter the name" />
+          <input
+            v-model="name"
+            :class="{ 'known-error': name === '' && showKnownErrors }"
+            type="text"
+            placeholder="Enter the name"
+          />
         </label>
-        <h3>Summary<span class="required">*</span></h3>
         <label>
           <span>
-            Give a short description of your project that will appear on search
-            pages.
+            <h3>Summary<span class="required">*</span></h3>
+            <span>
+              Give a short description of your project that will appear on
+              search pages.
+            </span>
           </span>
           <input
             v-model="description"
+            :class="{ 'known-error': description === '' && showKnownErrors }"
             type="text"
             placeholder="Enter the summary"
           />
         </label>
-        <h3>Categories</h3>
         <label>
-          <span class="no-padding">
-            Select up to 3 categories that will help others <br />
-            find your project.
+          <span>
+            <h3>Categories</h3>
+            <span class="no-padding">
+              Select up to 3 categories that will help others <br />
+              find your project.
+            </span>
           </span>
           <multiselect
             id="categories"
@@ -67,6 +110,9 @@
               $tag.categories
                 .filter((x) => x.project_type === projectType.toLowerCase())
                 .map((it) => it.name)
+            "
+            :custom-label="
+              (value) => value.charAt(0).toUpperCase() + value.slice(1)
             "
             :loading="$tag.categories.length === 0"
             :multiple="true"
@@ -81,16 +127,21 @@
             placeholder="Choose categories"
           />
         </label>
-        <h3>Vanity URL (slug)<span class="required">*</span></h3>
         <label>
           <span>
-            Set this to something that will looks nice in your project's URL.
+            <h3>Vanity URL (slug)<span class="required">*</span></h3>
+            <span class="slug-description"
+              >https://modrinth.com/{{ projectType.toLowerCase() }}/{{
+                slug ? slug : 'your-slug'
+              }}
+            </span>
           </span>
           <input
             id="name"
             v-model="slug"
+            :class="{ 'known-error': slug === '' && showKnownErrors }"
             type="text"
-            placeholder="Enter the vanity URL slug"
+            placeholder="Enter the vanity URL"
           />
         </label>
       </section>
@@ -104,7 +155,9 @@
           "
           alt="preview-image"
         />
-        <file-input
+        <SmartFileInput
+          :show-icon="false"
+          :max-size="262144"
           accept="image/png,image/jpeg,image/gif,image/webp"
           class="choose-image"
           prompt="Choose image or drag it here"
@@ -122,11 +175,13 @@
         </button>
       </section>
       <section class="card game-sides">
-        <h3>Supported environments</h3>
         <div class="columns">
-          <span>
-            Let others know what environments your project supports.
-          </span>
+          <div class="column">
+            <h3>Supported environments</h3>
+            <span>
+              Let others know what environments your project supports.
+            </span>
+          </div>
           <div class="labeled-control">
             <h3>Client<span class="required">*</span></h3>
             <Multiselect
@@ -159,20 +214,20 @@
             for="body"
             title="You can type an extended description of your project here."
           >
-            Body
+            Body<span class="required">*</span>
           </label>
         </h3>
         <span>
           You can type an extended description of your mod here. This editor
-          supports Markdown. Its syntax can be found
+          supports
           <a
             class="text-link"
             href="https://guides.github.com/features/mastering-markdown/"
             target="_blank"
             rel="noopener noreferrer"
-            >here</a
-          >. HTML can also be used inside your description, excluding scripts
-          and iframes.
+            >Markdown</a
+          >. HTML can also be used inside your description, not including
+          styles, scripts, and iframes (though YouTube iframes are allowed).
         </span>
         <ThisOrThat
           v-model="bodyViewMode"
@@ -181,7 +236,11 @@
         />
         <div class="edit-wrapper">
           <div v-if="bodyViewMode === 'source'" class="textarea-wrapper">
-            <textarea id="body" v-model="body" />
+            <textarea
+              id="body"
+              v-model="body"
+              :class="{ 'known-error': body === '' && showKnownErrors }"
+            />
           </div>
           <div
             v-if="bodyViewMode === 'preview'"
@@ -193,7 +252,7 @@
       </section>
       <section class="card versions">
         <div class="title">
-          <h3>Create versions</h3>
+          <h3>Versions<span class="required">*</span></h3>
           <button
             title="Add a version"
             class="iconified-button"
@@ -204,144 +263,142 @@
             Add a version
           </button>
         </div>
-        <table>
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Version</th>
-              <th>Mod loader</th>
-              <th>Minecraft version</th>
-              <th>Channel</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="(version, index) in versions.filter((it) =>
-                currentVersionIndex !== -1
-                  ? it !== versions[currentVersionIndex]
-                  : true
-              )"
-              :key="version.id"
-            >
-              <td>{{ version.version_title }}</td>
-              <td>{{ version.version_number }}</td>
-              <td>
-                {{
-                  version.loaders
-                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-                    .join(', ')
-                }}
-              </td>
-              <td>
-                {{
-                  version.game_versions
-                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-                    .join(', ')
-                }}
-              </td>
-              <td>
-                <VersionBadge
-                  v-if="version.release_channel === 'release'"
-                  type="release"
-                  color="green"
-                />
-                <VersionBadge
-                  v-else-if="version.release_channel === 'beta'"
-                  type="beta"
-                  color="yellow"
-                />
-                <VersionBadge
-                  v-else-if="version.release_channel === 'alpha'"
-                  type="alpha"
-                  color="red"
-                />
-              </td>
-              <td>
-                <button
-                  class="iconified-button"
-                  title="Remove version"
-                  @click="versions.splice(index, 1)"
-                >
-                  Remove
-                </button>
-                <button
-                  class="iconified-button"
-                  title="Edit version"
-                  @click="currentVersionIndex = index"
-                >
-                  Edit
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
         <div v-if="versions.length === 0" class="no-versions-warning">
-          At least 1 version is required.
+          At least 1 version is required to submit for review.
         </div>
-        <hr v-if="currentVersionIndex !== -1" />
-        <div v-if="currentVersionIndex !== -1" class="new-version">
-          <div class="controls">
-            <button
-              class="brand-button-colors iconified-button"
-              title="Save version"
-              @click="currentVersionIndex = -1"
-            >
-              Save version
-            </button>
-            <button
-              class="iconified-button"
-              title="Discard version"
-              @click="deleteVersion"
-            >
-              Discard
-            </button>
+        <div
+          v-if="currentVersionIndex !== -1"
+          class="new-version outlined-area"
+        >
+          <div class="header">
+            <h3 v-if="currentVersionNew" class="title">Add a version</h3>
+            <h3 v-else class="title">Edit version</h3>
+            <div class="controls">
+              <button
+                v-if="currentVersionNew"
+                class="iconified-button"
+                title="Cancel adding version"
+                @click="deleteVersion()"
+              >
+                <CrossIcon />
+                Cancel
+              </button>
+              <button
+                v-else
+                class="iconified-button"
+                title="Remove version"
+                @click="deleteVersion()"
+              >
+                <TrashIcon />
+                Remove
+              </button>
+              <button
+                v-if="currentVersionNew"
+                class="brand-button-colors iconified-button"
+                title="Save version"
+                @click="saveVersion()"
+              >
+                <CheckIcon />
+                Add
+              </button>
+              <button
+                v-else
+                class="brand-button-colors iconified-button"
+                title="Save version"
+                @click="saveVersion()"
+              >
+                <SaveIcon />
+                Save
+              </button>
+            </div>
+          </div>
+          <div v-if="showKnownVersionErrors" class="known-errors">
+            <ul>
+              <li v-if="versions[currentVersionIndex].version_number === ''">
+                Your version must have a unique version number.
+              </li>
+              <li v-if="versions[currentVersionIndex].loaders.length < 1">
+                Your version must have the supported mod loaders selected.
+              </li>
+              <li v-if="versions[currentVersionIndex].game_versions.length < 1">
+                Your version must have the supported Minecraft versions
+                selected.
+              </li>
+              <li v-if="versions[currentVersionIndex].files.length < 1">
+                Your version must have a file uploaded.
+              </li>
+            </ul>
           </div>
           <div class="main">
-            <h3>Name</h3>
             <label>
               <span>
-                This is what users will see first. If not specified, this will
-                default to the version number.
+                <h3>Title</h3>
+                <span>
+                  An optional nicely formatted name for this version.
+                </span>
               </span>
               <input
                 v-model="versions[currentVersionIndex].version_title"
                 type="text"
-                placeholder="Enter the name"
+                placeholder="Enter the title of this version"
               />
             </label>
-            <h3>Number<span class="required">*</span></h3>
             <label>
               <span>
-                This is how your version will appear in project lists and URLs.
+                <h3>Version number<span class="required">*</span></h3>
+                <span>
+                  A unique identifier for versions of your project, used for
+                  display and in URLs.
+                </span>
               </span>
               <input
                 v-model="versions[currentVersionIndex].version_number"
+                :class="{
+                  'known-error':
+                    versions[currentVersionIndex].version_number === '' &&
+                    showKnownVersionErrors,
+                }"
                 type="text"
-                placeholder="Enter the number"
+                placeholder="Enter the version number"
               />
             </label>
-            <h3>Channel<span class="required">*</span></h3>
             <label>
               <span>
-                It is important to notify everyone whether the version is stable
-                or if it's still in development.
+                <h3>Release channel<span class="required">*</span></h3>
+                <span>
+                  Used to indicate to users the stability of this release.
+                </span>
               </span>
               <multiselect
                 v-model="versions[currentVersionIndex].release_channel"
+                :class="{
+                  'known-error':
+                    versions[currentVersionIndex].release_channel === null &&
+                    showKnownVersionErrors,
+                }"
                 placeholder="Select one"
                 :options="['release', 'beta', 'alpha']"
+                :custom-label="
+                  (value) => value.charAt(0).toUpperCase() + value.slice(1)
+                "
                 :searchable="false"
                 :close-on-select="true"
                 :show-labels="false"
                 :allow-empty="false"
               />
             </label>
-            <h3>Mod loaders<span class="required">*</span></h3>
             <label>
-              <span> Mark all mod loaders this version works with. </span>
+              <span>
+                <h3>Mod loaders<span class="required">*</span></h3>
+                <span> Select all mod loaders this version supports. </span>
+              </span>
               <multiselect
                 v-model="versions[currentVersionIndex].loaders"
+                :class="{
+                  'known-error':
+                    versions[currentVersionIndex].loaders.length < 1 &&
+                    showKnownVersionErrors,
+                }"
                 :options="
                   $tag.loaders
                     .filter((x) =>
@@ -350,6 +407,12 @@
                       )
                     )
                     .map((it) => it.name)
+                "
+                :custom-label="
+                  (value) =>
+                    value === 'modloader'
+                      ? 'Risugami\'s ModLoader'
+                      : value.charAt(0).toUpperCase() + value.slice(1)
                 "
                 :loading="$tag.loaders.length === 0"
                 :multiple="true"
@@ -363,13 +426,20 @@
                 placeholder="Choose mod loaders..."
               />
             </label>
-            <h3>Minecraft versions<span class="required">*</span></h3>
             <label>
               <span>
-                Mark all Minecraft version this project's version supports.
+                <h3>Minecraft versions<span class="required">*</span></h3>
+                <span>
+                  Select all versions of Minecraft this version supports.
+                </span>
               </span>
               <multiselect
                 v-model="versions[currentVersionIndex].game_versions"
+                :class="{
+                  'known-error':
+                    versions[currentVersionIndex].game_versions.length < 1 &&
+                    showKnownVersionErrors,
+                }"
                 :options="$tag.gameVersions.map((it) => it.version)"
                 :loading="$tag.gameVersions.length === 0"
                 :multiple="true"
@@ -396,13 +466,19 @@
                 <input
                   v-model="newDependencyId"
                   type="text"
-                  :placeholder="`Enter the ${dependencyAddMode} ID...`"
+                  :placeholder="`Enter the ${dependencyAddMode} ID${
+                    dependencyAddMode === 'project' ? '/slug' : ''
+                  }`"
+                  @keyup.enter="addDependency"
                 />
                 <Multiselect
                   v-model="newDependencyType"
                   class="input"
                   placeholder="Select one"
                   :options="['required', 'optional', 'incompatible']"
+                  :custom-label="
+                    (value) => value.charAt(0).toUpperCase() + value.slice(1)
+                  "
                   :searchable="false"
                   :close-on-select="true"
                   :show-labels="false"
@@ -454,7 +530,8 @@
                         )
                       "
                     >
-                      <TrashIcon /> Delete
+                      <TrashIcon />
+                      Remove
                     </button>
                   </div>
                 </div>
@@ -463,11 +540,17 @@
           </div>
           <div class="files">
             <h3>Files<span class="required">*</span></h3>
-            <SmartFileInput
+            <StatelessFileInput
+              :class="{
+                'known-error':
+                  versions[currentVersionIndex].files.length < 1 &&
+                  showKnownVersionErrors,
+              }"
               class="file-input"
               multiple
               accept=".jar,application/java-archive,.zip,application/zip,.mrpack"
               prompt="Choose files or drag them here"
+              :max-size="524288000"
               @change="
                 (x) =>
                   x.forEach((y) => versions[currentVersionIndex].files.push(y))
@@ -485,7 +568,7 @@
                   @click="versions[currentVersionIndex].files.splice(index, 1)"
                 >
                   <TrashIcon aria-hidden="true" />
-                  Delete
+                  Remove
                 </button>
               </div>
             </div>
@@ -493,8 +576,15 @@
           <div class="changelog">
             <h3>Changes</h3>
             <span>
-              Tell everyone what's new. It supports the same Markdown formatting
-              as the description.
+              Let everyone know what's changed since the last version. This
+              editor supports
+              <a
+                class="text-link"
+                href="https://guides.github.com/features/mastering-markdown/"
+                target="_blank"
+                rel="noopener noreferrer"
+                >Markdown</a
+              >.
             </span>
             <ThisOrThat
               v-model="changelogViewMode"
@@ -526,29 +616,167 @@
             </div>
           </div>
         </div>
+        <table>
+          <thead>
+            <tr
+              v-if="
+                (versions.length > 0 && currentVersionIndex === -1) ||
+                versions.length > 1
+              "
+            >
+              <th>Name</th>
+              <th>Version</th>
+              <th>Mod loaders</th>
+              <th>Minecraft versions</th>
+              <th>Release channel</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="(version, index) in versions.filter((it) =>
+                currentVersionIndex !== -1
+                  ? it !== versions[currentVersionIndex]
+                  : true
+              )"
+              :key="version.id"
+            >
+              <td>{{ version.version_title }}</td>
+              <td>{{ version.version_number }}</td>
+              <td>
+                {{
+                  version.loaders
+                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                    .join(', ')
+                }}
+              </td>
+              <td>
+                {{
+                  version.game_versions
+                    .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+                    .join(', ')
+                }}
+              </td>
+              <td>
+                <VersionBadge
+                  v-if="version.release_channel === 'release'"
+                  type="release"
+                  color="green"
+                />
+                <VersionBadge
+                  v-else-if="version.release_channel === 'beta'"
+                  type="beta"
+                  color="yellow"
+                />
+                <VersionBadge
+                  v-else-if="version.release_channel === 'alpha'"
+                  type="alpha"
+                  color="red"
+                />
+              </td>
+              <td>
+                <button
+                  class="iconified-button"
+                  title="Remove version"
+                  @click="versions.splice(index, 1)"
+                >
+                  <TrashIcon />
+                  Remove
+                </button>
+                <button
+                  class="iconified-button"
+                  title="Edit version"
+                  @click="editVersion(index)"
+                >
+                  <EditIcon />
+                  Edit
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </section>
       <section class="card gallery">
         <div class="title">
           <div class="text">
-            <h3>Gallery</h3>
+            <h3>Gallery images</h3>
             <i>— this section is optional</i>
           </div>
           <button
             title="Add an image"
             class="iconified-button"
-            :disabled="false"
-            @click="gallery.push({})"
+            :disabled="currentGalleryIndex !== -1"
+            @click="createGalleryImage()"
           >
             <PlusIcon />
             Add an image
           </button>
         </div>
-        <div v-for="(item, index) in gallery" :key="index" class="gallery-item">
+        <div
+          v-if="currentGalleryIndex !== -1"
+          class="new-gallery-item outlined-area"
+        >
+          <div class="header">
+            <h3 class="title">Add an image</h3>
+            <div class="controls">
+              <button
+                v-if="currentGalleryNew"
+                class="iconified-button"
+                title="Cancel adding image"
+                @click="deleteGalleryImage()"
+              >
+                <CrossIcon />
+                Cancel
+              </button>
+              <button
+                v-else
+                class="iconified-button"
+                title="Remove image"
+                @click="deleteGalleryImage()"
+              >
+                <TrashIcon />
+                Remove
+              </button>
+              <button
+                v-if="currentGalleryNew"
+                class="brand-button-colors iconified-button"
+                title="Add image"
+                @click="saveGalleryImage()"
+              >
+                <CheckIcon />
+                Add
+              </button>
+              <button
+                v-else
+                class="brand-button-colors iconified-button"
+                title="Save image"
+                @click="saveGalleryImage()"
+              >
+                <SaveIcon />
+                Save changes
+              </button>
+            </div>
+          </div>
+          <div v-if="showKnownGalleryErrors" class="known-errors">
+            <ul>
+              <li v-if="gallery[currentGalleryIndex].title === ''">
+                Your image must have a title.
+              </li>
+              <li v-if="gallery[currentGalleryIndex].preview === null">
+                Your image must have a file uploaded.
+              </li>
+            </ul>
+          </div>
           <div class="info">
             <label title="The title of the gallery item">
               <span>Title</span>
               <input
-                v-model="item.title"
+                v-model="gallery[currentGalleryIndex].title"
+                :class="{
+                  'known-error':
+                    gallery[currentGalleryIndex].title === '' &&
+                    showKnownGalleryErrors,
+                }"
                 type="text"
                 placeholder="Enter a title"
               />
@@ -558,7 +786,7 @@
             >
               <span>Description (optional)</span>
               <input
-                v-model="item.description"
+                v-model="gallery[currentGalleryIndex].description"
                 type="text"
                 placeholder="Enter a description"
               />
@@ -567,38 +795,84 @@
           <div class="image">
             <img
               :src="
-                item.preview
-                  ? item.preview
+                gallery[currentGalleryIndex].preview
+                  ? gallery[currentGalleryIndex].preview
                   : 'https://cdn.modrinth.com/placeholder-banner.svg'
               "
               alt="preview-image"
             />
             <div class="bottom">
               <SmartFileInput
+                :max-size="5242880"
                 accept="image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp"
                 prompt="Upload"
-                @change="(files) => showGalleryPreviewImage(files, index)"
-              />
-              <button
-                class="iconified-button"
-                @click="
-                  item.icon = null
-                  item.preview = null
-                  $forceUpdate()
+                :class="{
+                  'known-error':
+                    !gallery[currentGalleryIndex].preview &&
+                    showKnownGalleryErrors,
+                }"
+                @change="
+                  (files) => showGalleryPreviewImage(files, currentGalleryIndex)
                 "
-              >
-                <TrashIcon />
-                Reset
-              </button>
+              />
+              <div>
+                <button
+                  class="iconified-button"
+                  @click="
+                    gallery[currentGalleryIndex].icon = null
+                    gallery[currentGalleryIndex].preview = null
+                    $forceUpdate()
+                  "
+                >
+                  <TrashIcon />
+                  Reset
+                </button>
+              </div>
             </div>
           </div>
-          <div class="buttons">
-            <button class="iconified-button" @click="gallery.splice(index, 1)">
-              <TrashIcon />
-              Remove
-            </button>
-
-            <hr v-if="gallery.length > 0 && index !== gallery.length - 1" />
+        </div>
+        <div class="gallery-items">
+          <div
+            v-for="(item, index) in gallery.filter((it) =>
+              currentGalleryIndex === -1 || it !== gallery[currentGalleryIndex]
+                ? it !== gallery[currentGalleryIndex]
+                : true
+            )"
+            :key="index"
+            class="gallery-item"
+          >
+            <div class="info">
+              <h3>{{ item.title }}</h3>
+              <h4 v-if="item.description">{{ item.description }}</h4>
+            </div>
+            <div class="image">
+              <img
+                :src="
+                  item.preview
+                    ? item.preview
+                    : 'https://cdn.modrinth.com/placeholder-banner.svg'
+                "
+                alt="preview-image"
+              />
+            </div>
+            <div class="controls">
+              <button
+                class="iconified-button"
+                title="Edit gallery image"
+                @click="editGalleryImage(index)"
+              >
+                <EditIcon />
+                Edit
+              </button>
+              <button
+                class="iconified-button"
+                title="Remove gallery image"
+                @click="gallery.splice(index, 1)"
+              >
+                <TrashIcon />
+                Remove
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -654,39 +928,53 @@
             <h3>License<span class="required">*</span></h3>
           </div>
         </div>
-        <label>
-          <span>
-            It is very important to choose a proper license for your mod. You
-            may choose one from our list or provide a URL to a custom license.
-            <br />
-            Confused? See our
-            <a
-              class="text-link"
-              href="https://blog.modrinth.com/licensing-guide/"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              licensing guide</a
-            >
-            for more information.
-          </span>
+        <div class="row">
+          <label for="license">
+            <span>
+              It is very important to choose a proper license for your mod. You
+              may choose one from our list or provide a URL to a custom license.
+              <br />
+              Confused? See our
+              <a
+                class="text-link"
+                href="https://blog.modrinth.com/licensing-guide/"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                licensing guide</a
+              >
+              for more information.
+            </span>
+          </label>
           <div class="input-group">
             <Multiselect
+              id="license"
               v-model="license"
+              :class="{ 'known-error': license === null && showKnownErrors }"
+              :custom-label="(value) => value.short.toUpperCase()"
               placeholder="Choose license..."
               :loading="$tag.licenses.length === 0"
               :options="$tag.licenses"
               track-by="short"
-              label="short"
               :multiple="false"
               :searchable="true"
               :close-on-select="true"
               :show-labels="false"
               :allow-empty="false"
             />
-            <input v-model="license_url" type="url" placeholder="License URL" />
+            <input
+              v-model="license_url"
+              aria-label="License URL"
+              type="url"
+              placeholder="License URL"
+              :class="{
+                'known-error':
+                  (license_url === null || license_url === '') &&
+                  showKnownErrors,
+              }"
+            />
           </div>
-        </label>
+        </div>
       </section>
       <section class="card donations">
         <div class="title">
@@ -707,44 +995,54 @@
             Add a link
           </button>
         </div>
-        <div v-for="(item, index) in donationPlatforms" :key="index">
-          <label title="The donation link.">
-            <span>Donation Link</span>
+        <div
+          v-for="(item, index) in donationPlatforms"
+          :key="index"
+          class="outlined-area"
+        >
+          <div class="header">
+            <h3 class="title">Link</h3>
+            <div class="controls">
+              <button
+                class="iconified-button"
+                @click="
+                  donationPlatforms.splice(index, 1)
+                  donationLinks.splice(index, 1)
+                "
+              >
+                <TrashIcon />
+                Remove link
+              </button>
+            </div>
+          </div>
+          <label>
+            <span class="no-padding"
+              >Donation link<span class="required">*</span></span
+            >
             <input
               v-model="donationLinks[index]"
               type="url"
               placeholder="Enter a valid URL"
             />
           </label>
-          <label title="The donation platform of the link.">
-            <span>Donation Platform</span>
+          <label>
+            <span class="no-padding"
+              >Donation platform<span class="required">*</span></span
+            >
             <Multiselect
+              id="donationPlatform"
               v-model="donationPlatforms[index]"
-              placeholder="Select one"
+              placeholder="Choose a platform..."
+              :loading="$tag.donationPlatforms.length === 0"
+              :options="$tag.donationPlatforms"
               track-by="short"
               label="name"
-              :options="$tag.donationPlatforms"
-              :searchable="false"
+              :multiple="false"
               :close-on-select="true"
               :show-labels="false"
+              :allow-empty="false"
             />
           </label>
-          <button
-            class="iconified-button"
-            @click="
-              donationPlatforms.splice(index, 1)
-              donationLinks.splice(index, 1)
-            "
-          >
-            <TrashIcon />
-            Remove Link
-          </button>
-          <hr
-            v-if="
-              donationPlatforms.length > 0 &&
-              index !== donationPlatforms.length - 1
-            "
-          />
         </div>
       </section>
     </div>
@@ -753,23 +1051,29 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
-import FileInput from '~/components/ui/FileInput'
 import SmartFileInput from '~/components/ui/SmartFileInput'
+import StatelessFileInput from '~/components/ui/StatelessFileInput'
 import ThisOrThat from '~/components/ui/ThisOrThat'
 import VersionBadge from '~/components/ui/Badge'
 
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import EditIcon from '~/assets/images/utils/edit.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg?inline'
 
 export default {
   components: {
-    FileInput,
     SmartFileInput,
+    StatelessFileInput,
     Multiselect,
     CheckIcon,
     PlusIcon,
+    SaveIcon,
     TrashIcon,
+    CrossIcon,
+    EditIcon,
     ThisOrThat,
     VersionBadge,
   },
@@ -788,6 +1092,9 @@ export default {
       compiledBody: '',
       releaseChannels: ['beta', 'alpha', 'release'],
       currentVersionIndex: -1,
+      currentVersionNew: true,
+      currentGalleryIndex: -1,
+      currentGalleryNew: true,
       name: '',
       slug: '',
       draft: false,
@@ -819,9 +1126,14 @@ export default {
       bodyViewMode: 'source',
       changelogViewMode: 'source',
 
-      newDependencyType: 'required',
       dependencyAddMode: 'project',
+      newDependencyType: 'required',
       newDependencyId: '',
+
+      showKnownErrors: false,
+      showKnownVersionErrors: false,
+      showKnownGalleryErrors: false,
+      savingAsDraft: false,
     }
   },
   watch: {
@@ -845,15 +1157,46 @@ export default {
       e.preventDefault()
       e.returnValue = ''
     }
+
     window.addEventListener('beforeunload', preventLeave)
     this.$once('hook:beforeDestroy', () => {
       window.removeEventListener('beforeunload', preventLeave)
     })
   },
   methods: {
+    checkFields() {
+      const reviewConditions = this.body !== '' && this.versions.length > 0
+      if (
+        this.name !== '' &&
+        this.description !== '' &&
+        this.slug !== '' &&
+        this.license !== null &&
+        this.license_url !== null &&
+        this.license_url !== ''
+      ) {
+        if (this.savingAsDraft) {
+          return true
+        } else if (reviewConditions) {
+          return true
+        }
+      }
+      this.showKnownErrors = true
+      this.showKnownVersionErrors = true
+      this.showKnownGalleryErrors = true
+      return false
+    },
     async createDraft() {
-      this.draft = true
-      await this.createProject()
+      this.savingAsDraft = true
+      if (this.checkFields()) {
+        this.draft = true
+        await this.createProject()
+      }
+    },
+    async createProjectForReview() {
+      this.savingAsDraft = false
+      if (this.checkFields()) {
+        await this.createProject()
+      }
     },
     async createProject() {
       this.$nuxt.$loading.start()
@@ -957,7 +1300,9 @@ export default {
 
         await this.$router.replace(`/user/${this.$auth.user.username}`)
       } catch (err) {
-        let description = err.response.data.description
+        let description = !err.response.data
+          ? 'Data is null?'
+          : err.response.data.description
 
         if (description.includes('JSON')) {
           description = 'Please fill in missing required fields.'
@@ -1020,11 +1365,64 @@ export default {
       })
 
       this.currentVersionIndex = this.versions.length - 1
+      this.currentVersionNew = true
+    },
+
+    saveVersion() {
+      const version = this.versions[this.currentVersionIndex]
+      if (
+        version.version_number !== '' &&
+        version.releaseChannels !== null &&
+        version.loaders.length > 0 &&
+        version.game_versions.length > 0 &&
+        version.files.length > 0
+      ) {
+        this.currentVersionIndex = -1
+      } else {
+        this.showKnownVersionErrors = true
+      }
+    },
+
+    editVersion(index) {
+      this.currentVersionIndex = index
+      this.currentVersionNew = false
     },
 
     deleteVersion() {
       this.versions.splice(this.currentVersionIndex, 1)
       this.currentVersionIndex = -1
+      this.showKnownVersionErrors = false
+    },
+
+    createGalleryImage() {
+      this.gallery.push({
+        title: '',
+        description: '',
+        preview: null,
+      })
+      this.currentGalleryIndex = this.gallery.length - 1
+      this.currentGalleryNew = true
+    },
+
+    saveGalleryImage() {
+      const image = this.gallery[this.currentGalleryIndex]
+      if (image.title !== '' && image.preview !== null) {
+        this.currentGalleryIndex = -1
+        this.showKnownGalleryErrors = false
+      } else {
+        this.showKnownGalleryErrors = true
+      }
+    },
+
+    editGalleryImage(index) {
+      this.currentGalleryIndex = index
+      this.currentGalleryNew = false
+    },
+
+    deleteGalleryImage() {
+      this.gallery.splice(this.currentGalleryIndex, 1)
+      this.currentGalleryIndex = -1
+      this.showKnownGalleryErrors = false
     },
 
     async addDependency() {
@@ -1138,8 +1536,16 @@ section.project-icon {
 
   img {
     max-width: 100%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.25rem;
     border-radius: var(--size-rounded-lg);
+
+    @media screen and (min-width: 420px) {
+      max-width: 20rem;
+    }
+
+    @media screen and (min-width: 1024px) {
+      max-width: 100%;
+    }
   }
 
   .iconified-button {
@@ -1153,13 +1559,13 @@ section.game-sides {
   .columns {
     flex-wrap: wrap;
 
-    span {
+    div {
       flex: 2;
     }
 
     .labeled-control {
-      flex: 2;
       margin-left: var(--spacing-card-lg);
+      margin-bottom: 0.5rem;
 
       h3 {
         margin-bottom: var(--spacing-card-sm);
@@ -1186,6 +1592,30 @@ section.description {
   }
 }
 
+.outlined-area {
+  margin: var(--spacing-card-md) 0;
+  border: 1px solid var(--color-divider);
+  border-radius: var(--size-rounded-card);
+  padding: 1rem;
+
+  .header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 1rem;
+    grid-area: header;
+
+    .title {
+      flex-grow: 1;
+    }
+  }
+}
+
+.controls {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
 section.versions {
   grid-area: versions;
 
@@ -1199,14 +1629,6 @@ section.versions {
 
     * {
       text-align: left;
-    }
-
-    tr:not(:last-child),
-    tr:first-child {
-      th,
-      td {
-        border-bottom: 1px solid var(--color-divider);
-      }
     }
 
     th,
@@ -1255,10 +1677,8 @@ section.versions {
 
     th {
       color: var(--color-heading);
-      font-size: 0.8rem;
       letter-spacing: 0.02rem;
       padding: 0.75rem 1rem;
-      text-transform: uppercase;
     }
 
     td {
@@ -1276,7 +1696,7 @@ section.versions {
     background-color: var(--color-divider);
     border: none;
     color: var(--color-divider);
-    height: 2px;
+    height: 1px;
     margin: 0.5rem 0;
   }
 
@@ -1289,7 +1709,8 @@ section.versions {
   .new-version {
     display: grid;
     grid-template:
-      'controls controls' auto
+      'header header' auto
+      'known-errors known-errors' auto
       'main main' auto
       'dependencies dependencies' auto
       'files files'
@@ -1299,18 +1720,12 @@ section.versions {
 
     @media screen and (min-width: 1024px) {
       grid-template:
-        'controls controls' auto
+        'header header' auto
+        'known-errors known-errors' auto
         'main dependencies' auto
         'main files' 1fr
         'changelog changelog'
         / 5fr 4fr;
-    }
-
-    .controls {
-      grid-area: controls;
-      display: flex;
-      flex-direction: row-reverse;
-      gap: 0.5rem;
     }
 
     .main {
@@ -1332,7 +1747,7 @@ section.versions {
         .edit-info {
           display: flex;
           flex-wrap: wrap;
-          row-gap: 0.25rem;
+          gap: 0.5rem;
 
           .multiselect {
             max-width: 10rem;
@@ -1342,10 +1757,15 @@ section.versions {
             min-height: 2.5rem;
           }
 
+          input {
+            flex-grow: 1;
+            max-width: fit-content;
+          }
+
           input,
           .multiselect,
           .iconified-button {
-            margin: 0 0.5rem 0 0;
+            margin: 0;
           }
         }
       }
@@ -1405,6 +1825,7 @@ section.versions {
           * {
             margin-left: 0.25rem;
           }
+
           .filename {
             margin: 0;
             font-weight: bold;
@@ -1437,20 +1858,45 @@ section.versions {
 section.gallery {
   grid-area: gallery;
 
-  .gallery-item {
+  .gallery-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-card-lg);
+
+    .gallery-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+
+      h2 {
+        margin: 0;
+      }
+      h4 {
+        margin: 0;
+      }
+      width: calc((100% - 2 * var(--spacing-card-lg)) / 3);
+
+      img {
+        width: 100%;
+        border-radius: var(--size-rounded-card);
+      }
+    }
+  }
+
+  .new-gallery-item {
     margin-top: 1rem;
     display: grid;
     grid-template:
+      'header' auto
+      'known-errors' auto
       'info' auto
-      'image' auto
-      'buttons' auto
-      / 1fr;
+      'image' auto;
 
     @media screen and (min-width: 1024px) {
       grid-template:
-        'info image' auto
-        'buttons buttons'
-        / 2fr 1fr;
+        'header header' auto
+        'known-errors known-errors' auto
+        'info image' auto;
     }
 
     column-gap: var(--spacing-card-md);
@@ -1485,11 +1931,8 @@ section.gallery {
 
       .bottom {
         display: flex;
-
-        input,
-        button {
-          margin-right: 0.5rem;
-        }
+        gap: 0.5rem;
+        align-items: center;
       }
     }
 
@@ -1506,6 +1949,10 @@ section.gallery {
 section.extra-links {
   grid-area: extra-links;
 
+  .title {
+    margin-top: 0.5rem;
+  }
+
   label {
     align-items: center;
     margin-top: var(--spacing-card-sm);
@@ -1519,22 +1966,23 @@ section.extra-links {
 section.license {
   grid-area: license;
 
+  .title {
+    margin-top: 0.5rem;
+  }
+
   label {
     margin-top: var(--spacing-card-sm);
+  }
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
   }
 }
 
 section.donations {
   grid-area: donations;
-
-  label {
-    align-items: center;
-    margin-top: var(--spacing-card-sm);
-
-    span {
-      flex: 1;
-    }
-  }
 }
 
 .footer {
@@ -1551,5 +1999,29 @@ section.donations {
 
 .required {
   color: var(--color-badge-red-bg);
+}
+
+.essentials,
+.new-version,
+.donations {
+  label {
+    margin-bottom: 1rem;
+  }
+  span {
+    margin-bottom: 0.5rem;
+  }
+
+  @media screen and (min-width: 1024px) {
+    label {
+      margin-bottom: 0.5rem;
+    }
+    input {
+      margin-left: 1.5rem;
+    }
+  }
+}
+
+.slug-description {
+  overflow-wrap: break-word;
 }
 </style>

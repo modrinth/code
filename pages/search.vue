@@ -6,7 +6,7 @@
     }"
   >
     <aside class="normal-page__sidebar" aria-label="Filters">
-      <section class="card" role="presentation">
+      <section class="card filters-card" role="presentation">
         <button
           class="iconified-button sidebar-menu-close-button"
           @click="sidebarMenuOpen = !sidebarMenuOpen"
@@ -30,7 +30,7 @@
             class="iconified-button"
             @click="clearFilters"
           >
-            <ExitIcon aria-hidden="true" />
+            <ClearIcon aria-hidden="true" />
             Clear filters
           </button>
           <section aria-label="Category filters">
@@ -291,7 +291,7 @@ import ClientSide from '~/assets/images/categories/client.svg?inline'
 import ServerSide from '~/assets/images/categories/server.svg?inline'
 
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
-import ExitIcon from '~/assets/images/utils/exit.svg?inline'
+import ClearIcon from '~/assets/images/utils/clear.svg?inline'
 import EyeIcon from '~/assets/images/utils/eye.svg?inline'
 import EyeOffIcon from '~/assets/images/utils/eye-off.svg?inline'
 
@@ -309,7 +309,7 @@ export default {
     ClientSide,
     ServerSide,
     SearchIcon,
-    ExitIcon,
+    ClearIcon,
     EyeIcon,
     EyeOffIcon,
     LogoAnimated,
@@ -649,6 +649,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.filters-card {
+  padding: var(--spacing-card-lg);
+}
+
 .sidebar-menu {
   display: none;
   margin-top: 1rem;

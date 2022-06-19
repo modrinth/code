@@ -247,7 +247,7 @@ h2 {
 
 h3 {
   margin-top: 0.5rem;
-  margin-bottom: 0;
+  margin-bottom: 0.25rem;
   color: var(--color-text-dark);
 }
 
@@ -258,6 +258,7 @@ button {
 
 input {
   border-radius: 2rem;
+  box-sizing: border-box;
 }
 
 pre {
