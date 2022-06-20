@@ -14,6 +14,8 @@ export { default as Chips } from './components/Chips.svelte'
 
 export { default as Field } from './components/Field.svelte'
 
+export { default as FileUpload } from './components/FileUpload.svelte'
+
 export { default as Modal } from './components/Modal.svelte'
 
 export { default as ModalDeletion } from './components/ModalDeletion.svelte'

@@ -3,14 +3,14 @@
 	import IconMoon from 'virtual:icons/heroicons-outline/moon'
 	import IconSun from 'virtual:icons/heroicons-outline/sun'
 
-	export let meta: { raised: boolean }
+	export let meta: { raised: boolean; column: boolean }
 
 	let theme = 'light'
 	let background = meta.raised ? 'var(--color-raised-bg)' : 'var(--color-bg)'
 </script>
 
 <div class="example">
-	<div class="example__preview theme-{theme} base" style:background>
+	<div class="example__preview theme-{theme} base" class:column={meta.column} style:background>
 		<slot name="example" />
 	</div>
 	<div class="example__source">
@@ -44,6 +44,10 @@
 			justify-content: flex-start;
 			z-index: 1;
 			padding: 1rem;
+
+			&.column {
+				flex-direction: column;
+			}
 		}
 
 		&__source {
