@@ -2,16 +2,7 @@ export default ({ store }, inject) => {
   inject('user', store.state.user)
   inject('tag', store.state.tag)
   inject('auth', store.state.auth)
-  inject('formatNumber', (number) => {
-    const x = +number
-    if (x >= 1000000) {
-      return (x / 1000000).toFixed(2).toString() + 'M'
-    } else if (x >= 10000) {
-      return (x / 1000).toFixed(1).toString() + 'K'
-    } else {
-      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
-    }
-  })
+  inject('formatNumber', formatNumber)
   inject('formatVersion', (versionArray) => {
     const allVersions = store.state.tag.gameVersions.slice().reverse()
     const allReleases = allVersions.filter((x) => x.version_type === 'release')
@@ -98,15 +89,28 @@ export default ({ store }, inject) => {
 
     return output.join(', ')
   })
-  inject('formatBytes', (bytes, decimals = 2) => {
-    if (bytes === 0) return '0 Bytes'
+  inject('formatBytes', formatBytes)
+}
 
-    const k = 1024
-    const dm = decimals < 0 ? 0 : decimals
-    const sizes = ['Bytes', 'KiB', 'MiB', 'GiB']
+export const formatNumber = (number) => {
+  const x = +number
+  if (x >= 1000000) {
+    return (x / 1000000).toFixed(2).toString() + 'M'
+  } else if (x >= 10000) {
+    return (x / 1000).toFixed(1).toString() + 'K'
+  } else {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
+}
 
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
+export const formatBytes = (bytes, decimals = 2) => {
+  if (bytes === 0) return '0 Bytes'
 
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
-  })
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KiB', 'MiB', 'GiB']
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }

@@ -16,6 +16,7 @@
 </template>
 
 <script>
+import { fileIsValid } from '~/plugins/fileUtils'
 import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 
 export default {
@@ -36,6 +37,9 @@ export default {
       type: String,
       default: null,
     },
+    /**
+     * The max file size in bytes
+     */
     maxSize: {
       type: Number,
       default: null,
@@ -54,22 +58,10 @@ export default {
     onChange(files, shouldNotReset) {
       if (!shouldNotReset) this.files = files.target.files
 
-      this.files = [...this.files].filter((file) => {
-        if (this.maxSize === null) {
-          return true
-        } else if (file.size > this.maxSize) {
-          console.log('File size: ' + file.size + ', max size: ' + this.maxSize)
-          alert(
-            'File ' +
-              file.name +
-              ' is too big! Must be less than ' +
-              this.$formatBytes(this.maxSize)
-          )
-          return false
-        } else {
-          return true
-        }
-      })
+      const validationOptions = { maxSize: this.maxSize, alertOnInvalid: true }
+      this.files = [...this.files].filter((file) =>
+        fileIsValid(file, validationOptions)
+      )
 
       if (this.files.length > 0) {
         this.$emit('change', this.files)
