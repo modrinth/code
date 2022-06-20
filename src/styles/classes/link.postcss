@@ -11,12 +11,14 @@
 }
 
 .link-group {
-	display: grid;
-	grid-template-columns: repeat(3, auto);
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
 	gap: 1rem;
 
 	.link {
 		color: var(--color-text);
+		margin-right: 1rem;
 
 		&:hover {
 			color: var(--color-link);

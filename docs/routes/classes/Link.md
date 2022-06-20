@@ -14,9 +14,11 @@
 	import IconWiki from 'virtual:icons/heroicons-outline/book-open'
 </script>
 
-<div class="link-group">
+<div class="link-group" style="max-width: 18rem">
 	<a class="link" href="#issues"><IconIssues /> Issues</a>
 	<a class="link" href="#source"><IconCode /> Source</a>
 	<a class="link" href="#wiki"><IconWiki /> Wiki</a>
+  <a class="link" href="#issues"><IconIssues /> Discord chat</a>
+	<a class="link" href="#source"><IconCode /> Source link</a>
 </div>
 ```

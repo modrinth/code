@@ -41,8 +41,8 @@
 		disabled={key !== data.key}
 		let:close
 		on:click={() => {
-			dispatch('deletion')
 			close()
+			dispatch('deletion')
 		}}>
 		<IconTrash />
 		{$t(`modal.deletion.${type}.action`)}

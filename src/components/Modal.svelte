@@ -14,11 +14,12 @@
 	/** If enabled, clicking outside the modal with close it */
 	export let dismissable = true
 
-	export let data: Record<string, any> = {}
+	export let defaultData: Record<string, any> = {}
+	export let data: Record<string, any> = defaultData
 
 	function close() {
 		open = false
-		data = {}
+		data = defaultData
 	}
 
 	function trigger() {
