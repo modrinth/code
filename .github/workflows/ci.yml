@@ -40,5 +40,5 @@ jobs:
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/main'
         with:
-          message: "Bump package version [skip ci]"
+          message: 'Bump package version [skip ci]'
           default_author: github_actions

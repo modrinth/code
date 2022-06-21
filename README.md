@@ -6,15 +6,25 @@ _The Modrinth component library, in Svelte_
 
 Read the documentation at [omorphia.modrinth.com.](https://omorphia.modrinth.com)
 
-Requires Node v16.5+.
-
 ## Developing
 
-The library lives in the `package/` folder, and the documentation lives in the `docs/` folder.
+The library lives in the `src/` folder, and the documentation lives in the `docs/` folder.
+
+### Getting started
+
+Install [Node (16.5+)](https://docs.volta.sh/guide/getting-started) and [PNPM](https://pnpm.io/installation) prior to developing.
+
+To start the dev server, install dependencies and run `pnpm dev`:
 
 ```bash
 pnpm install # Install dependencies
 pnpm dev # Run dev server
+```
+
+To use the git hooks in the repo, which will save you waiting for CI to tell you that you forgot to lint, run this:
+
+```bash
+git config core.hookspath .githooks
 ```
 
 ### Adding new components
@@ -38,12 +48,6 @@ pnpm dev # Run dev server
    <ComponentName />
    ```
    ````
-
-## Packaging
-
-```bash
-pnpm package
-```
 
 ## Building
 
