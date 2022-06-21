@@ -24,3 +24,21 @@ jobs:
         run: pnpm lint
       - name: Run check
         run: pnpm check
+
+  release:
+    needs: [lint]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Publish
+        if: github.ref == 'refs/heads/main'
+        run: |
+          cd package
+          pnpm publish --no-git-checks --tag alpha
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - uses: EndBug/add-and-commit@v9
+        if: github.ref == 'refs/heads/main'
+        with:
+          message: "Bump package version [skip ci]"
+          default_author: github_actions

@@ -4,11 +4,11 @@
 <script lang="ts">
 	import { Field, FileUpload } from 'omorphia'
 
-  let file: File
+	let file: File
 </script>
 
 <Field label="Upload image">
-  <FileUpload accept="image/*" constrained bind:file />
+	<FileUpload accept="image/*" constrained bind:file />
 </Field>
 
 File name: {file?.name}
@@ -20,11 +20,11 @@ File name: {file?.name}
 <script lang="ts">
 	import { Field, FileUpload } from 'omorphia'
 
-  let files: File[] = []
+	let files: File[] = []
 </script>
 
 <Field label="Upload file">
-  <FileUpload accept="*" multiple bind:files />
+	<FileUpload accept="*" multiple bind:files />
 </Field>
 
 Count: {files.length}

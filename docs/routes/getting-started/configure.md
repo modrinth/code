@@ -9,7 +9,7 @@ To make use of the built-in icons, styles, and plugins in omorphia, you will nee
 Add the following parts to your `svelte.config.js` file:
 
 ```js
-import { preprocess, plugins } from 'omorphia/config/svelte.config'
+import { preprocess, plugins } from 'omorphia/config/svelte.js'
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -32,5 +32,5 @@ Create a `postcss.config.cjs` file in the root of your project.
 Add the following line to that file:
 
 ```js
-module.exports = require('omorphia/config/postcss.config.cjs')
+module.exports = require('omorphia/config/postcss.cjs')
 ```

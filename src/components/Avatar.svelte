@@ -18,13 +18,13 @@
 		floatUp && 'avatar--float-up',
 	])
 
-	let img
+	let img: HTMLImageElement
 
 	onMount(() => {
 		if (img && img.naturalWidth) {
 			const isPixelated = () => {
 				if (img.naturalWidth < 96 && img.naturalWidth > 0) {
-					img.style = 'image-rendering: pixelated;'
+					img.style.imageRendering = 'pixelated'
 				}
 			}
 

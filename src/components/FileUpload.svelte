@@ -3,8 +3,8 @@
 	import IconUpload from 'virtual:icons/heroicons-outline/upload'
 	import IconFile from 'virtual:icons/lucide/file'
 	import { t } from 'svelte-intl-precompile'
-	import Button from 'omorphia/components/Button.svelte'
-	import { classCombine } from 'omorphia/utils/classCombine'
+	import Button from './Button.svelte'
+	import { classCombine } from '../utils/classCombine'
 
 	export let multiple = false
 	export let accept: string

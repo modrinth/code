@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { SvelteComponent } from 'svelte/internal'
-
 	export let placeholder = ''
-	export let icon: SvelteComponent = undefined
+	/** A Svelte component */
+	export let icon: any = undefined
 	export let value = ''
 	export let multiline = false
+	/** An ID for better accessibility */
 	export let id: string = undefined
 	export let fill = false
 </script>
@@ -41,14 +41,14 @@
 			border: none;
 			width: 100%;
 			max-width: 100%;
-
-			&.has-icon {
-				padding-left: 2.5rem;
-			}
 		}
 
 		input {
 			padding: 0.25rem 1rem;
+
+			&.has-icon {
+				padding-left: 2.5rem;
+			}
 		}
 
 		textarea {

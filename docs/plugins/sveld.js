@@ -2,7 +2,7 @@ import { ComponentParser } from 'sveld'
 import * as svelte from 'svelte/compiler'
 import fs from 'fs/promises'
 import path from 'path'
-import { preprocess } from '../../src/config/svelte.config.js'
+import { preprocess } from '../../src/config/svelte.js'
 
 export default function sveld() {
 	return {

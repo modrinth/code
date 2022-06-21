@@ -4,7 +4,7 @@
 	import IconChat from 'virtual:icons/heroicons-outline/chat-alt-2'
 	import { onMount } from 'svelte'
 
-	let headerElement
+	let headerElement: HTMLElement
 
 	onMount(() => {
 		let lastScrollTop: number

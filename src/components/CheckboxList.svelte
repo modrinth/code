@@ -8,8 +8,8 @@
 	/** Wrap the options horizontally */
 	export let wrap = false
 
-	const handleChange = (e, key) => {
-		if (e.target.checked) {
+	const handleChange = (event: any, key: string | number) => {
+		if (event.target.checked) {
 			if (!value) value = []
 			value = [key, ...value]
 		} else {

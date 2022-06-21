@@ -11,8 +11,8 @@
 	export let value = []
 	export let options: Option[] = []
 
-	const handleChange = (e, key) => {
-		if (e.target.checked) {
+	const handleChange = (event: any, key: string | number) => {
+		if (event.target.checked) {
 			if (!value) value = []
 			value = [key, ...value]
 		} else {

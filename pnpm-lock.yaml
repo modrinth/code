@@ -10,6 +10,7 @@ specifiers:
   '@poppanator/sveltekit-svg': ^0.3.1
   '@sveltejs/adapter-static': ^1.0.0-next.29
   '@sveltejs/kit': next
+  '@types/marked': ^4.0.3
   '@typescript-eslint/eslint-plugin': ^5.10.1
   '@typescript-eslint/parser': ^5.10.1
   cli-progress: ^3.11.1
@@ -39,7 +40,7 @@ specifiers:
   sanitize.css: ^13.0.0
   sveld: ^0.13.4
   svelte: ^3.48.0
-  svelte-check: ^2.2.6
+  svelte-check: ^2.7.2
   svelte-intl-precompile: ^0.11.1
   svelte-preprocess: ^4.10.1
   svelte-tiny-virtual-list: ^2.0.1
@@ -85,6 +86,7 @@ dependencies:
 devDependencies:
   '@sveltejs/adapter-static': 1.0.0-next.29
   '@sveltejs/kit': 1.0.0-next.350_svelte@3.48.0
+  '@types/marked': 4.0.3
   '@typescript-eslint/eslint-plugin': 5.14.0_4p27j37cxves4nxlnqogdhp4ta
   '@typescript-eslint/parser': 5.14.0_e6rt7vlgxfprtuallp2t3cvyi4
   eslint: 7.32.0
@@ -97,7 +99,7 @@ devDependencies:
   prettier-plugin-svelte: 2.7.0_kkjbqzpydplecjtkxrgomroeru
   sveld: 0.13.4_jw3wiphoy34i6ad2hx6ga3jifa
   svelte: 3.48.0
-  svelte-check: 2.4.5_2pvebpkgu3ohgo43qaf5qmcxwm
+  svelte-check: 2.7.2_2pvebpkgu3ohgo43qaf5qmcxwm
   svelte-intl-precompile: 0.11.1_svelte@3.48.0
   svelte-preprocess: 4.10.4_44qe5g6fi6uxvss56imdgyaaty
   svelte2tsx: 0.5.5_c64miirrcucob5yjzfkddrmila
@@ -1141,6 +1143,10 @@ packages:
     resolution: {integrity: sha512-BQ5aZNSCpj7D6K2ksrRCTmKRLEpnPvWDiLPfoGyhZ++8YtiK9d/3DBKPJgry359X/P1PfruyYwvnvwFjuEiEIg==}
     dependencies:
       '@types/node': 17.0.21
+    dev: true
+
+  /@types/marked/4.0.3:
+    resolution: {integrity: sha512-HnMWQkLJEf/PnxZIfbm0yGJRRZYYMhb++O9M36UCTA9z53uPvVoSlAwJr3XOpDEryb7Hwl1qAx/MV6YIW1RXxg==}
     dev: true
 
   /@types/node/16.9.1:
@@ -4866,19 +4872,18 @@ packages:
       - sugarss
     dev: true
 
-  /svelte-check/2.4.5_2pvebpkgu3ohgo43qaf5qmcxwm:
-    resolution: {integrity: sha512-nRft8BbG2wcxyCdHDZ7X43xLcvDzua3xLwq6wzHGcAF3ka3Jyhv2rvgq0+SF9NwHLMefp9C2XkM6etzsxK/cMQ==}
+  /svelte-check/2.7.2_2pvebpkgu3ohgo43qaf5qmcxwm:
+    resolution: {integrity: sha512-TuVX4YtXHbRM8sVuK5Jk+mKWdm3f0d6hvAC6qCTp8yUszGZewpEBCo2V5fRWZCiz+0J4OCiDHOS+DFMxv39rJA==}
     hasBin: true
     peerDependencies:
       svelte: ^3.24.0
     dependencies:
+      '@jridgewell/trace-mapping': 0.3.13
       chokidar: 3.5.3
       fast-glob: 3.2.11
       import-fresh: 3.3.0
-      minimist: 1.2.5
       picocolors: 1.0.0
       sade: 1.8.1
-      source-map: 0.7.3
       svelte: 3.48.0
       svelte-preprocess: 4.10.4_44qe5g6fi6uxvss56imdgyaaty
       typescript: 4.6.2

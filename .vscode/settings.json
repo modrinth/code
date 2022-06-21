@@ -11,6 +11,7 @@
 	"gitlens.hovers.enabled": false,
 	"svelte.enable-ts-plugin": true,
 	"svelte.ask-to-enable-ts-plugin": false,
+  "svelte.plugin.svelte.useNewTransformation": true,
 	"yaml.schemas": {
 		"https://json.schemastore.org/github-workflow.json": "file:///Users/sha/Code/Modrinth/knossos/.github/workflows/deploy.yml"
 	},

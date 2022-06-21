@@ -19,8 +19,11 @@
 	const dispatch = createEventDispatcher()
 </script>
 
-<Modal title={$t(`modal.deletion.${type}.title`)} bind:open let:trigger bind:data>
-	<slot slot="trigger" name="trigger" {trigger} />
+<!-- @ts-ignore -->
+<Modal title={$t(`modal.deletion.${type}.title`)} bind:open bind:data>
+	<svelte:fragment slot="trigger" let:trigger>
+		<slot name="trigger" {trigger} />
+	</svelte:fragment>
 
 	{#if type === 'account' || 'project'}
 		<div class="important-banner">
@@ -35,18 +38,18 @@
 			{id} />
 	</Field>
 
-	<Button
-		color="danger"
-		slot="button"
-		disabled={key !== data.key}
-		let:close
-		on:click={() => {
-			close()
-			dispatch('deletion')
-		}}>
-		<IconTrash />
-		{$t(`modal.deletion.${type}.action`)}
-	</Button>
+	<svelte:fragment slot="button" let:close>
+		<Button
+			color="danger"
+			disabled={key !== data.key}
+			on:click={() => {
+				close()
+				dispatch('deletion')
+			}}>
+			<IconTrash />
+			{$t(`modal.deletion.${type}.action`)}
+		</Button>
+	</svelte:fragment>
 </Modal>
 
 <style lang="postcss">

@@ -4,7 +4,7 @@ import adapter from '@sveltejs/adapter-static'
 import examples from 'mdsvexamples/vite'
 import sveld from './docs/plugins/sveld.js'
 import path from 'path'
-import { preprocess, plugins } from './src/config/svelte.config.js'
+import { preprocess, plugins } from './src/config/svelte.js'
 import Generator from './src/plugins/generator/index.js'
 import precompileIntl from 'svelte-intl-precompile/sveltekit-plugin'
 

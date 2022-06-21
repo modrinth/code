@@ -16,7 +16,7 @@
 		$page.url.pathname.replace('/', '') || 'index'
 	}.md`
 
-	let api
+	let api = { props: [], events: [], slots: [] }
 	if ($page.url.pathname.includes('components')) {
 		if (import.meta.env.DEV) {
 			import(`../../src/components/${title}.svelte?raw&sveld`).then(
