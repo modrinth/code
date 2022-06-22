@@ -40,10 +40,12 @@ jobs:
           cache: pnpm
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-      - name: Bump version
-        run: pnpm version patch --commit-hooks false --git-tag-version false
+      - name: Package
+        run: |
+          pnpm version patch --commit-hooks false --git-tag-version false
+          pnpm package
       - name: Publish
-        run: pnpm publish --no-git-checks --tag alpha --dry-run
+        run: pnpm publish --no-git-checks --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: EndBug/add-and-commit@v9

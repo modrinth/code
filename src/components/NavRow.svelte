@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { prerendering } from '$app/env'
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
 
@@ -28,7 +29,9 @@
 	$: basePath = path.slice(0, level).join('')
 
 	$: activeIndex = query
-		? links.findIndex((link) => ($page.url.searchParams.get(query) || '') === link.href)
+		? prerendering
+			? -1
+			: links.findIndex((link) => ($page.url.searchParams.get(query) || '') === link.href)
 		: links.findIndex((link) => path[level] === link.href || path[level] === link.href.slice(0, -1))
 
 	const linkElements: HTMLAnchorElement[] = []
@@ -56,9 +59,7 @@
 				if (resetScroll) document.body.scrollTo(0, 0)
 			}}
 			class="navigation__link"
-			class:is-active={query
-				? ($page.url.searchParams.get(query) || '') === link.href
-				: path[level] === link.href || path[level] === link.href.slice(0, -1)}
+			class:is-active={index === activeIndex}
 			sveltekit:noscroll={!resetScroll || null}
 			bind:this={linkElements[index]}>
 			{link.label}
