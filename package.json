@@ -31,8 +31,8 @@
 	},
 	"homepage": "https://omorphia.modrinth.com",
 	"exports": {
-		".": "./src/index",
-		"./utils": "./src//utils/index.ts",
+		".": "./index.js",
+		"./utils": "./src/utils/index.ts",
 		"./styles.postcss": "./src/styles.postcss",
 		"./plugins": "./src/plugins/index.js",
 		"./config/postcss": "./src/config/postcss.cjs",

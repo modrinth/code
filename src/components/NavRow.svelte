@@ -67,6 +67,7 @@
 	{/each}
 	<div
 		class="navigation__indicator"
+		style:visibility={indicatorReady && activeIndex !== -1 ? 'visible' : 'hidden'}
 		style:left={linkElements
 			.slice(0, activeIndex)
 			.map((element, index) => element.offsetWidth + 16)
@@ -86,7 +87,6 @@
 		&__link {
 			font-weight: var(--font-weight-bold);
 			color: var(--color-text-light);
-			transition: color 0.3s ease-in-out;
 			position: relative;
 
 			&.is-active {
@@ -101,11 +101,13 @@
 				width: 100%;
 				border-radius: var(--rounded-max);
 				height: 0.25rem;
-				transition: background-color 0.2s ease-in-out;
+				transition: opacity 0.2s ease-in-out;
+				background-color: var(--color-brand);
+				opacity: 0;
 			}
 
 			&:hover::after {
-				background-color: var(--color-brand-light);
+				opacity: 0.5;
 			}
 		}
 
@@ -126,12 +128,6 @@
 			background-color: var(--color-brand);
 			transition: width 0.3s ease-out, left 0.3s ease-out;
 			visibility: hidden;
-		}
-
-		&:not(.static-indicator) {
-			.navigation__indicator {
-				visibility: visible;
-			}
 		}
 	}
 </style>

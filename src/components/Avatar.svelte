@@ -71,11 +71,13 @@
 			&-xs {
 				--size: 2.5rem;
 				box-shadow: var(--shadow-inset), var(--shadow-raised);
+				border-radius: var(--rounded-sm);
 			}
 
 			&-sm {
 				--size: 3rem;
 				box-shadow: var(--shadow-inset), var(--shadow-raised);
+				border-radius: var(--rounded-sm);
 			}
 
 			&-md {

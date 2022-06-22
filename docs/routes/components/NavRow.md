@@ -35,22 +35,20 @@
 	import { NavRow } from 'omorphia'
 </script>
 
-<div class="card card--strip card--pad-x">
-	<NavRow
-		level={1}
-		links={[
-			{
-				href: '/Button',
-				label: 'Button',
-			},
-			{
-				href: '/Chips',
-				label: 'Chips',
-			},
-			{
-				href: '/NavRow',
-				label: 'NavRow',
-			},
-		]} />
-</div>
+<NavRow
+  level={1}
+  links={[
+    {
+      href: '/Button',
+      label: 'Button',
+    },
+    {
+      href: '/Chips',
+      label: 'Chips',
+    },
+    {
+      href: '/NavRow',
+      label: 'NavRow',
+    },
+  ]} />
 ```
