@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
-		"package": "sed -i \"\" 's|\\./|\\./src/|g' src/index.ts && cp src/index.ts index.js && cp src/index.ts index.d.ts",
+		"package": "sed -i 's|\\./|\\./src/|g' src/index.ts && cp src/index.ts index.js && cp src/index.ts index.d.ts",
 		"preview": "svelte-kit preview",
 		"prepare": "svelte-kit sync",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
