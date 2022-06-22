@@ -36,19 +36,19 @@
 </script>
 
 <NavRow
-  level={1}
-  links={[
-    {
-      href: '/Button',
-      label: 'Button',
-    },
-    {
-      href: '/Chips',
-      label: 'Chips',
-    },
-    {
-      href: '/NavRow',
-      label: 'NavRow',
-    },
-  ]} />
+	level={1}
+	links={[
+		{
+			href: '/Button',
+			label: 'Button',
+		},
+		{
+			href: '/Chips',
+			label: 'Chips',
+		},
+		{
+			href: '/NavRow',
+			label: 'NavRow',
+		},
+	]} />
 ```
