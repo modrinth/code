@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/stores'
+	import { onMount } from 'svelte'
 
 	interface Link {
 		href: string
@@ -25,10 +26,24 @@
 	]
 
 	$: basePath = path.slice(0, level).join('')
+
+	$: activeIndex = query
+		? links.findIndex((link) => ($page.url.searchParams.get(query) || '') === link.href)
+		: links.findIndex((link) => path[level] === link.href || path[level] === link.href.slice(0, -1))
+
+	const linkElements: HTMLAnchorElement[] = []
+
+	let indicatorReady = false
+
+	onMount(() => {
+		setTimeout(() => {
+			indicatorReady = true
+		}, 300)
+	})
 </script>
 
-<nav class="navigation">
-	{#each links as link}
+<nav class="navigation" class:static-indicator={!indicatorReady}>
+	{#each links as link, index}
 		<a
 			href={query
 				? link.href
@@ -44,8 +59,18 @@
 			class:is-active={query
 				? ($page.url.searchParams.get(query) || '') === link.href
 				: path[level] === link.href || path[level] === link.href.slice(0, -1)}
-			sveltekit:noscroll={!resetScroll || null}>{link.label}</a>
+			sveltekit:noscroll={!resetScroll || null}
+			bind:this={linkElements[index]}>
+			{link.label}
+		</a>
 	{/each}
+	<div
+		class="navigation__indicator"
+		style:left={linkElements
+			.slice(0, activeIndex)
+			.map((element, index) => element.offsetWidth + 16)
+			.reduce((acc, a) => acc + a, 0) + 'px'}
+		style:width={linkElements[activeIndex]?.offsetWidth + 'px'} />
 </nav>
 
 <style lang="postcss">
@@ -55,25 +80,56 @@
 		align-items: center;
 		gap: 1rem;
 		flex-wrap: wrap;
+		position: relative;
 
 		&__link {
 			font-weight: var(--font-weight-bold);
 			color: var(--color-text-light);
+			transition: color 0.3s ease-in-out;
+			position: relative;
 
 			&.is-active {
 				color: var(--color-text);
-				position: relative;
+			}
 
-				&::after {
-					content: '';
-					display: block;
-					position: absolute;
-					bottom: -1px;
-					width: 100%;
-					border-radius: var(--rounded-max);
-					height: 0.25rem;
+			&::after {
+				content: '';
+				display: block;
+				position: absolute;
+				bottom: -2px;
+				width: 100%;
+				border-radius: var(--rounded-max);
+				height: 0.25rem;
+				transition: background-color 0.2s ease-in-out;
+			}
+
+			&:hover::after {
+				background-color: var(--color-brand-light);
+			}
+		}
+
+		&.static-indicator {
+			.navigation__link {
+				&.is-active::after {
 					background-color: var(--color-brand);
 				}
+			}
+		}
+
+		&__indicator {
+			position: absolute;
+			bottom: -2px;
+			width: 1rem;
+			height: 0.25rem;
+			border-radius: var(--rounded-max);
+			background-color: var(--color-brand);
+			transition: width 0.3s ease-out, left 0.3s ease-out;
+			visibility: hidden;
+		}
+
+		&:not(.static-indicator) {
+			.navigation__indicator {
+				visibility: visible;
 			}
 		}
 	}

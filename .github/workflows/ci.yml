@@ -28,15 +28,25 @@ jobs:
   release:
     needs: [lint]
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Bump version
+        run: pnpm version patch --commit-hooks false --git-tag-version false
       - name: Publish
-        if: github.ref == 'refs/heads/main'
-        run: npm publish --tag alpha
+        run: pnpm publish --no-git-checks --tag alpha --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - uses: EndBug/add-and-commit@v9
-        if: github.ref == 'refs/heads/main'
         with:
           message: 'Bump package version [skip ci]'
           default_author: github_actions
