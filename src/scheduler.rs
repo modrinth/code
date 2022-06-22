@@ -96,7 +96,7 @@ async fn update_versions(
     pool: &sqlx::Pool<sqlx::Postgres>,
 ) -> Result<(), VersionIndexingError> {
     let input = reqwest::get(
-        "https://launchermeta.mojang.com/mc/game/version_manifest.json",
+        "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
     )
     .await?
     .json::<InputFormat>()
