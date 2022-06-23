@@ -49,7 +49,9 @@
             </div>
           </div>
         </div>
-        <template v-if="$auth.user && $auth.user.id !== user.id">
+        <template
+          v-if="!$auth.user || ($auth.user && $auth.user.id !== user.id)"
+        >
           <hr class="card-divider" />
           <nuxt-link
             :to="`/create/report?id=${user.id}&t=user`"

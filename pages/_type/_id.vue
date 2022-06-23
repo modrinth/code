@@ -109,10 +109,9 @@
             <span class="value">{{ $dayjs(project.updated).fromNow() }}</span>
           </div>
         </div>
-        <hr v-if="$auth.user" class="card-divider" />
+        <hr class="card-divider" />
         <div class="buttons">
           <nuxt-link
-            v-if="$auth.user"
             :to="`/create/report?id=${project.id}&t=project`"
             class="iconified-button"
           >

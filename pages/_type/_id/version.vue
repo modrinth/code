@@ -94,7 +94,6 @@
           Download
         </a>
         <nuxt-link
-          v-if="$auth.user"
           :to="`/create/report?id=${version.id}&t=version`"
           class="action iconified-button"
         >
