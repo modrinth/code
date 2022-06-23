@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { prerendering } from '$app/env'
+	import { browser, prerendering } from '$app/env'
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
 
@@ -28,15 +28,41 @@
 
 	$: basePath = path.slice(0, level).join('')
 
+	/* Animation */
+	const FAST_TIMING = 'cubic-bezier(1,0,.3,1) -140ms'
+	const SLOW_TIMING = 'cubic-bezier(.75,-0.01,.24,.99) -40ms'
+
 	$: activeIndex = query
 		? prerendering
 			? -1
 			: links.findIndex((link) => ($page.url.searchParams.get(query) || '') === link.href)
 		: links.findIndex((link) => path[level] === link.href || path[level] === link.href.slice(0, -1))
 
+	let oldIndex = -1
+
 	const linkElements: HTMLAnchorElement[] = []
 
 	let indicatorReady = false
+
+	const indicator = {
+		left: 0,
+		right: 0,
+		direction: 'right',
+	}
+
+	$: if (activeIndex > -1 && browser && linkElements.length > 0) startAnimation()
+
+	function startAnimation() {
+		indicator.direction = activeIndex < oldIndex ? 'left' : 'right'
+
+		indicator.left = linkElements[activeIndex].offsetLeft
+		indicator.right =
+			linkElements[activeIndex].parentElement.offsetWidth -
+			linkElements[activeIndex].offsetLeft -
+			linkElements[activeIndex].offsetWidth
+
+		oldIndex = activeIndex
+	}
 
 	onMount(() => {
 		setTimeout(() => {
@@ -68,11 +94,11 @@
 	<div
 		class="navigation__indicator"
 		style:visibility={indicatorReady && activeIndex !== -1 ? 'visible' : 'hidden'}
-		style:left={linkElements
-			.slice(0, activeIndex)
-			.map((element, index) => element.offsetWidth + 16)
-			.reduce((acc, a) => acc + a, 0) + 'px'}
-		style:width={linkElements[activeIndex]?.offsetWidth + 'px'} />
+		style:left={indicator.left + 'px'}
+		style:right={indicator.right + 'px'}
+		style:transition={`left 350ms ${
+			indicator.direction === 'left' ? FAST_TIMING : SLOW_TIMING
+		},right 350ms ${indicator.direction === 'right' ? FAST_TIMING : SLOW_TIMING}`} />
 </nav>
 
 <style lang="postcss">
@@ -101,20 +127,28 @@
 				width: 100%;
 				border-radius: var(--rounded-max);
 				height: 0.25rem;
-				transition: opacity 0.2s ease-in-out;
+				transition: opacity 0.1s ease-in-out;
 				background-color: var(--color-brand);
 				opacity: 0;
 			}
 
+			&:hover {
+				color: var(--color-text);
+			}
+
 			&:hover::after {
-				opacity: 0.5;
+				opacity: 0.4;
+			}
+
+			&:active::after {
+				opacity: 0.1;
 			}
 		}
 
 		&.static-indicator {
 			.navigation__link {
 				&.is-active::after {
-					background-color: var(--color-brand);
+					opacity: 1;
 				}
 			}
 		}
@@ -122,11 +156,11 @@
 		&__indicator {
 			position: absolute;
 			bottom: -2px;
-			width: 1rem;
 			height: 0.25rem;
 			border-radius: var(--rounded-max);
 			background-color: var(--color-brand);
-			transition: width 0.3s ease-out, left 0.3s ease-out;
+			transition-property: left, right;
+			transition-duration: 350ms;
 			visibility: hidden;
 		}
 	}

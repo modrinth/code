@@ -57,7 +57,7 @@
 				position: absolute;
 				top: 0;
 				right: 0;
-				padding: 0.5rem;
+				padding: 1rem;
 				display: flex;
 				justify-content: flex-end;
 

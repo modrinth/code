@@ -24,6 +24,18 @@
 				href: 'modpacks',
 				label: 'Modpacks',
 			},
+			{
+				href: 'textures',
+				label: 'Textures',
+			},
+			{
+				href: 'shaders',
+				label: 'Shaders',
+			},
+			{
+				href: 'maps',
+				label: 'Maps',
+			},
 		]} />
 </div>
 ```
