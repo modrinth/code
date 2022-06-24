@@ -37,13 +37,14 @@ pub async fn index_local(
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
             INNER JOIN licenses l ON m.license = l.id
-            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $2 AND tm.accepted = TRUE
+            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE
             INNER JOIN users u ON tm.user_id = u.id
-            WHERE s.status = $1
+            WHERE s.status = $1 OR s.status = $2
             GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id, u.id;
             ",
             //endregion query
             crate::models::projects::ProjectStatus::Approved.as_str(),
+            crate::models::projects::ProjectStatus::Archived.as_str(),
             crate::models::teams::OWNER_ROLE,
         )
             .fetch_many(&pool)
