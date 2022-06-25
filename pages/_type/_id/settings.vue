@@ -330,7 +330,7 @@ export default {
         await this.$axios.post(
           `team/${this.project.team}/members`,
           data,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
         await this.updateMembers()
       } catch (err) {
@@ -350,7 +350,7 @@ export default {
       try {
         await this.$axios.delete(
           `team/${this.project.team}/members/${this.allTeamMembers[index].user.id}`,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
         await this.updateMembers()
       } catch (err) {
@@ -376,7 +376,7 @@ export default {
         await this.$axios.patch(
           `team/${this.project.team}/members/${this.allTeamMembers[index].user.id}`,
           data,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
         await this.updateMembers()
       } catch (err) {
@@ -399,7 +399,7 @@ export default {
           {
             user_id: this.allTeamMembers[index].user.id,
           },
-          this.$auth.headers
+          this.$defaultHeaders()
         )
         await this.updateMembers()
       } catch (err) {
@@ -422,7 +422,10 @@ export default {
       }
     },
     async deleteProject() {
-      await this.$axios.delete(`project/${this.project.id}`, this.$auth.headers)
+      await this.$axios.delete(
+        `project/${this.project.id}`,
+        this.$defaultHeaders()
+      )
       await this.$store.dispatch('user/fetchProjects')
       await this.$router.push(`/user/${this.$auth.user.username}`)
       this.$notify({
@@ -436,7 +439,7 @@ export default {
       this.allTeamMembers = (
         await this.$axios.get(
           `team/${this.project.team}/members`,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
       ).data.map((it) => ({
         avatar_url: it.user.avatar_url,

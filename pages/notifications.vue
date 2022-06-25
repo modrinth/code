@@ -127,7 +127,7 @@ export default {
 
         await this.$axios.delete(
           `notifications?ids=${JSON.stringify(ids)}`,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         ids.forEach((x) => this.$store.dispatch('user/deleteNotification', x))
@@ -145,7 +145,7 @@ export default {
       try {
         await this.$axios.delete(
           `notification/${notification.id}`,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         await this.$store.dispatch('user/deleteNotification', notification.id)

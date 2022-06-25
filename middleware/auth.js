@@ -37,7 +37,9 @@ export default async function (context) {
 
   if (!context.$auth.user) {
     return context.redirect(
-      `${context.$axios.defaults.baseURL}auth/init?url=${process.env.domain}${context.route.fullPath}`
+      `${
+        process.env.BROWSER_BASE_URL || 'https://staging-api.modrinth.com/v2/'
+      }auth/init?url=${process.env.domain}${context.route.fullPath}`
     )
   }
 }

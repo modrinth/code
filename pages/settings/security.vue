@@ -90,7 +90,7 @@ export default {
       try {
         await this.$axios.delete(
           `user/${this.$auth.user.id}`,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
       } catch (err) {
         this.$notify({

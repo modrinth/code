@@ -164,10 +164,10 @@ export default {
     try {
       const [user, projects] = (
         await Promise.all([
-          data.$axios.get(`user/${data.params.id}`, data.$auth.headers),
+          data.$axios.get(`user/${data.params.id}`, data.$defaultHeaders()),
           data.$axios.get(
             `user/${data.params.id}/projects`,
-            data.$auth.headers
+            data.$defaultHeaders()
           ),
         ])
       ).map((it) => it.data)

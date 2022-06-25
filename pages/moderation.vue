@@ -195,8 +195,8 @@ export default {
   async asyncData(data) {
     const [projects, reports] = (
       await Promise.all([
-        data.$axios.get(`moderation/projects`, data.$auth.headers),
-        data.$axios.get(`report`, data.$auth.headers),
+        data.$axios.get(`moderation/projects`, data.$defaultHeaders()),
+        data.$axios.get(`report`, data.$defaultHeaders()),
       ])
     ).map((it) => it.data)
 
@@ -253,7 +253,7 @@ export default {
               : null,
             status: this.currentProject.newStatus,
           },
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         this.projects.splice(
@@ -278,7 +278,7 @@ export default {
       try {
         await this.$axios.delete(
           `report/${this.reports[index].id}`,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         this.reports.splice(index, 1)

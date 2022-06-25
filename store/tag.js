@@ -26,13 +26,21 @@ export const mutations = {
 
 export const actions = {
   async fetchAllTags({ commit }) {
+    const headers = {
+      headers: {
+        'x-ratelimit-key': process.server
+          ? process.env.RATE_LIMIT_IGNORE_KEY
+          : '',
+      },
+    }
+
     const [categories, loaders, gameVersions, licenses, donationPlatforms] = (
       await Promise.all([
-        this.$axios.get(`tag/category`),
-        this.$axios.get(`tag/loader`),
-        this.$axios.get(`tag/game_version`),
-        this.$axios.get(`tag/license`),
-        this.$axios.get(`tag/donation_platform`),
+        this.$axios.get(`tag/category`, headers),
+        this.$axios.get(`tag/loader`, headers),
+        this.$axios.get(`tag/game_version`, headers),
+        this.$axios.get(`tag/license`, headers),
+        this.$axios.get(`tag/donation_platform`, headers),
       ])
     ).map((it) => it.data)
 

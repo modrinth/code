@@ -658,7 +658,7 @@ export default {
         await this.$axios.patch(
           `project/${this.newProject.id}`,
           data,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         if (this.iconChanged) {
@@ -667,7 +667,7 @@ export default {
               this.icon.type.split('/')[this.icon.type.split('/').length - 1]
             }`,
             this.icon,
-            this.$auth.headers
+            this.$defaultHeaders()
           )
         }
 

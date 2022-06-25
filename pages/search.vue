@@ -570,7 +570,7 @@ export default {
           }
         }
 
-        const res = await this.$axios.get(url)
+        const res = await this.$axios.get(url, this.$defaultHeaders())
         this.results = res.data.hits
 
         const pageAmount = Math.ceil(res.data.total_hits / res.data.limit)

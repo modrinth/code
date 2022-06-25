@@ -16,7 +16,7 @@
       </p>
 
       <h2>General Data Protection Regulation (GDPR)</h2>
-      <p>We are a Data Controller of your information.</p>
+      <p>We (Modrinth) are a Data Controller of your information.</p>
 
       <p>
         Rinth, Inc. legal basis for collecting and using the personal
@@ -54,7 +54,7 @@
       <ul>
         <li>
           The right to access, update or to delete the information we have on
-          you.
+          you. (please email admin@modrinth.com for data requests)
         </li>
         <li>The right of rectification.</li>
         <li>The right to object.</li>
@@ -92,19 +92,6 @@
         <a href="https://www.privacypolicies.com/blog/cookies/"
           >"What Are Cookies"</a
         >.
-      </p>
-
-      <h2>Google DoubleClick DART Cookie</h2>
-
-      <p>
-        Google is a third-party vendor on our site. It also uses cookies, known
-        as DART cookies, to serve ads to our site visitors based upon their
-        visit to www.website.com and other sites on the internet. However,
-        visitors may choose to decline the use of DART cookies by visiting the
-        Google ad and content network Privacy Policy at the following URL –
-        <a href="https://policies.google.com/technologies/ads"
-          >https://policies.google.com/technologies/ads</a
-        >
       </p>
 
       <h2>Privacy Policies</h2>

@@ -377,12 +377,12 @@ export default {
     ])
     if (
       (this.$auth.user && this.$auth.user.role === 'moderator') ||
-      this.$auth.user.role === 'admin'
+      (this.$auth.user && this.$auth.user.role === 'admin')
     ) {
       const [projects, reports] = (
         await Promise.all([
-          this.$axios.get(`moderation/projects`, this.$auth.headers),
-          this.$axios.get(`report`, this.$auth.headers),
+          this.$axios.get(`moderation/projects`, this.$defaultHeaders()),
+          this.$axios.get(`report`, this.$defaultHeaders()),
         ])
       ).map((it) => it.data)
 
@@ -458,8 +458,8 @@ export default {
     async getModerationCount() {
       const [projects, reports] = (
         await Promise.all([
-          this.$axios.get(`moderation/projects`, this.$auth.headers),
-          this.$axios.get(`report`, this.$auth.headers),
+          this.$axios.get(`moderation/projects`, this.$defaultHeaders()),
+          this.$axios.get(`report`, this.$defaultHeaders()),
         ])
       ).map((it) => it.data)
 

@@ -17,12 +17,15 @@ export const mutations = {
 }
 
 export const actions = {
-  async fetchUser({ commit }, { token }) {
+  async fetchUser({ commit, state }, { token }) {
     try {
       const user = (
         await this.$axios.get(`user`, {
           headers: {
             Authorization: token,
+            'x-ratelimit-key': process.server
+              ? process.env.RATE_LIMIT_IGNORE_KEY
+              : '',
           },
         })
       ).data

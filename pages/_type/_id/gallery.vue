@@ -348,7 +348,7 @@ export default {
           if (item.title) url += `&title=${item.title}`
           if (item.description) url += `&description=${item.description}`
 
-          await this.$axios.post(url, item.icon, this.$auth.headers)
+          await this.$axios.post(url, item.icon, this.$defaultHeaders())
         }
 
         for (const index of this.editGalleryIndexes) {
@@ -363,20 +363,20 @@ export default {
           if (item.title) url += `&title=${item.title}`
           if (item.description) url += `&description=${item.description}`
 
-          await this.$axios.patch(url, {}, this.$auth.headers)
+          await this.$axios.patch(url, {}, this.$defaultHeaders())
         }
 
         for (const url of this.deleteGalleryUrls) {
           await this.$axios.delete(
             `project/${this.project.id}/gallery?url=${encodeURIComponent(url)}`,
-            this.$auth.headers
+            this.$defaultHeaders()
           )
         }
 
         const project = (
           await this.$axios.get(
             `project/${this.project.id}`,
-            this.$auth.headers
+            this.$defaultHeaders()
           )
         ).data
         this.$emit('update:project', project)

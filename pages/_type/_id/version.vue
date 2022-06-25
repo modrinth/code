@@ -828,7 +828,10 @@ export default {
         }
 
         for (const hash of this.deleteFiles) {
-          await this.$axios.delete(`version_file/${hash}`, this.$auth.headers)
+          await this.$axios.delete(
+            `version_file/${hash}`,
+            this.$defaultHeaders()
+          )
         }
 
         this.version.primary_file = ['sha1', this.primaryFile.hashes.sha1]
@@ -838,15 +841,18 @@ export default {
         await this.$axios.patch(
           `version/${this.version.id}`,
           copyVersion,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         const [version, featuredVersions] = (
           await Promise.all([
-            this.$axios.get(`version/${this.version.id}`, this.$auth.headers),
+            this.$axios.get(
+              `version/${this.version.id}`,
+              this.$defaultHeaders()
+            ),
             this.$axios.get(
               `project/${this.version.project_id}/version?featured=true`,
-              this.$auth.headers
+              this.$defaultHeaders()
             ),
           ])
         ).map((it) => it.data)
@@ -946,7 +952,10 @@ export default {
     async deleteVersion() {
       this.$nuxt.$loading.start()
 
-      await this.$axios.delete(`version/${this.version.id}`, this.$auth.headers)
+      await this.$axios.delete(
+        `version/${this.version.id}`,
+        this.$defaultHeaders()
+      )
 
       await this.$router.replace(
         `/${this.project.project_type}/${this.project.id}`

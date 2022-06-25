@@ -157,7 +157,7 @@ export default {
           body: this.body,
         }
 
-        await this.$axios.post('report', data, this.$auth.headers)
+        await this.$axios.post('report', data, this.$defaultHeaders())
 
         switch (this.itemType) {
           case 'version': {

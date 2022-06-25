@@ -625,22 +625,22 @@ export default {
 
       const [project, members, dependencies, versions, featuredVersions] = (
         await Promise.all([
-          data.$axios.get(`project/${data.params.id}`, data.$auth.headers),
+          data.$axios.get(`project/${data.params.id}`, data.$defaultHeaders()),
           data.$axios.get(
             `project/${data.params.id}/members`,
-            data.$auth.headers
+            data.$defaultHeaders()
           ),
           data.$axios.get(
             `project/${data.params.id}/dependencies`,
-            data.$auth.headers
+            data.$defaultHeaders()
           ),
           data.$axios.get(
             `project/${data.params.id}/version`,
-            data.$auth.headers
+            data.$defaultHeaders()
           ),
           data.$axios.get(
             `project/${data.params.id}/version?featured=true`,
-            data.$auth.headers
+            data.$defaultHeaders()
           ),
         ])
       ).map((it) => it.data)
@@ -764,7 +764,7 @@ export default {
             moderation_message: null,
             moderation_message_body: null,
           },
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         this.project.moderator_message = null
@@ -791,7 +791,7 @@ export default {
             {
               status: 'processing',
             },
-            this.$auth.headers
+            this.$defaultHeaders()
           )
 
           this.project.status = 'processing'

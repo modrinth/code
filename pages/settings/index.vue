@@ -220,7 +220,7 @@ export default {
               this.icon.type.split('/')[this.icon.type.split('/').length - 1]
             }`,
             this.icon,
-            this.$auth.headers
+            this.$defaultHeaders()
           )
         }
 
@@ -235,7 +235,7 @@ export default {
         await this.$axios.patch(
           `user/${this.$auth.user.id}`,
           data,
-          this.$auth.headers
+          this.$defaultHeaders()
         )
 
         await this.$store.dispatch('auth/fetchUser', {
