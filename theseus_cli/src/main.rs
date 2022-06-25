@@ -15,10 +15,8 @@ pub struct Args {
 #[tokio::main]
 async fn main() -> Result<()> {
     let args = argh::from_env::<Args>();
-    theseus::init().await?;
 
     args.dispatch()
         .inspect_err(|_| error!("An error has occurred!\n"))
-        .and_then(|_| async { Ok(theseus::save().await?) })
         .await
 }

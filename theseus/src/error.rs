@@ -36,6 +36,9 @@ pub enum Error {
 
     #[error("Invalid input: {0}")]
     InputError(String),
+
+    #[error("Error: {0}")]
+    OtherError(String),
 }
 
 pub type Result<T> = core::result::Result<T, Error>;

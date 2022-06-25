@@ -45,6 +45,27 @@ pub async fn fetch(
     future::select_ok(attempts).map_ok(|it| it.0).await
 }
 
+// This is implemented, as it will be useful in porting modpacks
+// For now, allow it to be dead code
+#[allow(dead_code)]
+pub async fn fetch_mirrors(
+    urls: &[&str],
+    sha1: Option<&str>,
+) -> crate::Result<bytes::Bytes> {
+    future::select_ok(urls.into_iter().cloned().map(|it| {
+        let sha1 = sha1.map(String::from);
+        let url = String::from(it);
+        async {
+            tokio::spawn(async move { fetch(&url, sha1.as_deref()).await })
+                .await
+                .unwrap()
+        }
+        .boxed()
+    }))
+    .await
+    .map(|it| it.0)
+}
+
 pub async fn write(path: &Path, bytes: &[u8]) -> crate::Result<()> {
     let st = crate::State::get().await?;
     let _permit = st.io_semaphore.acquire().await.unwrap();

@@ -5,7 +5,10 @@ use std::{path::Path, process::Stdio};
 use tokio::process::{Child, Command};
 
 mod args;
+
 mod auth;
+pub use auth::Credentials;
+
 mod download;
 
 pub fn parse_rule(rule: &d::minecraft::Rule) -> bool {

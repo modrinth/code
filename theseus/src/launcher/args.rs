@@ -7,7 +7,7 @@ use crate::{
 };
 use daedalus::{
     get_path_from_artifact,
-    minecraft::{Argument, ArgumentValue, Library, Os, VersionType},
+    minecraft::{Argument, ArgumentValue, Library, VersionType},
     modded::SidedDataEntry,
 };
 use std::io::{BufRead, BufReader};

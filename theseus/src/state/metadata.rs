@@ -51,7 +51,12 @@ impl Metadata {
         let mut metadata = None;
 
         if let Some(ref meta_bin) = db.get(METADATA_DB_FIELD)? {
-            metadata = Some(bincode::deserialize::<Metadata>(meta_bin)?);
+            match bincode::deserialize::<Metadata>(meta_bin) {
+                Ok(val) => metadata = Some(val),
+                Err(err) => {
+                    log::warn!("Could not read launcher metadata: {err}")
+                }
+            }
         }
 
         let mut fetch_futures = LinkedList::new();

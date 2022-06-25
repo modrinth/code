@@ -45,7 +45,4 @@ lazy_static = "1.4"
 argh = "0.1.6"
 pretty_assertions = "1.1.0"
 
-[[example]]
-name = "download-pack"
-
 [features]

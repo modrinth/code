@@ -1,13 +1,10 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::state::State;
 use daedalus::modded::LoaderVersion;
 use futures::prelude::*;
-use once_cell::sync::OnceCell;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
-    sync::Arc,
 };
 use tokio::fs;
 
@@ -114,137 +111,6 @@ impl Profile {
         })
     }
 
-    // TODO: Reimplement in API
-    /*
-        pub async fn run(
-            &self,
-            credentials: &crate::launcher::Credentials,
-        ) -> Result<Child, crate::launcher::LauncherError> {
-            let (settings, version_info) = tokio::try_join! {
-                super::Settings::get(),
-                super::Metadata::get()
-                    .and_then(|manifest| async move {
-                        let version = manifest
-                            .minecraft
-                            .versions
-                            .iter()
-                            .find(|it| it.id == self.metadata.game_version.as_ref())
-                            .ok_or_else(|| DataError::FormatError(format!(
-                                "invalid or unknown version: {}",
-                                self.metadata.game_version
-                            )))?;
-
-                        Ok(daedalus::minecraft::fetch_version_info(version)
-                           .await?)
-                    })
-            }?;
-
-            let ref pre_launch_hooks =
-                self.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
-            for hook in pre_launch_hooks.iter() {
-                // TODO: hook parameters
-                let mut cmd = hook.split(' ');
-                let result = Command::new(cmd.next().unwrap())
-                    .args(&cmd.collect::<Vec<&str>>())
-                    .current_dir(&self.path)
-                    .spawn()?
-                    .wait()
-                    .await?;
-
-                if !result.success() {
-                    return Err(LauncherError::ExitError(
-                        result.code().unwrap_or(-1),
-                    ));
-                }
-            }
-
-            let java_install = match self.java {
-                Some(JavaSettings {
-                    install: Some(ref install),
-                    ..
-                }) => install,
-                _ => if version_info
-                    .java_version
-                    .as_ref()
-                    .filter(|it| it.major_version >= 16)
-                    .is_some()
-                {
-                    settings.java_17_path.as_ref()
-                } else {
-                    settings.java_8_path.as_ref()
-                }
-                .ok_or_else(|| {
-                    LauncherError::JavaError(format!(
-                        "No Java installed for version {}",
-                        version_info.java_version.map_or(8, |it| it.major_version),
-                    ))
-                })?,
-            };
-
-            if !java_install.exists() {
-                return Err(LauncherError::JavaError(format!(
-                    "Could not find java install: {}",
-                    java_install.display()
-                )));
-            }
-
-            let java_args = &self
-                .java
-                .as_ref()
-                .and_then(|it| it.extra_arguments.as_ref())
-                .unwrap_or(&settings.custom_java_args);
-
-            let wrapper = self
-                .hooks
-                .as_ref()
-                .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
-
-            let ref memory = self.memory.unwrap_or(settings.memory);
-            let ref resolution =
-                self.resolution.unwrap_or(settings.game_resolution);
-
-            crate::launcher::launch_minecraft(
-                &self.metadata.game_version,
-                &self.metadata.loader_version,
-                &self.path,
-                &java_install,
-                &java_args,
-                &wrapper,
-                memory,
-                resolution,
-                credentials,
-            )
-            .await
-        }
-
-        pub async fn kill(
-            &self,
-            running: &mut Child,
-        ) -> Result<(), crate::launcher::LauncherError> {
-            running.kill().await?;
-            self.wait_for(running).await
-        }
-
-        pub async fn wait_for(
-            &self,
-            running: &mut Child,
-        ) -> Result<(), crate::launcher::LauncherError> {
-            let result = running.wait().await.map_err(|err| {
-                crate::launcher::LauncherError::ProcessError {
-                    inner: err,
-                    process: String::from("minecraft"),
-                }
-            })?;
-
-            match result.success() {
-                false => Err(crate::launcher::LauncherError::ExitError(
-                    result.code().unwrap_or(-1),
-                )),
-                true => Ok(()),
-            }
-    }
-        */
-
     // TODO: deduplicate these builder methods
     // They are flat like this in order to allow builder-style usage
     pub fn with_name(&mut self, name: String) -> &mut Self {
@@ -319,9 +185,10 @@ impl Profile {
 
 impl Profiles {
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
-        let profile_db: Vec<PathBuf> = bincode::deserialize(
-            &db.get(PROFILE_SUBTREE)?.unwrap_or_default(),
-        )?;
+        let profile_db = match db.get(PROFILE_SUBTREE)? {
+            Some(bytes) => bincode::deserialize::<Vec<PathBuf>>(&bytes)?,
+            None => Vec::new(),
+        };
 
         let profiles = stream::iter(profile_db.iter())
             .then(|it| async move {
@@ -348,7 +215,10 @@ impl Profiles {
         Ok(self)
     }
 
-    pub async fn insert_from(&mut self, path: &Path) -> crate::Result<&Self> {
+    pub async fn insert_from<'a>(
+        &'a mut self,
+        path: &'a Path,
+    ) -> crate::Result<&Self> {
         self.insert(Self::read_profile_from_dir(&path.canonicalize()?).await?)
     }
 
@@ -358,7 +228,10 @@ impl Profiles {
         Ok(self)
     }
 
-    pub async fn sync(&self, batch: &mut sled::Batch) -> crate::Result<&Self> {
+    pub async fn sync<'a>(
+        &'a self,
+        batch: &'a mut sled::Batch,
+    ) -> crate::Result<&Self> {
         stream::iter(self.0.iter())
             .map(Ok::<_, crate::Error>)
             .try_for_each_concurrent(None, |(path, profile)| async move {
@@ -396,7 +269,7 @@ mod tests {
     #[test]
     fn profile_test() -> Result<(), serde_json::Error> {
         let profile = Profile {
-            path: PathBuf::from("/tmp/nunya/beeswax"),
+            path: PathBuf::new(),
             metadata: ProfileMetadata {
                 name: String::from("Example Pack"),
                 icon: None,
@@ -421,14 +294,15 @@ mod tests {
             }),
         };
         let json = serde_json::json!({
-            "path": "/tmp/nunya/beeswax",
             "metadata": {
                 "name": "Example Pack",
                 "game_version": "1.18.2",
                 "format_version": 1u32,
+                "loader": "vanilla",
             },
             "java": {
-              "install": "/usr/bin/java",
+                "extra_arguments": [],
+                "install": "/usr/bin/java",
             },
             "memory": {
               "maximum": 8192u32,

@@ -7,7 +7,6 @@ WixTools
 [#]*[#]
 
 # TEMPORARY: ignore my test instance and metadata
-theseus_cli/launcher
 theseus_cli/foo
 
 # Temporary: ignore during refactor

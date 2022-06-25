@@ -1,5 +1,4 @@
 //! Theseus state management system
-use futures::TryFutureExt;
 use std::sync::Arc;
 use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
 
