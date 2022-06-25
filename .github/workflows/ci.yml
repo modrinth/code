@@ -42,6 +42,7 @@ jobs:
         with:
           node-version: 16
           cache: pnpm
+          registry-url: 'https://registry.npmjs.org'
       - name: Bump version
         run: pnpm version patch --commit-hooks false --git-tag-version false
       - uses: EndBug/add-and-commit@v9
