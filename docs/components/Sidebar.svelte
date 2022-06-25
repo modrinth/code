@@ -1,14 +1,15 @@
 <script lang="ts">
 	import { page } from '$app/stores'
-
 	import IconMenu from 'virtual:icons/lucide/menu'
 
+	const cleanPath = (it) => it.replace(/\.\.\/routes\/.*\//, '').replace('.md', '')
+
 	const components = Object.keys(import.meta.glob('../routes/components/**'))
-		.map((it) => it.replace('../routes/components/', '').replace('.md', ''))
+		.map(cleanPath)
 		.sort()
 
 	const classes = Object.keys(import.meta.glob('../routes/classes/**'))
-		.map((it) => it.replace('../routes/classes/', '').replace('.md', ''))
+		.map(cleanPath)
 		.sort()
 
 	let slideIn = false
@@ -21,14 +22,17 @@
 <nav class="sidebar" class:slideIn>
 	<div class="sidebar__content">
 		<div class="section">
-			<span class="section__title">Getting started</span>
 			<a href="/" class="section__link">Introduction</a>
-			<a href="/getting-started/configure" class="section__link">Configure</a>
-			<a href="/getting-started/icons" class="section__link">Using Icons</a>
-			<a href="/getting-started/css" class="section__link">Writing CSS</a>
-			<a href="/getting-started/illustrations" class="section__link">Illustrations</a>
-			<a href="/getting-started/utils" class="section__link">Built-in utilities</a>
-			<a href="/getting-started/generator" class="section__link">Generator plugin</a>
+			<a href="/setup" class="section__link">Setup</a>
+		</div>
+
+		<div class="section">
+			<span class="section__title">Usage</span>
+			<a href="/usage/icons" class="section__link">Using Icons</a>
+			<a href="/usage/css" class="section__link">Writing CSS</a>
+			<a href="/usage/illustrations" class="section__link">Illustrations</a>
+			<a href="/usage/utils" class="section__link">Built-in utilities</a>
+			<a href="/usage/generator" class="section__link">Generator plugin</a>
 		</div>
 
 		<div class="section">

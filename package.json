@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
-		"package": "svelte-kit package",
+		"package": "svelte-kit package && merge-dirs package/src package",
 		"preview": "svelte-kit preview",
 		"prepare": "svelte-kit sync",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
@@ -42,6 +42,8 @@
 		"eslint-plugin-svelte3": "^3.2.1",
 		"mdsvex": "^0.10.5",
 		"mdsvexamples": "^0.3.0",
+		"merge-dirs": "^0.2.1",
+		"micromatch": "^4.0.5",
 		"nodemon": "^2.0.15",
 		"prettier": "^2.6.2",
 		"prettier-plugin-svelte": "^2.7.0",
@@ -49,7 +51,6 @@
 		"svelte": "^3.48.0",
 		"svelte-check": "^2.7.2",
 		"svelte-intl-precompile": "^0.11.1",
-		"svelte-preprocess": "^4.10.1",
 		"svelte2tsx": "^0.5.5",
 		"tslib": "^2.3.1",
 		"typescript": "~4.6.2"
@@ -80,6 +81,7 @@
 		"postcss-preset-env": "^7.7.1",
 		"postcss-pxtorem": "^6.0.0",
 		"sanitize.css": "^13.0.0",
+		"svelte-preprocess": "^4.10.1",
 		"svelte-tiny-virtual-list": "^2.0.1",
 		"svelte-use-click-outside": "^1.0.0",
 		"throttle-debounce": "^3.0.1",

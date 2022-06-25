@@ -27,3 +27,5 @@ mdsvex.config.js
 svelte.config.js
 tsconfig.json
 pnpm-lock.yaml
+
+src/
