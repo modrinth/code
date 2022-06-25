@@ -2,7 +2,7 @@
 	import { page } from '$app/stores'
 	import IconMenu from 'virtual:icons/lucide/menu'
 
-	const cleanPath = (it) => it.replace(/\.\.\/routes\/.*\//, '').replace('.md', '')
+	const cleanPath = (it: string) => it.replace(/\.\.\/routes\/.*\//, '').replace('.md', '')
 
 	const components = Object.keys(import.meta.glob('../routes/components/**'))
 		.map(cleanPath)

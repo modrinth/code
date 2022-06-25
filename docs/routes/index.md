@@ -16,6 +16,10 @@ Omorphia is used in [Knossos](https://github.com/modrinth/knossos) (modrinth.com
 
 It uses [Svelte](https://svelte.dev/) to deliver the best performance with the least boilerplate.
 
+## Try Omorphia online
+
+You can try Omorphia online via [➜ **CodeSandbox** 💻](https://codesandbox.io/s/omorphia-starter-bsbgke).
+
 ## Getting started
 
-Follow the instructions on the [➜ setup page 🛠️](/setup).
+Follow the instructions on the [➜ **setup page** 🛠️](/setup).

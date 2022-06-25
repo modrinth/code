@@ -35,6 +35,7 @@ export async function send<Operation extends keyof operations>(
 
 	const fetchOptions: RequestInit = {
 		method,
+		headers: {},
 	}
 
 	const token = get(tokenStore) || options.token

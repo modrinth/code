@@ -1,9 +1,5 @@
 # Omorphia
 
-_The Modrinth frontend library_
-
----
-
 Omorphia is Modrinth's component, style, and utility library for Svelte projects. It includes:
 
 - 🧩 Typed components which enhance HTML elements and provide a consistent UI

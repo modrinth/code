@@ -7,7 +7,6 @@ import path from 'path'
 import { preprocess, plugins } from './src/config/svelte.js'
 import Generator from './src/plugins/generator/index.js'
 import precompileIntl from 'svelte-intl-precompile/sveltekit-plugin'
-import mm from 'micromatch'
 
 /** @type {import('@sveltejs/kit').Config} */
 export default {
