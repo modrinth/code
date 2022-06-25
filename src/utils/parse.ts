@@ -1,6 +1,6 @@
 import { marked } from 'marked'
-import hljs from 'highlight.js'
 import insane from 'insane'
+import { highlight } from './highlight'
 
 const renderer = new marked.Renderer()
 
@@ -27,10 +27,7 @@ renderer.link = (href, title, text) => {
 
 marked.setOptions({
 	renderer,
-	highlight: function (code, lang) {
-		const language = hljs.getLanguage(lang) ? lang : 'plaintext'
-		return hljs.highlight(code, { language }).value
-	},
+	highlight,
 	langPrefix: 'hljs language-',
 	headerPrefix: '',
 	gfm: true,

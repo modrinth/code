@@ -1,6 +1,7 @@
 {
 	"prettier.endOfLine": "lf",
 	"cSpell.words": [
+    "sveltekit",
     "undici",
     "unplugin"
   ],

@@ -9,7 +9,7 @@ import Generator from './src/plugins/generator/index.js'
 import precompileIntl from 'svelte-intl-precompile/sveltekit-plugin'
 
 /** @type {import('@sveltejs/kit').Config} */
-const config = {
+export default {
 	extensions: ['.svelte', ...mdsvexConfig.extensions],
 
 	preprocess: [preprocess, mdsvex(mdsvexConfig)],
@@ -61,5 +61,3 @@ const config = {
 		},
 	},
 }
-
-export default config
