@@ -1,3 +1,4 @@
+/* TODO: Rewrite after porting modpacks
 use std::{path::PathBuf, time::Instant};
 
 use argh::FromArgs;
@@ -53,3 +54,4 @@ pub async fn main() {
     println!("Download completed in {} seconds", end.as_secs_f32());
     debug("Done!", args.verbose);
 }
+*/
