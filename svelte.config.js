@@ -20,10 +20,18 @@ export default {
 			default: true,
 			onError: 'continue',
 		},
+
+		alias: {
+			$generated: path.resolve('./generated'),
+			omorphia: path.resolve('./src'),
+			['$stores/account']: path.resolve('./docs/dummyStore.ts'),
+		},
+
 		vite: {
 			plugins: [
 				Generator({
 					gameVersions: true,
+					openapi: true,
 				}),
 				...plugins,
 				examples,
@@ -31,16 +39,9 @@ export default {
 				precompileIntl('locales'),
 			],
 
-			resolve: {
-				alias: {
-					$generated: path.resolve('./generated'),
-					omorphia: path.resolve('./src'),
-				},
-			},
-
 			build: {
 				rollupOptions: {
-					external: '/_app/COMPONENT_API.json',
+					external: ['/_app/COMPONENT_API.json'],
 				},
 			},
 

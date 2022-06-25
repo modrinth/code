@@ -69,6 +69,7 @@
 		"insane": "^2.6.2",
 		"jimp": "^0.16.1",
 		"marked": "^4.0.12",
+		"openapi-typescript": "^5.4.0",
 		"postcss": "^8.4.8",
 		"postcss-easy-import": "^4.0.0",
 		"postcss-extend-rule": "^4.0.0",

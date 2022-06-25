@@ -2,6 +2,24 @@
 title: Built-in utilities
 ---
 
+## API requests
+
+Use the `send` function to make API requests.
+
+```svelte example raised
+<script lang="ts">
+	import { send } from 'omorphia/utils'
+
+	const project = send<'getProject'>('GET', 'project/sodium')
+</script>
+
+{#await project}
+	fetching...
+{:then project}
+	{project.downloads} downloads
+{/await}
+```
+
 ## Markdown
 
 Use the markdown utilities to parse markdown text into HTML. Both markdown parsers have HTML sanitization built-in.

@@ -3,6 +3,7 @@ import { landingPage } from './outputs/landingPage.js'
 import { projectColors } from './outputs/projectColors.js'
 import { gameVersions } from './outputs/gameVersions.js'
 import { tags } from './outputs/tags.js'
+import { openapi } from './outputs/openapi.js'
 
 const API_URL =
 	process.env.VITE_API_URL && process.env.VITE_API_URL === 'https://staging-api.modrinth.com/v2/'
@@ -25,6 +26,7 @@ const TTL = 7 * 24 * 60 * 60 * 1000
  * @param {boolean} options.landingPage
  * @param {boolean} options.gameVersions
  * @param {boolean} options.tags
+ * @param {boolean} options.openapi
  * @returns {PluginResult}
  */
 export default function Generator(options) {
@@ -57,6 +59,7 @@ export default function Generator(options) {
 			if (options.tags) await tags(API_URL)
 			if (options.landingPage) await landingPage(API_URL)
 			if (options.gameVersions) await gameVersions(API_URL)
+			if (options.openapi) await openapi(API_URL)
 			if (options.projectColors) await projectColors(API_URL)
 		},
 	}
