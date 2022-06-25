@@ -11,6 +11,5 @@
 		"./src/**/*.ts",
 		"./src/**/*.svelte"
 	],
-	"exclude": ["./node_modules/**", "./generated/**", ".svelte-kit/**"],
 	"extends": "./.svelte-kit/tsconfig.json"
 }
