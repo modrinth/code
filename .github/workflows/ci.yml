@@ -53,6 +53,8 @@ jobs:
       - name: Package
         run: pnpm package
       - name: Publish
-        run: pnpm publish package --no-git-checks --tag alpha
+        run: |
+          cd package
+          npm publish --tag alpha
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
