@@ -1,6 +1,9 @@
 {
 	"prettier.endOfLine": "lf",
-	"cSpell.words": ["unplugin"],
+	"cSpell.words": [
+    "undici",
+    "unplugin"
+  ],
 	"gitlens.showWelcomeOnInstall": false,
 	"gitlens.showWhatsNewAfterUpgrades": false,
 	"gitlens.plusFeatures.enabled": false,

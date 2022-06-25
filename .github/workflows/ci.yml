@@ -48,13 +48,11 @@ jobs:
         with:
           message: 'Bump package version [skip ci]'
           default_author: github_actions
-      - name: Remove svelte.config.js # prevents `svelte-kit sync` from running
-        run: rm svelte.config.js
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Package
         run: pnpm package
       - name: Publish
-        run: pnpm publish --no-git-checks --tag alpha
+        run: pnpm publish package --no-git-checks --tag alpha
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

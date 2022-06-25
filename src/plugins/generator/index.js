@@ -12,6 +12,21 @@ const API_URL =
 // Time to live: 7 days
 const TTL = 7 * 24 * 60 * 60 * 1000
 
+/**
+ * @typedef {Object} PluginResult
+ * @property {string} name
+ * @property {() => Promise<void>} buildStart
+ */
+
+/**
+ * Generate JSON data from the backend
+ * @param {Object} options Plugin options
+ * @param {boolean} options.projectColors
+ * @param {boolean} options.landingPage
+ * @param {boolean} options.gameVersions
+ * @param {boolean} options.tags
+ * @returns {PluginResult}
+ */
 export default function Generator(options) {
 	return {
 		name: 'rollup-plugin-omorphia-generator',

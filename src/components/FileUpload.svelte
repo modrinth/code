@@ -1,6 +1,7 @@
 <script lang="ts">
 	import IconTrash from 'virtual:icons/heroicons-outline/trash'
 	import IconUpload from 'virtual:icons/heroicons-outline/upload'
+	import IconPhotograph from 'virtual:icons/heroicons-outline/photograph'
 	import IconFile from 'virtual:icons/lucide/file'
 	import { t } from 'svelte-intl-precompile'
 	import Button from './Button.svelte'
@@ -52,7 +53,11 @@
 	{#each files as file (file.name)}
 		<div class="file">
 			<div class="file__tab">
-				<IconFile />
+				{#if file.type.startsWith('image/')}
+					<IconPhotograph />
+				{:else}
+					<IconFile />
+				{/if}
 				<div class="file__tab__name"><b>{file.name}</b></div>
 				<Button
 					color="tertiary"
@@ -61,7 +66,12 @@
 					}}><IconTrash /> Remove</Button>
 			</div>
 			{#if file.type.startsWith('image/')}
-				<img class="file__preview" src={URL.createObjectURL(file)} alt="Uploaded file preview" />
+				<div class="file__preview">
+					<img
+						class="file__preview__image"
+						src={URL.createObjectURL(file)}
+						alt="Uploaded file preview" />
+				</div>
 			{/if}
 		</div>
 	{/each}
@@ -91,15 +101,21 @@
 		}
 
 		.file {
-			box-shadow: var(--shadow-inset);
 			border-radius: var(--rounded);
 			background-color: var(--color-button-bg);
+			box-shadow: var(--shadow-raised-sm), var(--shadow-inset);
 
 			&__tab {
 				display: flex;
 				align-items: center;
 				padding: 0.75rem 1rem;
 				gap: 1rem;
+
+				:global(.icon) {
+					/* Uses `px` to make icons slightly larger */
+					min-width: 18px;
+					height: 18px;
+				}
 
 				&__name {
 					text-overflow: ellipsis;
@@ -112,6 +128,17 @@
 			&__preview {
 				width: 100%;
 				border-radius: var(--rounded-bottom);
+				overflow: hidden;
+				display: flex;
+				justify-content: center;
+				background-color: black;
+
+				&__image {
+					height: auto;
+					max-height: 22rem;
+					width: 100%;
+					object-fit: contain;
+				}
 			}
 		}
 	}

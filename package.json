@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "svelte-kit dev",
 		"build": "svelte-kit build",
-		"package": "sed -i 's|\\./|\\./src/|g' src/index.ts && cp src/index.ts index.js && cp src/index.ts index.d.ts",
+		"package": "svelte-kit package",
 		"preview": "svelte-kit preview",
 		"prepare": "svelte-kit sync",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
@@ -30,17 +30,10 @@
 		"url": "https://github.com/modrinth/omorphia/issues"
 	},
 	"homepage": "https://omorphia.modrinth.com",
-	"exports": {
-		".": "./index.js",
-		"./utils": "./src/utils/index.ts",
-		"./styles.postcss": "./src/styles.postcss",
-		"./plugins": "./src/plugins/index.js",
-		"./config/postcss": "./src/config/postcss.cjs",
-		"./config/svelte": "./src/config/svelte.js"
-	},
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^1.0.0-next.29",
 		"@sveltejs/kit": "next",
+		"@types/cli-progress": "^3.11.0",
 		"@types/marked": "^4.0.3",
 		"@typescript-eslint/eslint-plugin": "^5.10.1",
 		"@typescript-eslint/parser": "^5.10.1",

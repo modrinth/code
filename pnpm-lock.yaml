@@ -10,6 +10,7 @@ specifiers:
   '@poppanator/sveltekit-svg': ^0.3.1
   '@sveltejs/adapter-static': ^1.0.0-next.29
   '@sveltejs/kit': next
+  '@types/cli-progress': ^3.11.0
   '@types/marked': ^4.0.3
   '@typescript-eslint/eslint-plugin': ^5.10.1
   '@typescript-eslint/parser': ^5.10.1
@@ -85,7 +86,8 @@ dependencies:
 
 devDependencies:
   '@sveltejs/adapter-static': 1.0.0-next.29
-  '@sveltejs/kit': 1.0.0-next.350_svelte@3.48.0
+  '@sveltejs/kit': 1.0.0-next.354_svelte@3.48.0
+  '@types/cli-progress': 3.11.0
   '@types/marked': 4.0.3
   '@typescript-eslint/eslint-plugin': 5.14.0_4p27j37cxves4nxlnqogdhp4ta
   '@typescript-eslint/parser': 5.14.0_e6rt7vlgxfprtuallp2t3cvyi4
@@ -1076,14 +1078,14 @@ packages:
       tiny-glob: 0.2.9
     dev: true
 
-  /@sveltejs/kit/1.0.0-next.350_svelte@3.48.0:
-    resolution: {integrity: sha512-qkZNjp7yIj6t91+wMhmMtGJH0Lb89OaKdVXUDy92CS5/4OHRTKcQPdfOKs4no/upkS3RiFb+rEpOkYqTMcPUXg==}
+  /@sveltejs/kit/1.0.0-next.354_svelte@3.48.0:
+    resolution: {integrity: sha512-dTfFT0c3sxztFpiw6H4bQnPd+PtHgEZG6j6ssT9sWLONfzUgWRX0S7H/WoPEjr7u65o2HNazoj8jmEq3ZTwb9g==}
     engines: {node: '>=16.7'}
     hasBin: true
     peerDependencies:
       svelte: ^3.44.0
     dependencies:
-      '@sveltejs/vite-plugin-svelte': 1.0.0-next.47_svelte@3.48.0+vite@2.9.10
+      '@sveltejs/vite-plugin-svelte': 1.0.0-next.49_svelte@3.48.0+vite@2.9.10
       chokidar: 3.5.3
       sade: 1.8.1
       svelte: 3.48.0
@@ -1096,8 +1098,8 @@ packages:
       - supports-color
     dev: true
 
-  /@sveltejs/vite-plugin-svelte/1.0.0-next.47_svelte@3.48.0+vite@2.9.10:
-    resolution: {integrity: sha512-J6n8UN51aq/TEZGQ89/EtdXTtca3cRcTJGzi6fi+xK8LkgsHQLCZhRj+PJ+swktRSWTX9IOmQS55SqVg6bz5fA==}
+  /@sveltejs/vite-plugin-svelte/1.0.0-next.49_svelte@3.48.0+vite@2.9.10:
+    resolution: {integrity: sha512-AKh0Ka8EDgidnxWUs8Hh2iZLZovkETkefO99XxZ4sW4WGJ7VFeBx5kH/NIIGlaNHLcrIvK3CK0HkZwC3Cici0A==}
     engines: {node: ^14.13.1 || >= 16}
     peerDependencies:
       diff-match-patch: ^1.0.5
@@ -1130,6 +1132,12 @@ packages:
     resolution: {integrity: sha512-L7z9BgrNEcYyUYtF+HaEfiS5ebkh9jXqbszz7pC0hRBPaatV0XjSD3+eHrpqFemQfgwiFF0QPIarnIihIDn7OA==}
     engines: {node: '>=10.13.0'}
     dev: false
+
+  /@types/cli-progress/3.11.0:
+    resolution: {integrity: sha512-XhXhBv1R/q2ahF3BM7qT5HLzJNlIL0wbcGyZVjqOTqAybAnsLisd7gy1UCyIqpL+5Iv6XhlSyzjLCnI2sIdbCg==}
+    dependencies:
+      '@types/node': 17.0.21
+    dev: true
 
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
