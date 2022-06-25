@@ -280,6 +280,8 @@ export default {
     branch: process.env.VERCEL_GIT_COMMIT_REF || 'master',
     hash: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
     domain: getDomain(),
+    authURLBase:
+      process.env.BROWSER_BASE_URL || 'https://staging-api.modrinth.com/v2/',
   },
   publicRuntimeConfig: {
     axios: {
