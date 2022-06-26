@@ -89,7 +89,7 @@ where
         .to_str()
         .map_err(|_| AuthenticationError::InvalidCredentials)?;
 
-    Ok(get_user_from_token(token, executor).await?)
+    get_user_from_token(token, executor).await
 }
 
 pub async fn check_is_moderator_from_headers<'a, 'b, E>(

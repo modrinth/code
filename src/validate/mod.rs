@@ -4,7 +4,9 @@ use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
 use crate::validate::liteloader::LiteLoaderValidator;
 use crate::validate::pack::PackValidator;
+use crate::validate::plugin::PluginValidator;
 use crate::validate::quilt::QuiltValidator;
+use crate::validate::resourcepack::ResourcePackValidator;
 use std::io::Cursor;
 use thiserror::Error;
 use time::OffsetDateTime;
@@ -14,7 +16,9 @@ mod fabric;
 mod forge;
 mod liteloader;
 mod pack;
+mod plugin;
 mod quilt;
+mod resourcepack;
 
 #[derive(Error, Debug)]
 pub enum ValidationError {
@@ -22,7 +26,7 @@ pub enum ValidationError {
     Zip(#[from] zip::result::ZipError),
     #[error("IO Error: {0}")]
     Io(#[from] std::io::Error),
-    #[error("Error while validating JSON: {0}")]
+    #[error("Error while validating JSON for uploaded file: {0}")]
     SerDe(#[from] serde_json::Error),
     #[error("Invalid Input: {0}")]
     InvalidInput(std::borrow::Cow<'static, str>),
@@ -72,13 +76,15 @@ pub trait Validator: Sync {
     ) -> Result<ValidationResult, ValidationError>;
 }
 
-static VALIDATORS: [&dyn Validator; 6] = [
+static VALIDATORS: [&dyn Validator; 8] = [
     &PackValidator,
     &FabricValidator,
     &ForgeValidator,
     &LegacyForgeValidator,
     &QuiltValidator,
     &LiteLoaderValidator,
+    &ResourcePackValidator,
+    &PluginValidator,
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file

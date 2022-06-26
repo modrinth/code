@@ -650,7 +650,7 @@ impl Version {
                         .hashes
                         .unwrap_or_default()
                         .split(" ~~~~ ")
-                        .map(|f| {
+                        .flat_map(|f| {
                             let hash: Vec<&str> = f.split(" |||| ").collect();
 
                             if hash.len() >= 3 {
@@ -663,13 +663,12 @@ impl Version {
                                 None
                             }
                         })
-                        .flatten()
                         .collect();
 
                     v.files
                         .unwrap_or_default()
                         .split(" ~~~~ ")
-                        .map(|f| {
+                        .flat_map(|f| {
                             let file: Vec<&str> = f.split(" |||| ").collect();
 
                             if file.len() >= 5 {
@@ -698,7 +697,6 @@ impl Version {
                                 None
                             }
                         })
-                        .flatten()
                         .collect()
                 },
                 game_versions: {
@@ -737,7 +735,7 @@ impl Version {
                     .dependencies
                     .unwrap_or_default()
                     .split(" ~~~~ ")
-                    .map(|f| {
+                    .flat_map(|f| {
                         let dependency: Vec<&str> = f.split(" |||| ").collect();
 
                         if dependency.len() >= 4 {
@@ -767,7 +765,6 @@ impl Version {
                             None
                         }
                     })
-                    .flatten()
                     .collect(),
                 version_type: v.version_type,
             }))
@@ -824,7 +821,7 @@ impl Version {
                         date_published: v.date_published,
                         downloads: v.downloads,
                         files: {
-                            let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default().split(" ~~~~ ").map(|f| {
+                            let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default().split(" ~~~~ ").flat_map(|f| {
                                 let hash: Vec<&str> = f.split(" |||| ").collect();
 
                                 if hash.len() >= 3 {
@@ -836,9 +833,9 @@ impl Version {
                                 } else {
                                     None
                                 }
-                            }).flatten().collect();
+                            }).collect();
 
-                            v.files.unwrap_or_default().split(" ~~~~ ").map(|f| {
+                            v.files.unwrap_or_default().split(" ~~~~ ").flat_map(|f| {
                                 let file: Vec<&str> = f.split(" |||| ").collect();
 
                                 if file.len() >= 5 {
@@ -862,7 +859,7 @@ impl Version {
                                 } else {
                                     None
                                 }
-                            }).flatten().collect()
+                            }).collect()
                         },
                         game_versions: {
                             let game_versions = v
@@ -893,7 +890,7 @@ impl Version {
                         dependencies: v.dependencies
                             .unwrap_or_default()
                             .split(" ~~~~ ")
-                            .map(|f| {
+                            .flat_map(|f| {
                                 let dependency: Vec<&str> = f.split(" |||| ").collect();
 
                                 if dependency.len() >= 4 {
@@ -922,7 +919,7 @@ impl Version {
                                 } else {
                                     None
                                 }
-                            }).flatten().collect(),
+                            }).collect(),
                         version_type: v.version_type
                     }
                 ))

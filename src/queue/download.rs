@@ -27,7 +27,7 @@ impl DownloadQueue {
     pub async fn index(&self, pool: &PgPool) -> Result<(), DatabaseError> {
         let queue = self.take().await;
 
-        if queue.len() > 0 {
+        if !queue.is_empty() {
             let mut transaction = pool.begin().await?;
 
             for (project_id, version_id) in queue {

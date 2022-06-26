@@ -46,7 +46,8 @@ dependencies = [
 [[package]]
 name = "actix-cors"
 version = "0.6.1"
-source = "git+https://github.com/modrinth/actix-extras.git?rev=34d301f#34d301f173c1e7dd5d835ffe29ea46b3e0e4bb8c"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "414360eed71ba2d5435b185ba43ecbe281dfab5df3898286d6b7be8074372c92"
 dependencies = [
  "actix-utils",
  "actix-web",
@@ -107,7 +108,8 @@ dependencies = [
 [[package]]
 name = "actix-multipart"
 version = "0.4.0"
-source = "git+https://github.com/modrinth/actix-web?rev=88c7c18#88c7c184abeed2b3d8765af2d7d1a9345010b9eb"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c9edfb0e7663d7fe18c8d5b668c9c1bcf79176b1dcc9d4da9592503209a6bfb0"
 dependencies = [
  "actix-utils",
  "actix-web",
@@ -187,8 +189,9 @@ dependencies = [
 
 [[package]]
 name = "actix-web"
-version = "4.0.1"
-source = "git+https://github.com/modrinth/actix-web?rev=88c7c18#88c7c184abeed2b3d8765af2d7d1a9345010b9eb"
+version = "4.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a27e8fe9ba4ae613c21f677c2cfaf0696c3744030c6f485b34634e502d6bb379"
 dependencies = [
  "actix-codec",
  "actix-http",
@@ -1441,7 +1444,7 @@ dependencies = [
 
 [[package]]
 name = "labrinth"
-version = "2.4.3"
+version = "2.4.4"
 dependencies = [
  "actix",
  "actix-cors",

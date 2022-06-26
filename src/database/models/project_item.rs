@@ -679,7 +679,7 @@ impl Project {
                     .donations
                     .unwrap_or_default()
                     .split(" ~~~~ ")
-                    .map(|d| {
+                    .flat_map(|d| {
                         let strings: Vec<&str> = d.split(" |||| ").collect();
 
                         if strings.len() >= 3 {
@@ -696,13 +696,12 @@ impl Project {
                             None
                         }
                     })
-                    .flatten()
                     .collect(),
                 gallery_items: m
                     .gallery
                     .unwrap_or_default()
                     .split(" ~~~~ ")
-                    .map(|d| {
+                    .flat_map(|d| {
                         let strings: Vec<&str> = d.split(" |||| ").collect();
 
                         if strings.len() >= 5 {
@@ -726,7 +725,6 @@ impl Project {
                             None
                         }
                     })
-                    .flatten()
                     .collect(),
                 status: crate::models::projects::ProjectStatus::from_str(
                     &m.status_name,
@@ -822,7 +820,7 @@ impl Project {
                             .gallery
                             .unwrap_or_default()
                             .split(" ~~~~ ")
-                            .map(|d| {
+                            .flat_map(|d| {
                                 let strings: Vec<&str> = d.split(" |||| ").collect();
 
                                 if strings.len() >= 5 {
@@ -838,13 +836,12 @@ impl Project {
                                     None
                                 }
                             })
-                            .flatten()
                             .collect(),
                         donation_urls: m
                             .donations
                             .unwrap_or_default()
                             .split(" ~~~~ ")
-                            .map(|d| {
+                            .flat_map(|d| {
                                 let strings: Vec<&str> = d.split(" |||| ").collect();
 
                                 if strings.len() >= 3 {
@@ -859,7 +856,6 @@ impl Project {
                                     None
                                 }
                             })
-                            .flatten()
                             .collect(),
                         status: crate::models::projects::ProjectStatus::from_str(&m.status_name),
                         license_id: m.short,
