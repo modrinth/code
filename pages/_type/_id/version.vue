@@ -551,6 +551,10 @@
           :max-size="524288000"
           @change="(x) => x.forEach((y) => newFiles.push(y))"
         />
+        <span v-if="mode === 'edit' || mode === 'create'">
+          You may upload multiple files, but this should only be used for cases
+          like sources or Javadocs.
+        </span>
       </section>
     </div>
     <NuxtChild v-show="false" :mode.sync="mode" />

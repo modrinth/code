@@ -545,6 +545,10 @@
           </div>
           <div class="files">
             <h3>Files<span class="required">*</span></h3>
+            <span>
+              You may upload multiple files, but this should only be used for
+              cases like sources or Javadocs.
+            </span>
             <StatelessFileInput
               :class="{
                 'known-error':
