@@ -182,13 +182,17 @@ pub async fn user_edit(
             let mut transaction = pool.begin().await?;
 
             if let Some(username) = &new_user.username {
-                let user_option =
+                let existing_user_id_option =
                     crate::database::models::User::get_id_from_username_or_id(
                         username, &**pool,
                     )
                     .await?;
 
-                if user_option.is_none() {
+                if existing_user_id_option
+                    .map(UserId::from)
+                    .map(|id| id == user.id)
+                    .unwrap_or(true)
+                {
                     sqlx::query!(
                         "
                     UPDATE users
