@@ -734,7 +734,7 @@ pub async fn upload_file(
                                 project_id: Some(models::ProjectId(project_id)),
                                 version_id: Some(models::VersionId(version_id)),
                                 file_name: None,
-                                dependency_type: DependencyType::Required
+                                dependency_type: DependencyType::Embedded
                                     .to_string(),
                             });
                         }
@@ -750,7 +750,7 @@ pub async fn upload_file(
                                 .unwrap_or(first_download)
                                 .to_string(),
                         ),
-                        dependency_type: DependencyType::Required.to_string(),
+                        dependency_type: DependencyType::Embedded.to_string(),
                     });
                 }
             }
@@ -761,7 +761,7 @@ pub async fn upload_file(
                         project_id: None,
                         version_id: None,
                         file_name: Some(file.to_string()),
-                        dependency_type: DependencyType::Required.to_string(),
+                        dependency_type: DependencyType::Embedded.to_string(),
                     });
                 }
             }

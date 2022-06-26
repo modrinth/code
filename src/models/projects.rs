@@ -445,6 +445,7 @@ pub enum DependencyType {
     Required,
     Optional,
     Incompatible,
+    Embedded,
 }
 
 impl std::fmt::Display for DependencyType {
@@ -460,6 +461,7 @@ impl DependencyType {
             DependencyType::Required => "required",
             DependencyType::Optional => "optional",
             DependencyType::Incompatible => "incompatible",
+            DependencyType::Embedded => "embedded",
         }
     }
 
@@ -468,6 +470,7 @@ impl DependencyType {
             "required" => DependencyType::Required,
             "optional" => DependencyType::Optional,
             "incompatible" => DependencyType::Incompatible,
+            "embedded" => DependencyType::Embedded,
             _ => DependencyType::Required,
         }
     }
