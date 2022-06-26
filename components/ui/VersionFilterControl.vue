@@ -133,7 +133,7 @@ export default {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .search-controls {
   display: flex;
   flex-direction: row;

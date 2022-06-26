@@ -670,6 +670,7 @@ export default {
   display: flex;
   flex-direction: row;
   gap: var(--spacing-card-md);
+  flex-wrap: wrap;
 
   .sort-controls {
     width: 100%;
