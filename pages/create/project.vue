@@ -548,7 +548,13 @@
               }"
               class="file-input"
               multiple
-              accept=".jar,application/java-archive,.zip,application/zip,.mrpack"
+              :accept="
+                projectType.toLowerCase() === 'modpack'
+                  ? '.mrpack,application/x-modrinth-modpack+zip'
+                  : projectType.toLowerCase() === 'mod'
+                  ? '.jar,application/java-archive'
+                  : '*'
+              "
               prompt="Choose files or drag them here"
               :max-size="524288000"
               @change="

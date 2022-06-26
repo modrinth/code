@@ -540,7 +540,13 @@
           v-if="mode === 'edit' || mode === 'create'"
           multiple
           class="choose-files"
-          accept=".jar,application/java-archive,.zip,application/zip,.mrpack"
+          :accept="
+            project.project_type.toLowerCase() === 'modpack'
+              ? '.mrpack,application/x-modrinth-modpack+zip'
+              : project.project_type.toLowerCase() === 'mod'
+              ? '.jar,application/java-archive'
+              : '*'
+          "
           prompt="Choose files or drag them here"
           :max-size="524288000"
           @change="(x) => x.forEach((y) => newFiles.push(y))"
