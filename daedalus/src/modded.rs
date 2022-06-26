@@ -1,9 +1,14 @@
 use crate::{download_file, Error};
 
-use crate::minecraft::{Argument, ArgumentType, Library, VersionInfo, VersionType};
+use crate::minecraft::{
+    Argument, ArgumentType, Library, VersionInfo, VersionType,
+};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
+
+#[cfg(feature = "bincode")]
+use bincode::{Decode, Encode};
 
 /// The latest version of the format the fabric model structs deserialize to
 pub const CURRENT_FABRIC_FORMAT_VERSION: usize = 0;
@@ -11,6 +16,7 @@ pub const CURRENT_FABRIC_FORMAT_VERSION: usize = 0;
 pub const CURRENT_FORGE_FORMAT_VERSION: usize = 0;
 
 /// A data variable entry that depends on the side of the installation
+#[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct SidedDataEntry {
     /// The value on the client
@@ -19,6 +25,7 @@ pub struct SidedDataEntry {
     pub server: String,
 }
 
+#[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 /// A partial version returned by fabric meta
@@ -28,8 +35,10 @@ pub struct PartialVersionInfo {
     /// The version ID this partial version inherits from
     pub inherits_from: String,
     /// The time that the version was released
+    #[bincode(with_serde)]
     pub release_time: DateTime<Utc>,
     /// The latest time a file in this version was updated
+    #[bincode(with_serde)]
     pub time: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     /// The classpath to the main class to launch the game
@@ -54,6 +63,7 @@ pub struct PartialVersionInfo {
 }
 
 /// A processor to be ran after downloading the files
+#[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Processor {
     /// Maven coordinates for the JAR library of this processor.
@@ -72,12 +82,17 @@ pub struct Processor {
 }
 
 /// Fetches the version manifest of a game version's URL
-pub async fn fetch_partial_version(url: &str) -> Result<PartialVersionInfo, Error> {
+pub async fn fetch_partial_version(
+    url: &str,
+) -> Result<PartialVersionInfo, Error> {
     Ok(serde_json::from_slice(&download_file(url, None).await?)?)
 }
 
 /// Merges a partial version into a complete one
-pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) -> VersionInfo {
+pub fn merge_partial_version(
+    partial: PartialVersionInfo,
+    merge: VersionInfo,
+) -> VersionInfo {
     VersionInfo {
         arguments: if let Some(partial_args) = partial.arguments {
             if let Some(merge_args) = merge.arguments {
@@ -133,6 +148,7 @@ pub fn merge_partial_version(partial: PartialVersionInfo, merge: VersionInfo) ->
     }
 }
 
+#[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 /// A manifest containing information about a mod loader's versions
@@ -141,6 +157,7 @@ pub struct Manifest {
     pub game_versions: Vec<Version>,
 }
 
+#[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 ///  A game version of Minecraft
 pub struct Version {
@@ -150,6 +167,7 @@ pub struct Version {
     pub loaders: Vec<LoaderVersion>,
 }
 
+#[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug, Clone)]
 /// A version of a Minecraft mod loader
 pub struct LoaderVersion {
