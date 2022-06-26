@@ -50,10 +50,10 @@ pub struct Version {
     /// A link to additional information about the version
     pub url: String,
     /// The latest time a file in this version was updated
-    #[bincode(with_serde)]
+    #[cfg_attr(feature = "bincode", bincode(with_serde))]
     pub time: DateTime<Utc>,
     /// The time this version was released
-    #[bincode(with_serde)]
+    #[cfg_attr(feature = "bincode", bincode(with_serde))]
     pub release_time: DateTime<Utc>,
     /// The SHA1 hash of the additional information about the version
     pub sha1: String,
@@ -362,10 +362,10 @@ pub struct VersionInfo {
     /// The minimum version of the Minecraft Launcher that can run this version of the game
     pub minimum_launcher_version: u32,
     /// The time that the version was released
-    #[bincode(with_serde)]
+    #[cfg_attr(feature = "bincode", bincode(with_serde))]
     pub release_time: DateTime<Utc>,
     /// The latest time a file in this version was updated
-    #[bincode(with_serde)]
+    #[cfg_attr(feature = "bincode", bincode(with_serde))]
     pub time: DateTime<Utc>,
     #[serde(rename = "type")]
     /// The type of version

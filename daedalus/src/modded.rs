@@ -35,10 +35,10 @@ pub struct PartialVersionInfo {
     /// The version ID this partial version inherits from
     pub inherits_from: String,
     /// The time that the version was released
-    #[bincode(with_serde)]
+    #[cfg_attr(feature = "bincode", bincode(with_serde))]
     pub release_time: DateTime<Utc>,
     /// The latest time a file in this version was updated
-    #[bincode(with_serde)]
+    #[cfg_attr(feature = "bincode", bincode(with_serde))]
     pub time: DateTime<Utc>,
     #[serde(skip_serializing_if = "Option::is_none")]
     /// The classpath to the main class to launch the game
