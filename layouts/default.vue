@@ -391,9 +391,7 @@ export default {
   },
   computed: {
     authUrl() {
-      return `${
-        process.env.BROWSER_BASE_URL || 'https://staging-api.modrinth.com/v2/'
-      }auth/init?url=${process.env.domain}${this.$route.path}`
+      return `${process.env.authURLBase}auth/init?url=${process.env.domain}${this.$route.path}`
     },
   },
   watch: {

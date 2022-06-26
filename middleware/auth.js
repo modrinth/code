@@ -37,9 +37,7 @@ export default async function (context) {
 
   if (!context.$auth.user) {
     return context.redirect(
-      `${
-        process.env.BROWSER_BASE_URL || 'https://staging-api.modrinth.com/v2/'
-      }auth/init?url=${process.env.domain}${context.route.fullPath}`
+      `${process.env.authURLBase}auth/init?url=${process.env.domain}${context.route.fullPath}`
     )
   }
 }
