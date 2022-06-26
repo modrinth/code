@@ -127,7 +127,7 @@ impl User {
         let result = sqlx::query!(
             "
             SELECT u.id, u.github_id, u.name, u.email,
-                u.avatar_url, u.bio,
+                u.avatar_url, u.username, u.bio,
                 u.created, u.role
             FROM users u
             WHERE LOWER(u.username) = LOWER($1)
@@ -144,7 +144,7 @@ impl User {
                 name: row.name,
                 email: row.email,
                 avatar_url: row.avatar_url,
-                username,
+                username: row.username,
                 bio: row.bio,
                 created: row.created,
                 role: row.role,

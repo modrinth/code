@@ -3099,6 +3099,74 @@
     },
     "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number = $1) AND (mod_id = $2))"
   },
+  "7ecf1bdb78a03dbdee2e4a57d0914409751c13bdc8f01fa82c8001c2255e31a5": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "github_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "name",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "email",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "avatar_url",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "username",
+          "ordinal": 5,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "bio",
+          "ordinal": 6,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created",
+          "ordinal": 7,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "role",
+          "ordinal": 8,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        true,
+        true,
+        true,
+        true,
+        false,
+        true,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n            SELECT u.id, u.github_id, u.name, u.email,\n                u.avatar_url, u.username, u.bio,\n                u.created, u.role\n            FROM users u\n            WHERE LOWER(u.username) = LOWER($1)\n            "
+  },
   "8129255d25bf0624d83f50558b668ed7b7f9c264e380d276522fc82bc871939b": {
     "describe": {
       "columns": [],
@@ -5509,68 +5577,6 @@
       }
     },
     "query": "\n            SELECT id FROM licenses\n            WHERE short = $1\n            "
-  },
-  "d97246f46e85cd99356468cdf36f00d86d1d576f94e4a259bf8b43cf20463f0e": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "github_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "name",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "email",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "avatar_url",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "bio",
-          "ordinal": 5,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "created",
-          "ordinal": 6,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "role",
-          "ordinal": 7,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        true,
-        true,
-        true,
-        true,
-        true,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Text"
-        ]
-      }
-    },
-    "query": "\n            SELECT u.id, u.github_id, u.name, u.email,\n                u.avatar_url, u.bio,\n                u.created, u.role\n            FROM users u\n            WHERE LOWER(u.username) = LOWER($1)\n            "
   },
   "dc2a3a07469ce25a9749d9d1c2e7424ac6765a72e8d9dd90eb682664f7cf036f": {
     "describe": {
