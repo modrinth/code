@@ -4,15 +4,13 @@ use crate::util::{
 };
 use daedalus::modded::LoaderVersion;
 use eyre::{ensure, Result};
+use futures::prelude::*;
 use paris::*;
 use std::path::{Path, PathBuf};
 use tabled::{Table, Tabled};
-use theseus::{
-    data::{profiles::PROFILE_JSON_PATH, Metadata, Profile, Profiles},
-    launcher::ModLoader,
-};
+use theseus::prelude::*;
 use tokio::fs;
-use tokio_stream::{wrappers::ReadDirStream, StreamExt};
+use tokio_stream::wrappers::ReadDirStream;
 use uuid::Uuid;
 
 #[derive(argh::FromArgs)]
@@ -54,16 +52,19 @@ impl ProfileAdd {
         );
 
         let profile = self.profile.canonicalize()?;
-        let json_path = profile.join(PROFILE_JSON_PATH);
+        let json_path = profile.join("profile.json");
+
         ensure!(
             json_path.exists(),
             "Profile json does not exist. Perhaps you wanted `profile init` or `profile fetch`?"
         );
         ensure!(
-            Profiles::get().await.unwrap().0.get(&profile).is_none(),
+            !profile::is_managed(&profile).await?,
             "Profile already managed by Theseus. If the contents of the profile are invalid or missing, the profile can be regenerated using `profile init` or `profile fetch`"
         );
-        Profiles::insert_from(profile).await?;
+
+        profile::add_path(&profile).await?;
+        State::sync().await?;
         success!("Profile added!");
 
         Ok(())
@@ -106,13 +107,15 @@ impl ProfileInit {
         _largs: &ProfileCommand,
     ) -> Result<()> {
         // TODO: validate inputs from args early
+        let state = State::get().await?;
+
         if self.path.exists() {
             ensure!(
                 self.path.is_dir(),
                 "Attempted to create profile in something other than a folder!"
             );
             ensure!(
-                !self.path.join(PROFILE_JSON_PATH).exists(),
+                !self.path.join("profile.json").exists(),
                 "Profile already exists! Perhaps you want `profile add` instead?"
             );
             if ReadDirStream::new(fs::read_dir(&self.path).await?)
@@ -138,8 +141,6 @@ impl ProfileInit {
             &self.path.canonicalize()?.display()
         );
 
-        let metadata = Metadata::get().await?;
-
         // TODO: abstract default prompting
         let name = match &self.name {
             Some(name) => name.clone(),
@@ -157,7 +158,7 @@ impl ProfileInit {
         let game_version = match &self.game_version {
             Some(version) => version.clone(),
             None => {
-                let default = &metadata.minecraft.latest.release;
+                let default = &state.metadata.minecraft.latest.release;
 
                 prompt_async(
                     String::from("Game version"),
@@ -206,8 +207,8 @@ impl ProfileInit {
             };
 
             let loader_data = match loader {
-                ModLoader::Forge => &metadata.forge,
-                ModLoader::Fabric => &metadata.fabric,
+                ModLoader::Forge => &state.metadata.forge,
+                ModLoader::Fabric => &state.metadata.fabric,
                 _ => eyre::bail!("Could not get manifest for loader {loader}. This is a bug in the CLI!"),
             };
 
@@ -238,8 +239,6 @@ impl ProfileInit {
             .map(PathBuf::from),
         };
 
-        // We don't really care if the profile already is managed, as getting this far means that the user probably wanted to re-create a profile
-        drop(metadata);
         let mut profile =
             Profile::new(name, game_version, self.path.clone()).await?;
 
@@ -251,8 +250,8 @@ impl ProfileInit {
             profile.with_loader(loader, Some(loader_version));
         }
 
-        Profiles::insert(profile).await?;
-        Profiles::save().await?;
+        profile::add(profile).await?;
+        State::sync().await?;
 
         success!(
             "Successfully created instance, it is now available to use with Theseus!"
@@ -294,20 +293,39 @@ impl<'a> From<&'a Profile> for ProfileRow<'a> {
     }
 }
 
+impl<'a> From<&'a Path> for ProfileRow<'a> {
+    fn from(it: &'a Path) -> Self {
+        Self {
+            name: "?",
+            path: it,
+            game_version: "?",
+            loader: &ModLoader::Vanilla,
+            loader_version: "?",
+        }
+    }
+}
+
 impl ProfileList {
     pub async fn run(
         &self,
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
-        let profiles = Profiles::get().await?;
-        let profiles = profiles.0.values().map(ProfileRow::from);
+        let state = State::get().await?;
+        let profiles = state.profiles.read().await;
+        let profiles = profiles.0.iter().map(|(path, prof)| {
+            prof.as_ref().map_or_else(
+                || ProfileRow::from(path.as_path()),
+                ProfileRow::from,
+            )
+        });
 
         let table = Table::new(profiles).with(tabled::Style::psql()).with(
             tabled::Modify::new(tabled::Column(1..=1))
                 .with(tabled::MaxWidth::wrapping(40)),
         );
         println!("{table}");
+
         Ok(())
     }
 }
@@ -329,10 +347,13 @@ impl ProfileRemove {
     ) -> Result<()> {
         let profile = self.profile.canonicalize()?;
         info!("Removing profile {} from Theseus", self.profile.display());
+
         if confirm_async(String::from("Do you wish to continue"), true).await? {
-            if Profiles::remove(&profile).await?.is_none() {
+            if !profile::is_managed(&profile).await? {
                 warn!("Profile was not managed by Theseus!");
             } else {
+                profile::remove(&profile).await?;
+                State::sync().await?;
                 success!("Profile removed!");
             }
         } else {
@@ -372,24 +393,21 @@ impl ProfileRun {
         _largs: &ProfileCommand,
     ) -> Result<()> {
         info!("Starting profile at path {}...", self.profile.display());
-        let ref profiles = Profiles::get().await?.0;
         let path = self.profile.canonicalize()?;
-        let profile = profiles
-            .get(&path)
-            .ok_or(
-                eyre::eyre!(
-                    "Profile not managed by Theseus (if it exists, try using `profile add` first!)"
-                )
-            )?;
 
-        let credentials = theseus::launcher::Credentials {
+        ensure!(
+           profile::is_managed(&path).await?,
+           "Profile not managed by Theseus (if it exists, try using `profile add` first!)",
+        );
+
+        let credentials = Credentials {
             id: self.id.clone(),
             username: self.name.clone(),
             access_token: self.token.clone(),
         };
 
-        let mut proc = profile.run(&credentials).await?;
-        profile.wait_for(&mut proc).await?;
+        let mut proc = profile::run(&path, &credentials).await?;
+        profile::wait_for(&mut proc).await?;
 
         success!("Process exited successfully!");
         Ok(())

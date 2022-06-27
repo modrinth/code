@@ -8,7 +8,7 @@ edition = "2018"
 
 [dependencies]
 theseus = { path = "../theseus" }
-daedalus = "0.1.12"
+daedalus = {version = "0.1.15", features = ["bincode"]}
 tokio = { version = "1", features = ["full"] }
 tokio-stream = { version = "0.1", features = ["fs"] }
 futures = "0.3"
@@ -19,3 +19,6 @@ eyre = "0.6"
 tabled = "0.5"
 dirs = "4.0"
 uuid = {version = "0.8", features = ["v4", "serde"]}
+# TODO: merge logging with paris logging
+pretty_env_logger = "0.4"
+log = "0.4.14"

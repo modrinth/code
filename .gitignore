@@ -3,9 +3,10 @@ node_modules/
 .svelte-kit/
 theseus_gui/build/
 WixTools
+.direnv/
 
 [#]*[#]
 
 # TEMPORARY: ignore my test instance and metadata
-theseus_cli/launcher
 theseus_cli/foo
+
