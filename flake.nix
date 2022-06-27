@@ -78,5 +78,5 @@
         buildInputs = with deps;
           global ++ gui ++ shell;
       };
-    })
+    });
 }
