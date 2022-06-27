@@ -10,5 +10,3 @@ WixTools
 # TEMPORARY: ignore my test instance and metadata
 theseus_cli/foo
 
-# Temporary: ignore during refactor
-theseus/src-old
