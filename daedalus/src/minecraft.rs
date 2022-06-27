@@ -91,7 +91,7 @@ pub struct VersionManifest {
 
 /// The URL to the version manifest
 pub const VERSION_MANIFEST_URL: &str =
-    "https://launchermeta.mojang.com/mc/game/version_manifest_v2.json";
+    "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json";
 
 /// Fetches a version manifest from the specified URL. If no URL is specified, the default is used.
 pub async fn fetch_version_manifest(
