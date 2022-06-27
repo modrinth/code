@@ -59,7 +59,7 @@ impl ProfileAdd {
             "Profile json does not exist. Perhaps you wanted `profile init` or `profile fetch`?"
         );
         ensure!(
-            !profile::is_managed(&profile).await,
+            !profile::is_managed(&profile).await?,
             "Profile already managed by Theseus. If the contents of the profile are invalid or missing, the profile can be regenerated using `profile init` or `profile fetch`"
         );
 
@@ -293,6 +293,18 @@ impl<'a> From<&'a Profile> for ProfileRow<'a> {
     }
 }
 
+impl<'a> From<&'a Path> for ProfileRow<'a> {
+    fn from(it: &'a Path) -> Self {
+        Self {
+            name: "?",
+            path: it,
+            game_version: "?",
+            loader: &ModLoader::Vanilla,
+            loader_version: "?",
+        }
+    }
+}
+
 impl ProfileList {
     pub async fn run(
         &self,
@@ -301,7 +313,12 @@ impl ProfileList {
     ) -> Result<()> {
         let state = State::get().await?;
         let profiles = state.profiles.read().await;
-        let profiles = profiles.0.values().map(ProfileRow::from);
+        let profiles = profiles.0.iter().map(|(path, prof)| {
+            prof.as_ref().map_or_else(
+                || ProfileRow::from(path.as_path()),
+                ProfileRow::from,
+            )
+        });
 
         let table = Table::new(profiles).with(tabled::Style::psql()).with(
             tabled::Modify::new(tabled::Column(1..=1))
@@ -332,7 +349,7 @@ impl ProfileRemove {
         info!("Removing profile {} from Theseus", self.profile.display());
 
         if confirm_async(String::from("Do you wish to continue"), true).await? {
-            if !profile::is_managed(&profile).await {
+            if !profile::is_managed(&profile).await? {
                 warn!("Profile was not managed by Theseus!");
             } else {
                 profile::remove(&profile).await?;
@@ -379,7 +396,7 @@ impl ProfileRun {
         let path = self.profile.canonicalize()?;
 
         ensure!(
-           !profile::is_managed(&path).await,
+           profile::is_managed(&path).await?,
            "Profile not managed by Theseus (if it exists, try using `profile add` first!)",
         );
 

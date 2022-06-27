@@ -33,7 +33,7 @@ impl Default for Settings {
             java_8_path: None,
             java_17_path: None,
             hooks: Hooks::default(),
-            max_concurrent_downloads: 32,
+            max_concurrent_downloads: 64,
             version: CURRENT_FORMAT_VERSION,
         }
     }

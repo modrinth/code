@@ -3,6 +3,7 @@ node_modules/
 .svelte-kit/
 theseus_gui/build/
 WixTools
+.direnv/
 
 [#]*[#]
 

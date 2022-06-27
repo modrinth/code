@@ -73,7 +73,7 @@ pub async fn launch_minecraft(
         .map_or(version.id.clone(), |it| it.id.clone());
 
     let mut version_info = download::download_version_info(
-        &state.directories,
+        &state,
         &version,
         loader_version.as_ref(),
     )
@@ -84,7 +84,8 @@ pub async fn launch_minecraft(
         .version_dir(&version.id)
         .join(format!("{version_jar}.jar"));
 
-    download::download_minecraft(&version_info, &state.directories).await?;
+    download::download_minecraft(&state, &version_info).await?;
+    st::State::sync().await?;
 
     if let Some(processors) = &version_info.processors {
         if let Some(ref mut data) = version_info.data {

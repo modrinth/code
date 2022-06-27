@@ -1,29 +1,25 @@
 //! Functions for fetching infromation from the Internet
+use crate::config::REQWEST_CLIENT;
 use futures::prelude::*;
-use std::{collections::LinkedList, path::Path, time};
+use std::{collections::LinkedList, convert::TryInto, path::Path, sync::Arc};
 use tokio::{
     fs::{self, File},
     io::AsyncWriteExt,
+    sync::{Semaphore, SemaphorePermit},
 };
 
 const FETCH_ATTEMPTS: usize = 3;
 
-pub async fn fetch(
+pub async fn fetch<'a>(
     url: &str,
     sha1: Option<&str>,
+    _permit: &SemaphorePermit<'a>,
 ) -> crate::Result<bytes::Bytes> {
-    let st = crate::State::get().await?;
-    let _permit = st.io_semaphore.acquire().await.unwrap();
-
-    let client = reqwest::Client::builder()
-        .tcp_keepalive(Some(time::Duration::from_secs(10)))
-        .build()?;
-
     let mut attempts = LinkedList::new();
     for _ in 0..FETCH_ATTEMPTS {
         attempts.push_back(
             async {
-                let content = client.get(url).send().await?;
+                let content = REQWEST_CLIENT.get(url).send().await?;
                 let bytes = content.bytes().await?;
 
                 if let Some(hash) = sha1 {
@@ -42,6 +38,7 @@ pub async fn fetch(
         )
     }
 
+    log::debug!("Done downloading URL {url}");
     future::select_ok(attempts).map_ok(|it| it.0).await
 }
 
@@ -51,30 +48,39 @@ pub async fn fetch(
 pub async fn fetch_mirrors(
     urls: &[&str],
     sha1: Option<&str>,
+    permits: u32,
+    sem: &Semaphore,
 ) -> crate::Result<bytes::Bytes> {
-    future::select_ok(urls.into_iter().cloned().map(|it| {
+    let _permits = sem.acquire_many(permits).await.unwrap();
+    let sem = Arc::new(Semaphore::new(permits.try_into().unwrap()));
+
+    future::select_ok(urls.into_iter().map(|url| {
         let sha1 = sha1.map(String::from);
-        let url = String::from(it);
-        async {
-            tokio::spawn(async move { fetch(&url, sha1.as_deref()).await })
-                .await
-                .unwrap()
-        }
+        let url = String::from(*url);
+        let sem = Arc::clone(&sem);
+
+        tokio::spawn(async move {
+            let permit = sem.acquire().await.unwrap();
+            fetch(&url, sha1.as_deref(), &permit).await
+        })
+        .map(Result::unwrap)
         .boxed()
     }))
     .await
     .map(|it| it.0)
 }
 
-pub async fn write(path: &Path, bytes: &[u8]) -> crate::Result<()> {
-    let st = crate::State::get().await?;
-    let _permit = st.io_semaphore.acquire().await.unwrap();
-
+pub async fn write<'a>(
+    path: &Path,
+    bytes: &[u8],
+    _permit: &SemaphorePermit<'a>,
+) -> crate::Result<()> {
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).await?;
     }
 
     let mut file = File::create(path).await?;
+    log::debug!("Done writing file {}", path.display());
     file.write_all(bytes).await?;
     Ok(())
 }

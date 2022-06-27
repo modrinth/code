@@ -38,76 +38,91 @@ impl DirectoryInfo {
     }
 
     /// Get the Minecraft instance metadata directory
+    #[inline]
     pub fn metadata_dir(&self) -> PathBuf {
         self.config_dir.join("meta")
     }
 
     /// Get the Minecraft versions metadata directory
+    #[inline]
     pub fn versions_dir(&self) -> PathBuf {
         self.metadata_dir().join("versions")
     }
 
     /// Get the metadata directory for a given version
+    #[inline]
     pub fn version_dir(&self, version: &str) -> PathBuf {
         self.versions_dir().join(version)
     }
 
     /// Get the Minecraft libraries metadata directory
+    #[inline]
     pub fn libraries_dir(&self) -> PathBuf {
         self.metadata_dir().join("libraries")
     }
 
     /// Get the Minecraft assets metadata directory
+    #[inline]
     pub fn assets_dir(&self) -> PathBuf {
         self.metadata_dir().join("assets")
     }
 
     /// Get the assets index directory
+    #[inline]
     pub fn assets_index_dir(&self) -> PathBuf {
         self.assets_dir().join("indexes")
     }
 
     /// Get the assets objects directory
+    #[inline]
     pub fn objects_dir(&self) -> PathBuf {
         self.assets_dir().join("objects")
     }
 
     /// Get the directory for a specific object
+    #[inline]
     pub fn object_dir(&self, hash: &str) -> PathBuf {
         self.objects_dir().join(&hash[..2]).join(hash)
     }
 
     /// Get the Minecraft legacy assets metadata directory
+    #[inline]
     pub fn legacy_assets_dir(&self) -> PathBuf {
         self.metadata_dir().join("resources")
     }
 
     /// Get the Minecraft legacy assets metadata directory
+    #[inline]
     pub fn natives_dir(&self) -> PathBuf {
         self.metadata_dir().join("natives")
     }
 
     /// Get the natives directory for a version of Minecraft
+    #[inline]
     pub fn version_natives_dir(&self, version: &str) -> PathBuf {
         self.natives_dir().join(version)
     }
 
     /// Get the directory containing instance icons
+    #[inline]
     pub fn icon_dir(&self) -> PathBuf {
         self.config_dir.join("icons")
     }
 
     /// Get the file containing the global database
+    #[inline]
     pub fn database_file(&self) -> PathBuf {
         self.config_dir.join("data.bin")
     }
 
     /// Get the settings file for Theseus
+    #[inline]
     pub fn settings_file(&self) -> PathBuf {
         self.config_dir.join("settings.json")
     }
 
     /// Get path from environment variable
+    #[inline]
     fn env_path(name: &str) -> Option<PathBuf> {
         std::env::var_os(name).map(PathBuf::from)
     }

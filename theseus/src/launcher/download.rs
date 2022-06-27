@@ -1,7 +1,7 @@
 //! Downloader for Minecraft data
 
 use crate::{
-    state::DirectoryInfo as Dirs,
+    state::State,
     util::{fetch::*, platform::OsExt},
 };
 use daedalus::{
@@ -13,39 +13,45 @@ use daedalus::{
     modded::LoaderVersion,
 };
 use futures::prelude::*;
-use tokio::fs;
+use std::sync::Arc;
+use tokio::{fs, sync::OnceCell};
 
 pub async fn download_minecraft(
+    st: &State,
     version: &GameVersionInfo,
-    dirs: &Dirs,
 ) -> crate::Result<()> {
-    let assets_index = download_assets_index(dirs, version).await?;
+    log::info!("Downloading Minecraft version {}", version.id);
+    let assets_index = download_assets_index(st, version).await?;
 
     tokio::try_join! {
-        download_client(dirs, version),
-        download_assets(dirs, version.assets == "legacy", &assets_index),
-        download_libraries(dirs, version.libraries.as_slice())
+        download_client(st, version),
+        download_assets(st, version.assets == "legacy", &assets_index),
+        download_libraries(st, version.libraries.as_slice(), &version.id)
     }?;
 
+    log::info!("Done downloading Minecraft!");
     Ok(())
 }
 
 pub async fn download_version_info(
-    dirs: &Dirs,
+    st: &State,
     version: &GameVersion,
     loader: Option<&LoaderVersion>,
 ) -> crate::Result<GameVersionInfo> {
     let version_id = loader.map_or(&version.id, |it| &it.id);
-    let path = dirs
+    log::debug!("Loading version info for Minecraft {version_id}");
+    let path = st
+        .directories
         .version_dir(version_id)
         .join(format!("{version_id}.json"));
 
-    if path.exists() {
+    let res = if path.exists() {
         fs::read(path)
             .err_into::<crate::Error>()
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
+        log::info!("Downloading version info for version {}", &version.id);
         let mut info = d::minecraft::fetch_version_info(version).await?;
 
         if let Some(loader) = loader {
@@ -54,90 +60,142 @@ pub async fn download_version_info(
             info.id = loader.id.clone();
         }
 
-        write(&path, &serde_json::to_vec(&info)?).await?;
+        let permit = st.io_semaphore.acquire().await.unwrap();
+        write(&path, &serde_json::to_vec(&info)?, &permit).await?;
         Ok(info)
-    }
+    }?;
+
+    log::debug!("Loaded version info for Minecraft {version_id}");
+    Ok(res)
 }
 
 pub async fn download_client(
-    dirs: &Dirs,
+    st: &State,
     version_info: &GameVersionInfo,
 ) -> crate::Result<()> {
     let ref version = version_info.id;
+    log::debug!("Locating client for version {version}");
     let client_download = version_info
         .downloads
         .get(&d::minecraft::DownloadType::Client)
         .ok_or(crate::Error::LauncherError(format!(
             "No client downloads exist for version {version}"
         )))?;
-    let path = dirs.version_dir(version).join(format!("{version}.jar"));
+    let path = st
+        .directories
+        .version_dir(version)
+        .join(format!("{version}.jar"));
 
-    fetch(&client_download.url, Some(&client_download.sha1))
-        .and_then(|it| async move {
-            write(&path, &it).await?;
-            Ok(())
-        })
-        .await
+    if !path.exists() {
+        let permit = st.io_semaphore.acquire().await.unwrap();
+        let bytes =
+            fetch(&client_download.url, Some(&client_download.sha1), &permit)
+                .await?;
+        write(&path, &bytes, &permit).await?;
+        log::info!("Fetched client version {version}");
+    }
+
+    log::debug!("Client loaded for version {version}!");
+    Ok(())
 }
 
 pub async fn download_assets_index(
-    dirs: &Dirs,
+    st: &State,
     version: &GameVersionInfo,
 ) -> crate::Result<AssetsIndex> {
-    let path = dirs
+    log::debug!("Loading assets index");
+    let path = st
+        .directories
         .assets_index_dir()
         .join(format!("{}.json", &version.asset_index.id));
 
-    if path.exists() {
+    let res = if path.exists() {
         fs::read(path)
             .err_into::<crate::Error>()
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
         let index = d::minecraft::fetch_assets_index(version).await?;
-        write(&path, &serde_json::to_vec(&index)?).await?;
+        let permit = st.io_semaphore.acquire().await.unwrap();
+        write(&path, &serde_json::to_vec(&index)?, &permit).await?;
+        log::info!("Fetched assets index");
         Ok(index)
-    }
+    }?;
+
+    log::debug!("Assets index successfully loaded!");
+    Ok(res)
 }
 
 pub async fn download_assets(
-    dirs: &Dirs,
+    st: &State,
     with_legacy: bool,
     index: &AssetsIndex,
 ) -> crate::Result<()> {
+    log::debug!("Loading assets");
+
     stream::iter(index.objects.iter())
         .map(Ok::<(&String, &Asset), crate::Error>)
         .try_for_each_concurrent(None, |(name, asset)| async move {
             let ref hash = asset.hash;
-            let resource_path = dirs.object_dir(hash);
+            let resource_path = st.directories.object_dir(hash);
             let url = format!(
-                "https://resources.download.minecraft.net/{sub_hash}/hash",
+                "https://resources.download.minecraft.net/{sub_hash}/{hash}",
                 sub_hash = &hash[..2]
             );
 
-            let resource = fetch(&url, Some(hash)).await?;
+            let fetch_cell = OnceCell::<bytes::Bytes>::new();
             tokio::try_join! {
-                write(&resource_path, &resource),
+                async {
+                    if !resource_path.exists() {
+                        let permit = st.io_semaphore.acquire().await.unwrap();
+                        let resource = fetch_cell
+                            .get_or_try_init(|| fetch(&url, Some(hash), &permit))
+                            .await?;
+                        write(&resource_path, &resource, &permit).await?;
+                        log::info!("Fetched asset with hash {hash}");
+                    }
+                    Ok::<_, crate::Error>(())
+                },
                 async {
                     if with_legacy {
-                        let resource_path = dirs.legacy_assets_dir().join(
+                        let permit = st.io_semaphore.acquire().await.unwrap();
+                        let resource = fetch_cell
+                            .get_or_try_init(|| fetch(&url, Some(hash), &permit))
+                            .await?;
+                        let resource_path = st.directories.legacy_assets_dir().join(
                             name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
                         );
-                        write(&resource_path, &resource).await?;
+                        write(&resource_path, &resource, &permit).await?;
+                        log::info!("Fetched legacy asset with hash {hash}");
                     }
-                    Ok(())
-                }
+                    Ok::<_, crate::Error>(())
+                },
             }?;
 
+            log::debug!("Loaded asset with hash {hash}");
             Ok(())
         }).await?;
+
+    log::debug!("Done loading assets!");
     Ok(())
 }
 
 pub async fn download_libraries(
-    dirs: &Dirs,
+    st: &State,
     libraries: &[Library],
+    version: &str,
 ) -> crate::Result<()> {
+    log::debug!("Loading libraries");
+    let (libraries_dir, natives_dir) = (
+        Arc::new(st.directories.libraries_dir()),
+        Arc::new(st.directories.version_natives_dir(version)),
+    );
+
+    tokio::try_join! {
+        fs::create_dir_all(st.directories.libraries_dir()),
+        fs::create_dir_all(st.directories.version_natives_dir(version))
+    }?;
+
     stream::iter(libraries.iter())
         .map(Ok::<&Library, crate::Error>)
         .try_for_each_concurrent(None, |library| async move {
@@ -146,23 +204,23 @@ pub async fn download_libraries(
                     return Ok(());
                 }
             }
-
             tokio::try_join! {
                 async {
                     let artifact_path = d::get_path_from_artifact(&library.name)?;
-                    let path = dirs.libraries_dir().join(&artifact_path);
+                    let path = st.directories.libraries_dir().join(&artifact_path);
 
                     match library.downloads {
+                        _ if path.exists() => Ok(()),
                         Some(d::minecraft::LibraryDownloads {
                             artifact: Some(ref artifact),
                             ..
                         }) => {
-                            fetch(&artifact.url, Some(&artifact.sha1))
-                                .and_then(|it| async move {
-                                    write(&path, &it).await?;
-                                    Ok(())
-                                })
-                                .await
+                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let bytes = fetch(&artifact.url, Some(&artifact.sha1), &permit)
+                                .await?;
+                            write(&path, &bytes, &permit).await?;
+                            log::info!("Fetched library {}", &library.name);
+                            Ok::<_, crate::Error>(())
                         }
                         None => {
                             let url = [
@@ -173,12 +231,11 @@ pub async fn download_libraries(
                                 &artifact_path
                             ].concat();
 
-                            fetch(&url, None)
-                                .and_then(|it| async move {
-                                    write(&path, &it).await?;
-                                    Ok(())
-                                })
-                                .await
+                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let bytes = fetch(&url, None, &permit).await?;
+                            write(&path, &bytes, &permit).await?;
+                            log::info!("Fetched library {}", &library.name);
+                            Ok::<_, crate::Error>(())
                         }
                         _ => Ok(())
                     }
@@ -202,11 +259,12 @@ pub async fn download_libraries(
                         );
 
                         if let Some(native) = classifiers.get(&parsed_key) {
-                            let data = fetch(&native.url, Some(&native.sha1)).await?;
+                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let data = fetch(&native.url, Some(&native.sha1), &permit).await?;
                             let reader = std::io::Cursor::new(&data);
                             let mut archive = zip::ZipArchive::new(reader).unwrap();
-
-                            archive.extract(dirs.natives_dir()).unwrap();
+                            archive.extract(&st.directories.version_natives_dir(version)).unwrap();
+                            log::info!("Fetched native {}", &library.name);
                         }
                     }
 
@@ -214,9 +272,11 @@ pub async fn download_libraries(
                 }
             }?;
 
+            log::debug!("Loaded library {}", library.name);
             Ok(())
         }
     ).await?;
 
+    log::debug!("Done loading libraries!");
     Ok(())
 }

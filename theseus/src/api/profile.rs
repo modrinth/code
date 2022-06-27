@@ -35,19 +35,36 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
     Ok(())
 }
 
-/// Get a profile by path
+/// Get a profile by path,
 pub async fn get(path: &Path) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
 
-    Ok(profiles.0.get(path).cloned())
+    profiles.0.get(path).map_or(Ok(None), |prof| match prof {
+        Some(prof) => Ok(Some(prof.clone())),
+        None => Err(crate::Error::UnloadedProfileError(
+            path.display().to_string(),
+        )),
+    })
 }
 
 /// Check if a profile is already managed by Theseus
-pub async fn is_managed(profile: &Path) -> bool {
-    let state = State::get().await.unwrap();
+pub async fn is_managed(profile: &Path) -> crate::Result<bool> {
+    let state = State::get().await?;
     let profiles = state.profiles.read().await;
-    profiles.0.contains_key(profile)
+    Ok(profiles.0.contains_key(profile))
+}
+
+/// Check if a profile is loaded
+pub async fn is_loaded(profile: &Path) -> crate::Result<bool> {
+    let state = State::get().await?;
+    let profiles = state.profiles.read().await;
+    Ok(profiles
+        .0
+        .get(profile)
+        .map(Option::as_ref)
+        .flatten()
+        .is_some())
 }
 
 /// Edit a profile using a given asynchronous closure
@@ -60,13 +77,15 @@ where
 {
     let state = State::get().await.unwrap();
     let mut profiles = state.profiles.write().await;
-    if let Some(profile) = profiles.0.get_mut(path) {
-        action(profile).await
-    } else {
-        Err(crate::Error::OtherError(format!(
-            "Tried to edit a nonexistent profile at path {}!",
-            path.display()
-        )))
+
+    match profiles.0.get_mut(path) {
+        Some(&mut Some(ref mut profile)) => action(profile).await,
+        Some(&mut None) => Err(crate::Error::UnloadedProfileError(
+            path.display().to_string(),
+        )),
+        None => Err(crate::Error::UnmanagedProfileError(
+            path.display().to_string(),
+        )),
     }
 }
 
@@ -79,7 +98,7 @@ pub async fn run(
     let settings = state.settings.read().await;
     let profile = get(path).await?.ok_or_else(|| {
         crate::Error::OtherError(format!(
-            "Tried to run a nonexistent profile at path {}!",
+            "Tried to run a nonexistent or unloaded profile at path {}!",
             path.display()
         ))
     })?;

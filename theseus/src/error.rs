@@ -8,7 +8,10 @@ pub enum Error {
     JSONError(#[from] serde_json::Error),
 
     #[error("Serialization error (Bincode): {0}")]
-    BincodeError(#[from] bincode::Error),
+    EncodeError(#[from] bincode::error::DecodeError),
+
+    #[error("Deserialization error (Bincode): {0}")]
+    DecodeError(#[from] bincode::error::EncodeError),
 
     #[error("Database error: {0}")]
     DBError(#[from] sled::Error),
@@ -36,6 +39,14 @@ pub enum Error {
 
     #[error("Invalid input: {0}")]
     InputError(String),
+
+    #[error(
+        "Tried to access unloaded profile {0}, loading it probably failed"
+    )]
+    UnloadedProfileError(String),
+
+    #[error("Profile {0} is not managed by Theseus!")]
+    UnmanagedProfileError(String),
 
     #[error("Error: {0}")]
     OtherError(String),

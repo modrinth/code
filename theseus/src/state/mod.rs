@@ -1,4 +1,5 @@
 //! Theseus state management system
+use crate::config::sled_config;
 use std::sync::Arc;
 use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
 
@@ -23,7 +24,7 @@ pub struct State {
     pub(self) database: sled::Db,
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
-    /// Semaphore used to limit concurrent downloads, caps I/O to avoid errors
+    /// Semaphore used to limit concurrent I/O and avoid errors
     pub io_semaphore: Semaphore,
     /// Launcher metadata
     pub metadata: Metadata,
@@ -43,7 +44,8 @@ impl State {
 
                 // Database
                 // TODO: make database versioned
-                let database = sled::open(directories.database_file())?;
+                let database =
+                    sled_config().path(directories.database_file()).open()?;
 
                 // Settings
                 let settings =

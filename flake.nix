@@ -14,7 +14,7 @@
     };
   };
 
-  outputs = inputs:
+  outputs = inputs@{self, ...}:
     inputs.utils.lib.eachDefaultSystem (system: let
       pkgs = import inputs.nixpkgs { inherit system; };
       fenix = inputs.fenix.packages.${system};
@@ -32,13 +32,15 @@
 
       deps = with pkgs; {
         global = [
-          openssl pkg-config
+          openssl pkg-config gcc
         ];
         gui = [
-          gtk4 gdk-pixbuf atk webkitgtk
+          gtk4 gdk-pixbuf atk webkitgtk dbus
         ];
         shell = [
-          toolchain fenix.default.clippy git
+          toolchain
+          (with fenix; combine [toolchain default.clippy rust-analyzer])
+          git
           jdk17 jdk8
         ];
       };
@@ -53,14 +55,41 @@
       };
 
       apps = {
-        theseus-cli = utils.mkApp {
-          drv = inputs.self.packages.${system}.theseus-cli;
+        cli = utils.mkApp {
+          drv = self.packages.${system}.theseus-cli;
+        };
+        cli-test = utils.mkApp {
+          drv = pkgs.writeShellApplication {
+            name = "theseus-test-cli";
+            runtimeInputs = [
+              (self.packages.${system}.theseus-cli.overrideAttrs (old: old // {
+                release = false;
+              }))
+            ];
+            text = ''
+              DUMMY_ID="$(printf '%0.sa' {1..32})"
+              theseus_cli profile run -t "" -n "Test" -i "$DUMMY_ID" "$@"
+            '';
+          };
         };
       };
 
       devShell = pkgs.mkShell {
         buildInputs = with deps;
           global ++ gui ++ shell;
+
+        shellHook = ''
+          export USE_RELEASE=false
+
+          test_run_cli () {
+            if [ "$USE_RELEASE" = true ]; then
+              local RELEASE_FLAG=--release
+            fi
+            DUMMY_ID="$(printf "%0.sa" {1..32})"
+            cargo run $RELEASE_FLAG -p theseus_cli -- \
+              profile run -t "" -n "Test" -i "$DUMMY_ID" $@
+          }
+        '';
       };
     });
 }

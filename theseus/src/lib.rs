@@ -8,6 +8,7 @@ and launching Modrinth mod packs
 #![deny(unused_must_use)]
 
 mod api;
+mod config;
 mod error;
 mod launcher;
 mod state;

@@ -1,4 +1,6 @@
 //! Theseus metadata
+use crate::config::BINCODE_CONFIG;
+use bincode::{Decode, Encode};
 use daedalus::{
     minecraft::{fetch_version_manifest, VersionManifest as MinecraftManifest},
     modded::{
@@ -6,13 +8,12 @@ use daedalus::{
     },
 };
 use futures::prelude::*;
-use serde::{Deserialize, Serialize};
 use std::collections::LinkedList;
 
 const METADATA_URL: &str = "https://meta.modrinth.com/gamedata";
 const METADATA_DB_FIELD: &[u8] = b"metadata";
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Encode, Decode, Debug)]
 pub struct Metadata {
     pub minecraft: MinecraftManifest,
     pub forge: LoaderManifest,
@@ -51,8 +52,11 @@ impl Metadata {
         let mut metadata = None;
 
         if let Some(ref meta_bin) = db.get(METADATA_DB_FIELD)? {
-            match bincode::deserialize::<Metadata>(meta_bin) {
-                Ok(val) => metadata = Some(val),
+            match bincode::decode_from_slice::<Self, _>(
+                &meta_bin,
+                *BINCODE_CONFIG,
+            ) {
+                Ok((meta, _)) => metadata = Some(meta),
                 Err(err) => {
                     log::warn!("Could not read launcher metadata: {err}")
                 }
@@ -70,7 +74,14 @@ impl Metadata {
         }
 
         if let Some(meta) = metadata {
-            db.insert(METADATA_DB_FIELD, bincode::serialize(&meta)?)?;
+            db.insert(
+                METADATA_DB_FIELD,
+                sled::IVec::from(bincode::encode_to_vec(
+                    &meta,
+                    *BINCODE_CONFIG,
+                )?),
+            )?;
+            db.flush_async().await?;
             Ok(meta)
         } else {
             Err(crate::Error::NoValueFor(String::from("launcher metadata")))

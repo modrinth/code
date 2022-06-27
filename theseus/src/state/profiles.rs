@@ -1,4 +1,5 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
+use crate::config::BINCODE_CONFIG;
 use daedalus::modded::LoaderVersion;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -12,7 +13,7 @@ const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";
 
 #[derive(Debug)]
-pub struct Profiles(pub HashMap<PathBuf, Profile>);
+pub struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -118,7 +119,10 @@ impl Profile {
         self
     }
 
-    pub async fn with_icon(&mut self, icon: &Path) -> crate::Result<&mut Self> {
+    pub async fn with_icon<'a>(
+        &'a mut self,
+        icon: &'a Path,
+    ) -> crate::Result<&'a mut Self> {
         let ext = icon
             .extension()
             .and_then(std::ffi::OsStr::to_str)
@@ -185,19 +189,31 @@ impl Profile {
 
 impl Profiles {
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
-        let profile_db = match db.get(PROFILE_SUBTREE)? {
-            Some(bytes) => bincode::deserialize::<Vec<PathBuf>>(&bytes)?,
-            None => Vec::new(),
-        };
+        let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
+            Ok(Default::default()),
+            |bytes| {
+                bincode::decode_from_slice::<Box<[PathBuf]>, _>(
+                    &bytes,
+                    *BINCODE_CONFIG,
+                )
+                .map(|it| it.0)
+            },
+        )?;
 
         let profiles = stream::iter(profile_db.iter())
             .then(|it| async move {
                 let path = PathBuf::from(it);
-                let profile = Self::read_profile_from_dir(&path).await?;
-                Ok::<_, crate::Error>((path, profile))
+                let prof = match Self::read_profile_from_dir(&path).await {
+                    Ok(prof) => Some(prof),
+                    Err(err) => {
+                        log::warn!("Error loading profile: {err}. Skipping...");
+                        None
+                    }
+                };
+                (path, prof)
             })
-            .try_collect::<HashMap<PathBuf, Profile>>()
-            .await?;
+            .collect::<HashMap<PathBuf, Option<Profile>>>()
+            .await;
 
         Ok(Self(profiles))
     }
@@ -210,7 +226,7 @@ impl Profiles {
                 .to_str()
                 .ok_or(crate::Error::UTFError(profile.path.clone()))?
                 .into(),
-            profile,
+            Some(profile),
         );
         Ok(self)
     }
@@ -247,7 +263,10 @@ impl Profiles {
 
         batch.insert(
             PROFILE_SUBTREE,
-            bincode::serialize(&self.0.keys().collect::<Vec<_>>())?,
+            bincode::encode_to_vec(
+                self.0.keys().collect::<Box<[_]>>(),
+                *BINCODE_CONFIG,
+            )?,
         );
         Ok(self)
     }
