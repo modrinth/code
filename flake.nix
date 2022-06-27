@@ -77,19 +77,6 @@
       devShell = pkgs.mkShell {
         buildInputs = with deps;
           global ++ gui ++ shell;
-
-        shellHook = ''
-          export USE_RELEASE=false
-
-          test_run_cli () {
-            if [ "$USE_RELEASE" = true ]; then
-              local RELEASE_FLAG=--release
-            fi
-            DUMMY_ID="$(printf "%0.sa" {1..32})"
-            cargo run $RELEASE_FLAG -p theseus_cli -- \
-              profile run -t "" -n "Test" -i "$DUMMY_ID" $@
-          }
-        '';
       };
-    });
+    })
 }
