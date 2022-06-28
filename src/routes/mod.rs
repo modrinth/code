@@ -53,6 +53,7 @@ pub fn projects_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("project")
             .service(projects::project_get)
+            .service(projects::project_get_check)
             .service(projects::project_delete)
             .service(projects::project_edit)
             .service(projects::project_icon_edit)

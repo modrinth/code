@@ -498,9 +498,9 @@ impl Project {
     {
         let id = sqlx::query!(
             "
-                SELECT id FROM mods
-                WHERE LOWER(slug) = LOWER($1)
-                ",
+            SELECT id FROM mods
+            WHERE LOWER(slug) = LOWER($1)
+            ",
             slug
         )
         .fetch_optional(executor)
@@ -522,9 +522,9 @@ impl Project {
     {
         let id = sqlx::query!(
             "
-                SELECT id FROM mods
-                WHERE LOWER(slug) = LOWER($1)
-                ",
+            SELECT id FROM mods
+            WHERE LOWER(slug) = LOWER($1)
+            ",
             slug
         )
         .fetch_optional(executor)

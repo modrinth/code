@@ -13,6 +13,7 @@ use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::{PgPool, Row};
 use std::sync::Arc;
 use time::OffsetDateTime;
@@ -86,9 +87,66 @@ pub async fn project_get(
     Ok(HttpResponse::NotFound().body(""))
 }
 
+//checks the validity of a project id or slug
+#[get("{id}/check")]
+pub async fn project_get_check(
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let slug = info.into_inner().0;
+
+    let id_option = models::ids::base62_impl::parse_base62(&*slug).ok();
+
+    let id = if let Some(id) = id_option {
+        let id = sqlx::query!(
+            "
+            SELECT id FROM mods
+            WHERE id = $1
+            ",
+            id as i64
+        )
+        .fetch_optional(&**pool)
+        .await?;
+
+        if id.is_none() {
+            sqlx::query!(
+                "
+                SELECT id FROM mods
+                WHERE LOWER(slug) = LOWER($1)
+                ",
+                &slug
+            )
+            .fetch_optional(&**pool)
+            .await?
+            .map(|x| x.id)
+        } else {
+            id.map(|x| x.id)
+        }
+    } else {
+        sqlx::query!(
+            "
+            SELECT id FROM mods
+            WHERE LOWER(slug) = LOWER($1)
+            ",
+            &slug
+        )
+        .fetch_optional(&**pool)
+        .await?
+        .map(|x| x.id)
+    };
+
+    if let Some(id) = id {
+        Ok(HttpResponse::Ok().json(json! ({
+            "id": models::ids::ProjectId(id as u64)
+        })))
+    } else {
+        Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
 #[derive(Serialize)]
 struct DependencyInfo {
-    pub projects: Vec<models::projects::Project>,
+    pub projects: Vec<Project>,
     pub versions: Vec<models::projects::Version>,
 }
 
@@ -1569,7 +1627,7 @@ pub async fn project_unfollow(
 }
 
 pub async fn delete_from_index(
-    id: crate::models::projects::ProjectId,
+    id: ProjectId,
     config: web::Data<SearchConfig>,
 ) -> Result<(), meilisearch_sdk::errors::Error> {
     let client =
