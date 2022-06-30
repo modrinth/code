@@ -2,6 +2,7 @@
 	import { browser, prerendering } from '$app/env'
 	import { page } from '$app/stores'
 	import { onMount } from 'svelte'
+	import { debounce } from 'throttle-debounce'
 
 	interface Link {
 		href: string
@@ -42,11 +43,10 @@
 
 	const linkElements: HTMLAnchorElement[] = []
 
-	let indicatorReady = false
-
 	const indicator = {
 		left: 0,
 		right: 0,
+		top: 0,
 		direction: 'right',
 	}
 
@@ -60,18 +60,23 @@
 			linkElements[activeIndex].parentElement.offsetWidth -
 			linkElements[activeIndex].offsetLeft -
 			linkElements[activeIndex].offsetWidth
+		indicator.top = linkElements[activeIndex].offsetTop + linkElements[activeIndex].offsetHeight - 2
 
 		oldIndex = activeIndex
 	}
 
+	let useAnimation = false
+
 	onMount(() => {
 		setTimeout(() => {
-			indicatorReady = true
+			useAnimation = true
 		}, 300)
+
+		window.addEventListener('resize', debounce(100, startAnimation))
 	})
 </script>
 
-<nav class="navigation" class:static-indicator={!indicatorReady}>
+<nav class="navigation" class:use-animation={useAnimation}>
 	{#each links as link, index}
 		<a
 			href={query
@@ -93,12 +98,15 @@
 	{/each}
 	<div
 		class="navigation__indicator"
-		style:visibility={indicatorReady && activeIndex !== -1 ? 'visible' : 'hidden'}
+		style:visibility={useAnimation && activeIndex !== -1 ? 'visible' : 'hidden'}
 		style:left={indicator.left + 'px'}
 		style:right={indicator.right + 'px'}
+		style:top={indicator.top + 'px'}
 		style:transition={`left 350ms ${
 			indicator.direction === 'left' ? FAST_TIMING : SLOW_TIMING
-		},right 350ms ${indicator.direction === 'right' ? FAST_TIMING : SLOW_TIMING}`} />
+		},right 350ms ${
+			indicator.direction === 'right' ? FAST_TIMING : SLOW_TIMING
+		}, top 100ms ease-in-out`} />
 </nav>
 
 <style lang="postcss">
@@ -115,10 +123,6 @@
 			color: var(--color-text-light);
 			position: relative;
 
-			&.is-active {
-				color: var(--color-text);
-			}
-
 			&::after {
 				content: '';
 				display: block;
@@ -134,32 +138,39 @@
 
 			&:hover {
 				color: var(--color-text);
-			}
 
-			&:hover::after {
-				opacity: 0.4;
+				&::after {
+					opacity: 0.4;
+				}
 			}
 
 			&:active::after {
-				opacity: 0.1;
+				opacity: 0.2;
+			}
+
+			&.is-active {
+				color: var(--color-text);
+
+				&::after {
+					opacity: 1;
+				}
 			}
 		}
 
-		&.static-indicator {
+		&.use-animation {
 			.navigation__link {
 				&.is-active::after {
-					opacity: 1;
+					opacity: 0;
 				}
 			}
 		}
 
 		&__indicator {
 			position: absolute;
-			bottom: -2px;
 			height: 0.25rem;
 			border-radius: var(--rounded-max);
 			background-color: var(--color-brand);
-			transition-property: left, right;
+			transition-property: left, right, top;
 			transition-duration: 350ms;
 			visibility: hidden;
 		}

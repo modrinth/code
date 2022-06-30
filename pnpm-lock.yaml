@@ -12,6 +12,7 @@ specifiers:
   '@sveltejs/kit': 1.0.0-next.352
   '@types/cli-progress': ^3.11.0
   '@types/marked': ^4.0.3
+  '@types/throttle-debounce': ^5.0.0
   '@typescript-eslint/eslint-plugin': ^5.10.1
   '@typescript-eslint/parser': ^5.10.1
   cli-progress: ^3.11.1
@@ -92,6 +93,7 @@ devDependencies:
   '@sveltejs/kit': 1.0.0-next.352_svelte@3.48.0
   '@types/cli-progress': 3.11.0
   '@types/marked': 4.0.3
+  '@types/throttle-debounce': 5.0.0
   '@typescript-eslint/eslint-plugin': 5.14.0_4p27j37cxves4nxlnqogdhp4ta
   '@typescript-eslint/parser': 5.14.0_e6rt7vlgxfprtuallp2t3cvyi4
   eslint: 7.32.0
@@ -1198,6 +1200,10 @@ packages:
   /@types/throttle-debounce/2.1.0:
     resolution: {integrity: sha512-5eQEtSCoESnh2FsiLTxE121IiE60hnMqcb435fShf4bpLRjEu1Eoekht23y6zXS9Ts3l+Szu3TARnTsA0GkOkQ==}
     dev: false
+
+  /@types/throttle-debounce/5.0.0:
+    resolution: {integrity: sha512-Pb7k35iCGFcGPECoNE4DYp3Oyf2xcTd3FbFQxXUI9hEYKUl6YX+KLf7HrBmgVcD05nl50LIH6i+80js4iYmWbw==}
+    dev: true
 
   /@types/unist/2.0.6:
     resolution: {integrity: sha512-PBjIUxZHOuj0R15/xuwJYjFi+KZdNFrehocChv4g5hu6aFroHue8m0lBP0POdK2nKzbw0cgV1mws8+V/JAcEkQ==}

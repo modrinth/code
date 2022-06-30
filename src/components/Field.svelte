@@ -34,7 +34,7 @@
 				font-weight: var(--font-weight-bold);
 
 				:global(i) {
-					font-weight: var(--font-weight-normal);
+					font-weight: var(--font-weight-regular);
 				}
 			}
 
