@@ -50,6 +50,7 @@ function sanitize(html: string): string {
 			span: ['class'],
 			input: ['type', 'checked', 'disabled'],
 			font: ['color'],
+			details: ['open'],
 		},
 		allowedClasses: {},
 		allowedSchemes: ['http', 'https', 'mailto'],
