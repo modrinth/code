@@ -549,6 +549,26 @@
               You may upload multiple files, but this should only be used for
               cases like sources or Javadocs.
             </span>
+            <p
+              v-if="projectType.toLowerCase() === 'modpack'"
+              aria-label="Warning"
+            >
+              Modpack support is currently in alpha, and you may encounter
+              issues. Our documentation includes instructions on
+              <a
+                href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/"
+                target="_blank"
+                class="text-link"
+                >creating modpacks</a
+              >. Join us on
+              <a
+                href="https://discord.gg/EUHuJHt"
+                target="_blank"
+                class="text-link"
+                >Discord</a
+              >
+              for support.
+            </p>
             <StatelessFileInput
               :class="{
                 'known-error':
@@ -1270,7 +1290,7 @@ export default {
               item: `gallery-${index}`,
               featured: false,
               title: x.title,
-              description: x.description,
+              description: x.description || null,
             }
           }),
         })

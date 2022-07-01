@@ -554,6 +554,26 @@
         <span v-if="mode === 'edit' || mode === 'create'">
           You may upload multiple files, but this should only be used for cases
           like sources or Javadocs.
+          <p
+            v-if="project.project_type.toLowerCase() === 'modpack'"
+            aria-label="Warning"
+          >
+            Modpack support is currently in alpha, and you may encounter issues.
+            Our documentation includes instructions on
+            <a
+              href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/"
+              target="_blank"
+              class="text-link"
+              >creating modpacks</a
+            >. Join us on
+            <a
+              href="https://discord.gg/EUHuJHt"
+              target="_blank"
+              class="text-link"
+              >Discord</a
+            >
+            for support.
+          </p>
         </span>
       </section>
     </div>

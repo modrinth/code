@@ -810,10 +810,11 @@ label {
   // box-shadow: var(--shadow-card);
 
   &.warning {
+    border-left: 0.5rem solid var(--color-banner-side);
     padding: 1.5rem;
     line-height: 1.5;
-    background-color: var(--color-warning-bg);
-    color: var(--color-warning-text);
+    background-color: var(--color-banner-bg);
+    color: var(--color-banner-text);
     min-height: 0;
 
     a {

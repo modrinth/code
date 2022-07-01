@@ -159,7 +159,11 @@
       </section>
     </aside>
     <section class="normal-page__content">
-      <div v-if="projectType === 'modpack'" class="card warning">
+      <div
+        v-if="projectType === 'modpack'"
+        class="card warning"
+        aria-label="Warning"
+      >
         Modpack support is currently in alpha, and you may encounter issues. Our
         documentation includes instructions on
         <a

@@ -76,6 +76,10 @@ html {
   --color-warning-text: hsl(358, 57%, 20%);
   --color-warning-bg: hsl(358, 57%, 80%);
 
+  --color-banner-text: hsl(0, 11%, 16%);
+  --color-banner-bg: hsl(356, 59%, 77%);
+  --color-banner-side: hsl(357, 78%, 40%);
+
   --color-block-quote: var(--color-tooltip-bg);
   --color-header-underline: var(--color-tooltip-text);
   --color-hr: var(--color-text);
@@ -156,6 +160,10 @@ html {
 
   --color-warning-text: hsl(358, 57%, 85%);
   --color-warning-bg: hsl(358, 57%, 25%);
+
+  --color-banner-text: hsl(0, 100%, 96%);
+  --color-banner-bg: hsl(356, 18%, 18%);
+  --color-banner-side: hsl(357, 78%, 40%);
 
   --color-block-quote: var(--color-code-bg);
   --color-header-underline: var(--color-tooltip-text);

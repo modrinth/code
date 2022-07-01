@@ -183,6 +183,10 @@
             your team. If your project is ready for review, click the button
             below to make your mod public!
           </p>
+          <p v-if="project.status === 'abandoned'">
+            Modrinth's moderators have marked your project as abandoned. If you
+            wish to remove this status, please resubmit!
+          </p>
           <p v-if="project.moderator_message">
             {{ project.moderator_message.message }}
           </p>
@@ -195,7 +199,11 @@
         </div>
         <div class="buttons">
           <button
-            v-if="project.status === 'rejected'"
+            v-if="
+              project.status === 'rejected' ||
+              project.status === 'unlisted' ||
+              project.status === 'abandoned'
+            "
             class="iconified-button brand-button-colors"
             @click="submitForReview"
           >
@@ -478,8 +486,42 @@
       />
       <div class="content">
         <div class="project-main">
-          <div v-if="project.project_type === 'modpack'" class="card warning">
-            To install this modpack, visit
+          <div
+            v-if="project.status === 'unlisted'"
+            class="card warning"
+            aria-label="Warning"
+          >
+            {{ project.title }} is not viewable in search — either because the
+            author has marked it as such or because it has been found to be in
+            violation of one of
+            <nuxt-link to="/legal/rules">Modrinth's project rules</nuxt-link>.
+            Modrinth makes no guarantees as to whether {{ project.title }} is
+            safe for use in a multiplayer context.
+          </div>
+          <div
+            v-if="project.status === 'archived'"
+            class="card warning"
+            aria-label="Warning"
+          >
+            {{ project.title }} has been archived by the project author.
+            {{ project.title }} will not receive any further updates unless the
+            author decides to unarchive the project.
+          </div>
+          <div
+            v-if="project.status === 'abandoned'"
+            class="card warning"
+            aria-label="Warning"
+          >
+            {{ project.title }} has been marked as abandoned by Modrinth's
+            moderators. {{ project.title }} will not receive any further updates
+            unless the author decides to return.
+          </div>
+          <div
+            v-if="project.project_type === 'modpack'"
+            class="card warning"
+            aria-label="Warning"
+          >
+            To install {{ project.title }}, visit
             <a
               href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
               target="_blank"
@@ -487,7 +529,7 @@
             >
             which provides instructions on using
             <a href="https://atlauncher.com/about" target="_blank">ATLauncher</a
-            >, <a href="https://multimc.org/" target="_blank">MultiMC</a> and
+            >, <a href="https://multimc.org/" target="_blank">MultiMC</a>, and
             <a href="https://polymc.org/" target="_blank">PolyMC</a>.
           </div>
           <div class="card styled-tabs">
