@@ -37,13 +37,19 @@ input:focus-visible,
 input,
 button,
 a,
+textarea {
+	transition: outline 0.1s ease-in-out;
+}
+
+input:not([type='text']),
+button,
+a,
 .select {
-	outline: 0 solid hsla(290, 100%, 40%, 0);
-	transition: outline 0.2s ease-in-out;
+	outline: 0 solid hsla(155, 58%, 44%, 0.7);
 }
 
 input[type='text']:focus-visible,
-input[type='textarea']:focus-visible {
+textarea:focus-visible {
 	outline: 0.25rem solid hsla(155, 58%, 44%, 0.7);
 }
 

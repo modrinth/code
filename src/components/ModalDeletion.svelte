@@ -12,15 +12,13 @@
 	export let key: string
 	export let type: 'project' | 'version' | 'account' | 'image'
 
-	export let open = false
-
 	let data: { key?: string } = {}
 
 	const dispatch = createEventDispatcher()
 </script>
 
 <!-- @ts-ignore -->
-<Modal title={$t(`modal.deletion.${type}.title`)} bind:open bind:data>
+<Modal title={$t(`modal.deletion.${type}.title`)} bind:data>
 	<svelte:fragment slot="trigger" let:trigger>
 		<slot name="trigger" {trigger} />
 	</svelte:fragment>
@@ -32,10 +30,7 @@
 	{/if}
 	{@html markdown($t(`modal.deletion.${type}.description`))}
 	<Field label={$t('modal.deletion.generic.verify', { values: { key } })} let:id>
-		<TextInput
-			placeholder={$t('modal.deletion.generic.placeholder', { values: { key } })}
-			bind:value={data.key}
-			{id} />
+		<TextInput placeholder={$t('modal.deletion.generic.placeholder')} bind:value={data.key} {id} />
 	</Field>
 
 	<svelte:fragment slot="button" let:close>
