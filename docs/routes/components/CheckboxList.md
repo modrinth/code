@@ -5,7 +5,7 @@
 	import IconCircle from 'virtual:icons/lucide/circle'
 	import IconTriangle from 'virtual:icons/lucide/triangle'
 
-	let selected = []
+	let selected = ['TRI']
 </script>
 
 <CheckboxList

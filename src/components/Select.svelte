@@ -12,11 +12,11 @@
 
 	export let options: Option[] = []
 	export let value: string | number
-	export let selected: Option | undefined
 	export let color = ''
 	export let label = ''
 	export let icon = null
 
+	let selected: Option | undefined
 	let open = false
 	let direction = 'down'
 	let checkingDirection = false

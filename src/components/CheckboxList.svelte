@@ -20,7 +20,9 @@
 
 <div class="checkbox-list" class:wrap>
 	{#each options as option}
-		<Checkbox on:change={(e) => handleChange(e, option.value)}>
+		<Checkbox
+			on:change={(e) => handleChange(e, option.value)}
+			checked={value && value.includes(option.value)}>
 			{#if option.icon && typeof option.icon === 'string'}
 				{@html option.icon}
 			{:else if option.icon}

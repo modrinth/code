@@ -17,9 +17,18 @@
 	export let defaultData: Record<string, any> = {}
 	export let data: Record<string, any> = defaultData
 
+	$: if (open === true && typeof window !== 'undefined') {
+		setTimeout(() => {
+			window.dispatchEvent(new Event('resize'))
+		}, 300)
+	}
+
+	$: if (open === false) {
+		data = defaultData
+	}
+
 	function close() {
 		open = false
-		data = defaultData
 	}
 
 	function trigger() {
