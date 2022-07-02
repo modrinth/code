@@ -1,5 +1,9 @@
 export default function (context) {
-  if (process.client && context.from.path === context.route.path) {
+  if (!process.client) {
+    return
+  }
+
+  if (context.from.path === context.route.path) {
     return
   }
 
@@ -9,19 +13,9 @@ export default function (context) {
 
   setTimeout(() => {
     context.$axios
-      .post(
-        `${context.$config.analytics.base_url}view`,
-        {
-          url: process.env.domain + context.route.fullPath,
-        },
-        context.$config.analytics.admin_key
-          ? {
-              headers: {
-                'Modrinth-Admin': context.$config.analytics.admin_key,
-              },
-            }
-          : {}
-      )
+      .post(`${context.$config.analytics.base_url}view`, {
+        url: process.env.domain + context.route.fullPath,
+      })
       .then(() => {})
       .catch((e) => {
         console.error('An error occurred while registering the visit: ', e)

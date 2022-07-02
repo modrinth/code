@@ -1,4 +1,5 @@
 import { sortRoutes } from '@nuxt/utils'
+import axios from 'axios'
 
 export default {
   /*
@@ -305,10 +306,35 @@ export default {
         },
       },
     },
-    analytics: {
-      base_url:
-        process.env.ARIADNE_URL || 'https://staging-ariadne.modrinth.com/v1/',
-      admin_key: process.env.ARIADNE_ADMIN_KEY,
+  },
+  hooks: {
+    render: {
+      routeDone(url) {
+        setTimeout(() => {
+          axios
+            .post(
+              `${
+                process.env.ARIADNE_URL ||
+                'https://staging-ariadne.modrinth.com/v1/'
+              }view`,
+              {
+                url: process.env.domain + url,
+              },
+              {
+                headers: {
+                  'Modrinth-Admin': process.env.ARIADNE_ADMIN_KEY || 'feedbeef',
+                },
+              }
+            )
+            .then(() => {})
+            .catch((e) => {
+              console.error(
+                'An error occurred while registering the visit: ',
+                e
+              )
+            })
+        })
+      },
     },
   },
 }
