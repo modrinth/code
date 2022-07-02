@@ -1,6 +1,4 @@
 export default function (context) {
-  // Temporary disable analytics
-  /*
   if (process.client && context.from.path === context.route.path) {
     return
   }
@@ -11,15 +9,22 @@ export default function (context) {
 
   setTimeout(() => {
     context.$axios
-      .post(`${context.$config.analytics.base_url}/register/visit`, {
-        path: context.route.path,
-        domain: process.server ? context.req.headers.host : location.host,
-        consent: false,
-      })
+      .post(
+        `${context.$config.analytics.base_url}view`,
+        {
+          url: process.env.domain + context.route.fullPath,
+        },
+        context.$config.analytics.admin_key
+          ? {
+              headers: {
+                'Modrinth-Admin': context.$config.analytics.admin_key,
+              },
+            }
+          : {}
+      )
       .then(() => {})
       .catch((e) => {
         console.error('An error occurred while registering the visit: ', e)
       })
   })
-  */
 }

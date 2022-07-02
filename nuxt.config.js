@@ -291,7 +291,9 @@ export default {
       ethicalAds: process.env.ETHICAL_ADS,
     },
     analytics: {
-      base_url: process.env.ARIADNE_URL,
+      base_url:
+        process.env.BROWSER_ARIADNE_URL ||
+        'https://staging-ariadne.modrinth.com/v1/',
     },
   },
   privateRuntimeConfig: {
@@ -299,9 +301,14 @@ export default {
       baseURL: process.env.BASE_URL,
       headers: {
         common: {
-          'x-ratelimit-key': process.env.RATE_LIMIT_IGNORE_KEY,
+          'x-ratelimit-key': process.env.RATE_LIMIT_IGNORE_KEY || '',
         },
       },
+    },
+    analytics: {
+      base_url:
+        process.env.ARIADNE_URL || 'https://staging-ariadne.modrinth.com/v1/',
+      admin_key: process.env.ARIADNE_ADMIN_KEY,
     },
   },
 }

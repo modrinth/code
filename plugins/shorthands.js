@@ -6,7 +6,7 @@ export default ({ store }, inject) => {
     const obj = { headers: {} }
 
     if (process.server && process.env.RATE_LIMIT_IGNORE_KEY) {
-      obj.headers['x-ratelimit-key'] = process.env.RATE_LIMIT_IGNORE_KEY
+      obj.headers['x-ratelimit-key'] = process.env.RATE_LIMIT_IGNORE_KEY || ''
     }
 
     if (store.state.auth.user) {

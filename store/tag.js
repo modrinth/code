@@ -29,7 +29,7 @@ export const actions = {
     const headers = {
       headers: {
         'x-ratelimit-key': process.server
-          ? process.env.RATE_LIMIT_IGNORE_KEY
+          ? process.env.RATE_LIMIT_IGNORE_KEY || ''
           : '',
       },
     }
