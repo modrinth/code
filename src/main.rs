@@ -343,5 +343,8 @@ fn check_env_vars() -> bool {
     failed |= check_var::<String>("GITHUB_CLIENT_ID");
     failed |= check_var::<String>("GITHUB_CLIENT_SECRET");
 
+    failed |= check_var::<String>("ARIADNE_ADMIN_KEY");
+    failed |= check_var::<String>("ARIADNE_URL");
+
     failed
 }

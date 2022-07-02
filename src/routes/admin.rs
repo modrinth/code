@@ -4,6 +4,7 @@ use crate::util::guards::admin_key_guard;
 use crate::DownloadQueue;
 use actix_web::{patch, web, HttpResponse};
 use serde::Deserialize;
+use serde_json::json;
 use sqlx::PgPool;
 use std::sync::Arc;
 
@@ -58,6 +59,19 @@ pub async fn count_download(
             crate::database::models::VersionId(version_id),
         )
         .await;
+
+    let client = reqwest::Client::new();
+
+    client
+        .post(format!("{}downloads", dotenv::var("ARIADNE_URL")?))
+        .header("Modrinth-Admin", dotenv::var("ARIADNE_ADMIN_KEY")?)
+        .json(&json!({
+            "url": download_body.url,
+            "project_id": download_body.hash
+        }))
+        .send()
+        .await
+        .ok();
 
     Ok(HttpResponse::Ok().body(""))
 }
