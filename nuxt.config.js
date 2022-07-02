@@ -318,7 +318,7 @@ export default {
                 'https://staging-ariadne.modrinth.com/v1/'
               }view`,
               {
-                url: process.env.domain + url,
+                url: getDomain() + url,
               },
               {
                 headers: {
