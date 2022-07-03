@@ -134,7 +134,7 @@
 
 		const debounced = debounce(100, checkDirection)
 		window.addEventListener('resize', debounced)
-		window.addEventListener('scroll;', debounced)
+		window.addEventListener('scroll', debounced)
 	})
 </script>
 

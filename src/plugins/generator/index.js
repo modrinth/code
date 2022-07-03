@@ -5,11 +5,6 @@ import { gameVersions } from './outputs/gameVersions.js'
 import { tags } from './outputs/tags.js'
 import { openapi } from './outputs/openapi.js'
 
-const API_URL =
-	process.env.VITE_API_URL && process.env.VITE_API_URL === 'https://staging-api.modrinth.com/v2/'
-		? 'https://staging-api.modrinth.com/v2/'
-		: 'https://api.modrinth.com/v2/'
-
 // Time to live: 7 days
 const TTL = 7 * 24 * 60 * 60 * 1000
 
@@ -56,11 +51,11 @@ export default function Generator(options) {
 
 			await fs.writeFile('./generated/state.json', JSON.stringify(state, null, 2))
 
-			if (options.tags) await tags(API_URL)
-			if (options.landingPage) await landingPage(API_URL)
-			if (options.gameVersions) await gameVersions(API_URL)
-			if (options.openapi) await openapi(API_URL)
-			if (options.projectColors) await projectColors(API_URL)
+			if (options.tags) await tags()
+			if (options.landingPage) await landingPage()
+			if (options.gameVersions) await gameVersions()
+			if (options.openapi) await openapi()
+			if (options.projectColors) await projectColors()
 		},
 	}
 }

@@ -25,7 +25,7 @@
 {#if count > 1}
 	<div class="pagination">
 		<Button
-			color="raised"
+			raised
 			on:click={() => dispatch('change', page - 1)}
 			disabled={page <= 1}
 			title="Last page"
@@ -36,12 +36,13 @@
 				<IconMinus class="pagination__dash" />
 			{:else}
 				<Button
-					color={option === page ? 'primary' : 'raised'}
+					color={option === page ? 'primary' : ''}
+					raised
 					on:click={() => dispatch('change', option)}>{option}</Button>
 			{/if}
 		{/each}
 		<Button
-			color="raised"
+			raised
 			on:click={() => dispatch('change', page + 1)}
 			disabled={page >= count}
 			title="Next page">

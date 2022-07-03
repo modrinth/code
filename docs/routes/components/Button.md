@@ -6,7 +6,7 @@
 	import IconDownload from 'virtual:icons/heroicons-outline/download'
 </script>
 
-<Button color="raised"><IconDownload /> Download</Button>
+<Button raised><IconDownload /> Download</Button>
 ```
 
 ### Color variants example
@@ -19,7 +19,6 @@
 
 <div class="button-group">
 	<Button>Default</Button>
-	<Button color="raised">Raised</Button>
 	<Button color="primary">Primary</Button>
 	<Button color="primary-light">Light primary</Button>
 	<Button color="secondary">Secondary</Button>
@@ -33,7 +32,7 @@
 
 ### With icons example
 
-```svelte example raised
+```svelte example
 <script lang="ts">
 	import { Button } from 'omorphia'
 	import IconDownload from 'virtual:icons/heroicons-outline/download'
@@ -41,7 +40,7 @@
 </script>
 
 <div class="button-group">
-	<Button color="primary"><IconDownload /></Button>
-	<Button><IconHeart /> Follow mod</Button>
+	<Button color="primary" raised><IconDownload /></Button>
+	<Button raised><IconHeart /> Follow mod</Button>
 </div>
 ```

@@ -1,11 +1,11 @@
-import { fetch } from 'undici'
+import { fetch } from '../fetch.js'
 import { createWriteStream } from 'fs'
 import cliProgress from 'cli-progress'
 import Jimp from 'jimp'
 import { getAverageColor } from 'fast-average-color-node'
 
 // Note: This function has issues and will occasionally fail with some project icons. It averages at a 99.4% success rate. Most issues are from ECONNRESET errors & Jimp not being able to handle webp & svg images.
-export async function projectColors(API_URL) {
+export async function projectColors() {
 	const progressBar = new cliProgress.SingleBar({
 		format: 'Generating project colors | {bar} | {percentage}% || {value}/{total} projects',
 		barCompleteChar: '\u2588',
@@ -13,7 +13,7 @@ export async function projectColors(API_URL) {
 		hideCursor: true,
 	})
 	// Get total number of projects
-	const projectCount = (await (await fetch(API_URL + 'search?limit=0')).json()).total_hits
+	const projectCount = (await (await fetch('search?limit=0')).json()).total_hits
 	progressBar.start(projectCount, 0)
 	const writeStream = createWriteStream('./generated/projects.json')
 	writeStream.write('{')
@@ -24,7 +24,7 @@ export async function projectColors(API_URL) {
 	const requestCount = Math.ceil(projectCount / 100)
 	await Promise.allSettled(
 		Array.from({ length: requestCount }, async (_, index) => {
-			const response = await fetch(API_URL + `search?limit=100&offset=${index * 100}`)
+			const response = await fetch(`search?limit=100&offset=${index * 100}`)
 			if (!response.ok) {
 				throw new Error(`Failed to fetch projects: ${response.statusText}`)
 			}

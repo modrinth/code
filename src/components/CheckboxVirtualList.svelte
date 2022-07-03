@@ -11,7 +11,12 @@
 	export let value = []
 	export let options: Option[] = []
 
+	// Scroll into view selected options when created
+	let scrollToIndex =
+		Math.min(...value.map((val) => options.map((it) => it.value).indexOf(val))) || null
+
 	const handleChange = (event: any, key: string | number) => {
+		scrollToIndex = null
 		if (event.target.checked) {
 			if (!value) value = []
 			value = [key, ...value]
@@ -21,7 +26,14 @@
 	}
 </script>
 
-<VirtualList width="100%" {height} itemCount={options.length} itemSize={26}>
+<VirtualList
+	width="100%"
+	{height}
+	itemCount={options.length}
+	itemSize={26}
+	{scrollToIndex}
+	scrollToAlignment="center"
+	scrollToBehaviour="smooth">
 	<div
 		slot="item"
 		let:index

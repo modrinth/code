@@ -1,7 +1,8 @@
-import { fetch } from 'undici'
+import { fetch } from '../fetch.js'
 import { promises as fs } from 'fs'
 import cliProgress from 'cli-progress'
-export async function tags(API_URL) {
+
+export async function tags() {
 	const progressBar = new cliProgress.SingleBar({
 		format: 'Generating tags           | {bar} | {percentage}%',
 		barCompleteChar: '\u2588',
@@ -12,11 +13,11 @@ export async function tags(API_URL) {
 
 	// eslint-disable-next-line prefer-const
 	let [categories, loaders, licenses, donationPlatforms, reportTypes] = await Promise.all([
-		await (await fetch(API_URL + 'tag/category')).json(),
-		await (await fetch(API_URL + 'tag/loader')).json(),
-		await (await fetch(API_URL + 'tag/license')).json(),
-		await (await fetch(API_URL + 'tag/donation_platform')).json(),
-		await (await fetch(API_URL + 'tag/report_type')).json(),
+		await (await fetch('tag/category')).json(),
+		await (await fetch('tag/loader')).json(),
+		await (await fetch('tag/license')).json(),
+		await (await fetch('tag/donation_platform')).json(),
+		await (await fetch('tag/report_type')).json(),
 	])
 	progressBar.update(5)
 

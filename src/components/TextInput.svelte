@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { classCombine } from '$lib/utils/classCombine'
+
 	export let placeholder = ''
 	/** A Svelte component */
 	export let icon: any = undefined
@@ -7,9 +9,10 @@
 	/** An ID for better accessibility */
 	export let id: string = undefined
 	export let fill = false
+	export let raised = false
 </script>
 
-<div class="text-input" class:fill>
+<div class={classCombine(['text-input', raised && 'text-input--raised'])} class:fill>
 	{#if multiline}
 		<textarea {id} {placeholder} bind:value />
 	{:else}
@@ -41,6 +44,12 @@
 			border: none;
 			width: 100%;
 			max-width: 100%;
+		}
+
+		&--raised > input,
+		&--raised > textarea {
+			border: 2px solid var(--color-text-lightest);
+			box-shadow: var(--shadow-inset-sm), var(--shadow-raised);
 		}
 
 		input {

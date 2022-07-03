@@ -2,17 +2,16 @@
 <script lang="ts">
 	import { CheckboxVirtualList } from 'omorphia'
 	import IconStar from 'virtual:icons/heroicons-outline/star'
-	import { uniqueId } from 'omorphia/utils/uniqueId'
 
 	let options = Array(100)
 		.fill({})
-		.map((option) => ({
-			label: 'Star-' + uniqueId(),
+		.map((option, index) => ({
+			label: 'Star-' + index,
 			icon: IconStar,
-			value: uniqueId(),
+			value: index,
 		}))
 
-	let selected = ['2', '6']
+	let selected = [22, 24]
 </script>
 
 <CheckboxVirtualList bind:value={selected} {options} />

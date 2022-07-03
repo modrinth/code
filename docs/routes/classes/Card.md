@@ -23,7 +23,7 @@
 
 <div class="card">
 	<div class="card__overlay">
-		<Button color="raised"><IconPencil /> Edit</Button>
+		<Button raised><IconPencil /> Edit</Button>
 	</div>
 	<div class="card__banner card__banner--short card__banner--dark" />
 	<Avatar size="md" floatUp />

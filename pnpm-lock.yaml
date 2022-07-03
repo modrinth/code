@@ -47,7 +47,7 @@ specifiers:
   svelte-check: ^2.7.2
   svelte-intl-precompile: ^0.11.1
   svelte-preprocess: ^4.10.7
-  svelte-tiny-virtual-list: ^2.0.1
+  svelte-tiny-virtual-list: ^2.0.5
   svelte-use-click-outside: ^1.0.0
   svelte2tsx: ^0.5.5
   throttle-debounce: ^3.0.1
@@ -82,7 +82,7 @@ dependencies:
   postcss-preset-env: 7.7.1_postcss@8.4.8
   postcss-pxtorem: 6.0.0_postcss@8.4.8
   sanitize.css: 13.0.0
-  svelte-tiny-virtual-list: 2.0.1
+  svelte-tiny-virtual-list: 2.0.5
   svelte-use-click-outside: 1.0.0
   throttle-debounce: 3.0.1
   undici: 5.2.0
@@ -5141,8 +5141,8 @@ packages:
       typescript: 4.6.2
     dev: true
 
-  /svelte-tiny-virtual-list/2.0.1:
-    resolution: {integrity: sha512-0X6k5cZxF9yRLfVJ1bfwQmfEMbd3OSNNM/tI9y44jYbsB/FkI2GEIKpeV5J8AQy87qFU9xnPLxxo3erQFfdC2A==}
+  /svelte-tiny-virtual-list/2.0.5:
+    resolution: {integrity: sha512-xg9ckb8UeeIme4/5qlwCrl2QNmUZ8SCQYZn3Ji83cUsoASqRNy3KWjpmNmzYvPDqCHSZjruBBsoB7t5hwuzw5g==}
     dev: false
 
   /svelte-use-click-outside/1.0.0:

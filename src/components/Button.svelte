@@ -5,7 +5,7 @@
 	import { classCombine } from '../utils/classCombine'
 
 	/** The element to be styled as a button */
-	export let as: 'button' | 'a' | 'summary' | 'input' = 'button'
+	export let as: 'button' | 'a' | 'summary' | 'input' | 'file' = 'button'
 	export let href = ''
 	if (href) as = 'a'
 
@@ -15,7 +15,6 @@
 	export let size: 'sm' | 'md' | 'lg' = 'md'
 	export let color:
 		| ''
-		| 'raised'
 		| 'primary'
 		| 'primary-light'
 		| 'secondary'
@@ -23,6 +22,9 @@
 		| 'danger'
 		| 'danger-light'
 		| 'transparent' = ''
+
+	/** Applies a stronger shadow to the element. To be used when the button isn't on a card  */
+	export let raised = false
 
 	/** Show notification badge in the upper right of button */
 	export let badge = false
@@ -40,6 +42,7 @@
 		'button',
 		`button--size-${size}`,
 		`button--color-${color}`,
+		raised && 'button--raised',
 		badge && 'has-badge',
 	])
 
@@ -47,6 +50,10 @@
 
 	function dispatchClick() {
 		if (!disabled) dispatch('click')
+	}
+
+	function dispatchFiles(event: Event) {
+		if (!disabled) dispatch('files', (event.target as HTMLInputElement).files || new FileList())
 	}
 </script>
 
@@ -56,6 +63,11 @@
 	</a>
 {:else if as === 'input'}
 	<input class={className} {value} {disabled} {title} on:click={dispatchClick} />
+{:else if as === 'file'}
+	<label class={className} {disabled} {title}>
+		<input type="file" on:change={dispatchFiles} />
+		<slot />
+	</label>
 {:else}
 	<svelte:element this={as} class={className} {disabled} {title} on:click={dispatchClick}>
 		<slot />
@@ -83,6 +95,11 @@
 		transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
 			outline 0.2s ease-in-out;
 
+		&--raised {
+			background-color: var(--color-raised-bg);
+			box-shadow: var(--shadow-inset-sm), var(--shadow-raised);
+		}
+
 		&:hover:not(&--color-transparent, &:disabled) {
 			filter: brightness(0.85);
 		}
@@ -93,11 +110,6 @@
 		}
 
 		&--color {
-			&-raised {
-				background-color: var(--color-raised-bg);
-				box-shadow: var(--shadow-inset-sm), var(--shadow-raised);
-			}
-
 			&-primary {
 				background-color: var(--color-brand);
 				color: var(--color-brand-contrast);
@@ -165,6 +177,11 @@
 			position: absolute;
 			top: 0.5rem;
 			right: 0.5rem;
+		}
+
+		/* Hides default file input */
+		input[type='file'] {
+			display: none;
 		}
 	}
 </style>

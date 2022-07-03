@@ -1,8 +1,8 @@
-import { fetch } from 'undici'
+import { fetch } from '../fetch.js'
 import { promises as fs } from 'fs'
 import cliProgress from 'cli-progress'
 
-export async function gameVersions(API_URL) {
+export async function gameVersions() {
 	const progressBar = new cliProgress.SingleBar({
 		format: 'Generating game versions  | {bar} | {percentage}%',
 		barCompleteChar: '\u2588',
@@ -11,7 +11,7 @@ export async function gameVersions(API_URL) {
 	})
 	progressBar.start(2, 0)
 
-	const gameVersions = await (await fetch(API_URL + 'tag/game_version')).json()
+	const gameVersions = await (await fetch('tag/game_version')).json()
 	progressBar.increment()
 
 	// Write JSON file
