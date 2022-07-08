@@ -629,7 +629,7 @@ async fn upload_file_to_version_inner(
         }
     }
 
-    Ok(HttpResponse::Ok().into())
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 // This function is used for adding a file to a version, uploading the initial
