@@ -2,8 +2,9 @@
 	import IconChevronDown from 'virtual:icons/lucide/chevron-down'
 	import IconCheck from 'virtual:icons/heroicons-outline/check'
 	import { clickOutside } from 'svelte-use-click-outside'
-	import { onMount, tick } from 'svelte'
+	import { onDestroy, onMount, tick } from 'svelte'
 	import { debounce } from 'throttle-debounce'
+	import { browser } from '$app/env'
 
 	interface Option {
 		label: string
@@ -129,12 +130,20 @@
 		}
 	}
 
+	const debounced = debounce(100, checkDirection)
+
 	onMount(() => {
 		checkDirection()
 
-		const debounced = debounce(100, checkDirection)
 		window.addEventListener('resize', debounced)
-		window.addEventListener('scroll', debounced)
+		document.body.addEventListener('scroll', debounced)
+	})
+
+	onDestroy(() => {
+		if (browser) {
+			window.removeEventListener('resize', debounced)
+			document.body.removeEventListener('scroll', debounced)
+		}
 	})
 </script>
 

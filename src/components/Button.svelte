@@ -52,8 +52,15 @@
 		if (!disabled) dispatch('click')
 	}
 
-	function dispatchFiles(event: Event) {
+	// Handle `change` event on file input
+	function handleChangeFiles(event: Event) {
 		if (!disabled) dispatch('files', (event.target as HTMLInputElement).files || new FileList())
+	}
+
+	// Handle `drop` event on file input
+	function handleDropFiles(event: DragEvent) {
+		event.preventDefault()
+		if (!disabled) dispatch('files', event.dataTransfer.files || new FileList())
 	}
 </script>
 
@@ -64,8 +71,13 @@
 {:else if as === 'input'}
 	<input class={className} {value} {disabled} {title} on:click={dispatchClick} />
 {:else if as === 'file'}
-	<label class={className} {disabled} {title}>
-		<input type="file" on:change={dispatchFiles} />
+	<label
+		class={className}
+		{disabled}
+		{title}
+		on:drop={handleDropFiles}
+		on:dragover={(event) => event.preventDefault()}>
+		<input type="file" on:change={handleChangeFiles} />
 		<slot />
 	</label>
 {:else}

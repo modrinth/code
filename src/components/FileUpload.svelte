@@ -13,12 +13,12 @@
 	}
 
 	export let multiple = false
-	export let accept: string
+	export let accept: string = '*'
 	/** Prevents width from expanding due to large file names or images */
 	export let constrained = false
 
 	export let files: (File | RemoteFile)[] = []
-	export let file: File | RemoteFile | undefined
+	export let file: File | RemoteFile | undefined = undefined
 	$: if (files) file = files[0] || undefined
 
 	let inputElement: HTMLInputElement
@@ -28,7 +28,7 @@
 			// Check for duplicate files that aren't remote
 			if (
 				!files
-					.filter((it) => it instanceof File)
+					.filter((it) => !('remote' in file))
 					.map((file) => file.name)
 					.includes(file.name)
 			) {
@@ -67,7 +67,7 @@
 	{#each files as file (file.name)}
 		<div class="file">
 			<div class="file__tab">
-				{#if file instanceof File && file.type.startsWith('image/')}
+				{#if !('remote' in file) && file.type.startsWith('image/')}
 					<IconPhotograph />
 				{:else}
 					<IconFile />
@@ -79,7 +79,7 @@
 						files = files.filter((it) => it.name !== file.name)
 					}}><IconTrash /> Remove</Button>
 			</div>
-			{#if file instanceof File && file.type.startsWith('image/')}
+			{#if !('remote' in file) && file.type.startsWith('image/')}
 				<div class="file__preview">
 					<img
 						class="file__preview__image"

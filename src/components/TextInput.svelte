@@ -10,13 +10,14 @@
 	export let id: string = undefined
 	export let fill = false
 	export let raised = false
+	export let autofocus = false
 </script>
 
 <div class={classCombine(['text-input', raised && 'text-input--raised'])} class:fill>
 	{#if multiline}
-		<textarea {id} {placeholder} bind:value />
+		<textarea {id} {placeholder} {autofocus} bind:value />
 	{:else}
-		<input type="text" {id} {placeholder} bind:value class:has-icon={icon} />
+		<input type="text" {id} {placeholder} {autofocus} bind:value class:has-icon={icon} />
 		{#if icon}
 			<svelte:component this={icon} />
 		{/if}

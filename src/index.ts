@@ -12,6 +12,8 @@ export { default as CheckboxVirtualList } from './components/CheckboxVirtualList
 
 export { default as Chips } from './components/Chips.svelte'
 
+export { default as Code } from './components/Code.svelte'
+
 export { default as Field } from './components/Field.svelte'
 
 export { default as FileUpload } from './components/FileUpload.svelte'

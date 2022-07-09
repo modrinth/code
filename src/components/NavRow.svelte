@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { browser, prerendering } from '$app/env'
 	import { page } from '$app/stores'
-	import { onMount } from 'svelte'
+	import { onDestroy, onMount } from 'svelte'
 	import { debounce } from 'throttle-debounce'
 
 	interface Link {
@@ -53,17 +53,23 @@
 	$: if (activeIndex > -1 && browser && linkElements.length > 0) startAnimation()
 
 	function startAnimation() {
-		indicator.direction = activeIndex < oldIndex ? 'left' : 'right'
+		// Avoids error that `linkElements[activeIndex]` is null
+		if (linkElements[activeIndex]) {
+			indicator.direction = activeIndex < oldIndex ? 'left' : 'right'
 
-		indicator.left = linkElements[activeIndex].offsetLeft
-		indicator.right =
-			linkElements[activeIndex].parentElement.offsetWidth -
-			linkElements[activeIndex].offsetLeft -
-			linkElements[activeIndex].offsetWidth
-		indicator.top = linkElements[activeIndex].offsetTop + linkElements[activeIndex].offsetHeight - 2
+			indicator.left = linkElements[activeIndex].offsetLeft
+			indicator.right =
+				linkElements[activeIndex].parentElement.offsetWidth -
+				linkElements[activeIndex].offsetLeft -
+				linkElements[activeIndex].offsetWidth
+			indicator.top =
+				linkElements[activeIndex].offsetTop + linkElements[activeIndex].offsetHeight - 2
+		}
 
 		oldIndex = activeIndex
 	}
+
+	const debounced = debounce(100, startAnimation)
 
 	let useAnimation = false
 
@@ -72,7 +78,11 @@
 			useAnimation = true
 		}, 300)
 
-		window.addEventListener('resize', debounce(100, startAnimation))
+		window.addEventListener('resize', debounced)
+	})
+
+	onDestroy(() => {
+		if (browser) window.removeEventListener('resize', debounced)
 	})
 </script>
 
