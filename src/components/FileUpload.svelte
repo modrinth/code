@@ -13,7 +13,7 @@
 	}
 
 	export let multiple = false
-	export let accept: string = '*'
+	export let accept = '*'
 	/** Prevents width from expanding due to large file names or images */
 	export let constrained = false
 
