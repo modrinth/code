@@ -2,7 +2,6 @@ pub mod auth;
 pub mod env;
 pub mod ext;
 pub mod guards;
-pub mod report;
 pub mod routes;
 pub mod time_ser;
 pub mod validate;

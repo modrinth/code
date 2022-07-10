@@ -1,6 +1,5 @@
 use super::ApiError;
 use crate::database;
-use crate::database::models::VersionId;
 use crate::models;
 use crate::models::projects::{Dependency, Version};
 use crate::models::teams::Permissions;
@@ -248,16 +247,6 @@ pub async fn version_edit(
                 )
                 .execute(&mut *transaction)
                 .await?;
-
-                crate::util::report::censor_check(
-                    &*name,
-                    None,
-                    Some(VersionId::from(version_id)),
-                    None,
-                    "Version edited with inappropriate name".to_string(),
-                    &mut transaction,
-                )
-                .await?;
             }
 
             if let Some(number) = &new_version.version_number {
@@ -473,16 +462,6 @@ pub async fn version_edit(
                     id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
-                .await?;
-
-                crate::util::report::censor_check(
-                    &*body,
-                    None,
-                    Some(VersionId::from(version_id)),
-                    None,
-                    "Version edited with inappropriate changelog".to_string(),
-                    &mut transaction,
-                )
                 .await?;
             }
 

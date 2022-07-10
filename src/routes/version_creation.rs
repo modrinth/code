@@ -393,28 +393,6 @@ async fn version_create_inner(
     .insert_many(users, &mut *transaction)
     .await?;
 
-    if let Some(version_body) = version_data.version_body {
-        crate::util::report::censor_check(
-            &*version_body,
-            None,
-            Some(models::ids::VersionId::from(version_id)),
-            None,
-            "Version created with inappropriate changelog".to_string(),
-            &mut *transaction,
-        )
-        .await?;
-    }
-
-    crate::util::report::censor_check(
-        &*version_data.version_title,
-        None,
-        Some(models::ids::VersionId::from(version_id)),
-        None,
-        "Version created with inappropriate name".to_string(),
-        &mut *transaction,
-    )
-    .await?;
-
     let response = Version {
         id: builder.version_id.into(),
         project_id: builder.project_id.into(),
