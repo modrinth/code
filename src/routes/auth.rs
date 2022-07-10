@@ -247,19 +247,52 @@ pub async fn auth_callback(
                 }
 
                 if let Some(username) = username {
-                    User {
+                    let new_user = User {
                         id: user_id,
                         github_id: Some(user.id as i64),
-                        username,
+                        username: username.clone(),
                         name: user.name,
                         email: user.email,
                         avatar_url: Some(user.avatar_url),
                         bio: user.bio,
                         created: OffsetDateTime::now_utc(),
                         role: Role::Developer.to_string(),
-                    }
-                    .insert(&mut transaction)
+                    };
+
+                    crate::util::report::censor_check(
+                        &*username,
+                        None,
+                        None,
+                        Some(user_id),
+                        "New user's username is inappropriate".to_string(),
+                        &mut transaction,
+                    )
                     .await?;
+
+                    if let Some(name) = &new_user.name {
+                        crate::util::report::censor_check(
+                            &*name,
+                            None,
+                            None,
+                            Some(user_id),
+                            "New user's name is inappropriate".to_string(),
+                            &mut transaction,
+                        )
+                        .await?;
+                    }
+                    if let Some(bio) = &new_user.bio {
+                        crate::util::report::censor_check(
+                            &*bio,
+                            None,
+                            None,
+                            Some(user_id),
+                            "New user's bio is inappropriate".to_string(),
+                            &mut transaction,
+                        )
+                        .await?;
+                    }
+
+                    new_user.insert(&mut transaction).await?;
                 }
             }
         }

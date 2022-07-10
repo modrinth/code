@@ -1,5 +1,7 @@
 use super::DatabaseError;
+use crate::models::ids::base62_impl::to_base62;
 use crate::models::ids::random_base62_rng;
+use censor::Censor;
 use sqlx::sqlx_macros::Type;
 
 const ID_RETRY_COUNT: usize = 20;
@@ -13,6 +15,7 @@ macro_rules! generate_ids {
             let length = $id_length;
             let mut id = random_base62_rng(&mut rng, length);
             let mut retry_count = 0;
+            let censor = Censor::Standard + Censor::Sex;
 
             // Check if ID is unique
             loop {
@@ -20,7 +23,7 @@ macro_rules! generate_ids {
                     .fetch_one(&mut *con)
                     .await?;
 
-                if results.exists.unwrap_or(true) {
+                if results.exists.unwrap_or(true) || censor.check(&*to_base62(id)) {
                     id = random_base62_rng(&mut rng, length);
                 } else {
                     break;

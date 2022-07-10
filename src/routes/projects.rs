@@ -387,6 +387,16 @@ pub async fn project_edit(
                 )
                 .execute(&mut *transaction)
                 .await?;
+
+                crate::util::report::censor_check(
+                    &*title,
+                    Some(project_item.inner.id),
+                    None,
+                    None,
+                    "Project edited with inappropriate title".to_string(),
+                    &mut transaction,
+                )
+                .await?;
             }
 
             if let Some(description) = &new_project.description {
@@ -407,6 +417,16 @@ pub async fn project_edit(
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)
+                .await?;
+
+                crate::util::report::censor_check(
+                    &*description,
+                    Some(project_item.inner.id),
+                    None,
+                    None,
+                    "Project edited with inappropriate description".to_string(),
+                    &mut transaction,
+                )
                 .await?;
             }
 
@@ -679,6 +699,16 @@ pub async fn project_edit(
                             ));
                         }
                     }
+
+                    crate::util::report::censor_check(
+                        &*slug,
+                        Some(project_item.inner.id),
+                        None,
+                        None,
+                        "Project edited with inappropriate slug".to_string(),
+                        &mut transaction,
+                    )
+                    .await?;
                 }
 
                 sqlx::query!(
@@ -890,6 +920,16 @@ pub async fn project_edit(
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)
+                .await?;
+
+                crate::util::report::censor_check(
+                    &*body,
+                    Some(project_item.inner.id),
+                    None,
+                    None,
+                    "Project edited with inappropriate body".to_string(),
+                    &mut transaction,
+                )
                 .await?;
             }
 
