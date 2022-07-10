@@ -8,9 +8,9 @@ use std::path::Component;
 use validator::Validate;
 use zip::ZipArchive;
 
-pub struct PackValidator;
+pub struct ModpackValidator;
 
-impl super::Validator for PackValidator {
+impl super::Validator for ModpackValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["mrpack"]
     }

@@ -3,10 +3,10 @@ use crate::models::projects::{GameVersion, Loader};
 use crate::validate::fabric::FabricValidator;
 use crate::validate::forge::{ForgeValidator, LegacyForgeValidator};
 use crate::validate::liteloader::LiteLoaderValidator;
-use crate::validate::pack::PackValidator;
-use crate::validate::plugin::PluginValidator;
+use crate::validate::modpack::ModpackValidator;
+use crate::validate::plugin::*;
 use crate::validate::quilt::QuiltValidator;
-use crate::validate::resourcepack::ResourcePackValidator;
+use crate::validate::resourcepack::{PackValidator, TexturePackValidator};
 use std::io::Cursor;
 use thiserror::Error;
 use time::OffsetDateTime;
@@ -15,7 +15,7 @@ use zip::ZipArchive;
 mod fabric;
 mod forge;
 mod liteloader;
-mod pack;
+mod modpack;
 mod plugin;
 mod quilt;
 mod resourcepack;
@@ -76,15 +76,19 @@ pub trait Validator: Sync {
     ) -> Result<ValidationResult, ValidationError>;
 }
 
-static VALIDATORS: [&dyn Validator; 8] = [
-    &PackValidator,
+static VALIDATORS: [&dyn Validator; 12] = [
+    &ModpackValidator,
     &FabricValidator,
     &ForgeValidator,
     &LegacyForgeValidator,
     &QuiltValidator,
     &LiteLoaderValidator,
-    &ResourcePackValidator,
-    &PluginValidator,
+    &PackValidator,
+    &TexturePackValidator,
+    &BukkitValidator,
+    &BungeeCordValidator,
+    &VelocityValidator,
+    &SpongeValidator,
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file
@@ -97,8 +101,8 @@ pub async fn validate_file(
     all_game_versions: Vec<crate::database::models::categories::GameVersion>,
 ) -> Result<ValidationResult, ValidationError> {
     actix_web::web::block(move || {
-        let reader = std::io::Cursor::new(data);
-        let mut zip = zip::ZipArchive::new(reader)?;
+        let reader = Cursor::new(data);
+        let mut zip = ZipArchive::new(reader)?;
 
         let mut visited = false;
         for validator in &VALIDATORS {

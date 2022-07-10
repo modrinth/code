@@ -17,7 +17,7 @@ impl super::Validator for QuiltValidator {
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
-        &["fabric"]
+        &["quilt"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
