@@ -9,9 +9,8 @@ use paris::*;
 use std::path::{Path, PathBuf};
 use tabled::{Table, Tabled};
 use theseus::prelude::*;
-use tokio::fs;
+use tokio::{fs, sync::oneshot};
 use tokio_stream::wrappers::ReadDirStream;
-use uuid::Uuid;
 
 #[derive(argh::FromArgs)]
 #[argh(subcommand, name = "profile")]
@@ -371,19 +370,6 @@ pub struct ProfileRun {
     #[argh(positional, default = "std::env::current_dir().unwrap()")]
     /// the profile to run
     profile: PathBuf,
-
-    // TODO: auth
-    #[argh(option, short = 't')]
-    /// the Minecraft token to use for player login. Should be replaced by auth when that is a thing.
-    token: String,
-
-    #[argh(option, short = 'n')]
-    /// the uername to use for running the game
-    name: String,
-
-    #[argh(option, short = 'i')]
-    /// the account id to use for running the game
-    id: Uuid,
 }
 
 impl ProfileRun {
@@ -400,11 +386,12 @@ impl ProfileRun {
            "Profile not managed by Theseus (if it exists, try using `profile add` first!)",
         );
 
-        let credentials = Credentials {
-            id: self.id.clone(),
-            username: self.name.clone(),
-            access_token: self.token.clone(),
-        };
+        // TODO: credential storage and refresh
+        let (tx, rx) = oneshot::channel::<url::Url>();
+        let auth_flow = tokio::spawn(authenticate(tx));
+        let url = rx.await?;
+        webbrowser::open(url.as_str())?;
+        let credentials = auth_flow.await??;
 
         let mut proc = profile::run(&path, &credentials).await?;
         profile::wait_for(&mut proc).await?;

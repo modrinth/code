@@ -92,7 +92,7 @@ where
 /// Run Minecraft using a profile
 pub async fn run(
     path: &Path,
-    credentials: &crate::launcher::Credentials,
+    credentials: &crate::auth::Credentials,
 ) -> crate::Result<Child> {
     let state = State::get().await.unwrap();
     let settings = state.settings.read().await;

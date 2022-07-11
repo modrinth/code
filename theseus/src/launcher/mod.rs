@@ -6,8 +6,7 @@ use tokio::process::{Child, Command};
 
 mod args;
 
-mod auth;
-pub use auth::Credentials;
+pub mod auth;
 
 mod download;
 

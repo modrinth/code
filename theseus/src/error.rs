@@ -13,6 +13,9 @@ pub enum Error {
     #[error("Deserialization error (Bincode): {0}")]
     DecodeError(#[from] bincode::error::EncodeError),
 
+    #[error("Error parsing URL: {0}")]
+    URLError(#[from] url::ParseError),
+
     #[error("Database error: {0}")]
     DBError(#[from] sled::Error),
 
@@ -22,6 +25,9 @@ pub enum Error {
     #[error("Metadata error: {0}")]
     MetadataError(#[from] daedalus::Error),
 
+    #[error("Minecraft authentication error: {0}")]
+    HydraError(String),
+
     #[error("I/O error: {0}")]
     IOError(#[from] std::io::Error),
 
@@ -30,6 +36,12 @@ pub enum Error {
 
     #[error("Error fetching URL: {0}")]
     FetchError(#[from] reqwest::Error),
+
+    #[error("Websocket error: {0}")]
+    WSError(#[from] async_tungstenite::tungstenite::Error),
+
+    #[error("Websocket closed before {0} could be received!")]
+    WSClosedError(String),
 
     #[error("Incorrect Sha1 hash for download: {0} != {1}")]
     HashError(String, String),

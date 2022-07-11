@@ -38,8 +38,7 @@
           gtk4 gdk-pixbuf atk webkitgtk dbus
         ];
         shell = [
-          toolchain
-          (with fenix; combine [toolchain default.clippy rust-analyzer])
+          (with fenix; combine [toolchain default.clippy complete.rust-src rust-analyzer])
           git
           jdk17 jdk8
         ];

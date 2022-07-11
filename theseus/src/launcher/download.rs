@@ -13,7 +13,6 @@ use daedalus::{
     modded::LoaderVersion,
 };
 use futures::prelude::*;
-use std::sync::Arc;
 use tokio::{fs, sync::OnceCell};
 
 pub async fn download_minecraft(
@@ -186,10 +185,6 @@ pub async fn download_libraries(
     version: &str,
 ) -> crate::Result<()> {
     log::debug!("Loading libraries");
-    let (libraries_dir, natives_dir) = (
-        Arc::new(st.directories.libraries_dir()),
-        Arc::new(st.directories.version_natives_dir(version)),
-    );
 
     tokio::try_join! {
         fs::create_dir_all(st.directories.libraries_dir()),
