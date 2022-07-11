@@ -4,17 +4,18 @@ use std::sync::Arc;
 use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
 
 // Submodules
-mod dirs;
-pub use self::dirs::*;
+macro_rules! submodule {
+    ($name:ident) => {
+        mod $name;
+        pub use self::$name::*;
+    };
+}
 
-mod metadata;
-pub use metadata::*;
-
-mod settings;
-pub use settings::*;
-
-mod profiles;
-pub use profiles::*;
+submodule!(dirs);
+submodule!(metadata);
+submodule!(profiles);
+submodule!(settings);
+submodule!(users);
 
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -28,10 +29,13 @@ pub struct State {
     pub io_semaphore: Semaphore,
     /// Launcher metadata
     pub metadata: Metadata,
+    // TODO: settings API
     /// Launcher configuration
     pub settings: RwLock<Settings>,
     /// Launcher profile metadata
-    pub profiles: RwLock<Profiles>,
+    pub(crate) profiles: RwLock<Profiles>,
+    /// Launcher user account info
+    pub(crate) users: RwLock<Users>,
 }
 
 impl State {
@@ -51,11 +55,12 @@ impl State {
                 let settings =
                     Settings::init(&directories.settings_file()).await?;
 
-                // Metadata
-                let metadata = Metadata::init(&database).await?;
-
-                // Profiles
-                let profiles = Profiles::init(&database).await?;
+                // Launcher data
+                let (metadata, profiles) = tokio::try_join! {
+                    Metadata::init(&database),
+                    Profiles::init(&database),
+                }?;
+                let users = Users::init(&database)?;
 
                 // Loose initializations
                 let io_semaphore =
@@ -68,6 +73,7 @@ impl State {
                     metadata,
                     settings: RwLock::new(settings),
                     profiles: RwLock::new(profiles),
+                    users: RwLock::new(users),
                 }))
             })
             .await

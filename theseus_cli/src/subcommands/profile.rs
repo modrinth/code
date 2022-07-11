@@ -310,16 +310,15 @@ impl ProfileList {
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
-        let state = State::get().await?;
-        let profiles = state.profiles.read().await;
-        let profiles = profiles.0.iter().map(|(path, prof)| {
+        let profiles = profile::list().await?;
+        let rows = profiles.iter().map(|(path, prof)| {
             prof.as_ref().map_or_else(
                 || ProfileRow::from(path.as_path()),
                 ProfileRow::from,
             )
         });
 
-        let table = Table::new(profiles).with(tabled::Style::psql()).with(
+        let table = Table::new(rows).with(tabled::Style::psql()).with(
             tabled::Modify::new(tabled::Column(1..=1))
                 .with(tabled::MaxWidth::wrapping(40)),
         );
@@ -370,6 +369,10 @@ pub struct ProfileRun {
     #[argh(positional, default = "std::env::current_dir().unwrap()")]
     /// the profile to run
     profile: PathBuf,
+
+    #[argh(option)]
+    /// the user to authenticate with
+    user: Option<uuid::Uuid>,
 }
 
 impl ProfileRun {
@@ -386,12 +389,18 @@ impl ProfileRun {
            "Profile not managed by Theseus (if it exists, try using `profile add` first!)",
         );
 
-        // TODO: credential storage and refresh
-        let (tx, rx) = oneshot::channel::<url::Url>();
-        let auth_flow = tokio::spawn(authenticate(tx));
-        let url = rx.await?;
-        webbrowser::open(url.as_str())?;
-        let credentials = auth_flow.await??;
+        let id = future::ready(self.user.ok_or(()))
+            .or_else(|_| async move {
+                let state = State::get().await?;
+                let settings = state.settings.read().await;
+
+                settings.default_user
+                    .ok_or(eyre::eyre!(
+                        "Could not find any users, please add one using the `user add` command."
+                    ))
+            })
+            .await?;
+        let credentials = auth::refresh(id, false).await?;
 
         let mut proc = profile::run(&path, &credentials).await?;
         profile::wait_for(&mut proc).await?;

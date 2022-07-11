@@ -1,5 +1,6 @@
 //! Authentication flow interface
-use crate::launcher::auth as inner;
+use crate::{launcher::auth as inner, State};
+use futures::prelude::*;
 use tokio::sync::oneshot;
 
 pub use inner::Credentials;
@@ -12,25 +13,75 @@ pub async fn authenticate(
     browser_url: oneshot::Sender<url::Url>,
 ) -> crate::Result<Credentials> {
     let mut flow = inner::HydraAuthFlow::new().await?;
+    let state = State::get().await?;
+    let mut users = state.users.write().await;
+
     let url = flow.prepare_login_url().await?;
     browser_url.send(url).map_err(|url| {
         crate::Error::OtherError(format!(
             "Error sending browser url to parent: {url}"
         ))
     })?;
-    flow.extract_credentials().await
+
+    let credentials = flow.extract_credentials().await?;
+    users.insert(&credentials)?;
+
+    if state.settings.read().await.default_user.is_none() {
+        let mut settings = state.settings.write().await;
+        settings.default_user = Some(credentials.id);
+    }
+
+    State::sync().await?;
+    Ok(credentials)
 }
 
 /// Refresh some credentials using Hydra, if needed
 pub async fn refresh(
-    credentials: &mut Credentials,
+    user: uuid::Uuid,
     update_name: bool,
-) -> crate::Result<()> {
-    if chrono::offset::Utc::now() > credentials.expires {
-        inner::refresh_credentials(credentials).await?;
-        if update_name {
-            inner::refresh_username(credentials).await?;
+) -> crate::Result<Credentials> {
+    let state = State::get().await?;
+    let mut users = state.users.write().await;
+
+    futures::future::ready(users.get(user)?.ok_or_else(|| {
+        crate::Error::OtherError(format!(
+            "Tried to refresh nonexistent user with ID {user}"
+        ))
+    }))
+    .and_then(|mut credentials| async move {
+        if chrono::offset::Utc::now() > credentials.expires {
+            inner::refresh_credentials(&mut credentials).await?;
+            if update_name {
+                inner::refresh_username(&mut credentials).await?;
+            }
         }
+        users.insert(&credentials)?;
+        Ok(credentials)
+    })
+    .await
+}
+
+/// Remove a user account from the database
+pub async fn remove(user: uuid::Uuid) -> crate::Result<()> {
+    let state = State::get().await?;
+    let mut users = state.users.write().await;
+
+    if state.settings.read().await.default_user == Some(user) {
+        let mut settings = state.settings.write().await;
+        settings.default_user = users
+            .0
+            .first()?
+            .map(|it| uuid::Uuid::from_slice(&it.0))
+            .transpose()?;
     }
+
+    users.remove(user)?;
     Ok(())
+}
+
+/// Get a copy of the list of all user credentials
+pub async fn users() -> crate::Result<Box<[Credentials]>> {
+    let state = State::get().await?;
+    let users = state.users.read().await;
+    users.iter().collect()
 }

@@ -7,6 +7,9 @@ pub enum Error {
     #[error("Serialization error (JSON): {0}")]
     JSONError(#[from] serde_json::Error),
 
+    #[error("Error parsing UUID: {0}")]
+    UUIDError(#[from] uuid::Error),
+
     #[error("Serialization error (Bincode): {0}")]
     EncodeError(#[from] bincode::error::DecodeError),
 

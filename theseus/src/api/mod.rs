@@ -11,7 +11,7 @@ pub mod data {
 
 pub mod prelude {
     pub use crate::{
-        auth::{authenticate, Credentials},
+        auth::{self, Credentials},
         data::*,
         profile::{self, Profile},
         State,

@@ -13,7 +13,7 @@ const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";
 
 #[derive(Debug)]
-pub struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
+pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;

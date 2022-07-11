@@ -54,6 +54,7 @@ pub struct Credentials {
     pub refresh_token: String,
     #[bincode(with_serde)]
     pub expires: DateTime<Utc>,
+    _ctor_scope: (),
 }
 
 // Implementation
@@ -64,7 +65,7 @@ pub struct HydraAuthFlow<S: AsyncRead + AsyncWrite + Unpin> {
 impl HydraAuthFlow<ws::tokio::ConnectStream> {
     pub async fn new() -> crate::Result<Self> {
         let sock_url = wrap_ref_builder!(
-            it < HYDRA_URL =>
+            it = HYDRA_URL =>
             { it.set_scheme("wss").ok() }
         );
         let (socket, _) = ws::tokio::connect_async(sock_url.clone()).await?;
@@ -82,7 +83,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
             .into_data();
         let code = ErrorJSON::unwrap::<LoginCodeJSON>(&code_resp)?;
         Ok(wrap_ref_builder!(
-            it < HYDRA_URL.join("login")? =>
+            it = HYDRA_URL.join("login")? =>
             { it.query_pairs_mut().append_pair("id", &code.login_code); }
         ))
     }
@@ -111,6 +112,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
             refresh_token: token.refresh_token,
             access_token: token.token,
             expires,
+            _ctor_scope: (),
         })
     }
 }

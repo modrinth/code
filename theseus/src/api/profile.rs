@@ -1,11 +1,13 @@
 //! Theseus profile management interface
-
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
 };
 use daedalus as d;
-use std::{future::Future, path::Path};
+use std::{
+    future::Future,
+    path::{Path, PathBuf},
+};
 use tokio::process::{Child, Command};
 
 /// Add a profile to the in-memory state
@@ -75,7 +77,7 @@ pub async fn edit<Fut>(
 where
     Fut: Future<Output = crate::Result<()>>,
 {
-    let state = State::get().await.unwrap();
+    let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
     match profiles.0.get_mut(path) {
@@ -87,6 +89,14 @@ where
             path.display().to_string(),
         )),
     }
+}
+
+/// Get a copy of the profile set
+pub async fn list(
+) -> crate::Result<std::collections::HashMap<PathBuf, Option<Profile>>> {
+    let state = State::get().await?;
+    let profiles = state.profiles.read().await;
+    Ok(profiles.0.clone())
 }
 
 /// Run Minecraft using a profile

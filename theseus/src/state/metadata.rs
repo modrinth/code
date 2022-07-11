@@ -13,6 +13,7 @@ use std::collections::LinkedList;
 const METADATA_URL: &str = "https://meta.modrinth.com/gamedata";
 const METADATA_DB_FIELD: &[u8] = b"metadata";
 
+// TODO: store as subtree in database
 #[derive(Encode, Decode, Debug)]
 pub struct Metadata {
     pub minecraft: MinecraftManifest,
