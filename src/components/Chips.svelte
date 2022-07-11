@@ -40,6 +40,6 @@
 <style lang="postcss">
 	.chips {
 		display: flex;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 	}
 </style>

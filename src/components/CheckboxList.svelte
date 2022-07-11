@@ -37,12 +37,12 @@
 	.checkbox-list {
 		display: flex;
 		flex-direction: column;
-		gap: 2px;
+		grid-gap: 2px;
 
 		&.wrap {
 			flex-direction: row;
 			flex-wrap: wrap;
-			gap: 2rem;
+			grid-gap: 2rem;
 		}
 	}
 </style>

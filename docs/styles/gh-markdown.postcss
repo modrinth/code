@@ -1,5 +1,5 @@
-*:not(.example__preview *) {
-	:where(a) {
+*:not(.example__preview) * {
+	:where(a):not(.link) {
 		text-decoration: none;
 
 		&.absent {
@@ -378,7 +378,7 @@
 		background-color: var(--accent-color-transparent);
 	}
 
-	&:where(a) {
+	&:where(a):not(.link) {
 		color: var(--accent-color);
 
 		&:hover {

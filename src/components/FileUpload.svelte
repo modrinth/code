@@ -95,7 +95,7 @@
 	.file-dropzone {
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		grid-gap: 1rem;
 
 		&--constrained {
 			width: 27rem;
@@ -106,7 +106,7 @@
 			padding: 1.5rem 2rem;
 			justify-content: center;
 			align-items: center;
-			gap: 0.5rem;
+			grid-gap: 0.5rem;
 			background-color: var(--color-button-bg);
 			border-radius: var(--rounded-sm);
 			border: dashed 0.3rem var(--color-text-lightest);

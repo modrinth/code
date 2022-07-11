@@ -55,7 +55,7 @@
 	.pagination {
 		align-self: center;
 		display: flex;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 		align-items: center;
 
 		:global(.button) {
@@ -72,7 +72,7 @@
 		}
 
 		@media (width <= 500px) {
-			gap: 0.25rem;
+			grid-gap: 0.25rem;
 
 			:global(> *:nth-child(4)),
 			:global(> *:nth-child(6)) {

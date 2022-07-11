@@ -15,7 +15,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 
 		&__input {
 			-webkit-appearance: none;

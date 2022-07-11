@@ -40,7 +40,7 @@
 <style lang="postcss">
 	.header {
 		display: flex;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 		align-items: center;
 		flex-wrap: wrap;
 		padding: 1rem 1.5rem;
@@ -74,7 +74,7 @@
 
 		&__links {
 			margin-left: auto;
-			gap: 1rem;
+			grid-gap: 1rem;
 			align-items: center;
 			justify-content: center;
 			display: flex;

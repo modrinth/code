@@ -180,4 +180,4 @@ Use a utility by importing from `omorphia/utils`.
 
 ### Using icons and styles
 
-Follow the guides on the sidebar to learn how to use [icons](/getting-started/icons) and general concepts.
+Follow the guides on the sidebar to learn how to use [icons](/usage/icons) and general concepts.

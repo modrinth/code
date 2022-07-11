@@ -28,7 +28,7 @@
 	.text-input {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 		position: relative;
 		width: 20rem;
 

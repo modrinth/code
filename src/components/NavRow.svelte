@@ -124,7 +124,7 @@
 		display: flex;
 		flex-direction: row;
 		align-items: center;
-		gap: 1rem;
+		grid-gap: 1rem;
 		flex-wrap: wrap;
 		position: relative;
 

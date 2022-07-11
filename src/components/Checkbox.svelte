@@ -25,12 +25,12 @@
 
 		display: inline-flex;
 		align-items: center;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 
 		&__label {
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
+			grid-gap: 0.5rem;
 
 			> :global(.icon) {
 				/* Icon on checkbox helps to be a little larger than normal icons 16px -> 18px */

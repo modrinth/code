@@ -114,7 +114,7 @@
 	.edit-link {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 		margin-bottom: 54px;
 		color: var(--accent-color);
 	}

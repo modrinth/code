@@ -38,7 +38,7 @@
 			border: solid 2px hsl(0, 0%, 20%);
 			border-bottom: none;
 			display: flex;
-			gap: 1rem;
+			grid-gap: 1rem;
 			flex-wrap: wrap;
 			position: relative;
 			justify-content: flex-start;

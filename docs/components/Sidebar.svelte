@@ -85,14 +85,14 @@
 			height: 100vh;
 			max-height: 100vh;
 			overflow-y: auto;
-			gap: 2.5rem;
+			grid-gap: 2.5rem;
 			display: flex;
 			flex-direction: column;
 
 			.section {
 				display: flex;
 				flex-direction: column;
-				gap: 0.5rem;
+				grid-gap: 0.5rem;
 
 				&__title {
 					text-transform: uppercase;

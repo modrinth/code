@@ -22,13 +22,13 @@
 	.field {
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 		min-width: 0;
 
 		&__label {
 			display: flex;
 			flex-direction: column;
-			gap: 0;
+			grid-gap: 0;
 
 			&__title {
 				font-weight: var(--font-weight-bold);

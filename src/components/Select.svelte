@@ -220,7 +220,7 @@
 			justify-content: space-between;
 			align-items: center;
 			padding: 0.25rem 1rem;
-			gap: 0.5rem;
+			grid-gap: 0.5rem;
 			background-color: var(--color-button-bg);
 			box-shadow: var(--shadow-inset-sm);
 			border-radius: var(--rounded);
@@ -265,7 +265,7 @@
 				padding: 0.25rem 1rem;
 				display: flex;
 				align-items: center;
-				gap: 0.5rem;
+				grid-gap: 0.5rem;
 
 				&:hover:not(.current, .is-selected) {
 					background-color: var(--color-brand-dark);

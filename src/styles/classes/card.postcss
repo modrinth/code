@@ -10,7 +10,7 @@
 	box-shadow: var(--shadow-raised), var(--shadow-inset);
 
 	padding: var(--padding);
-	gap: 1rem;
+	grid-gap: 1rem;
 	max-width: 100%;
 
 	.profile-picture {
@@ -19,11 +19,11 @@
 
 	&--gap {
 		&-compressed {
-			gap: 0.5rem;
+			grid-gap: 0.5rem;
 		}
 
 		&-none {
-			gap: 0;
+			grid-gap: 0;
 		}
 	}
 
@@ -60,7 +60,7 @@
 		display: flex;
 		flex-direction: column;
 		align-items: flex-end;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 
 		z-index: 2;
 

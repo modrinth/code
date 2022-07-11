@@ -121,7 +121,7 @@
 			padding: 1rem 1.25rem;
 			display: flex;
 			align-items: center;
-			gap: 1rem;
+			grid-gap: 1rem;
 			color: var(--color-danger-text);
 			border-color: var(--color-danger-text);
 			border-width: 0.15rem 0;
@@ -152,7 +152,7 @@
 			margin-top: 1rem;
 			display: flex;
 			justify-content: flex-end;
-			gap: 1rem;
+			grid-gap: 1rem;
 			flex-wrap: wrap;
 		}
 	}

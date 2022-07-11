@@ -2,11 +2,21 @@
 	color: var(--color-link);
 	display: flex;
 	align-items: center;
-	gap: 0.5rem;
+	grid-gap: 0.25rem;
 	line-height: 100%;
+	text-decoration: underline;
+	text-underline-offset: 3px;
 
 	&:hover {
-		text-decoration: underline;
+		text-decoration-thickness: 2px;
+
+		.icon > path {
+			stroke-width: 3px;
+		}
+	}
+
+	.icon {
+		margin-bottom: -3px;
 	}
 }
 
@@ -14,7 +24,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
-	gap: 1rem;
+	grid-gap: 1rem;
 
 	.link {
 		color: var(--color-text);

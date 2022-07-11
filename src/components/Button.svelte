@@ -93,7 +93,7 @@
 		justify-content: center;
 		padding: 0.5rem 1rem;
 		min-width: min-content;
-		gap: 0.5rem;
+		grid-gap: 0.5rem;
 		cursor: pointer;
 		position: relative;
 		line-height: 100%;
