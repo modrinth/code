@@ -14,7 +14,7 @@ use tokio_stream::wrappers::ReadDirStream;
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "profile")]
-/// profile management
+/// manage Minecraft instances
 pub struct ProfileCommand {
     #[argh(subcommand)]
     action: ProfileSubcommand,

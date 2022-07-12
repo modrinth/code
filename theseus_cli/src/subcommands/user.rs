@@ -8,7 +8,7 @@ use tokio::sync::oneshot;
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "user")]
-/// user management
+/// manage Minecraft accounts
 pub struct UserCommand {
     #[argh(subcommand)]
     action: UserSubcommand,
@@ -20,6 +20,7 @@ pub enum UserSubcommand {
     Add(UserAdd),
     List(UserList),
     Remove(UserRemove),
+    SetDefault(UserDefault),
 }
 
 #[derive(argh::FromArgs, Debug)]
@@ -136,12 +137,46 @@ impl UserRemove {
     }
 }
 
+#[derive(argh::FromArgs, Debug)]
+/// set the default user
+#[argh(subcommand, name = "set-default")]
+pub struct UserDefault {
+    /// the user to set as default
+    #[argh(positional)]
+    user: uuid::Uuid,
+}
+
+impl UserDefault {
+    #[tracing::instrument]
+    pub async fn run(
+        &self,
+        _args: &crate::Args,
+        _largs: &UserCommand,
+    ) -> Result<()> {
+        info!("Setting user {} as default", self.user.as_hyphenated());
+
+        // TODO: settings API
+        let state: std::sync::Arc<State> = State::get().await?;
+        let mut settings = state.settings.write().await;
+
+        if settings.default_user == Some(self.user) {
+            warn!("User is already the default!");
+        } else {
+            settings.default_user = Some(self.user);
+            success!("User set as default!");
+        }
+
+        Ok(())
+    }
+}
+
 impl UserCommand {
     pub async fn run(&self, args: &crate::Args) -> Result<()> {
         dispatch!(&self.action, (args, self) => {
             UserSubcommand::Add,
             UserSubcommand::List,
-            UserSubcommand::Remove
+            UserSubcommand::Remove,
+            UserSubcommand::SetDefault
         })
     }
 }
