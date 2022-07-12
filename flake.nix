@@ -61,6 +61,7 @@
           drv = self.packages.${system}.theseus-cli.overrideAttrs (old: old // {
             release = false;
           });
+        };
       };
 
       devShell = pkgs.mkShell {

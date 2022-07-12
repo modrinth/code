@@ -17,7 +17,7 @@ paris = { version = "1.5", features = ["macros", "no_logger"] }
 dialoguer = "0.10"
 tabled = "0.5"
 dirs = "4.0"
-uuid = {version = "0.8", features = ["v4", "serde"]}
+uuid = {version = "1.1", features = ["v4", "serde"]}
 url = "2.2"
 
 color-eyre = "0.6"

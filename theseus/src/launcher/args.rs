@@ -244,7 +244,7 @@ fn parse_minecraft_argument(
         .replace("${auth_access_token}", access_token)
         .replace("${auth_session}", access_token)
         .replace("${auth_player_name}", username)
-        .replace("${auth_uuid}", &uuid.to_hyphenated().to_string())
+        .replace("${auth_uuid}", &uuid.hyphenated().to_string())
         .replace("${user_properties}", "{}")
         .replace("${user_type}", "mojang")
         .replace("${version_name}", version)

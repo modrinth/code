@@ -1,5 +1,5 @@
 //! User management subcommand
-use crate::util::table;
+use crate::util::{confirm_async, table};
 use eyre::Result;
 use paris::*;
 use tabled::Tabled;
@@ -19,6 +19,7 @@ pub struct UserCommand {
 pub enum UserSubcommand {
     Add(UserAdd),
     List(UserList),
+    Remove(UserRemove),
 }
 
 #[derive(argh::FromArgs, Debug)]
@@ -50,6 +51,7 @@ impl UserAdd {
         }?;
 
         let credentials = flow.await??;
+        State::sync().await?;
         success!("Logged in user {}.", credentials.username);
         Ok(())
     }
@@ -62,8 +64,8 @@ pub struct UserList {}
 
 #[derive(Tabled)]
 struct UserRow<'a> {
-    id: uuid::Uuid,
     username: &'a str,
+    id: uuid::Uuid,
     default: bool,
 }
 
@@ -73,8 +75,8 @@ impl<'a> UserRow<'a> {
         default: Option<uuid::Uuid>,
     ) -> Self {
         Self {
-            id: credentials.id,
             username: &credentials.username,
+            id: credentials.id,
             default: Some(credentials.id) == default,
         }
     }
@@ -100,11 +102,46 @@ impl UserList {
     }
 }
 
+#[derive(argh::FromArgs, Debug)]
+/// remove a user
+#[argh(subcommand, name = "remove")]
+pub struct UserRemove {
+    /// the user to remove
+    #[argh(positional)]
+    user: uuid::Uuid,
+}
+
+impl UserRemove {
+    #[tracing::instrument]
+    pub async fn run(
+        &self,
+        _args: &crate::Args,
+        _largs: &UserCommand,
+    ) -> Result<()> {
+        info!("Removing user {}", self.user.as_hyphenated());
+
+        if confirm_async(String::from("Do you wish to continue"), true).await? {
+            if !auth::has_user(self.user).await? {
+                warn!("Profile was not managed by Theseus!");
+            } else {
+                auth::remove_user(self.user).await?;
+                State::sync().await?;
+                success!("User removed!");
+            }
+        } else {
+            error!("Aborted!");
+        }
+
+        Ok(())
+    }
+}
+
 impl UserCommand {
     pub async fn run(&self, args: &crate::Args) -> Result<()> {
         dispatch!(&self.action, (args, self) => {
             UserSubcommand::Add,
-            UserSubcommand::List
+            UserSubcommand::List,
+            UserSubcommand::Remove
         })
     }
 }
