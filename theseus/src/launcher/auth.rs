@@ -19,7 +19,7 @@ struct ErrorJSON {
 impl ErrorJSON {
     pub fn unwrap<'a, T: Deserialize<'a>>(data: &'a [u8]) -> crate::Result<T> {
         if let Ok(err) = serde_json::from_slice::<Self>(data) {
-            Err(crate::Error::HydraError(err.error))
+            Err(crate::ErrorKind::HydraError(err.error).as_error())
         } else {
             Ok(serde_json::from_slice::<T>(data)?)
         }
@@ -54,7 +54,7 @@ pub struct Credentials {
     pub refresh_token: String,
     #[bincode(with_serde)]
     pub expires: DateTime<Utc>,
-    _ctor_scope: (),
+    _ctor_scope: std::marker::PhantomData<()>,
 }
 
 // Implementation
@@ -77,9 +77,12 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
             .socket
             .try_next()
             .await?
-            .ok_or(crate::Error::WSClosedError(String::from(
-                "login socket ID",
-            )))?
+            .ok_or(
+                crate::ErrorKind::WSClosedError(String::from(
+                    "login socket ID",
+                ))
+                .as_error(),
+            )?
             .into_data();
         let code = ErrorJSON::unwrap::<LoginCodeJSON>(&code_resp)?;
         Ok(wrap_ref_builder!(
@@ -94,9 +97,12 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
             .socket
             .try_next()
             .await?
-            .ok_or(crate::Error::WSClosedError(String::from(
-                "login socket ID",
-            )))?
+            .ok_or(
+                crate::ErrorKind::WSClosedError(String::from(
+                    "login socket ID",
+                ))
+                .as_error(),
+            )?
             .into_data();
         let token = ErrorJSON::unwrap::<TokenJSON>(&token_resp)?;
         let expires =
@@ -112,7 +118,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
             refresh_token: token.refresh_token,
             access_token: token.token,
             expires,
-            _ctor_scope: (),
+            _ctor_scope: std::marker::PhantomData,
         })
     }
 }

@@ -49,6 +49,7 @@ impl Metadata {
         })
     }
 
+    #[tracing::instrument]
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
         let mut metadata = None;
 
@@ -85,7 +86,10 @@ impl Metadata {
             db.flush_async().await?;
             Ok(meta)
         } else {
-            Err(crate::Error::NoValueFor(String::from("launcher metadata")))
+            Err(
+                crate::ErrorKind::NoValueFor(String::from("launcher metadata"))
+                    .as_error(),
+            )
         }
     }
 }

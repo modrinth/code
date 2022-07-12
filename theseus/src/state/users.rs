@@ -38,11 +38,13 @@ impl Users {
     }
 
     pub fn iter(&self) -> UserIter<impl UserInnerIter> {
-        UserIter(self.0.iter().keys(), false)
+        UserIter(self.0.iter().values(), false)
     }
 }
 
-alias_trait! {pub UserInnerIter: Iterator<Item = sled::Result<sled::IVec>>, Send, Sync}
+alias_trait! {
+    pub UserInnerIter: Iterator<Item = sled::Result<sled::IVec>>, Send, Sync
+}
 
 /// An iterator over the set of users
 #[derive(Debug)]
@@ -51,6 +53,7 @@ pub struct UserIter<I: UserInnerIter>(I, bool);
 impl<I: UserInnerIter> Iterator for UserIter<I> {
     type Item = crate::Result<Credentials>;
 
+    #[tracing::instrument(skip(self))]
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 {
             return None;

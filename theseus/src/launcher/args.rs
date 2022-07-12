@@ -40,10 +40,11 @@ pub fn get_class_paths(
         client_path
             .canonicalize()
             .map_err(|_| {
-                crate::Error::LauncherError(format!(
+                crate::ErrorKind::LauncherError(format!(
                     "Specified class path {} does not exist",
                     client_path.to_string_lossy()
                 ))
+                .as_error()
             })?
             .to_string_lossy()
             .to_string(),
@@ -70,10 +71,11 @@ pub fn get_lib_path(libraries_path: &Path, lib: &str) -> crate::Result<String> {
     path.push(get_path_from_artifact(lib.as_ref())?);
 
     let path = &path.canonicalize().map_err(|_| {
-        crate::Error::LauncherError(format!(
+        crate::ErrorKind::LauncherError(format!(
             "Library file at path {} does not exist",
             path.to_string_lossy()
         ))
+        .as_error()
     })?;
 
     Ok(path.to_string_lossy().to_string())
@@ -104,10 +106,11 @@ pub fn get_jvm_arguments(
             "-Djava.library.path={}",
             &natives_path
                 .canonicalize()
-                .map_err(|_| crate::Error::LauncherError(format!(
+                .map_err(|_| crate::ErrorKind::LauncherError(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
-                )))?
+                ))
+                .as_error())?
                 .to_string_lossy()
                 .to_string()
         ));
@@ -142,10 +145,11 @@ fn parse_jvm_argument(
             &natives_path
                 .canonicalize()
                 .map_err(|_| {
-                    crate::Error::LauncherError(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified natives path {} does not exist",
                         natives_path.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy(),
         )
@@ -154,10 +158,11 @@ fn parse_jvm_argument(
             &libraries_path
                 .canonicalize()
                 .map_err(|_| {
-                    crate::Error::LauncherError(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified libraries path {} does not exist",
                         libraries_path.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_string(),
@@ -249,10 +254,11 @@ fn parse_minecraft_argument(
             &game_directory
                 .canonicalize()
                 .map_err(|_| {
-                    crate::Error::LauncherError(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified game directory {} does not exist",
                         game_directory.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_owned(),
@@ -262,10 +268,11 @@ fn parse_minecraft_argument(
             &assets_directory
                 .canonicalize()
                 .map_err(|_| {
-                    crate::Error::LauncherError(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
                         assets_directory.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_owned(),
@@ -275,10 +282,11 @@ fn parse_minecraft_argument(
             &assets_directory
                 .canonicalize()
                 .map_err(|_| {
-                    crate::Error::LauncherError(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
                         assets_directory.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_owned(),
@@ -361,17 +369,19 @@ pub async fn get_processor_main_class(
     Ok(tokio::task::spawn_blocking(move || {
         let zipfile = std::fs::File::open(&path)?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
-            crate::Error::LauncherError(format!(
+            crate::ErrorKind::LauncherError(format!(
                 "Cannot read processor at {}",
                 path
             ))
+            .as_error()
         })?;
 
         let file = archive.by_name("META-INF/MANIFEST.MF").map_err(|_| {
-            crate::Error::LauncherError(format!(
+            crate::ErrorKind::LauncherError(format!(
                 "Cannot read processor manifest at {}",
                 path
             ))
+            .as_error()
         })?;
 
         let reader = BufReader::new(file);

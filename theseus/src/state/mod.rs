@@ -39,47 +39,52 @@ pub struct State {
 }
 
 impl State {
+    #[tracing::instrument]
     /// Get the current launcher state, initializing it if needed
     pub async fn get() -> crate::Result<Arc<Self>> {
         LAUNCHER_STATE
-            .get_or_try_init(|| async {
-                // Directories
-                let directories = DirectoryInfo::init().await?;
+            .get_or_try_init(|| {
+                async {
+                    // Directories
+                    let directories = DirectoryInfo::init().await?;
 
-                // Database
-                // TODO: make database versioned
-                let database =
-                    sled_config().path(directories.database_file()).open()?;
+                    // Database
+                    // TODO: make database versioned
+                    let database = sled_config()
+                        .path(directories.database_file())
+                        .open()?;
 
-                // Settings
-                let settings =
-                    Settings::init(&directories.settings_file()).await?;
+                    // Settings
+                    let settings =
+                        Settings::init(&directories.settings_file()).await?;
 
-                // Launcher data
-                let (metadata, profiles) = tokio::try_join! {
-                    Metadata::init(&database),
-                    Profiles::init(&database),
-                }?;
-                let users = Users::init(&database)?;
+                    // Launcher data
+                    let (metadata, profiles) = tokio::try_join! {
+                        Metadata::init(&database),
+                        Profiles::init(&database),
+                    }?;
+                    let users = Users::init(&database)?;
 
-                // Loose initializations
-                let io_semaphore =
-                    Semaphore::new(settings.max_concurrent_downloads);
+                    // Loose initializations
+                    let io_semaphore =
+                        Semaphore::new(settings.max_concurrent_downloads);
 
-                Ok(Arc::new(Self {
-                    database,
-                    directories,
-                    io_semaphore,
-                    metadata,
-                    settings: RwLock::new(settings),
-                    profiles: RwLock::new(profiles),
-                    users: RwLock::new(users),
-                }))
+                    Ok(Arc::new(Self {
+                        database,
+                        directories,
+                        io_semaphore,
+                        metadata,
+                        settings: RwLock::new(settings),
+                        profiles: RwLock::new(profiles),
+                        users: RwLock::new(users),
+                    }))
+                }
             })
             .await
             .map(Arc::clone)
     }
 
+    #[tracing::instrument]
     /// Synchronize in-memory state with persistent state
     pub async fn sync() -> crate::Result<()> {
         let state = Self::get().await?;

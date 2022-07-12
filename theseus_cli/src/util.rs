@@ -1,6 +1,7 @@
 use dialoguer::{Confirm, Input, Select};
 use eyre::Result;
 use std::{borrow::Cow, path::Path};
+use tabled::{Table, Tabled};
 
 // TODO: make primarily async to avoid copies
 
@@ -56,7 +57,11 @@ pub async fn confirm_async(prompt: String, default: bool) -> Result<bool> {
     tokio::task::spawn_blocking(move || confirm(&prompt, default)).await?
 }
 
-// Table display helpers
+// Table helpers
+pub fn table<T: Tabled>(rows: impl IntoIterator<Item = T>) -> Table {
+    Table::new(rows).with(tabled::Style::psql())
+}
+
 pub fn table_path_display(path: &Path) -> String {
     let mut res = path.display().to_string();
 
@@ -65,6 +70,20 @@ pub fn table_path_display(path: &Path) -> String {
     }
 
     res
+}
+
+// Dispatch macros
+macro_rules! dispatch {
+    ($on:expr, $args:tt => {$($option:path),+}) => {
+        match $on {
+            $($option (ref cmd) => dispatch!(@apply cmd => $args)),+
+        }
+    };
+
+    (@apply $cmd:expr => ($($args:expr),*)) => {{
+        use tracing_futures::WithSubscriber;
+        $cmd.run($($args),*).with_current_subscriber().await
+    }};
 }
 
 // Internal helpers

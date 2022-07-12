@@ -15,6 +15,7 @@ use daedalus::{
 use futures::prelude::*;
 use tokio::{fs, sync::OnceCell};
 
+#[tracing::instrument]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
@@ -32,6 +33,7 @@ pub async fn download_minecraft(
     Ok(())
 }
 
+#[tracing::instrument]
 pub async fn download_version_info(
     st: &State,
     version: &GameVersion,
@@ -68,6 +70,7 @@ pub async fn download_version_info(
     Ok(res)
 }
 
+#[tracing::instrument]
 pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
@@ -77,9 +80,12 @@ pub async fn download_client(
     let client_download = version_info
         .downloads
         .get(&d::minecraft::DownloadType::Client)
-        .ok_or(crate::Error::LauncherError(format!(
-            "No client downloads exist for version {version}"
-        )))?;
+        .ok_or(
+            crate::ErrorKind::LauncherError(format!(
+                "No client downloads exist for version {version}"
+            ))
+            .as_error(),
+        )?;
     let path = st
         .directories
         .version_dir(version)
@@ -98,6 +104,7 @@ pub async fn download_client(
     Ok(())
 }
 
+#[tracing::instrument]
 pub async fn download_assets_index(
     st: &State,
     version: &GameVersionInfo,
@@ -125,6 +132,7 @@ pub async fn download_assets_index(
     Ok(res)
 }
 
+#[tracing::instrument]
 pub async fn download_assets(
     st: &State,
     with_legacy: bool,
@@ -179,6 +187,7 @@ pub async fn download_assets(
     Ok(())
 }
 
+#[tracing::instrument]
 pub async fn download_libraries(
     st: &State,
     libraries: &[Library],

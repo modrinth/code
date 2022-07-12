@@ -42,14 +42,16 @@ impl Default for Settings {
 }
 
 impl Settings {
+    #[tracing::instrument]
     pub async fn init(file: &Path) -> crate::Result<Self> {
         if file.exists() {
             fs::read(&file)
                 .await
                 .map_err(|err| {
-                    crate::Error::FSError(format!(
+                    crate::ErrorKind::FSError(format!(
                         "Error reading settings file: {err}"
                     ))
+                    .as_error()
                 })
                 .and_then(|it| {
                     serde_json::from_slice::<Settings>(&it)
@@ -60,13 +62,15 @@ impl Settings {
         }
     }
 
+    #[tracing::instrument]
     pub async fn sync(&self, to: &Path) -> crate::Result<()> {
         fs::write(to, serde_json::to_vec_pretty(self)?)
             .await
             .map_err(|err| {
-                crate::Error::FSError(format!(
+                crate::ErrorKind::FSError(format!(
                     "Error saving settings to file: {err}"
                 ))
+                .as_error()
             })
     }
 }

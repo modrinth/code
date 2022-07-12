@@ -15,12 +15,16 @@ futures = "0.3"
 argh = "0.1"
 paris = { version = "1.5", features = ["macros", "no_logger"] }
 dialoguer = "0.10"
-eyre = "0.6"
 tabled = "0.5"
 dirs = "4.0"
 uuid = {version = "0.8", features = ["v4", "serde"]}
 url = "2.2"
-# TODO: merge logging with paris logging
-pretty_env_logger = "0.4"
-log = "0.4.14"
+
+color-eyre = "0.6"
+eyre = "0.6"
+tracing = "0.1"
+tracing-error = "0.2"
+tracing-futures = "0.2"
+tracing-subscriber = {version = "0.3", features = ["env-filter"]}
+
 webbrowser = "0.7"

@@ -10,6 +10,7 @@ pub mod auth;
 
 mod download;
 
+#[tracing::instrument]
 pub fn parse_rule(rule: &d::minecraft::Rule) -> bool {
     use d::minecraft::{Rule, RuleAction};
 
@@ -43,6 +44,7 @@ macro_rules! processor_rules {
     }
 }
 
+#[tracing::instrument]
 pub async fn launch_minecraft(
     game_version: &str,
     loader_version: &Option<d::modded::LoaderVersion>,
@@ -63,7 +65,7 @@ pub async fn launch_minecraft(
         .versions
         .iter()
         .find(|it| it.id == game_version)
-        .ok_or(crate::Error::LauncherError(format!(
+        .ok_or(crate::ErrorKind::LauncherError(format!(
             "Invalid game version: {game_version}"
         )))?;
 
@@ -130,7 +132,7 @@ pub async fn launch_minecraft(
                         )?)
                         .await?
                         .ok_or_else(|| {
-                            crate::Error::LauncherError(format!(
+                            crate::ErrorKind::LauncherError(format!(
                                 "Could not find processor main class for {}",
                                 processor.jar
                             ))
@@ -144,16 +146,17 @@ pub async fn launch_minecraft(
                     .output()
                     .await
                     .map_err(|err| {
-                        crate::Error::LauncherError(format!(
+                        crate::ErrorKind::LauncherError(format!(
                             "Error running processor: {err}",
                         ))
                     })?;
 
                 if !child.status.success() {
-                    return Err(crate::Error::LauncherError(format!(
+                    return Err(crate::ErrorKind::LauncherError(format!(
                         "Processor error: {}",
                         String::from_utf8_lossy(&child.stderr)
-                    )));
+                    ))
+                    .as_error());
                 }
             }
         }
@@ -202,10 +205,11 @@ pub async fn launch_minecraft(
         .stderr(Stdio::inherit());
 
     command.spawn().map_err(|err| {
-        crate::Error::LauncherError(format!(
+        crate::ErrorKind::LauncherError(format!(
             "Error running Minecraft (minecraft-{} @ {}): {err}",
             &version.id,
             instance_path.display()
         ))
+        .as_error()
     })
 }

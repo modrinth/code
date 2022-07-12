@@ -1,18 +1,18 @@
 //! Profile management subcommand
 use crate::util::{
-    confirm_async, prompt_async, select_async, table_path_display,
+    confirm_async, prompt_async, select_async, table, table_path_display,
 };
 use daedalus::modded::LoaderVersion;
 use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
 use std::path::{Path, PathBuf};
-use tabled::{Table, Tabled};
+use tabled::Tabled;
 use theseus::prelude::*;
-use tokio::{fs, sync::oneshot};
+use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "profile")]
 /// profile management
 pub struct ProfileCommand {
@@ -20,7 +20,7 @@ pub struct ProfileCommand {
     action: ProfileSubcommand,
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand)]
 pub enum ProfileSubcommand {
     Add(ProfileAdd),
@@ -30,7 +30,7 @@ pub enum ProfileSubcommand {
     Run(ProfileRun),
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "add")]
 /// add a new profile to Theseus
 pub struct ProfileAdd {
@@ -40,6 +40,7 @@ pub struct ProfileAdd {
 }
 
 impl ProfileAdd {
+    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -70,7 +71,7 @@ impl ProfileAdd {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "init")]
 /// create a new profile and manage it with Theseus
 pub struct ProfileInit {
@@ -100,6 +101,7 @@ pub struct ProfileInit {
 }
 
 impl ProfileInit {
+    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -259,7 +261,7 @@ impl ProfileInit {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 /// list all managed profiles
 #[argh(subcommand, name = "list")]
 pub struct ProfileList {}
@@ -305,6 +307,7 @@ impl<'a> From<&'a Path> for ProfileRow<'a> {
 }
 
 impl ProfileList {
+    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -318,7 +321,7 @@ impl ProfileList {
             )
         });
 
-        let table = Table::new(rows).with(tabled::Style::psql()).with(
+        let table = table(rows).with(
             tabled::Modify::new(tabled::Column(1..=1))
                 .with(tabled::MaxWidth::wrapping(40)),
         );
@@ -328,7 +331,7 @@ impl ProfileList {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 /// unmanage a profile
 #[argh(subcommand, name = "remove")]
 pub struct ProfileRemove {
@@ -338,6 +341,7 @@ pub struct ProfileRemove {
 }
 
 impl ProfileRemove {
+    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -362,7 +366,7 @@ impl ProfileRemove {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 /// run a profile
 #[argh(subcommand, name = "run")]
 pub struct ProfileRun {
@@ -376,6 +380,7 @@ pub struct ProfileRun {
 }
 
 impl ProfileRun {
+    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -411,14 +416,15 @@ impl ProfileRun {
 }
 
 impl ProfileCommand {
-    pub async fn dispatch(&self, args: &crate::Args) -> Result<()> {
-        match &self.action {
-            ProfileSubcommand::Add(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::Init(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::List(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::Remove(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::Run(ref cmd) => cmd.run(args, self).await,
-        }
+    #[tracing::instrument]
+    pub async fn run(&self, args: &crate::Args) -> Result<()> {
+        dispatch!(&self.action, (args, self) => {
+            ProfileSubcommand::Add,
+            ProfileSubcommand::Init,
+            ProfileSubcommand::List,
+            ProfileSubcommand::Remove,
+            ProfileSubcommand::Run
+        })
     }
 }
 

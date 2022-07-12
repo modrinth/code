@@ -57,20 +57,10 @@
         cli = utils.mkApp {
           drv = self.packages.${system}.theseus-cli;
         };
-        cli-test = utils.mkApp {
-          drv = pkgs.writeShellApplication {
-            name = "theseus-test-cli";
-            runtimeInputs = [
-              (self.packages.${system}.theseus-cli.overrideAttrs (old: old // {
-                release = false;
-              }))
-            ];
-            text = ''
-              DUMMY_ID="$(printf '%0.sa' {1..32})"
-              theseus_cli profile run -t "" -n "Test" -i "$DUMMY_ID" "$@"
-            '';
-          };
-        };
+        cli-dev = utils.mkApp {
+          drv = self.packages.${system}.theseus-cli.overrideAttrs (old: old // {
+            release = false;
+          });
       };
 
       devShell = pkgs.mkShell {

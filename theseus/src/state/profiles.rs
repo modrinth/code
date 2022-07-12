@@ -84,15 +84,17 @@ pub struct JavaSettings {
 }
 
 impl Profile {
+    #[tracing::instrument]
     pub async fn new(
         name: String,
         version: String,
         path: PathBuf,
     ) -> crate::Result<Self> {
         if name.trim().is_empty() {
-            return Err(crate::Error::InputError(String::from(
+            return Err(crate::ErrorKind::InputError(String::from(
                 "Empty name for instance!",
-            )));
+            ))
+            .into());
         }
 
         Ok(Self {
@@ -114,11 +116,13 @@ impl Profile {
 
     // TODO: deduplicate these builder methods
     // They are flat like this in order to allow builder-style usage
+    #[tracing::instrument]
     pub fn with_name(&mut self, name: String) -> &mut Self {
         self.metadata.name = name;
         self
     }
 
+    #[tracing::instrument]
     pub async fn with_icon<'a>(
         &'a mut self,
         icon: &'a Path,
@@ -136,17 +140,20 @@ impl Profile {
 
             Ok(self)
         } else {
-            Err(crate::Error::InputError(format!(
+            Err(crate::ErrorKind::InputError(format!(
                 "Unsupported image type: {ext}"
-            )))
+            ))
+            .into())
         }
     }
 
+    #[tracing::instrument]
     pub fn with_game_version(&mut self, version: String) -> &mut Self {
         self.metadata.game_version = version;
         self
     }
 
+    #[tracing::instrument]
     pub fn with_loader(
         &mut self,
         loader: ModLoader,
@@ -157,6 +164,7 @@ impl Profile {
         self
     }
 
+    #[tracing::instrument]
     pub fn with_java_settings(
         &mut self,
         settings: Option<JavaSettings>,
@@ -165,6 +173,7 @@ impl Profile {
         self
     }
 
+    #[tracing::instrument]
     pub fn with_memory(
         &mut self,
         settings: Option<MemorySettings>,
@@ -173,6 +182,7 @@ impl Profile {
         self
     }
 
+    #[tracing::instrument]
     pub fn with_resolution(
         &mut self,
         resolution: Option<WindowSize>,
@@ -181,6 +191,7 @@ impl Profile {
         self
     }
 
+    #[tracing::instrument]
     pub fn with_hooks(&mut self, hooks: Option<Hooks>) -> &mut Self {
         self.hooks = hooks;
         self
@@ -188,6 +199,7 @@ impl Profile {
 }
 
 impl Profiles {
+    #[tracing::instrument]
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
         let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
             Ok(Default::default()),
@@ -218,19 +230,23 @@ impl Profiles {
         Ok(Self(profiles))
     }
 
+    #[tracing::instrument]
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         self.0.insert(
             profile
                 .path
                 .canonicalize()?
                 .to_str()
-                .ok_or(crate::Error::UTFError(profile.path.clone()))?
+                .ok_or(
+                    crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
+                )?
                 .into(),
             Some(profile),
         );
         Ok(self)
     }
 
+    #[tracing::instrument]
     pub async fn insert_from<'a>(
         &'a mut self,
         path: &'a Path,
@@ -238,12 +254,14 @@ impl Profiles {
         self.insert(Self::read_profile_from_dir(&path.canonicalize()?).await?)
     }
 
+    #[tracing::instrument]
     pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
         let path = PathBuf::from(path.canonicalize()?.to_str().unwrap());
         self.0.remove(&path);
         Ok(self)
     }
 
+    #[tracing::instrument]
     pub async fn sync<'a>(
         &'a self,
         batch: &'a mut sled::Batch,

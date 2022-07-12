@@ -9,6 +9,7 @@ pub use inner::Credentials;
 /// To run this, you need to first spawn this function as a task, then
 /// open a browser to the given URL and finally wait on the spawned future
 /// with the ability to cancel in case the browser is closed before finishing
+#[tracing::instrument]
 pub async fn authenticate(
     browser_url: oneshot::Sender<url::Url>,
 ) -> crate::Result<Credentials> {
@@ -18,7 +19,7 @@ pub async fn authenticate(
 
     let url = flow.prepare_login_url().await?;
     browser_url.send(url).map_err(|url| {
-        crate::Error::OtherError(format!(
+        crate::ErrorKind::OtherError(format!(
             "Error sending browser url to parent: {url}"
         ))
     })?;
@@ -36,6 +37,7 @@ pub async fn authenticate(
 }
 
 /// Refresh some credentials using Hydra, if needed
+#[tracing::instrument]
 pub async fn refresh(
     user: uuid::Uuid,
     update_name: bool,
@@ -44,9 +46,10 @@ pub async fn refresh(
     let mut users = state.users.write().await;
 
     futures::future::ready(users.get(user)?.ok_or_else(|| {
-        crate::Error::OtherError(format!(
+        crate::ErrorKind::OtherError(format!(
             "Tried to refresh nonexistent user with ID {user}"
         ))
+        .as_error()
     }))
     .and_then(|mut credentials| async move {
         if chrono::offset::Utc::now() > credentials.expires {
@@ -62,6 +65,7 @@ pub async fn refresh(
 }
 
 /// Remove a user account from the database
+#[tracing::instrument]
 pub async fn remove(user: uuid::Uuid) -> crate::Result<()> {
     let state = State::get().await?;
     let mut users = state.users.write().await;
@@ -80,6 +84,7 @@ pub async fn remove(user: uuid::Uuid) -> crate::Result<()> {
 }
 
 /// Get a copy of the list of all user credentials
+#[tracing::instrument]
 pub async fn users() -> crate::Result<Box<[Credentials]>> {
     let state = State::get().await?;
     let users = state.users.read().await;
