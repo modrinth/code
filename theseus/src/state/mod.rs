@@ -4,18 +4,20 @@ use std::sync::Arc;
 use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
 
 // Submodules
-macro_rules! submodule {
-    ($name:ident) => {
-        mod $name;
-        pub use self::$name::*;
-    };
-}
+mod dirs;
+pub use self::dirs::*;
 
-submodule!(dirs);
-submodule!(metadata);
-submodule!(profiles);
-submodule!(settings);
-submodule!(users);
+mod metadata;
+pub use self::metadata::*;
+
+mod profiles;
+pub use self::profiles::*;
+
+mod settings;
+pub use self::settings::*;
+
+mod users;
+pub use self::users::*;
 
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
