@@ -4,16 +4,16 @@ use crate::{auth::Credentials, config::BINCODE_CONFIG};
 const USER_DB_TREE: &[u8] = b"users";
 
 /// The set of users stored in the launcher
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub(crate) struct Users(pub(crate) sled::Tree);
 
 impl Users {
-    #[tracing::instrument]
+    #[tracing::instrument(skip(db))]
     pub fn init(db: &sled::Db) -> crate::Result<Self> {
         Ok(Self(db.open_tree(USER_DB_TREE)?))
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub fn insert(
         &mut self,
         credentials: &Credentials,
@@ -26,12 +26,12 @@ impl Users {
         Ok(self)
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     pub fn contains(&self, id: uuid::Uuid) -> crate::Result<bool> {
         Ok(self.0.contains_key(id.as_bytes())?)
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     pub fn get(&self, id: uuid::Uuid) -> crate::Result<Option<Credentials>> {
         self.0.get(id.as_bytes())?.map_or(Ok(None), |prof| {
             bincode::decode_from_slice(&prof, *BINCODE_CONFIG)
@@ -40,7 +40,7 @@ impl Users {
         })
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     pub fn remove(&mut self, id: uuid::Uuid) -> crate::Result<&Self> {
         self.0.remove(id.as_bytes())?;
         Ok(self)

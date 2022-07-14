@@ -49,7 +49,7 @@ impl Metadata {
         })
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
         let mut metadata = None;
 

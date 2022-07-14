@@ -33,7 +33,6 @@ pub struct UserAdd {
 }
 
 impl UserAdd {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -84,7 +83,6 @@ impl<'a> UserRow<'a> {
 }
 
 impl UserList {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -113,7 +111,6 @@ pub struct UserRemove {
 }
 
 impl UserRemove {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -147,7 +144,6 @@ pub struct UserDefault {
 }
 
 impl UserDefault {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,

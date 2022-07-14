@@ -12,7 +12,6 @@ use tokio::fs;
 const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";
 
-#[derive(Debug)]
 pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
 
 // TODO: possibly add defaults to some of these values
@@ -199,7 +198,7 @@ impl Profile {
 }
 
 impl Profiles {
-    #[tracing::instrument]
+    #[tracing::instrument(skip(db))]
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
         let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
             Ok(Default::default()),
@@ -230,7 +229,7 @@ impl Profiles {
         Ok(Self(profiles))
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         self.0.insert(
             profile
@@ -246,7 +245,7 @@ impl Profiles {
         Ok(self)
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     pub async fn insert_from<'a>(
         &'a mut self,
         path: &'a Path,
@@ -254,14 +253,14 @@ impl Profiles {
         self.insert(Self::read_profile_from_dir(&path.canonicalize()?).await?)
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
         let path = PathBuf::from(path.canonicalize()?.to_str().unwrap());
         self.0.remove(&path);
         Ok(self)
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip_all)]
     pub async fn sync<'a>(
         &'a self,
         batch: &'a mut sled::Batch,

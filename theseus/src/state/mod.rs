@@ -21,7 +21,6 @@ pub use self::users::*;
 
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
-#[derive(Debug)]
 pub struct State {
     /// Database, used to store some information
     pub(self) database: sled::Db,

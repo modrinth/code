@@ -44,7 +44,7 @@ macro_rules! processor_rules {
     }
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip_all, fields(path = ?instance_path))]
 pub async fn launch_minecraft(
     game_version: &str,
     loader_version: &Option<d::modded::LoaderVersion>,
@@ -116,8 +116,9 @@ pub async fn launch_minecraft(
                     }
                 }
 
-                let mut cp = processor.classpath.clone();
-                cp.push(processor.jar.clone());
+                let cp = wrap_ref_builder!(cp = processor.classpath.clone() => {
+                    cp.push(processor.jar.clone())
+                });
 
                 let child = Command::new("java")
                     .arg("-cp")
@@ -165,9 +166,7 @@ pub async fn launch_minecraft(
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
         Some(hook) => {
-            let mut cmd = Command::new(hook);
-            cmd.arg(java_install);
-            cmd
+            wrap_ref_builder!(it = Command::new(hook) => {it.arg(java_install)})
         }
         None => Command::new(String::from(java_install.to_string_lossy())),
     };

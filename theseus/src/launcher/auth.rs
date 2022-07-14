@@ -45,7 +45,7 @@ struct ProfileInfoJSON {
 }
 
 // Login information
-#[derive(Debug, Encode, Decode)]
+#[derive(Encode, Decode)]
 pub struct Credentials {
     #[bincode(with_serde)]
     pub id: uuid::Uuid,

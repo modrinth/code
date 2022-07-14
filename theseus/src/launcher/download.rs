@@ -15,7 +15,7 @@ use daedalus::{
 use futures::prelude::*;
 use tokio::{fs, sync::OnceCell};
 
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
@@ -33,7 +33,7 @@ pub async fn download_minecraft(
     Ok(())
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip_all, fields(version = version.id.as_str(), loader = ?loader))]
 pub async fn download_version_info(
     st: &State,
     version: &GameVersion,
@@ -70,7 +70,7 @@ pub async fn download_version_info(
     Ok(res)
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
@@ -104,7 +104,7 @@ pub async fn download_client(
     Ok(())
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 pub async fn download_assets_index(
     st: &State,
     version: &GameVersionInfo,
@@ -132,7 +132,7 @@ pub async fn download_assets_index(
     Ok(res)
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip(st, index))]
 pub async fn download_assets(
     st: &State,
     with_legacy: bool,
@@ -187,7 +187,7 @@ pub async fn download_assets(
     Ok(())
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip(st, libraries))]
 pub async fn download_libraries(
     st: &State,
     libraries: &[Library],

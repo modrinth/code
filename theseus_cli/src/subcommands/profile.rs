@@ -40,7 +40,6 @@ pub struct ProfileAdd {
 }
 
 impl ProfileAdd {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -101,7 +100,6 @@ pub struct ProfileInit {
 }
 
 impl ProfileInit {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -307,7 +305,6 @@ impl<'a> From<&'a Path> for ProfileRow<'a> {
 }
 
 impl ProfileList {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -341,7 +338,6 @@ pub struct ProfileRemove {
 }
 
 impl ProfileRemove {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -380,7 +376,6 @@ pub struct ProfileRun {
 }
 
 impl ProfileRun {
-    #[tracing::instrument]
     pub async fn run(
         &self,
         _args: &crate::Args,
@@ -416,7 +411,6 @@ impl ProfileRun {
 }
 
 impl ProfileCommand {
-    #[tracing::instrument]
     pub async fn run(&self, args: &crate::Args) -> Result<()> {
         dispatch!(&self.action, (args, self) => {
             ProfileSubcommand::Add,

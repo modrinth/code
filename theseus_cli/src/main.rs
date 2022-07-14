@@ -26,8 +26,14 @@ fn main() -> Result<()> {
     let filter = EnvFilter::try_from_default_env()
         .or_else(|_| EnvFilter::try_new("info"))?;
 
+    let format = fmt::layer()
+        .without_time()
+        .with_writer(std::io::stderr)
+        .with_target(false)
+        .compact();
+
     tracing_subscriber::registry()
-        .with(fmt::layer().with_target(false))
+        .with(format)
         .with(filter)
         .with(ErrorLayer::default())
         .init();

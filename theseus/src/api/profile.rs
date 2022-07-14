@@ -110,7 +110,7 @@ pub async fn list(
 }
 
 /// Run Minecraft using a profile
-#[tracing::instrument]
+#[tracing::instrument(skip_all)]
 pub async fn run(
     path: &Path,
     credentials: &crate::auth::Credentials,

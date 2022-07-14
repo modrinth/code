@@ -62,7 +62,7 @@ impl Settings {
         }
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     pub async fn sync(&self, to: &Path) -> crate::Result<()> {
         fs::write(to, serde_json::to_vec_pretty(self)?)
             .await
