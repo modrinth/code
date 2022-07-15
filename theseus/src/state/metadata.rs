@@ -13,6 +13,7 @@ use std::collections::LinkedList;
 const METADATA_URL: &str = "https://meta.modrinth.com/gamedata";
 const METADATA_DB_FIELD: &[u8] = b"metadata";
 
+// TODO: store as subtree in database
 #[derive(Encode, Decode, Debug)]
 pub struct Metadata {
     pub minecraft: MinecraftManifest,
@@ -48,6 +49,7 @@ impl Metadata {
         })
     }
 
+    #[tracing::instrument(skip_all)]
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
         let mut metadata = None;
 
@@ -84,7 +86,10 @@ impl Metadata {
             db.flush_async().await?;
             Ok(meta)
         } else {
-            Err(crate::Error::NoValueFor(String::from("launcher metadata")))
+            Err(
+                crate::ErrorKind::NoValueFor(String::from("launcher metadata"))
+                    .as_error(),
+            )
         }
     }
 }

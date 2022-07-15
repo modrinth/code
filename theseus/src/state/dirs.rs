@@ -10,10 +10,11 @@ pub struct DirectoryInfo {
 
 impl DirectoryInfo {
     /// Get all paths needed for Theseus to operate properly
+    #[tracing::instrument]
     pub async fn init() -> crate::Result<Self> {
         // Working directory
         let working_dir = std::env::current_dir().map_err(|err| {
-            crate::Error::FSError(format!(
+            crate::ErrorKind::FSError(format!(
                 "Could not open working directory: {err}"
             ))
         })?;
@@ -21,12 +22,12 @@ impl DirectoryInfo {
         // Config directory
         let config_dir = Self::env_path("THESEUS_CONFIG_DIR")
             .or_else(|| Some(dirs::config_dir()?.join("theseus")))
-            .ok_or(crate::Error::FSError(
+            .ok_or(crate::ErrorKind::FSError(
                 "Could not find valid config dir".to_string(),
             ))?;
 
         fs::create_dir_all(&config_dir).await.map_err(|err| {
-            crate::Error::FSError(format!(
+            crate::ErrorKind::FSError(format!(
                 "Error creating Theseus config directory: {err}"
             ))
         })?;

@@ -1,27 +1,26 @@
 //! Profile management subcommand
 use crate::util::{
-    confirm_async, prompt_async, select_async, table_path_display,
+    confirm_async, prompt_async, select_async, table, table_path_display,
 };
 use daedalus::modded::LoaderVersion;
 use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
 use std::path::{Path, PathBuf};
-use tabled::{Table, Tabled};
+use tabled::Tabled;
 use theseus::prelude::*;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
-use uuid::Uuid;
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "profile")]
-/// profile management
+/// manage Minecraft instances
 pub struct ProfileCommand {
     #[argh(subcommand)]
     action: ProfileSubcommand,
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand)]
 pub enum ProfileSubcommand {
     Add(ProfileAdd),
@@ -31,7 +30,7 @@ pub enum ProfileSubcommand {
     Run(ProfileRun),
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "add")]
 /// add a new profile to Theseus
 pub struct ProfileAdd {
@@ -71,7 +70,7 @@ impl ProfileAdd {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "init")]
 /// create a new profile and manage it with Theseus
 pub struct ProfileInit {
@@ -260,7 +259,7 @@ impl ProfileInit {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 /// list all managed profiles
 #[argh(subcommand, name = "list")]
 pub struct ProfileList {}
@@ -311,16 +310,15 @@ impl ProfileList {
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
-        let state = State::get().await?;
-        let profiles = state.profiles.read().await;
-        let profiles = profiles.0.iter().map(|(path, prof)| {
+        let profiles = profile::list().await?;
+        let rows = profiles.iter().map(|(path, prof)| {
             prof.as_ref().map_or_else(
                 || ProfileRow::from(path.as_path()),
                 ProfileRow::from,
             )
         });
 
-        let table = Table::new(profiles).with(tabled::Style::psql()).with(
+        let table = table(rows).with(
             tabled::Modify::new(tabled::Column(1..=1))
                 .with(tabled::MaxWidth::wrapping(40)),
         );
@@ -330,7 +328,7 @@ impl ProfileList {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 /// unmanage a profile
 #[argh(subcommand, name = "remove")]
 pub struct ProfileRemove {
@@ -364,7 +362,7 @@ impl ProfileRemove {
     }
 }
 
-#[derive(argh::FromArgs)]
+#[derive(argh::FromArgs, Debug)]
 /// run a profile
 #[argh(subcommand, name = "run")]
 pub struct ProfileRun {
@@ -372,18 +370,9 @@ pub struct ProfileRun {
     /// the profile to run
     profile: PathBuf,
 
-    // TODO: auth
-    #[argh(option, short = 't')]
-    /// the Minecraft token to use for player login. Should be replaced by auth when that is a thing.
-    token: String,
-
-    #[argh(option, short = 'n')]
-    /// the uername to use for running the game
-    name: String,
-
-    #[argh(option, short = 'i')]
-    /// the account id to use for running the game
-    id: Uuid,
+    #[argh(option)]
+    /// the user to authenticate with
+    user: Option<uuid::Uuid>,
 }
 
 impl ProfileRun {
@@ -400,11 +389,18 @@ impl ProfileRun {
            "Profile not managed by Theseus (if it exists, try using `profile add` first!)",
         );
 
-        let credentials = Credentials {
-            id: self.id.clone(),
-            username: self.name.clone(),
-            access_token: self.token.clone(),
-        };
+        let id = future::ready(self.user.ok_or(()))
+            .or_else(|_| async move {
+                let state = State::get().await?;
+                let settings = state.settings.read().await;
+
+                settings.default_user
+                    .ok_or(eyre::eyre!(
+                        "Could not find any users, please add one using the `user add` command."
+                    ))
+            })
+            .await?;
+        let credentials = auth::refresh(id, false).await?;
 
         let mut proc = profile::run(&path, &credentials).await?;
         profile::wait_for(&mut proc).await?;
@@ -415,14 +411,14 @@ impl ProfileRun {
 }
 
 impl ProfileCommand {
-    pub async fn dispatch(&self, args: &crate::Args) -> Result<()> {
-        match &self.action {
-            ProfileSubcommand::Add(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::Init(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::List(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::Remove(ref cmd) => cmd.run(args, self).await,
-            ProfileSubcommand::Run(ref cmd) => cmd.run(args, self).await,
-        }
+    pub async fn run(&self, args: &crate::Args) -> Result<()> {
+        dispatch!(&self.action, (args, self) => {
+            ProfileSubcommand::Add,
+            ProfileSubcommand::Init,
+            ProfileSubcommand::List,
+            ProfileSubcommand::Remove,
+            ProfileSubcommand::Run
+        })
     }
 }
 

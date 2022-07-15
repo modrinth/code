@@ -19,6 +19,7 @@ pub struct Settings {
     pub custom_java_args: Vec<String>,
     pub java_8_path: Option<PathBuf>,
     pub java_17_path: Option<PathBuf>,
+    pub default_user: Option<uuid::Uuid>,
     pub hooks: Hooks,
     pub max_concurrent_downloads: usize,
     pub version: u32,
@@ -32,6 +33,7 @@ impl Default for Settings {
             custom_java_args: Vec::new(),
             java_8_path: None,
             java_17_path: None,
+            default_user: None,
             hooks: Hooks::default(),
             max_concurrent_downloads: 64,
             version: CURRENT_FORMAT_VERSION,
@@ -40,14 +42,16 @@ impl Default for Settings {
 }
 
 impl Settings {
+    #[tracing::instrument]
     pub async fn init(file: &Path) -> crate::Result<Self> {
         if file.exists() {
             fs::read(&file)
                 .await
                 .map_err(|err| {
-                    crate::Error::FSError(format!(
+                    crate::ErrorKind::FSError(format!(
                         "Error reading settings file: {err}"
                     ))
+                    .as_error()
                 })
                 .and_then(|it| {
                     serde_json::from_slice::<Settings>(&it)
@@ -58,13 +62,15 @@ impl Settings {
         }
     }
 
+    #[tracing::instrument(skip(self))]
     pub async fn sync(&self, to: &Path) -> crate::Result<()> {
         fs::write(to, serde_json::to_vec_pretty(self)?)
             .await
             .map_err(|err| {
-                crate::Error::FSError(format!(
+                crate::ErrorKind::FSError(format!(
                     "Error saving settings to file: {err}"
                 ))
+                .as_error()
             })
     }
 }

@@ -10,6 +10,7 @@ use tokio::{
 
 const FETCH_ATTEMPTS: usize = 3;
 
+#[tracing::instrument(skip(_permit))]
 pub async fn fetch<'a>(
     url: &str,
     sha1: Option<&str>,
@@ -25,10 +26,11 @@ pub async fn fetch<'a>(
                 if let Some(hash) = sha1 {
                     let actual_hash = sha1_async(bytes.clone()).await;
                     if actual_hash != hash {
-                        return Err(crate::Error::HashError(
+                        return Err(crate::ErrorKind::HashError(
                             actual_hash,
                             String::from(hash),
-                        ));
+                        )
+                        .into());
                     }
                 }
 
@@ -45,6 +47,7 @@ pub async fn fetch<'a>(
 // This is implemented, as it will be useful in porting modpacks
 // For now, allow it to be dead code
 #[allow(dead_code)]
+#[tracing::instrument(skip(sem))]
 pub async fn fetch_mirrors(
     urls: &[&str],
     sha1: Option<&str>,
@@ -70,6 +73,7 @@ pub async fn fetch_mirrors(
     .map(|it| it.0)
 }
 
+#[tracing::instrument(skip(bytes, _permit))]
 pub async fn write<'a>(
     path: &Path,
     bytes: &[u8],

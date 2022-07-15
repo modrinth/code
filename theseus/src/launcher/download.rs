@@ -13,9 +13,9 @@ use daedalus::{
     modded::LoaderVersion,
 };
 use futures::prelude::*;
-use std::sync::Arc;
 use tokio::{fs, sync::OnceCell};
 
+#[tracing::instrument(skip_all)]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
@@ -33,6 +33,7 @@ pub async fn download_minecraft(
     Ok(())
 }
 
+#[tracing::instrument(skip_all, fields(version = version.id.as_str(), loader = ?loader))]
 pub async fn download_version_info(
     st: &State,
     version: &GameVersion,
@@ -69,6 +70,7 @@ pub async fn download_version_info(
     Ok(res)
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
@@ -78,9 +80,12 @@ pub async fn download_client(
     let client_download = version_info
         .downloads
         .get(&d::minecraft::DownloadType::Client)
-        .ok_or(crate::Error::LauncherError(format!(
-            "No client downloads exist for version {version}"
-        )))?;
+        .ok_or(
+            crate::ErrorKind::LauncherError(format!(
+                "No client downloads exist for version {version}"
+            ))
+            .as_error(),
+        )?;
     let path = st
         .directories
         .version_dir(version)
@@ -99,6 +104,7 @@ pub async fn download_client(
     Ok(())
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn download_assets_index(
     st: &State,
     version: &GameVersionInfo,
@@ -126,6 +132,7 @@ pub async fn download_assets_index(
     Ok(res)
 }
 
+#[tracing::instrument(skip(st, index))]
 pub async fn download_assets(
     st: &State,
     with_legacy: bool,
@@ -180,16 +187,13 @@ pub async fn download_assets(
     Ok(())
 }
 
+#[tracing::instrument(skip(st, libraries))]
 pub async fn download_libraries(
     st: &State,
     libraries: &[Library],
     version: &str,
 ) -> crate::Result<()> {
     log::debug!("Loading libraries");
-    let (libraries_dir, natives_dir) = (
-        Arc::new(st.directories.libraries_dir()),
-        Arc::new(st.directories.version_natives_dir(version)),
-    );
 
     tokio::try_join! {
         fs::create_dir_all(st.directories.libraries_dir()),

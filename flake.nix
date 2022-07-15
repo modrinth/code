@@ -38,8 +38,7 @@
           gtk4 gdk-pixbuf atk webkitgtk dbus
         ];
         shell = [
-          toolchain
-          (with fenix; combine [toolchain default.clippy rust-analyzer])
+          (with fenix; combine [toolchain default.clippy complete.rust-src rust-analyzer])
           git
           jdk17 jdk8
         ];
@@ -58,19 +57,10 @@
         cli = utils.mkApp {
           drv = self.packages.${system}.theseus-cli;
         };
-        cli-test = utils.mkApp {
-          drv = pkgs.writeShellApplication {
-            name = "theseus-test-cli";
-            runtimeInputs = [
-              (self.packages.${system}.theseus-cli.overrideAttrs (old: old // {
-                release = false;
-              }))
-            ];
-            text = ''
-              DUMMY_ID="$(printf '%0.sa' {1..32})"
-              theseus_cli profile run -t "" -n "Test" -i "$DUMMY_ID" "$@"
-            '';
-          };
+        cli-dev = utils.mkApp {
+          drv = self.packages.${system}.theseus-cli.overrideAttrs (old: old // {
+            release = false;
+          });
         };
       };
 

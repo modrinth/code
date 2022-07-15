@@ -8,17 +8,19 @@ mod dirs;
 pub use self::dirs::*;
 
 mod metadata;
-pub use metadata::*;
-
-mod settings;
-pub use settings::*;
+pub use self::metadata::*;
 
 mod profiles;
-pub use profiles::*;
+pub use self::profiles::*;
+
+mod settings;
+pub use self::settings::*;
+
+mod users;
+pub use self::users::*;
 
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
-#[derive(Debug)]
 pub struct State {
     /// Database, used to store some information
     pub(self) database: sled::Db,
@@ -28,52 +30,62 @@ pub struct State {
     pub io_semaphore: Semaphore,
     /// Launcher metadata
     pub metadata: Metadata,
+    // TODO: settings API
     /// Launcher configuration
     pub settings: RwLock<Settings>,
     /// Launcher profile metadata
-    pub profiles: RwLock<Profiles>,
+    pub(crate) profiles: RwLock<Profiles>,
+    /// Launcher user account info
+    pub(crate) users: RwLock<Users>,
 }
 
 impl State {
+    #[tracing::instrument]
     /// Get the current launcher state, initializing it if needed
     pub async fn get() -> crate::Result<Arc<Self>> {
         LAUNCHER_STATE
-            .get_or_try_init(|| async {
-                // Directories
-                let directories = DirectoryInfo::init().await?;
+            .get_or_try_init(|| {
+                async {
+                    // Directories
+                    let directories = DirectoryInfo::init().await?;
 
-                // Database
-                // TODO: make database versioned
-                let database =
-                    sled_config().path(directories.database_file()).open()?;
+                    // Database
+                    // TODO: make database versioned
+                    let database = sled_config()
+                        .path(directories.database_file())
+                        .open()?;
 
-                // Settings
-                let settings =
-                    Settings::init(&directories.settings_file()).await?;
+                    // Settings
+                    let settings =
+                        Settings::init(&directories.settings_file()).await?;
 
-                // Metadata
-                let metadata = Metadata::init(&database).await?;
+                    // Launcher data
+                    let (metadata, profiles) = tokio::try_join! {
+                        Metadata::init(&database),
+                        Profiles::init(&database),
+                    }?;
+                    let users = Users::init(&database)?;
 
-                // Profiles
-                let profiles = Profiles::init(&database).await?;
+                    // Loose initializations
+                    let io_semaphore =
+                        Semaphore::new(settings.max_concurrent_downloads);
 
-                // Loose initializations
-                let io_semaphore =
-                    Semaphore::new(settings.max_concurrent_downloads);
-
-                Ok(Arc::new(Self {
-                    database,
-                    directories,
-                    io_semaphore,
-                    metadata,
-                    settings: RwLock::new(settings),
-                    profiles: RwLock::new(profiles),
-                }))
+                    Ok(Arc::new(Self {
+                        database,
+                        directories,
+                        io_semaphore,
+                        metadata,
+                        settings: RwLock::new(settings),
+                        profiles: RwLock::new(profiles),
+                        users: RwLock::new(users),
+                    }))
+                }
             })
             .await
             .map(Arc::clone)
     }
 
+    #[tracing::instrument]
     /// Synchronize in-memory state with persistent state
     pub async fn sync() -> crate::Result<()> {
         let state = Self::get().await?;
