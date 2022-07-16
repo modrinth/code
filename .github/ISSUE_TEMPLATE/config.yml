@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Discord
+    about: Ask questions on our Discord Server.
+    url: https://discord.gg/EUHuJHt
+  - name: Documentation
+    about: Useful documentation about Modrinth, its API, and how you can contribute.
+    url: https://docs.modrinth.com
