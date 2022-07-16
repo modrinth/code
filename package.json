@@ -1,6 +1,6 @@
 {
 	"name": "omorphia",
-	"version": "0.0.59",
+	"version": "0.0.60",
 	"description": "A beautiful Svelte component & style library",
 	"scripts": {
 		"dev": "vite dev",
