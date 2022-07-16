@@ -11,24 +11,11 @@ export default function sveld() {
 		// TODO: Make more efficient & handle typescript types with `svelte2tsx`
 		async transform(src, id) {
 			if (id.includes('/src/components/')) {
-				const output = {}
-
-				const componentFiles = await fs.readdir(path.resolve('./src/components'))
-
-				for (const fileName of componentFiles.filter((name) => name.endsWith('.svelte'))) {
-					const filePath = path.resolve('./src/components', fileName)
-					const raw = (await fs.readFile(filePath)).toString()
-					output[fileName] = await parseRaw(raw, filePath)
-				}
-
-				try {
-					await fs.mkdir(path.resolve('./generated'))
-				} catch {
-					// Do nothing, directory already exists
-				}
-
-				await fs.writeFile(path.resolve('./generated/COMPONENT_API.json'), JSON.stringify(output))
+				await generateComponentApi()
 			}
+		},
+		async buildStart() {
+			await generateComponentApi()
 		},
 	}
 }
@@ -43,4 +30,24 @@ async function parseRaw(raw, filePath) {
 		filePath,
 		moduleName: filePath,
 	})
+}
+
+async function generateComponentApi() {
+	const output = {}
+
+	const componentFiles = await fs.readdir(path.resolve('./src/components'))
+
+	for (const fileName of componentFiles.filter((name) => name.endsWith('.svelte'))) {
+		const filePath = path.resolve('./src/components', fileName)
+		const raw = (await fs.readFile(filePath)).toString()
+		output[fileName] = await parseRaw(raw, filePath)
+	}
+
+	try {
+		await fs.mkdir(path.resolve('./generated'))
+	} catch {
+		// Do nothing, directory already exists
+	}
+
+	await fs.writeFile(path.resolve('./generated/COMPONENT_API.json'), JSON.stringify(output))
 }
