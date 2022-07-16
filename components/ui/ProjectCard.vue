@@ -310,6 +310,7 @@ export default {
           display: flex;
           align-items: center;
           margin-right: 2rem;
+          cursor: default;
 
           svg {
             width: 1.25rem;

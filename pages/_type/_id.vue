@@ -960,6 +960,7 @@ export default {
       display: flex;
       align-items: center;
       margin-bottom: 0.25rem;
+      cursor: default;
 
       .label {
         margin-right: 0.25rem;

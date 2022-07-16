@@ -31,7 +31,12 @@
         <div class="sidebar__item stats-block">
           <div class="stats-block__item secondary-stat">
             <SunriseIcon class="secondary-stat__icon" aria-hidden="true" />
-            <span class="secondary-stat__text">
+            <span
+              v-tooltip="
+                $dayjs(user.created).format('MMMM D, YYYY [at] h:mm:ss A')
+              "
+              class="secondary-stat__text date"
+            >
               Joined {{ $dayjs(user.created).fromNow() }}
             </span>
           </div>
@@ -327,5 +332,9 @@ export default {
 .primary-stat__counter {
   font-size: var(--font-size-lg);
   font-weight: bold;
+}
+
+.date {
+  cursor: default;
 }
 </style>
