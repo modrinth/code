@@ -120,22 +120,13 @@
       <p>
         When you upload text, software, mods, scripts, graphics, photos, audio,
         videos, links, interactive features and other materials that may be
-        viewed on, or accessed through Modrinth, we refer to it as “Content”.
+        viewed on or accessed through Modrinth, we refer to it as "Content".
       </p>
 
       <ul>
         <li>
-          You must own or have the necessary licenses, rights, consents, and
-          permissions to store, share or distribute the Content that is uploaded
-          under your Modrinth account.
-        </li>
-        <li>
           You are responsible for all activity and Content that is uploaded
           under your Modrinth account.
-        </li>
-        <li>
-          You must not transmit any viruses, worms, malware, or any other code
-          of a destructive nature through Modrinth.
         </li>
         <li>
           You retain all of your ownership rights to your Content. We do not
@@ -150,11 +141,10 @@
         </li>
       </ul>
 
-      <h2>11. Project Rules</h2>
-
       <p>
-        Please read our
-        <nuxt-link to="/legal/rules">Project Rules</nuxt-link>.
+        All Content on Modrinth must obey the
+        <nuxt-link to="/legal/rules">Content Rules</nuxt-link>. Please be aware
+        of these Rules before uploading any Content to Modrinth.
       </p>
     </div>
   </div>

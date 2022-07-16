@@ -176,16 +176,13 @@
           <p v-if="project.status === 'processing'">
             Your project is currently not viewable by people who are not part of
             your team. Please wait for our moderators to manually review your
-            project to see if it abides by our project rules!
+            project to see if it abides by our
+            <nuxt-link to="/legal/rules">content rules!</nuxt-link>
           </p>
           <p v-if="project.status === 'draft'">
             Your project is currently not viewable by people who are not part of
             your team. If your project is ready for review, click the button
             below to make your mod public!
-          </p>
-          <p v-if="project.status === 'abandoned'">
-            Modrinth's moderators have marked your project as abandoned. If you
-            wish to remove this status, please resubmit!
           </p>
           <p v-if="project.moderator_message">
             {{ project.moderator_message.message }}
@@ -494,7 +491,7 @@
             {{ project.title }} is not viewable in search — either because the
             author has marked it as such or because it has been found to be in
             violation of one of
-            <nuxt-link to="/legal/rules">Modrinth's project rules</nuxt-link>.
+            <nuxt-link to="/legal/rules">Modrinth's content rules</nuxt-link>.
             Modrinth makes no guarantees as to whether {{ project.title }} is
             safe for use in a multiplayer context.
           </div>
