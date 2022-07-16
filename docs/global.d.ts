@@ -1,9 +1,8 @@
-/// <reference types="vite-plugin-sveld" />
-
 declare module '$assets/images/*'
 declare module '$locales/*'
-declare module 'insane'
 
-declare module '*.svg' {
-	export { SvelteComponentDev as default } from 'svelte/internal'
+declare module '*.svg?component' {
+	import type { SvelteComponentTyped } from 'svelte/internal'
+	class SVGComponent extends SvelteComponentTyped<{ class: string }> {}
+	export default SVGComponent
 }

@@ -3,11 +3,11 @@
 	"version": "0.0.59",
 	"description": "A beautiful Svelte component & style library",
 	"scripts": {
-		"dev": "svelte-kit dev",
-		"build": "svelte-kit build",
+		"dev": "vite dev",
+		"build": "vite build",
 		"package": "svelte-kit package && merge-dirs package/src package",
 		"watch:package": "svelte-kit package --watch",
-		"preview": "svelte-kit preview",
+		"preview": "vite preview",
 		"prepare": "svelte-kit sync",
 		"check": "svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
@@ -33,7 +33,7 @@
 	"homepage": "https://omorphia.modrinth.com",
 	"devDependencies": {
 		"@sveltejs/adapter-static": "^1.0.0-next.29",
-		"@sveltejs/kit": "1.0.0-next.352",
+		"@sveltejs/kit": "1.0.0-next.377",
 		"@types/cli-progress": "^3.11.0",
 		"@types/marked": "^4.0.3",
 		"@types/throttle-debounce": "^5.0.0",
@@ -50,12 +50,12 @@
 		"prettier-plugin-svelte": "^2.7.0",
 		"sveld": "^0.13.4",
 		"svelte": "^3.48.0",
-		"svelte-check": "^2.7.2",
+		"svelte-check": "^2.8.0",
 		"svelte-intl-precompile": "^0.11.1",
 		"svelte-preprocess": "^4.10.7",
-		"svelte2tsx": "^0.5.5",
 		"tslib": "^2.3.1",
-		"typescript": "~4.6.2"
+		"typescript": "~4.7.4",
+		"vite": "^3.0.0"
 	},
 	"dependencies": {
 		"@iconify-json/carbon": "^1.1.1",
@@ -87,9 +87,17 @@
 		"svelte-use-click-outside": "^1.0.0",
 		"throttle-debounce": "^3.0.1",
 		"undici": "^5.2.0",
-		"unplugin-icons": "^0.13.3"
+		"unplugin-icons": "^0.14.7"
 	},
 	"engines": {
 		"node": ">=16.5.0"
+	},
+	"pnpm": {
+		"peerDependencyRules": {
+			"allowedVersions": {
+				"vite": "^3.0.0",
+				"//": "TODO: remove after upstream PR is merged (https://github.com/mattjennings/mdsvexamples/pull/16)"
+			}
+		}
 	}
 }

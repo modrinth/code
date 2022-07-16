@@ -7,37 +7,28 @@ import { preprocess } from '../../src/config/svelte.js'
 export default function sveld() {
 	return {
 		name: 'vite-plugin-sveld',
+		// This generates a `COMPONENT_API.json` with sveld in the `/_app` folder which is used by the docs about components
+		// TODO: Make more efficient & handle typescript types with `svelte2tsx`
 		async transform(src, id) {
-			if (id.endsWith('?raw&sveld')) {
-				const raw = JSON.parse(src.split('export default ')[1])
+			if (id.includes('/src/components/')) {
+				const output = {}
 
-				const data = await parseRaw(raw, id)
+				const componentFiles = await fs.readdir(path.resolve('./src/components'))
 
-				return {
-					code: `export default ${JSON.stringify(data)}`,
-					map: null,
+				for (const fileName of componentFiles.filter((name) => name.endsWith('.svelte'))) {
+					const filePath = path.resolve('./src/components', fileName)
+					const raw = (await fs.readFile(filePath)).toString()
+					output[fileName] = await parseRaw(raw, filePath)
 				}
+
+				try {
+					await fs.mkdir(path.resolve('./generated'))
+				} catch {
+					// Do nothing, directory already exists
+				}
+
+				await fs.writeFile(path.resolve('./generated/COMPONENT_API.json'), JSON.stringify(output))
 			}
-		},
-		// This generates a `COMPONENT_API.json` with sveld in the `/_app` folder on build, which is used by the docs about components (only when built statically)
-		async buildStart() {
-			const output = {}
-
-			const componentFiles = await fs.readdir(path.resolve('./src/components'))
-
-			for (const fileName of componentFiles.filter((name) => name.endsWith('.svelte'))) {
-				const filePath = path.resolve('./src/components', fileName)
-				const raw = (await fs.readFile(filePath)).toString()
-				output[fileName] = await parseRaw(raw, filePath)
-			}
-
-			try {
-				await fs.mkdir(path.resolve('./generated'))
-			} catch {
-				// Do nothing, directory already exists
-			}
-
-			await fs.writeFile(path.resolve('./generated/COMPONENT_API.json'), JSON.stringify(output))
 		},
 	}
 }

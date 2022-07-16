@@ -1,5 +1,5 @@
 <script lang="ts">
-	import OmorphiaLogo from '../assets/omorphia.svg'
+	import OmorphiaLogo from '../assets/omorphia.svg?component'
 	import IconLogoGithub from 'virtual:icons/carbon/logo-github'
 	import IconChat from 'virtual:icons/heroicons-outline/chat-alt-2'
 	import { onMount } from 'svelte'
