@@ -136,7 +136,7 @@ pub async fn delete_file(
         ?;
 
     if let Some(row) = result {
-        if !user.role.is_mod() {
+        if !user.role.is_admin() {
             let team_member =
                 database::models::TeamMember::get_from_user_id_version(
                     database::models::ids::VersionId(row.version_id),

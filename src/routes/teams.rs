@@ -386,7 +386,7 @@ pub async fn transfer_ownership(
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    if !current_user.role.is_mod() {
+    if !current_user.role.is_admin() {
         let member = TeamMember::get_from_user_id(
             id.into(),
             current_user.id.into(),

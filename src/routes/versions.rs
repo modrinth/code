@@ -217,10 +217,13 @@ pub async fn version_edit(
             .await?;
         let permissions;
 
-        if let Some(member) = team_member {
+        if user.role.is_admin() {
+            permissions = Some(Permissions::ALL)
+        } else if let Some(member) = team_member {
             permissions = Some(member.permissions)
         } else if user.role.is_mod() {
-            permissions = Some(Permissions::ALL)
+            permissions =
+                Some(Permissions::EDIT_DETAILS | Permissions::EDIT_BODY)
         } else {
             permissions = None
         }
@@ -521,7 +524,7 @@ pub async fn version_delete(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id = info.into_inner().0;
 
-    if !user.role.is_mod() {
+    if !user.role.is_admin() {
         let team_member = database::models::TeamMember::get_from_user_id_version(
             id.into(),
             user.id.into(),

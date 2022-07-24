@@ -65,7 +65,7 @@ pub async fn user_follows(
     .await?;
 
     if let Some(id) = id_option {
-        if !user.role.is_mod() && user.id != id.into() {
+        if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to see the projects this user follows!".to_string(),
             ));

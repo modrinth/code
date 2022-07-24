@@ -77,4 +77,11 @@ impl Role {
             Role::Moderator | Role::Admin => true,
         }
     }
+
+    pub fn is_admin(&self) -> bool {
+        match self {
+            Role::Developer | Role::Moderator => false,
+            Role::Admin => true,
+        }
+    }
 }

@@ -39,7 +39,7 @@ pub async fn notifications_get(
 
     let notifications: Vec<Notification> = notifications_data
         .into_iter()
-        .filter(|n| n.user_id == user.id.into() || user.role.is_mod())
+        .filter(|n| n.user_id == user.id.into() || user.role.is_admin())
         .map(Notification::from)
         .collect();
 
@@ -64,7 +64,7 @@ pub async fn notification_get(
         .await?;
 
     if let Some(data) = notification_data {
-        if user.id == data.user_id.into() || user.role.is_mod() {
+        if user.id == data.user_id.into() || user.role.is_admin() {
             Ok(HttpResponse::Ok().json(Notification::from(data)))
         } else {
             Ok(HttpResponse::NotFound().body(""))
@@ -92,7 +92,7 @@ pub async fn notification_delete(
         .await?;
 
     if let Some(data) = notification_data {
-        if data.user_id == user.id.into() || user.role.is_mod() {
+        if data.user_id == user.id.into() || user.role.is_admin() {
             let mut transaction = pool.begin().await?;
 
             database::models::notification_item::Notification::remove(
@@ -142,7 +142,7 @@ pub async fn notifications_delete(
         Vec::new();
 
     for notification in notifications_data {
-        if notification.user_id == user.id.into() || user.role.is_mod() {
+        if notification.user_id == user.id.into() || user.role.is_admin() {
             notifications.push(notification.id);
         }
     }
