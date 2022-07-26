@@ -13,7 +13,7 @@
 	/** Query param name to use (to not use queries, leave this prop blank) */
 	export let query = ''
 
-	export let resetScroll = false
+	export let noScroll: true | null = null
 
 	/** Path level in URL, zero-indexed */
 	export let level = 0
@@ -96,12 +96,10 @@
 				: level === 0
 				? link.href
 				: basePath + link.href}
-			on:click={() => {
-				if (resetScroll) document.body.scrollTo(0, 0)
-			}}
 			class="navigation__link"
 			class:is-active={index === activeIndex}
-			sveltekit:noscroll={!resetScroll || null}
+			sveltekit:noscroll={noScroll}
+			sveltekit:prefetch
 			bind:this={linkElements[index]}>
 			{link.label}
 		</a>
