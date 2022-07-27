@@ -202,6 +202,71 @@ impl TeamMember {
         Ok(team_members)
     }
 
+    pub async fn get_from_team_full_many<'a, E>(
+        team_ids: Vec<TeamId>,
+        exec: E,
+    ) -> Result<Vec<QueryTeamMember>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        use futures::stream::TryStreamExt;
+
+        let team_ids_parsed: Vec<i64> =
+            team_ids.into_iter().map(|x| x.0).collect();
+
+        let teams = sqlx::query!(
+            "
+            SELECT tm.id id, tm.team_id team_id, tm.role member_role, tm.permissions permissions, tm.accepted accepted,
+            u.id user_id, u.github_id github_id, u.name user_name, u.email email,
+            u.avatar_url avatar_url, u.username username, u.bio bio,
+            u.created created, u.role user_role
+            FROM team_members tm
+            INNER JOIN users u ON u.id = tm.user_id
+            WHERE tm.team_id = ANY($1)
+            ORDER BY tm.team_id
+            ",
+            &team_ids_parsed
+        )
+          .fetch_many(exec)
+          .try_filter_map(|e| async {
+              if let Some(m) = e.right() {
+                  let permissions = Permissions::from_bits(m.permissions as u64);
+                  if let Some(perms) = permissions {
+                      Ok(Some(Ok(QueryTeamMember {
+                          id: TeamMemberId(m.id),
+                          team_id: TeamId(m.team_id),
+                          role: m.member_role,
+                          permissions: perms,
+                          accepted: m.accepted,
+                          user: User {
+                              id: UserId(m.user_id),
+                              github_id: m.github_id,
+                              name: m.user_name,
+                              email: m.email,
+                              avatar_url: m.avatar_url,
+                              username: m.username,
+                              bio: m.bio,
+                              created: m.created,
+                              role: m.user_role,
+                          },
+                      })))
+                  } else {
+                      Ok(Some(Err(super::DatabaseError::Bitflag)))
+                  }
+              } else {
+                  Ok(None)
+              }
+          })
+          .try_collect::<Vec<Result<QueryTeamMember, super::DatabaseError>>>()
+          .await?;
+
+        let team_members = teams
+            .into_iter()
+            .collect::<Result<Vec<QueryTeamMember>, super::DatabaseError>>()?;
+
+        Ok(team_members)
+    }
+
     /// Lists the team members for a user.  Does not list pending requests.
     pub async fn get_from_user_public<'a, 'b, E>(
         id: UserId,
@@ -332,6 +397,59 @@ impl TeamMember {
         } else {
             Ok(None)
         }
+    }
+
+    /// Gets team members from user ids and team ids.  Does not return pending members.
+    pub async fn get_from_user_id_many<'a, 'b, E>(
+        team_ids: Vec<TeamId>,
+        user_id: UserId,
+        executor: E,
+    ) -> Result<Vec<Self>, super::DatabaseError>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use futures::stream::TryStreamExt;
+
+        let team_ids_parsed: Vec<i64> =
+            team_ids.into_iter().map(|x| x.0).collect();
+
+        let team_members = sqlx::query!(
+            "
+            SELECT id, team_id, user_id, role, permissions, accepted
+            FROM team_members
+            WHERE (team_id = ANY($1) AND user_id = $2 AND accepted = TRUE)
+            ",
+            &team_ids_parsed,
+            user_id as UserId
+        )
+        .fetch_many(executor)
+        .try_filter_map(|e| async {
+            if let Some(m) = e.right() {
+                let permissions = Permissions::from_bits(m.permissions as u64);
+                if let Some(perms) = permissions {
+                    Ok(Some(Ok(TeamMember {
+                        id: TeamMemberId(m.id),
+                        team_id: TeamId(m.team_id),
+                        user_id,
+                        role: m.role,
+                        permissions: perms,
+                        accepted: m.accepted,
+                    })))
+                } else {
+                    Ok(Some(Err(super::DatabaseError::Bitflag)))
+                }
+            } else {
+                Ok(None)
+            }
+        })
+        .try_collect::<Vec<Result<TeamMember, super::DatabaseError>>>()
+        .await?;
+
+        let team_members = team_members
+            .into_iter()
+            .collect::<Result<Vec<TeamMember>, super::DatabaseError>>()?;
+
+        Ok(team_members)
     }
 
     /// Gets a team member from a user id and team id, including pending members.

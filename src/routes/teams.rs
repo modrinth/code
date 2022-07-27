@@ -101,6 +101,63 @@ pub async fn team_members_get(
     Ok(HttpResponse::Ok().json(team_members))
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct TeamIds {
+    pub ids: String,
+}
+
+#[get("teams")]
+pub async fn teams_get(
+    req: HttpRequest,
+    web::Query(ids): web::Query<TeamIds>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    use itertools::Itertools;
+
+    let team_ids = serde_json::from_str::<Vec<TeamId>>(&*ids.ids)?
+        .into_iter()
+        .map(|x| x.into())
+        .collect::<Vec<crate::database::models::ids::TeamId>>();
+
+    let teams_data =
+        TeamMember::get_from_team_full_many(team_ids.clone(), &**pool).await?;
+
+    let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
+    let accepted = if let Some(user) = current_user {
+        TeamMember::get_from_user_id_many(team_ids, user.id.into(), &**pool)
+            .await?
+            .into_iter()
+            .map(|m| m.team_id.0)
+            .collect()
+    } else {
+        std::collections::HashSet::new()
+    };
+
+    let teams_groups = teams_data.into_iter().group_by(|data| data.team_id.0);
+
+    let mut teams: Vec<Vec<crate::models::teams::TeamMember>> = vec![];
+
+    for (id, member_data) in &teams_groups {
+        if accepted.contains(&id) {
+            let team_members = member_data.map(|data| {
+                crate::models::teams::TeamMember::from(data, false)
+            });
+
+            teams.push(team_members.collect());
+
+            continue;
+        }
+
+        let team_members = member_data
+            .filter(|x| x.accepted)
+            .map(|data| crate::models::teams::TeamMember::from(data, true));
+
+        teams.push(team_members.collect());
+    }
+
+    Ok(HttpResponse::Ok().json(teams))
+}
+
 #[post("{id}/join")]
 pub async fn join_team(
     req: HttpRequest,
