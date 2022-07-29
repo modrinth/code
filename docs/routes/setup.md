@@ -66,9 +66,7 @@ Add the following parts to your `svelte.config.js` file:
 
 ```js
 import adapter from '@sveltejs/adapter-auto'
-import { preprocess, plugins } from 'omorphia/config/svelte'
-import precompileIntl from 'svelte-intl-precompile/sveltekit-plugin'
-import { Generator } from 'omorphia/plugins'
+import { preprocess } from 'omorphia/config/svelte'
 import path from 'path'
 
 /** @type {import('@sveltejs/kit').Config} */
@@ -81,24 +79,6 @@ const config = {
 		alias: {
 			$generated: path.resolve('./generated'),
 			$stores: path.resolve('./src/stores'),
-		},
-
-		vite: {
-			plugins: [
-				...plugins,
-				precompileIntl('locales'),
-				Generator({
-					gameVersions: true,
-					openapi: true,
-					// Add more if needed
-				}),
-			],
-
-			server: {
-				fs: {
-					allow: ['generated'],
-				},
-			},
 		},
 	},
 }
@@ -114,7 +94,38 @@ import { writable } from 'svelte/store'
 export const token = writable('')
 ```
 
-## `5.` Configure PostCSS
+## `5.` Configure Vite
+
+Add the following to your `vite.config.js` file:
+
+```js
+import { plugins } from 'omorphia/config/vite.js'
+import { Generator } from 'omorphia/plugins'
+import precompileIntl from 'svelte-intl-precompile/sveltekit-plugin'
+
+/** @type {import('vite').UserConfig} */
+const config = {
+	plugins: [
+		...plugins,
+		precompileIntl('locales'),
+		Generator({
+			gameVersions: true,
+			openapi: true,
+			// Add more if needed
+		}),
+	],
+
+	server: {
+		fs: {
+			allow: ['generated'],
+		},
+	},
+}
+
+export default config
+```
+
+## `6.` Configure PostCSS
 
 Create a `postcss.config.cjs` file in the root of your project.
 
@@ -124,7 +135,7 @@ Add the following line to that file:
 module.exports = require('omorphia/config/postcss.cjs')
 ```
 
-## `6.` Setup styles
+## `7.` Setup styles
 
 Import styles in `src/routes/__layout.svelte`:
 
@@ -142,7 +153,7 @@ Add the `base` class and a theme to the `<body>` tag in `src/app.html`:
 </body>
 ```
 
-## `7.` Setup fonts
+## `8.` Setup fonts
 
 Copy the the `fonts/` folder from [Omorphia's repository](https://github.com/modrinth/omorphia/blob/main/docs/static/assets/fonts) and place them in the `static/` folder at the root of your project.
 
@@ -151,14 +162,14 @@ Add the following preload tags to your head in `app.html` to speed up font loadi
 <!-- prettier-ignore-start -->
 ```html
 <head>
-  <link rel="preload" href="/assets/fonts/InterRegular.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/assets/fonts/InterBold.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/assets/fonts/InterSemiBold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/InterRegular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/InterBold.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/InterSemiBold.woff2" as="font" type="font/woff2" crossorigin>
 </head>
 ```
 <!-- prettier-ignore-end -->
 
-## `8.` Using Omorphia
+## `9.` Using Omorphia
 
 ### Developing
 
