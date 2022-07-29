@@ -144,7 +144,7 @@ Add the `base` class and a theme to the `<body>` tag in `src/app.html`:
 
 ## `7.` Setup fonts
 
-Copy the the `fonts/` folder from [Omorphia's repository](https://github.com/modrinth/omorphia/blob/main/docs/static/assets/fonts) and place them in the `/assets` folder at the root of your project.
+Copy the the `fonts/` folder from [Omorphia's repository](https://github.com/modrinth/omorphia/blob/main/docs/static/assets/fonts) and place them in the `static/` folder at the root of your project.
 
 Add the following preload tags to your head in `app.html` to speed up font loading:
 
