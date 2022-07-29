@@ -4,7 +4,7 @@
  */
 
 const rft = new Intl.RelativeTimeFormat(
-	typeof navigator !== 'undefined' ? [...navigator.languages] : ['en'],
+	typeof navigator !== 'undefined' ? [...navigator?.languages] : ['en'],
 	{ numeric: 'auto' }
 )
 

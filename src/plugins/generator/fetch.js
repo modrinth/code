@@ -12,7 +12,7 @@ export async function fetch(route, options = {}) {
 	if (!version) {
 		version = JSON.parse(await fs.readFile('./package.json', 'utf8')).version
 	}
-	return baseFetch(API_URL + route, {
+	return baseFetch((route.startsWith('http') ? '' : API_URL) + route, {
 		...options,
 		headers: {
 			'user-agent': `Omorphia / ${version} (venashial@modrinth.com)`,
