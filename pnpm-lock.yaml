@@ -26,7 +26,7 @@ specifiers:
   jimp: ^0.16.1
   marked: ^4.0.12
   mdsvex: ^0.10.5
-  mdsvexamples: ^0.3.0
+  mdsvexamples: ^0.3.1
   merge-dirs: ^0.2.1
   nodemon: ^2.0.15
   openapi-typescript: ^5.4.0
@@ -101,7 +101,7 @@ devDependencies:
   eslint-config-prettier: 8.5.0_eslint@7.32.0
   eslint-plugin-svelte3: 3.4.1_6wevxxng4y4ff26nzlndg2wnpa
   mdsvex: 0.10.5_svelte@3.48.0
-  mdsvexamples: 0.3.0_vite@3.0.0
+  mdsvexamples: 0.3.1_vite@3.0.0
   merge-dirs: 0.2.1
   nodemon: 2.0.15
   prettier: 2.6.2
@@ -1365,7 +1365,6 @@ packages:
     resolution: {integrity: sha512-Xx54uLJQZ19lKygFXOWsscKUbsBZW0CPykPhVQdhIeIwrbPmJzqeASDInc8nKBnp/JT6igTs82qPXz069H8I/A==}
     engines: {node: '>=0.4.0'}
     hasBin: true
-    dev: false
 
   /ajv/6.12.6:
     resolution: {integrity: sha512-j3fVLgvTo527anyYyJOGTYJbG+vnnQYvE0m5mmkc1TK+nxAppkCLMIL0aZ4dblVCNoGShhm+kzE4ZUykBoMg4g==}
@@ -3281,14 +3280,14 @@ packages:
       vfile-message: 2.0.4
     dev: true
 
-  /mdsvexamples/0.3.0_vite@3.0.0:
-    resolution: {integrity: sha512-d662JjeT0Vw+XPwc2u+DAnGq+x8JMNJa17vMQpT+uvHJpkBs5Uszm0oDoU3LHmI1ZVB/Hq17HVrr0N/IUFQUJg==}
+  /mdsvexamples/0.3.1_vite@3.0.0:
+    resolution: {integrity: sha512-bCtJQODJHJIlHT6t+2wHNnZ2TyV4qBqDzhPRcaNj4VUV+q+AVs7fk6v+h890IRNitMUlOlfhpDOa4C/S++zW3Q==}
     dependencies:
       abstract-syntax-tree: 2.20.5
       prism-svelte: 0.5.0
       prismjs: 1.27.0
       unist-util-visit: 4.1.0
-      unplugin: 0.6.2_vite@3.0.0
+      unplugin: 0.7.2_vite@3.0.0
       upath: 2.0.1
     transitivePeerDependencies:
       - esbuild
@@ -5390,29 +5389,6 @@ packages:
       - webpack
     dev: false
 
-  /unplugin/0.6.2_vite@3.0.0:
-    resolution: {integrity: sha512-+QONc2uBFQbeo4x5mlJHjTKjR6pmuchMpGVrWhwdGFFMb4ttFZ4E9KqhOOrNcm3Q8NNyB1vJ4s5e36IZC7UWYw==}
-    peerDependencies:
-      esbuild: '>=0.13'
-      rollup: ^2.50.0
-      vite: ^2.3.0 || ^3.0.0
-      webpack: 4 || 5
-    peerDependenciesMeta:
-      esbuild:
-        optional: true
-      rollup:
-        optional: true
-      vite:
-        optional: true
-      webpack:
-        optional: true
-    dependencies:
-      chokidar: 3.5.3
-      vite: 3.0.0
-      webpack-sources: 3.2.3
-      webpack-virtual-modules: 0.4.3
-    dev: true
-
   /unplugin/0.7.2_vite@3.0.0:
     resolution: {integrity: sha512-m7thX4jP8l5sETpLdUASoDOGOcHaOVtgNyrYlToyQUvILUtEzEnngRBrHnAX3IKqooJVmXpoa/CwQ/QqzvGaHQ==}
     peerDependencies:
@@ -5435,7 +5411,6 @@ packages:
       vite: 3.0.0
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.4.4
-    dev: false
 
   /upath/2.0.1:
     resolution: {integrity: sha512-1uEe95xksV1O0CYKXo8vQvN1JEbtJp7lb7C5U9HMsIp6IVwntkH/oNUzyVNQSd4S1sYk2FpSSW44FqMc8qee5w==}
@@ -5536,13 +5511,8 @@ packages:
     resolution: {integrity: sha512-/DyMEOrDgLKKIG0fmvtz+4dUX/3Ghozwgm6iPp8KRhvn+eQf9+Q7GWxVNMk3+uCPWfdXYC4ExGBckIXdFEfH1w==}
     engines: {node: '>=10.13.0'}
 
-  /webpack-virtual-modules/0.4.3:
-    resolution: {integrity: sha512-5NUqC2JquIL2pBAAo/VfBP6KuGkHIZQXW/lNKupLPfhViwh8wNsu0BObtl09yuKZszeEUfbXz8xhrHvSG16Nqw==}
-    dev: true
-
   /webpack-virtual-modules/0.4.4:
     resolution: {integrity: sha512-h9atBP/bsZohWpHnr+2sic8Iecb60GxftXsWNLLLSqewgIsGzByd2gcIID4nXcG+3tNe4GQG3dLcff3kXupdRA==}
-    dev: false
 
   /whatwg-url/5.0.0:
     resolution: {integrity: sha1-lmRU6HZUYuN2RNNib2dCzotwll0=}

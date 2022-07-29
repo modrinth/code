@@ -1,5 +1,5 @@
 import { sveltekit } from '@sveltejs/kit/vite'
-import { plugins } from './src/config/svelte.js'
+import { plugins } from './src/config/vite.js'
 import examples from 'mdsvexamples/vite'
 import sveld from './docs/plugins/sveld.js'
 import Generator from './src/plugins/generator/index.js'

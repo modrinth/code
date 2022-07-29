@@ -14,8 +14,36 @@
 	--font-weight-bold: 700;
 
 	/* Font stacks */
-	--body-font: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica Neue, Helvetica,
+	--body-font: Inter, Times;
+	/* --body-font: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica Neue, Helvetica,
 		Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, 'Apple Color Emoji', 'Segoe UI Emoji',
-		Arial, sans-serif;
+		Arial, sans-serif; */
 	--mono-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
+
+	/* inter-regular - latin */
+	@font-face {
+		font-family: 'Inter';
+		font-style: normal;
+		font-weight: 400;
+		font-display: fallback;
+		src: local(''), url('/assets/fonts/InterRegular.woff2') format('woff2');
+	}
+
+	/* inter-600 - latin */
+	@font-face {
+		font-family: 'Inter';
+		font-style: normal;
+		font-weight: 600;
+		font-display: fallback;
+		src: local(''), url('/assets/fonts/InterSemiBold.woff2') format('woff2');
+	}
+
+	/* inter-700 - latin */
+	@font-face {
+		font-family: 'Inter';
+		font-style: normal;
+		font-weight: 700;
+		font-display: fallback;
+		src: local(''), url('/assets/fonts/InterBold.woff2') format('woff2');
+	}
 }
