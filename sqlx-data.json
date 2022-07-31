@@ -1707,48 +1707,6 @@
     },
     "query": "\n            SELECT id, user_id, role, permissions, accepted\n            FROM team_members\n            WHERE (team_id = $1 AND user_id = $2 AND accepted = TRUE)\n            "
   },
-  "4c0ddff96476162ed90800cc91147edec58f12d6d2bc09e67308ed678ac7009f": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int4"
-        },
-        {
-          "name": "category",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "icon",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "header",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "project_type",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": []
-      }
-    },
-    "query": "\n            SELECT c.id id, c.category category, c.icon icon, c.header header, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ORDER BY c.id\n            "
-  },
   "4ccf5373d9593fd19622dba270ae2b194f8029f2fb05ad00ff6b3f2ac4d589b0": {
     "describe": {
       "columns": [
@@ -3463,6 +3421,48 @@
       }
     },
     "query": "\n            SELECT id, team_id, role, permissions, accepted\n            FROM team_members\n            WHERE user_id = $1\n            "
+  },
+  "8b2e65cec164bb84de6929b1c2afeee28b36d0e36edea75baceaf97d7574bdd7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int4"
+        },
+        {
+          "name": "category",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "icon",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "category_header",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "project_type",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\n            SELECT c.id id, c.category category, c.icon icon, c.header category_header, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ORDER BY c.id\n            "
   },
   "8b867ee091fe5ffa83eea1a2ca12ce42c6649b84bf9b086f59a288708a61d32c": {
     "describe": {

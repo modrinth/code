@@ -149,7 +149,7 @@ impl Category {
     {
         let result = sqlx::query!(
             "
-            SELECT c.id id, c.category category, c.icon icon, c.header header, pt.name project_type
+            SELECT c.id id, c.category category, c.icon icon, c.header category_header, pt.name project_type
             FROM categories c
             INNER JOIN project_types pt ON c.project_type = pt.id
             ORDER BY c.id
@@ -162,7 +162,7 @@ impl Category {
                 category: c.category,
                 project_type: c.project_type,
                 icon: c.icon,
-                header: c.header
+                header: c.category_header
             }))
         })
         .try_collect::<Vec<Category>>()
