@@ -643,7 +643,7 @@ impl Project {
             LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
             LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON mc.joining_category_id = c.id
+            LEFT JOIN categories c ON mc.joining_category_id = c.id AND mc.is_additional = FALSE
             LEFT JOIN categories ca ON mc.joining_category_id = c.id AND mc.is_additional = TRUE
             LEFT JOIN versions v ON v.mod_id = m.id
             LEFT JOIN mods_gallery mg ON mg.mod_id = m.id

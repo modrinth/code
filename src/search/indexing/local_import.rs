@@ -17,12 +17,12 @@ pub async fn index_local(
             m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,
             m.team_id team_id, m.license license, m.slug slug,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
-            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories, ARRAY_AGG(DISTINCT cp.category) filter (where cp.category is not null) primary_categories, ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders, ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null) versions,
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories, ARRAY_AGG(DISTINCT ca.category) filter (where ca.category is not null) additional_categories, ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders, ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null) gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
-            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
-            LEFT OUTER JOIN categories cp ON mc.joining_category_id = c.id AND mc.is_additional = FALSE
+            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id AND mc.is_additional = FALSE
+            LEFT OUTER JOIN categories ca ON mc.joining_category_id = ca.id AND mc.is_additional = TRUE
             LEFT OUTER JOIN versions v ON v.mod_id = m.id
             LEFT OUTER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
             LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id
@@ -47,7 +47,13 @@ pub async fn index_local(
             .try_filter_map(|e| async {
                 Ok(e.right().map(|m| {
                     let mut categories = m.categories.unwrap_or_default();
+
                     categories.append(&mut m.loaders.unwrap_or_default());
+
+                    let primary_categories = categories.clone();
+
+                    categories.append(&mut m.additional_categories.unwrap_or_default());
+
                     let versions = m.versions.unwrap_or_default();
 
                     let project_id: crate::models::projects::ProjectId = ProjectId(m.id).into();
@@ -73,7 +79,7 @@ pub async fn index_local(
                         slug: m.slug,
                         project_type: m.project_type_name,
                         gallery: m.gallery.unwrap_or_default(),
-                        display_categories: m.primary_categories.unwrap_or_default()
+                        display_categories: primary_categories
                     }
                 }))
             })
