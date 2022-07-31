@@ -1,8 +1,7 @@
 [package]
 name = "labrinth"
-version = "2.4.4"
-#Team members, please add your emails and usernames
-authors = ["geometrically <jai.a@tuta.io>", "Redblueflame <contact@redblueflame.com>", "Aeledfyr <aeledfyr@gmail.com>", "Charalampos Fanoulis <yo@fanoulis.dev>", "AppleTheGolden <scotsbox@protonmail.com>"]
+version = "2.5.0"
+authors = ["geometrically <jai@modrinth.com>"]
 edition = "2018"
 license = "AGPL-3.0"
 
@@ -31,7 +30,7 @@ xml-rs = "0.8.4"
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
 serde_with = "1.12.0"
-time = { version = "0.2.27", features = ["serde"] }
+chrono = { version = "0.4.19", features = ["serde"]}
 rand = "0.8.5"
 base64 = "0.13.0"
 sha1 = { version = "0.6.1", features = ["std"] }
@@ -57,7 +56,7 @@ futures-timer = "3.0.2"
 rust-s3 = "0.30.0"
 async-trait = "0.1.53"
 
-sqlx = { version = "0.5.11", features = ["runtime-actix-rustls", "postgres", "time", "offline", "macros", "migrate"] }
+sqlx = { version = "0.6.0", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate"] }
 
 bytes = "1.1.0"
 

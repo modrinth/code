@@ -7,9 +7,9 @@ use crate::validate::modpack::ModpackValidator;
 use crate::validate::plugin::*;
 use crate::validate::quilt::QuiltValidator;
 use crate::validate::resourcepack::{PackValidator, TexturePackValidator};
+use chrono::{DateTime, Utc};
 use std::io::Cursor;
 use thiserror::Error;
-use time::OffsetDateTime;
 use zip::ZipArchive;
 
 mod fabric;
@@ -59,8 +59,8 @@ impl ValidationResult {
 
 pub enum SupportedGameVersions {
     All,
-    PastDate(OffsetDateTime),
-    Range(OffsetDateTime, OffsetDateTime),
+    PastDate(DateTime<Utc>),
+    Range(DateTime<Utc>, DateTime<Utc>),
     #[allow(dead_code)]
     Custom(Vec<GameVersion>),
 }

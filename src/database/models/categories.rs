@@ -1,7 +1,8 @@
 use super::ids::*;
 use super::DatabaseError;
+use chrono::DateTime;
+use chrono::Utc;
 use futures::TryStreamExt;
-use time::OffsetDateTime;
 
 pub struct ProjectType {
     pub id: ProjectTypeId,
@@ -20,7 +21,7 @@ pub struct GameVersion {
     pub id: GameVersionId,
     pub version: String,
     pub version_type: String,
-    pub date: OffsetDateTime,
+    pub date: DateTime<Utc>,
     pub major: bool,
 }
 
@@ -29,6 +30,7 @@ pub struct Category {
     pub category: String,
     pub project_type: String,
     pub icon: String,
+    pub header: String,
 }
 
 pub struct ReportType {
@@ -52,6 +54,7 @@ pub struct CategoryBuilder<'a> {
     pub name: Option<&'a str>,
     pub project_type: Option<&'a ProjectTypeId>,
     pub icon: Option<&'a str>,
+    pub header: Option<&'a str>,
 }
 
 impl Category {
@@ -60,6 +63,7 @@ impl Category {
             name: None,
             project_type: None,
             icon: None,
+            header: None,
         }
     }
 
@@ -145,7 +149,7 @@ impl Category {
     {
         let result = sqlx::query!(
             "
-            SELECT c.id id, c.category category, c.icon icon, pt.name project_type
+            SELECT c.id id, c.category category, c.icon icon, c.header header, pt.name project_type
             FROM categories c
             INNER JOIN project_types pt ON c.project_type = pt.id
             ORDER BY c.id
@@ -158,6 +162,7 @@ impl Category {
                 category: c.category,
                 project_type: c.project_type,
                 icon: c.icon,
+                header: c.header
             }))
         })
         .try_collect::<Vec<Category>>()
@@ -211,6 +216,16 @@ impl<'a> CategoryBuilder<'a> {
         }
     }
 
+    pub fn header(
+        self,
+        header: &'a str,
+    ) -> Result<CategoryBuilder<'a>, DatabaseError> {
+        Ok(Self {
+            header: Some(header),
+            ..self
+        })
+    }
+
     pub fn project_type(
         self,
         project_type: &'a ProjectTypeId,
@@ -243,13 +258,14 @@ impl<'a> CategoryBuilder<'a> {
         })?;
         let result = sqlx::query!(
             "
-            INSERT INTO categories (category, project_type, icon)
-            VALUES ($1, $2, $3)
+            INSERT INTO categories (category, project_type, icon, header)
+            VALUES ($1, $2, $3, $4)
             RETURNING id
             ",
             self.name,
             id as ProjectTypeId,
-            self.icon
+            self.icon,
+            self.header
         )
         .fetch_one(exec)
         .await?;
@@ -327,7 +343,7 @@ impl Loader {
         let result = sqlx::query!(
             "
             SELECT l.id id, l.loader loader, l.icon icon,
-            ARRAY_AGG(DISTINCT pt.name) project_types
+            ARRAY_AGG(DISTINCT pt.name) filter (where pt.name is not null) project_types
             FROM loaders l
             LEFT OUTER JOIN loaders_project_types lpt ON joining_loader_id = l.id
             LEFT OUTER JOIN project_types pt ON lpt.joining_project_type_id = pt.id
@@ -470,7 +486,7 @@ impl<'a> LoaderBuilder<'a> {
 pub struct GameVersionBuilder<'a> {
     pub version: Option<&'a str>,
     pub version_type: Option<&'a str>,
-    pub date: Option<&'a OffsetDateTime>,
+    pub date: Option<&'a DateTime<Utc>>,
 }
 
 impl GameVersion {
@@ -688,10 +704,7 @@ impl<'a> GameVersionBuilder<'a> {
         }
     }
 
-    pub fn created(
-        self,
-        created: &'a OffsetDateTime,
-    ) -> GameVersionBuilder<'a> {
+    pub fn created(self, created: &'a DateTime<Utc>) -> GameVersionBuilder<'a> {
         Self {
             date: Some(created),
             ..self
@@ -719,7 +732,7 @@ impl<'a> GameVersionBuilder<'a> {
             ",
             self.version,
             self.version_type,
-            self.date.map(|x| time::PrimitiveDateTime::new(x.date(), x.time())),
+            self.date.map(chrono::DateTime::naive_utc),
         )
         .fetch_one(exec)
         .await?;

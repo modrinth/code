@@ -1,8 +1,8 @@
 use crate::validate::{
     SupportedGameVersions, ValidationError, ValidationResult,
 };
+use chrono::{DateTime, NaiveDateTime, Utc};
 use std::io::Cursor;
-use time::OffsetDateTime;
 use zip::ZipArchive;
 
 pub struct QuiltValidator;
@@ -21,9 +21,9 @@ impl super::Validator for QuiltValidator {
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
-        // Time since release of 18w49a, the first fabric version
-        SupportedGameVersions::PastDate(OffsetDateTime::from_unix_timestamp(
-            1646070100,
+        SupportedGameVersions::PastDate(DateTime::from_utc(
+            NaiveDateTime::from_timestamp(1646070100, 0),
+            Utc,
         ))
     }
 

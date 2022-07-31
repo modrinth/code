@@ -5,10 +5,10 @@ use crate::util::auth::{
     check_is_moderator_from_headers, get_user_from_headers,
 };
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use chrono::Utc;
 use futures::StreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
-use time::OffsetDateTime;
 
 #[derive(Deserialize)]
 pub struct CreateReport {
@@ -60,7 +60,7 @@ pub async fn report_create(
         user_id: None,
         body: new_report.body.clone(),
         reporter: current_user.id.into(),
-        created: OffsetDateTime::now_utc(),
+        created: Utc::now(),
     };
 
     match new_report.item_type {
@@ -109,7 +109,7 @@ pub async fn report_create(
         item_type: new_report.item_type.clone(),
         reporter: current_user.id,
         body: new_report.body.clone(),
-        created: OffsetDateTime::now_utc(),
+        created: Utc::now(),
     }))
 }
 

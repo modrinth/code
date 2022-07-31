@@ -11,12 +11,12 @@ use crate::util::auth::{get_user_from_headers, is_authorized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use chrono::Utc;
 use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::{PgPool, Row};
 use std::sync::Arc;
-use time::OffsetDateTime;
 use validator::Validate;
 
 #[get("search")]
@@ -112,7 +112,7 @@ pub async fn project_get_check(
             sqlx::query!(
                 "
                 SELECT id FROM mods
-                WHERE LOWER(slug) = LOWER($1)
+                WHERE slug = LOWER($1)
                 ",
                 &slug
             )
@@ -126,7 +126,7 @@ pub async fn project_get_check(
         sqlx::query!(
             "
             SELECT id FROM mods
-            WHERE LOWER(slug) = LOWER($1)
+            WHERE slug = LOWER($1)
             ",
             &slug
         )
@@ -259,6 +259,8 @@ pub struct EditProject {
     pub body: Option<String>,
     #[validate(length(max = 3))]
     pub categories: Option<Vec<String>>,
+    #[validate(length(max = 256))]
+    pub additional_categories: Option<Vec<String>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -483,6 +485,21 @@ pub async fn project_edit(
                     )
                 })?;
 
+                if status == &ProjectStatus::Approved
+                    || status == &ProjectStatus::Unlisted
+                {
+                    sqlx::query!(
+                        "
+                        UPDATE mods
+                        SET published = NOW()
+                        WHERE id = $1 AND approved = NULL
+                        ",
+                        id as database::models::ids::ProjectId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -513,7 +530,7 @@ pub async fn project_edit(
                 sqlx::query!(
                     "
                     DELETE FROM mods_categories
-                    WHERE joining_mod_id = $1
+                    WHERE joining_mod_id = $1 AND is_additional = FALSE
                     ",
                     id as database::models::ids::ProjectId,
                 )
@@ -536,14 +553,59 @@ pub async fn project_edit(
 
                     sqlx::query!(
                         "
-                        INSERT INTO mods_categories (joining_mod_id, joining_category_id)
-                        VALUES ($1, $2)
+                        INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)
+                        VALUES ($1, $2, FALSE)
                         ",
                         id as database::models::ids::ProjectId,
                         category_id as database::models::ids::CategoryId,
                     )
                     .execute(&mut *transaction)
                     .await?;
+                }
+            }
+
+            if let Some(categories) = &new_project.additional_categories {
+                if !perms.contains(Permissions::EDIT_DETAILS) {
+                    return Err(ApiError::CustomAuthentication(
+                        "You do not have the permissions to edit the additional categories of this project!"
+                            .to_string(),
+                    ));
+                }
+
+                sqlx::query!(
+                    "
+                    DELETE FROM mods_categories
+                    WHERE joining_mod_id = $1 AND is_additional = TRUE
+                    ",
+                    id as database::models::ids::ProjectId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+
+                for category in categories {
+                    let category_id =
+                        database::models::categories::Category::get_id(
+                            category,
+                            &mut *transaction,
+                        )
+                        .await?
+                        .ok_or_else(|| {
+                            ApiError::InvalidInput(format!(
+                                "Category {} does not exist.",
+                                category.clone()
+                            ))
+                        })?;
+
+                    sqlx::query!(
+                        "
+                        INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)
+                        VALUES ($1, $2, TRUE)
+                        ",
+                        id as database::models::ids::ProjectId,
+                        category_id as database::models::ids::CategoryId,
+                    )
+                        .execute(&mut *transaction)
+                        .await?;
                 }
             }
 
@@ -1178,7 +1240,7 @@ pub async fn add_gallery_item(
             featured: item.featured,
             title: item.title,
             description: item.description,
-            created: OffsetDateTime::now_utc(),
+            created: Utc::now(),
         }
         .insert(&mut transaction)
         .await?;

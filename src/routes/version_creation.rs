@@ -18,10 +18,10 @@ use crate::validate::{validate_file, ValidationResult};
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
 use actix_web::{post, HttpRequest, HttpResponse};
+use chrono::Utc;
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
-use time::OffsetDateTime;
 use validator::Validate;
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
@@ -402,7 +402,7 @@ async fn version_create_inner(
         version_number: builder.version_number.clone(),
         changelog: builder.changelog.clone(),
         changelog_url: None,
-        date_published: OffsetDateTime::now_utc(),
+        date_published: Utc::now(),
         downloads: 0,
         version_type: version_data.release_channel,
         files: builder
@@ -722,23 +722,18 @@ pub async fn upload_file(
 
             for file in &format.files {
                 if let Some(dep) = res.iter().find(|x| {
-                    x.hash.as_deref()
+                    Some(&*x.hash)
                         == file
                             .hashes
                             .get(&PackFileHash::Sha1)
                             .map(|x| x.as_bytes())
                 }) {
-                    if let Some(project_id) = dep.project_id {
-                        if let Some(version_id) = dep.version_id {
-                            dependencies.push(DependencyBuilder {
-                                project_id: Some(models::ProjectId(project_id)),
-                                version_id: Some(models::VersionId(version_id)),
-                                file_name: None,
-                                dependency_type: DependencyType::Embedded
-                                    .to_string(),
-                            });
-                        }
-                    }
+                    dependencies.push(DependencyBuilder {
+                        project_id: Some(models::ProjectId(dep.project_id)),
+                        version_id: Some(models::VersionId(dep.version_id)),
+                        file_name: None,
+                        dependency_type: DependencyType::Embedded.to_string(),
+                    });
                 } else if let Some(first_download) = file.downloads.first() {
                     dependencies.push(DependencyBuilder {
                         project_id: None,

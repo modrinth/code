@@ -1,5 +1,5 @@
 use super::ids::*;
-use time::OffsetDateTime;
+use chrono::{DateTime, Utc};
 
 pub struct Report {
     pub id: ReportId,
@@ -9,7 +9,7 @@ pub struct Report {
     pub user_id: Option<UserId>,
     pub body: String,
     pub reporter: UserId,
-    pub created: OffsetDateTime,
+    pub created: DateTime<Utc>,
 }
 
 pub struct QueryReport {
@@ -20,7 +20,7 @@ pub struct QueryReport {
     pub user_id: Option<UserId>,
     pub body: String,
     pub reporter: UserId,
-    pub created: OffsetDateTime,
+    pub created: DateTime<Utc>,
 }
 
 impl Report {

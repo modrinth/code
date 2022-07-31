@@ -14,13 +14,13 @@ use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::Data;
 use actix_web::{post, HttpRequest, HttpResponse};
+use chrono::Utc;
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::collections::HashSet;
 use std::sync::Arc;
 use thiserror::Error;
-use time::OffsetDateTime;
 use validator::Validate;
 
 #[derive(Error, Debug)]
@@ -166,6 +166,9 @@ struct ProjectCreateData {
     #[validate(length(max = 3))]
     /// A list of the categories that the project is in.
     pub categories: Vec<String>,
+    #[validate(length(max = 256))]
+    /// A list of the categories that the project is in.
+    pub additional_categories: Vec<String>,
 
     #[validate(url, length(max = 2048))]
     /// An optional link to where to submit bugs or issues with the project.
@@ -388,7 +391,7 @@ pub async fn project_create_inner(
         {
             let results = sqlx::query!(
                 "
-                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = $1)
+                SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))
                 ",
                 create_data.slug
             )
@@ -522,7 +525,7 @@ pub async fn project_create_inner(
                     featured: item.featured,
                     title: item.title.clone(),
                     description: item.description.clone(),
-                    created: OffsetDateTime::now_utc(),
+                    created: Utc::now(),
                 });
 
                 continue;
@@ -591,6 +594,19 @@ pub async fn project_create_inner(
             .await?
             .ok_or_else(|| CreateError::InvalidCategory(category.clone()))?;
             categories.push(id);
+        }
+
+        let mut additional_categories =
+            Vec::with_capacity(project_create_data.additional_categories.len());
+        for category in &project_create_data.additional_categories {
+            let id = models::categories::Category::get_id_project(
+                category,
+                project_type_id,
+                &mut *transaction,
+            )
+            .await?
+            .ok_or_else(|| CreateError::InvalidCategory(category.clone()))?;
+            additional_categories.push(id);
         }
 
         let team = models::team_item::TeamBuilder {
@@ -698,6 +714,7 @@ pub async fn project_create_inner(
             license_url: project_create_data.license_url,
             discord_url: project_create_data.discord_url,
             categories,
+            additional_categories,
             initial_versions: versions,
             status: status_id,
             client_side: client_side_id,
@@ -718,7 +735,7 @@ pub async fn project_create_inner(
                 .collect(),
         };
 
-        let now = OffsetDateTime::now_utc();
+        let now = Utc::now();
 
         let response = crate::models::projects::Project {
             id: project_id,
@@ -731,6 +748,7 @@ pub async fn project_create_inner(
             body_url: None,
             published: now,
             updated: now,
+            approved: None,
             status: status.clone(),
             moderator_message: None,
             license: License {
@@ -743,6 +761,7 @@ pub async fn project_create_inner(
             downloads: 0,
             followers: 0,
             categories: project_create_data.categories,
+            additional_categories: project_create_data.additional_categories,
             versions: project_builder
                 .initial_versions
                 .iter()

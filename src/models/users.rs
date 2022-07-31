@@ -1,6 +1,6 @@
 use super::ids::Base62Id;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(from = "Base62Id")]
@@ -18,8 +18,7 @@ pub struct User {
     pub email: Option<String>,
     pub avatar_url: Option<String>,
     pub bio: Option<String>,
-    #[serde(with = "crate::util::time_ser")]
-    pub created: OffsetDateTime,
+    pub created: DateTime<Utc>,
     pub role: Role,
 }
 

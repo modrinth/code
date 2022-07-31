@@ -1,6 +1,6 @@
 use super::ids::*;
 use crate::database::models::convert_postgres_date;
-use time::OffsetDateTime;
+use chrono::{DateTime, Utc};
 
 #[derive(Clone, Debug)]
 pub struct DonationUrl {
@@ -43,7 +43,7 @@ pub struct GalleryItem {
     pub featured: bool,
     pub title: Option<String>,
     pub description: Option<String>,
-    pub created: OffsetDateTime,
+    pub created: DateTime<Utc>,
 }
 
 impl GalleryItem {
@@ -87,6 +87,7 @@ pub struct ProjectBuilder {
     pub license_url: Option<String>,
     pub discord_url: Option<String>,
     pub categories: Vec<CategoryId>,
+    pub additional_categories: Vec<CategoryId>,
     pub initial_versions: Vec<super::version_item::VersionBuilder>,
     pub status: StatusId,
     pub client_side: SideTypeId,
@@ -110,8 +111,9 @@ impl ProjectBuilder {
             description: self.description,
             body: self.body,
             body_url: None,
-            published: time::OffsetDateTime::now_utc(),
-            updated: time::OffsetDateTime::now_utc(),
+            published: Utc::now(),
+            updated: Utc::now(),
+            approved: None,
             status: self.status,
             downloads: 0,
             follows: 0,
@@ -148,14 +150,27 @@ impl ProjectBuilder {
         for category in self.categories {
             sqlx::query!(
                 "
-                INSERT INTO mods_categories (joining_mod_id, joining_category_id)
-                VALUES ($1, $2)
+                INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)
+                VALUES ($1, $2, FALSE)
                 ",
                 self.project_id as ProjectId,
                 category as CategoryId,
             )
             .execute(&mut *transaction)
             .await?;
+        }
+
+        for category in self.additional_categories {
+            sqlx::query!(
+                "
+                INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)
+                VALUES ($1, $2, TRUE)
+                ",
+                self.project_id as ProjectId,
+                category as CategoryId,
+            )
+                .execute(&mut *transaction)
+                .await?;
         }
 
         Ok(self.project_id)
@@ -170,8 +185,9 @@ pub struct Project {
     pub description: String,
     pub body: String,
     pub body_url: Option<String>,
-    pub published: OffsetDateTime,
-    pub updated: OffsetDateTime,
+    pub published: DateTime<Utc>,
+    pub updated: DateTime<Utc>,
+    pub approved: Option<DateTime<Utc>>,
     pub status: StatusId,
     pub downloads: i32,
     pub follows: i32,
@@ -248,7 +264,7 @@ impl Project {
             "
             SELECT project_type, title, description, downloads, follows,
                    icon_url, body, body_url, published,
-                   updated, status,
+                   updated, approved, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body
@@ -286,6 +302,7 @@ impl Project {
                 follows: row.follows,
                 moderation_message: row.moderation_message,
                 moderation_message_body: row.moderation_message_body,
+                approved: row.approved,
             }))
         } else {
             Ok(None)
@@ -307,7 +324,7 @@ impl Project {
             "
             SELECT id, project_type, title, description, downloads, follows,
                    icon_url, body, body_url, published,
-                   updated, status,
+                   updated, approved, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body
@@ -343,6 +360,7 @@ impl Project {
                 follows: m.follows,
                 moderation_message: m.moderation_message,
                 moderation_message_body: m.moderation_message_body,
+                approved: m.approved,
             }))
         })
         .try_collect::<Vec<Project>>()
@@ -499,7 +517,7 @@ impl Project {
         let id = sqlx::query!(
             "
             SELECT id FROM mods
-            WHERE LOWER(slug) = LOWER($1)
+            WHERE slug = LOWER($1)
             ",
             slug
         )
@@ -523,7 +541,7 @@ impl Project {
         let id = sqlx::query!(
             "
             SELECT id FROM mods
-            WHERE LOWER(slug) = LOWER($1)
+            WHERE slug = LOWER($1)
             ",
             slug
         )
@@ -607,13 +625,15 @@ impl Project {
             "
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
-            m.updated updated, m.status status,
+            m.updated updated, m.approved approved, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ' ~~~~ ') categories, STRING_AGG(DISTINCT v.id::text, ' ~~~~ ') versions,
-            STRING_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' '), ' ~~~~ ') gallery,
-            STRING_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url, ' ~~~~ ') donations
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
+            ARRAY_AGG(DISTINCT ca.category) filter (where ca.category is not null) additional_categories,
+            ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
+            ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
+            ARRAY_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url) filter (where md.joining_platform_id is not null) donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
@@ -624,6 +644,7 @@ impl Project {
             LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
             LEFT JOIN categories c ON mc.joining_category_id = c.id
+            LEFT JOIN categories ca ON mc.joining_category_id = c.id AND mc.is_additional = TRUE
             LEFT JOIN versions v ON v.mod_id = m.id
             LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
             WHERE m.id = $1
@@ -661,24 +682,44 @@ impl Project {
                     follows: m.follows,
                     moderation_message: m.moderation_message,
                     moderation_message_body: m.moderation_message_body,
+                    approved: m.approved,
                 },
                 project_type: m.project_type_name,
-                categories: m
-                    .categories
-                    .map(|x| x.split(" ~~~~ ").map(|x| x.to_string()).collect())
+                categories: m.categories.unwrap_or_default(),
+                additional_categories: m
+                    .additional_categories
                     .unwrap_or_default(),
-                versions: m
-                    .versions
-                    .map(|x| {
-                        x.split(" ~~~~ ")
-                            .map(|x| VersionId(x.parse().unwrap_or_default()))
-                            .collect()
-                    })
-                    .unwrap_or_default(),
+                versions: {
+                    let versions = m.versions.unwrap_or_default();
+
+                    let mut v = versions
+                        .into_iter()
+                        .flat_map(|x| {
+                            let version: Vec<&str> =
+                                x.split(" |||| ").collect();
+
+                            if version.len() >= 2 {
+                                Some((
+                                    VersionId(
+                                        version[0].parse().unwrap_or_default(),
+                                    ),
+                                    convert_postgres_date(version[1])
+                                        .timestamp(),
+                                ))
+                            } else {
+                                None
+                            }
+                        })
+                        .collect::<Vec<(VersionId, i64)>>();
+
+                    v.sort_by(|a, b| a.1.cmp(&b.1));
+
+                    v.into_iter().map(|x| x.0).collect()
+                },
                 donation_urls: m
                     .donations
                     .unwrap_or_default()
-                    .split(" ~~~~ ")
+                    .into_iter()
                     .flat_map(|d| {
                         let strings: Vec<&str> = d.split(" |||| ").collect();
 
@@ -700,7 +741,7 @@ impl Project {
                 gallery_items: m
                     .gallery
                     .unwrap_or_default()
-                    .split(" ~~~~ ")
+                    .into_iter()
                     .flat_map(|d| {
                         let strings: Vec<&str> = d.split(" |||| ").collect();
 
@@ -758,13 +799,15 @@ impl Project {
             "
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
-            m.updated updated, m.status status,
+            m.updated updated, m.approved approved, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            STRING_AGG(DISTINCT c.category, ' ~~~~ ') categories, STRING_AGG(DISTINCT v.id::text, ' ~~~~ ') versions,
-            STRING_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' '), ' ~~~~ ') gallery,
-            STRING_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url, ' ~~~~ ') donations
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
+            ARRAY_AGG(DISTINCT ca.category) filter (where ca.category is not null) additional_categories,
+            ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
+            ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
+            ARRAY_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url) filter (where md.joining_platform_id is not null) donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN statuses s ON s.id = m.status
@@ -774,7 +817,8 @@ impl Project {
             LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
             LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON mc.joining_category_id = c.id
+            LEFT JOIN categories c ON mc.joining_category_id = c.id AND mc.is_additional = FALSE
+            LEFT JOIN categories ca ON mc.joining_category_id = c.id AND mc.is_additional = TRUE
             LEFT JOIN versions v ON v.mod_id = m.id
             LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
             WHERE m.id = ANY($1)
@@ -812,14 +856,40 @@ impl Project {
                             follows: m.follows,
                             moderation_message: m.moderation_message,
                             moderation_message_body: m.moderation_message_body,
+                            approved: m.approved
                         },
                         project_type: m.project_type_name,
-                        categories: m.categories.map(|x| x.split(" ~~~~ ").map(|x| x.to_string()).collect()).unwrap_or_default(),
-                        versions: m.versions.map(|x| x.split(" ~~~~ ").map(|x| VersionId(x.parse().unwrap_or_default())).collect()).unwrap_or_default(),
+                        categories: m.categories.unwrap_or_default(),
+                        additional_categories: m.additional_categories.unwrap_or_default(),
+                        versions: {
+                            let versions = m.versions.unwrap_or_default();
+
+                            let mut v = versions
+                                .into_iter()
+                                .flat_map(|x| {
+                                    let version: Vec<&str> =
+                                        x.split(" |||| ").collect();
+
+                                    if version.len() >= 2 {
+                                        Some((
+                                            VersionId(version[0].parse().unwrap_or_default()),
+                                            convert_postgres_date(version[1])
+                                                .timestamp(),
+                                        ))
+                                    } else {
+                                        None
+                                    }
+                                })
+                                .collect::<Vec<(VersionId, i64)>>();
+
+                            v.sort_by(|a, b| a.1.cmp(&b.1));
+
+                            v.into_iter().map(|x| x.0).collect()
+                        },
                         gallery_items: m
                             .gallery
                             .unwrap_or_default()
-                            .split(" ~~~~ ")
+                            .into_iter()
                             .flat_map(|d| {
                                 let strings: Vec<&str> = d.split(" |||| ").collect();
 
@@ -840,7 +910,7 @@ impl Project {
                         donation_urls: m
                             .donations
                             .unwrap_or_default()
-                            .split(" ~~~~ ")
+                            .into_iter()
                             .flat_map(|d| {
                                 let strings: Vec<&str> = d.split(" |||| ").collect();
 
@@ -873,6 +943,7 @@ pub struct QueryProject {
     pub inner: Project,
     pub project_type: String,
     pub categories: Vec<String>,
+    pub additional_categories: Vec<String>,
     pub versions: Vec<VersionId>,
     pub donation_urls: Vec<DonationUrl>,
     pub gallery_items: Vec<GalleryItem>,

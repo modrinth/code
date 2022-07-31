@@ -108,7 +108,7 @@ pub async fn maven_metadata(
                     .map(|x| x.version_number.clone())
                     .collect::<Vec<_>>(),
             },
-            last_updated: data.inner.updated.format("%Y%m%d%H%M%S"),
+            last_updated: data.inner.updated.format("%Y%m%d%H%M%S").to_string(),
         },
     };
 

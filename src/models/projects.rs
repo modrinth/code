@@ -3,8 +3,8 @@ use super::teams::TeamId;
 use super::users::UserId;
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::QueryVersion;
+use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use time::OffsetDateTime;
 use validator::Validate;
 
 /// The ID of a specific project, encoded as base62 for usage in the API
@@ -40,12 +40,14 @@ pub struct Project {
     pub body_url: Option<String>,
 
     /// The date at which the project was first published.
-    #[serde(with = "crate::util::time_ser")]
-    pub published: OffsetDateTime,
+    pub published: DateTime<Utc>,
 
-    #[serde(with = "crate::util::time_ser")]
     /// The date at which the project was first published.
-    pub updated: OffsetDateTime,
+    pub updated: DateTime<Utc>,
+
+    /// The date at which the project was first approved.
+    //pub approved: Option<DateTime<Utc>>,
+    pub approved: Option<DateTime<Utc>>,
 
     /// The status of the project
     pub status: ProjectStatus,
@@ -67,6 +69,9 @@ pub struct Project {
 
     /// A list of the categories that the project is in.
     pub categories: Vec<String>,
+
+    /// A list of the categories that the project is in.
+    pub additional_categories: Vec<String>,
     /// A list of ids for versions of the project.
     pub versions: Vec<VersionId>,
     /// The URL of the icon of the project
@@ -100,6 +105,7 @@ impl From<QueryProject> for Project {
             body_url: m.body_url,
             published: m.published,
             updated: m.updated,
+            approved: m.approved,
             status: data.status,
             moderator_message: if let Some(message) = m.moderation_message {
                 Some(ModeratorMessage {
@@ -119,6 +125,7 @@ impl From<QueryProject> for Project {
             downloads: m.downloads as u32,
             followers: m.follows as u32,
             categories: data.categories,
+            additional_categories: data.additional_categories,
             versions: data.versions.into_iter().map(|v| v.into()).collect(),
             icon_url: m.icon_url,
             issues_url: m.issues_url,
@@ -156,8 +163,7 @@ pub struct GalleryItem {
     pub featured: bool,
     pub title: Option<String>,
     pub description: Option<String>,
-    #[serde(with = "crate::util::time_ser")]
-    pub created: OffsetDateTime,
+    pub created: DateTime<Utc>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -303,9 +309,8 @@ pub struct Version {
     /// A link to the changelog for this version of the project. (Deprecated), being replaced by `changelog`
     pub changelog_url: Option<String>,
 
-    #[serde(with = "crate::util::time_ser")]
     /// The date that this version was published.
-    pub date_published: OffsetDateTime,
+    pub date_published: DateTime<Utc>,
     /// The number of downloads this specific version has had.
     pub downloads: u32,
     /// The type of the release - `Alpha`, `Beta`, or `Release`.

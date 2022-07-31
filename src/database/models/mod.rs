@@ -1,8 +1,8 @@
 #![allow(dead_code)]
 // TODO: remove attr once routes are created
 
+use chrono::{DateTime, Utc};
 use thiserror::Error;
-use time::OffsetDateTime;
 
 pub mod categories;
 pub mod ids;
@@ -123,14 +123,12 @@ impl ids::ProjectTypeId {
         .fetch_optional(exec)
         .await?;
 
-        Ok(result.map(|r| ids::ProjectTypeId(r.id)))
+        Ok(result.map(|r| ProjectTypeId(r.id)))
     }
 }
 
-pub fn convert_postgres_date(input: &str) -> OffsetDateTime {
-    OffsetDateTime::parse(
-        format!("{}:00Z", input.replace(' ', "T")),
-        time::Format::Rfc3339,
-    )
-    .unwrap_or_else(|_| OffsetDateTime::now_utc())
+pub fn convert_postgres_date(input: &str) -> DateTime<Utc> {
+    DateTime::parse_from_rfc3339(&*format!("{}:00Z", input.replace(' ', "T")))
+        .map(|x| x.with_timezone(&Utc))
+        .unwrap_or_else(|_| Utc::now())
 }

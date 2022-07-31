@@ -1,8 +1,8 @@
 use super::ids::*;
 use super::DatabaseError;
 use crate::database::models::convert_postgres_date;
+use chrono::{DateTime, Utc};
 use std::collections::HashMap;
-use time::OffsetDateTime;
 
 pub struct VersionBuilder {
     pub version_id: VersionId,
@@ -144,7 +144,7 @@ impl VersionBuilder {
             version_number: self.version_number,
             changelog: self.changelog,
             changelog_url: None,
-            date_published: OffsetDateTime::now_utc(),
+            date_published: Utc::now(),
             downloads: 0,
             featured: self.featured,
             version_type: self.version_type,
@@ -244,7 +244,7 @@ pub struct Version {
     pub version_number: String,
     pub changelog: String,
     pub changelog_url: Option<String>,
-    pub date_published: OffsetDateTime,
+    pub date_published: DateTime<Utc>,
     pub downloads: i32,
     pub version_type: String,
     pub featured: bool,
@@ -614,10 +614,10 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured,
-            STRING_AGG(DISTINCT gv.version || ' |||| ' || gv.created, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,
-            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,
-            STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,
-            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies
+            ARRAY_AGG(DISTINCT gv.version || ' |||| ' || gv.created) filter (where gv.version is not null) game_versions, ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+            ARRAY_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename) filter (where f.id is not null) files,
+            ARRAY_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id) filter (where h.hash is not null) hashes,
+            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' ')) filter (where d.dependency_type is not null) dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -649,7 +649,7 @@ impl Version {
                     let hashes: Vec<(FileId, String, Vec<u8>)> = v
                         .hashes
                         .unwrap_or_default()
-                        .split(" ~~~~ ")
+                        .into_iter()
                         .flat_map(|f| {
                             let hash: Vec<&str> = f.split(" |||| ").collect();
 
@@ -667,7 +667,7 @@ impl Version {
 
                     v.files
                         .unwrap_or_default()
-                        .split(" ~~~~ ")
+                        .into_iter()
                         .flat_map(|f| {
                             let file: Vec<&str> = f.split(" |||| ").collect();
 
@@ -703,38 +703,33 @@ impl Version {
                     let game_versions = v.game_versions.unwrap_or_default();
 
                     let mut gv = game_versions
-                        .split(" ~~~~ ")
+                        .into_iter()
                         .flat_map(|x| {
                             let version: Vec<&str> =
                                 x.split(" |||| ").collect();
 
                             if version.len() >= 2 {
                                 Some((
-                                    version[0],
+                                    version[0].to_string(),
                                     convert_postgres_date(version[1])
-                                        .unix_timestamp(),
+                                        .timestamp(),
                                 ))
                             } else {
                                 None
                             }
                         })
-                        .collect::<Vec<(&str, i64)>>();
+                        .collect::<Vec<(String, i64)>>();
 
                     gv.sort_by(|a, b| a.1.cmp(&b.1));
 
-                    gv.into_iter().map(|x| x.0.to_string()).collect()
+                    gv.into_iter().map(|x| x.0).collect()
                 },
-                loaders: v
-                    .loaders
-                    .unwrap_or_default()
-                    .split(" ~~~~ ")
-                    .map(|x| x.to_string())
-                    .collect(),
+                loaders: v.loaders.unwrap_or_default(),
                 featured: v.featured,
                 dependencies: v
                     .dependencies
                     .unwrap_or_default()
-                    .split(" ~~~~ ")
+                    .into_iter()
                     .flat_map(|f| {
                         let dependency: Vec<&str> = f.split(" |||| ").collect();
 
@@ -789,10 +784,10 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured,
-            STRING_AGG(DISTINCT gv.version || ' |||| ' || gv.created, ' ~~~~ ') game_versions, STRING_AGG(DISTINCT l.loader, ' ~~~~ ') loaders,
-            STRING_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename, ' ~~~~ ') files,
-            STRING_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id,  ' ~~~~ ') hashes,
-            STRING_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' '),  ' ~~~~ ') dependencies
+            ARRAY_AGG(DISTINCT gv.version || ' |||| ' || gv.created) filter (where gv.version is not null) game_versions, ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+            ARRAY_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename) filter (where f.id is not null) files,
+            ARRAY_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id) filter (where h.hash is not null) hashes,
+            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' ')) filter (where d.dependency_type is not null) dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -821,7 +816,9 @@ impl Version {
                         date_published: v.date_published,
                         downloads: v.downloads,
                         files: {
-                            let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default().split(" ~~~~ ").flat_map(|f| {
+                            let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default()
+                                .into_iter()
+                                .flat_map(|f| {
                                 let hash: Vec<&str> = f.split(" |||| ").collect();
 
                                 if hash.len() >= 3 {
@@ -835,7 +832,9 @@ impl Version {
                                 }
                             }).collect();
 
-                            v.files.unwrap_or_default().split(" ~~~~ ").flat_map(|f| {
+                            v.files.unwrap_or_default()
+                                .into_iter()
+                                .flat_map(|f| {
                                 let file: Vec<&str> = f.split(" |||| ").collect();
 
                                 if file.len() >= 5 {
@@ -867,29 +866,31 @@ impl Version {
                                 .unwrap_or_default();
 
                             let mut gv = game_versions
-                                .split(" ~~~~ ")
+                                .into_iter()
+
                                 .flat_map(|x| {
                                     let version: Vec<&str> = x.split(" |||| ").collect();
 
                                     if version.len() >= 2 {
-                                        Some((version[0], convert_postgres_date(version[1]).unix_timestamp()))
+                                        Some((version[0].to_string(), convert_postgres_date(version[1]).timestamp()))
                                     } else {
                                         None
                                     }
                                 })
-                                .collect::<Vec<(&str, i64)>>();
+                                .collect::<Vec<(String, i64)>>();
 
                             gv.sort_by(|a, b| a.1.cmp(&b.1));
 
                             gv.into_iter()
-                                .map(|x| x.0.to_string())
+                                .map(|x| x.0)
                                 .collect()
                         },
-                        loaders: v.loaders.unwrap_or_default().split(" ~~~~ ").map(|x| x.to_string()).collect(),
+                        loaders: v.loaders.unwrap_or_default(),
                         featured: v.featured,
                         dependencies: v.dependencies
                             .unwrap_or_default()
-                            .split(" ~~~~ ")
+                            .into_iter()
+
                             .flat_map(|f| {
                                 let dependency: Vec<&str> = f.split(" |||| ").collect();
 
@@ -952,7 +953,7 @@ pub struct QueryVersion {
     pub version_number: String,
     pub changelog: String,
     pub changelog_url: Option<String>,
-    pub date_published: OffsetDateTime,
+    pub date_published: DateTime<Utc>,
     pub downloads: i32,
 
     pub version_type: String,

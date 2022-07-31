@@ -5,9 +5,9 @@ use crate::database::models::categories::{
 };
 use crate::util::auth::check_is_admin_from_headers;
 use actix_web::{delete, get, put, web, HttpRequest, HttpResponse};
+use chrono::{DateTime, Utc};
 use models::categories::{Category, GameVersion, Loader};
 use sqlx::PgPool;
-use time::OffsetDateTime;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -38,6 +38,7 @@ pub struct CategoryData {
     icon: String,
     name: String,
     project_type: String,
+    header: String,
 }
 
 // TODO: searching / filtering? Could be used to implement a live
@@ -53,6 +54,7 @@ pub async fn category_list(
             icon: x.icon,
             name: x.category,
             project_type: x.project_type,
+            header: x.header,
         })
         .collect::<Vec<_>>();
 
@@ -84,6 +86,7 @@ pub async fn category_create(
         .name(&new_category.name)?
         .project_type(&project_type)?
         .icon(&new_category.icon)?
+        .header(&new_category.header)?
         .insert(&**pool)
         .await?;
 
@@ -202,8 +205,7 @@ pub async fn loader_delete(
 pub struct GameVersionQueryData {
     pub version: String,
     pub version_type: String,
-    #[serde(with = "crate::util::time_ser")]
-    pub date: OffsetDateTime,
+    pub date: DateTime<Utc>,
     pub major: bool,
 }
 
@@ -243,7 +245,7 @@ pub async fn game_version_list(
 pub struct GameVersionData {
     #[serde(rename = "type")]
     type_: String,
-    date: Option<OffsetDateTime>,
+    date: Option<DateTime<Utc>>,
 }
 
 #[put("game_version/{name}")]

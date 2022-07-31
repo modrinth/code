@@ -73,9 +73,8 @@ pub enum VersionIndexingError {
 }
 
 use crate::util::env::parse_var;
+use chrono::{DateTime, Utc};
 use serde::Deserialize;
-use time::Format::Rfc3339;
-use time::OffsetDateTime;
 use tokio_stream::wrappers::IntervalStream;
 
 #[derive(Deserialize)]
@@ -88,8 +87,8 @@ struct VersionFormat<'a> {
     id: String,
     #[serde(rename = "type")]
     type_: std::borrow::Cow<'a, str>,
-    #[serde(rename = "releaseTime", with = "crate::util::time_ser")]
-    release_time: OffsetDateTime,
+    #[serde(rename = "releaseTime")]
+    release_time: DateTime<Utc>,
 }
 
 async fn update_versions(
@@ -128,26 +127,30 @@ async fn update_versions(
     lazy_static::lazy_static! {
         /// Mojank for some reason has versions released at the same DateTime. This hardcodes them to fix this,
         /// as most of our ordering logic is with DateTime
-        static ref HALL_OF_SHAME_2: [(&'static str, OffsetDateTime); 4] = [
+        static ref HALL_OF_SHAME_2: [(&'static str, chrono::DateTime<chrono::Utc>); 4] = [
             (
                 "1.4.5",
-                OffsetDateTime::parse("2012-12-19T22:00:00+00:00", Rfc3339)
+                chrono::DateTime::parse_from_rfc3339("2012-12-19T22:00:00+00:00")
                     .unwrap()
+                    .into(),
             ),
             (
                 "1.4.6",
-                OffsetDateTime::parse("2012-12-19T22:00:01+00:00", Rfc3339)
+                chrono::DateTime::parse_from_rfc3339("2012-12-19T22:00:01+00:00")
                     .unwrap()
+                    .into(),
             ),
             (
                 "1.6.3",
-                OffsetDateTime::parse("2013-09-13T10:54:41+00:00", Rfc3339)
+                chrono::DateTime::parse_from_rfc3339("2013-09-13T10:54:41+00:00")
                     .unwrap()
+                    .into(),
             ),
             (
                 "13w37b",
-                OffsetDateTime::parse("2013-09-13T10:54:42+00:00", Rfc3339)
+                chrono::DateTime::parse_from_rfc3339("2013-09-13T10:54:42+00:00")
                     .unwrap()
+                    .into(),
             ),
         ];
     }
