@@ -167,6 +167,7 @@ struct ProjectCreateData {
     /// A list of the categories that the project is in.
     pub categories: Vec<String>,
     #[validate(length(max = 256))]
+    #[serde(default = "Vec::new")]
     /// A list of the categories that the project is in.
     pub additional_categories: Vec<String>,
 
