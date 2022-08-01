@@ -54,16 +54,18 @@
         <label>
           <span>
             <h3>Type<span class="required">*</span></h3>
-            <span class="no-padding">The type of project of your project.</span>
+            <span class="no-padding">The type of project your project is.</span>
           </span>
           <Multiselect
             v-model="projectType"
             placeholder="Select one"
+            label="display"
             :options="projectTypes"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
             :allow-empty="false"
+            @input="setCategories"
           />
         </label>
         <label>
@@ -106,11 +108,7 @@
           <multiselect
             id="categories"
             v-model="categories"
-            :options="
-              $tag.categories
-                .filter((x) => x.project_type === projectType.toLowerCase())
-                .map((it) => it.name)
-            "
+            :options="selectableCategories"
             :custom-label="
               (value) => value.charAt(0).toUpperCase() + value.slice(1)
             "
@@ -125,13 +123,44 @@
             :limit="6"
             :hide-selected="true"
             placeholder="Choose categories"
+            @input="setCategories"
+          />
+        </label>
+        <label>
+          <span>
+            <h3>Additional Categories</h3>
+            <span class="no-padding">
+              Select more categories that will help others <br />
+              find your project. These are searchable, but not <br />
+              displayed in search.
+            </span>
+          </span>
+          <multiselect
+            id="additional_categories"
+            v-model="additional_categories"
+            :show-no-results="false"
+            :options="selectableAdditionalCategories"
+            :custom-label="
+              (value) => value.charAt(0).toUpperCase() + value.slice(1)
+            "
+            :loading="$tag.categories.length === 0"
+            :multiple="true"
+            :searchable="false"
+            :close-on-select="false"
+            :clear-on-select="false"
+            :show-labels="false"
+            :max="255"
+            :limit="6"
+            :hide-selected="true"
+            placeholder="Choose additional categories"
+            @input="setCategories"
           />
         </label>
         <label>
           <span>
             <h3>Vanity URL (slug)<span class="required">*</span></h3>
             <span class="slug-description"
-              >https://modrinth.com/{{ projectType.toLowerCase() }}/{{
+              >https://modrinth.com/{{ projectType.id }}/{{
                 slug ? slug : 'your-slug'
               }}
             </span>
@@ -402,9 +431,7 @@
                 :options="
                   $tag.loaders
                     .filter((x) =>
-                      x.supported_project_types.includes(
-                        projectType.toLowerCase()
-                      )
+                      x.supported_project_types.includes(projectType.id)
                     )
                     .map((it) => it.name)
                 "
@@ -549,10 +576,7 @@
               You may upload multiple files, but this should only be used for
               cases like sources or Javadocs.
             </span>
-            <p
-              v-if="projectType.toLowerCase() === 'modpack'"
-              aria-label="Warning"
-            >
+            <p v-if="projectType.id === 'modpack'" aria-label="Warning">
               Modpack support is currently in alpha, and you may encounter
               issues. Our documentation includes instructions on
               <a
@@ -578,9 +602,9 @@
               class="file-input"
               multiple
               :accept="
-                projectType.toLowerCase() === 'modpack'
+                projectType.id === 'modpack'
                   ? '.mrpack,application/x-modrinth-modpack+zip'
-                  : projectType.toLowerCase() === 'mod'
+                  : projectType.id === 'mod'
                   ? '.jar,application/java-archive'
                   : '*'
               "
@@ -1137,6 +1161,7 @@ export default {
       body: '',
       versions: [],
       categories: [],
+      additional_categories: [],
       issues_url: null,
       source_url: null,
       wiki_url: null,
@@ -1145,8 +1170,27 @@ export default {
       license: null,
       license_url: null,
 
-      projectTypes: ['Mod', 'Modpack'],
-      projectType: 'Mod',
+      selectableCategories: [],
+      selectableAdditionalCategories: [],
+
+      projectTypes: [
+        {
+          display: 'Mod / Plugin',
+          id: 'mod',
+        },
+        {
+          display: 'Modpack',
+          id: 'modpack',
+        },
+        {
+          display: 'Resource Pack',
+          id: 'resourcepack',
+        },
+      ],
+      projectType: {
+        display: 'Mod / Plugin',
+        id: 'mod',
+      },
 
       sideTypes: ['Required', 'Optional', 'Unsupported'],
       clientSideType: 'Required',
@@ -1170,6 +1214,9 @@ export default {
       showKnownGalleryErrors: false,
       savingAsDraft: false,
     }
+  },
+  fetch() {
+    this.setCategories()
   },
   watch: {
     license(newValue, oldValue) {
@@ -1199,6 +1246,23 @@ export default {
     })
   },
   methods: {
+    setCategories() {
+      this.selectableCategories = this.$tag.categories
+        .filter(
+          (x) =>
+            x.project_type === this.projectType.id &&
+            !this.additional_categories.includes(x.name)
+        )
+        .map((it) => it.name)
+
+      this.selectableAdditionalCategories = this.$tag.categories
+        .filter(
+          (x) =>
+            x.project_type === this.projectType.id &&
+            !this.categories.includes(x.name)
+        )
+        .map((it) => it.name)
+    },
     checkFields() {
       const reviewConditions = this.body !== '' && this.versions.length > 0
       if (
@@ -1256,7 +1320,7 @@ export default {
         'data',
         JSON.stringify({
           title: this.name,
-          project_type: this.projectType.toLowerCase(),
+          project_type: this.projectType.id,
           slug: this.slug,
           description: this.description,
           body: this.body,
@@ -1269,6 +1333,7 @@ export default {
             },
           ],
           categories: this.categories,
+          additional_categories: this.additional_categories,
           issues_url: this.issues_url ? this.issues_url : null,
           source_url: this.source_url ? this.source_url : null,
           wiki_url: this.wiki_url ? this.wiki_url : null,
