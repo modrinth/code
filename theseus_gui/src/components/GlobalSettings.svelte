@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { FormField, Slider, TextInput, Button } from "omorphia"
+    import { Field, Slider, TextInput, Button } from "omorphia"
     import TitledSection from "$components/TitledSection.svelte"
     import WindowSettings from "$components/WindowSettings.svelte"
 
@@ -8,50 +8,50 @@
 
 <div class="section">
     <TitledSection title="Downloads">
-        <FormField label="Max concurrent downloads">
+        <Field label="Max concurrent downloads">
             <Slider min=1 max=64 bind:value={maxConcurrentDownloads} />
-        </FormField>
+        </Field>
     </TitledSection>
     <TitledSection title="Override game resolution" toggleable=true>
         <WindowSettings />
     </TitledSection>
     <TitledSection title="Profile hooks">
-        <FormField label="Pre-launch">
+        <Field label="Pre-launch">
             <TextInput />
-        </FormField>
-        <FormField label="Wrapper">
+        </Field>
+        <Field label="Wrapper">
             <TextInput />
-        </FormField>
-        <FormField label="Post-exit">
+        </Field>
+        <Field label="Post-exit">
             <TextInput />
-        </FormField>
+        </Field>
     </TitledSection>
     <TitledSection title="Java">
-        <FormField label="Java 8 installation">
+        <Field label="Java 8 installation">
             <TextInput placeholder="/Library/Java/JavaVirtualMachines/zulu-8.jdk/Contents/Home" />
             <div class="button-group">
                 <Button>Auto-detect</Button>
                 <Button>Browse installations</Button>
                 <Button>Test</Button>
             </div>
-        </FormField>
-        <FormField label="Java 17 installation">
+        </Field>
+        <Field label="Java 17 installation">
             <TextInput placeholder="/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home" />
             <div class="button-group">
                 <Button>Auto-detect</Button>
                 <Button>Browse installations</Button>
                 <Button>Test</Button>
             </div>
-        </FormField>
-        <FormField label="Minimum memory allocatted (in MB)">
+        </Field>
+        <Field label="Minimum memory allocatted (in MB)">
             <TextInput />
-        </FormField>
-        <FormField label="Maximum memory allocatted (in MB)">
+        </Field>
+        <Field label="Maximum memory allocatted (in MB)">
             <TextInput value="2048" />
-        </FormField>
-        <FormField label="Arguments">
+        </Field>
+        <Field label="Arguments">
             <TextInput/>
-        </FormField>
+        </Field>
     </TitledSection>
 </div>
 

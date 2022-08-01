@@ -1,1 +1,1 @@
-module.exports = require('omorphia/config/postcss.config.cjs')
+module.exports = require('omorphia/config/postcss.cjs')

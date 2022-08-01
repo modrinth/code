@@ -24,6 +24,7 @@
     "prettier-plugin-svelte": "^2.5.0",
     "svelte": "^3.46.0",
     "svelte-check": "^2.2.6",
+    "svelte-intl-precompile": "^0.11.1",
     "tslib": "^2.3.1",
     "typescript": "~4.5.4",
     "vite": "^3.0.0"
@@ -35,9 +36,10 @@
     "@iconify-json/heroicons-outline": "^1.1.1",
     "@iconify-json/heroicons-solid": "^1.1.1",
     "@iconify-json/lucide": "^1.1.5",
-    "@tauri-apps/api": "^1.0.0-rc.1",
-    "omorphia": "0.0.17",
-    "svrollbar": "^0.10.4",
-    "unplugin-icons": "^0.14.7"
+    "@tauri-apps/api": "^1.0.2",
+    "omorphia": "0.0.67",
+    "svrollbar": "^0.12.0",
+    "unplugin-icons": "^0.14.7",
+    "highlight.js": "11.5.1"
   }
 }

@@ -3,9 +3,12 @@
 	<head>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="preload" href="/fonts/InterRegular.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/fonts/InterBold.woff2" as="font" type="font/woff2" crossorigin>
+		<link rel="preload" href="/fonts/InterSemiBold.woff2" as="font" type="font/woff2" crossorigin>
 		%sveltekit.head%
 	</head>
-	<body style="background-color: hsl(220, 13%, 15%)">
+	<body class="base theme-dark" style="background-color: hsl(220, 13%, 15%)">
 		%sveltekit.body%
 	</body>
 </html>

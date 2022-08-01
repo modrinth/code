@@ -7,6 +7,23 @@
     import Page from "$layout/Page.svelte";
 </script>
 
+<script context="module" lang="ts">
+    import { init, waitLocale, t, getLocaleFromAcceptLanguageHeader } from 'svelte-intl-precompile'
+    import { registerAll, availableLocales } from '$locales'
+
+    registerAll()
+
+    export const load: import('@sveltejs/kit').Load = async ({ session }) => {
+        init({
+            fallbackLocale: 'en',
+            initialLocale: getLocaleFromAcceptLanguageHeader(session.acceptLanguage, availableLocales),
+        })
+        await waitLocale()
+
+        return {}
+    }
+</script>
+
 <div class="app base theme-dark">
     <Sidebar />
     <StatusBar />

@@ -9,7 +9,7 @@ use tauri::{
 };
 
 fn main() {
-    let ctx = tauri::generate_context!();
+    let ctx = tauri::generate_context!(); // Run `pnpm build:web` (builds the web app) to get rid of the error.
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![])

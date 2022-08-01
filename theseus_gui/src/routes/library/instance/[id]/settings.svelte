@@ -3,7 +3,6 @@
 </script>
 
 <script lang="ts">
-    import { Checkbox, FormField, TextInput, Button } from "omorphia"
     import GlobalSettings from "$components/GlobalSettings.svelte"
     import TitledSection from "$components/TitledSection.svelte"
 
