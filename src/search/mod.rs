@@ -157,9 +157,9 @@ pub async fn search_for_project(
     let sort = match index {
         "relevance" => ("projects", ["downloads:desc"]),
         "downloads" => ("projects_filtered", ["downloads:desc"]),
-        "follows" => ("projects_filtered", ["follows:desc"]),
-        "updated" => ("projects_filtered", ["date_modified:desc"]),
-        "newest" => ("projects_filtered", ["date_created:desc"]),
+        "follows" => ("projects", ["follows:desc"]),
+        "updated" => ("projects", ["date_modified:desc"]),
+        "newest" => ("projects", ["date_created:desc"]),
         i => return Err(SearchError::InvalidIndex(i.to_string())),
     };
 
