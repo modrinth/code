@@ -3,7 +3,8 @@
   import IconHeart from 'virtual:icons/lucide/heart';
   import IconDownload from 'virtual:icons/heroicons-outline/download';
   import IconCalendar from 'virtual:icons/lucide/calendar';
-  import { ago, simplify } from 'omorphia/utils';
+  import { ago } from 'omorphia/utils';
+  import { simplify } from '$lib/number';
   import { Avatar, Button } from 'omorphia';
   import { tagIcons } from '$generated/tags.json';
 

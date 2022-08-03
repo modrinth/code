@@ -12,7 +12,8 @@ const config = {
     precompileIntl('locales'),
     Generator({
       gameVersions: true,
-      openapi: true
+      openapi: true,
+      tags: true
     })
   ],
   optimizeDeps: {
