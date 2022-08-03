@@ -75,6 +75,7 @@
         color: var(--color-text-lightest);
       }
     }
+  }
 
     .statuses {
       margin-left: auto;

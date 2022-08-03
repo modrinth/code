@@ -1,362 +1,286 @@
+//! Downloader for Minecraft data
+
 use crate::{
-    data::{DataError, Settings},
-    launcher::LauncherError,
+    state::State,
+    util::{fetch::*, platform::OsExt},
 };
-use daedalus::get_path_from_artifact;
-use daedalus::minecraft::{
-    fetch_assets_index, fetch_version_info, Asset, AssetsIndex, DownloadType,
-    Library, Os, Version, VersionInfo,
+use daedalus::{
+    self as d,
+    minecraft::{
+        Asset, AssetsIndex, Library, Os, Version as GameVersion,
+        VersionInfo as GameVersionInfo,
+    },
+    modded::LoaderVersion,
 };
-use daedalus::modded::{
-    fetch_partial_version, merge_partial_version, LoaderVersion,
-};
-use futures::future;
-use std::path::Path;
-use std::time::Duration;
-use tokio::{
-    fs::File,
-    io::AsyncWriteExt,
-    sync::{OnceCell, Semaphore},
-};
+use futures::prelude::*;
+use tokio::{fs, sync::OnceCell};
 
-static DOWNLOADS_SEMAPHORE: OnceCell<Semaphore> = OnceCell::const_new();
+#[tracing::instrument(skip_all)]
+pub async fn download_minecraft(
+    st: &State,
+    version: &GameVersionInfo,
+) -> crate::Result<()> {
+    log::info!("Downloading Minecraft version {}", version.id);
+    let assets_index = download_assets_index(st, version).await?;
 
-pub async fn init() -> Result<(), DataError> {
-    DOWNLOADS_SEMAPHORE
-        .get_or_try_init(|| async {
-            let settings = Settings::get().await?;
-            Ok::<_, DataError>(Semaphore::new(
-                settings.max_concurrent_downloads,
-            ))
-        })
-        .await?;
+    tokio::try_join! {
+        download_client(st, version),
+        download_assets(st, version.assets == "legacy", &assets_index),
+        download_libraries(st, version.libraries.as_slice(), &version.id)
+    }?;
 
+    log::info!("Done downloading Minecraft!");
     Ok(())
 }
 
+#[tracing::instrument(skip_all, fields(version = version.id.as_str(), loader = ?loader))]
 pub async fn download_version_info(
-    client_path: &Path,
-    version: &Version,
-    loader_version: Option<&LoaderVersion>,
-) -> Result<VersionInfo, LauncherError> {
-    let id = match loader_version {
-        Some(x) => &x.id,
-        None => &version.id,
-    };
+    st: &State,
+    version: &GameVersion,
+    loader: Option<&LoaderVersion>,
+) -> crate::Result<GameVersionInfo> {
+    let version_id = loader.map_or(&version.id, |it| &it.id);
+    log::debug!("Loading version info for Minecraft {version_id}");
+    let path = st
+        .directories
+        .version_dir(version_id)
+        .join(format!("{version_id}.json"));
 
-    let mut path = client_path.join(id);
-    path.push(&format!("{id}.json"));
-
-    if path.exists() {
-        let contents = std::fs::read_to_string(path)?;
-        Ok(serde_json::from_str(&contents)?)
+    let res = if path.exists() {
+        fs::read(path)
+            .err_into::<crate::Error>()
+            .await
+            .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
-        let mut info = fetch_version_info(version).await?;
+        log::info!("Downloading version info for version {}", &version.id);
+        let mut info = d::minecraft::fetch_version_info(version).await?;
 
-        if let Some(loader_version) = loader_version {
-            let partial = fetch_partial_version(&loader_version.url).await?;
-            info = merge_partial_version(partial, info);
-            info.id = loader_version.id.clone();
+        if let Some(loader) = loader {
+            let partial = d::modded::fetch_partial_version(&loader.url).await?;
+            info = d::modded::merge_partial_version(partial, info);
+            info.id = loader.id.clone();
         }
-        let info_s = serde_json::to_string(&info)?;
-        save_file(&path, &bytes::Bytes::from(info_s)).await?;
 
+        let permit = st.io_semaphore.acquire().await.unwrap();
+        write(&path, &serde_json::to_vec(&info)?, &permit).await?;
         Ok(info)
-    }
+    }?;
+
+    log::debug!("Loaded version info for Minecraft {version_id}");
+    Ok(res)
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn download_client(
-    client_path: &Path,
-    version_info: &VersionInfo,
-) -> Result<(), LauncherError> {
-    let version = &version_info.id;
+    st: &State,
+    version_info: &GameVersionInfo,
+) -> crate::Result<()> {
+    let ref version = version_info.id;
+    log::debug!("Locating client for version {version}");
     let client_download = version_info
         .downloads
-        .get(&DownloadType::Client)
-        .ok_or_else(|| {
-            LauncherError::InvalidInput(format!(
-                "Version {version} does not have any client downloads"
+        .get(&d::minecraft::DownloadType::Client)
+        .ok_or(
+            crate::ErrorKind::LauncherError(format!(
+                "No client downloads exist for version {version}"
             ))
-        })?;
+            .as_error(),
+        )?;
+    let path = st
+        .directories
+        .version_dir(version)
+        .join(format!("{version}.jar"));
 
-    let mut path = client_path.join(version);
-    path.push(&format!("{version}.jar"));
-
-    save_and_download_file(
-        &path,
-        &client_download.url,
-        Some(&client_download.sha1),
-    )
-    .await?;
-    Ok(())
-}
-
-pub async fn download_assets_index(
-    assets_path: &Path,
-    version: &VersionInfo,
-) -> Result<AssetsIndex, LauncherError> {
-    let path =
-        assets_path.join(format!("indexes/{}.json", &version.asset_index.id));
-
-    if path.exists() {
-        let content = std::fs::read_to_string(path)?;
-        Ok(serde_json::from_str(&content)?)
-    } else {
-        let index = fetch_assets_index(version).await?;
-
-        save_file(&path, &bytes::Bytes::from(serde_json::to_string(&index)?))
-            .await?;
-
-        Ok(index)
-    }
-}
-
-pub async fn download_assets(
-    assets_path: &Path,
-    legacy_path: Option<&Path>,
-    index: &AssetsIndex,
-) -> Result<(), LauncherError> {
-    future::join_all(index.objects.iter().map(|(name, asset)| {
-        download_asset(assets_path, legacy_path, name, asset)
-    }))
-    .await
-    .into_iter()
-    .collect::<Result<Vec<()>, LauncherError>>()?;
-
-    Ok(())
-}
-
-async fn download_asset(
-    assets_path: &Path,
-    legacy_path: Option<&Path>,
-    name: &str,
-    asset: &Asset,
-) -> Result<(), LauncherError> {
-    let hash = &asset.hash;
-    let sub_hash = &hash[..2];
-
-    let mut resource_path = assets_path.join("objects");
-    resource_path.push(sub_hash);
-    resource_path.push(hash);
-
-    let url =
-        format!("https://resources.download.minecraft.net/{sub_hash}/{hash}");
-
-    let resource =
-        save_and_download_file(&resource_path, &url, Some(hash)).await?;
-
-    if let Some(legacy_path) = legacy_path {
-        let resource_path = legacy_path
-            .join(name.replace('/', &std::path::MAIN_SEPARATOR.to_string()));
-        save_file(resource_path.as_path(), &resource).await?;
-    }
-
-    Ok(())
-}
-
-pub async fn download_libraries(
-    libraries_path: &Path,
-    natives_path: &Path,
-    libraries: &[Library],
-) -> Result<(), LauncherError> {
-    future::join_all(libraries.iter().map(|library| {
-        download_library(libraries_path, natives_path, library)
-    }))
-    .await
-    .into_iter()
-    .collect::<Result<Vec<()>, LauncherError>>()?;
-
-    Ok(())
-}
-
-async fn download_library(
-    libraries_path: &Path,
-    natives_path: &Path,
-    library: &Library,
-) -> Result<(), LauncherError> {
-    if let Some(rules) = &library.rules {
-        if !super::rules::parse_rules(rules) {
-            return Ok(());
-        }
-    }
-
-    future::try_join(
-        download_library_jar(libraries_path, library),
-        download_native(natives_path, library),
-    )
-    .await?;
-
-    Ok(())
-}
-
-async fn download_library_jar(
-    libraries_path: &Path,
-    library: &Library,
-) -> Result<(), LauncherError> {
-    let artifact_path = get_path_from_artifact(&library.name)?;
-    let path = libraries_path.join(&artifact_path);
-
-    if let Some(downloads) = &library.downloads {
-        if let Some(library) = &downloads.artifact {
-            save_and_download_file(&path, &library.url, Some(&library.sha1))
+    if !path.exists() {
+        let permit = st.io_semaphore.acquire().await.unwrap();
+        let bytes =
+            fetch(&client_download.url, Some(&client_download.sha1), &permit)
                 .await?;
-        }
+        write(&path, &bytes, &permit).await?;
+        log::info!("Fetched client version {version}");
+    }
+
+    log::debug!("Client loaded for version {version}!");
+    Ok(())
+}
+
+#[tracing::instrument(skip_all)]
+pub async fn download_assets_index(
+    st: &State,
+    version: &GameVersionInfo,
+) -> crate::Result<AssetsIndex> {
+    log::debug!("Loading assets index");
+    let path = st
+        .directories
+        .assets_index_dir()
+        .join(format!("{}.json", &version.asset_index.id));
+
+    let res = if path.exists() {
+        fs::read(path)
+            .err_into::<crate::Error>()
+            .await
+            .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
-        let url = format!(
-            "{}{artifact_path}",
-            library
-                .url
-                .as_deref()
-                .unwrap_or("https://libraries.minecraft.net/"),
-        );
-        save_and_download_file(&path, &url, None).await?;
-    }
+        let index = d::minecraft::fetch_assets_index(version).await?;
+        let permit = st.io_semaphore.acquire().await.unwrap();
+        write(&path, &serde_json::to_vec(&index)?, &permit).await?;
+        log::info!("Fetched assets index");
+        Ok(index)
+    }?;
 
+    log::debug!("Assets index successfully loaded!");
+    Ok(res)
+}
+
+#[tracing::instrument(skip(st, index))]
+pub async fn download_assets(
+    st: &State,
+    with_legacy: bool,
+    index: &AssetsIndex,
+) -> crate::Result<()> {
+    log::debug!("Loading assets");
+
+    stream::iter(index.objects.iter())
+        .map(Ok::<(&String, &Asset), crate::Error>)
+        .try_for_each_concurrent(None, |(name, asset)| async move {
+            let ref hash = asset.hash;
+            let resource_path = st.directories.object_dir(hash);
+            let url = format!(
+                "https://resources.download.minecraft.net/{sub_hash}/{hash}",
+                sub_hash = &hash[..2]
+            );
+
+            let fetch_cell = OnceCell::<bytes::Bytes>::new();
+            tokio::try_join! {
+                async {
+                    if !resource_path.exists() {
+                        let permit = st.io_semaphore.acquire().await.unwrap();
+                        let resource = fetch_cell
+                            .get_or_try_init(|| fetch(&url, Some(hash), &permit))
+                            .await?;
+                        write(&resource_path, &resource, &permit).await?;
+                        log::info!("Fetched asset with hash {hash}");
+                    }
+                    Ok::<_, crate::Error>(())
+                },
+                async {
+                    if with_legacy {
+                        let permit = st.io_semaphore.acquire().await.unwrap();
+                        let resource = fetch_cell
+                            .get_or_try_init(|| fetch(&url, Some(hash), &permit))
+                            .await?;
+                        let resource_path = st.directories.legacy_assets_dir().join(
+                            name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
+                        );
+                        write(&resource_path, &resource, &permit).await?;
+                        log::info!("Fetched legacy asset with hash {hash}");
+                    }
+                    Ok::<_, crate::Error>(())
+                },
+            }?;
+
+            log::debug!("Loaded asset with hash {hash}");
+            Ok(())
+        }).await?;
+
+    log::debug!("Done loading assets!");
     Ok(())
 }
 
-async fn download_native(
-    natives_path: &Path,
-    library: &Library,
-) -> Result<(), LauncherError> {
-    use daedalus::minecraft::LibraryDownload;
-    use std::collections::HashMap;
+#[tracing::instrument(skip(st, libraries))]
+pub async fn download_libraries(
+    st: &State,
+    libraries: &[Library],
+    version: &str,
+) -> crate::Result<()> {
+    log::debug!("Loading libraries");
 
-    // Try blocks in stable Rust when?
-    let optional_cascade =
-        || -> Option<(&String, &HashMap<String, LibraryDownload>)> {
-            let os_key = library.natives.as_ref()?.get(&get_os())?;
-            let classifiers =
-                library.downloads.as_ref()?.classifiers.as_ref()?;
-            Some((os_key, classifiers))
-        };
+    tokio::try_join! {
+        fs::create_dir_all(st.directories.libraries_dir()),
+        fs::create_dir_all(st.directories.version_natives_dir(version))
+    }?;
 
-    if let Some((os_key, classifiers)) = optional_cascade() {
-        #[cfg(target_pointer_width = "64")]
-        let parsed_key = os_key.replace("${arch}", "64");
-        #[cfg(target_pointer_width = "32")]
-        let parsed_key = os_key.replace("${arch}", "32");
+    stream::iter(libraries.iter())
+        .map(Ok::<&Library, crate::Error>)
+        .try_for_each_concurrent(None, |library| async move {
+            if let Some(rules) = &library.rules {
+                if !rules.iter().all(super::parse_rule) {
+                    return Ok(());
+                }
+            }
+            tokio::try_join! {
+                async {
+                    let artifact_path = d::get_path_from_artifact(&library.name)?;
+                    let path = st.directories.libraries_dir().join(&artifact_path);
 
-        if let Some(native) = classifiers.get(&parsed_key) {
-            let file = download_file(&native.url, Some(&native.sha1)).await?;
+                    match library.downloads {
+                        _ if path.exists() => Ok(()),
+                        Some(d::minecraft::LibraryDownloads {
+                            artifact: Some(ref artifact),
+                            ..
+                        }) => {
+                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let bytes = fetch(&artifact.url, Some(&artifact.sha1), &permit)
+                                .await?;
+                            write(&path, &bytes, &permit).await?;
+                            log::info!("Fetched library {}", &library.name);
+                            Ok::<_, crate::Error>(())
+                        }
+                        None => {
+                            let url = [
+                                library
+                                    .url
+                                    .as_deref()
+                                    .unwrap_or("https://libraries.minecraft.net"),
+                                &artifact_path
+                            ].concat();
 
-            let reader = std::io::Cursor::new(&file);
+                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let bytes = fetch(&url, None, &permit).await?;
+                            write(&path, &bytes, &permit).await?;
+                            log::info!("Fetched library {}", &library.name);
+                            Ok::<_, crate::Error>(())
+                        }
+                        _ => Ok(())
+                    }
+                },
+                async {
+                    // HACK: pseudo try block using or else
+                    if let Some((os_key, classifiers)) = None.or_else(|| Some((
+                        library
+                            .natives
+                            .as_ref()?
+                            .get(&Os::native())?,
+                        library
+                            .downloads
+                            .as_ref()?
+                            .classifiers
+                            .as_ref()?
+                    ))) {
+                        let parsed_key = os_key.replace(
+                            "${arch}",
+                            crate::util::platform::ARCH_WIDTH,
+                        );
 
-            let mut archive = zip::ZipArchive::new(reader).unwrap();
-            archive.extract(natives_path).unwrap();
-        }
-    }
-    Ok(())
-}
-
-async fn save_and_download_file(
-    path: &Path,
-    url: &str,
-    sha1: Option<&str>,
-) -> Result<bytes::Bytes, LauncherError> {
-    match std::fs::read(path) {
-        Ok(bytes) => Ok(bytes::Bytes::from(bytes)),
-        Err(_) => {
-            let file = download_file(url, sha1).await?;
-            save_file(path, &file).await?;
-            Ok(file)
-        }
-    }
-}
-
-async fn save_file(path: &Path, bytes: &bytes::Bytes) -> std::io::Result<()> {
-    let _save_permit = DOWNLOADS_SEMAPHORE
-        .get()
-        .expect("File operation semaphore not initialized!")
-        .acquire()
-        .await
-        .unwrap();
-    if let Some(parent) = path.parent() {
-        tokio::fs::create_dir_all(parent).await?;
-    }
-
-    let mut file = File::create(path).await?;
-    file.write_all(bytes).await?;
-    Ok(())
-}
-
-pub fn get_os() -> Os {
-    match std::env::consts::OS {
-        "windows" => Os::Windows,
-        "macos" => Os::Osx,
-        "linux" => Os::Linux,
-        _ => Os::Unknown,
-    }
-}
-
-pub async fn download_file(
-    url: &str,
-    sha1: Option<&str>,
-) -> Result<bytes::Bytes, LauncherError> {
-    let _download_permit = DOWNLOADS_SEMAPHORE
-        .get()
-        .expect("File operation semaphore not initialized!")
-        .acquire()
-        .await
-        .unwrap();
-
-    let client = reqwest::Client::builder()
-        .tcp_keepalive(Some(Duration::from_secs(10)))
-        .build()
-        .map_err(|err| LauncherError::FetchError {
-            inner: err,
-            item: url.to_string(),
-        })?;
-
-    for attempt in 1..=4 {
-        let result = client.get(url).send().await;
-
-        match result {
-            Ok(x) => {
-                let bytes = x.bytes().await;
-
-                if let Ok(bytes) = bytes {
-                    if let Some(sha1) = sha1 {
-                        if &get_hash(bytes.clone()).await? != sha1 {
-                            if attempt <= 3 {
-                                continue;
-                            } else {
-                                return Err(LauncherError::ChecksumFailure {
-                                    hash: sha1.to_string(),
-                                    url: url.to_string(),
-                                    tries: attempt,
-                                });
-                            }
+                        if let Some(native) = classifiers.get(&parsed_key) {
+                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let data = fetch(&native.url, Some(&native.sha1), &permit).await?;
+                            let reader = std::io::Cursor::new(&data);
+                            let mut archive = zip::ZipArchive::new(reader).unwrap();
+                            archive.extract(&st.directories.version_natives_dir(version)).unwrap();
+                            log::info!("Fetched native {}", &library.name);
                         }
                     }
 
-                    return Ok(bytes);
-                } else if attempt <= 3 {
-                    continue;
-                } else if let Err(err) = bytes {
-                    return Err(LauncherError::FetchError {
-                        inner: err,
-                        item: url.to_string(),
-                    });
+                    Ok(())
                 }
-            }
-            Err(_) if attempt <= 3 => continue,
-            Err(err) => {
-                return Err(LauncherError::FetchError {
-                    inner: err,
-                    item: url.to_string(),
-                })
-            }
+            }?;
+
+            log::debug!("Loaded library {}", library.name);
+            Ok(())
         }
-    }
-    unreachable!()
-}
+    ).await?;
 
-/// Computes a checksum of the input bytes
-async fn get_hash(bytes: bytes::Bytes) -> Result<String, LauncherError> {
-    let hash =
-        tokio::task::spawn_blocking(|| sha1::Sha1::from(bytes).hexdigest())
-            .await?;
-
-    Ok(hash)
+    log::debug!("Done loading libraries!");
+    Ok(())
 }

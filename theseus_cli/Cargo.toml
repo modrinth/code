@@ -8,14 +8,23 @@ edition = "2018"
 
 [dependencies]
 theseus = { path = "../theseus" }
-daedalus = "0.1.12"
+daedalus = {version = "0.1.15", features = ["bincode"]}
 tokio = { version = "1", features = ["full"] }
 tokio-stream = { version = "0.1", features = ["fs"] }
 futures = "0.3"
 argh = "0.1"
 paris = { version = "1.5", features = ["macros", "no_logger"] }
 dialoguer = "0.10"
-eyre = "0.6"
 tabled = "0.5"
 dirs = "4.0"
-uuid = {version = "0.8", features = ["v4", "serde"]}
+uuid = {version = "1.1", features = ["v4", "serde"]}
+url = "2.2"
+
+color-eyre = "0.6"
+eyre = "0.6"
+tracing = "0.1"
+tracing-error = "0.2"
+tracing-futures = "0.2"
+tracing-subscriber = {version = "0.3", features = ["env-filter"]}
+
+webbrowser = "0.7"

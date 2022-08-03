@@ -14,7 +14,7 @@
     };
   };
 
-  outputs = inputs:
+  outputs = inputs@{self, ...}:
     inputs.utils.lib.eachDefaultSystem (system: let
       pkgs = import inputs.nixpkgs { inherit system; };
       fenix = inputs.fenix.packages.${system};
@@ -32,13 +32,14 @@
 
       deps = with pkgs; {
         global = [
-          openssl pkg-config
+          openssl pkg-config gcc
         ];
         gui = [
-          gtk4 gdk-pixbuf atk webkitgtk
+          gtk4 gdk-pixbuf atk webkitgtk dbus
         ];
         shell = [
-          toolchain fenix.default.clippy git
+          (with fenix; combine [toolchain default.clippy complete.rust-src rust-analyzer])
+          git
           jdk17 jdk8
         ];
       };
@@ -53,8 +54,13 @@
       };
 
       apps = {
-        theseus-cli = utils.mkApp {
-          drv = inputs.self.packages.${system}.theseus-cli;
+        cli = utils.mkApp {
+          drv = self.packages.${system}.theseus-cli;
+        };
+        cli-dev = utils.mkApp {
+          drv = self.packages.${system}.theseus-cli.overrideAttrs (old: old // {
+            release = false;
+          });
         };
       };
 

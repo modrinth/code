@@ -1,32 +1,29 @@
-use crate::data::profiles::*;
-use crate::launcher::auth::provider::Credentials;
-use crate::launcher::rules::parse_rules;
-use crate::launcher::LauncherError;
-use daedalus::get_path_from_artifact;
-use daedalus::minecraft::{Argument, ArgumentValue, Library, Os, VersionType};
-use daedalus::modded::SidedDataEntry;
-use std::collections::HashMap;
+//! Minecraft CLI argument logic
+// TODO: Rafactor this section
+use super::{auth::Credentials, parse_rule};
+use crate::{
+    state::{MemorySettings, WindowSize},
+    util::platform::classpath_separator,
+};
+use daedalus::{
+    get_path_from_artifact,
+    minecraft::{Argument, ArgumentValue, Library, VersionType},
+    modded::SidedDataEntry,
+};
 use std::io::{BufRead, BufReader};
-use std::path::Path;
+use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
-
-fn get_cp_separator() -> &'static str {
-    match super::download::get_os() {
-        Os::Osx | Os::Linux | Os::Unknown => ":",
-        Os::Windows => ";",
-    }
-}
 
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
     client_path: &Path,
-) -> Result<String, LauncherError> {
-    let mut class_paths = libraries
+) -> crate::Result<String> {
+    let mut cps = libraries
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if !super::rules::parse_rules(rules.as_slice()) {
+                if !rules.iter().all(parse_rule) {
                     return None;
                 }
             }
@@ -39,56 +36,50 @@ pub fn get_class_paths(
         })
         .collect::<Result<Vec<_>, _>>()?;
 
-    class_paths.push(
-        crate::util::absolute_path(&client_path)
+    cps.push(
+        client_path
+            .canonicalize()
             .map_err(|_| {
-                LauncherError::InvalidInput(format!(
+                crate::ErrorKind::LauncherError(format!(
                     "Specified class path {} does not exist",
                     client_path.to_string_lossy()
                 ))
+                .as_error()
             })?
             .to_string_lossy()
             .to_string(),
     );
 
-    Ok(class_paths.join(get_cp_separator()))
+    Ok(cps.join(classpath_separator()))
 }
 
 pub fn get_class_paths_jar<T: AsRef<str>>(
     libraries_path: &Path,
     libraries: &[T],
-) -> Result<String, LauncherError> {
-    let class_paths = libraries
+) -> crate::Result<String> {
+    let cps = libraries
         .iter()
         .map(|library| get_lib_path(libraries_path, library.as_ref()))
         .collect::<Result<Vec<_>, _>>()?;
 
-    Ok(class_paths.join(get_cp_separator()))
+    Ok(cps.join(classpath_separator()))
 }
 
-pub fn get_lib_path(libraries_path: &Path, lib: &str) -> Result<String, LauncherError> {
+pub fn get_lib_path(libraries_path: &Path, lib: &str) -> crate::Result<String> {
     let mut path = libraries_path.to_path_buf();
 
     path.push(get_path_from_artifact(lib.as_ref())?);
 
-    let path = crate::util::absolute_path(&path).map_err(|_| {
-        LauncherError::InvalidInput(format!(
+    let path = &path.canonicalize().map_err(|_| {
+        crate::ErrorKind::LauncherError(format!(
             "Library file at path {} does not exist",
             path.to_string_lossy()
         ))
+        .as_error()
     })?;
-
-    /*if !path.exists() {
-        if let Some(parent) = &path.parent() {
-            std::fs::create_dir_all(parent)?;
-        }
-
-        std::fs::File::create(&path)?;
-    }*/
 
     Ok(path.to_string_lossy().to_string())
 }
-
 pub fn get_jvm_arguments(
     arguments: Option<&[Argument]>,
     natives_path: &Path,
@@ -97,7 +88,7 @@ pub fn get_jvm_arguments(
     version_name: &str,
     memory: MemorySettings,
     custom_args: Vec<String>,
-) -> Result<Vec<String>, LauncherError> {
+) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
     if let Some(args) = arguments {
@@ -113,11 +104,13 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            &crate::util::absolute_path(natives_path)
-                .map_err(|_| LauncherError::InvalidInput(format!(
+            &natives_path
+                .canonicalize()
+                .map_err(|_| crate::ErrorKind::LauncherError(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
-                )))?
+                ))
+                .as_error())?
                 .to_string_lossy()
                 .to_string()
         ));
@@ -144,33 +137,37 @@ fn parse_jvm_argument(
     libraries_path: &Path,
     class_paths: &str,
     version_name: &str,
-) -> Result<String, LauncherError> {
+) -> crate::Result<String> {
     argument.retain(|c| !c.is_whitespace());
     Ok(argument
         .replace(
             "${natives_directory}",
-            &crate::util::absolute_path(natives_path)
+            &natives_path
+                .canonicalize()
                 .map_err(|_| {
-                    LauncherError::InvalidInput(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified natives path {} does not exist",
                         natives_path.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy(),
         )
         .replace(
             "${library_directory}",
-            &crate::util::absolute_path(libraries_path)
+            &libraries_path
+                .canonicalize()
                 .map_err(|_| {
-                    LauncherError::InvalidInput(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified libraries path {} does not exist",
                         libraries_path.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_string(),
         )
-        .replace("${classpath_separator}", get_cp_separator())
+        .replace("${classpath_separator}", classpath_separator())
         .replace("${launcher_name}", "theseus")
         .replace("${launcher_version}", env!("CARGO_PKG_VERSION"))
         .replace("${version_name}", version_name)
@@ -188,7 +185,7 @@ pub fn get_minecraft_arguments(
     assets_directory: &Path,
     version_type: &VersionType,
     resolution: WindowSize,
-) -> Result<Vec<String>, LauncherError> {
+) -> crate::Result<Vec<String>> {
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
 
@@ -242,48 +239,54 @@ fn parse_minecraft_argument(
     assets_directory: &Path,
     version_type: &VersionType,
     resolution: WindowSize,
-) -> Result<String, LauncherError> {
+) -> crate::Result<String> {
     Ok(argument
         .replace("${auth_access_token}", access_token)
         .replace("${auth_session}", access_token)
         .replace("${auth_player_name}", username)
-        .replace("${auth_uuid}", &uuid.to_hyphenated().to_string())
+        .replace("${auth_uuid}", &uuid.hyphenated().to_string())
         .replace("${user_properties}", "{}")
         .replace("${user_type}", "mojang")
         .replace("${version_name}", version)
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &crate::util::absolute_path(game_directory)
+            &game_directory
+                .canonicalize()
                 .map_err(|_| {
-                    LauncherError::InvalidInput(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified game directory {} does not exist",
                         game_directory.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_owned(),
         )
         .replace(
             "${assets_root}",
-            &crate::util::absolute_path(assets_directory)
+            &assets_directory
+                .canonicalize()
                 .map_err(|_| {
-                    LauncherError::InvalidInput(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
                         assets_directory.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_owned(),
         )
         .replace(
             "${game_assets}",
-            &crate::util::absolute_path(assets_directory)
+            &assets_directory
+                .canonicalize()
                 .map_err(|_| {
-                    LauncherError::InvalidInput(format!(
+                    crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
                         assets_directory.to_string_lossy()
                     ))
+                    .as_error()
                 })?
                 .to_string_lossy()
                 .to_owned(),
@@ -297,9 +300,9 @@ fn parse_arguments<F>(
     arguments: &[Argument],
     parsed_arguments: &mut Vec<String>,
     parse_function: F,
-) -> Result<(), LauncherError>
+) -> crate::Result<()>
 where
-    F: Fn(&str) -> Result<String, LauncherError>,
+    F: Fn(&str) -> crate::Result<String>,
 {
     for argument in arguments {
         match argument {
@@ -311,7 +314,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if parse_rules(rules.as_slice()) {
+                if rules.iter().all(parse_rule) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(arg)?);
@@ -334,7 +337,7 @@ pub fn get_processor_arguments<T: AsRef<str>>(
     libraries_path: &Path,
     arguments: &[T],
     data: &HashMap<String, SidedDataEntry>,
-) -> Result<Vec<String>, LauncherError> {
+) -> crate::Result<Vec<String>> {
     let mut new_arguments = Vec::new();
 
     for argument in arguments {
@@ -342,7 +345,10 @@ pub fn get_processor_arguments<T: AsRef<str>>(
         if argument.as_ref().starts_with('{') {
             if let Some(entry) = data.get(trimmed_arg) {
                 new_arguments.push(if entry.client.starts_with('[') {
-                    get_lib_path(libraries_path, &entry.client[1..entry.client.len() - 1])?
+                    get_lib_path(
+                        libraries_path,
+                        &entry.client[1..entry.client.len() - 1],
+                    )?
                 } else {
                     entry.client.clone()
                 })
@@ -357,15 +363,25 @@ pub fn get_processor_arguments<T: AsRef<str>>(
     Ok(new_arguments)
 }
 
-pub async fn get_processor_main_class(path: String) -> Result<Option<String>, LauncherError> {
+pub async fn get_processor_main_class(
+    path: String,
+) -> crate::Result<Option<String>> {
     Ok(tokio::task::spawn_blocking(move || {
         let zipfile = std::fs::File::open(&path)?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
-            LauncherError::ProcessorError(format!("Cannot read processor at {}", path))
+            crate::ErrorKind::LauncherError(format!(
+                "Cannot read processor at {}",
+                path
+            ))
+            .as_error()
         })?;
 
         let file = archive.by_name("META-INF/MANIFEST.MF").map_err(|_| {
-            LauncherError::ProcessorError(format!("Cannot read processor manifest at {}", path))
+            crate::ErrorKind::LauncherError(format!(
+                "Cannot read processor manifest at {}",
+                path
+            ))
+            .as_error()
         })?;
 
         let reader = BufReader::new(file);
@@ -381,7 +397,8 @@ pub async fn get_processor_main_class(path: String) -> Result<Option<String>, La
             }
         }
 
-        Ok::<Option<String>, LauncherError>(None)
+        Ok::<Option<String>, crate::Error>(None)
     })
-    .await??)
+    .await
+    .unwrap()?)
 }

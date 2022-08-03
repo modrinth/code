@@ -1,205 +1,168 @@
-pub mod api {
-    use serde::{Deserialize, Serialize};
-    use uuid::Uuid;
+//! Authentication flow based on Hydra
+use async_tungstenite as ws;
+use bincode::{Decode, Encode};
+use chrono::{prelude::*, Duration};
+use futures::prelude::*;
+use once_cell::sync::*;
+use serde::Deserialize;
+use url::Url;
 
-    #[derive(Debug, Serialize, Deserialize)]
-    pub struct GameProfile {
-        pub id: Uuid,
-        pub name: String,
-    }
+pub const HYDRA_URL: Lazy<Url> =
+    Lazy::new(|| Url::parse("https://hydra.modrinth.com").unwrap());
 
-    #[derive(Debug, Deserialize)]
-    pub struct UserProperty {
-        pub name: String,
-        pub value: String,
-    }
+// Socket messages
+#[derive(Deserialize)]
+struct ErrorJSON {
+    error: String,
+}
 
-    #[derive(Debug, Deserialize)]
-    pub struct User {
-        pub id: String,
-        pub username: String,
-        pub properties: Option<Vec<UserProperty>>,
-    }
-
-    #[derive(Debug, Deserialize)]
-    #[serde(rename_all = "camelCase")]
-    pub struct AuthenticateResponse {
-        pub user: Option<User>,
-        pub client_token: Uuid,
-        pub access_token: String,
-        pub available_profiles: Vec<GameProfile>,
-        pub selected_profile: Option<GameProfile>,
-    }
-
-    pub async fn login(
-        username: &str,
-        password: &str,
-        request_user: bool,
-    ) -> Result<AuthenticateResponse, reqwest::Error> {
-        let client = reqwest::Client::new();
-
-        client
-            .post("https://authserver.mojang.com/authenticate")
-            .header(reqwest::header::CONTENT_TYPE, "application/json")
-            .body(
-                serde_json::json!(
-                    {
-                        "agent": {
-                            "name": "Minecraft",
-                            "version": 1
-                        },
-                        "username": username,
-                        "password": password,
-                        "clientToken": Uuid::new_v4(),
-                        "requestUser": request_user
-                    }
-                )
-                .to_string(),
-            )
-            .send()
-            .await?
-            .json()
-            .await
-    }
-
-    pub async fn sign_out(username: &str, password: &str) -> Result<(), reqwest::Error> {
-        let client = reqwest::Client::new();
-
-        client
-            .post("https://authserver.mojang.com/signout")
-            .header(reqwest::header::CONTENT_TYPE, "application/json")
-            .body(
-                serde_json::json!(
-                    {
-                        "username": username,
-                        "password": password
-                    }
-                )
-                .to_string(),
-            )
-            .send()
-            .await?;
-
-        Ok(())
-    }
-
-    pub async fn validate(access_token: &str, client_token: &str) -> Result<(), reqwest::Error> {
-        let client = reqwest::Client::new();
-
-        client
-            .post("https://authserver.mojang.com/validate")
-            .header(reqwest::header::CONTENT_TYPE, "application/json")
-            .body(
-                serde_json::json!(
-                    {
-                        "accessToken": access_token,
-                        "clientToken": client_token
-                    }
-                )
-                .to_string(),
-            )
-            .send()
-            .await?;
-
-        Ok(())
-    }
-
-    pub async fn invalidate(access_token: &str, client_token: &str) -> Result<(), reqwest::Error> {
-        let client = reqwest::Client::new();
-
-        client
-            .post("https://authserver.mojang.com/invalidate")
-            .header(reqwest::header::CONTENT_TYPE, "application/json")
-            .body(
-                serde_json::json!(
-                    {
-                        "accessToken": access_token,
-                        "clientToken": client_token
-                    }
-                )
-                .to_string(),
-            )
-            .send()
-            .await?;
-
-        Ok(())
-    }
-
-    #[derive(Debug, Deserialize)]
-    #[serde(rename_all = "camelCase")]
-    pub struct RefreshResponse {
-        pub user: Option<User>,
-        pub client_token: Uuid,
-        pub access_token: String,
-        pub selected_profile: Option<GameProfile>,
-    }
-
-    pub async fn refresh(
-        access_token: &str,
-        client_token: &str,
-        selected_profile: &GameProfile,
-        request_user: bool,
-    ) -> Result<RefreshResponse, reqwest::Error> {
-        let client = reqwest::Client::new();
-
-        client
-            .post("https://authserver.mojang.com/refresh")
-            .header(reqwest::header::CONTENT_TYPE, "application/json")
-            .body(
-                serde_json::json!(
-                    {
-                        "accessToken": access_token,
-                        "clientToken": client_token,
-                        "selectedProfile": {
-                            "id": selected_profile.id,
-                            "name": selected_profile.name,
-                        },
-                        "requestUser": request_user,
-                    }
-                )
-                .to_string(),
-            )
-            .send()
-            .await?
-            .json()
-            .await
+impl ErrorJSON {
+    pub fn unwrap<'a, T: Deserialize<'a>>(data: &'a [u8]) -> crate::Result<T> {
+        if let Ok(err) = serde_json::from_slice::<Self>(data) {
+            Err(crate::ErrorKind::HydraError(err.error).as_error())
+        } else {
+            Ok(serde_json::from_slice::<T>(data)?)
+        }
     }
 }
 
-pub mod provider {
-    use crate::launcher::auth::api::login;
-    use crate::launcher::LauncherError;
-    use uuid::Uuid;
+#[derive(Deserialize)]
+struct LoginCodeJSON {
+    login_code: String,
+}
 
-    #[derive(Debug)]
-    /// The credentials of a user
-    pub struct Credentials {
-        /// The user UUID the credentials belong to
-        pub id: Uuid,
-        /// The username of the user
-        pub username: String,
-        /// The access token associated with the credentials
-        pub access_token: String,
+#[derive(Deserialize)]
+struct TokenJSON {
+    token: String,
+    refresh_token: String,
+    expires_after: u32,
+}
+
+#[derive(Deserialize)]
+struct ProfileInfoJSON {
+    id: uuid::Uuid,
+    name: String,
+}
+
+// Login information
+#[derive(Encode, Decode)]
+pub struct Credentials {
+    #[bincode(with_serde)]
+    pub id: uuid::Uuid,
+    pub username: String,
+    pub access_token: String,
+    pub refresh_token: String,
+    #[bincode(with_serde)]
+    pub expires: DateTime<Utc>,
+    _ctor_scope: std::marker::PhantomData<()>,
+}
+
+// Implementation
+pub struct HydraAuthFlow<S: AsyncRead + AsyncWrite + Unpin> {
+    socket: ws::WebSocketStream<S>,
+}
+
+impl HydraAuthFlow<ws::tokio::ConnectStream> {
+    pub async fn new() -> crate::Result<Self> {
+        let sock_url = wrap_ref_builder!(
+            it = HYDRA_URL =>
+            { it.set_scheme("wss").ok() }
+        );
+        let (socket, _) = ws::tokio::connect_async(sock_url.clone()).await?;
+        Ok(Self { socket })
     }
 
-    impl Credentials {
-        /// Gets a credentials instance from a user's login
-        pub async fn from_login(username: &str, password: &str) -> Result<Self, LauncherError> {
-            let login =
-                login(username, password, true)
-                    .await
-                    .map_err(|err| LauncherError::FetchError {
-                        inner: err,
-                        item: "authentication credentials".to_string(),
-                    })?;
-
-            let profile = login.selected_profile.unwrap();
-
-            Ok(Credentials {
-                id: profile.id,
-                username: profile.name,
-                access_token: login.access_token,
-            })
-        }
+    pub async fn prepare_login_url(&mut self) -> crate::Result<Url> {
+        let code_resp = self
+            .socket
+            .try_next()
+            .await?
+            .ok_or(
+                crate::ErrorKind::WSClosedError(String::from(
+                    "login socket ID",
+                ))
+                .as_error(),
+            )?
+            .into_data();
+        let code = ErrorJSON::unwrap::<LoginCodeJSON>(&code_resp)?;
+        Ok(wrap_ref_builder!(
+            it = HYDRA_URL.join("login")? =>
+            { it.query_pairs_mut().append_pair("id", &code.login_code); }
+        ))
     }
+
+    pub async fn extract_credentials(&mut self) -> crate::Result<Credentials> {
+        // Minecraft bearer token
+        let token_resp = self
+            .socket
+            .try_next()
+            .await?
+            .ok_or(
+                crate::ErrorKind::WSClosedError(String::from(
+                    "login socket ID",
+                ))
+                .as_error(),
+            )?
+            .into_data();
+        let token = ErrorJSON::unwrap::<TokenJSON>(&token_resp)?;
+        let expires =
+            Utc::now() + Duration::seconds(token.expires_after.into());
+
+        // Get account credentials
+        let info = fetch_info(&token.token).await?;
+
+        // Return structure from response
+        Ok(Credentials {
+            username: info.name,
+            id: info.id,
+            refresh_token: token.refresh_token,
+            access_token: token.token,
+            expires,
+            _ctor_scope: std::marker::PhantomData,
+        })
+    }
+}
+
+pub async fn refresh_credentials(
+    credentials: &mut Credentials,
+) -> crate::Result<()> {
+    let resp = crate::config::REQWEST_CLIENT
+        .post(HYDRA_URL.join("/refresh")?)
+        .json(
+            &serde_json::json!({ "refresh_token": credentials.refresh_token }),
+        )
+        .send()
+        .await?
+        .error_for_status()?
+        .json::<TokenJSON>()
+        .await?;
+
+    credentials.access_token = resp.token;
+    credentials.refresh_token = resp.refresh_token;
+    credentials.expires =
+        Utc::now() + Duration::seconds(resp.expires_after.into());
+
+    Ok(())
+}
+
+pub async fn refresh_username(
+    credentials: &mut Credentials,
+) -> crate::Result<()> {
+    let info = fetch_info(&credentials.access_token).await?;
+    credentials.username = info.name;
+    Ok(())
+}
+
+// Helpers
+async fn fetch_info(token: &str) -> crate::Result<ProfileInfoJSON> {
+    let url =
+        Url::parse("https://api.minecraftservices.com/minecraft/profile")?;
+    Ok(crate::config::REQWEST_CLIENT
+        .get(url)
+        .header(reqwest::header::AUTHORIZATION, format!("Bearer {token}"))
+        .send()
+        .await?
+        .error_for_status()?
+        .json::<ProfileInfoJSON>()
+        .await?)
 }
