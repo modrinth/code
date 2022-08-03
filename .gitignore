@@ -5,6 +5,8 @@ theseus_gui/build/
 theseus_gui/generated/
 WixTools
 .direnv/
+.DS_Store
+.pnpm-debug.log
 
 [#]*[#]
 

@@ -128,10 +128,52 @@
         align-items: center;
         grid-gap: 8px;
 
-        :global(button) {
-          width: 34px;
+        &__title {
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          font-size: 11px;
+          line-height: 100%;
         }
       }
+
+      &__container {
+        max-height: calc(100vh - 400px);
+        overflow-y: auto;
+        mask-image: linear-gradient(to bottom, transparent, hsla(0, 0%, 0%, 1) 5% 95%, transparent);
+        scrollbar-width: none;
+        padding: 8px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        &::-webkit-scrollbar {
+          display: none;
+        }
+      }
+
+      &__create {
+        margin-top: 16px;
+        display: flex;
+        align-items: center;
+        grid-gap: 8px;
+
+        :global(button) {
+          width: 32px;
+        }
+      }
+    }
+
+    > :global(*) {
+      margin-bottom: 24px;
+    }
+
+    > *:last-child {
+      margin-top: auto;
+      margin-bottom: 0;
+    }
+
+    :global(button) {
+      width: 34px;
     }
 
     > :global(*) {
