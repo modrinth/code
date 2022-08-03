@@ -206,7 +206,7 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "license",
     "client_side",
     "server_side",
-    "gallery"
+    "gallery",
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =

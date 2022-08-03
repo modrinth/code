@@ -50,6 +50,8 @@ pub enum AuthorizationError {
     Decoding(#[from] DecodingError),
     #[error("Invalid callback URL specified")]
     Url,
+    #[error("User is not allowed to access Modrinth services")]
+    Banned,
 }
 impl actix_web::ResponseError for AuthorizationError {
     fn status_code(&self) -> StatusCode {
@@ -67,6 +69,7 @@ impl actix_web::ResponseError for AuthorizationError {
             AuthorizationError::Decoding(..) => StatusCode::BAD_REQUEST,
             AuthorizationError::Authentication(..) => StatusCode::UNAUTHORIZED,
             AuthorizationError::Url => StatusCode::BAD_REQUEST,
+            AuthorizationError::Banned => StatusCode::FORBIDDEN,
         }
     }
 
@@ -84,6 +87,7 @@ impl actix_web::ResponseError for AuthorizationError {
                     "authentication_error"
                 }
                 AuthorizationError::Url => "url_error",
+                AuthorizationError::Banned => "user_banned",
             },
             description: &self.to_string(),
         })
@@ -215,6 +219,17 @@ pub async fn auth_callback(
         match user_result {
             Some(_) => {}
             None => {
+                let banned_user = sqlx::query!(
+                    "SELECT user FROM banned_users WHERE github_id = $1",
+                    user.id as i64
+                )
+                .fetch_optional(&mut *transaction)
+                .await?;
+
+                if banned_user.is_some() {
+                    return Err(AuthorizationError::Banned);
+                }
+
                 let user_id =
                     crate::database::models::generate_user_id(&mut transaction)
                         .await?;

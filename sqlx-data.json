@@ -838,6 +838,18 @@
     },
     "query": "\n            DELETE FROM notifications_actions\n             WHERE notification_id = ANY($1)\n            "
   },
+  "28d5825964b0fddc43bd7d6851daf91845b79c9e88c82d5c7d97ae02502d0b4f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "INSERT INTO banned_users (github_id) VALUES ($1);"
+  },
   "292da3eec2cc7d7eb635fa123be1b1387e9e91466f007e10101053fdb9874e3f": {
     "describe": {
       "columns": [
@@ -932,6 +944,18 @@
       }
     },
     "query": "\n                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted)\n                VALUES ($1, $2, $3, $4, $5, $6)\n                "
+  },
+  "2f7c011654d15c85dbb614ac01ed5613a6872ea8c172ab38fdaa0eb38a7d6e4f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "DELETE FROM banned_users WHERE github_id = $1;"
   },
   "33a965c7dc615d3b701c05299889357db8dd36d378850625d2602ba471af4885": {
     "describe": {
@@ -2519,6 +2543,26 @@
       }
     },
     "query": "\n        SELECT v.id id, v.mod_id project_id FROM files f\n        INNER JOIN versions v ON v.id = f.version_id\n        WHERE f.url = $1\n        "
+  },
+  "69bb839ea7fd5687538656e1907599d75e2c4948a54d58446bec8a90170ee618": {
+    "describe": {
+      "columns": [
+        {
+          "name": "user",
+          "ordinal": 0,
+          "type_info": "Name"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT user FROM banned_users WHERE github_id = $1"
   },
   "6a7b7704c2a0c52a70f5d881a1e6d3e8e77ddaa83ecc5688cd86bf327775fb76": {
     "describe": {
