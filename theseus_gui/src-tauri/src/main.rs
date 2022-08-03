@@ -31,7 +31,7 @@ fn main() {
             MenuEntry::Submenu(Submenu::new(
                 &ctx.package_info().name,
                 Menu::with_items([
-                    MenuItem::About(ctx.package_info().name.clone()).into(),
+                    // MenuItem::About(ctx.package_info().name.clone()).into(),
                     MenuItem::Separator.into(),
                     MenuItem::Services.into(),
                     MenuItem::Separator.into(),
