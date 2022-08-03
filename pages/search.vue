@@ -267,7 +267,7 @@
             :icon-url="result.icon_url"
             :client-side="result.client_side"
             :server-side="result.server_side"
-            :categories="result.display_categories"
+            :categories="result.categories"
           />
           <div v-if="results && results.length === 0" class="no-results">
             <p>No results found for your query!</p>
