@@ -1,13 +1,12 @@
 <script context="module" lang="ts">
-
 </script>
 
 <script lang="ts">
-    import GlobalSettings from "$components/GlobalSettings.svelte"
+  import GlobalSettings from '$components/GlobalSettings.svelte';
 </script>
 
 <div class="section">
-    <GlobalSettings />
+  <GlobalSettings />
 </div>
 
 <style lang="postcss">
