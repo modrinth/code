@@ -2,6 +2,7 @@
 node_modules/
 .svelte-kit/
 theseus_gui/build/
+theseus_gui/generated/
 WixTools
 .direnv/
 

@@ -9,12 +9,12 @@ use tauri::{
 };
 
 fn main() {
-    let ctx = tauri::generate_context!();
+    let ctx = tauri::generate_context!(); // Run `pnpm build:web` (builds the web app) to get rid of the error.
 
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![])
-        .create_window("main", WindowUrl::default(), |win, webview| {
-            let win = win
+        .setup(|app| {
+            let _win = WindowBuilder::new(app, "main", WindowUrl::default())
                 .title("Modrinth")
                 .resizable(true)
                 .decorations(true)
@@ -22,15 +22,16 @@ fn main() {
                 .inner_size(800.0, 550.0)
                 .min_inner_size(400.0, 200.0)
                 .skip_taskbar(false)
-                .fullscreen(false);
-            return (win, webview);
+                .fullscreen(false)
+                .build()?;
+            Ok(())
         })
         .menu(Menu::with_items([
             #[cfg(target_os = "macos")]
             MenuEntry::Submenu(Submenu::new(
                 &ctx.package_info().name,
                 Menu::with_items([
-                    MenuItem::About(ctx.package_info().name.clone()).into(),
+                    // MenuItem::About(ctx.package_info().name.clone()).into(),
                     MenuItem::Separator.into(),
                     MenuItem::Services.into(),
                     MenuItem::Separator.into(),

@@ -1,14 +1,14 @@
 <script lang="ts">
-    import { FormField, TextInput } from "omorphia"
+  import { Field, TextInput } from 'omorphia';
 </script>
 
 <div class="section">
-    <FormField label="Window width">
-        <TextInput />
-    </FormField>
-    <FormField label="Window height">
-        <TextInput />
-    </FormField>
+  <Field label="Window width">
+    <TextInput />
+  </Field>
+  <Field label="Window height">
+    <TextInput />
+  </Field>
 </div>
 
 <style lang="postcss">
