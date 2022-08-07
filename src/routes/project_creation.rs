@@ -18,7 +18,6 @@ use chrono::Utc;
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
-use std::collections::HashSet;
 use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
@@ -361,12 +360,6 @@ pub async fn project_create_inner(
         create_data.validate().map_err(|err| {
             CreateError::InvalidInput(validation_errors_to_string(err, None))
         })?;
-
-        let mut uniq = HashSet::new();
-        create_data
-            .initial_versions
-            .iter()
-            .all(|x| uniq.insert(x.version_number.clone()));
 
         let slug_project_id_option: Option<ProjectId> =
             serde_json::from_str(&*format!("\"{}\"", create_data.slug)).ok();

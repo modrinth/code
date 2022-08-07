@@ -169,23 +169,6 @@ async fn version_create_inner(
                 ));
             }
 
-            // Check whether there is already a version of this project with the
-            // same version number
-            let results = sqlx::query!(
-                "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number = $1) AND (mod_id = $2))",
-                version_create_data.version_number,
-                project_id as models::ProjectId,
-            )
-            .fetch_one(&mut *transaction)
-            .await?;
-
-            if results.exists.unwrap_or(true) {
-                return Err(CreateError::InvalidInput(
-                    "A version with that version_number already exists"
-                        .to_string(),
-                ));
-            }
-
             // Check that the user creating this version is a team member
             // of the project the version is being added to.
             let team_member = models::TeamMember::get_from_user_id_project(
@@ -367,10 +350,9 @@ async fn version_create_inner(
     )
     .fetch_many(&mut *transaction)
     .try_filter_map(|e| async {
-        Ok(e.right()
-            .map(|m| crate::database::models::ids::UserId(m.follower_id)))
+        Ok(e.right().map(|m| models::ids::UserId(m.follower_id)))
     })
-    .try_collect::<Vec<crate::database::models::ids::UserId>>()
+    .try_collect::<Vec<models::ids::UserId>>()
     .await?;
 
     let project_id: ProjectId = builder.project_id.into();

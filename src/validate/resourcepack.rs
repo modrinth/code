@@ -34,7 +34,7 @@ impl super::Validator for PackValidator {
     ) -> Result<ValidationResult, ValidationError> {
         archive.by_name("pack.mcmeta").map_err(|_| {
             ValidationError::InvalidInput(
-                "No pack.mcmeta present for pack file.".into(),
+                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!".into(),
             )
         })?;
 

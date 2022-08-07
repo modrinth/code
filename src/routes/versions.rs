@@ -253,23 +253,6 @@ pub async fn version_edit(
             }
 
             if let Some(number) = &new_version.version_number {
-                let results = sqlx::query!(
-                    "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number = $1) AND (mod_id = $2))",
-                    number,
-                    version_item.project_id as database::models::ids::ProjectId,
-                )
-                    .fetch_one(&mut *transaction)
-                    .await?;
-
-                if results.exists.unwrap_or(true)
-                    && &version_item.version_number != number
-                {
-                    return Err(ApiError::InvalidInput(
-                        "A version with that version_number already exists"
-                            .to_string(),
-                    ));
-                }
-
                 sqlx::query!(
                     "
                     UPDATE versions

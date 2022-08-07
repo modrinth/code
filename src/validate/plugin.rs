@@ -93,11 +93,11 @@ impl super::Validator for VelocityValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("velocity-plugin.json").map_err(|_| {
-            ValidationError::InvalidInput(
-                "No velocity-plugin.json present for plugin file.".into(),
-            )
-        })?;
+        if archive.by_name("velocity-plugin.json").is_err() {
+            return Ok(ValidationResult::Warning(
+                "No velocity-plugin.json present for plugin file.",
+            ));
+        }
 
         Ok(ValidationResult::Pass)
     }

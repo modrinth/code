@@ -2991,27 +2991,6 @@
     },
     "query": "\n        SELECT id FROM mods_gallery\n        WHERE image_url = $1\n        "
   },
-  "7cae1137ab3aaa8de1617d820fb5635eb7498e61174e79da3cdd0da7e99aaca3": {
-    "describe": {
-      "columns": [
-        {
-          "name": "exists",
-          "ordinal": 0,
-          "type_info": "Bool"
-        }
-      ],
-      "nullable": [
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Text",
-          "Int8"
-        ]
-      }
-    },
-    "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE (version_number = $1) AND (mod_id = $2))"
-  },
   "7cb691738c28e0d1f28c84ba2dbcfa21a6dbd859bcf0f565f90cd7ce2ea5aa1c": {
     "describe": {
       "columns": [],
