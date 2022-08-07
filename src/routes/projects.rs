@@ -491,7 +491,7 @@ pub async fn project_edit(
                     sqlx::query!(
                         "
                         UPDATE mods
-                        SET published = NOW()
+                        SET approved = NOW()
                         WHERE id = $1 AND approved = NULL
                         ",
                         id as database::models::ids::ProjectId,

@@ -838,6 +838,18 @@
     },
     "query": "\n            DELETE FROM notifications_actions\n             WHERE notification_id = ANY($1)\n            "
   },
+  "28be156dc8d8c394dd7c8de33a8e45be9c2d9033de461c0b7365cd8e7585aa8d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        UPDATE mods\n                        SET approved = NOW()\n                        WHERE id = $1 AND approved = NULL\n                        "
+  },
   "28d5825964b0fddc43bd7d6851daf91845b79c9e88c82d5c7d97ae02502d0b4f": {
     "describe": {
       "columns": [],
@@ -2664,18 +2676,6 @@
       }
     },
     "query": "\n            UPDATE dependencies\n            SET dependency_id = $2\n            WHERE id = ANY($1::bigint[])\n            "
-  },
-  "729ca6f7065c1e189a0ddb9ca28d86d86f9685efcbfc805d137be080f97d13d5": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE mods\n                        SET published = NOW()\n                        WHERE id = $1 AND approved = NULL\n                        "
   },
   "72ad6f4be40d7620a0ec557e3806da41ce95335aeaa910fe35aca2ec7c3f09b6": {
     "describe": {
