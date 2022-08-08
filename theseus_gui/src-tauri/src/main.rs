@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+mod commands;
+
 use tauri::api::shell;
 use tauri::{
     CustomMenuItem, Manager, Menu, MenuEntry, MenuItem, Submenu, WindowBuilder, WindowUrl,
@@ -12,7 +14,11 @@ fn main() {
     let ctx = tauri::generate_context!(); // Run `pnpm build:web` (builds the web app) to get rid of the error.
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![])
+        .invoke_handler(tauri::generate_handler![
+            commands::auth::auth_user_add,
+            commands::auth::auth_users,
+            commands::auth::auth_remove_user
+        ])
         .setup(|app| {
             let _win = WindowBuilder::new(app, "main", WindowUrl::default())
                 .title("Modrinth")

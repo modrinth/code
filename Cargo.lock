@@ -3631,6 +3631,11 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "theseus",
+ "thiserror",
+ "tokio",
+ "url",
+ "uuid 1.1.2",
 ]
 
 [[package]]

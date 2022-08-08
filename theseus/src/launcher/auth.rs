@@ -4,7 +4,7 @@ use bincode::{Decode, Encode};
 use chrono::{prelude::*, Duration};
 use futures::prelude::*;
 use once_cell::sync::*;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use url::Url;
 
 pub const HYDRA_URL: Lazy<Url> =
@@ -45,7 +45,7 @@ struct ProfileInfoJSON {
 }
 
 // Login information
-#[derive(Encode, Decode)]
+#[derive(Encode, Decode, Serialize)]
 pub struct Credentials {
     #[bincode(with_serde)]
     pub id: uuid::Uuid,
