@@ -8,7 +8,7 @@
   function fetchUser() {
     invoke('auth_users')
       .then((res) => {
-        user = res[0];
+        user = res === [] ? { uninitialized: false } : res[0];
       })
       .catch((error) => console.error(error));
   }
@@ -52,7 +52,12 @@
   {/if}
 
   <div class="button-row">
-    <Button color="primary" class="button-row__items" on:click={userAdd}>Add an account</Button>
+    <Button
+      color="primary"
+      class="button-row__items"
+      disabled={user !== undefined}
+      on:click={userAdd}>Add an account</Button
+    >
     <Button
       color="primary"
       class="button-row__items"
