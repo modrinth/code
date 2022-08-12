@@ -66,6 +66,7 @@
 		height: var(--size);
 		width: var(--size);
 		background-color: var(--color-button-bg);
+		object-fit: contain;
 
 		&--size {
 			&-xs {
