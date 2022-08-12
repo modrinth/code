@@ -8,7 +8,7 @@ The generator plugin creates static files from API responses to increase perform
 
 - `projectColors` (false) generates colors for every project
 - `tags` (false) copies & parses tags from API
-- `gameVersions` copes game versions from API
+- `gameVersions` copies game versions from API
 - `landingPage` gets icon urls for top 100 mods
 
 > All options are disabled by default
