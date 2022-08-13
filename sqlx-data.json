@@ -1,17 +1,5 @@
 {
   "db": "PostgreSQL",
-  "006e439742f15d3de8c3c3fbacbc199a25c0f01d736869cdccbdec725e2971e9": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    DELETE FROM mods_categories\n                    WHERE joining_mod_id = $1 AND is_additional = FALSE\n                    "
-  },
   "017c9fd0c8103c590489453a25b3317e6790a21f388bcf7ec8c93cd26255f368": {
     "describe": {
       "columns": [
@@ -1360,6 +1348,18 @@
       }
     },
     "query": "\n                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n                        VALUES ($1, $2)\n                        "
+  },
+  "40f7c5bec98fe3503d6bd6db2eae5a4edb8d5d6efda9b9dc124f344ae5c60e08": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        DELETE FROM mods_categories\n                        WHERE joining_mod_id = $1 AND is_additional = TRUE\n                        "
   },
   "4298552497a48adb9ace61c8dcf989c4d35866866b61c0cc4d45909b1d31c660": {
     "describe": {
@@ -3257,18 +3257,6 @@
     },
     "query": "\n            SELECT c.id id, c.category category, c.icon icon, c.header category_header, pt.name project_type\n            FROM categories c\n            INNER JOIN project_types pt ON c.project_type = pt.id\n            ORDER BY c.id\n            "
   },
-  "8b867ee091fe5ffa83eea1a2ca12ce42c6649b84bf9b086f59a288708a61d32c": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    DELETE FROM mods_categories\n                    WHERE joining_mod_id = $1 AND is_additional = TRUE\n                    "
-  },
   "8ba2b2c38958f1c542e514fc62ab4682f58b0b442ac1842d20625420698e34ec": {
     "describe": {
       "columns": [],
@@ -3791,6 +3779,18 @@
       }
     },
     "query": "\n            UPDATE dependencies\n            SET dependency_id = $2\n            WHERE dependency_id = $1\n            "
+  },
+  "a0148ff25855202e7bb220b6a2bc9220a95e309fb0dae41d9a05afa86e6b33af": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        DELETE FROM mods_categories\n                        WHERE joining_mod_id = $1 AND is_additional = FALSE\n                        "
   },
   "a39ce28b656032f862b205cffa393a76b989f4803654a615477a94fda5f57354": {
     "describe": {

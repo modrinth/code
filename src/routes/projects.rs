@@ -519,6 +519,32 @@ pub async fn project_edit(
                 }
             }
 
+            if perms.contains(Permissions::EDIT_DETAILS) {
+                if new_project.categories.is_some() {
+                    sqlx::query!(
+                        "
+                        DELETE FROM mods_categories
+                        WHERE joining_mod_id = $1 AND is_additional = FALSE
+                        ",
+                        id as database::models::ids::ProjectId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+
+                if new_project.additional_categories.is_some() {
+                    sqlx::query!(
+                        "
+                        DELETE FROM mods_categories
+                        WHERE joining_mod_id = $1 AND is_additional = TRUE
+                        ",
+                        id as database::models::ids::ProjectId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+                }
+            }
+
             if let Some(categories) = &new_project.categories {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(
@@ -526,16 +552,6 @@ pub async fn project_edit(
                             .to_string(),
                     ));
                 }
-
-                sqlx::query!(
-                    "
-                    DELETE FROM mods_categories
-                    WHERE joining_mod_id = $1 AND is_additional = FALSE
-                    ",
-                    id as database::models::ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
 
                 for category in categories {
                     let category_id =
@@ -571,16 +587,6 @@ pub async fn project_edit(
                             .to_string(),
                     ));
                 }
-
-                sqlx::query!(
-                    "
-                    DELETE FROM mods_categories
-                    WHERE joining_mod_id = $1 AND is_additional = TRUE
-                    ",
-                    id as database::models::ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
 
                 for category in categories {
                     let category_id =
