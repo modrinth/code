@@ -318,27 +318,6 @@
     },
     "query": "\n            UPDATE mods_gallery\n            SET description = $2\n            WHERE id = $1\n            "
   },
-  "153100dc632392c4d446cc768235d071bac26a0818a4a72d203d8e549f969eea": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Text"
-        ]
-      }
-    },
-    "query": "SELECT id FROM versions WHERE mod_id = $1 AND version_number = $2"
-  },
   "15b8ea323c2f6d03c2e385d9c46d7f13460764f2f106fd638226c42ae0217f75": {
     "describe": {
       "columns": [],
@@ -3072,6 +3051,38 @@
     },
     "query": "\n            SELECT u.id, u.github_id, u.name, u.email,\n                u.avatar_url, u.username, u.bio,\n                u.created, u.role\n            FROM users u\n            WHERE LOWER(u.username) = LOWER($1)\n            "
   },
+  "7f4fef104bdff9036c83499268c6b22406f8d7e5502607ed6ff47d5a0979ede2": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "version_number",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "version_type",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        SELECT id, version_number, version_type\n        FROM versions\n        WHERE mod_id = $1\n        ORDER BY date_published ASC\n        "
+  },
   "8129255d25bf0624d83f50558b668ed7b7f9c264e380d276522fc82bc871939b": {
     "describe": {
       "columns": [],
@@ -4790,6 +4801,28 @@
     },
     "query": "\n            INSERT INTO reports (\n                id, report_type_id, mod_id, version_id, user_id,\n                body, reporter\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7\n            )\n            "
   },
+  "c44e260a1f7712b14ac521fd301fea1b3f92238da62aeaf819997aecc365be43": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Text",
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC"
+  },
   "c545a74e902c5c63bca1057b76e94b9547ee21fadbc61964f45837915d5f4608": {
     "describe": {
       "columns": [],
@@ -5896,32 +5929,6 @@
       }
     },
     "query": "\n            SELECT u.id, u.name, u.email,\n                u.avatar_url, u.username, u.bio,\n                u.created, u.role\n            FROM users u\n            WHERE u.github_id = $1\n            "
-  },
-  "ea92ca7efdb8ba621729ce35b2ba5bf3fd0bb1ccd23a2875509eb90c6bcfee08": {
-    "describe": {
-      "columns": [
-        {
-          "name": "version_number",
-          "ordinal": 0,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "version_type",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            SELECT version_number, version_type\n            FROM versions\n            WHERE mod_id = $1\n            "
   },
   "ebef881a0dae70e990814e567ed3de9565bb29b772782bc974c953af195fd6d7": {
     "describe": {

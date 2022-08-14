@@ -1,11 +1,12 @@
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::{QueryFile, QueryVersion};
-use crate::models::projects::ProjectId;
+use crate::models::projects::{ProjectId, VersionId};
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
 use crate::{database, util::auth::is_authorized};
 use actix_web::{get, route, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
+use std::collections::HashSet;
 use yaserde_derive::YaSerialize;
 
 #[derive(Default, Debug, Clone, YaSerialize)]
@@ -78,14 +79,34 @@ pub async fn maven_metadata(
 
     let version_names = sqlx::query!(
         "
-            SELECT version_number, version_type
-            FROM versions
-            WHERE mod_id = $1
-            ",
+        SELECT id, version_number, version_type
+        FROM versions
+        WHERE mod_id = $1
+        ORDER BY date_published ASC
+        ",
         data.inner.id as database::models::ids::ProjectId
     )
     .fetch_all(&**pool)
     .await?;
+
+    let mut new_versions = Vec::new();
+    let mut vals = HashSet::new();
+    let mut latest_release = None;
+
+    for row in version_names {
+        let value = if vals.contains(&row.version_number) {
+            format!("{}", VersionId(row.id as u64))
+        } else {
+            row.version_number
+        };
+
+        vals.insert(value.clone());
+        if row.version_type == "release" {
+            latest_release = Some(value.clone())
+        }
+
+        new_versions.push(value);
+    }
 
     let project_id: ProjectId = data.inner.id.into();
 
@@ -93,20 +114,13 @@ pub async fn maven_metadata(
         group_id: "maven.modrinth".to_string(),
         artifact_id: format!("{}", project_id),
         versioning: Versioning {
-            latest: version_names
+            latest: new_versions
                 .last()
-                .map_or("release", |x| &x.version_number)
+                .unwrap_or(&"release".to_string())
                 .to_string(),
-            release: version_names
-                .iter()
-                .rfind(|x| x.version_type == "release")
-                .map_or("", |x| &x.version_number)
-                .to_string(),
+            release: latest_release.unwrap_or_default().to_string(),
             versions: Versions {
-                versions: version_names
-                    .iter()
-                    .map(|x| x.version_number.clone())
-                    .collect::<Vec<_>>(),
+                versions: new_versions,
             },
             last_updated: data.inner.updated.format("%Y%m%d%H%M%S").to_string(),
         },
@@ -135,8 +149,11 @@ fn find_file<'a>(
         _ => return None,
     };
 
+    let version_id: VersionId = version.id.into();
+
     if file
         == format!("{}-{}.{}", &project_id, &version.version_number, fileext)
+        || file == format!("{}-{}.{}", &project_id, &version_id, fileext)
     {
         version
             .files
@@ -178,10 +195,15 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
+    let id_option = crate::models::ids::base62_impl::parse_base62(&vnum)
+        .ok()
+        .map(|x| x as i64);
+
     let vid = if let Some(vid) = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = $1 AND version_number = $2",
+        "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC",
         project.inner.id as database::models::ids::ProjectId,
-        vnum
+        vnum,
+        id_option
     )
     .fetch_optional(&**pool)
     .await?
@@ -202,7 +224,10 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    if file == format!("{}-{}.pom", &project_id, &version.version_number) {
+    let version_id: VersionId = version.id.into();
+    if file == format!("{}-{}.pom", &project_id, &version.version_number)
+        || file == format!("{}-{}.pom", &project_id, version_id)
+    {
         let respdata = MavenPom {
             schema_location:
                 "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
@@ -211,7 +236,7 @@ pub async fn version_file(
             model_version: "4.0.0".to_string(),
             group_id: "maven.modrinth".to_string(),
             artifact_id: project_id,
-            version: version.version_number,
+            version: vnum,
             name: project.inner.title,
             description: project.inner.description,
         };
@@ -255,10 +280,15 @@ pub async fn version_file_sha1(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
+    let id_option = crate::models::ids::base62_impl::parse_base62(&vnum)
+        .ok()
+        .map(|x| x as i64);
+
     let vid = if let Some(vid) = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = $1 AND version_number = $2",
+        "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC",
         project.inner.id as database::models::ids::ProjectId,
-        vnum
+        vnum,
+        id_option
     )
     .fetch_optional(&**pool)
     .await?
@@ -312,10 +342,15 @@ pub async fn version_file_sha512(
         return Ok(HttpResponse::NotFound().body(""));
     }
 
+    let id_option = crate::models::ids::base62_impl::parse_base62(&vnum)
+        .ok()
+        .map(|x| x as i64);
+
     let vid = if let Some(vid) = sqlx::query!(
-        "SELECT id FROM versions WHERE mod_id = $1 AND version_number = $2",
+        "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC",
         project.inner.id as database::models::ids::ProjectId,
-        vnum
+        vnum,
+        id_option
     )
     .fetch_optional(&**pool)
     .await?
