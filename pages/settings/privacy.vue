@@ -204,6 +204,9 @@ export default {
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
+
+    flex-wrap: wrap;
+    justify-content: flex-end;
   }
 }
 </style>

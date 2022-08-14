@@ -4,24 +4,24 @@
 
 <script>
 export default {
-  name: 'Modpacks',
+  name: 'ResourcePacks',
   head: {
-    title: 'Modpacks - Modrinth',
+    title: 'Resource packs - Modrinth',
     meta: [
       {
         hid: 'apple-mobile-web-app-title',
         name: 'apple-mobile-web-app-title',
-        content: 'Modpacks',
+        content: 'Resource packs - Modrinth',
       },
       {
         hid: 'og:title',
         name: 'og:title',
-        content: 'Modpacks',
+        content: 'Resource packs - Modrinth',
       },
       {
         hid: 'og:url',
         name: 'og:url',
-        content: `https://modrinth.com/modpacks`,
+        content: `https://modrinth.com/resourcepacks`,
       },
     ],
   },

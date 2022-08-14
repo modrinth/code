@@ -36,38 +36,46 @@
         </nuxt-link>
         <div
           v-if="
-            project.client_side === 'optional' &&
-            project.server_side === 'optional'
+            project.project_type !== 'resourcepack' &&
+            projectTypeDisplay !== 'plugin'
           "
-          class="side-descriptor"
         >
-          <InfoIcon aria-hidden="true" />
-          Universal {{ project.project_type }}
+          <div
+            v-if="
+              project.client_side === 'optional' &&
+              project.server_side === 'optional'
+            "
+            class="side-descriptor"
+          >
+            <InfoIcon aria-hidden="true" />
+            Universal {{ projectTypeDisplay }}
+          </div>
+          <div
+            v-else-if="
+              (project.client_side === 'optional' ||
+                project.client_side === 'required') &&
+              (project.server_side === 'optional' ||
+                project.server_side === 'unsupported')
+            "
+            class="side-descriptor"
+          >
+            <InfoIcon aria-hidden="true" />
+            Client {{ projectTypeDisplay }}
+          </div>
+          <div
+            v-else-if="
+              (project.server_side === 'optional' ||
+                project.server_side === 'required') &&
+              (project.client_side === 'optional' ||
+                project.client_side === 'unsupported')
+            "
+            class="side-descriptor"
+          >
+            <InfoIcon aria-hidden="true" />
+            Server {{ projectTypeDisplay }}
+          </div>
         </div>
-        <div
-          v-else-if="
-            (project.client_side === 'optional' ||
-              project.client_side === 'required') &&
-            (project.server_side === 'optional' ||
-              project.server_side === 'unsupported')
-          "
-          class="side-descriptor"
-        >
-          <InfoIcon aria-hidden="true" />
-          Client {{ project.project_type }}
-        </div>
-        <div
-          v-else-if="
-            (project.server_side === 'optional' ||
-              project.server_side === 'required') &&
-            (project.client_side === 'optional' ||
-              project.client_side === 'unsupported')
-          "
-          class="side-descriptor"
-        >
-          <InfoIcon aria-hidden="true" />
-          Server {{ project.project_type }}
-        </div>
+
         <p class="description">
           {{ project.description }}
         </p>
@@ -389,7 +397,7 @@
               <nuxt-link
                 :to="`/${project.project_type}/${
                   project.slug ? project.slug : project.id
-                }/version/${encodeURIComponent(version.version_number)}`"
+                }/version/${encodeURI(version.displayUrlEnding)}`"
                 class="top title-link"
               >
                 {{ version.name }}
@@ -398,15 +406,7 @@
                 v-if="version.game_versions.length > 0"
                 class="game-version item"
               >
-                {{
-                  version.loaders
-                    .map((x) =>
-                      x.toLowerCase() === 'modloader'
-                        ? 'ModLoader'
-                        : x.charAt(0).toUpperCase() + x.slice(1)
-                    )
-                    .join(', ')
-                }}
+                {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
                 {{ $formatVersion(version.game_versions) }}
               </div>
               <VersionBadge
@@ -455,13 +455,25 @@
               }}</a>
             </div>
           </div>
-          <div class="info">
+          <div
+            v-if="
+              project.project_type !== 'resourcepack' &&
+              projectTypeDisplay !== 'plugin'
+            "
+            class="info"
+          >
             <div class="key">Client side</div>
             <div class="value">
               {{ project.client_side }}
             </div>
           </div>
-          <div class="info">
+          <div
+            v-if="
+              project.project_type !== 'resourcepack' &&
+              projectTypeDisplay !== 'plugin'
+            "
+            class="info"
+          >
             <div class="key">Server side</div>
             <div class="value">
               {{ project.server_side }}
@@ -647,7 +659,7 @@ export default {
     Categories,
   },
   async asyncData(data) {
-    const projectTypes = ['mod', 'modpack']
+    const projectTypes = ['mod', 'modpack', 'resourcepack']
 
     try {
       if (
@@ -706,6 +718,16 @@ export default {
         project.body = (await data.$axios.get(project.body_url)).data
       }
 
+      const loaders = []
+
+      versions.forEach((version) => {
+        version.loaders.forEach((loader) => {
+          if (!loaders.includes(loader)) {
+            loaders.push(loader)
+          }
+        })
+      })
+
       return {
         project,
         versions,
@@ -714,6 +736,7 @@ export default {
         allMembers: members,
         currentMember,
         dependencies,
+        loaders,
       }
     } catch {
       data.error({
@@ -726,6 +749,10 @@ export default {
     return {
       showKnownErrors: false,
     }
+  },
+  fetch() {
+    this.versions = this.$computeVersions(this.versions)
+    this.featuredVersions = this.$computeVersions(this.featuredVersions)
   },
   head() {
     return {
@@ -778,6 +805,14 @@ export default {
         },
       ],
     }
+  },
+  computed: {
+    projectTypeDisplay() {
+      return this.$getProjectTypeForDisplay(
+        this.project.project_type,
+        this.loaders
+      )
+    },
   },
   methods: {
     findPrimary(version) {
@@ -1119,7 +1154,10 @@ export default {
 
     .value {
       width: 50%;
-      text-transform: capitalize;
+
+      &::first-letter {
+        text-transform: capitalize;
+      }
 
       &.lowercase {
         text-transform: none;

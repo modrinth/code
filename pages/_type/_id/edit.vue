@@ -110,17 +110,13 @@
         <Multiselect
           id="categories"
           v-model="newProject.categories"
-          :options="
-            $tag.categories
-              .filter((x) => x.project_type === project.project_type)
-              .map((it) => it.name)
-          "
+          :options="selectableCategories"
           :custom-label="
             (value) => value.charAt(0).toUpperCase() + value.slice(1)
           "
           :loading="$tag.categories.length === 0"
           :multiple="true"
-          :searchable="false"
+          :searchable="true"
           :show-no-results="false"
           :close-on-select="false"
           :clear-on-select="false"
@@ -132,13 +128,46 @@
           :disabled="
             (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
           "
+          @input="setCategories"
+        />
+      </label>
+      <label>
+        <span>
+          <h3>Additional Categories</h3>
+          <span class="no-padding">
+            Select up to 3 categories that will help others <br />
+            find your project.
+          </span>
+        </span>
+        <Multiselect
+          id="additional_categories"
+          v-model="newProject.additional_categories"
+          :options="selectableAdditionalCategories"
+          :custom-label="
+            (value) => value.charAt(0).toUpperCase() + value.slice(1)
+          "
+          :loading="$tag.categories.length === 0"
+          :multiple="true"
+          :searchable="true"
+          :show-no-results="false"
+          :close-on-select="false"
+          :clear-on-select="false"
+          :show-labels="false"
+          :max="255"
+          :limit="6"
+          :hide-selected="true"
+          placeholder="Choose additional categories"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
+          @input="setCategories"
         />
       </label>
       <label class="vertical-input">
         <span>
           <h3>Vanity URL (slug)<span class="required">*</span></h3>
           <span class="slug-description"
-            >https://modrinth.com/{{ newProject.project_type.toLowerCase() }}/{{
+            >https://modrinth.com/{{ project.project_type.toLowerCase() }}/{{
               newProject.slug ? newProject.slug : 'your-slug'
             }}
           </span>
@@ -189,7 +218,10 @@
         Reset
       </button>
     </section>
-    <section class="card game-sides">
+    <section
+      v-if="project.project_type !== 'resourcepack'"
+      class="card game-sides"
+    >
       <div class="columns">
         <div>
           <h3>Supported environments</h3>
@@ -241,7 +273,7 @@
           for="body"
           title="You can type an extended description of your project here."
         >
-          Body<span class="required">*</span>
+          Description<span class="required">*</span>
         </label>
       </h3>
       <span>
@@ -500,6 +532,9 @@ export default {
       donationPlatforms: [],
       donationLinks: [],
 
+      selectableCategories: [],
+      selectableAdditionalCategories: [],
+
       isProcessing: false,
       previewImage: null,
       compiledBody: '',
@@ -544,6 +579,8 @@ export default {
     this.serverSideType =
       this.newProject.server_side.charAt(0) +
       this.newProject.server_side.slice(1)
+
+    this.setCategories()
   },
   watch: {
     license(newValue, oldValue) {
@@ -584,6 +621,23 @@ export default {
     this.DELETE_PROJECT = 1 << 7
   },
   methods: {
+    setCategories() {
+      this.selectableCategories = this.$tag.categories
+        .filter(
+          (x) =>
+            x.project_type === this.project.project_type &&
+            !this.newProject.additional_categories.includes(x.name)
+        )
+        .map((it) => it.name)
+
+      this.selectableAdditionalCategories = this.$tag.categories
+        .filter(
+          (x) =>
+            x.project_type === this.project.project_type &&
+            !this.newProject.categories.includes(x.name)
+        )
+        .map((it) => it.name)
+    },
     checkFields() {
       const reviewConditions =
         this.newProject.body !== '' && this.newProject.versions.length > 0
@@ -626,6 +680,7 @@ export default {
           description: this.newProject.description,
           body: this.newProject.body,
           categories: this.newProject.categories,
+          additional_categories: this.newProject.additional_categories,
           issues_url: this.newProject.issues_url
             ? this.newProject.issues_url
             : null,

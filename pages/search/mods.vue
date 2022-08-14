@@ -5,9 +5,6 @@
 <script>
 export default {
   name: 'Mods',
-  asyncData(ctx) {
-    ctx.params.projectType = 'mod'
-  },
   head: {
     title: 'Mods - Modrinth',
     meta: [

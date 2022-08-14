@@ -263,6 +263,14 @@
   > :last-child {
     margin-bottom: 0 !important;
   }
+
+  @media screen and (max-width: 850px) {
+    iframe {
+      aspect-ratio: 16 / 9;
+      width: 100%;
+      height: auto;
+    }
+  }
 }
 
 .tooltip {
@@ -826,12 +834,12 @@ label {
 }
 
 .vue-notification {
-  background: #44A4FC;
-  border-left: 5px solid #44A4FC;
+  background: #44a4fc;
+  border-left: 5px solid #44a4fc;
 
   &.success {
-    background: #68CD86;
-    border-left-color: #68CD86;
+    background: #68cd86;
+    border-left-color: #68cd86;
   }
 
   &.warn {
@@ -840,25 +848,43 @@ label {
   }
 
   &.error {
-    background: #E54D42;
-    border-left-color: #E54D42;
+    background: #e54d42;
+    border-left-color: #e54d42;
   }
 }
 
 .vue-notification-group {
   right: 25px !important;
+  bottom: 25px !important;
 
-  .vue-notification-template {
-    border-radius: var(--size-rounded-card);
-    margin: 0 0 25px 0;
+  .vue-notification-wrapper {
+    margin-bottom: 10px;
 
-    .notification-title {
-      font-size: var(--font-size-lg);
-      margin-right: auto;
+    .vue-notification-template {
+      border-radius: var(--size-rounded-card);
+      margin: 0;
+
+      .notification-title {
+        font-size: var(--font-size-lg);
+        margin-right: auto;
+      }
+
+      .notification-content {
+        font-size: var(--font-size-md);
+      }
     }
 
-    .notification-content {
-      font-size: var(--font-size-md);
+    &:last-child {
+      margin: 0;
+    }
+  }
+
+  @media screen and (max-width: 750px) {
+    transition: bottom 0.25s ease-in-out;
+    bottom: calc(var(--size-mobile-navbar-height) + 10px) !important;
+
+    &.browse-menu-open {
+      bottom: calc(var(--size-mobile-navbar-height-expanded) + 10px) !important;
     }
   }
 }

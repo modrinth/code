@@ -14,7 +14,7 @@
               <nuxt-link
                 :to="`/${project.project_type}/${
                   project.slug ? project.slug : project.id
-                }/version/${encodeURIComponent(version.version_number)}`"
+                }/version/${encodeURI(version.displayUrlEnding)}`"
                 >{{ version.name }}</nuxt-link
               >
             </h2>
@@ -69,12 +69,6 @@ export default {
     DownloadIcon,
     VersionFilterControl,
   },
-  data() {
-    return {
-      filteredVersions: this.versions,
-    }
-  },
-  auth: false,
   props: {
     project: {
       type: Object,
@@ -95,6 +89,12 @@ export default {
       },
     },
   },
+  data() {
+    return {
+      filteredVersions: this.versions,
+    }
+  },
+  auth: false,
   methods: {
     updateVersions(updatedVersions) {
       this.filteredVersions = updatedVersions

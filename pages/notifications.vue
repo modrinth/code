@@ -76,8 +76,8 @@ import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
 import ThisOrThat from '~/components/ui/ThisOrThat'
 
 const NOTIFICATION_TYPES = {
-  'Team Invites': 'team_invite',
-  'Project Updates': 'project_update',
+  'Team invites': 'team_invite',
+  'Project updates': 'project_update',
 }
 
 export default {

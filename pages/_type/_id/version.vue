@@ -26,7 +26,7 @@
         Back to list
       </nuxt-link>
     </div>
-    <div>
+    <div v-if="version">
       <div v-if="mode === 'version'" class="version-header">
         <h2>{{ version.name }}</h2>
 
@@ -47,7 +47,7 @@
           v-if="$auth.user"
           :to="`/${project.project_type}/${
             project.slug ? project.slug : project.id
-          }/version/${encodeURIComponent(version.version_number)}`"
+          }/version/${encodeURI(version.displayUrlEnding)}`"
           class="iconified-button"
         >
           <CrossIcon aria-hidden="true" />
@@ -113,7 +113,7 @@
           class="action iconified-button"
           :to="`/${project.project_type}/${
             project.slug ? project.slug : project.id
-          }/version/${encodeURIComponent(version.version_number)}/edit`"
+          }/version/${encodeURI(version.displayUrlEnding)}/edit`"
           @click.prevent="mode = 'edit'"
         >
           <EditIcon aria-hidden="true" />
@@ -209,8 +209,8 @@
               color="red"
             />
           </div>
-          <div class="data">
-            <p class="title">Mod loaders</p>
+          <div v-if="project.project_type !== 'resourcepack'" class="data">
+            <p class="title">Loaders</p>
             <multiselect
               v-if="mode === 'edit' || mode === 'create'"
               v-model="version.loaders"
@@ -223,12 +223,7 @@
                   )
                   .map((it) => it.name)
               "
-              :custom-label="
-                (value) =>
-                  value === 'modloader'
-                    ? 'Risugami\'s ModLoader'
-                    : value.charAt(0).toUpperCase() + value.slice(1)
-              "
+              :custom-label="(value) => $formatCategory(value)"
               :loading="$tag.loaders.length === 0"
               :multiple="true"
               :searchable="false"
@@ -238,18 +233,10 @@
               :show-labels="false"
               :limit="6"
               :hide-selected="true"
-              placeholder="Choose mod loaders..."
+              placeholder="Choose loaders..."
             />
             <p v-else class="value">
-              {{
-                version.loaders
-                  .map((x) =>
-                    x.toLowerCase() === 'modloader'
-                      ? "Risugami's ModLoader"
-                      : x.charAt(0).toUpperCase() + x.slice(1)
-                  )
-                  .join(', ')
-              }}
+              {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
             </p>
           </div>
           <div v-if="mode === 'version'" class="data">
@@ -365,7 +352,7 @@
                           dependency.project.slug
                             ? dependency.project.slug
                             : dependency.project.id
-                        }/version/${encodeURIComponent(
+                        }/version/${encodeURI(
                           dependency.version.version_number
                         )}`
                       : `/${dependency.project.project_type}/${
@@ -754,8 +741,17 @@ export default {
 
       if (!this.version)
         this.version = this.versions.find(
-          (x) => x.version_number === this.$route.params.version
+          (x) => x.displayUrlEnding === this.$route.params.version
         )
+
+      if (!this.version) {
+        this.$nuxt.context.error({
+          statusCode: 404,
+          message: 'The page could not be found',
+        })
+
+        return
+      }
 
       this.version = JSON.parse(JSON.stringify(this.version))
       this.primaryFile =
@@ -891,8 +887,9 @@ export default {
         const index = this.versions.findIndex((x) => x.id === this.version.id)
         editedVersions.splice(index, 1, version)
 
-        this.$emit('update:versions', editedVersions)
+        const newEditedVersions = this.$computeVersions(editedVersions)
 
+        this.$emit('update:versions', newEditedVersions)
         this.$emit('update:featuredVersions', featuredVersions)
 
         this.newFiles = []
@@ -901,7 +898,7 @@ export default {
         await this.$router.replace(
           `/${this.project.project_type}/${
             this.project.slug ? this.project.slug : this.project.id
-          }/version/${encodeURIComponent(this.version.version_number)}`
+          }/version/${encodeURI(newEditedVersions[index].displayUrlEnding)}`
         )
       } catch (err) {
         this.$notify({
@@ -920,6 +917,10 @@ export default {
       const formData = new FormData()
 
       const fileParts = this.newFiles.map((f, idx) => `${f.name}-${idx}`)
+
+      if (this.project.project_type === 'resourcepack') {
+        this.version.loaders = ['minecraft']
+      }
 
       const newVersion = {
         project_id: this.version.project_id,
@@ -958,15 +959,19 @@ export default {
         ).data
 
         const newProject = JSON.parse(JSON.stringify(this.project))
-        newProject.versions = newProject.versions.concat([data])
+        newProject.versions = newProject.versions.concat([data.id])
+
+        const newVersions = this.$computeVersions(this.versions.concat([data]))
 
         await this.$emit('update:project', newProject)
-        await this.$emit('update:versions', this.versions.concat([data]))
+        await this.$emit('update:versions', newVersions)
 
         await this.$router.push(
           `/${this.project.project_type}/${
             this.project.slug ? this.project.slug : this.project.project_id
-          }/version/${encodeURIComponent(this.version.version_number)}`
+          }/version/${encodeURI(
+            newVersions[newVersions.length - 1].displayUrlEnding
+          )}`
         )
       } catch (err) {
         this.$notify({

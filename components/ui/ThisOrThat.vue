@@ -43,11 +43,15 @@ export default {
 
 <style scoped>
 button {
+  text-transform: capitalize;
   margin: 0;
   padding: 0;
-  text-transform: capitalize;
   background-color: transparent;
   border-radius: 0;
   color: inherit;
+}
+
+button span::first-letter {
+  text-transform: uppercase;
 }
 </style>

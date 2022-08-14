@@ -69,7 +69,6 @@ export default {
   }
 
   span {
-    text-transform: capitalize;
     user-select: none;
   }
 }

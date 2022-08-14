@@ -54,16 +54,18 @@
         <label>
           <span>
             <h3>Type<span class="required">*</span></h3>
-            <span class="no-padding">The type of project of your project.</span>
+            <span class="no-padding">The type of project your project is.</span>
           </span>
           <Multiselect
             v-model="projectType"
             placeholder="Select one"
+            label="display"
             :options="projectTypes"
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
             :allow-empty="false"
+            @input="setCategories(true)"
           />
         </label>
         <label>
@@ -106,32 +108,59 @@
           <multiselect
             id="categories"
             v-model="categories"
-            :options="
-              $tag.categories
-                .filter((x) => x.project_type === projectType.toLowerCase())
-                .map((it) => it.name)
-            "
+            :options="selectableCategories"
             :custom-label="
               (value) => value.charAt(0).toUpperCase() + value.slice(1)
             "
             :loading="$tag.categories.length === 0"
             :multiple="true"
-            :searchable="false"
+            :searchable="true"
             :show-no-results="false"
             :close-on-select="false"
-            :clear-on-select="false"
+            :clear-on-select="true"
             :show-labels="false"
             :max="3"
             :limit="6"
             :hide-selected="true"
             placeholder="Choose categories"
+            @input="setCategories(false)"
+          />
+        </label>
+        <label>
+          <span>
+            <h3>Additional Categories</h3>
+            <span class="no-padding">
+              Select more categories that will help others <br />
+              find your project. These are searchable, but not <br />
+              displayed in search.
+            </span>
+          </span>
+          <multiselect
+            id="additional_categories"
+            v-model="additional_categories"
+            :show-no-results="false"
+            :options="selectableAdditionalCategories"
+            :custom-label="
+              (value) => value.charAt(0).toUpperCase() + value.slice(1)
+            "
+            :loading="$tag.categories.length === 0"
+            :multiple="true"
+            :searchable="true"
+            :close-on-select="false"
+            :clear-on-select="true"
+            :show-labels="false"
+            :max="255"
+            :limit="6"
+            :hide-selected="true"
+            placeholder="Choose additional categories"
+            @input="setCategories(false)"
           />
         </label>
         <label>
           <span>
             <h3>Vanity URL (slug)<span class="required">*</span></h3>
             <span class="slug-description"
-              >https://modrinth.com/{{ projectType.toLowerCase() }}/{{
+              >https://modrinth.com/{{ projectType.id }}/{{
                 slug ? slug : 'your-slug'
               }}
             </span>
@@ -174,7 +203,13 @@
           Reset
         </button>
       </section>
-      <section class="card game-sides">
+      <section
+        v-if="
+          projectType.realId !== 'resourcepack' &&
+          projectType.realId !== 'plugin'
+        "
+        class="card game-sides"
+      >
         <div class="columns">
           <div class="column">
             <h3>Supported environments</h3>
@@ -214,7 +249,7 @@
             for="body"
             title="You can type an extended description of your project here."
           >
-            Body<span class="required">*</span>
+            Description<span class="required">*</span>
           </label>
         </h3>
         <span>
@@ -318,7 +353,7 @@
                 Your version must have a unique version number.
               </li>
               <li v-if="versions[currentVersionIndex].loaders.length < 1">
-                Your version must have the supported mod loaders selected.
+                Your version must have the supported loaders selected.
               </li>
               <li v-if="versions[currentVersionIndex].game_versions.length < 1">
                 Your version must have the supported Minecraft versions
@@ -387,10 +422,10 @@
                 :allow-empty="false"
               />
             </label>
-            <label>
+            <label v-if="projectType.realId !== 'resourcepack'">
               <span>
-                <h3>Mod loaders<span class="required">*</span></h3>
-                <span> Select all mod loaders this version supports. </span>
+                <h3>Loaders<span class="required">*</span></h3>
+                <span> Select all loaders this version supports. </span>
               </span>
               <multiselect
                 v-model="versions[currentVersionIndex].loaders"
@@ -401,19 +436,18 @@
                 }"
                 :options="
                   $tag.loaders
-                    .filter((x) =>
-                      x.supported_project_types.includes(
-                        projectType.toLowerCase()
-                      )
-                    )
+                    .filter((x) => {
+                      if (projectType.realId === 'plugin') {
+                        return $tag.loaderData.allPluginLoaders.includes(x.name)
+                      } else if (projectType.realId === 'mod') {
+                        return $tag.loaderData.modLoaders.includes(x.name)
+                      }
+
+                      return x.supported_project_types.includes(projectType.id)
+                    })
                     .map((it) => it.name)
                 "
-                :custom-label="
-                  (value) =>
-                    value === 'modloader'
-                      ? 'Risugami\'s ModLoader'
-                      : value.charAt(0).toUpperCase() + value.slice(1)
-                "
+                :custom-label="(value) => $formatCategory(value)"
                 :loading="$tag.loaders.length === 0"
                 :multiple="true"
                 :searchable="false"
@@ -423,7 +457,7 @@
                 :show-labels="false"
                 :limit="6"
                 :hide-selected="true"
-                placeholder="Choose mod loaders..."
+                placeholder="Choose loaders..."
               />
             </label>
             <label>
@@ -547,12 +581,9 @@
             <h3>Files<span class="required">*</span></h3>
             <span>
               You may upload multiple files, but this should only be used for
-              cases like sources or Javadocs.
+              cases like sources or Javadocs for mods/plugins.
             </span>
-            <p
-              v-if="projectType.toLowerCase() === 'modpack'"
-              aria-label="Warning"
-            >
+            <p v-if="projectType.id === 'modpack'" aria-label="Warning">
               Modpack support is currently in alpha, and you may encounter
               issues. Our documentation includes instructions on
               <a
@@ -578,9 +609,9 @@
               class="file-input"
               multiple
               :accept="
-                projectType.toLowerCase() === 'modpack'
+                projectType.id === 'modpack'
                   ? '.mrpack,application/x-modrinth-modpack+zip'
-                  : projectType.toLowerCase() === 'mod'
+                  : projectType.id === 'mod'
                   ? '.jar,application/java-archive'
                   : '*'
               "
@@ -661,7 +692,7 @@
             >
               <th>Name</th>
               <th>Version</th>
-              <th>Mod loaders</th>
+              <th>Project loaders</th>
               <th>Minecraft versions</th>
               <th>Release channel</th>
               <th>Actions</th>
@@ -1137,6 +1168,7 @@ export default {
       body: '',
       versions: [],
       categories: [],
+      additional_categories: [],
       issues_url: null,
       source_url: null,
       wiki_url: null,
@@ -1145,8 +1177,41 @@ export default {
       license: null,
       license_url: null,
 
-      projectTypes: ['Mod', 'Modpack'],
-      projectType: 'Mod',
+      selectableCategories: [],
+      selectableAdditionalCategories: [],
+
+      projectTypes: [
+        {
+          display: 'Mod',
+          id: 'mod',
+          realId: 'mod',
+        },
+        {
+          display: 'Plugin',
+          id: 'mod',
+          realId: 'plugin',
+        },
+        {
+          display: 'Mod and plugin',
+          id: 'mod',
+          realId: 'mod+plugin',
+        },
+        {
+          display: 'Modpack',
+          id: 'modpack',
+          realId: 'modpack',
+        },
+        {
+          display: 'Resource pack',
+          id: 'resourcepack',
+          realId: 'resourcepack',
+        },
+      ],
+      projectType: {
+        display: 'Mod',
+        id: 'mod',
+        realId: 'mod',
+      },
 
       sideTypes: ['Required', 'Optional', 'Unsupported'],
       clientSideType: 'Required',
@@ -1170,6 +1235,9 @@ export default {
       showKnownGalleryErrors: false,
       savingAsDraft: false,
     }
+  },
+  fetch() {
+    this.setCategories()
   },
   watch: {
     license(newValue, oldValue) {
@@ -1199,6 +1267,28 @@ export default {
     })
   },
   methods: {
+    setCategories(reset) {
+      this.selectableCategories = this.$tag.categories
+        .filter(
+          (x) =>
+            x.project_type === this.projectType.id &&
+            !this.additional_categories.includes(x.name)
+        )
+        .map((it) => it.name)
+
+      this.selectableAdditionalCategories = this.$tag.categories
+        .filter(
+          (x) =>
+            x.project_type === this.projectType.id &&
+            !this.categories.includes(x.name)
+        )
+        .map((it) => it.name)
+
+      if (reset) {
+        this.categories = []
+        this.additional_categories = []
+      }
+    },
     checkFields() {
       const reviewConditions = this.body !== '' && this.versions.length > 0
       if (
@@ -1221,6 +1311,7 @@ export default {
       return false
     },
     async createDraft() {
+      this.setValues()
       this.savingAsDraft = true
       if (this.checkFields()) {
         this.draft = true
@@ -1228,9 +1319,19 @@ export default {
       }
     },
     async createProjectForReview() {
+      this.setValues()
       this.savingAsDraft = false
       if (this.checkFields()) {
         await this.createProject()
+      }
+    },
+    setValues() {
+      if (this.projectType.realId === 'resourcepack') {
+        this.clientSideType = 'required'
+        this.serverSideType = 'optional'
+      } else if (this.projectType.realId === 'plugin') {
+        this.clientSideType = 'unsupported'
+        this.serverSideType = 'required'
       }
     },
     async createProject() {
@@ -1256,7 +1357,7 @@ export default {
         'data',
         JSON.stringify({
           title: this.name,
-          project_type: this.projectType.toLowerCase(),
+          project_type: this.projectType.id,
           slug: this.slug,
           description: this.description,
           body: this.body,
@@ -1269,6 +1370,7 @@ export default {
             },
           ],
           categories: this.categories,
+          additional_categories: this.additional_categories,
           issues_url: this.issues_url ? this.issues_url : null,
           source_url: this.source_url ? this.source_url : null,
           wiki_url: this.wiki_url ? this.wiki_url : null,
@@ -1405,6 +1507,9 @@ export default {
 
     saveVersion() {
       const version = this.versions[this.currentVersionIndex]
+      if (this.projectType.realId === 'resourcepack') {
+        version.loaders = ['minecraft']
+      }
       if (
         version.version_number !== '' &&
         version.releaseChannels !== null &&

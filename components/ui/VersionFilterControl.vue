@@ -5,16 +5,16 @@
   >
     <Multiselect
       v-if="getValidLoaders().length > 1"
-      v-model="selectedLoader"
+      v-model="selectedLoaders"
       :options="getValidLoaders()"
       :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
-      :multiple="false"
+      :multiple="true"
       :searchable="false"
       :show-no-results="false"
       :close-on-select="true"
       :clear-search-on-select="false"
       :show-labels="false"
-      :allow-empty="false"
+      :allow-empty="true"
       :disabled="getValidLoaders().length === 1"
       placeholder="Filter loader..."
       @input="updateVersionFilters()"
@@ -51,10 +51,12 @@
     />
     <button
       title="Clear filters"
-      :disabled="selectedLoader === null && selectedGameVersions.length === 0"
+      :disabled="
+        selectedLoaders.length === 0 && selectedGameVersions.length === 0
+      "
       class="iconified-button"
       @click="
-        selectedLoader = null
+        selectedLoaders = []
         selectedGameVersions = []
         updateVersionFilters()
       "
@@ -90,7 +92,7 @@ export default {
       cachedValidVersions: null,
       cachedValidLoaders: null,
       selectedGameVersions: [],
-      selectedLoader: null,
+      selectedLoaders: [],
     }
   },
   methods: {
@@ -124,8 +126,10 @@ export default {
             this.selectedGameVersions.some((gameVersion) =>
               projectVersion.game_versions.includes(gameVersion)
             )) &&
-          (this.selectedLoader === null ||
-            projectVersion.loaders.includes(this.selectedLoader))
+          (this.selectedLoaders.length === 0 ||
+            this.selectedLoaders.some((loader) =>
+              projectVersion.loaders.includes(loader)
+            ))
       )
       this.$emit('updateVersions', temp)
     },

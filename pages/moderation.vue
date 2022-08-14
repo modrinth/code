@@ -89,6 +89,7 @@
             :client-side="project.client_side"
             :server-side="project.server_side"
             :type="project.project_type"
+            :moderation="true"
           >
             <button
               class="iconified-button"

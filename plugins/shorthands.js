@@ -1,7 +1,7 @@
-export default ({ store }, inject) => {
-  inject('user', store.state.user)
-  inject('tag', store.state.tag)
-  inject('auth', store.state.auth)
+export default (ctx, inject) => {
+  inject('user', ctx.store.state.user)
+  inject('tag', ctx.store.state.tag)
+  inject('auth', ctx.store.state.auth)
   inject('defaultHeaders', () => {
     const obj = { headers: {} }
 
@@ -9,100 +9,143 @@ export default ({ store }, inject) => {
       obj.headers['x-ratelimit-key'] = process.env.RATE_LIMIT_IGNORE_KEY || ''
     }
 
-    if (store.state.auth.user) {
-      obj.headers.Authorization = store.state.auth.token
+    if (ctx.store.state.auth.user) {
+      obj.headers.Authorization = ctx.store.state.auth.token
     }
 
     return obj
   })
   inject('formatNumber', formatNumber)
-  inject('formatVersion', (versionArray) => {
-    const allVersions = store.state.tag.gameVersions.slice().reverse()
-    const allReleases = allVersions.filter((x) => x.version_type === 'release')
+  inject('formatVersion', (versionsArray) =>
+    formatVersions(versionsArray, ctx.store)
+  )
+  inject('formatBytes', formatBytes)
+  inject('formatProjectType', formatProjectType)
+  inject('formatCategory', formatCategory)
+  inject('formatCategoryHeader', formatCategoryHeader)
+  inject('computeVersions', (versions) => {
+    const versionsMap = {}
 
-    const intervals = []
-    let currentInterval = 0
-
-    for (let i = 0; i < versionArray.length; i++) {
-      const index = allVersions.findIndex((x) => x.version === versionArray[i])
-      const releaseIndex = allReleases.findIndex(
-        (x) => x.version === versionArray[i]
-      )
-
-      if (i === 0) {
-        intervals.push([[versionArray[i], index, releaseIndex]])
+    for (const version of versions.reverse()) {
+      if (versionsMap[version.version_number]) {
+        versionsMap[version.version_number].push(version)
       } else {
-        const intervalBase = intervals[currentInterval]
-
-        if (
-          (index - intervalBase[intervalBase.length - 1][1] === 1 ||
-            releaseIndex - intervalBase[intervalBase.length - 1][2] === 1) &&
-          (allVersions[intervalBase[0][1]].version_type === 'release' ||
-            allVersions[index].version_type !== 'release')
-        ) {
-          intervalBase[1] = [versionArray[i], index, releaseIndex]
-        } else {
-          currentInterval += 1
-          intervals[currentInterval] = [[versionArray[i], index, releaseIndex]]
-        }
+        versionsMap[version.version_number] = [version]
       }
     }
 
-    const newIntervals = []
-    for (let i = 0; i < intervals.length; i++) {
-      const interval = intervals[i]
+    const returnVersions = []
 
-      if (
-        interval.length === 2 &&
-        interval[0][2] !== -1 &&
-        interval[1][2] === -1
-      ) {
-        let lastSnapshot = null
-        for (let j = interval[1][1]; j > interval[0][1]; j--) {
-          if (allVersions[j].version_type === 'release') {
-            newIntervals.push([
-              interval[0],
-              [
-                allVersions[j].version,
-                j,
-                allReleases.findIndex(
-                  (x) => x.version === allVersions[j].version
-                ),
-              ],
-            ])
+    for (const id in versionsMap) {
+      const versions = versionsMap[id]
 
-            if (lastSnapshot !== null && lastSnapshot !== j + 1) {
-              newIntervals.push([
-                [allVersions[lastSnapshot].version, lastSnapshot, -1],
-                interval[1],
-              ])
+      if (versions.length === 1) {
+        versions[0].displayUrlEnding = versions[0].version_number
+
+        returnVersions.push(versions[0])
+      } else {
+        const reservedNames = {}
+
+        const seenLoaders = {}
+        const duplicateLoaderIndexes = []
+
+        for (let i = 0; i < versions.length; i++) {
+          const version = versions[i]
+          const value = version.loaders.join('+')
+
+          if (seenLoaders[value]) {
+            duplicateLoaderIndexes.push(i)
+          } else {
+            if (i !== 0) {
+              version.displayUrlEnding = `${version.version_number}-${value}`
             } else {
-              newIntervals.push([interval[1]])
+              version.displayUrlEnding = version.version_number
             }
 
-            break
-          } else {
-            lastSnapshot = j
+            reservedNames[version.displayUrlEnding] = true
+
+            version.displayName = version.loaders
+              .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+              .join(', ')
+
+            returnVersions.push(version)
+
+            seenLoaders[value] = true
           }
         }
-      } else {
-        newIntervals.push(interval)
+
+        const seenGameVersions = {}
+        const duplicateGameVersionIndexes = []
+
+        for (const i of duplicateLoaderIndexes) {
+          const version = versions[i]
+          const value = version.game_versions.join('+')
+
+          if (seenGameVersions[value]) {
+            duplicateGameVersionIndexes.push(i)
+          } else {
+            if (i !== 0) {
+              let setDisplayUrl = false
+
+              for (const gameVersion in version.game_versions) {
+                const displayUrlEnding = `${version.version_number}-${gameVersion}`
+
+                if (!reservedNames[version.version_number]) {
+                  version.displayUrlEnding = displayUrlEnding
+                  reservedNames[displayUrlEnding] = true
+                  setDisplayUrl = true
+
+                  break
+                }
+              }
+
+              if (!setDisplayUrl) {
+                version.displayUrlEnding = `${version.version_number}-${value}`
+              }
+            } else if (!reservedNames[version.version_number]) {
+              version.displayUrlEnding = version.version_number
+              reservedNames[version.version_number] = true
+            }
+
+            version.displayName = formatVersions(
+              version.game_versions,
+              ctx.store
+            )
+
+            returnVersions.push(version)
+
+            seenGameVersions[value] = true
+          }
+        }
+
+        for (const i in duplicateGameVersionIndexes) {
+          const version = versions[i]
+
+          version.displayUrlEnding = version.id
+          version.displayName = version.id
+
+          returnVersions.push(version)
+        }
       }
     }
 
-    const output = []
-
-    for (const interval of newIntervals) {
-      if (interval.length === 2) {
-        output.push(`${interval[0][0]}—${interval[1][0]}`)
-      } else {
-        output.push(interval[0][0])
-      }
-    }
-
-    return output.join(', ')
+    return returnVersions.reverse()
   })
-  inject('formatBytes', formatBytes)
+  inject('getProjectTypeForDisplay', (type, categories) => {
+    if (type === 'mod') {
+      const isPlugin = categories.some((category) => {
+        return ctx.store.state.tag.loaderData.allPluginLoaders.includes(
+          category
+        )
+      })
+      const isMod = categories.some((category) => {
+        return ctx.store.state.tag.loaderData.modLoaders.includes(category)
+      })
+      return isPlugin && isMod ? 'mod and plugin' : isPlugin ? 'plugin' : 'mod'
+    } else {
+      return formatProjectType(type)
+    }
+  })
 }
 
 export const formatNumber = (number) => {
@@ -126,4 +169,127 @@ export const formatBytes = (bytes, decimals = 2) => {
   const i = Math.floor(Math.log(bytes) / Math.log(k))
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+export const formatProjectType = (name) => {
+  if (name === 'resourcepack') {
+    return 'resource pack'
+  }
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
+export const formatCategory = (name) => {
+  if (name === 'modloader') {
+    return "Risugami's ModLoader"
+  } else if (name === 'bungeecord') {
+    return 'BungeeCord'
+  } else if (name === 'liteloader') {
+    return 'LiteLoader'
+  } else if (name === 'game-mechanics') {
+    return 'Game Mechanics'
+  } else if (name === 'worldgen') {
+    return 'World Generation'
+  } else if (name === 'core-shaders') {
+    return 'Core Shaders'
+  } else if (name === 'gui') {
+    return 'GUI'
+  } else if (name === '8x-') {
+    return '8x or lower'
+  } else if (name === '512x+') {
+    return '512x or higher'
+  } else if (name === 'kitchen-sink') {
+    return 'Kitchen Sink'
+  }
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
+export const formatCategoryHeader = (name) => {
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
+export const formatVersions = (versionArray, store) => {
+  const allVersions = store.state.tag.gameVersions.slice().reverse()
+  const allReleases = allVersions.filter((x) => x.version_type === 'release')
+
+  const intervals = []
+  let currentInterval = 0
+
+  for (let i = 0; i < versionArray.length; i++) {
+    const index = allVersions.findIndex((x) => x.version === versionArray[i])
+    const releaseIndex = allReleases.findIndex(
+      (x) => x.version === versionArray[i]
+    )
+
+    if (i === 0) {
+      intervals.push([[versionArray[i], index, releaseIndex]])
+    } else {
+      const intervalBase = intervals[currentInterval]
+
+      if (
+        (index - intervalBase[intervalBase.length - 1][1] === 1 ||
+          releaseIndex - intervalBase[intervalBase.length - 1][2] === 1) &&
+        (allVersions[intervalBase[0][1]].version_type === 'release' ||
+          allVersions[index].version_type !== 'release')
+      ) {
+        intervalBase[1] = [versionArray[i], index, releaseIndex]
+      } else {
+        currentInterval += 1
+        intervals[currentInterval] = [[versionArray[i], index, releaseIndex]]
+      }
+    }
+  }
+
+  const newIntervals = []
+  for (let i = 0; i < intervals.length; i++) {
+    const interval = intervals[i]
+
+    if (
+      interval.length === 2 &&
+      interval[0][2] !== -1 &&
+      interval[1][2] === -1
+    ) {
+      let lastSnapshot = null
+      for (let j = interval[1][1]; j > interval[0][1]; j--) {
+        if (allVersions[j].version_type === 'release') {
+          newIntervals.push([
+            interval[0],
+            [
+              allVersions[j].version,
+              j,
+              allReleases.findIndex(
+                (x) => x.version === allVersions[j].version
+              ),
+            ],
+          ])
+
+          if (lastSnapshot !== null && lastSnapshot !== j + 1) {
+            newIntervals.push([
+              [allVersions[lastSnapshot].version, lastSnapshot, -1],
+              interval[1],
+            ])
+          } else {
+            newIntervals.push([interval[1]])
+          }
+
+          break
+        } else {
+          lastSnapshot = j
+        }
+      }
+    } else {
+      newIntervals.push(interval)
+    }
+  }
+
+  const output = []
+
+  for (const interval of newIntervals) {
+    if (interval.length === 2) {
+      output.push(`${interval[0][0]}—${interval[1][0]}`)
+    } else {
+      output.push(interval[0][0])
+    }
+  }
+
+  return output.join(', ')
 }

@@ -90,7 +90,8 @@
         <ProjectCard
           v-for="project in selectedProjectType !== 'all'
             ? projects.filter(
-                (x) => x.project_type === selectedProjectType.slice(0, -1)
+                (x) =>
+                  x.project_type === convertProjectType(selectedProjectType)
               )
             : projects"
           :id="project.slug || project.id"
@@ -246,13 +247,24 @@ export default {
       const obj = { all: true }
 
       for (const project of this.projects) {
-        obj[project.project_type + 's'] = true
+        if (project.project_type === 'resourcepack') {
+          obj['Resource Packs'] = true
+        } else {
+          obj[project.project_type + 's'] = true
+        }
       }
 
       return Object.keys(obj)
     },
   },
   methods: {
+    convertProjectType(name) {
+      if (name === 'Resource Packs') {
+        return 'resourcepack'
+      } else {
+        return name.slice(0, -1)
+      }
+    },
     sumDownloads() {
       let sum = 0
 

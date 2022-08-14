@@ -48,7 +48,7 @@
                   <nuxt-link
                     :to="`/${project.project_type}/${
                       project.slug ? project.slug : project.id
-                    }/version/${encodeURIComponent(version.version_number)}`"
+                    }/version/${encodeURI(version.displayUrlEnding)}`"
                   >
                     {{ version.name }}
                   </nuxt-link>
@@ -78,11 +78,7 @@
                   <p>
                     {{
                       version.loaders
-                        .map((x) =>
-                          x.toLowerCase() === 'modloader'
-                            ? 'ModLoader'
-                            : x.charAt(0).toUpperCase() + x.slice(1)
-                        )
+                        .map((x) => $formatCategory(x))
                         .join(', ') +
                       ' ' +
                       $formatVersion(version.game_versions)
@@ -104,15 +100,7 @@
             </td>
             <td>
               <p>
-                {{
-                  version.loaders
-                    .map((x) =>
-                      x.toLowerCase() === 'modloader'
-                        ? 'ModLoader'
-                        : x.charAt(0).toUpperCase() + x.slice(1)
-                    )
-                    .join(', ')
-                }}
+                {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
               </p>
               <p>{{ $formatVersion(version.game_versions) }}</p>
             </td>

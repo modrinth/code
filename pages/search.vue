@@ -34,28 +34,41 @@
             Clear filters
           </button>
           <section aria-label="Category filters">
-            <h3
-              v-if="
-                $tag.categories.filter((x) => x.project_type === projectType)
-                  .length > 0
-              "
-              class="sidebar-menu-heading"
-            >
-              Categories
-            </h3>
-            <SearchFilter
-              v-for="category in $tag.categories.filter(
-                (x) => x.project_type === projectType
-              )"
-              :key="category.name"
-              :active-filters="facets"
-              :display-name="category.name"
-              :facet-name="`categories:${category.name}`"
-              :icon="category.icon"
-              @toggle="toggleFacet"
-            />
+            <div v-for="(categories, header) in categoriesMap" :key="header">
+              <h3
+                v-if="
+                  categories.filter((x) => x.project_type === projectType)
+                    .length > 0
+                "
+                class="sidebar-menu-heading"
+              >
+                {{ $formatCategoryHeader(header) }}
+              </h3>
+
+              <SearchFilter
+                v-for="category in categories
+                  .filter((x) => x.project_type === projectType)
+                  .sort((a, b) => {
+                    if (header === 'resolutions') {
+                      return (
+                        a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
+                      )
+                    }
+                    return 0
+                  })"
+                :key="category.name"
+                :active-filters="facets"
+                :display-name="$formatCategory(category.name)"
+                :facet-name="`categories:${category.name}`"
+                :icon="header === 'resolutions' ? null : category.icon"
+                @toggle="toggleFacet"
+              />
+            </div>
           </section>
-          <section aria-label="Loader filters">
+          <section
+            v-if="projectType !== 'resourcepack'"
+            aria-label="Loader filters"
+          >
             <h3
               v-if="
                 $tag.loaders.filter((x) =>
@@ -69,6 +82,8 @@
             <SearchFilter
               v-for="loader in $tag.loaders.filter((x) => {
                 if (
+                  projectType === 'mod' &&
+                  !isPlugins &&
                   !showAllLoaders &&
                   x.name !== 'forge' &&
                   x.name !== 'fabric' &&
@@ -76,18 +91,25 @@
                 ) {
                   return false
                 }
-                return x.supported_project_types.includes(projectType)
+
+                if (projectType === 'mod' && showAllLoaders) {
+                  return $tag.loaderData.modLoaders.includes(x.name)
+                }
+
+                return isPlugins
+                  ? $tag.loaderData.pluginLoaders.includes(x.name)
+                  : x.supported_project_types.includes(projectType)
               })"
               :key="loader.name"
+              ref="loaderFilters"
               :active-filters="orFacets"
-              :display-name="
-                loader.name === 'modloader' ? 'ModLoader' : loader.name
-              "
+              :display-name="$formatCategory(loader.name)"
               :facet-name="`categories:${loader.name}`"
               :icon="loader.icon"
               @toggle="toggleOrFacet"
             />
             <Checkbox
+              v-if="projectType === 'mod' && !isPlugins"
               v-model="showAllLoaders"
               :label="showAllLoaders ? 'Less' : 'More'"
               description="Show all loaders"
@@ -96,7 +118,34 @@
               :collapsing-toggle-style="true"
             />
           </section>
-          <section aria-label="Environment filters">
+          <section v-if="isPlugins" aria-label="Platform loader filters">
+            <h3
+              v-if="
+                $tag.loaders.filter((x) =>
+                  x.supported_project_types.includes(projectType)
+                ).length > 0
+              "
+              class="sidebar-menu-heading"
+            >
+              Proxies
+            </h3>
+            <SearchFilter
+              v-for="loader in $tag.loaders.filter((x) =>
+                $tag.loaderData.pluginPlatformLoaders.includes(x.name)
+              )"
+              :key="loader.name"
+              ref="platformFilters"
+              :active-filters="orFacets"
+              :display-name="$formatCategory(loader.name)"
+              :facet-name="`categories:${loader.name}`"
+              :icon="loader.icon"
+              @toggle="toggleOrFacet"
+            />
+          </section>
+          <section
+            v-if="projectType !== 'resourcepack' && !isPlugins"
+            aria-label="Environment filters"
+          >
             <h3 class="sidebar-menu-heading">Environments</h3>
             <SearchFilter
               :active-filters="selectedEnvironments"
@@ -267,7 +316,7 @@
             :icon-url="result.icon_url"
             :client-side="result.client_side"
             :server-side="result.server_side"
-            :categories="result.categories"
+            :categories="result.display_categories"
           />
           <div v-if="results && results.length === 0" class="no-results">
             <p>No results found for your query!</p>
@@ -336,6 +385,7 @@ export default {
       currentPage: 1,
 
       projectType: 'mod',
+      isPlugins: false,
 
       sortTypes: [
         { display: 'Relevance', name: 'relevance' },
@@ -405,7 +455,38 @@ export default {
       this.$route.name.length - 1
     )
 
+    if (this.projectType === 'plugin') {
+      this.projectType = 'mod'
+      this.isPlugins = true
+    }
+
     await this.onSearchChange(this.currentPage)
+  },
+  computed: {
+    categoriesMap() {
+      const categories = {}
+
+      for (const category of this.$tag.categories) {
+        if (categories[category.header]) {
+          categories[category.header].push(category)
+        } else {
+          categories[category.header] = [category]
+        }
+      }
+
+      const newVals = Object.keys(categories)
+        .sort()
+        .reduce((obj, key) => {
+          obj[key] = categories[key]
+          return obj
+        }, {})
+
+      for (const header of Object.keys(categories)) {
+        newVals[header].sort((a, b) => a.name.localeCompare(b.name))
+      }
+
+      return newVals
+    },
   },
   watch: {
     '$route.path': {
@@ -415,12 +496,21 @@ export default {
           this.$route.name.length - 1
         )
 
+        if (this.projectType === 'plugin') {
+          this.projectType = 'mod'
+          this.isPlugins = true
+        } else {
+          this.isPlugins = false
+        }
+
         this.results = null
         this.pages = []
         this.currentPage = 1
         this.query = ''
         this.maxResults = 20
         this.sortType = { display: 'Relevance', name: 'relevance' }
+        this.showAllLoaders = false
+        this.sidebarMenuOpen = false
 
         await this.clearFilters()
       },
@@ -463,6 +553,18 @@ export default {
       if (index !== -1) {
         this.orFacets.splice(index, 1)
       } else {
+        if (elementName === 'categories:purpur') {
+          this.orFacets.push('categories:paper')
+          this.orFacets.push('categories:spigot')
+          this.orFacets.push('categories:bukkit')
+        } else if (elementName === 'categories:paper') {
+          this.orFacets.push('categories:spigot')
+          this.orFacets.push('categories:bukkit')
+        } else if (elementName === 'categories:spigot') {
+          this.orFacets.push('categories:bukkit')
+        } else if (elementName === 'categories:waterfall') {
+          this.orFacets.push('categories:bungeecord')
+        }
         this.orFacets.push(elementName)
       }
 
@@ -498,6 +600,7 @@ export default {
 
         if (
           this.facets.length > 0 ||
+          this.orFacets.length > 0 ||
           this.selectedVersions.length > 0 ||
           this.selectedEnvironments.length > 0 ||
           this.projectType
@@ -507,8 +610,19 @@ export default {
             formattedFacets.push([facet])
           }
 
+          // loaders specifier
           if (this.orFacets.length > 0) {
             formattedFacets.push(this.orFacets)
+          } else if (this.isPlugins) {
+            formattedFacets.push(
+              this.$tag.loaderData.allPluginLoaders.map(
+                (x) => `categories:${x}`
+              )
+            )
+          } else if (this.projectType === 'mod') {
+            formattedFacets.push(
+              this.$tag.loaderData.modLoaders.map((x) => `categories:${x}`)
+            )
           }
 
           if (this.selectedVersions.length > 0) {

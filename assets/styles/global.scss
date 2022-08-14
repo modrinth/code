@@ -208,7 +208,9 @@ body {
   --size-rounded-tooltip: 0.25rem;
 
   --size-navbar-height: 3.5rem;
-  --size-mobile-navbar-height: 4rem;
+  --size-mobile-navbar-height: 3.5rem;
+  // --size-mobile-navbar-height-expanded: 10rem;
+  --size-mobile-navbar-height-expanded: 7.5rem;
 
   --spacing-card-lg: 1.5rem;
   --spacing-card-bg: 1rem;
@@ -235,6 +237,10 @@ body {
   --font-weight-text: var(--font-weight-medium);
   --font-weight-heading: var(--font-weight-extrabold);
   --font-weight-title: var(--font-weight-extrabold);
+
+  @media screen and (min-width: 501px) {
+    --size-mobile-navbar-height-expanded: 7rem;
+  }
 }
 
 svg {
