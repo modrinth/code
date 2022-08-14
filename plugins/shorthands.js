@@ -26,7 +26,9 @@ export default (ctx, inject) => {
   inject('computeVersions', (versions) => {
     const versionsMap = {}
 
-    for (const version of versions.reverse()) {
+    for (const version of versions.sort(
+      (a, b) => ctx.$dayjs(a.date_published) - ctx.$dayjs(b.date_published)
+    )) {
       if (versionsMap[version.version_number]) {
         versionsMap[version.version_number].push(version)
       } else {
@@ -129,7 +131,9 @@ export default (ctx, inject) => {
       }
     }
 
-    return returnVersions.reverse()
+    return returnVersions.sort(
+      (a, b) => ctx.$dayjs(b.date_published) - ctx.$dayjs(a.date_published)
+    )
   })
   inject('getProjectTypeForDisplay', (type, categories) => {
     if (type === 'mod') {
