@@ -128,8 +128,7 @@ export default {
 
   vue: {
     config: {
-      productionTip: false,
-      devtools: true,
+      devtools: false,
     },
   },
   router: {
