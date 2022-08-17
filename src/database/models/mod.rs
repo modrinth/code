@@ -30,7 +30,7 @@ pub enum DatabaseError {
     RandomId,
     #[error(
         "Invalid identifier: Category/version names must contain only ASCII \
-             alphanumeric characters or '_-'."
+             alphanumeric characters or '_-+'."
     )]
     InvalidIdentifier(String),
     #[error("Invalid permissions bitflag!")]

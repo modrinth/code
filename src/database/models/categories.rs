@@ -74,10 +74,9 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if !name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             return Err(DatabaseError::InvalidIdentifier(name.to_string()));
         }
 
@@ -102,10 +101,9 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if !name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             return Err(DatabaseError::InvalidIdentifier(name.to_string()));
         }
 
@@ -203,10 +201,9 @@ impl<'a> CategoryBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<CategoryBuilder<'a>, DatabaseError> {
-        if name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             Ok(Self {
                 name: Some(name),
                 ..self
@@ -296,10 +293,9 @@ impl Loader {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if !name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             return Err(DatabaseError::InvalidIdentifier(name.to_string()));
         }
 
@@ -403,10 +399,9 @@ impl<'a> LoaderBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<LoaderBuilder<'a>, DatabaseError> {
-        if name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             Ok(Self {
                 name: Some(name),
                 ..self
@@ -501,10 +496,9 @@ impl GameVersion {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !version
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
-        {
+        if !version.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             return Err(DatabaseError::InvalidIdentifier(version.to_string()));
         }
 
@@ -676,7 +670,7 @@ impl<'a> GameVersionBuilder<'a> {
     ) -> Result<GameVersionBuilder<'a>, DatabaseError> {
         if version
             .chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
+            .all(|c| c.is_ascii_alphanumeric() || "-_.+".contains(c))
         {
             Ok(Self {
                 version: Some(version),
@@ -693,7 +687,7 @@ impl<'a> GameVersionBuilder<'a> {
     ) -> Result<GameVersionBuilder<'a>, DatabaseError> {
         if version_type
             .chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
+            .all(|c| c.is_ascii_alphanumeric() || "-_.+".contains(c))
         {
             Ok(Self {
                 version_type: Some(version_type),
@@ -851,10 +845,9 @@ impl<'a> LicenseBuilder<'a> {
         self,
         short: &'a str,
     ) -> Result<LicenseBuilder<'a>, DatabaseError> {
-        if short
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
-        {
+        if short.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             Ok(Self {
                 short: Some(short),
                 ..self
@@ -1011,10 +1004,9 @@ impl<'a> DonationPlatformBuilder<'a> {
         self,
         short: &'a str,
     ) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
-        if short
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
-        {
+        if short.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             Ok(Self {
                 short: Some(short),
                 ..self
@@ -1075,10 +1067,9 @@ impl ReportType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if !name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             return Err(DatabaseError::InvalidIdentifier(name.to_string()));
         }
 
@@ -1164,10 +1155,9 @@ impl<'a> ReportTypeBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<ReportTypeBuilder<'a>, DatabaseError> {
-        if name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             Ok(Self { name: Some(name) })
         } else {
             Err(DatabaseError::InvalidIdentifier(name.to_string()))
@@ -1213,10 +1203,9 @@ impl ProjectType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if !name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             return Err(DatabaseError::InvalidIdentifier(name.to_string()));
         }
 
@@ -1330,10 +1319,9 @@ impl<'a> ProjectTypeBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<ProjectTypeBuilder<'a>, DatabaseError> {
-        if name
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || c == '-' || c == '_')
-        {
+        if name.chars().all(|c| {
+            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
+        }) {
             Ok(Self { name: Some(name) })
         } else {
             Err(DatabaseError::InvalidIdentifier(name.to_string()))

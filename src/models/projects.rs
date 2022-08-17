@@ -219,7 +219,10 @@ pub struct License {
 pub struct DonationLink {
     pub id: String,
     pub platform: String,
-    #[validate(url)]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
     pub url: String,
 }
 
@@ -482,7 +485,7 @@ impl DependencyType {
 }
 
 /// A specific version of Minecraft
-#[derive(Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(transparent)]
 pub struct GameVersion(pub String);
 

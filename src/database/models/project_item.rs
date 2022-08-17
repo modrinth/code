@@ -629,8 +629,7 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
-            ARRAY_AGG(DISTINCT ca.category) filter (where ca.category is not null) additional_categories,
+            ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
             ARRAY_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url) filter (where md.joining_platform_id is not null) donations
@@ -643,8 +642,7 @@ impl Project {
             LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
             LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON mc.joining_category_id = c.id AND mc.is_additional = FALSE
-            LEFT JOIN categories ca ON mc.joining_category_id = c.id AND mc.is_additional = TRUE
+            LEFT JOIN categories c ON mc.joining_category_id = c.id
             LEFT JOIN versions v ON v.mod_id = m.id
             LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
             WHERE m.id = $1
@@ -656,6 +654,23 @@ impl Project {
             .await?;
 
         if let Some(m) = result {
+            let categories_raw = m.categories.unwrap_or_default();
+
+            let mut categories = Vec::new();
+            let mut additional_categories = Vec::new();
+
+            for category in categories_raw {
+                let category: Vec<&str> = category.split(" |||| ").collect();
+
+                if category.len() >= 2 {
+                    if category[1].parse::<bool>().ok().unwrap_or_default() {
+                        additional_categories.push(category[0].to_string());
+                    } else {
+                        categories.push(category[0].to_string());
+                    }
+                }
+            }
+
             Ok(Some(QueryProject {
                 inner: Project {
                     id: ProjectId(m.id),
@@ -685,10 +700,8 @@ impl Project {
                     approved: m.approved,
                 },
                 project_type: m.project_type_name,
-                categories: m.categories.unwrap_or_default(),
-                additional_categories: m
-                    .additional_categories
-                    .unwrap_or_default(),
+                categories,
+                additional_categories,
                 versions: {
                     let versions = m.versions.unwrap_or_default();
 
@@ -803,8 +816,7 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
-            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
-            ARRAY_AGG(DISTINCT ca.category) filter (where ca.category is not null) additional_categories,
+            ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
             ARRAY_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url) filter (where md.joining_platform_id is not null) donations
@@ -817,8 +829,7 @@ impl Project {
             LEFT JOIN mods_donations md ON md.joining_mod_id = m.id
             LEFT JOIN donation_platforms dp ON md.joining_platform_id = dp.id
             LEFT JOIN mods_categories mc ON mc.joining_mod_id = m.id
-            LEFT JOIN categories c ON mc.joining_category_id = c.id AND mc.is_additional = FALSE
-            LEFT JOIN categories ca ON mc.joining_category_id = c.id AND mc.is_additional = TRUE
+            LEFT JOIN categories c ON mc.joining_category_id = c.id
             LEFT JOIN versions v ON v.mod_id = m.id
             LEFT JOIN mods_gallery mg ON mg.mod_id = m.id
             WHERE m.id = ANY($1)
@@ -830,6 +841,25 @@ impl Project {
             .try_filter_map(|e| async {
                 Ok(e.right().map(|m| {
                     let id = m.id;
+
+                    let categories_raw = m.categories.unwrap_or_default();
+
+                    let mut categories = Vec::new();
+                    let mut additional_categories = Vec::new();
+
+                    for category in categories_raw {
+                        let category: Vec<&str> =
+                            category.split(" |||| ").collect();
+
+                        if category.len() >= 2 {
+                            if category[1].parse::<bool>().ok().unwrap_or_default() {
+                                additional_categories.push(category[0].to_string());
+                            } else {
+                                categories.push(category[0].to_string());
+                            }
+                        }
+                    }
+
                     QueryProject {
                         inner: Project {
                             id: ProjectId(id),
@@ -859,8 +889,8 @@ impl Project {
                             approved: m.approved
                         },
                         project_type: m.project_type_name,
-                        categories: m.categories.unwrap_or_default(),
-                        additional_categories: m.additional_categories.unwrap_or_default(),
+                        categories,
+                        additional_categories,
                         versions: {
                             let versions = m.versions.unwrap_or_default();
 

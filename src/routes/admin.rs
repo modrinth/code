@@ -25,11 +25,18 @@ pub async fn count_download(
     let project_id: crate::database::models::ids::ProjectId =
         download_body.hash.into();
 
+    let id_option = crate::models::ids::base62_impl::parse_base62(
+        &download_body.version_name,
+    )
+    .ok()
+    .map(|x| x as i64);
+
     let (version_id, project_id) = if let Some(version) = sqlx::query!(
         "SELECT id, mod_id FROM versions
-         WHERE (version_number = $1 AND mod_id = $2)",
+         WHERE ((version_number = $1 OR id = $3) AND mod_id = $2)",
         download_body.version_name,
-        project_id as crate::database::models::ids::ProjectId
+        project_id as crate::database::models::ids::ProjectId,
+        id_option
     )
     .fetch_optional(pool.as_ref())
     .await?

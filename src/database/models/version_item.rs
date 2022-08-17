@@ -735,14 +735,14 @@ impl Version {
 
                         if dependency.len() >= 4 {
                             Some(QueryDependency {
-                                project_id: match &*dependency[1] {
+                                project_id: match dependency[1] {
                                     "0" => None,
                                     _ => match dependency[1].parse() {
                                         Ok(x) => Some(ProjectId(x)),
                                         Err(_) => None,
                                     },
                                 },
-                                version_id: match &*dependency[0] {
+                                version_id: match dependency[0] {
                                     "0" => None,
                                     _ => match dependency[0].parse() {
                                         Ok(x) => Some(VersionId(x)),
@@ -896,14 +896,14 @@ impl Version {
 
                                 if dependency.len() >= 4 {
                                     Some(QueryDependency {
-                                        project_id: match &*dependency[1] {
+                                        project_id: match dependency[1] {
                                             "0" => None,
                                             _ => match dependency[1].parse() {
                                                 Ok(x) => Some(ProjectId(x)),
                                                 Err(_) => None,
                                             },
                                         },
-                                        version_id: match &*dependency[0] {
+                                        version_id: match dependency[0] {
                                             "0" => None,
                                             _ => match dependency[0].parse() {
                                                 Ok(x) => Some(VersionId(x)),

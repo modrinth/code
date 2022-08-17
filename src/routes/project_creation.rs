@@ -170,19 +170,34 @@ struct ProjectCreateData {
     /// A list of the categories that the project is in.
     pub additional_categories: Vec<String>,
 
-    #[validate(url, length(max = 2048))]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
     /// An optional link to where to submit bugs or issues with the project.
     pub issues_url: Option<String>,
-    #[validate(url, length(max = 2048))]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
     /// An optional link to the source code for the project.
     pub source_url: Option<String>,
-    #[validate(url, length(max = 2048))]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
     /// An optional link to the project's wiki page or other relevant information.
     pub wiki_url: Option<String>,
-    #[validate(url, length(max = 2048))]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
     /// An optional link to the project's license page
     pub license_url: Option<String>,
-    #[validate(url, length(max = 2048))]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
     /// An optional link to the project's discord.
     pub discord_url: Option<String>,
     /// An optional list of all donation links the project has\
@@ -550,7 +565,7 @@ pub async fn project_create_inner(
             &cdn_url,
             &content_disposition,
             project_id,
-            &version_data.version_number,
+            created_version.version_id.into(),
             &*project_create_data.project_type,
             version_data.loaders.clone(),
             version_data.game_versions.clone(),

@@ -302,7 +302,7 @@ async fn version_create_inner(
             &cdn_url,
             &content_disposition,
             version.project_id.into(),
-            &version.version_number,
+            version.version_id.into(),
             &*project_type,
             version_data.loaders,
             version_data.game_versions,
@@ -520,7 +520,6 @@ async fn upload_file_to_version_inner(
     }
 
     let project_id = ProjectId(version.project_id.0 as u64);
-    let version_number = version.version_number;
 
     let project_type = sqlx::query!(
         "
@@ -567,7 +566,7 @@ async fn upload_file_to_version_inner(
         let mut dependencies = version
             .dependencies
             .iter()
-            .map(|x| models::version_item::DependencyBuilder {
+            .map(|x| DependencyBuilder {
                 project_id: x.project_id,
                 version_id: x.version_id,
                 file_name: None,
@@ -584,7 +583,7 @@ async fn upload_file_to_version_inner(
             &cdn_url,
             &content_disposition,
             project_id,
-            &version_number,
+            version_id.into(),
             &*project_type,
             version.loaders.clone().into_iter().map(Loader).collect(),
             version
@@ -626,7 +625,7 @@ pub async fn upload_file(
     cdn_url: &str,
     content_disposition: &actix_web::http::header::ContentDisposition,
     project_id: ProjectId,
-    version_number: &str,
+    version_id: VersionId,
     project_type: &str,
     loaders: Vec<Loader>,
     game_versions: Vec<GameVersion>,
@@ -748,13 +747,11 @@ pub async fn upload_file(
     let file_path_encode = format!(
         "data/{}/versions/{}/{}",
         project_id,
-        version_number,
+        version_id,
         urlencoding::encode(file_name)
     );
-    let file_path = format!(
-        "data/{}/versions/{}/{}",
-        project_id, version_number, &file_name
-    );
+    let file_path =
+        format!("data/{}/versions/{}/{}", project_id, version_id, &file_name);
 
     let upload_data = file_host
         .upload_file(content_type, &file_path, data.freeze())

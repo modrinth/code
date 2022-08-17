@@ -27,11 +27,11 @@ impl super::Validator for BukkitValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("plugin.yml").map_err(|_| {
-            ValidationError::InvalidInput(
-                "No plugin.yml present for plugin file.".into(),
-            )
-        })?;
+        if archive.by_name("plugin.yml").is_err() {
+            return Ok(ValidationResult::Warning(
+                "No plugin.yml present for plugin file.",
+            ));
+        }
 
         Ok(ValidationResult::Pass)
     }

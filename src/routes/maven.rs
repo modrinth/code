@@ -118,7 +118,7 @@ pub async fn maven_metadata(
                 .last()
                 .unwrap_or(&"release".to_string())
                 .to_string(),
-            release: latest_release.unwrap_or_default().to_string(),
+            release: latest_release.unwrap_or_default(),
             versions: Versions {
                 versions: new_versions,
             },
