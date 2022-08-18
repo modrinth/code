@@ -291,12 +291,7 @@
               :href="project.discord_url"
               target="_blank"
             >
-              <DiscordIcon
-                v-if="$colorMode.value === 'light'"
-                class="shrink"
-                aria-hidden="true"
-              />
-              <DiscordIconWhite v-else class="shrink" aria-hidden="true" />
+              <DiscordIcon class="shrink" aria-hidden="true" />
               <span>Discord</span>
             </a>
             <a
@@ -306,60 +301,24 @@
               target="_blank"
             >
               <BuyMeACoffeeLogo
-                v-if="donation.id === 'bmac' && $colorMode.value === 'light'"
+                v-if="donation.id === 'bmac'"
                 aria-hidden="true"
               />
-              <BuyMeACoffeeLogoWhite
-                v-else-if="
-                  donation.id === 'bmac' && $colorMode.value === 'dark'
-                "
+              <PatreonIcon
+                v-else-if="donation.id === 'patreon'"
                 aria-hidden="true"
               />
-              <img
-                v-else-if="
-                  donation.id === 'patreon' && $colorMode.value === 'light'
-                "
-                class="shrink"
-                alt=""
-                src="~/assets/images/external/patreon.png"
+              <KoFiIcon
+                v-else-if="donation.id === 'ko-fi'"
+                aria-hidden="true"
               />
-              <img
-                v-else-if="
-                  donation.id === 'patreon' && $colorMode.value === 'dark'
-                "
-                class="shrink"
-                alt=""
-                src="~/assets/images/external/patreon-white.png"
+              <PayPalIcon
+                v-else-if="donation.id === 'paypal'"
+                aria-hidden="true"
               />
-              <img
-                v-else-if="
-                  donation.id === 'paypal' && $colorMode.value === 'light'
-                "
-                class="shrink"
-                alt=""
-                src="~/assets/images/external/paypal.png"
-              />
-              <img
-                v-else-if="
-                  donation.id === 'paypal' && $colorMode.value === 'dark'
-                "
-                class="shrink"
-                alt=""
-                src="~/assets/images/external/paypal-white.png"
-              />
-              <img
-                v-else-if="
-                  donation.id === 'ko-fi' && $colorMode.value === 'light'
-                "
-                alt=""
-                src="~/assets/images/external/kofi.png"
-              />
-              <img
-                v-else-if="
-                  donation.id === 'ko-fi' && $colorMode.value === 'dark'
-                "
-                alt=""
-                src="~/assets/images/external/kofi-white.png"
+              <OpenCollectiveIcon
+                v-else-if="donation.id === 'open-collective'"
+                aria-hidden="true"
               />
               <FollowIcon v-else-if="donation.id === 'github'" />
               <UnknownIcon v-else />
@@ -627,11 +586,12 @@ import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import IssuesIcon from '~/assets/images/utils/issues.svg?inline'
 import WikiIcon from '~/assets/images/utils/wiki.svg?inline'
 import DiscordIcon from '~/assets/images/external/discord.svg?inline'
-import DiscordIconWhite from '~/assets/images/external/discord-white.svg?inline'
 import BuyMeACoffeeLogo from '~/assets/images/external/bmac.svg?inline'
-import BuyMeACoffeeLogoWhite from '~/assets/images/external/bmac-white.svg?inline'
-import UnknownIcon from '~/assets/images/utils/unknown.svg?inline'
-
+import PatreonIcon from '~/assets/images/external/patreon.svg?inline'
+import KoFiIcon from '~/assets/images/external/kofi.svg?inline'
+import PayPalIcon from '~/assets/images/external/paypal.svg?inline'
+import OpenCollectiveIcon from '~/assets/images/external/opencollective.svg?inline'
+import UnknownIcon from '~/assets/images/utils/unknown-donation.svg?inline'
 import Advertisement from '~/components/ads/Advertisement'
 import VersionBadge from '~/components/ui/Badge'
 import Categories from '~/components/ui/search/Categories'
@@ -652,11 +612,13 @@ export default {
     InfoIcon,
     WikiIcon,
     DiscordIcon,
-    DiscordIconWhite,
     BuyMeACoffeeLogo,
-    BuyMeACoffeeLogoWhite,
+    PayPalIcon,
+    OpenCollectiveIcon,
     UnknownIcon,
     Categories,
+    PatreonIcon,
+    KoFiIcon,
   },
   async asyncData(data) {
     const projectTypes = ['mod', 'modpack', 'resourcepack']
