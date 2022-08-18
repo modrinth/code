@@ -13,6 +13,7 @@ const options = {
     h4: ['id'],
     h5: ['id'],
     h6: ['id'],
+    kbd: ['id'],
     input: ['checked', 'disabled', 'type'],
     iframe: ['width', 'height', 'allowfullscreen', 'frameborder'],
     img: [...xss.whiteList.img, 'style'],

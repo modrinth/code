@@ -51,6 +51,8 @@ html {
   --color-code-bg: var(--color-bg);
   --color-code-text: var(--color-text-dark);
 
+  --color-kbd-shadow: rgba(0, 0, 0, 0.25);
+
   --color-ad: #d6e6f9;
 
   --shadow-dropdown: 3px 3px 14px hsla(0, 0%, 0%, 0.15);
@@ -138,6 +140,8 @@ html {
 
   --color-code-bg: var(--color-button-bg);
   --color-code-text: var(--color-text-dark);
+
+  --color-kbd-shadow: rgba(0, 0, 0, 0.35);
 
   --color-ad: #2c323a;
 
@@ -336,6 +340,16 @@ button {
     background-color: var(--color-button-bg-active);
     color: var(--color-button-text-active);
   }
+}
+
+kbd {
+  background-color: var(--color-code-bg);
+  color: var(--color-code-text);
+  box-shadow: 0 2px 1px var(--color-kbd-shadow);
+  padding: 0.2em 0.5em 0.1em;
+  border-radius: 3px;
+  line-height: 1;
+  font-size: 0.85em !important;
 }
 
 // @import "vue-select/src/scss/vue-select.scss";
