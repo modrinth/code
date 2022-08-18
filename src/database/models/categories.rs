@@ -74,12 +74,6 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            return Err(DatabaseError::InvalidIdentifier(name.to_string()));
-        }
-
         let result = sqlx::query!(
             "
             SELECT id FROM categories
@@ -101,12 +95,6 @@ impl Category {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            return Err(DatabaseError::InvalidIdentifier(name.to_string()));
-        }
-
         let result = sqlx::query!(
             "
             SELECT id FROM categories
@@ -201,16 +189,10 @@ impl<'a> CategoryBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<CategoryBuilder<'a>, DatabaseError> {
-        if name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            Ok(Self {
-                name: Some(name),
-                ..self
-            })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(name.to_string()))
-        }
+        Ok(Self {
+            name: Some(name),
+            ..self
+        })
     }
 
     pub fn header(
@@ -293,12 +275,6 @@ impl Loader {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            return Err(DatabaseError::InvalidIdentifier(name.to_string()));
-        }
-
         let result = sqlx::query!(
             "
             SELECT id FROM loaders
@@ -399,16 +375,10 @@ impl<'a> LoaderBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<LoaderBuilder<'a>, DatabaseError> {
-        if name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            Ok(Self {
-                name: Some(name),
-                ..self
-            })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(name.to_string()))
-        }
+        Ok(Self {
+            name: Some(name),
+            ..self
+        })
     }
 
     pub fn icon(
@@ -496,12 +466,6 @@ impl GameVersion {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !version.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            return Err(DatabaseError::InvalidIdentifier(version.to_string()));
-        }
-
         let result = sqlx::query!(
             "
             SELECT id FROM game_versions
@@ -668,34 +632,20 @@ impl<'a> GameVersionBuilder<'a> {
         self,
         version: &'a str,
     ) -> Result<GameVersionBuilder<'a>, DatabaseError> {
-        if version
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.+".contains(c))
-        {
-            Ok(Self {
-                version: Some(version),
-                ..self
-            })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(version.to_string()))
-        }
+        Ok(Self {
+            version: Some(version),
+            ..self
+        })
     }
 
     pub fn version_type(
         self,
         version_type: &'a str,
     ) -> Result<GameVersionBuilder<'a>, DatabaseError> {
-        if version_type
-            .chars()
-            .all(|c| c.is_ascii_alphanumeric() || "-_.+".contains(c))
-        {
-            Ok(Self {
-                version_type: Some(version_type),
-                ..self
-            })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(version_type.to_string()))
-        }
+        Ok(Self {
+            version_type: Some(version_type),
+            ..self
+        })
     }
 
     pub fn created(self, created: &'a DateTime<Utc>) -> GameVersionBuilder<'a> {
@@ -845,16 +795,10 @@ impl<'a> LicenseBuilder<'a> {
         self,
         short: &'a str,
     ) -> Result<LicenseBuilder<'a>, DatabaseError> {
-        if short.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            Ok(Self {
-                short: Some(short),
-                ..self
-            })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(short.to_string()))
-        }
+        Ok(Self {
+            short: Some(short),
+            ..self
+        })
     }
 
     /// The license's long name
@@ -1004,16 +948,10 @@ impl<'a> DonationPlatformBuilder<'a> {
         self,
         short: &'a str,
     ) -> Result<DonationPlatformBuilder<'a>, DatabaseError> {
-        if short.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            Ok(Self {
-                short: Some(short),
-                ..self
-            })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(short.to_string()))
-        }
+        Ok(Self {
+            short: Some(short),
+            ..self
+        })
     }
 
     /// The donation platform long name
@@ -1067,12 +1005,6 @@ impl ReportType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            return Err(DatabaseError::InvalidIdentifier(name.to_string()));
-        }
-
         let result = sqlx::query!(
             "
             SELECT id FROM report_types
@@ -1155,13 +1087,7 @@ impl<'a> ReportTypeBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<ReportTypeBuilder<'a>, DatabaseError> {
-        if name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            Ok(Self { name: Some(name) })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(name.to_string()))
-        }
+        Ok(Self { name: Some(name) })
     }
 
     pub async fn insert<'b, E>(
@@ -1203,12 +1129,6 @@ impl ProjectType {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
-        if !name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            return Err(DatabaseError::InvalidIdentifier(name.to_string()));
-        }
-
         let result = sqlx::query!(
             "
             SELECT id FROM project_types
@@ -1319,13 +1239,7 @@ impl<'a> ProjectTypeBuilder<'a> {
         self,
         name: &'a str,
     ) -> Result<ProjectTypeBuilder<'a>, DatabaseError> {
-        if name.chars().all(|c| {
-            c.is_ascii_alphanumeric() || c == '-' || c == '_' || c == '+'
-        }) {
-            Ok(Self { name: Some(name) })
-        } else {
-            Err(DatabaseError::InvalidIdentifier(name.to_string()))
-        }
+        Ok(Self { name: Some(name) })
     }
 
     pub async fn insert<'b, E>(

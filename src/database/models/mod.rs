@@ -28,11 +28,6 @@ pub enum DatabaseError {
     Database(#[from] sqlx::error::Error),
     #[error("Error while trying to generate random ID")]
     RandomId,
-    #[error(
-        "Invalid identifier: Category/version names must contain only ASCII \
-             alphanumeric characters or '_-+'."
-    )]
-    InvalidIdentifier(String),
     #[error("Invalid permissions bitflag!")]
     Bitflag,
     #[error("A database request failed")]
