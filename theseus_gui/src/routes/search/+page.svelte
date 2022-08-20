@@ -1,17 +1,7 @@
-<script lang="ts" context="module">
-  /** @type {import('./index').Load} */
-  export async function load({ fetch }) {
-    const response = await fetch(`https://api.modrinth.com/v2/search?query=&limit=10&offset=0&index=relevance`);
-
-    return {
-      props: {
-        projects: response.ok && (await response.json()).hits
-      }
-    };
-  }
-</script>
-
 <script lang="ts">
+  import type { PageData } from './$types';
+  export let data: PageData;
+
   import IconSearch from 'virtual:icons/heroicons-outline/search';
   import IconSortDescending from 'virtual:icons/heroicons-outline/sort-descending';
   import IconBox from 'virtual:icons/lucide/box';
@@ -22,8 +12,6 @@
 
   import { TextInput, Button } from 'omorphia';
   import ProjectCard from '$components/ProjectCard.svelte';
-
-  export let projects;
 </script>
 
 <div class="controls">
@@ -41,7 +29,7 @@
 </div>
 
 <div class="results">
-  {#each projects as project}
+  {#each data.projects as project}
     <ProjectCard {project} />
   {/each}
 </div>

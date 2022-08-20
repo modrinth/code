@@ -1,20 +1,3 @@
-<script context="module" lang="ts">
-  import { init, waitLocale, t, getLocaleFromAcceptLanguageHeader } from 'svelte-intl-precompile';
-  import { registerAll, availableLocales } from '$locales';
-
-  registerAll();
-
-  export const load: import('@sveltejs/kit').Load = async ({ session }) => {
-    init({
-      fallbackLocale: 'en',
-      initialLocale: getLocaleFromAcceptLanguageHeader(session.acceptLanguage, availableLocales)
-    });
-    await waitLocale();
-
-    return {};
-  };
-</script>
-
 <script lang="ts">
   import '@fontsource/inter';
   import 'omorphia/styles.postcss';
