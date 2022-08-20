@@ -150,6 +150,23 @@ export default (ctx, inject) => {
       return formatProjectType(type)
     }
   })
+  inject('getProjectTypeForUrl', (type, categories) => {
+    if (type === 'mod') {
+      const isPlugin = categories.some((category) => {
+        return ctx.store.state.tag.loaderData.allPluginLoaders.includes(
+          category
+        )
+      })
+
+      const isMod = categories.some((category) => {
+        return ctx.store.state.tag.loaderData.modLoaders.includes(category)
+      })
+
+      return isPlugin && isMod ? 'mod' : isPlugin ? 'plugin' : 'mod'
+    } else {
+      return type
+    }
+  })
 }
 
 export const formatNumber = (number) => {

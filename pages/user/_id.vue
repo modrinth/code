@@ -178,17 +178,50 @@ export default {
         ])
       ).map((it) => it.data)
 
-      const githubUrl = (
-        await (
-          await fetch(`https://api.github.com/user/` + user.github_id)
-        ).json()
-      ).html_url
+      const [gitHubUser, versions] = (
+        await Promise.all([
+          data.$axios.get(`https://api.github.com/user/` + user.github_id),
+          data.$axios.get(
+            `versions?ids=${JSON.stringify(
+              [].concat.apply(
+                [],
+                projects.map((x) => x.versions)
+              )
+            )}`
+          ),
+        ])
+      ).map((it) => it.data)
+
+      for (const version of versions) {
+        const projectIndex = projects.findIndex(
+          (x) => x.id === version.project_id
+        )
+
+        if (projects[projectIndex].loaders) {
+          for (const loader of version.loaders) {
+            if (!projects[projectIndex].loaders.includes(loader)) {
+              projects[projectIndex].loaders.push(loader)
+            }
+          }
+        } else {
+          projects[projectIndex].loaders = version.loaders
+        }
+      }
+
+      for (const project of projects) {
+        project.categories = project.categories.concat(project.loaders)
+
+        project.project_type = data.$getProjectTypeForUrl(
+          project.project_type,
+          project.categories
+        )
+      }
 
       return {
         selectedProjectType: 'all',
         user,
         projects,
-        githubUrl,
+        githubUrl: gitHubUser.html_url,
       }
     } catch {
       data.error({

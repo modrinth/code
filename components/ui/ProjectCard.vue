@@ -2,7 +2,7 @@
   <article class="project-card card" :aria-label="name" role="listitem">
     <div class="columns">
       <div class="icon">
-        <nuxt-link :to="`/${type}/${id}`">
+        <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
           <img
             :src="iconUrl || 'https://cdn.modrinth.com/placeholder.svg?inline'"
             :alt="name"
@@ -19,7 +19,10 @@
         <div class="info">
           <div class="top">
             <h2 class="title">
-              <nuxt-link :to="`/${type}/${id}`">{{ name }}</nuxt-link>
+              <nuxt-link
+                :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
+                >{{ name }}</nuxt-link
+              >
             </h2>
             <p v-if="author" class="author">
               by
@@ -29,7 +32,10 @@
             </p>
           </div>
           <div
-            v-if="type !== 'resourcepack' && projectTypeDisplay !== 'plugin'"
+            v-if="
+              type !== 'resourcepack' &&
+              !(projectTypeDisplay === 'plugin' && search)
+            "
             class="side-type"
           >
             <div
@@ -229,6 +235,11 @@ export default {
       default: '',
     },
     moderation: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
+    search: {
       type: Boolean,
       required: false,
       default: false,

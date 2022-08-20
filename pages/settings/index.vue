@@ -195,15 +195,6 @@ export default {
 
       return this.$formatNumber(sum)
     },
-    sumFollows() {
-      let sum = 0
-
-      for (const projects of this.$user.projects) {
-        sum += projects.followers
-      }
-
-      return this.$formatNumber(sum)
-    },
     async changeLayout() {
       await this.$store.dispatch('cosmetics/save', {
         searchLayout: this.searchLayout,
