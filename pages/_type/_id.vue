@@ -37,7 +37,7 @@
         <div
           v-if="
             project.project_type !== 'resourcepack' &&
-            projectTypeDisplay !== 'plugin'
+            project.project_type !== 'plugin'
           "
         >
           <div
@@ -81,7 +81,7 @@
         </p>
         <Categories
           :categories="project.categories"
-          :type="project.project_type"
+          :type="project.actualProjectType"
           class="categories"
         />
         <hr class="card-divider" />
@@ -417,7 +417,7 @@
           <div
             v-if="
               project.project_type !== 'resourcepack' &&
-              projectTypeDisplay !== 'plugin'
+              project.project_type !== 'plugin'
             "
             class="info"
           >
@@ -429,7 +429,7 @@
           <div
             v-if="
               project.project_type !== 'resourcepack' &&
-              projectTypeDisplay !== 'plugin'
+              project.project_type !== 'plugin'
             "
             class="info"
           >
@@ -662,6 +662,10 @@ export default {
           projectLoaders[loader] = true
         }
       }
+
+      project.actualProjectType = JSON.parse(
+        JSON.stringify(project.project_type)
+      )
 
       project.project_type = data.$getProjectTypeForUrl(
         project.project_type,

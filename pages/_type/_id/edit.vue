@@ -135,8 +135,9 @@
         <span>
           <h3>Additional Categories</h3>
           <span class="no-padding">
-            Select up to 3 categories that will help others <br />
-            find your project.
+            Select more categories that will help others <br />
+            find your project. These are searchable, but not <br />
+            displayed in search.
           </span>
         </span>
         <Multiselect
@@ -625,7 +626,7 @@ export default {
       this.selectableCategories = this.$tag.categories
         .filter(
           (x) =>
-            x.project_type === this.project.project_type &&
+            x.project_type === this.project.actualProjectType &&
             !this.newProject.additional_categories.includes(x.name)
         )
         .map((it) => it.name)
@@ -633,7 +634,7 @@ export default {
       this.selectableAdditionalCategories = this.$tag.categories
         .filter(
           (x) =>
-            x.project_type === this.project.project_type &&
+            x.project_type === this.project.actualProjectType &&
             !this.newProject.categories.includes(x.name)
         )
         .map((it) => it.name)

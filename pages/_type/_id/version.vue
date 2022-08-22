@@ -218,7 +218,7 @@
                 $tag.loaders
                   .filter((x) =>
                     x.supported_project_types.includes(
-                      project.project_type.toLowerCase()
+                      project.actualProjectType.toLowerCase()
                     )
                   )
                   .map((it) => it.name)
@@ -528,10 +528,10 @@
           multiple
           class="choose-files"
           :accept="
-            project.project_type.toLowerCase() === 'modpack'
+            project.actualProjectType.toLowerCase() === 'modpack'
               ? '.mrpack,application/x-modrinth-modpack+zip'
               : project.project_type.toLowerCase() === 'mod'
-              ? '.jar,application/java-archive'
+              ? '.jar,actualProjectType/java-archive'
               : '*'
           "
           prompt="Choose files or drag them here"
