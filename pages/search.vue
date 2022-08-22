@@ -59,7 +59,9 @@
                 :key="category.name"
                 :active-filters="facets"
                 :display-name="$formatCategory(category.name)"
-                :facet-name="`categories:${category.name}`"
+                :facet-name="`categories:'${encodeURIComponent(
+                  category.name
+                )}'`"
                 :icon="header === 'resolutions' ? null : category.icon"
                 @toggle="toggleFacet"
               />
@@ -104,7 +106,7 @@
               ref="loaderFilters"
               :active-filters="orFacets"
               :display-name="$formatCategory(loader.name)"
-              :facet-name="`categories:${loader.name}`"
+              :facet-name="`categories:'${encodeURIComponent(loader.name)}'`"
               :icon="loader.icon"
               @toggle="toggleOrFacet"
             />
@@ -137,7 +139,7 @@
               ref="platformFilters"
               :active-filters="orFacets"
               :display-name="$formatCategory(loader.name)"
-              :facet-name="`categories:${loader.name}`"
+              :facet-name="`categories:'${encodeURIComponent(loader.name)}'`"
               :icon="loader.icon"
               @toggle="toggleOrFacet"
             />
@@ -555,16 +557,23 @@ export default {
         this.orFacets.splice(index, 1)
       } else {
         if (elementName === 'categories:purpur') {
-          this.orFacets.push('categories:paper')
-          this.orFacets.push('categories:spigot')
-          this.orFacets.push('categories:bukkit')
+          if (!this.orFacets.includes('categories:paper'))
+            this.orFacets.push('categories:paper')
+          if (!this.orFacets.includes('categories:spigot'))
+            this.orFacets.push('categories:spigot')
+          if (!this.orFacets.includes('categories:bukkit'))
+            this.orFacets.push('categories:bukkit')
         } else if (elementName === 'categories:paper') {
-          this.orFacets.push('categories:spigot')
-          this.orFacets.push('categories:bukkit')
+          if (!this.orFacets.includes('categories:spigot'))
+            this.orFacets.push('categories:spigot')
+          if (!this.orFacets.includes('categories:bukkit'))
+            this.orFacets.push('categories:bukkit')
         } else if (elementName === 'categories:spigot') {
-          this.orFacets.push('categories:bukkit')
+          if (!this.orFacets.includes('categories:bukkit'))
+            this.orFacets.push('categories:bukkit')
         } else if (elementName === 'categories:waterfall') {
-          this.orFacets.push('categories:bungeecord')
+          if (!this.orFacets.includes('categories:bungeecord'))
+            this.orFacets.push('categories:bungeecord')
         }
         this.orFacets.push(elementName)
       }
@@ -617,12 +626,14 @@ export default {
           } else if (this.isPlugins) {
             formattedFacets.push(
               this.$tag.loaderData.allPluginLoaders.map(
-                (x) => `categories:${x}`
+                (x) => `categories:'${encodeURIComponent(x)}'`
               )
             )
           } else if (this.projectType === 'mod') {
             formattedFacets.push(
-              this.$tag.loaderData.modLoaders.map((x) => `categories:${x}`)
+              this.$tag.loaderData.modLoaders.map(
+                (x) => `categories:'${encodeURIComponent(x)}'`
+              )
             )
           }
 
