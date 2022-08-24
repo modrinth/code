@@ -184,6 +184,14 @@
     height: auto;
   }
 
+  html:not(.dark-mode, .oled-mode) & img[src$='#gh-dark-mode-only'] {
+    display: none;
+  }
+
+  html:is(.dark-mode, .oled-mode) & img[src$='#gh-light-mode-only'] {
+    display: none;
+  }
+
   pre {
     margin-top: 1rem;
     padding: 14px;
