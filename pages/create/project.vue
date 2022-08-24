@@ -1730,6 +1730,10 @@ section.description {
     overflow-y: auto;
     padding: 0 var(--spacing-card-sm);
   }
+
+  label {
+    flex-direction: row;
+  }
 }
 
 .outlined-area {
