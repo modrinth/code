@@ -15,6 +15,7 @@ use crate::util::auth::get_user_from_headers;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{validate_file, ValidationResult};
+use actix::fut::ready;
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
 use actix_web::{post, HttpRequest, HttpResponse};
@@ -65,7 +66,7 @@ struct InitialFileData {
 #[post("version")]
 pub async fn version_create(
     req: HttpRequest,
-    payload: Multipart,
+    mut payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<std::sync::Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, CreateError> {
@@ -74,7 +75,7 @@ pub async fn version_create(
 
     let result = version_create_inner(
         req,
-        payload,
+        &mut payload,
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
@@ -88,6 +89,8 @@ pub async fn version_create(
         )
         .await;
         let rollback_result = transaction.rollback().await;
+
+        payload.for_each(|_| ready(())).await;
 
         if let Err(e) = undo_result {
             return Err(e);
@@ -104,7 +107,7 @@ pub async fn version_create(
 
 async fn version_create_inner(
     req: HttpRequest,
-    mut payload: Multipart,
+    payload: &mut Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
@@ -428,7 +431,7 @@ async fn version_create_inner(
 pub async fn upload_file_to_version(
     req: HttpRequest,
     url_data: actix_web::web::Path<(VersionId,)>,
-    payload: Multipart,
+    mut payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<std::sync::Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, CreateError> {
@@ -439,7 +442,7 @@ pub async fn upload_file_to_version(
 
     let result = upload_file_to_version_inner(
         req,
-        payload,
+        &mut payload,
         client,
         &mut transaction,
         &***file_host,
@@ -456,6 +459,8 @@ pub async fn upload_file_to_version(
         .await;
         let rollback_result = transaction.rollback().await;
 
+        payload.for_each(|_| ready(())).await;
+
         if let Err(e) = undo_result {
             return Err(e);
         }
@@ -471,7 +476,7 @@ pub async fn upload_file_to_version(
 
 async fn upload_file_to_version_inner(
     req: HttpRequest,
-    mut payload: Multipart,
+    payload: &mut Multipart,
     client: Data<PgPool>,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,

@@ -116,7 +116,7 @@ pub async fn mods_get(
 #[post("mod")]
 pub async fn mod_create(
     req: HttpRequest,
-    payload: Multipart,
+    mut payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
 ) -> Result<HttpResponse, CreateError> {
@@ -125,7 +125,7 @@ pub async fn mod_create(
 
     let result = project_create_inner(
         req,
-        payload,
+        &mut payload,
         &mut transaction,
         &***file_host,
         &mut uploaded_files,
