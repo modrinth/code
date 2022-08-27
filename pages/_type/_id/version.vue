@@ -228,7 +228,7 @@
               :multiple="true"
               :searchable="false"
               :show-no-results="false"
-              :close-on-select="true"
+              :close-on-select="false"
               :clear-on-select="false"
               :show-labels="false"
               :limit="6"
