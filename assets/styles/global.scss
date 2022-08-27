@@ -94,7 +94,7 @@ html {
   --shadow-image-md: 0px 2px 4px 0px hsla(221, 39%, 11%, 0.2),
     inset 0px -2px 2px 0px hsla(221, 39%, 11%, 0.1);
 
-  --color-card-link-bg: rgba(0,0,0,7%);
+  --color-card-link-bg: rgba(0, 0, 0, 7%);
 }
 
 .dark-mode {
@@ -217,8 +217,7 @@ body {
 
   --size-navbar-height: 3.5rem;
   --size-mobile-navbar-height: 3.5rem;
-  // --size-mobile-navbar-height-expanded: 10rem;
-  --size-mobile-navbar-height-expanded: 7.5rem;
+  --size-mobile-navbar-height-expanded: 10rem;
 
   --spacing-card-lg: 1.5rem;
   --spacing-card-bg: 1rem;
