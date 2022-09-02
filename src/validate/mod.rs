@@ -85,7 +85,7 @@ static VALIDATORS: [&dyn Validator; 12] = [
     &LiteLoaderValidator,
     &PackValidator,
     &TexturePackValidator,
-    &BukkitValidator,
+    &PluginYmlValidator,
     &BungeeCordValidator,
     &VelocityValidator,
     &SpongeValidator,

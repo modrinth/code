@@ -4,9 +4,9 @@ use crate::validate::{
 use std::io::Cursor;
 use zip::ZipArchive;
 
-pub struct BukkitValidator;
+pub struct PluginYmlValidator;
 
-impl super::Validator for BukkitValidator {
+impl super::Validator for PluginYmlValidator {
     fn get_file_extensions(&self) -> &[&str] {
         &["zip", "jar"]
     }
@@ -16,7 +16,7 @@ impl super::Validator for BukkitValidator {
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
-        &["bukkit", "spigot", "paper", "purpur"]
+        &["bukkit", "spigot", "paper", "purpur", "bungeecord", "waterfall"]
     }
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
