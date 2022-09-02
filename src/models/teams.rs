@@ -34,7 +34,9 @@ bitflags::bitflags! {
         const REMOVE_MEMBER = 1 << 5;
         const EDIT_MEMBER = 1 << 6;
         const DELETE_PROJECT = 1 << 7;
-        const ALL = 0b11111111;
+        const VIEW_ANALYTICS = 1 << 8;
+        const VIEW_PAYOUTS = 1 << 9;
+        const ALL = 0b1111111111;
     }
 }
 
@@ -57,6 +59,9 @@ pub struct TeamMember {
     pub permissions: Option<Permissions>,
     /// Whether the user has joined the team or is just invited to it
     pub accepted: bool,
+    /// Payouts split. This is a weighted average. For example. if a team has two members with this
+    /// value set to 25.0 for both members, they split revenue 50/50
+    pub payouts_split: Option<f32>,
 }
 
 impl TeamMember {
@@ -71,6 +76,11 @@ impl TeamMember {
                 Some(data.permissions)
             },
             accepted: data.accepted,
+            payouts_split: if override_permissions {
+                None
+            } else {
+                Some(data.payouts_split)
+            },
         }
     }
 }

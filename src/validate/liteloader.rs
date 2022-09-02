@@ -8,7 +8,7 @@ pub struct LiteLoaderValidator;
 
 impl super::Validator for LiteLoaderValidator {
     fn get_file_extensions(&self) -> &[&str] {
-        &["litemod"]
+        &["litemod", "jar"]
     }
 
     fn get_project_types(&self) -> &[&str] {

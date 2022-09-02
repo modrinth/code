@@ -28,8 +28,6 @@ pub enum DatabaseError {
     Database(#[from] sqlx::error::Error),
     #[error("Error while trying to generate random ID")]
     RandomId,
-    #[error("Invalid permissions bitflag!")]
-    Bitflag,
     #[error("A database request failed")]
     Other(String),
 }
