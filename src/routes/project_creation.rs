@@ -907,10 +907,11 @@ async fn process_icon_upload(
         )
         .await?;
 
+        let hash = sha1::Sha1::from(&data).hexdigest();
         let upload_data = file_host
             .upload_file(
                 content_type,
-                &format!("data/{}/icon.{}", project_id, file_extension),
+                &format!("data/{}/{}.{}", project_id, hash, file_extension),
                 data.freeze(),
             )
             .await?;

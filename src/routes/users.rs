@@ -354,10 +354,11 @@ pub async fn user_icon_edit(
             )
             .await?;
 
+            let hash = sha1::Sha1::from(&bytes).hexdigest();
             let upload_data = file_host
                 .upload_file(
                     content_type,
-                    &format!("user/{}/icon.{}", user_id, ext.ext),
+                    &format!("user/{}/{}.{}", user_id, hash, ext.ext),
                     bytes.freeze(),
                 )
                 .await?;
