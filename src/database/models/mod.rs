@@ -121,7 +121,13 @@ impl ids::ProjectTypeId {
 }
 
 pub fn convert_postgres_date(input: &str) -> DateTime<Utc> {
-    DateTime::parse_from_str(input, "%Y-%m-%d %T%#z")
+    let mut result = DateTime::parse_from_str(input, "%Y-%m-%d %T.%f%#z");
+
+    if result.is_err() {
+        result = DateTime::parse_from_str(input, "%Y-%m-%d %T%#z")
+    }
+
+    result
         .map(|x| x.with_timezone(&Utc))
         .unwrap_or_else(|_| Utc::now())
 }

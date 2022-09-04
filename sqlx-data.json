@@ -1091,18 +1091,6 @@
     },
     "query": "\n            SELECT id, team_id, role, permissions, accepted, payouts_split\n            FROM team_members\n            WHERE (user_id = $1 AND accepted = TRUE)\n            "
   },
-  "28be156dc8d8c394dd7c8de33a8e45be9c2d9033de461c0b7365cd8e7585aa8d": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        UPDATE mods\n                        SET approved = NOW()\n                        WHERE id = $1 AND approved = NULL\n                        "
-  },
   "28d5825964b0fddc43bd7d6851daf91845b79c9e88c82d5c7d97ae02502d0b4f": {
     "describe": {
       "columns": [],
@@ -3717,6 +3705,18 @@
       }
     },
     "query": "\n                        DELETE FROM mods_categories\n                        WHERE joining_mod_id = $1 AND is_additional = FALSE\n                        "
+  },
+  "a11d613479d09dff5fcdc45ab7a0341fb1b4738f0ede71572d939ef0984bd65f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        UPDATE mods\n                        SET approved = NOW()\n                        WHERE id = $1 AND approved IS NULL\n                        "
   },
   "a1e3ac170e45196e5fcca154c96a206f35be68a3219a0d493e1e149206590043": {
     "describe": {

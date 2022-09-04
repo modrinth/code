@@ -507,7 +507,7 @@ pub async fn project_edit(
                         "
                         UPDATE mods
                         SET approved = NOW()
-                        WHERE id = $1 AND approved = NULL
+                        WHERE id = $1 AND approved IS NULL
                         ",
                         id as database::models::ids::ProjectId,
                     )
