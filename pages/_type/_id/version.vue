@@ -236,7 +236,13 @@
               />
             </div>
             <div v-if="project.project_type !== 'resourcepack'" class="data">
-              <p class="title">Loaders<span class="required">*</span></p>
+              <p class="title">
+                Loaders<span
+                  v-if="mode === 'edit' || mode === 'create'"
+                  class="required"
+                  >*</span
+                >
+              </p>
               <multiselect
                 v-if="mode === 'edit' || mode === 'create'"
                 v-model="version.loaders"
@@ -270,7 +276,13 @@
               <p class="value">{{ $formatNumber(version.downloads) }}</p>
             </div>
             <div class="data">
-              <p class="title">Version number<span class="required">*</span></p>
+              <p class="title">
+                Version number<span
+                  v-if="mode === 'edit' || mode === 'create'"
+                  class="required"
+                  >*</span
+                >
+              </p>
               <input
                 v-if="mode === 'edit' || mode === 'create'"
                 v-model="version.version_number"
@@ -281,7 +293,11 @@
             </div>
             <div class="data">
               <p class="title">
-                Minecraft versions<span class="required">*</span>
+                Minecraft versions<span
+                  v-if="mode === 'edit' || mode === 'create'"
+                  class="required"
+                  >*</span
+                >
               </p>
               <div v-if="mode === 'edit' || mode === 'create'">
                 <multiselect
@@ -491,7 +507,13 @@
             version.files.length > 0 || mode === 'edit' || mode === 'create'
           "
         >
-          <h3>Files<span class="required">*</span></h3>
+          <h3>
+            Files<span
+              v-if="mode === 'edit' || mode === 'create'"
+              class="required"
+              >*</span
+            >
+          </h3>
           <div
             v-for="(file, index) in version.files"
             :key="file.hashes.sha1"
