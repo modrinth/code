@@ -1,48 +1,8 @@
 <template>
-  <div class="content card">
-    <ConfirmPopup
-      ref="delete_version_popup"
-      title="Are you sure you want to delete this version?"
-      description="This will remove this version forever (like really forever)."
-      :has-to-type="false"
-      proceed-label="Delete version"
-      @proceed="deleteVersion()"
-    />
-    <div class="columns">
-      <nuxt-link
-        v-if="mode === 'version'"
-        class="iconified-button back-button"
-        :to="`/${project.project_type}/${
-          project.slug ? project.slug : project.id
-        }/${
-          $nuxt.context.from
-            ? $nuxt.context.from.name === 'type-id-changelog'
-              ? 'changelog'
-              : 'versions'
-            : 'versions'
-        }`"
-      >
-        <BackIcon aria-hidden="true" />
-        Back to list
-      </nuxt-link>
-    </div>
-    <div v-if="version">
-      <div v-if="mode === 'version'" class="version-header">
-        <h2>{{ version.name }}</h2>
-
-        <div v-if="version.featured" class="featured">
-          <StarIcon aria-hidden="true" />
-          Featured
-        </div>
-        <div
-          v-else-if="featuredVersions.find((x) => x.id === version.id)"
-          class="featured"
-        >
-          <StarIcon aria-hidden="true" />
-          Auto-featured
-        </div>
-      </div>
-      <div v-if="mode === 'edit'" class="header-buttons buttons">
+  <div>
+    <header class="card">
+      <div v-if="mode === 'edit'" class="header-buttons buttons columns">
+        <h3 class="column-grow-1">Edit version</h3>
         <nuxt-link
           v-if="$auth.user"
           :to="`/${project.project_type}/${
@@ -61,7 +21,8 @@
           Save
         </button>
       </div>
-      <div v-else-if="mode === 'create'" class="header-buttons buttons">
+      <div v-else-if="mode === 'create'" class="header-buttons buttons columns">
+        <h3 class="column-grow-1">Create version</h3>
         <nuxt-link
           v-if="$auth.user"
           :to="`/${project.project_type}/${
@@ -120,451 +81,523 @@
           Edit
         </nuxt-link>
       </div>
-      <div
-        v-if="mode === 'edit' || mode === 'create'"
-        class="version-data-inputs"
-      >
-        <input
-          v-model="version.name"
-          class="full-width-input"
-          type="text"
-          placeholder="Enter the version name..."
-        />
-        <Checkbox v-model="version.featured" label="Featured" />
-        <hr class="card-divider" />
+      <div v-if="showKnownErrors" class="known-errors">
+        <ul>
+          <li v-if="version.version_number === ''">
+            Your version must have a version number.
+          </li>
+          <li v-if="version.game_versions.length === 0">
+            Your version must have the supported Minecraft versions selected.
+          </li>
+          <li v-if="newFiles.length === 0 && version.files.length === 0">
+            Your version must have a file uploaded.
+          </li>
+          <li
+            v-if="
+              version.loaders.length === 0 &&
+              project.project_type !== 'resourcepack'
+            "
+          >
+            Your version must have the supported mod loaders selected.
+          </li>
+        </ul>
       </div>
-      <section v-if="mode === 'edit' || mode === 'create'">
-        <h3>Changelog</h3>
-        <ThisOrThat
-          v-model="changelogViewMode"
-          :items="['source', 'preview']"
-        />
-        <div v-if="changelogViewMode === 'source'" class="textarea-wrapper">
-          <textarea
-            id="body"
-            v-model="version.changelog"
-            class="changelog-textarea"
-            spellcheck="true"
-          />
+    </header>
+    <div class="content card">
+      <ConfirmPopup
+        ref="delete_version_popup"
+        title="Are you sure you want to delete this version?"
+        description="This will remove this version forever (like really forever)."
+        :has-to-type="false"
+        proceed-label="Delete version"
+        @proceed="deleteVersion()"
+      />
+      <div class="columns">
+        <nuxt-link
+          v-if="mode === 'version'"
+          class="iconified-button back-button"
+          :to="`/${project.project_type}/${
+            project.slug ? project.slug : project.id
+          }/${
+            $nuxt.context.from
+              ? $nuxt.context.from.name === 'type-id-changelog'
+                ? 'changelog'
+                : 'versions'
+              : 'versions'
+          }`"
+        >
+          <BackIcon aria-hidden="true" />
+          Back to list
+        </nuxt-link>
+      </div>
+      <div v-if="version">
+        <div v-if="mode === 'version'" class="version-header">
+          <h2>{{ version.name }}</h2>
+
+          <div v-if="version.featured" class="featured">
+            <StarIcon aria-hidden="true" />
+            Featured
+          </div>
+          <div
+            v-else-if="featuredVersions.find((x) => x.id === version.id)"
+            class="featured"
+          >
+            <StarIcon aria-hidden="true" />
+            Auto-featured
+          </div>
         </div>
         <div
-          v-if="changelogViewMode === 'preview'"
-          v-highlightjs
-          class="markdown-body"
-          v-html="
-            version.changelog
-              ? $xss($md.render(version.changelog))
-              : 'No changelog specified.'
-          "
-        ></div>
-      </section>
-      <section v-else>
-        <h3>Changelog</h3>
-        <div
-          v-highlightjs
-          class="markdown-body"
-          v-html="
-            version.changelog
-              ? $xss($md.render(version.changelog))
-              : 'No changelog specified.'
-          "
-        ></div>
-        <hr class="card-divider" />
-      </section>
-      <section>
-        <h3>Metadata</h3>
-        <div :class="'data-wrapper ' + mode">
-          <div class="data">
-            <p class="title">Release channel</p>
-            <Multiselect
-              v-if="mode === 'edit' || mode === 'create'"
-              v-model="version.version_type"
-              class="input"
-              placeholder="Select one"
-              :options="['release', 'beta', 'alpha']"
-              :custom-label="
-                (value) => value.charAt(0).toUpperCase() + value.slice(1)
-              "
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-              :allow-empty="false"
-            />
-            <VersionBadge
-              v-else-if="version.version_type === 'release'"
-              class="value"
-              type="release"
-              color="green"
-            />
-            <VersionBadge
-              v-else-if="version.version_type === 'beta'"
-              class="value"
-              type="beta"
-              color="yellow"
-            />
-            <VersionBadge
-              v-else-if="version.version_type === 'alpha'"
-              class="value"
-              type="alpha"
-              color="red"
+          v-if="mode === 'edit' || mode === 'create'"
+          class="version-data-inputs"
+        >
+          <input
+            v-model="version.name"
+            class="full-width-input"
+            type="text"
+            placeholder="Enter an optional version name..."
+          />
+          <Checkbox v-model="version.featured" label="Featured" />
+          <hr class="card-divider" />
+        </div>
+        <section v-if="mode === 'edit' || mode === 'create'">
+          <h3>Changelog</h3>
+          <ThisOrThat
+            v-model="changelogViewMode"
+            :items="['source', 'preview']"
+          />
+          <div v-if="changelogViewMode === 'source'" class="textarea-wrapper">
+            <textarea
+              id="body"
+              v-model="version.changelog"
+              class="changelog-textarea"
+              spellcheck="true"
             />
           </div>
-          <div v-if="project.project_type !== 'resourcepack'" class="data">
-            <p class="title">Loaders</p>
-            <multiselect
-              v-if="mode === 'edit' || mode === 'create'"
-              v-model="version.loaders"
-              :options="
-                $tag.loaders
-                  .filter((x) =>
-                    x.supported_project_types.includes(
-                      project.actualProjectType.toLowerCase()
-                    )
-                  )
-                  .map((it) => it.name)
-              "
-              :custom-label="(value) => $formatCategory(value)"
-              :loading="$tag.loaders.length === 0"
-              :multiple="true"
-              :searchable="false"
-              :show-no-results="false"
-              :close-on-select="false"
-              :clear-on-select="false"
-              :show-labels="false"
-              :limit="6"
-              :hide-selected="true"
-              placeholder="Choose loaders..."
-            />
-            <p v-else class="value">
-              {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
-            </p>
-          </div>
-          <div v-if="mode === 'version'" class="data">
-            <p class="title">Downloads</p>
-            <p class="value">{{ $formatNumber(version.downloads) }}</p>
-          </div>
-          <div class="data">
-            <p class="title">Version number</p>
-            <input
-              v-if="mode === 'edit' || mode === 'create'"
-              v-model="version.version_number"
-              type="text"
-              placeholder="Enter the version number..."
-            />
-            <p v-else class="value">{{ version.version_number }}</p>
-          </div>
-          <div class="data">
-            <p class="title">Minecraft versions</p>
-            <div v-if="mode === 'edit' || mode === 'create'">
-              <multiselect
-                v-model="version.game_versions"
-                :options="
-                  showSnapshots
-                    ? $tag.gameVersions.map((x) => x.version)
-                    : $tag.gameVersions
-                        .filter((it) => it.version_type === 'release')
-                        .map((x) => x.version)
+          <div
+            v-if="changelogViewMode === 'preview'"
+            v-highlightjs
+            class="markdown-body"
+            v-html="
+              version.changelog
+                ? $xss($md.render(version.changelog))
+                : 'No changelog specified.'
+            "
+          ></div>
+        </section>
+        <section v-else>
+          <h3>Changelog</h3>
+          <div
+            v-highlightjs
+            class="markdown-body"
+            v-html="
+              version.changelog
+                ? $xss($md.render(version.changelog))
+                : 'No changelog specified.'
+            "
+          ></div>
+          <hr class="card-divider" />
+        </section>
+        <section>
+          <h3>Metadata</h3>
+          <div :class="'data-wrapper ' + mode">
+            <div class="data">
+              <p class="title">Release channel</p>
+              <Multiselect
+                v-if="mode === 'edit' || mode === 'create'"
+                v-model="version.version_type"
+                class="input"
+                placeholder="Select one"
+                :options="['release', 'beta', 'alpha']"
+                :custom-label="
+                  (value) => value.charAt(0).toUpperCase() + value.slice(1)
                 "
-                :loading="$tag.gameVersions.length === 0"
+                :searchable="false"
+                :close-on-select="true"
+                :show-labels="false"
+                :allow-empty="false"
+              />
+              <VersionBadge
+                v-else-if="version.version_type === 'release'"
+                class="value"
+                type="release"
+                color="green"
+              />
+              <VersionBadge
+                v-else-if="version.version_type === 'beta'"
+                class="value"
+                type="beta"
+                color="yellow"
+              />
+              <VersionBadge
+                v-else-if="version.version_type === 'alpha'"
+                class="value"
+                type="alpha"
+                color="red"
+              />
+            </div>
+            <div v-if="project.project_type !== 'resourcepack'" class="data">
+              <p class="title">Loaders<span class="required">*</span></p>
+              <multiselect
+                v-if="mode === 'edit' || mode === 'create'"
+                v-model="version.loaders"
+                :options="
+                  $tag.loaders
+                    .filter((x) =>
+                      x.supported_project_types.includes(
+                        project.actualProjectType.toLowerCase()
+                      )
+                    )
+                    .map((it) => it.name)
+                "
+                :custom-label="(value) => $formatCategory(value)"
+                :loading="$tag.loaders.length === 0"
                 :multiple="true"
-                :searchable="true"
+                :searchable="false"
                 :show-no-results="false"
                 :close-on-select="false"
                 :clear-on-select="false"
                 :show-labels="false"
                 :limit="6"
                 :hide-selected="true"
-                placeholder="Choose versions..."
+                placeholder="Choose loaders..."
               />
-              <Checkbox
-                v-model="showSnapshots"
-                label="Include snapshots"
-                description="Include snapshots"
-                style="margin-top: 0.5rem"
-                :border="false"
-              />
+              <p v-else class="value">
+                {{ version.loaders.map((x) => $formatCategory(x)).join(', ') }}
+              </p>
             </div>
-            <p v-else class="value">
-              {{ $formatVersion(version.game_versions) }}
-            </p>
-          </div>
-          <div v-if="mode === 'version'" class="data">
-            <p class="title">Published</p>
-            <p class="value">
-              {{ $dayjs(version.date_published).format('MMM D, YYYY') }}
-              <span v-if="members.find((x) => x.user.id === version.author_id)">
-                by
-                <nuxt-link
-                  class="text-link"
-                  :to="
-                    '/user/' +
-                    members.find((x) => x.user.id === version.author_id).user
-                      .username
+            <div v-if="mode === 'version'" class="data">
+              <p class="title">Downloads</p>
+              <p class="value">{{ $formatNumber(version.downloads) }}</p>
+            </div>
+            <div class="data">
+              <p class="title">Version number<span class="required">*</span></p>
+              <input
+                v-if="mode === 'edit' || mode === 'create'"
+                v-model="version.version_number"
+                type="text"
+                placeholder="Enter the version number..."
+              />
+              <p v-else class="value">{{ version.version_number }}</p>
+            </div>
+            <div class="data">
+              <p class="title">
+                Minecraft versions<span class="required">*</span>
+              </p>
+              <div v-if="mode === 'edit' || mode === 'create'">
+                <multiselect
+                  v-model="version.game_versions"
+                  :options="
+                    showSnapshots
+                      ? $tag.gameVersions.map((x) => x.version)
+                      : $tag.gameVersions
+                          .filter((it) => it.version_type === 'release')
+                          .map((x) => x.version)
                   "
-                  >{{
-                    members.find((x) => x.user.id === version.author_id).user
-                      .username
-                  }}</nuxt-link
+                  :loading="$tag.gameVersions.length === 0"
+                  :multiple="true"
+                  :searchable="true"
+                  :show-no-results="false"
+                  :close-on-select="false"
+                  :clear-on-select="false"
+                  :show-labels="false"
+                  :limit="6"
+                  :hide-selected="true"
+                  placeholder="Choose versions..."
+                />
+                <Checkbox
+                  v-model="showSnapshots"
+                  label="Include snapshots"
+                  description="Include snapshots"
+                  style="margin-top: 0.5rem"
+                  :border="false"
+                />
+              </div>
+              <p v-else class="value">
+                {{ $formatVersion(version.game_versions) }}
+              </p>
+            </div>
+            <div v-if="mode === 'version'" class="data">
+              <p class="title">Published</p>
+              <p class="value">
+                {{ $dayjs(version.date_published).format('MMM D, YYYY') }}
+                <span
+                  v-if="members.find((x) => x.user.id === version.author_id)"
                 >
-              </span>
-            </p>
+                  by
+                  <nuxt-link
+                    class="text-link"
+                    :to="
+                      '/user/' +
+                      members.find((x) => x.user.id === version.author_id).user
+                        .username
+                    "
+                    >{{
+                      members.find((x) => x.user.id === version.author_id).user
+                        .username
+                    }}</nuxt-link
+                  >
+                </span>
+              </p>
+            </div>
+            <div v-if="mode === 'version'" class="data">
+              <p class="title">Version ID</p>
+              <p class="value">{{ version.id }}</p>
+            </div>
           </div>
-          <div v-if="mode === 'version'" class="data">
-            <p class="title">Version ID</p>
-            <p class="value">{{ version.id }}</p>
-          </div>
-        </div>
-        <hr class="card-divider" />
-      </section>
-      <section
-        v-if="
-          version.dependencies.filter((x) => !x.file_name).length > 0 ||
-          mode === 'edit' ||
-          mode === 'create'
-        "
-      >
-        <h3>Dependencies</h3>
-        <div class="dependencies">
-          <div
-            v-for="(dependency, index) in version.dependencies.filter(
-              (x) => !x.file_name
-            )"
-            :key="index"
-            class="dependency"
-          >
-            <img
-              class="icon"
-              :src="
-                dependency.project
-                  ? dependency.project.icon_url
-                    ? dependency.project.icon_url
-                    : 'https://cdn.modrinth.com/placeholder.svg?inline'
-                  : 'https://cdn.modrinth.com/placeholder.svg?inline'
-              "
-              alt="dependency-icon"
-            />
-            <div class="info">
-              <nuxt-link
-                :to="
+          <hr class="card-divider" />
+        </section>
+        <section
+          v-if="
+            version.dependencies.filter((x) => !x.file_name).length > 0 ||
+            mode === 'edit' ||
+            mode === 'create'
+          "
+        >
+          <h3>Dependencies</h3>
+          <div class="dependencies">
+            <div
+              v-for="(dependency, index) in version.dependencies.filter(
+                (x) => !x.file_name
+              )"
+              :key="index"
+              class="dependency"
+            >
+              <img
+                class="icon"
+                :src="
                   dependency.project
-                    ? dependency.version
-                      ? `/${dependency.project.project_type}/${
-                          dependency.project.slug
-                            ? dependency.project.slug
-                            : dependency.project.id
-                        }/version/${encodeURI(
-                          dependency.version.version_number
-                        )}`
-                      : `/${dependency.project.project_type}/${
-                          dependency.project.slug
-                            ? dependency.project.slug
-                            : dependency.project.id
-                        }/`
-                    : ''
+                    ? dependency.project.icon_url
+                      ? dependency.project.icon_url
+                      : 'https://cdn.modrinth.com/placeholder.svg?inline'
+                    : 'https://cdn.modrinth.com/placeholder.svg?inline'
                 "
-              >
-                <h4 class="title">
-                  {{
+                alt="dependency-icon"
+              />
+              <div class="info">
+                <nuxt-link
+                  :to="
                     dependency.project
-                      ? dependency.project.title
-                      : 'Unknown Project'
-                  }}
-                </h4>
-                <p v-if="dependency.version" class="version-number">
-                  Version {{ dependency.version.version_number }} is
-                  {{ dependency.dependency_type }}
-                </p>
-                <p v-else>
-                  {{ dependency.dependency_type }}
-                </p>
-              </nuxt-link>
-              <div class="bottom">
-                <button
-                  v-if="mode === 'edit' || mode === 'create'"
-                  class="iconified-button"
-                  @click="version.dependencies.splice(index, 1)"
+                      ? dependency.version
+                        ? `/${dependency.project.project_type}/${
+                            dependency.project.slug
+                              ? dependency.project.slug
+                              : dependency.project.id
+                          }/version/${encodeURI(
+                            dependency.version.version_number
+                          )}`
+                        : `/${dependency.project.project_type}/${
+                            dependency.project.slug
+                              ? dependency.project.slug
+                              : dependency.project.id
+                          }/`
+                      : ''
+                  "
                 >
-                  <TrashIcon /> Remove
-                </button>
+                  <h4 class="title">
+                    {{
+                      dependency.project
+                        ? dependency.project.title
+                        : 'Unknown Project'
+                    }}
+                  </h4>
+                  <p v-if="dependency.version" class="version-number">
+                    Version {{ dependency.version.version_number }} is
+                    {{ dependency.dependency_type }}
+                  </p>
+                  <p v-else>
+                    {{ dependency.dependency_type }}
+                  </p>
+                </nuxt-link>
+                <div class="bottom">
+                  <button
+                    v-if="mode === 'edit' || mode === 'create'"
+                    class="iconified-button"
+                    @click="version.dependencies.splice(index, 1)"
+                  >
+                    <TrashIcon /> Remove
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        <div
-          v-if="mode === 'edit' || mode === 'create'"
-          class="edit-dependency"
-        >
-          <h4>Add dependency</h4>
-          <ThisOrThat
-            v-model="dependencyAddMode"
-            :items="['project', 'version']"
-          />
-          <div class="edit-info">
-            <input
-              v-model="newDependencyId"
-              type="text"
-              oninput="this.value = this.value.replace(' ', '')"
-              :placeholder="`Enter the ${dependencyAddMode} ID${
-                dependencyAddMode === 'project' ? '/slug' : ''
-              }`"
-              @keyup.enter="addDependency"
+          <div
+            v-if="mode === 'edit' || mode === 'create'"
+            class="edit-dependency"
+          >
+            <h4>Add dependency</h4>
+            <ThisOrThat
+              v-model="dependencyAddMode"
+              :items="['project', 'version']"
             />
-            <Multiselect
-              v-model="newDependencyType"
-              class="input"
-              placeholder="Select one"
-              :options="['required', 'optional', 'incompatible', 'embedded']"
-              :custom-label="
-                (value) => value.charAt(0).toUpperCase() + value.slice(1)
+            <div class="edit-info">
+              <input
+                v-model="newDependencyId"
+                type="text"
+                oninput="this.value = this.value.replace(' ', '')"
+                :placeholder="`Enter the ${dependencyAddMode} ID${
+                  dependencyAddMode === 'project' ? '/slug' : ''
+                }`"
+                @keyup.enter="addDependency"
+              />
+              <Multiselect
+                v-model="newDependencyType"
+                class="input"
+                placeholder="Select one"
+                :options="['required', 'optional', 'incompatible', 'embedded']"
+                :custom-label="
+                  (value) => value.charAt(0).toUpperCase() + value.slice(1)
+                "
+                :searchable="false"
+                :close-on-select="true"
+                :show-labels="false"
+                :allow-empty="false"
+              />
+              <button class="iconified-button" @click="addDependency">
+                <PlusIcon />
+                Add
+              </button>
+            </div>
+          </div>
+          <hr class="card-divider" />
+        </section>
+        <section
+          v-if="version.dependencies.filter((x) => x.file_name).length > 0"
+        >
+          <div>
+            <h3>External Dependencies</h3>
+            <InfoIcon
+              v-tooltip="
+                'Mods not part of the Modrinth platform but depended on by this project'
               "
-              :searchable="false"
-              :close-on-select="true"
-              :show-labels="false"
-              :allow-empty="false"
             />
-            <button class="iconified-button" @click="addDependency">
-              <PlusIcon />
-              Add
-            </button>
           </div>
-        </div>
-        <hr class="card-divider" />
-      </section>
-      <section
-        v-if="version.dependencies.filter((x) => x.file_name).length > 0"
-      >
-        <div>
-          <h3>External Dependencies</h3>
-          <InfoIcon
-            v-tooltip="
-              'Mods not part of the Modrinth platform but depended on by this project'
-            "
-          />
-        </div>
-        <div class="external-dependency">
-          <div
-            v-for="(dependency, index) in version.dependencies.filter(
-              (x) => x.file_name
-            )"
-            :key="index"
-            class="external-dependency"
-          >
-            <p v-if="dependency.file_name">
-              {{ decodeURIComponent(dependency.file_name) }}
-            </p>
+          <div class="external-dependency">
+            <div
+              v-for="(dependency, index) in version.dependencies.filter(
+                (x) => x.file_name
+              )"
+              :key="index"
+              class="external-dependency"
+            >
+              <p v-if="dependency.file_name">
+                {{ decodeURIComponent(dependency.file_name) }}
+              </p>
+            </div>
           </div>
-        </div>
-        <hr class="card-divider" />
-      </section>
-      <section
-        v-if="version.files.length > 0 || mode === 'edit' || mode === 'create'"
-      >
-        <h3>Files</h3>
-        <div
-          v-for="(file, index) in version.files"
-          :key="file.hashes.sha1"
-          class="file"
+          <hr class="card-divider" />
+        </section>
+        <section
+          v-if="
+            version.files.length > 0 || mode === 'edit' || mode === 'create'
+          "
         >
-          <p class="filename">
-            {{ file.filename }}
-          </p>
+          <h3>Files<span class="required">*</span></h3>
           <div
-            v-if="primaryFile.hashes.sha1 === file.hashes.sha1"
-            class="featured"
-          >
-            <StarIcon aria-hidden="true" />
-            Primary
-          </div>
-          <a
-            :href="file.url"
-            class="action iconified-button"
-            :title="`Download ${file.filename}`"
-            tabindex="0"
-          >
-            <DownloadIcon aria-hidden="true" />
-            Download
-          </a>
-          <p v-if="mode === 'version'">({{ $formatBytes(file.size) }})</p>
-          <button
-            v-if="mode === 'edit'"
-            class="action iconified-button"
-            @click="
-              deleteFiles.push(file.hashes.sha1)
-              version.files.splice(index, 1)
-            "
-          >
-            <TrashIcon aria-hidden="true" />
-            Remove
-          </button>
-          <button
-            v-if="
-              mode === 'edit' && primaryFile.hashes.sha1 !== file.hashes.sha1
-            "
-            class="action iconified-button"
-            @click="primaryFile = file"
-          >
-            <StarIcon aria-hidden="true" />
-            Make primary
-          </button>
-        </div>
-        <div v-if="mode === 'edit' || mode === 'create'">
-          <div
-            v-for="(file, index) in newFiles"
-            :key="index + 'new'"
+            v-for="(file, index) in version.files"
+            :key="file.hashes.sha1"
             class="file"
           >
-            <p class="filename">{{ file.name }}</p>
-            <button
+            <p class="filename">
+              {{ file.filename }}
+            </p>
+            <div
+              v-if="primaryFile.hashes.sha1 === file.hashes.sha1"
+              class="featured"
+            >
+              <StarIcon aria-hidden="true" />
+              Primary
+            </div>
+            <a
+              :href="file.url"
               class="action iconified-button"
-              @click="newFiles.splice(index, 1)"
+              :title="`Download ${file.filename}`"
+              tabindex="0"
+            >
+              <DownloadIcon aria-hidden="true" />
+              Download
+            </a>
+            <p v-if="mode === 'version'">({{ $formatBytes(file.size) }})</p>
+            <button
+              v-if="mode === 'edit'"
+              class="action iconified-button"
+              @click="
+                deleteFiles.push(file.hashes.sha1)
+                version.files.splice(index, 1)
+              "
             >
               <TrashIcon aria-hidden="true" />
               Remove
             </button>
-          </div>
-        </div>
-        <StatelessFileInput
-          v-if="mode === 'edit' || mode === 'create'"
-          multiple
-          class="choose-files"
-          :accept="
-            project.actualProjectType.toLowerCase() === 'modpack'
-              ? '.mrpack,application/x-modrinth-modpack+zip'
-              : project.project_type.toLowerCase() === 'mod'
-              ? '.jar,actualProjectType/java-archive'
-              : '*'
-          "
-          prompt="Choose files or drag them here"
-          :max-size="524288000"
-          @change="(x) => x.forEach((y) => newFiles.push(y))"
-        />
-        <span v-if="mode === 'edit' || mode === 'create'">
-          You may upload multiple files, but this should only be used for cases
-          like sources or Javadocs.
-          <p
-            v-if="project.project_type.toLowerCase() === 'modpack'"
-            aria-label="Warning"
-          >
-            Modpack support is currently in alpha, and you may encounter issues.
-            Our documentation includes instructions on
-            <a
-              href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/"
-              target="_blank"
-              class="text-link"
-              >creating modpacks</a
-            >. Join us on
-            <a
-              href="https://discord.gg/EUHuJHt"
-              target="_blank"
-              class="text-link"
-              >Discord</a
+            <button
+              v-if="
+                mode === 'edit' && primaryFile.hashes.sha1 !== file.hashes.sha1
+              "
+              class="action iconified-button"
+              @click="primaryFile = file"
             >
-            for support.
-          </p>
-        </span>
-      </section>
+              <StarIcon aria-hidden="true" />
+              Make primary
+            </button>
+          </div>
+          <div v-if="mode === 'edit' || mode === 'create'">
+            <div
+              v-for="(file, index) in newFiles"
+              :key="index + 'new'"
+              class="file"
+            >
+              <p class="filename">{{ file.name }}</p>
+              <button
+                class="action iconified-button"
+                @click="newFiles.splice(index, 1)"
+              >
+                <TrashIcon aria-hidden="true" />
+                Remove
+              </button>
+            </div>
+          </div>
+          <StatelessFileInput
+            v-if="mode === 'edit' || mode === 'create'"
+            multiple
+            class="choose-files"
+            :accept="
+              project.actualProjectType.toLowerCase() === 'modpack'
+                ? '.mrpack,application/x-modrinth-modpack+zip'
+                : project.project_type.toLowerCase() === 'mod'
+                ? '.jar,actualProjectType/java-archive'
+                : '*'
+            "
+            prompt="Choose files or drag them here"
+            :max-size="524288000"
+            @change="(x) => x.forEach((y) => newFiles.push(y))"
+          />
+          <span v-if="mode === 'edit' || mode === 'create'">
+            You may upload multiple files, but this should only be used for
+            cases like sources or Javadocs.
+            <p
+              v-if="project.project_type.toLowerCase() === 'modpack'"
+              aria-label="Warning"
+            >
+              Modpack support is currently in alpha, and you may encounter
+              issues. Our documentation includes instructions on
+              <a
+                href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/"
+                target="_blank"
+                class="text-link"
+                >creating modpacks</a
+              >. Join us on
+              <a
+                href="https://discord.gg/EUHuJHt"
+                target="_blank"
+                class="text-link"
+                >Discord</a
+              >
+              for support.
+            </p>
+          </span>
+        </section>
+      </div>
+      <NuxtChild v-show="false" :mode.sync="mode" />
     </div>
-    <NuxtChild v-show="false" :mode.sync="mode" />
   </div>
 </template>
 <script>
@@ -673,6 +706,8 @@ export default {
       newFiles: [],
       deleteFiles: [],
       showSnapshots: false,
+
+      showKnownErrors: false,
     }
   },
   async fetch() {
@@ -698,6 +733,19 @@ export default {
     }
   },
   methods: {
+    checkFields() {
+      if (
+        this.version.version_number === '' ||
+        this.version.game_versions.length === 0 ||
+        (this.version.loaders.length === 0 &&
+          this.project.project_type !== 'resourcepack') ||
+        (this.newFiles.length === 0 && this.version.files.length === 0)
+      ) {
+        return false
+      }
+
+      return true
+    },
     reset() {
       this.changelogViewMode = 'source'
       this.dependencyAddMode = 'project'
@@ -749,7 +797,6 @@ export default {
           statusCode: 404,
           message: 'The page could not be found',
         })
-
         return
       }
 
@@ -830,6 +877,14 @@ export default {
     },
     async saveEditedVersion() {
       this.$nuxt.$loading.start()
+
+      if (!this.checkFields()) {
+        this.showKnownErrors = true
+        this.$nuxt.$loading.finish()
+        return
+      }
+      this.showKnownErrors = false
+
       try {
         if (this.newFiles.length > 0) {
           const formData = new FormData()
@@ -861,9 +916,9 @@ export default {
         }
 
         this.version.primary_file = ['sha1', this.primaryFile.hashes.sha1]
-
         const copyVersion = JSON.parse(JSON.stringify(this.version))
         delete copyVersion.downloads
+        copyVersion.name = copyVersion.name || copyVersion.version_number
         await this.$axios.patch(
           `version/${this.version.id}`,
           copyVersion,
@@ -914,6 +969,13 @@ export default {
     async createVersion() {
       this.$nuxt.$loading.start()
 
+      if (!this.checkFields()) {
+        this.showKnownErrors = true
+        this.$nuxt.$loading.finish()
+        return
+      }
+      this.showKnownErrors = false
+
       const formData = new FormData()
 
       const fileParts = this.newFiles.map((f, idx) => `${f.name}-${idx}`)
@@ -926,7 +988,7 @@ export default {
         project_id: this.version.project_id,
         file_parts: fileParts,
         version_number: this.version.version_number,
-        version_title: this.version.name,
+        version_title: this.version.name || this.version.version_number,
         version_body: this.version.changelog,
         dependencies: this.version.dependencies,
         game_versions: this.version.game_versions,
@@ -960,7 +1022,6 @@ export default {
 
         const newProject = JSON.parse(JSON.stringify(this.project))
         newProject.versions = newProject.versions.concat([data.id])
-
         const newVersions = this.$computeVersions(this.versions.concat([data]))
 
         await this.$emit('update:project', newProject)
@@ -1004,6 +1065,10 @@ export default {
 <style lang="scss" scoped>
 .content {
   max-width: calc(100% - (2 * var(--spacing-card-lg)));
+}
+
+.required {
+  color: var(--color-badge-red-bg);
 }
 
 .version-header {
