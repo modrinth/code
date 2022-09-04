@@ -1,108 +1,26 @@
 <template>
   <div>
-    <header class="card">
-      <div v-if="mode === 'edit'" class="header-buttons buttons columns">
-        <h3 class="column-grow-1">Edit version</h3>
-        <nuxt-link
-          v-if="$auth.user"
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/version/${encodeURI(version.displayUrlEnding)}`"
-          class="iconified-button"
-        >
-          <CrossIcon aria-hidden="true" />
-          Cancel
-        </nuxt-link>
-        <button
-          class="iconified-button brand-button-colors"
-          @click="saveEditedVersion"
-        >
-          <SaveIcon aria-hidden="true" />
-          Save
-        </button>
-      </div>
-      <div v-else-if="mode === 'create'" class="header-buttons buttons columns">
-        <h3 class="column-grow-1">Create version</h3>
-        <nuxt-link
-          v-if="$auth.user"
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/versions`"
-          class="iconified-button"
-        >
-          <CrossIcon aria-hidden="true" />
-          Cancel
-        </nuxt-link>
-        <button
-          class="iconified-button brand-button-colors"
-          @click="createVersion"
-        >
-          <CheckIcon aria-hidden="true" />
-          Create
-        </button>
-      </div>
-      <div v-else class="buttons">
-        <a
-          v-if="primaryFile"
-          v-tooltip="
-            primaryFile.filename + ' (' + $formatBytes(primaryFile.size) + ')'
+    <div v-if="showKnownErrors" class="known-errors card">
+      <ul>
+        <li v-if="version.version_number === ''">
+          Your version must have a version number.
+        </li>
+        <li v-if="version.game_versions.length === 0">
+          Your version must have the supported Minecraft versions selected.
+        </li>
+        <li v-if="newFiles.length === 0 && version.files.length === 0">
+          Your version must have a file uploaded.
+        </li>
+        <li
+          v-if="
+            version.loaders.length === 0 &&
+            project.project_type !== 'resourcepack'
           "
-          :href="primaryFile.url"
-          class="bold-button iconified-button brand-button-colors"
-          :title="`Download ${primaryFile.filename}`"
         >
-          <DownloadIcon aria-hidden="true" />
-          Download
-        </a>
-        <nuxt-link
-          :to="`/create/report?id=${version.id}&t=version`"
-          class="action iconified-button"
-        >
-          <ReportIcon aria-hidden="true" />
-          Report
-        </nuxt-link>
-        <button
-          v-if="currentMember"
-          class="action iconified-button"
-          @click="$refs.delete_version_popup.show()"
-        >
-          <TrashIcon aria-hidden="true" />
-          Delete
-        </button>
-        <nuxt-link
-          v-if="currentMember"
-          class="action iconified-button"
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/version/${encodeURI(version.displayUrlEnding)}/edit`"
-          @click.prevent="mode = 'edit'"
-        >
-          <EditIcon aria-hidden="true" />
-          Edit
-        </nuxt-link>
-      </div>
-      <div v-if="showKnownErrors" class="known-errors">
-        <ul>
-          <li v-if="version.version_number === ''">
-            Your version must have a version number.
-          </li>
-          <li v-if="version.game_versions.length === 0">
-            Your version must have the supported Minecraft versions selected.
-          </li>
-          <li v-if="newFiles.length === 0 && version.files.length === 0">
-            Your version must have a file uploaded.
-          </li>
-          <li
-            v-if="
-              version.loaders.length === 0 &&
-              project.project_type !== 'resourcepack'
-            "
-          >
-            Your version must have the supported mod loaders selected.
-          </li>
-        </ul>
-      </div>
-    </header>
+          Your version must have the supported mod loaders selected.
+        </li>
+      </ul>
+    </div>
     <div class="content card">
       <ConfirmPopup
         ref="delete_version_popup"
@@ -158,6 +76,89 @@
           />
           <Checkbox v-model="version.featured" label="Featured" />
           <hr class="card-divider" />
+        </div>
+        <div v-if="mode === 'edit'" class="header-buttons buttons columns">
+          <h3 class="column-grow-1">Edit version</h3>
+          <nuxt-link
+            v-if="$auth.user"
+            :to="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/version/${encodeURI(version.displayUrlEnding)}`"
+            class="iconified-button"
+          >
+            <CrossIcon aria-hidden="true" />
+            Cancel
+          </nuxt-link>
+          <button
+            class="iconified-button brand-button-colors"
+            @click="saveEditedVersion"
+          >
+            <SaveIcon aria-hidden="true" />
+            Save
+          </button>
+        </div>
+        <div
+          v-else-if="mode === 'create'"
+          class="header-buttons buttons columns"
+        >
+          <h3 class="column-grow-1">Create version</h3>
+          <nuxt-link
+            v-if="$auth.user"
+            :to="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/versions`"
+            class="iconified-button"
+          >
+            <CrossIcon aria-hidden="true" />
+            Cancel
+          </nuxt-link>
+          <button
+            class="iconified-button brand-button-colors"
+            @click="createVersion"
+          >
+            <CheckIcon aria-hidden="true" />
+            Create
+          </button>
+        </div>
+        <div v-else class="buttons">
+          <a
+            v-if="primaryFile"
+            v-tooltip="
+              primaryFile.filename + ' (' + $formatBytes(primaryFile.size) + ')'
+            "
+            :href="primaryFile.url"
+            class="bold-button iconified-button brand-button-colors"
+            :title="`Download ${primaryFile.filename}`"
+          >
+            <DownloadIcon aria-hidden="true" />
+            Download
+          </a>
+          <nuxt-link
+            :to="`/create/report?id=${version.id}&t=version`"
+            class="action iconified-button"
+          >
+            <ReportIcon aria-hidden="true" />
+            Report
+          </nuxt-link>
+          <button
+            v-if="currentMember"
+            class="action iconified-button"
+            @click="$refs.delete_version_popup.show()"
+          >
+            <TrashIcon aria-hidden="true" />
+            Delete
+          </button>
+          <nuxt-link
+            v-if="currentMember"
+            class="action iconified-button"
+            :to="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/version/${encodeURI(version.displayUrlEnding)}/edit`"
+            @click.prevent="mode = 'edit'"
+          >
+            <EditIcon aria-hidden="true" />
+            Edit
+          </nuxt-link>
         </div>
         <section v-if="mode === 'edit' || mode === 'create'">
           <h3>Changelog</h3>
