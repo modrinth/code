@@ -1047,15 +1047,18 @@ export default {
     display: inline-flex;
     align-items: center;
     gap: 3px;
-    padding: 5px 3px 5px 7px; // <- 3px & -> 7px to compensate for chevron
+
     border-radius: 5px;
-    transition: 0.05s all ease-in-out;
+    color: var(--color-link);
   }
 
   .all-link:hover,
-  .all-link:focus {
+  .all-link:focus-visible {
+    color: var(--color-link-hover);
+  }
+
+  .all-link:active {
     color: var(--color-link-active);
-    background: var(--color-card-link-bg);
   }
 }
 
