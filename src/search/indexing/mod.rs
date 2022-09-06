@@ -210,7 +210,7 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
-    &["title", "description", "author"];
+    &["title", "description", "author", "slug"];
 
 const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "categories",
@@ -225,6 +225,7 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "title",
     "date_created",
     "date_modified",
+    "project_id",
 ];
 
 const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =
