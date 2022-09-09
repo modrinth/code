@@ -1,6 +1,6 @@
 <template>
   <div class="info-wrapper">
-    <div v-if="isBlocked" id="info-popup">
+    <div v-show="isBlocked" id="info-popup">
       <span>
         <span class="info-popup-wrap">
           <a
@@ -30,7 +30,6 @@
       </span>
     </div>
     <script
-      v-show="!isBlocked"
       id="_carbonads_js"
       async
       type="text/javascript"
@@ -48,23 +47,7 @@ export default {
     }
   },
   mounted() {
-    if (!this.$store.state.cosmetics.notUsingBlockers) {
-      setTimeout(() => this.checkAds(0), 1000)
-    }
-  },
-  methods: {
-    checkAds(tries) {
-      if (!document.getElementById('carbonads')) {
-        this.isBlocked = true
-
-        if (tries < 1000) {
-          setTimeout(() => this.checkAds(tries + 1), 250)
-        }
-      } else {
-        this.$store.state.cosmetics.commit('SET_NOT_USING_BLOCKERS', true)
-        this.isBlocked = false
-      }
-    },
+    setTimeout(() => (this.isBlocked = true), 1000)
   },
 }
 </script>
@@ -103,6 +86,10 @@ export default {
   -webkit-box-sizing: border-box;
 
   position: relative;
+
+  div:first-child:nth-last-child(3) {
+    display: none;
+  }
 }
 
 #carbonads_1 {
