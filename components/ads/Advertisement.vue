@@ -21,7 +21,7 @@
           </a>
         </span>
         <a
-          href="http://carbonads.net/?utm_source=modrinthcom&amp;utm_medium=ad_via_link&amp;utm_campaign=in_unit&amp;utm_term=carbon"
+          href="https://docs.modrinth.com/docs/details/carbon"
           class="info-popup-poweredby"
           target="_blank"
           rel="noopener sponsored"
@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     checkAds(tries) {
-      if (!window._carbonads) {
+      if (!document.getElementById('carbonads')) {
         this.isBlocked = true
 
         if (tries < 1000) {
