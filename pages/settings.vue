@@ -14,9 +14,6 @@
           <nuxt-link v-if="$auth.user" class="tab" to="/settings/security">
             <span>Security</span>
           </nuxt-link>
-          <nuxt-link class="tab" to="/settings/privacy">
-            <span>Privacy</span>
-          </nuxt-link>
         </div>
         <NuxtChild />
       </div>

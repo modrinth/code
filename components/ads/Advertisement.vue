@@ -1,192 +1,188 @@
 <template>
-  <div v-if="ethical_ads_on">
-    <div v-if="ethical_ad_display && ethicalAdType === 'text'">
-      <div
-        :class="ethical_ad_style"
-        data-ea-publisher="modrinth-com"
-        :data-ea-type="ethicalAdType"
-        data-ea-manual="true"
-      ></div>
+  <div class="info-wrapper">
+    <div v-if="isBlocked" id="info-popup">
+      <span>
+        <span class="info-popup-wrap">
+          <a
+            class="info-popup-img"
+            href="https://docs.modrinth.com/docs/details/carbon"
+          >
+            <img
+              src="https://cdn.modrinth.com/barrier_fixes.png"
+              alt="ads via Carbon"
+            />
+          </a>
+          <a
+            href="https://docs.modrinth.com/docs/details/carbon"
+            class="info-popup-text"
+          >
+            Please disable your adblocker. Advertisements support this site and
+            its creators.
+          </a>
+        </span>
+        <a
+          href="http://carbonads.net/?utm_source=modrinthcom&amp;utm_medium=ad_via_link&amp;utm_campaign=in_unit&amp;utm_term=carbon"
+          class="info-popup-poweredby"
+          target="_blank"
+          rel="noopener sponsored"
+          >ads via Carbon
+        </a>
+      </span>
     </div>
-    <div v-else-if="ethical_ad_display" class="ethical-wrapper">
-      <div
-        :class="ethical_ad_style"
-        data-ea-publisher="modrinth-com"
-        :data-ea-type="ethicalAdType"
-        data-ea-manual="true"
-      ></div>
-    </div>
+    <script
+      v-show="!isBlocked"
+      id="_carbonads_js"
+      async
+      type="text/javascript"
+      src="//cdn.carbonads.com/carbon.js?serve=CEAIKK3N&placement=modrinthcom"
+    ></script>
   </div>
-  <div v-else></div>
 </template>
 
 <script>
-const sizes = {
-  banner: {
-    adUnit: 'banner',
-    size: '728x90,468x60',
-  },
-  square: {
-    adUnit: 'square',
-    size: '250x250,200x200',
-  },
-}
-
-/* eslint-disable no-undef */
 export default {
   name: 'Advertisement',
-  props: {
-    type: {
-      type: String,
-      required: true,
-    },
-    smallScreen: {
-      type: String,
-      required: true,
-    },
-    ethicalAdsBig: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    ethicalAdsSmall: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-    ethicalAdType: {
-      type: String,
-      required: false,
-      default: 'text',
-    },
-  },
   data() {
     return {
-      isDark: false,
-      format: null,
-      displayed: false,
-      onSmallScreen: false,
-      windowResizeListenerDebounce: null,
-      ethicalAdLoad: null,
-      ethicalAdTries: 0,
+      isBlocked: false,
     }
   },
-  head: {
-    script: [
-      {
-        hid: 'ethical_ads_script',
-        type: 'text/javascript',
-        src: 'https://media.ethicalads.io/media/client/ethicalads.min.js',
-        async: true,
-        body: true,
-        defer: true,
-      }, // Insert in body
-    ],
-  },
-  computed: {
-    ethical_ads_on() {
-      return (
-        this.$store.app.$config.ads.ethicalAds === 'true' &&
-        (this.ethicalAdsSmall || this.ethicalAdsBig)
-      )
-    },
-    hidden() {
-      return this.$store.app.$config.ads.ethicalAds === 'true'
-    },
-    ethical_ad_display() {
-      return (
-        (this.onSmallScreen && this.ethicalAdsSmall) ||
-        (!this.onSmallScreen && this.ethicalAdsBig)
-      )
-    },
-    ethical_ad_style() {
-      return {
-        dark: this.isDark,
-        raised: true,
-      }
-    },
-  },
-
   mounted() {
-    // Register hook on resize
-    window.addEventListener('resize', this.handleWindowResize)
-    this.isDark = this.$colorMode.value !== 'light'
-    // Find ad
-    if (!(this.type in sizes)) {
-      console.error('Ad type not recognized.')
-      return
-    }
-    // Set the informations
-    this.format = sizes[this.type]
-    this.displayed = true
-    if (process.browser) {
-      this.handleWindowResize()
-      this.refresh_ad()
+    if (!this.$store.state.cosmetics.notUsingBlockers) {
+      setTimeout(() => this.checkAds(0), 1000)
     }
   },
   methods: {
-    handleWindowResize() {
-      clearTimeout(this.windowResizeListenerDebounce)
-      this.windowResizeListenerDebounce = setTimeout(() => {
-        if (window.innerWidth > 1024) {
-          if (this.onSmallScreen) {
-            // Return everything to normal size
-            this.onSmallScreen = false
-            this.format = sizes[this.type]
-            this.displayed = true
-            // Refresh ad
-            this.refresh_ad()
-          }
-          return
-        }
-        if (this.onSmallScreen === false) {
-          // Reload ad
-          this.onSmallScreen = true
-          this.refresh_ad()
-        }
-        this.onSmallScreen = true
-        if (this.smallScreen === 'destroy') {
-          this.displayed = false
-        } else if (this.smallScreen in sizes) {
-          console.log('Changing ad size to ', this.smallScreen)
-          this.format = sizes[this.smallScreen]
-        }
-      }, 300)
-    },
-    refresh_ad() {
-      if (this.ethical_ads_on) {
-        this.ethicalAdTries++
-        clearTimeout(this.ethicalAdLoad)
+    checkAds(tries) {
+      if (!window._carbonads) {
+        this.isBlocked = true
 
-        if (this.ethicalAdTries <= 5) {
-          this.ethicalAdLoad = setTimeout(() => {
-            if (typeof window.ethicalads === 'undefined') {
-              console.log('EthicalAds are not loaded yet, retrying...')
-              this.refresh_ad()
-            }
-            ethicalads.load()
-          }, 100)
+        if (tries < 1000) {
+          setTimeout(() => this.checkAds(tries + 1), 250)
         }
+      } else {
+        this.$store.state.cosmetics.commit('SET_NOT_USING_BLOCKERS', true)
+        this.isBlocked = false
       }
     },
   },
 }
 </script>
 
-<style lang="scss" scoped>
-.ad-wrapper {
-  width: 100%;
-  // @extend %card;
-  display: flex;
-  flex-direction: row;
-  margin-bottom: var(--spacing-card-md);
-  justify-content: center;
+<style lang="scss">
+.do-not-style {
+  position: absolute !important;
+
+  padding: 0 !important;
+  margin: 0 !important;
+
+  top: 0 !important;
+  left: 0 !important;
+  min-height: 2px !important;
+  height: 2px !important;
+  max-height: 2px !important;
+
+  min-width: 2px !important;
+  width: 2px !important;
+  max-width: 2px !important;
+
+  background: none !important;
+  border: none !important;
 }
-.ethical-wrapper {
-  width: 100%;
-  display: flex;
-  flex-direction: row;
+
+.info-wrapper {
+  min-height: 122px;
+  color: var(--color-text);
+  background: var(--color-ad);
   margin-bottom: var(--spacing-card-md);
-  justify-content: center;
+  border-radius: var(--size-rounded-card);
+
+  border: 3px solid var(--color-ad-raised);
+  box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+
+  position: relative;
+}
+
+#carbonads_1 {
+  display: none;
+}
+
+#carbonads,
+#info-popup {
+  overflow: hidden;
+  max-width: 100%;
+
+  font-size: 22px;
+  box-sizing: content-box;
+
+  padding: var(--spacing-card-sm) var(--spacing-card-sm);
+
+  > span {
+    display: block;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+
+    &:hover {
+      color: inherit;
+    }
+  }
+}
+
+.carbon-wrap,
+.info-popup-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.carbon-img,
+.info-popup-img {
+  display: block;
+  margin: 0;
+  line-height: 1;
+
+  img {
+    display: block;
+    height: 100px;
+    width: auto;
+    border-radius: var(--size-rounded-card);
+  }
+}
+
+.carbon-text,
+.info-popup-text {
+  display: block;
+  padding: 0 1em;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.carbon-poweredby,
+.info-popup-poweredby {
+  display: block;
+  padding: 8px 10px;
+  background: var(--color-ad-raised);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.1ch;
+  font-weight: 600;
+  font-size: 0.5em;
+  line-height: 1;
+  border-top-left-radius: var(--size-rounded-card);
+  position: absolute;
+  bottom: -3px;
+  right: -3px;
+  border-bottom-right-radius: var(--size-rounded-card);
+}
+
+@media only screen and (max-width: 759px) {
+  .carbon-text,
+  .info-popup-text {
+    font-size: 14px;
+  }
 }
 </style>

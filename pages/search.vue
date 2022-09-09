@@ -235,6 +235,12 @@
         <a href="https://discord.gg/EUHuJHt" target="_blank">Discord</a>
         for support.
       </div>
+      <Advertisement
+        type="banner"
+        small-screen="square"
+        ethical-ads-small
+        ethical-ads-big
+      />
       <div class="card search-controls">
         <div class="iconified-input">
           <label class="hidden" for="search">Search</label>
@@ -292,12 +298,6 @@
         @switch-page="onSearchChange"
       ></pagination>
       <div>
-        <Advertisement
-          type="banner"
-          small-screen="square"
-          ethical-ads-small
-          ethical-ads-big
-        />
         <div v-if="$fetchState.pending" class="no-results">
           <LogoAnimated aria-hidden="true" />
           <p>Loading...</p>

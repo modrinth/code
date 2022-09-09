@@ -69,6 +69,7 @@
       </aside>
     </div>
     <div class="normal-page__content">
+      <Advertisement />
       <nav class="card user-navigation">
         <ThisOrThat v-model="selectedProjectType" :items="projectTypes" />
         <nuxt-link
@@ -80,12 +81,6 @@
           Create a project
         </nuxt-link>
       </nav>
-      <Advertisement
-        type="banner"
-        small-screen="square"
-        ethical-ads-small
-        ethical-ads-big
-      />
       <div v-if="projects.length > 0">
         <ProjectCard
           v-for="project in selectedProjectType !== 'all'

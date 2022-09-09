@@ -9,6 +9,7 @@ const parameters = {
 export const state = () => ({
   searchLayout: false,
   projectLayout: false,
+  notUsingBlockers: false,
 })
 
 export const mutations = {
@@ -17,6 +18,9 @@ export const mutations = {
   },
   SET_PROJECT_LAYOUT(state, projectLayout) {
     state.projectLayout = projectLayout
+  },
+  SET_NOT_USING_BLOCKERS(state, notUsingBlockers) {
+    state.notUsingBlockers = notUsingBlockers
   },
 }
 
