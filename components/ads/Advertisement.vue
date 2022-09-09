@@ -29,12 +29,14 @@
         </a>
       </span>
     </div>
-    <script
-      id="_carbonads_js"
-      async
-      type="text/javascript"
-      src="//cdn.carbonads.com/carbon.js?serve=CEAIKK3N&placement=modrinthcom"
-    ></script>
+    <client-only>
+      <script
+        id="_carbonads_js"
+        async
+        type="text/javascript"
+        src="//cdn.carbonads.com/carbon.js?serve=CEAIKK3N&placement=modrinthcom"
+      ></script>
+    </client-only>
   </div>
 </template>
 
@@ -87,6 +89,9 @@ export default {
 
   position: relative;
 
+  div:first-child:nth-last-child(4) {
+    display: none;
+  }
   div:first-child:nth-last-child(3) {
     display: none;
   }
