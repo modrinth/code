@@ -130,7 +130,25 @@
         You can choose to disable cookies through your individual browser
         options. To know more detailed information about cookie management with
         specific web browsers, it can be found at the browsers' respective
-        websites. What Are Cookies?
+        websites.
+      </p>
+
+      <p>
+        In addition, anytime you click on links (including advertising banners),
+        which take you to third-party websites, you will be subject to the third
+        parties’ privacy policies. While we support the protection of our
+        customer’s privacy on the Internet, Modrinth expressly disclaims any and
+        all liability for the actions of third parties, including but without
+        limitation to actions relating to the use and/or disclosure of personal
+        information by third parties.
+      </p>
+
+      <p>
+        Modrinth makes use external ads providers. These include BuySellAds. You
+        can read BuySellAds's privacy policy here and the data they collect:
+        <a href="https://www.buysellads.com/about/privacy"
+          >https://www.buysellads.com/about/privacy</a
+        >
       </p>
 
       <h2>Children's Information</h2>
