@@ -1,37 +1,9 @@
 <template>
   <div class="info-wrapper">
-    <div v-show="isBlocked" id="info-popup">
-      <span>
-        <span class="info-popup-wrap">
-          <a
-            class="info-popup-img"
-            href="https://docs.modrinth.com/docs/details/carbon"
-          >
-            <img
-              src="https://cdn.modrinth.com/barrier_fixes.png"
-              alt="ads via Carbon"
-            />
-          </a>
-          <a
-            href="https://docs.modrinth.com/docs/details/carbon"
-            class="info-popup-text"
-          >
-            Please disable your adblocker. Advertisements support this site and
-            its creators.
-          </a>
-        </span>
-        <a
-          href="https://docs.modrinth.com/docs/details/carbon"
-          class="info-popup-poweredby"
-          target="_blank"
-          rel="noopener sponsored"
-          >ads via Carbon
-        </a>
-      </span>
-    </div>
     <client-only>
       <script
         id="_carbonads_js"
+        ref="carbon-script"
         async
         type="text/javascript"
         src="//cdn.carbonads.com/carbon.js?serve=CEAIKK3N&placement=modrinthcom"
@@ -49,7 +21,39 @@ export default {
     }
   },
   mounted() {
-    setTimeout(() => (this.isBlocked = true), 1000)
+    setTimeout(() => {
+      this.$refs['carbon-script'].outerHTML += `
+      <div id="info-popup">
+        <span>
+          <span class="info-popup-wrap">
+            <a
+              class="info-popup-img"
+              href="https://docs.modrinth.com/docs/details/carbon"
+            >
+              <img
+                src="https://cdn.modrinth.com/barrier_fixes.png"
+                alt="ads via Carbon"
+              />
+            </a>
+            <a
+              href="https://docs.modrinth.com/docs/details/carbon"
+              class="info-popup-text"
+            >
+              Please disable your adblocker. Advertisements support this site
+              and its creators.
+            </a>
+          </span>
+          <a
+            href="https://docs.modrinth.com/docs/details/carbon"
+            class="info-popup-poweredby"
+            target="_blank"
+            rel="noopener sponsored"
+            >ads via Carbon
+          </a>
+        </span>
+      </div>
+      `
+    }, 1000)
   },
 }
 </script>
@@ -89,11 +93,12 @@ export default {
 
   position: relative;
 
-  div:first-child:nth-last-child(4) {
+  & > * {
     display: none;
   }
-  div:first-child:nth-last-child(3) {
-    display: none;
+
+  div:last-child {
+    display: block;
   }
 }
 
