@@ -7,6 +7,7 @@
         async
         type="text/javascript"
         src="//cdn.carbonads.com/carbon.js?serve=CEAIKK3N&placement=modrinthcom"
+        @error="onBlocked"
       ></script>
     </client-only>
   </div>
@@ -15,13 +16,8 @@
 <script>
 export default {
   name: 'Advertisement',
-  data() {
-    return {
-      isBlocked: false,
-    }
-  },
-  mounted() {
-    setTimeout(() => {
+  methods: {
+    onBlocked() {
       this.$refs['carbon-script'].outerHTML += `
       <div id="info-popup">
         <span>
@@ -53,7 +49,7 @@ export default {
         </span>
       </div>
       `
-    }, 1000)
+    },
   },
 }
 </script>
