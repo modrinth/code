@@ -489,7 +489,7 @@
             </label>
           </div>
           <div
-            v-if="projectType.toLowerCase() !== 'modpack'"
+            v-if="projectType.id.toLowerCase() !== 'modpack'"
             class="dependencies"
           >
             <h3>Dependencies</h3>
