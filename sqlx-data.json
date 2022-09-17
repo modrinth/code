@@ -3681,6 +3681,18 @@
     },
     "query": "\n        SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id\n        INNER JOIN mods m on v.mod_id = m.id\n        INNER JOIN statuses s on m.status = s.id\n        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3\n        "
   },
+  "9c8f3f9503b5bb52e05bbc8a8eee7f640ab7d6b04a59ec111ce8b23e886911de": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                            DELETE FROM dependencies WHERE dependent_id = $1\n                            "
+  },
   "9ceca63fb11f35f09f77bb9db175a1ac74dfcc2200c8134866922742fbbedea3": {
     "describe": {
       "columns": [],
@@ -3839,18 +3851,6 @@
       }
     },
     "query": "\n            DELETE FROM states\n            WHERE id = $1\n            "
-  },
-  "a40e4075ba1bff5b6fde104ed1557ad8d4a75d7d90d481decd222f31685c4981": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    DELETE FROM dependencies WHERE dependent_id = $1\n                    "
   },
   "a647c282a276b63f36d2d8a253c32d0f627cea9cab8eb1b32b39875536bdfcbb": {
     "describe": {

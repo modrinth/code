@@ -208,6 +208,12 @@ pub async fn version_edit(
     let result = database::models::Version::get_full(id, &**pool).await?;
 
     if let Some(version_item) = result {
+        let project_item = database::models::Project::get_full(
+            version_item.project_id,
+            &**pool,
+        )
+        .await?;
+
         let team_member =
             database::models::TeamMember::get_from_user_id_version(
                 version_item.id,
@@ -281,29 +287,33 @@ pub async fn version_edit(
             }
 
             if let Some(dependencies) = &new_version.dependencies {
-                sqlx::query!(
-                    "
-                    DELETE FROM dependencies WHERE dependent_id = $1
-                    ",
-                    id as database::models::ids::VersionId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-
-                let builders = dependencies
-                    .iter()
-                    .map(|x| database::models::version_item::DependencyBuilder {
-                        project_id: x.project_id.map(|x| x.into()),
-                        version_id: x.version_id.map(|x| x.into()),
-                        file_name: x.file_name.clone(),
-                        dependency_type: x.dependency_type.to_string(),
-                    })
-                    .collect::<Vec<database::models::version_item::DependencyBuilder>>();
-
-                for dependency in builders {
-                    dependency
-                        .insert(version_item.id, &mut transaction)
+                if let Some(project) = project_item {
+                    if project.project_type != "modpack" {
+                        sqlx::query!(
+                            "
+                            DELETE FROM dependencies WHERE dependent_id = $1
+                            ",
+                            id as database::models::ids::VersionId,
+                        )
+                        .execute(&mut *transaction)
                         .await?;
+
+                        let builders = dependencies
+                            .iter()
+                            .map(|x| database::models::version_item::DependencyBuilder {
+                                project_id: x.project_id.map(|x| x.into()),
+                                version_id: x.version_id.map(|x| x.into()),
+                                file_name: x.file_name.clone(),
+                                dependency_type: x.dependency_type.to_string(),
+                            })
+                            .collect::<Vec<database::models::version_item::DependencyBuilder>>();
+
+                        for dependency in builders {
+                            dependency
+                                .insert(version_item.id, &mut transaction)
+                                .await?;
+                        }
+                    }
                 }
             }
 
