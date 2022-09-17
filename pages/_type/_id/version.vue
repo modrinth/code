@@ -365,9 +365,10 @@
         </section>
         <section
           v-if="
-            version.dependencies.filter((x) => !x.file_name).length > 0 ||
-            mode === 'edit' ||
-            mode === 'create'
+            (mode === 'version' &&
+              version.dependencies.filter((x) => !x.file_name).length > 0) ||
+            ((mode === 'edit' || mode === 'create') &&
+              project.project_type.toLowerCase() !== 'modpack')
           "
         >
           <h3>Dependencies</h3>
@@ -478,7 +479,10 @@
           <hr class="card-divider" />
         </section>
         <section
-          v-if="version.dependencies.filter((x) => x.file_name).length > 0"
+          v-if="
+            version.dependencies.filter((x) => x.file_name).length > 0 &&
+            mode === 'version'
+          "
         >
           <div>
             <h3>External Dependencies</h3>

@@ -488,7 +488,10 @@
               />
             </label>
           </div>
-          <div class="dependencies">
+          <div
+            v-if="projectType.toLowerCase() !== 'modpack'"
+            class="dependencies"
+          >
             <h3>Dependencies</h3>
             <div class="dependency-selector">
               <ThisOrThat
