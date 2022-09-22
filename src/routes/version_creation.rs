@@ -43,7 +43,7 @@ pub struct InitialVersionData {
     #[serde(alias = "changelog")]
     pub version_body: Option<String>,
     #[validate(
-        length(min = 0, max = 256),
+        length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
     )]
     pub dependencies: Vec<Dependency>,

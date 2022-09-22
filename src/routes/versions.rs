@@ -178,7 +178,7 @@ pub struct EditVersion {
     pub changelog: Option<String>,
     pub version_type: Option<models::projects::VersionType>,
     #[validate(
-        length(min = 0, max = 256),
+        length(min = 0, max = 4096),
         custom(function = "crate::util::validate::validate_deps")
     )]
     pub dependencies: Option<Vec<Dependency>>,
