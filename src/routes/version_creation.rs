@@ -32,11 +32,11 @@ pub struct InitialVersionData {
     #[validate(length(min = 1, max = 256))]
     pub file_parts: Vec<String>,
     #[validate(
-        length(min = 1, max = 64),
+        length(min = 1, max = 32),
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
     pub version_number: String,
-    #[validate(length(min = 1, max = 256))]
+    #[validate(length(min = 1, max = 64))]
     #[serde(alias = "name")]
     pub version_title: String,
     #[validate(length(max = 65536))]

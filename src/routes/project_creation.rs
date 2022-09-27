@@ -130,7 +130,7 @@ fn default_project_type() -> String {
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
 struct ProjectCreateData {
-    #[validate(length(min = 3, max = 256))]
+    #[validate(length(min = 3, max = 64))]
     #[serde(alias = "mod_name")]
     /// The title or name of the project.
     pub title: String,
@@ -145,7 +145,7 @@ struct ProjectCreateData {
     #[serde(alias = "mod_slug")]
     /// The slug of a project, used for vanity URLs
     pub slug: String,
-    #[validate(length(min = 3, max = 2048))]
+    #[validate(length(min = 3, max = 255))]
     #[serde(alias = "mod_description")]
     /// A short description of the project.
     pub description: String,

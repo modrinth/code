@@ -167,10 +167,10 @@ pub async fn version_get(
 
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditVersion {
-    #[validate(length(min = 1, max = 256))]
+    #[validate(length(min = 1, max = 64))]
     pub name: Option<String>,
     #[validate(
-        length(min = 1, max = 64),
+        length(min = 1, max = 32),
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
     pub version_number: Option<String>,

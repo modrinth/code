@@ -130,21 +130,21 @@ lazy_static! {
 
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditUser {
-    #[validate(length(min = 1, max = 255), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 39), regex = "RE_URL_SAFE")]
     pub username: Option<String>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(length(min = 1, max = 255), regex = "RE_URL_SAFE")]
+    #[validate(length(min = 1, max = 64), regex = "RE_URL_SAFE")]
     pub name: Option<Option<String>>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
         with = "::serde_with::rust::double_option"
     )]
-    #[validate(email)]
+    #[validate(email, length(max = 2048))]
     pub email: Option<Option<String>>,
     #[serde(
         default,

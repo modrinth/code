@@ -251,9 +251,9 @@ pub async fn dependency_list(
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditProject {
-    #[validate(length(min = 3, max = 256))]
+    #[validate(length(min = 3, max = 64))]
     pub title: Option<String>,
-    #[validate(length(min = 3, max = 2048))]
+    #[validate(length(min = 3, max = 256))]
     pub description: Option<String>,
     #[validate(length(max = 65536))]
     pub body: Option<String>,
