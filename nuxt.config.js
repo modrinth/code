@@ -98,19 +98,6 @@ export default {
         rel: 'icon',
         type: 'image/x-icon',
         href: '/favicon.ico',
-        media: '(prefers-color-scheme:no-preference)',
-      },
-      {
-        rel: 'icon',
-        type: 'image/x-icon',
-        href: '/favicon-dark.ico',
-        media: '(prefers-color-scheme:dark)',
-      },
-      {
-        rel: 'icon',
-        type: 'image/x-icon',
-        href: '/favicon.ico',
-        media: '(prefers-color-scheme:light)',
       },
       {
         rel: 'stylesheet',
