@@ -345,8 +345,9 @@ export default {
               : null
           }&featured=${item.featured}`
 
-          if (item.title) url += `&title=${item.title}`
-          if (item.description) url += `&description=${item.description}`
+          if (item.title) url += `&title=${encodeURIComponent(item.title)}`
+          if (item.description)
+            url += `&description=${encodeURIComponent(item.description)}`
 
           await this.$axios.post(url, item.icon, this.$defaultHeaders())
         }
@@ -360,8 +361,9 @@ export default {
             item.featured
           }`
 
-          if (item.title) url += `&title=${item.title}`
-          if (item.description) url += `&description=${item.description}`
+          if (item.title) url += `&title=${encodeURIComponent(item.title)}`
+          if (item.description)
+            url += `&description=${encodeURIComponent(item.description)}`
 
           await this.$axios.patch(url, {}, this.$defaultHeaders())
         }
