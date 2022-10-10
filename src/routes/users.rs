@@ -360,12 +360,10 @@ pub async fn user_icon_edit(
             }
 
             if let Some(icon) = icon_url {
-                if icon.starts_with(&cdn_url) {
-                    let name = icon.split('/').next();
+                let name = icon.split(&format!("{cdn_url}/")).nth(1);
 
-                    if let Some(icon_path) = name {
-                        file_host.delete_file_version("", icon_path).await?;
-                    }
+                if let Some(icon_path) = name {
+                    file_host.delete_file_version("", icon_path).await?;
                 }
             }
 

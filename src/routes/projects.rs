@@ -1046,7 +1046,7 @@ pub async fn project_icon_edit(
         }
 
         if let Some(icon) = project_item.icon_url {
-            let name = icon.split('/').next();
+            let name = icon.split(&format!("{cdn_url}/")).nth(1);
 
             if let Some(icon_path) = name {
                 file_host.delete_file_version("", icon_path).await?;
@@ -1136,8 +1136,9 @@ pub async fn delete_project_icon(
         }
     }
 
+    let cdn_url = dotenv::var("CDN_URL")?;
     if let Some(icon) = project_item.icon_url {
-        let name = icon.split('/').next();
+        let name = icon.split(&format!("{cdn_url}/")).nth(1);
 
         if let Some(icon_path) = name {
             file_host.delete_file_version("", icon_path).await?;
@@ -1489,10 +1490,11 @@ pub async fn delete_gallery_item(
     })?
     .id;
 
-    let name = item.url.split('/').next();
+    let cdn_url = dotenv::var("CDN_URL")?;
+    let name = item.url.split(&format!("{cdn_url}/")).nth(1);
 
-    if let Some(item_path) = name {
-        file_host.delete_file_version("", item_path).await?;
+    if let Some(icon_path) = name {
+        file_host.delete_file_version("", icon_path).await?;
     }
 
     let mut transaction = pool.begin().await?;

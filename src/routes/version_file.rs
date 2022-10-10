@@ -206,18 +206,6 @@ pub async fn delete_file(
         .execute(&mut *transaction)
         .await?;
 
-        let project_id: models::projects::ProjectId =
-            database::models::ids::ProjectId(row.project_id).into();
-        file_host
-            .delete_file_version(
-                "",
-                &format!(
-                    "data/{}/versions/{}/{}",
-                    project_id, row.version_number, row.filename
-                ),
-            )
-            .await?;
-
         transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().body(""))

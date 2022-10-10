@@ -46,8 +46,6 @@ impl S3Host {
             )
         })?;
 
-        bucket.add_header("x-amz-acl", "public-read");
-
         Ok(S3Host { bucket })
     }
 }
