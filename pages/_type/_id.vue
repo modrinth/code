@@ -505,10 +505,11 @@
               >our documentation</a
             >
             which provides instructions on using
-            <a href="https://atlauncher.com/about" target="_blank"
-              >ATLauncher</a
-            >
-            and <a href="https://multimc.org/" target="_blank">MultiMC</a>.
+            <a href="https://atlauncher.com/about" target="_blank">ATLauncher</a
+            >, <a href="https://multimc.org/" target="_blank">MultiMC</a> and
+            <a href="https://prismlauncher.org" target="_blank"
+              >Prism Launcher</a
+            >.
           </div>
           <Advertisement
             v-if="

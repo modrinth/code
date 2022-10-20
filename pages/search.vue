@@ -224,8 +224,9 @@
         >
         with
         <a href="https://atlauncher.com/about" target="_blank">ATLauncher</a>
-        and <a href="https://multimc.org/" target="_blank">MultiMC</a>. Pack
-        creators can reference our documentation on
+        , <a href="https://multimc.org/" target="_blank">MultiMC</a> and
+        <a href="https://prismlauncher.org" target="_blank">Prism Launcher</a>.
+        Pack creators can reference our documentation on
         <a
           href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/"
           target="_blank"
