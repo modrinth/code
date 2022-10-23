@@ -112,7 +112,7 @@ async fn version_create_inner(
     file_host: &dyn FileHost,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, CreateError> {
-    let cdn_url = dotenv::var("CDN_URL")?;
+    let cdn_url = dotenvy::var("CDN_URL")?;
 
     let mut initial_version_data = None;
     let mut version_builder = None;
@@ -483,7 +483,7 @@ async fn upload_file_to_version_inner(
     uploaded_files: &mut Vec<UploadedFile>,
     version_id: models::VersionId,
 ) -> Result<HttpResponse, CreateError> {
-    let cdn_url = dotenv::var("CDN_URL")?;
+    let cdn_url = dotenvy::var("CDN_URL")?;
 
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();

@@ -21,7 +21,7 @@ impl FileHost for MockHost {
         file_bytes: Bytes,
     ) -> Result<UploadFileData, FileHostingError> {
         let path =
-            std::path::Path::new(&dotenv::var("MOCK_FILE_PATH").unwrap())
+            std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
                 .join(file_name.replace("../", ""));
         std::fs::create_dir_all(
             path.parent().ok_or(FileHostingError::InvalidFilename)?,
@@ -49,7 +49,7 @@ impl FileHost for MockHost {
         file_name: &str,
     ) -> Result<DeleteFileData, FileHostingError> {
         let path =
-            std::path::Path::new(&dotenv::var("MOCK_FILE_PATH").unwrap())
+            std::path::Path::new(&dotenvy::var("MOCK_FILE_PATH").unwrap())
                 .join(file_name.replace("../", ""));
         std::fs::remove_file(path)?;
 

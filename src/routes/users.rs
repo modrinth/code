@@ -328,7 +328,7 @@ pub async fn user_icon_edit(
     if let Some(content_type) =
         crate::util::ext::get_image_content_type(&*ext.ext)
     {
-        let cdn_url = dotenv::var("CDN_URL")?;
+        let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let id_option =
             crate::database::models::User::get_id_from_username_or_id(

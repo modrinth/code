@@ -478,7 +478,7 @@ pub async fn project_edit(
                     .await?;
 
                     if let Ok(webhook_url) =
-                        dotenv::var("MODERATION_DISCORD_WEBHOOK")
+                        dotenvy::var("MODERATION_DISCORD_WEBHOOK")
                     {
                         crate::util::webhook::send_discord_webhook(
                             Project::from(project_item.clone()),
@@ -1008,7 +1008,7 @@ pub async fn project_icon_edit(
     if let Some(content_type) =
         crate::util::ext::get_image_content_type(&*ext.ext)
     {
-        let cdn_url = dotenv::var("CDN_URL")?;
+        let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let string = info.into_inner().0;
 
@@ -1136,7 +1136,7 @@ pub async fn delete_project_icon(
         }
     }
 
-    let cdn_url = dotenv::var("CDN_URL")?;
+    let cdn_url = dotenvy::var("CDN_URL")?;
     if let Some(icon) = project_item.icon_url {
         let name = icon.split(&format!("{cdn_url}/")).nth(1);
 
@@ -1189,7 +1189,7 @@ pub async fn add_gallery_item(
             ApiError::Validation(validation_errors_to_string(err, None))
         })?;
 
-        let cdn_url = dotenv::var("CDN_URL")?;
+        let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let string = info.into_inner().0;
 
@@ -1490,7 +1490,7 @@ pub async fn delete_gallery_item(
     })?
     .id;
 
-    let cdn_url = dotenv::var("CDN_URL")?;
+    let cdn_url = dotenvy::var("CDN_URL")?;
     let name = item.url.split(&format!("{cdn_url}/")).nth(1);
 
     if let Some(icon_path) = name {

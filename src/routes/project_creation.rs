@@ -26,7 +26,7 @@ use validator::Validate;
 #[derive(Error, Debug)]
 pub enum CreateError {
     #[error("Environment Error")]
-    EnvError(#[from] dotenv::Error),
+    EnvError(#[from] dotenvy::Error),
     #[error("An unknown database error occurred")]
     SqlxDatabaseError(#[from] sqlx::Error),
     #[error("Database Error: {0}")]
@@ -324,7 +324,7 @@ pub async fn project_create_inner(
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, CreateError> {
     // The base URL for files uploaded to backblaze
-    let cdn_url = dotenv::var("CDN_URL")?;
+    let cdn_url = dotenvy::var("CDN_URL")?;
 
     // The currently logged in user
     let current_user =
@@ -793,7 +793,7 @@ pub async fn project_create_inner(
         let _project_id = project_builder.insert(&mut *transaction).await?;
 
         if status == ProjectStatus::Processing {
-            if let Ok(webhook_url) = dotenv::var("MODERATION_DISCORD_WEBHOOK") {
+            if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
                 crate::util::webhook::send_discord_webhook(
                     response.clone(),
                     webhook_url,

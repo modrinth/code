@@ -7,16 +7,16 @@ use std::time::Duration;
 pub async fn connect() -> Result<PgPool, sqlx::Error> {
     info!("Initializing database connection");
     let database_url =
-        dotenv::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+        dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
     let pool = PgPoolOptions::new()
         .min_connections(
-            dotenv::var("DATABASE_MIN_CONNECTIONS")
+            dotenvy::var("DATABASE_MIN_CONNECTIONS")
                 .ok()
                 .and_then(|x| x.parse().ok())
                 .unwrap_or(0),
         )
         .max_connections(
-            dotenv::var("DATABASE_MAX_CONNECTIONS")
+            dotenvy::var("DATABASE_MAX_CONNECTIONS")
                 .ok()
                 .and_then(|x| x.parse().ok())
                 .unwrap_or(16),
@@ -28,7 +28,7 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
     Ok(pool)
 }
 pub async fn check_for_migrations() -> Result<(), sqlx::Error> {
-    let uri = dotenv::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
+    let uri = dotenvy::var("DATABASE_URL").expect("`DATABASE_URL` not in .env");
     let uri = uri.as_str();
     if !Postgres::database_exists(uri).await? {
         info!("Creating database...");

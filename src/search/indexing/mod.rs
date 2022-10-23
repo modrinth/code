@@ -20,7 +20,7 @@ pub enum IndexingError {
     #[error("Database Error: {0}")]
     Database(#[from] crate::database::models::DatabaseError),
     #[error("Environment Error")]
-    Env(#[from] dotenv::Error),
+    Env(#[from] dotenvy::Error),
     #[error("Error while awaiting index creation task")]
     Task,
 }

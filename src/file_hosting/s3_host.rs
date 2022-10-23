@@ -23,9 +23,15 @@ impl S3Host {
     ) -> Result<S3Host, FileHostingError> {
         let mut bucket = Bucket::new(
             bucket_name,
-            Region::Custom {
-                region: bucket_region.to_string(),
-                endpoint: url.to_string(),
+            if bucket_region == "r2" {
+                Region::R2 {
+                    account_id: url.to_string(),
+                }
+            } else {
+                Region::Custom {
+                    region: bucket_region.to_string(),
+                    endpoint: url.to_string(),
+                }
             },
             Credentials::new(
                 Some(access_token),

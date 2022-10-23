@@ -24,7 +24,7 @@ pub enum SearchError {
     #[error("Error while formatting strings: {0}")]
     FormatError(#[from] std::fmt::Error),
     #[error("Environment Error")]
-    Env(#[from] dotenv::Error),
+    Env(#[from] dotenvy::Error),
     #[error("Invalid index to sort by: {0}")]
     InvalidIndex(String),
 }

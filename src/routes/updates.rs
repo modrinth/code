@@ -53,7 +53,7 @@ pub async fn forge_updates(
     let mut response = ForgeUpdates {
         homepage: format!(
             "{}/mod/{}",
-            dotenv::var("SITE_URL").unwrap_or_default(),
+            dotenvy::var("SITE_URL").unwrap_or_default(),
             id
         ),
         promos: HashMap::new(),
