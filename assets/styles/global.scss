@@ -315,18 +315,6 @@ textarea {
   }
 }
 
-.ea-content {
-  background: var(--color-ad) !important;
-  border-radius: var(--size-rounded-card) !important;
-  margin: 0 !important;
-  box-shadow: var(--shadow-faint) !important;
-}
-
-.ea-callout {
-  margin: 0.25rem 0 !important;
-  padding: 0 !important;
-}
-
 button {
   padding: 0.5rem 0;
   //outline: none; Bad for accessibility

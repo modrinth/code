@@ -144,10 +144,10 @@
       </p>
 
       <p>
-        Modrinth makes use of external ads providers. These include BuySellAds.
-        You can read BuySellAds's privacy policy here and the data they collect:
-        <a href="https://www.buysellads.com/about/privacy"
-          >https://www.buysellads.com/about/privacy</a
+        Modrinth makes use of external ads providers. These include EthicalAds.
+        You can read EthicalAds's privacy policy here and the data they collect:
+        <a href="https://www.ethicalads.io/privacy-policy/"
+          >https://www.ethicalads.io/privacy-policy/</a
         >
       </p>
 
