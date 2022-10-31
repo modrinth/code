@@ -136,9 +136,7 @@ pub async fn mod_create(
         let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
         let rollback_result = transaction.rollback().await;
 
-        if let Err(e) = undo_result {
-            return Err(e);
-        }
+        undo_result?;
         if let Err(e) = rollback_result {
             return Err(e.into());
         }

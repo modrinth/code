@@ -8,6 +8,7 @@ use crate::models::users::UserId;
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
@@ -216,7 +217,7 @@ pub struct NewTeamMember {
     #[serde(default = "Permissions::default")]
     pub permissions: Permissions,
     #[serde(default)]
-    pub payouts_split: f32,
+    pub payouts_split: Decimal,
 }
 
 #[post("{id}/members")]
@@ -259,7 +260,9 @@ pub async fn add_team_member(
         ));
     }
 
-    if !(0.0..=5000.0).contains(&new_member.payouts_split) {
+    if new_member.payouts_split < Decimal::from(0)
+        || new_member.payouts_split > Decimal::from(5000)
+    {
         return Err(ApiError::InvalidInput(
             "Payouts split must be between 0 and 5000!".to_string(),
         ));
@@ -360,7 +363,7 @@ pub async fn add_team_member(
 pub struct EditTeamMember {
     pub permissions: Option<Permissions>,
     pub role: Option<String>,
-    pub payouts_split: Option<f32>,
+    pub payouts_split: Option<Decimal>,
 }
 
 #[patch("{id}/members/{user_id}")]
@@ -419,7 +422,9 @@ pub async fn edit_team_member(
     }
 
     if let Some(payouts_split) = edit_member.payouts_split {
-        if !(0.0..=5000.0).contains(&payouts_split) {
+        if payouts_split < Decimal::from(0)
+            || payouts_split > Decimal::from(5000)
+        {
             return Err(ApiError::InvalidInput(
                 "Payouts split must be between 0 and 5000!".to_string(),
             ));

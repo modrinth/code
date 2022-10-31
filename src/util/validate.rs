@@ -89,7 +89,7 @@ pub fn validate_deps(
     Ok(())
 }
 
-pub fn validate_url(value: &String) -> Result<(), validator::ValidationError> {
+pub fn validate_url(value: &str) -> Result<(), validator::ValidationError> {
     let url = url::Url::parse(value)
         .ok()
         .ok_or_else(|| validator::ValidationError::new("invalid URL"))?;

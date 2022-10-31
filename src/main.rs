@@ -7,7 +7,6 @@ use crate::util::env::{parse_strings_from_var, parse_var};
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use env_logger::Env;
-use gumdrop::Options;
 use log::{error, info, warn};
 use search::indexing::index_projects;
 use search::indexing::IndexingSettings;
@@ -25,23 +24,6 @@ mod search;
 mod util;
 mod validate;
 
-#[derive(Debug, Options)]
-struct Config {
-    #[options(help = "Print help message")]
-    help: bool,
-
-    #[options(no_short, help = "Skip indexing on startup")]
-    skip_first_index: bool,
-    #[options(no_short, help = "Reset the documents in the indices")]
-    reset_indices: bool,
-
-    #[options(
-        no_short,
-        help = "Allow missing environment variables on startup. This is a bad idea, but it may work in some cases."
-    )]
-    allow_missing_vars: bool,
-}
-
 #[derive(Clone)]
 pub struct Pepper {
     pub pepper: String,
@@ -53,39 +35,19 @@ async fn main() -> std::io::Result<()> {
     env_logger::Builder::from_env(Env::default().default_filter_or("info"))
         .init();
 
-    let config = Config::parse_args_default_or_exit();
-
     if check_env_vars() {
         error!("Some environment variables are missing!");
-        if !config.allow_missing_vars {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::Other,
-                "Missing required environment variables",
-            ));
-        }
     }
 
-    info!("Starting Labrinth on {}", dotenvy::var("BIND_ADDR").unwrap());
+    info!(
+        "Starting Labrinth on {}",
+        dotenvy::var("BIND_ADDR").unwrap()
+    );
 
     let search_config = search::SearchConfig {
         address: dotenvy::var("MEILISEARCH_ADDR").unwrap(),
         key: dotenvy::var("MEILISEARCH_KEY").unwrap(),
     };
-
-    if config.reset_indices {
-        info!("Resetting indices");
-        search::indexing::reset_indices(&search_config)
-            .await
-            .unwrap();
-        return Ok(());
-    }
-
-    // Allow manually skipping the initial indexing for quicker iteration
-    // and startup times.
-    let skip_initial = config.skip_first_index;
-    if skip_initial {
-        info!("Skipping initial indexing");
-    }
 
     database::check_for_migrations()
         .await
@@ -131,20 +93,12 @@ async fn main() -> std::io::Result<()> {
         parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
     );
 
-    let mut skip = skip_initial;
     let pool_ref = pool.clone();
     let search_config_ref = search_config.clone();
     scheduler.run(local_index_interval, move || {
         let pool_ref = pool_ref.clone();
         let search_config_ref = search_config_ref.clone();
-        let local_skip = skip;
-        if skip {
-            skip = false;
-        }
         async move {
-            if local_skip {
-                return;
-            }
             info!("Indexing local database");
             let settings = IndexingSettings { index_local: true };
             let result =
@@ -183,7 +137,7 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    scheduler::schedule_versions(&mut scheduler, pool.clone(), skip_initial);
+    scheduler::schedule_versions(&mut scheduler, pool.clone());
 
     let download_queue = Arc::new(DownloadQueue::new());
 
@@ -253,7 +207,9 @@ async fn main() -> std::io::Result<()> {
                     })
                     .with_interval(std::time::Duration::from_secs(60))
                     .with_max_requests(300)
-                    .with_ignore_key(dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok()),
+                    .with_ignore_key(
+                        dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok(),
+                    ),
             )
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(file_host.clone()))
@@ -345,6 +301,9 @@ fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("ARIADNE_ADMIN_KEY");
     failed |= check_var::<String>("ARIADNE_URL");
+
+    failed |= check_var::<String>("STRIPE_TOKEN");
+    failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
 
     failed
 }

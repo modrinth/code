@@ -1,6 +1,5 @@
 use super::ApiError;
 use crate::database::models::{version_item::QueryVersion, DatabaseError};
-use crate::file_hosting::FileHost;
 use crate::models::projects::{GameVersion, Loader, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::get_user_from_headers;
@@ -10,7 +9,6 @@ use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
-use std::sync::Arc;
 use tokio::sync::RwLock;
 
 #[derive(Deserialize)]
@@ -114,7 +112,6 @@ pub async fn delete_file(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     algorithm: web::Query<Algorithm>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;

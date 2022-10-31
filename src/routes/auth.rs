@@ -273,6 +273,7 @@ pub async fn auth_callback(
                         created: Utc::now(),
                         role: Role::Developer.to_string(),
                         badges: Badges::default(),
+                        paypal_email: None,
                     }
                     .insert(&mut transaction)
                     .await?;

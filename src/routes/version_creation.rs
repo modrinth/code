@@ -92,9 +92,7 @@ pub async fn version_create(
 
         payload.for_each(|_| ready(())).await;
 
-        if let Err(e) = undo_result {
-            return Err(e);
-        }
+        undo_result?;
         if let Err(e) = rollback_result {
             return Err(e.into());
         }
@@ -461,9 +459,7 @@ pub async fn upload_file_to_version(
 
         payload.for_each(|_| ready(())).await;
 
-        if let Err(e) = undo_result {
-            return Err(e);
-        }
+        undo_result?;
         if let Err(e) = rollback_result {
             return Err(e.into());
         }

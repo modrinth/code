@@ -62,15 +62,6 @@ pub async fn index_projects(
     Ok(())
 }
 
-pub async fn reset_indices(config: &SearchConfig) -> Result<(), IndexingError> {
-    let client = config.make_client();
-
-    client.delete_index("projects").await?;
-    client.delete_index("projects_filtered").await?;
-
-    Ok(())
-}
-
 async fn create_index(
     client: &Client,
     name: &'static str,

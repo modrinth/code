@@ -73,6 +73,7 @@ where
             created: result.created,
             role: Role::from_string(&result.role),
             badges: result.badges,
+            paypal_email: result.paypal_email,
         }),
         None => Err(AuthenticationError::InvalidCredentials),
     }

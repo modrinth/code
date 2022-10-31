@@ -17,6 +17,7 @@ use actix_web::web::Data;
 use actix_web::{post, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::sync::Arc;
@@ -274,9 +275,7 @@ pub async fn project_create(
         // fix multipart error bug:
         payload.for_each(|_| ready(())).await;
 
-        if let Err(e) = undo_result {
-            return Err(e);
-        }
+        undo_result?;
         if let Err(e) = rollback_result {
             return Err(e.into());
         }
@@ -628,7 +627,7 @@ pub async fn project_create_inner(
                 role: crate::models::teams::OWNER_ROLE.to_owned(),
                 permissions: crate::models::teams::Permissions::ALL,
                 accepted: true,
-                payouts_split: 100.0,
+                payouts_split: Decimal::from(100),
             }],
         };
 
@@ -793,7 +792,8 @@ pub async fn project_create_inner(
         let _project_id = project_builder.insert(&mut *transaction).await?;
 
         if status == ProjectStatus::Processing {
-            if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
+            if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK")
+            {
                 crate::util::webhook::send_discord_webhook(
                     response.clone(),
                     webhook_url,

@@ -6,6 +6,7 @@ mod auth;
 mod health;
 mod index;
 mod maven;
+mod midas;
 mod moderation;
 mod not_found;
 mod notifications;
@@ -41,7 +42,8 @@ pub fn v2_config(cfg: &mut web::ServiceConfig) {
             .configure(moderation_config)
             .configure(reports_config)
             .configure(notifications_config)
-            .configure(admin_config),
+            .configure(admin_config)
+            .configure(midas_config),
     );
 }
 
@@ -169,6 +171,15 @@ pub fn admin_config(cfg: &mut web::ServiceConfig) {
     cfg.service(web::scope("admin").service(admin::count_download));
 }
 
+pub fn midas_config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("midas")
+            .service(midas::init_checkout)
+            .service(midas::init_customer_portal)
+            .service(midas::handle_stripe_webhook),
+    );
+}
+
 #[derive(thiserror::Error, Debug)]
 pub enum ApiError {
     #[error("Environment Error")]
@@ -195,6 +206,12 @@ pub enum ApiError {
     Search(#[from] meilisearch_sdk::errors::Error),
     #[error("Indexing Error: {0}")]
     Indexing(#[from] crate::search::indexing::IndexingError),
+    #[error("Ariadne Error: {0}")]
+    Analytics(String),
+    #[error("Crypto Error: {0}")]
+    Crypto(String),
+    #[error("Payments Error: {0}")]
+    Payments(String),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -234,6 +251,13 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Validation(..) => {
                 actix_web::http::StatusCode::BAD_REQUEST
             }
+            ApiError::Analytics(..) => {
+                actix_web::http::StatusCode::FAILED_DEPENDENCY
+            }
+            ApiError::Crypto(..) => actix_web::http::StatusCode::FORBIDDEN,
+            ApiError::Payments(..) => {
+                actix_web::http::StatusCode::FAILED_DEPENDENCY
+            }
         }
     }
 
@@ -253,6 +277,9 @@ impl actix_web::ResponseError for ApiError {
                     ApiError::FileHosting(..) => "file_hosting_error",
                     ApiError::InvalidInput(..) => "invalid_input",
                     ApiError::Validation(..) => "invalid_input",
+                    ApiError::Analytics(..) => "analytics_error",
+                    ApiError::Crypto(..) => "crypto_error",
+                    ApiError::Payments(..) => "payments_error",
                 },
                 description: &self.to_string(),
             },

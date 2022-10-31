@@ -1,6 +1,7 @@
 use super::ids::Base62Id;
 use crate::database::models::team_item::QueryTeamMember;
 use crate::models::users::User;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 /// The ID of a team
@@ -59,9 +60,11 @@ pub struct TeamMember {
     pub permissions: Option<Permissions>,
     /// Whether the user has joined the team or is just invited to it
     pub accepted: bool,
+
+    #[serde(with = "rust_decimal::serde::float_option")]
     /// Payouts split. This is a weighted average. For example. if a team has two members with this
     /// value set to 25.0 for both members, they split revenue 50/50
-    pub payouts_split: Option<f32>,
+    pub payouts_split: Option<Decimal>,
 }
 
 impl TeamMember {

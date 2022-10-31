@@ -35,23 +35,14 @@ use log::{info, warn};
 pub fn schedule_versions(
     scheduler: &mut Scheduler,
     pool: sqlx::Pool<sqlx::Postgres>,
-    skip_initial: bool,
 ) {
     let version_index_interval = std::time::Duration::from_secs(
         parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800),
     );
 
-    let mut skip = skip_initial;
     scheduler.run(version_index_interval, move || {
         let pool_ref = pool.clone();
-        let local_skip = skip;
-        if skip {
-            skip = false;
-        }
         async move {
-            if local_skip {
-                return;
-            }
             info!("Indexing game versions list from Mojang");
             let result = update_versions(&pool_ref).await;
             if let Err(e) = result {

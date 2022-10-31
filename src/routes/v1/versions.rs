@@ -1,4 +1,4 @@
-use crate::file_hosting::FileHost;
+use crate::database;
 use crate::models::ids::{ProjectId, UserId, VersionId};
 use crate::models::projects::{
     Dependency, GameVersion, Loader, Version, VersionFile, VersionType,
@@ -7,12 +7,10 @@ use crate::models::teams::Permissions;
 use crate::routes::versions::{VersionIds, VersionListFilters};
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
-use crate::{database, models};
 use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use std::sync::Arc;
 
 /// A specific version of a mod
 #[derive(Serialize, Deserialize)]
@@ -286,7 +284,6 @@ pub async fn delete_file(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     algorithm: web::Query<Algorithm>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;

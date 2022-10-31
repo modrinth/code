@@ -1,16 +1,20 @@
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
-use crate::models::projects::{Project, ProjectStatus};
+use crate::models::projects::{Project, ProjectId, ProjectStatus};
 use crate::models::users::{Badges, Role, UserId};
 use crate::routes::ApiError;
-use crate::util::auth::get_user_from_headers;
+use crate::util::auth::{check_is_admin_from_headers, get_user_from_headers};
+use crate::util::payout_calc::get_claimable_time;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
+use chrono::{DateTime, Utc};
 use lazy_static::lazy_static;
 use regex::Regex;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use serde_json::json;
 use sqlx::PgPool;
 use std::sync::Arc;
 use validator::Validate;
@@ -20,10 +24,8 @@ pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    Ok(HttpResponse::Ok().json(
-        get_user_from_headers(req.headers(), &mut *pool.acquire().await?)
-            .await?,
-    ))
+    Ok(HttpResponse::Ok()
+        .json(get_user_from_headers(req.headers(), &**pool).await?))
 }
 
 #[derive(Serialize, Deserialize)]
@@ -155,6 +157,8 @@ pub struct EditUser {
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
     pub badges: Option<Badges>,
+    #[validate(email, length(max = 128))]
+    pub paypal_email: Option<Option<String>>,
 }
 
 #[patch("{id}")]
@@ -293,6 +297,20 @@ pub async fn user_edit(
                     WHERE (id = $2)
                     ",
                     badges.bits() as i64,
+                    id as crate::database::models::ids::UserId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            if let Some(paypal_email) = &new_user.paypal_email {
+                sqlx::query!(
+                    "
+                    UPDATE users
+                    SET paypal_email = $1
+                    WHERE (id = $2)
+                    ",
+                    paypal_email.as_deref(),
                     id as crate::database::models::ids::UserId,
                 )
                 .execute(&mut *transaction)
@@ -538,6 +556,105 @@ pub async fn user_notifications(
         notifications.sort_by(|a, b| b.created.cmp(&a.created));
 
         Ok(HttpResponse::Ok().json(notifications))
+    } else {
+        Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+#[derive(Serialize)]
+pub struct Payout {
+    pub claimed: bool,
+    pub claimable: bool,
+    pub created: DateTime<Utc>,
+    pub project: Option<ProjectId>,
+    pub amount: Decimal,
+}
+
+#[get("{id}/payouts")]
+pub async fn user_payouts(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+    let id_option =
+        User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
+            .await?;
+
+    if let Some(id) = id_option {
+        if !user.role.is_admin() && user.id != id.into() {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have permission to see the payouts of this user!"
+                    .to_string(),
+            ));
+        }
+
+        use futures::TryStreamExt;
+
+        let payouts: Vec<Payout> = sqlx::query!(
+            "
+            SELECT pv.mod_id, pv.created, pv.claimed, pv.amount
+            FROM payouts_values pv
+            WHERE pv.user_id = $1
+            ORDER BY pv.created DESC
+            ",
+            id as crate::database::models::UserId
+        )
+        .fetch_many(&**pool)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|row| {
+                let claimable_time: DateTime<Utc> =
+                    get_claimable_time(row.created, true);
+
+                Payout {
+                    claimed: row.claimed,
+                    claimable: Utc::now() > claimable_time,
+                    created: row.created,
+                    project: row.mod_id.map(|x| ProjectId(x as u64)),
+                    amount: row.amount,
+                }
+            }))
+        })
+        .try_collect::<Vec<Payout>>()
+        .await?;
+
+        Ok(HttpResponse::Ok().json(json!({
+            "all_time": payouts.iter().map(|x| x.amount).sum::<Decimal>(),
+            "current_period": payouts.iter().filter(|x| !x.claimed && !x.claimable).map(|x| x.amount).sum::<Decimal>(),
+            "withdrawable": payouts.iter().filter(|x| x.claimable && !x.claimed).map(|x| x.amount).sum::<Decimal>(),
+            "payouts": payouts,
+        })))
+    } else {
+        Ok(HttpResponse::NotFound().body(""))
+    }
+}
+
+#[get("{id}/payouts")]
+pub async fn finish_user_payout(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    check_is_admin_from_headers(req.headers(), &**pool).await?;
+
+    let id_option =
+        User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
+            .await?;
+
+    if let Some(id) = id_option {
+        sqlx::query!(
+            "
+            UPDATE payouts_values
+            SET claimed = TRUE
+            WHERE (claimed = FALSE AND user_id = $1 AND created <= $2)
+            ",
+            id as crate::database::models::ids::UserId,
+            get_claimable_time(Utc::now(), false)
+        )
+        .execute(&**pool)
+        .await?;
+
+        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

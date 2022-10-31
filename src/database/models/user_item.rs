@@ -13,6 +13,7 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: String,
     pub badges: Badges,
+    pub paypal_email: Option<String>,
 }
 
 impl User {
@@ -56,7 +57,7 @@ impl User {
             "
             SELECT u.github_id, u.name, u.email,
                 u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges
+                u.created, u.role, u.badges, u.paypal_email
             FROM users u
             WHERE u.id = $1
             ",
@@ -78,6 +79,7 @@ impl User {
                 role: row.role,
                 badges: Badges::from_bits(row.badges as u64)
                     .unwrap_or_default(),
+                paypal_email: row.paypal_email,
             }))
         } else {
             Ok(None)
@@ -95,7 +97,7 @@ impl User {
             "
             SELECT u.id, u.name, u.email,
                 u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges
+                u.created, u.role, u.badges, u.paypal_email
             FROM users u
             WHERE u.github_id = $1
             ",
@@ -117,6 +119,7 @@ impl User {
                 role: row.role,
                 badges: Badges::from_bits(row.badges as u64)
                     .unwrap_or_default(),
+                paypal_email: row.paypal_email,
             }))
         } else {
             Ok(None)
@@ -134,7 +137,7 @@ impl User {
             "
             SELECT u.id, u.github_id, u.name, u.email,
                 u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges
+                u.created, u.role, u.badges, u.paypal_email
             FROM users u
             WHERE LOWER(u.username) = LOWER($1)
             ",
@@ -156,6 +159,7 @@ impl User {
                 role: row.role,
                 badges: Badges::from_bits(row.badges as u64)
                     .unwrap_or_default(),
+                paypal_email: row.paypal_email,
             }))
         } else {
             Ok(None)
@@ -177,7 +181,7 @@ impl User {
             "
             SELECT u.id, u.github_id, u.name, u.email,
                 u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges
+                u.created, u.role, u.badges, u.paypal_email
             FROM users u
             WHERE u.id = ANY($1)
             ",
@@ -196,6 +200,7 @@ impl User {
                 created: u.created,
                 role: u.role,
                 badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
+                paypal_email: u.paypal_email,
             }))
         })
         .try_collect::<Vec<User>>()
@@ -345,6 +350,16 @@ impl User {
         sqlx::query!(
             "
             DELETE FROM team_members
+            WHERE user_id = $1
+            ",
+            id as UserId,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        sqlx::query!(
+            "
+            DELETE FROM payouts_values
             WHERE user_id = $1
             ",
             id as UserId,
