@@ -967,6 +967,38 @@
     },
     "query": "\n            SELECT id FROM loaders\n            WHERE loader = $1\n            "
   },
+  "2534464b06d567078bcfaa94e0c5e37729db111f5b46c4035cabe72634104b2e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "payouts_split",
+          "ordinal": 2,
+          "type_info": "Numeric"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split\n            FROM mods m\n            INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n            WHERE m.id = ANY($1)\n            "
+  },
   "2576a47d17794598f9318d1b2d2892006c8af165a188a8695c0f0b4837082eb9": {
     "describe": {
       "columns": [],
@@ -1242,44 +1274,6 @@
       }
     },
     "query": "\n            SELECT u.id, u.github_id, u.name, u.email,\n                u.avatar_url, u.username, u.bio,\n                u.created, u.role, u.badges, u.paypal_email\n            FROM users u\n            WHERE LOWER(u.username) = LOWER($1)\n            "
-  },
-  "31a689dcba742809681e02ab2d8803fda64420572f36311c324ce94322bcf42b": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "payouts_split",
-          "ordinal": 2,
-          "type_info": "Numeric"
-        },
-        {
-          "name": "project_type",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split, pt.name project_type\n        FROM mods m\n        INNER JOIN team_members tm on m.team_id = tm.team_id\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.id = ANY($1)\n        "
   },
   "33a965c7dc615d3b701c05299889357db8dd36d378850625d2602ba471af4885": {
     "describe": {
@@ -3822,6 +3816,44 @@
     },
     "query": "\n            SELECT id FROM mods\n            WHERE slug = LOWER($1)\n            "
   },
+  "96b2f4e0e619e7ed312d191dc90d64113235d72254fbda8f528ce866d1795cb5": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "payouts_split",
+          "ordinal": 2,
+          "type_info": "Numeric"
+        },
+        {
+          "name": "project_type",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split, pt.name project_type\n        FROM mods m\n        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.id = ANY($1)\n        "
+  },
   "97690dda7edea8c985891cae5ad405f628ed81e333bc88df5493c928a4324d43": {
     "describe": {
       "columns": [
@@ -4406,20 +4438,6 @@
       }
     },
     "query": "\n            DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL AND dependency_file_name = NULL\n            "
-  },
-  "af4339fee915a3bca2faa1efe87afef33c7970794d1624626bcce9a3b5189518": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Numeric",
-          "Timestamptz"
-        ]
-      }
-    },
-    "query": "\n                    INSERT INTO payouts_values (user_id, amount, created)\n                    VALUES ($1, $2, $3)\n                    "
   },
   "b030a9e0fdb75eee8ee50aafdcb6063a073e2aa53cc70d40ed46437c1d0dfe80": {
     "describe": {
@@ -5022,38 +5040,6 @@
     },
     "query": "\n                    UPDATE versions\n                    SET version_type = $1\n                    WHERE (id = $2)\n                    "
   },
-  "c3cef0e5a0c22330376f34970a6906b80c9201a2f032ae686ff2a70500ccc59d": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "payouts_split",
-          "ordinal": 2,
-          "type_info": "Numeric"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split\n            FROM mods m\n            INNER JOIN team_members tm on m.team_id = tm.team_id\n            WHERE m.id = ANY($1)\n            "
-  },
   "c3dcb5a8b798ea6c0922698a007dbc8ab549f5f85bad780da59163f4d6371238": {
     "describe": {
       "columns": [
@@ -5141,6 +5127,21 @@
       }
     },
     "query": "\n            INSERT INTO mod_follows (follower_id, mod_id)\n            VALUES ($1, $2)\n            "
+  },
+  "c5bfaf443d56825fb1f53ace39c5fecfa14957b66889197754fb3a4eef9a7538": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Numeric",
+          "Timestamptz"
+        ]
+      }
+    },
+    "query": "\n                        INSERT INTO payouts_values (user_id, mod_id, amount, created)\n                        VALUES ($1, $2, $3, $4)\n                        "
   },
   "c5d44333c62223bd3e68185d1fb3f95152fafec593da8d06c9b2b665218a02be": {
     "describe": {

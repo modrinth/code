@@ -5,7 +5,7 @@ use crate::util::guards::admin_key_guard;
 use crate::util::payout_calc::get_claimable_time;
 use crate::DownloadQueue;
 use actix_web::{get, patch, post, web, HttpRequest, HttpResponse};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, SecondsFormat, Utc};
 use rust_decimal::Decimal;
 use serde::Deserialize;
 use serde_json::json;
@@ -99,7 +99,11 @@ pub async fn process_payout(
     pool: web::Data<PgPool>,
     data: web::Json<PayoutData>,
 ) -> Result<HttpResponse, ApiError> {
-    let start = data.date.date().and_hms(0, 0, 0);
+    let start = data
+        .date
+        .date()
+        .and_hms_nano(0, 0, 0, 0)
+        .with_timezone(&Utc);
 
     let client = reqwest::Client::new();
     let mut transaction = pool.begin().await?;
@@ -107,16 +111,16 @@ pub async fn process_payout(
     #[derive(Deserialize)]
     struct PayoutMultipliers {
         sum: u64,
-        values: HashMap<i64, u64>,
+        values: HashMap<String, u64>,
     }
 
     let multipliers: PayoutMultipliers = client
-        .get(format!(
-            "{}multipliers?start_date=\"{}\"",
-            dotenvy::var("ARIADNE_URL")?,
-            start.to_rfc3339(),
-        ))
+        .get(format!("{}multipliers", dotenvy::var("ARIADNE_URL")?,))
         .header("Modrinth-Admin", dotenvy::var("ARIADNE_ADMIN_KEY")?)
+        .query(&[(
+            "start_date",
+            start.to_rfc3339_opts(SecondsFormat::Nanos, true),
+        )])
         .send()
         .await
         .map_err(|_| {
@@ -146,8 +150,8 @@ pub async fn process_payout(
         project_type: String,
         // user_id, payouts_split
         team_members: Vec<(i64, Decimal)>,
-        // user_id, payouts_split
-        split_team_members: Vec<(i64, Decimal)>,
+        // user_id, payouts_split, actual_project_id
+        split_team_members: Vec<(i64, Decimal, i64)>,
     }
 
     let mut projects_map: HashMap<i64, Project> = HashMap::new();
@@ -157,11 +161,11 @@ pub async fn process_payout(
         "
         SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split, pt.name project_type
         FROM mods m
-        INNER JOIN team_members tm on m.team_id = tm.team_id
+        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE
         INNER JOIN project_types pt ON pt.id = m.project_type
         WHERE m.id = ANY($1)
         ",
-        &multipliers.values.keys().map(|x| *x).collect::<Vec<i64>>()
+        &multipliers.values.keys().flat_map(|x| x.parse::<i64>().ok()).collect::<Vec<i64>>()
     )
         .fetch_many(&mut *transaction)
         .try_for_each(|e| {
@@ -236,7 +240,7 @@ pub async fn process_payout(
             "
             SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split
             FROM mods m
-            INNER JOIN team_members tm on m.team_id = tm.team_id
+            INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE
             WHERE m.id = ANY($1)
             ",
             &*fetch_team_members
@@ -256,10 +260,10 @@ pub async fn process_payout(
         })
         .await?;
 
-        for (project, dependencies) in project_dependencies {
+        for (project_id, dependencies) in project_dependencies {
             let dep_sum: i64 = dependencies.iter().map(|x| x.1).sum();
 
-            let project = projects_map.get_mut(&project);
+            let project = projects_map.get_mut(&project_id);
 
             if let Some(project) = project {
                 for dependency in dependencies {
@@ -276,6 +280,7 @@ pub async fn process_payout(
                             project.split_team_members.push((
                                 member.0,
                                 member_multiplier * project_multiplier,
+                                project_id,
                             ));
                         }
                     }
@@ -285,7 +290,7 @@ pub async fn process_payout(
     }
 
     for (id, project) in projects_map {
-        if let Some(value) = &multipliers.values.get(&id) {
+        if let Some(value) = &multipliers.values.get(&id.to_string()) {
             let project_multiplier: Decimal =
                 Decimal::from(**value) / Decimal::from(multipliers.sum);
 
@@ -308,21 +313,23 @@ pub async fn process_payout(
                         &default_split_given
                     });
 
-                sqlx::query!(
-                    "
-                    INSERT INTO payouts_values (user_id, mod_id, amount, created)
-                    VALUES ($1, $2, $3, $4)
-                    ",
-                    user_id,
-                    id,
-                    payout,
-                    start
-                )
-                    .execute(&mut *transaction)
-                    .await?;
+                if payout > Decimal::from(0) {
+                    sqlx::query!(
+                        "
+                        INSERT INTO payouts_values (user_id, mod_id, amount, created)
+                        VALUES ($1, $2, $3, $4)
+                        ",
+                        user_id,
+                        id,
+                        payout,
+                        start
+                    )
+                        .execute(&mut *transaction)
+                        .await?;
+                }
             }
 
-            for (user_id, split) in project.split_team_members {
+            for (user_id, split, project_id) in project.split_team_members {
                 let payout: Decimal = data.amount
                     * project_multiplier
                     * (split / sum_tm_splits)
@@ -330,10 +337,11 @@ pub async fn process_payout(
 
                 sqlx::query!(
                     "
-                    INSERT INTO payouts_values (user_id, amount, created)
-                    VALUES ($1, $2, $3)
+                    INSERT INTO payouts_values (user_id, mod_id, amount, created)
+                    VALUES ($1, $2, $3, $4)
                     ",
                     user_id,
+                    project_id,
                     payout,
                     start
                 )
@@ -357,7 +365,7 @@ pub async fn get_payout_data(
 
     use futures::stream::TryStreamExt;
 
-    let payouts = sqlx::query!(
+    let mut payouts: HashMap<String, Decimal> = sqlx::query!(
             "
             SELECT u.paypal_email, SUM(pv.amount) amount
             FROM payouts_values pv
@@ -373,6 +381,9 @@ pub async fn get_payout_data(
         })
         .try_collect::<HashMap<String, Decimal>>()
         .await?;
+
+    let mut minimum_payout = Decimal::from(5);
+    payouts.retain(|_k, v| v > &mut minimum_payout);
 
     Ok(HttpResponse::Ok().json(payouts))
 }
