@@ -1,14 +1,16 @@
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
-use crate::models::projects::{Project, ProjectId, ProjectStatus};
-use crate::models::users::{Badges, Role, UserId};
+use crate::models::projects::{Project, ProjectStatus};
+use crate::models::users::{
+    Badges, RecipientType, RecipientWallet, Role, UserId,
+};
+use crate::queue::payouts::{PayoutAmount, PayoutItem, PayoutsQueue};
 use crate::routes::ApiError;
-use crate::util::auth::{check_is_admin_from_headers, get_user_from_headers};
-use crate::util::payout_calc::get_claimable_time;
+use crate::util::auth::get_user_from_headers;
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
-use actix_web::{delete, get, patch, web, HttpRequest, HttpResponse};
+use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
 use lazy_static::lazy_static;
 use regex::Regex;
@@ -17,6 +19,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::PgPool;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 use validator::Validate;
 
 #[get("user")]
@@ -157,8 +160,16 @@ pub struct EditUser {
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
     pub badges: Option<Badges>,
-    #[validate(email, length(max = 128))]
-    pub paypal_email: Option<Option<String>>,
+    #[validate]
+    pub payout_data: Option<EditPayoutData>,
+}
+
+#[derive(Serialize, Deserialize, Validate)]
+pub struct EditPayoutData {
+    pub payout_wallet: RecipientWallet,
+    pub payout_wallet_type: RecipientType,
+    #[validate(length(max = 128))]
+    pub payout_address: String,
 }
 
 #[patch("{id}")]
@@ -303,18 +314,43 @@ pub async fn user_edit(
                 .await?;
             }
 
-            if let Some(paypal_email) = &new_user.paypal_email {
+            if let Some(payout_data) = &new_user.payout_data {
+                if payout_data.payout_wallet_type == RecipientType::UserHandle
+                    && payout_data.payout_wallet == RecipientWallet::PayPal
+                {
+                    return Err(ApiError::InvalidInput(
+                        "You cannot use a paypal wallet with a user handle!"
+                            .to_string(),
+                    ));
+                }
+
+                if !match payout_data.payout_wallet_type {
+                    RecipientType::Email => {
+                        validator::validate_email(&payout_data.payout_address)
+                    }
+                    RecipientType::Phone => {
+                        validator::validate_phone(&payout_data.payout_address)
+                    }
+                    RecipientType::UserHandle => true,
+                } {
+                    return Err(ApiError::InvalidInput(
+                        "Invalid wallet specified!".to_string(),
+                    ));
+                }
+
                 sqlx::query!(
                     "
                     UPDATE users
-                    SET paypal_email = $1
-                    WHERE (id = $2)
+                    SET payout_wallet = $1, payout_wallet_type = $2, payout_address = $3
+                    WHERE (id = $4)
                     ",
-                    paypal_email.as_deref(),
+                    payout_data.payout_wallet.as_str(),
+                    payout_data.payout_wallet_type.as_str(),
+                    payout_data.payout_address,
                     id as crate::database::models::ids::UserId,
                 )
-                .execute(&mut *transaction)
-                .await?;
+                    .execute(&mut *transaction)
+                    .await?;
             }
 
             transaction.commit().await?;
@@ -349,11 +385,8 @@ pub async fn user_icon_edit(
         let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let id_option =
-            crate::database::models::User::get_id_from_username_or_id(
-                &*info.into_inner().0,
-                &**pool,
-            )
-            .await?;
+            User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
+                .await?;
 
         if let Some(id) = id_option {
             if user.id != id.into() && !user.role.is_mod() {
@@ -442,11 +475,9 @@ pub async fn user_delete(
     removal_type: web::Query<RemovalType>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &*info.into_inner().0,
-        &**pool,
-    )
-    .await?;
+    let id_option =
+        User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
+            .await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
@@ -458,10 +489,9 @@ pub async fn user_delete(
         let mut transaction = pool.begin().await?;
 
         let result = if &*removal_type.removal_type == "full" {
-            crate::database::models::User::remove_full(id, &mut transaction)
-                .await?
+            User::remove_full(id, &mut transaction).await?
         } else {
-            crate::database::models::User::remove(id, &mut transaction).await?
+            User::remove(id, &mut transaction).await?
         };
 
         transaction.commit().await?;
@@ -563,11 +593,9 @@ pub async fn user_notifications(
 
 #[derive(Serialize)]
 pub struct Payout {
-    pub claimed: bool,
-    pub claimable: bool,
     pub created: DateTime<Utc>,
-    pub project: Option<ProjectId>,
     pub amount: Decimal,
+    pub status: String,
 }
 
 #[get("{id}/payouts")]
@@ -589,39 +617,51 @@ pub async fn user_payouts(
             ));
         }
 
-        use futures::TryStreamExt;
-
-        let payouts: Vec<Payout> = sqlx::query!(
-            "
-            SELECT pv.mod_id, pv.created, pv.claimed, pv.amount
-            FROM payouts_values pv
-            WHERE pv.user_id = $1
-            ORDER BY pv.created DESC
-            ",
-            id as crate::database::models::UserId
-        )
-        .fetch_many(&**pool)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|row| {
-                let claimable_time: DateTime<Utc> =
-                    get_claimable_time(row.created, true);
-
-                Payout {
-                    claimed: row.claimed,
-                    claimable: Utc::now() > claimable_time,
+        let (all_time, last_month, payouts) = futures::future::try_join3(
+            sqlx::query!(
+                "
+                SELECT SUM(pv.amount) amount
+                FROM payouts_values pv
+                WHERE pv.user_id = $1
+                ",
+                id as crate::database::models::UserId
+            )
+            .fetch_one(&**pool),
+            sqlx::query!(
+                "
+                SELECT SUM(pv.amount) amount
+                FROM payouts_values pv
+                WHERE pv.user_id = $1 AND created > NOW() - '1 month'::interval
+                ",
+                id as crate::database::models::UserId
+            )
+            .fetch_one(&**pool),
+            sqlx::query!(
+                "
+                SELECT hp.created, hp.amount, hp.status
+                FROM historical_payouts hp
+                WHERE hp.user_id = $1
+                ORDER BY hp.created DESC
+                ",
+                id as crate::database::models::UserId
+            )
+            .fetch_many(&**pool)
+            .try_filter_map(|e| async {
+                Ok(e.right().map(|row| Payout {
                     created: row.created,
-                    project: row.mod_id.map(|x| ProjectId(x as u64)),
                     amount: row.amount,
-                }
-            }))
-        })
-        .try_collect::<Vec<Payout>>()
+                    status: row.status,
+                }))
+            })
+            .try_collect::<Vec<Payout>>(),
+        )
         .await?;
 
+        use futures::TryStreamExt;
+
         Ok(HttpResponse::Ok().json(json!({
-            "all_time": payouts.iter().map(|x| x.amount).sum::<Decimal>(),
-            "current_period": payouts.iter().filter(|x| !x.claimed && !x.claimable).map(|x| x.amount).sum::<Decimal>(),
-            "withdrawable": payouts.iter().filter(|x| x.claimable && !x.claimed).map(|x| x.amount).sum::<Decimal>(),
+            "all_time": all_time.amount,
+            "last_month": last_month.amount,
             "payouts": payouts,
         })))
     } else {
@@ -629,32 +669,97 @@ pub async fn user_payouts(
     }
 }
 
-#[get("{id}/payouts")]
-pub async fn finish_user_payout(
+#[derive(Deserialize)]
+pub struct PayoutData {
+    amount: Decimal,
+}
+
+#[post("{id}/payouts")]
+pub async fn user_payouts_request(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
+    data: web::Json<PayoutData>,
+    payouts_queue: web::Data<Arc<Mutex<PayoutsQueue>>>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_admin_from_headers(req.headers(), &**pool).await?;
-
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
         User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
             .await?;
 
     if let Some(id) = id_option {
-        sqlx::query!(
-            "
-            UPDATE payouts_values
-            SET claimed = TRUE
-            WHERE (claimed = FALSE AND user_id = $1 AND created <= $2)
-            ",
-            id as crate::database::models::ids::UserId,
-            get_claimable_time(Utc::now(), false)
-        )
-        .execute(&**pool)
-        .await?;
+        if !user.role.is_admin() && user.id != id.into() {
+            return Err(ApiError::CustomAuthentication(
+                "You do not have permission to request payouts of this user!"
+                    .to_string(),
+            ));
+        }
 
-        Ok(HttpResponse::NoContent().body(""))
+        if let Some(payouts_data) = user.payout_data {
+            if let Some(payout_address) = payouts_data.payout_address {
+                if let Some(payout_wallet_type) =
+                    payouts_data.payout_wallet_type
+                {
+                    if let Some(payout_wallet) = payouts_data.payout_wallet {
+                        return if data.amount > payouts_data.balance {
+                            let mut transaction = pool.begin().await?;
+
+                            sqlx::query!(
+                                "
+                                INSERT INTO historical_payouts (user_id, amount, status)
+                                VALUES ($1, $2, $3)
+                                ",
+                                id as crate::database::models::ids::UserId,
+                                data.amount,
+                                "success"
+                            )
+                                .execute(&mut *transaction)
+                                .await?;
+
+                            sqlx::query!(
+                                "
+                                UPDATE users
+                                SET balance = balance - $1
+                                WHERE id = $2
+                                ",
+                                data.amount,
+                                id as crate::database::models::ids::UserId
+                            )
+                            .execute(&mut *transaction)
+                            .await?;
+
+                            let mut payouts_queue = payouts_queue.lock().await;
+                            payouts_queue
+                                .send_payout(PayoutItem {
+                                    amount: PayoutAmount {
+                                        currency: "USD".to_string(),
+                                        value: data.amount.to_string(),
+                                    },
+                                    receiver: payout_address,
+                                    note: "Payment from Modrinth creator monetization program".to_string(),
+                                    recipient_type: payout_wallet_type,
+                                    recipient_wallet: payout_wallet,
+                                    sender_item_id: format!("{}-{}", UserId::from(id), Utc::now().timestamp()),
+                                })
+                                .await?;
+
+                            transaction.commit().await?;
+
+                            Ok(HttpResponse::NoContent().body(""))
+                        } else {
+                            Err(ApiError::InvalidInput(
+                                "You do not have enough funds to make this payout!"
+                                    .to_string(),
+                            ))
+                        };
+                    }
+                }
+            }
+        }
+
+        Err(ApiError::InvalidInput(
+            "You are not enrolled in the payouts program yet!".to_string(),
+        ))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

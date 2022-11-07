@@ -1,5 +1,6 @@
 use super::ids::Base62Id;
 use chrono::{DateTime, Utc};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 
 #[derive(Copy, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -45,7 +46,76 @@ pub struct User {
     pub created: DateTime<Utc>,
     pub role: Role,
     pub badges: Badges,
-    pub paypal_email: Option<String>,
+    pub payout_data: Option<UserPayoutData>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct UserPayoutData {
+    pub balance: Decimal,
+    pub payout_wallet: Option<RecipientWallet>,
+    pub payout_wallet_type: Option<RecipientType>,
+    pub payout_address: Option<String>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+pub enum RecipientType {
+    Email,
+    Phone,
+    UserHandle,
+}
+
+impl std::fmt::Display for RecipientType {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.write_str(self.as_str())
+    }
+}
+
+impl RecipientType {
+    pub fn from_string(string: &str) -> RecipientType {
+        match string {
+            "user_handle" => RecipientType::UserHandle,
+            "phone" => RecipientType::Phone,
+            _ => RecipientType::Email,
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            RecipientType::Email => "email",
+            RecipientType::Phone => "phone",
+            RecipientType::UserHandle => "user_handle",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[serde(rename_all = "PascalCase")]
+pub enum RecipientWallet {
+    Venmo,
+    PayPal,
+}
+
+impl std::fmt::Display for RecipientWallet {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.write_str(self.as_str())
+    }
+}
+
+impl RecipientWallet {
+    pub fn from_string(string: &str) -> RecipientWallet {
+        match string {
+            "venmo" => RecipientWallet::Venmo,
+            _ => RecipientWallet::PayPal,
+        }
+    }
+
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            RecipientWallet::PayPal => "paypal",
+            RecipientWallet::Venmo => "venmo",
+        }
+    }
 }
 
 use crate::database::models::user_item::User as DBUser;
@@ -62,7 +132,7 @@ impl From<DBUser> for User {
             created: data.created,
             role: Role::from_string(&*data.role),
             badges: data.badges,
-            paypal_email: None,
+            payout_data: None,
         }
     }
 }

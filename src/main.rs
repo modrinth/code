@@ -1,5 +1,6 @@
 use crate::file_hosting::S3Host;
 use crate::queue::download::DownloadQueue;
+use crate::queue::payouts::PayoutsQueue;
 use crate::ratelimit::errors::ARError;
 use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
 use crate::ratelimit::middleware::RateLimiter;
@@ -11,6 +12,7 @@ use log::{error, info, warn};
 use search::indexing::index_projects;
 use search::indexing::IndexingSettings;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 
 mod database;
 mod file_hosting;
@@ -157,6 +159,8 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
+    let payouts_queue = Arc::new(Mutex::new(PayoutsQueue::new()));
+
     let ip_salt = Pepper {
         pepper: models::ids::Base62Id(models::ids::random_base62(11))
             .to_string(),
@@ -215,6 +219,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(file_host.clone()))
             .app_data(web::Data::new(search_config.clone()))
             .app_data(web::Data::new(download_queue.clone()))
+            .app_data(web::Data::new(payouts_queue.clone()))
             .app_data(web::Data::new(ip_salt.clone()))
             .configure(routes::v1_config)
             .configure(routes::v2_config)
@@ -304,6 +309,10 @@ fn check_env_vars() -> bool {
 
     failed |= check_var::<String>("STRIPE_TOKEN");
     failed |= check_var::<String>("STRIPE_WEBHOOK_SECRET");
+
+    failed |= check_var::<String>("PAYPAL_API_URL");
+    failed |= check_var::<String>("PAYPAL_CLIENT_ID");
+    failed |= check_var::<String>("PAYPAL_CLIENT_SECRET");
 
     failed
 }

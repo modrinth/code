@@ -22,6 +22,7 @@ use actix_web::http::StatusCode;
 use actix_web::web::{scope, Data, Query, ServiceConfig};
 use actix_web::{get, HttpResponse};
 use chrono::Utc;
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
@@ -273,7 +274,10 @@ pub async fn auth_callback(
                         created: Utc::now(),
                         role: Role::Developer.to_string(),
                         badges: Badges::default(),
-                        paypal_email: None,
+                        balance: Decimal::from(0),
+                        payout_wallet: None,
+                        payout_wallet_type: None,
+                        payout_address: None,
                     }
                     .insert(&mut transaction)
                     .await?;

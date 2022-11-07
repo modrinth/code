@@ -1,10 +1,8 @@
 use crate::models::ids::ProjectId;
 use crate::routes::ApiError;
-use crate::util::auth::check_is_admin_from_headers;
 use crate::util::guards::admin_key_guard;
-use crate::util::payout_calc::get_claimable_time;
 use crate::DownloadQueue;
-use actix_web::{get, patch, post, web, HttpRequest, HttpResponse};
+use actix_web::{patch, post, web, HttpResponse};
 use chrono::{DateTime, SecondsFormat, Utc};
 use rust_decimal::Decimal;
 use serde::Deserialize;
@@ -136,16 +134,6 @@ pub async fn process_payout(
             )
         })?;
 
-    sqlx::query!(
-        "
-        DELETE FROM payouts_values
-        WHERE created = $1
-        ",
-        start
-    )
-    .execute(&mut *transaction)
-    .await?;
-
     struct Project {
         project_type: String,
         // user_id, payouts_split
@@ -266,22 +254,27 @@ pub async fn process_payout(
             let project = projects_map.get_mut(&project_id);
 
             if let Some(project) = project {
-                for dependency in dependencies {
-                    let project_multiplier: Decimal =
-                        Decimal::from(dependency.1) / Decimal::from(dep_sum);
+                if dep_sum > 0 {
+                    for dependency in dependencies {
+                        let project_multiplier: Decimal =
+                            Decimal::from(dependency.1)
+                                / Decimal::from(dep_sum);
 
-                    if let Some(members) = team_members.get(&dependency.0) {
-                        let members_sum: Decimal =
-                            members.iter().map(|x| x.1).sum();
+                        if let Some(members) = team_members.get(&dependency.0) {
+                            let members_sum: Decimal =
+                                members.iter().map(|x| x.1).sum();
 
-                        for member in members {
-                            let member_multiplier: Decimal =
-                                member.1 / members_sum;
-                            project.split_team_members.push((
-                                member.0,
-                                member_multiplier * project_multiplier,
-                                project_id,
-                            ));
+                            if members_sum > Decimal::from(0) {
+                                for member in members {
+                                    let member_multiplier: Decimal =
+                                        member.1 / members_sum;
+                                    project.split_team_members.push((
+                                        member.0,
+                                        member_multiplier * project_multiplier,
+                                        project_id,
+                                    ));
+                                }
+                            }
                         }
                     }
                 }
@@ -303,50 +296,80 @@ pub async fn process_payout(
             let sum_tm_splits: Decimal =
                 project.split_team_members.iter().map(|x| x.1).sum();
 
-            for (user_id, split) in project.team_members {
-                let payout: Decimal = data.amount
-                    * project_multiplier
-                    * (split / sum_splits)
-                    * (if !project.split_team_members.is_empty() {
-                        &split_given
-                    } else {
-                        &default_split_given
-                    });
+            if sum_splits > Decimal::from(0) {
+                for (user_id, split) in project.team_members {
+                    let payout: Decimal = data.amount
+                        * project_multiplier
+                        * (split / sum_splits)
+                        * (if !project.split_team_members.is_empty() {
+                            &split_given
+                        } else {
+                            &default_split_given
+                        });
 
-                if payout > Decimal::from(0) {
-                    sqlx::query!(
-                        "
-                        INSERT INTO payouts_values (user_id, mod_id, amount, created)
-                        VALUES ($1, $2, $3, $4)
-                        ",
-                        user_id,
-                        id,
-                        payout,
-                        start
-                    )
+                    if payout > Decimal::from(0) {
+                        sqlx::query!(
+                            "
+                            INSERT INTO payouts_values (user_id, mod_id, amount, created)
+                            VALUES ($1, $2, $3, $4)
+                            ",
+                            user_id,
+                            id,
+                            payout,
+                            start
+                        )
+                            .execute(&mut *transaction)
+                            .await?;
+
+                        sqlx::query!(
+                            "
+                            UPDATE users
+                            SET balance = balance + $1
+                            WHERE id = $2
+                            ",
+                            payout,
+                            user_id
+                        )
                         .execute(&mut *transaction)
                         .await?;
+                    }
                 }
             }
 
-            for (user_id, split, project_id) in project.split_team_members {
-                let payout: Decimal = data.amount
-                    * project_multiplier
-                    * (split / sum_tm_splits)
-                    * split_retention;
+            if sum_tm_splits > Decimal::from(0) {
+                for (user_id, split, project_id) in project.split_team_members {
+                    let payout: Decimal = data.amount
+                        * project_multiplier
+                        * (split / sum_tm_splits)
+                        * split_retention;
 
-                sqlx::query!(
-                    "
-                    INSERT INTO payouts_values (user_id, mod_id, amount, created)
-                    VALUES ($1, $2, $3, $4)
-                    ",
-                    user_id,
-                    project_id,
-                    payout,
-                    start
-                )
-                .execute(&mut *transaction)
-                .await?;
+                    if payout > Decimal::from(0) {
+                        sqlx::query!(
+                            "
+                            INSERT INTO payouts_values (user_id, mod_id, amount, created)
+                            VALUES ($1, $2, $3, $4)
+                            ",
+                            user_id,
+                            project_id,
+                            payout,
+                            start
+                        )
+                            .execute(&mut *transaction)
+                            .await?;
+
+                        sqlx::query!(
+                            "
+                            UPDATE users
+                            SET balance = balance + $1
+                            WHERE id = $2
+                            ",
+                            payout,
+                            user_id
+                        )
+                        .execute(&mut *transaction)
+                        .await?;
+                    }
+                }
             }
         }
     }
@@ -354,36 +377,4 @@ pub async fn process_payout(
     transaction.commit().await?;
 
     Ok(HttpResponse::NoContent().body(""))
-}
-
-#[get("/_get-payout-data")]
-pub async fn get_payout_data(
-    req: HttpRequest,
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
-    check_is_admin_from_headers(req.headers(), &**pool).await?;
-
-    use futures::stream::TryStreamExt;
-
-    let mut payouts: HashMap<String, Decimal> = sqlx::query!(
-            "
-            SELECT u.paypal_email, SUM(pv.amount) amount
-            FROM payouts_values pv
-            INNER JOIN users u ON pv.user_id = u.id AND u.paypal_email IS NOT NULL
-            WHERE pv.created <= $1 AND pv.claimed = FALSE
-            GROUP BY u.paypal_email
-            ",
-            get_claimable_time(Utc::now(), false)
-        )
-        .fetch_many(&**pool)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|r| (r.paypal_email.unwrap_or_default(), r.amount.unwrap_or_default())))
-        })
-        .try_collect::<HashMap<String, Decimal>>()
-        .await?;
-
-    let mut minimum_payout = Decimal::from(5);
-    payouts.retain(|_k, v| v > &mut minimum_payout);
-
-    Ok(HttpResponse::Ok().json(payouts))
 }

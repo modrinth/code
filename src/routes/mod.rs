@@ -124,7 +124,8 @@ pub fn users_config(cfg: &mut web::ServiceConfig) {
             .service(users::user_icon_edit)
             .service(users::user_notifications)
             .service(users::user_follows)
-            .service(users::user_payouts),
+            .service(users::user_payouts)
+            .service(users::user_payouts_request),
     );
 }
 
@@ -172,8 +173,7 @@ pub fn admin_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("admin")
             .service(admin::count_download)
-            .service(admin::process_payout)
-            .service(admin::get_payout_data),
+            .service(admin::process_payout),
     );
 }
 
