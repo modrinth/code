@@ -701,7 +701,11 @@ pub async fn user_payouts_request(
                     payouts_data.payout_wallet_type
                 {
                     if let Some(payout_wallet) = payouts_data.payout_wallet {
-                        return if data.amount > payouts_data.balance {
+                        let paypal_fee = Decimal::from(1) / Decimal::from(4);
+
+                        return if data.amount < payouts_data.balance
+                            && data.amount > paypal_fee
+                        {
                             let mut transaction = pool.begin().await?;
 
                             sqlx::query!(
@@ -733,7 +737,7 @@ pub async fn user_payouts_request(
                                 .send_payout(PayoutItem {
                                     amount: PayoutAmount {
                                         currency: "USD".to_string(),
-                                        value: data.amount.to_string(),
+                                        value: (data.amount - paypal_fee).to_string(),
                                     },
                                     receiver: payout_address,
                                     note: "Payment from Modrinth creator monetization program".to_string(),
