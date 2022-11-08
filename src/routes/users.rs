@@ -316,7 +316,7 @@ pub async fn user_edit(
 
             if let Some(payout_data) = &new_user.payout_data {
                 if payout_data.payout_wallet_type == RecipientType::UserHandle
-                    && payout_data.payout_wallet == RecipientWallet::PayPal
+                    && payout_data.payout_wallet == RecipientWallet::Paypal
                 {
                     return Err(ApiError::InvalidInput(
                         "You cannot use a paypal wallet with a user handle!"
@@ -741,8 +741,8 @@ pub async fn user_payouts_request(
                                     },
                                     receiver: payout_address,
                                     note: "Payment from Modrinth creator monetization program".to_string(),
-                                    recipient_type: payout_wallet_type,
-                                    recipient_wallet: payout_wallet,
+                                    recipient_type: payout_wallet_type.to_string().to_uppercase(),
+                                    recipient_wallet: payout_wallet.as_str_api().to_string(),
                                     sender_item_id: format!("{}-{}", UserId::from(id), Utc::now().timestamp()),
                                 })
                                 .await?;

@@ -58,7 +58,7 @@ pub struct UserPayoutData {
 }
 
 #[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[serde(rename_all = "snake_case")]
 pub enum RecipientType {
     Email,
     Phone,
@@ -90,10 +90,10 @@ impl RecipientType {
 }
 
 #[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
-#[serde(rename_all = "PascalCase")]
+#[serde(rename_all = "snake_case")]
 pub enum RecipientWallet {
     Venmo,
-    PayPal,
+    Paypal,
 }
 
 impl std::fmt::Display for RecipientWallet {
@@ -106,14 +106,21 @@ impl RecipientWallet {
     pub fn from_string(string: &str) -> RecipientWallet {
         match string {
             "venmo" => RecipientWallet::Venmo,
-            _ => RecipientWallet::PayPal,
+            _ => RecipientWallet::Paypal,
         }
     }
 
     pub fn as_str(&self) -> &'static str {
         match self {
-            RecipientWallet::PayPal => "paypal",
+            RecipientWallet::Paypal => "paypal",
             RecipientWallet::Venmo => "venmo",
+        }
+    }
+
+    pub fn as_str_api(&self) -> &'static str {
+        match self {
+            RecipientWallet::Paypal => "PayPal",
+            RecipientWallet::Venmo => "Venmo",
         }
     }
 }

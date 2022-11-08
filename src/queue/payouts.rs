@@ -1,4 +1,3 @@
-use crate::models::users::{RecipientType, RecipientWallet};
 use crate::routes::ApiError;
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
@@ -22,8 +21,8 @@ pub struct PayoutItem {
     pub amount: PayoutAmount,
     pub receiver: String,
     pub note: String,
-    pub recipient_type: RecipientType,
-    pub recipient_wallet: RecipientWallet,
+    pub recipient_type: String,
+    pub recipient_wallet: String,
     pub sender_item_id: String,
 }
 
