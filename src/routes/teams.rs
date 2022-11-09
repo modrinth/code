@@ -399,9 +399,12 @@ pub async fn edit_team_member(
 
     let mut transaction = pool.begin().await?;
 
-    if &*edit_member_db.role == crate::models::teams::OWNER_ROLE {
+    if &*edit_member_db.role == crate::models::teams::OWNER_ROLE
+        && (edit_member.role.is_some() || edit_member.permissions.is_some())
+    {
         return Err(ApiError::InvalidInput(
-            "The owner of a team cannot be edited".to_string(),
+            "The owner's permission and role of a team cannot be edited"
+                .to_string(),
         ));
     }
 
