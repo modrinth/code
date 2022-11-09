@@ -3576,6 +3576,21 @@
     },
     "query": "\n            DELETE FROM team_members\n            WHERE (team_id = $1 AND user_id = $2 AND NOT role = $3)\n            "
   },
+  "8cbd74dad7a21128d99fd32b430c2e0427480f910e1f125ff56b893c67a6e8a4": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Varchar",
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        UPDATE users\n                        SET payout_wallet = $1, payout_wallet_type = $2, payout_address = $3\n                        WHERE (id = $4)\n                        "
+  },
   "8ced4b7a1c4f944b918d2d2eefc8007a3fb9565021ca8c44608caccbe1ab9674": {
     "describe": {
       "columns": [
@@ -5032,21 +5047,6 @@
     },
     "query": "\n                    UPDATE mods\n                    SET license_url = $1\n                    WHERE (id = $2)\n                    "
   },
-  "c11a0f7ca3959ede1655c4f244cfe4461701218d26e28152306bca5c46f1abd5": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    UPDATE users\n                    SET payout_wallet = $1, payout_wallet_type = $2, payout_address = $3\n                    WHERE (id = $4)\n                    "
-  },
   "c15534b7259e2b138c6f041bf2a9f4c77bea060a9bce6f2a829a2d7594dddd3a": {
     "describe": {
       "columns": [
@@ -5223,6 +5223,18 @@
       }
     },
     "query": "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC"
+  },
+  "c4b167ec7452cc92be0e33f7e4f3908f0c4109291511c94909e9105fc62a432f": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        UPDATE users\n                        SET payout_wallet = NULL, payout_wallet_type = NULL, payout_address = NULL\n                        WHERE (id = $1)\n                        "
   },
   "c545a74e902c5c63bca1057b76e94b9547ee21fadbc61964f45837915d5f4608": {
     "describe": {

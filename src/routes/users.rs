@@ -160,8 +160,13 @@ pub struct EditUser {
     pub bio: Option<Option<String>>,
     pub role: Option<Role>,
     pub badges: Option<Badges>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
     #[validate]
-    pub payout_data: Option<EditPayoutData>,
+    pub payout_data: Option<Option<EditPayoutData>>,
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -315,42 +320,56 @@ pub async fn user_edit(
             }
 
             if let Some(payout_data) = &new_user.payout_data {
-                if payout_data.payout_wallet_type == RecipientType::UserHandle
-                    && payout_data.payout_wallet == RecipientWallet::Paypal
-                {
-                    return Err(ApiError::InvalidInput(
-                        "You cannot use a paypal wallet with a user handle!"
-                            .to_string(),
-                    ));
-                }
-
-                if !match payout_data.payout_wallet_type {
-                    RecipientType::Email => {
-                        validator::validate_email(&payout_data.payout_address)
+                if let Some(payout_data) = payout_data {
+                    if payout_data.payout_wallet_type
+                        == RecipientType::UserHandle
+                        && payout_data.payout_wallet == RecipientWallet::Paypal
+                    {
+                        return Err(ApiError::InvalidInput(
+                            "You cannot use a paypal wallet with a user handle!"
+                                .to_string(),
+                        ));
                     }
-                    RecipientType::Phone => {
-                        validator::validate_phone(&payout_data.payout_address)
-                    }
-                    RecipientType::UserHandle => true,
-                } {
-                    return Err(ApiError::InvalidInput(
-                        "Invalid wallet specified!".to_string(),
-                    ));
-                }
 
-                sqlx::query!(
-                    "
-                    UPDATE users
-                    SET payout_wallet = $1, payout_wallet_type = $2, payout_address = $3
-                    WHERE (id = $4)
-                    ",
-                    payout_data.payout_wallet.as_str(),
-                    payout_data.payout_wallet_type.as_str(),
-                    payout_data.payout_address,
-                    id as crate::database::models::ids::UserId,
-                )
-                    .execute(&mut *transaction)
-                    .await?;
+                    if !match payout_data.payout_wallet_type {
+                        RecipientType::Email => validator::validate_email(
+                            &payout_data.payout_address,
+                        ),
+                        RecipientType::Phone => validator::validate_phone(
+                            &payout_data.payout_address,
+                        ),
+                        RecipientType::UserHandle => true,
+                    } {
+                        return Err(ApiError::InvalidInput(
+                            "Invalid wallet specified!".to_string(),
+                        ));
+                    }
+
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET payout_wallet = $1, payout_wallet_type = $2, payout_address = $3
+                        WHERE (id = $4)
+                        ",
+                        payout_data.payout_wallet.as_str(),
+                        payout_data.payout_wallet_type.as_str(),
+                        payout_data.payout_address,
+                        id as crate::database::models::ids::UserId,
+                    )
+                        .execute(&mut *transaction)
+                        .await?;
+                } else {
+                    sqlx::query!(
+                        "
+                        UPDATE users
+                        SET payout_wallet = NULL, payout_wallet_type = NULL, payout_address = NULL
+                        WHERE (id = $1)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                        .execute(&mut *transaction)
+                        .await?;
+                }
             }
 
             transaction.commit().await?;
