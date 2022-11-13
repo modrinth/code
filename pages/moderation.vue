@@ -1,8 +1,7 @@
 <template>
-  <div class="page-container">
-    <Popup v-if="currentProject" :show-popup="true">
-      <div class="moderation-popup">
-        <h2>Moderation form</h2>
+  <div>
+    <Modal ref="modal" header="Moderation Form">
+      <div v-if="currentProject !== null" class="moderation-modal">
         <p>
           Both of these fields are optional, but can be used to communicate
           problems with a project's team members. The body supports markdown
@@ -37,46 +36,63 @@
           placeholder="Enter the message..."
         />
         <h3>Body</h3>
-        <ThisOrThat v-model="bodyViewMode" :items="['source', 'preview']" />
-        <div v-if="bodyViewMode === 'source'" class="textarea-wrapper">
+        <div class="textarea-wrapper">
+          <Chips
+            v-model="bodyViewMode"
+            class="separator"
+            :items="['source', 'preview']"
+          />
           <textarea
+            v-if="bodyViewMode === 'source'"
             id="body"
             v-model="currentProject.moderation_message_body"
           />
+          <div
+            v-else
+            v-highlightjs
+            class="markdown-body preview"
+            v-html="$xss($md.render(currentProject.moderation_message_body))"
+          ></div>
         </div>
-        <div
-          v-if="bodyViewMode === 'preview'"
-          v-highlightjs
-          class="markdown-body"
-          v-html="$xss($md.render(currentProject.moderation_message_body))"
-        ></div>
         <div class="buttons">
-          <button class="iconified-button" @click="currentProject = null">
+          <button
+            class="iconified-button"
+            @click="
+              $refs.modal.hide()
+              currentProject = null
+            "
+          >
             <CrossIcon />
             Cancel
           </button>
-          <button
-            class="iconified-button brand-button-colors"
-            @click="saveProject"
-          >
+          <button class="iconified-button brand-button" @click="saveProject">
             <CheckIcon />
             Confirm
           </button>
         </div>
       </div>
-    </Popup>
-    <div class="page-contents">
-      <div class="content">
-        <h1>Moderation</h1>
-        <ThisOrThat
-          v-model="selectedType"
-          class="card"
-          :items="moderationTypes"
-        />
+    </Modal>
+    <div class="normal-page">
+      <div class="normal-page__sidebar">
+        <aside class="universal-card">
+          <h1>Moderation</h1>
+          <NavStack>
+            <NavStackItem link="" label="All"> </NavStackItem>
+            <NavStackItem
+              v-for="type in moderationTypes"
+              :key="type"
+              :link="'?type=' + type"
+              :label="$formatProjectType(type) + 's'"
+            >
+            </NavStackItem>
+          </NavStack>
+        </aside>
+      </div>
+      <div class="normal-page__content">
         <div class="projects">
           <ProjectCard
-            v-for="project in selectedType !== 'all'
-              ? projects.filter((x) => x.project_type === selectedType)
+            v-for="project in $route.query.type !== undefined
+              ? projects.filter((x) => x.project_type === $route.query.type)
               : projects"
             :id="project.slug || project.id"
             :key="project.id"
@@ -115,49 +131,48 @@
           </ProjectCard>
         </div>
         <div
-          v-if="selectedType === 'report' || selectedType === 'all'"
+          v-if="
+            $route.query.type === 'report' || $route.query.type === undefined
+          "
           class="reports"
         >
           <div
-            v-for="(report, index) in reports"
-            :key="report.id"
-            class="report card"
+            v-for="(item, index) in reports"
+            :key="index"
+            class="card report"
           >
-            <div class="header">
-              <h5 class="title">
-                Report for {{ report.item_type }}
-                <nuxt-link
-                  :to="
-                    '/' +
-                    report.item_type +
-                    '/' +
-                    report.item_id.replace(/\W/g, '')
-                  "
-                  >{{ report.item_id }}
-                </nuxt-link>
-              </h5>
-              <p
+            <div class="info">
+              <div class="title">
+                <h3>
+                  {{ item.item_type }}
+                  <a :href="item.url">{{ item.item_id }}</a>
+                </h3>
+                reported by
+                <a :href="`/user/${item.reporter}`">{{ item.reporter }}</a>
+              </div>
+              <div
+                v-highlightjs
+                class="markdown-body"
+                v-html="$xss($md.render(item.body))"
+              />
+              <Badge :type="`Marked as ${item.report_type}`" color="yellow" />
+            </div>
+            <div class="actions">
+              <button class="iconified-button" @click="deleteReport(index)">
+                <TrashIcon /> Delete report
+              </button>
+              <span
                 v-tooltip="
-                  $dayjs(report.created).format(
+                  $dayjs(item.created).format(
                     '[Created at] YYYY-MM-DD [at] HH:mm A'
                   )
                 "
-                class="date"
+                class="stat"
               >
-                Created {{ $dayjs(report.created).fromNow() }}
-              </p>
-              <button
-                class="delete iconified-button"
-                @click="deleteReport(index)"
-              >
-                Delete
-              </button>
+                <CalendarIcon />
+                Created {{ $dayjs(item.created).fromNow() }}
+              </span>
             </div>
-            <div
-              v-highlightjs
-              class="markdown-body"
-              v-html="$xss($md.render(report.body))"
-            ></div>
           </div>
         </div>
         <div v-if="reports.length === 0 && projects.length === 0" class="error">
@@ -171,27 +186,35 @@
 </template>
 
 <script>
-import ThisOrThat from '~/components/ui/ThisOrThat'
+import Chips from '~/components/ui/Chips'
 import ProjectCard from '~/components/ui/ProjectCard'
-import Popup from '~/components/ui/Popup'
+import Modal from '~/components/ui/Modal'
 import Badge from '~/components/ui/Badge'
 
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import UnlistIcon from '~/assets/images/utils/eye-off.svg?inline'
 import CrossIcon from '~/assets/images/utils/x.svg?inline'
+import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import Security from '~/assets/images/illustrations/security.svg?inline'
+import NavStack from '~/components/ui/NavStack'
+import NavStackItem from '~/components/ui/NavStackItem'
 
 export default {
   name: 'Moderation',
   components: {
-    ThisOrThat,
+    NavStack,
+    NavStackItem,
+    Chips,
     ProjectCard,
     CheckIcon,
     CrossIcon,
     UnlistIcon,
-    Popup,
+    Modal,
     Badge,
     Security,
+    TrashIcon,
+    CalendarIcon,
   },
   async asyncData(data) {
     const [projects, reports] = (
@@ -201,10 +224,76 @@ export default {
       ])
     ).map((it) => it.data)
 
+    const newReports = await Promise.all(
+      reports.map(async (report) => {
+        try {
+          report.item_id = report.item_id?.replace
+            ? report.item_id.replace(/"/g, '')
+            : report.item_id
+          let url = ''
+
+          if (report.item_type === 'user') {
+            const user = (
+              await data.$axios.get(
+                `user/${report.item_id}`,
+                data.$defaultHeaders()
+              )
+            ).data
+            url = `/user/${user.username}`
+            report.item_id = user.username
+          } else if (report.item_type === 'project') {
+            const project = (
+              await data.$axios.get(
+                `project/${report.item_id}`,
+                data.$defaultHeaders()
+              )
+            ).data
+            report.item_id = project.slug || report.item_id
+            url = `/${project.project_type}/${report.item_id}`
+          } else if (report.item_type === 'version') {
+            const version = (
+              await data.$axios.get(
+                `version/${report.item_id}`,
+                data.$defaultHeaders()
+              )
+            ).data
+            const project = (
+              await data.$axios.get(
+                `project/${version.project_id}`,
+                data.$defaultHeaders()
+              )
+            ).data
+            report.item_id = version.version_number || report.item_id
+            url = `/${project.project_type}/${
+              project.slug || project.id
+            }/version/${report.item_id}`
+          }
+
+          report.reporter = (
+            await data.$axios.get(
+              `user/${report.reporter}`,
+              data.$defaultHeaders()
+            )
+          ).data.username
+
+          return {
+            ...report,
+            moderation_type: 'report',
+            url,
+          }
+        } catch (err) {
+          return {
+            ...report,
+            url: 'error',
+            moderation_type: 'report',
+          }
+        }
+      })
+    )
+
     return {
       projects,
-      reports,
-      selectedType: 'all',
+      reports: newReports,
     }
   },
   data() {
@@ -218,7 +307,7 @@ export default {
   },
   computed: {
     moderationTypes() {
-      const obj = { all: true }
+      const obj = {}
 
       for (const project of this.projects) {
         obj[project.project_type] = true
@@ -238,6 +327,7 @@ export default {
       project.newStatus = status
 
       this.currentProject = project
+      this.$refs.modal.show()
     },
     async saveProject() {
       this.$nuxt.$loading.start()
@@ -262,6 +352,7 @@ export default {
           1
         )
         this.currentProject = null
+        this.$refs.modal.hide()
       } catch (err) {
         this.$notify({
           group: 'main',
@@ -299,7 +390,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.moderation-popup {
+.moderation-modal {
   width: auto;
   padding: var(--spacing-card-md) var(--spacing-card-lg);
 
@@ -311,6 +402,19 @@ export default {
     span {
       margin-right: 0.5rem;
     }
+  }
+
+  .textarea-wrapper {
+    margin-top: 0.5rem;
+    height: 15rem;
+
+    .preview {
+      overflow-y: auto;
+    }
+  }
+
+  .separator {
+    margin: var(--spacing-card-sm) 0;
   }
 
   .buttons {
@@ -325,28 +429,70 @@ export default {
 
 h1 {
   color: var(--color-text-dark);
-  margin: 0 0 1rem 1.5rem;
 }
 
 .report {
-  .header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+
+  > div {
     display: flex;
-    align-items: center;
-    flex-direction: row;
-    justify-content: center;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .info {
+    display: flex;
+    flex-wrap: wrap;
+
     .title {
-      font-size: var(--font-size-lg);
-      margin: 0 0.5rem 0 0;
+      display: flex;
+      align-items: baseline;
+      gap: 0.25rem;
+      flex-wrap: wrap;
+
+      h3 {
+        margin: 0;
+        text-transform: capitalize;
+
+        a {
+          text-transform: none;
+        }
+      }
+
+      a {
+        text-decoration: underline;
+      }
     }
+  }
+
+  .actions {
+    min-width: fit-content;
+
     .iconified-button {
       margin-left: auto;
+      width: fit-content;
+    }
+
+    .stat {
+      margin-top: auto;
+      display: flex;
+      align-items: center;
+      grid-gap: 0.5rem;
+
+      svg {
+        width: 1em;
+      }
     }
   }
 }
 
 @media screen and (min-width: 1024px) {
   .page-contents {
-    max-width: calc(1280px - 20rem) !important;
+    max-width: 800px;
   }
 }
 </style>

@@ -1,18 +1,19 @@
 <template>
-  <div v-if="pages.length > 1" class="columns paginates">
-    <button
-      :class="{ disabled: currentPage === 1 }"
+  <div v-if="count > 1" class="columns paginates">
+    <a
+      :class="{ disabled: page === 1 }"
       class="left-arrow paginate has-icon"
       aria-label="Previous Page"
-      @click="currentPage !== 1 ? switchPage(currentPage - 1) : null"
+      :href="linkFunction(page - 1)"
+      @click.prevent="page !== 1 ? switchPage(page - 1) : null"
     >
       <LeftArrowIcon />
-    </button>
+    </a>
     <div
       v-for="(item, index) in pages"
       :key="'page-' + item + '-' + index"
       :class="{
-        'page-number': currentPage !== item,
+        'page-number': page !== item,
         shrink: item > 99,
       }"
       class="page-number-container"
@@ -20,32 +21,32 @@
       <div v-if="item === '-'" class="has-icon">
         <GapIcon />
       </div>
-      <button
+      <a
         v-else
         :class="{
-          'page-number current': currentPage === item,
+          'page-number current': page === item,
           shrink: item > 99,
         }"
-        @click="currentPage !== item ? switchPage(item) : null"
+        :href="linkFunction(item)"
+        @click.prevent="page !== item ? switchPage(item) : null"
       >
         {{ item }}
-      </button>
+      </a>
     </div>
 
-    <button
+    <a
       :class="{
-        disabled: currentPage === pages[pages.length - 1],
+        disabled: page === pages[pages.length - 1],
       }"
       class="right-arrow paginate has-icon"
       aria-label="Next Page"
-      @click="
-        currentPage !== pages[pages.length - 1]
-          ? switchPage(currentPage + 1)
-          : null
+      :href="linkFunction(page + 1)"
+      @click.prevent="
+        page !== pages[pages.length - 1] ? switchPage(page + 1) : null
       "
     >
       <RightArrowIcon />
-    </button>
+    </a>
   </div>
 </template>
 
@@ -62,15 +63,54 @@ export default {
     RightArrowIcon,
   },
   props: {
-    currentPage: {
+    page: {
       type: Number,
       default: 1,
     },
-    pages: {
-      type: Array,
+    count: {
+      type: Number,
+      default: 1,
+    },
+    linkFunction: {
+      type: Function,
       default() {
-        return []
+        return () => '/'
       },
+    },
+  },
+  computed: {
+    pages() {
+      let pages = []
+
+      if (this.count > 4) {
+        if (this.page + 3 >= this.count) {
+          pages = [
+            1,
+            '-',
+            this.count - 4,
+            this.count - 3,
+            this.count - 2,
+            this.count - 1,
+            this.count,
+          ]
+        } else if (this.page > 4) {
+          pages = [
+            1,
+            '-',
+            this.page - 1,
+            this.page,
+            this.page + 1,
+            '-',
+            this.count,
+          ]
+        } else {
+          pages = [1, 2, 3, 4, 5, '-', this.count]
+        }
+      } else {
+        pages = Array.from({ length: this.count }, (_, i) => i + 1)
+      }
+
+      return pages
     },
   },
   methods: {
@@ -82,15 +122,17 @@ export default {
 </script>
 
 <style scoped lang="scss">
-button {
-  box-shadow: var(--shadow-card);
+a {
+  color: var(--color-button-text);
+  box-shadow: var(--shadow-raised), var(--shadow-inset);
 
-  padding: 0;
+  padding: 0.5rem 1rem;
   margin: 0;
-  width: 2rem;
-  height: 2rem;
   border-radius: 2rem;
   background: var(--color-raised-bg);
+
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out, outline 0.2s ease-in-out;
 
   &.page-number.current {
     background: var(--color-brand);
@@ -100,40 +142,35 @@ button {
 
   &.paginate.disabled {
     background-color: transparent;
-    cursor: default;
-    color: var(--color-button-text-disabled);
-    box-shadow: inset 0 0 0 1px var(--color-button-bg-disabled);
+    cursor: not-allowed;
+    filter: grayscale(50%);
+    opacity: 0.5;
   }
 
-  &:focus-visible,
-  &:hover {
-    background-color: var(--color-button-bg-hover);
-    color: var(--color-button-text-hover);
+  &:hover:not(&:disabled) {
+    filter: brightness(0.85);
   }
 
-  &:active {
-    background-color: var(--color-button-bg-active);
-    color: var(--color-button-text-active);
+  &:active:not(&:disabled) {
+    transform: scale(0.95);
+    filter: brightness(0.8);
   }
 }
 
 .has-icon {
   display: flex;
   align-items: center;
-  height: 2em;
   svg {
     width: 1em;
   }
 }
 
 .page-number-container,
-button,
+a,
 .has-icon {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 2em;
-  width: 2em;
 }
 
 .paginates {
@@ -143,16 +180,6 @@ button,
   .has-icon {
     margin: 0 0.3em;
   }
-  font-size: 80%;
-  @media screen and (min-width: 350px) {
-    font-size: 100%;
-  }
-}
-
-.shrink {
-  font-size: 0.9rem;
-  height: 2.225em;
-  width: 2.225em;
 }
 
 .left-arrow {
@@ -161,5 +188,18 @@ button,
 
 .right-arrow {
   margin-right: auto !important;
+}
+
+@media screen and (max-width: 400px) {
+  .paginates {
+    font-size: 80%;
+  }
+}
+
+@media screen and (max-width: 530px) {
+  a {
+    width: 2.5rem;
+    padding: 0.5rem 0;
+  }
 }
 </style>

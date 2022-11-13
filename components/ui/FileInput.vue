@@ -1,10 +1,12 @@
 <template>
   <div class="columns">
-    <label class="button" @drop.prevent="handleDrop" @dragover.prevent>
-      <span>
-        <UploadIcon v-if="showIcon" />
-        {{ prompt }}
-      </span>
+    <label
+      class="iconified-button"
+      @drop.prevent="handleDrop"
+      @dragover.prevent
+    >
+      <UploadIcon v-if="showIcon" />
+      {{ prompt }}
       <input
         type="file"
         :multiple="multiple"
@@ -20,7 +22,7 @@ import { fileIsValid } from '~/plugins/fileUtils'
 import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 
 export default {
-  name: 'StatelessFileInput',
+  name: 'FileInput',
   components: {
     UploadIcon,
   },
@@ -48,35 +50,32 @@ export default {
       type: Boolean,
       default: true,
     },
+    shouldAlwaysReset: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  data() {
+    return {
+      files: [],
+    }
   },
   methods: {
-    onChange(addedFiles) {
-      this.$emit('change', addedFiles)
-    },
-    /**
-     * @param {FileList} filesToAdd
-     */
-    addFiles(filesToAdd) {
-      if (!filesToAdd) return
+    addFiles(files, shouldNotReset) {
+      if (!shouldNotReset || this.shouldAlwaysReset) this.files = files
 
       const validationOptions = { maxSize: this.maxSize, alertOnInvalid: true }
-      const validFiles = [...filesToAdd].filter((file) =>
+      this.files = [...this.files].filter((file) =>
         fileIsValid(file, validationOptions)
       )
 
-      if (validFiles.length > 0) {
-        this.onChange(this.multiple ? validFiles : [validFiles[0]])
+      if (this.files.length > 0) {
+        this.$emit('change', this.files)
       }
     },
-    /**
-     * @param {DragEvent} e
-     */
     handleDrop(e) {
       this.addFiles(e.dataTransfer.files)
     },
-    /**
-     * @param {Event} e native file input event
-     */
     handleChange(e) {
       this.addFiles(e.target.files)
     },
@@ -86,31 +85,29 @@ export default {
 
 <style lang="scss" scoped>
 label {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: var(--spacing-card-sm) var(--spacing-card-md);
-  margin-bottom: var(--spacing-card-sm);
-}
-
-span {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  gap: 0.5rem;
-  border: 2px dashed var(--color-divider-dark);
-  border-radius: var(--size-rounded-control);
-  padding: var(--spacing-card-md) var(--spacing-card-lg);
+  flex-direction: unset;
+  margin-bottom: 0;
+  max-height: unset;
 
   svg {
-    height: 1.25rem;
+    height: 1rem;
   }
 }
 
 input {
   display: none;
+}
+
+.known-error label {
+  border-color: var(--color-badge-red-bg) !important;
+  background-color: var(--color-warning-bg) !important;
+
+  span {
+    border-color: var(--color-badge-red-bg);
+  }
+
+  &::placeholder {
+    color: var(--color-warning-text);
+  }
 }
 </style>

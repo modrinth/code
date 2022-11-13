@@ -71,7 +71,6 @@
 import Multiselect from 'vue-multiselect'
 import Checkbox from '~/components/ui/Checkbox'
 import ClearIcon from '~/assets/images/utils/clear.svg?inline'
-
 export default {
   name: 'VersionFilterControl',
   components: {
@@ -144,16 +143,13 @@ export default {
   gap: var(--spacing-card-md);
   align-items: center;
   flex-wrap: wrap;
-
   .multiselect {
     flex: 1;
   }
-
   .checkbox-outer {
     min-width: fit-content;
   }
 }
-
 .circle-button {
   display: flex;
   max-width: 2rem;
@@ -161,18 +157,15 @@ export default {
   background-color: var(--color-button-bg);
   border-radius: var(--size-rounded-max);
   box-shadow: inset 0px -1px 1px rgba(17, 24, 39, 0.1);
-
   &:hover,
   &:focus-visible {
     background-color: var(--color-button-bg-hover);
     color: var(--color-button-text-hover);
   }
-
   &:active {
     background-color: var(--color-button-bg-active);
     color: var(--color-button-text-active);
   }
-
   svg {
     height: 1rem;
     width: 1rem;

@@ -22,6 +22,8 @@ export default {
 
 <style lang="scss" scoped>
 .markdown-body {
-  max-width: calc(100% - (2 * var(--spacing-card-lg)));
+  max-width: calc(
+    60rem - 2 * var(--spacing-card-lg) - 9px
+  ); // $2.50 to anyone who can figure out why the 9px is needed
 }
 </style>

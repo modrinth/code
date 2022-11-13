@@ -43,6 +43,10 @@
   margin: 0 0.75rem;
 }
 
+.site-header {
+  margin: 0 0.75rem;
+}
+
 @media (min-width: 1024px) {
   .normal-page {
     flex-direction: row;
@@ -56,10 +60,16 @@
   }
 
   .normal-page__sidebar {
+    min-width: 20rem;
     width: 20rem;
   }
 
   .normal-page__content {
     width: 60rem;
+    max-width: 60rem;
+  }
+
+  .site-header {
+    margin: 0 auto;
   }
 }

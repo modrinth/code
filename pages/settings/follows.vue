@@ -28,7 +28,7 @@
     <FollowIllustration class="icon" />
     <br />
     <span class="text"
-      >You don't have any followed mods. <br />
+      >You don't have any followed projects. <br />
       Why don't you <nuxt-link class="link" to="/mods">search</nuxt-link> for
       new ones?</span
     >
@@ -51,7 +51,7 @@ export default {
     await this.$store.dispatch('user/fetchFollows')
   },
   head: {
-    title: 'Followed Projects - Modrinth',
+    title: 'Followed projects - Modrinth',
   },
 }
 </script>

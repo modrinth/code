@@ -1,20 +1,19 @@
 <template>
   <div
     :class="{
+      'search-page': true,
       'normal-page': true,
       'alt-layout': $store.state.cosmetics.searchLayout,
     }"
   >
-    <aside class="normal-page__sidebar" aria-label="Filters">
+    <aside
+      :class="{
+        'normal-page__sidebar': true,
+        open: sidebarMenuOpen,
+      }"
+      aria-label="Filters"
+    >
       <section class="card filters-card" role="presentation">
-        <button
-          class="iconified-button sidebar-menu-close-button"
-          @click="sidebarMenuOpen = !sidebarMenuOpen"
-        >
-          <EyeOffIcon v-if="sidebarMenuOpen" aria-hidden="true" />
-          <EyeIcon v-else aria-hidden="true" />
-          {{ sidebarMenuOpen ? 'Hide filters' : 'Show filters' }}
-        </button>
         <div
           class="sidebar-menu"
           :class="{ 'sidebar-menu_open': sidebarMenuOpen }"
@@ -37,8 +36,9 @@
             <div v-for="(categories, header) in categoriesMap" :key="header">
               <h3
                 v-if="
-                  categories.filter((x) => x.project_type === projectType)
-                    .length > 0
+                  categories.filter(
+                    (x) => x.project_type === projectType.actual
+                  ).length > 0
                 "
                 class="sidebar-menu-heading"
               >
@@ -47,7 +47,7 @@
 
               <SearchFilter
                 v-for="category in categories
-                  .filter((x) => x.project_type === projectType)
+                  .filter((x) => x.project_type === projectType.actual)
                   .sort((a, b) => {
                     if (header === 'resolutions') {
                       return (
@@ -68,13 +68,13 @@
             </div>
           </section>
           <section
-            v-if="projectType !== 'resourcepack'"
+            v-if="projectType.id !== 'resourcepack'"
             aria-label="Loader filters"
           >
             <h3
               v-if="
                 $tag.loaders.filter((x) =>
-                  x.supported_project_types.includes(projectType)
+                  x.supported_project_types.includes(projectType.actual)
                 ).length > 0
               "
               class="sidebar-menu-heading"
@@ -84,8 +84,7 @@
             <SearchFilter
               v-for="loader in $tag.loaders.filter((x) => {
                 if (
-                  projectType === 'mod' &&
-                  !isPlugins &&
+                  projectType.id === 'mod' &&
                   !showAllLoaders &&
                   x.name !== 'forge' &&
                   x.name !== 'fabric' &&
@@ -94,13 +93,13 @@
                   return false
                 }
 
-                if (projectType === 'mod' && showAllLoaders) {
+                if (projectType.id === 'mod' && showAllLoaders) {
                   return $tag.loaderData.modLoaders.includes(x.name)
                 }
 
-                return isPlugins
+                return projectType.id === 'plugin'
                   ? $tag.loaderData.pluginLoaders.includes(x.name)
-                  : x.supported_project_types.includes(projectType)
+                  : x.supported_project_types.includes(projectType.actual)
               })"
               :key="loader.name"
               ref="loaderFilters"
@@ -111,7 +110,7 @@
               @toggle="toggleOrFacet"
             />
             <Checkbox
-              v-if="projectType === 'mod' && !isPlugins"
+              v-if="projectType.id === 'mod'"
               v-model="showAllLoaders"
               :label="showAllLoaders ? 'Less' : 'More'"
               description="Show all loaders"
@@ -120,11 +119,14 @@
               :collapsing-toggle-style="true"
             />
           </section>
-          <section v-if="isPlugins" aria-label="Platform loader filters">
+          <section
+            v-if="projectType.id === 'plugin'"
+            aria-label="Platform loader filters"
+          >
             <h3
               v-if="
                 $tag.loaders.filter((x) =>
-                  x.supported_project_types.includes(projectType)
+                  x.supported_project_types.includes(projectType.actual)
                 ).length > 0
               "
               class="sidebar-menu-heading"
@@ -145,7 +147,7 @@
             />
           </section>
           <section
-            v-if="projectType !== 'resourcepack' && !isPlugins"
+            v-if="!['resourcepack', 'plugin'].includes(projectType.id)"
             aria-label="Environment filters"
           >
             <h3 class="sidebar-menu-heading">Environments</h3>
@@ -211,12 +213,16 @@
     </aside>
     <section class="normal-page__content">
       <div
-        v-if="projectType === 'modpack'"
+        v-if="
+          projectType.id === 'modpack' &&
+          $orElse($store.state.cosmetics.modpacksAlphaNotice, true)
+        "
         class="card warning"
         aria-label="Warning"
       >
-        Modpack support is currently in alpha, and you may encounter issues. Our
-        documentation includes instructions on
+        Modpack support is currently in alpha, and can only be created and
+        installed through third party tools. Our documentation includes
+        instructions on
         <a
           href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
           target="_blank"
@@ -242,18 +248,28 @@
         ethical-ads-big
       />
       <div class="card search-controls">
-        <div class="iconified-input">
-          <label class="hidden" for="search">Search</label>
-          <SearchIcon aria-hidden="true" />
-          <input
-            id="search"
-            v-model="query"
-            type="search"
-            name="search"
-            placeholder="Search..."
-            autocomplete="off"
-            @input="onSearchChange(1)"
-          />
+        <div class="search-filter-container">
+          <button
+            class="iconified-button sidebar-menu-close-button"
+            :class="{ open: sidebarMenuOpen }"
+            @click="sidebarMenuOpen = !sidebarMenuOpen"
+          >
+            <FilterIcon aria-hidden="true" />
+            Filters...
+          </button>
+          <div class="iconified-input">
+            <label class="hidden" for="search">Search</label>
+            <SearchIcon aria-hidden="true" />
+            <input
+              id="search"
+              v-model="query"
+              type="search"
+              name="search"
+              :placeholder="`Search ${projectType.display}s...`"
+              autocomplete="off"
+              @input="onSearchChange(1)"
+            />
+          </div>
         </div>
         <div class="sort-controls">
           <div class="labeled-control">
@@ -293,12 +309,14 @@
         </div>
       </div>
       <pagination
-        :current-page="currentPage"
-        :pages="pages"
+        :page="currentPage"
+        :count="pageCount"
+        :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
+        class="pagination-before"
         @switch-page="onSearchChange"
       ></pagination>
-      <div>
-        <div v-if="$fetchState.pending" class="no-results">
+      <div class="search-results-container">
+        <div v-if="isLoading" class="no-results">
           <LogoAnimated aria-hidden="true" />
           <p>Loading...</p>
         </div>
@@ -327,8 +345,10 @@
         </div>
       </div>
       <pagination
-        :current-page="currentPage"
-        :pages="pages"
+        :page="currentPage"
+        :count="pageCount"
+        :link-function="(x) => getSearchUrl(x <= 1 ? 0 : (x - 1) * maxResults)"
+        class="pagination-after"
         @switch-page="onSearchChangeToTop"
       ></pagination>
     </section>
@@ -348,8 +368,7 @@ import ServerSide from '~/assets/images/categories/server.svg?inline'
 
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
 import ClearIcon from '~/assets/images/utils/clear.svg?inline'
-import EyeIcon from '~/assets/images/utils/eye.svg?inline'
-import EyeOffIcon from '~/assets/images/utils/eye-off.svg?inline'
+import FilterIcon from '~/assets/images/utils/filter.svg?inline'
 
 import Advertisement from '~/components/ads/Advertisement'
 
@@ -366,8 +385,7 @@ export default {
     ServerSide,
     SearchIcon,
     ClearIcon,
-    EyeIcon,
-    EyeOffIcon,
+    FilterIcon,
     LogoAnimated,
   },
   data() {
@@ -384,11 +402,10 @@ export default {
       facets: [],
       orFacets: [],
       results: null,
-      pages: [],
+      pageCount: 1,
       currentPage: 1,
 
-      projectType: 'mod',
-      isPlugins: false,
+      projectType: { id: 'mod', display: 'mod', actual: 'mod' },
 
       sortTypes: [
         { display: 'Relevance', name: 'relevance' },
@@ -405,6 +422,8 @@ export default {
       showAllLoaders: false,
 
       skipLink: '#search-results',
+
+      isLoading: true,
     }
   },
   async fetch() {
@@ -453,17 +472,37 @@ export default {
     if (this.$route.query.o)
       this.currentPage = Math.ceil(this.$route.query.o / this.maxResults) + 1
 
-    this.projectType = this.$route.name.substring(
-      0,
-      this.$route.name.length - 1
+    this.projectType = this.$tag.projectTypes.find(
+      (x) => x.id === this.$route.name.substring(0, this.$route.name.length - 1)
     )
 
-    if (this.projectType === 'plugin') {
-      this.projectType = 'mod'
-      this.isPlugins = true
-    }
-
     await this.onSearchChange(this.currentPage)
+
+    this.isLoading = false
+  },
+  head() {
+    const name = this.$route.name.substring(0, this.$route.name.length - 1)
+
+    return {
+      title: `Search ${this.$formatProjectType(name)}s - Modrinth`,
+      meta: [
+        {
+          hid: 'apple-mobile-web-app-title',
+          name: 'apple-mobile-web-app-title',
+          content: `Search ${this.$formatProjectType(name)}s`,
+        },
+        {
+          hid: 'og:title',
+          name: 'og:title',
+          content: `Search ${this.$formatProjectType(name)}s`,
+        },
+        {
+          hid: 'description',
+          name: 'description',
+          content: `Search and browse thousands of Minecraft ${name}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${name}s.\n`,
+        },
+      ],
+    }
   },
   computed: {
     categoriesMap() {
@@ -494,20 +533,14 @@ export default {
   watch: {
     '$route.path': {
       async handler() {
-        this.projectType = this.$route.name.substring(
-          0,
-          this.$route.name.length - 1
+        this.isLoading = true
+        this.projectType = this.$tag.projectTypes.find(
+          (x) =>
+            x.id === this.$route.name.substring(0, this.$route.name.length - 1)
         )
 
-        if (this.projectType === 'plugin') {
-          this.projectType = 'mod'
-          this.isPlugins = true
-        } else {
-          this.isPlugins = false
-        }
-
         this.results = null
-        this.pages = []
+        this.pageCount = 1
         this.currentPage = 1
         this.query = ''
         this.maxResults = 20
@@ -516,6 +549,8 @@ export default {
         this.sidebarMenuOpen = false
 
         await this.clearFilters()
+
+        this.isLoading = false
       },
     },
   },
@@ -596,6 +631,8 @@ export default {
       await this.onSearchChange(newPageNumber)
     },
     async onSearchChange(newPageNumber) {
+      this.currentPage = newPageNumber
+
       if (this.query === null) return
 
       try {
@@ -623,13 +660,13 @@ export default {
           // loaders specifier
           if (this.orFacets.length > 0) {
             formattedFacets.push(this.orFacets)
-          } else if (this.isPlugins) {
+          } else if (this.projectType.id === 'plugin') {
             formattedFacets.push(
               this.$tag.loaderData.allPluginLoaders.map(
                 (x) => `categories:'${encodeURIComponent(x)}'`
               )
             )
-          } else if (this.projectType === 'mod') {
+          } else if (this.projectType.id === 'mod') {
             formattedFacets.push(
               this.$tag.loaderData.modLoaders.map(
                 (x) => `categories:'${encodeURIComponent(x)}'`
@@ -682,7 +719,7 @@ export default {
           }
 
           if (this.projectType)
-            formattedFacets.push([`project_type:${this.projectType}`])
+            formattedFacets.push([`project_type:${this.projectType.actual}`])
 
           params.push(`facets=${JSON.stringify(formattedFacets)}`)
         }
@@ -703,69 +740,10 @@ export default {
         const res = await this.$axios.get(url, this.$defaultHeaders())
         this.results = res.data.hits
 
-        const pageAmount = Math.ceil(res.data.total_hits / res.data.limit)
-
-        this.currentPage = newPageNumber
-        if (pageAmount > 4) {
-          if (this.currentPage + 3 >= pageAmount) {
-            this.pages = [
-              1,
-              '-',
-              pageAmount - 4,
-              pageAmount - 3,
-              pageAmount - 2,
-              pageAmount - 1,
-              pageAmount,
-            ]
-          } else if (this.currentPage > 4) {
-            this.pages = [
-              1,
-              '-',
-              this.currentPage - 1,
-              this.currentPage,
-              this.currentPage + 1,
-              '-',
-              pageAmount,
-            ]
-          } else {
-            this.pages = [1, 2, 3, 4, 5, '-', pageAmount]
-          }
-        } else {
-          this.pages = Array.from({ length: pageAmount }, (_, i) => i + 1)
-        }
+        this.pageCount = Math.ceil(res.data.total_hits / res.data.limit)
 
         if (process.client) {
-          const queryItems = []
-
-          if (this.query) queryItems.push(`q=${encodeURIComponent(this.query)}`)
-          if (offset > 0) queryItems.push(`o=${offset}`)
-          if (this.facets.length > 0)
-            queryItems.push(`f=${encodeURIComponent(this.facets)}`)
-          if (this.orFacets.length > 0)
-            queryItems.push(`g=${encodeURIComponent(this.orFacets)}`)
-          if (this.selectedVersions.length > 0)
-            queryItems.push(`v=${encodeURIComponent(this.selectedVersions)}`)
-          if (this.selectedLicenses.length > 0)
-            queryItems.push(`l=${encodeURIComponent(this.selectedLicenses)}`)
-          if (this.showSnapshots) url += `h=true`
-          if (this.selectedEnvironments.length > 0)
-            queryItems.push(
-              `e=${encodeURIComponent(this.selectedEnvironments)}`
-            )
-          if (this.sortType.name !== 'relevance')
-            queryItems.push(`s=${encodeURIComponent(this.sortType.name)}`)
-          if (this.maxResults !== 20)
-            queryItems.push(`m=${encodeURIComponent(this.maxResults)}`)
-
-          url = `${this.$route.path}`
-
-          if (queryItems.length > 0) {
-            url += `?${queryItems[0]}`
-
-            for (let i = 1; i < queryItems.length; i++) {
-              url += `&${queryItems[i]}`
-            }
-          }
+          url = this.getSearchUrl(offset)
 
           await this.$router.replace({ path: url })
         }
@@ -774,18 +752,91 @@ export default {
         console.error(err)
       }
     },
+    getSearchUrl(offset) {
+      const queryItems = []
+
+      if (this.query) queryItems.push(`q=${encodeURIComponent(this.query)}`)
+      if (offset > 0) queryItems.push(`o=${offset}`)
+      if (this.facets.length > 0)
+        queryItems.push(`f=${encodeURIComponent(this.facets)}`)
+      if (this.orFacets.length > 0)
+        queryItems.push(`g=${encodeURIComponent(this.orFacets)}`)
+      if (this.selectedVersions.length > 0)
+        queryItems.push(`v=${encodeURIComponent(this.selectedVersions)}`)
+      if (this.selectedLicenses.length > 0)
+        queryItems.push(`l=${encodeURIComponent(this.selectedLicenses)}`)
+      if (this.showSnapshots) queryItems.push(`h=true`)
+      if (this.selectedEnvironments.length > 0)
+        queryItems.push(`e=${encodeURIComponent(this.selectedEnvironments)}`)
+      if (this.sortType.name !== 'relevance')
+        queryItems.push(`s=${encodeURIComponent(this.sortType.name)}`)
+      if (this.maxResults !== 20)
+        queryItems.push(`m=${encodeURIComponent(this.maxResults)}`)
+
+      let url = `${this.$route.path}`
+
+      if (queryItems.length > 0) {
+        url += `?${queryItems[0]}`
+
+        for (let i = 1; i < queryItems.length; i++) {
+          url += `&${queryItems[i]}`
+        }
+      }
+
+      return url
+    },
   },
 }
 </script>
 
 <style lang="scss" scoped>
+// Mobile-first CSS: search page is grid on mobile...
+.search-page {
+  display: grid;
+  grid-template-rows: auto;
+  grid-template-columns: 100%;
+
+  // ...and flex on desktop
+  @media screen and (min-width: 1024px) {
+    display: flex;
+
+    // Note that the actual flex layout properties come from .normal-page
+  }
+}
+
+.normal-page__content {
+  // Passthrough children as grid items on mobile
+  display: contents;
+
+  @media screen and (min-width: 1024px) {
+    display: block;
+  }
+}
+
+// Move the filters "sidebar" on mobile underneath the search card
+.normal-page__sidebar {
+  grid-row: 3;
+
+  // Hide on mobile unless open
+  @media screen and (max-width: 1024px) {
+    display: none;
+
+    &.open {
+      display: block;
+    }
+  }
+}
+
 .filters-card {
-  padding: var(--spacing-card-lg);
+  padding: var(--spacing-card-md);
+
+  @media screen and (min-width: 1024px) {
+    padding: var(--spacing-card-lg);
+  }
 }
 
 .sidebar-menu {
   display: none;
-  margin-top: 1rem;
 }
 
 .sidebar-menu_open {
@@ -796,11 +847,47 @@ export default {
   margin: 1.5rem 0 0.5rem 0;
 }
 
+// EthicalAds
+.content-wrapper {
+  grid-row: 1;
+}
+
 .search-controls {
   display: flex;
   flex-direction: row;
   gap: var(--spacing-card-md);
   flex-wrap: wrap;
+  padding: var(--spacing-card-md);
+  grid-row: 2;
+
+  .search-filter-container {
+    display: flex;
+    width: 100%;
+    align-items: center;
+
+    .sidebar-menu-close-button {
+      max-height: none;
+      // match height of the search field
+      height: 40px;
+      transition: box-shadow 0.1s ease-in-out;
+      margin-right: var(--spacing-card-md);
+
+      &.open {
+        color: var(--color-button-text-active);
+        background-color: var(--color-brand-highlight);
+        box-shadow: inset 0 0 0 transparent, 0 0 0 2px var(--color-brand);
+      }
+    }
+
+    .iconified-input {
+      flex: 1;
+
+      input {
+        width: 100%;
+        margin: 0;
+      }
+    }
+  }
 
   .sort-controls {
     width: 100%;
@@ -822,15 +909,6 @@ export default {
       }
     }
   }
-
-  .iconified-input {
-    flex: 1;
-
-    input {
-      min-width: 15rem;
-      width: 100%;
-    }
-  }
 }
 
 .search-controls__sorting {
@@ -842,11 +920,23 @@ export default {
   display: block;
 }
 
+.pagination-before {
+  grid-row: 4;
+}
+
+.search-results-container {
+  grid-row: 5;
+}
+
+.pagination-after {
+  grid-row: 6;
+}
+
 .no-results {
   text-align: center;
 }
 
-@media screen and (min-width: 700px) {
+@media screen and (min-width: 750px) {
   .search-controls {
     flex-wrap: nowrap;
     flex-direction: row;

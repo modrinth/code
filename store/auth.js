@@ -30,6 +30,11 @@ export const actions = {
         })
       ).data
 
+      if (user.payout_data && user.payout_data.balance) {
+        user.payout_data.balance =
+          Math.floor(user.payout_data.balance * 100) / 100
+      }
+
       commit('SET_USER', user)
       commit('SET_TOKEN', token)
       commit('SET_HEADERS', {

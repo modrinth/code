@@ -22,26 +22,31 @@
       </ul>
     </div>
     <div class="content card">
-      <ConfirmPopup
-        ref="delete_version_popup"
+      <ModalConfirm
+        ref="modal_confirm"
         title="Are you sure you want to delete this version?"
         description="This will remove this version forever (like really forever)."
         :has-to-type="false"
-        proceed-label="Delete version"
+        proceed-label="Delete"
         @proceed="deleteVersion()"
+      />
+      <ModalReport
+        ref="modal_version_report"
+        :item-id="version.id"
+        item-type="version"
       />
       <div class="columns">
         <nuxt-link
           v-if="mode === 'version'"
           class="iconified-button back-button"
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/${
-            $nuxt.context.from
-              ? $nuxt.context.from.name === 'type-id-changelog'
-                ? 'changelog'
-                : 'versions'
-              : 'versions'
+          :to="`${
+            $nuxt.context.from &&
+            ($nuxt.context.from.name === 'type-id-changelog' ||
+              $nuxt.context.from.name === 'type-id-versions')
+              ? $nuxt.context.from.fullPath
+              : `/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/versions`
           }`"
         >
           <BackIcon aria-hidden="true" />
@@ -73,11 +78,12 @@
             class="full-width-input"
             type="text"
             placeholder="Enter an optional version name..."
+            maxlength="64"
           />
           <Checkbox v-model="version.featured" label="Featured" />
           <hr class="card-divider" />
         </div>
-        <div v-if="mode === 'edit'" class="header-buttons buttons columns">
+        <div v-if="mode === 'edit'" class="header-buttons button-group columns">
           <h3 class="column-grow-1">Edit version</h3>
           <nuxt-link
             v-if="$auth.user"
@@ -90,7 +96,7 @@
             Cancel
           </nuxt-link>
           <button
-            class="iconified-button brand-button-colors"
+            class="iconified-button brand-button"
             @click="saveEditedVersion"
           >
             <SaveIcon aria-hidden="true" />
@@ -99,7 +105,7 @@
         </div>
         <div
           v-else-if="mode === 'create'"
-          class="header-buttons buttons columns"
+          class="header-buttons button-group columns"
         >
           <h3 class="column-grow-1">Create version</h3>
           <nuxt-link
@@ -112,42 +118,36 @@
             <CrossIcon aria-hidden="true" />
             Cancel
           </nuxt-link>
-          <button
-            class="iconified-button brand-button-colors"
-            @click="createVersion"
-          >
+          <button class="iconified-button brand-button" @click="createVersion">
             <CheckIcon aria-hidden="true" />
             Create
           </button>
         </div>
-        <div v-else class="buttons">
+        <div v-else class="button-group">
           <a
             v-if="primaryFile"
             v-tooltip="
               primaryFile.filename + ' (' + $formatBytes(primaryFile.size) + ')'
             "
             :href="primaryFile.url"
-            class="bold-button iconified-button brand-button-colors"
+            class="bold-button iconified-button brand-button"
             :title="`Download ${primaryFile.filename}`"
           >
             <DownloadIcon aria-hidden="true" />
             Download
           </a>
-          <nuxt-link
-            :to="`/create/report?id=${version.id}&t=version`"
+          <button
+            v-if="$auth.user"
             class="action iconified-button"
+            @click="$refs.modal_version_report.show()"
           >
             <ReportIcon aria-hidden="true" />
             Report
-          </nuxt-link>
-          <button
-            v-if="currentMember"
-            class="action iconified-button"
-            @click="$refs.delete_version_popup.show()"
-          >
-            <TrashIcon aria-hidden="true" />
-            Delete
           </button>
+          <a v-else class="action iconified-button" :href="authUrl">
+            <ReportIcon aria-hidden="true" />
+            Report
+          </a>
           <nuxt-link
             v-if="currentMember"
             class="action iconified-button"
@@ -159,11 +159,20 @@
             <EditIcon aria-hidden="true" />
             Edit
           </nuxt-link>
+          <button
+            v-if="currentMember"
+            class="action iconified-button danger-button"
+            @click="$refs.modal_confirm.show()"
+          >
+            <TrashIcon aria-hidden="true" />
+            Delete
+          </button>
         </div>
         <section v-if="mode === 'edit' || mode === 'create'">
           <h3>Changelog</h3>
-          <ThisOrThat
+          <Chips
             v-model="changelogViewMode"
+            class="separator"
             :items="['source', 'preview']"
           />
           <div v-if="changelogViewMode === 'source'" class="textarea-wrapper">
@@ -289,6 +298,7 @@
                 v-model="version.version_number"
                 type="text"
                 placeholder="Enter the version number..."
+                maxlength="32"
               />
               <p v-else class="value">{{ version.version_number }}</p>
             </div>
@@ -358,7 +368,7 @@
             </div>
             <div v-if="mode === 'version'" class="data">
               <p class="title">Version ID</p>
-              <p class="value">{{ version.id }}</p>
+              <p class="value"><CopyCode :text="version.id" /></p>
             </div>
           </div>
           <hr class="card-divider" />
@@ -380,16 +390,10 @@
               :key="index"
               class="dependency"
             >
-              <img
-                class="icon"
-                :src="
-                  dependency.project
-                    ? dependency.project.icon_url
-                      ? dependency.project.icon_url
-                      : 'https://cdn.modrinth.com/placeholder.svg?inline'
-                    : 'https://cdn.modrinth.com/placeholder.svg?inline'
-                "
+              <Avatar
+                :src="dependency.project ? dependency.project.icon_url : null"
                 alt="dependency-icon"
+                size="sm"
               />
               <div class="info">
                 <nuxt-link
@@ -443,8 +447,9 @@
             class="edit-dependency"
           >
             <h4>Add dependency</h4>
-            <ThisOrThat
+            <Chips
               v-model="dependencyAddMode"
+              class="separator"
               :items="['project', 'version']"
             />
             <div class="edit-info">
@@ -582,9 +587,10 @@
               </button>
             </div>
           </div>
-          <StatelessFileInput
+          <FileInput
             v-if="mode === 'edit' || mode === 'create'"
             multiple
+            should-always-reset
             class="choose-files"
             :accept="
               project.actualProjectType.toLowerCase() === 'modpack'
@@ -629,8 +635,7 @@
 </template>
 <script>
 import Multiselect from 'vue-multiselect'
-import ConfirmPopup from '~/components/ui/ConfirmPopup'
-import StatelessFileInput from '~/components/ui/StatelessFileInput'
+import FileInput from '~/components/ui/FileInput'
 
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
@@ -645,11 +650,20 @@ import StarIcon from '~/assets/images/utils/star.svg?inline'
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import VersionBadge from '~/components/ui/Badge'
 import Checkbox from '~/components/ui/Checkbox'
-import ThisOrThat from '~/components/ui/ThisOrThat'
+import Chips from '~/components/ui/Chips'
+import ModalConfirm from '~/components/ui/ModalConfirm'
+import ModalReport from '~/components/ui/ModalReport'
+import CopyCode from '~/components/ui/CopyCode'
+import Avatar from '~/components/ui/Avatar'
 
 export default {
   components: {
-    ThisOrThat,
+    Avatar,
+    CopyCode,
+    ModalConfirm,
+    ModalReport,
+    FileInput,
+    Chips,
     Checkbox,
     VersionBadge,
     DownloadIcon,
@@ -657,28 +671,13 @@ export default {
     EditIcon,
     ReportIcon,
     BackIcon,
-    ConfirmPopup,
     StarIcon,
     CheckIcon,
     Multiselect,
     SaveIcon,
     PlusIcon,
     CrossIcon,
-    StatelessFileInput,
     InfoIcon,
-  },
-  beforeRouteLeave(to, from, next) {
-    if (this.mode === 'create') {
-      if (
-        !window.confirm('Are you sure that you want to leave without saving?')
-      ) {
-        return
-      }
-    }
-
-    this.setVersion()
-
-    next()
   },
   props: {
     project: {
@@ -738,7 +737,56 @@ export default {
     }
   },
   async fetch() {
+    console.log(this.$nuxt.context.from)
     await this.setVersion()
+  },
+  head() {
+    if (!this.version.game_versions) {
+      return {}
+    }
+    const title = `${
+      this.mode === 'create' ? 'Create Version' : this.version.name
+    } - ${this.project.title}`
+    const description = `Download ${this.project.title} ${
+      this.version.version_number
+    } on Modrinth. Supports ${this.$formatVersion(
+      this.version.game_versions
+    )} ${this.version.loaders
+      .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
+      .join(' & ')}. Published on ${this.$dayjs(
+      this.version.date_published
+    ).format('MMM D, YYYY')}. ${this.version.downloads} downloads.`
+
+    return {
+      title,
+      meta: [
+        {
+          hid: 'og:title',
+          name: 'og:title',
+          content: title,
+        },
+        {
+          hid: 'apple-mobile-web-app-title',
+          name: 'apple-mobile-web-app-title',
+          content: title,
+        },
+        {
+          hid: 'og:description',
+          name: 'og:description',
+          content: description,
+        },
+        {
+          hid: 'description',
+          name: 'description',
+          content: description,
+        },
+      ],
+    }
+  },
+  computed: {
+    authUrl() {
+      return `${process.env.authURLBase}auth/init?url=${process.env.domain}${this.$route.path}`
+    },
   },
   watch: {
     '$route.path': {
@@ -747,31 +795,15 @@ export default {
       },
     },
   },
-  mounted() {
-    if (this.mode === 'create') {
-      function preventLeave(e) {
-        e.preventDefault()
-        e.returnValue = ''
-      }
-      window.addEventListener('beforeunload', preventLeave)
-      this.$once('hook:beforeDestroy', () => {
-        window.removeEventListener('beforeunload', preventLeave)
-      })
-    }
-  },
   methods: {
     checkFields() {
-      if (
+      return !(
         this.version.version_number === '' ||
         this.version.game_versions.length === 0 ||
         (this.version.loaders.length === 0 &&
           this.project.project_type !== 'resourcepack') ||
         (this.newFiles.length === 0 && this.version.files.length === 0)
-      ) {
-        return false
-      }
-
-      return true
+      )
     },
     reset() {
       this.changelogViewMode = 'source'
@@ -1112,8 +1144,12 @@ export default {
 section {
   margin: 1rem 0;
 
-  h3 {
-    margin-bottom: 0.5rem;
+  .separator {
+    margin: var(--spacing-card-sm) 0;
+  }
+
+  .choose-files {
+    margin-bottom: var(--spacing-card-sm);
   }
 }
 
@@ -1125,10 +1161,6 @@ section {
   display: flex;
   flex-wrap: wrap;
   row-gap: 0.5rem;
-
-  .bold-button {
-    font-weight: bold;
-  }
 
   @media screen and (min-width: 1024px) {
     margin-left: auto;
@@ -1186,17 +1218,10 @@ section {
   .dependency {
     align-items: center;
     display: flex;
+    gap: 0.25rem;
 
     @media screen and (min-width: 800px) {
       flex-basis: 30%;
-    }
-
-    .icon {
-      width: 3rem;
-      height: 3rem;
-      margin-right: 0.5rem;
-      border-radius: var(--size-rounded-xs);
-      object-fit: contain;
     }
 
     .info {
@@ -1276,10 +1301,6 @@ section {
 }
 
 .options {
-  margin-bottom: var(--spacing-card-sm);
-}
-
-.styled-tabs {
   margin-bottom: var(--spacing-card-sm);
 }
 

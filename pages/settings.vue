@@ -1,46 +1,57 @@
 <template>
-  <div class="page-container">
-    <div class="page-contents">
-      <div class="content">
-        <h1 v-if="$auth.user">Settings for {{ $auth.user.username }}</h1>
-        <h1 v-else>Settings</h1>
-        <div class="card styled-tabs">
-          <nuxt-link v-if="$auth.user" class="tab" to="/settings" exact
-            ><span>General</span></nuxt-link
-          >
-          <nuxt-link v-if="$auth.user" class="tab" to="/settings/follows">
-            <span>Followed projects</span>
-          </nuxt-link>
-          <nuxt-link v-if="$auth.user" class="tab" to="/settings/security">
-            <span>Security</span>
-          </nuxt-link>
-        </div>
-        <NuxtChild />
-      </div>
+  <div class="normal-page">
+    <div class="normal-page__sidebar">
+      <aside class="universal-card">
+        <h1>Settings</h1>
+        <NavStack>
+          <NavStackItem link="/settings" label="Appearance">
+            <PaintbrushIcon />
+          </NavStackItem>
+          <template v-if="$auth.user">
+            <h3>User settings</h3>
+            <NavStackItem link="/settings/account" label="Account">
+              <UserIcon />
+            </NavStackItem>
+            <NavStackItem link="/settings/follows" label="Followed projects">
+              <HeartIcon />
+            </NavStackItem>
+            <NavStackItem
+              link="/settings/monetization"
+              label="Monetization"
+              beta
+            >
+              <CurrencyIcon />
+            </NavStackItem>
+          </template>
+        </NavStack>
+      </aside>
+    </div>
+    <div class="normal-page__content">
+      <NuxtChild />
     </div>
   </div>
 </template>
 
 <script>
+import NavStack from '~/components/ui/NavStack'
+import NavStackItem from '~/components/ui/NavStackItem'
+
+import PaintbrushIcon from '~/assets/images/utils/paintbrush.svg?inline'
+import UserIcon from '~/assets/images/utils/user.svg?inline'
+import HeartIcon from '~/assets/images/utils/heart.svg?inline'
+import CurrencyIcon from '~/assets/images/utils/currency.svg?inline'
+
 export default {
   name: 'Settings',
+  components: {
+    NavStack,
+    NavStackItem,
+    PaintbrushIcon,
+    UserIcon,
+    HeartIcon,
+    CurrencyIcon,
+  },
 }
 </script>
 
-<style lang="scss" scoped>
-.page-contents {
-  display: flex;
-  flex-direction: column;
-
-  h1 {
-    color: var(--color-text-dark);
-    margin: 0 0 0.5rem 1.5rem;
-  }
-}
-
-@media screen and (min-width: 1024px) {
-  .page-contents {
-    max-width: 60rem !important;
-  }
-}
-</style>
+<style lang="scss" scoped></style>

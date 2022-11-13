@@ -1,7 +1,7 @@
 <template>
-  <div ref="layout" class="layout">
+  <div class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
     <header class="site-header" role="presentation">
-      <section class="navbar columns" role="navigation">
+      <section class="navbar card columns" role="navigation">
         <section class="skip column" role="presentation">
           <a href="#main">Skip to Main Content</a>
           <a
@@ -11,31 +11,47 @@
           >
         </section>
         <section class="logo column" role="presentation">
-          <NuxtLink to="/" aria-label="Modrinth home page">
+          <NuxtLink class="button-base" to="/" aria-label="Modrinth home page">
             <ModrinthLogo aria-hidden="true" class="text-logo" />
           </NuxtLink>
         </section>
         <section class="nav-group columns" role="presentation">
           <section class="nav" aria-label="Page links">
-            <div class="styled-tabs">
-              <NuxtLink to="/mods" class="tab">
-                <span>Mods</span>
-              </NuxtLink>
-              <NuxtLink to="/plugins" class="tab">
-                <span>Plugins</span>
-              </NuxtLink>
-              <NuxtLink to="/resourcepacks" class="tab">
-                <span>Resource Packs</span>
-              </NuxtLink>
-              <NuxtLink to="/modpacks" class="tab">
-                <span>Modpacks</span>
-              </NuxtLink>
-            </div>
+            <NavRow
+              class="navigation"
+              :links="[
+                {
+                  label: 'Mods',
+                  href: '/mods',
+                },
+                {
+                  label: 'Plugins',
+                  href: '/plugins',
+                },
+                {
+                  label: 'Resource Packs',
+                  href: '/resourcepacks',
+                },
+                {
+                  label: 'Modpacks',
+                  href: '/modpacks',
+                },
+              ]"
+            />
           </section>
           <section class="column-grow user-outer" aria-label="Account links">
             <section class="user-controls">
+              <nuxt-link
+                v-if="$auth.user"
+                to="/notifications"
+                class="control-button button-transparent"
+                :class="{ bubble: $user.notifications.length > 0 }"
+                title="Notifications"
+              >
+                <NotificationIcon aria-hidden="true" />
+              </nuxt-link>
               <button
-                class="control-button"
+                class="control-button button-transparent"
                 title="Switch theme"
                 @click="changeTheme"
               >
@@ -45,123 +61,87 @@
                 />
                 <SunIcon v-else aria-hidden="true" />
               </button>
-              <nuxt-link
+              <div
                 v-if="$auth.user"
-                to="/create/project"
-                class="control-button"
-                title="Create project"
+                class="dropdown"
+                :class="{ closed: !isDropdownOpen }"
+                tabindex="0"
+                @mouseover="isDropdownOpen = true"
+                @focus="isDropdownOpen = true"
+                @mouseleave="isDropdownOpen = false"
               >
-                <PlusIcon aria-hidden="true" />
-              </nuxt-link>
-              <nuxt-link
-                v-if="$auth.user"
-                to="/notifications"
-                class="control-button"
-                title="Notifications"
-              >
-                <NotificationIcon aria-hidden="true" />
-                <div v-if="$user.notifications.length > 0" class="bubble">
-                  {{ $user.notifications.length }}
-                </div>
-              </nuxt-link>
-              <nuxt-link
-                v-if="
-                  $auth.user &&
-                  ($auth.user.role === 'moderator' ||
-                    $auth.user.role === 'admin')
-                "
-                to="/moderation"
-                class="control-button"
-                title="Moderation"
-              >
-                <ModerationIcon aria-hidden="true" />
-                <div v-if="moderationNotifications > 0" class="bubble">
-                  {{ moderationNotifications }}
-                </div>
-              </nuxt-link>
-              <div v-if="$auth.user" ref="mobileMenu" class="dropdown">
                 <button class="control" value="Profile Dropdown">
-                  <img
+                  <Avatar
                     :src="$auth.user.avatar_url"
                     class="user-icon"
-                    aria-hidden="true"
                     alt="Your avatar"
+                    aria-hidden="true"
+                    circle
                   />
                   <DropdownIcon class="caret" />
                 </button>
-                <ul class="content card" @click="removeFocus">
-                  <li>
-                    <NuxtLink
-                      class="item"
-                      :to="`/user/${$auth.user.username}`"
-                      @click="removeFocus"
-                    >
-                      <div class="title profile-link">
-                        <div class="username">@{{ $auth.user.username }}</div>
-                        <div class="prompt">Go to my profile</div>
-                      </div>
-                    </NuxtLink>
-                  </li>
+                <div class="content card">
+                  <NuxtLink
+                    class="item button-transparent"
+                    :to="`/user/${$auth.user.username}`"
+                  >
+                    <div class="title profile-link">
+                      <div class="username">@{{ $auth.user.username }}</div>
+                      <div class="prompt">Go to my profile</div>
+                    </div>
+                  </NuxtLink>
                   <hr class="divider" />
-                  <li>
-                    <NuxtLink class="item" to="/create/project">
-                      <PlusIcon class="icon" />
-                      <span class="title">Create a project</span>
-                    </NuxtLink>
-                  </li>
+                  <button
+                    class="item button-transparent"
+                    @click="$refs.modal_creation.show()"
+                  >
+                    <PlusIcon class="icon" />
+                    <span class="title">Create a project</span>
+                  </button>
                   <hr class="divider" />
-                  <li>
-                    <NuxtLink class="item" to="/notifications">
-                      <NotificationIcon class="icon" />
-                      <span class="title">Notifications</span>
-                    </NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink class="item" to="/settings/follows">
-                      <HeartIcon class="icon" />
-                      <span class="title">Following</span>
-                    </NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink class="item" to="/settings">
-                      <SettingsIcon class="icon" />
-                      <span class="title">Settings</span>
-                    </NuxtLink>
-                  </li>
-                  <li>
-                    <NuxtLink
-                      v-if="
-                        $auth.user.role === 'moderator' ||
-                        $auth.user.role === 'admin'
-                      "
-                      class="item"
-                      to="/moderation"
-                    >
-                      <ModerationIcon class="icon" />
-                      <span class="title">Moderation</span>
-                    </NuxtLink>
-                  </li>
-                  <li>
-                    <button class="item" @click="changeTheme">
-                      <MoonIcon
-                        v-if="$colorMode.value === 'light'"
-                        class="icon"
-                      />
-                      <SunIcon v-else class="icon" />
-                      <span class="dropdown-item__text">Change theme</span>
-                    </button>
-                  </li>
+                  <NuxtLink class="item button-transparent" to="/notifications">
+                    <NotificationIcon class="icon" />
+                    <span class="title">Notifications</span>
+                  </NuxtLink>
+                  <NuxtLink class="item button-transparent" to="/dashboard">
+                    <ChartIcon class="icon" />
+                    <span class="title">Dashboard</span
+                    ><span class="beta-badge">BETA</span>
+                  </NuxtLink>
+                  <NuxtLink
+                    class="item button-transparent"
+                    to="/settings/follows"
+                  >
+                    <HeartIcon class="icon" />
+                    <span class="title">Following</span>
+                  </NuxtLink>
+                  <NuxtLink class="item button-transparent" to="/settings">
+                    <SettingsIcon class="icon" />
+                    <span class="title">Settings</span>
+                  </NuxtLink>
+                  <NuxtLink
+                    v-if="
+                      $auth.user.role === 'moderator' ||
+                      $auth.user.role === 'admin'
+                    "
+                    class="item button-transparent"
+                    to="/moderation"
+                  >
+                    <ModerationIcon class="icon" />
+                    <span class="title">Moderation</span>
+                  </NuxtLink>
                   <hr class="divider" />
-                  <li>
-                    <button class="item" @click="logout">
-                      <LogOutIcon class="icon" />
-                      <span class="dropdown-item__text">Log out</span>
-                    </button>
-                  </li>
-                </ul>
+                  <button class="item button-transparent" @click="logout">
+                    <LogOutIcon class="icon" />
+                    <span class="dropdown-item__text">Log out</span>
+                  </button>
+                </div>
               </div>
               <section v-else class="auth-prompt">
-                <a :href="authUrl" class="log-in-button">
+                <a
+                  :href="authUrl"
+                  class="log-in-button header-button brand-button"
+                >
                   <GitHubIcon aria-hidden="true" />
                   Sign in with GitHub</a
                 >
@@ -170,39 +150,46 @@
           </section>
         </section>
       </section>
-      <section ref="mobileNavBar" class="mobile-navbar">
+      <section class="mobile-navbar" :class="{ expanded: isBrowseMenuOpen }">
         <div class="top-row">
-          <NuxtLink to="/" class="tab" @click.native="closeBrowseMenu()">
+          <NuxtLink
+            to="/"
+            class="tab button-animation"
+            @click.native="isBrowseMenuOpen = false"
+          >
             <HomeIcon />
           </NuxtLink>
           <div class="spacer"></div>
-          <button class="tab browse" @click="toggleBrowseMenu()">
+          <button
+            class="tab browse button-animation"
+            @click="toggleBrowseMenu()"
+          >
             <DropdownIcon :class="{ closed: !isBrowseMenuOpen }" />
             <span>Browse</span>
           </button>
           <div class="spacer"></div>
-          <button class="tab" @click="toggleMobileMenu()">
+          <button class="tab button-animation" @click="toggleMobileMenu()">
             <HamburgerIcon v-if="!isMobileMenuOpen" />
             <CrossIcon v-else />
           </button>
         </div>
         <div
-          :class="{ 'disable-childern': !isBrowseMenuOpen }"
+          :class="{ 'disable-children': !isBrowseMenuOpen }"
           class="project-types"
         >
           <NuxtLink
             :tabindex="isBrowseMenuOpen ? 0 : -1"
             to="/mods"
-            class="tab"
-            @click.native="closeBrowseMenu()"
+            class="tab iconified-button"
+            @click.native="isBrowseMenuOpen = false"
           >
             <span>Mods</span>
           </NuxtLink>
           <NuxtLink
             :tabindex="isBrowseMenuOpen ? 0 : -1"
             to="/plugins"
-            class="tab"
-            @click.native="closeBrowseMenu()"
+            class="tab iconified-button"
+            @click.native="isBrowseMenuOpen = false"
           >
             <span>Plugins</span>
           </NuxtLink>
@@ -210,72 +197,102 @@
           <NuxtLink
             :tabindex="isBrowseMenuOpen ? 0 : -1"
             to="/resourcepacks"
-            class="tab"
-            @click.native="closeBrowseMenu()"
+            class="tab iconified-button"
+            @click.native="isBrowseMenuOpen = false"
           >
             <span>Resource Packs</span>
           </NuxtLink>
           <NuxtLink
             :tabindex="isBrowseMenuOpen ? 0 : -1"
             to="/modpacks"
-            class="tab"
-            @click.native="closeBrowseMenu()"
+            class="tab iconified-button"
+            @click.native="isBrowseMenuOpen = false"
           >
             <span>Modpacks</span>
           </NuxtLink>
         </div>
       </section>
-      <section ref="mobileMenu" class="mobile-menu">
+      <section class="mobile-menu" :class="{ active: isMobileMenuOpen }">
         <div class="mobile-menu-wrapper">
           <div class="items-container rows">
             <NuxtLink
               v-if="$auth.user"
-              class="item user-item"
+              class="iconified-button raised-button user-item"
               :to="`/user/${$auth.user.username}`"
             >
-              <img :src="$auth.user.avatar_url" class="user-icon" />
+              <img
+                :src="$auth.user.avatar_url"
+                class="user-icon"
+                aria-hidden="true"
+                alt="User profile icon"
+              />
               <div class="profile-link">
                 <div class="username">@{{ $auth.user.username }}</div>
                 <div class="prompt">Go to my profile</div>
               </div>
             </NuxtLink>
-            <button v-if="$auth.user" class="item log-out" @click="logout">
-              <LogOutIcon class="icon" />
-              <span class="dropdown-item__text">Log out</span>
-            </button>
-            <NuxtLink v-if="$auth.user" class="item" to="/create/project">
+            <button
+              v-if="$auth.user"
+              class="iconified-button raised-button"
+              @click="$refs.modal_creation.show()"
+            >
               <PlusIcon class="icon" />
-              <span class="title">Create a project</span>
+              <span class="dropdown-item__text">Create a project</span>
+            </button>
+            <NuxtLink
+              v-if="$auth.user"
+              class="iconified-button raised-button"
+              to="/notifications"
+            >
+              <NotificationIcon class="icon" />
+              <span class="dropdown-item__text">Notifications</span>
             </NuxtLink>
-            <NuxtLink v-if="$auth.user" class="item" to="/settings">
+            <NuxtLink
+              v-if="$auth.user"
+              class="iconified-button raised-button"
+              to="/dashboard"
+            >
+              <ChartIcon class="icon" />
+              <span class="dropdown-item__text">Dashboard</span>
+              <span class="beta-badge">BETA</span>
+            </NuxtLink>
+            <NuxtLink
+              v-if="$auth.user"
+              class="iconified-button raised-button"
+              to="/settings/follows"
+            >
+              <HeartIcon class="icon" />
+              <span class="dropdown-item__text">Following</span>
+            </NuxtLink>
+            <NuxtLink class="iconified-button raised-button" to="/settings">
               <SettingsIcon class="icon" />
-              <span class="title">Settings</span>
+              <span class="dropdown-item__text">Settings</span>
             </NuxtLink>
             <NuxtLink
               v-if="
                 $auth.user &&
                 ($auth.user.role === 'moderator' || $auth.user.role === 'admin')
               "
-              class="item"
+              class="iconified-button raised-button"
               to="/moderation"
             >
               <ModerationIcon class="icon" />
-              <span class="title">Moderation</span>
+              <span class="dropdown-item__text">Moderation</span>
             </NuxtLink>
-            <NuxtLink v-if="$auth.user" class="item" to="/settings/follows">
-              <HeartIcon class="icon" />
-              <span class="title">Following</span>
-            </NuxtLink>
-            <NuxtLink v-if="$auth.user" class="item" to="/notifications">
-              <NotificationIcon class="icon" />
-              <span class="title">Notifications</span>
-            </NuxtLink>
-            <button class="item" @click="changeTheme">
+            <button class="iconified-button raised-button" @click="changeTheme">
               <MoonIcon v-if="$colorMode.value === 'light'" class="icon" />
               <SunIcon v-else class="icon" />
               <span class="dropdown-item__text">Change theme</span>
             </button>
-            <a v-if="!$auth.user" :href="authUrl" class="item log-in">
+            <button
+              v-if="$auth.user"
+              class="iconified-button danger-button"
+              @click="logout"
+            >
+              <LogOutIcon class="icon" />
+              <span class="dropdown-item__text">Log out</span>
+            </button>
+            <a v-else :href="authUrl" class="iconified-button brand-button">
               <GitHubIcon aria-hidden="true" />
               Sign in with GitHub</a
             >
@@ -284,6 +301,7 @@
       </section>
     </header>
     <main>
+      <ModalCreation ref="modal_creation" />
       <notifications
         group="main"
         position="bottom right"
@@ -332,16 +350,31 @@
       <div class="links links-2" role="region" aria-label="Resources">
         <h4 aria-hidden="true">Resources</h4>
         <a target="_blank" href="https://blog.modrinth.com">Blog</a>
-        <a target="_blank" href="https://discord.gg/EUHuJHt">Discord</a>
-        <a target="_blank" href="https://github.com/modrinth/knossos">GitHub</a>
         <a target="_blank" href="https://docs.modrinth.com">Docs</a>
+        <a target="_blank" href="https://status.modrinth.com">Status</a>
+        <a target="_blank" href="https://github.com/modrinth">GitHub</a>
+      </div>
+      <div class="links links-3" role="region" aria-label="Interact">
+        <h4 aria-hidden="true">Interact</h4>
+        <a target="_blank" href="https://discord.gg/EUHuJHt">Discord</a>
+        <a target="_blank" href="https://twitter.com/modrinth">Twitter</a>
+        <a target="_blank" rel="me" href="https://floss.social/@modrinth">
+          Mastodon
+        </a>
+        <a target="_blank" href="https://crowdin.com/project/modrinth">
+          Crowdin
+        </a>
       </div>
       <div class="buttons">
-        <button class="iconified-button" @click="changeTheme">
+        <button class="iconified-button raised-button" @click="changeTheme">
           <MoonIcon v-if="$colorMode.value === 'light'" aria-hidden="true" />
           <SunIcon v-else aria-hidden="true" />
           Change theme
         </button>
+        <nuxt-link class="iconified-button raised-button" to="/settings">
+          <SettingsIcon aria-hidden="true" />
+          Settings
+        </nuxt-link>
       </div>
     </footer>
   </div>
@@ -366,13 +399,18 @@ import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
 import LogOutIcon from '~/assets/images/utils/log-out.svg?inline'
 import HeartIcon from '~/assets/images/utils/heart.svg?inline'
+import ChartIcon from '~/assets/images/utils/chart.svg?inline'
 
 import GitHubIcon from '~/assets/images/utils/github.svg?inline'
-
-const overflowStyle = 'scroll'
+import NavRow from '~/components/ui/NavRow'
+import ModalCreation from '~/components/ui/ModalCreation'
+import Avatar from '~/components/ui/Avatar'
 
 export default {
   components: {
+    Avatar,
+    ModalCreation,
+    NavRow,
     ModrinthLogo,
     MoonIcon,
     SunIcon,
@@ -387,6 +425,7 @@ export default {
     PlusIcon,
     DropdownIcon,
     HeartIcon,
+    ChartIcon,
   },
   directives: {
     ClickOutside,
@@ -401,27 +440,32 @@ export default {
       isMobileMenuOpen: false,
       isBrowseMenuOpen: false,
       registeredSkipLink: null,
-      moderationNotifications: 0,
+      hideDropdown: false,
     }
   },
   async fetch() {
     await Promise.all([
       this.$store.dispatch('user/fetchAll', { force: true }),
-      this.$store.dispatch('tag/fetchAllTags'),
       this.$store.dispatch('cosmetics/fetchCosmetics', this.$cookies),
     ])
-    if (
-      (this.$auth.user && this.$auth.user.role === 'moderator') ||
-      (this.$auth.user && this.$auth.user.role === 'admin')
-    ) {
-      const [projects, reports] = (
-        await Promise.all([
-          this.$axios.get(`moderation/projects`, this.$defaultHeaders()),
-          this.$axios.get(`report`, this.$defaultHeaders()),
-        ])
-      ).map((it) => it.data)
+  },
+  head() {
+    const link = process.env.domain + this.$route.path.replace(/\/+$/, '')
 
-      this.moderationNotifications = projects.length + reports.length
+    return {
+      link: [
+        {
+          rel: 'canonical',
+          href: link,
+        },
+      ],
+      meta: [
+        {
+          hid: 'og:url',
+          name: 'og:url',
+          content: link,
+        },
+      ],
     }
   },
   computed: {
@@ -431,13 +475,13 @@ export default {
   },
   watch: {
     $route() {
-      this.$refs.mobileMenu.className = 'mobile-menu'
-      this.isMobileMenuOpen =
-        this.$refs.mobileMenu.className === 'mobile-menu active'
-
-      document.body.style.overflowY = overflowStyle
+      this.isMobileMenuOpen = false
+      document.body.style.overflowY = 'scroll'
 
       this.$store.dispatch('user/fetchAll')
+
+      document.body.setAttribute('tabindex', '-1')
+      document.body.removeAttribute('tabindex')
     },
   },
   beforeCreate() {
@@ -453,54 +497,29 @@ export default {
   methods: {
     toggleMobileMenu() {
       window.scrollTo(0, 0)
-      const currentlyActive =
-        this.$refs.mobileMenu.className === 'mobile-menu active'
-      this.$refs.mobileMenu.className = `mobile-menu${
-        currentlyActive ? '' : ' active'
-      }`
       document.body.scrollTop = 0
 
-      document.body.style.overflowY =
-        document.body.style.overflowY !== 'hidden' ? 'hidden' : overflowStyle
-
-      this.isMobileMenuOpen = !currentlyActive
+      this.isMobileMenuOpen = !this.isMobileMenuOpen
 
       if (this.isMobileMenuOpen) {
-        this.$refs.mobileNavBar.className = `mobile-navbar`
-        this.$refs.layout.className = `layout`
-
+        document.body.style.overflowY = 'hidden'
         this.isBrowseMenuOpen = false
+      } else {
+        document.body.style.overflowY = 'scroll'
       }
     },
     toggleBrowseMenu() {
-      const currentlyActive =
-        this.$refs.mobileNavBar.className === 'mobile-navbar expanded'
-      this.$refs.mobileNavBar.className = `mobile-navbar${
-        currentlyActive ? '' : ' expanded'
-      }`
-      this.$refs.layout.className = `layout${
-        currentlyActive ? '' : ' expanded-mobile-nav'
-      }`
-
-      this.isBrowseMenuOpen = !currentlyActive
+      this.isBrowseMenuOpen = !this.isBrowseMenuOpen
 
       if (this.isBrowseMenuOpen) {
-        this.$refs.mobileMenu.className = `mobile-menu`
-
         this.isMobileMenuOpen = false
       }
-    },
-    closeBrowseMenu() {
-      this.$refs.mobileNavBar.className = `mobile-navbar`
-      this.$refs.layout.className = `layout`
-
-      this.isBrowseMenuOpen = false
     },
     async logout() {
       this.$cookies.set('auth-token-reset', true)
       // If users logs out on dashboard, force redirect on the home page to clear cookies
-      if (this.$route.path.startsWith('/settings')) {
-        window.location.href = '/'
+      if (this.$route.path.startsWith('/settings/')) {
+        window.location.href = '/settings'
       } else {
         await this.$router.go(null)
 
@@ -515,9 +534,6 @@ export default {
     changeTheme() {
       this.$colorMode.preference =
         this.$colorMode.value === 'dark' ? 'light' : 'dark'
-    },
-    removeFocus() {
-      document.activeElement.blur() // This doesn't work, sadly. Help
     },
   },
 }
@@ -575,7 +591,6 @@ export default {
 
     .navbar {
       margin: 0 var(--spacing-card-lg);
-      padding: 0 var(--spacing-card-lg);
       max-width: 1280px;
       margin-left: auto;
       margin-right: auto;
@@ -631,12 +646,12 @@ export default {
         section.nav {
           flex-grow: 5;
 
-          .styled-tabs {
+          .navigation {
             display: flex;
+            width: fit-content;
             position: relative;
             top: 50%;
             transform: translateY(-50%);
-            margin-top: 3px;
             margin-left: 2rem;
 
             a {
@@ -664,7 +679,7 @@ export default {
         }
 
         .user-outer {
-          z-index: 20;
+          z-index: 5;
         }
 
         section.user-controls {
@@ -675,48 +690,41 @@ export default {
           position: relative;
           top: 50%;
           transform: translateY(-50%);
-          min-width: 12rem;
+          min-width: 6rem;
 
           .control-button {
+            position: relative;
             display: flex;
-            max-width: 2rem;
-            padding: 0.5rem;
-            background-color: var(--color-raised-bg);
-            border-radius: var(--size-rounded-max);
-            margin: 0 0.5rem 0 0;
-            box-shadow: inset 0px -1px 1px rgba(17, 24, 39, 0.1);
-
-            &:hover,
-            &:focus-visible {
-              background-color: var(--color-button-bg-hover);
-              color: var(--color-button-text-hover);
-            }
-
-            &:active {
-              background-color: var(--color-button-bg-active);
-              color: var(--color-button-text-active);
-            }
+            padding: 0.5rem 0.5rem;
+            margin: 0 1rem 0 0;
+            color: var(--color-text);
+            border-radius: 2rem;
+            transition: filter 0.1s ease-in-out;
+            border: 2px solid transparent;
+            box-sizing: border-box;
 
             svg {
-              height: 1rem;
-              width: 1rem;
+              height: 1.25rem;
+              width: 1.25rem;
             }
 
-            .bubble {
-              position: absolute;
-              margin-left: 0.5rem;
-              bottom: 1rem;
-              border-radius: 0.9rem;
-              height: 0.8rem;
-              padding: 0 0.25rem;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-
-              font-size: 0.6rem;
-              background-color: var(--color-brand);
-              color: var(--color-brand-inverted);
+            &.bubble {
+              &::after {
+                background-color: var(--color-brand);
+                border-radius: var(--size-rounded-max);
+                content: '';
+                height: 0.5rem;
+                position: absolute;
+                right: 0.25rem;
+                top: 0.5rem;
+                width: 0.5rem;
+              }
             }
+
+            //&.nuxt-link-exact-active {
+            //  color: var(--color-button-text-active);
+            //  background-color: var(--color-button-bg);
+            //}
           }
 
           .hide-desktop {
@@ -734,14 +742,14 @@ export default {
               padding: 0;
 
               .user-icon {
-                border-radius: 100%;
                 height: 2rem;
-                outline: 2px solid var(--color-raised-bg);
                 width: 2rem;
+                outline: 2px solid var(--color-raised-bg);
+                transition: outline-color 0.1s ease-in-out;
               }
 
               .caret {
-                color: inherit;
+                color: var(--color-button-text);
                 margin-left: 0.25rem;
                 width: 1rem;
               }
@@ -765,6 +773,7 @@ export default {
               visibility: hidden;
               width: max-content;
               z-index: 1;
+              box-shadow: var(--shadow-floating);
 
               .divider {
                 background-color: var(--color-divider-dark);
@@ -776,7 +785,6 @@ export default {
 
               .item {
                 align-items: center;
-                background: none;
                 border-radius: 0.5rem;
                 box-sizing: border-box;
                 color: inherit;
@@ -789,11 +797,20 @@ export default {
                   height: 20px;
                   width: 20px;
                 }
-              }
 
-              .item:hover,
-              .item:focus {
-                background-color: var(--color-bg);
+                &.nuxt-link-exact-active {
+                  color: var(--color-button-text-active);
+                  background-color: var(--color-button-bg);
+
+                  .profile-link {
+                    .username {
+                      margin-block: 0.7rem;
+                    }
+                    .prompt {
+                      display: none;
+                    }
+                  }
+                }
               }
 
               .profile-link {
@@ -811,13 +828,13 @@ export default {
             }
           }
 
-          .dropdown:hover .user-icon,
-          .dropdown:focus .user-icon,
-          .dropdown:focus-within .user-icon {
-            outline-color: var(--color-raised-bg-hover);
+          .dropdown:hover .user-icon {
+            outline-color: var(--color-brand);
           }
 
-          .dropdown:hover .content {
+          .dropdown:hover:not(.closed) .content,
+          .dropdown:focus:not(.closed) .content,
+          .dropdown:focus-within:not(.closed) .content {
             opacity: 1;
             transform: scaleY(1);
             visibility: visible;
@@ -832,43 +849,12 @@ export default {
 
           .log-in-button {
             margin: 0 auto;
-
-            display: flex;
-            align-items: center;
-
-            text-align: center;
-            border-radius: var(--size-rounded-max);
-            background-color: var(--color-brand);
-            white-space: nowrap;
-            //outline: none; Bad for accessibility
-            color: var(--color-brand-inverted);
-            padding: 0.5rem 0.75rem;
-
-            svg {
-              vertical-align: middle;
-              margin-right: 0.5rem;
-            }
-
-            &:hover,
-            &:focus {
-              background-color: var(--color-brand-hover);
-            }
-
-            &:active {
-              background-color: var(--color-brand-active);
-            }
           }
         }
       }
 
       @media screen and (max-width: 750px) {
-        section.nav-group {
-          display: none;
-
-          .hide-desktop {
-            display: unset;
-          }
-        }
+        display: none;
       }
     }
 
@@ -953,7 +939,7 @@ export default {
         }
       }
 
-      .disable-childern {
+      .disable-children {
         a {
           pointer-events: none;
         }
@@ -965,17 +951,18 @@ export default {
         justify-content: center;
         flex-wrap: wrap;
         row-gap: 0.5rem;
+        margin-inline: var(--spacing-card-sm);
 
         .tab {
           flex: 0 0 fit-content;
           background-color: var(--color-button-bg);
-          padding: 0.5rem 1.25rem;
+          padding: 0.4rem 1.25rem;
           margin: 0 0.25rem;
-          border-radius: var(--size-rounded-max);
+          max-height: unset;
 
           &.nuxt-link-exact-active {
-            background-color: var(--color-brand);
             color: var(--color-brand-inverted);
+            background-color: var(--color-brand);
           }
         }
       }
@@ -994,6 +981,7 @@ export default {
     display: none;
     position: absolute;
     top: 0;
+    left: 0;
     background-color: var(--color-bg);
     height: 100%;
     width: 100%;
@@ -1008,45 +996,47 @@ export default {
       .items-container {
         margin: 1rem 2rem;
 
-        button {
-          box-sizing: unset;
-        }
-
-        .item {
-          padding: 1rem 2rem;
-          background-color: var(--color-raised-bg);
-          border-radius: var(--size-rounded-md);
+        .iconified-button {
+          box-sizing: border-box;
+          padding: 0.85rem 1.5rem;
           align-items: center;
           justify-content: center;
           display: flex;
           column-gap: 0.25rem;
-          width: calc(100% - 4rem);
-          max-width: 18rem;
+          width: 100%;
+          max-width: 20rem;
+          max-height: unset;
+
+          svg {
+            height: 1.25rem;
+            width: 1.25rem;
+          }
 
           &.nuxt-link-exact-active {
-            color: var(--color-button-text-active);
-
-            svg {
-              color: var(--color-brand);
-            }
-          }
-
-          &.log-in {
             color: var(--color-brand-inverted);
             background-color: var(--color-brand);
-          }
 
-          &.log-out {
-            color: white;
-            background-color: var(--color-badge-red-bg);
+            .profile-link {
+              .prompt {
+                display: none;
+              }
+            }
+
+            .beta-badge {
+              background-color: var(--color-brand-inverted);
+              box-sizing: border-box;
+              outline: none;
+              color: var(--color-text-dark);
+            }
           }
 
           &.user-item {
             flex-direction: column;
             row-gap: 0.5rem;
-            //width: 8rem;
-            max-width: 18rem;
+            width: fit-content;
+            max-width: 16rem;
             flex-grow: 0;
+            padding-inline: 3rem;
 
             .profile-link {
               text-align: center;
@@ -1091,10 +1081,10 @@ export default {
     text-align: center;
     display: grid;
     grid-template:
-      'logo-info logo-info' auto
-      'links-1   links-2' auto
-      'buttons buttons' auto
-      / 1fr 1fr;
+      'logo-info logo-info logo-info' auto
+      'links-1   links-2   links-3' auto
+      'buttons   buttons   buttons' auto
+      / 1fr 1fr 1fr;
 
     .logo-info {
       margin-left: auto;
@@ -1130,6 +1120,10 @@ export default {
       &.links-2 {
         grid-area: links-2;
       }
+
+      &.links-3 {
+        grid-area: links-3;
+      }
     }
 
     .buttons {
@@ -1139,16 +1133,9 @@ export default {
 
       button,
       a {
-        background-color: var(--color-raised-bg);
-
         margin-bottom: 0.5rem;
         margin-left: auto;
         margin-right: auto;
-
-        &:hover,
-        &:focus-visible {
-          background-color: var(--color-button-bg-hover);
-        }
       }
     }
 

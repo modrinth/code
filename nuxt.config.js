@@ -1,5 +1,9 @@
+import { promises as fs } from 'fs'
 import { sortRoutes } from '@nuxt/utils'
 import axios from 'axios'
+
+const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
+const STAGING_ARIADNE_URL = 'https://staging-ariadne.modrinth.com/v1/'
 
 export default {
   /*
@@ -15,7 +19,7 @@ export default {
     htmlAttrs: {
       lang: 'en',
     },
-    title: 'Modrinth: Download and publish Minecraft Mods',
+    title: 'Modrinth',
     meta: [
       {
         charset: 'utf-8',
@@ -28,13 +32,17 @@ export default {
         hid: 'description',
         name: 'description',
         content:
-          'Download Minecraft Fabric and Forge mods on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
+          'Download Minecraft mods, plugins, resource packs, and modpacks on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
       },
-
       {
         hid: 'publisher',
         name: 'publisher',
         content: 'Rinth, Inc.',
+      },
+      {
+        hid: 'og:title',
+        name: 'og:title',
+        content: 'Modrinth',
       },
       {
         hid: 'apple-mobile-web-app-title',
@@ -44,14 +52,13 @@ export default {
       {
         hid: 'theme-color',
         name: 'theme-color',
-        content: '#30b27b',
+        content: '#1bd96a',
       },
       {
         hid: 'color-scheme',
         name: 'color-scheme',
         content: 'light dark',
       },
-
       {
         hid: 'og:site_name',
         name: 'og:site_name',
@@ -63,11 +70,6 @@ export default {
         content: 'An open source modding platform',
       },
       {
-        hid: 'og:title',
-        name: 'og:title',
-        content: 'Modrinth',
-      },
-      {
         hid: 'og:type',
         name: 'og:type',
         content: 'website',
@@ -75,12 +77,12 @@ export default {
       {
         hid: 'og:url',
         name: 'og:url',
-        content: 'https://www.modrinth.com',
+        content: 'https://modrinth.com',
       },
       {
         hid: 'og:image',
         name: 'og:image',
-        content: 'https://cdn.modrinth.com/modrinth-new.png',
+        content: 'https://cdn.modrinth.com/modrinth-new.png?',
       },
       {
         hid: 'twitter:card',
@@ -97,7 +99,20 @@ export default {
       {
         rel: 'icon',
         type: 'image/x-icon',
+        href: '/favicon-light.ico',
+        media: '(prefers-color-scheme:no-preference)',
+      },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
         href: '/favicon.ico',
+        media: '(prefers-color-scheme:dark)',
+      },
+      {
+        rel: 'icon',
+        type: 'image/x-icon',
+        href: '/favicon-light.ico',
+        media: '(prefers-color-scheme:light)',
       },
       {
         rel: 'stylesheet',
@@ -114,7 +129,7 @@ export default {
 
   vue: {
     config: {
-      devtools: false,
+      devtools: true,
     },
   },
   router: {
@@ -194,7 +209,6 @@ export default {
     '@nuxtjs/dayjs',
     '@nuxtjs/axios',
     '@nuxtjs/robots',
-    '@nuxtjs/sitemap',
     '@nuxtjs/style-resources',
     '@nuxtjs/markdownit',
     'cookie-universal-nuxt',
@@ -207,24 +221,12 @@ export default {
   robots: {
     Sitemap: 'https://modrinth.com/sitemap.xml',
   },
-  sitemap: {
-    exclude: [
-      '/settings/**',
-      '/settings',
-      '/notifications',
-      '/moderation',
-      '/search',
-      '/search/**',
-      '/create/**',
-    ],
-    routes: ['mods', 'modpacks', 'resourcepacks', 'plugins'],
-  },
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://staging-api.modrinth.com/v2/',
+    baseURL: getApiUrl(),
     headers: {
       common: {
         Accept: 'application/json',
@@ -260,7 +262,6 @@ export default {
     },
   },
   markdownit: {
-    runtime: true,
     preset: 'default',
     html: true,
     linkify: true,
@@ -276,8 +277,7 @@ export default {
     branch: process.env.VERCEL_GIT_COMMIT_REF || 'master',
     hash: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
     domain: getDomain(),
-    authURLBase:
-      process.env.BROWSER_BASE_URL || 'https://staging-api.modrinth.com/v2/',
+    authURLBase: getApiUrl(),
   },
   publicRuntimeConfig: {
     axios: {
@@ -287,9 +287,7 @@ export default {
       ethicalAds: process.env.ETHICAL_ADS,
     },
     analytics: {
-      base_url:
-        process.env.BROWSER_ARIADNE_URL ||
-        'https://staging-ariadne.modrinth.com/v1/',
+      base_url: process.env.BROWSER_ARIADNE_URL || STAGING_ARIADNE_URL,
     },
   },
   privateRuntimeConfig: {
@@ -303,15 +301,83 @@ export default {
     },
   },
   hooks: {
+    build: {
+      async before(nuxt, buildOptions) {
+        // 30 minutes
+        const TTL = 30 * 60 * 1000
+
+        let state = {}
+        try {
+          state = JSON.parse(
+            await fs.readFile('./generated/state.json', 'utf8')
+          )
+        } catch {
+          // File doesn't exist, create folder
+          await fs.mkdir('./generated', { recursive: true })
+        }
+
+        const API_URL = getApiUrl()
+
+        if (
+          // Skip regeneration if within TTL...
+          state.lastGenerated &&
+          new Date(state.lastGenerated).getTime() + TTL >
+            new Date().getTime() &&
+          // ...but only if the API URL is the same
+          state.apiUrl &&
+          state.apiUrl === API_URL
+        ) {
+          return
+        }
+
+        console.log('Generating tags...')
+
+        state.lastGenerated = new Date().toISOString()
+
+        state.apiUrl = API_URL
+
+        const headers = {
+          headers: {
+            'user-agent': `Knossos generator (admin@modrinth.com)`,
+          },
+        }
+
+        const [
+          categories,
+          loaders,
+          gameVersions,
+          licenses,
+          donationPlatforms,
+          reportTypes,
+        ] = (
+          await Promise.all([
+            axios.get(`${API_URL}tag/category`, headers),
+            axios.get(`${API_URL}tag/loader`, headers),
+            axios.get(`${API_URL}tag/game_version`, headers),
+            axios.get(`${API_URL}tag/license`, headers),
+            axios.get(`${API_URL}tag/donation_platform`, headers),
+            axios.get(`${API_URL}tag/report_type`, headers),
+          ])
+        ).map((it) => it.data)
+
+        state.categories = categories
+        state.loaders = loaders
+        state.gameVersions = gameVersions
+        state.licenses = licenses
+        state.donationPlatforms = donationPlatforms
+        state.reportTypes = reportTypes
+
+        await fs.writeFile('./generated/state.json', JSON.stringify(state))
+
+        console.log('Tags generated!')
+      },
+    },
     render: {
       routeDone(url, result, context) {
         setTimeout(() => {
           axios
             .post(
-              `${
-                process.env.ARIADNE_URL ||
-                'https://staging-ariadne.modrinth.com/v1/'
-              }view`,
+              `${process.env.ARIADNE_URL || STAGING_ARIADNE_URL}view`,
               {
                 url: getDomain() + url,
               },
@@ -340,6 +406,10 @@ export default {
   },
 }
 
+function getApiUrl() {
+  return process.env.BROWSER_BASE_URL ?? STAGING_API_URL
+}
+
 function getDomain() {
   if (process.env.NODE_ENV === 'production') {
     if (process.env.SITE_URL) {
@@ -348,6 +418,8 @@ function getDomain() {
       return `https://${process.env.HEROKU_APP_NAME}.herokuapp.com`
     } else if (process.env.VERCEL_URL) {
       return `https://${process.env.VERCEL_URL}`
+    } else if (getApiUrl() === STAGING_API_URL) {
+      return 'https://staging.modrinth.com'
     } else {
       return 'https://modrinth.com'
     }

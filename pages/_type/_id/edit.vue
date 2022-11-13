@@ -1,40 +1,42 @@
 <template>
-  <div class="page-contents">
-    <header class="card">
-      <div class="columns">
-        <h3 class="column-grow-1">Edit project</h3>
-        <nuxt-link
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/settings`"
-          class="iconified-button column"
-        >
-          <CrossIcon />
-          Cancel
-        </nuxt-link>
-        <button
-          v-if="
-            project.status === 'rejected' ||
-            project.status === 'draft' ||
-            project.status === 'unlisted'
-          "
-          title="Submit for review"
-          class="iconified-button column"
-          :disabled="!$nuxt.$loading"
-          @click="saveProjectReview"
-        >
-          <CheckIcon />
-          Submit for review
-        </button>
-        <button
-          title="Save"
-          class="iconified-button brand-button-colors column"
-          :disabled="!$nuxt.$loading"
-          @click="saveProjectNotForReview"
-        >
-          <SaveIcon />
-          Save changes
-        </button>
+  <div class="page-contents legacy-label-styles">
+    <header class="header-card">
+      <div class="header__row">
+        <h2 class="header__title">Edit project</h2>
+        <div class="input-group">
+          <nuxt-link
+            :to="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/settings`"
+            class="iconified-button column"
+          >
+            <CrossIcon />
+            Cancel
+          </nuxt-link>
+          <button
+            v-if="
+              project.status === 'rejected' ||
+              project.status === 'draft' ||
+              project.status === 'unlisted'
+            "
+            title="Submit for review"
+            class="iconified-button column"
+            :disabled="!$nuxt.$loading"
+            @click="saveProjectReview"
+          >
+            <CheckIcon />
+            Submit for review
+          </button>
+          <button
+            title="Save"
+            class="iconified-button brand-button column"
+            :disabled="!$nuxt.$loading"
+            @click="saveProjectNotForReview"
+          >
+            <SaveIcon />
+            Save changes
+          </button>
+        </div>
       </div>
       <div v-if="showKnownErrors" class="known-errors">
         <ul>
@@ -43,7 +45,7 @@
             Your project must have a summary.
           </li>
           <li v-if="newProject.slug === ''">
-            Your project must have a vanity URL.
+            Your project cannot have an empty URL suffix.
           </li>
           <li v-if="!savingAsDraft && newProject.body === ''">
             Your project must have a body to submit for review.
@@ -74,6 +76,7 @@
           :class="{ 'known-error': newProject.title === '' && showKnownErrors }"
           type="text"
           placeholder="Enter the name"
+          maxlength="64"
           :disabled="
             (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
           "
@@ -94,6 +97,7 @@
           }"
           type="text"
           placeholder="Enter the summary"
+          maxlength="256"
           :disabled="
             (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
           "
@@ -164,45 +168,49 @@
           @input="setCategories"
         />
       </label>
-      <label class="vertical-input">
-        <span>
-          <h3>Vanity URL (slug)<span class="required">*</span></h3>
-          <span class="slug-description"
-            >https://modrinth.com/{{ project.project_type.toLowerCase() }}/{{
-              newProject.slug ? newProject.slug : 'your-slug'
-            }}
-          </span>
-        </span>
-        <input
-          id="name"
-          v-model="newProject.slug"
+      <div class="universal-labels">
+        <label for="slug">
+          <span class="label__title">URL<span class="required">*</span></span>
+        </label>
+        <div
+          class="text-input-wrapper"
           :class="{ 'known-error': newProject.slug === '' && showKnownErrors }"
-          type="text"
-          placeholder="Enter the vanity URL"
-          :disabled="
-            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
-          "
-        />
-      </label>
+        >
+          <div class="text-input-wrapper__before">
+            https://modrinth.com/{{ project.project_type.toLowerCase() }}/
+          </div>
+          <!-- this is a textarea so it is horizontally scrollable on mobile -->
+          <textarea
+            id="slug"
+            v-model="newProject.slug"
+            type="text"
+            maxlength="64"
+            autocorrect="off"
+            autocomplete="off"
+            autocapitalize="none"
+            rows="1"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
+            @input="manualSlug = true"
+          />
+        </div>
+      </div>
     </section>
     <section class="card project-icon">
       <h3>Icon</h3>
-      <img
-        :src="
-          previewImage
-            ? previewImage
-            : newProject.icon_url && !iconChanged
-            ? newProject.icon_url
-            : 'https://cdn.modrinth.com/placeholder.svg'
-        "
+      <Avatar
+        size="lg"
+        class="avatar"
+        :src="previewImage ? previewImage : newProject.icon_url"
         alt="preview-image"
       />
-      <SmartFileInput
+      <FileInput
         :max-size="262144"
-        :show-icon="false"
+        :show-icon="true"
         accept="image/png,image/jpeg,image/gif,image/webp"
         class="choose-image"
-        prompt="Choose image or drag it here"
+        prompt="Choose image"
         :disabled="(currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS"
         @change="showPreviewImage"
       />
@@ -212,11 +220,11 @@
         @click="
           icon = null
           previewImage = null
-          iconChanged = true
+          iconChanged = false
         "
       >
-        <TrashIcon />
-        Reset
+        <RevertIcon />
+        Revert
       </button>
     </section>
     <section
@@ -289,7 +297,7 @@
         >. HTML can also be used inside your description, not including styles,
         scripts, and iframes (though YouTube iframes are allowed).
       </span>
-      <ThisOrThat
+      <Chips
         v-model="bodyViewMode"
         class="separator"
         :items="['source', 'preview']"
@@ -329,6 +337,7 @@
           v-model="newProject.issues_url"
           type="url"
           placeholder="Enter a valid URL"
+          maxlength="2048"
           :disabled="
             (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
           "
@@ -341,6 +350,7 @@
         <input
           v-model="newProject.source_url"
           type="url"
+          maxlength="2048"
           placeholder="Enter a valid URL"
         />
       </label>
@@ -351,17 +361,22 @@
         <input
           v-model="newProject.wiki_url"
           type="url"
+          maxlength="2048"
           placeholder="Enter a valid URL"
           :disabled="
             (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
           "
         />
       </label>
-      <label title="An invitation link to your Discord server.">
+      <label
+        class="no-margin"
+        title="An invitation link to your Discord server."
+      >
         <span>Discord invite</span>
         <input
           v-model="newProject.discord_url"
           type="url"
+          maxlength="2048"
           placeholder="Enter a valid URL"
           :disabled="
             (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
@@ -389,7 +404,7 @@
           >
           for more information.
         </span>
-        <div class="input-group">
+        <div class="legacy-input-group">
           <Multiselect
             v-model="license"
             placeholder="Choose license..."
@@ -407,7 +422,11 @@
           <input
             v-model="license_url"
             type="url"
+            maxlength="2048"
             placeholder="License URL"
+            :class="{
+              'known-error': newProject.license_url === '' && showKnownErrors,
+            }"
             :disabled="
               (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
             "
@@ -415,21 +434,23 @@
         </div>
       </label>
     </section>
-    <section class="card donations">
-      <div class="title">
-        <h3>Donation links</h3>
-        <button
-          title="Add a link"
-          class="iconified-button"
-          :disabled="false"
-          @click="
-            donationPlatforms.push({})
-            donationLinks.push('')
-          "
-        >
-          <PlusIcon />
-          Add a link
-        </button>
+    <section class="header-card donations">
+      <div class="header__row">
+        <h3 class="header__title">Donation links</h3>
+        <div class="input-group">
+          <button
+            title="Add a link"
+            class="iconified-button"
+            :disabled="false"
+            @click="
+              donationPlatforms.push({})
+              donationLinks.push('')
+            "
+          >
+            <PlusIcon />
+            Add a link
+          </button>
+        </div>
       </div>
       <div v-for="(item, index) in donationPlatforms" :key="index">
         <label title="The donation link.">
@@ -438,6 +459,7 @@
             v-model="donationLinks[index]"
             type="url"
             placeholder="Enter a valid URL"
+            class="donation-link-input"
           />
         </label>
         <label title="The donation platform of the link.">
@@ -482,29 +504,24 @@ import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 import SaveIcon from '~/assets/images/utils/save.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import RevertIcon from '~/assets/images/utils/undo.svg?inline'
 
-import ThisOrThat from '~/components/ui/ThisOrThat'
-import SmartFileInput from '~/components/ui/SmartFileInput'
+import Chips from '~/components/ui/Chips'
+import FileInput from '~/components/ui/FileInput'
+import Avatar from '~/components/ui/Avatar'
 
 export default {
   components: {
-    SmartFileInput,
-    ThisOrThat,
+    Avatar,
+    FileInput,
+    Chips,
     Multiselect,
     CrossIcon,
     CheckIcon,
     PlusIcon,
     SaveIcon,
     TrashIcon,
-  },
-  beforeRouteLeave(to, from, next) {
-    if (
-      this.isEditing &&
-      !window.confirm('Are you sure that you want to leave without saving?')
-    ) {
-      return
-    }
-    next()
+    RevertIcon,
   },
   props: {
     project: {
@@ -550,6 +567,7 @@ export default {
 
       showKnownErrors: false,
       savingAsDraft: false,
+      manualSlug: false,
     }
   },
   fetch() {
@@ -601,16 +619,6 @@ export default {
       }
     },
   },
-  mounted() {
-    function preventLeave(e) {
-      e.preventDefault()
-      e.returnValue = ''
-    }
-    window.addEventListener('beforeunload', preventLeave)
-    this.$once('hook:beforeDestroy', () => {
-      window.removeEventListener('beforeunload', preventLeave)
-    })
-  },
   created() {
     this.UPLOAD_VERSION = 1 << 0
     this.DELETE_VERSION = 1 << 1
@@ -643,7 +651,7 @@ export default {
       const reviewConditions =
         this.newProject.body !== '' && this.newProject.versions.length > 0
       if (
-        this.newProject.name !== '' &&
+        this.newProject.title !== '' &&
         this.newProject.description !== '' &&
         this.newProject.slug !== '' &&
         this.license.short !== null &&
@@ -789,13 +797,13 @@ label {
 
   input,
   .multiselect,
-  .input-group {
+  .legacy-input-group {
     flex: 3;
     height: fit-content;
   }
 }
 
-.input-group {
+.legacy-input-group {
   display: flex;
   flex-direction: column;
 
@@ -849,24 +857,10 @@ label {
 
 header {
   grid-area: header;
-  padding: var(--spacing-card-md) var(--spacing-card-lg);
-
-  h3 {
-    margin: auto 0;
-    color: var(--color-text-dark);
-    font-weight: var(--font-weight-extrabold);
-  }
-
-  button {
-    margin-left: 0.5rem;
-  }
 }
 
 section.essentials {
   grid-area: essentials;
-  label {
-    margin-bottom: 0.5rem;
-  }
 
   @media screen and (min-width: 1024px) {
     input {
@@ -877,15 +871,17 @@ section.essentials {
 
 section.project-icon {
   grid-area: project-icon;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-card-sm);
 
-  img {
-    max-width: 100%;
-    margin-bottom: 0.25rem;
-    border-radius: var(--size-rounded-lg);
+  .avatar {
+    margin-bottom: var(--spacing-card-sm);
   }
 
   .iconified-button {
-    margin-top: 0.5rem;
+    margin-top: var(--spacing-card-sm);
   }
 }
 
@@ -901,10 +897,6 @@ section.game-sides {
 
     .labeled-control {
       margin-left: var(--spacing-card-lg);
-
-      h3 {
-        margin-bottom: var(--spacing-card-sm);
-      }
     }
   }
 }
@@ -959,10 +951,6 @@ section.donations {
       flex: 1;
     }
   }
-
-  button {
-    margin: 0.5rem 0;
-  }
 }
 
 .footer {
@@ -973,7 +961,9 @@ section.donations {
   cursor: pointer;
 }
 
-.card {
+.card,
+.universal-card,
+.header-card {
   margin-bottom: 0;
 }
 
@@ -990,5 +980,36 @@ section.donations {
   input {
     margin-left: 0 !important;
   }
+}
+
+.legacy-input-group {
+  display: flex;
+  flex-direction: column;
+
+  * {
+    margin-bottom: var(--spacing-card-sm);
+  }
+}
+
+.text-input-wrapper {
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  textarea {
+    width: 100%;
+    height: 100%;
+    margin-left: 0 !important;
+    white-space: nowrap;
+    overflow-x: auto;
+    overflow-y: none;
+    resize: none;
+    min-height: 0;
+  }
+  margin-bottom: var(--spacing-card-md);
+}
+
+.donation-link-input {
+  width: 100%;
 }
 </style>

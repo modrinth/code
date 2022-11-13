@@ -1,0 +1,14 @@
+name: Regenerate tags
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Re-deploy site
+        run: |
+          curl -X POST \
+            ${{ secrets.VERCEL_DEPLOY_URL }}

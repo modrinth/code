@@ -3,7 +3,11 @@ export default function (context) {
     return
   }
 
-  if (context.from.path === context.route.path) {
+  if (
+    context.from &&
+    context.route &&
+    context.from.path === context.route.path
+  ) {
     return
   }
 

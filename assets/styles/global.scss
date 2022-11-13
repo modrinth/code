@@ -11,7 +11,7 @@ html {
   --color-text-inactive: hsl(215, 14%, 34%);
   --color-text-dark: #1a202c;
   --color-heading: #2c313d;
-  --color-bg: hsl(220, 13%, 91%);
+  --color-bg: #e5e7eb;
   --color-raised-bg: #ffffff;
   --color-divider: hsl(220, 13%, 91%);
   --color-divider-dark: #c8cdd3;
@@ -19,31 +19,24 @@ html {
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-brand: #30b27b;
-  --color-brand-hover: #1e9565;
-  --color-brand-active: #177955;
+  --color-brand: #00af5c;
+  --color-brand-highlight: rgba(0, 175, 92, 0.25);
+  --color-brand-shadow: rgba(0, 175, 92, 0.7);
   --color-brand-inverted: #ffffff;
 
   --tab-underline-hovered: #e2e8f0;
 
-  --color-button-bg: #e0e0e5;
+  --color-button-bg: hsl(220, 13%, 91%);
   --color-button-text: var(--color-text-dark);
   --color-button-bg-hover: #d9dce0;
   --color-button-text-hover: #1b1e24;
   --color-button-bg-active: #c3c6cb;
   --color-button-text-active: var(--color-button-text-hover);
-  --color-button-bg-disabled: #cacdd2;
-  --color-button-text-disabled: #9da3ac;
-  --color-transparent-button-bg-hover: var(--color-button-bg);
-  --color-transparent-button-text-hover: var(--color-text-dark);
-  --color-transparent-button-bg-active: var(--color-button-bg-hover);
-  --color-transparent-button-text-active: var(--color-text-dark);
+
+  --color-toggle-handle: var(--color-icon);
 
   --color-dropdown-bg: var(--color-button-bg);
   --color-dropdown-text: var(--color-button-text);
-
-  --color-category-bg: var(--color-bg);
-  --color-category-text: var(--color-text-dark);
 
   --color-tooltip-bg: var(--color-text);
   --color-tooltip-text: var(--color-bg);
@@ -56,14 +49,10 @@ html {
   --color-ad: #d6e6f9;
   --color-ad-raised: #b1c8e4;
 
-  --shadow-dropdown: 3px 3px 14px hsla(0, 0%, 0%, 0.15);
-  --shadow-dropdown-strong: 3px 3px 10px hsla(0, 0%, 0%, 0.3);
-  --shadow-tooltip: 0.2rem 0.2rem 10px rgba(0, 0, 0, 0.15);
-
   --color-grey-link: var(--color-text);
   --color-grey-link-hover: var(--color-heading);
   --color-grey-link-active: var(--color-text-dark);
-  --color-link: #2089ff;
+  --color-link: #0d60bb;
   --color-link-hover: #1a76e7;
   --color-link-active: #146fd7;
 
@@ -76,11 +65,11 @@ html {
   --color-badge-yellow-text: #755920;
   --color-badge-yellow-bg: #f7bb43;
 
-  --color-warning-text: hsl(358, 57%, 20%);
-  --color-warning-bg: hsl(358, 57%, 80%);
+  --color-warning-bg: hsl(355, 70%, 88%);
+  --color-warning-text: hsl(342, 70%, 35%);
 
   --color-banner-text: hsl(0, 11%, 16%);
-  --color-banner-bg: hsl(356, 59%, 77%);
+  --color-banner-bg: hsl(0, 100%, 95%);
   --color-banner-side: hsl(357, 78%, 40%);
 
   --color-block-quote: var(--color-tooltip-bg);
@@ -90,12 +79,18 @@ html {
   --color-table-border: #dfe2e5;
   --color-table-alternate-row: #f6f8fa;
 
-  --shadow-card: 0px 2px 4px 0px hsla(221, 39%, 11%, 0.1),
-    inset 0px -2px 2px 0px hsla(221, 39%, 11%, 0.05);
-  --shadow-image-md: 0px 2px 4px 0px hsla(221, 39%, 11%, 0.2),
-    inset 0px -2px 2px 0px hsla(221, 39%, 11%, 0.1);
+  --shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 11%, 0.1);
+  --shadow-inset: inset 0px -2px 2px hsla(221, 39%, 11%, 0.05);
+  --shadow-inset-sm: inset 0px -1px 2px hsla(221, 39%, 11%, 0.15);
 
-  --color-card-link-bg: rgba(0, 0, 0, 7%);
+  --shadow-raised-lg: 0px 2px 4px hsla(221, 39%, 11%, 0.2);
+  --shadow-raised: 0.3px 0.5px 0.6px hsl(var(--shadow-color) / 0.15),
+    1px 2px 2.2px -1.7px hsl(var(--shadow-color) / 0.12),
+    4.4px 8.8px 9.7px -3.4px hsl(var(--shadow-color) / 0.09);
+  --shadow-floating: hsla(0, 0%, 0%, 0) 0px 0px 0px 0px, hsla(0, 0%, 0%, 0) 0px 0px 0px 0px,
+  hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
+
+  --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
 }
 
 .dark-mode {
@@ -113,33 +108,26 @@ html {
   --color-bg-inverted: var(--color-text);
 
   --color-brand: #1bd96a;
-  --color-brand-hover: #2de391;
-  --color-brand-active: #55f5ae;
+  --color-brand-highlight: rgba(27, 217, 106, 0.25);
+  --color-brand-shadow: rgba(27, 217, 106, 0.7);
   --color-brand-inverted: #000;
 
   --tab-underline-hovered: #414146;
 
-  --color-button-bg: #3e434b;
+  --color-button-bg: hsl(222, 13%, 30%);
   --color-button-text: var(--color-text);
   --color-button-bg-hover: #494f58;
   --color-button-text-hover: #ffffff;
   --color-button-bg-active: #616570;
   --color-button-text-active: var(--color-button-text-hover);
-  --color-button-bg-disabled: #3a434d;
-  --color-button-text-disabled: #555d65;
-  --color-transparent-button-bg-hover: var(--color-button-bg);
-  --color-transparent-button-text-hover: var(--color-text-dark);
-  --color-transparent-button-bg-active: var(--color-button-bg-hover);
-  --color-transparent-button-text-active: var(--color-text-dark);
+
+  --color-toggle-handle: var(--color-button-text);
 
   --color-dropdown-bg: var(--color-button-bg);
   --color-dropdown-text: var(--color-button-text);
 
-  --color-category-bg: var(--color-button-bg);
-  --color-category-text: var(--color-text-dark);
-
-  --color-tooltip-bg: var(--color-text);
-  --color-tooltip-text: var(--color-bg);
+  --color-tooltip-bg: var(--color-button-bg);
+  --color-tooltip-text: var(--color-text);
 
   --color-code-bg: var(--color-button-bg);
   --color-code-text: var(--color-text-dark);
@@ -148,10 +136,6 @@ html {
 
   --color-ad: #1f324a;
   --color-ad-raised: #2e4057;
-
-  --shadow-dropdown: 3px 3px 14px hsla(0, 0%, 0%, 0.15);
-  --shadow-dropdown-strong: 3px 3px 20px hsla(0, 0%, 0%, 0.15);
-  --shadow-tooltip: 0.2rem 0.2rem 10px rgba(0, 0, 0, 0.15);
 
   --color-link: #74b6f3;
   --color-link-hover: #92c0f5;
@@ -166,8 +150,8 @@ html {
   --color-badge-yellow-text: #dba22d;
   --color-badge-yellow-bg: #f7bb43;
 
-  --color-warning-text: hsl(358, 57%, 85%);
-  --color-warning-bg: hsl(358, 57%, 25%);
+  --color-warning-bg: hsl(355, 70%, 20%);
+  --color-warning-text: hsl(342, 70%, 75%);
 
   --color-banner-text: hsl(0, 100%, 96%);
   --color-banner-bg: hsl(356, 18%, 18%);
@@ -180,7 +164,16 @@ html {
   --color-table-border: #4f5864;
   --color-table-alternate-row: #262a30;
 
-  --color-card-link-bg: rgb(255, 255, 255, 15%);
+  --shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 11%, 0.1);
+  --shadow-inset: inset 0px -2px 2px hsla(221, 39%, 11%, 0.05);
+  --shadow-inset-sm: inset 0px -1px 1px hsla(221, 39%, 11%, 0.25);
+
+  --shadow-raised-lg: 0px 2px 4px hsla(221, 39%, 11%, 0.2);
+  --shadow-raised: 0px -2px 4px hsla(221, 39%, 11%, 0.1);
+  --shadow-floating: hsla(0, 0%, 0%, 0) 0px 0px 0px 0px, hsla(0, 0%, 0%, 0) 0px 0px 0px 0px,
+  hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+
+  --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 }
 
 .oled-mode {
@@ -193,15 +186,21 @@ html {
   --color-button-bg-active: #3c3c40;
 }
 
+.midas-mode {
+  @extend .dark-mode;
+  --color-brand: #fac413;
+  --color-brand-shadow: rgba(250, 196, 19, 0.7);
+}
+
 body {
   // Defaults
   background-color: var(--color-bg);
   color: var(--color-text);
-  --font-standard: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
-    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --font-standard: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --mono-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
   font-family: var(--font-standard);
   font-size: 16px;
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-regular);
   margin: 0;
   padding: 0;
 
@@ -219,12 +218,13 @@ body {
 
   --size-navbar-height: 3.5rem;
   --size-mobile-navbar-height: 3.5rem;
-  --size-mobile-navbar-height-expanded: 10rem;
+  --size-mobile-navbar-height-expanded: 11.75rem;
 
   --spacing-card-lg: 1.5rem;
   --spacing-card-bg: 1rem;
   --spacing-card-md: 0.75rem;
   --spacing-card-sm: 0.5rem;
+  --spacing-card-xs: 0.25rem;
 
   // Font Sizes
   --font-size-xxs: 0.625rem; //10px
@@ -247,19 +247,27 @@ body {
   --font-weight-heading: var(--font-weight-extrabold);
   --font-weight-title: var(--font-weight-extrabold);
 
-  @media screen and (min-width: 501px) {
+  @media screen and (min-width: 318px) {
+    --size-mobile-navbar-height-expanded: 9.25rem;
+  }
+
+  @media screen and (min-width: 517px) {
     --size-mobile-navbar-height-expanded: 7rem;
   }
 }
 
 svg {
-  height: 24px;
-  width: 24px;
+  height: 1em;
+  width: 1em;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+h1 {
+  color: var(--color-text-dark);
 }
 
 h2 {
@@ -269,19 +277,17 @@ h2 {
 }
 
 h3 {
-  margin-top: 0.5rem;
-  margin-bottom: 0.25rem;
+  margin-block: var(--spacing-card-md) var(--spacing-card-sm);
   color: var(--color-text-dark);
 }
 
-button {
-  cursor: pointer;
-  @extend .button;
-}
-
 input {
-  border-radius: 2rem;
+  border-radius: var(--size-rounded-sm);
   box-sizing: border-box;
+  border: 2px solid transparent;
+  // safari iOS rounds inputs by default
+  // set the appearance to none to prevent this
+  appearance: none !important;
 }
 
 pre {
@@ -293,17 +299,15 @@ textarea {
   background: var(--color-button-bg);
   color: var(--color-text);
   padding: 0.5rem 1rem;
-  border: 2px solid transparent;
+  font-weight: var(--font-weight-medium);
+  border: none;
+  outline: none;
+  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  transition: box-shadow 0.1s ease-in-out;
+  min-height: 40px;
 
-  &:hover:not([disabled]):not(:focus) {
-    background: var(--color-button-bg-hover);
-    color: var(--color-button-text-hover);
-    border-color: var(--color-divider-dark);
-  }
-
-  &:focus {
-    outline: none !important;
-    border-color: var(--color-brand);
+  &:focus, &:focus-visible {
+    box-shadow: inset 0 0 0 transparent, 0 0 0 .25rem var(--color-brand-shadow);
     color: var(--color-button-text-active);
   }
 
@@ -313,26 +317,21 @@ textarea {
     pointer-events: none;
     cursor: not-allowed;
   }
+
+  &:focus::placeholder {
+    opacity: 0.8;
+  }
+
+  &::placeholder {
+    color: var(--color-button-text);
+    opacity: 0.6;
+  }
 }
 
-button {
-  padding: 0.5rem 0;
-  //outline: none; Bad for accessibility
-  color: var(--color-button-text);
-  background-color: var(--color-button-bg);
+button, input[type=button] {
+  cursor: pointer;
   border: none;
-  border-radius: var(--size-rounded-control);
-
-  &:focus-visible,
-  &:hover {
-    background-color: var(--color-button-bg-hover);
-    color: var(--color-button-text-hover);
-  }
-
-  &:active {
-    background-color: var(--color-button-bg-active);
-    color: var(--color-button-text-active);
-  }
+  outline: none;
 }
 
 kbd {
@@ -345,10 +344,13 @@ kbd {
   font-size: 0.85em !important;
 }
 
-// @import "vue-select/src/scss/vue-select.scss";
-
 @import '~assets/styles/highlightjs.scss';
 @import '~assets/styles/layout.scss';
 @import '~assets/styles/utils.scss';
 @import '~assets/styles/components.scss';
 @import '~assets/styles/normalize.scss';
+
+button:focus-visible, a:focus-visible, [tabindex="0"]:focus-visible {
+  outline: .25rem solid #ea80ff;
+  border-radius: .25rem;
+}

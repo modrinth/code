@@ -32,7 +32,7 @@
             </p>
           </div>
           <div class="controls">
-            <div v-if="gallery.length > 1" class="buttons">
+            <div class="buttons">
               <button
                 class="close circle-button"
                 @click="expandedGalleryItem = null"
@@ -54,10 +54,18 @@
                 <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
                 <ContractIcon v-else aria-hidden="true" />
               </button>
-              <button class="previous circle-button" @click="previousImage()">
+              <button
+                v-if="gallery.length > 1"
+                class="previous circle-button"
+                @click="previousImage()"
+              >
                 <LeftArrowIcon aria-hidden="true" />
               </button>
-              <button class="next circle-button" @click="nextImage()">
+              <button
+                v-if="gallery.length > 1"
+                class="next circle-button"
+                @click="nextImage()"
+              >
                 <RightArrowIcon aria-hidden="true" />
               </button>
             </div>
@@ -66,6 +74,32 @@
       </div>
     </div>
     <div v-if="currentMember" class="card buttons header-buttons">
+      <button
+        class="iconified-button"
+        :class="{
+          'brand-button':
+            newGalleryItems.length === 0 &&
+            editGalleryIndexes.length === 0 &&
+            deleteGalleryUrls.length === 0,
+        }"
+        @click="
+          newGalleryItems.push({
+            title: '',
+            description: '',
+            featured: false,
+            url: '',
+          })
+        "
+      >
+        <PlusIcon />
+        {{
+          newGalleryItems.length === 0 &&
+          editGalleryIndexes.length === 0 &&
+          deleteGalleryUrls.length === 0
+            ? 'Add an image'
+            : 'Add another image'
+        }}
+      </button>
       <button
         v-if="
           newGalleryItems.length > 0 ||
@@ -84,25 +118,11 @@
           editGalleryIndexes.length > 0 ||
           deleteGalleryUrls.length > 0
         "
-        class="action brand-button-colors iconified-button"
+        class="action brand-button iconified-button"
         @click="saveGallery"
       >
         <CheckIcon />
         Save changes
-      </button>
-      <button
-        class="iconified-button"
-        @click="
-          newGalleryItems.push({
-            title: '',
-            description: '',
-            featured: false,
-            url: '',
-          })
-        "
-      >
-        <PlusIcon />
-        Add an image
       </button>
     </div>
     <div class="items">
@@ -147,7 +167,7 @@
             <CalendarIcon />
             {{ $dayjs(item.created).format('MMMM D, YYYY') }}
           </div>
-          <div v-if="currentMember" class="gallery-buttons">
+          <div v-if="currentMember" class="gallery-buttons input-group">
             <button
               v-if="editGalleryIndexes.includes(index)"
               class="iconified-button"
@@ -213,7 +233,7 @@
           </div>
         </div>
         <div class="gallery-bottom">
-          <SmartFileInput
+          <FileInput
             :max-size="5242880"
             accept="image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp"
             prompt="Choose image or drag it here"
@@ -249,7 +269,7 @@ import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 import ExpandIcon from '~/assets/images/utils/expand.svg?inline'
 import ContractIcon from '~/assets/images/utils/contract.svg?inline'
 
-import SmartFileInput from '~/components/ui/SmartFileInput'
+import FileInput from '~/components/ui/FileInput'
 import Checkbox from '~/components/ui/Checkbox'
 
 export default {
@@ -260,7 +280,7 @@ export default {
     EditIcon,
     TrashIcon,
     CheckIcon,
-    SmartFileInput,
+    FileInput,
     CrossIcon,
     RightArrowIcon,
     LeftArrowIcon,
@@ -301,6 +321,36 @@ export default {
   },
   fetch() {
     this.gallery = JSON.parse(JSON.stringify(this.project.gallery))
+  },
+  head() {
+    const title = `${this.project.title} - Gallery`
+    const description = `View ${this.project.gallery.length} images of ${this.project.title} on Modrinth.`
+
+    return {
+      title,
+      meta: [
+        {
+          hid: 'og:title',
+          name: 'og:title',
+          content: title,
+        },
+        {
+          hid: 'apple-mobile-web-app-title',
+          name: 'apple-mobile-web-app-title',
+          content: title,
+        },
+        {
+          hid: 'og:description',
+          name: 'og:description',
+          content: description,
+        },
+        {
+          hid: 'description',
+          name: 'description',
+          content: description,
+        },
+      ],
+    }
   },
   mounted() {
     this._keyListener = function (e) {
@@ -456,6 +506,7 @@ export default {
       line-height: 1;
       display: flex;
       max-width: 2rem;
+      color: var(--color-button-text);
       background-color: var(--color-button-bg);
       border-radius: var(--size-rounded-max);
       margin: 0;
@@ -563,18 +614,6 @@ export default {
 
   button {
     margin-right: 0.5rem;
-
-    &.brand-button-colors {
-      background-color: var(--color-brand);
-
-      &:hover {
-        background-color: var(--color-brand-hover);
-      }
-
-      &:active {
-        background-color: var(--color-brand-active);
-      }
-    }
   }
 }
 

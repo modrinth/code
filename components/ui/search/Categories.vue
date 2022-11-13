@@ -49,11 +49,11 @@ export default {
     align-items: center;
     flex-direction: row;
     color: var(--color-icon);
-    margin-right: 1em;
+    margin-right: var(--spacing-card-md);
 
     svg {
       width: 1rem;
-      margin-right: 0.125rem;
+      margin-right: 0.2rem;
     }
   }
 }
