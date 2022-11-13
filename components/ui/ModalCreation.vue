@@ -182,7 +182,7 @@ Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`
         })
 
         this.$refs.modal.hide()
-        await this.$router.replace(`/${projectType.display}/${this.slug}`)
+        await this.$router.replace(`/${projectType.actual}/${this.slug}`)
       } catch (err) {
         this.$notify({
           group: 'main',
