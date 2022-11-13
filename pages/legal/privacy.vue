@@ -92,6 +92,17 @@
       >.
     </p>
 
+    <h2>Payouts Program</h2>
+
+    <p>
+      Modrinth allows creators to enroll in the Creator Monetization Program
+      (the "CMP"). By enrolling in the CMP, your PayPal or Venmo email
+      addresses, phone numbers, and usernames will be collected. This is
+      required to transfer the money to your account. You may remove this
+      information at any time by removing your enrollment in the dashboard or by
+      contacting gdpr@modrinth.com.
+    </p>
+
     <h2>Privacy Policies</h2>
 
     <P
