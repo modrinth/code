@@ -4,7 +4,7 @@
       <span
         >You are initiating a transfer of your revenue from Modrinth's Creator
         Monetization Program. How much of your
-        <strong>${{ balance }}</strong> balance would you like to
+        <strong>{{ $formatMoney(balance) }}</strong> balance would you like to
         transfer?</span
       >
       <div class="confirmation-input">
@@ -31,10 +31,11 @@
             to cover {{ $formatWallet(wallet) }} processing fees.</template
           >
           <template v-else
-            >I acknowledge that an estimated {{ calcProcessingFees() }} will be
-            deducted from the amount I receive to cover
-            {{ $formatWallet(wallet) }} processing fees and that any excess will
-            be returned to my Modrinth balance.</template
+            >I acknowledge that an estimated
+            {{ $formatMoney(calcProcessingFees()) }} will be deducted from the
+            amount I receive to cover {{ $formatWallet(wallet) }} processing
+            fees and that any excess will be returned to my Modrinth
+            balance.</template
           >
         </Checkbox>
         <Checkbox
@@ -52,10 +53,10 @@
           v-else-if="validInput && parseInput() < minWithdraw"
           class="invalid"
         >
-          The amount must be at least ${{ minWithdraw }}</span
+          The amount must be at least {{ $formatMoney(minWithdraw) }}</span
         >
         <span v-else-if="validInput && parseInput() > balance" class="invalid">
-          The amount must be no more than ${{ balance }}</span
+          The amount must be no more than {{ $formatMoney(balance) }}</span
         >
         <span v-else-if="amount.length > 0" class="invalid">
           {{ amount }} is not a valid amount</span
@@ -200,8 +201,8 @@ export default {
   }
 
   .button-group {
-    margin-left: auto;
-    margin-top: 1.5rem;
+    margin-top: var(--spacing-card-md);
+    justify-content: right;
   }
 
   strong {
@@ -215,7 +216,7 @@ export default {
 
   .confirm-text {
     margin-top: var(--spacing-card-sm);
-    min-height: 6rem;
+    min-height: 7rem;
     display: flex;
     flex-direction: column;
     gap: var(--spacing-card-sm);

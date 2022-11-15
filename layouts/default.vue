@@ -376,6 +376,10 @@
           Settings
         </nuxt-link>
       </div>
+      <div class="not-affiliated-notice">
+        NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH
+        MOJANG.
+      </div>
     </footer>
   </div>
 </template>
@@ -1024,8 +1028,6 @@ export default {
 
             .beta-badge {
               background-color: var(--color-brand-inverted);
-              box-sizing: border-box;
-              outline: none;
               color: var(--color-text-dark);
             }
           }
@@ -1081,9 +1083,10 @@ export default {
     text-align: center;
     display: grid;
     grid-template:
-      'logo-info logo-info logo-info' auto
-      'links-1   links-2   links-3' auto
-      'buttons   buttons   buttons' auto
+      'logo-info  logo-info  logo-info' auto
+      'links-1    links-2    links-3' auto
+      'buttons    buttons    buttons' auto
+      'notice     notice     notice' auto
       / 1fr 1fr 1fr;
 
     .logo-info {
@@ -1139,8 +1142,21 @@ export default {
       }
     }
 
+    .not-affiliated-notice {
+      grid-area: notice;
+      font-size: var(--font-size-xs);
+      text-align: center;
+      font-weight: 500;
+      margin-top: var(--spacing-card-md);
+    }
+
     @media screen and (min-width: 1024px) {
-      display: flex;
+      display: grid;
+      margin-inline: auto;
+      width: fit-content;
+      grid-template:
+        'logo-info  links-1 links-2 links-3 buttons' auto
+        'notice     notice  notice  notice  notice' auto;
       text-align: unset;
 
       .logo-info {
@@ -1159,6 +1175,10 @@ export default {
         a {
           margin-right: unset;
         }
+      }
+
+      .not-affiliated-notice {
+        margin-top: 0;
       }
     }
   }

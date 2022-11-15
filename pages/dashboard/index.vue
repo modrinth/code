@@ -49,8 +49,8 @@
         </div>
         <div class="metric">
           <div class="label">Total revenue</div>
-          <div class="value">${{ $formatNumber(payouts.all_time) }}</div>
-          <span>${{ $formatNumber(payouts.last_month) }} this month</span>
+          <div class="value">{{ $formatMoney(payouts.all_time) }}</div>
+          <span>{{ $formatMoney(payouts.last_month) }} this month</span>
           <!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
           <!--            >View breakdown-->
           <!--            <ChevronRightIcon-->
@@ -61,7 +61,7 @@
         <div class="metric">
           <div class="label">Current balance</div>
           <div class="value">
-            ${{ $formatNumber($auth.user.payout_data.balance) }}
+            {{ $formatMoney($auth.user.payout_data.balance) }}
           </div>
           <NuxtLink
             v-if="$auth.user.payout_data.balance >= minWithdraw"

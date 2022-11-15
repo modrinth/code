@@ -16,6 +16,7 @@ export default (ctx, inject) => {
     return obj
   })
   inject('formatNumber', formatNumber)
+  inject('formatMoney', (number) => '$' + formatNumber(number.toFixed(2)))
   inject('formatVersion', (versionsArray) =>
     formatVersions(versionsArray, ctx.store)
   )

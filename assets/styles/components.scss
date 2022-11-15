@@ -920,7 +920,7 @@ h1 {
 
 .beta-badge {
   font-size: 0.7em;
-  padding: 0.25rem 0.5rem;
+  padding: 0.2rem 0.4rem;
   background-color: transparent;
   box-sizing: border-box;
   border: 2px solid var(--color-text);
@@ -934,7 +934,7 @@ h1 {
   .beta-badge {
     background-color: var(--color-button-text-active);
     box-sizing: border-box;
-    outline: none;
+    border-color: transparent;
     color: var(--color-raised-bg);
   }
 }
