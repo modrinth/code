@@ -87,7 +87,7 @@
 
     <p>
       For more general information on cookies, please read
-      <a href="https://www.privacypolicies.com/blog/cookies/"
+      <a href="https://www.privacypolicies.com/etblog/cookies/"
         >"What Are Cookies"</a
       >.
     </p>

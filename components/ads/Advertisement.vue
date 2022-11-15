@@ -1,29 +1,26 @@
 <template>
   <div class="content-wrapper">
-    <div
-      v-if="!isBlocked"
-      data-ea-publisher="modrinth-com"
-      data-ea-type="text"
-    ></div>
-    <div
-      v-else
-      data-ea-publisher="modrinth-com"
-      data-ea-type="text"
-      class="loaded"
-    >
+    <div data-ea-publisher="modrinth-com" data-ea-type="text" class="loaded">
       <div class="ea-placement ea-type-text">
         <div class="ea-content">
           <div class="ea-text">
             <a
-              href="https://docs.modrinth.com/docs/details/carbon/"
+              href="https://exaroton.com/?utm_source=modrinth&utm_medium=text&utm_campaign=host&utm_content=top"
               rel="nofollow noopener"
               target="_blank"
             >
+              <LightIcon
+                v-if="$colorMode.value === 'light'"
+                class="brand-icon"
+              />
+              <DarkIcon v-else class="brand-icon" />
               <span>
-                Please disable your adblocker. Advertisements support this site
-                and its creators.
+                <span> Host your Minecraft server on </span>
+                <strong>exaroton</strong>
+                <span>
+                  - only pay while the server is running - billed per second.
+                </span>
               </span>
-              <strong>View instructions here!</strong>
             </a>
           </div>
         </div>
@@ -31,29 +28,29 @@
           <a
             rel="nofollow noopener"
             target="_blank"
-            href="https://ethicalads.io?ref=ea-text"
+            href="https://modrinth.com"
           >
-            Ad by EthicalAds
+            Ads via Adrinth
           </a>
         </div>
       </div>
     </div>
-    <client-only>
-      <script
-        async
-        src="https://media.ethicalads.io/media/client/ethicalads.min.js"
-        @error="isBlocked = true"
-      />
-    </client-only>
   </div>
 </template>
 
 <script>
+import LightIcon from '~/assets/images/external/exaroton-light.svg?inline'
+import DarkIcon from '~/assets/images/external/exaroton-dark.svg?inline'
+
 export default {
   name: 'Advertisement',
+  components: {
+    LightIcon,
+    DarkIcon,
+  },
   data() {
     return {
-      isBlocked: false,
+      isBlocked: true,
     }
   },
 }
@@ -85,6 +82,12 @@ export default {
   text-align: left;
 }
 
+.brand-icon {
+  padding-top: 1px;
+  height: 1.2rem;
+  width: auto;
+}
+
 .ea-callout {
   position: absolute;
   bottom: -2px;
@@ -105,6 +108,10 @@ export default {
 
 [data-ea-publisher].loaded .ea-callout a,
 [data-ea-type].loaded .ea-callout a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
   font-size: 0.8em;
 
   &:hover {
@@ -118,6 +125,10 @@ export default {
 
 [data-ea-publisher].loaded .ea-content a,
 [data-ea-type].loaded .ea-content a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
   b,
   strong {
     color: #088cdb;
@@ -148,6 +159,12 @@ export default {
 }
 
 @media screen and (max-width: 800px) {
+  [data-ea-publisher].loaded .ea-content a,
+  [data-ea-type].loaded .ea-content a {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .ea-text {
     margin-bottom: 0.5rem;
   }
