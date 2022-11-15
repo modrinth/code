@@ -8,7 +8,7 @@
     <div
       :class="{
         'normal-page': true,
-        'alt-layout': $store.state.cosmetics.searchLayout,
+        'alt-layout': $store.state.cosmetics.projectLayout,
       }"
     >
       <aside class="normal-page__sidebar">
