@@ -31,6 +31,26 @@
     },
     "query": "\n            INSERT INTO users (\n                id, github_id, username, name, email,\n                avatar_url, bio, created\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8\n            )\n            "
   },
+  "03284fe5b045e2cf93f160863c4d121439382b348b728fffb5ac588dee980731": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND email IS NULL)\n                        "
+  },
   "041f499f542ddab1b81bd445d6cabe225b1b2ad3ec7bbc1f755346c016ae06e6": {
     "describe": {
       "columns": [],

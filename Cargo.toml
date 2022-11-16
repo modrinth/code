@@ -66,4 +66,4 @@ env_logger = "0.9.1"
 thiserror = "1.0.37"
 
 sqlx = { version = "0.6.2", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate", "decimal"] }
-rust_decimal = { version = "1.26", features = ["serde-with-float"] }
+rust_decimal = { version = "1.26", features = ["serde-with-float", "serde-with-str"] }

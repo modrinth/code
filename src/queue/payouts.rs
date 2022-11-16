@@ -1,5 +1,6 @@
 use crate::routes::ApiError;
 use chrono::{DateTime, Duration, Utc};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
@@ -26,10 +27,11 @@ pub struct PayoutItem {
     pub sender_item_id: String,
 }
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct PayoutAmount {
     pub currency: String,
-    pub value: String,
+    #[serde(with = "rust_decimal::serde::str")]
+    pub value: Decimal,
 }
 
 // Batches payouts and handles token refresh
@@ -85,14 +87,30 @@ impl PayoutsQueue {
 
     pub async fn send_payout(
         &mut self,
-        payout: PayoutItem,
-    ) -> Result<(), ApiError> {
+        mut payout: PayoutItem,
+    ) -> Result<Decimal, ApiError> {
         if self.credential_expires < Utc::now() {
             self.refresh_token().await.map_err(|_| {
                 ApiError::Payments(
                     "Error while authenticating with PayPal".to_string(),
                 )
             })?;
+        }
+
+        let fee = std::cmp::min(
+            std::cmp::max(
+                Decimal::ONE / Decimal::from(4),
+                (Decimal::from(2) / Decimal::ONE_HUNDRED) * payout.amount.value,
+            ),
+            Decimal::from(20),
+        );
+
+        payout.amount.value -= fee;
+
+        if payout.amount.value <= Decimal::ZERO {
+            return Err(ApiError::InvalidInput(
+                "You do not have enough funds to make this payout!".to_string(),
+            ));
         }
 
         let client = reqwest::Client::new();
@@ -130,8 +148,58 @@ impl PayoutsQueue {
                 "Error while registering payment in PayPal: {}",
                 body.body.message
             )));
+        } else {
+            #[derive(Deserialize)]
+            struct PayPalLink {
+                href: String,
+            }
+
+            #[derive(Deserialize)]
+            struct PayoutsResponse {
+                pub links: Vec<PayPalLink>,
+            }
+
+            #[derive(Deserialize)]
+            struct PayoutDataItem {
+                payout_item_fee: PayoutAmount,
+            }
+
+            #[derive(Deserialize)]
+            struct PayoutData {
+                pub items: Vec<PayoutDataItem>,
+            }
+
+            // Calculate actual fee + refund if we took too big of a fee.
+            if let Some(res) = res.json::<PayoutsResponse>().await.ok() {
+                if let Some(link) = res.links.first() {
+                    if let Some(res) = client
+                        .get(&link.href)
+                        .header(
+                            "Authorization",
+                            format!(
+                                "{} {}",
+                                self.credential.token_type,
+                                self.credential.access_token
+                            ),
+                        )
+                        .send()
+                        .await
+                        .ok()
+                    {
+                        if let Some(res) = res.json::<PayoutData>().await.ok() {
+                            if let Some(data) = res.items.first() {
+                                if (fee - data.payout_item_fee.value)
+                                    > Decimal::ZERO
+                                {
+                                    return Ok(fee - data.payout_item_fee.value);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
 
-        Ok(())
+        Ok(Decimal::ZERO)
     }
 }

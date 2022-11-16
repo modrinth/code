@@ -627,7 +627,7 @@ pub async fn project_create_inner(
                 role: crate::models::teams::OWNER_ROLE.to_owned(),
                 permissions: crate::models::teams::Permissions::ALL,
                 accepted: true,
-                payouts_split: Decimal::from(100),
+                payouts_split: Decimal::ONE_HUNDRED,
             }],
         };
 

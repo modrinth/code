@@ -264,7 +264,7 @@ pub async fn process_payout(
                             let members_sum: Decimal =
                                 members.iter().map(|x| x.1).sum();
 
-                            if members_sum > Decimal::from(0) {
+                            if members_sum > Decimal::ZERO {
                                 for member in members {
                                     let member_multiplier: Decimal =
                                         member.1 / members_sum;
@@ -287,8 +287,8 @@ pub async fn process_payout(
             let project_multiplier: Decimal =
                 Decimal::from(**value) / Decimal::from(multipliers.sum);
 
-            let default_split_given = Decimal::from(1);
-            let split_given = Decimal::from(1) / Decimal::from(5);
+            let default_split_given = Decimal::ONE;
+            let split_given = Decimal::ONE / Decimal::from(5);
             let split_retention = Decimal::from(4) / Decimal::from(5);
 
             let sum_splits: Decimal =
@@ -296,7 +296,7 @@ pub async fn process_payout(
             let sum_tm_splits: Decimal =
                 project.split_team_members.iter().map(|x| x.1).sum();
 
-            if sum_splits > Decimal::from(0) {
+            if sum_splits > Decimal::ZERO {
                 for (user_id, split) in project.team_members {
                     let payout: Decimal = data.amount
                         * project_multiplier
@@ -307,7 +307,7 @@ pub async fn process_payout(
                             &default_split_given
                         });
 
-                    if payout > Decimal::from(0) {
+                    if payout > Decimal::ZERO {
                         sqlx::query!(
                             "
                             INSERT INTO payouts_values (user_id, mod_id, amount, created)
@@ -336,14 +336,14 @@ pub async fn process_payout(
                 }
             }
 
-            if sum_tm_splits > Decimal::from(0) {
+            if sum_tm_splits > Decimal::ZERO {
                 for (user_id, split, project_id) in project.split_team_members {
                     let payout: Decimal = data.amount
                         * project_multiplier
                         * (split / sum_tm_splits)
                         * split_retention;
 
-                    if payout > Decimal::from(0) {
+                    if payout > Decimal::ZERO {
                         sqlx::query!(
                             "
                             INSERT INTO payouts_values (user_id, mod_id, amount, created)

@@ -345,6 +345,22 @@ pub async fn user_edit(
                         ));
                     }
 
+                    let results = sqlx::query!(
+                        "
+                        SELECT EXISTS(SELECT 1 FROM users WHERE id = $1 AND email IS NULL)
+                        ",
+                        id as crate::database::models::ids::UserId,
+                    )
+                        .fetch_one(&mut *transaction)
+                        .await?;
+
+                    if results.exists.unwrap_or(false) {
+                        return Err(ApiError::InvalidInput(
+                            "You must have an email set on your Modrinth account to enroll in the monetization program!"
+                                .to_string(),
+                        ));
+                    }
+
                     sqlx::query!(
                         "
                         UPDATE users
@@ -720,12 +736,24 @@ pub async fn user_payouts_request(
                     payouts_data.payout_wallet_type
                 {
                     if let Some(payout_wallet) = payouts_data.payout_wallet {
-                        let paypal_fee = Decimal::from(1) / Decimal::from(4);
-
-                        return if data.amount < payouts_data.balance
-                            && data.amount > paypal_fee
-                        {
+                        return if data.amount < payouts_data.balance {
                             let mut transaction = pool.begin().await?;
+
+                            let mut payouts_queue = payouts_queue.lock().await;
+
+                            let leftover = payouts_queue
+                                .send_payout(PayoutItem {
+                                    amount: PayoutAmount {
+                                        currency: "USD".to_string(),
+                                        value: data.amount,
+                                    },
+                                    receiver: payout_address,
+                                    note: "Payment from Modrinth creator monetization program".to_string(),
+                                    recipient_type: payout_wallet_type.to_string().to_uppercase(),
+                                    recipient_wallet: payout_wallet.as_str_api().to_string(),
+                                    sender_item_id: format!("{}-{}", UserId::from(id), Utc::now().timestamp()),
+                                })
+                                .await?;
 
                             sqlx::query!(
                                 "
@@ -745,26 +773,11 @@ pub async fn user_payouts_request(
                                 SET balance = balance - $1
                                 WHERE id = $2
                                 ",
-                                data.amount,
+                                data.amount - leftover,
                                 id as crate::database::models::ids::UserId
                             )
                             .execute(&mut *transaction)
                             .await?;
-
-                            let mut payouts_queue = payouts_queue.lock().await;
-                            payouts_queue
-                                .send_payout(PayoutItem {
-                                    amount: PayoutAmount {
-                                        currency: "USD".to_string(),
-                                        value: (data.amount - paypal_fee).to_string(),
-                                    },
-                                    receiver: payout_address,
-                                    note: "Payment from Modrinth creator monetization program".to_string(),
-                                    recipient_type: payout_wallet_type.to_string().to_uppercase(),
-                                    recipient_wallet: payout_wallet.as_str_api().to_string(),
-                                    sender_item_id: format!("{}-{}", UserId::from(id), Utc::now().timestamp()),
-                                })
-                                .await?;
 
                             transaction.commit().await?;
 

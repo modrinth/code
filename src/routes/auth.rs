@@ -274,7 +274,7 @@ pub async fn auth_callback(
                         created: Utc::now(),
                         role: Role::Developer.to_string(),
                         badges: Badges::default(),
-                        balance: Decimal::from(0),
+                        balance: Decimal::ZERO,
                         payout_wallet: None,
                         payout_wallet_type: None,
                         payout_address: None,
