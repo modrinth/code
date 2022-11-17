@@ -159,7 +159,7 @@ pub async fn versions_get(
     ids: web::Query<VersionIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let version_ids = serde_json::from_str::<Vec<VersionId>>(&*ids.ids)?
+    let version_ids = serde_json::from_str::<Vec<VersionId>>(&ids.ids)?
         .into_iter()
         .map(|x| x.into())
         .collect();

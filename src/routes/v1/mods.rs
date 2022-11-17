@@ -52,7 +52,7 @@ pub async fn mod_search(
     web::Query(info): web::Query<SearchRequest>,
     config: web::Data<SearchConfig>,
 ) -> Result<HttpResponse, SearchError> {
-    let results = search_for_project(&info, &**config).await?;
+    let results = search_for_project(&info, &config).await?;
     Ok(HttpResponse::Ok().json(SearchResults {
         hits: results
             .hits
@@ -92,7 +92,7 @@ pub async fn mods_get(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let project_ids =
-        serde_json::from_str::<Vec<models::ids::ProjectId>>(&*ids.ids)?
+        serde_json::from_str::<Vec<models::ids::ProjectId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
             .collect();

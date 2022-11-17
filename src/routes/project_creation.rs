@@ -380,7 +380,7 @@ pub async fn project_create_inner(
         })?;
 
         let slug_project_id_option: Option<ProjectId> =
-            serde_json::from_str(&*format!("\"{}\"", create_data.slug)).ok();
+            serde_json::from_str(&format!("\"{}\"", create_data.slug)).ok();
 
         if let Some(slug_project_id) = slug_project_id_option {
             let slug_project_id: models::ids::ProjectId =
@@ -569,7 +569,7 @@ pub async fn project_create_inner(
             &content_disposition,
             project_id,
             created_version.version_id.into(),
-            &*project_create_data.project_type,
+            &project_create_data.project_type,
             version_data.loaders.clone(),
             version_data.game_versions.clone(),
             all_game_versions.clone(),
@@ -875,10 +875,7 @@ async fn create_initial_version(
         author_id: author.into(),
         name: version_data.version_title.clone(),
         version_number: version_data.version_number.clone(),
-        changelog: version_data
-            .version_body
-            .clone()
-            .unwrap_or_else(|| "".to_string()),
+        changelog: version_data.version_body.clone().unwrap_or_default(),
         files: Vec::new(),
         dependencies,
         game_versions,

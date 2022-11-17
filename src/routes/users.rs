@@ -41,7 +41,7 @@ pub async fn users_get(
     web::Query(ids): web::Query<UserIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let user_ids = serde_json::from_str::<Vec<UserId>>(&*ids.ids)?
+    let user_ids = serde_json::from_str::<Vec<UserId>>(&ids.ids)?
         .into_iter()
         .map(|x| x.into())
         .collect();
@@ -61,7 +61,7 @@ pub async fn user_get(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
     let id_option: Option<UserId> =
-        serde_json::from_str(&*format!("\"{}\"", string)).ok();
+        serde_json::from_str(&format!("\"{}\"", string)).ok();
 
     let mut user_data;
 
@@ -92,7 +92,7 @@ pub async fn projects_list(
     let user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &*info.into_inner().0,
+        &info.into_inner().0,
         &**pool,
     )
     .await?;
@@ -191,7 +191,7 @@ pub async fn user_edit(
     })?;
 
     let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &*info.into_inner().0,
+        &info.into_inner().0,
         &**pool,
     )
     .await?;
@@ -415,12 +415,12 @@ pub async fn user_icon_edit(
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
     if let Some(content_type) =
-        crate::util::ext::get_image_content_type(&*ext.ext)
+        crate::util::ext::get_image_content_type(&ext.ext)
     {
         let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let id_option =
-            User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
+            User::get_id_from_username_or_id(&info.into_inner().0, &**pool)
                 .await?;
 
         if let Some(id) = id_option {
@@ -511,8 +511,7 @@ pub async fn user_delete(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
-        User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
@@ -549,7 +548,7 @@ pub async fn user_follows(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &*info.into_inner().0,
+        &info.into_inner().0,
         &**pool,
     )
     .await?;
@@ -599,7 +598,7 @@ pub async fn user_notifications(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &*info.into_inner().0,
+        &info.into_inner().0,
         &**pool,
     )
     .await?;
@@ -641,8 +640,7 @@ pub async fn user_payouts(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
-        User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
@@ -719,8 +717,7 @@ pub async fn user_payouts_request(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
-        User::get_id_from_username_or_id(&*info.into_inner().0, &**pool)
-            .await?;
+        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {

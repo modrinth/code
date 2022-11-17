@@ -124,7 +124,7 @@ pub async fn notifications_delete(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
     let notification_ids =
-        serde_json::from_str::<Vec<NotificationId>>(&*ids.ids)?
+        serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
             .collect();

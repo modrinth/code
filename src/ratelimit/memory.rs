@@ -201,7 +201,7 @@ mod tests {
             .send(ActorMessage::Set {
                 key: "hello".to_string(),
                 value: 30usize,
-                expiry: expiry,
+                expiry,
             })
             .await;
         let res = res.expect("Failed to send msg");
@@ -235,7 +235,7 @@ mod tests {
             .send(ActorMessage::Set {
                 key: "hello".to_string(),
                 value: 30usize,
-                expiry: expiry,
+                expiry,
             })
             .await;
         let res = res.expect("Failed to send msg");
@@ -246,7 +246,7 @@ mod tests {
             },
             _ => panic!("Shouldn't happen!"),
         }
-        assert_eq!(addr.connected(), true);
+        assert!(addr.connected());
 
         let res3 = addr.send(ActorMessage::Expire("hello".to_string())).await;
         let res3 = res3.expect("Failed to send msg");
@@ -254,9 +254,7 @@ mod tests {
             ActorResponse::Expire(c) => match c.await {
                 Ok(dur) => {
                     let now = Duration::from_secs(3);
-                    if dur > now {
-                        panic!("Expiry is invalid!");
-                    } else if dur > now + Duration::from_secs(4) {
+                    if dur > now || dur > now + Duration::from_secs(4) {
                         panic!("Expiry is invalid!");
                     }
                 }

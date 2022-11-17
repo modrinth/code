@@ -189,8 +189,8 @@ impl TeamMember {
                             role: m.user_role,
                             badges: Badges::from_bits(m.badges as u64).unwrap_or_default(),
                             balance: m.balance,
-                            payout_wallet: m.payout_wallet.map(|x| RecipientWallet::from_string(&*x)),
-                            payout_wallet_type: m.payout_wallet_type.map(|x| RecipientType::from_string(&*x)),
+                            payout_wallet: m.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
+                            payout_wallet_type: m.payout_wallet_type.map(|x| RecipientType::from_string(&x)),
                             payout_address: m.payout_address
                         },
                         payouts_split: m.payouts_split
@@ -258,8 +258,8 @@ impl TeamMember {
                               role: m.user_role,
                               badges: Badges::from_bits(m.badges as u64).unwrap_or_default(),
                               balance: m.balance,
-                              payout_wallet: m.payout_wallet.map(|x| RecipientWallet::from_string(&*x)),
-                              payout_wallet_type: m.payout_wallet_type.map(|x| RecipientType::from_string(&*x)),
+                              payout_wallet: m.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
+                              payout_wallet_type: m.payout_wallet_type.map(|x| RecipientType::from_string(&x)),
                               payout_address: m.payout_address
                           },
                           payouts_split: m.payouts_split

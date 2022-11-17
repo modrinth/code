@@ -168,7 +168,7 @@ pub async fn auth_callback(
     client: Data<PgPool>,
 ) -> Result<HttpResponse, AuthorizationError> {
     let mut transaction = client.begin().await?;
-    let state_id = parse_base62(&*info.state)?;
+    let state_id = parse_base62(&info.state)?;
 
     let result_option = sqlx::query!(
         "
@@ -213,7 +213,7 @@ pub async fn auth_callback(
             .json()
             .await?;
 
-        let user = get_github_user_from_token(&*token.access_token).await?;
+        let user = get_github_user_from_token(&token.access_token).await?;
 
         let user_result =
             User::get_from_github_id(user.id, &mut *transaction).await?;
@@ -241,7 +241,7 @@ pub async fn auth_callback(
                 while username.is_none() {
                     let test_username = format!(
                         "{}{}",
-                        &*user.login,
+                        &user.login,
                         if username_increment > 0 {
                             username_increment.to_string()
                         } else {
@@ -250,7 +250,7 @@ pub async fn auth_callback(
                     );
 
                     let new_id = crate::database::models::User::get_id_from_username_or_id(
-                        &*test_username,
+                        &test_username,
                         &**client,
                     )
                     .await?;

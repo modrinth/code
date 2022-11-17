@@ -88,10 +88,10 @@ impl User {
                 balance: row.balance,
                 payout_wallet: row
                     .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&*x)),
+                    .map(|x| RecipientWallet::from_string(&x)),
                 payout_wallet_type: row
                     .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&*x)),
+                    .map(|x| RecipientType::from_string(&x)),
                 payout_address: row.payout_address,
             }))
         } else {
@@ -137,10 +137,10 @@ impl User {
                 balance: row.balance,
                 payout_wallet: row
                     .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&*x)),
+                    .map(|x| RecipientWallet::from_string(&x)),
                 payout_wallet_type: row
                     .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&*x)),
+                    .map(|x| RecipientType::from_string(&x)),
                 payout_address: row.payout_address,
             }))
         } else {
@@ -186,10 +186,10 @@ impl User {
                 balance: row.balance,
                 payout_wallet: row
                     .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&*x)),
+                    .map(|x| RecipientWallet::from_string(&x)),
                 payout_wallet_type: row
                     .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&*x)),
+                    .map(|x| RecipientType::from_string(&x)),
                 payout_address: row.payout_address,
             }))
         } else {
@@ -236,10 +236,10 @@ impl User {
                 balance: u.balance,
                 payout_wallet: u
                     .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&*x)),
+                    .map(|x| RecipientWallet::from_string(&x)),
                 payout_wallet_type: u
                     .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&*x)),
+                    .map(|x| RecipientType::from_string(&x)),
                 payout_address: u.payout_address,
             }))
         })

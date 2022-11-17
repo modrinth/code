@@ -223,7 +223,7 @@ pub async fn search_for_project(
                     write!(filter_string, " AND ({})", filters)?;
                 }
             } else {
-                filter_string.push_str(&*filters);
+                filter_string.push_str(&filters);
             }
 
             if !filter_string.is_empty() {

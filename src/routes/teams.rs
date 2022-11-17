@@ -115,7 +115,7 @@ pub async fn teams_get(
 ) -> Result<HttpResponse, ApiError> {
     use itertools::Itertools;
 
-    let team_ids = serde_json::from_str::<Vec<TeamId>>(&*ids.ids)?
+    let team_ids = serde_json::from_str::<Vec<TeamId>>(&ids.ids)?
         .into_iter()
         .map(|x| x.into())
         .collect::<Vec<crate::database::models::ids::TeamId>>();

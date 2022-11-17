@@ -75,11 +75,11 @@ async fn main() -> std::io::Result<()> {
             ),
             "s3" => Arc::new(
                 S3Host::new(
-                    &*dotenvy::var("S3_BUCKET_NAME").unwrap(),
-                    &*dotenvy::var("S3_REGION").unwrap(),
-                    &*dotenvy::var("S3_URL").unwrap(),
-                    &*dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
-                    &*dotenvy::var("S3_SECRET").unwrap(),
+                    &dotenvy::var("S3_BUCKET_NAME").unwrap(),
+                    &dotenvy::var("S3_REGION").unwrap(),
+                    &dotenvy::var("S3_URL").unwrap(),
+                    &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
+                    &dotenvy::var("S3_SECRET").unwrap(),
                 )
                 .unwrap(),
             ),

@@ -260,7 +260,7 @@ async fn version_create_inner(
                 changelog: version_create_data
                     .version_body
                     .clone()
-                    .unwrap_or_else(|| "".to_string()),
+                    .unwrap_or_default(),
                 files: Vec::new(),
                 dependencies,
                 game_versions,
@@ -304,7 +304,7 @@ async fn version_create_inner(
             &content_disposition,
             version.project_id.into(),
             version.version_id.into(),
-            &*project_type,
+            &project_type,
             version_data.loaders,
             version_data.game_versions,
             all_game_versions.clone(),
@@ -585,7 +585,7 @@ async fn upload_file_to_version_inner(
             &content_disposition,
             project_id,
             version_id.into(),
-            &*project_type,
+            &project_type,
             version.loaders.clone().into_iter().map(Loader).collect(),
             version
                 .game_versions

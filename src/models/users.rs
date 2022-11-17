@@ -137,7 +137,7 @@ impl From<DBUser> for User {
             avatar_url: data.avatar_url,
             bio: data.bio,
             created: data.created,
-            role: Role::from_string(&*data.role),
+            role: Role::from_string(&data.role),
             badges: data.badges,
             payout_data: None,
         }

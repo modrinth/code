@@ -42,7 +42,7 @@ pub async fn report_create(
     let id =
         crate::database::models::generate_report_id(&mut transaction).await?;
     let report_type = crate::database::models::categories::ReportType::get_id(
-        &*new_report.report_type,
+        &new_report.report_type,
         &mut *transaction,
     )
     .await?
@@ -66,7 +66,7 @@ pub async fn report_create(
     match new_report.item_type {
         ItemType::Project => {
             report.project_id = Some(
-                serde_json::from_str::<ProjectId>(&*format!(
+                serde_json::from_str::<ProjectId>(&format!(
                     "\"{}\"",
                     new_report.item_id
                 ))?
@@ -75,7 +75,7 @@ pub async fn report_create(
         }
         ItemType::Version => {
             report.version_id = Some(
-                serde_json::from_str::<VersionId>(&*format!(
+                serde_json::from_str::<VersionId>(&format!(
                     "\"{}\"",
                     new_report.item_id
                 ))?
@@ -84,7 +84,7 @@ pub async fn report_create(
         }
         ItemType::User => {
             report.user_id = Some(
-                serde_json::from_str::<UserId>(&*format!(
+                serde_json::from_str::<UserId>(&format!(
                     "\"{}\"",
                     new_report.item_id
                 ))?

@@ -201,7 +201,7 @@ pub async fn handle_stripe_webhook(
         object: Value,
     }
 
-    let webhook: StripeWebhookBody = serde_json::from_str(&*body)?;
+    let webhook: StripeWebhookBody = serde_json::from_str(&body)?;
 
     #[derive(Deserialize)]
     struct CheckoutSession {

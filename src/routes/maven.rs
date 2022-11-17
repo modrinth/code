@@ -60,7 +60,7 @@ pub async fn maven_metadata(
     let project_id = params.into_inner().0;
     let project_data =
         database::models::Project::get_full_from_slug_or_project_id(
-            &*project_id,
+            &project_id,
             &**pool,
         )
         .await?;
