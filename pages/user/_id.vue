@@ -108,14 +108,14 @@
               <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
               <div class="primary-stat__text">
                 <span class="primary-stat__counter">{{ sumDownloads() }}</span>
-                <span class="primary-stat__label">downloads</span>
+                downloads
               </div>
             </div>
             <div class="primary-stat">
               <HeartIcon class="primary-stat__icon" aria-hidden="true" />
               <div class="primary-stat__text">
                 <span class="primary-stat__counter">{{ sumFollows() }}</span>
-                <span class="primary-stat__label">followers of projects</span>
+                followers of projects
               </div>
             </div>
             <div class="stats-block__item secondary-stat">
@@ -564,26 +564,6 @@ export default {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-}
-
-.primary-stat {
-  align-items: center;
-  display: flex;
-  margin-bottom: 0.6rem;
-}
-
-.primary-stat__icon {
-  height: 1rem;
-  width: 1rem;
-}
-
-.primary-stat__text {
-  margin-left: 0.4rem;
-}
-
-.primary-stat__counter {
-  font-size: var(--font-size-md);
-  font-weight: bold;
 }
 
 .date {

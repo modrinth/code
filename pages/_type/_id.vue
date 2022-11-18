@@ -84,15 +84,23 @@
             class="categories"
           />
           <hr class="card-divider" />
-          <div class="stats">
-            <span class="stat">{{ $formatNumber(project.downloads) }}</span>
-            <span class="label"
-              >download<span v-if="project.downloads !== 1">s</span></span
-            >
-            <span class="stat">{{ $formatNumber(project.followers) }}</span>
-            <span class="label"
-              >follower<span v-if="project.followers !== 1">s</span></span
-            >
+          <div class="primary-stat">
+            <DownloadIcon class="primary-stat__icon" aria-hidden="true" />
+            <div class="primary-stat__text">
+              <span class="primary-stat__counter">
+                {{ $formatNumber(project.downloads) }}
+              </span>
+              download<span v-if="project.downloads !== 1">s</span>
+            </div>
+          </div>
+          <div class="primary-stat">
+            <HeartIcon class="primary-stat__icon" aria-hidden="true" />
+            <div class="primary-stat__text">
+              <span class="primary-stat__counter">
+                {{ $formatNumber(project.followers) }}
+              </span>
+              follower<span v-if="project.followers !== 1">s</span>
+            </div>
           </div>
           <div class="dates">
             <div
@@ -141,7 +149,7 @@
                 class="iconified-button"
                 @click="$store.dispatch('user/unfollowProject', project)"
               >
-                <FollowIcon fill="currentColor" aria-hidden="true" />
+                <HeartIcon fill="currentColor" aria-hidden="true" />
                 Unfollow
               </button>
             </template>
@@ -151,7 +159,7 @@
                 Report
               </a>
               <a class="iconified-button" :href="authUrl">
-                <FollowIcon fill="currentColor" aria-hidden="true" />
+                <HeartIcon fill="currentColor" aria-hidden="true" />
                 Follow
               </a>
             </template>
@@ -331,7 +339,7 @@
                   v-else-if="donation.id === 'open-collective'"
                   aria-hidden="true"
                 />
-                <FollowIcon v-else-if="donation.id === 'github'" />
+                <HeartIcon v-else-if="donation.id === 'github'" />
                 <UnknownIcon v-else />
                 <span v-if="donation.id === 'bmac'">Buy Me a Coffee</span>
                 <span v-else-if="donation.id === 'patreon'">Patreon</span>
@@ -666,7 +674,7 @@
                   v-else-if="donation.id === 'open-collective'"
                   aria-hidden="true"
                 />
-                <FollowIcon v-else-if="donation.id === 'github'" />
+                <HeartIcon v-else-if="donation.id === 'github'" />
                 <UnknownIcon v-else />
                 <span v-if="donation.id === 'bmac'">Buy Me a Coffee</span>
                 <span v-else-if="donation.id === 'patreon'">Patreon</span>
@@ -837,7 +845,7 @@ import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import UpdateIcon from '~/assets/images/utils/updated.svg?inline'
 import CodeIcon from '~/assets/images/sidebar/mod.svg?inline'
 import ReportIcon from '~/assets/images/utils/report.svg?inline'
-import FollowIcon from '~/assets/images/utils/heart.svg?inline'
+import HeartIcon from '~/assets/images/utils/heart.svg?inline'
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import IssuesIcon from '~/assets/images/utils/issues.svg?inline'
 import WikiIcon from '~/assets/images/utils/wiki.svg?inline'
@@ -873,7 +881,7 @@ export default {
     UpdateIcon,
     CodeIcon,
     ReportIcon,
-    FollowIcon,
+    HeartIcon,
     InfoIcon,
     WikiIcon,
     DiscordIcon,
@@ -1190,17 +1198,6 @@ export default {
     margin: 0.25rem 0;
     color: var(--color-text-secondary);
     font-size: var(--font-size-nm);
-  }
-
-  .stats {
-    .stat {
-      font-size: var(--font-size-lg);
-      font-weight: bold;
-    }
-
-    .label {
-      margin-right: 0.125rem;
-    }
   }
 
   .dates {

@@ -1271,3 +1271,23 @@ button {
     color: var(--color-button-text-active);
   }
 }
+
+.primary-stat {
+  align-items: center;
+  display: flex;
+  margin-bottom: 0.6rem;
+
+  .primary-stat__icon {
+    height: 1rem;
+    width: 1rem;
+  }
+
+  .primary-stat__text {
+    margin-left: 0.4rem;
+  }
+
+  .primary-stat__counter {
+    font-size: var(--font-size-lg);
+    font-weight: bold;
+  }
+}
