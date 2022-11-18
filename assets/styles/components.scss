@@ -752,6 +752,17 @@ tr.button-transparent {
   }
 }
 
+.resizable-textarea-wrapper {
+  display: block;
+
+  textarea {
+    border-radius: var(--size-rounded-sm);
+    min-height: 10rem;
+    width: calc(100% - var(--spacing-card-lg) - var(--spacing-card-sm));
+    resize: vertical;
+  }
+}
+
 .error {
   display: flex;
   flex-direction: column;

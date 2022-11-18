@@ -302,28 +302,26 @@
         class="separator"
         :items="['source', 'preview']"
       />
-      <div class="edit-wrapper">
-        <div v-if="bodyViewMode === 'source'" class="textarea-wrapper">
-          <textarea
-            id="body"
-            v-model="newProject.body"
-            :class="{
-              'known-error': newProject.body === '' && showKnownErrors,
-            }"
-            :disabled="(currentMember.permissions & EDIT_BODY) !== EDIT_BODY"
-          />
-        </div>
-        <div
-          v-if="bodyViewMode === 'preview'"
-          v-highlightjs
-          class="markdown-body"
-          v-html="
-            newProject.body
-              ? $xss($md.render(newProject.body))
-              : 'No body specified.'
-          "
-        ></div>
+      <div v-if="bodyViewMode === 'source'" class="resizable-textarea-wrapper">
+        <textarea
+          id="body"
+          v-model="newProject.body"
+          :class="{
+            'known-error': newProject.body === '' && showKnownErrors,
+          }"
+          :disabled="(currentMember.permissions & EDIT_BODY) !== EDIT_BODY"
+        />
       </div>
+      <div
+        v-if="bodyViewMode === 'preview'"
+        v-highlightjs
+        class="markdown-body"
+        v-html="
+          newProject.body
+            ? $xss($md.render(newProject.body))
+            : 'No body specified.'
+        "
+      ></div>
     </section>
     <section class="card extra-links">
       <div class="title">
@@ -812,17 +810,8 @@ label {
   }
 }
 
-.textarea-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-
-  textarea {
-    flex: 1;
-    overflow-y: auto;
-    resize: none;
-    max-width: 100%;
-  }
+.resizable-textarea-wrapper textarea {
+  min-height: 20rem;
 }
 
 .page-contents {
@@ -906,11 +895,6 @@ section.description {
 
   .separator {
     margin: var(--spacing-card-sm) 0;
-  }
-
-  .edit-wrapper * {
-    min-height: 10rem;
-    max-height: 40rem;
   }
 
   .markdown-body {

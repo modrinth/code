@@ -175,13 +175,11 @@
             class="separator"
             :items="['source', 'preview']"
           />
-          <div v-if="changelogViewMode === 'source'" class="textarea-wrapper">
-            <textarea
-              id="body"
-              v-model="version.changelog"
-              class="changelog-textarea"
-              spellcheck="true"
-            />
+          <div
+            v-if="changelogViewMode === 'source'"
+            class="resizable-textarea-wrapper"
+          >
+            <textarea id="body" v-model="version.changelog" spellcheck="true" />
           </div>
           <div
             v-if="changelogViewMode === 'preview'"
@@ -1302,18 +1300,6 @@ section {
 
 .options {
   margin-bottom: var(--spacing-card-sm);
-}
-
-.textarea-wrapper {
-  display: inline-block;
-  width: 100%;
-}
-
-.changelog-textarea {
-  resize: vertical;
-  width: calc(100% - var(--spacing-card-lg) - var(--spacing-card-md));
-  min-height: 10rem;
-  display: block;
 }
 
 .full-width-input {

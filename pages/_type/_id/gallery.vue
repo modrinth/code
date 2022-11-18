@@ -222,7 +222,7 @@
               type="text"
               placeholder="Enter the title..."
             />
-            <div class="textarea-wrapper">
+            <div class="resizable-textarea-wrapper">
               <textarea
                 id="body"
                 v-model="item.description"
@@ -650,10 +650,6 @@ export default {
 
     textarea {
       border-radius: var(--size-rounded-sm);
-    }
-
-    .textarea-wrapper {
-      width: 100%;
     }
 
     input {
