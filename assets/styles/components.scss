@@ -244,6 +244,10 @@
         margin-bottom: 0.5rem;
         border-radius: var(--size-rounded-xs) var(--size-rounded-xs) 0 0;
       }
+
+      > :last-child:not(summary) {
+        margin-bottom: 0 !important;
+      }
     }
   }
 
