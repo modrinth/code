@@ -141,7 +141,7 @@
                 class="iconified-button"
                 @click="$store.dispatch('user/followProject', project)"
               >
-                <FollowIcon aria-hidden="true" />
+                <HeartIcon aria-hidden="true" />
                 Follow
               </button>
               <button
