@@ -215,6 +215,13 @@ export default {
           type: 'error',
         })
       }
+
+      this.$cookies.set('auth-token-reset', true)
+      alert(
+        'Please note that logging back in with GitHub will create a new account.'
+      )
+      window.location.href = '/'
+
       this.$nuxt.$loading.finish()
     },
     logout() {
