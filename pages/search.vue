@@ -3,7 +3,7 @@
     :class="{
       'search-page': true,
       'normal-page': true,
-      'alt-layout': $store.state.cosmetics.searchLayout,
+      'alt-layout': $cosmetics.searchLayout,
     }"
   >
     <aside
@@ -215,7 +215,7 @@
       <div
         v-if="
           projectType.id === 'modpack' &&
-          $orElse($store.state.cosmetics.modpacksAlphaNotice, true)
+          $orElse($cosmetics.modpacksAlphaNotice, true)
         "
         class="card warning"
         aria-label="Warning"
@@ -225,20 +225,22 @@
         instructions on
         <a
           href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
-          target="_blank"
+          :target="$external()"
           >playing modpacks</a
         >
         with
-        <a href="https://atlauncher.com/about" target="_blank">ATLauncher</a>,
-        <a href="https://multimc.org/" target="_blank">MultiMC</a>, and
-        <a href="https://prismlauncher.org" target="_blank">Prism Launcher</a>.
-        Pack creators can reference our documentation on
+        <a href="https://atlauncher.com/about" :target="$external()"
+          >ATLauncher</a
+        >, <a href="https://multimc.org/" :target="$external()">MultiMC</a>, and
+        <a href="https://prismlauncher.org" :target="$external()">
+          Prism Launcher</a
+        >. Pack creators can reference our documentation on
         <a
           href="https://docs.modrinth.com/docs/modpacks/creating_modpacks/"
-          target="_blank"
+          :target="$external()"
           >creating modpacks</a
         >. Join us on
-        <a href="https://discord.gg/EUHuJHt" target="_blank">Discord</a>
+        <a href="https://discord.gg/EUHuJHt" :target="$external()">Discord</a>
         for support.
       </div>
       <Advertisement

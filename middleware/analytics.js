@@ -11,7 +11,7 @@ export default function (context) {
     return
   }
 
-  if (context.$config.analytics.base_url == null) {
+  if (process.env.NODE_ENV !== 'production') {
     return
   }
 

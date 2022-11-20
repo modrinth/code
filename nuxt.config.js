@@ -375,6 +375,7 @@ export default {
     render: {
       routeDone(url, result, context) {
         setTimeout(() => {
+          if (process.env.NODE_ENV !== 'production') return
           axios
             .post(
               `${process.env.ARIADNE_URL || STAGING_ARIADNE_URL}view`,

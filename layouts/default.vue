@@ -318,7 +318,7 @@
         <p>
           Modrinth is
           <a
-            target="_blank"
+            :target="$external()"
             href="https://github.com/modrinth"
             class="text-link"
           >
@@ -327,7 +327,7 @@
         </p>
         <p>
           {{ owner }}/{{ slug }} {{ branch }}@<a
-            target="_blank"
+            :target="$external()"
             :href="'https://github.com/' + owner + '/' + slug + '/tree/' + hash"
             class="text-link"
             >{{ hash.substring(0, 7) }}</a
@@ -341,7 +341,7 @@
         <nuxt-link to="/legal/privacy">Privacy</nuxt-link>
         <nuxt-link to="/legal/rules">Rules</nuxt-link>
         <a
-          target="_blank"
+          :target="$external()"
           href="https://github.com/modrinth/knossos/blob/master/LICENSE.md"
         >
           License
@@ -349,19 +349,19 @@
       </div>
       <div class="links links-2" role="region" aria-label="Resources">
         <h4 aria-hidden="true">Resources</h4>
-        <a target="_blank" href="https://blog.modrinth.com">Blog</a>
-        <a target="_blank" href="https://docs.modrinth.com">Docs</a>
-        <a target="_blank" href="https://status.modrinth.com">Status</a>
-        <a target="_blank" href="https://github.com/modrinth">GitHub</a>
+        <a :target="$external()" href="https://blog.modrinth.com">Blog</a>
+        <a :target="$external()" href="https://docs.modrinth.com">Docs</a>
+        <a :target="$external()" href="https://status.modrinth.com">Status</a>
+        <a :target="$external()" href="https://github.com/modrinth">GitHub</a>
       </div>
       <div class="links links-3" role="region" aria-label="Interact">
         <h4 aria-hidden="true">Interact</h4>
-        <a target="_blank" href="https://discord.gg/EUHuJHt">Discord</a>
-        <a target="_blank" href="https://twitter.com/modrinth">Twitter</a>
-        <a target="_blank" rel="me" href="https://floss.social/@modrinth">
+        <a :target="$external()" href="https://discord.gg/EUHuJHt">Discord</a>
+        <a :target="$external()" href="https://twitter.com/modrinth">Twitter</a>
+        <a :target="$external()" rel="me" href="https://floss.social/@modrinth">
           Mastodon
         </a>
-        <a target="_blank" href="https://crowdin.com/project/modrinth">
+        <a :target="$external()" href="https://crowdin.com/project/modrinth">
           Crowdin
         </a>
       </div>

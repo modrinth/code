@@ -8,7 +8,7 @@
     <div
       :class="{
         'normal-page': true,
-        'alt-layout': $store.state.cosmetics.projectLayout,
+        'alt-layout': $cosmetics.projectLayout,
       }"
     >
       <aside class="normal-page__sidebar">
@@ -282,7 +282,7 @@
                 v-if="project.issues_url"
                 :href="project.issues_url"
                 class="title"
-                target="_blank"
+                :target="$external()"
               >
                 <IssuesIcon aria-hidden="true" />
                 <span>Issues</span>
@@ -291,7 +291,7 @@
                 v-if="project.source_url"
                 :href="project.source_url"
                 class="title"
-                target="_blank"
+                :target="$external()"
               >
                 <CodeIcon aria-hidden="true" />
                 <span>Source</span>
@@ -300,7 +300,7 @@
                 v-if="project.wiki_url"
                 :href="project.wiki_url"
                 class="title"
-                target="_blank"
+                :target="$external()"
               >
                 <WikiIcon aria-hidden="true" />
                 <span>Wiki</span>
@@ -308,7 +308,7 @@
               <a
                 v-if="project.discord_url"
                 :href="project.discord_url"
-                target="_blank"
+                :target="$external()"
               >
                 <DiscordIcon class="shrink" aria-hidden="true" />
                 <span>Discord</span>
@@ -317,7 +317,7 @@
                 v-for="(donation, index) in project.donation_urls"
                 :key="index"
                 :href="donation.url"
-                target="_blank"
+                :target="$external()"
               >
                 <BuyMeACoffeeLogo
                   v-if="donation.id === 'bmac'"
@@ -537,13 +537,16 @@
           To install {{ project.title }}, visit
           <a
             href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"
-            target="_blank"
+            :target="$external()"
             >our documentation</a
           >
           which provides instructions on using
-          <a href="https://atlauncher.com/about" target="_blank">ATLauncher</a>,
-          <a href="https://multimc.org/" target="_blank">MultiMC</a>, and
-          <a href="https://prismlauncher.org" target="_blank">Prism Launcher</a
+          <a href="https://atlauncher.com/about" :target="$external()">
+            ATLauncher</a
+          >, <a href="https://multimc.org/" :target="$external()">MultiMC</a>,
+          and
+          <a href="https://prismlauncher.org" :target="$external()">
+            Prism Launcher</a
           >.
         </div>
         <Advertisement
@@ -617,7 +620,7 @@
                 v-if="project.issues_url"
                 :href="project.issues_url"
                 class="title"
-                target="_blank"
+                :target="$external()"
               >
                 <IssuesIcon aria-hidden="true" />
                 <span>Issues</span>
@@ -626,7 +629,7 @@
                 v-if="project.source_url"
                 :href="project.source_url"
                 class="title"
-                target="_blank"
+                :target="$external()"
               >
                 <CodeIcon aria-hidden="true" />
                 <span>Source</span>
@@ -635,7 +638,7 @@
                 v-if="project.wiki_url"
                 :href="project.wiki_url"
                 class="title"
-                target="_blank"
+                :target="$external()"
               >
                 <WikiIcon aria-hidden="true" />
                 <span>Wiki</span>
@@ -643,7 +646,7 @@
               <a
                 v-if="project.discord_url"
                 :href="project.discord_url"
-                target="_blank"
+                :target="$external()"
               >
                 <DiscordIcon class="shrink" aria-hidden="true" />
                 <span>Discord</span>
@@ -652,7 +655,7 @@
                 v-for="(donation, index) in project.donation_urls"
                 :key="index"
                 :href="donation.url"
-                target="_blank"
+                :target="$external()"
               >
                 <BuyMeACoffeeLogo
                   v-if="donation.id === 'bmac'"

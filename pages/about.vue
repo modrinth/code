@@ -9,8 +9,9 @@
 
       <p>
         Our primary goal is to be as open as possible, with all our code being
-        <a target="_blank" href="https://github.com/modrinth">open source</a>,
-        while giving back to the modding community as much as possible.
+        <a :target="$external()" href="https://github.com/modrinth">
+          open source</a
+        >, while giving back to the modding community as much as possible.
       </p>
 
       <p>
@@ -27,29 +28,32 @@
       <p>
         On the technical level, Modrinth is made up of two main components: the
         Rust-based backend named
-        <a target="_blank" href="https://github.com/modrinth/labrinth"
+        <a :target="$external()" href="https://github.com/modrinth/labrinth"
           >Labrinth</a
         >, and the Vue-based frontend named
-        <a target="_blank" href="https://github.com/modrinth/knossos">Knossos</a
+        <a :target="$external()" href="https://github.com/modrinth/knossos">
+          Knossos</a
         >.
       </p>
 
       <p>
         Additionally, some other custom-created resources exist, including but
         not limited to:
-        <a target="_blank" href="https://github.com/modrinth/minotaur"
+        <a :target="$external()" href="https://github.com/modrinth/minotaur"
           >Minotaur</a
         >, a Gradle plugin for easily publishing mods to Modrinth, and
-        <a target="_blank" href="https://github.com/modrinth/minos">Minos</a>,
-        an authentication provider. All of Modrinth's code can be found on
-        <a target="_blank" href="https://github.com/modrinth">our GitHub page</a
+        <a :target="$external()" href="https://github.com/modrinth/minos">
+          Minos</a
+        >, an authentication provider. All of Modrinth's code can be found on
+        <a :target="$external()" href="https://github.com/modrinth"
+          >our GitHub page</a
         >.
       </p>
       <h2>Backend Documentation</h2>
       <p>
         Documentation for the Modrinth API (Labrinth) can be found on the GitHub
         repository's wiki
-        <a target="_blank" href="https://docs.modrinth.com">here</a>.
+        <a :target="$external()" href="https://docs.modrinth.com">here</a>.
       </p>
     </div>
   </div>

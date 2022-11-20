@@ -138,7 +138,7 @@
             </div>
             <a
               :href="githubUrl"
-              target="_blank"
+              :target="$external()"
               class="sidebar__item github-button iconified-button"
             >
               <GitHubIcon aria-hidden="true" />

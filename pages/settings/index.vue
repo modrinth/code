@@ -92,6 +92,24 @@
           @change="saveCosmeticSettings"
         />
       </div>
+      <div class="adjacent-input small">
+        <label for="external-links-new-tab">
+          <span class="label__title">Open external links in new tab</span>
+          <span class="label__description">
+            Make links which go outside of Modrinth open in a new tab. No matter
+            this setting, links on the same domain and in Markdown descriptions
+            will open in the same tab, and links on ads and edit pages will open
+            in a new tab.
+          </span>
+        </label>
+        <input
+          id="external-links-new-tab"
+          v-model="externalLinksNewTab"
+          class="switch stylized-toggle"
+          type="checkbox"
+          @change="saveCosmeticSettings"
+        />
+      </div>
     </section>
   </div>
 </template>
@@ -110,6 +128,7 @@ export default {
       projectLayout: false,
       modpacksAlphaNotice: true,
       advancedRendering: true,
+      externalLinksNewTab: true,
     }
   },
   fetch() {
@@ -122,6 +141,9 @@ export default {
       this.modpacksAlphaNotice
     this.advancedRendering =
       this.$store.state.cosmetics.advancedRendering ?? this.advancedRendering
+    this.externalLinksNewTab =
+      this.$store.state.cosmetics.externalLinksNewTab ??
+      this.externalLinksNewTab
   },
   head: {
     title: 'Display settings - Modrinth',
@@ -133,6 +155,7 @@ export default {
         projectLayout: this.projectLayout,
         modpacksAlphaNotice: this.modpacksAlphaNotice,
         advancedRendering: this.advancedRendering,
+        externalLinksNewTab: this.externalLinksNewTab,
         $cookies: this.$cookies,
       })
     },

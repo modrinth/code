@@ -11,6 +11,7 @@ export const state = () => ({
   projectLayout: false,
   modpacksAlphaNotice: true,
   advancedRendering: true,
+  externalLinksNewTab: true,
   notUsingBlockers: false,
 })
 
@@ -27,6 +28,9 @@ export const mutations = {
   SET_ADVANCED_RENDERING(state, advancedRendering) {
     state.advancedRendering = advancedRendering
   },
+  SET_EXTERNAL_LINKS_NEW_TAB(state, externalLinksNewTab) {
+    state.externalLinksNewTab = externalLinksNewTab
+  },
   SET_NOT_USING_BLOCKERS(state, notUsingBlockers) {
     state.notUsingBlockers = notUsingBlockers
   },
@@ -38,6 +42,7 @@ export const actions = {
     commit('SET_SEARCH_LAYOUT', $cookies.get('search-layout'))
     commit('SET_MODPACKS_ALPHA_NOTICE', $cookies.get('modpacks-alpha-notice'))
     commit('SET_ADVANCED_RENDERING', $cookies.get('advanced-rendering'))
+    commit('SET_EXTERNAL_LINKS_NEW_TAB', $cookies.get('external-links-new-tab'))
   },
   save(
     { commit },
@@ -46,6 +51,7 @@ export const actions = {
       searchLayout,
       modpacksAlphaNotice,
       advancedRendering,
+      externalLinksNewTab,
       $cookies,
     }
   ) {
@@ -53,10 +59,12 @@ export const actions = {
     commit('SET_SEARCH_LAYOUT', searchLayout)
     commit('SET_MODPACKS_ALPHA_NOTICE', modpacksAlphaNotice)
     commit('SET_ADVANCED_RENDERING', advancedRendering)
+    commit('SET_EXTERNAL_LINKS_NEW_TAB', externalLinksNewTab)
 
     $cookies.set('project-layout', projectLayout, parameters)
     $cookies.set('search-layout', searchLayout, parameters)
     $cookies.set('modpacks-alpha-notice', modpacksAlphaNotice, parameters)
     $cookies.set('advanced-rendering', advancedRendering, parameters)
+    $cookies.set('external-links-new-tab', externalLinksNewTab, parameters)
   },
 }
