@@ -55,7 +55,7 @@
           <VersionBadge
             v-else-if="version.version_type === 'beta'"
             type="beta"
-            color="yellow"
+            color="orange"
           />
           <VersionBadge
             v-else-if="version.version_type === 'alpha'"

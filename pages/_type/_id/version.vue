@@ -234,7 +234,7 @@
                 v-else-if="version.version_type === 'beta'"
                 class="value"
                 type="beta"
-                color="yellow"
+                color="orange"
               />
               <VersionBadge
                 v-else-if="version.version_type === 'alpha'"
@@ -1125,7 +1125,7 @@ export default {
 }
 
 .required {
-  color: var(--color-badge-red-bg);
+  color: var(--color-special-red);
 }
 
 .version-header {

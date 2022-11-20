@@ -17,6 +17,7 @@ export default (ctx, inject) => {
     return obj
   })
   inject('formatNumber', formatNumber)
+  inject('capitalizeString', capitalizeString)
   inject('formatMoney', (number) => '$' + formatNumber(number.toFixed(2)))
   inject('formatVersion', (versionsArray) =>
     formatVersions(versionsArray, ctx.store)
@@ -199,18 +200,22 @@ export const formatBytes = (bytes, decimals = 2) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
 }
 
+export const capitalizeString = (name) => {
+  return name.charAt(0).toUpperCase() + name.slice(1)
+}
+
 export const formatWallet = (name) => {
   if (name === 'paypal') {
     return 'PayPal'
   }
-  return name.charAt(0).toUpperCase() + name.slice(1)
+  return capitalizeString(name)
 }
 
 export const formatProjectType = (name) => {
   if (name === 'resourcepack') {
     return 'Resource Pack'
   }
-  return name.charAt(0).toUpperCase() + name.slice(1)
+  return capitalizeString(name)
 }
 
 export const formatCategory = (name) => {
@@ -235,11 +240,11 @@ export const formatCategory = (name) => {
   } else if (name === 'kitchen-sink') {
     return 'Kitchen Sink'
   }
-  return name.charAt(0).toUpperCase() + name.slice(1)
+  return capitalizeString(name)
 }
 
 export const formatCategoryHeader = (name) => {
-  return name.charAt(0).toUpperCase() + name.slice(1)
+  return capitalizeString(name)
 }
 
 export const formatVersions = (versionArray, store) => {

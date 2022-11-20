@@ -211,7 +211,7 @@ export default {
   }
 
   .invalid {
-    color: var(--color-badge-red-bg);
+    color: var(--color-special-red);
   }
 
   .confirm-text {

@@ -92,13 +92,11 @@
           </template>
           <template v-else>
             <div class="sidebar__item">
-              <Badge v-if="user.role === 'admin'" type="admin" color="red" />
               <Badge
-                v-else-if="user.role === 'moderator'"
-                type="moderator"
-                color="yellow"
+                v-if="user.role === 'admin' || user.role === 'moderator'"
+                :type="user.role"
               />
-              <Badge v-else type="developer" color="green" />
+              <Badge v-else-if="projects.length > 0" type="creator" />
             </div>
             <span v-if="user.bio" class="sidebar__item bio">{{
               user.bio

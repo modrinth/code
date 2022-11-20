@@ -182,18 +182,18 @@ export default {
   padding-left: 1.8rem;
 
   .changelog-bar {
-    --color: var(--color-badge-green-bg);
+    --color: var(--color-special-green);
 
     &.alpha {
-      --color: var(--color-badge-red-bg);
+      --color: var(--color-special-red);
     }
 
     &.release {
-      --color: var(--color-badge-green-bg);
+      --color: var(--color-special-green);
     }
 
     &.beta {
-      --color: var(--color-badge-yellow-bg);
+      --color: var(--color-special-orange);
     }
 
     left: 0;

@@ -99,11 +99,11 @@ input {
 }
 
 .known-error label {
-  border-color: var(--color-badge-red-bg) !important;
+  border-color: var(--color-special-red) !important;
   background-color: var(--color-warning-bg) !important;
 
   span {
-    border-color: var(--color-badge-red-bg);
+    border-color: var(--color-special-red);
   }
 
   &::placeholder {

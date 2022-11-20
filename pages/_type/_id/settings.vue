@@ -95,7 +95,7 @@
         </div>
         <div class="side-buttons">
           <Badge v-if="member.accepted" type="accepted" color="green" />
-          <Badge v-else type="pending" color="yellow" />
+          <Badge v-else type="pending" color="orange" />
           <button
             class="dropdown-icon"
             @click="

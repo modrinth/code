@@ -19,7 +19,8 @@ html {
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-brand: #00af5c;
+  --color-brand-green: #00af5c;
+  --color-brand: var(--color-brand-green);
   --color-brand-highlight: rgba(0, 175, 92, 0.25);
   --color-brand-shadow: rgba(0, 175, 92, 0.7);
   --color-brand-inverted: #ffffff;
@@ -56,14 +57,12 @@ html {
   --color-link-hover: #1a76e7;
   --color-link-active: #146fd7;
 
-  --color-badge-gray-text: #646161;
-  --color-badge-gray-bg: #c8c1c1;
-  --color-badge-red-text: #6e1931;
-  --color-badge-red-bg: #db3162;
-  --color-badge-green-text: #184e38;
-  --color-badge-green-bg: #24a54e;
-  --color-badge-yellow-text: #755920;
-  --color-badge-yellow-bg: #f7bb43;
+  --color-special-red: #cb2245;
+  --color-special-orange: #e08325;
+  --color-special-green: var(--color-brand-green);
+  --color-special-blue: #1f68c0;
+  --color-special-purple: #8e32F3;
+  --color-special-gray: #595B61;
 
   --color-warning-bg: hsl(355, 70%, 88%);
   --color-warning-text: hsl(342, 70%, 35%);
@@ -107,7 +106,15 @@ html {
   --color-text-inverted: var(--color-bg);
   --color-bg-inverted: var(--color-text);
 
-  --color-brand: #1bd96a;
+  --color-special-red: #ff496e;
+  --color-special-orange: #ffa347;
+  --color-special-green: var(--color-brand-green);
+  --color-special-blue: #4F9CFF;
+  --color-special-purple: #C78AFF;
+  --color-special-gray: #9FA4B3;
+
+  --color-brand-green: #1bd96a;
+  --color-brand: var(--color-brand-green);
   --color-brand-highlight: rgba(27, 217, 106, 0.25);
   --color-brand-shadow: rgba(27, 217, 106, 0.7);
   --color-brand-inverted: #000;
@@ -140,15 +147,6 @@ html {
   --color-link: #74b6f3;
   --color-link-hover: #92c0f5;
   --color-link-active: #b5d5fd;
-
-  --color-badge-gray-bg: #646161;
-  --color-badge-gray-text: #c8c1c1;
-  --color-badge-red-text: #bd1a48;
-  --color-badge-red-bg: #db3162;
-  --color-badge-green-text: #1ebb7b;
-  --color-badge-green-bg: #24a54e;
-  --color-badge-yellow-text: #dba22d;
-  --color-badge-yellow-bg: #f7bb43;
 
   --color-warning-bg: hsl(355, 70%, 20%);
   --color-warning-text: hsl(342, 70%, 75%);

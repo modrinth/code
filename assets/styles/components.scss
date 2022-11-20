@@ -27,35 +27,6 @@
   }
 }
 
-.badge {
-  max-height: 1rem;
-  border-radius: 1rem;
-  font-size: var(--font-size-xs);
-  font-weight: bold;
-  letter-spacing: 0.02rem;
-  padding: 0.25rem 0.5rem;
-
-  &.gray {
-    background-color: var(--color-badge-gray-bg);
-    color: var(--color-badge-gray-text);
-  }
-
-  &.red {
-    background-color: var(--color-badge-red-bg);
-    color: var(--color-badge-red-text);
-  }
-
-  &.green {
-    background-color: var(--color-badge-green-bg);
-    color: var(--color-badge-green-text);
-  }
-
-  &.yellow {
-    background-color: var(--color-badge-yellow-bg);
-    color: var(--color-badge-yellow-text);
-  }
-}
-
 .text-link {
   color: var(--color-link);
   text-decoration: underline;
@@ -532,7 +503,7 @@ tr.button-transparent {
 }
 
 .danger-button {
-  --background-color: var(--color-badge-red-bg);
+  --background-color: var(--color-special-red);
   --text-color: var(--color-brand-inverted);
 }
 
@@ -554,7 +525,7 @@ tr.button-transparent {
 }
 
 .known-error .multiselect__tags {
-  border-color: var(--color-badge-red-bg) !important;
+  border-color: var(--color-special-red) !important;
   background-color: var(--color-warning-bg) !important;
 
   &::placeholder {
@@ -898,7 +869,7 @@ tr.button-transparent {
 .text-input-wrapper.known-error,
 input.known-error,
 textarea.known-error {
-  outline: 2px solid var(--color-badge-red-bg);
+  outline: 2px solid var(--color-special-red);
   background-color: var(--color-warning-bg) !important;
 
   &::placeholder {
@@ -907,7 +878,7 @@ textarea.known-error {
 }
 
 .known-errors {
-  color: var(--color-badge-red-bg);
+  color: var(--color-special-red);
 
   ul {
     margin: 0;
@@ -1017,7 +988,7 @@ h1 {
       font-weight: bold;
 
       .required {
-        color: var(--color-badge-red-bg);
+        color: var(--color-special-red);
       }
     }
     .label__description {

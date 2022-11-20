@@ -952,7 +952,7 @@ section.donations {
 }
 
 .required {
-  color: var(--color-badge-red-bg);
+  color: var(--color-special-red);
 }
 
 .vertical-input {

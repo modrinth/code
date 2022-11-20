@@ -622,14 +622,6 @@ export default {
           width: auto;
         }
 
-        .badge {
-          margin-left: 0.25rem;
-          display: none;
-          @media screen and (min-width: 430px) {
-            display: unset;
-          }
-        }
-
         button {
           background: none;
           border: none;

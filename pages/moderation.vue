@@ -9,26 +9,7 @@
         </p>
         <div class="status">
           <span>New project status: </span>
-          <Badge
-            v-if="currentProject.newStatus === 'approved'"
-            color="green"
-            :type="currentProject.newStatus"
-          />
-          <Badge
-            v-else-if="
-              currentProject.newStatus === 'processing' ||
-              currentProject.newStatus === 'unlisted' ||
-              currentProject.newStatus === 'archived'
-            "
-            color="yellow"
-            :type="currentProject.newStatus"
-          />
-          <Badge
-            v-else-if="currentProject.newStatus === 'rejected'"
-            color="red"
-            :type="currentProject.newStatus"
-          />
-          <Badge v-else color="gray" :type="currentProject.newStatus" />
+          <Badge :type="currentProject.newStatus" />
         </div>
         <input
           v-model="currentProject.moderation_message"
@@ -155,7 +136,7 @@
                 class="markdown-body"
                 v-html="$xss($md.render(item.body))"
               />
-              <Badge :type="`Marked as ${item.report_type}`" color="yellow" />
+              <Badge :type="`Marked as ${item.report_type}`" color="orange" />
             </div>
             <div class="actions">
               <button class="iconified-button" @click="deleteReport(index)">
