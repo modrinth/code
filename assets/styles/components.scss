@@ -371,6 +371,7 @@
 .button-base {
   @extend .button-animation;
   font-weight: 500;
+  outline: 2px solid transparent;
 
   &:focus-visible:not(&:disabled),
   &:hover:not(&:disabled) {
@@ -563,6 +564,7 @@ tr.button-transparent {
 
 .multiselect {
   color: var(--color-text) !important;
+  outline: 2px solid transparent;
 
   input {
     background: transparent;
@@ -697,6 +699,7 @@ tr.button-transparent {
     border-radius: 50%;
     background: var(--color-toggle-handle);
     transition: all 0.2s cubic-bezier(0.5, 0.1, 0.75, 1.35);
+    outline: 2px solid transparent;
 
     @media (prefers-reduced-motion) {
       transition: none;
@@ -795,6 +798,7 @@ tr.button-transparent {
 
   background: var(--color-raised-bg);
   border-radius: var(--size-rounded-card);
+  outline: 2px solid transparent;
 
   margin-bottom: var(--spacing-card-md);
 
@@ -970,6 +974,7 @@ h1 {
   border-radius: var(--size-rounded-card);
 
   margin-bottom: var(--spacing-card-md);
+  outline: 2px solid transparent;
 
   box-shadow: var(--shadow-card);
 
