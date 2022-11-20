@@ -867,6 +867,7 @@ export default {
       width: 100%;
       transition: height 0.25s ease-in-out;
       height: var(--size-mobile-navbar-height);
+      padding-bottom: env(safe-area-inset-bottom);
       position: fixed;
       left: 0;
       bottom: 0;
@@ -977,6 +978,21 @@ export default {
 
       &.expanded {
         height: var(--size-mobile-navbar-height-expanded);
+
+        &::after {
+          top: var(--size-mobile-navbar-height-expanded);
+        }
+      }
+
+      &::after {
+        content: '';
+        background: var(--color-raised-bg);
+        width: 100%;
+        height: 50px;
+        position: absolute;
+        top: var(--size-mobile-navbar-height);
+        left: 0;
+        transition: top 0.25s ease-in-out;
       }
     }
   }
