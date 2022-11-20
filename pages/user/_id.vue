@@ -197,11 +197,13 @@
             :client-side="project.client_side"
             :server-side="project.server_side"
             :status="
-              $auth.user &&
-              ($auth.user.role === 'admin' || $auth.user.role === 'moderator')
+              ($auth.user && $auth.user.id === user.id) ||
+              $auth.user.role === 'admin' ||
+              $auth.user.role === 'moderator'
                 ? project.status
                 : null
             "
+            :has-mod-message="project.moderator_message"
             :type="project.project_type"
           >
             <nuxt-link

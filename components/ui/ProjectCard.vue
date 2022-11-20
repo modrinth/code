@@ -12,8 +12,16 @@
             <h2 class="title">
               <nuxt-link
                 :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
-                >{{ name }}</nuxt-link
               >
+                <IssuesIcon
+                  v-if="hasModMessage"
+                  v-tooltip="
+                    'Project has a message from the moderators. View the project to see more.'
+                  "
+                  aria-label="Project has a message from the moderators. View the project to see more."
+                />
+                {{ name }}
+              </nuxt-link>
             </h2>
             <p v-if="author" class="author">
               by
@@ -155,6 +163,7 @@ import Categories from '~/components/ui/search/Categories'
 import Badge from '~/components/ui/Badge'
 
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
+import IssuesIcon from '~/assets/images/utils/issues.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import EditIcon from '~/assets/images/utils/updated.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
@@ -168,6 +177,7 @@ export default {
     Categories,
     Badge,
     InfoIcon,
+    IssuesIcon,
     CalendarIcon,
     EditIcon,
     DownloadIcon,
@@ -226,6 +236,10 @@ export default {
     status: {
       type: String,
       default: null,
+    },
+    hasModMessage: {
+      type: Boolean,
+      default: false,
     },
     serverSide: {
       type: String,
@@ -301,6 +315,13 @@ export default {
           color: var(--color-text-dark);
           font-size: var(--font-size-xl);
           word-wrap: break-word;
+
+          svg {
+            width: auto;
+            color: var(--color-badge-yellow-text);
+            height: 1.5rem;
+            margin-bottom: -0.25rem;
+          }
         }
 
         .author {
