@@ -89,6 +89,11 @@ pub struct Project {
 
     /// A string of URLs to visual content featuring the project
     pub gallery: Vec<GalleryItem>,
+
+    /// The project linked from FlameAnvil to sync with
+    pub flame_anvil_project: Option<i32>,
+    /// The user_id of the team member whose token
+    pub flame_anvil_user: Option<UserId>,
 }
 
 impl From<QueryProject> for Project {
@@ -153,6 +158,8 @@ impl From<QueryProject> for Project {
                     created: x.created,
                 })
                 .collect(),
+            flame_anvil_project: m.flame_anvil_project,
+            flame_anvil_user: m.flame_anvil_user.map(|x| x.into()),
         }
     }
 }

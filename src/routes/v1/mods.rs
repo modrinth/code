@@ -1,5 +1,6 @@
 use crate::file_hosting::FileHost;
 use crate::models::projects::SearchRequest;
+use crate::queue::flameanvil::FlameAnvilQueue;
 use crate::routes::project_creation::{
     project_create_inner, undo_uploads, CreateError,
 };
@@ -15,6 +16,7 @@ use actix_web::{get, post, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::sync::Arc;
+use tokio::sync::Mutex;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResultSearchMod {
@@ -119,6 +121,7 @@ pub async fn mod_create(
     mut payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    flame_anvil_queue: Data<Arc<Mutex<FlameAnvilQueue>>>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -128,6 +131,7 @@ pub async fn mod_create(
         &mut payload,
         &mut transaction,
         &***file_host,
+        &flame_anvil_queue,
         &mut uploaded_files,
     )
     .await;

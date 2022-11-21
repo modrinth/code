@@ -97,13 +97,18 @@ impl PayoutsQueue {
             })?;
         }
 
-        let fee = std::cmp::min(
-            std::cmp::max(
-                Decimal::ONE / Decimal::from(4),
-                (Decimal::from(2) / Decimal::ONE_HUNDRED) * payout.amount.value,
-            ),
-            Decimal::from(20),
-        );
+        let fee = if payout.recipient_wallet == *"Venmo" {
+            Decimal::ONE / Decimal::from(4)
+        } else {
+            std::cmp::min(
+                std::cmp::max(
+                    Decimal::ONE / Decimal::from(4),
+                    (Decimal::from(2) / Decimal::ONE_HUNDRED)
+                        * payout.amount.value,
+                ),
+                Decimal::from(20),
+            )
+        };
 
         payout.amount.value -= fee;
 
@@ -170,9 +175,9 @@ impl PayoutsQueue {
             }
 
             // Calculate actual fee + refund if we took too big of a fee.
-            if let Some(res) = res.json::<PayoutsResponse>().await.ok() {
+            if let Ok(res) = res.json::<PayoutsResponse>().await {
                 if let Some(link) = res.links.first() {
-                    if let Some(res) = client
+                    if let Ok(res) = client
                         .get(&link.href)
                         .header(
                             "Authorization",
@@ -184,9 +189,8 @@ impl PayoutsQueue {
                         )
                         .send()
                         .await
-                        .ok()
                     {
-                        if let Some(res) = res.json::<PayoutData>().await.ok() {
+                        if let Ok(res) = res.json::<PayoutData>().await {
                             if let Some(data) = res.items.first() {
                                 if (fee - data.payout_item_fee.value)
                                     > Decimal::ZERO

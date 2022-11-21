@@ -69,9 +69,16 @@ pub struct TeamMember {
 
 impl TeamMember {
     pub fn from(data: QueryTeamMember, override_permissions: bool) -> Self {
+        let has_flame_anvil_key = data.user.flame_anvil_key.is_some();
+        let mut user: User = data.user.into();
+
+        if !override_permissions {
+            user.has_flame_anvil_key = Some(has_flame_anvil_key);
+        }
+
         Self {
             team_id: data.team_id.into(),
-            user: data.user.into(),
+            user,
             role: data.role,
             permissions: if override_permissions {
                 None

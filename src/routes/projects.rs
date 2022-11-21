@@ -1,6 +1,7 @@
 use crate::database;
 use crate::file_hosting::FileHost;
 use crate::models;
+use crate::models::ids::UserId;
 use crate::models::projects::{
     DonationLink, Project, ProjectId, ProjectStatus, SearchRequest, SideType,
 };
@@ -341,6 +342,18 @@ pub struct EditProject {
     )]
     #[validate(length(max = 65536))]
     pub moderation_message_body: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub flame_anvil_user: Option<Option<UserId>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    pub flame_anvil_project: Option<Option<i32>>,
 }
 
 #[patch("{id}")]
@@ -973,6 +986,92 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     body,
+                    id as database::models::ids::ProjectId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            if let Some(project) = &new_project.flame_anvil_project {
+                if !perms.contains(Permissions::EDIT_DETAILS) {
+                    return Err(ApiError::CustomAuthentication(
+                        "You do not have the permissions to edit the external syncing project!"
+                            .to_string(),
+                    ));
+                }
+
+                if project_item.project_type == "modpack" {
+                    return Err(ApiError::InvalidInput(
+                        "This project syncing feature is not available for modpacks!"
+                            .to_string(),
+                    ));
+                }
+
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET flame_anvil_project = $1
+                    WHERE (id = $2)
+                    ",
+                    *project,
+                    id as database::models::ids::ProjectId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            if let Some(user_id) = &new_project.flame_anvil_user {
+                if !perms.contains(Permissions::EDIT_DETAILS) {
+                    return Err(ApiError::CustomAuthentication(
+                        "You do not have the permissions to edit the syncing user for this project!"
+                            .to_string(),
+                    ));
+                }
+
+                if project_item.project_type == "modpack" {
+                    return Err(ApiError::InvalidInput(
+                        "This project syncing feature is not available for modpacks!"
+                            .to_string(),
+                    ));
+                }
+
+                if let Some(user_id) = user_id {
+                    if user_id != &user.id && !user.role.is_admin() {
+                        return Err(ApiError::InvalidInput(
+                            "You may only set yourself as the syncing user!"
+                                .to_string(),
+                        ));
+                    }
+
+                    let results = sqlx::query!(
+                        "
+                        SELECT EXISTS(
+                            SELECT 1 FROM team_members
+                            INNER JOIN users u on team_members.user_id = u.id AND u.flame_anvil_key IS NOT NULL
+                            WHERE team_id = $1 AND user_id = $2 AND accepted = TRUE
+                        )
+                        ",
+                        project_item.inner.team_id as database::models::ids::TeamId,
+                        database::models::ids::UserId::from(*user_id) as database::models::ids::UserId,
+                    )
+                        .fetch_one(&mut *transaction)
+                        .await?;
+
+                    if !results.exists.unwrap_or(true) {
+                        return Err(ApiError::InvalidInput(
+                            "The given user is not part of your team or does not have a syncing key added to their account!"
+                                .to_string(),
+                        ));
+                    }
+                }
+
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET flame_anvil_user = $1
+                    WHERE (id = $2)
+                    ",
+                    user_id.map(|x| x.0 as i64),
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)

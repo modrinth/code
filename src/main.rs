@@ -1,5 +1,6 @@
 use crate::file_hosting::S3Host;
 use crate::queue::download::DownloadQueue;
+use crate::queue::flameanvil::FlameAnvilQueue;
 use crate::queue::payouts::PayoutsQueue;
 use crate::ratelimit::errors::ARError;
 use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
@@ -39,6 +40,14 @@ async fn main() -> std::io::Result<()> {
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
+    }
+
+    // DSN is from SENTRY_DSN env variable.
+    // Has no effect if not set.
+    let sentry = sentry::init(());
+    if sentry.is_enabled() {
+        info!("Enabled Sentry integration");
+        std::env::set_var("RUST_BACKTRACE", "1");
     }
 
     info!(
@@ -166,6 +175,8 @@ async fn main() -> std::io::Result<()> {
             .to_string(),
     };
 
+    let flame_anvil_queue = Arc::new(Mutex::new(FlameAnvilQueue::new()));
+
     let store = MemoryStore::new();
 
     info!("Starting Actix HTTP server!");
@@ -220,7 +231,9 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(search_config.clone()))
             .app_data(web::Data::new(download_queue.clone()))
             .app_data(web::Data::new(payouts_queue.clone()))
+            .app_data(flame_anvil_queue.clone())
             .app_data(web::Data::new(ip_salt.clone()))
+            .wrap(sentry_actix::Sentry::new())
             .configure(routes::v1_config)
             .configure(routes::v2_config)
             .service(routes::index_get)

@@ -572,6 +572,8 @@ pub async fn remove_team_member(
             ));
         }
 
+        let mut transaction = pool.begin().await?;
+
         if delete_member.accepted {
             // Members other than the owner can either leave the team, or be
             // removed by a member with the REMOVE_MEMBER permission.
@@ -579,7 +581,7 @@ pub async fn remove_team_member(
                 || (member.permissions.contains(Permissions::REMOVE_MEMBER)
                     && member.accepted)
             {
-                TeamMember::delete(id, user_id, &**pool).await?;
+                TeamMember::delete(id, user_id, &mut transaction).await?;
             } else {
                 return Err(ApiError::CustomAuthentication(
                     "You do not have permission to remove a member from this team".to_string(),
@@ -592,13 +594,15 @@ pub async fn remove_team_member(
             // This is a pending invite rather than a member, so the
             // user being invited or team members with the MANAGE_INVITES
             // permission can remove it.
-            TeamMember::delete(id, user_id, &**pool).await?;
+            TeamMember::delete(id, user_id, &mut transaction).await?;
         } else {
             return Err(ApiError::CustomAuthentication(
                 "You do not have permission to cancel a team invite"
                     .to_string(),
             ));
         }
+
+        transaction.commit().await?;
         Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))

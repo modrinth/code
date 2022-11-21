@@ -5,6 +5,7 @@ use crate::models::projects::{
     DonationLink, License, ProjectId, ProjectStatus, SideType, VersionId,
 };
 use crate::models::users::UserId;
+use crate::queue::flameanvil::FlameAnvilQueue;
 use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::IndexingError;
 use crate::util::auth::{get_user_from_headers, AuthenticationError};
@@ -22,6 +23,7 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
+use tokio::sync::Mutex;
 use validator::Validate;
 
 #[derive(Error, Debug)]
@@ -255,6 +257,7 @@ pub async fn project_create(
     mut payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
+    flame_anvil_queue: Data<Arc<Mutex<FlameAnvilQueue>>>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -264,6 +267,7 @@ pub async fn project_create(
         &mut payload,
         &mut transaction,
         &***file_host,
+        &flame_anvil_queue,
         &mut uploaded_files,
     )
     .await;
@@ -320,6 +324,7 @@ pub async fn project_create_inner(
     payload: &mut Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
+    flame_anvil_queue: &Mutex<FlameAnvilQueue>,
     uploaded_files: &mut Vec<UploadedFile>,
 ) -> Result<HttpResponse, CreateError> {
     // The base URL for files uploaded to backblaze
@@ -562,6 +567,7 @@ pub async fn project_create_inner(
         super::version_creation::upload_file(
             &mut field,
             file_host,
+            version_data.file_parts.len(),
             uploaded_files,
             &mut created_version.files,
             &mut created_version.dependencies,
@@ -575,6 +581,12 @@ pub async fn project_create_inner(
             all_game_versions.clone(),
             version_data.primary_file.is_some(),
             version_data.primary_file.as_deref() == Some(name),
+            version_data.version_title.clone(),
+            version_data.version_body.clone().unwrap_or_default(),
+            version_data.release_channel.clone().to_string(),
+            flame_anvil_queue,
+            None,
+            None,
             transaction,
         )
         .await?;
@@ -787,6 +799,8 @@ pub async fn project_create_inner(
             discord_url: project_builder.discord_url.clone(),
             donation_urls: project_create_data.donation_urls.clone(),
             gallery: gallery_urls,
+            flame_anvil_project: None,
+            flame_anvil_user: None,
         };
 
         let _project_id = project_builder.insert(&mut *transaction).await?;

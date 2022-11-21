@@ -129,6 +129,8 @@ impl ProjectBuilder {
             slug: self.slug,
             moderation_message: None,
             moderation_message_body: None,
+            flame_anvil_project: None,
+            flame_anvil_user: None,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -203,6 +205,8 @@ pub struct Project {
     pub slug: Option<String>,
     pub moderation_message: Option<String>,
     pub moderation_message_body: Option<String>,
+    pub flame_anvil_project: Option<i32>,
+    pub flame_anvil_user: Option<UserId>,
 }
 
 impl Project {
@@ -267,7 +271,8 @@ impl Project {
                    updated, approved, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
-                   moderation_message, moderation_message_body
+                   moderation_message, moderation_message_body, flame_anvil_project,
+                   flame_anvil_user
             FROM mods
             WHERE id = $1
             ",
@@ -303,6 +308,8 @@ impl Project {
                 moderation_message: row.moderation_message,
                 moderation_message_body: row.moderation_message_body,
                 approved: row.approved,
+                flame_anvil_project: row.flame_anvil_project,
+                flame_anvil_user: row.flame_anvil_user.map(UserId),
             }))
         } else {
             Ok(None)
@@ -327,7 +334,8 @@ impl Project {
                    updated, approved, status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
-                   moderation_message, moderation_message_body
+                   moderation_message, moderation_message_body, flame_anvil_project,
+                   flame_anvil_user
             FROM mods
             WHERE id = ANY($1)
             ",
@@ -361,6 +369,8 @@ impl Project {
                 moderation_message: m.moderation_message,
                 moderation_message_body: m.moderation_message_body,
                 approved: m.approved,
+                flame_anvil_project: m.flame_anvil_project,
+                flame_anvil_user: m.flame_anvil_user.map(UserId)
             }))
         })
         .try_collect::<Vec<Project>>()
@@ -639,7 +649,7 @@ impl Project {
             m.updated updated, m.approved approved, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
+            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user,
             ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
@@ -709,6 +719,8 @@ impl Project {
                     moderation_message: m.moderation_message,
                     moderation_message_body: m.moderation_message_body,
                     approved: m.approved,
+                    flame_anvil_project: m.flame_anvil_project,
+                    flame_anvil_user: m.flame_anvil_user.map(UserId),
                 },
                 project_type: m.project_type_name,
                 categories,
@@ -826,7 +838,7 @@ impl Project {
             m.updated updated, m.approved approved, m.status status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name,
+            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, l.name license_name, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user,
             ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
@@ -897,7 +909,9 @@ impl Project {
                             follows: m.follows,
                             moderation_message: m.moderation_message,
                             moderation_message_body: m.moderation_message_body,
-                            approved: m.approved
+                            approved: m.approved,
+                            flame_anvil_project: m.flame_anvil_project,
+                            flame_anvil_user: m.flame_anvil_user.map(UserId)
                         },
                         project_type: m.project_type_name,
                         categories,
