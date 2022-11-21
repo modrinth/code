@@ -135,6 +135,7 @@
               </span>
             </div>
             <a
+              v-if="githubUrl"
               :href="githubUrl"
               :target="$external()"
               class="sidebar__item github-button iconified-button"
@@ -299,19 +300,27 @@ export default {
         return
       }
 
-      const [gitHubUser, versions] = (
-        await Promise.all([
-          data.$axios.get(`https://api.github.com/user/` + user.github_id),
-          data.$axios.get(
-            `versions?ids=${JSON.stringify(
-              [].concat.apply(
-                [],
-                projects.map((x) => x.versions)
-              )
-            )}`
-          ),
-        ])
-      ).map((it) => it.data)
+      let gitHubUser = {}
+      let versions = []
+
+      try {
+        const [gitHubUserData, versionsData] = (
+          await Promise.all([
+            data.$axios.get(`https://api.github.com/user/` + user.github_id),
+            data.$axios.get(
+              `versions?ids=${JSON.stringify(
+                [].concat.apply(
+                  [],
+                  projects.map((x) => x.versions)
+                )
+              )}`
+            ),
+          ])
+        ).map((it) => it.data)
+
+        gitHubUser = gitHubUserData
+        versions = versionsData
+      } catch {}
 
       for (const version of versions) {
         const projectIndex = projects.findIndex(
