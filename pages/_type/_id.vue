@@ -915,7 +915,10 @@ export default {
     try {
       if (
         !data.params.id ||
-        !data.$tag.projectTypes.find((x) => x.id === data.params.type)
+        !(
+          data.$tag.projectTypes.find((x) => x.id === data.params.type) ||
+          data.params.type === 'project'
+        )
       ) {
         data.error({
           statusCode: 404,
@@ -968,12 +971,15 @@ export default {
         project.project_type !== data.params.type ||
         data.params.id !== project.slug
       ) {
-        const route = data.route.fullPath.split('/')
+        let route = data.route.fullPath.split('/')
         route.splice(0, 3)
+        route = route.filter((x) => x)
 
         data.redirect(
           301,
-          `/${project.project_type}/${project.slug}/${route.join('/')}`
+          `/${project.project_type}/${project.slug}${
+            route.length > 0 ? `/${route.join('/')}` : ''
+          }`
         )
 
         return

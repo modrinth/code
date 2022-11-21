@@ -168,8 +168,6 @@ Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`
         })
       )
 
-      console.log(formData)
-
       try {
         await this.$axios({
           url: 'project',

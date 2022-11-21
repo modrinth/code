@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="version">
     <div v-if="showKnownErrors" class="known-errors card">
       <ul>
         <li v-if="version.version_number === ''">
@@ -53,7 +53,7 @@
           Back to list
         </nuxt-link>
       </div>
-      <div v-if="version">
+      <div>
         <div v-if="mode === 'version'" class="version-header">
           <h2>{{ version.name }}</h2>
 
@@ -630,6 +630,7 @@
       <NuxtChild v-show="false" :mode.sync="mode" />
     </div>
   </div>
+  <div v-else></div>
 </template>
 <script>
 import Multiselect from 'vue-multiselect'
@@ -735,11 +736,10 @@ export default {
     }
   },
   async fetch() {
-    console.log(this.$nuxt.context.from)
     await this.setVersion()
   },
   head() {
-    if (!this.version.game_versions) {
+    if (!this.version || !this.version.game_versions) {
       return {}
     }
     const title = `${
