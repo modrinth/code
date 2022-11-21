@@ -196,9 +196,10 @@
             :client-side="project.client_side"
             :server-side="project.server_side"
             :status="
-              ($auth.user && $auth.user.id === user.id) ||
-              $auth.user.role === 'admin' ||
-              $auth.user.role === 'moderator'
+              $auth.user &&
+              ($auth.user.id === user.id ||
+                $auth.user.role === 'admin' ||
+                $auth.user.role === 'moderator')
                 ? project.status
                 : null
             "
