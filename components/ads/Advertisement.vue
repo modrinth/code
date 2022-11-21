@@ -25,11 +25,7 @@
           </div>
         </div>
         <div class="ea-callout">
-          <a
-            rel="nofollow noopener"
-            target="_blank"
-            href="https://modrinth.com"
-          >
+          <a rel="nofollow noopener" target="_blank" href="https://adrinth.com">
             Ads via Adrinth
           </a>
         </div>
