@@ -16,7 +16,7 @@ mod fabric;
 mod forge;
 mod liteloader;
 mod modpack;
-mod plugin;
+pub mod plugin;
 mod quilt;
 mod resourcepack;
 

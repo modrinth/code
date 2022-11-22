@@ -15,7 +15,8 @@ use crate::routes::project_creation::{CreateError, UploadedFile};
 use crate::util::auth::get_user_from_headers;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
-use crate::validate::{validate_file, ValidationResult};
+use crate::validate::plugin::PluginYmlValidator;
+use crate::validate::{validate_file, ValidationResult, Validator};
 use actix::fut::ready;
 use actix_multipart::{Field, Multipart};
 use actix_web::web::Data;
@@ -802,6 +803,12 @@ pub async fn upload_file(
             if let Some(key) = flame_anvil_key {
                 let mut flame_anvil_queue = flame_anvil_queue.lock().await;
 
+                let is_plugin = loaders.iter().any(|x| {
+                    PluginYmlValidator {}
+                        .get_supported_loaders()
+                        .contains(&&*x.0)
+                });
+
                 flame_anvil_queue
                     .upload_file(
                         &key,
@@ -820,6 +827,7 @@ pub async fn upload_file(
                         data.to_vec(),
                         file_name.to_string(),
                         content_type.to_string(),
+                        is_plugin,
                     )
                     .await?;
             }

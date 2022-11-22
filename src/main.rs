@@ -231,7 +231,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(search_config.clone()))
             .app_data(web::Data::new(download_queue.clone()))
             .app_data(web::Data::new(payouts_queue.clone()))
-            .app_data(flame_anvil_queue.clone())
+            .app_data(web::Data::new(flame_anvil_queue.clone()))
             .app_data(web::Data::new(ip_salt.clone()))
             .wrap(sentry_actix::Sentry::new())
             .configure(routes::v1_config)

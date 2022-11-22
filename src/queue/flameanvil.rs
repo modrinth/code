@@ -35,6 +35,7 @@ struct FlameUploadFile {
 pub struct FlameAnvilQueue {
     mod_loaders: Vec<FlameGameVersion>,
     minecraft_versions: Vec<FlameGameVersion>,
+    bukkit_versions: Vec<FlameGameVersion>,
     last_updated: DateTime<Utc>,
 }
 
@@ -52,25 +53,26 @@ impl FlameAnvilQueue {
         FlameAnvilQueue {
             mod_loaders: vec![],
             minecraft_versions: vec![],
+            bukkit_versions: vec![],
             last_updated: Utc::now() - Duration::days(365),
         }
     }
 
-    pub fn convert_game_versions_to_flame(
+    fn convert_game_versions_to_flame(
         &self,
         original: Vec<String>,
+        flame_game_versions: &[FlameGameVersion],
         game_versions: &[GameVersion],
     ) -> Vec<i32> {
         let mut og_to_flame = HashMap::new();
-        let mut last_visited = if self
-            .minecraft_versions
+        let mut last_visited = if flame_game_versions
             .last()
             .map(|x| x.name.ends_with("-Snapshot"))
             .unwrap_or_default()
         {
             None
         } else {
-            self.minecraft_versions
+            flame_game_versions
                 .iter()
                 .rfind(|x| !x.name.ends_with("-Snapshot"))
                 .cloned()
@@ -78,7 +80,7 @@ impl FlameAnvilQueue {
 
         for game_version in game_versions {
             if let Some(flame_game_version) =
-                self.minecraft_versions.iter().find(|x| {
+                flame_game_versions.iter().find(|x| {
                     x.name
                         == if game_version.version.starts_with('b') {
                             game_version.version.replace('b', "Beta ")
@@ -101,10 +103,8 @@ impl FlameAnvilQueue {
                         splits.next().unwrap_or_default()
                     );
 
-                    if let Some(flame_game_version) = self
-                        .minecraft_versions
-                        .iter()
-                        .find(|x| x.name == new_str)
+                    if let Some(flame_game_version) =
+                        flame_game_versions.iter().find(|x| x.name == new_str)
                     {
                         og_to_flame.insert(
                             &game_version.version,
@@ -115,8 +115,8 @@ impl FlameAnvilQueue {
                             .insert(&game_version.version, last_visited.id);
                     }
                 }
-            } else if let Some(first) = self.minecraft_versions.last() {
-                og_to_flame.insert(&game_version.version, first.id);
+            } else if let Some(last) = flame_game_versions.last() {
+                og_to_flame.insert(&game_version.version, last.id);
             }
         }
 
@@ -141,6 +141,7 @@ impl FlameAnvilQueue {
         file: Vec<u8>,
         file_name: String,
         mime_type: String,
+        is_plugin: bool,
     ) -> Result<i32, CreateError> {
         if self.last_updated < (Utc::now() - Duration::minutes(30)) {
             self.index(api_token).await.map_err(|_| {
@@ -159,6 +160,11 @@ impl FlameAnvilQueue {
 
         let mut game_versions_converted = self.convert_game_versions_to_flame(
             upload_file.game_versions,
+            if is_plugin {
+                &self.bukkit_versions
+            } else {
+                &self.minecraft_versions
+            },
             game_versions,
         );
 
@@ -209,14 +215,23 @@ impl FlameAnvilQueue {
         &mut self,
         api_token: &str,
     ) -> Result<(), reqwest::Error> {
-        let (game_versions, game_version_types) = futures::future::try_join(
+        let (game_versions, game_version_types, bukkit_game_versions, bukkit_game_versions_types) = futures::future::try_join4(
             reqwest::get(format!("https://minecraft.curseforge.com/api/game/versions?token={api_token}")),
-            reqwest::get(format!("https://minecraft.curseforge.com/api/game/version-types?token={api_token}"))
+            reqwest::get(format!("https://minecraft.curseforge.com/api/game/version-types?token={api_token}")),
+            reqwest::get(format!("https://dev.bukkit.org/api/game/versions?token={api_token}")),
+            reqwest::get(format!("https://dev.bukkit.org/api/game/version-types?token={api_token}"))
         ).await?;
 
-        let (game_versions, game_version_types) = futures::future::try_join(
+        let (
+            game_versions,
+            game_version_types,
+            bukkit_game_versions,
+            bukkit_game_versions_types,
+        ) = futures::future::try_join4(
             game_versions.json::<Vec<FlameGameVersion>>(),
             game_version_types.json::<Vec<FlameGameVersionType>>(),
+            bukkit_game_versions.json::<Vec<FlameGameVersion>>(),
+            bukkit_game_versions_types.json::<Vec<FlameGameVersionType>>(),
         )
         .await?;
 
@@ -230,6 +245,11 @@ impl FlameAnvilQueue {
             .filter(|x| x.slug.starts_with("minecraft"))
             .map(|x| x.id)
             .collect::<Vec<_>>();
+        let bukkit_types = bukkit_game_versions_types
+            .iter()
+            .filter(|x| x.slug.starts_with("bukkit"))
+            .map(|x| x.id)
+            .collect::<Vec<_>>();
 
         let mod_loaders = game_versions
             .iter()
@@ -241,9 +261,15 @@ impl FlameAnvilQueue {
             .filter(|x| minecraft_types.contains(&x.game_version_type_id))
             .cloned()
             .collect::<Vec<_>>();
+        let bukkit_versions = bukkit_game_versions
+            .iter()
+            .filter(|x| bukkit_types.contains(&x.game_version_type_id))
+            .cloned()
+            .collect::<Vec<_>>();
 
         self.mod_loaders = mod_loaders;
         self.minecraft_versions = minecraft_versions;
+        self.bukkit_versions = bukkit_versions;
 
         Ok(())
     }

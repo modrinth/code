@@ -42,7 +42,7 @@ pub enum CreateError {
     SerDeError(#[from] serde_json::Error),
     #[error("Error while validating input: {0}")]
     ValidationError(String),
-    #[error("Error while uploading file")]
+    #[error("Error while uploading file: {0}")]
     FileHostingError(#[from] FileHostingError),
     #[error("Error while validating uploaded file: {0}")]
     FileValidationError(#[from] crate::validate::ValidationError),
