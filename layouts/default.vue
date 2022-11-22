@@ -87,7 +87,7 @@
                   >
                     <div class="title profile-link">
                       <div class="username">@{{ $auth.user.username }}</div>
-                      <div class="prompt">Go to my profile</div>
+                      <div class="prompt">Visit your profile</div>
                     </div>
                   </NuxtLink>
                   <hr class="divider" />
@@ -228,7 +228,7 @@
               />
               <div class="profile-link">
                 <div class="username">@{{ $auth.user.username }}</div>
-                <div class="prompt">Go to my profile</div>
+                <div class="prompt">Visit your profile</div>
               </div>
             </NuxtLink>
             <button
