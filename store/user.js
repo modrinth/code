@@ -57,14 +57,14 @@ export const actions = {
   async fetchNotifications({ commit, rootState }) {
     if (rootState.auth.user && rootState.auth.user.id) {
       try {
-        const follows = (
+        const notifications = (
           await this.$axios.get(
             `user/${rootState.auth.user.id}/notifications`,
             rootState.auth.headers
           )
         ).data
 
-        commit('SET_FOLLOWS', follows)
+        commit('SET_NOTIFICATIONS', notifications)
       } catch (err) {
         console.error(err)
       }
