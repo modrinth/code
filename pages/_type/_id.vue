@@ -267,6 +267,14 @@
                 Your project must have at least one version to submit for
                 review.
               </li>
+              <li
+                v-if="
+                  project.client_side === 'unknown' ||
+                  project.server_side === 'unknown'
+                "
+              >
+                Your project must have the supported environments selected.
+              </li>
             </ul>
           </div>
         </div>
@@ -1155,7 +1163,12 @@ export default {
       this.$nuxt.$loading.finish()
     },
     async submitForReview() {
-      if (this.project.body === '' || this.project.versions.length < 1) {
+      if (
+        this.project.body === '' ||
+        this.project.versions.length < 1 ||
+        this.project.client_side === 'unknown' ||
+        this.project.server_side === 'unknown'
+      ) {
         this.showKnownErrors = true
       } else {
         this.$nuxt.$loading.start()
