@@ -13,6 +13,9 @@
           <NavStackItem link="/legal/rules" label="Content Rules">
             <RulesIcon />
           </NavStackItem>
+          <NavStackItem link="/legal/security" label="Security Notice">
+            <ShieldIcon />
+          </NavStackItem>
         </NavStack>
       </aside>
     </div>
@@ -29,6 +32,7 @@ import NavStackItem from '~/components/ui/NavStackItem'
 import TermsIcon from '~/assets/images/utils/heart-handshake.svg?inline'
 import PrivacyIcon from '~/assets/images/utils/lock.svg?inline'
 import RulesIcon from '~/assets/images/sidebar/admin.svg?inline'
+import ShieldIcon from '~/assets/images/utils/shield.svg?inline'
 
 export default {
   name: 'Settings',
@@ -38,6 +42,7 @@ export default {
     TermsIcon,
     PrivacyIcon,
     RulesIcon,
+    ShieldIcon,
   },
 }
 </script>
