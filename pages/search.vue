@@ -243,12 +243,7 @@
         <a href="https://discord.gg/EUHuJHt" :target="$external()">Discord</a>
         for support.
       </div>
-      <Advertisement
-        type="banner"
-        small-screen="square"
-        ethical-ads-small
-        ethical-ads-big
-      />
+      <Advertisement type="banner" small-screen="square" />
       <div class="card search-controls">
         <div class="search-filter-container">
           <button

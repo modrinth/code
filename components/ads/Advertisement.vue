@@ -1,5 +1,5 @@
 <template>
-  <div class="content-wrapper">
+  <div class="modrinth-content-wrapper">
     <div data-ea-publisher="modrinth-com" data-ea-type="text" class="loaded">
       <div class="ea-placement ea-type-text">
         <div class="ea-content">
@@ -53,7 +53,7 @@ export default {
 </script>
 
 <style lang="scss">
-.content-wrapper {
+.modrinth-content-wrapper {
   min-height: 46.2px;
   margin-bottom: var(--spacing-card-md);
 

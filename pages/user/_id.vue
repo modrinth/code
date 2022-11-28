@@ -147,12 +147,7 @@
         </article>
       </div>
       <div class="normal-page__content">
-        <Advertisement
-          type="banner"
-          small-screen="square"
-          ethical-ads-small
-          ethical-ads-big
-        />
+        <Advertisement type="banner" small-screen="square" />
         <nav class="card user-navigation">
           <NavRow
             query="type"
