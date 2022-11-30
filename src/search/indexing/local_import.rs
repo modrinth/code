@@ -16,7 +16,7 @@ pub async fn index_local(
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,
             m.team_id team_id, m.license license, m.slug slug,
-            s.status status_name, cs.name client_side_type, ss.name server_side_type, l.short short, pt.name project_type_name, u.username username,
+            s.status status_name, cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, u.username username,
             ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
             ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null) versions,
@@ -34,11 +34,10 @@ pub async fn index_local(
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
-            INNER JOIN licenses l ON m.license = l.id
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE
             INNER JOIN users u ON tm.user_id = u.id
             WHERE s.status = $1 OR s.status = $2
-            GROUP BY m.id, s.id, cs.id, ss.id, l.id, pt.id, u.id;
+            GROUP BY m.id, s.id, cs.id, ss.id, pt.id, u.id;
             ",
             crate::models::projects::ProjectStatus::Approved.as_str(),
             crate::models::projects::ProjectStatus::Archived.as_str(),
@@ -73,6 +72,16 @@ pub async fn index_local(
 
                     let project_id: crate::models::projects::ProjectId = ProjectId(m.id).into();
 
+                    let license = match m.license.split(" ").next() {
+                        Some(license) => license.to_string(),
+                        None => m.license,
+                    };
+
+                    let open_source = match spdx::license_id(&license) {
+                        Some(id) => id.is_osi_approved(),
+                        _ => false,
+                    };
+
                     UploadSearchProject {
                         project_id: format!("{}", project_id),
                         title: m.title,
@@ -88,13 +97,14 @@ pub async fn index_local(
                         modified_timestamp: m.updated.timestamp(),
                         latest_version: versions.last().cloned().unwrap_or_else(|| "None".to_string()),
                         versions,
-                        license: m.short,
+                        license,
                         client_side: m.client_side_type,
                         server_side: m.server_side_type,
                         slug: m.slug,
                         project_type: m.project_type_name,
                         gallery: m.gallery.unwrap_or_default(),
-                        display_categories
+                        display_categories,
+                        open_source,
                     }
                 }))
             })

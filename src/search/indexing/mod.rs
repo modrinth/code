@@ -217,6 +217,7 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "date_created",
     "date_modified",
     "project_id",
+    "open_source",
 ];
 
 const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =

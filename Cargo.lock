@@ -1566,6 +1566,7 @@ dependencies = [
  "serde_with",
  "sha1 0.6.1",
  "sha2 0.9.9",
+ "spdx",
  "sqlx",
  "thiserror",
  "tokio",
@@ -2779,6 +2780,15 @@ checksum = "02e2d2db9033d13a1567121ddd7a095ee144db4e1ca1b1bda3419bc0da294ebd"
 dependencies = [
  "libc",
  "winapi",
+]
+
+[[package]]
+name = "spdx"
+version = "0.9.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a346909b3fd07776f9b96b98d4a58e3666f831c9a672c279b10f795a34c36425"
+dependencies = [
+ "smallvec",
 ]
 
 [[package]]

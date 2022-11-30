@@ -97,6 +97,7 @@ pub struct UploadSearchProject {
     pub date_modified: DateTime<Utc>,
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
+    pub open_source: bool,
 }
 
 #[derive(Serialize, Deserialize, Debug)]

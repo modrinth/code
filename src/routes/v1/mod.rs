@@ -35,8 +35,6 @@ pub fn tags_config(cfg: &mut web::ServiceConfig) {
             .service(tags::game_version_list)
             .service(super::tags::game_version_create)
             .service(super::tags::game_version_delete)
-            .service(super::tags::license_create)
-            .service(super::tags::license_delete)
             .service(super::tags::license_list)
             .service(super::tags::donation_platform_create)
             .service(super::tags::donation_platform_list)
