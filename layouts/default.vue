@@ -682,12 +682,12 @@ export default {
           top: 50%;
           transform: translateY(-50%);
           min-width: 6rem;
+          gap: 1rem;
 
           .control-button {
             position: relative;
             display: flex;
-            padding: 0.5rem 0.5rem;
-            margin: 0 1rem 0 0;
+            padding: 0.5rem;
             color: var(--color-text);
             border-radius: 2rem;
             transition: filter 0.1s ease-in-out;
@@ -724,6 +724,7 @@ export default {
 
           .dropdown {
             position: relative;
+            margin-left: 0.5rem;
 
             .control {
               align-items: center;
