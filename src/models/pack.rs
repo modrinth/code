@@ -8,9 +8,9 @@ use validator::Validate;
 pub struct PackFormat {
     pub game: String,
     pub format_version: i32,
-    #[validate(length(min = 3, max = 512))]
+    #[validate(length(min = 1, max = 512))]
     pub version_id: String,
-    #[validate(length(min = 3, max = 512))]
+    #[validate(length(min = 1, max = 512))]
     pub name: String,
     #[validate(length(max = 2048))]
     pub summary: Option<String>,

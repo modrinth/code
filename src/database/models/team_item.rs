@@ -49,8 +49,8 @@ impl TeamBuilder {
 
             sqlx::query!(
                 "
-                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted)
-                VALUES ($1, $2, $3, $4, $5, $6)
+                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted, payouts_split)
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
                 ",
                 team_member.id as TeamMemberId,
                 team_member.team_id as TeamId,
@@ -58,6 +58,7 @@ impl TeamBuilder {
                 team_member.role,
                 team_member.permissions.bits() as i64,
                 team_member.accepted,
+                team_member.payouts_split,
             )
             .execute(&mut *transaction)
             .await?;
