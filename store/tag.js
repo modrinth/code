@@ -44,4 +44,5 @@ export const state = () => ({
     ],
     modLoaders: ['forge', 'fabric', 'quilt', 'liteloader', 'modloader', 'rift'],
   },
+  projectViewModes: ['list', 'grid', 'gallery'],
 })

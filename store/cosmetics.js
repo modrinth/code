@@ -6,14 +6,23 @@ const parameters = {
   path: '/',
 }
 
-export const state = () => ({
+export const defaults = {
   searchLayout: false,
   projectLayout: false,
   modpacksAlphaNotice: true,
   advancedRendering: true,
   externalLinksNewTab: true,
   notUsingBlockers: false,
-})
+  searchDisplayMode: {
+    mod: 'list',
+    plugin: 'list',
+    resourcepack: 'gallery',
+    modpack: 'list',
+    user: 'list',
+  },
+}
+
+export const state = () => defaults
 
 export const mutations = {
   SET_SEARCH_LAYOUT(state, searchLayout) {
@@ -31,6 +40,9 @@ export const mutations = {
   SET_EXTERNAL_LINKS_NEW_TAB(state, externalLinksNewTab) {
     state.externalLinksNewTab = externalLinksNewTab
   },
+  SET_SEARCH_DISPLAY_MODE(state, { projectType, mode }) {
+    state.searchDisplayMode[projectType] = mode
+  },
   SET_NOT_USING_BLOCKERS(state, notUsingBlockers) {
     state.notUsingBlockers = notUsingBlockers
   },
@@ -38,11 +50,34 @@ export const mutations = {
 
 export const actions = {
   fetchCosmetics({ commit }, $cookies) {
-    commit('SET_PROJECT_LAYOUT', $cookies.get('project-layout'))
-    commit('SET_SEARCH_LAYOUT', $cookies.get('search-layout'))
-    commit('SET_MODPACKS_ALPHA_NOTICE', $cookies.get('modpacks-alpha-notice'))
-    commit('SET_ADVANCED_RENDERING', $cookies.get('advanced-rendering'))
-    commit('SET_EXTERNAL_LINKS_NEW_TAB', $cookies.get('external-links-new-tab'))
+    commit(
+      'SET_PROJECT_LAYOUT',
+      $cookies.get('project-layout') ?? defaults.projectLayout
+    )
+    commit(
+      'SET_SEARCH_LAYOUT',
+      $cookies.get('search-layout') ?? defaults.searchLayout
+    )
+    commit(
+      'SET_MODPACKS_ALPHA_NOTICE',
+      $cookies.get('modpacks-alpha-notice') ?? defaults.modpacksAlphaNotice
+    )
+    commit(
+      'SET_ADVANCED_RENDERING',
+      $cookies.get('advanced-rendering') ?? defaults.advancedRendering
+    )
+    commit(
+      'SET_EXTERNAL_LINKS_NEW_TAB',
+      $cookies.get('external-links-new-tab') ?? defaults.externalLinksNewTab
+    )
+    Object.keys(defaults.searchDisplayMode).forEach((projectType) => {
+      commit('SET_SEARCH_DISPLAY_MODE', {
+        projectType,
+        mode:
+          $cookies.get('search-display-mode-' + projectType) ??
+          defaults.searchDisplayMode[projectType],
+      })
+    })
   },
   save(
     { commit },
@@ -66,5 +101,10 @@ export const actions = {
     $cookies.set('modpacks-alpha-notice', modpacksAlphaNotice, parameters)
     $cookies.set('advanced-rendering', advancedRendering, parameters)
     $cookies.set('external-links-new-tab', externalLinksNewTab, parameters)
+  },
+  saveSearchDisplayMode({ commit }, { projectType, mode, $cookies }) {
+    commit('SET_SEARCH_DISPLAY_MODE', { projectType, mode })
+
+    $cookies.set('search-display-mode-' + projectType, mode, parameters)
   },
 }

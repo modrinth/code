@@ -1,143 +1,140 @@
 <template>
-  <article class="project-card card" :aria-label="name" role="listitem">
-    <div class="columns">
-      <div class="icon">
-        <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
-          <Avatar :src="iconUrl" :alt="name" size="md" />
-        </nuxt-link>
-      </div>
-      <div class="card-content">
-        <div class="info">
-          <div class="top">
-            <h2 class="title">
-              <nuxt-link
-                :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
-              >
-                <IssuesIcon
-                  v-if="hasModMessage"
-                  v-tooltip="
-                    'Project has a message from the moderators. View the project to see more.'
-                  "
-                  aria-label="Project has a message from the moderators. View the project to see more."
-                />
-                {{ name }}
-              </nuxt-link>
-            </h2>
-            <p v-if="author" class="author">
-              by
-              <nuxt-link class="title-link" :to="'/user/' + author"
-                >{{ author }}
-              </nuxt-link>
-            </p>
-          </div>
-          <div
-            v-if="
-              type !== 'resourcepack' &&
-              !(projectTypeDisplay === 'plugin' && search)
+  <article
+    class="project-card base-card padding-bg"
+    :aria-label="name"
+    role="listitem"
+  >
+    <nuxt-link
+      class="icon"
+      tabindex="-1"
+      :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
+    >
+      <Avatar :src="iconUrl" :alt="name" size="md" />
+    </nuxt-link>
+    <nuxt-link
+      class="gallery"
+      tabindex="-1"
+      :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
+    >
+      <img
+        v-if="galleryImages.length > 0"
+        :src="galleryImages[0]"
+        alt="Gallery image TODO: improve this lol"
+      />
+    </nuxt-link>
+    <div class="title">
+      <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
+        <h2 class="name">
+          <IssuesIcon
+            v-if="hasModMessage"
+            v-tooltip="
+              'Project has a message from the moderators. View the project to see more.'
             "
-            class="side-type"
-          >
-            <div
-              v-if="clientSide === 'optional' && serverSide === 'optional'"
-              class="side-descriptor"
-            >
-              <InfoIcon aria-hidden="true" />
-              Universal {{ projectTypeDisplay }}
-            </div>
-            <div
-              v-else-if="
-                (clientSide === 'optional' || clientSide === 'required') &&
-                (serverSide === 'optional' || serverSide === 'unsupported')
-              "
-              class="side-descriptor"
-            >
-              <InfoIcon aria-hidden="true" />
-              Client {{ projectTypeDisplay }}
-            </div>
-            <div
-              v-else-if="
-                (serverSide === 'optional' || serverSide === 'required') &&
-                (clientSide === 'optional' || clientSide === 'unsupported')
-              "
-              class="side-descriptor"
-            >
-              <InfoIcon aria-hidden="true" />
-              Server {{ projectTypeDisplay }}
-            </div>
-            <div v-else-if="moderation" class="side-descriptor">
-              <InfoIcon aria-hidden="true" />
-              A {{ projectTypeDisplay }}
-            </div>
-          </div>
-          <div v-else-if="moderation" class="side-descriptor">
-            <InfoIcon aria-hidden="true" />
-            A {{ projectTypeDisplay }}
-          </div>
-          <p class="description">
-            {{ description }}
-          </p>
-          <Categories
-            :categories="categories"
-            :type="type"
-            class="right-categories"
+            aria-label="Project has a message from the moderators. View the project to see more."
           />
-          <div class="dates">
-            <div
-              v-tooltip="
-                $dayjs(createdAt).format('MMMM D, YYYY [at] h:mm:ss A')
-              "
-              class="date"
-            >
-              <CalendarIcon aria-hidden="true" />
-              Created {{ $dayjs(createdAt).fromNow() }}
-            </div>
-            <div
-              v-tooltip="
-                $dayjs(updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')
-              "
-              class="date"
-            >
-              <EditIcon aria-hidden="true" />
-              Updated {{ $dayjs(updatedAt).fromNow() }}
-            </div>
-          </div>
-        </div>
-      </div>
+          {{ name }}
+        </h2>
+      </nuxt-link>
+      <p v-if="author" class="author">
+        by
+        <nuxt-link class="title-link" :to="'/user/' + author"
+          >{{ author }}
+        </nuxt-link>
+      </p>
+      <Badge
+        v-if="status && status !== 'approved'"
+        :type="status"
+        class="status"
+      />
     </div>
-    <div class="right-side">
+    <p class="description">
+      {{ description }}
+    </p>
+    <Categories :categories="categories" :type="type" class="tags">
+      <span v-if="moderation" class="environment">
+        <InfoIcon aria-hidden="true" />
+        A {{ projectTypeDisplay }}
+      </span>
+      <span
+        v-else-if="
+          type !== 'resourcepack' &&
+          !(projectTypeDisplay === 'plugin' && search)
+        "
+        class="environment"
+      >
+        <template v-if="clientSide === 'optional' && serverSide === 'optional'">
+          <GlobeIcon aria-hidden="true" />
+          Client or server
+        </template>
+        <template
+          v-else-if="clientSide === 'required' && serverSide === 'required'"
+        >
+          <GlobeIcon aria-hidden="true" />
+          Client and server
+        </template>
+        <template
+          v-else-if="
+            (clientSide === 'optional' || clientSide === 'required') &&
+            (serverSide === 'optional' || serverSide === 'unsupported')
+          "
+        >
+          <ClientIcon aria-hidden="true" />
+          Client
+        </template>
+        <template
+          v-else-if="
+            (serverSide === 'optional' || serverSide === 'required') &&
+            (clientSide === 'optional' || clientSide === 'unsupported')
+          "
+        >
+          <ServerIcon aria-hidden="true" />
+          Server
+        </template>
+        <template v-else-if="moderation">
+          <InfoIcon aria-hidden="true" />
+          A {{ projectTypeDisplay }}
+        </template>
+      </span>
+    </Categories>
+    <div class="stats">
       <div v-if="downloads" class="stat">
         <DownloadIcon aria-hidden="true" />
         <p>
-          <strong>{{ $formatNumber(downloads) }}</strong> download<span
-            v-if="downloads !== '1'"
-            >s</span
+          <strong>{{ $formatNumber(downloads) }}</strong
+          ><span class="stat-label">
+            download<span v-if="downloads !== '1'">s</span></span
           >
         </p>
       </div>
       <div v-if="follows" class="stat">
         <HeartIcon aria-hidden="true" />
         <p>
-          <strong>{{ $formatNumber(follows) }}</strong> follower<span
-            v-if="follows !== '1'"
-            >s</span
+          <strong>{{ $formatNumber(follows) }}</strong
+          ><span class="stat-label">
+            follower<span v-if="follows !== '1'">s</span></span
           >
         </p>
       </div>
-      <div class="mobile-dates">
-        <div class="date">
-          <CalendarIcon aria-hidden="true" />
-          Created {{ $dayjs(createdAt).fromNow() }}
-        </div>
-        <div class="date">
-          <EditIcon aria-hidden="true" />
-          Updated {{ $dayjs(updatedAt).fromNow() }}
-        </div>
-      </div>
-      <div v-if="status" class="status">
-        <Badge :type="status" />
-      </div>
       <div class="buttons">
         <slot />
+      </div>
+      <div
+        v-if="showUpdatedDate"
+        v-tooltip="$dayjs(updatedAt).format('MMMM D, YYYY [at] h:mm:ss A')"
+        class="stat date"
+      >
+        <EditIcon aria-hidden="true" />
+        <span class="date-label">Updated </span
+        >{{ $dayjs(updatedAt).fromNow() }}
+      </div>
+      <div
+        v-else
+        v-tooltip="$dayjs(createdAt).format('MMMM D, YYYY [at] h:mm:ss A')"
+        class="stat date"
+      >
+        <CalendarIcon aria-hidden="true" />
+        <span class="date-label">Published </span
+        >{{ $dayjs(createdAt).fromNow() }}
       </div>
     </div>
   </article>
@@ -148,6 +145,9 @@ import Categories from '~/components/ui/search/Categories'
 import Badge from '~/components/ui/Badge'
 
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
+import ClientIcon from '~/assets/images/utils/client.svg?inline'
+import GlobeIcon from '~/assets/images/utils/globe.svg?inline'
+import ServerIcon from '~/assets/images/utils/server.svg?inline'
 import IssuesIcon from '~/assets/images/utils/issues.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import EditIcon from '~/assets/images/utils/updated.svg?inline'
@@ -162,6 +162,9 @@ export default {
     Categories,
     Badge,
     InfoIcon,
+    ClientIcon,
+    ServerIcon,
+    GlobeIcon,
     IssuesIcon,
     CalendarIcon,
     EditIcon,
@@ -246,6 +249,18 @@ export default {
       required: false,
       default: false,
     },
+    galleryImages: {
+      type: Array,
+      required: false,
+      default() {
+        return []
+      },
+    },
+    showUpdatedDate: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
   },
   computed: {
     projectTypeDisplay() {
@@ -256,230 +271,248 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.columns {
-  width: 100%;
+.project-card {
+  display: inline-grid;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 0;
 }
 
-.project-card {
-  display: flex;
-  flex-direction: row;
-  padding: var(--spacing-card-bg);
-  width: calc(100% - 2 * var(--spacing-card-bg));
-  overflow: hidden;
+.display-mode--list .project-card {
+  grid-template:
+    'icon title stats'
+    'icon description stats'
+    'icon tags stats';
+  grid-template-columns: min-content 1fr auto;
+  grid-template-rows: min-content 1fr min-content;
+  column-gap: var(--spacing-card-md);
+  row-gap: var(--spacing-card-sm);
+  width: 100%;
 
-  @media screen and (min-width: 1024px) {
-    flex-direction: row;
-    justify-content: space-between;
+  @media screen and (max-width: 750px) {
+    grid-template:
+      'icon title'
+      'icon description'
+      'icon tags'
+      'stats stats';
+    grid-template-columns: min-content auto;
+    grid-template-rows: min-content 1fr min-content min-content;
+  }
+
+  @media screen and (max-width: 550px) {
+    grid-template:
+      'icon title'
+      'icon description'
+      'tags tags'
+      'stats stats';
+    grid-template-columns: min-content auto;
+    grid-template-rows: min-content 1fr min-content min-content;
+  }
+}
+
+.display-mode--gallery .project-card,
+.display-mode--grid .project-card {
+  padding: 0 0 var(--spacing-card-bg) 0;
+  grid-template: 'gallery gallery' 'icon title' 'description  description' 'tags tags' 'stats stats';
+  grid-template-columns: min-content 1fr;
+  grid-template-rows: min-content min-content 1fr min-content min-content;
+  row-gap: var(--spacing-card-sm);
+
+  .gallery {
+    display: inline-block;
+    width: 100%;
+    height: 10rem;
+    background-color: var(--color-button-bg-active);
+
+    img {
+      width: 100%;
+      height: 10rem;
+      object-fit: cover;
+    }
   }
 
   .icon {
-    margin: 0 var(--spacing-card-md) var(--spacing-card-md) 0;
+    margin-left: var(--spacing-card-bg);
+    margin-top: -3rem;
+    z-index: 1;
   }
 
-  .card-content {
-    display: flex;
-    justify-content: space-between;
-    flex-grow: 1;
-    overflow: hidden;
+  .title {
+    margin-left: var(--spacing-card-md);
+    margin-right: var(--spacing-card-bg);
+    flex-direction: column;
 
-    .info {
-      display: flex;
-      flex-direction: column;
-
-      .top {
-        align-items: baseline;
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        flex-shrink: 0;
-        margin-right: var(--spacing-card-md);
-
-        .title {
-          margin: 0 0.5rem 0 0;
-          overflow-wrap: anywhere;
-          color: var(--color-text-dark);
-          font-size: var(--font-size-xl);
-          word-wrap: break-word;
-
-          svg {
-            width: auto;
-            color: var(--color-badge-yellow-text);
-            height: 1.5rem;
-            margin-bottom: -0.25rem;
-          }
-        }
-
-        .author {
-          margin: auto 0 0 0;
-          color: var(--color-text);
-          line-break: anywhere;
-        }
-      }
-
-      .side-descriptor {
-        display: flex;
-        align-items: center;
-        font-weight: bolder;
-        font-size: var(--font-size-sm);
-
-        margin: 0.125rem 0;
-
-        svg {
-          width: auto;
-          height: 1rem;
-          margin-right: 0.125rem;
-        }
-      }
-
-      .description {
-        margin: var(--spacing-card-sm) var(--spacing-card-md)
-          var(--spacing-card-sm) 0;
-      }
-
-      .right-categories {
-        margin-bottom: var(--spacing-card-sm);
-      }
-
-      .dates {
-        display: flex;
-        flex-wrap: wrap;
-
-        .date {
-          display: flex;
-          align-items: center;
-          margin-right: 2rem;
-          cursor: default;
-
-          svg {
-            width: 1.25rem;
-            height: 1.25rem;
-            margin-right: 0.25rem;
-          }
-        }
-      }
-    }
-  }
-
-  .right-side {
-    min-width: fit-content;
-
-    .stat {
-      display: flex;
-      align-items: center;
-      margin-bottom: 0.5rem;
-
-      svg {
-        width: auto;
-        height: 1.25rem;
-
-        margin-left: auto;
-        margin-right: 0.25rem;
-      }
-
-      p {
-        margin: 0;
-
-        strong {
-          font-weight: bolder;
-          font-size: var(--font-size-lg);
-        }
-      }
+    .name {
+      font-size: 1.25rem;
     }
 
     .status {
-      display: flex;
-      justify-content: right;
-      margin-bottom: 0.5rem;
+      margin-top: var(--spacing-card-xs);
+    }
+  }
+
+  .description {
+    margin-inline: var(--spacing-card-bg);
+  }
+
+  .tags {
+    margin-inline: var(--spacing-card-bg);
+  }
+
+  .stats {
+    margin-inline: var(--spacing-card-bg);
+    flex-direction: row;
+    align-items: center;
+
+    .stat-label {
+      display: none;
     }
 
     .buttons {
-      display: flex;
-      flex-direction: column;
+      flex-direction: row;
+      gap: var(--spacing-card-sm);
+      align-items: center;
 
-      button,
-      a {
-        margin-right: 0;
+      > :first-child {
         margin-left: auto;
-        margin-bottom: 0.5rem;
+      }
 
-        &:last-child {
-          margin-bottom: 0;
-        }
+      &:first-child > :last-child {
+        margin-right: auto;
       }
     }
 
-    .mobile-dates {
+    .buttons:not(:empty) + .date {
+      flex-basis: 100%;
+    }
+  }
+}
+
+.display-mode--grid .project-card {
+  .gallery {
+    display: none;
+  }
+
+  .icon {
+    margin-top: calc(var(--spacing-card-bg) - var(--spacing-card-sm));
+  }
+
+  .title {
+    margin-top: calc(var(--spacing-card-bg) - var(--spacing-card-sm));
+  }
+}
+
+.icon {
+  grid-area: icon;
+  display: flex;
+  align-items: center;
+}
+
+.gallery {
+  display: none;
+  height: 10rem;
+  grid-area: gallery;
+}
+
+.title {
+  grid-area: title;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: var(--spacing-card-sm);
+  row-gap: 0;
+  word-wrap: anywhere;
+
+  h2,
+  p {
+    margin: 0;
+  }
+
+  svg {
+    width: auto;
+    color: var(--color-special-orange);
+    height: 1.5rem;
+    margin-bottom: -0.25rem;
+  }
+}
+
+.stats {
+  grid-area: stats;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--spacing-card-md);
+
+  .stat {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: fit-content;
+    gap: var(--spacing-card-xs);
+    --stat-strong-size: 1.25rem;
+
+    strong {
+      font-size: var(--stat-strong-size);
+    }
+
+    p {
+      margin: 0;
+    }
+
+    svg {
+      height: var(--stat-strong-size);
+      width: var(--stat-strong-size);
+    }
+  }
+
+  .date {
+    margin-top: auto;
+  }
+
+  @media screen and (max-width: 750px) {
+    flex-direction: row;
+    column-gap: var(--spacing-card-md);
+    margin-top: var(--spacing-card-xs);
+  }
+
+  @media screen and (max-width: 600px) {
+    margin-top: 0;
+
+    .stat-label {
       display: none;
     }
   }
+}
 
-  @media screen and (max-width: 800px) {
-    flex-wrap: wrap;
+.environment {
+  color: var(--color-text) !important;
+  font-weight: bold;
+}
 
-    .card-content {
-      flex-direction: column;
+.description {
+  grid-area: description;
+  margin-block: 0;
+  display: flex;
+  justify-content: start;
+}
 
-      .info {
-        .top {
-          flex-direction: column;
-        }
+.tags {
+  grid-area: tags;
+  display: flex;
+  flex-direction: row;
 
-        .dates {
-          display: none;
-        }
-      }
-    }
-
-    .right-side {
-      display: flex;
-      gap: 0.5rem;
-      flex-wrap: wrap;
-      align-items: center;
-
-      text-align: left;
-
-      .stat {
-        margin-bottom: 0;
-      }
-
-      .stat svg {
-        margin-left: 0;
-      }
-
-      .buttons {
-        flex: 1 1 100%;
-      }
-
-      .buttons button,
-      a {
-        margin-left: unset;
-        margin-right: unset;
-      }
-
-      .status {
-        margin-bottom: 0;
-      }
-
-      .mobile-dates {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.5rem 0.5rem;
-        color: var(--color-icon);
-        font-size: var(--font-size-nm);
-
-        .date {
-          display: flex;
-          align-items: center;
-          cursor: default;
-
-          svg {
-            width: 1rem;
-            height: 1rem;
-            margin-right: 0.25rem;
-          }
-        }
-      }
-    }
+  @media screen and (max-width: 550px) {
+    margin-top: var(--spacing-card-xs);
   }
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-card-sm);
+  align-items: end;
+  flex-grow: 1;
 }
 </style>

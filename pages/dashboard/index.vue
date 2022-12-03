@@ -13,9 +13,9 @@
             }}
           </div>
           <span
-            >from {{ $user.projects.length }} project{{
-              $user.projects.length === 1 ? '' : 's'
-            }}</span
+            >from
+            {{ downloadsProjectCount }}
+            project{{ downloadsProjectCount === 1 ? '' : 's' }}</span
           >
           <!--          <NuxtLink class="goto-link" to="/dashboard/analytics"-->
           <!--            >View breakdown-->
@@ -35,8 +35,8 @@
           </div>
           <span>
             <span
-              >from {{ $user.projects.length }} project{{
-                $user.projects.length === 1 ? '' : 's'
+              >from {{ followersProjectCount }} project{{
+                followersProjectCount === 1 ? '' : 's'
               }}</span
             ></span
           >
@@ -116,6 +116,16 @@ export default {
   fetch() {},
   head: {
     title: 'Creator dashboard - Modrinth',
+  },
+  computed: {
+    downloadsProjectCount() {
+      return this.$user.projects.filter((project) => project.downloads > 0)
+        .length
+    },
+    followersProjectCount() {
+      return this.$user.projects.filter((project) => project.followers > 0)
+        .length
+    },
   },
   methods: {},
 }

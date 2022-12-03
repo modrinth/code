@@ -1,5 +1,6 @@
 <template>
   <div class="categories">
+    <slot />
     <span
       v-for="category in categoriesFiltered"
       :key="category.name"

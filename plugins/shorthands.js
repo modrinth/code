@@ -175,6 +175,7 @@ export default (ctx, inject) => {
       return type
     }
   })
+  inject('cycleValue', cycleValue)
 }
 
 export const formatNumber = (number) => {
@@ -332,4 +333,9 @@ export const formatVersions = (versionArray, store) => {
   }
 
   return output.join(', ')
+}
+
+export const cycleValue = (value, values) => {
+  const index = values.indexOf(value) + 1
+  return values[index % values.length]
 }

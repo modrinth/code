@@ -38,7 +38,7 @@
             ')'
           "
           :href="$parent.findPrimary(version).url"
-          class="download-button"
+          class="download-button square-button brand-button"
           :class="version.version_type"
           :title="`Download ${version.name}`"
           @click.stop="(event) => event.stopPropagation()"

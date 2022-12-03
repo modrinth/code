@@ -157,7 +157,7 @@
               facet-name="client"
               @toggle="toggleEnv"
             >
-              <ClientSide aria-hidden="true" />
+              <ClientIcon aria-hidden="true" />
             </SearchFilter>
             <SearchFilter
               :active-filters="selectedEnvironments"
@@ -165,7 +165,7 @@
               facet-name="server"
               @toggle="toggleEnv"
             >
-              <ServerSide aria-hidden="true" />
+              <ServerIcon aria-hidden="true" />
             </SearchFilter>
           </section>
           <h3 class="sidebar-menu-heading">Minecraft versions</h3>
@@ -303,6 +303,28 @@
               @input="onSearchChange(currentPage)"
             />
           </div>
+          <button
+            v-tooltip="
+              $capitalizeString($cosmetics.searchDisplayMode[projectType.id]) +
+              ' view'
+            "
+            :aria-label="
+              $capitalizeString($cosmetics.searchDisplayMode[projectType.id]) +
+              ' view'
+            "
+            class="square-button"
+            @click="cycleSearchDisplayMode()"
+          >
+            <GridIcon
+              v-if="$cosmetics.searchDisplayMode[projectType.id] === 'grid'"
+            />
+            <ImageIcon
+              v-else-if="
+                $cosmetics.searchDisplayMode[projectType.id] === 'gallery'
+              "
+            />
+            <ListIcon v-else />
+          </button>
         </div>
       </div>
       <pagination
@@ -317,11 +339,22 @@
           <LogoAnimated aria-hidden="true" />
           <p>Loading...</p>
         </div>
-        <div v-else id="search-results" role="list" aria-label="Search results">
-          <SearchResult
+        <div
+          v-else-if="true"
+          id="search-results"
+          class="project-list"
+          :class="
+            'display-mode--' + $cosmetics.searchDisplayMode[projectType.id]
+          "
+          role="list"
+          aria-label="Search results"
+        >
+          <ProjectCard
             v-for="result in results"
             :id="result.slug ? result.slug : result.project_id"
             :key="result.project_id"
+            :display="$cosmetics.searchDisplayMode[projectType.id]"
+            :gallery-images="result.gallery"
             :type="result.project_type"
             :author="result.author"
             :name="result.title"
@@ -335,6 +368,7 @@
             :server-side="result.server_side"
             :categories="result.display_categories"
             :search="true"
+            :show-updated-date="sortType.name !== 'newest'"
           />
           <div v-if="results && results.length === 0" class="no-results">
             <p>No results found for your query!</p>
@@ -354,18 +388,21 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
-import SearchResult from '~/components/ui/ProjectCard'
+import ProjectCard from '~/components/ui/ProjectCard'
 import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'
 import LogoAnimated from '~/components/ui/search/LogoAnimated'
 import Checkbox from '~/components/ui/Checkbox'
 
-import ClientSide from '~/assets/images/categories/client.svg?inline'
-import ServerSide from '~/assets/images/categories/server.svg?inline'
+import ClientIcon from '~/assets/images/categories/client.svg?inline'
+import ServerIcon from '~/assets/images/categories/server.svg?inline'
 
 import SearchIcon from '~/assets/images/utils/search.svg?inline'
 import ClearIcon from '~/assets/images/utils/clear.svg?inline'
 import FilterIcon from '~/assets/images/utils/filter.svg?inline'
+import GridIcon from '~/assets/images/utils/grid.svg?inline'
+import ListIcon from '~/assets/images/utils/list.svg?inline'
+import ImageIcon from '~/assets/images/utils/image.svg?inline'
 
 import Advertisement from '~/components/ads/Advertisement'
 
@@ -373,16 +410,19 @@ export default {
   auth: false,
   components: {
     Advertisement,
-    SearchResult,
+    ProjectCard,
     Pagination,
     Multiselect,
     SearchFilter,
     Checkbox,
-    ClientSide,
-    ServerSide,
+    ClientIcon,
+    ServerIcon,
     SearchIcon,
     ClearIcon,
     FilterIcon,
+    GridIcon,
+    ListIcon,
+    ImageIcon,
     LogoAnimated,
   },
   data() {
@@ -408,7 +448,7 @@ export default {
         { display: 'Relevance', name: 'relevance' },
         { display: 'Download count', name: 'downloads' },
         { display: 'Follow count', name: 'follows' },
-        { display: 'Recently created', name: 'newest' },
+        { display: 'Recently published', name: 'newest' },
         { display: 'Recently updated', name: 'updated' },
       ],
       sortType: { display: 'Relevance', name: 'relevance' },
@@ -782,6 +822,15 @@ export default {
 
       return url
     },
+    async cycleSearchDisplayMode() {
+      const value = this.$cosmetics.searchDisplayMode[this.projectType.id]
+      const newValue = this.$cycleValue(value, this.$tag.projectViewModes)
+      await this.$store.dispatch('cosmetics/saveSearchDisplayMode', {
+        projectType: this.projectType.id,
+        mode: newValue,
+        $cookies: this.$cookies,
+      })
+    },
   },
 }
 </script>
@@ -892,6 +941,7 @@ export default {
     flex-direction: row;
     gap: var(--spacing-card-md);
     flex-wrap: wrap;
+    align-items: center;
 
     .labeled-control {
       flex: 1;

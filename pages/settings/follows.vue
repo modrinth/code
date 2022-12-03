@@ -1,5 +1,5 @@
 <template>
-  <div v-if="$user.follows.length > 0">
+  <div v-if="$user.follows.length > 0" class="project-list display-mode--list">
     <ProjectCard
       v-for="project in $user.follows"
       :id="project.id"
