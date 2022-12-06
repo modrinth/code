@@ -221,7 +221,10 @@ Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`
     },
     updatedName() {
       if (!this.manualSlug) {
-        this.slug = this.name.toLowerCase().replaceAll(' ', '-')
+        this.slug = this.name
+          .toLowerCase()
+          .replaceAll(' ', '-')
+          .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
       }
     },
   },
