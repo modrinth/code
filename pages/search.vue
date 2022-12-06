@@ -220,8 +220,8 @@
         class="card warning"
         aria-label="Warning"
       >
-        Modpack support is currently in alpha, and modpacks can only be created and
-        installed through third party tools. Our documentation includes
+        Modpack support is currently in alpha, and modpacks can only be created
+        and installed through third party tools. Our documentation includes
         instructions on
         <a
           href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/"

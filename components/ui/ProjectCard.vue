@@ -442,7 +442,7 @@ export default {
   display: flex;
   flex-direction: column;
   flex-wrap: wrap;
-  align-items: end;
+  align-items: flex-end;
   gap: var(--spacing-card-md);
 
   .stat {
@@ -495,7 +495,7 @@ export default {
   grid-area: description;
   margin-block: 0;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
 }
 
 .tags {
@@ -512,7 +512,7 @@ export default {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-card-sm);
-  align-items: end;
+  align-items: flex-end;
   flex-grow: 1;
 }
 </style>
