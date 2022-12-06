@@ -1,6 +1,7 @@
 use super::ids::*;
 use super::DatabaseError;
 use crate::database::models::convert_postgres_date;
+use crate::models::projects::VersionStatus;
 use chrono::{DateTime, Utc};
 use std::cmp::Ordering;
 use std::collections::HashMap;
@@ -18,6 +19,8 @@ pub struct VersionBuilder {
     pub loaders: Vec<LoaderId>,
     pub version_type: String,
     pub featured: bool,
+    pub status: VersionStatus,
+    pub requested_status: Option<VersionStatus>,
 }
 
 pub struct DependencyBuilder {
@@ -149,6 +152,8 @@ impl VersionBuilder {
             downloads: 0,
             featured: self.featured,
             version_type: self.version_type,
+            status: self.status,
+            requested_status: self.requested_status,
         };
 
         version.insert(&mut *transaction).await?;
@@ -237,6 +242,7 @@ impl VersionBuilder {
     }
 }
 
+#[derive(Clone)]
 pub struct Version {
     pub id: VersionId,
     pub project_id: ProjectId,
@@ -249,6 +255,8 @@ pub struct Version {
     pub downloads: i32,
     pub version_type: String,
     pub featured: bool,
+    pub status: VersionStatus,
+    pub requested_status: Option<VersionStatus>,
 }
 
 impl Version {
@@ -261,13 +269,13 @@ impl Version {
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
                 changelog, changelog_url, date_published,
-                downloads, version_type, featured
+                downloads, version_type, featured, status
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7,
                 $8, $9,
-                $10, $11
+                $10, $11, $12
             )
             ",
             self.id as VersionId,
@@ -280,7 +288,8 @@ impl Version {
             self.date_published,
             self.downloads,
             &self.version_type,
-            self.featured
+            self.featured,
+            self.status.as_str()
         )
         .execute(&mut *transaction)
         .await?;
@@ -360,37 +369,6 @@ impl Version {
         )
         .execute(&mut *transaction)
         .await?;
-
-        let files = sqlx::query!(
-            "
-            SELECT files.id, files.url, files.filename, files.is_primary FROM files
-            WHERE files.version_id = $1
-            ",
-            id as VersionId,
-        )
-        .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|c| VersionFile {
-                id: FileId(c.id),
-                version_id: id,
-                url: c.url,
-                filename: c.filename,
-                primary: c.is_primary,
-            }))
-        })
-        .try_collect::<Vec<VersionFile>>()
-        .await?;
-
-        for file in files {
-            // TODO: store backblaze id in database so that we can delete the files here
-            // For now, we can't delete the files since we don't have the backblaze id
-            log::warn!(
-                "Can't delete version file id: {} (url: {}, name: {})",
-                file.id.0,
-                file.url,
-                file.filename
-            )
-        }
 
         sqlx::query!(
             "
@@ -531,7 +509,7 @@ impl Version {
             "
             SELECT v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog, v.changelog_url, v.date_published, v.downloads,
-                v.version_type, v.featured
+                v.version_type, v.featured, v.status, v.requested_status
             FROM versions v
             WHERE v.id = $1
             ",
@@ -553,6 +531,10 @@ impl Version {
                 downloads: row.downloads,
                 version_type: row.version_type,
                 featured: row.featured,
+                status: VersionStatus::from_str(&row.status),
+                requested_status: row
+                    .requested_status
+                    .map(|x| VersionStatus::from_str(&x)),
             }))
         } else {
             Ok(None)
@@ -574,7 +556,7 @@ impl Version {
             "
             SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
                 v.changelog, v.changelog_url, v.date_published, v.downloads,
-                v.version_type, v.featured
+                v.version_type, v.featured, v.status, v.requested_status
             FROM versions v
             WHERE v.id = ANY($1)
             ORDER BY v.date_published ASC
@@ -595,6 +577,10 @@ impl Version {
                 downloads: v.downloads,
                 featured: v.featured,
                 version_type: v.version_type,
+                status: VersionStatus::from_str(&v.status),
+                requested_status: v
+                    .requested_status
+                    .map(|x| VersionStatus::from_str(&x)),
             }))
         })
         .try_collect::<Vec<Version>>()
@@ -614,7 +600,7 @@ impl Version {
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
-            v.version_type version_type, v.featured featured,
+            v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
             ARRAY_AGG(DISTINCT gv.version || ' |||| ' || gv.created) filter (where gv.version is not null) game_versions, ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
             ARRAY_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename) filter (where f.id is not null) files,
             ARRAY_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id) filter (where h.hash is not null) hashes,
@@ -637,15 +623,23 @@ impl Version {
 
         if let Some(v) = result {
             Ok(Some(QueryVersion {
-                id: VersionId(v.id),
-                project_id: ProjectId(v.mod_id),
-                author_id: UserId(v.author_id),
-                name: v.version_name,
-                version_number: v.version_number,
-                changelog: v.changelog,
-                changelog_url: v.changelog_url,
-                date_published: v.date_published,
-                downloads: v.downloads,
+                inner: Version {
+                    id: VersionId(v.id),
+                    project_id: ProjectId(v.mod_id),
+                    author_id: UserId(v.author_id),
+                    name: v.version_name,
+                    version_number: v.version_number,
+                    changelog: v.changelog,
+                    changelog_url: v.changelog_url,
+                    date_published: v.date_published,
+                    downloads: v.downloads,
+                    version_type: v.version_type,
+                    featured: v.featured,
+                    status: VersionStatus::from_str(&v.status),
+                    requested_status: v
+                        .requested_status
+                        .map(|x| VersionStatus::from_str(&x)),
+                },
                 files: {
                     let hashes: Vec<(FileId, String, Vec<u8>)> = v
                         .hashes
@@ -737,7 +731,6 @@ impl Version {
                     gv.into_iter().map(|x| x.0).collect()
                 },
                 loaders: v.loaders.unwrap_or_default(),
-                featured: v.featured,
                 dependencies: v
                     .dependencies
                     .unwrap_or_default()
@@ -773,7 +766,6 @@ impl Version {
                         }
                     })
                     .collect(),
-                version_type: v.version_type,
             }))
         } else {
             Ok(None)
@@ -795,7 +787,7 @@ impl Version {
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
-            v.version_type version_type, v.featured featured,
+            v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
             ARRAY_AGG(DISTINCT gv.version || ' |||| ' || gv.created) filter (where gv.version is not null) game_versions, ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
             ARRAY_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename) filter (where f.id is not null) files,
             ARRAY_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id) filter (where h.hash is not null) hashes,
@@ -818,15 +810,22 @@ impl Version {
             .try_filter_map(|e| async {
                 Ok(e.right().map(|v|
                     QueryVersion {
-                        id: VersionId(v.id),
-                        project_id: ProjectId(v.mod_id),
-                        author_id: UserId(v.author_id),
-                        name: v.version_name,
-                        version_number: v.version_number,
-                        changelog: v.changelog,
-                        changelog_url: v.changelog_url,
-                        date_published: v.date_published,
-                        downloads: v.downloads,
+                        inner: Version {
+                            id: VersionId(v.id),
+                            project_id: ProjectId(v.mod_id),
+                            author_id: UserId(v.author_id),
+                            name: v.version_name,
+                            version_number: v.version_number,
+                            changelog: v.changelog,
+                            changelog_url: v.changelog_url,
+                            date_published: v.date_published,
+                            downloads: v.downloads,
+                            version_type: v.version_type,
+                            featured: v.featured,
+                            status: VersionStatus::from_str(&v.status),
+                            requested_status: v.requested_status
+                                .map(|x| VersionStatus::from_str(&x)),
+                        },
                         files: {
                             let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default()
                                 .into_iter()
@@ -909,7 +908,6 @@ impl Version {
                                 .collect()
                         },
                         loaders: v.loaders.unwrap_or_default(),
-                        featured: v.featured,
                         dependencies: v.dependencies
                             .unwrap_or_default()
                             .into_iter()
@@ -944,7 +942,6 @@ impl Version {
                                     None
                                 }
                             }).collect(),
-                        version_type: v.version_type
                     }
                 ))
             })
@@ -953,37 +950,13 @@ impl Version {
     }
 }
 
-pub struct VersionFile {
-    pub id: FileId,
-    pub version_id: VersionId,
-    pub url: String,
-    pub filename: String,
-    pub primary: bool,
-}
-
-pub struct FileHash {
-    pub file_id: FileId,
-    pub algorithm: String,
-    pub hash: Vec<u8>,
-}
-
 #[derive(Clone)]
 pub struct QueryVersion {
-    pub id: VersionId,
-    pub project_id: ProjectId,
-    pub author_id: UserId,
-    pub name: String,
-    pub version_number: String,
-    pub changelog: String,
-    pub changelog_url: Option<String>,
-    pub date_published: DateTime<Utc>,
-    pub downloads: i32,
+    pub inner: Version,
 
-    pub version_type: String,
     pub files: Vec<QueryFile>,
     pub game_versions: Vec<String>,
     pub loaders: Vec<String>,
-    pub featured: bool,
     pub dependencies: Vec<QueryDependency>,
 }
 

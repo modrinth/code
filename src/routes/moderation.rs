@@ -29,9 +29,7 @@ pub async fn get_projects(
     let project_ids = sqlx::query!(
         "
         SELECT id FROM mods
-        WHERE status = (
-            SELECT id FROM statuses WHERE status = $1
-        )
+        WHERE status = $1
         ORDER BY updated ASC
         LIMIT $2;
         ",

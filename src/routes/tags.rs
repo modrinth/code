@@ -332,13 +332,13 @@ pub async fn license_text(
 ) -> Result<HttpResponse, ApiError> {
     let license_id = params.into_inner().0;
 
-    if license_id == crate::models::projects::DEFAULT_LICENSE_ID.to_string() {
+    if license_id == *crate::models::projects::DEFAULT_LICENSE_ID {
         return Ok(HttpResponse::Ok().json(LicenseText {
             body: "All rights reserved unless explicitly stated.".to_string(),
         }));
     }
 
-    if let Some(license) = spdx::license_id(&*license_id) {
+    if let Some(license) = spdx::license_id(&license_id) {
         return Ok(HttpResponse::Ok().json(LicenseText {
             body: license.text().to_string(),
         }));

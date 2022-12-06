@@ -1,6 +1,5 @@
 use crate::database;
-use crate::database::models;
-use crate::database::models::project_item::QueryProject;
+use crate::database::{models, Project, Version};
 use crate::models::users::{Role, User, UserId, UserPayoutData};
 use crate::routes::ApiError;
 use actix_web::http::header::HeaderMap;
@@ -132,7 +131,7 @@ where
 }
 
 pub async fn is_authorized(
-    project_data: &QueryProject,
+    project_data: &Project,
     user_option: &Option<User>,
     pool: &web::Data<PgPool>,
 ) -> Result<bool, ApiError> {
@@ -147,7 +146,7 @@ pub async fn is_authorized(
 
                 let project_exists = sqlx::query!(
                     "SELECT EXISTS(SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2)",
-                    project_data.inner.team_id as database::models::ids::TeamId,
+                    project_data.team_id as database::models::ids::TeamId,
                     user_id as database::models::ids::UserId,
                 )
                 .fetch_one(&***pool)
@@ -158,5 +157,37 @@ pub async fn is_authorized(
             }
         }
     }
+
+    Ok(authorized)
+}
+
+pub async fn is_authorized_version(
+    version_data: &Version,
+    user_option: &Option<User>,
+    pool: &web::Data<PgPool>,
+) -> Result<bool, ApiError> {
+    let mut authorized = !version_data.status.is_hidden();
+
+    if let Some(user) = &user_option {
+        if !authorized {
+            if user.role.is_mod() {
+                authorized = true;
+            } else {
+                let user_id: models::ids::UserId = user.id.into();
+
+                let version_exists = sqlx::query!(
+                    "SELECT EXISTS(SELECT 1 FROM mods m INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 WHERE m.id = $1)",
+                    version_data.project_id as database::models::ids::ProjectId,
+                    user_id as database::models::ids::UserId,
+                )
+                    .fetch_one(&***pool)
+                    .await?
+                    .exists;
+
+                authorized = version_exists.unwrap_or(false);
+            }
+        }
+    }
+
     Ok(authorized)
 }

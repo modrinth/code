@@ -2,7 +2,7 @@ use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::{QueryFile, QueryVersion};
 use crate::models::projects::{ProjectId, VersionId};
 use crate::routes::ApiError;
-use crate::util::auth::get_user_from_headers;
+use crate::util::auth::{get_user_from_headers, is_authorized_version};
 use crate::{database, util::auth::is_authorized};
 use actix_web::{get, route, web, HttpRequest, HttpResponse};
 use sqlx::PgPool;
@@ -58,12 +58,11 @@ pub async fn maven_metadata(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id = params.into_inner().0;
-    let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(
-            &project_id,
-            &**pool,
-        )
-        .await?;
+    let project_data = database::models::Project::get_from_slug_or_project_id(
+        &project_id,
+        &**pool,
+    )
+    .await?;
 
     let data = if let Some(data) = project_data {
         data
@@ -81,10 +80,14 @@ pub async fn maven_metadata(
         "
         SELECT id, version_number, version_type
         FROM versions
-        WHERE mod_id = $1
+        WHERE mod_id = $1 AND status = ANY($2)
         ORDER BY date_published ASC
         ",
-        data.inner.id as database::models::ids::ProjectId
+        data.id as database::models::ids::ProjectId,
+        &*crate::models::projects::VersionStatus::iterator()
+            .filter(|x| x.is_listed())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
     .fetch_all(&**pool)
     .await?;
@@ -108,7 +111,7 @@ pub async fn maven_metadata(
         new_versions.push(value);
     }
 
-    let project_id: ProjectId = data.inner.id.into();
+    let project_id: ProjectId = data.id.into();
 
     let respdata = Metadata {
         group_id: "maven.modrinth".to_string(),
@@ -122,7 +125,7 @@ pub async fn maven_metadata(
             versions: Versions {
                 versions: new_versions,
             },
-            last_updated: data.inner.updated.format("%Y%m%d%H%M%S").to_string(),
+            last_updated: data.updated.format("%Y%m%d%H%M%S").to_string(),
         },
     };
 
@@ -149,10 +152,13 @@ fn find_file<'a>(
         _ => return None,
     };
 
-    let version_id: VersionId = version.id.into();
+    let version_id: VersionId = version.inner.id.into();
 
     if file
-        == format!("{}-{}.{}", &project_id, &version.version_number, fileext)
+        == format!(
+            "{}-{}.{}",
+            &project_id, &version.inner.version_number, fileext
+        )
         || file == format!("{}-{}.{}", &project_id, &version_id, fileext)
     {
         version
@@ -191,7 +197,7 @@ pub async fn version_file(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    if !is_authorized(&project, &user_option, &pool).await? {
+    if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
@@ -224,8 +230,12 @@ pub async fn version_file(
         return Ok(HttpResponse::NotFound().body(""));
     };
 
-    let version_id: VersionId = version.id.into();
-    if file == format!("{}-{}.pom", &project_id, &version.version_number)
+    if !is_authorized_version(&version.inner, &user_option, &pool).await? {
+        return Ok(HttpResponse::NotFound().body(""));
+    }
+
+    let version_id: VersionId = version.inner.id.into();
+    if file == format!("{}-{}.pom", &project_id, &version.inner.version_number)
         || file == format!("{}-{}.pom", &project_id, version_id)
     {
         let respdata = MavenPom {
@@ -276,7 +286,7 @@ pub async fn version_file_sha1(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    if !is_authorized(&project, &user_option, &pool).await? {
+    if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
@@ -338,7 +348,7 @@ pub async fn version_file_sha512(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    if !is_authorized(&project, &user_option, &pool).await? {
+    if !is_authorized(&project.inner, &user_option, &pool).await? {
         return Ok(HttpResponse::NotFound().body(""));
     }
 
@@ -370,6 +380,10 @@ pub async fn version_file_sha512(
     } else {
         return Ok(HttpResponse::NotFound().body(""));
     };
+
+    if !is_authorized_version(&version.inner, &user_option, &pool).await? {
+        return Ok(HttpResponse::NotFound().body(""));
+    }
 
     Ok(find_file(&project_id, &project, &version, &file)
         .and_then(|file| file.hashes.get("sha512"))

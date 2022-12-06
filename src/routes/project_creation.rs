@@ -3,6 +3,7 @@ use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::projects::{
     DonationLink, License, ProjectId, ProjectStatus, SideType, VersionId,
+    VersionStatus,
 };
 use crate::models::users::UserId;
 use crate::queue::flameanvil::FlameAnvilQueue;
@@ -131,6 +132,10 @@ fn default_project_type() -> String {
     "mod".to_string()
 }
 
+fn default_requested_status() -> ProjectStatus {
+    ProjectStatus::Approved
+}
+
 #[derive(Serialize, Deserialize, Validate, Clone)]
 struct ProjectCreateData {
     #[validate(length(min = 3, max = 64))]
@@ -218,6 +223,9 @@ struct ProjectCreateData {
     #[validate]
     /// The multipart names of the gallery items to upload
     pub gallery_items: Option<Vec<NewGalleryItem>>,
+    #[serde(default = "default_requested_status")]
+    /// The status of the mod to be set once it is approved
+    pub requested_status: ProjectStatus,
 }
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
@@ -658,14 +666,12 @@ pub async fn project_create_inner(
             }
         }
 
-        let status_id = models::StatusId::get_id(&status, &mut *transaction)
-            .await?
-            .ok_or_else(|| {
-                CreateError::InvalidInput(format!(
-                    "Status {} does not exist.",
-                    status.clone()
-                ))
-            })?;
+        if !project_create_data.requested_status.can_be_requested() {
+            return Err(CreateError::InvalidInput(String::from(
+                "Specified requested status is not allowed to be requested",
+            )));
+        }
+
         let client_side_id = models::SideTypeId::get_id(
             &project_create_data.client_side,
             &mut *transaction,
@@ -741,7 +747,8 @@ pub async fn project_create_inner(
             categories,
             additional_categories,
             initial_versions: versions,
-            status: status_id,
+            status,
+            requested_status: Some(project_create_data.requested_status),
             client_side: client_side_id,
             server_side: server_side_id,
             license: license_id.to_string(),
@@ -774,7 +781,8 @@ pub async fn project_create_inner(
             published: now,
             updated: now,
             approved: None,
-            status: status.clone(),
+            status,
+            requested_status: project_builder.requested_status,
             moderator_message: None,
             license: License {
                 id: project_create_data.license_id.clone(),
@@ -895,7 +903,9 @@ async fn create_initial_version(
         game_versions,
         loaders,
         featured: version_data.featured,
+        status: VersionStatus::Listed,
         version_type: version_data.release_channel.to_string(),
+        requested_status: None,
     };
 
     Ok(version)

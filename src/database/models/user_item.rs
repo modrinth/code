@@ -256,34 +256,6 @@ impl User {
 
     pub async fn get_projects<'a, E>(
         user_id: UserId,
-        status: &str,
-        exec: E,
-    ) -> Result<Vec<ProjectId>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        use futures::stream::TryStreamExt;
-
-        let projects = sqlx::query!(
-            "
-            SELECT m.id FROM mods m
-            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.accepted = TRUE
-            WHERE tm.user_id = $1 AND m.status = (SELECT s.id FROM statuses s WHERE s.status = $2)
-            ORDER BY m.downloads DESC
-            ",
-            user_id as UserId,
-            status,
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async { Ok(e.right().map(|m| ProjectId(m.id))) })
-        .try_collect::<Vec<ProjectId>>()
-        .await?;
-
-        Ok(projects)
-    }
-
-    pub async fn get_projects_private<'a, E>(
-        user_id: UserId,
         exec: E,
     ) -> Result<Vec<ProjectId>, sqlx::Error>
     where

@@ -121,6 +121,7 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
+    // Deleting old authentication states from the database every 15 minutes
     let pool_ref = pool.clone();
     scheduler.run(std::time::Duration::from_secs(15 * 60), move || {
         let pool_ref = pool_ref.clone();
@@ -148,6 +149,53 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
+    // Changes statuses of scheduled projects/versions
+    let pool_ref = pool.clone();
+    scheduler.run(std::time::Duration::from_secs(60), move || {
+        let pool_ref = pool_ref.clone();
+        info!("Releasing scheduled versions/projects!");
+
+        async move {
+            let projects_results = sqlx::query!(
+                "
+                UPDATE mods
+                SET status = requested_status
+                WHERE status = $1 AND approved < CURRENT_DATE AND requested_status IS NOT NULL
+                ",
+                crate::models::projects::ProjectStatus::Scheduled.as_str(),
+            )
+                .execute(&pool_ref)
+                .await;
+
+            if let Err(e) = projects_results {
+                warn!(
+                    "Syncing scheduled releases for projects failed: {:?}",
+                    e
+                );
+            }
+
+            let versions_results = sqlx::query!(
+                "
+                UPDATE versions
+                SET status = requested_status
+                WHERE status = $1 AND date_published < CURRENT_DATE AND requested_status IS NOT NULL
+                ",
+                crate::models::projects::VersionStatus::Scheduled.as_str(),
+            )
+                .execute(&pool_ref)
+                .await;
+
+            if let Err(e) = versions_results {
+                warn!(
+                    "Syncing scheduled releases for versions failed: {:?}",
+                    e
+                );
+            }
+
+            info!("Finished releasing scheduled versions/projects");
+        }
+    });
+
     scheduler::schedule_versions(&mut scheduler, pool.clone());
 
     let download_queue = Arc::new(DownloadQueue::new());
@@ -168,13 +216,12 @@ async fn main() -> std::io::Result<()> {
         }
     });
 
-    let payouts_queue = Arc::new(Mutex::new(PayoutsQueue::new()));
-
     let ip_salt = Pepper {
         pepper: models::ids::Base62Id(models::ids::random_base62(11))
             .to_string(),
     };
 
+    let payouts_queue = Arc::new(Mutex::new(PayoutsQueue::new()));
     let flame_anvil_queue = Arc::new(Mutex::new(FlameAnvilQueue::new()));
 
     let store = MemoryStore::new();

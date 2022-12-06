@@ -35,14 +35,20 @@ pub async fn get_version_from_hash(
         SELECT f.version_id version_id
         FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v on f.version_id = v.id
+        INNER JOIN versions v on f.version_id = v.id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
-        INNER JOIN statuses s on m.status = s.id
-        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3
+        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
         ",
+        &*crate::models::projects::VersionStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
         hash.as_bytes(),
         algorithm.algorithm,
-        models::projects::ProjectStatus::Rejected.to_string()
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
     .fetch_optional(&**pool)
     .await?;
@@ -83,14 +89,14 @@ pub async fn download_version(
         "
         SELECT f.url url, f.id id, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
-        INNER JOIN statuses s on m.status = s.id
-        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3
+        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
         ",
+        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
         hash.as_bytes(),
         algorithm.algorithm,
-        models::projects::ProjectStatus::Rejected.to_string()
+        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
     )
     .fetch_optional(&mut *transaction)
     .await?;
@@ -234,14 +240,20 @@ pub async fn get_update_from_hash(
         "
         SELECT v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
-        INNER JOIN statuses s on m.status = s.id
-        WHERE h.algorithm = $2 AND h.hash = $1 AND s.status != $3
+        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
         ",
+        &*crate::models::projects::VersionStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
         hash.as_bytes(),
         algorithm.algorithm,
-        models::projects::ProjectStatus::Rejected.to_string()
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
     .fetch_optional(&**pool)
     .await?;
@@ -306,14 +318,14 @@ pub async fn get_versions_from_hashes(
         "
         SELECT h.hash hash, h.algorithm algorithm, f.version_id version_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
-        INNER JOIN statuses s on m.status = s.id
-        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
         ",
+        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
         hashes_parsed.as_slice(),
         file_data.algorithm,
-        models::projects::ProjectStatus::Rejected.to_string()
+        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
     )
     .fetch_all(&**pool)
     .await?;
@@ -333,7 +345,7 @@ pub async fn get_versions_from_hashes(
             versions_data
                 .clone()
                 .into_iter()
-                .find(|x| x.id.0 == row.version_id)
+                .find(|x| x.inner.id.0 == row.version_id)
                 .map(|v| {
                     if let Ok(parsed_hash) = String::from_utf8(row.hash) {
                         Ok((
@@ -369,14 +381,14 @@ pub async fn download_files(
         "
         SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
-        INNER JOIN statuses s on m.status = s.id
-        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
         ",
+        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
         hashes_parsed.as_slice(),
         file_data.algorithm,
-        models::projects::ProjectStatus::Rejected.to_string()
+        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
     )
     .fetch_all(&mut *transaction)
     .await?;
@@ -423,14 +435,14 @@ pub async fn update_files(
         "
         SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
-        INNER JOIN statuses s on m.status = s.id
-        WHERE h.algorithm = $2 AND h.hash = ANY($1::bytea[]) AND s.status != $3
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
         ",
+        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
         hashes_parsed.as_slice(),
         update_data.algorithm,
-        models::projects::ProjectStatus::Rejected.to_string()
+        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
     )
         .fetch_all(&mut *transaction)
         .await?;
@@ -482,7 +494,7 @@ pub async fn update_files(
     let mut response = HashMap::new();
 
     for version in versions {
-        let hash = version_ids.get(&version.id);
+        let hash = version_ids.get(&version.inner.id);
 
         if let Some(hash) = hash {
             if let Ok(parsed_hash) = String::from_utf8(hash.clone()) {
@@ -491,7 +503,8 @@ pub async fn update_files(
                     models::projects::Version::from(version),
                 );
             } else {
-                let version_id: models::projects::VersionId = version.id.into();
+                let version_id: models::projects::VersionId =
+                    version.inner.id.into();
 
                 return Err(ApiError::Database(DatabaseError::Other(format!(
                     "Could not parse hash for version {}",

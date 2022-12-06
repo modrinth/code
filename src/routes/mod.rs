@@ -67,6 +67,7 @@ pub fn projects_config(cfg: &mut web::ServiceConfig) {
             .service(projects::delete_gallery_item)
             .service(projects::project_follow)
             .service(projects::project_unfollow)
+            .service(projects::project_schedule)
             .service(teams::team_members_get_project)
             .service(
                 web::scope("{project_id}")
@@ -95,7 +96,8 @@ pub fn versions_config(cfg: &mut web::ServiceConfig) {
             .service(versions::version_get)
             .service(versions::version_delete)
             .service(version_creation::upload_file_to_version)
-            .service(versions::version_edit),
+            .service(versions::version_edit)
+            .service(versions::version_schedule),
     );
     cfg.service(
         web::scope("version_file")

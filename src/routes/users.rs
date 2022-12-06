@@ -1,7 +1,7 @@
 use crate::database::models::User;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
-use crate::models::projects::{Project, ProjectStatus};
+use crate::models::projects::Project;
 use crate::models::users::{
     Badges, RecipientType, RecipientWallet, Role, UserId,
 };
@@ -91,35 +91,23 @@ pub async fn projects_list(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &info.into_inner().0,
-        &**pool,
-    )
-    .await?;
+    let id_option =
+        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         let user_id: UserId = id.into();
 
-        let project_data = if let Some(current_user) = user {
-            if current_user.role.is_mod() || current_user.id == user_id {
-                User::get_projects_private(id, &**pool).await?
-            } else {
-                User::get_projects(
-                    id,
-                    ProjectStatus::Approved.as_str(),
-                    &**pool,
-                )
-                .await?
-            }
-        } else {
-            User::get_projects(id, ProjectStatus::Approved.as_str(), &**pool)
-                .await?
-        };
+        let can_view_private = user
+            .map(|y| y.role.is_mod() || y.id == user_id)
+            .unwrap_or(false);
+
+        let project_data = User::get_projects(id, &**pool).await?;
 
         let response: Vec<_> =
             crate::database::Project::get_many_full(project_data, &**pool)
                 .await?
                 .into_iter()
+                .filter(|x| can_view_private || x.inner.status.is_approved())
                 .map(Project::from)
                 .collect();
 

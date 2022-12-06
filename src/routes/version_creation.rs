@@ -7,7 +7,7 @@ use crate::file_hosting::FileHost;
 use crate::models::pack::PackFileHash;
 use crate::models::projects::{
     Dependency, DependencyType, GameVersion, Loader, ProjectId, Version,
-    VersionFile, VersionId, VersionType,
+    VersionFile, VersionId, VersionStatus, VersionType,
 };
 use crate::models::teams::Permissions;
 use crate::queue::flameanvil::{FlameAnvilQueue, UploadFile};
@@ -59,6 +59,7 @@ pub struct InitialVersionData {
     pub loaders: Vec<Loader>,
     pub featured: bool,
     pub primary_file: Option<String>,
+    pub status: VersionStatus,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -159,6 +160,12 @@ async fn version_create_inner(
                     err, None,
                 ))
             })?;
+
+            if !version_create_data.status.can_be_requested() {
+                return Err(CreateError::InvalidInput(
+                    "Status specified cannot be requested".to_string(),
+                ));
+            }
 
             let project_id: models::ProjectId =
                 version_create_data.project_id.unwrap().into();
@@ -274,6 +281,8 @@ async fn version_create_inner(
                 loaders,
                 version_type: version_create_data.release_channel.to_string(),
                 featured: version_create_data.featured,
+                status: version_create_data.status,
+                requested_status: None,
             });
 
             continue;
@@ -415,6 +424,8 @@ async fn version_create_inner(
         date_published: Utc::now(),
         downloads: 0,
         version_type: version_data.release_channel,
+        status: builder.status,
+        requested_status: builder.requested_status,
         files: builder
             .files
             .iter()
@@ -448,8 +459,6 @@ async fn version_create_inner(
 
     Ok(HttpResponse::Ok().json(response))
 }
-
-// TODO: file deletion, listing, etc
 
 // under /api/v1/version/{version_id}
 #[post("{version_id}/file")]
@@ -551,7 +560,7 @@ async fn upload_file_to_version_inner(
         ));
     }
 
-    let project_id = ProjectId(version.project_id.0 as u64);
+    let project_id = ProjectId(version.inner.project_id.0 as u64);
 
     let project_type = sqlx::query!(
         "
@@ -559,7 +568,7 @@ async fn upload_file_to_version_inner(
         INNER JOIN mods ON mods.project_type = pt.id
         WHERE mods.id = $1
         ",
-        version.project_id as models::ProjectId,
+        version.inner.project_id as models::ProjectId,
     )
     .fetch_one(&mut *transaction)
     .await?
@@ -628,9 +637,9 @@ async fn upload_file_to_version_inner(
             all_game_versions.clone(),
             true,
             false,
-            version.name.clone(),
-            version.changelog.clone(),
-            version.version_type.clone(),
+            version.inner.name.clone(),
+            version.inner.changelog.clone(),
+            version.inner.version_type.clone(),
             flame_anvil_queue,
             None,
             None,

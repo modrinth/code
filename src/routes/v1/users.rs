@@ -1,6 +1,6 @@
 use crate::database::models::User;
 use crate::models::ids::UserId;
-use crate::models::projects::{ProjectId, ProjectStatus};
+use crate::models::projects::ProjectId;
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
 use actix_web::web;
@@ -24,26 +24,19 @@ pub async fn mods_list(
     if let Some(id) = id_option {
         let user_id: UserId = id.into();
 
-        let project_data = if let Some(current_user) = user {
-            if current_user.role.is_mod() || current_user.id == user_id {
-                User::get_projects_private(id, &**pool).await?
-            } else {
-                User::get_projects(
-                    id,
-                    ProjectStatus::Approved.as_str(),
-                    &**pool,
-                )
-                .await?
-            }
-        } else {
-            User::get_projects(id, ProjectStatus::Approved.as_str(), &**pool)
-                .await?
-        };
+        let can_view_private = user
+            .map(|y| y.role.is_mod() || y.id == user_id)
+            .unwrap_or(false);
 
-        let response = project_data
-            .into_iter()
-            .map(|v| v.into())
-            .collect::<Vec<crate::models::ids::ProjectId>>();
+        let project_data = User::get_projects(id, &**pool).await?;
+
+        let response: Vec<_> =
+            crate::database::Project::get_many(project_data, &**pool)
+                .await?
+                .into_iter()
+                .filter(|x| can_view_private || x.status.is_approved())
+                .map(|x| x.id.into())
+                .collect::<Vec<ProjectId>>();
 
         Ok(HttpResponse::Ok().json(response))
     } else {

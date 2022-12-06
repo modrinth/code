@@ -108,7 +108,7 @@ pub async fn mods_get(
 
     // can't use `map` and `collect` here since `is_authorized` must be async
     for proj in projects_data {
-        if is_authorized(&proj, &user_option, &pool).await? {
+        if is_authorized(&proj.inner, &user_option, &pool).await? {
             projects.push(crate::models::projects::Project::from(proj))
         }
     }

@@ -6,7 +6,10 @@ use sqlx::PgPool;
 
 use crate::database;
 use crate::models::projects::{Version, VersionType};
-use crate::util::auth::{get_user_from_headers, is_authorized};
+use crate::util::auth::{
+    get_user_from_headers, is_authorized, is_authorized_version,
+};
+use futures::StreamExt;
 
 use super::ApiError;
 
@@ -20,11 +23,10 @@ pub async fn forge_updates(
 
     let (id,) = info.into_inner();
 
-    let project = database::models::Project::get_full_from_slug_or_project_id(
-        &id, &**pool,
-    )
-    .await?
-    .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
+    let project =
+        database::models::Project::get_from_slug_or_project_id(&id, &**pool)
+            .await?
+            .ok_or_else(|| ApiError::InvalidInput(ERROR.to_string()))?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -33,16 +35,32 @@ pub async fn forge_updates(
     }
 
     let version_ids = database::models::Version::get_project_versions(
-        project.inner.id,
+        project.id,
         None,
         Some(vec!["forge".to_string()]),
         &**pool,
     )
     .await?;
 
-    let mut versions =
+    let versions =
         database::models::Version::get_many_full(version_ids, &**pool).await?;
-    versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+
+    let mut versions = futures::stream::iter(versions)
+        .filter_map(|data| async {
+            if is_authorized_version(&data.inner, &user_option, &pool)
+                .await
+                .ok()?
+            {
+                Some(data)
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>()
+        .await;
+
+    versions
+        .sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {

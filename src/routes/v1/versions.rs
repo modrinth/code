@@ -92,14 +92,16 @@ pub async fn version_list(
             .filter(|version| {
                 filters
                     .featured
-                    .map(|featured| featured == version.featured)
+                    .map(|featured| featured == version.inner.featured)
                     .unwrap_or(true)
             })
             .map(Version::from)
             .map(convert_to_legacy)
             .collect::<Vec<_>>();
 
-        versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
+        versions.sort_by(|a, b| {
+            b.inner.date_published.cmp(&a.inner.date_published)
+        });
 
         // Attempt to populate versions with "auto featured" versions
         if response.is_empty()

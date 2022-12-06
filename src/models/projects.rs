@@ -51,6 +51,9 @@ pub struct Project {
 
     /// The status of the project
     pub status: ProjectStatus,
+    /// The requested status of this projct
+    pub requested_status: Option<ProjectStatus>,
+
     /// The rejection data of the project
     pub moderator_message: Option<ModeratorMessage>,
 
@@ -111,7 +114,8 @@ impl From<QueryProject> for Project {
             published: m.published,
             updated: m.updated,
             approved: m.approved,
-            status: data.status,
+            status: m.status,
+            requested_status: m.requested_status,
             moderator_message: if let Some(message) = m.moderation_message {
                 Some(ModeratorMessage {
                     message,
@@ -122,7 +126,7 @@ impl From<QueryProject> for Project {
             },
             license: License {
                 id: m.license.clone(),
-                name: match spdx::Expression::parse(&*m.license) {
+                name: match spdx::Expression::parse(&m.license) {
                     Ok(spdx_expr) => {
                         let mut vec: Vec<&str> = Vec::new();
                         for node in spdx_expr.iter() {
@@ -256,8 +260,11 @@ pub struct DonationLink {
 /// Rejected - Project is not displayed on search, and not accessible by URL (Temporary state, project can reapply)
 /// Draft - Project is not displayed on search, and not accessible by URL
 /// Unlisted - Project is not displayed on search, but accessible by URL
+/// Withheld - Same as unlisted, but set by a moderator. Cannot be switched to another type without moderator approval
 /// Processing - Project is not displayed on search, and not accessible by URL (Temporary state, project under review)
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq, Debug)]
+/// Scheduled - Project is scheduled to be released in the future
+/// Private - Project is approved, but is not viewable to the public
+#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum ProjectStatus {
     Approved,
@@ -266,6 +273,9 @@ pub enum ProjectStatus {
     Draft,
     Unlisted,
     Processing,
+    Withheld,
+    Scheduled,
+    Private,
     Unknown,
 }
 
@@ -284,6 +294,8 @@ impl ProjectStatus {
             "draft" => ProjectStatus::Draft,
             "unlisted" => ProjectStatus::Unlisted,
             "archived" => ProjectStatus::Archived,
+            "withheld" => ProjectStatus::Withheld,
+            "private" => ProjectStatus::Private,
             _ => ProjectStatus::Unknown,
         }
     }
@@ -296,23 +308,77 @@ impl ProjectStatus {
             ProjectStatus::Processing => "processing",
             ProjectStatus::Unknown => "unknown",
             ProjectStatus::Archived => "archived",
+            ProjectStatus::Withheld => "withheld",
+            ProjectStatus::Scheduled => "scheduled",
+            ProjectStatus::Private => "private",
         }
     }
 
+    pub fn iterator() -> impl Iterator<Item = ProjectStatus> {
+        [
+            ProjectStatus::Approved,
+            ProjectStatus::Archived,
+            ProjectStatus::Rejected,
+            ProjectStatus::Draft,
+            ProjectStatus::Unlisted,
+            ProjectStatus::Processing,
+            ProjectStatus::Withheld,
+            ProjectStatus::Scheduled,
+            ProjectStatus::Private,
+            ProjectStatus::Unknown,
+        ]
+        .iter()
+        .copied()
+    }
+
+    // Project pages + info cannot be viewed
     pub fn is_hidden(&self) -> bool {
         match self {
-            ProjectStatus::Approved => false,
             ProjectStatus::Rejected => true,
             ProjectStatus::Draft => true,
-            ProjectStatus::Unlisted => false,
             ProjectStatus::Processing => true,
             ProjectStatus::Unknown => true,
+            ProjectStatus::Scheduled => true,
+            ProjectStatus::Private => true,
+
+            ProjectStatus::Approved => false,
+            ProjectStatus::Unlisted => false,
             ProjectStatus::Archived => false,
+            ProjectStatus::Withheld => false,
         }
     }
 
+    // Project can be displayed in search
     pub fn is_searchable(&self) -> bool {
-        matches!(self, ProjectStatus::Approved)
+        matches!(self, ProjectStatus::Approved | ProjectStatus::Archived)
+    }
+
+    // Project is "Approved" by moderators
+    pub fn is_approved(&self) -> bool {
+        matches!(
+            self,
+            ProjectStatus::Approved
+                | ProjectStatus::Archived
+                | ProjectStatus::Unlisted
+                | ProjectStatus::Private
+        )
+    }
+
+    // Project status can be requested after moderator approval
+    pub fn can_be_requested(&self) -> bool {
+        match self {
+            ProjectStatus::Approved => true,
+            ProjectStatus::Archived => true,
+            ProjectStatus::Unlisted => true,
+            ProjectStatus::Private => true,
+            ProjectStatus::Draft => true,
+
+            ProjectStatus::Rejected => false,
+            ProjectStatus::Processing => false,
+            ProjectStatus::Unknown => false,
+            ProjectStatus::Withheld => false,
+            ProjectStatus::Scheduled => false,
+        }
     }
 }
 
@@ -343,6 +409,10 @@ pub struct Version {
     pub downloads: u32,
     /// The type of the release - `Alpha`, `Beta`, or `Release`.
     pub version_type: VersionType,
+    /// The status of tne version
+    pub status: VersionStatus,
+    /// The requested status of the version (used for scheduling)
+    pub requested_status: Option<VersionStatus>,
 
     /// A list of files available for download for this version.
     pub files: Vec<VersionFile>,
@@ -356,25 +426,29 @@ pub struct Version {
 
 impl From<QueryVersion> for Version {
     fn from(data: QueryVersion) -> Version {
-        Version {
-            id: data.id.into(),
-            project_id: data.project_id.into(),
-            author_id: data.author_id.into(),
+        let v = data.inner;
 
-            featured: data.featured,
-            name: data.name,
-            version_number: data.version_number,
-            changelog: data.changelog,
-            changelog_url: data.changelog_url,
-            date_published: data.date_published,
-            downloads: data.downloads as u32,
-            version_type: match data.version_type.as_str() {
+        Version {
+            id: v.id.into(),
+            project_id: v.project_id.into(),
+            author_id: v.author_id.into(),
+
+            featured: v.featured,
+            name: v.name,
+            version_number: v.version_number,
+            changelog: v.changelog,
+            changelog_url: v.changelog_url,
+            date_published: v.date_published,
+            downloads: v.downloads as u32,
+            version_type: match v.version_type.as_str() {
                 "release" => VersionType::Release,
                 "beta" => VersionType::Beta,
                 "alpha" => VersionType::Alpha,
                 _ => VersionType::Release,
             },
 
+            status: v.status,
+            requested_status: v.requested_status,
             files: data
                 .files
                 .into_iter()
@@ -413,6 +487,88 @@ impl From<QueryVersion> for Version {
                 .map(GameVersion)
                 .collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),
+        }
+    }
+}
+
+/// A status decides the visibility of a project in search, URLs, and the whole site itself.
+/// Listed - Version is displayed on project, and accessible by URL
+/// Draft - Version is not displayed on project, and not accessible by URL
+/// Unlisted - Version is not displayed on project, and accessible by URL
+/// Scheduled - Version is scheduled to be released in the future
+#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq, Debug)]
+#[serde(rename_all = "lowercase")]
+pub enum VersionStatus {
+    Listed,
+    Draft,
+    Unlisted,
+    Scheduled,
+    Unknown,
+}
+
+impl std::fmt::Display for VersionStatus {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        write!(fmt, "{}", self.as_str())
+    }
+}
+
+impl VersionStatus {
+    pub fn from_str(string: &str) -> VersionStatus {
+        match string {
+            "listed" => VersionStatus::Listed,
+            "draft" => VersionStatus::Draft,
+            "unlisted" => VersionStatus::Unlisted,
+            _ => VersionStatus::Unknown,
+        }
+    }
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            VersionStatus::Listed => "listed",
+            VersionStatus::Draft => "draft",
+            VersionStatus::Unlisted => "unlisted",
+            VersionStatus::Unknown => "unknown",
+            VersionStatus::Scheduled => "scheduled",
+        }
+    }
+
+    pub fn iterator() -> impl Iterator<Item = VersionStatus> {
+        [
+            VersionStatus::Listed,
+            VersionStatus::Draft,
+            VersionStatus::Unlisted,
+            VersionStatus::Scheduled,
+            VersionStatus::Unknown,
+        ]
+        .iter()
+        .copied()
+    }
+
+    // Version pages + info cannot be viewed
+    pub fn is_hidden(&self) -> bool {
+        match self {
+            VersionStatus::Listed => false,
+            VersionStatus::Unlisted => false,
+
+            VersionStatus::Draft => true,
+            VersionStatus::Scheduled => true,
+            VersionStatus::Unknown => true,
+        }
+    }
+
+    // Whether version is listed on project / returned in aggregate routes
+    pub fn is_listed(&self) -> bool {
+        matches!(self, VersionStatus::Listed)
+    }
+
+    // Whether a version status can be requested
+    pub fn can_be_requested(&self) -> bool {
+        match self {
+            VersionStatus::Listed => true,
+            VersionStatus::Draft => true,
+            VersionStatus::Unlisted => true,
+            VersionStatus::Scheduled => false,
+
+            VersionStatus::Unknown => false,
         }
     }
 }
