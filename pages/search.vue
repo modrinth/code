@@ -220,7 +220,7 @@
         class="card warning"
         aria-label="Warning"
       >
-        Modpack support is currently in alpha, and can only be created and
+        Modpack support is currently in alpha, and modpacks can only be created and
         installed through third party tools. Our documentation includes
         instructions on
         <a
