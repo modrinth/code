@@ -1,6 +1,7 @@
 use super::ids::*;
 use crate::database::models::DatabaseError;
 use chrono::{DateTime, Utc};
+use serde::Deserialize;
 
 pub struct NotificationBuilder {
     pub notification_type: Option<String>,
@@ -27,6 +28,7 @@ pub struct Notification {
     pub actions: Vec<NotificationAction>,
 }
 
+#[derive(Deserialize)]
 pub struct NotificationAction {
     pub id: NotificationActionId,
     pub notification_id: NotificationId,
@@ -124,7 +126,7 @@ impl Notification {
         let result = sqlx::query!(
             "
             SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            ARRAY_AGG(DISTINCT na.id || ' |||| ' || na.title || ' |||| ' || na.action_route || ' |||| ' || na.action_route_method) filter (where na.id is not null) actions
+            JSONB_AGG(DISTINCT TO_JSONB(na)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id = $1
@@ -136,24 +138,6 @@ impl Notification {
             .await?;
 
         if let Some(row) = result {
-            let mut actions: Vec<NotificationAction> = Vec::new();
-
-            row.actions.unwrap_or_default().into_iter().for_each(|x| {
-                let action: Vec<&str> = x.split(" |||| ").collect();
-
-                if action.len() >= 3 {
-                    actions.push(NotificationAction {
-                        id: NotificationActionId(
-                            action[0].parse().unwrap_or(0),
-                        ),
-                        notification_id: id,
-                        title: action[1].to_string(),
-                        action_route_method: action[3].to_string(),
-                        action_route: action[2].to_string(),
-                    });
-                }
-            });
-
             Ok(Some(Notification {
                 id,
                 user_id: UserId(row.user_id),
@@ -163,7 +147,11 @@ impl Notification {
                 link: row.link,
                 read: row.read,
                 created: row.created,
-                actions,
+                actions: serde_json::from_value(
+                    row.actions.unwrap_or_default(),
+                )
+                .ok()
+                .unwrap_or_default(),
             }))
         } else {
             Ok(None)
@@ -184,7 +172,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            ARRAY_AGG(DISTINCT na.id || ' |||| ' || na.title || ' |||| ' || na.action_route || ' |||| ' || na.action_route_method) filter (where na.id is not null) actions
+            JSONB_AGG(DISTINCT TO_JSONB(na)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id = ANY($1)
@@ -197,21 +185,6 @@ impl Notification {
             .try_filter_map(|e| async {
                 Ok(e.right().map(|row| {
                     let id = NotificationId(row.id);
-                    let mut actions: Vec<NotificationAction> = Vec::new();
-
-                    row.actions.unwrap_or_default().into_iter().for_each(|x| {
-                        let action: Vec<&str> = x.split(" |||| ").collect();
-
-                        if action.len() >= 3 {
-                            actions.push(NotificationAction {
-                                id: NotificationActionId(action[0].parse().unwrap_or(0)),
-                                notification_id: id,
-                                title: action[1].to_string(),
-                                action_route_method: action[3].to_string(),
-                                action_route: action[2].to_string(),
-                            });
-                        }
-                    });
 
                     Notification {
                         id,
@@ -222,7 +195,11 @@ impl Notification {
                         link: row.link,
                         read: row.read,
                         created: row.created,
-                        actions,
+                        actions: serde_json::from_value(
+                            row.actions.unwrap_or_default(),
+                        )
+                            .ok()
+                            .unwrap_or_default(),
                     }
                 }))
             })
@@ -242,7 +219,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            ARRAY_AGG(DISTINCT na.id || ' |||| ' || na.title || ' |||| ' || na.action_route || ' |||| ' || na.action_route_method) filter (where na.id is not null) actions
+            JSONB_AGG(DISTINCT TO_JSONB(na)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.user_id = $1
@@ -254,21 +231,6 @@ impl Notification {
             .try_filter_map(|e| async {
                 Ok(e.right().map(|row| {
                     let id = NotificationId(row.id);
-                    let mut actions: Vec<NotificationAction> = Vec::new();
-
-                    row.actions.unwrap_or_default().into_iter().for_each(|x| {
-                        let action: Vec<&str> = x.split(" |||| ").collect();
-
-                        if action.len() >= 3 {
-                            actions.push(NotificationAction {
-                                id: NotificationActionId(action[0].parse().unwrap_or(0)),
-                                notification_id: id,
-                                title: action[1].to_string(),
-                                action_route_method: action[3].to_string(),
-                                action_route: action[2].to_string(),
-                            });
-                        }
-                    });
 
                     Notification {
                         id,
@@ -279,7 +241,11 @@ impl Notification {
                         link: row.link,
                         read: row.read,
                         created: row.created,
-                        actions,
+                        actions: serde_json::from_value(
+                            row.actions.unwrap_or_default(),
+                        )
+                            .ok()
+                            .unwrap_or_default(),
                     }
                 }))
             })

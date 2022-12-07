@@ -117,7 +117,7 @@ pub struct TeamId(pub i64);
 #[sqlx(transparent)]
 pub struct TeamMemberId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Deserialize)]
 #[sqlx(transparent)]
 pub struct ProjectId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]
@@ -130,11 +130,11 @@ pub struct StatusId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
 pub struct SideTypeId(pub i32);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Deserialize)]
 #[sqlx(transparent)]
 pub struct DonationPlatformId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash, Deserialize)]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Deserialize)]
@@ -154,7 +154,7 @@ pub struct ReportId(pub i64);
 #[sqlx(transparent)]
 pub struct ReportTypeId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Hash, Eq, PartialEq)]
+#[derive(Copy, Clone, Debug, Type, Hash, Eq, PartialEq, Deserialize)]
 #[sqlx(transparent)]
 pub struct FileId(pub i64);
 
@@ -162,10 +162,10 @@ pub struct FileId(pub i64);
 #[sqlx(transparent)]
 pub struct StateId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Deserialize)]
 #[sqlx(transparent)]
 pub struct NotificationId(pub i64);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Deserialize)]
 #[sqlx(transparent)]
 pub struct NotificationActionId(pub i32);
 

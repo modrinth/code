@@ -72,7 +72,8 @@ pub async fn send_discord_webhook(
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
             JSONB_AGG(DISTINCT TO_JSONB(gv)) filter (where gv.version is not null) versions,
             JSONB_AGG(DISTINCT TO_JSONB(agv)) filter (where gv.version is not null) all_game_versions,
-            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null) gallery
+            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
+            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id AND mc.is_additional = FALSE
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -95,7 +96,7 @@ pub async fn send_discord_webhook(
             &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
             crate::models::teams::OWNER_ROLE,
         )
-        .fetch_optional(&*pool)
+        .fetch_optional(pool)
         .await?;
 
     if let Some(project) = row {
@@ -106,19 +107,13 @@ pub async fn send_discord_webhook(
 
         let versions: Vec<GameVersion> =
             serde_json::from_value(project.versions.unwrap_or_default())
-                .map_err(|err| {
-                    ApiError::DiscordError(
-                        "Error while sending projects webhook".to_string(),
-                    )
-                })?;
+                .ok()
+                .unwrap_or_default();
         let all_game_versions: Vec<GameVersion> = serde_json::from_value(
             project.all_game_versions.unwrap_or_default(),
         )
-        .map_err(|err| {
-            ApiError::DiscordError(
-                "Error while sending projects webhook".to_string(),
-            )
-        })?;
+        .ok()
+        .unwrap_or_default();
 
         if !categories.is_empty() {
             fields.push(DiscordEmbedField {
@@ -170,7 +165,7 @@ pub async fn send_discord_webhook(
         }
 
         if !versions.is_empty() {
-            let mut formatted_game_versions: String =
+            let formatted_game_versions: String =
                 get_gv_range(versions, all_game_versions);
 
             fields.push(DiscordEmbedField {
@@ -204,11 +199,14 @@ pub async fn send_discord_webhook(
             thumbnail: DiscordEmbedThumbnail {
                 url: project.icon_url,
             },
-            image: project.gallery.unwrap_or_default().first().map(|x| {
-                DiscordEmbedImage {
-                    url: Some(x.to_string()),
-                }
-            }),
+            image: if let Some(first) =
+                project.featured_gallery.unwrap_or_default().first()
+            {
+                Some(first.clone())
+            } else {
+                project.gallery.unwrap_or_default().first().cloned()
+            }
+            .map(|x| DiscordEmbedImage { url: Some(x) }),
             footer: Some(DiscordEmbedFooter {
                 text: "Modrinth".to_string(),
                 icon_url: Some(
@@ -231,7 +229,7 @@ pub async fn send_discord_webhook(
             })
             .send()
             .await
-            .map_err(|err| {
+            .map_err(|_| {
                 ApiError::DiscordError(
                     "Error while sending projects webhook".to_string(),
                 )
@@ -261,8 +259,8 @@ fn get_gv_range(
 
     const MAX_VALUE: usize = 1000000;
 
-    for i in 0..game_versions.len() {
-        let current_version = &*game_versions[i].version;
+    for (i, current_version) in game_versions.iter().enumerate() {
+        let current_version = &current_version.version;
 
         let index = all_game_versions
             .iter()

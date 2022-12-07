@@ -1,11 +1,10 @@
 use super::ids::*;
-use crate::database::models::convert_postgres_date;
 use crate::models::projects::ProjectStatus;
 use chrono::{DateTime, Utc};
+use serde::Deserialize;
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct DonationUrl {
-    pub project_id: ProjectId,
     pub platform_id: DonationPlatformId,
     pub platform_short: String,
     pub platform_name: String,
@@ -15,6 +14,7 @@ pub struct DonationUrl {
 impl DonationUrl {
     pub async fn insert(
         &self,
+        project_id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
@@ -26,7 +26,7 @@ impl DonationUrl {
                 $1, $2, $3
             )
             ",
-            self.project_id as ProjectId,
+            project_id as ProjectId,
             self.platform_id as DonationPlatformId,
             self.url,
         )
@@ -37,9 +37,8 @@ impl DonationUrl {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Deserialize)]
 pub struct GalleryItem {
-    pub project_id: ProjectId,
     pub image_url: String,
     pub featured: bool,
     pub title: Option<String>,
@@ -50,6 +49,7 @@ pub struct GalleryItem {
 impl GalleryItem {
     pub async fn insert(
         &self,
+        project_id: ProjectId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), sqlx::error::Error> {
         sqlx::query!(
@@ -61,7 +61,7 @@ impl GalleryItem {
                 $1, $2, $3, $4, $5
             )
             ",
-            self.project_id as ProjectId,
+            project_id as ProjectId,
             self.image_url,
             self.featured,
             self.title,
@@ -143,14 +143,12 @@ impl ProjectBuilder {
             version.insert(&mut *transaction).await?;
         }
 
-        for mut donation in self.donation_urls {
-            donation.project_id = self.project_id;
-            donation.insert(&mut *transaction).await?;
+        for donation in self.donation_urls {
+            donation.insert(self.project_id, &mut *transaction).await?;
         }
 
-        for mut gallery in self.gallery_items {
-            gallery.project_id = self.project_id;
-            gallery.insert(&mut *transaction).await?;
+        for gallery in self.gallery_items {
+            gallery.insert(self.project_id, &mut *transaction).await?;
         }
 
         for category in self.categories {
@@ -667,10 +665,11 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent webhook_sent,
-            ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
-            ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
-            ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
-            ARRAY_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url) filter (where md.joining_platform_id is not null) donations
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
+            JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
+            JSONB_AGG(DISTINCT TO_JSONB(mg)) filter (where mg.image_url is not null) gallery,
+            JSONB_AGG(DISTINCT jsonb_build_object('platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url)) filter (where md.joining_platform_id is not null) donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN side_types cs ON m.client_side = cs.id
@@ -691,23 +690,6 @@ impl Project {
             .await?;
 
         if let Some(m) = result {
-            let categories_raw = m.categories.unwrap_or_default();
-
-            let mut categories = Vec::new();
-            let mut additional_categories = Vec::new();
-
-            for category in categories_raw {
-                let category: Vec<&str> = category.split(" |||| ").collect();
-
-                if category.len() >= 2 {
-                    if category[1].parse::<bool>().ok().unwrap_or_default() {
-                        additional_categories.push(category[0].to_string());
-                    } else {
-                        categories.push(category[0].to_string());
-                    }
-                }
-            }
-
             Ok(Some(QueryProject {
                 inner: Project {
                     id: ProjectId(m.id),
@@ -743,86 +725,38 @@ impl Project {
                     webhook_sent: m.webhook_sent,
                 },
                 project_type: m.project_type_name,
-                categories,
-                additional_categories,
+                categories: m.categories.unwrap_or_default(),
+                additional_categories: m
+                    .additional_categories
+                    .unwrap_or_default(),
                 versions: {
-                    let versions = m.versions.unwrap_or_default();
+                    #[derive(Deserialize)]
+                    struct Version {
+                        pub id: VersionId,
+                        pub date_published: DateTime<Utc>,
+                    }
 
-                    let mut v = versions
-                        .into_iter()
-                        .flat_map(|x| {
-                            let version: Vec<&str> =
-                                x.split(" |||| ").collect();
+                    let mut versions: Vec<Version> =
+                        serde_json::from_value(m.versions.unwrap_or_default())
+                            .ok()
+                            .unwrap_or_default();
 
-                            if version.len() >= 2 {
-                                Some((
-                                    VersionId(
-                                        version[0].parse().unwrap_or_default(),
-                                    ),
-                                    convert_postgres_date(version[1])
-                                        .timestamp(),
-                                ))
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<(VersionId, i64)>>();
+                    versions.sort_by(|a, b| {
+                        a.date_published.cmp(&b.date_published)
+                    });
 
-                    v.sort_by(|a, b| a.1.cmp(&b.1));
-
-                    v.into_iter().map(|x| x.0).collect()
+                    versions.into_iter().map(|x| x.id).collect()
                 },
-                donation_urls: m
-                    .donations
-                    .unwrap_or_default()
-                    .into_iter()
-                    .flat_map(|d| {
-                        let strings: Vec<&str> = d.split(" |||| ").collect();
-
-                        if strings.len() >= 3 {
-                            Some(DonationUrl {
-                                project_id: id,
-                                platform_id: DonationPlatformId(
-                                    strings[0].parse().unwrap_or(0),
-                                ),
-                                platform_short: strings[1].to_string(),
-                                platform_name: strings[2].to_string(),
-                                url: strings[3].to_string(),
-                            })
-                        } else {
-                            None
-                        }
-                    })
-                    .collect(),
-                gallery_items: m
-                    .gallery
-                    .unwrap_or_default()
-                    .into_iter()
-                    .flat_map(|d| {
-                        let strings: Vec<&str> = d.split(" |||| ").collect();
-
-                        if strings.len() >= 5 {
-                            Some(GalleryItem {
-                                project_id: id,
-                                image_url: strings[0].to_string(),
-                                featured: strings[1].parse().unwrap_or(false),
-                                title: if strings[3] == " " {
-                                    None
-                                } else {
-                                    Some(strings[3].to_string())
-                                },
-                                description: if strings[4] == " " {
-                                    None
-                                } else {
-                                    Some(strings[4].to_string())
-                                },
-                                created: convert_postgres_date(strings[2]),
-                            })
-                        } else {
-                            None
-                        }
-                    })
-                    .collect(),
+                gallery_items: serde_json::from_value(
+                    m.gallery.unwrap_or_default(),
+                )
+                .ok()
+                .unwrap_or_default(),
+                donation_urls: serde_json::from_value(
+                    m.donations.unwrap_or_default(),
+                )
+                .ok()
+                .unwrap_or_default(),
                 client_side: crate::models::projects::SideType::from_str(
                     &m.client_side_type,
                 ),
@@ -854,10 +788,11 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent,
-            ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
-            ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
-            ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
-            ARRAY_AGG(DISTINCT md.joining_platform_id || ' |||| ' || dp.short || ' |||| ' || dp.name || ' |||| ' || md.url) filter (where md.joining_platform_id is not null) donations
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
+            JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
+            JSONB_AGG(DISTINCT TO_JSONB(mg)) filter (where mg.image_url is not null) gallery,
+            JSONB_AGG(DISTINCT jsonb_build_object('platform_id', md.joining_platform_id, 'platform_short', dp.short, 'platform_name', dp.name,'url', md.url)) filter (where md.joining_platform_id is not null) donations
             FROM mods m
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN side_types cs ON m.client_side = cs.id
@@ -878,24 +813,6 @@ impl Project {
             .try_filter_map(|e| async {
                 Ok(e.right().map(|m| {
                     let id = m.id;
-
-                    let categories_raw = m.categories.unwrap_or_default();
-
-                    let mut categories = Vec::new();
-                    let mut additional_categories = Vec::new();
-
-                    for category in categories_raw {
-                        let category: Vec<&str> =
-                            category.split(" |||| ").collect();
-
-                        if category.len() >= 2 {
-                            if category[1].parse::<bool>().ok().unwrap_or_default() {
-                                additional_categories.push(category[0].to_string());
-                            } else {
-                                categories.push(category[0].to_string());
-                            }
-                        }
-                    }
 
                     QueryProject {
                         inner: Project {
@@ -934,74 +851,31 @@ impl Project {
                             webhook_sent: m.webhook_sent,
                         },
                         project_type: m.project_type_name,
-                        categories,
-                        additional_categories,
+                        categories: m.categories.unwrap_or_default(),
+                        additional_categories: m.additional_categories.unwrap_or_default(),
                         versions: {
-                            let versions = m.versions.unwrap_or_default();
+                            #[derive(Deserialize)]
+                            struct Version {
+                                pub id: VersionId,
+                                pub date_published: DateTime<Utc>,
+                            }
 
-                            let mut v = versions
-                                .into_iter()
-                                .flat_map(|x| {
-                                    let version: Vec<&str> =
-                                        x.split(" |||| ").collect();
+                            let mut versions: Vec<Version> = serde_json::from_value(
+                                m.versions.unwrap_or_default(),
+                            )
+                                .ok()
+                                .unwrap_or_default();
 
-                                    if version.len() >= 2 {
-                                        Some((
-                                            VersionId(version[0].parse().unwrap_or_default()),
-                                            convert_postgres_date(version[1])
-                                                .timestamp(),
-                                        ))
-                                    } else {
-                                        None
-                                    }
-                                })
-                                .collect::<Vec<(VersionId, i64)>>();
+                            versions.sort_by(|a, b| a.date_published.cmp(&b.date_published));
 
-                            v.sort_by(|a, b| a.1.cmp(&b.1));
-
-                            v.into_iter().map(|x| x.0).collect()
+                            versions.into_iter().map(|x| x.id).collect()
                         },
-                        gallery_items: m
-                            .gallery
-                            .unwrap_or_default()
-                            .into_iter()
-                            .flat_map(|d| {
-                                let strings: Vec<&str> = d.split(" |||| ").collect();
-
-                                if strings.len() >= 5 {
-                                    Some(GalleryItem {
-                                        project_id: ProjectId(id),
-                                        image_url: strings[0].to_string(),
-                                        featured: strings[1].parse().unwrap_or(false),
-                                        title: if strings[3] == " " { None } else { Some(strings[3].to_string()) },
-                                        description: if strings[4] == " " { None } else { Some(strings[4].to_string()) },
-                                        created: convert_postgres_date(strings[2])
-                                    })
-                                } else {
-                                    None
-                                }
-                            })
-                            .collect(),
-                        donation_urls: m
-                            .donations
-                            .unwrap_or_default()
-                            .into_iter()
-                            .flat_map(|d| {
-                                let strings: Vec<&str> = d.split(" |||| ").collect();
-
-                                if strings.len() >= 3 {
-                                    Some(DonationUrl {
-                                        project_id: ProjectId(id),
-                                        platform_id: DonationPlatformId(strings[0].parse().unwrap_or(0)),
-                                        platform_short: strings[1].to_string(),
-                                        platform_name: strings[2].to_string(),
-                                        url: strings[3].to_string(),
-                                    })
-                                } else {
-                                    None
-                                }
-                            })
-                            .collect(),
+                        gallery_items: serde_json::from_value(
+                            m.gallery.unwrap_or_default(),
+                        ).ok().unwrap_or_default(),
+                        donation_urls: serde_json::from_value(
+                            m.donations.unwrap_or_default(),
+                        ).ok().unwrap_or_default(),
                         client_side: crate::models::projects::SideType::from_str(&m.client_side_type),
                         server_side: crate::models::projects::SideType::from_str(&m.server_side_type),
                     }}))

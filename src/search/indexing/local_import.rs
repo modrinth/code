@@ -18,10 +18,12 @@ pub async fn index_local(
             m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,
             m.team_id team_id, m.license license, m.slug slug, m.status status_name,
             cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, u.username username,
-            ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
+            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
             ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null) versions,
-            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null) gallery
+            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
+            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
@@ -46,27 +48,13 @@ pub async fn index_local(
             .fetch_many(&pool)
             .try_filter_map(|e| async {
                 Ok(e.right().map(|m| {
-                    let categories_raw = m.categories.unwrap_or_default();
-
-                    let mut additional_categories = Vec::new();
-                    let mut categories = Vec::new();
-
-                    for category in categories_raw {
-                        let category: Vec<&str> = category.split(" |||| ").collect();
-
-                        if category.len() >= 2 {
-                            if category[1].parse::<bool>().ok().unwrap_or_default() {
-                                additional_categories.push(category[0].to_string());
-                            } else {
-                                categories.push(category[0].to_string());
-                            }
-                        }
-                    }
+                    let mut additional_categories = m.additional_categories.unwrap_or_default();
+                    let mut categories = m.categories.unwrap_or_default();
 
                     categories.append(&mut m.loaders.unwrap_or_default());
 
                     let display_categories = categories.clone();
-                    categories.append(&mut additional_categories.clone());
+                    categories.append(&mut additional_categories);
 
                     let versions = m.versions.unwrap_or_default();
 
@@ -82,8 +70,11 @@ pub async fn index_local(
                         _ => false,
                     };
 
+                    let mut gallery = m.featured_gallery.unwrap_or_default();
+                    gallery.append(&mut m.gallery.unwrap_or_default());
+
                     UploadSearchProject {
-                        project_id: format!("{}", project_id),
+                        project_id: project_id.to_string(),
                         title: m.title,
                         description: m.description,
                         categories,
@@ -102,7 +93,7 @@ pub async fn index_local(
                         server_side: m.server_side_type,
                         slug: m.slug,
                         project_type: m.project_type_name,
-                        gallery: m.gallery.unwrap_or_default(),
+                        gallery,
                         display_categories,
                         open_source,
                     }

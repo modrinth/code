@@ -1,8 +1,8 @@
 use super::ids::*;
 use super::DatabaseError;
-use crate::database::models::convert_postgres_date;
 use crate::models::projects::VersionStatus;
 use chrono::{DateTime, Utc};
+use serde::Deserialize;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 
@@ -601,10 +601,11 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
-            ARRAY_AGG(DISTINCT gv.version || ' |||| ' || gv.created) filter (where gv.version is not null) game_versions, ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-            ARRAY_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename) filter (where f.id is not null) files,
-            ARRAY_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id) filter (where h.hash is not null) hashes,
-            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' ')) filter (where d.dependency_type is not null) dependencies
+            JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
+            ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+            JSONB_AGG(DISTINCT TO_JSONB(f))  filter (where f.id is not null) files,
+            JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
+            JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -641,59 +642,57 @@ impl Version {
                         .map(|x| VersionStatus::from_str(&x)),
                 },
                 files: {
-                    let hashes: Vec<(FileId, String, Vec<u8>)> = v
-                        .hashes
-                        .unwrap_or_default()
+                    #[derive(Deserialize)]
+                    struct Hash {
+                        pub file_id: FileId,
+                        pub algorithm: String,
+                        pub hash: Vec<u8>,
+                    }
+
+                    #[derive(Deserialize)]
+                    struct File {
+                        pub id: FileId,
+                        pub url: String,
+                        pub filename: String,
+                        pub primary: bool,
+                        pub size: u32,
+                    }
+
+                    let hashes: Vec<Hash> =
+                        serde_json::from_value(v.hashes.unwrap_or_default())
+                            .ok()
+                            .unwrap_or_default();
+
+                    let files: Vec<File> =
+                        serde_json::from_value(v.files.unwrap_or_default())
+                            .ok()
+                            .unwrap_or_default();
+
+                    let mut files = files
                         .into_iter()
-                        .flat_map(|f| {
-                            let hash: Vec<&str> = f.split(" |||| ").collect();
+                        .map(|x| {
+                            let mut file_hashes = HashMap::new();
 
-                            if hash.len() >= 3 {
-                                Some((
-                                    FileId(hash[2].parse().unwrap_or(0)),
-                                    hash[0].to_string(),
-                                    hash[1].to_string().into_bytes(),
-                                ))
-                            } else {
-                                None
-                            }
-                        })
-                        .collect();
-
-                    let mut files: Vec<QueryFile> = v
-                        .files
-                        .unwrap_or_default()
-                        .into_iter()
-                        .flat_map(|f| {
-                            let file: Vec<&str> = f.split(" |||| ").collect();
-
-                            if file.len() >= 5 {
-                                let file_id =
-                                    FileId(file[0].parse().unwrap_or(0));
-                                let mut file_hashes = HashMap::new();
-
-                                for hash in &hashes {
-                                    if (hash.0).0 == file_id.0 {
-                                        file_hashes.insert(
-                                            hash.1.clone(),
-                                            hash.2.clone(),
-                                        );
-                                    }
+                            for hash in &hashes {
+                                if hash.file_id == x.id {
+                                    file_hashes.insert(
+                                        hash.algorithm.clone(),
+                                        hash.hash.clone(),
+                                    );
                                 }
+                            }
 
-                                Some(QueryFile {
-                                    id: file_id,
-                                    url: file[3].to_string(),
-                                    filename: file[4].to_string(),
-                                    hashes: file_hashes,
-                                    primary: file[1].parse().unwrap_or(false),
-                                    size: file[2].parse().unwrap_or(0),
-                                })
-                            } else {
-                                None
+                            QueryFile {
+                                id: x.id,
+                                url: x.url,
+                                filename: x.filename,
+                                hashes: file_hashes,
+                                primary: x.primary,
+                                size: x.size,
                             }
                         })
-                        .collect();
+                        .collect::<Vec<_>>();
+
                     files.sort_by(|a, b| {
                         if a.primary {
                             Ordering::Less
@@ -703,69 +702,33 @@ impl Version {
                             a.filename.cmp(&b.filename)
                         }
                     });
+
                     files
                 },
                 game_versions: {
-                    let game_versions = v.game_versions.unwrap_or_default();
+                    #[derive(Deserialize)]
+                    struct GameVersion {
+                        pub version: String,
+                        pub created: DateTime<Utc>,
+                    }
 
-                    let mut gv = game_versions
-                        .into_iter()
-                        .flat_map(|x| {
-                            let version: Vec<&str> =
-                                x.split(" |||| ").collect();
+                    let mut game_versions: Vec<GameVersion> =
+                        serde_json::from_value(
+                            v.game_versions.unwrap_or_default(),
+                        )
+                        .ok()
+                        .unwrap_or_default();
 
-                            if version.len() >= 2 {
-                                Some((
-                                    version[0].to_string(),
-                                    convert_postgres_date(version[1])
-                                        .timestamp(),
-                                ))
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<(String, i64)>>();
+                    game_versions.sort_by(|a, b| a.created.cmp(&b.created));
 
-                    gv.sort_by(|a, b| a.1.cmp(&b.1));
-
-                    gv.into_iter().map(|x| x.0).collect()
+                    game_versions.into_iter().map(|x| x.version).collect()
                 },
                 loaders: v.loaders.unwrap_or_default(),
-                dependencies: v
-                    .dependencies
-                    .unwrap_or_default()
-                    .into_iter()
-                    .flat_map(|f| {
-                        let dependency: Vec<&str> = f.split(" |||| ").collect();
-
-                        if dependency.len() >= 4 {
-                            Some(QueryDependency {
-                                project_id: match dependency[1] {
-                                    "0" => None,
-                                    _ => match dependency[1].parse() {
-                                        Ok(x) => Some(ProjectId(x)),
-                                        Err(_) => None,
-                                    },
-                                },
-                                version_id: match dependency[0] {
-                                    "0" => None,
-                                    _ => match dependency[0].parse() {
-                                        Ok(x) => Some(VersionId(x)),
-                                        Err(_) => None,
-                                    },
-                                },
-                                file_name: if dependency[3] == " " {
-                                    None
-                                } else {
-                                    Some(dependency[3].to_string())
-                                },
-                                dependency_type: dependency[2].to_string(),
-                            })
-                        } else {
-                            None
-                        }
-                    })
-                    .collect(),
+                dependencies: serde_json::from_value(
+                    v.dependencies.unwrap_or_default(),
+                )
+                .ok()
+                .unwrap_or_default(),
             }))
         } else {
             Ok(None)
@@ -788,10 +751,11 @@ impl Version {
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
             v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
-            ARRAY_AGG(DISTINCT gv.version || ' |||| ' || gv.created) filter (where gv.version is not null) game_versions, ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-            ARRAY_AGG(DISTINCT f.id || ' |||| ' || f.is_primary || ' |||| ' || f.size || ' |||| ' || f.url || ' |||| ' || f.filename) filter (where f.id is not null) files,
-            ARRAY_AGG(DISTINCT h.algorithm || ' |||| ' || encode(h.hash, 'escape') || ' |||| ' || h.file_id) filter (where h.hash is not null) hashes,
-            ARRAY_AGG(DISTINCT COALESCE(d.dependency_id, 0) || ' |||| ' || COALESCE(d.mod_dependency_id, 0) || ' |||| ' || d.dependency_type || ' |||| ' || COALESCE(d.dependency_file_name, ' ')) filter (where d.dependency_type is not null) dependencies
+            JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
+            ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
+            JSONB_AGG(DISTINCT TO_JSONB(f))  filter (where f.id is not null) files,
+            JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
+            JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
             FROM versions v
             LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
             LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
@@ -827,50 +791,56 @@ impl Version {
                                 .map(|x| VersionStatus::from_str(&x)),
                         },
                         files: {
-                            let hashes: Vec<(FileId, String, Vec<u8>)> = v.hashes.unwrap_or_default()
-                                .into_iter()
-                                .flat_map(|f| {
-                                let hash: Vec<&str> = f.split(" |||| ").collect();
+                            #[derive(Deserialize)]
+                            struct Hash {
+                                pub file_id: FileId,
+                                pub algorithm: String,
+                                pub hash: Vec<u8>,
+                            }
 
-                                if hash.len() >= 3 {
-                                    Some((
-                                        FileId(hash[2].parse().unwrap_or(0)),
-                                        hash[0].to_string(),
-                                        hash[1].to_string().into_bytes(),
-                                    ))
-                                } else {
-                                    None
-                                }
-                            }).collect();
+                            #[derive(Deserialize)]
+                            struct File {
+                                pub id: FileId,
+                                pub url: String,
+                                pub filename: String,
+                                pub primary: bool,
+                                pub size: u32,
+                            }
 
-                            let mut files: Vec<QueryFile> = v.files.unwrap_or_default()
-                                .into_iter()
-                                .flat_map(|f| {
-                                let file: Vec<&str> = f.split(" |||| ").collect();
+                            let hashes: Vec<Hash> = serde_json::from_value(
+                                v.hashes.unwrap_or_default(),
+                            )
+                                .ok()
+                                .unwrap_or_default();
 
-                                if file.len() >= 5 {
-                                    let file_id = FileId(file[0].parse().unwrap_or(0));
-                                    let mut file_hashes = HashMap::new();
+                            let files: Vec<File> = serde_json::from_value(
+                                v.files.unwrap_or_default(),
+                            )
+                                .ok()
+                                .unwrap_or_default();
 
-                                    for hash in &hashes {
-                                        if (hash.0).0 == file_id.0 {
-                                            file_hashes.insert(hash.1.clone(), hash.2.clone());
-                                        }
+                            let mut files = files.into_iter().map(|x| {
+                                let mut file_hashes = HashMap::new();
+
+                                for hash in &hashes {
+                                    if hash.file_id == x.id {
+                                        file_hashes.insert(
+                                            hash.algorithm.clone(),
+                                            hash.hash.clone(),
+                                        );
                                     }
-
-                                    Some(QueryFile {
-                                        id: file_id,
-                                        url: file[3].to_string(),
-                                        filename: file[4].to_string(),
-                                        hashes: file_hashes,
-                                        primary: file[1].parse().unwrap_or(false),
-                                        size: file[2].parse().unwrap_or(0),
-                                    })
-                                } else {
-                                    None
                                 }
-                            })
-                            .collect();
+
+                                QueryFile {
+                                    id: x.id,
+                                    url: x.url,
+                                    filename: x.filename,
+                                    hashes: file_hashes,
+                                    primary: x.primary,
+                                    size: x.size,
+                                }
+                            }).collect::<Vec<_>>();
+
                             files.sort_by(|a, b| {
                                 if a.primary {
                                     Ordering::Less
@@ -880,68 +850,32 @@ impl Version {
                                     a.filename.cmp(&b.filename)
                                 }
                             });
+
                             files
                         },
                         game_versions: {
-                            let game_versions = v
-                                .game_versions
+                            #[derive(Deserialize)]
+                            struct GameVersion {
+                                pub version: String,
+                                pub created: DateTime<Utc>,
+                            }
+
+                            let mut game_versions: Vec<GameVersion> = serde_json::from_value(
+                                v.game_versions.unwrap_or_default(),
+                            )
+                                .ok()
                                 .unwrap_or_default();
 
-                            let mut gv = game_versions
-                                .into_iter()
+                            game_versions.sort_by(|a, b| a.created.cmp(&b.created));
 
-                                .flat_map(|x| {
-                                    let version: Vec<&str> = x.split(" |||| ").collect();
-
-                                    if version.len() >= 2 {
-                                        Some((version[0].to_string(), convert_postgres_date(version[1]).timestamp()))
-                                    } else {
-                                        None
-                                    }
-                                })
-                                .collect::<Vec<(String, i64)>>();
-
-                            gv.sort_by(|a, b| a.1.cmp(&b.1));
-
-                            gv.into_iter()
-                                .map(|x| x.0)
-                                .collect()
+                            game_versions.into_iter().map(|x| x.version).collect()
                         },
                         loaders: v.loaders.unwrap_or_default(),
-                        dependencies: v.dependencies
-                            .unwrap_or_default()
-                            .into_iter()
-
-                            .flat_map(|f| {
-                                let dependency: Vec<&str> = f.split(" |||| ").collect();
-
-                                if dependency.len() >= 4 {
-                                    Some(QueryDependency {
-                                        project_id: match dependency[1] {
-                                            "0" => None,
-                                            _ => match dependency[1].parse() {
-                                                Ok(x) => Some(ProjectId(x)),
-                                                Err(_) => None,
-                                            },
-                                        },
-                                        version_id: match dependency[0] {
-                                            "0" => None,
-                                            _ => match dependency[0].parse() {
-                                                Ok(x) => Some(VersionId(x)),
-                                                Err(_) => None,
-                                            },
-                                        },
-                                        file_name: if dependency[3] == " " {
-                                            None
-                                        } else {
-                                            Some(dependency[3].to_string())
-                                        },
-                                        dependency_type: dependency[2].to_string(),
-                                    })
-                                } else {
-                                    None
-                                }
-                            }).collect(),
+                        dependencies: serde_json::from_value(
+                            v.dependencies.unwrap_or_default(),
+                        )
+                            .ok()
+                            .unwrap_or_default(),
                     }
                 ))
             })
@@ -960,7 +894,7 @@ pub struct QueryVersion {
     pub dependencies: Vec<QueryDependency>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize)]
 pub struct QueryDependency {
     pub project_id: Option<ProjectId>,
     pub version_id: Option<VersionId>,
