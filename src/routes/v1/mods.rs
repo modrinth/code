@@ -133,6 +133,7 @@ pub async fn mod_create(
         &***file_host,
         &flame_anvil_queue,
         &mut uploaded_files,
+        &*client,
     )
     .await;
 

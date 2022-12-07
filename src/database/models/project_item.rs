@@ -134,6 +134,7 @@ impl ProjectBuilder {
             moderation_message_body: None,
             flame_anvil_project: None,
             flame_anvil_user: None,
+            webhook_sent: false,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -211,6 +212,7 @@ pub struct Project {
     pub moderation_message_body: Option<String>,
     pub flame_anvil_project: Option<i32>,
     pub flame_anvil_user: Option<UserId>,
+    pub webhook_sent: bool,
 }
 
 impl Project {
@@ -277,7 +279,7 @@ impl Project {
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body, flame_anvil_project,
-                   flame_anvil_user
+                   flame_anvil_user, webhook_sent
             FROM mods
             WHERE id = $1
             ",
@@ -318,6 +320,7 @@ impl Project {
                 approved: row.approved,
                 flame_anvil_project: row.flame_anvil_project,
                 flame_anvil_user: row.flame_anvil_user.map(UserId),
+                webhook_sent: row.webhook_sent,
             }))
         } else {
             Ok(None)
@@ -343,7 +346,7 @@ impl Project {
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body, flame_anvil_project,
-                   flame_anvil_user
+                   flame_anvil_user, webhook_sent
             FROM mods
             WHERE id = ANY($1)
             ",
@@ -384,6 +387,7 @@ impl Project {
                 approved: m.approved,
                 flame_anvil_project: m.flame_anvil_project,
                 flame_anvil_user: m.flame_anvil_user.map(UserId),
+                webhook_sent: m.webhook_sent,
             }))
         })
         .try_collect::<Vec<Project>>()
@@ -662,7 +666,7 @@ impl Project {
             m.updated updated, m.approved approved, m.status status, m.requested_status requested_status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user,
+            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent webhook_sent,
             ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
@@ -736,6 +740,7 @@ impl Project {
                     approved: m.approved,
                     flame_anvil_project: m.flame_anvil_project,
                     flame_anvil_user: m.flame_anvil_user.map(UserId),
+                    webhook_sent: m.webhook_sent,
                 },
                 project_type: m.project_type_name,
                 categories,
@@ -848,7 +853,7 @@ impl Project {
             m.updated updated, m.approved approved, m.status status, m.requested_status requested_status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user,
+            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent,
             ARRAY_AGG(DISTINCT c.category || ' |||| ' || mc.is_additional) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT v.id || ' |||| ' || v.date_published) filter (where v.id is not null) versions,
             ARRAY_AGG(DISTINCT mg.image_url || ' |||| ' || mg.featured || ' |||| ' || mg.created || ' |||| ' || COALESCE(mg.title, ' ') || ' |||| ' || COALESCE(mg.description, ' ')) filter (where mg.image_url is not null) gallery,
@@ -925,7 +930,8 @@ impl Project {
                             moderation_message_body: m.moderation_message_body,
                             approved: m.approved,
                             flame_anvil_project: m.flame_anvil_project,
-                            flame_anvil_user: m.flame_anvil_user.map(UserId)
+                            flame_anvil_user: m.flame_anvil_user.map(UserId),
+                            webhook_sent: m.webhook_sent,
                         },
                         project_type: m.project_type_name,
                         categories,

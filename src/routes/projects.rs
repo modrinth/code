@@ -499,7 +499,8 @@ pub async fn project_edit(
                         dotenvy::var("MODERATION_DISCORD_WEBHOOK")
                     {
                         crate::util::webhook::send_discord_webhook(
-                            Project::from(project_item.clone()),
+                            project_item.inner.id.into(),
+                            &*pool,
                             webhook_url,
                         )
                         .await
@@ -507,7 +508,9 @@ pub async fn project_edit(
                     }
                 }
 
-                if status.is_approved() {
+                if status.is_approved()
+                    && !project_item.inner.status.is_approved()
+                {
                     sqlx::query!(
                         "
                         UPDATE mods
@@ -518,6 +521,31 @@ pub async fn project_edit(
                     )
                     .execute(&mut *transaction)
                     .await?;
+                }
+
+                if status.is_searchable() && !project_item.inner.webhook_sent {
+                    if let Ok(webhook_url) =
+                        dotenvy::var("PUBLIC_DISCORD_WEBHOOK")
+                    {
+                        crate::util::webhook::send_discord_webhook(
+                            project_item.inner.id.into(),
+                            &*pool,
+                            webhook_url,
+                        )
+                        .await
+                        .ok();
+
+                        sqlx::query!(
+                            "
+                            UPDATE mods
+                            SET webhook_sent = TRUE
+                            WHERE id = $1
+                            ",
+                            id as database::models::ids::ProjectId,
+                        )
+                        .execute(&mut *transaction)
+                        .await?;
+                    }
                 }
 
                 sqlx::query!(

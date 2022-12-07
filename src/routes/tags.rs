@@ -231,8 +231,8 @@ pub async fn game_version_list(
     .into_iter()
     .map(|x| GameVersionQueryData {
         version: x.version,
-        version_type: x.version_type,
-        date: x.date,
+        version_type: x.type_,
+        date: x.created,
         major: x.major,
     })
     .collect();

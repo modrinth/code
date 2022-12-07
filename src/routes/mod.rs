@@ -226,6 +226,8 @@ pub enum ApiError {
     Crypto(String),
     #[error("Payments Error: {0}")]
     Payments(String),
+    #[error("Discord Error: {0}")]
+    DiscordError(String),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -272,6 +274,9 @@ impl actix_web::ResponseError for ApiError {
             ApiError::Payments(..) => {
                 actix_web::http::StatusCode::FAILED_DEPENDENCY
             }
+            ApiError::DiscordError(..) => {
+                actix_web::http::StatusCode::FAILED_DEPENDENCY
+            }
         }
     }
 
@@ -294,6 +299,7 @@ impl actix_web::ResponseError for ApiError {
                     ApiError::Analytics(..) => "analytics_error",
                     ApiError::Crypto(..) => "crypto_error",
                     ApiError::Payments(..) => "payments_error",
+                    ApiError::DiscordError(..) => "discord_error",
                 },
                 description: &self.to_string(),
             },

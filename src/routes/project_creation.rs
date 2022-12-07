@@ -277,6 +277,7 @@ pub async fn project_create(
         &***file_host,
         &flame_anvil_queue,
         &mut uploaded_files,
+        &*client,
     )
     .await;
 
@@ -334,6 +335,7 @@ pub async fn project_create_inner(
     file_host: &dyn FileHost,
     flame_anvil_queue: &Mutex<FlameAnvilQueue>,
     uploaded_files: &mut Vec<UploadedFile>,
+    pool: &PgPool,
 ) -> Result<HttpResponse, CreateError> {
     // The base URL for files uploaded to backblaze
     let cdn_url = dotenvy::var("CDN_URL")?;
@@ -817,7 +819,8 @@ pub async fn project_create_inner(
             if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK")
             {
                 crate::util::webhook::send_discord_webhook(
-                    response.clone(),
+                    response.id,
+                    pool,
                     webhook_url,
                 )
                 .await

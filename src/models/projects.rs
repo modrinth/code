@@ -493,6 +493,7 @@ impl From<QueryVersion> for Version {
 
 /// A status decides the visibility of a project in search, URLs, and the whole site itself.
 /// Listed - Version is displayed on project, and accessible by URL
+/// Archived - Identical to listed but has a message displayed stating version is unsupported
 /// Draft - Version is not displayed on project, and not accessible by URL
 /// Unlisted - Version is not displayed on project, and accessible by URL
 /// Scheduled - Version is scheduled to be released in the future
@@ -500,6 +501,7 @@ impl From<QueryVersion> for Version {
 #[serde(rename_all = "lowercase")]
 pub enum VersionStatus {
     Listed,
+    Archived,
     Draft,
     Unlisted,
     Scheduled,
@@ -518,12 +520,14 @@ impl VersionStatus {
             "listed" => VersionStatus::Listed,
             "draft" => VersionStatus::Draft,
             "unlisted" => VersionStatus::Unlisted,
+            "scheduled" => VersionStatus::Scheduled,
             _ => VersionStatus::Unknown,
         }
     }
     pub fn as_str(&self) -> &'static str {
         match self {
             VersionStatus::Listed => "listed",
+            VersionStatus::Archived => "archived",
             VersionStatus::Draft => "draft",
             VersionStatus::Unlisted => "unlisted",
             VersionStatus::Unknown => "unknown",
@@ -534,6 +538,7 @@ impl VersionStatus {
     pub fn iterator() -> impl Iterator<Item = VersionStatus> {
         [
             VersionStatus::Listed,
+            VersionStatus::Archived,
             VersionStatus::Draft,
             VersionStatus::Unlisted,
             VersionStatus::Scheduled,
@@ -547,6 +552,7 @@ impl VersionStatus {
     pub fn is_hidden(&self) -> bool {
         match self {
             VersionStatus::Listed => false,
+            VersionStatus::Archived => false,
             VersionStatus::Unlisted => false,
 
             VersionStatus::Draft => true,
@@ -557,13 +563,14 @@ impl VersionStatus {
 
     // Whether version is listed on project / returned in aggregate routes
     pub fn is_listed(&self) -> bool {
-        matches!(self, VersionStatus::Listed)
+        matches!(self, VersionStatus::Listed | VersionStatus::Archived)
     }
 
     // Whether a version status can be requested
     pub fn can_be_requested(&self) -> bool {
         match self {
             VersionStatus::Listed => true,
+            VersionStatus::Archived => true,
             VersionStatus::Draft => true,
             VersionStatus::Unlisted => true,
             VersionStatus::Scheduled => false,

@@ -3,6 +3,7 @@ use super::DatabaseError;
 use chrono::DateTime;
 use chrono::Utc;
 use futures::TryStreamExt;
+use serde::Deserialize;
 
 pub struct ProjectType {
     pub id: ProjectTypeId,
@@ -16,12 +17,13 @@ pub struct Loader {
     pub supported_project_types: Vec<String>,
 }
 
-#[derive(Clone)]
+#[derive(Clone, Deserialize, Debug)]
 pub struct GameVersion {
     pub id: GameVersionId,
     pub version: String,
-    pub version_type: String,
-    pub date: DateTime<Utc>,
+    #[serde(rename = "type")]
+    pub type_: String,
+    pub created: DateTime<Utc>,
     pub major: bool,
 }
 
@@ -507,8 +509,8 @@ impl GameVersion {
         .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
             id: GameVersionId(c.id),
             version: c.version_,
-            version_type: c.type_,
-            date: c.created,
+            type_: c.type_,
+            created: c.created,
             major: c.major
         })) })
         .try_collect::<Vec<GameVersion>>()
@@ -542,8 +544,8 @@ impl GameVersion {
                     .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
                         id: GameVersionId(c.id),
                         version: c.version_,
-                        version_type: c.type_,
-                        date: c.created,
+                        type_: c.type_,
+                        created: c.created,
                         major: c.major,
                     })) })
                 .try_collect::<Vec<GameVersion>>()
@@ -561,8 +563,8 @@ impl GameVersion {
                     .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
                         id: GameVersionId(c.id),
                         version: c.version_,
-                        version_type: c.type_,
-                        date: c.created,
+                        type_: c.type_,
+                        created: c.created,
                         major: c.major,
                     })) })
                 .try_collect::<Vec<GameVersion>>()
@@ -581,8 +583,8 @@ impl GameVersion {
                 .try_filter_map(|e| async { Ok(e.right().map(|c| GameVersion {
                     id: GameVersionId(c.id),
                     version: c.version_,
-                    version_type: c.type_,
-                    date: c.created,
+                    type_: c.type_,
+                    created: c.created,
                     major: c.major,
                 })) })
             .try_collect::<Vec<GameVersion>>()

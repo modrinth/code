@@ -29,6 +29,10 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use validator::Validate;
 
+fn default_requested_status() -> VersionStatus {
+    VersionStatus::Listed
+}
+
 #[derive(Serialize, Deserialize, Validate, Clone)]
 pub struct InitialVersionData {
     #[serde(alias = "mod_id")]
@@ -59,6 +63,7 @@ pub struct InitialVersionData {
     pub loaders: Vec<Loader>,
     pub featured: bool,
     pub primary_file: Option<String>,
+    #[serde(default = "default_requested_status")]
     pub status: VersionStatus,
 }
 

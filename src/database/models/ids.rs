@@ -2,6 +2,7 @@ use super::DatabaseError;
 use crate::models::ids::base62_impl::to_base62;
 use crate::models::ids::random_base62_rng;
 use censor::Censor;
+use serde::Deserialize;
 use sqlx::sqlx_macros::Type;
 
 const ID_RETRY_COUNT: usize = 20;
@@ -136,7 +137,7 @@ pub struct DonationPlatformId(pub i32);
 #[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Hash)]
 #[sqlx(transparent)]
 pub struct VersionId(pub i64);
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Deserialize)]
 #[sqlx(transparent)]
 pub struct GameVersionId(pub i32);
 #[derive(Copy, Clone, Debug, Type)]
