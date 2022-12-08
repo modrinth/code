@@ -321,8 +321,7 @@ pub async fn version_file_sha1(
 
     Ok(find_file(&project_id, &project, &version, &file)
         .and_then(|file| file.hashes.get("sha1"))
-        .and_then(|hash_bytes| std::str::from_utf8(hash_bytes).ok())
-        .map(|hash_str| HttpResponse::Ok().body(hash_str.to_string()))
+        .map(|hash_str| HttpResponse::Ok().body(hash_str.clone()))
         .unwrap_or_else(|| HttpResponse::NotFound().body("")))
 }
 
@@ -387,7 +386,6 @@ pub async fn version_file_sha512(
 
     Ok(find_file(&project_id, &project, &version, &file)
         .and_then(|file| file.hashes.get("sha512"))
-        .and_then(|hash_bytes| std::str::from_utf8(hash_bytes).ok())
-        .map(|hash_str| HttpResponse::Ok().body(hash_str.to_string()))
+        .map(|hash_str| HttpResponse::Ok().body(hash_str.clone()))
         .unwrap_or_else(|| HttpResponse::NotFound().body("")))
 }

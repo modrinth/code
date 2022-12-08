@@ -642,11 +642,11 @@ impl Version {
                         .map(|x| VersionStatus::from_str(&x)),
                 },
                 files: {
-                    #[derive(Deserialize)]
+                    #[derive(Deserialize, Debug)]
                     struct Hash {
                         pub file_id: FileId,
                         pub algorithm: String,
-                        pub hash: Vec<u8>,
+                        pub hash: String,
                     }
 
                     #[derive(Deserialize, Debug)]
@@ -795,7 +795,7 @@ impl Version {
                             struct Hash {
                                 pub file_id: FileId,
                                 pub algorithm: String,
-                                pub hash: Vec<u8>,
+                                pub hash: String,
                             }
 
                             #[derive(Deserialize)]
@@ -907,7 +907,7 @@ pub struct QueryFile {
     pub id: FileId,
     pub url: String,
     pub filename: String,
-    pub hashes: HashMap<String, Vec<u8>>,
+    pub hashes: HashMap<String, String>,
     pub primary: bool,
     pub size: u32,
 }

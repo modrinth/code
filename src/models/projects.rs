@@ -452,21 +452,12 @@ impl From<QueryVersion> for Version {
             files: data
                 .files
                 .into_iter()
-                .map(|f| {
-                    VersionFile {
-                        url: f.url,
-                        filename: f.filename,
-                        // FIXME: Hashes are currently stored as an ascii byte slice instead
-                        // of as an actual byte array in the database
-                        hashes: f
-                            .hashes
-                            .into_iter()
-                            .map(|(k, v)| Some((k, String::from_utf8(v).ok()?)))
-                            .collect::<Option<_>>()
-                            .unwrap_or_default(),
-                        primary: f.primary,
-                        size: f.size,
-                    }
+                .map(|f| VersionFile {
+                    url: f.url,
+                    filename: f.filename,
+                    hashes: f.hashes,
+                    primary: f.primary,
+                    size: f.size,
                 })
                 .collect(),
             dependencies: data
