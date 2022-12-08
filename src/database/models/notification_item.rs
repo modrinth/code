@@ -126,7 +126,7 @@ impl Notification {
         let result = sqlx::query!(
             "
             SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            JSONB_AGG(DISTINCT TO_JSONB(na)) filter (where na.id is not null) actions
+            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id = $1
@@ -172,7 +172,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            JSONB_AGG(DISTINCT TO_JSONB(na)) filter (where na.id is not null) actions
+            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.id = ANY($1)
@@ -219,7 +219,7 @@ impl Notification {
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            JSONB_AGG(DISTINCT TO_JSONB(na)) filter (where na.id is not null) actions
+            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions
             FROM notifications n
             LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
             WHERE n.user_id = $1

@@ -603,7 +603,7 @@ impl Version {
             v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
             JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
             ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-            JSONB_AGG(DISTINCT TO_JSONB(f))  filter (where f.id is not null) files,
+            JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size))  filter (where f.id is not null) files,
             JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
             JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
             FROM versions v
@@ -649,7 +649,7 @@ impl Version {
                         pub hash: Vec<u8>,
                     }
 
-                    #[derive(Deserialize)]
+                    #[derive(Deserialize, Debug)]
                     struct File {
                         pub id: FileId,
                         pub url: String,
@@ -753,7 +753,7 @@ impl Version {
             v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
             JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
             ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-            JSONB_AGG(DISTINCT TO_JSONB(f))  filter (where f.id is not null) files,
+            JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size))  filter (where f.id is not null) files,
             JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
             JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
             FROM versions v

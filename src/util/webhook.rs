@@ -70,8 +70,8 @@ pub async fn send_discord_webhook(
             pt.name project_type, u.username username, u.avatar_url avatar_url,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
-            JSONB_AGG(DISTINCT TO_JSONB(gv)) filter (where gv.version is not null) versions,
-            JSONB_AGG(DISTINCT TO_JSONB(agv)) filter (where gv.version is not null) all_game_versions,
+            JSONB_AGG(DISTINCT jsonb_build_object('id', gv.id, 'version', gv.version, 'type', gv.type, 'created', gv.created, 'major', gv.major)) filter (where gv.version is not null) versions,
+            JSONB_AGG(DISTINCT jsonb_build_object('id', agv.id, 'version', agv.version, 'type', agv.type, 'created', agv.created, 'major', agv.major)) filter (where agv.version is not null) all_game_versions,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery
             FROM mods m
