@@ -457,15 +457,6 @@ pub async fn project_edit(
                     ));
                 }
 
-                if (status.is_approved() || !status.can_be_requested())
-                    && !user.role.is_mod()
-                {
-                    return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set this status!"
-                            .to_string(),
-                    ));
-                }
-
                 if status == &ProjectStatus::Processing {
                     if project_item.versions.is_empty() {
                         return Err(ApiError::InvalidInput(String::from(
@@ -506,6 +497,15 @@ pub async fn project_edit(
                         .await
                         .ok();
                     }
+                }
+
+                if (status.is_approved() || !status.can_be_requested())
+                    && !user.role.is_mod()
+                {
+                    return Err(ApiError::CustomAuthentication(
+                        "You don't have permission to set this status!"
+                            .to_string(),
+                    ));
                 }
 
                 if status.is_approved()
@@ -1420,7 +1420,7 @@ pub async fn add_gallery_item(
         let string = info.into_inner().0;
 
         let project_item =
-            database::models::Project::get_from_slug_or_project_id(
+            database::models::Project::get_full_from_slug_or_project_id(
                 &string, &**pool,
             )
             .await?
@@ -1430,9 +1430,16 @@ pub async fn add_gallery_item(
                 )
             })?;
 
+        if project_item.gallery_items.len() > 64 {
+            return Err(ApiError::CustomAuthentication(
+                "You have reached the maximum of gallery images to upload."
+                    .to_string(),
+            ));
+        }
+
         if !user.role.is_admin() {
             let team_member = database::models::TeamMember::get_from_user_id(
-                project_item.team_id,
+                project_item.inner.team_id,
                 user.id.into(),
                 &**pool,
             )
@@ -1460,7 +1467,7 @@ pub async fn add_gallery_item(
         .await?;
         let hash = sha1::Sha1::from(&bytes).hexdigest();
 
-        let id: ProjectId = project_item.id.into();
+        let id: ProjectId = project_item.inner.id.into();
         let url = format!("data/{}/images/{}.{}", id, hash, &*ext.ext);
         file_host
             .upload_file(content_type, &url, bytes.freeze())
@@ -1475,7 +1482,7 @@ pub async fn add_gallery_item(
                 SET featured = $2
                 WHERE mod_id = $1
                 ",
-                project_item.id as database::models::ids::ProjectId,
+                project_item.inner.id as database::models::ids::ProjectId,
                 false,
             )
             .execute(&mut *transaction)
@@ -1489,7 +1496,7 @@ pub async fn add_gallery_item(
             description: item.description,
             created: Utc::now(),
         }
-        .insert(project_item.id, &mut transaction)
+        .insert(project_item.inner.id, &mut transaction)
         .await?;
 
         transaction.commit().await?;

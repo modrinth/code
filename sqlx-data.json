@@ -3204,7 +3204,7 @@
     },
     "query": "\n            INSERT INTO notifications_actions (\n                notification_id, title, action_route, action_route_method\n            )\n            VALUES (\n                $1, $2, $3, $4\n            )\n            "
   },
-  "8408e6e0b473abe606f917d6d59eb30424c9913840fc3a89d3cda7aec249a77a": {
+  "86720f27dbb8ce88ec10603c69c15bde44d9faf203fc235f08a4840922e94a8f": {
     "describe": {
       "columns": [
         {
@@ -3273,18 +3273,13 @@
           "type_info": "Jsonb"
         },
         {
-          "name": "all_game_versions",
-          "ordinal": 13,
-          "type_info": "Jsonb"
-        },
-        {
           "name": "gallery",
-          "ordinal": 14,
+          "ordinal": 13,
           "type_info": "VarcharArray"
         },
         {
           "name": "featured_gallery",
-          "ordinal": 15,
+          "ordinal": 14,
           "type_info": "VarcharArray"
         }
       ],
@@ -3303,7 +3298,6 @@
         null,
         null,
         null,
-        null,
         null
       ],
       "parameters": {
@@ -3314,7 +3308,7 @@
         ]
       }
     },
-    "query": "\n            SELECT m.id id, m.title title, m.description description,\n            m.icon_url icon_url, m.slug slug, cs.name client_side_type, ss.name server_side_type,\n            pt.name project_type, u.username username, u.avatar_url avatar_url,\n            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,\n            ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', gv.id, 'version', gv.version, 'type', gv.type, 'created', gv.created, 'major', gv.major)) filter (where gv.version is not null) versions,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', agv.id, 'version', agv.version, 'type', agv.type, 'created', agv.created, 'major', agv.major)) filter (where agv.version is not null) all_game_versions,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id AND mc.is_additional = FALSE\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id AND v.status != ANY($2)\n            LEFT OUTER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id\n            LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id\n            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id\n            LEFT OUTER JOIN game_versions agv ON 1=1\n            INNER JOIN project_types pt ON pt.id = m.project_type\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE\n            INNER JOIN users u ON tm.user_id = u.id\n            WHERE m.id = $1\n            GROUP BY m.id, cs.id, ss.id, pt.id, u.id;\n            "
+    "query": "\n            SELECT m.id id, m.title title, m.description description,\n            m.icon_url icon_url, m.slug slug, cs.name client_side_type, ss.name server_side_type,\n            pt.name project_type, u.username username, u.avatar_url avatar_url,\n            ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,\n            ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', gv.id, 'version', gv.version, 'type', gv.type, 'created', gv.created, 'major', gv.major)) filter (where gv.version is not null) versions,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,\n            ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery\n            FROM mods m\n            LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id AND mc.is_additional = FALSE\n            LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id\n            LEFT OUTER JOIN versions v ON v.mod_id = m.id AND v.status != ANY($2)\n            LEFT OUTER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id\n            LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id\n            LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id\n            INNER JOIN project_types pt ON pt.id = m.project_type\n            INNER JOIN side_types cs ON m.client_side = cs.id\n            INNER JOIN side_types ss ON m.server_side = ss.id\n            INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.role = $3 AND tm.accepted = TRUE\n            INNER JOIN users u ON tm.user_id = u.id\n            WHERE m.id = $1\n            GROUP BY m.id, cs.id, ss.id, pt.id, u.id;\n            "
   },
   "868ee76d507cc9e94cd3c2e44770faff127e2b3c5f49b8100a9a37ac4d7b1f1d": {
     "describe": {

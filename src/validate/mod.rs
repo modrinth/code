@@ -7,6 +7,9 @@ use crate::validate::modpack::ModpackValidator;
 use crate::validate::plugin::*;
 use crate::validate::quilt::QuiltValidator;
 use crate::validate::resourcepack::{PackValidator, TexturePackValidator};
+use crate::validate::shader::{
+    CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
+};
 use chrono::{DateTime, Utc};
 use std::io::Cursor;
 use thiserror::Error;
@@ -19,6 +22,7 @@ mod modpack;
 pub mod plugin;
 mod quilt;
 mod resourcepack;
+mod shader;
 
 #[derive(Error, Debug)]
 pub enum ValidationError {
@@ -76,7 +80,7 @@ pub trait Validator: Sync {
     ) -> Result<ValidationResult, ValidationError>;
 }
 
-static VALIDATORS: [&dyn Validator; 12] = [
+static VALIDATORS: [&dyn Validator; 15] = [
     &ModpackValidator,
     &FabricValidator,
     &ForgeValidator,
@@ -89,6 +93,9 @@ static VALIDATORS: [&dyn Validator; 12] = [
     &BungeeCordValidator,
     &VelocityValidator,
     &SpongeValidator,
+    &CanvasShaderValidator,
+    &ShaderValidator,
+    &CoreShaderValidator,
 ];
 
 /// The return value is whether this file should be marked as primary or not, based on the analysis of the file

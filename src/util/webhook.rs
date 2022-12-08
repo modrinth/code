@@ -62,6 +62,8 @@ pub async fn send_discord_webhook(
     pool: &PgPool,
     webhook_url: String,
 ) -> Result<(), ApiError> {
+    let all_game_versions = GameVersion::list(pool).await?;
+
     let row =
         sqlx::query!(
             "
@@ -71,7 +73,6 @@ pub async fn send_discord_webhook(
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
             ARRAY_AGG(DISTINCT lo.loader) filter (where lo.loader is not null) loaders,
             JSONB_AGG(DISTINCT jsonb_build_object('id', gv.id, 'version', gv.version, 'type', gv.type, 'created', gv.created, 'major', gv.major)) filter (where gv.version is not null) versions,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', agv.id, 'version', agv.version, 'type', agv.type, 'created', agv.created, 'major', agv.major)) filter (where agv.version is not null) all_game_versions,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is false) gallery,
             ARRAY_AGG(DISTINCT mg.image_url) filter (where mg.image_url is not null and mg.featured is true) featured_gallery
             FROM mods m
@@ -83,7 +84,6 @@ pub async fn send_discord_webhook(
             LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id
             LEFT OUTER JOIN loaders lo ON lo.id = lv.loader_id
             LEFT OUTER JOIN mods_gallery mg ON mg.mod_id = m.id
-            LEFT OUTER JOIN game_versions agv ON 1=1
             INNER JOIN project_types pt ON pt.id = m.project_type
             INNER JOIN side_types cs ON m.client_side = cs.id
             INNER JOIN side_types ss ON m.server_side = ss.id
@@ -109,11 +109,6 @@ pub async fn send_discord_webhook(
             serde_json::from_value(project.versions.unwrap_or_default())
                 .ok()
                 .unwrap_or_default();
-        let all_game_versions: Vec<GameVersion> = serde_json::from_value(
-            project.all_game_versions.unwrap_or_default(),
-        )
-        .ok()
-        .unwrap_or_default();
 
         if !categories.is_empty() {
             fields.push(DiscordEmbedField {
