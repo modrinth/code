@@ -221,7 +221,7 @@ pub async fn send_discord_webhook(
             .map(|x| DiscordEmbedImage { url: Some(x) }),
             footer: Some(DiscordEmbedFooter {
                 text: format!(
-                    "{project_type}{} on Modrinth",
+                    "{}{project_type} on Modrinth",
                     project_type.remove(0).to_uppercase()
                 ),
                 icon_url: Some(
