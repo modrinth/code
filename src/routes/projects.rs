@@ -457,11 +457,11 @@ pub async fn project_edit(
                     ));
                 }
 
-                if !user.role.is_mod()
-                    && !(!project_item.inner.status.is_approved()
+                if !(user.role.is_mod()
+                    || !project_item.inner.status.is_approved()
                         && status == &ProjectStatus::Processing
-                        || project_item.inner.status.is_approved()
-                            && status.can_be_requested())
+                    || project_item.inner.status.is_approved()
+                        && status.can_be_requested())
                 {
                     return Err(ApiError::CustomAuthentication(
                         "You don't have permission to set this status!"

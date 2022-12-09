@@ -57,6 +57,17 @@ struct DiscordWebhook {
     pub embeds: Vec<DiscordEmbed>,
 }
 
+const PLUGIN_LOADERS: &[&str] = &[
+    "bukkit",
+    "spigot",
+    "paper",
+    "purpur",
+    "bungeecord",
+    "waterfall",
+    "velocity",
+    "sponge",
+];
+
 pub async fn send_discord_webhook(
     project_id: ProjectId,
     pool: &PgPool,
@@ -125,8 +136,8 @@ pub async fn send_discord_webhook(
         if !loaders.is_empty() {
             let mut formatted_loaders: String = String::new();
 
-            for loader in loaders {
-                let emoji_id: i64 = match &*loader {
+            for loader in &loaders {
+                let emoji_id: i64 = match &**loader {
                     "bukkit" => 1049793345481883689,
                     "bungeecord" => 1049793347067314220,
                     "fabric" => 1049793348719890532,
@@ -170,6 +181,12 @@ pub async fn send_discord_webhook(
             });
         }
 
+        let mut project_type = project.project_type;
+
+        if loaders.iter().all(|x| PLUGIN_LOADERS.contains(&&**x)) {
+            project_type = "plugin".to_string();
+        }
+
         let embed = DiscordEmbed {
             author: Some(DiscordEmbedAuthor {
                 name: project.username.clone(),
@@ -183,7 +200,7 @@ pub async fn send_discord_webhook(
             url: format!(
                 "{}/{}/{}",
                 dotenvy::var("SITE_URL").unwrap_or_default(),
-                project.project_type,
+                project_type,
                 project.slug.unwrap_or_else(|| project_id.to_string())
             ),
             title: project.title,
@@ -203,7 +220,10 @@ pub async fn send_discord_webhook(
             }
             .map(|x| DiscordEmbedImage { url: Some(x) }),
             footer: Some(DiscordEmbedFooter {
-                text: "Modrinth".to_string(),
+                text: format!(
+                    "{project_type}{} on Modrinth",
+                    project_type.remove(0).to_uppercase()
+                ),
                 icon_url: Some(
                     "https://cdn-raw.modrinth.com/modrinth-new.png".to_string(),
                 ),
