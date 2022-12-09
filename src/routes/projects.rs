@@ -457,6 +457,18 @@ pub async fn project_edit(
                     ));
                 }
 
+                if !user.role.is_mod()
+                    && !(!project_item.inner.status.is_approved()
+                        && status == &ProjectStatus::Processing
+                        || project_item.inner.status.is_approved()
+                            && status.can_be_requested())
+                {
+                    return Err(ApiError::CustomAuthentication(
+                        "You don't have permission to set this status!"
+                            .to_string(),
+                    ));
+                }
+
                 if status == &ProjectStatus::Processing {
                     if project_item.versions.is_empty() {
                         return Err(ApiError::InvalidInput(String::from(
@@ -497,15 +509,6 @@ pub async fn project_edit(
                         .await
                         .ok();
                     }
-                }
-
-                if (status.is_approved() || !status.can_be_requested())
-                    && !user.role.is_mod()
-                {
-                    return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set this status!"
-                            .to_string(),
-                    ));
                 }
 
                 if status.is_approved()
