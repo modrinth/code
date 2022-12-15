@@ -12,9 +12,9 @@
         <h1>Discover, Play, and Create Minecraft content</h1>
         <h3>
           Find enjoyable, quality content through our
-          <a href="https://github.com/modrinth" :target="$external()">
-            open-source
-          </a>
+          <a href="https://github.com/modrinth" :target="$external()"
+            >open-source</a
+          >
           modding platform built for the community. Create stuff, get paid, and
           deploy your project with our
           <a href="https://docs.modrinth.com" :target="$external()"
