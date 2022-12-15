@@ -53,13 +53,7 @@
           <li v-if="!savingAsDraft && project.versions.length < 1">
             Your project must have at least one version to submit for review.
           </li>
-          <li
-            v-if="
-              license === null || license_url === null || license_url === ''
-            "
-          >
-            Your project must have a license.
-          </li>
+          <li v-if="license.short === ''">Your project must have a license.</li>
         </ul>
       </div>
     </header>
@@ -350,6 +344,9 @@
           type="url"
           maxlength="2048"
           placeholder="Enter a valid URL"
+          :disabled="
+            (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+          "
         />
       </label>
       <label
@@ -382,55 +379,106 @@
         />
       </label>
     </section>
-    <section class="card license">
-      <div class="title">
-        <h3>License<span class="required">*</span></h3>
-      </div>
-      <label>
-        <span>
-          It is very important to choose a proper license for your mod. You may
-          choose one from our list or provide a URL to a custom license.
-          <br />
-          Confused? See our
-          <a
-            href="https://blog.modrinth.com/licensing-guide/"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="text-link"
-          >
-            licensing guide</a
-          >
-          for more information.
-        </span>
+    <section class="universal-card license">
+      <h3>License<span class="required">*</span></h3>
+      <div class="adjacent-input">
+        <label for="license-multiselect">
+          <span class="label__description">
+            It is very important to choose a proper license for your mod. You
+            may choose one from our list or provide a custom license. You may
+            also provide a custom URL to your chosen license; otherwise, the
+            license text will be displayed.
+            <span
+              v-if="license && license.friendly === 'Custom'"
+              class="label__subdescription"
+            >
+              Enter a valid
+              <a
+                href="https://spdx.org/licenses/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-link"
+                >SPDX license identifier</a
+              >
+              in the marked area. If your license does not have a SPDX
+              identifier (for example, if you created the license yourself or if
+              the license is Minecraft-specific), simply check the box and enter
+              the name of the license instead.
+            </span>
+            <span class="label__subdescription">
+              Confused? See our
+              <a
+                href="https://blog.modrinth.com/licensing-guide/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-link"
+              >
+                licensing guide</a
+              >
+              for more information.
+            </span>
+          </span>
+        </label>
         <div class="legacy-input-group">
           <Multiselect
+            id="license-multiselect"
             v-model="license"
-            placeholder="Choose license..."
+            placeholder="Select license..."
             track-by="short"
-            label="short"
-            :options="$tag.licenses"
-            :custom-label="(value) => value.short.toUpperCase()"
+            label="friendly"
+            :options="defaultLicenses"
             :searchable="true"
             :close-on-select="true"
             :show-labels="false"
-            :disabled="
-              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
-            "
-          />
-          <input
-            v-model="license_url"
-            type="url"
-            maxlength="2048"
-            placeholder="License URL"
             :class="{
-              'known-error': newProject.license_url === '' && showKnownErrors,
+              'known-error': license.short === '' && showKnownErrors,
             }"
             :disabled="
               (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
             "
           />
+          <Checkbox
+            v-if="license.requiresOnlyOrLater"
+            v-model="allowOrLater"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
+          >
+            Allow later editions of this license
+          </Checkbox>
+          <Checkbox
+            v-if="license.friendly === 'Custom'"
+            v-model="nonSpdxLicense"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
+          >
+            License does not have a SPDX identifier
+          </Checkbox>
+          <input
+            v-if="license.friendly === 'Custom'"
+            v-model="license.short"
+            type="text"
+            maxlength="2048"
+            :placeholder="nonSpdxLicense ? 'License name' : 'SPDX identifier'"
+            :class="{
+              'known-error': license.short === '' && showKnownErrors,
+            }"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
+          />
+          <input
+            v-model="newProject.license.url"
+            type="url"
+            maxlength="2048"
+            placeholder="License URL (optional)"
+            :disabled="
+              (currentMember.permissions & EDIT_DETAILS) !== EDIT_DETAILS
+            "
+          />
         </div>
-      </label>
+      </div>
     </section>
     <section class="header-card donations">
       <div class="header__row">
@@ -507,9 +555,11 @@ import RevertIcon from '~/assets/images/utils/undo.svg?inline'
 import Chips from '~/components/ui/Chips'
 import FileInput from '~/components/ui/FileInput'
 import Avatar from '~/components/ui/Avatar'
+import Checkbox from '~/components/ui/Checkbox'
 
 export default {
   components: {
+    Checkbox,
     Avatar,
     FileInput,
     Chips,
@@ -542,8 +592,79 @@ export default {
       clientSideType: '',
       serverSideType: '',
 
-      license: { short: '', name: '' },
-      license_url: '',
+      defaultLicenses: [
+        { friendly: 'Custom', short: '' },
+        {
+          friendly: 'All Rights Reserved/No License',
+          short: 'All-Rights-Reserved',
+        },
+        { friendly: 'Apache License 2.0', short: 'Apache-2.0' },
+        {
+          friendly: 'BSD 2-Clause "Simplified" License',
+          short: 'BSD-2-Clause',
+        },
+        {
+          friendly: 'BSD 3-Clause "New" or "Revised" License',
+          short: 'BSD-3-Clause',
+        },
+        {
+          friendly: 'CC Zero (Public Domain equivalent)',
+          short: 'CC0-1.0',
+        },
+        { friendly: 'CC-BY 4.0', short: 'CC-BY-4.0' },
+        {
+          friendly: 'CC-BY-SA 4.0',
+          short: 'CC-BY-SA-4.0',
+        },
+        {
+          friendly: 'CC-BY-NC 4.0',
+          short: 'CC-BY-NC-4.0',
+        },
+        {
+          friendly: 'CC-BY-NC-SA 4.0',
+          short: 'CC-BY-NC-SA-4.0',
+        },
+        {
+          friendly: 'CC-BY-ND 4.0',
+          short: 'CC-BY-ND-4.0',
+        },
+        {
+          friendly: 'CC-BY-NC-ND 4.0',
+          short: 'CC-BY-NC-ND-4.0',
+        },
+        {
+          friendly: 'GNU Affero General Public License v3',
+          short: 'AGPL-3.0',
+          requiresOnlyOrLater: true,
+        },
+        {
+          friendly: 'GNU Lesser General Public License v2.1',
+          short: 'LGPL-2.1',
+          requiresOnlyOrLater: true,
+        },
+        {
+          friendly: 'GNU Lesser General Public License v3',
+          short: 'LGPL-3.0',
+          requiresOnlyOrLater: true,
+        },
+        {
+          friendly: 'GNU General Public License v2',
+          short: 'GPL-2.0',
+          requiresOnlyOrLater: true,
+        },
+        {
+          friendly: 'GNU General Public License v3',
+          short: 'GPL-3.0',
+          requiresOnlyOrLater: true,
+        },
+        { friendly: 'ISC License', short: 'ISC' },
+        { friendly: 'MIT License', short: 'MIT' },
+        { friendly: 'Mozilla Public License 2.0', short: 'MPL-2.0' },
+        { friendly: 'zlib License', short: 'Zlib' },
+      ],
+      license: { friendly: '', short: '', requiresOnlyOrLater: false },
+      allowOrLater: false,
+      nonSpdxLicense: false,
 
       donationPlatforms: [],
       donationLinks: [],
@@ -571,8 +692,6 @@ export default {
   fetch() {
     this.newProject = this.project
 
-    this.newProject.license.short = this.newProject.license.id
-
     if (this.newProject.donation_urls) {
       for (const platform of this.newProject.donation_urls) {
         this.donationPlatforms.push({
@@ -583,12 +702,16 @@ export default {
       }
     }
 
-    this.license = {
-      short: this.newProject.license.id,
-      name: this.newProject.license.name,
-    }
-
-    this.license_url = this.newProject.license.url
+    const licenseId = this.newProject.license.id
+    const trimmedLicenseId = licenseId
+      .replaceAll('-only', '')
+      .replaceAll('-or-later', '')
+      .replaceAll('LicenseRef-', '')
+    this.license = this.defaultLicenses.find(
+      (x) => x.short === trimmedLicenseId
+    ) ?? { friendly: 'Custom', short: licenseId.replaceAll('LicenseRef-', '') }
+    this.allowOrLater = licenseId.includes('-or-later')
+    this.nonSpdxLicense = licenseId.includes('LicenseRef-')
 
     this.clientSideType =
       this.newProject.client_side.charAt(0) +
@@ -599,22 +722,21 @@ export default {
 
     this.setCategories()
   },
-  watch: {
-    license(newValue, oldValue) {
-      if (newValue == null) {
-        this.license_url = ''
-        return
-      }
+  computed: {
+    licenseId() {
+      let id = ''
 
-      switch (newValue.short) {
-        case 'custom':
-          if (oldValue === null || oldValue.short !== '') {
-            this.license_url = ''
-          }
-          break
-        default:
-          this.license_url = `https://cdn.modrinth.com/licenses/${newValue.short}.txt`
-      }
+      if (this.nonSpdxLicense || this.license.short === 'All-Rights-Reserved')
+        id += 'LicenseRef-'
+
+      id += this.license.short
+
+      if (this.license.requiresOnlyOrLater)
+        id += this.allowOrLater ? 'or-later' : '-only'
+
+      if (this.nonSpdxLicense) id.replaceAll(' ', '-')
+
+      return id
     },
   },
   created() {
@@ -652,9 +774,7 @@ export default {
         this.newProject.title !== '' &&
         this.newProject.description !== '' &&
         this.newProject.slug !== '' &&
-        this.license.short !== null &&
-        this.license_url !== null &&
-        this.license_url !== ''
+        this.license.short !== ''
       ) {
         if (this.savingAsDraft) {
           return true
@@ -695,15 +815,16 @@ export default {
             ? this.newProject.source_url
             : null,
           wiki_url: this.newProject.wiki_url ? this.newProject.wiki_url : null,
-          license_url: this.license_url,
+          license_url: this.newProject.license.url
+            ? this.newProject.license.url
+            : null,
           discord_url: this.newProject.discord_url
             ? this.newProject.discord_url
             : null,
-          license_id: this.license.short,
+          license_id: this.licenseId,
           client_side: this.clientSideType.toLowerCase(),
           server_side: this.serverSideType.toLowerCase(),
           slug: this.newProject.slug,
-          license: this.license.short,
           donation_urls: this.donationPlatforms.map((it, index) => {
             return {
               id: it.short,
@@ -733,10 +854,11 @@ export default {
           )
         }
 
-        this.newProject.license = {
-          id: this.newProject.license.short,
-          url: this.newProject.license.url,
-        }
+        // While the emit below will take care of most changes,
+        // some items require manually updating
+        this.newProject.license.id = this.licenseId
+        this.newProject.client_side = this.clientSideType.toLowerCase()
+        this.newProject.server_side = this.serverSideType.toLowerCase()
 
         this.$emit('update:project', this.newProject)
 
@@ -795,6 +917,7 @@ label {
 
   input,
   .multiselect,
+  .checkbox,
   .legacy-input-group {
     flex: 3;
     height: fit-content;
@@ -807,6 +930,11 @@ label {
 
   * {
     margin-bottom: var(--spacing-card-sm);
+  }
+
+  .multiselect {
+    width: unset;
+    height: inherit;
   }
 }
 
@@ -963,15 +1091,6 @@ section.donations {
 
   input {
     margin-left: 0 !important;
-  }
-}
-
-.legacy-input-group {
-  display: flex;
-  flex-direction: column;
-
-  * {
-    margin-bottom: var(--spacing-card-sm);
   }
 }
 

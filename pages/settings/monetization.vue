@@ -25,7 +25,7 @@
           Program. Setup a method of receiving payments below to enable
           monetization.
         </p>
-        <div class="enroll">
+        <div class="enroll extend-styling">
           <Chips
             v-model="selectedWallet"
             :starting-value="selectedWallet"

@@ -4,7 +4,6 @@ export const state = () => ({
   categories: tags.categories,
   loaders: tags.loaders,
   gameVersions: tags.gameVersions,
-  licenses: tags.licenses,
   donationPlatforms: tags.donationPlatforms,
   reportTypes: tags.reportTypes,
   projectTypes: [

@@ -181,9 +181,7 @@ Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`
           categories: [],
           client_side: this.getClientSide(),
           server_side: this.getServerSide(),
-          license_id: this.$tag.licenses.map((it) => it.short).includes('arr')
-            ? 'arr'
-            : this.$tag.licenses[0].short,
+          license_id: 'LicenseRef-All-Rights-Reserved',
           is_draft: true,
         })
       )
