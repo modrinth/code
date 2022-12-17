@@ -167,7 +167,7 @@
                 Report
               </a>
               <a class="iconified-button" :href="authUrl">
-                <HeartIcon fill="currentColor" aria-hidden="true" />
+                <HeartIcon aria-hidden="true" />
                 Follow
               </a>
             </template>
