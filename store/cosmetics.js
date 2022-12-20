@@ -18,6 +18,7 @@ export const defaults = {
     plugin: 'list',
     resourcepack: 'gallery',
     modpack: 'list',
+    shader: 'gallery',
     user: 'list',
   },
 }

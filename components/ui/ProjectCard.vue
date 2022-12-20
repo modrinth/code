@@ -57,7 +57,7 @@
       </span>
       <span
         v-else-if="
-          type !== 'resourcepack' &&
+          !['resourcepack', 'shader'].includes(type) &&
           !(projectTypeDisplay === 'plugin' && search)
         "
         class="environment"

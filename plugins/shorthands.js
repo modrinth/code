@@ -240,7 +240,12 @@ export const formatCategory = (name) => {
     return '512x or higher'
   } else if (name === 'kitchen-sink') {
     return 'Kitchen Sink'
+  } else if (name === 'path-tracing') {
+    return 'Path Tracing'
+  } else if (name === 'pbr') {
+    return 'PBR'
   }
+
   return capitalizeString(name)
 }
 

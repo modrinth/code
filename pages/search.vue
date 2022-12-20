@@ -53,6 +53,16 @@
                       return (
                         a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
                       )
+                    } else if (header === 'performance impact') {
+                      const x = [
+                        'potato',
+                        'low',
+                        'medium',
+                        'high',
+                        'screenshot',
+                      ]
+
+                      return x.indexOf(a.name) - x.indexOf(b.name)
                     }
                     return 0
                   })"
@@ -147,7 +157,9 @@
             />
           </section>
           <section
-            v-if="!['resourcepack', 'plugin'].includes(projectType.id)"
+            v-if="
+              !['resourcepack', 'plugin', 'shader'].includes(projectType.id)
+            "
             aria-label="Environment filters"
           >
             <h3 class="sidebar-menu-heading">Environments</h3>

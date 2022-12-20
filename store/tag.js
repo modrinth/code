@@ -27,6 +27,11 @@ export const state = () => ({
       id: 'modpack',
       display: 'modpack',
     },
+    {
+      actual: 'shader',
+      id: 'shader',
+      display: 'shader',
+    },
   ],
   loaderData: {
     pluginLoaders: ['bukkit', 'spigot', 'paper', 'purpur', 'sponge'],

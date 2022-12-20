@@ -70,7 +70,7 @@
         </aside>
       </div>
       <div class="normal-page__content">
-        <div class="project-list display-mode--gallery">
+        <div class="project-list display-mode--list">
           <ProjectCard
             v-for="project in $route.query.type !== undefined
               ? projects.filter((x) => x.project_type === $route.query.type)
