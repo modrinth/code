@@ -1,10 +1,22 @@
 <template>
   <div class="content">
     <div v-if="currentMember" class="card header-buttons">
-      <nuxt-link to="version/create" class="brand-button iconified-button">
-        <PlusIcon />
-        Create a version
-      </nuxt-link>
+      <FileInput
+        :max-size="524288000"
+        :accept="acceptFileFromProjectType(project.project_type)"
+        prompt="Upload a version"
+        class="brand-button iconified-button"
+        @change="handleFiles"
+      >
+        <UploadIcon />
+      </FileInput>
+      <span class="indicator">
+        <InfoIcon /> Click to choose a file or drag one onto this page
+      </span>
+      <DropArea
+        :accept="acceptFileFromProjectType(project.project_type)"
+        @change="handleFiles"
+      />
     </div>
     <VersionFilterControl
       class="card"
@@ -45,7 +57,14 @@
         >
           <DownloadIcon aria-hidden="true" />
         </a>
-        <span class="version__title">{{ version.name }}</span>
+        <nuxt-link
+          :to="`/${project.project_type}/${
+            project.slug ? project.slug : project.id
+          }/version/${encodeURI(version.displayUrlEnding)}`"
+          class="version__title"
+        >
+          {{ version.name }}
+        </nuxt-link>
         <div class="version__metadata">
           <VersionBadge
             v-if="version.version_type === 'release'"
@@ -88,17 +107,24 @@
   </div>
 </template>
 <script>
-import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import { acceptFileFromProjectType } from '~/plugins/fileUtils'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
+import UploadIcon from '~/assets/images/utils/upload.svg?inline'
+import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import VersionBadge from '~/components/ui/Badge'
+import FileInput from '~/components/ui/FileInput'
 import VersionFilterControl from '~/components/ui/VersionFilterControl'
+import DropArea from '~/components/ui/DropArea.vue'
 
 export default {
   components: {
-    PlusIcon,
+    DropArea,
     DownloadIcon,
+    UploadIcon,
+    InfoIcon,
     VersionBadge,
     VersionFilterControl,
+    FileInput,
   },
   auth: false,
   props: {
@@ -167,8 +193,19 @@ export default {
     }
   },
   methods: {
+    acceptFileFromProjectType,
     updateVersions(updatedVersions) {
       this.filteredVersions = updatedVersions
+    },
+    handleFiles(files) {
+      this.$router.push({
+        name: 'type-id-version-create',
+        params: {
+          type: this.project.project_type,
+          id: this.project.slug ? this.project.slug : this.project.id,
+          newPrimaryFile: files[0],
+        },
+      })
     },
   },
 }
@@ -177,7 +214,15 @@ export default {
 <style lang="scss" scoped>
 .header-buttons {
   display: flex;
-  justify-content: right;
+  align-items: center;
+  gap: 1rem;
+
+  .indicator {
+    display: flex;
+    gap: 0.5ch;
+    align-items: center;
+    color: var(--color-text-inactive);
+  }
 }
 
 .all-versions {
@@ -215,7 +260,10 @@ export default {
 
   .version-button {
     display: grid;
-    grid-template: 'download title supports stats' 'download metadata supports stats';
+    grid-template:
+      'download title supports stats'
+      'download metadata supports stats'
+      'download dummy supports stats';
     grid-template-columns: calc(2.25rem + var(--spacing-card-sm)) 1fr 1fr 1fr;
     column-gap: var(--spacing-card-sm);
     justify-content: left;
@@ -285,6 +333,16 @@ export default {
         margin: 0;
       }
     }
+  }
+}
+
+.modal-create {
+  padding: var(--spacing-card-bg);
+
+  .input-group {
+    width: fit-content;
+    margin-left: auto;
+    margin-top: 1.5rem;
   }
 }
 </style>

@@ -23,10 +23,12 @@
               :max-size="262144"
               :show-icon="true"
               accept="image/png,image/jpeg,image/gif,image/webp"
-              class="choose-image"
+              class="choose-image iconified-button"
               prompt="Upload avatar"
               @change="showPreviewImage"
-            />
+            >
+              <UploadIcon />
+            </FileInput>
             <button
               v-else-if="$auth.user && $auth.user.id === user.id"
               class="iconified-button"
@@ -269,6 +271,7 @@ import SaveIcon from '~/assets/images/utils/save.svg?inline'
 import GridIcon from '~/assets/images/utils/grid.svg?inline'
 import ListIcon from '~/assets/images/utils/list.svg?inline'
 import ImageIcon from '~/assets/images/utils/image.svg?inline'
+import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 import FileInput from '~/components/ui/FileInput'
 import ModalReport from '~/components/ui/ModalReport'
 import ModalCreation from '~/components/ui/ModalCreation'
@@ -302,6 +305,7 @@ export default {
     GridIcon,
     ListIcon,
     ImageIcon,
+    UploadIcon,
   },
   async asyncData(data) {
     try {
@@ -322,51 +326,12 @@ export default {
       }
 
       let gitHubUser = {}
-      let versions = []
 
       try {
-        const [gitHubUserData, versionsData] = (
-          await Promise.all([
-            data.$axios.get(`https://api.github.com/user/` + user.github_id),
-            data.$axios.get(
-              `versions?ids=${JSON.stringify(
-                [].concat.apply(
-                  [],
-                  projects.map((x) => x.versions)
-                )
-              )}`
-            ),
-          ])
-        ).map((it) => it.data)
-
-        gitHubUser = gitHubUserData
-        versions = versionsData
+        gitHubUser = (
+          await data.$axios.get(`https://api.github.com/user/` + user.github_id)
+        ).data
       } catch {}
-
-      for (const version of versions) {
-        const projectIndex = projects.findIndex(
-          (x) => x.id === version.project_id
-        )
-
-        if (projects[projectIndex].loaders) {
-          for (const loader of version.loaders) {
-            if (!projects[projectIndex].loaders.includes(loader)) {
-              projects[projectIndex].loaders.push(loader)
-            }
-          }
-        } else {
-          projects[projectIndex].loaders = version.loaders
-        }
-      }
-
-      for (const project of projects) {
-        project.categories = project.categories.concat(project.loaders)
-
-        project.project_type = data.$getProjectTypeForUrl(
-          project.project_type,
-          project.categories
-        )
-      }
 
       return {
         user,

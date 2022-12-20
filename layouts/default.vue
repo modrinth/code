@@ -1,5 +1,9 @@
 <template>
-  <div class="layout" :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }">
+  <div
+    ref="main_page"
+    class="layout"
+    :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }"
+  >
     <header class="site-header" role="presentation">
       <section class="navbar card columns" role="navigation">
         <section class="skip column" role="presentation">
@@ -581,7 +585,7 @@ export default {
     margin-bottom: var(--spacing-card-md);
     max-width: 100vw;
 
-    @media screen and (min-width: 1024px) {
+    @media screen and (min-width: 1280px) {
       border-radius: var(--size-rounded-sm);
       max-width: 1280px;
       margin-left: auto;
@@ -793,15 +797,6 @@ export default {
                 &.nuxt-link-exact-active {
                   color: var(--color-button-text-active);
                   background-color: var(--color-button-bg);
-
-                  .profile-link {
-                    .username {
-                      margin-block: 0.7rem;
-                    }
-                    .prompt {
-                      display: none;
-                    }
-                  }
                 }
               }
 
@@ -1023,12 +1018,6 @@ export default {
           &.nuxt-link-exact-active {
             color: var(--color-brand-inverted);
             background-color: var(--color-brand);
-
-            .profile-link {
-              .prompt {
-                display: none;
-              }
-            }
 
             .beta-badge {
               background-color: var(--color-brand-inverted);

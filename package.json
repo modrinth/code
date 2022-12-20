@@ -13,6 +13,7 @@
     "fix": "eslint --fix --ext .js,.vue --ignore-path .eslintignore ."
   },
   "dependencies": {
+    "@iarna/toml": "^2.2.5",
     "@nuxtjs/axios": "^5.13.1",
     "@nuxtjs/dayjs": "^1.2.0",
     "@nuxtjs/markdownit": "^2.0.0",
@@ -21,6 +22,8 @@
     "cookie-universal-nuxt": "^2.1.5",
     "core-js": "^3.9.1",
     "highlight.js": "^10.3.2",
+    "js-yaml": "^4.1.0",
+    "jszip": "^3.10.1",
     "nuxt": "^2.15.3",
     "sass": "^1.32.12",
     "v-tooltip": "^2.0.3",

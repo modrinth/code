@@ -1,31 +1,26 @@
 <template>
-  <div class="columns">
-    <label
-      class="iconified-button"
-      @drop.prevent="handleDrop"
-      @dragover.prevent
-    >
-      <UploadIcon v-if="showIcon" />
-      {{ prompt }}
-      <input
-        type="file"
-        :multiple="multiple"
-        :accept="accept"
-        @change="handleChange"
-      />
-    </label>
-  </div>
+  <label
+    :class="{ 'long-style': longStyle }"
+    @drop.prevent="handleDrop"
+    @dragover.prevent
+  >
+    <slot></slot>
+    {{ prompt }}
+    <input
+      type="file"
+      :multiple="multiple"
+      :accept="accept"
+      @change="handleChange"
+    />
+  </label>
 </template>
 
 <script>
 import { fileIsValid } from '~/plugins/fileUtils'
-import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 
 export default {
   name: 'FileInput',
-  components: {
-    UploadIcon,
-  },
+  components: {},
   props: {
     prompt: {
       type: String,
@@ -51,6 +46,10 @@ export default {
       default: true,
     },
     shouldAlwaysReset: {
+      type: Boolean,
+      default: false,
+    },
+    longStyle: {
       type: Boolean,
       default: false,
     },
@@ -92,22 +91,22 @@ label {
   svg {
     height: 1rem;
   }
-}
 
-input {
-  display: none;
-}
-
-.known-error label {
-  border-color: var(--color-special-red) !important;
-  background-color: var(--color-warning-bg) !important;
-
-  span {
-    border-color: var(--color-special-red);
+  input {
+    display: none;
   }
 
-  &::placeholder {
-    color: var(--color-warning-text);
+  &.long-style {
+    display: flex;
+    padding: 1.5rem 2rem;
+    justify-content: center;
+    align-items: center;
+    grid-gap: 0.5rem;
+    background-color: var(--color-button-bg);
+    border-radius: var(--size-rounded-sm);
+    border: dashed 0.3rem var(--color-text);
+    cursor: pointer;
+    color: var(--color-text-dark);
   }
 }
 </style>

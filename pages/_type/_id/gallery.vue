@@ -237,8 +237,11 @@
             :max-size="5242880"
             accept="image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp"
             prompt="Choose image or drag it here"
+            class="iconified-button"
             @change="(files) => showPreviewImage(files, index)"
-          />
+          >
+            <UploadIcon />
+          </FileInput>
           <div class="gallery-buttons">
             <div class="delete-button-container">
               <button
@@ -268,6 +271,7 @@ import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import ExternalIcon from '~/assets/images/utils/external.svg?inline'
 import ExpandIcon from '~/assets/images/utils/expand.svg?inline'
 import ContractIcon from '~/assets/images/utils/contract.svg?inline'
+import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 
 import FileInput from '~/components/ui/FileInput'
 import Checkbox from '~/components/ui/Checkbox'
@@ -287,6 +291,7 @@ export default {
     ExternalIcon,
     ExpandIcon,
     ContractIcon,
+    UploadIcon,
   },
   auth: false,
   beforeRouteLeave(to, from, next) {
