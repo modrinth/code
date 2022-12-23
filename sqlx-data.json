@@ -418,6 +418,26 @@
     },
     "query": "\n            UPDATE mods_gallery\n            SET description = $2\n            WHERE id = $1\n            "
   },
+  "1220d15a56dbf823eaa452fbafa17442ab0568bc81a31fa38e16e3df3278e5f9": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT EXISTS(SELECT 1 FROM users WHERE id = $1)"
+  },
   "124fbf0544ea6989d6dc5e840405dbc76d7385276a38ad79d9093c53c73bbde2": {
     "describe": {
       "columns": [],
@@ -1351,6 +1371,26 @@
     },
     "query": "\n                SELECT u.id\n                FROM users u\n                WHERE u.stripe_customer_id = $1\n                "
   },
+  "352185977065c9903c2504081ef7c400075807785d4b62fdb48d0a45ca560f51": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)"
+  },
   "371048e45dd74c855b84cdb8a6a565ccbef5ad166ec9511ab20621c336446da6": {
     "describe": {
       "columns": [],
@@ -1973,6 +2013,26 @@
       }
     },
     "query": "\n            INSERT INTO project_types (name)\n            VALUES ($1)\n            ON CONFLICT (name) DO NOTHING\n            RETURNING id\n            "
+  },
+  "4c9e2190e2a68ffc093a69aaa1fc9384957138f57ac9cd85cbc6179613c13a08": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)"
   },
   "4cfafb61d38608152743c38cb8fb9a9c35e788fcbefe6f7f81476a3f144af3f8": {
     "describe": {

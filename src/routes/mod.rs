@@ -228,6 +228,8 @@ pub enum ApiError {
     Payments(String),
     #[error("Discord Error: {0}")]
     DiscordError(String),
+    #[error("Error while decoding Base62: {0}")]
+    Decoding(#[from] crate::models::ids::DecodingError),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -277,6 +279,7 @@ impl actix_web::ResponseError for ApiError {
             ApiError::DiscordError(..) => {
                 actix_web::http::StatusCode::FAILED_DEPENDENCY
             }
+            ApiError::Decoding(..) => actix_web::http::StatusCode::BAD_REQUEST,
         }
     }
 
@@ -300,6 +303,7 @@ impl actix_web::ResponseError for ApiError {
                     ApiError::Crypto(..) => "crypto_error",
                     ApiError::Payments(..) => "payments_error",
                     ApiError::DiscordError(..) => "discord_error",
+                    ApiError::Decoding(..) => "decoding_error",
                 },
                 description: &self.to_string(),
             },
