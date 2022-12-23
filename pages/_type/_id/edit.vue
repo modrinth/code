@@ -14,24 +14,10 @@
             Cancel
           </nuxt-link>
           <button
-            v-if="
-              project.status === 'rejected' ||
-              project.status === 'draft' ||
-              project.status === 'unlisted'
-            "
-            title="Submit for review"
-            class="iconified-button column"
-            :disabled="!$nuxt.$loading"
-            @click="saveProjectReview"
-          >
-            <CheckIcon />
-            Submit for review
-          </button>
-          <button
             title="Save"
             class="iconified-button brand-button column"
             :disabled="!$nuxt.$loading"
-            @click="saveProjectNotForReview"
+            @click="saveProject"
           >
             <SaveIcon />
             Save changes
@@ -47,11 +33,8 @@
           <li v-if="newProject.slug === ''">
             Your project cannot have an empty URL suffix.
           </li>
-          <li v-if="!savingAsDraft && newProject.body === ''">
-            Your project must have a body to submit for review.
-          </li>
-          <li v-if="!savingAsDraft && project.versions.length < 1">
-            Your project must have at least one version to submit for review.
+          <li v-if="newProject.body === ''">
+            Your project must have an extended description.
           </li>
           <li v-if="license.short === ''">Your project must have a license.</li>
         </ul>
@@ -551,7 +534,6 @@
 import Multiselect from 'vue-multiselect'
 
 import CrossIcon from '~/assets/images/utils/x.svg?inline'
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
 import PlusIcon from '~/assets/images/utils/plus.svg?inline'
 import SaveIcon from '~/assets/images/utils/save.svg?inline'
 import TrashIcon from '~/assets/images/utils/trash.svg?inline'
@@ -571,7 +553,6 @@ export default {
     Chips,
     Multiselect,
     CrossIcon,
-    CheckIcon,
     PlusIcon,
     SaveIcon,
     TrashIcon,
@@ -679,7 +660,6 @@ export default {
       selectableCategories: [],
       selectableAdditionalCategories: [],
 
-      isProcessing: false,
       previewImage: null,
       compiledBody: '',
 
@@ -692,7 +672,6 @@ export default {
       bodyViewMode: 'source',
 
       showKnownErrors: false,
-      savingAsDraft: false,
       manualSlug: false,
     }
   },
@@ -775,37 +754,23 @@ export default {
         .map((it) => it.name)
     },
     checkFields() {
-      const reviewConditions =
-        this.newProject.body !== '' && this.newProject.versions.length > 0
       if (
         this.newProject.title !== '' &&
         this.newProject.description !== '' &&
         this.newProject.slug !== '' &&
+        this.newProject.body !== '' &&
         this.license.short !== ''
       ) {
-        if (this.savingAsDraft) {
-          return true
-        } else if (reviewConditions) {
-          return true
-        }
+        return true
       }
       this.showKnownErrors = true
       return false
     },
-    async saveProjectReview() {
-      this.savingAsDraft = false
-      if (this.checkFields()) {
-        this.isProcessing = true
-        await this.saveProject()
-      }
-    },
-    async saveProjectNotForReview() {
-      this.savingAsDraft = true
-      if (this.checkFields()) {
-        await this.saveProject()
-      }
-    },
     async saveProject() {
+      if (!this.checkFields()) {
+        return
+      }
+
       this.$nuxt.$loading.start()
 
       try {
@@ -839,10 +804,6 @@ export default {
               url: this.donationLinks[index],
             }
           }),
-        }
-
-        if (this.isProcessing) {
-          data.status = 'processing'
         }
 
         await this.$axios.patch(
