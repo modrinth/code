@@ -8,7 +8,7 @@ use tokio::sync::Mutex;
 
 pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<VersionManifest, Error> {
     let old_manifest =
-        daedalus::minecraft::fetch_version_manifest(Some(&*crate::format_url(&*format!(
+        daedalus::minecraft::fetch_version_manifest(Some(&*crate::format_url(&format!(
             "minecraft/v{}/manifest.json",
             daedalus::minecraft::CURRENT_FORMAT_VERSION
         ))))
@@ -43,12 +43,12 @@ pub async fn retrieve_data(uploaded_files: &mut Vec<String>) -> Result<VersionMa
             let cloned_manifest_mutex = Arc::clone(&cloned_manifest);
             let uploaded_files_mutex = Arc::clone(&uploaded_files_mutex);
 
-            let assets_hash = old_version.map(|x| x.assets_index_sha1.clone()).flatten();
+            let assets_hash = old_version.and_then(|x| x.assets_index_sha1.clone());
 
             async move {
                 let mut upload_futures = Vec::new();
 
-                let mut version_info = daedalus::minecraft::fetch_version_info(version).await?;
+                let version_info = daedalus::minecraft::fetch_version_info(version).await?;
 
                 let version_path = format!(
                     "minecraft/v{}/versions/{}.json",

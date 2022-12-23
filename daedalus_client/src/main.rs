@@ -1,9 +1,8 @@
 use log::{error, warn};
-use rusoto_core::credential::StaticProvider;
-use rusoto_core::{HttpClient, Region, RusotoError};
-use rusoto_s3::{PutObjectError, S3Client};
-use rusoto_s3::{PutObjectRequest, S3};
 use std::time::Duration;
+use s3::{Bucket, Region};
+use s3::creds::Credentials;
+use s3::error::S3Error;
 
 mod fabric;
 mod forge;
@@ -21,7 +20,7 @@ pub enum Error {
     TaskError(#[from] tokio::task::JoinError),
     #[error("Error while uploading file to S3")]
     S3Error {
-        inner: RusotoError<PutObjectError>,
+        inner: S3Error,
         file: String,
     },
     #[error("Error while parsing version as semver: {0}")]
@@ -70,11 +69,6 @@ async fn main() {
                 Err(err) => error!("{:?}", err),
             };
         }
-
-        match purge_digitalocean_cache(uploaded_files).await {
-            Ok(..) => {}
-            Err(err) => error!("{:?}", err),
-        };
     }
 }
 
@@ -82,13 +76,13 @@ fn check_env_vars() -> bool {
     let mut failed = false;
 
     fn check_var<T: std::str::FromStr>(var: &str) -> bool {
-        if dotenv::var(var)
+        if dotenvy::var(var)
             .ok()
             .and_then(|s| s.parse::<T>().ok())
             .is_none()
         {
             warn!(
-                "Variable `{}` missing in dotenv or not of type `{}`",
+                "Variable `{}` missing in dotenvy or not of type `{}`",
                 var,
                 std::any::type_name::<T>()
             );
@@ -107,36 +101,31 @@ fn check_env_vars() -> bool {
     failed |= check_var::<String>("S3_REGION");
     failed |= check_var::<String>("S3_BUCKET_NAME");
 
-    failed |= check_var::<bool>("DO_INTEGRATION");
-
-    let do_integration = dotenv::var("DO_INTEGRATION")
-        .ok()
-        .map(|x| x.parse::<bool>().ok())
-        .flatten()
-        .unwrap_or(false);
-
-    if do_integration {
-        failed |= check_var::<String>("DO_ACCESS_KEY");
-        failed |= check_var::<String>("DO_ENDPOINT_ID");
-    }
-
     failed
 }
 
+
 lazy_static::lazy_static! {
-    static ref CLIENT : S3Client = S3Client::new_with(
-            HttpClient::new().unwrap(),
-            StaticProvider::new(
-                dotenv::var("S3_ACCESS_TOKEN").unwrap(),
-                dotenv::var("S3_SECRET").unwrap(),
-                None,
-                None,
-            ),
+    static ref CLIENT : Bucket = Bucket::new(
+        &dotenvy::var("S3_BUCKET_NAME").unwrap(),
+        if &*dotenvy::var("S3_REGION").unwrap() == "r2" {
+            Region::R2 {
+                account_id: dotenvy::var("S3_URL").unwrap(),
+            }
+        } else {
             Region::Custom {
-                name: dotenv::var("S3_REGION").unwrap(),
-                endpoint: dotenv::var("S3_URL").unwrap(),
-            },
-        );
+                region: dotenvy::var("S3_REGION").unwrap(),
+                endpoint: dotenvy::var("S3_URL").unwrap(),
+            }
+        },
+        Credentials::new(
+            Some(&*dotenvy::var("S3_ACCESS_TOKEN").unwrap()),
+            Some(&*dotenvy::var("S3_SECRET").unwrap()),
+            None,
+            None,
+            None,
+        ).unwrap(),
+    ).unwrap();
 }
 
 pub async fn upload_file_to_bucket(
@@ -145,23 +134,24 @@ pub async fn upload_file_to_bucket(
     content_type: Option<String>,
     uploaded_files: &tokio::sync::Mutex<Vec<String>>,
 ) -> Result<(), Error> {
-    let key = format!("{}/{}", &*dotenv::var("BASE_FOLDER").unwrap(), path);
+    let key = format!("{}/{}", &*dotenvy::var("BASE_FOLDER").unwrap(), path);
 
     for attempt in 1..=4 {
-        let result = CLIENT
-            .put_object(PutObjectRequest {
-                bucket: dotenv::var("S3_BUCKET_NAME").unwrap(),
-                key: key.clone(),
-                body: Some(bytes.clone().into()),
-                acl: Some("public-read".to_string()),
-                content_type: content_type.clone(),
-                ..Default::default()
-            })
-            .await
-            .map_err(|err| Error::S3Error {
-                inner: err,
-                file: format!("{}/{}", &*dotenv::var("BASE_FOLDER").unwrap(), path),
-            });
+        let result = if let Some(ref content_type) = content_type {
+            CLIENT.put_object_with_content_type(
+                key.clone(),
+                &bytes,
+                content_type,
+            ).await
+        } else {
+            CLIENT.put_object(
+                key.clone(),
+                &bytes,
+            ).await
+        }.map_err(|err| Error::S3Error {
+            inner: err,
+            file: format!("{}/{}", &*dotenvy::var("BASE_FOLDER").unwrap(), path),
+        });
 
         match result {
             Ok(_) => {
@@ -185,45 +175,8 @@ pub async fn upload_file_to_bucket(
 pub fn format_url(path: &str) -> String {
     format!(
         "{}/{}/{}",
-        &*dotenv::var("BASE_URL").unwrap(),
-        &*dotenv::var("BASE_FOLDER").unwrap(),
+        &*dotenvy::var("BASE_URL").unwrap(),
+        &*dotenvy::var("BASE_FOLDER").unwrap(),
         path
     )
-}
-
-#[derive(serde::Serialize)]
-struct PurgeCacheRequest {
-    pub files: Vec<String>,
-}
-
-pub async fn purge_digitalocean_cache(files: Vec<String>) -> Result<(), Error> {
-    if !dotenv::var("DO_INTEGRATION")
-        .ok()
-        .map(|x| x.parse::<bool>().ok())
-        .flatten()
-        .unwrap_or(false)
-    {
-        return Ok(());
-    }
-
-    let client = reqwest::Client::new();
-
-    client
-        .delete(&format!(
-            "https://api.digitalocean.com/v2/cdn/endpoints/{}/cache",
-            &*dotenv::var("DO_ENDPOINT_ID").unwrap()
-        ))
-        .header(
-            "Authorization",
-            &*format!("Bearer {}", &*dotenv::var("DO_ACCESS_KEY").unwrap()),
-        )
-        .json(&PurgeCacheRequest { files })
-        .send()
-        .await
-        .map_err(|err| Error::FetchError {
-            inner: err,
-            item: "purging digital ocean cache".to_string(),
-        })?;
-
-    Ok(())
 }

@@ -13,7 +13,7 @@ pub async fn retrieve_data(
     uploaded_files: &mut Vec<String>,
 ) -> Result<(), Error> {
     let mut list = fetch_fabric_versions(None).await?;
-    let old_manifest = daedalus::modded::fetch_manifest(&*format!(
+    let old_manifest = daedalus::modded::fetch_manifest(&format!(
         "fabric/v{}/manifest.json",
         daedalus::modded::CURRENT_FABRIC_FORMAT_VERSION,
     ))
@@ -47,11 +47,7 @@ pub async fn retrieve_data(
                 }
             }
 
-            list.loader = list
-                .loader
-                .into_iter()
-                .filter(|x| loaders.iter().any(|val| val.1 == x.version))
-                .collect();
+            list.loader.retain(|x| loaders.iter().any(|val| val.1 == x.version))
         }
 
         let mut version_futures = Vec::new();
@@ -79,7 +75,7 @@ pub async fn retrieve_data(
                                 }
 
                                 let version =
-                                    fetch_fabric_version(&*game_version.version, &*loader).await?;
+                                    fetch_fabric_version(&game_version.version, &loader).await?;
 
                                 Ok::<Option<(Box<bool>, String, PartialVersionInfo)>, Error>(Some(
                                     (stable, loader, version),
@@ -106,10 +102,10 @@ pub async fn retrieve_data(
                                 }
                             }
 
-                            let artifact_path = daedalus::get_path_from_artifact(&*lib.name)?;
+                            let artifact_path = daedalus::get_path_from_artifact(&lib.name)?;
 
                             let artifact = daedalus::download_file(
-                                &*format!(
+                                &format!(
                                     "{}{}",
                                     lib.url.unwrap_or_else(|| {
                                         "https://maven.fabricmc.net/".to_string()
@@ -169,7 +165,7 @@ pub async fn retrieve_data(
                         async move {
                             loader_version_map.push(LoaderVersion {
                                 id: format!("{}-{}", inherits_from, loader),
-                                url: format_url(&*version_path),
+                                url: format_url(&version_path),
                                 stable: *stable,
                             });
                         }
@@ -280,7 +276,7 @@ async fn fetch_fabric_version(
 ) -> Result<PartialVersionInfo, Error> {
     Ok(serde_json::from_slice(
         &download_file(
-            &*format!(
+            &format!(
                 "{}/versions/loader/{}/{}/profile/json",
                 FABRIC_META_URL, version_number, loader_version
             ),

@@ -45,7 +45,7 @@ pub enum Error {
 pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
     let name_items = artifact.split(':').collect::<Vec<&str>>();
 
-    let package = name_items.get(0).ok_or_else(|| {
+    let package = name_items.first().ok_or_else(|| {
         Error::ParseError(format!("Unable to find package for library {}", &artifact))
     })?;
     let name = name_items.get(1).ok_or_else(|| {
@@ -60,14 +60,14 @@ pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
             })?
             .split('@')
             .collect::<Vec<&str>>();
-        let version = version_ext.get(0).ok_or_else(|| {
+        let version = version_ext.first().ok_or_else(|| {
             Error::ParseError(format!("Unable to find version for library {}", &artifact))
         })?;
         let ext = version_ext.get(1);
 
         Ok(format!(
             "{}/{}/{}/{}-{}.{}",
-            package.replace(".", "/"),
+            package.replace('.', "/"),
             name,
             version,
             name,
@@ -86,14 +86,14 @@ pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
             })?
             .split('@')
             .collect::<Vec<&str>>();
-        let data = data_ext.get(0).ok_or_else(|| {
+        let data = data_ext.first().ok_or_else(|| {
             Error::ParseError(format!("Unable to find data for library {}", &artifact))
         })?;
         let ext = data_ext.get(1);
 
         Ok(format!(
             "{}/{}/{}/{}-{}-{}.{}",
-            package.replace(".", "/"),
+            package.replace('.', "/"),
             name,
             version,
             name,
@@ -115,7 +115,7 @@ pub async fn download_file_mirrors(
     }
 
     for (index, mirror) in mirrors.iter().enumerate() {
-        let result = download_file(&*format!("{}{}", mirror, base), sha1).await;
+        let result = download_file(&format!("{}{}", mirror, base), sha1).await;
 
         if result.is_ok() || (result.is_err() && index == (mirrors.len() - 1)) {
             return result;
