@@ -134,7 +134,7 @@ impl Category {
             SELECT c.id id, c.category category, c.icon icon, c.header category_header, pt.name project_type
             FROM categories c
             INNER JOIN project_types pt ON c.project_type = pt.id
-            ORDER BY c.id
+            ORDER BY c.ordering, c.category
             "
         )
         .fetch_many(exec)

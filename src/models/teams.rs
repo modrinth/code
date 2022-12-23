@@ -65,6 +65,8 @@ pub struct TeamMember {
     /// Payouts split. This is a weighted average. For example. if a team has two members with this
     /// value set to 25.0 for both members, they split revenue 50/50
     pub payouts_split: Option<Decimal>,
+    /// Ordering of the member in the list
+    pub ordering: i64,
 }
 
 impl TeamMember {
@@ -91,6 +93,7 @@ impl TeamMember {
             } else {
                 Some(data.payouts_split)
             },
+            ordering: data.ordering,
         }
     }
 }

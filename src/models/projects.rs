@@ -176,6 +176,7 @@ impl From<QueryProject> for Project {
                     title: x.title,
                     description: x.description,
                     created: x.created,
+                    ordering: x.ordering,
                 })
                 .collect(),
             flame_anvil_project: m.flame_anvil_project,
@@ -191,6 +192,7 @@ pub struct GalleryItem {
     pub title: Option<String>,
     pub description: Option<String>,
     pub created: DateTime<Utc>,
+    pub ordering: i64,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]

@@ -13,6 +13,7 @@ pub struct TeamMemberBuilder {
     pub permissions: Permissions,
     pub accepted: bool,
     pub payouts_split: Decimal,
+    pub ordering: i64,
 }
 
 impl TeamBuilder {
@@ -45,12 +46,13 @@ impl TeamBuilder {
                 permissions: member.permissions,
                 accepted: member.accepted,
                 payouts_split: member.payouts_split,
+                ordering: member.ordering,
             };
 
             sqlx::query!(
                 "
-                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted, payouts_split)
-                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted, payouts_split, ordering)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                 ",
                 team_member.id as TeamMemberId,
                 team_member.team_id as TeamId,
@@ -59,6 +61,7 @@ impl TeamBuilder {
                 team_member.permissions.bits() as i64,
                 team_member.accepted,
                 team_member.payouts_split,
+                team_member.ordering,
             )
             .execute(&mut *transaction)
             .await?;
@@ -84,6 +87,7 @@ pub struct TeamMember {
     pub permissions: Permissions,
     pub accepted: bool,
     pub payouts_split: Decimal,
+    pub ordering: i64,
 }
 
 /// A member of a team
@@ -96,6 +100,7 @@ pub struct QueryTeamMember {
     pub permissions: Permissions,
     pub accepted: bool,
     pub payouts_split: Decimal,
+    pub ordering: i64,
 }
 
 impl TeamMember {
@@ -111,9 +116,10 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT id, user_id, role, permissions, accepted, payouts_split
+            SELECT id, user_id, role, permissions, accepted, payouts_split, ordering
             FROM team_members
             WHERE team_id = $1
+            ORDER BY ordering
             ",
             id as TeamId,
         )
@@ -129,6 +135,7 @@ impl TeamMember {
                         .unwrap_or_default(),
                     accepted: m.accepted,
                     payouts_split: m.payouts_split,
+                    ordering: m.ordering,
                 })))
             } else {
                 Ok(None)
@@ -156,7 +163,7 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT tm.id id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split,
+            SELECT tm.id id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split, tm.ordering ordering,
             u.id user_id, u.github_id github_id, u.name user_name, u.email email,
             u.avatar_url avatar_url, u.username username, u.bio bio,
             u.created created, u.role user_role, u.badges badges, u.balance balance,
@@ -165,6 +172,7 @@ impl TeamMember {
             FROM team_members tm
             INNER JOIN users u ON u.id = tm.user_id
             WHERE tm.team_id = $1
+            ORDER BY tm.ordering
             ",
             id as TeamId,
         )
@@ -195,7 +203,8 @@ impl TeamMember {
                             payout_address: m.payout_address,
                             flame_anvil_key: m.flame_anvil_key,
                         },
-                        payouts_split: m.payouts_split
+                        payouts_split: m.payouts_split,
+                        ordering: m.ordering,
                     })))
             } else {
                 Ok(None)
@@ -225,7 +234,7 @@ impl TeamMember {
 
         let teams = sqlx::query!(
             "
-            SELECT tm.id id, tm.team_id team_id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split,
+            SELECT tm.id id, tm.team_id team_id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split, tm.ordering,
             u.id user_id, u.github_id github_id, u.name user_name, u.email email,
             u.avatar_url avatar_url, u.username username, u.bio bio,
             u.created created, u.role user_role, u.badges badges, u.balance balance,
@@ -234,7 +243,7 @@ impl TeamMember {
             FROM team_members tm
             INNER JOIN users u ON u.id = tm.user_id
             WHERE tm.team_id = ANY($1)
-            ORDER BY tm.team_id
+            ORDER BY tm.team_id, tm.ordering
             ",
             &team_ids_parsed
         )
@@ -265,7 +274,8 @@ impl TeamMember {
                               payout_address: m.payout_address,
                               flame_anvil_key: m.flame_anvil_key,
                           },
-                          payouts_split: m.payouts_split
+                          payouts_split: m.payouts_split,
+                          ordering: m.ordering,
                       })))
               } else {
                   Ok(None)
@@ -293,9 +303,10 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT id, team_id, role, permissions, accepted, payouts_split
+            SELECT id, team_id, role, permissions, accepted, payouts_split, ordering
             FROM team_members
             WHERE (user_id = $1 AND accepted = TRUE)
+            ORDER BY ordering
             ",
             id as UserId,
         )
@@ -311,6 +322,7 @@ impl TeamMember {
                         .unwrap_or_default(),
                     accepted: m.accepted,
                     payouts_split: m.payouts_split,
+                    ordering: m.ordering,
                 })))
             } else {
                 Ok(None)
@@ -338,9 +350,10 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT id, team_id, role, permissions, accepted, payouts_split
+            SELECT id, team_id, role, permissions, accepted, payouts_split, ordering
             FROM team_members
             WHERE user_id = $1
+            ORDER BY ordering
             ",
             id as UserId,
         )
@@ -356,6 +369,7 @@ impl TeamMember {
                         .unwrap_or_default(),
                     accepted: m.accepted,
                     payouts_split: m.payouts_split,
+                    ordering: m.ordering,
                 })))
             } else {
                 Ok(None)
@@ -382,7 +396,7 @@ impl TeamMember {
     {
         let result = sqlx::query!(
             "
-            SELECT id, user_id, role, permissions, accepted, payouts_split
+            SELECT id, user_id, role, permissions, accepted, payouts_split, ordering
             FROM team_members
             WHERE (team_id = $1 AND user_id = $2 AND accepted = TRUE)
             ",
@@ -402,6 +416,7 @@ impl TeamMember {
                     .unwrap_or_default(),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
+                ordering: m.ordering,
             }))
         } else {
             Ok(None)
@@ -424,9 +439,10 @@ impl TeamMember {
 
         let team_members = sqlx::query!(
             "
-            SELECT id, team_id, user_id, role, permissions, accepted, payouts_split
+            SELECT id, team_id, user_id, role, permissions, accepted, payouts_split, ordering
             FROM team_members
             WHERE (team_id = ANY($1) AND user_id = $2 AND accepted = TRUE)
+            ORDER BY ordering
             ",
             &team_ids_parsed,
             user_id as UserId
@@ -441,7 +457,8 @@ impl TeamMember {
                         role: m.role,
                         permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
                         accepted: m.accepted,
-                        payouts_split: m.payouts_split
+                        payouts_split: m.payouts_split,
+                        ordering: m.ordering,
                     })))
             } else {
                 Ok(None)
@@ -468,7 +485,7 @@ impl TeamMember {
     {
         let result = sqlx::query!(
             "
-            SELECT id, user_id, role, permissions, accepted, payouts_split
+            SELECT id, user_id, role, permissions, accepted, payouts_split, ordering
             FROM team_members
             WHERE (team_id = $1 AND user_id = $2)
             ",
@@ -488,6 +505,7 @@ impl TeamMember {
                     .unwrap_or_default(),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
+                ordering: m.ordering,
             }))
         } else {
             Ok(None)
@@ -559,6 +577,7 @@ impl TeamMember {
         new_role: Option<String>,
         new_accepted: Option<bool>,
         new_payouts_split: Option<Decimal>,
+        new_ordering: Option<i64>,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), super::DatabaseError> {
         if let Some(permissions) = new_permissions {
@@ -622,6 +641,21 @@ impl TeamMember {
             .await?;
         }
 
+        if let Some(ordering) = new_ordering {
+            sqlx::query!(
+                "
+                UPDATE team_members
+                SET ordering = $1
+                WHERE (team_id = $2 AND user_id = $3)
+                ",
+                ordering,
+                id as TeamId,
+                user_id as UserId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
         Ok(())
     }
 
@@ -635,7 +669,7 @@ impl TeamMember {
     {
         let result = sqlx::query!(
             "
-            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.permissions, tm.accepted, tm.payouts_split FROM mods m
+            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.permissions, tm.accepted, tm.payouts_split, tm.ordering FROM mods m
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2 AND accepted = TRUE
             WHERE m.id = $1
             ",
@@ -655,6 +689,7 @@ impl TeamMember {
                     .unwrap_or_default(),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
+                ordering: m.ordering,
             }))
         } else {
             Ok(None)
@@ -671,7 +706,7 @@ impl TeamMember {
     {
         let result = sqlx::query!(
             "
-            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.permissions, tm.accepted, tm.payouts_split FROM versions v
+            SELECT tm.id, tm.team_id, tm.user_id, tm.role, tm.permissions, tm.accepted, tm.payouts_split, tm.ordering FROM versions v
             INNER JOIN mods m ON m.id = v.mod_id
             INNER JOIN team_members tm ON tm.team_id = m.team_id AND tm.user_id = $2 AND tm.accepted = TRUE
             WHERE v.id = $1
@@ -692,6 +727,7 @@ impl TeamMember {
                     .unwrap_or_default(),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
+                ordering: m.ordering,
             }))
         } else {
             Ok(None)

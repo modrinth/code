@@ -191,6 +191,7 @@ pub async fn join_team(
             None,
             Some(true),
             None,
+            None,
             &mut transaction,
         )
         .await?;
@@ -209,6 +210,10 @@ fn default_role() -> String {
     "Member".to_string()
 }
 
+fn default_ordering() -> i64 {
+    0
+}
+
 #[derive(Serialize, Deserialize, Clone)]
 pub struct NewTeamMember {
     pub user_id: UserId,
@@ -218,6 +223,8 @@ pub struct NewTeamMember {
     pub permissions: Permissions,
     #[serde(default)]
     pub payouts_split: Decimal,
+    #[serde(default = "default_ordering")]
+    pub ordering: i64,
 }
 
 #[post("{id}/members")]
@@ -305,6 +312,7 @@ pub async fn add_team_member(
         permissions: new_member.permissions,
         accepted: false,
         payouts_split: new_member.payouts_split,
+        ordering: new_member.ordering,
     }
     .insert(&mut transaction)
     .await?;
@@ -364,6 +372,7 @@ pub struct EditTeamMember {
     pub permissions: Option<Permissions>,
     pub role: Option<String>,
     pub payouts_split: Option<Decimal>,
+    pub ordering: Option<i64>,
 }
 
 #[patch("{id}/members/{user_id}")]
@@ -446,6 +455,7 @@ pub async fn edit_team_member(
         edit_member.role.clone(),
         None,
         edit_member.payouts_split,
+        edit_member.ordering,
         &mut transaction,
     )
     .await?;
@@ -520,6 +530,7 @@ pub async fn transfer_ownership(
         Some(crate::models::teams::DEFAULT_ROLE.to_string()),
         None,
         None,
+        None,
         &mut transaction,
     )
     .await?;
@@ -529,6 +540,7 @@ pub async fn transfer_ownership(
         new_owner.user_id.into(),
         Some(Permissions::ALL),
         Some(crate::models::teams::OWNER_ROLE.to_string()),
+        None,
         None,
         None,
         &mut transaction,

@@ -46,7 +46,7 @@ pub struct CategoryData {
 pub async fn category_list(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let mut results = Category::list(&**pool)
+    let results = Category::list(&**pool)
         .await?
         .into_iter()
         .map(|x| CategoryData {
@@ -56,8 +56,6 @@ pub async fn category_list(
             header: x.header,
         })
         .collect::<Vec<_>>();
-
-    results.sort_by(|a, b| a.name.to_lowercase().cmp(&b.name.to_lowercase()));
 
     Ok(HttpResponse::Ok().json(results))
 }
