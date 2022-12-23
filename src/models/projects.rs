@@ -460,6 +460,7 @@ impl From<QueryVersion> for Version {
                     hashes: f.hashes,
                     primary: f.primary,
                     size: f.size,
+                    file_type: f.file_type,
                 })
                 .collect(),
             dependencies: data
@@ -587,6 +588,8 @@ pub struct VersionFile {
     pub primary: bool,
     /// The size in bytes of the file
     pub size: u32,
+    /// The type of the file
+    pub file_type: Option<FileType>,
 }
 
 /// A dendency which describes what versions are required, break support, or are optional to the
@@ -603,7 +606,7 @@ pub struct Dependency {
     pub dependency_type: DependencyType,
 }
 
-#[derive(Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Serialize, Deserialize, Copy, Clone, Eq, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum VersionType {
     Release,
@@ -628,7 +631,7 @@ impl VersionType {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Copy, Clone)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
     Required,
@@ -661,6 +664,31 @@ impl DependencyType {
             "incompatible" => DependencyType::Incompatible,
             "embedded" => DependencyType::Embedded,
             _ => DependencyType::Required,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[serde(rename_all = "kebab-case")]
+pub enum FileType {
+    RequiredResourcePack,
+    OptionalResourcePack,
+    Unknown,
+}
+
+impl std::fmt::Display for FileType {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.write_str(self.as_str())
+    }
+}
+
+impl FileType {
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            FileType::RequiredResourcePack => "required-resource-pack",
+            FileType::OptionalResourcePack => "optional-resource-pack",
+            FileType::Unknown => "unknown",
         }
     }
 }

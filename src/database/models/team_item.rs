@@ -570,6 +570,7 @@ impl TeamMember {
         Ok(())
     }
 
+    #[allow(clippy::too_many_arguments)]
     pub async fn edit_team_member(
         id: TeamId,
         user_id: UserId,

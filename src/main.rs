@@ -1,6 +1,5 @@
 use crate::file_hosting::S3Host;
 use crate::queue::download::DownloadQueue;
-use crate::queue::flameanvil::FlameAnvilQueue;
 use crate::queue::payouts::PayoutsQueue;
 use crate::ratelimit::errors::ARError;
 use crate::ratelimit::memory::{MemoryStore, MemoryStoreActor};
@@ -222,7 +221,6 @@ async fn main() -> std::io::Result<()> {
     };
 
     let payouts_queue = Arc::new(Mutex::new(PayoutsQueue::new()));
-    let flame_anvil_queue = Arc::new(Mutex::new(FlameAnvilQueue::new()));
 
     let store = MemoryStore::new();
 
@@ -278,7 +276,6 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(search_config.clone()))
             .app_data(web::Data::new(download_queue.clone()))
             .app_data(web::Data::new(payouts_queue.clone()))
-            .app_data(web::Data::new(flame_anvil_queue.clone()))
             .app_data(web::Data::new(ip_salt.clone()))
             .wrap(sentry_actix::Sentry::new())
             .configure(routes::v1_config)

@@ -6,7 +6,6 @@ use crate::models::projects::{
     VersionStatus,
 };
 use crate::models::users::UserId;
-use crate::queue::flameanvil::FlameAnvilQueue;
 use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::IndexingError;
 use crate::util::auth::{get_user_from_headers, AuthenticationError};
@@ -24,7 +23,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
-use tokio::sync::Mutex;
 use validator::Validate;
 
 #[derive(Error, Debug)]
@@ -266,7 +264,6 @@ pub async fn project_create(
     mut payload: Multipart,
     client: Data<PgPool>,
     file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-    flame_anvil_queue: Data<Arc<Mutex<FlameAnvilQueue>>>,
 ) -> Result<HttpResponse, CreateError> {
     let mut transaction = client.begin().await?;
     let mut uploaded_files = Vec::new();
@@ -276,7 +273,6 @@ pub async fn project_create(
         &mut payload,
         &mut transaction,
         &***file_host,
-        &flame_anvil_queue,
         &mut uploaded_files,
         &client,
     )
@@ -334,7 +330,6 @@ pub async fn project_create_inner(
     payload: &mut Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     file_host: &dyn FileHost,
-    flame_anvil_queue: &Mutex<FlameAnvilQueue>,
     uploaded_files: &mut Vec<UploadedFile>,
     pool: &PgPool,
 ) -> Result<HttpResponse, CreateError> {
@@ -593,11 +588,6 @@ pub async fn project_create_inner(
             all_game_versions.clone(),
             version_data.primary_file.is_some(),
             version_data.primary_file.as_deref() == Some(name),
-            version_data.version_title.clone(),
-            version_data.version_body.clone().unwrap_or_default(),
-            version_data.release_channel.clone().to_string(),
-            flame_anvil_queue,
-            None,
             None,
             transaction,
         )

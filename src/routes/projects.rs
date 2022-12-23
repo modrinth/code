@@ -1473,6 +1473,18 @@ pub async fn add_gallery_item(
 
         let id: ProjectId = project_item.inner.id.into();
         let url = format!("data/{}/images/{}.{}", id, hash, &*ext.ext);
+
+        let file_url = format!("{}/{}", cdn_url, url);
+        if project_item
+            .gallery_items
+            .iter()
+            .any(|x| x.image_url == file_url)
+        {
+            return Err(ApiError::InvalidInput(
+                "You may not upload duplicate gallery images!".to_string(),
+            ));
+        }
+
         file_host
             .upload_file(content_type, &url, bytes.freeze())
             .await?;
@@ -1494,7 +1506,7 @@ pub async fn add_gallery_item(
         }
 
         database::models::project_item::GalleryItem {
-            image_url: format!("{}/{}", cdn_url, url),
+            image_url: file_url,
             featured: item.featured,
             title: item.title,
             description: item.description,
