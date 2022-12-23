@@ -176,7 +176,7 @@ export default {
 
 <style lang="scss" scoped>
 .changelog-item {
-  display: flex;
+  display: block;
   margin-bottom: 1rem;
   position: relative;
   padding-left: 1.8rem;
