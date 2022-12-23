@@ -48,6 +48,7 @@
       label="Include snapshots"
       description="Include snapshots"
       :border="false"
+      @input="updateQuery"
     />
     <button
       title="Clear filters"
@@ -94,6 +95,12 @@ export default {
       selectedLoaders: [],
     }
   },
+  fetch() {
+    this.selectedLoaders = this.$route.query.l?.split(',') || []
+    this.selectedGameVersions = this.$route.query.g?.split(',') || []
+    this.showSnapshots = this.$route.query.s === 'true'
+    this.updateVersionFilters()
+  },
   methods: {
     getValidVersions() {
       if (!this.cachedValidVersions) {
@@ -118,7 +125,16 @@ export default {
       }
       return this.cachedValidLoaders
     },
-    updateVersionFilters() {
+    async updateVersionFilters() {
+      this.selectedLoaders = this.selectedLoaders.filter((loader) =>
+        this.getValidLoaders().includes(loader)
+      )
+      this.selectedGameVersions = this.selectedGameVersions.filter((version) =>
+        this.getValidVersions().some(
+          (validVersion) => validVersion.version === version
+        )
+      )
+
       const temp = this.versions.filter(
         (projectVersion) =>
           (this.selectedGameVersions.length === 0 ||
@@ -130,7 +146,24 @@ export default {
               projectVersion.loaders.includes(loader)
             ))
       )
+      await this.updateQuery()
       this.$emit('updateVersions', temp)
+    },
+    async updateQuery() {
+      await this.$router.replace({
+        query: {
+          ...this.$route.query,
+          l:
+            this.selectedLoaders.length === 0
+              ? undefined
+              : this.selectedLoaders.join(','),
+          g:
+            this.selectedGameVersions.length === 0
+              ? undefined
+              : this.selectedGameVersions.join(','),
+          s: this.showSnapshots ? true : undefined,
+        },
+      })
     },
   },
 }
