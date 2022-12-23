@@ -5,11 +5,10 @@ authors = ["geometrically <jai@modrinth.com>"]
 edition = "2018"
 license = "AGPL-3.0"
 
+# This seems redundant, but it's necessary for Docker to work
 [[bin]]
 name = "labrinth"
 path = "src/main.rs"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 actix = "0.13.0"
@@ -41,7 +40,7 @@ xml-rs = "0.8.4"
 
 rand = "0.8.5"
 bytes = "1.2.1"
-base64 = "0.13.0"
+base64 = "0.20.0"
 sha1 = { version = "0.6.1", features = ["std"] }
 sha2 = "0.9.9"
 hmac = "0.11.0"
@@ -51,14 +50,13 @@ hex = "0.4.3"
 url = "2.3.1"
 urlencoding = "2.1.2"
 
-# Temporary - to fix zstd conflict
-zip = { git = "https://github.com/zip-rs/zip", rev = "bb230ef56adc13436d1fcdfaa489249d119c498f" }
+zip = "0.6.3"
 
 itertools = "0.10.5"
 
 validator = { version = "0.16.0", features = ["derive", "phone"] }
 regex = "1.6.0"
-censor = "0.2.0"
+censor = "0.3.0"
 spdx = { version = "0.9.0", features = ["text"] }
 
 dotenvy = "0.15.6"
@@ -69,5 +67,5 @@ thiserror = "1.0.37"
 sqlx = { version = "0.6.2", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate", "decimal", "json"] }
 rust_decimal = { version = "1.26", features = ["serde-with-float", "serde-with-str"] }
 
-sentry = "0.28.0"
-sentry-actix = "0.28.0"
+sentry = "0.29.1"
+sentry-actix = "0.29.1"

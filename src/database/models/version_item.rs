@@ -268,14 +268,13 @@ impl Version {
             "
             INSERT INTO versions (
                 id, mod_id, author_id, name, version_number,
-                changelog, changelog_url, date_published,
-                downloads, version_type, featured, status
+                changelog, date_published, downloads,
+                version_type, featured, status
             )
             VALUES (
                 $1, $2, $3, $4, $5,
-                $6, $7,
-                $8, $9,
-                $10, $11, $12
+                $6, $7, $8,
+                $9, $10, $11
             )
             ",
             self.id as VersionId,
@@ -284,7 +283,6 @@ impl Version {
             &self.name,
             &self.version_number,
             self.changelog,
-            self.changelog_url.as_ref(),
             self.date_published,
             self.downloads,
             &self.version_type,
@@ -508,7 +506,7 @@ impl Version {
         let result = sqlx::query!(
             "
             SELECT v.mod_id, v.author_id, v.name, v.version_number,
-                v.changelog, v.changelog_url, v.date_published, v.downloads,
+                v.changelog, v.date_published, v.downloads,
                 v.version_type, v.featured, v.status, v.requested_status
             FROM versions v
             WHERE v.id = $1
@@ -526,7 +524,7 @@ impl Version {
                 name: row.name,
                 version_number: row.version_number,
                 changelog: row.changelog,
-                changelog_url: row.changelog_url,
+                changelog_url: None,
                 date_published: row.date_published,
                 downloads: row.downloads,
                 version_type: row.version_type,
@@ -555,7 +553,7 @@ impl Version {
         let versions = sqlx::query!(
             "
             SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
-                v.changelog, v.changelog_url, v.date_published, v.downloads,
+                v.changelog, v.date_published, v.downloads,
                 v.version_type, v.featured, v.status, v.requested_status
             FROM versions v
             WHERE v.id = ANY($1)
@@ -572,7 +570,7 @@ impl Version {
                 name: v.name,
                 version_number: v.version_number,
                 changelog: v.changelog,
-                changelog_url: v.changelog_url,
+                changelog_url: None,
                 date_published: v.date_published,
                 downloads: v.downloads,
                 featured: v.featured,
@@ -599,7 +597,7 @@ impl Version {
         let result = sqlx::query!(
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
-            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
+            v.changelog changelog, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
             JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
             ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
@@ -631,7 +629,7 @@ impl Version {
                     name: v.version_name,
                     version_number: v.version_number,
                     changelog: v.changelog,
-                    changelog_url: v.changelog_url,
+                    changelog_url: None,
                     date_published: v.date_published,
                     downloads: v.downloads,
                     version_type: v.version_type,
@@ -749,7 +747,7 @@ impl Version {
         sqlx::query!(
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
-            v.changelog changelog, v.changelog_url changelog_url, v.date_published date_published, v.downloads downloads,
+            v.changelog changelog, v.date_published date_published, v.downloads downloads,
             v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
             JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
             ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
@@ -781,7 +779,7 @@ impl Version {
                             name: v.version_name,
                             version_number: v.version_number,
                             changelog: v.changelog,
-                            changelog_url: v.changelog_url,
+                            changelog_url: None,
                             date_published: v.date_published,
                             downloads: v.downloads,
                             version_type: v.version_type,

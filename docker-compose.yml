@@ -20,17 +20,6 @@ services:
       - meilisearch-data:/data.ms
     environment:
       MEILI_MASTER_KEY: modrinth
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@modrinth.com
-      PGADMIN_DEFAULT_PASSWORD: secret
-      PGADMIN_CONFIG_SERVER_MODE: "False"
-      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
-    ports:
-      - "8070:80"
-    volumes:
-      - ./pgadmin_default_servers.json:/pgadmin4/servers.json
 volumes:
   meilisearch-data:
   db-data:

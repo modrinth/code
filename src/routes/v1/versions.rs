@@ -4,6 +4,7 @@ use crate::models::projects::{
     Dependency, GameVersion, Loader, Version, VersionFile, VersionType,
 };
 use crate::models::teams::Permissions;
+use crate::routes::version_file::Algorithm;
 use crate::routes::versions::{VersionIds, VersionListFilters};
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
@@ -41,7 +42,7 @@ fn convert_to_legacy(version: Version) -> LegacyVersion {
         name: version.name,
         version_number: version.version_number,
         changelog: version.changelog,
-        changelog_url: version.changelog_url,
+        changelog_url: None,
         date_published: version.date_published,
         downloads: version.downloads,
         version_type: version.version_type,
@@ -188,177 +189,6 @@ pub async fn version_get(
 
     if let Some(data) = version_data {
         Ok(HttpResponse::Ok().json(convert_to_legacy(Version::from(data))))
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-#[derive(Deserialize)]
-pub struct Algorithm {
-    #[serde(default = "default_algorithm")]
-    algorithm: String,
-}
-
-fn default_algorithm() -> String {
-    "sha1".into()
-}
-
-// under /api/v1/version_file/{hash}
-#[get("{version_id}")]
-pub async fn get_version_from_hash(
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    algorithm: web::Query<Algorithm>,
-) -> Result<HttpResponse, ApiError> {
-    let hash = info.into_inner().0.to_lowercase();
-
-    let result = sqlx::query!(
-        "
-        SELECT f.version_id version_id FROM hashes h
-        INNER JOIN files f ON h.file_id = f.id
-        WHERE h.algorithm = $2 AND h.hash = $1
-        ",
-        hash.as_bytes(),
-        algorithm.algorithm
-    )
-    .fetch_optional(&**pool)
-    .await?;
-
-    if let Some(id) = result {
-        let version_data = database::models::Version::get_full(
-            database::models::VersionId(id.version_id),
-            &**pool,
-        )
-        .await?;
-
-        if let Some(data) = version_data {
-            Ok(HttpResponse::Ok()
-                .json(crate::models::projects::Version::from(data)))
-        } else {
-            Ok(HttpResponse::NotFound().body(""))
-        }
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-#[derive(Serialize, Deserialize)]
-pub struct DownloadRedirect {
-    pub url: String,
-}
-
-// under /api/v1/version_file/{hash}/download
-#[allow(clippy::await_holding_refcell_ref)]
-#[get("{version_id}/download")]
-pub async fn download_version(
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    algorithm: web::Query<Algorithm>,
-) -> Result<HttpResponse, ApiError> {
-    let hash = info.into_inner().0;
-
-    let result = sqlx::query!(
-        "
-        SELECT f.url url, f.id id, f.version_id version_id, v.mod_id mod_id FROM hashes h
-        INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash = $1
-        ",
-        hash.as_bytes(),
-        algorithm.algorithm
-    )
-    .fetch_optional(&**pool)
-    .await
-    .map_err(|e| ApiError::Database(e.into()))?;
-
-    if let Some(id) = result {
-        Ok(HttpResponse::TemporaryRedirect()
-            .append_header(("Location", &*id.url))
-            .json(DownloadRedirect { url: id.url }))
-    } else {
-        Ok(HttpResponse::NotFound().body(""))
-    }
-}
-
-// under /api/v1/version_file/{hash}
-#[delete("{version_id}")]
-pub async fn delete_file(
-    req: HttpRequest,
-    info: web::Path<(String,)>,
-    pool: web::Data<PgPool>,
-    algorithm: web::Query<Algorithm>,
-) -> Result<HttpResponse, ApiError> {
-    let user = get_user_from_headers(req.headers(), &**pool).await?;
-
-    let hash = info.into_inner().0.to_lowercase();
-
-    let result = sqlx::query!(
-        "
-        SELECT f.id id, f.version_id version_id, f.filename filename, v.version_number version_number, v.mod_id project_id FROM hashes h
-        INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id
-        WHERE h.algorithm = $2 AND h.hash = $1
-        ",
-        hash.as_bytes(),
-        algorithm.algorithm
-    )
-        .fetch_optional(&**pool)
-        .await
-        ?;
-
-    if let Some(row) = result {
-        if !user.role.is_admin() {
-            let team_member =
-                database::models::TeamMember::get_from_user_id_version(
-                    database::models::ids::VersionId(row.version_id),
-                    user.id.into(),
-                    &**pool,
-                )
-                .await
-                .map_err(ApiError::Database)?
-                .ok_or_else(|| {
-                    ApiError::CustomAuthentication(
-                        "You don't have permission to delete this file!"
-                            .to_string(),
-                    )
-                })?;
-
-            if !team_member
-                .permissions
-                .contains(Permissions::DELETE_VERSION)
-            {
-                return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to delete this file!"
-                        .to_string(),
-                ));
-            }
-        }
-
-        let mut transaction = pool.begin().await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM hashes
-            WHERE file_id = $1
-            ",
-            row.id
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM files
-            WHERE files.id = $1
-            ",
-            row.id,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        transaction.commit().await?;
-
-        Ok(HttpResponse::NoContent().body(""))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }

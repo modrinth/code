@@ -1,8 +1,6 @@
 use actix_web::web;
 
-mod moderation;
 mod mods;
-mod reports;
 mod tags;
 mod teams;
 mod users;
@@ -11,13 +9,11 @@ mod versions;
 pub fn v1_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("api/v1")
-            .configure(super::auth_config)
             .configure(tags_config)
             .configure(mods_config)
             .configure(versions_config)
             .configure(teams_config)
             .configure(users_config)
-            .configure(moderation_config)
             .configure(reports_config)
             .configure(notifications_config),
     );
@@ -27,20 +23,9 @@ pub fn tags_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
         web::scope("tag")
             .service(tags::category_list)
-            .service(tags::category_create)
-            .service(super::tags::category_delete)
             .service(tags::loader_list)
-            .service(tags::loader_create)
-            .service(super::tags::loader_delete)
             .service(tags::game_version_list)
-            .service(super::tags::game_version_create)
-            .service(super::tags::game_version_delete)
             .service(super::tags::license_list)
-            .service(super::tags::donation_platform_create)
-            .service(super::tags::donation_platform_list)
-            .service(super::tags::donation_platform_delete)
-            .service(super::tags::report_type_create)
-            .service(super::tags::report_type_delete)
             .service(super::tags::report_type_list),
     );
 }
@@ -74,9 +59,9 @@ pub fn versions_config(cfg: &mut web::ServiceConfig) {
     );
     cfg.service(
         web::scope("version_file")
-            .service(versions::delete_file)
-            .service(versions::get_version_from_hash)
-            .service(versions::download_version),
+            .service(super::version_file::delete_file)
+            .service(super::version_file::get_version_from_hash)
+            .service(super::version_file::download_version),
     );
 }
 
@@ -117,12 +102,6 @@ pub fn notifications_config(cfg: &mut web::ServiceConfig) {
     );
 }
 
-pub fn moderation_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(web::scope("moderation").service(moderation::get_mods));
-}
-
 pub fn reports_config(cfg: &mut web::ServiceConfig) {
-    cfg.service(reports::reports);
-    cfg.service(reports::report_create);
-    cfg.service(super::reports::delete_report);
+    cfg.service(super::reports::report_create);
 }

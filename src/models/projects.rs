@@ -36,7 +36,7 @@ pub struct Project {
     pub description: String,
     /// A long form description of the project.
     pub body: String,
-    /// The link to the long description of the project. (Deprecated), being replaced by `body`
+    /// The link to the long description of the project. Deprecated, always None
     pub body_url: Option<String>,
 
     /// The date at which the project was first published.
@@ -110,7 +110,7 @@ impl From<QueryProject> for Project {
             title: m.title,
             description: m.description,
             body: m.body,
-            body_url: m.body_url,
+            body_url: None,
             published: m.published,
             updated: m.updated,
             approved: m.approved,
@@ -402,7 +402,7 @@ pub struct Version {
     pub version_number: String,
     /// The changelog for this version of the project.
     pub changelog: String,
-    /// A link to the changelog for this version of the project. (Deprecated), being replaced by `changelog`
+    /// A link to the changelog for this version of the project. Deprecated, always None
     pub changelog_url: Option<String>,
 
     /// The date that this version was published.
@@ -439,7 +439,7 @@ impl From<QueryVersion> for Version {
             name: v.name,
             version_number: v.version_number,
             changelog: v.changelog,
-            changelog_url: v.changelog_url,
+            changelog_url: None,
             date_published: v.date_published,
             downloads: v.downloads as u32,
             version_type: match v.version_type.as_str() {

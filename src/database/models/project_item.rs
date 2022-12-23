@@ -274,7 +274,7 @@ impl Project {
         let result = sqlx::query!(
             "
             SELECT project_type, title, description, downloads, follows,
-                   icon_url, body, body_url, published,
+                   icon_url, body, published,
                    updated, approved, status, requested_status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
@@ -296,7 +296,7 @@ impl Project {
                 title: row.title,
                 description: row.description,
                 downloads: row.downloads,
-                body_url: row.body_url,
+                body_url: None,
                 icon_url: row.icon_url,
                 published: row.published,
                 updated: row.updated,
@@ -341,7 +341,7 @@ impl Project {
         let projects = sqlx::query!(
             "
             SELECT id, project_type, title, description, downloads, follows,
-                   icon_url, body, body_url, published,
+                   icon_url, body, published,
                    updated, approved, status, requested_status,
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
@@ -361,7 +361,7 @@ impl Project {
                 title: m.title,
                 description: m.description,
                 downloads: m.downloads,
-                body_url: m.body_url,
+                body_url: None,
                 icon_url: m.icon_url,
                 published: m.published,
                 updated: m.updated,
@@ -662,7 +662,7 @@ impl Project {
         let result = sqlx::query!(
             "
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
-            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
+            m.icon_url icon_url, m.body body, m.published published,
             m.updated updated, m.approved approved, m.status status, m.requested_status requested_status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
@@ -700,7 +700,7 @@ impl Project {
                     title: m.title.clone(),
                     description: m.description.clone(),
                     downloads: m.downloads,
-                    body_url: m.body_url.clone(),
+                    body_url: None,
                     icon_url: m.icon_url.clone(),
                     published: m.published,
                     updated: m.updated,
@@ -790,7 +790,7 @@ impl Project {
         sqlx::query!(
             "
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
-            m.icon_url icon_url, m.body body, m.body_url body_url, m.published published,
+            m.icon_url icon_url, m.body body, m.published published,
             m.updated updated, m.approved approved, m.status status, m.requested_status requested_status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
@@ -829,7 +829,7 @@ impl Project {
                             title: m.title.clone(),
                             description: m.description.clone(),
                             downloads: m.downloads,
-                            body_url: m.body_url.clone(),
+                            body_url: None,
                             icon_url: m.icon_url.clone(),
                             published: m.published,
                             updated: m.updated,

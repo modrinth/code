@@ -23,6 +23,8 @@ pub struct Report {
 #[serde(rename_all = "kebab-case")]
 pub enum ItemType {
     Project,
+    // TODO remove when API v1 POST routes are removed
+    Mod,
     Version,
     User,
     Unknown,
@@ -32,6 +34,7 @@ impl ItemType {
     pub fn as_str(&self) -> &'static str {
         match self {
             ItemType::Project => "project",
+            ItemType::Mod => "mod",
             ItemType::Version => "version",
             ItemType::User => "user",
             ItemType::Unknown => "unknown",

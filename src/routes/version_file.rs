@@ -14,7 +14,7 @@ use tokio::sync::RwLock;
 #[derive(Deserialize)]
 pub struct Algorithm {
     #[serde(default = "default_algorithm")]
-    algorithm: String,
+    pub algorithm: String,
 }
 
 fn default_algorithm() -> String {

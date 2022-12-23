@@ -64,7 +64,7 @@ pub async fn report_create(
     };
 
     match new_report.item_type {
-        ItemType::Project => {
+        ItemType::Project | ItemType::Mod => {
             report.project_id = Some(
                 serde_json::from_str::<ProjectId>(&format!(
                     "\"{}\"",
