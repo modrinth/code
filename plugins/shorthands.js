@@ -18,7 +18,7 @@ export default (ctx, inject) => {
   })
   inject('formatNumber', formatNumber)
   inject('capitalizeString', capitalizeString)
-  inject('formatMoney', (number) => '$' + formatNumber(number.toFixed(2)))
+  inject('formatMoney', formatMoney)
   inject('formatVersion', (versionsArray) =>
     formatVersions(versionsArray, ctx.store)
   )
@@ -186,6 +186,23 @@ export const formatNumber = (number) => {
     return (x / 1000).toFixed(1).toString() + 'K'
   } else {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+  }
+}
+
+export const formatMoney = (number) => {
+  const x = +number
+  if (x >= 1000000) {
+    return '$' + (x / 1000000).toFixed(2).toString() + 'M'
+  } else if (x >= 10000) {
+    return '$' + (x / 1000).toFixed(1).toString() + 'K'
+  } else {
+    return (
+      '$' +
+      x
+        .toFixed(2)
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+    )
   }
 }
 
