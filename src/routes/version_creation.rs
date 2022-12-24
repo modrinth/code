@@ -703,6 +703,7 @@ pub async fn upload_file(
         loaders.clone(),
         game_versions.clone(),
         all_game_versions.clone(),
+        file_type,
     )
     .await?;
 

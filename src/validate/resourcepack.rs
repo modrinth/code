@@ -13,7 +13,7 @@ impl super::Validator for PackValidator {
     }
 
     fn get_project_types(&self) -> &[&str] {
-        &["resourcepack", "datapack"]
+        &["resourcepack"]
     }
 
     fn get_supported_loaders(&self) -> &[&str] {
