@@ -697,7 +697,9 @@ export default {
       (x) => x.short === trimmedLicenseId
     ) ?? { friendly: 'Custom', short: licenseId.replaceAll('LicenseRef-', '') }
     this.allowOrLater = licenseId.includes('-or-later')
-    this.nonSpdxLicense = licenseId.includes('LicenseRef-')
+    this.nonSpdxLicense =
+      licenseId.includes('LicenseRef-') &&
+      this.license.short !== 'All-Rights-Reserved'
 
     this.clientSideType =
       this.newProject.client_side.charAt(0) +
@@ -718,7 +720,7 @@ export default {
       id += this.license.short
 
       if (this.license.requiresOnlyOrLater)
-        id += this.allowOrLater ? 'or-later' : '-only'
+        id += this.allowOrLater ? '-or-later' : '-only'
 
       if (this.nonSpdxLicense) id.replaceAll(' ', '-')
 
