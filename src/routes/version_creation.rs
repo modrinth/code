@@ -23,6 +23,7 @@ use chrono::Utc;
 use futures::stream::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
+use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -62,13 +63,14 @@ pub struct InitialVersionData {
     pub primary_file: Option<String>,
     #[serde(default = "default_requested_status")]
     pub status: VersionStatus,
-    #[serde(default = "Vec::new")]
-    pub file_types: Vec<(String, FileType)>,
+    #[serde(default = "HashMap::new")]
+    pub file_types: HashMap<String, FileType>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 struct InitialFileData {
-    pub file_type: Option<FileType>,
+    #[serde(default = "HashMap::new")]
+    pub file_types: HashMap<String, FileType>,
 }
 
 // under `/api/v1/version`
@@ -328,11 +330,7 @@ async fn version_create_inner(
             all_game_versions.clone(),
             version_data.primary_file.is_some(),
             version_data.primary_file.as_deref() == Some(name),
-            version_data
-                .file_types
-                .iter()
-                .find(|x| x.0 == name)
-                .map(|x| x.1),
+            version_data.file_types.get(name).copied(),
             transaction,
         )
         .await?;
@@ -594,7 +592,7 @@ async fn upload_file_to_version_inner(
             .map(|x| DependencyBuilder {
                 project_id: x.project_id,
                 version_id: x.version_id,
-                file_name: None,
+                file_name: x.file_name.clone(),
                 dependency_type: x.dependency_type.clone(),
             })
             .collect();
@@ -621,7 +619,7 @@ async fn upload_file_to_version_inner(
             all_game_versions.clone(),
             true,
             false,
-            file_data.file_type,
+            file_data.file_types.get(name).copied(),
             transaction,
         )
         .await?;
