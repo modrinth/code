@@ -93,12 +93,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'LogoAnimated',
-}
-</script>
-
 <style lang="scss" scoped>
 div {
   display: flex;

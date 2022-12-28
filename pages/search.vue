@@ -343,7 +343,7 @@
       ></pagination>
       <div class="search-results-container">
         <div v-if="isLoading" class="no-results">
-          <LogoAnimated aria-hidden="true" />
+          <BrandLogoAnimated aria-hidden="true" />
           <p>Loading...</p>
         </div>
         <div
@@ -398,7 +398,6 @@ import Multiselect from 'vue-multiselect'
 import ProjectCard from '~/components/ui/ProjectCard'
 import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'
-import LogoAnimated from '~/components/ui/search/LogoAnimated'
 import Checkbox from '~/components/ui/Checkbox'
 
 import ClientIcon from '~/assets/images/categories/client.svg?inline'
@@ -430,7 +429,6 @@ export default {
     GridIcon,
     ListIcon,
     ImageIcon,
-    LogoAnimated,
   },
   data() {
     return {

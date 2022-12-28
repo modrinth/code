@@ -16,7 +16,7 @@
         </section>
         <section class="logo column" role="presentation">
           <NuxtLink class="button-base" to="/" aria-label="Modrinth home page">
-            <ModrinthLogo aria-hidden="true" class="text-logo" />
+            <BrandTextLogo aria-hidden="true" class="text-logo" />
           </NuxtLink>
         </section>
         <section class="nav-group columns" role="presentation">
@@ -329,7 +329,7 @@
     </main>
     <footer>
       <div class="logo-info" role="region" aria-label="Modrinth information">
-        <ModrinthLogo aria-hidden="true" class="text-logo" />
+        <BrandTextLogo aria-hidden="true" class="text-logo" />
         <p>
           Modrinth is
           <a
@@ -397,8 +397,6 @@
 <script>
 import ClickOutside from 'vue-click-outside'
 
-import ModrinthLogo from '~/assets/images/text-logo.svg?inline'
-
 import HamburgerIcon from '~/assets/images/utils/hamburger.svg?inline'
 import CrossIcon from '~/assets/images/utils/x.svg?inline'
 
@@ -425,7 +423,6 @@ export default {
     Avatar,
     ModalCreation,
     NavRow,
-    ModrinthLogo,
     MoonIcon,
     SunIcon,
     LogOutIcon,
