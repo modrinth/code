@@ -32,7 +32,7 @@ export default {
         hid: 'description',
         name: 'description',
         content:
-          'Download Minecraft mods, plugins, resource packs, and modpacks on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
+          'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
       },
       {
         hid: 'publisher',
@@ -169,6 +169,11 @@ export default {
             path: '/shaders',
             component: resolve(__dirname, 'pages/search/shaders.vue'),
             name: 'shaders',
+          },
+          {
+            path: '/datapacks',
+            component: resolve(__dirname, 'pages/search/datapacks.vue'),
+            name: 'datapacks',
           },
         ],
       })

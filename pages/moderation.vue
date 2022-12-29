@@ -126,7 +126,7 @@
               <div class="title">
                 <h3>
                   {{ item.item_type }}
-                  <a :href="item.url">{{ item.item_id }}</a>
+                  <nuxt-link :to="item.url">{{ item.item_id }}</nuxt-link>
                 </h3>
                 reported by
                 <a :href="`/user/${item.reporter}`">{{ item.reporter }}</a>

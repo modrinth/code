@@ -50,7 +50,15 @@
     <p class="description">
       {{ description }}
     </p>
-    <Categories :categories="categories" :type="type" class="tags">
+    <Categories
+      :categories="
+        categories.filter(
+          (x) => !hideLoaders || !$tag.loaders.find((y) => y.name === x)
+        )
+      "
+      :type="type"
+      class="tags"
+    >
       <span v-if="moderation" class="environment">
         <InfoIcon aria-hidden="true" />
         A {{ projectTypeDisplay }}
@@ -58,7 +66,8 @@
       <span
         v-else-if="
           !['resourcepack', 'shader'].includes(type) &&
-          !(projectTypeDisplay === 'plugin' && search)
+          !(projectTypeDisplay === 'plugin' && search) &&
+          !categories.some((x) => $tag.loaderData.dataPackLoaders.includes(x))
         "
         class="environment"
       >
@@ -260,6 +269,11 @@ export default {
       type: Boolean,
       required: false,
       default: true,
+    },
+    hideLoaders: {
+      type: Boolean,
+      required: false,
+      default: false,
     },
   },
   computed: {

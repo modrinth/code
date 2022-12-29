@@ -19,6 +19,7 @@ export const defaults = {
     resourcepack: 'gallery',
     modpack: 'list',
     shader: 'gallery',
+    datapack: 'list',
     user: 'list',
   },
 }

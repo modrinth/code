@@ -209,7 +209,8 @@
     <section
       v-if="
         project.project_type !== 'resourcepack' &&
-        project.project_type !== 'shader'
+        project.project_type !== 'shader' &&
+        project.project_type !== 'datapack'
       "
       class="card game-sides"
     >
@@ -827,6 +828,9 @@ export default {
         // While the emit below will take care of most changes,
         // some items require manually updating
         this.newProject.license.id = this.licenseId
+        this.newProject.client_side = this.clientSideType.toLowerCase()
+        this.newProject.server_side = this.serverSideType.toLowerCase()
+
         this.newProject.client_side = this.clientSideType.toLowerCase()
         this.newProject.server_side = this.serverSideType.toLowerCase()
 

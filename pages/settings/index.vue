@@ -161,6 +161,7 @@ export default {
         resourcepack: 'gallery',
         modpack: 'list',
         shader: 'gallery',
+        datapack: 'list',
         user: 'list',
       },
     }

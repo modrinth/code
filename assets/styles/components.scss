@@ -85,7 +85,14 @@
     border-bottom: 1px solid var(--color-header-underline);
   }
 
-  h1, h2, h3, h4, h5, h6, li, p {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  li,
+  p {
     word-wrap: break-word;
     overflow-wrap: anywhere;
   }
@@ -227,11 +234,17 @@
     margin-bottom: 0 !important;
   }
 
+  iframe,
+  video {
+    aspect-ratio: 16 / 9;
+    width: 850px;
+    height: auto;
+  }
+
   @media screen and (max-width: 850px) {
-    iframe {
-      aspect-ratio: 16 / 9;
+    iframe,
+    video {
       width: 100%;
-      height: auto;
     }
   }
 }
@@ -332,8 +345,8 @@
 }
 
 .button-animation {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
-  outline 0.2s ease-in-out;
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out, outline 0.2s ease-in-out;
 
   &:active:not(&:disabled) {
     transform: scale(0.95);
@@ -403,8 +416,8 @@ tr.button-transparent {
 }
 
 .button-within {
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
-  outline 0.2s ease-in-out;
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out,
+    transform 0.05s ease-in-out, outline 0.2s ease-in-out;
 
   &:focus-visible:not(&.disabled),
   &:hover:not(&.disabled) {
@@ -541,6 +554,11 @@ tr.button-transparent {
   --text-color: var(--color-brand-inverted);
 }
 
+.alt-brand-button {
+  --background-color: var(--color-brand-highlight);
+  --text-color: var(--color-text);
+}
+
 .button-group {
   display: flex;
   grid-gap: var(--spacing-card-sm);
@@ -563,6 +581,15 @@ tr.button-transparent {
 }
 
 .multiselect {
+  &.raised-multiselect {
+    .multiselect__tags,
+    .multiselect__content-wrapper,
+    .multiselect__spinner {
+      background-color: var(--color-raised-bg);
+      box-shadow: none;
+    }
+  }
+
   color: var(--color-text) !important;
   outline: 2px solid transparent;
 
@@ -584,7 +611,7 @@ tr.button-transparent {
     padding-left: 7px;
     padding-top: 10px;
 
-    transition: background-color .1s ease-in-out;
+    transition: background-color 0.1s ease-in-out;
 
     &:active {
       background: var(--color-button-bg-hover);
@@ -790,7 +817,7 @@ tr.button-transparent {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    grid-gap: .5rem;
+    grid-gap: 0.5rem;
     z-index: 2;
   }
 
@@ -929,7 +956,10 @@ h1 {
   font-weight: bold;
 }
 
-.nuxt-link-exact-active, h1, h2, h3 {
+.nuxt-link-exact-active,
+h1,
+h2,
+h3 {
   .beta-badge {
     background-color: var(--color-button-text-active);
     box-sizing: border-box;
@@ -939,7 +969,8 @@ h1 {
 }
 
 @media (prefers-reduced-motion) {
-  .button-animation, button {
+  .button-animation,
+  button {
     transform: none !important;
   }
 }
@@ -965,7 +996,7 @@ h1 {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    grid-gap: .5rem;
+    grid-gap: 0.5rem;
     z-index: 2;
   }
 
@@ -986,7 +1017,8 @@ h1 {
 }
 
 .universal-labels {
-  label, .label {
+  label,
+  .label {
     .label__title {
       display: block;
       margin-block: var(--spacing-card-md) var(--spacing-card-sm);
@@ -1074,13 +1106,16 @@ h1 {
   }
 
   .input-group {
-    .multiselect, input {
+    .multiselect,
+    input {
       width: auto;
       flex-basis: 0;
     }
   }
 
-  button, .button, .iconified-button {
+  button,
+  .button,
+  .iconified-button {
     width: fit-content;
   }
 
@@ -1095,12 +1130,14 @@ h1 {
     }
   }
 
-  .adjacent-input, &.adjacent-input {
+  .adjacent-input,
+  &.adjacent-input {
     display: flex;
     flex-direction: row;
     align-items: center;
 
-    .iconified-button, .input-group {
+    .iconified-button,
+    .input-group {
       flex-shrink: 0;
     }
 
@@ -1152,7 +1189,9 @@ h1 {
 }
 
 .full-width-inputs {
-  .multiselect, input, .iconified-input {
+  .multiselect,
+  input,
+  .iconified-input {
     width: 100%;
     flex-basis: 100%;
   }
@@ -1286,7 +1325,8 @@ button {
     flex-shrink: 0;
   }
 
-  input, textarea {
+  input,
+  textarea {
     border-radius: 0;
     background-color: transparent;
     box-shadow: unset;
@@ -1294,8 +1334,10 @@ button {
     flex-grow: 1;
   }
 
-  &:focus, &:focus-visible, &:focus-within {
-    box-shadow: inset 0 0 0 transparent, 0 0 0 .25rem var(--color-brand-shadow);
+  &:focus,
+  &:focus-visible,
+  &:focus-within {
+    box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
     color: var(--color-button-text-active);
   }
 }
@@ -1365,7 +1407,8 @@ button {
   }
 
   @media screen and (max-width: 550px) {
-    grid-template-columns: repeat(1, minmax(0, 1fr));
+    display: flex;
+    flex-direction: column;
   }
 }
 

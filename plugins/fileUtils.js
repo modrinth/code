@@ -15,7 +15,6 @@ import { formatBytes } from '~/plugins/shorthands'
 export const fileIsValid = (file, validationOptions) => {
   const { maxSize, alertOnInvalid } = validationOptions
   if (maxSize !== null && maxSize !== undefined && file.size > maxSize) {
-    console.log(`File size: ${file.size}, max size: ${maxSize}`)
     if (alertOnInvalid) {
       alert(
         `File ${file.name} is too big! Must be less than ${formatBytes(
@@ -38,6 +37,8 @@ export const acceptFileFromProjectType = (projectType) => {
     case 'resourcepack':
       return '.zip,application/zip'
     case 'shader':
+      return '.zip,application/zip'
+    case 'datapack':
       return '.zip,application/zip'
     case 'modpack':
       return '.mrpack,application/x-modrinth-modpack+zip'
@@ -108,7 +109,7 @@ export const inferVersionInfo = async function (
     'META-INF/mods.toml': (file, zip) => {
       const metadata = TOML.parse(file)
 
-      console.log(JSON.stringify(metadata))
+      // ${file.jarVersion} -> Implementation-Version from manifest
 
       // TODO: Parse minecraft version ranges, handle if version is set to value from manifest
       if (metadata.mods && metadata.mods.length > 0) {
@@ -165,8 +166,10 @@ export const inferVersionInfo = async function (
         version_type: versionType(metadata.quilt_loader.version),
         game_versions: metadata.quilt_loader.depends
           ? gameVersionRange(
-              metadata.depends.find((x) => x.id === 'minecraft')
-                ? metadata.depends.find((x) => x.id === 'minecraft').versions
+              metadata.quilt_loader.depends.find((x) => x.id === 'minecraft')
+                ? metadata.quilt_loader.depends.find(
+                    (x) => x.id === 'minecraft'
+                  ).versions
                 : [],
               gameVersions
             )
@@ -222,6 +225,112 @@ export const inferVersionInfo = async function (
           .map((x) => x.version),
       }
     },
+    // Resource Packs + Data Packs
+    'pack.mcmeta': (file) => {
+      const metadata = JSON.parse(file)
+
+      function getRange(versionA, versionB) {
+        const startingIndex = gameVersions.findIndex(
+          (x) => x.version === versionA
+        )
+        const endingIndex = gameVersions.findIndex(
+          (x) => x.version === versionB
+        )
+
+        const final = []
+        const filterOnlyRelease =
+          gameVersions[startingIndex].version_type === 'release'
+
+        for (let i = startingIndex; i >= endingIndex; i--) {
+          if (
+            gameVersions[i].version_type === 'release' ||
+            !filterOnlyRelease
+          ) {
+            final.push(gameVersions[i].version)
+          }
+        }
+
+        return final
+      }
+
+      const loaders = []
+      let newGameVersions = []
+
+      if (project.actualProjectType === 'mod') {
+        loaders.push('datapack')
+
+        switch (metadata.pack.pack_format) {
+          case 4:
+            newGameVersions = getRange('1.13', '1.14.4')
+            break
+          case 5:
+            newGameVersions = getRange('1.15', '1.16.1')
+            break
+          case 6:
+            newGameVersions = getRange('1.16.2', '1.16.5')
+            break
+          case 7:
+            newGameVersions = getRange('1.17', '1.17.1')
+            break
+          case 8:
+            newGameVersions = getRange('1.18', '1.18.1')
+            break
+          case 9:
+            newGameVersions.push('1.18.2')
+            break
+          case 10:
+            newGameVersions = getRange('1.19', '1.19.3')
+            break
+          default:
+        }
+      }
+
+      if (project.actualProjectType === 'resourcepack') {
+        loaders.push('minecraft')
+
+        switch (metadata.pack.pack_format) {
+          case 1:
+            newGameVersions = getRange('1.6.1', '1.8.9')
+            break
+          case 2:
+            newGameVersions = getRange('1.9', '1.10.2')
+            break
+          case 3:
+            newGameVersions = getRange('1.11', '1.12.2')
+            break
+          case 4:
+            newGameVersions = getRange('1.13', '1.14.4')
+            break
+          case 5:
+            newGameVersions = getRange('1.15', '1.16.1')
+            break
+          case 6:
+            newGameVersions = getRange('1.16.2', '1.16.5')
+            break
+          case 7:
+            newGameVersions = getRange('1.17', '1.17.1')
+            break
+          case 8:
+            newGameVersions = getRange('1.18', '1.18.2')
+            break
+          case 9:
+            newGameVersions = getRange('1.19', '1.19.2')
+            break
+          case 11:
+            newGameVersions = getRange('22w42a', '22w44a')
+            break
+          case 12:
+            newGameVersions.push('1.19.3')
+            break
+          default:
+        }
+      }
+
+      return {
+        loaders,
+        game_versions: newGameVersions,
+      }
+    },
   }
 
   const zipReader = new JSZip()
@@ -236,4 +345,202 @@ export const inferVersionInfo = async function (
       return inferFunctions[fileName](text, zip)
     }
   }
+}
+
+export const createDataPackVersion = async function (
+  project,
+  version,
+  primaryFile,
+  members,
+  allGameVersions,
+  loaders
+) {
+  // force version to start with number, as required by FML
+  const newVersionNumber = version.version_number.match(/^\d/)
+    ? version.version_number
+    : `1-${version.version_number}`
+
+  const newSlug = `${project.slug
+    .replace('-', '_')
+    .replace(/\W/g, '')
+    .substring(0, 63)}_mr`
+
+  const iconPath = `${project.slug}_pack.png`
+
+  const fabricModJson = {
+    schemaVersion: 1,
+    id: newSlug,
+    version: newVersionNumber,
+    name: project.title,
+    description: project.description,
+    authors: members.map((x) => x.name),
+    contact: {
+      homepage: `${process.env.domain}/${project.project_type}/${
+        project.slug ?? project.id
+      }`,
+    },
+    license: project.license.id,
+    icon: iconPath,
+    environment: '*',
+    depends: {
+      'fabric-resource-loader-v0': '*',
+    },
+  }
+
+  const quiltModJson = {
+    schema_version: 1,
+    quilt_loader: {
+      group: 'com.modrinth',
+      id: newSlug,
+      version: newVersionNumber,
+      metadata: {
+        name: project.title,
+        description: project.description,
+        contributors: members.reduce(
+          (acc, x) => ({
+            ...acc,
+            [x.name]: x.role,
+          }),
+          {}
+        ),
+        contact: {
+          homepage: `${process.env.domain}/${project.project_type}/${
+            project.slug ?? project.id
+          }`,
+        },
+        icon: iconPath,
+      },
+      intermediate_mappings: 'net.fabricmc:intermediary',
+      depends: [
+        {
+          id: 'quilt_resource_loader',
+          versions: '*',
+          unless: 'fabric-resource-loader-v0',
+        },
+      ],
+    },
+  }
+
+  const cutoffIndex = allGameVersions.findIndex((x) => x.version === '1.18.2')
+
+  let maximumIndex = Number.MIN_VALUE
+  for (const val of version.game_versions) {
+    const index = allGameVersions.findIndex((x) => x.version === val)
+    if (index > maximumIndex) {
+      maximumIndex = index
+    }
+  }
+
+  const newForge = maximumIndex < cutoffIndex
+
+  const forgeModsToml = {
+    modLoader: newForge ? 'lowcodefml' : 'javafml',
+    loaderVersion: newForge ? '[40,)' : '[25,)',
+    license: project.license.id,
+    showAsResourcePack: true,
+    mods: [
+      {
+        modId: newSlug,
+        version: newVersionNumber,
+        displayName: project.title,
+        description: project.description,
+        logoFile: iconPath,
+        updateJSONURL: `${process.env.authURLBase.replace(
+          '/v2/',
+          ''
+        )}/updates/${project.id}/forge_updates.json`,
+        credits: 'Generated by Modrinth',
+        authors: members.map((x) => x.name).join(', '),
+        displayURL: `${process.env.domain}/${project.project_type}/${
+          project.slug ?? project.id
+        }`,
+      },
+    ],
+  }
+
+  if (project.source_url) {
+    quiltModJson.quilt_loader.metadata.contact.sources = project.source_url
+    fabricModJson.contact.sources = project.source_url
+  }
+
+  if (project.issues_url) {
+    quiltModJson.quilt_loader.metadata.contact.issues = project.issues_url
+    fabricModJson.contact.issues = project.issues_url
+    forgeModsToml.issueTrackerURL = project.issues_url
+  }
+
+  const primaryFileData = await (await fetch(primaryFile.url)).blob()
+
+  const primaryZipReader = new JSZip()
+  await primaryZipReader.loadAsync(primaryFileData)
+
+  if (loaders.includes('fabric'))
+    primaryZipReader.file('fabric.mod.json', JSON.stringify(fabricModJson))
+  if (loaders.includes('quilt'))
+    primaryZipReader.file('quilt.mod.json', JSON.stringify(quiltModJson))
+  if (loaders.includes('forge'))
+    primaryZipReader.file('META-INF/mods.toml', TOML.stringify(forgeModsToml))
+
+  if (!newForge && loaders.includes('forge')) {
+    const classFile = new Uint8Array(
+      await (
+        await fetch(
+          'https://cdn.modrinth.com/wrapper/ModrinthWrapperRestiched.class'
+        )
+      ).arrayBuffer()
+    )
+
+    let binary = ''
+    for (let i = 0; i < classFile.byteLength; i++) {
+      binary += String.fromCharCode(classFile[i])
+    }
+
+    binary = binary
+      .replace(
+        String.fromCharCode(32) + 'needs1to1be1changed1modrinth1mod',
+        String.fromCharCode(newSlug.length) + newSlug
+      )
+      .replace('/wrappera/', `/${project.id.substring(0, 8)}/`)
+
+    const newArr = []
+    for (let i = 0; i < binary.length; i++) {
+      newArr.push(binary.charCodeAt(i))
+    }
+
+    primaryZipReader.file(
+      `com/modrinth/${project.id.substring(0, 8)}/ModrinthWrapper.class`,
+      new Uint8Array(newArr)
+    )
+  }
+
+  const resourcePack = version.files.find(
+    (x) => x.file_type === 'required-resource-pack'
+  )
+
+  const resourcePackData = resourcePack
+    ? await (await fetch(resourcePack.url)).blob()
+    : null
+
+  if (resourcePackData) {
+    const resourcePackReader = new JSZip()
+    await resourcePackReader.loadAsync(resourcePackData)
+
+    for (const [path, file] of Object.entries(resourcePackReader.files)) {
+      if (!primaryZipReader.file(path) && !path.includes('.mcassetsroot')) {
+        primaryZipReader.file(path, await file.async('uint8array'))
+      }
+    }
+  }
+
+  if (primaryZipReader.file('pack.png')) {
+    primaryZipReader.file(
+      iconPath,
+      await primaryZipReader.file('pack.png').async('uint8array')
+    )
+  }
+
+  return await primaryZipReader.generateAsync({
+    type: 'blob',
+    mimeType: 'application/java-archive',
+  })
 }

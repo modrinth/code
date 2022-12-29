@@ -371,7 +371,10 @@ export default {
       }
     }
 
-    document.addEventListener('keydown', this._keyListener.bind(this))
+    // eslint-disable-next-line nuxt/no-env-in-hooks
+    if (process.client) {
+      document.addEventListener('keydown', this._keyListener.bind(this))
+    }
   },
   methods: {
     showPreviewImage(files, index) {

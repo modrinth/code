@@ -27,9 +27,12 @@ export default {
     },
   },
   mounted() {
-    document.addEventListener('dragenter', () => {
-      this.$refs.drop_area.style.visibility = 'visible'
-    })
+    // eslint-disable-next-line nuxt/no-env-in-hooks
+    if (process.client) {
+      document.addEventListener('dragenter', () => {
+        this.$refs.drop_area.style.visibility = 'visible'
+      })
+    }
   },
   methods: {
     allowDrag(event) {

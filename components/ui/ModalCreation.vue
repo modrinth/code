@@ -123,6 +123,8 @@ export default {
           return 'required'
         case 'shader':
           return 'required'
+        case 'datapack':
+          return 'optional'
         default:
           return 'unknown'
       }
@@ -135,6 +137,8 @@ export default {
           return 'unsupported'
         case 'shader':
           return 'unsupported'
+        case 'datapack':
+          return 'required'
         default:
           return 'unknown'
       }

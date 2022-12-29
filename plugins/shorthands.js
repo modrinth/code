@@ -153,24 +153,46 @@ export default (ctx, inject) => {
       const isMod = categories.some((category) => {
         return ctx.store.state.tag.loaderData.modLoaders.includes(category)
       })
-      return isPlugin && isMod ? 'mod and plugin' : isPlugin ? 'plugin' : 'mod'
-    } else {
-      return formatProjectType(type)
+      const isDataPack = categories.some((category) => {
+        return ctx.store.state.tag.loaderData.dataPackLoaders.includes(category)
+      })
+
+      if (isMod && isPlugin && isDataPack) {
+        return 'mod, plugin, and data pack'
+      } else if (isMod && isPlugin) {
+        return 'mod and plugin'
+      } else if (isMod && isDataPack) {
+        return 'mod and datapack'
+      }
     }
+
+    return type
   })
   inject('getProjectTypeForUrl', (type, categories) => {
     if (type === 'mod') {
+      const isMod = categories.some((category) => {
+        return ctx.store.state.tag.loaderData.modLoaders.includes(category)
+      })
+
       const isPlugin = categories.some((category) => {
         return ctx.store.state.tag.loaderData.allPluginLoaders.includes(
           category
         )
       })
 
-      const isMod = categories.some((category) => {
-        return ctx.store.state.tag.loaderData.modLoaders.includes(category)
+      const isDataPack = categories.some((category) => {
+        return ctx.store.state.tag.loaderData.dataPackLoaders.includes(category)
       })
 
-      return isPlugin && isMod ? 'mod' : isPlugin ? 'plugin' : 'mod'
+      if (isDataPack) {
+        return 'datapack'
+      } else if (isPlugin) {
+        return 'plugin'
+      } else if (isMod) {
+        return 'mod'
+      } else {
+        return 'mod'
+      }
     } else {
       return type
     }
@@ -232,7 +254,10 @@ export const formatWallet = (name) => {
 export const formatProjectType = (name) => {
   if (name === 'resourcepack') {
     return 'Resource Pack'
+  } else if (name === 'datapack') {
+    return 'Data Pack'
   }
+
   return capitalizeString(name)
 }
 
@@ -261,6 +286,8 @@ export const formatCategory = (name) => {
     return 'Path Tracing'
   } else if (name === 'pbr') {
     return 'PBR'
+  } else if (name === 'datapack') {
+    return 'Data pack'
   }
 
   return capitalizeString(name)
