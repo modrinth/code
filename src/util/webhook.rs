@@ -153,6 +153,7 @@ pub async fn send_discord_webhook(
                     "sponge" => 1049793416969605231,
                     "velocity" => 1049793419108700170,
                     "waterfall" => 1049793420937412638,
+                    "datapack" => 1057895494652788866,
                     _ => 1049805243866681424,
                 };
 
@@ -185,6 +186,8 @@ pub async fn send_discord_webhook(
 
         if loaders.iter().all(|x| PLUGIN_LOADERS.contains(&&**x)) {
             project_type = "plugin".to_string();
+        } else if loaders.iter().any(|x| x == "datapack") {
+            project_type = "datapack".to_string();
         }
 
         let embed = DiscordEmbed {
