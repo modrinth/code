@@ -64,13 +64,13 @@ pub struct InitialVersionData {
     #[serde(default = "default_requested_status")]
     pub status: VersionStatus,
     #[serde(default = "HashMap::new")]
-    pub file_types: HashMap<String, FileType>,
+    pub file_types: HashMap<String, Option<FileType>>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
 struct InitialFileData {
     #[serde(default = "HashMap::new")]
-    pub file_types: HashMap<String, FileType>,
+    pub file_types: HashMap<String, Option<FileType>>,
 }
 
 // under `/api/v1/version`
@@ -330,7 +330,7 @@ async fn version_create_inner(
             all_game_versions.clone(),
             version_data.primary_file.is_some(),
             version_data.primary_file.as_deref() == Some(name),
-            version_data.file_types.get(name).copied(),
+            version_data.file_types.get(name).copied().flatten(),
             transaction,
         )
         .await?;
@@ -619,7 +619,7 @@ async fn upload_file_to_version_inner(
             all_game_versions.clone(),
             true,
             false,
-            file_data.file_types.get(name).copied(),
+            file_data.file_types.get(name).copied().flatten(),
             transaction,
         )
         .await?;
