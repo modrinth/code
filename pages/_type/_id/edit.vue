@@ -715,7 +715,10 @@ export default {
     licenseId() {
       let id = ''
 
-      if (this.nonSpdxLicense || this.license.short === 'All-Rights-Reserved')
+      if (
+        (this.nonSpdxLicense && this.license.friendly === 'Custom') ||
+        this.license.short === 'All-Rights-Reserved'
+      )
         id += 'LicenseRef-'
 
       id += this.license.short
@@ -723,7 +726,8 @@ export default {
       if (this.license.requiresOnlyOrLater)
         id += this.allowOrLater ? '-or-later' : '-only'
 
-      if (this.nonSpdxLicense) id.replaceAll(' ', '-')
+      if (this.nonSpdxLicense && this.license.short === 'Custom')
+        id.replaceAll(' ', '-')
 
       return id
     },
