@@ -198,6 +198,8 @@ const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
     "client_side",
     "server_side",
     "gallery",
+    "featured_gallery",
+    "color",
 ];
 
 const DEFAULT_SEARCHABLE_ATTRIBUTES: &[&str] =
@@ -218,6 +220,7 @@ const DEFAULT_ATTRIBUTES_FOR_FACETING: &[&str] = &[
     "date_modified",
     "project_id",
     "open_source",
+    "color",
 ];
 
 const DEFAULT_SORTABLE_ATTRIBUTES: &[&str] =

@@ -89,6 +89,7 @@ pub struct UploadSearchProject {
     pub client_side: String,
     pub server_side: String,
     pub gallery: Vec<String>,
+    pub featured_gallery: Option<String>,
     /// RFC 3339 formatted creation date of the project
     pub date_created: DateTime<Utc>,
     /// Unix timestamp of the creation date of the project
@@ -119,7 +120,6 @@ pub struct ResultSearchProject {
     pub description: String,
     pub categories: Vec<String>,
     pub display_categories: Vec<String>,
-    // TODO: more efficient format for listing versions, without many repetitions
     pub versions: Vec<String>,
     pub downloads: i32,
     pub follows: i32,
@@ -133,6 +133,7 @@ pub struct ResultSearchProject {
     pub client_side: String,
     pub server_side: String,
     pub gallery: Vec<String>,
+    pub featured_gallery: Option<String>,
     pub color: Option<u32>,
 }
 

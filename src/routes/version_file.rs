@@ -1,24 +1,33 @@
 use super::ApiError;
 use crate::database::models::{version_item::QueryVersion, DatabaseError};
+use crate::models::ids::VersionId;
 use crate::models::projects::{GameVersion, Loader, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::get_user_from_headers;
 use crate::util::routes::ok_or_not_found;
 use crate::{database, models};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
 use tokio::sync::RwLock;
 
 #[derive(Deserialize)]
-pub struct Algorithm {
+pub struct HashQuery {
     #[serde(default = "default_algorithm")]
     pub algorithm: String,
+    #[serde(default = "default_multiple")]
+    pub multiple: bool,
+    pub version_id: Option<VersionId>,
 }
 
 fn default_algorithm() -> String {
     "sha1".into()
+}
+
+fn default_multiple() -> bool {
+    false
 }
 
 // under /api/v1/version_file/{hash}
@@ -26,7 +35,7 @@ fn default_algorithm() -> String {
 pub async fn get_version_from_hash(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    algorithm: web::Query<Algorithm>,
+    hash_query: web::Query<HashQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let hash = info.into_inner().0.to_lowercase();
 
@@ -38,32 +47,42 @@ pub async fn get_version_from_hash(
         INNER JOIN versions v on f.version_id = v.id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
         WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
+        ORDER BY v.date_published ASC
         ",
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_hidden())
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
         hash.as_bytes(),
-        algorithm.algorithm,
+        hash_query.algorithm,
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_hidden())
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_optional(&**pool)
+    .fetch_all(&**pool)
     .await?;
 
-    if let Some(id) = result {
-        let version_data = database::models::Version::get_full(
-            database::models::VersionId(id.version_id),
-            &**pool,
-        )
-        .await?;
+    let versions_data = database::models::Version::get_many_full(
+        result
+            .iter()
+            .map(|x| database::models::VersionId(x.version_id))
+            .collect(),
+        &**pool,
+    )
+    .await?;
 
-        if let Some(data) = version_data {
-            Ok(HttpResponse::Ok().json(models::projects::Version::from(data)))
+    if let Some(first) = versions_data.first() {
+        if hash_query.multiple {
+            Ok(HttpResponse::Ok().json(
+                versions_data
+                    .into_iter()
+                    .map(models::projects::Version::from)
+                    .collect::<Vec<_>>(),
+            ))
         } else {
-            Ok(HttpResponse::NotFound().body(""))
+            Ok(HttpResponse::Ok()
+                .json(models::projects::Version::from(first.clone())))
         }
     } else {
         Ok(HttpResponse::NotFound().body(""))
@@ -80,7 +99,7 @@ pub struct DownloadRedirect {
 pub async fn download_version(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    algorithm: web::Query<Algorithm>,
+    hash_query: web::Query<HashQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let hash = info.into_inner().0.to_lowercase();
     let mut transaction = pool.begin().await?;
@@ -92,10 +111,11 @@ pub async fn download_version(
         INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
         WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
+        ORDER BY v.date_published ASC
         ",
         &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
         hash.as_bytes(),
-        algorithm.algorithm,
+        hash_query.algorithm,
         &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
     )
     .fetch_optional(&mut *transaction)
@@ -118,7 +138,7 @@ pub async fn delete_file(
     req: HttpRequest,
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    algorithm: web::Query<Algorithm>,
+    hash_query: web::Query<HashQuery>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
@@ -130,15 +150,18 @@ pub async fn delete_file(
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id
         WHERE h.algorithm = $2 AND h.hash = $1
+        ORDER BY v.date_published ASC
         ",
         hash.as_bytes(),
-        algorithm.algorithm
+        hash_query.algorithm
     )
-        .fetch_optional(&**pool)
-        .await
-        ?;
+        .fetch_all(&**pool)
+        .await?;
 
-    if let Some(row) = result {
+    if let Some(row) = result.iter().find_or_first(|x| {
+        hash_query.version_id.is_none()
+            || Some(x.version_id) == hash_query.version_id.map(|x| x.0 as i64)
+    }) {
         if !user.role.is_admin() {
             let team_member =
                 database::models::TeamMember::get_from_user_id_version(
@@ -227,7 +250,7 @@ pub struct UpdateData {
 pub async fn get_update_from_hash(
     info: web::Path<(String,)>,
     pool: web::Data<PgPool>,
-    algorithm: web::Query<Algorithm>,
+    hash_query: web::Query<HashQuery>,
     update_data: web::Json<UpdateData>,
 ) -> Result<HttpResponse, ApiError> {
     let hash = info.into_inner().0.to_lowercase();
@@ -243,13 +266,14 @@ pub async fn get_update_from_hash(
         INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
         WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
+        ORDER BY v.date_published ASC
         ",
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_hidden())
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
         hash.as_bytes(),
-        algorithm.algorithm,
+        hash_query.algorithm,
         &*crate::models::projects::ProjectStatus::iterator()
             .filter(|x| x.is_hidden())
             .map(|x| x.to_string())

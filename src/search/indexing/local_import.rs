@@ -70,9 +70,6 @@ pub async fn index_local(
                         _ => false,
                     };
 
-                    let mut gallery = m.featured_gallery.unwrap_or_default();
-                    gallery.append(&mut m.gallery.unwrap_or_default());
-
                     UploadSearchProject {
                         project_id: project_id.to_string(),
                         title: m.title,
@@ -93,10 +90,11 @@ pub async fn index_local(
                         server_side: m.server_side_type,
                         slug: m.slug,
                         project_type: m.project_type_name,
-                        gallery,
+                        gallery: m.gallery.unwrap_or_default(),
                         display_categories,
                         open_source,
                         color: m.color.map(|x| x as u32),
+                        featured_gallery: m.featured_gallery.unwrap_or_default().first().cloned(),
                     }
                 }))
             })

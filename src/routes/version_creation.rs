@@ -677,10 +677,13 @@ pub async fn upload_file(
     let exists = sqlx::query!(
         "
         SELECT EXISTS(SELECT 1 FROM hashes h
-        WHERE h.algorithm = $2 AND h.hash = $1)
+        INNER JOIN files f ON f.id = h.file_id
+        INNER JOIN versions v ON v.id = f.version_id
+        WHERE h.algorithm = $2 AND h.hash = $1 AND v.mod_id != $3)
         ",
         hash.as_bytes(),
-        "sha1"
+        "sha1",
+        project_id.0 as i64
     )
     .fetch_one(&mut *transaction)
     .await?

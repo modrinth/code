@@ -34,9 +34,24 @@ pub async fn count_download(
     .ok()
     .map(|x| x as i64);
 
-    let (version_id, project_id) = if let Some(version) = sqlx::query!(
-        "SELECT id, mod_id FROM versions
-         WHERE ((version_number = $1 OR id = $3) AND mod_id = $2)",
+    let (version_id, project_id, file_type) = if let Some(version) =
+        sqlx::query!(
+            "
+            SELECT v.id id, v.mod_id mod_id, file_type FROM files f
+            INNER JOIN versions v ON v.id = f.version_id
+            WHERE f.url = $1
+            ",
+            download_body.url,
+        )
+        .fetch_optional(pool.as_ref())
+        .await?
+    {
+        (version.id, version.mod_id, version.file_type)
+    } else if let Some(version) = sqlx::query!(
+        "
+        SELECT id, mod_id FROM versions
+        WHERE ((version_number = $1 OR id = $3) AND mod_id = $2)
+        ",
         download_body.version_name,
         project_id as crate::database::models::ids::ProjectId,
         id_option
@@ -44,31 +59,21 @@ pub async fn count_download(
     .fetch_optional(pool.as_ref())
     .await?
     {
-        (version.id, version.mod_id)
-    } else if let Some(version) = sqlx::query!(
-        "
-        SELECT v.id id, v.mod_id project_id FROM files f
-        INNER JOIN versions v ON v.id = f.version_id
-        WHERE f.url = $1
-        ",
-        download_body.url,
-    )
-    .fetch_optional(pool.as_ref())
-    .await?
-    {
-        (version.id, version.project_id)
+        (version.id, version.mod_id, None)
     } else {
         return Err(ApiError::InvalidInput(
             "Specified version does not exist!".to_string(),
         ));
     };
 
-    download_queue
-        .add(
-            crate::database::models::ProjectId(project_id),
-            crate::database::models::VersionId(version_id),
-        )
-        .await;
+    if file_type.is_none() {
+        download_queue
+            .add(
+                crate::database::models::ProjectId(project_id),
+                crate::database::models::VersionId(version_id),
+            )
+            .await;
+    }
 
     let client = reqwest::Client::new();
 
