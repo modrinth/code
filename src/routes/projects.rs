@@ -1,4 +1,5 @@
 use crate::database;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::UserId;
@@ -13,7 +14,7 @@ use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
-use futures::StreamExt;
+use futures::{StreamExt, TryStreamExt};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sqlx::{PgPool, Row};
@@ -395,7 +396,7 @@ pub async fn project_edit(
 
         if user.role.is_admin() {
             permissions = Some(Permissions::ALL)
-        } else if let Some(member) = team_member {
+        } else if let Some(ref member) = team_member {
             permissions = Some(member.permissions)
         } else if user.role.is_mod() {
             permissions =
@@ -549,6 +550,40 @@ pub async fn project_edit(
                         .execute(&mut *transaction)
                         .await?;
                     }
+                }
+
+                if team_member.map(|x| !x.accepted).unwrap_or(true) {
+                    let notified_members = sqlx::query!(
+                        "
+                        SELECT tm.user_id id
+                        FROM team_members tm
+                        WHERE tm.team_id = $1 AND tm.accepted
+                        ",
+                        project_item.inner.team_id as database::models::ids::TeamId
+                    )
+                    .fetch_many(&mut *transaction)
+                    .try_filter_map(|e| async { Ok(e.right().map(|c| database::models::UserId(c.id))) })
+                    .try_collect::<Vec<_>>()
+                    .await?;
+
+                    NotificationBuilder {
+                        notification_type: Some("status_update".to_string()),
+                        title: format!("**{}**'s status has changed!", project_item.inner.title),
+                        text: format!(
+                            "The project {}'s status has changed from {} to {}",
+                            project_item.inner.title,
+                            project_item.inner.status.as_friendly_str(),
+                            status.as_friendly_str()
+                        ),
+                        link: format!(
+                            "/{}/{}",
+                            project_item.project_type,
+                            ProjectId::from(id)
+                        ),
+                        actions: vec![],
+                    }
+                    .insert_many(notified_members, &mut transaction)
+                    .await?;
                 }
 
                 sqlx::query!(
