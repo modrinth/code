@@ -69,3 +69,6 @@ rust_decimal = { version = "1.26", features = ["serde-with-float", "serde-with-s
 
 sentry = "0.29.1"
 sentry-actix = "0.29.1"
+
+image = "0.24.5"
+color-thief = "0.2.2"

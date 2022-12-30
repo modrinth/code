@@ -18,6 +18,7 @@ use actix_web::web::Data;
 use actix_web::{post, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::stream::StreamExt;
+use image::ImageError;
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::postgres::PgPool;
@@ -65,6 +66,8 @@ pub enum CreateError {
     Unauthorized(#[from] AuthenticationError),
     #[error("Authentication Error: {0}")]
     CustomAuthenticationError(String),
+    #[error("Image Parsing Error: {0}")]
+    ImageError(#[from] ImageError),
 }
 
 impl actix_web::ResponseError for CreateError {
@@ -95,6 +98,7 @@ impl actix_web::ResponseError for CreateError {
             CreateError::SlugCollision => StatusCode::BAD_REQUEST,
             CreateError::ValidationError(..) => StatusCode::BAD_REQUEST,
             CreateError::FileValidationError(..) => StatusCode::BAD_REQUEST,
+            CreateError::ImageError(..) => StatusCode::BAD_REQUEST,
         }
     }
 
@@ -120,6 +124,7 @@ impl actix_web::ResponseError for CreateError {
                 CreateError::SlugCollision => "invalid_input",
                 CreateError::ValidationError(..) => "invalid_input",
                 CreateError::FileValidationError(..) => "invalid_input",
+                CreateError::ImageError(..) => "invalid_image",
             },
             description: &self.to_string(),
         })
@@ -468,7 +473,7 @@ pub async fn project_create_inner(
         ))
     })?;
 
-    let mut icon_url = None;
+    let mut icon_data = None;
 
     while let Some(item) = payload.next().await {
         let mut field: Field = item.map_err(CreateError::MultipartError)?;
@@ -482,13 +487,13 @@ pub async fn project_create_inner(
             super::version_creation::get_name_ext(&content_disposition)?;
 
         if name == "icon" {
-            if icon_url.is_some() {
+            if icon_data.is_some() {
                 return Err(CreateError::InvalidInput(String::from(
                     "Projects can only have one icon",
                 )));
             }
             // Upload the icon to the cdn
-            icon_url = Some(
+            icon_data = Some(
                 process_icon_upload(
                     uploaded_files,
                     project_id,
@@ -731,7 +736,7 @@ pub async fn project_create_inner(
             title: project_create_data.title,
             description: project_create_data.description,
             body: project_create_data.body,
-            icon_url,
+            icon_url: icon_data.clone().map(|x| x.0),
             issues_url: project_create_data.issues_url,
             source_url: project_create_data.source_url,
             wiki_url: project_create_data.wiki_url,
@@ -759,6 +764,7 @@ pub async fn project_create_inner(
                     ordering: x.ordering,
                 })
                 .collect(),
+            color: icon_data.and_then(|x| x.1),
         };
 
         let now = Utc::now();
@@ -803,6 +809,7 @@ pub async fn project_create_inner(
             gallery: gallery_urls,
             flame_anvil_project: None,
             flame_anvil_user: None,
+            color: project_builder.color,
         };
 
         let _project_id = project_builder.insert(&mut *transaction).await?;
@@ -911,9 +918,9 @@ async fn process_icon_upload(
     project_id: ProjectId,
     file_extension: &str,
     file_host: &dyn FileHost,
-    mut field: actix_multipart::Field,
+    mut field: Field,
     cdn_url: &str,
-) -> Result<String, CreateError> {
+) -> Result<(String, Option<u32>), CreateError> {
     if let Some(content_type) =
         crate::util::ext::get_image_content_type(file_extension)
     {
@@ -923,6 +930,8 @@ async fn process_icon_upload(
             "Icons must be smaller than 256KiB",
         )
         .await?;
+
+        let color = crate::util::img::get_color_from_img(&data)?;
 
         let hash = sha1::Sha1::from(&data).hexdigest();
         let upload_data = file_host
@@ -938,7 +947,7 @@ async fn process_icon_upload(
             file_name: upload_data.file_name.clone(),
         });
 
-        Ok(format!("{}/{}", cdn_url, upload_data.file_name))
+        Ok((format!("{}/{}", cdn_url, upload_data.file_name), color))
     } else {
         Err(CreateError::InvalidIconFormat(file_extension.to_string()))
     }

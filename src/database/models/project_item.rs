@@ -100,6 +100,7 @@ pub struct ProjectBuilder {
     pub slug: Option<String>,
     pub donation_urls: Vec<DonationUrl>,
     pub gallery_items: Vec<GalleryItem>,
+    pub color: Option<u32>,
 }
 
 impl ProjectBuilder {
@@ -137,6 +138,7 @@ impl ProjectBuilder {
             flame_anvil_project: None,
             flame_anvil_user: None,
             webhook_sent: false,
+            color: self.color,
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -213,6 +215,7 @@ pub struct Project {
     pub flame_anvil_project: Option<i32>,
     pub flame_anvil_user: Option<UserId>,
     pub webhook_sent: bool,
+    pub color: Option<u32>,
 }
 
 impl Project {
@@ -227,14 +230,14 @@ impl Project {
                 published, downloads, icon_url, issues_url,
                 source_url, wiki_url, status, requested_status, discord_url,
                 client_side, server_side, license_url, license,
-                slug, project_type
+                slug, project_type, color
             )
             VALUES (
                 $1, $2, $3, $4, $5,
                 $6, $7, $8, $9,
                 $10, $11, $12, $13, $14,
                 $15, $16, $17, $18,
-                LOWER($19), $20
+                LOWER($19), $20, $21
             )
             ",
             self.id as ProjectId,
@@ -256,7 +259,8 @@ impl Project {
             self.license_url.as_ref(),
             &self.license,
             self.slug.as_ref(),
-            self.project_type as ProjectTypeId
+            self.project_type as ProjectTypeId,
+            self.color.map(|x| x as i32)
         )
         .execute(&mut *transaction)
         .await?;
@@ -279,7 +283,7 @@ impl Project {
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body, flame_anvil_project,
-                   flame_anvil_user, webhook_sent
+                   flame_anvil_user, webhook_sent, color
             FROM mods
             WHERE id = $1
             ",
@@ -321,6 +325,7 @@ impl Project {
                 flame_anvil_project: row.flame_anvil_project,
                 flame_anvil_user: row.flame_anvil_user.map(UserId),
                 webhook_sent: row.webhook_sent,
+                color: row.color.map(|x| x as u32),
             }))
         } else {
             Ok(None)
@@ -346,7 +351,7 @@ impl Project {
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body, flame_anvil_project,
-                   flame_anvil_user, webhook_sent
+                   flame_anvil_user, webhook_sent, color
             FROM mods
             WHERE id = ANY($1)
             ",
@@ -388,6 +393,7 @@ impl Project {
                 flame_anvil_project: m.flame_anvil_project,
                 flame_anvil_user: m.flame_anvil_user.map(UserId),
                 webhook_sent: m.webhook_sent,
+                color: m.color.map(|x| x as u32),
             }))
         })
         .try_collect::<Vec<Project>>()
@@ -666,7 +672,7 @@ impl Project {
             m.updated updated, m.approved approved, m.status status, m.requested_status requested_status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent webhook_sent,
+            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent webhook_sent, m.color,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
             JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
@@ -725,6 +731,7 @@ impl Project {
                     flame_anvil_project: m.flame_anvil_project,
                     flame_anvil_user: m.flame_anvil_user.map(UserId),
                     webhook_sent: m.webhook_sent,
+                    color: m.color.map(|x| x as u32),
                 },
                 project_type: m.project_type_name,
                 categories: m.categories.unwrap_or_default(),
@@ -794,7 +801,7 @@ impl Project {
             m.updated updated, m.approved approved, m.status status, m.requested_status requested_status,
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
-            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent,
+            cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent, m.color,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
             JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
@@ -856,6 +863,7 @@ impl Project {
                             flame_anvil_project: m.flame_anvil_project,
                             flame_anvil_user: m.flame_anvil_user.map(UserId),
                             webhook_sent: m.webhook_sent,
+                            color: m.color.map(|x| x as u32),
                         },
                         project_type: m.project_type_name,
                         categories: m.categories.unwrap_or_default(),

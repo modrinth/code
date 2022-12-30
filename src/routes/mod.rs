@@ -30,6 +30,7 @@ pub use self::index::index_get;
 pub use self::not_found::not_found;
 use crate::file_hosting::FileHostingError;
 use actix_web::web;
+use image::ImageError;
 
 pub fn v2_config(cfg: &mut web::ServiceConfig) {
     cfg.service(
@@ -230,6 +231,8 @@ pub enum ApiError {
     DiscordError(String),
     #[error("Error while decoding Base62: {0}")]
     Decoding(#[from] crate::models::ids::DecodingError),
+    #[error("Image Parsing Error: {0}")]
+    ImageError(#[from] ImageError),
 }
 
 impl actix_web::ResponseError for ApiError {
@@ -280,6 +283,9 @@ impl actix_web::ResponseError for ApiError {
                 actix_web::http::StatusCode::FAILED_DEPENDENCY
             }
             ApiError::Decoding(..) => actix_web::http::StatusCode::BAD_REQUEST,
+            ApiError::ImageError(..) => {
+                actix_web::http::StatusCode::BAD_REQUEST
+            }
         }
     }
 
@@ -304,6 +310,7 @@ impl actix_web::ResponseError for ApiError {
                     ApiError::Payments(..) => "payments_error",
                     ApiError::DiscordError(..) => "discord_error",
                     ApiError::Decoding(..) => "decoding_error",
+                    ApiError::ImageError(..) => "invalid_image",
                 },
                 description: &self.to_string(),
             },

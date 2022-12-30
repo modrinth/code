@@ -98,6 +98,7 @@ pub struct UploadSearchProject {
     /// Unix timestamp of the last major modification
     pub modified_timestamp: i64,
     pub open_source: bool,
+    pub color: Option<u32>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -132,6 +133,7 @@ pub struct ResultSearchProject {
     pub client_side: String,
     pub server_side: String,
     pub gallery: Vec<String>,
+    pub color: Option<u32>,
 }
 
 impl Document for UploadSearchProject {

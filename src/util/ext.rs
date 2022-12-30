@@ -2,12 +2,9 @@ pub fn get_image_content_type(extension: &str) -> Option<&'static str> {
     match extension {
         "bmp" => Some("image/bmp"),
         "gif" => Some("image/gif"),
-        "jpeg" | "jpg" | "jpe" => Some("image/jpeg"),
+        "jpeg" | "jpg" => Some("image/jpeg"),
         "png" => Some("image/png"),
-        "svg" | "svgz" => Some("image/svg+xml"),
         "webp" => Some("image/webp"),
-        "rgb" => Some("image/x-rgb"),
-        "mp4" => Some("video/mp4"),
         _ => None,
     }
 }

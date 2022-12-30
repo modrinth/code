@@ -1288,6 +1288,9 @@ pub async fn project_icon_edit(
             "Icons must be smaller than 256KiB",
         )
         .await?;
+
+        let color = crate::util::img::get_color_from_img(&bytes)?;
+
         let hash = sha1::Sha1::from(&bytes).hexdigest();
         let project_id: ProjectId = project_item.id.into();
         let upload_data = file_host
@@ -1303,10 +1306,11 @@ pub async fn project_icon_edit(
         sqlx::query!(
             "
             UPDATE mods
-            SET icon_url = $1
-            WHERE (id = $2)
+            SET icon_url = $1, color = $2
+            WHERE (id = $3)
             ",
             format!("{}/{}", cdn_url, upload_data.file_name),
+            color.map(|x| x as i32),
             project_item.id as database::models::ids::ProjectId,
         )
         .execute(&mut *transaction)
@@ -1379,7 +1383,7 @@ pub async fn delete_project_icon(
     sqlx::query!(
         "
         UPDATE mods
-        SET icon_url = NULL
+        SET icon_url = NULL, color = NULL
         WHERE (id = $1)
         ",
         project_item.id as database::models::ids::ProjectId,

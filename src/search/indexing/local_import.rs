@@ -16,7 +16,7 @@ pub async fn index_local(
             "
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,
             m.icon_url icon_url, m.published published, m.approved approved, m.updated updated,
-            m.team_id team_id, m.license license, m.slug slug, m.status status_name,
+            m.team_id team_id, m.license license, m.slug slug, m.status status_name, m.color color,
             cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, u.username username,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
@@ -96,6 +96,7 @@ pub async fn index_local(
                         gallery,
                         display_categories,
                         open_source,
+                        color: m.color.map(|x| x as u32),
                     }
                 }))
             })

@@ -97,6 +97,9 @@ pub struct Project {
     pub flame_anvil_project: Option<i32>,
     /// The user_id of the team member whose token
     pub flame_anvil_user: Option<UserId>,
+
+    /// The color of the project (picked from icon)
+    pub color: Option<u32>,
 }
 
 impl From<QueryProject> for Project {
@@ -181,6 +184,7 @@ impl From<QueryProject> for Project {
                 .collect(),
             flame_anvil_project: m.flame_anvil_project,
             flame_anvil_user: m.flame_anvil_user.map(|x| x.into()),
+            color: m.color,
         }
     }
 }
