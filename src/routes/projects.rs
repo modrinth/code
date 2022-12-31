@@ -318,16 +318,11 @@ pub struct EditProject {
     pub license_id: Option<String>,
     pub client_side: Option<SideType>,
     pub server_side: Option<SideType>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
     #[validate(
         length(min = 3, max = 64),
         regex = "crate::util::validate::RE_URL_SAFE"
     )]
-    pub slug: Option<Option<String>>,
+    pub slug: Option<String>,
     pub status: Option<ProjectStatus>,
     #[serde(
         default,
@@ -559,16 +554,22 @@ pub async fn project_edit(
                         FROM team_members tm
                         WHERE tm.team_id = $1 AND tm.accepted
                         ",
-                        project_item.inner.team_id as database::models::ids::TeamId
+                        project_item.inner.team_id
+                            as database::models::ids::TeamId
                     )
                     .fetch_many(&mut *transaction)
-                    .try_filter_map(|e| async { Ok(e.right().map(|c| database::models::UserId(c.id))) })
+                    .try_filter_map(|e| async {
+                        Ok(e.right().map(|c| database::models::UserId(c.id)))
+                    })
                     .try_collect::<Vec<_>>()
                     .await?;
 
                     NotificationBuilder {
                         notification_type: Some("status_update".to_string()),
-                        title: format!("**{}**'s status has changed!", project_item.inner.title),
+                        title: format!(
+                            "**{}**'s status has changed!",
+                            project_item.inner.title
+                        ),
                         text: format!(
                             "The project {}'s status has changed from {} to {}",
                             project_item.inner.title,
@@ -844,27 +845,25 @@ pub async fn project_edit(
                     ));
                 }
 
-                if let Some(slug) = slug {
-                    let slug_project_id_option: Option<ProjectId> =
-                        serde_json::from_str(&format!("\"{}\"", slug)).ok();
-                    if let Some(slug_project_id) = slug_project_id_option {
-                        let slug_project_id: database::models::ids::ProjectId =
-                            slug_project_id.into();
-                        let results = sqlx::query!(
-                            "
+                let slug_project_id_option: Option<ProjectId> =
+                    serde_json::from_str(&format!("\"{}\"", slug)).ok();
+                if let Some(slug_project_id) = slug_project_id_option {
+                    let slug_project_id: database::models::ids::ProjectId =
+                        slug_project_id.into();
+                    let results = sqlx::query!(
+                        "
                             SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)
                             ",
-                            slug_project_id as database::models::ids::ProjectId
-                        )
-                        .fetch_one(&mut *transaction)
-                        .await?;
+                        slug_project_id as database::models::ids::ProjectId
+                    )
+                    .fetch_one(&mut *transaction)
+                    .await?;
 
-                        if results.exists.unwrap_or(true) {
-                            return Err(ApiError::InvalidInput(
-                                "Slug collides with other project's id!"
-                                    .to_string(),
-                            ));
-                        }
+                    if results.exists.unwrap_or(true) {
+                        return Err(ApiError::InvalidInput(
+                            "Slug collides with other project's id!"
+                                .to_string(),
+                        ));
                     }
                 }
 
@@ -874,7 +873,7 @@ pub async fn project_edit(
                     SET slug = LOWER($1)
                     WHERE (id = $2)
                     ",
-                    slug.as_deref(),
+                    Some(slug),
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)
