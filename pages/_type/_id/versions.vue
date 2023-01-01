@@ -197,8 +197,8 @@ export default {
     updateVersions(updatedVersions) {
       this.filteredVersions = updatedVersions
     },
-    handleFiles(files) {
-      this.$router.push({
+    async handleFiles(files) {
+      await this.$router.push({
         name: 'type-id-version-create',
         params: {
           type: this.project.project_type,

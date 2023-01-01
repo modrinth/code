@@ -31,9 +31,9 @@ export const fileIsValid = (file, validationOptions) => {
 export const acceptFileFromProjectType = (projectType) => {
   switch (projectType) {
     case 'mod':
-      return '.jar,.zip,.litemod,application/java-archive,application/zip'
+      return '.jar,.zip,.litemod,application/java-archive,application/x-java-archive,application/zip'
     case 'plugin':
-      return '.jar,.zip,application/java-archive,application/zip'
+      return '.jar,.zip,application/java-archive,application/x-java-archive,application/zip'
     case 'resourcepack':
       return '.zip,application/zip'
     case 'shader':
@@ -41,7 +41,7 @@ export const acceptFileFromProjectType = (projectType) => {
     case 'datapack':
       return '.zip,application/zip'
     case 'modpack':
-      return '.mrpack,application/x-modrinth-modpack+zip'
+      return '.mrpack,application/x-modrinth-modpack+zip,application/zip'
     default:
       return '*'
   }
@@ -437,7 +437,7 @@ export const createDataPackVersion = async function (
     modLoader: newForge ? 'lowcodefml' : 'javafml',
     loaderVersion: newForge ? '[40,)' : '[25,)',
     license: project.license.id,
-    showAsResourcePack: true,
+    showAsResourcePack: false,
     mods: [
       {
         modId: newSlug,

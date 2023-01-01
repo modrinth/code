@@ -14,6 +14,7 @@
       :name="project.title"
       :client-side="project.client_side"
       :server-side="project.server_side"
+      :color="project.color"
     >
       <button
         class="iconified-button"

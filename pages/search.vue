@@ -365,7 +365,11 @@
             :id="result.slug ? result.slug : result.project_id"
             :key="result.project_id"
             :display="$cosmetics.searchDisplayMode[projectType.id]"
-            :gallery-images="result.gallery"
+            :gallery-images="
+              result.featured_gallery
+                ? result.featured_gallery
+                : result.gallery[0]
+            "
             :type="result.project_type"
             :author="result.author"
             :name="result.title"
@@ -383,6 +387,7 @@
             :hide-loaders="
               ['resourcepack', 'datapack'].includes(projectType.id)
             "
+            :color="result.color"
           />
           <div v-if="results && results.length === 0" class="no-results">
             <p>No results found for your query!</p>
@@ -965,6 +970,11 @@ export default {
       .labeled-control__label {
         white-space: nowrap;
       }
+    }
+
+    .square-button {
+      margin-top: auto;
+      margin-bottom: 0.25rem;
     }
   }
 }

@@ -86,6 +86,7 @@
             :client-side="project.client_side"
             :server-side="project.server_side"
             :type="project.project_type"
+            :color="project.color"
             :moderation="true"
           >
             <button

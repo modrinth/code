@@ -829,19 +829,7 @@ export default {
           )
         }
 
-        // While the emit below will take care of most changes,
-        // some items require manually updating
-        this.newProject.license.id = this.licenseId
-        this.newProject.client_side = this.clientSideType.toLowerCase()
-        this.newProject.server_side = this.serverSideType.toLowerCase()
-
-        this.newProject.client_side = this.clientSideType.toLowerCase()
-        this.newProject.server_side = this.serverSideType.toLowerCase()
-
-        this.newProject.client_side = this.clientSideType.toLowerCase()
-        this.newProject.server_side = this.serverSideType.toLowerCase()
-
-        this.$emit('update:project', this.newProject)
+        await this.$parent.resetProject()
 
         this.isEditing = false
 

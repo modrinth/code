@@ -150,9 +150,9 @@ export default {
     }
   },
   methods: {
-    switchPage(page, toTop) {
+    async switchPage(page, toTop) {
       this.currentPage = page
-      this.$router.replace(this.getPageLink(page))
+      await this.$router.replace(this.getPageLink(page))
 
       if (toTop) {
         setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 50)

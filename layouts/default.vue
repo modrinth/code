@@ -508,9 +508,9 @@ export default {
       }
     },
   },
-  beforeCreate() {
+  async beforeCreate() {
     if (this.$route.query.code) {
-      this.$router.push(this.$route.path)
+      await this.$router.push(this.$route.path)
     }
   },
   created() {
@@ -618,10 +618,6 @@ export default {
       max-width: 1280px;
       margin-left: auto;
       margin-right: auto;
-
-      @media screen and (max-width: 750px) {
-        justify-content: center;
-      }
 
       section.logo {
         display: flex;
@@ -1082,7 +1078,7 @@ export default {
     &.active {
       display: flex;
 
-      @media screen and (min-width: 750px) {
+      @media screen and (min-width: 1024px) {
         display: none;
       }
     }

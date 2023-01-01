@@ -213,7 +213,7 @@
               project.gallery
                 .slice()
                 .sort((a, b) => b.featured - a.featured)
-                .map((x) => x.url)
+                .map((x) => x.url)[0]
             "
             :description="project.description"
             :created-at="project.published"
@@ -234,6 +234,7 @@
             "
             :has-mod-message="project.moderator_message"
             :type="project.project_type"
+            :color="project.color"
           />
         </div>
         <div v-else class="error">

@@ -6,7 +6,7 @@
       (event) => {
         $refs.drop_area.style.visibility = 'hidden'
 
-        if (event.dataTransfer && event.dataTransfer.files) {
+        if (event.dataTransfer && event.dataTransfer.files && fileAllowed) {
           $emit('change', event.dataTransfer.files)
         }
       }
@@ -26,30 +26,40 @@ export default {
       default: '',
     },
   },
-  mounted() {
-    // eslint-disable-next-line nuxt/no-env-in-hooks
-    if (process.client) {
-      document.addEventListener('dragenter', () => {
-        this.$refs.drop_area.style.visibility = 'visible'
-      })
+  data() {
+    return {
+      fileAllowed: false,
     }
+  },
+  mounted() {
+    document.addEventListener('dragenter', this.allowDrag)
   },
   methods: {
     allowDrag(event) {
       const file = event.dataTransfer?.items[0]
 
+      console.log(file)
       if (
         file &&
         this.accept
           .split(',')
           .reduce(
-            (acc, t) => acc || file.type.startsWith(t) || file.type === t,
+            (acc, t) =>
+              acc || file.type.startsWith(t) || file.type === t || t === '*',
             false
           )
       ) {
-        // Adds file dropping indicator
+        this.fileAllowed = true
         event.dataTransfer.dropEffect = 'copy'
         event.preventDefault()
+
+        if (this.$refs.drop_area)
+          this.$refs.drop_area.style.visibility = 'visible'
+      } else {
+        this.fileAllowed = false
+
+        if (this.$refs.drop_area)
+          this.$refs.drop_area.style.visibility = 'hidden'
       }
     },
   },

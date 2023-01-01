@@ -206,7 +206,14 @@ Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`
         })
 
         this.$refs.modal.hide()
-        await this.$router.replace(`/${projectType.actual}/${this.slug}`)
+        await this.$router.push({
+          name: 'type-id',
+          params: {
+            type: projectType.id,
+            id: this.slug,
+            overrideProjectType: projectType.id,
+          },
+        })
       } catch (err) {
         this.$notify({
           group: 'main',

@@ -287,7 +287,7 @@ export const formatCategory = (name) => {
   } else if (name === 'pbr') {
     return 'PBR'
   } else if (name === 'datapack') {
-    return 'Data pack'
+    return 'Data Pack'
   }
 
   return capitalizeString(name)

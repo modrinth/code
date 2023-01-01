@@ -755,10 +755,12 @@ export default {
         JSON.stringify(project.project_type)
       )
 
-      project.project_type = data.$getProjectTypeForUrl(
-        project.project_type,
-        Object.keys(projectLoaders)
-      )
+      project.project_type = data.params.overrideProjectType
+        ? data.params.overrideProjectType
+        : data.$getProjectTypeForUrl(
+            project.project_type,
+            Object.keys(projectLoaders)
+          )
 
       if (
         project.project_type !== data.params.type ||
@@ -922,6 +924,33 @@ export default {
     },
   },
   methods: {
+    async resetProject() {
+      const project = (
+        await this.$axios.get(
+          `project/${this.project.id}`,
+          this.$defaultHeaders()
+        )
+      ).data
+
+      const projectLoaders = {}
+
+      for (const version of this.versions) {
+        for (const loader of version.loaders) {
+          projectLoaders[loader] = true
+        }
+      }
+
+      project.actualProjectType = JSON.parse(
+        JSON.stringify(project.project_type)
+      )
+
+      project.project_type = this.$getProjectTypeForUrl(
+        project.project_type,
+        Object.keys(projectLoaders)
+      )
+
+      this.project = project
+    },
     findPrimary(version) {
       let file = version.files.find((x) => x.primary)
 

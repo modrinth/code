@@ -1287,7 +1287,7 @@ export default {
 
         for (const hash of this.deleteFiles) {
           await this.$axios.delete(
-            `version_file/${hash}`,
+            `version_file/${hash}?version_id=${this.version.id}`,
             this.$defaultHeaders()
           )
         }
