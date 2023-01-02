@@ -24,12 +24,26 @@
   import ProjectCard from '$components/ProjectCard.svelte';
 
   export let projects;
+  export let searchQuery = "";
+
+  export const searchProjects = async (query) => {
+    const encodedQuery = encodeURI(query);
+    const response = await fetch(
+      `https://api.modrinth.com/v2/search?query=${encodedQuery}&limit=10&offset=0&index=relevance`
+      );
+      
+      return response.ok && (await response.json()).hits;
+  };
+
+ export async function search(event) {
+  projects = await searchProjects(searchQuery);
+ };
 </script>
 
 <div class="controls">
   <div class="controls__row">
-    <TextInput placeholder="Search..." icon={IconSearch} />
-    <Button color="tertiary"><IconSortDescending />Sort by relevance</Button>
+    <TextInput placeholder="Search..." icon={IconSearch} bind:value={searchQuery}/>
+    <Button on:click={search} color="tertiary"><IconSortDescending />Search</Button>
   </div>
   <div class="controls__row controls__row--overflow">
     <Button color="secondary"><IconBox />Minecraft versions</Button>
