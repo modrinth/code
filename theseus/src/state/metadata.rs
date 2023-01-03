@@ -12,6 +12,7 @@ use std::collections::LinkedList;
 
 const METADATA_URL: &str = "https://meta.modrinth.com/gamedata";
 const METADATA_DB_FIELD: &[u8] = b"metadata";
+const RETRY_ATTEMPTS: i32 = 3;
 
 // TODO: store as subtree in database
 #[derive(Encode, Decode, Debug)]
@@ -49,6 +50,7 @@ impl Metadata {
         })
     }
 
+    // Attempt to fetch metadata and store in sled DB
     #[tracing::instrument(skip_all)]
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
         let mut metadata = None;
@@ -66,7 +68,7 @@ impl Metadata {
         }
 
         let mut fetch_futures = LinkedList::new();
-        for _ in 0..3 {
+        for _ in 0..RETRY_ATTEMPTS {
             fetch_futures.push_back(Self::fetch().boxed());
         }
 

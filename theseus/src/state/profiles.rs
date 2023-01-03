@@ -21,6 +21,7 @@ pub const SUPPORTED_ICON_FORMATS: &[&'static str] = &[
     "mp4",
 ];
 
+// Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     #[serde(skip)]
