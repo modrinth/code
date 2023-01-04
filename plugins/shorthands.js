@@ -32,116 +32,33 @@ export default (ctx, inject) => {
   inject('formatCategory', formatCategory)
   inject('formatCategoryHeader', formatCategoryHeader)
   inject('computeVersions', (versions) => {
-    const versionsMap = {}
-
-    for (const version of versions.sort(
-      (a, b) => ctx.$dayjs(a.date_published) - ctx.$dayjs(b.date_published)
-    )) {
-      if (versionsMap[version.version_number]) {
-        versionsMap[version.version_number].push(version)
-      } else {
-        versionsMap[version.version_number] = [version]
-      }
-    }
-
+    const visitedVersions = []
     const returnVersions = []
 
-    for (const id in versionsMap) {
-      const versions = versionsMap[id]
-
-      if (versions.length === 1) {
-        versions[0].displayUrlEnding = versions[0].version_number
-
-        returnVersions.push(versions[0])
+    for (const version of versions.reverse()) {
+      if (visitedVersions.includes(version.version_number)) {
+        visitedVersions.push(version.version_number)
+        version.displayUrlEnding = version.id
       } else {
-        const reservedNames = {}
-
-        const seenLoaders = {}
-        const duplicateLoaderIndexes = []
-
-        for (let i = 0; i < versions.length; i++) {
-          const version = versions[i]
-          const value = version.loaders.join('+')
-
-          if (seenLoaders[value]) {
-            duplicateLoaderIndexes.push(i)
-          } else {
-            if (i !== 0) {
-              version.displayUrlEnding = `${version.version_number}-${value}`
-            } else {
-              version.displayUrlEnding = version.version_number
-            }
-
-            reservedNames[version.displayUrlEnding] = true
-
-            version.displayName = version.loaders
-              .map((x) => x.charAt(0).toUpperCase() + x.slice(1))
-              .join(', ')
-
-            returnVersions.push(version)
-
-            seenLoaders[value] = true
-          }
-        }
-
-        const seenGameVersions = {}
-        const duplicateGameVersionIndexes = []
-
-        for (const i of duplicateLoaderIndexes) {
-          const version = versions[i]
-          const value = version.game_versions.join('+')
-
-          if (seenGameVersions[value]) {
-            duplicateGameVersionIndexes.push(i)
-          } else {
-            if (i !== 0) {
-              let setDisplayUrl = false
-
-              for (const gameVersion in version.game_versions) {
-                const displayUrlEnding = `${version.version_number}-${gameVersion}`
-
-                if (!reservedNames[version.version_number]) {
-                  version.displayUrlEnding = displayUrlEnding
-                  reservedNames[displayUrlEnding] = true
-                  setDisplayUrl = true
-
-                  break
-                }
-              }
-
-              if (!setDisplayUrl) {
-                version.displayUrlEnding = `${version.version_number}-${value}`
-              }
-            } else if (!reservedNames[version.version_number]) {
-              version.displayUrlEnding = version.version_number
-              reservedNames[version.version_number] = true
-            }
-
-            version.displayName = formatVersions(
-              version.game_versions,
-              ctx.store
-            )
-
-            returnVersions.push(version)
-
-            seenGameVersions[value] = true
-          }
-        }
-
-        for (const i in duplicateGameVersionIndexes) {
-          const version = versions[i]
-
-          version.displayUrlEnding = version.id
-          version.displayName = version.id
-
-          returnVersions.push(version)
-        }
+        visitedVersions.push(version.version_number)
+        version.displayUrlEnding = version.version_number
       }
+
+      returnVersions.push(version)
     }
 
-    return returnVersions.sort(
-      (a, b) => ctx.$dayjs(b.date_published) - ctx.$dayjs(a.date_published)
-    )
+    return returnVersions.reverse().map((version, index) => {
+      const nextVersion = returnVersions[index + 1]
+      if (
+        nextVersion &&
+        version.changelog &&
+        nextVersion.changelog === version.changelog
+      ) {
+        return { duplicate: true, ...version }
+      } else {
+        return { duplicate: false, ...version }
+      }
+    })
   })
   inject('getProjectTypeForDisplay', (type, categories) => {
     if (type === 'mod') {

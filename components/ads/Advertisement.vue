@@ -6,7 +6,7 @@
           <div class="ea-text">
             <a
               href="https://exaroton.com/?utm_source=modrinth&utm_medium=text&utm_campaign=host&utm_content=top"
-              rel="nofollow noopener"
+              rel="noopener noreferrer nofollow sponsored"
               target="_blank"
             >
               <LightIcon
@@ -25,7 +25,11 @@
           </div>
         </div>
         <div class="ea-callout">
-          <a rel="nofollow noopener" target="_blank" href="https://adrinth.com">
+          <a
+            rel="noopener noreferrer nofollow sponsored"
+            target="_blank"
+            href="https://adrinth.com"
+          >
             Ads via Adrinth
           </a>
         </div>

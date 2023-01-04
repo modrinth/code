@@ -12,12 +12,18 @@
         <h1>Discover, Play, and Create Minecraft content</h1>
         <h3>
           Find enjoyable, quality content through our
-          <a href="https://github.com/modrinth" :target="$external()"
+          <a
+            href="https://github.com/modrinth"
+            :target="$external()"
+            rel="noopener noreferrer nofollow"
             >open-source</a
           >
           modding platform built for the community. Create stuff, get paid, and
           deploy your project with our
-          <a href="https://docs.modrinth.com" :target="$external()"
+          <a
+            href="https://docs.modrinth.com"
+            :target="$external()"
+            rel="noopener noreferrer nofollow"
             >fully documented</a
           >
           API!
@@ -82,7 +88,11 @@
               working on giving creators more analytics, adding new types of
               projects, our launcher, and much more! If you have any more
               feature ideas, feel free to join our
-              <a href="https://discord.gg/EUHuJHt" :target="$external()">
+              <a
+                rel="noopener noreferrer nofollow"
+                href="https://discord.gg/EUHuJHt"
+                :target="$external()"
+              >
                 Discord</a
               >!
             </p>
@@ -90,7 +100,11 @@
               <div class="feature completed">
                 <CheckIcon />
                 <p>
-                  <a href="https://github.com/modrinth" :target="$external()">
+                  <a
+                    rel="noopener noreferrer nofollow"
+                    href="https://github.com/modrinth"
+                    :target="$external()"
+                  >
                     100% open source
                   </a>
                 </p>

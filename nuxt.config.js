@@ -196,6 +196,7 @@ export default {
     '~/plugins/xss.js',
     '~/plugins/vue-syntax.js',
     '~/plugins/shorthands.js',
+    '~/plugins/markdown.js',
   ],
   /*
    ** Auto import components
@@ -218,9 +219,7 @@ export default {
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/dayjs',
     '@nuxtjs/axios',
-    '@nuxtjs/robots',
     '@nuxtjs/style-resources',
-    '@nuxtjs/markdownit',
     'cookie-universal-nuxt',
   ],
   ads: {
@@ -270,12 +269,6 @@ export default {
         ],
       ],
     },
-  },
-  markdownit: {
-    preset: 'default',
-    html: true,
-    linkify: true,
-    breaks: false,
   },
   loading: {
     color: '#1bd96a',

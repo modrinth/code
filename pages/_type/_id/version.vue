@@ -58,7 +58,6 @@
           </button>
           <button
             class="iconified-button brand-button"
-            :disabled="!$nuxt.$loading"
             @click="createDataPackVersion"
           >
             <RightArrowIcon />
@@ -120,11 +119,7 @@
         </ul>
       </div>
       <div v-if="isCreating" class="input-group">
-        <button
-          class="iconified-button brand-button"
-          :disabled="!$nuxt.$loading"
-          @click="createVersion"
-        >
+        <button class="iconified-button brand-button" @click="createVersion">
           <PlusIcon aria-hidden="true" />
           Create
         </button>
@@ -142,7 +137,6 @@
       <div v-else-if="isEditing" class="input-group">
         <button
           class="iconified-button brand-button"
-          :disabled="!$nuxt.$loading"
           @click="saveEditedVersion"
         >
           <SaveIcon aria-hidden="true" />
@@ -249,7 +243,7 @@
             class="text-link"
             href="https://guides.github.com/features/mastering-markdown/"
             target="_blank"
-            rel="noopener noreferrer"
+            rel="noopener noreferrer nofollow"
             >Markdown</a
           >. HTML can also be used inside your changelog, not including styles,
           scripts, and iframes.
@@ -1080,6 +1074,22 @@ export default {
         this.version = this.versions.find(
           (x) => x.displayUrlEnding === this.$route.params.version
         )
+
+      // LEGACY- to support old duplicate version URLs
+      const dashIndex = this.$route.params.version.indexOf('-')
+      if (!this.version && dashIndex !== -1) {
+        const version = this.versions.find(
+          (x) =>
+            x.displayUrlEnding ===
+            this.$route.params.version.substring(0, dashIndex)
+        )
+
+        this.$nuxt.context.redirect(
+          301,
+          `/${this.project.project_type}/${this.project.slug}/version/${version.version_number}`
+        )
+        return
+      }
 
       if (!this.version) {
         this.$nuxt.context.error({

@@ -105,19 +105,6 @@ export default {
   fetch() {
     if (this.$route.query.page)
       this.currentPage = parseInt(this.$route.query.page)
-
-    this.filteredVersions = this.versions.map((version, index) => {
-      const nextVersion = this.versions[index + 1]
-      if (
-        nextVersion &&
-        version.changelog &&
-        nextVersion.changelog === version.changelog
-      ) {
-        return { duplicate: true, ...version }
-      } else {
-        return { duplicate: false, ...version }
-      }
-    })
   },
   head() {
     const title = `${this.project.title} - Changelog`

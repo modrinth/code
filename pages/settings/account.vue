@@ -33,6 +33,7 @@
             <a
               href="https://github.com/settings/connections/applications/3acffb2e808d16d4b226"
               target="_blank"
+              rel="noopener noreferrer nofollow"
             >
               Head to the Modrinth Application page on GitHub.
             </a>

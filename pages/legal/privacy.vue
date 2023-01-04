@@ -44,7 +44,9 @@
       certain data protection rights. If you wish to be informed what Personal
       Information we hold about you and if you want it to be removed from our
       systems, please contact us by email at
-      <a href="mailto:gdpr@modrinth.com">gdpr@modrinth.com</a>.
+      <a href="mailto:gdpr@modrinth.com" rel="noopener noreferrer nofollow">
+        gdpr@modrinth.com</a
+      >.
     </p>
 
     <p>

@@ -240,10 +240,23 @@
           >playing modpacks</a
         >
         with
-        <a href="https://atlauncher.com/about" :target="$external()"
+        <a
+          rel="noopener noreferrer nofollow"
+          href="https://atlauncher.com/about"
+          :target="$external()"
           >ATLauncher</a
-        >, <a href="https://multimc.org/" :target="$external()">MultiMC</a>, and
-        <a href="https://prismlauncher.org" :target="$external()">
+        >,
+        <a
+          rel="noopener noreferrer nofollow"
+          href="https://multimc.org/"
+          :target="$external()"
+          >MultiMC</a
+        >, and
+        <a
+          rel="noopener noreferrer nofollow"
+          href="https://prismlauncher.org"
+          :target="$external()"
+        >
           Prism Launcher</a
         >. Pack creators can reference our documentation on
         <a
@@ -251,7 +264,12 @@
           :target="$external()"
           >creating modpacks</a
         >. Join us on
-        <a href="https://discord.gg/EUHuJHt" :target="$external()">Discord</a>
+        <a
+          rel="noopener noreferrer nofollow"
+          href="https://discord.gg/EUHuJHt"
+          :target="$external()"
+          >Discord</a
+        >
         for support.
       </div>
       <Advertisement type="banner" small-screen="square" />
@@ -365,7 +383,7 @@
             :id="result.slug ? result.slug : result.project_id"
             :key="result.project_id"
             :display="$cosmetics.searchDisplayMode[projectType.id]"
-            :gallery-images="
+            :featured-image="
               result.featured_gallery
                 ? result.featured_gallery
                 : result.gallery[0]

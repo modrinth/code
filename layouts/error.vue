@@ -11,6 +11,7 @@
         <a
           href="https://discord.gg/EUHuJHt"
           class="iconified-button raised-button"
+          rel="noopener noreferrer nofollow"
         >
           Get help on Discord
         </a>

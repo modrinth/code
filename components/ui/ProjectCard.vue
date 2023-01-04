@@ -22,13 +22,6 @@
     <div class="title">
       <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
         <h2 class="name">
-          <IssuesIcon
-            v-if="hasModMessage"
-            v-tooltip="
-              'Project has a message from the moderators. View the project to see more.'
-            "
-            aria-label="Project has a message from the moderators. View the project to see more."
-          />
           {{ name }}
         </h2>
       </nuxt-link>
@@ -162,7 +155,6 @@ import InfoIcon from '~/assets/images/utils/info.svg?inline'
 import ClientIcon from '~/assets/images/utils/client.svg?inline'
 import GlobeIcon from '~/assets/images/utils/globe.svg?inline'
 import ServerIcon from '~/assets/images/utils/server.svg?inline'
-import IssuesIcon from '~/assets/images/utils/issues.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import EditIcon from '~/assets/images/utils/updated.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
@@ -179,7 +171,6 @@ export default {
     ClientIcon,
     ServerIcon,
     GlobeIcon,
-    IssuesIcon,
     CalendarIcon,
     EditIcon,
     DownloadIcon,

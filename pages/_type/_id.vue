@@ -165,11 +165,19 @@
               </button>
             </template>
             <template v-else>
-              <a class="iconified-button" :href="authUrl">
+              <a
+                class="iconified-button"
+                :href="authUrl"
+                rel="noopener noreferrer nofollow"
+              >
                 <ReportIcon aria-hidden="true" />
                 Report
               </a>
-              <a class="iconified-button" :href="authUrl">
+              <a
+                class="iconified-button"
+                :href="authUrl"
+                rel="noopener noreferrer nofollow"
+              >
                 <HeartIcon aria-hidden="true" />
                 Follow
               </a>
@@ -307,6 +315,7 @@
               :href="project.issues_url"
               class="title"
               :target="$external()"
+              rel="noopener noreferrer nofollow ugc"
             >
               <IssuesIcon aria-hidden="true" />
               <span>Issues</span>
@@ -316,6 +325,7 @@
               :href="project.source_url"
               class="title"
               :target="$external()"
+              rel="noopener noreferrer nofollow ugc"
             >
               <CodeIcon aria-hidden="true" />
               <span>Source</span>
@@ -325,6 +335,7 @@
               :href="project.wiki_url"
               class="title"
               :target="$external()"
+              rel="noopener noreferrer nofollow ugc"
             >
               <WikiIcon aria-hidden="true" />
               <span>Wiki</span>
@@ -333,6 +344,7 @@
               v-if="project.discord_url"
               :href="project.discord_url"
               :target="$external()"
+              rel="noopener noreferrer nofollow ugc"
             >
               <DiscordIcon class="shrink" aria-hidden="true" />
               <span>Discord</span>
@@ -342,6 +354,7 @@
               :key="index"
               :href="donation.url"
               :target="$external()"
+              rel="noopener noreferrer nofollow ugc"
             >
               <BuyMeACoffeeLogo
                 v-if="donation.id === 'bmac'"
@@ -579,11 +592,24 @@
             >our documentation</a
           >
           which provides instructions on using
-          <a href="https://atlauncher.com/about" :target="$external()">
+          <a
+            href="https://atlauncher.com/about"
+            :target="$external()"
+            rel="noopener noreferrer nofollow"
+          >
             ATLauncher</a
-          >, <a href="https://multimc.org/" :target="$external()">MultiMC</a>,
-          and
-          <a href="https://prismlauncher.org" :target="$external()">
+          >,
+          <a
+            href="https://multimc.org/"
+            :target="$external()"
+            rel="noopener noreferrer nofollow"
+            >MultiMC</a
+          >, and
+          <a
+            href="https://prismlauncher.org"
+            :target="$external()"
+            rel="noopener noreferrer nofollow"
+          >
             Prism Launcher</a
           >.
         </div>

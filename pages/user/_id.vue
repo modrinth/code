@@ -45,7 +45,12 @@
               <ReportIcon aria-hidden="true" />
               Report
             </button>
-            <a v-else class="iconified-button" :href="authUrl">
+            <a
+              v-else
+              class="iconified-button"
+              :href="authUrl"
+              rel="noopener noreferrer nofollow"
+            >
               <ReportIcon aria-hidden="true" />
               Report
             </a>
@@ -140,6 +145,7 @@
               v-if="githubUrl"
               :href="githubUrl"
               :target="$external()"
+              rel="noopener noreferrer nofollow"
               class="sidebar__item github-button iconified-button"
             >
               <GitHubIcon aria-hidden="true" />
@@ -209,7 +215,7 @@
             :key="project.id"
             :name="project.title"
             :display="$cosmetics.searchDisplayMode.user"
-            :gallery-images="
+            :featured-image="
               project.gallery
                 .slice()
                 .sort((a, b) => b.featured - a.featured)
