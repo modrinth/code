@@ -2,7 +2,6 @@ use crate::database;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::file_hosting::FileHost;
 use crate::models;
-use crate::models::ids::UserId;
 use crate::models::projects::{
     DonationLink, Project, ProjectId, ProjectStatus, SearchRequest, SideType,
 };
@@ -30,6 +29,45 @@ pub async fn project_search(
     Ok(HttpResponse::Ok().json(results))
 }
 
+#[derive(Deserialize, Validate)]
+pub struct RandomProjects {
+    #[validate(range(min = 1, max = 100))]
+    pub count: u32,
+}
+
+#[get("projects_random")]
+pub async fn random_projects_get(
+    web::Query(count): web::Query<RandomProjects>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    count.validate().map_err(|err| {
+        ApiError::Validation(validation_errors_to_string(err, None))
+    })?;
+
+    let project_ids = sqlx::query!(
+            "
+            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2)
+            ",
+            count.count as i32,
+            &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_searchable()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        )
+        .fetch_many(&**pool)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|m| database::models::ids::ProjectId(m.id)))
+        })
+        .try_collect::<Vec<_>>()
+        .await?;
+
+    let projects_data =
+        database::models::Project::get_many_full(&project_ids, &**pool)
+            .await?
+            .into_iter()
+            .map(Project::from)
+            .collect::<Vec<_>>();
+
+    Ok(HttpResponse::Ok().json(projects_data))
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct ProjectIds {
     pub ids: String,
@@ -41,13 +79,14 @@ pub async fn projects_get(
     web::Query(ids): web::Query<ProjectIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let project_ids = serde_json::from_str::<Vec<ProjectId>>(&ids.ids)?
-        .into_iter()
-        .map(|x| x.into())
-        .collect();
+    let project_ids: Vec<database::models::ids::ProjectId> =
+        serde_json::from_str::<Vec<ProjectId>>(&ids.ids)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
 
     let projects_data =
-        database::models::Project::get_many_full(project_ids, &**pool).await?;
+        database::models::Project::get_many_full(&project_ids, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -207,22 +246,23 @@ pub async fn dependency_list(
         )>>()
         .await?;
 
-        let (projects_result, versions_result) = futures::join!(
-            database::Project::get_many_full(
-                dependencies
-                    .iter()
-                    .filter_map(|x| if x.0.is_none() {
-                        if let Some(mod_dependency_id) = x.2 {
-                            Some(mod_dependency_id)
-                        } else {
-                            x.1
-                        }
+        let project_ids = dependencies
+            .iter()
+            .filter_map(|x| {
+                if x.0.is_none() {
+                    if let Some(mod_dependency_id) = x.2 {
+                        Some(mod_dependency_id)
                     } else {
                         x.1
-                    })
-                    .collect(),
-                &**pool,
-            ),
+                    }
+                } else {
+                    x.1
+                }
+            })
+            .collect::<Vec<_>>();
+
+        let (projects_result, versions_result) = futures::join!(
+            database::Project::get_many_full(&project_ids, &**pool,),
             database::Version::get_many_full(
                 dependencies.iter().filter_map(|x| x.0).collect(),
                 &**pool,
@@ -344,18 +384,6 @@ pub struct EditProject {
     )]
     #[validate(length(max = 65536))]
     pub moderation_message_body: Option<Option<String>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    pub flame_anvil_user: Option<Option<UserId>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    pub flame_anvil_project: Option<Option<i32>>,
 }
 
 #[patch("{id}")]
@@ -1085,92 +1113,6 @@ pub async fn project_edit(
                 .await?;
             }
 
-            if let Some(project) = &new_project.flame_anvil_project {
-                if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the external syncing project!"
-                            .to_string(),
-                    ));
-                }
-
-                if project_item.project_type == "modpack" {
-                    return Err(ApiError::InvalidInput(
-                        "This project syncing feature is not available for modpacks!"
-                            .to_string(),
-                    ));
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET flame_anvil_project = $1
-                    WHERE (id = $2)
-                    ",
-                    *project,
-                    id as database::models::ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
-            if let Some(user_id) = &new_project.flame_anvil_user {
-                if !perms.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        "You do not have the permissions to edit the syncing user for this project!"
-                            .to_string(),
-                    ));
-                }
-
-                if project_item.project_type == "modpack" {
-                    return Err(ApiError::InvalidInput(
-                        "This project syncing feature is not available for modpacks!"
-                            .to_string(),
-                    ));
-                }
-
-                if let Some(user_id) = user_id {
-                    if user_id != &user.id && !user.role.is_admin() {
-                        return Err(ApiError::InvalidInput(
-                            "You may only set yourself as the syncing user!"
-                                .to_string(),
-                        ));
-                    }
-
-                    let results = sqlx::query!(
-                        "
-                        SELECT EXISTS(
-                            SELECT 1 FROM team_members
-                            INNER JOIN users u on team_members.user_id = u.id AND u.flame_anvil_key IS NOT NULL
-                            WHERE team_id = $1 AND user_id = $2 AND accepted = TRUE
-                        )
-                        ",
-                        project_item.inner.team_id as database::models::ids::TeamId,
-                        database::models::ids::UserId::from(*user_id) as database::models::ids::UserId,
-                    )
-                        .fetch_one(&mut *transaction)
-                        .await?;
-
-                    if !results.exists.unwrap_or(true) {
-                        return Err(ApiError::InvalidInput(
-                            "The given user is not part of your team or does not have a syncing key added to their account!"
-                                .to_string(),
-                        ));
-                    }
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE mods
-                    SET flame_anvil_user = $1
-                    WHERE (id = $2)
-                    ",
-                    user_id.map(|x| x.0 as i64),
-                    id as database::models::ids::ProjectId,
-                )
-                .execute(&mut *transaction)
-                .await?;
-            }
-
             transaction.commit().await?;
             Ok(HttpResponse::NoContent().body(""))
         } else {
@@ -1181,6 +1123,398 @@ pub async fn project_edit(
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
+}
+
+#[derive(Deserialize, Validate)]
+pub struct BulkEditProject {
+    #[validate(length(max = 3))]
+    pub categories: Option<Vec<String>>,
+    #[validate(length(max = 3))]
+    pub add_categories: Option<Vec<String>>,
+    pub remove_categories: Option<Vec<String>>,
+
+    #[validate(length(max = 256))]
+    pub additional_categories: Option<Vec<String>>,
+    #[validate(length(max = 3))]
+    pub add_additional_categories: Option<Vec<String>>,
+    pub remove_additional_categories: Option<Vec<String>>,
+
+    #[validate]
+    pub donation_urls: Option<Vec<DonationLink>>,
+    #[validate]
+    pub add_donation_urls: Option<Vec<DonationLink>>,
+    #[validate]
+    pub remove_donation_urls: Option<Vec<DonationLink>>,
+
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
+    pub issues_url: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
+    pub source_url: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
+    pub wiki_url: Option<Option<String>>,
+    #[serde(
+        default,
+        skip_serializing_if = "Option::is_none",
+        with = "::serde_with::rust::double_option"
+    )]
+    #[validate(
+        custom(function = "crate::util::validate::validate_url"),
+        length(max = 2048)
+    )]
+    pub discord_url: Option<Option<String>>,
+}
+
+#[patch("projects")]
+pub async fn projects_edit(
+    req: HttpRequest,
+    web::Query(ids): web::Query<ProjectIds>,
+    pool: web::Data<PgPool>,
+    bulk_edit_project: web::Json<BulkEditProject>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+
+    bulk_edit_project.validate().map_err(|err| {
+        ApiError::Validation(validation_errors_to_string(err, None))
+    })?;
+
+    let project_ids: Vec<database::models::ids::ProjectId> =
+        serde_json::from_str::<Vec<ProjectId>>(&ids.ids)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
+
+    let projects_data =
+        database::models::Project::get_many_full(&project_ids, &**pool).await?;
+
+    if let Some(id) = project_ids
+        .iter()
+        .find(|x| !projects_data.iter().any(|y| x == &&y.inner.id))
+    {
+        return Err(ApiError::InvalidInput(format!(
+            "Project {} not found",
+            ProjectId(id.0 as u64)
+        )));
+    }
+
+    let team_members = database::models::TeamMember::get_from_team_full_many(
+        projects_data.iter().map(|x| x.inner.team_id).collect(),
+        &**pool,
+    )
+    .await?;
+
+    let categories =
+        database::models::categories::Category::list(&**pool).await?;
+    let donation_platforms =
+        database::models::categories::DonationPlatform::list(&**pool).await?;
+
+    let mut transaction = pool.begin().await?;
+
+    for project in projects_data {
+        if !user.role.is_mod() {
+            if let Some(member) = team_members
+                .iter()
+                .find(|x| x.team_id == project.inner.team_id)
+            {
+                if !member.permissions.contains(Permissions::EDIT_DETAILS) {
+                    return Err(ApiError::CustomAuthentication(
+                        format!("You do not have the permissions to bulk edit project {}!", project.inner.title),
+                    ));
+                }
+            } else if project.inner.status.is_hidden() {
+                return Ok(HttpResponse::NotFound().body(""));
+            } else {
+                return Err(ApiError::CustomAuthentication(format!(
+                    "You are not a member of project {}!",
+                    project.inner.title
+                )));
+            };
+        }
+
+        let mut set_categories =
+            if let Some(categories) = bulk_edit_project.categories.clone() {
+                categories
+            } else {
+                project.categories.clone()
+            };
+
+        if let Some(delete_categories) = &bulk_edit_project.remove_categories {
+            for category in delete_categories {
+                if let Some(pos) =
+                    set_categories.iter().position(|x| x == category)
+                {
+                    set_categories.remove(pos);
+                }
+            }
+        }
+
+        if let Some(add_categories) = &bulk_edit_project.add_categories {
+            for category in add_categories {
+                if set_categories.len() < 3 {
+                    set_categories.push(category.clone());
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if set_categories != project.categories {
+            sqlx::query!(
+                "
+                DELETE FROM mods_categories
+                WHERE joining_mod_id = $1 AND is_additional = FALSE
+                ",
+                project.inner.id as database::models::ids::ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            for category in set_categories {
+                let category_id = categories
+                    .iter()
+                    .find(|x| x.category == category)
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(format!(
+                            "Category {} does not exist.",
+                            category.clone()
+                        ))
+                    })?
+                    .id;
+
+                sqlx::query!(
+                    "
+                    INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)
+                    VALUES ($1, $2, FALSE)
+                    ",
+                    project.inner.id as database::models::ids::ProjectId,
+                    category_id as database::models::ids::CategoryId,
+                )
+                    .execute(&mut *transaction)
+                    .await?;
+            }
+        }
+
+        let mut set_additional_categories = if let Some(categories) =
+            bulk_edit_project.additional_categories.clone()
+        {
+            categories
+        } else {
+            project.additional_categories.clone()
+        };
+
+        if let Some(delete_categories) =
+            &bulk_edit_project.remove_additional_categories
+        {
+            for category in delete_categories {
+                if let Some(pos) =
+                    set_additional_categories.iter().position(|x| x == category)
+                {
+                    set_additional_categories.remove(pos);
+                }
+            }
+        }
+
+        if let Some(add_categories) =
+            &bulk_edit_project.add_additional_categories
+        {
+            for category in add_categories {
+                if set_additional_categories.len() < 256 {
+                    set_additional_categories.push(category.clone());
+                } else {
+                    break;
+                }
+            }
+        }
+
+        if set_additional_categories != project.additional_categories {
+            sqlx::query!(
+                "
+                DELETE FROM mods_categories
+                WHERE joining_mod_id = $1 AND is_additional = TRUE
+                ",
+                project.inner.id as database::models::ids::ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            for category in set_additional_categories {
+                let category_id = categories
+                    .iter()
+                    .find(|x| x.category == category)
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(format!(
+                            "Category {} does not exist.",
+                            category.clone()
+                        ))
+                    })?
+                    .id;
+
+                sqlx::query!(
+                        "
+                        INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)
+                        VALUES ($1, $2, TRUE)
+                        ",
+                        project.inner.id as database::models::ids::ProjectId,
+                        category_id as database::models::ids::CategoryId,
+                    )
+                    .execute(&mut *transaction)
+                    .await?;
+            }
+        }
+
+        let project_donations: Vec<DonationLink> = project
+            .donation_urls
+            .into_iter()
+            .map(|d| DonationLink {
+                id: d.platform_short,
+                platform: d.platform_name,
+                url: d.url,
+            })
+            .collect();
+        let mut set_donation_links = if let Some(donation_links) =
+            bulk_edit_project.donation_urls.clone()
+        {
+            donation_links
+        } else {
+            project_donations.clone()
+        };
+
+        if let Some(delete_donations) = &bulk_edit_project.remove_donation_urls
+        {
+            for donation in delete_donations {
+                if let Some(pos) = set_donation_links
+                    .iter()
+                    .position(|x| donation.url == x.url && donation.id == x.id)
+                {
+                    set_donation_links.remove(pos);
+                }
+            }
+        }
+
+        if let Some(add_donations) = &bulk_edit_project.add_donation_urls {
+            set_donation_links.append(&mut add_donations.clone());
+        }
+
+        if set_donation_links != project_donations {
+            sqlx::query!(
+                "
+                DELETE FROM mods_donations
+                WHERE joining_mod_id = $1
+                ",
+                project.inner.id as database::models::ids::ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+
+            for donation in set_donation_links {
+                let platform_id = donation_platforms
+                    .iter()
+                    .find(|x| x.short == donation.id)
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(format!(
+                            "Platform {} does not exist.",
+                            donation.id.clone()
+                        ))
+                    })?
+                    .id;
+
+                sqlx::query!(
+                    "
+                    INSERT INTO mods_donations (joining_mod_id, joining_platform_id, url)
+                    VALUES ($1, $2, $3)
+                    ",
+                    project.inner.id as database::models::ids::ProjectId,
+                    platform_id as database::models::ids::DonationPlatformId,
+                    donation.url
+                )
+                    .execute(&mut *transaction)
+                    .await?;
+            }
+        }
+
+        if let Some(issues_url) = &bulk_edit_project.issues_url {
+            sqlx::query!(
+                "
+                UPDATE mods
+                SET issues_url = $1
+                WHERE (id = $2)
+                ",
+                issues_url.as_deref(),
+                project.inner.id as database::models::ids::ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        if let Some(source_url) = &bulk_edit_project.source_url {
+            sqlx::query!(
+                "
+                UPDATE mods
+                SET source_url = $1
+                WHERE (id = $2)
+                ",
+                source_url.as_deref(),
+                project.inner.id as database::models::ids::ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        if let Some(wiki_url) = &bulk_edit_project.wiki_url {
+            sqlx::query!(
+                "
+                UPDATE mods
+                SET wiki_url = $1
+                WHERE (id = $2)
+                ",
+                wiki_url.as_deref(),
+                project.inner.id as database::models::ids::ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+
+        if let Some(discord_url) = &bulk_edit_project.discord_url {
+            sqlx::query!(
+                "
+                UPDATE mods
+                SET discord_url = $1
+                WHERE (id = $2)
+                ",
+                discord_url.as_deref(),
+                project.inner.id as database::models::ids::ProjectId,
+            )
+            .execute(&mut *transaction)
+            .await?;
+        }
+    }
+
+    transaction.commit().await?;
+
+    Ok(HttpResponse::NoContent().body(""))
 }
 
 #[derive(Deserialize)]

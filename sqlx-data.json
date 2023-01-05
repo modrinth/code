@@ -992,6 +992,27 @@
     },
     "query": "\n            DELETE FROM donation_platforms\n            WHERE short = $1\n            "
   },
+  "1cefe4924d3c1f491739858ce844a22903d2dbe26f255219299f1833a10ce3d7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "TextArray"
+        ]
+      }
+    },
+    "query": "\n            SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2)\n            "
+  },
   "1d1fe6f0c03a63b1c6bd5ffbddfd82aa7d24e1db3f3137ed046724cb78929f88": {
     "describe": {
       "columns": [],
@@ -1084,19 +1105,6 @@
       }
     },
     "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE id=$1)"
-  },
-  "20061dd085656ec83b63d893c60bdd3dcbf5b8c78a725358aa8e3312a7571e5c": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    UPDATE mods\n                    SET flame_anvil_user = $1\n                    WHERE (id = $2)\n                    "
   },
   "20413fce27fe9c1dec71900f9563e787acc11e7789b5294786e0ea6f20d7d958": {
     "describe": {
@@ -1415,6 +1423,18 @@
       }
     },
     "query": "\n            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,\n            v.changelog changelog, v.date_published date_published, v.downloads downloads,\n            v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,\n            JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,\n            ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,\n            JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,\n            JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies\n            FROM versions v\n            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id\n            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id\n            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id\n            LEFT OUTER JOIN loaders l on lv.loader_id = l.id\n            LEFT OUTER JOIN files f on v.id = f.version_id\n            LEFT OUTER JOIN hashes h on f.id = h.file_id\n            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id\n            WHERE v.id = $1\n            GROUP BY v.id;\n            "
+  },
+  "299b8ea6e7a0048fa389cc4432715dc2a09e227d2f08e91167a43372a7ac6e35": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                DELETE FROM mods_categories\n                WHERE joining_mod_id = $1 AND is_additional = FALSE\n                "
   },
   "29e657d26f0fb24a766f5b5eb6a94d01d1616884d8ca10e91536e974d5b585a6": {
     "describe": {
@@ -1887,6 +1907,18 @@
     },
     "query": "\n                        INSERT INTO game_versions_versions (game_version_id, joining_version_id)\n                        VALUES ($1, $2)\n                        "
   },
+  "3fcfed18cbfb37866e0fa57a4e95efb326864f8219941d1b696add39ed333ad1": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                DELETE FROM mods_categories\n                WHERE joining_mod_id = $1 AND is_additional = TRUE\n                "
+  },
   "40f7c5bec98fe3503d6bd6db2eae5a4edb8d5d6efda9b9dc124f344ae5c60e08": {
     "describe": {
       "columns": [],
@@ -2150,6 +2182,18 @@
       }
     },
     "query": "\n                    INSERT INTO loaders_project_types (joining_loader_id, joining_project_type_id)\n                    VALUES ($1, $2)\n                    "
+  },
+  "4567790f0dc98ff20b596a33161d1f6ac8af73da67fe8c54192724626c6bf670": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                DELETE FROM mods_donations\n                WHERE joining_mod_id = $1\n                "
   },
   "4778d2f5994fda2f978fa53e0840c1a9a2582ef0434a5ff7f21706f1dc4edcf4": {
     "describe": {
@@ -3751,6 +3795,19 @@
     },
     "query": "\n            INSERT INTO notifications_actions (\n                notification_id, title, action_route, action_route_method\n            )\n            VALUES (\n                $1, $2, $3, $4\n            )\n            "
   },
+  "83d428e1c07d16e356ef26bdf1d707940b1683b5f631ded1f6674a081453d67b": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                UPDATE mods\n                SET source_url = $1\n                WHERE (id = $2)\n                "
+  },
   "85b40877c48fc4f23039c1b556007f92056a015f160fe1059b0d3b13615af0fb": {
     "describe": {
       "columns": [],
@@ -3974,6 +4031,19 @@
     },
     "query": "\n            DELETE FROM payouts_values\n            WHERE user_id = $1\n            "
   },
+  "8abb317c85f48c7dd9ccf4a7b8fbc0b58ac73f7ae87ff2dfe67009a51089f784": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                UPDATE mods\n                SET wiki_url = $1\n                WHERE (id = $2)\n                "
+  },
   "8ba2b2c38958f1c542e514fc62ab4682f58b0b442ac1842d20625420698e34ec": {
     "describe": {
       "columns": [],
@@ -4137,6 +4207,20 @@
       }
     },
     "query": "\n                    UPDATE mods\n                    SET wiki_url = $1\n                    WHERE (id = $2)\n                    "
+  },
+  "9aab2350d576fd934b0541d1f71f320ac939b44a179fee3d1638113cdb3ddfe7": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int4",
+          "Varchar"
+        ]
+      }
+    },
+    "query": "\n                    INSERT INTO mods_donations (joining_mod_id, joining_platform_id, url)\n                    VALUES ($1, $2, $3)\n                    "
   },
   "9c8f3f9503b5bb52e05bbc8a8eee7f640ab7d6b04a59ec111ce8b23e886911de": {
     "describe": {
@@ -4965,19 +5049,6 @@
     },
     "query": "\n            DELETE FROM users\n            WHERE id = $1\n            "
   },
-  "b69b18b3451762fc24a1390dd537f612ed066bd285e8237a99fb998ff9d066e9": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int4",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                    UPDATE mods\n                    SET flame_anvil_project = $1\n                    WHERE (id = $2)\n                    "
-  },
   "b7b2b5b99340c7601de53cc33dc56af054b50b2fe4d1d212901c958115a42baa": {
     "describe": {
       "columns": [],
@@ -5075,6 +5146,19 @@
       }
     },
     "query": "\n            DELETE FROM notifications_actions\n            WHERE notification_id = ANY($1)\n            "
+  },
+  "bad7cae347771e801976c26f2afaf33bda371051923b8f74a2f32a0ef5c65e57": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                UPDATE mods\n                SET discord_url = $1\n                WHERE (id = $2)\n                "
   },
   "bbfb47ae2c972734785df6b7c3e62077dc544ef4ccf8bb89e9c22c2f50a933c1": {
     "describe": {
@@ -5824,6 +5908,19 @@
       }
     },
     "query": "\n            DELETE FROM hashes\n            WHERE file_id = $1\n            "
+  },
+  "cdf20036b29b61da40bf990c9ab04c509297a4d65bc9b136c9fb20f1e97e1149": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int4"
+        ]
+      }
+    },
+    "query": "\n                    INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                    VALUES ($1, $2, FALSE)\n                    "
   },
   "ce46915d4ce10f3fc2d4328157b06016da838672c8336b3b8d27e09eeec979d3": {
     "describe": {
@@ -6796,6 +6893,19 @@
     },
     "query": "\n            DELETE FROM files\n            WHERE files.id = $1\n            "
   },
+  "e3fb74a94a6a78b1007dd99ad11bdcfaa0957ed7d1683997aef7301e0f15baba": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Varchar",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                UPDATE mods\n                SET issues_url = $1\n                WHERE (id = $2)\n                "
+  },
   "e42d3a64ae4d88b73136a319fe79a8b070c193707e3560d18deca478662d8d90": {
     "describe": {
       "columns": [],
@@ -6966,27 +7076,6 @@
       }
     },
     "query": "\n        SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)\n        INNER JOIN mods m on v.mod_id = m.id\n        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)\n        "
-  },
-  "e5de3b33893b6b48a7fee0e3f20e371e56fdfd71640662aacc15fe3bf747b3a1": {
-    "describe": {
-      "columns": [
-        {
-          "name": "exists",
-          "ordinal": 0,
-          "type_info": "Bool"
-        }
-      ],
-      "nullable": [
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                        SELECT EXISTS(\n                            SELECT 1 FROM team_members\n                            INNER JOIN users u on team_members.user_id = u.id AND u.flame_anvil_key IS NOT NULL\n                            WHERE team_id = $1 AND user_id = $2 AND accepted = TRUE\n                        )\n                        "
   },
   "e673006d1355fa91ba5739d7cf569eec5e1ec501f7b1dc2b431f0b1c25ac07d5": {
     "describe": {

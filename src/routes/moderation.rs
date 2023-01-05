@@ -44,7 +44,7 @@ pub async fn get_projects(
     .await?;
 
     let projects: Vec<_> =
-        database::Project::get_many_full(project_ids, &**pool)
+        database::Project::get_many_full(&project_ids, &**pool)
             .await?
             .into_iter()
             .map(crate::models::projects::Project::from)

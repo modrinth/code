@@ -250,7 +250,7 @@ pub struct License {
     pub url: Option<String>,
 }
 
-#[derive(Serialize, Deserialize, Validate, Clone)]
+#[derive(Serialize, Deserialize, Validate, Clone, Eq, PartialEq)]
 pub struct DonationLink {
     pub id: String,
     pub platform: String,

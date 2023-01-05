@@ -110,7 +110,7 @@ generate_ids!(
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type)]
+#[derive(Copy, Clone, Debug, Type, Eq, PartialEq)]
 #[sqlx(transparent)]
 pub struct TeamId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]

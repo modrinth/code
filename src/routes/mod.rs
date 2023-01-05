@@ -53,6 +53,8 @@ pub fn v2_config(cfg: &mut web::ServiceConfig) {
 pub fn projects_config(cfg: &mut web::ServiceConfig) {
     cfg.service(projects::project_search);
     cfg.service(projects::projects_get);
+    cfg.service(projects::projects_edit);
+    cfg.service(projects::random_projects_get);
     cfg.service(project_creation::project_create);
 
     cfg.service(
