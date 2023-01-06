@@ -1089,6 +1089,7 @@ export default {
 
   .description {
     line-height: 1.3;
+    overflow-wrap: break-word;
 
     margin-top: var(--spacing-card-sm);
     margin-bottom: 0.5rem;

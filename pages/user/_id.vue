@@ -596,6 +596,7 @@ export default {
 
 .bio {
   display: block;
+  overflow-wrap: break-word;
 }
 
 .secondary-stat {
