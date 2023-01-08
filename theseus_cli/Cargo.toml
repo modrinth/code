@@ -2,7 +2,7 @@
 name = "theseus_cli"
 version = "0.1.0"
 authors = ["Jai A <jaiagr+gpg@pm.me>"]
-edition = "2018"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -27,4 +27,4 @@ tracing-error = "0.2"
 tracing-futures = "0.2"
 tracing-subscriber = {version = "0.3", features = ["env-filter"]}
 
-webbrowser = "0.7"
+webbrowser = "0.8"
