@@ -520,27 +520,29 @@ async fn upload_file_to_version_inner(
         }
     };
 
-    let team_member = models::TeamMember::get_from_user_id_version(
-        version_id,
-        user.id.into(),
-        &mut *transaction,
-    )
-    .await?
-    .ok_or_else(|| {
-        CreateError::CustomAuthenticationError(
-            "You don't have permission to upload files to this version!"
-                .to_string(),
+    if !user.role.is_admin() {
+        let team_member = models::TeamMember::get_from_user_id_version(
+            version_id,
+            user.id.into(),
+            &mut *transaction,
         )
-    })?;
+        .await?
+        .ok_or_else(|| {
+            CreateError::CustomAuthenticationError(
+                "You don't have permission to upload files to this version!"
+                    .to_string(),
+            )
+        })?;
 
-    if !team_member
-        .permissions
-        .contains(Permissions::UPLOAD_VERSION)
-    {
-        return Err(CreateError::CustomAuthenticationError(
-            "You don't have permission to upload files to this version!"
-                .to_string(),
-        ));
+        if !team_member
+            .permissions
+            .contains(Permissions::UPLOAD_VERSION)
+        {
+            return Err(CreateError::CustomAuthenticationError(
+                "You don't have permission to upload files to this version!"
+                    .to_string(),
+            ));
+        }
     }
 
     let project_id = ProjectId(version.inner.project_id.0 as u64);
