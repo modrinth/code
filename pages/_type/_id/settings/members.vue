@@ -1,75 +1,33 @@
 <template>
   <div>
-    <ModalConfirm
-      ref="modal_confirm"
-      title="Are you sure you want to delete this project?"
-      description="If you proceed, all versions and any attached data will be removed from our servers. This may break other projects, so be careful."
-      :has-to-type="true"
-      :confirmation-text="project.title"
-      proceed-label="Delete"
-      @proceed="deleteProject"
-    />
     <div class="universal-card">
-      <h2>General settings</h2>
-      <div class="adjacent-input">
-        <label>
-          <span class="label__title">Edit project information</span>
-          <span class="label__description">
-            Edit your project's name, description, categories, and more.
-          </span>
-        </label>
-        <nuxt-link class="iconified-button" to="edit"
-          ><EditIcon />Edit</nuxt-link
-        >
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Manage members</span>
+        </h3>
       </div>
-      <div class="adjacent-input">
-        <span class="label">
-          <span class="label__title">Delete project</span>
-          <span class="label__description">
-            Removes your project from Modrinth's servers and search. Clicking on
-            this will delete your project, so be extra careful!
-          </span>
+      <span class="label">
+        <span class="label__title">Invite a member</span>
+        <span class="label__description">
+          Enter the Modrinth username of the person you'd like to invite to be a
+          member of this project.
         </span>
-        <button
-          class="iconified-button danger-button"
-          :disabled="
-            (currentMember.permissions & DELETE_PROJECT) !== DELETE_PROJECT
-          "
-          @click="$refs.modal_confirm.show()"
-        >
-          <TrashIcon />Delete project
+      </span>
+      <div
+        v-if="(currentMember.permissions & MANAGE_INVITES) === MANAGE_INVITES"
+        class="input-group"
+      >
+        <input
+          id="username"
+          v-model="currentUsername"
+          type="text"
+          placeholder="Username"
+        />
+        <label for="username" class="hidden">Username</label>
+        <button class="iconified-button brand-button" @click="inviteTeamMember">
+          <UserPlusIcon />
+          Invite
         </button>
-      </div>
-    </div>
-    <div class="universal-card">
-      <h2>Manage members</h2>
-      <div class="adjacent-input">
-        <span class="label">
-          <span class="label__title">Invite a member</span>
-          <span class="label__description">
-            Enter the Modrinth username of the person you'd like to invite to be
-            a member of this project.
-          </span>
-        </span>
-        <div
-          v-if="(currentMember.permissions & MANAGE_INVITES) === MANAGE_INVITES"
-          class="input-group"
-        >
-          <input
-            id="username"
-            v-model="currentUsername"
-            type="text"
-            placeholder="Username"
-          />
-          <label for="username" class="hidden">Username</label>
-          <button
-            class="iconified-button brand-button"
-            @click="inviteTeamMember"
-          >
-            <PlusIcon />
-            Invite
-          </button>
-        </div>
       </div>
     </div>
     <div
@@ -94,10 +52,10 @@
           </div>
         </div>
         <div class="side-buttons">
-          <Badge v-if="member.accepted" type="accepted" color="green" />
-          <Badge v-else type="pending" color="orange" />
+          <Badge v-if="member.accepted" type="accepted" />
+          <Badge v-else type="pending" />
           <button
-            class="dropdown-icon"
+            class="square-button dropdown-icon"
             @click="
               openTeamMembers.indexOf(member.user.id) === -1
                 ? openTeamMembers.push(member.user.id)
@@ -250,16 +208,26 @@
             />
           </div>
         </template>
-        <div class="button-group push-right">
+        <div class="input-group">
+          <button
+            class="iconified-button brand-button"
+            :disabled="
+              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
+            "
+            @click="updateTeamMember(index)"
+          >
+            <SaveIcon />
+            Save changes
+          </button>
           <button
             v-if="member.oldRole !== 'Owner'"
-            class="iconified-button"
+            class="iconified-button danger-button"
             :disabled="
               (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
             "
             @click="removeTeamMember(index)"
           >
-            <TrashIcon />
+            <UserRemoveIcon />
             Remove member
           </button>
           <button
@@ -271,18 +239,8 @@
             class="iconified-button"
             @click="transferOwnership(index)"
           >
-            <UserIcon />
+            <TransferIcon />
             Transfer ownership
-          </button>
-          <button
-            class="iconified-button brand-button"
-            :disabled="
-              (currentMember.permissions & EDIT_MEMBER) !== EDIT_MEMBER
-            "
-            @click="updateTeamMember(index)"
-          >
-            <CheckIcon />
-            Save changes
           </button>
         </div>
       </div>
@@ -291,30 +249,26 @@
 </template>
 
 <script>
-import ModalConfirm from '~/components/ui/ModalConfirm'
 import Checkbox from '~/components/ui/Checkbox'
 import Badge from '~/components/ui/Badge'
 
 import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
-import PlusIcon from '~/assets/images/utils/plus.svg?inline'
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
-import EditIcon from '~/assets/images/utils/edit.svg?inline'
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
-import UserIcon from '~/assets/images/utils/user.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
+import TransferIcon from '~/assets/images/utils/transfer.svg?inline'
+import UserPlusIcon from '~/assets/images/utils/user-plus.svg?inline'
+import UserRemoveIcon from '~/assets/images/utils/user-x.svg?inline'
 import Avatar from '~/components/ui/Avatar'
 
 export default {
   components: {
     Avatar,
     DropdownIcon,
-    ModalConfirm,
     Checkbox,
     Badge,
-    PlusIcon,
-    CheckIcon,
-    EditIcon,
-    TrashIcon,
-    UserIcon,
+    SaveIcon,
+    TransferIcon,
+    UserPlusIcon,
+    UserRemoveIcon,
   },
   props: {
     project: {
@@ -430,6 +384,12 @@ export default {
           this.$defaultHeaders()
         )
         await this.updateMembers()
+        this.$notify({
+          group: 'main',
+          title: 'Member(s) updated',
+          text: `Your project's member(s) has been updated.`,
+          type: 'success',
+        })
       } catch (err) {
         this.$notify({
           group: 'main',
@@ -463,20 +423,6 @@ export default {
       }
 
       this.$nuxt.$loading.finish()
-    },
-    async deleteProject() {
-      await this.$axios.delete(
-        `project/${this.project.id}`,
-        this.$defaultHeaders()
-      )
-      await this.$store.dispatch('user/fetchProjects')
-      await this.$router.push(`/user/${this.$auth.user.username}`)
-      this.$notify({
-        group: 'main',
-        title: 'Action Success',
-        text: 'Your project has been successfully deleted.',
-        type: 'success',
-      })
     },
     async updateMembers() {
       this.allTeamMembers = (
@@ -518,11 +464,10 @@ export default {
       align-items: center;
       .dropdown-icon {
         margin-left: 1rem;
-        cursor: pointer;
-        color: var(--color-text-dark);
-        background-color: unset;
-        transition: 150ms ease transform;
-        padding: unset;
+
+        svg {
+          transition: 150ms ease transform;
+        }
       }
     }
   }
@@ -546,7 +491,7 @@ export default {
 
   &.open {
     .member-header {
-      .dropdown-icon {
+      .dropdown-icon svg {
         transform: rotate(180deg);
       }
     }

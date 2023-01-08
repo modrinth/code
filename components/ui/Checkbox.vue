@@ -73,7 +73,7 @@ export default {
 
   p {
     user-select: none;
-    padding: 0.2rem 0rem;
+    padding: 0.2rem 0;
     margin: 0;
   }
 

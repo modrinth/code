@@ -2,14 +2,18 @@
   <img
     v-if="src"
     ref="img"
-    :class="`avatar size-${size} ${circle ? 'circle' : ''}`"
+    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${
+      noShadow ? 'no-shadow' : ''
+    }`"
     :src="src"
     :alt="alt"
     :loading="loading"
   />
   <svg
     v-else
-    :class="`avatar size-${size} ${circle ? 'circle' : ''}`"
+    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${
+      noShadow ? 'no-shadow' : ''
+    }`"
     xml:space="preserve"
     fill-rule="evenodd"
     stroke-linecap="round"
@@ -49,6 +53,10 @@ export default {
       },
     },
     circle: {
+      type: Boolean,
+      default: false,
+    },
+    noShadow: {
       type: Boolean,
       default: false,
     },
@@ -111,6 +119,10 @@ export default {
 
   &.circle {
     border-radius: 50%;
+  }
+
+  &.no-shadow {
+    box-shadow: none;
   }
 }
 </style>

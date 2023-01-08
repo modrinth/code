@@ -156,7 +156,7 @@
       </div>
       <div class="normal-page__content">
         <Advertisement type="banner" small-screen="square" />
-        <nav class="card user-navigation">
+        <nav class="navigation-card">
           <NavRow
             query="type"
             :links="[
@@ -565,15 +565,6 @@ export default {
   .user-header-wrapper .user-header .username {
     display: block;
   }
-}
-
-.user-navigation {
-  align-items: center;
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  row-gap: 0.5rem;
-  padding-right: var(--spacing-card-bg);
 }
 
 .sidebar {

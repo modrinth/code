@@ -46,26 +46,9 @@
               </h3>
 
               <SearchFilter
-                v-for="category in categories
-                  .filter((x) => x.project_type === projectType.actual)
-                  .sort((a, b) => {
-                    if (header === 'resolutions') {
-                      return (
-                        a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-                      )
-                    } else if (header === 'performance impact') {
-                      const x = [
-                        'potato',
-                        'low',
-                        'medium',
-                        'high',
-                        'screenshot',
-                      ]
-
-                      return x.indexOf(a.name) - x.indexOf(b.name)
-                    }
-                    return 0
-                  })"
+                v-for="category in categories.filter(
+                  (x) => x.project_type === projectType.actual
+                )"
                 :key="category.name"
                 :active-filters="facets"
                 :display-name="$formatCategory(category.name)"
@@ -580,7 +563,7 @@ export default {
     categoriesMap() {
       const categories = {}
 
-      for (const category of this.$tag.categories) {
+      for (const category of this.$sortedCategories) {
         if (categories[category.header]) {
           categories[category.header].push(category)
         } else {
@@ -588,16 +571,10 @@ export default {
         }
       }
 
-      const newVals = Object.keys(categories)
-        .sort()
-        .reduce((obj, key) => {
-          obj[key] = categories[key]
-          return obj
-        }, {})
-
-      for (const header of Object.keys(categories)) {
-        newVals[header].sort((a, b) => a.name.localeCompare(b.name))
-      }
+      const newVals = Object.keys(categories).reduce((obj, key) => {
+        obj[key] = categories[key]
+        return obj
+      }, {})
 
       return newVals
     },

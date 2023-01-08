@@ -91,17 +91,24 @@
           >
             <button
               class="iconified-button"
-              @click="setProjectStatus(project, 'approved')"
+              @click="
+                setProjectStatus(
+                  project,
+                  project.requested_status
+                    ? project.requested_status
+                    : 'approved'
+                )
+              "
             >
               <CheckIcon />
               Approve
             </button>
             <button
               class="iconified-button"
-              @click="setProjectStatus(project, 'unlisted')"
+              @click="setProjectStatus(project, 'withheld')"
             >
               <UnlistIcon />
-              Unlist
+              Withhold
             </button>
             <button
               class="iconified-button"

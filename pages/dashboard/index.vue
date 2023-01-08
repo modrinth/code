@@ -2,8 +2,8 @@
   <div>
     <section class="universal-card">
       <h2>Overview</h2>
-      <div class="metrics">
-        <div class="metric">
+      <div class="grid-display">
+        <div class="grid-display__item">
           <div class="label">Total downloads</div>
           <div class="value">
             {{
@@ -24,7 +24,7 @@
           <!--              aria-hidden="true"-->
           <!--          /></NuxtLink>-->
         </div>
-        <div class="metric">
+        <div class="grid-display__item">
           <div class="label">Total followers</div>
           <div class="value">
             {{
@@ -47,7 +47,7 @@
           <!--              aria-hidden="true"-->
           <!--          /></NuxtLink>-->
         </div>
-        <div class="metric">
+        <div class="grid-display__item">
           <div class="label">Total revenue</div>
           <div class="value">{{ $formatMoney(payouts.all_time) }}</div>
           <span>{{ $formatMoney(payouts.last_month) }} this month</span>
@@ -58,7 +58,7 @@
           <!--              aria-hidden="true"-->
           <!--          /></NuxtLink>-->
         </div>
-        <div class="metric">
+        <div class="grid-display__item">
           <div class="label">Current balance</div>
           <div class="value">
             {{ $formatMoney($auth.user.payout_data.balance) }}
@@ -130,33 +130,4 @@ export default {
   methods: {},
 }
 </script>
-<style lang="scss" scoped>
-.metrics {
-  display: grid;
-  grid-gap: var(--spacing-card-md);
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-
-  .metric {
-    display: flex;
-    flex-grow: 1;
-    flex-direction: column;
-    justify-content: center;
-    background-color: var(--color-bg);
-    border-radius: var(--size-rounded-card);
-    padding: var(--spacing-card-lg);
-    gap: var(--spacing-card-md);
-
-    .label {
-      color: var(--color-heading);
-      font-weight: bold;
-      font-size: 1rem;
-    }
-
-    .value {
-      color: var(--color-text-dark);
-      font-weight: bold;
-      font-size: 2rem;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

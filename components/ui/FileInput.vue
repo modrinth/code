@@ -85,7 +85,6 @@ export default {
 <style lang="scss" scoped>
 label {
   flex-direction: unset;
-  margin-bottom: 0;
   max-height: unset;
 
   svg {

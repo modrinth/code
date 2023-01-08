@@ -22,7 +22,7 @@
           >
         </p>
 
-        <div v-if="enrolled" class="buttons">
+        <div v-if="enrolled" class="input-group">
           <button
             class="iconified-button brand-button"
             @click="$refs.modal_transfer.show()"
@@ -121,11 +121,5 @@ export default {
 strong {
   color: var(--color-text-dark);
   font-weight: 500;
-}
-
-.buttons {
-  display: flex;
-  flex-direction: row;
-  gap: var(--spacing-card-sm);
 }
 </style>

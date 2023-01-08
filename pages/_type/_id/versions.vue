@@ -32,7 +32,7 @@
       </div>
       <div
         v-for="version in filteredVersions"
-        :key="version.id + '-new'"
+        :key="version.id"
         class="version-button button-transparent"
         @click="
           $router.push(

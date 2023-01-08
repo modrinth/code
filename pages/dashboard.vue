@@ -7,9 +7,9 @@
           <NavStackItem link="/dashboard" label="Overview">
             <DashboardIcon />
           </NavStackItem>
-          <!--          <NavStackItem link="/dashboard/projects" label="Projects">-->
-          <!--            <ListIcon />-->
-          <!--          </NavStackItem>-->
+          <NavStackItem link="/dashboard/projects" label="Projects">
+            <ListIcon />
+          </NavStackItem>
           <!--          <NavStackItem link="/dashboard/analytics" label="Analytics">-->
           <!--            <ChartIcon />-->
           <!--          </NavStackItem>-->
@@ -36,7 +36,7 @@ import NavStackItem from '~/components/ui/NavStackItem'
 import DashboardIcon from '~/assets/images/utils/dashboard.svg?inline'
 // import ChartIcon from '~/assets/images/utils/chart.svg?inline'
 import CurrencyIcon from '~/assets/images/utils/currency.svg?inline'
-// import ListIcon from '~/assets/images/utils/list.svg?inline'
+import ListIcon from '~/assets/images/utils/list.svg?inline'
 
 const monetization = true
 
@@ -48,7 +48,7 @@ export default {
     DashboardIcon,
     // ChartIcon,
     CurrencyIcon,
-    // ListIcon,
+    ListIcon,
   },
   methods: {
     hasMonetization() {

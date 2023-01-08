@@ -31,11 +31,14 @@ export default (ctx, inject) => {
   inject('formatProjectType', formatProjectType)
   inject('formatCategory', formatCategory)
   inject('formatCategoryHeader', formatCategoryHeader)
+  inject('formatProjectStatus', formatProjectStatus)
   inject('computeVersions', (versions) => {
     const visitedVersions = []
     const returnVersions = []
 
-    for (const version of versions.reverse()) {
+    for (const version of versions.sort(
+      (a, b) => ctx.$dayjs(a.date_published) - ctx.$dayjs(b.date_published)
+    )) {
       if (visitedVersions.includes(version.version_number)) {
         visitedVersions.push(version.version_number)
         version.displayUrlEnding = version.id
@@ -47,18 +50,23 @@ export default (ctx, inject) => {
       returnVersions.push(version)
     }
 
-    return returnVersions.reverse().map((version, index) => {
-      const nextVersion = returnVersions[index + 1]
-      if (
-        nextVersion &&
-        version.changelog &&
-        nextVersion.changelog === version.changelog
-      ) {
-        return { duplicate: true, ...version }
-      } else {
-        return { duplicate: false, ...version }
-      }
-    })
+    return returnVersions
+      .reverse()
+      .map((version, index) => {
+        const nextVersion = returnVersions[index + 1]
+        if (
+          nextVersion &&
+          version.changelog &&
+          nextVersion.changelog === version.changelog
+        ) {
+          return { duplicate: true, ...version }
+        } else {
+          return { duplicate: false, ...version }
+        }
+      })
+      .sort(
+        (a, b) => ctx.$dayjs(b.date_published) - ctx.$dayjs(a.date_published)
+      )
   })
   inject('getProjectTypeForDisplay', (type, categories) => {
     if (type === 'mod') {
@@ -115,6 +123,26 @@ export default (ctx, inject) => {
     }
   })
   inject('cycleValue', cycleValue)
+  const sortedCategories = ctx.store.state.tag.categories
+    .slice()
+    .sort((a, b) => {
+      const headerCompare = a.header.localeCompare(b.header)
+      if (headerCompare !== 0) {
+        return headerCompare
+      }
+      if (a.header === 'resolutions' && b.header === 'resolutions') {
+        return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
+      } else if (
+        a.header === 'performance impact' &&
+        b.header === 'performance impact'
+      ) {
+        const x = ['potato', 'low', 'medium', 'high', 'screenshot']
+
+        return x.indexOf(a.name) - x.indexOf(b.name)
+      }
+      return 0
+    })
+  inject('sortedCategories', sortedCategories)
 }
 
 export const formatNumber = (number) => {
@@ -158,7 +186,7 @@ export const formatBytes = (bytes, decimals = 2) => {
 }
 
 export const capitalizeString = (name) => {
-  return name.charAt(0).toUpperCase() + name.slice(1)
+  return name ? name.charAt(0).toUpperCase() + name.slice(1) : name
 }
 
 export const formatWallet = (name) => {
@@ -205,12 +233,26 @@ export const formatCategory = (name) => {
     return 'PBR'
   } else if (name === 'datapack') {
     return 'Data Pack'
+  } else if (name === 'colored-lighting') {
+    return 'Colored Lighting'
+  } else if (name === 'optifine') {
+    return 'OptiFine'
   }
 
   return capitalizeString(name)
 }
 
 export const formatCategoryHeader = (name) => {
+  return capitalizeString(name)
+}
+
+export const formatProjectStatus = (name) => {
+  if (name === 'approved') {
+    return 'Listed'
+  } else if (name === 'processing') {
+    return 'Under review'
+  }
+
   return capitalizeString(name)
 }
 

@@ -9,7 +9,7 @@
       tabindex="-1"
       :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
     >
-      <Avatar :src="iconUrl" :alt="name" size="md" loading="lazy" />
+      <Avatar :src="iconUrl" :alt="name" size="md" no-shadow loading="lazy" />
     </nuxt-link>
     <nuxt-link
       class="gallery"
@@ -49,59 +49,14 @@
       :type="type"
       class="tags"
     >
-      <span v-if="moderation" class="environment">
-        <InfoIcon aria-hidden="true" />
-        A {{ projectTypeDisplay }}
-      </span>
-      <span
-        v-else-if="
-          !['resourcepack', 'shader'].includes(type) &&
-          !(projectTypeDisplay === 'plugin' && search) &&
-          !categories.some((x) => $tag.loaderData.dataPackLoaders.includes(x))
-        "
-        class="environment"
-      >
-        <template v-if="clientSide === 'optional' && serverSide === 'optional'">
-          <GlobeIcon aria-hidden="true" />
-          Client or server
-        </template>
-        <template
-          v-else-if="clientSide === 'required' && serverSide === 'required'"
-        >
-          <GlobeIcon aria-hidden="true" />
-          Client and server
-        </template>
-        <template
-          v-else-if="
-            (clientSide === 'optional' || clientSide === 'required') &&
-            (serverSide === 'optional' || serverSide === 'unsupported')
-          "
-        >
-          <ClientIcon aria-hidden="true" />
-          Client
-        </template>
-        <template
-          v-else-if="
-            (serverSide === 'optional' || serverSide === 'required') &&
-            (clientSide === 'optional' || clientSide === 'unsupported')
-          "
-        >
-          <ServerIcon aria-hidden="true" />
-          Server
-        </template>
-        <template
-          v-else-if="
-            serverSide === 'unsupported' && clientSide === 'unsupported'
-          "
-        >
-          <GlobeIcon aria-hidden="true" />
-          Unsupported
-        </template>
-        <template v-else-if="moderation">
-          <InfoIcon aria-hidden="true" />
-          A {{ projectTypeDisplay }}
-        </template>
-      </span>
+      <EnvironmentIndicator
+        :type-only="moderation"
+        :client-side="clientSide"
+        :server-side="serverSide"
+        :type="projectTypeDisplay"
+        :search="search"
+        :categories="categories"
+      />
     </Categories>
     <div class="stats">
       <div v-if="downloads" class="stat">
@@ -150,11 +105,8 @@
 <script>
 import Categories from '~/components/ui/search/Categories'
 import Badge from '~/components/ui/Badge'
+import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator'
 
-import InfoIcon from '~/assets/images/utils/info.svg?inline'
-import ClientIcon from '~/assets/images/utils/client.svg?inline'
-import GlobeIcon from '~/assets/images/utils/globe.svg?inline'
-import ServerIcon from '~/assets/images/utils/server.svg?inline'
 import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import EditIcon from '~/assets/images/utils/updated.svg?inline'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
@@ -164,13 +116,10 @@ import Avatar from '~/components/ui/Avatar'
 export default {
   name: 'ProjectCard',
   components: {
+    EnvironmentIndicator,
     Avatar,
     Categories,
     Badge,
-    InfoIcon,
-    ClientIcon,
-    ServerIcon,
-    GlobeIcon,
     CalendarIcon,
     EditIcon,
     DownloadIcon,
@@ -364,7 +313,7 @@ export default {
     img,
     svg {
       border-radius: var(--size-rounded-lg);
-      border: 0.25rem solid var(--color-raised-bg);
+      border: 4px solid var(--color-raised-bg);
       border-bottom: none;
     }
   }
@@ -427,6 +376,11 @@ export default {
 
   .icon {
     margin-top: calc(var(--spacing-card-bg) - var(--spacing-card-sm));
+
+    img,
+    svg {
+      border: none;
+    }
   }
 
   .title {

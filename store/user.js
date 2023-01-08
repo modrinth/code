@@ -89,14 +89,14 @@ export const actions = {
   async fetchProjects({ commit, rootState }) {
     if (rootState.auth.user && rootState.auth.user.id) {
       try {
-        const follows = (
+        const projects = (
           await this.$axios.get(
-            `user/${rootState.auth.user.id}/follows`,
+            `user/${rootState.auth.user.id}/projects`,
             rootState.auth.headers
           )
         ).data
 
-        commit('SET_FOLLOWS', follows)
+        commit('SET_PROJECTS', projects)
       } catch (err) {
         console.error(err)
       }

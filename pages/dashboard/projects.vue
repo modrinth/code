@@ -1,22 +1,664 @@
 <template>
   <div>
+    <Modal ref="editLinksModal" header="Edit links">
+      <div class="universal-modal links-modal">
+        <p>
+          Any links you specify below will be overwritten on each of the
+          selected projects. Any you leave blank will be ignored. You can clear
+          a link from all selected projects using the trash can button.
+        </p>
+        <section class="links">
+          <label
+            for="issue-tracker-input"
+            title="A place for users to report bugs, issues, and concerns about your project."
+          >
+            <span class="label__title">Issue tracker</span>
+          </label>
+          <div class="input-group shrink-first">
+            <input
+              id="issue-tracker-input"
+              v-model="editLinks.issues.val"
+              :disabled="editLinks.issues.clear"
+              type="url"
+              :placeholder="
+                editLinks.issues.clear
+                  ? 'Existing link will be cleared'
+                  : 'Enter a valid URL'
+              "
+              maxlength="2048"
+            />
+            <button
+              v-tooltip="'Clear link'"
+              class="square-button label-button"
+              :data-active="editLinks.issues.clear"
+              @click="editLinks.issues.clear = !editLinks.issues.clear"
+            >
+              <TrashIcon />
+            </button>
+          </div>
+          <label
+            for="source-code-input"
+            title="A page/repository containing the source code for your project"
+          >
+            <span class="label__title">Source code</span>
+          </label>
+          <div class="input-group shrink-first">
+            <input
+              id="source-code-input"
+              v-model="editLinks.source.val"
+              :disabled="editLinks.source.clear"
+              type="url"
+              maxlength="2048"
+              :placeholder="
+                editLinks.source.clear
+                  ? 'Existing link will be cleared'
+                  : 'Enter a valid URL'
+              "
+            />
+            <button
+              v-tooltip="'Clear link'"
+              class="square-button label-button"
+              :data-active="editLinks.source.clear"
+              @click="editLinks.source.clear = !editLinks.source.clear"
+            >
+              <TrashIcon />
+            </button>
+          </div>
+          <label
+            for="wiki-page-input"
+            title="A page containing information, documentation, and help for the project."
+          >
+            <span class="label__title">Wiki page</span>
+          </label>
+          <div class="input-group shrink-first">
+            <input
+              id="wiki-page-input"
+              v-model="editLinks.wiki.val"
+              :disabled="editLinks.wiki.clear"
+              type="url"
+              maxlength="2048"
+              :placeholder="
+                editLinks.wiki.clear
+                  ? 'Existing link will be cleared'
+                  : 'Enter a valid URL'
+              "
+            />
+            <button
+              v-tooltip="'Clear link'"
+              class="square-button label-button"
+              :data-active="editLinks.wiki.clear"
+              @click="editLinks.wiki.clear = !editLinks.wiki.clear"
+            >
+              <TrashIcon />
+            </button>
+          </div>
+          <label
+            for="discord-invite-input"
+            title="An invitation link to your Discord server."
+          >
+            <span class="label__title">Discord invite</span>
+          </label>
+          <div class="input-group shrink-first">
+            <input
+              id="discord-invite-input"
+              v-model="editLinks.discord.val"
+              :disabled="editLinks.discord.clear"
+              type="url"
+              maxlength="2048"
+              :placeholder="
+                editLinks.discord.clear
+                  ? 'Existing link will be cleared'
+                  : 'Enter a valid Discord invite URL'
+              "
+            />
+            <button
+              v-tooltip="'Clear link'"
+              class="square-button label-button"
+              :data-active="editLinks.discord.clear"
+              @click="editLinks.discord.clear = !editLinks.discord.clear"
+            >
+              <TrashIcon />
+            </button>
+          </div>
+        </section>
+        <p>
+          Changes will be applied to
+          <strong>{{ selectedProjects.length }}</strong> project{{
+            selectedProjects.length > 1 ? 's' : ''
+          }}.
+        </p>
+        <ul>
+          <li
+            v-for="project in selectedProjects.slice(
+              0,
+              editLinks.showAffected ? selectedProjects.length : 3
+            )"
+            :key="project.id"
+          >
+            {{ project.title }}
+          </li>
+          <li v-if="!editLinks.showAffected && selectedProjects.length > 3">
+            <strong>and {{ selectedProjects.length - 3 }} more...</strong>
+          </li>
+        </ul>
+        <Checkbox
+          v-if="selectedProjects.length > 3"
+          v-model="editLinks.showAffected"
+          :label="editLinks.showAffected ? 'Less' : 'More'"
+          description="Show all loaders"
+          :border="false"
+          :collapsing-toggle-style="true"
+        />
+        <div class="push-right input-group">
+          <button class="iconified-button" @click="$refs.editLinksModal.hide()">
+            <CrossIcon />
+            Cancel
+          </button>
+          <button
+            class="iconified-button brand-button"
+            @click="bulkEditLinks()"
+          >
+            <SaveIcon />
+            Save changes
+          </button>
+        </div>
+      </div>
+    </Modal>
+    <ModalCreation ref="modal_creation" />
     <section class="universal-card">
-      <h2>Projects</h2>
+      <div class="header__row">
+        <h2 class="header__title">Projects</h2>
+        <div class="input-group">
+          <button
+            class="iconified-button brand-button"
+            @click="$refs.modal_creation.show()"
+          >
+            <PlusIcon />
+            Create a project
+          </button>
+        </div>
+      </div>
+      <p v-if="projects.length < 1">
+        You don't have any projects yet. Click the green button above to begin.
+      </p>
+      <template v-else>
+        <p>You can edit multiple projects at once by selecting them below.</p>
+        <div class="input-group">
+          <button
+            class="iconified-button"
+            :disabled="selectedProjects.length === 0"
+            @click="$refs.editLinksModal.show()"
+          >
+            <EditIcon />
+            Edit links
+          </button>
+          <div class="push-right">
+            <div class="labeled-control-row">
+              Sort By
+              <Multiselect
+                v-model="sortBy"
+                :searchable="false"
+                class="small-select"
+                :options="['Name', 'Status', 'Type']"
+                :close-on-select="true"
+                :show-labels="false"
+                :allow-empty="false"
+                @input="updateSort()"
+              ></Multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="grid-table">
+          <div class="grid-table__row grid-table__header">
+            <div>
+              <Checkbox
+                :value="selectedProjects === projects"
+                @input="
+                  selectedProjects === projects
+                    ? (selectedProjects = [])
+                    : (selectedProjects = projects)
+                "
+              />
+            </div>
+            <div>Icon</div>
+            <div>Name</div>
+            <div>ID</div>
+            <div>Type</div>
+            <div>Status</div>
+            <div></div>
+          </div>
+          <div
+            v-for="project in projects"
+            :key="`project-${project.id}`"
+            class="grid-table__row"
+          >
+            <div>
+              <Checkbox
+                :disabled="
+                  (project.permissions & EDIT_DETAILS) === EDIT_DETAILS
+                "
+                :value="selectedProjects.includes(project)"
+                @input="
+                  selectedProjects.includes(project)
+                    ? (selectedProjects = selectedProjects.filter(
+                        (it) => it !== project
+                      ))
+                    : selectedProjects.push(project)
+                "
+              />
+            </div>
+            <div>
+              <nuxt-link
+                tabindex="-1"
+                :to="`/${project.project_type}/${project.slug}`"
+              >
+                <Avatar
+                  :src="project.icon_url"
+                  aria-hidden="true"
+                  :alt="'Icon for ' + project.title"
+                  no-shadow
+                />
+              </nuxt-link>
+            </div>
+
+            <div>
+              <span class="project-title">
+                <IssuesIcon
+                  v-if="project.moderator_message"
+                  v-tooltip="
+                    'Project has a message from the moderators. View the project to see more.'
+                  "
+                  aria-label="Project has a message from the moderators. View the project to see more."
+                />
+
+                <nuxt-link
+                  class="hover-link wrap-as-needed"
+                  :to="`/${project.project_type}/${project.slug}`"
+                >
+                  {{ project.title }}
+                </nuxt-link>
+              </span>
+            </div>
+
+            <div>
+              <CopyCode :text="project.id" />
+            </div>
+
+            <div>
+              {{ $formatProjectType(project.project_type) }}
+            </div>
+
+            <div>
+              <Badge
+                v-if="project.status"
+                :type="project.status"
+                class="status"
+              />
+            </div>
+
+            <div>
+              <nuxt-link
+                class="square-button"
+                :to="`/${project.project_type}/${project.slug}/settings`"
+              >
+                <SettingsIcon />
+              </nuxt-link>
+            </div>
+          </div>
+        </div>
+      </template>
     </section>
   </div>
 </template>
 
 <script>
+import Multiselect from 'vue-multiselect'
+
+import Badge from '~/components/ui/Badge.vue'
+import Checkbox from '~/components/ui/Checkbox.vue'
+import Modal from '~/components/ui/Modal.vue'
+// import ModalConfirm from '~/components/ui/ModalConfirm.vue'
+import Avatar from '~/components/ui/Avatar.vue'
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import CopyCode from '~/components/ui/CopyCode.vue'
+
+import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
+import TrashIcon from '~/assets/images/utils/trash.svg?inline'
+import IssuesIcon from '~/assets/images/utils/issues.svg?inline'
+import PlusIcon from '~/assets/images/utils/plus.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg?inline'
+import EditIcon from '~/assets/images/utils/edit.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg?inline'
+
 export default {
-  components: {},
-  data() {
-    return {}
+  components: {
+    Avatar,
+    Badge,
+    SettingsIcon,
+    TrashIcon,
+    Checkbox,
+    IssuesIcon,
+    PlusIcon,
+    CrossIcon,
+    EditIcon,
+    SaveIcon,
+    Modal,
+    // ModalConfirm,
+    ModalCreation,
+    Multiselect,
+    CopyCode,
   },
-  fetch() {},
+  data() {
+    return {
+      projects: [],
+      versions: [],
+      selectedProjects: [],
+      sortBy: 'Name',
+      editLinks: {
+        showAffected: false,
+        source: {
+          val: '',
+          clear: false,
+        },
+        discord: {
+          val: '',
+          clear: false,
+        },
+        wiki: {
+          val: '',
+          clear: false,
+        },
+        issues: {
+          val: '',
+          clear: false,
+        },
+      },
+    }
+  },
+  fetch() {
+    this.projects = this.$user.projects
+    this.updateSort()
+  },
   head: {
     title: 'Projects - Modrinth',
   },
-  methods: {},
+  created() {
+    this.UPLOAD_VERSION = 1 << 0
+    this.DELETE_VERSION = 1 << 1
+    this.EDIT_DETAILS = 1 << 2
+    this.EDIT_BODY = 1 << 3
+    this.MANAGE_INVITES = 1 << 4
+    this.REMOVE_MEMBER = 1 << 5
+    this.EDIT_MEMBER = 1 << 6
+    this.DELETE_PROJECT = 1 << 7
+  },
+  mounted() {},
+  methods: {
+    updateSort() {
+      switch (this.sortBy) {
+        case 'Name':
+          this.projects = this.projects.slice().sort((a, b) => {
+            if (a.title < b.title) {
+              return -1
+            }
+            if (a.title > b.title) {
+              return 1
+            }
+            return 0
+          })
+          break
+        case 'Status':
+          this.projects = this.projects.slice().sort((a, b) => {
+            if (a.status < b.status) {
+              return -1
+            }
+            if (a.status > b.status) {
+              return 1
+            }
+            return 0
+          })
+          break
+        case 'Type':
+          this.projects = this.projects.slice().sort((a, b) => {
+            if (a.project_type < b.project_type) {
+              return -1
+            }
+            if (a.project_type > b.project_type) {
+              return 1
+            }
+            return 0
+          })
+          break
+        default:
+          break
+      }
+    },
+    async bulkEditLinks() {
+      try {
+        const baseData = {
+          issues_url:
+            !this.editLinks.issues.clear &&
+            this.editLinks.issues.val.trim() !== ''
+              ? this.editLinks.issues.val
+              : null,
+          source_url:
+            !this.editLinks.source.clear &&
+            this.editLinks.source.val.trim() !== ''
+              ? this.editLinks.source.val
+              : null,
+          wiki_url:
+            !this.editLinks.wiki.clear && this.editLinks.wiki.val.trim() !== ''
+              ? this.editLinks.wiki.val
+              : null,
+          discord_url:
+            !this.editLinks.discord.clear &&
+            this.editLinks.discord.val.trim() !== ''
+              ? this.editLinks.discord.val
+              : null,
+        }
+
+        await this.$axios.patch(
+          `projects?ids=${JSON.stringify(
+            this.selectedProjects.map((x) => x.id)
+          )}`,
+          baseData,
+          this.$defaultHeaders()
+        )
+
+        this.$refs.editLinksModal.hide()
+        this.$notify({
+          group: 'main',
+          title: 'Success',
+          text: "Bulk edited selected project's links.",
+          type: 'success',
+        })
+        this.selectedProjects = []
+      } catch (e) {
+        this.$notify({
+          group: 'main',
+          title: 'An error occurred',
+          text: e,
+          type: 'error',
+        })
+      }
+    },
+  },
 }
 </script>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.grid-table {
+  display: grid;
+  grid-template-columns:
+    min-content min-content minmax(min-content, 2fr)
+    minmax(min-content, 1fr) minmax(min-content, 1fr) minmax(min-content, 1fr) min-content;
+  border-radius: var(--size-rounded-sm);
+  overflow: hidden;
+  margin-top: var(--spacing-card-md);
+
+  .grid-table__row {
+    display: contents;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--spacing-card-sm);
+
+      // Left edge of table
+      &:first-child {
+        padding-left: var(--spacing-card-bg);
+      }
+
+      // Right edge of table
+      &:last-child {
+        padding-right: var(--spacing-card-bg);
+      }
+    }
+
+    &:nth-child(2n + 1) > div {
+      background-color: var(--color-table-alternate-row);
+    }
+
+    &.grid-table__header > div {
+      background-color: var(--color-bg);
+      font-weight: bold;
+      color: var(--color-text-dark);
+      padding-top: var(--spacing-card-bg);
+      padding-bottom: var(--spacing-card-bg);
+    }
+  }
+
+  @media screen and (max-width: 750px) {
+    display: flex;
+    flex-direction: column;
+
+    .grid-table__row {
+      display: grid;
+      grid-template: 'checkbox icon name type settings' 'checkbox icon id status settings';
+      grid-template-columns:
+        min-content min-content minmax(min-content, 2fr)
+        minmax(min-content, 1fr) min-content;
+
+      :nth-child(1) {
+        grid-area: checkbox;
+      }
+
+      :nth-child(2) {
+        grid-area: icon;
+      }
+
+      :nth-child(3) {
+        grid-area: name;
+      }
+
+      :nth-child(4) {
+        grid-area: id;
+        padding-top: 0;
+      }
+
+      :nth-child(5) {
+        grid-area: type;
+      }
+
+      :nth-child(6) {
+        grid-area: status;
+        padding-top: 0;
+      }
+
+      :nth-child(7) {
+        grid-area: settings;
+      }
+    }
+
+    .grid-table__header {
+      grid-template: 'checkbox settings';
+      grid-template-columns: min-content minmax(min-content, 1fr);
+
+      :nth-child(2),
+      :nth-child(3),
+      :nth-child(4),
+      :nth-child(5),
+      :nth-child(6) {
+        display: none;
+      }
+    }
+  }
+
+  @media screen and (max-width: 560px) {
+    .grid-table__row {
+      display: grid;
+      grid-template: 'checkbox icon name settings' 'checkbox icon id settings' 'checkbox icon type settings' 'checkbox icon status settings';
+      grid-template-columns: min-content min-content minmax(min-content, 1fr) min-content;
+
+      :nth-child(5) {
+        padding-top: 0;
+      }
+    }
+
+    .grid-table__header {
+      grid-template: 'checkbox settings';
+      grid-template-columns: min-content minmax(min-content, 1fr);
+    }
+  }
+}
+
+.project-title {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-card-xs);
+
+  svg {
+    color: var(--color-special-orange);
+  }
+}
+
+.status {
+  margin-top: var(--spacing-card-xs);
+}
+
+.hover-link:hover {
+  text-decoration: underline;
+}
+
+.labeled-control-row {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  min-width: 0;
+  align-items: center;
+  gap: var(--spacing-card-md);
+}
+
+.small-select {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.label-button[data-active='true'] {
+  --background-color: var(--color-special-red);
+  --text-color: var(--color-brand-inverted);
+}
+
+.links-modal {
+  .links {
+    display: grid;
+    gap: var(--spacing-card-sm);
+    grid-template-columns: 1fr 2fr;
+
+    .input-group {
+      flex-wrap: nowrap;
+    }
+
+    @media screen and (max-width: 530px) {
+      grid-template-columns: 1fr;
+      .input-group {
+        flex-wrap: wrap;
+      }
+    }
+  }
+
+  ul {
+    margin: 0 0 var(--spacing-card-sm) 0;
+  }
+}
+</style>

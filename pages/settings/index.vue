@@ -64,7 +64,7 @@
       <div
         v-for="projectType in listTypes"
         :key="projectType.id + '-display-mode-selector'"
-        class="adjacent-input small"
+        class="adjacent-input"
       >
         <label :for="projectType.id + '-search-display-mode'">
           <span class="label__title">{{ projectType.name }} display mode</span>
