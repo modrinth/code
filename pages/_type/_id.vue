@@ -264,7 +264,7 @@
                   Report
                 </a>
                 <a class="iconified-button" :href="authUrl">
-                  <HeartIcon fill="currentColor" aria-hidden="true" />
+                  <HeartIcon aria-hidden="true" />
                   Follow
                 </a>
               </template>
@@ -982,6 +982,13 @@ export default {
     this.reset()
     this.versions = this.$computeVersions(this.versions)
     this.featuredVersions = this.$computeVersions(this.featuredVersions)
+
+    this.featuredVersions.sort((a, b) => {
+      const aLatest = a.game_versions[a.game_versions.length - 1]
+      const bLatest = b.game_versions[b.game_versions.length - 1]
+      const gameVersions = this.$tag.gameVersions.map((e) => e.version)
+      return gameVersions.indexOf(aLatest) - gameVersions.indexOf(bLatest)
+    })
   },
   head() {
     const title = `${this.project.title} - Minecraft ${this.$formatProjectType(
