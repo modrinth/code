@@ -212,7 +212,7 @@
             class="tab iconified-button"
             @click.native="isBrowseMenuOpen = false"
           >
-            <span>Data packs</span>
+            <span>Data Packs</span>
           </NuxtLink>
           <NuxtLink
             :tabindex="isBrowseMenuOpen ? 0 : -1"
@@ -228,7 +228,7 @@
             class="tab iconified-button"
             @click.native="isBrowseMenuOpen = false"
           >
-            <span>Resource packs</span>
+            <span>Resource Packs</span>
           </NuxtLink>
           <NuxtLink
             :tabindex="isBrowseMenuOpen ? 0 : -1"

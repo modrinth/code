@@ -744,7 +744,7 @@ export default {
         animation: scroll 100s linear infinite;
 
         @media (prefers-reduced-motion) {
-          animation-play-state: paused;
+          animation-play-state: paused !important;
         }
 
         @keyframes scroll {
@@ -1250,7 +1250,7 @@ export default {
     animation: slide 10s infinite;
 
     @media (prefers-reduced-motion) {
-      animation-play-state: paused;
+      animation-play-state: paused !important;
     }
   }
 
