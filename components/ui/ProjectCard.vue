@@ -9,7 +9,7 @@
       tabindex="-1"
       :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
     >
-      <Avatar :src="iconUrl" :alt="name" size="md" />
+      <Avatar :src="iconUrl" :alt="name" size="md" loading="lazy" />
     </nuxt-link>
     <nuxt-link
       class="gallery"
@@ -546,5 +546,31 @@ export default {
   gap: var(--spacing-card-sm);
   align-items: flex-end;
   flex-grow: 1;
+}
+
+.small-mode {
+  @media screen and (min-width: 750px) {
+    grid-template:
+      'icon title'
+      'icon description'
+      'icon tags'
+      'stats stats' !important;
+    grid-template-columns: min-content auto !important;
+    grid-template-rows: min-content 1fr min-content min-content !important;
+
+    .tags {
+      margin-top: var(--spacing-card-xs) !important;
+    }
+
+    .stats {
+      flex-direction: row;
+      column-gap: var(--spacing-card-md) !important;
+      margin-top: var(--spacing-card-xs) !important;
+
+      .stat-label {
+        display: none !important;
+      }
+    }
+  }
 }
 </style>

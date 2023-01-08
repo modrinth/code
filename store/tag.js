@@ -23,6 +23,11 @@ export const state = () => ({
       display: 'data pack',
     },
     {
+      actual: 'shader',
+      id: 'shader',
+      display: 'shader',
+    },
+    {
       actual: 'resourcepack',
       id: 'resourcepack',
       display: 'resource pack',
@@ -31,11 +36,6 @@ export const state = () => ({
       actual: 'modpack',
       id: 'modpack',
       display: 'modpack',
-    },
-    {
-      actual: 'shader',
-      id: 'shader',
-      display: 'shader',
     },
   ],
   loaderData: {

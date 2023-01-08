@@ -5,7 +5,7 @@
     :class="{ 'expanded-mobile-nav': isBrowseMenuOpen }"
   >
     <header class="site-header" role="presentation">
-      <section class="navbar card columns" role="navigation">
+      <section class="navbar columns" role="navigation">
         <section class="skip column" role="presentation">
           <a href="#main">Skip to Main Content</a>
           <a
@@ -642,6 +642,7 @@ export default {
     }
 
     .navbar {
+      padding: 0 var(--spacing-card-lg);
       margin: 0 var(--spacing-card-lg);
       max-width: 1280px;
       margin-left: auto;
@@ -693,6 +694,7 @@ export default {
             top: 50%;
             transform: translateY(-50%);
             margin-left: 2rem;
+            grid-gap: 1.5rem;
 
             a {
               margin-left: 0;
@@ -885,7 +887,7 @@ export default {
         }
       }
 
-      @media screen and (max-width: 1024px) {
+      @media screen and (max-width: 1095px) {
         display: none;
       }
     }
@@ -1000,7 +1002,7 @@ export default {
         }
       }
 
-      @media screen and (max-width: 1024px) {
+      @media screen and (max-width: 1095px) {
         display: flex;
       }
 
@@ -1106,7 +1108,7 @@ export default {
     &.active {
       display: flex;
 
-      @media screen and (min-width: 1024px) {
+      @media screen and (min-width: 1095px) {
         display: none;
       }
     }
@@ -1126,11 +1128,12 @@ export default {
       'buttons    buttons    buttons' auto
       'notice     notice     notice' auto
       / 1fr 1fr 1fr;
+    max-width: 1280px;
 
     .logo-info {
       margin-left: auto;
       margin-right: auto;
-      max-width: 20rem;
+      max-width: 15rem;
       margin-bottom: 1rem;
       grid-area: logo-info;
 
@@ -1191,18 +1194,17 @@ export default {
     @media screen and (min-width: 1024px) {
       display: grid;
       margin-inline: auto;
-      width: fit-content;
       grid-template:
         'logo-info  links-1 links-2 links-3 buttons' auto
         'notice     notice  notice  notice  notice' auto;
       text-align: unset;
 
       .logo-info {
-        margin-right: 2rem;
+        margin-right: 4rem;
       }
 
       .links {
-        margin-right: 2rem;
+        margin-right: 4rem;
       }
 
       .buttons {

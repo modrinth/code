@@ -15,7 +15,7 @@
     </div>
     <div class="normal-page">
       <div class="normal-page__sidebar">
-        <article class="card sidebar">
+        <div class="card sidebar">
           <h1 class="mobile-username">{{ user.username }}</h1>
           <div class="card__overlay">
             <FileInput
@@ -152,7 +152,7 @@
               View GitHub profile
             </a>
           </template>
-        </article>
+        </div>
       </div>
       <div class="normal-page__content">
         <Advertisement type="banner" small-screen="square" />

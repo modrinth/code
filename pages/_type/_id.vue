@@ -20,7 +20,7 @@
         'alt-layout': $cosmetics.projectLayout,
       }"
     >
-      <article class="normal-page__sidebar">
+      <div class="normal-page__sidebar">
         <div class="header card">
           <nuxt-link
             :to="
@@ -297,7 +297,7 @@
             </ul>
           </div>
         </div>
-      </article>
+      </div>
       <div class="card normal-page__info">
         <template
           v-if="

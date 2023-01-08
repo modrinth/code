@@ -5,6 +5,7 @@
     :class="`avatar size-${size} ${circle ? 'circle' : ''}`"
     :src="src"
     :alt="alt"
+    :loading="loading"
   />
   <svg
     v-else
@@ -50,6 +51,10 @@ export default {
     circle: {
       type: Boolean,
       default: false,
+    },
+    loading: {
+      type: String,
+      default: 'eager',
     },
   },
   mounted() {

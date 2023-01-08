@@ -1,5 +1,5 @@
 html {
-  @extend .light-mode;
+  @extend .dark-mode;
   --dark-color-text: #b0bac5;
   --dark-color-text-dark: #ecf9fb;
 }
@@ -91,6 +91,49 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
+
+  --landing-maze-bg: url('https://cdn.modrinth.com/landing/landing-light.png');
+  --landing-maze-gradient-bg: url('https://cdn.modrinth.com/landing/landing-lower-light.png');
+  --landing-maze-outer-bg: linear-gradient(180deg, #f0f0f0 0%, #ffffff 100%);
+
+  --landing-color-heading: #000;
+  --landing-color-subheading: #3a3f45;
+
+  --landing-transition-gradient-start: rgba(255, 255, 255, 0);
+  --landing-transition-gradient-end: #ffffff;
+  --landing-hover-card-gradient: radial-gradient(
+    50% 50% at 50% 50%,
+    #fff 0%,
+    rgba(204, 204, 204, 0.77) 100%
+  );
+  --landing-border-gradient: linear-gradient(
+    to bottom right,
+    rgba(129, 137, 175, 0.75) 0%,
+    rgba(66, 71, 97, 0.34) 100%
+  );
+  --landing-creator-gradient: linear-gradient(
+    180deg,
+    #f8f8f8 0%,
+    #f8f8f8 63.19%
+  );
+
+  --landing-blob-gradient: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.2695) 100%
+  );
+  --landing-blob-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16),
+    inset 2px 2px 64px rgba(255, 255, 255, 0.45);
+
+  --landing-card-bg: rgba(255, 255, 255, 0.8);
+  --landing-card-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16);
+
+  --landing-blue-label: #0098ba;
+  --landing-blue-label-bg: rgba(0, 177, 216, 0.15);
+  --landing-green-label: #00a936;
+  --landing-green-label-bg: rgba(0, 216, 69, 0.15);
+
+  --landing-raw-bg: #fff;
 }
 
 .dark-mode {
@@ -174,6 +217,50 @@ html {
     rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
+
+  --landing-maze-bg: url('https://cdn.modrinth.com/landing/landing.png');
+  --landing-maze-gradient-bg: linear-gradient(
+      0deg,
+      #31375f 0%,
+      rgba(8, 14, 55, 0) 100%
+    ),
+    url('https://cdn.modrinth.com/landing/landing-lower.png');
+  --landing-maze-outer-bg: linear-gradient(180deg, #06060d 0%, #000000 100%);
+
+  --landing-color-heading: #fff;
+  --landing-color-subheading: #afb6be;
+
+  --landing-transition-gradient-start: rgba(14, 16, 32, 0);
+  --landing-transition-gradient-end: #060a1c;
+  --landing-hover-card-gradient: radial-gradient(
+    50% 50% at 50% 50%,
+    #2c304f 0%,
+    rgba(32, 35, 50, 0.77) 100%
+  );
+  --landing-border-gradient: linear-gradient(
+    to bottom right,
+    rgba(168, 177, 221, 0.75) 0%,
+    rgba(168, 177, 221, 0.18) 100%
+  );
+  --landing-creator-gradient: linear-gradient(180deg, #000000 0%, #0e101d 100%);
+
+  --landing-blob-gradient: radial-gradient(
+    50% 50% at 50% 50%,
+    rgba(44, 48, 79, 0.35) 0%,
+    rgba(32, 35, 50, 0.2695) 100%
+  );
+  --landing-blob-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16),
+    inset 2px 2px 64px rgba(57, 61, 94, 0.45);
+
+  --landing-card-bg: rgba(59, 63, 85, 0.15);
+  --landing-card-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16);
+
+  --landing-blue-label: #10c0e7;
+  --landing-blue-label-bg: rgba(0, 177, 216, 0.15);
+  --landing-green-label: #00d845;
+  --landing-green-label-bg: rgba(0, 216, 69, 0.15);
+
+  --landing-raw-bg: #000;
 }
 
 .oled-mode {
@@ -184,12 +271,6 @@ html {
   --color-button-bg: #222329;
   --color-button-bg-hover: #2d2d32;
   --color-button-bg-active: #3c3c40;
-}
-
-.midas-mode {
-  @extend .dark-mode;
-  --color-brand: #fac413;
-  --color-brand-shadow: rgba(250, 196, 19, 0.7);
 }
 
 body {
