@@ -119,7 +119,11 @@
         </ul>
       </div>
       <div v-if="isCreating" class="input-group">
-        <button class="iconified-button brand-button" @click="createVersion">
+        <button
+          class="iconified-button brand-button"
+          :disabled="shouldPreventActions"
+          @click="createVersion"
+        >
           <PlusIcon aria-hidden="true" />
           Create
         </button>
@@ -137,6 +141,7 @@
       <div v-else-if="isEditing" class="input-group">
         <button
           class="iconified-button brand-button"
+          :disabled="shouldPreventActions"
           @click="saveEditedVersion"
         >
           <SaveIcon aria-hidden="true" />
@@ -904,6 +909,7 @@ export default {
       packageLoaders: ['forge', 'fabric', 'quilt'],
 
       showKnownErrors: false,
+      shouldPreventActions: false,
     }
   },
   async fetch() {
@@ -1344,6 +1350,7 @@ export default {
       this.$nuxt.$loading.finish()
     },
     async createVersion() {
+      this.shouldPreventActions = true
       this.$nuxt.$loading.start()
       if (this.fieldErrors) {
         this.showKnownErrors = true
@@ -1365,6 +1372,7 @@ export default {
       }
 
       this.$nuxt.$loading.finish()
+      this.shouldPreventActions = false
     },
     async createVersionRaw(version) {
       const formData = new FormData()
@@ -1470,6 +1478,7 @@ export default {
       this.$nuxt.$loading.finish()
     },
     async createDataPackVersion() {
+      this.shouldPreventActions = true
       this.$nuxt.$loading.start()
       try {
         const blob = await createDataPackVersion(
@@ -1518,6 +1527,7 @@ export default {
         })
       }
       this.$nuxt.$loading.finish()
+      this.shouldPreventActions = false
     },
   },
 }

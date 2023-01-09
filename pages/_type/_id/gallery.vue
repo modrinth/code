@@ -104,6 +104,7 @@
           <button
             v-if="editIndex === -1"
             class="iconified-button brand-button"
+            :disabled="shouldPreventActions"
             @click="createGalleryItem"
           >
             <PlusIcon />
@@ -112,6 +113,7 @@
           <button
             v-else
             class="iconified-button brand-button"
+            :disabled="shouldPreventActions"
             @click="editGalleryItem"
           >
             <SaveIcon />
@@ -353,6 +355,7 @@ export default {
       editOrder: null,
       editFile: null,
       previewImage: null,
+      shouldPreventActions: false,
     }
   },
   head() {
@@ -452,6 +455,7 @@ export default {
       }
     },
     async createGalleryItem() {
+      this.shouldPreventActions = true
       this.$nuxt.$loading.start()
 
       try {
@@ -463,8 +467,10 @@ export default {
             : null
         }&featured=${this.editFeatured}`
 
-        if (this.editTitle) url += `&title=${this.editTitle}`
-        if (this.editDescription) url += `&description=${this.editDescription}`
+        if (this.editTitle)
+          url += `&title=${encodeURIComponent(this.editTitle)}`
+        if (this.editDescription)
+          url += `&description=${encodeURIComponent(this.editDescription)}`
         if (this.editOrder) url += `&ordering=${this.editOrder}`
 
         await this.$axios.post(url, this.editFile, this.$defaultHeaders())
@@ -481,8 +487,10 @@ export default {
       }
 
       this.$nuxt.$loading.finish()
+      this.shouldPreventActions = false
     },
     async editGalleryItem() {
+      this.shouldPreventActions = true
       this.$nuxt.$loading.start()
 
       try {
@@ -490,8 +498,10 @@ export default {
           this.project.gallery[this.editIndex].url
         )}&featured=${this.editFeatured}`
 
-        if (this.editTitle) url += `&title=${this.editTitle}`
-        if (this.editDescription) url += `&description=${this.editDescription}`
+        if (this.editTitle)
+          url += `&title=${encodeURIComponent(this.editTitle)}`
+        if (this.editDescription)
+          url += `&description=${encodeURIComponent(this.editDescription)}`
         if (this.editOrder) url += `&ordering=${this.editOrder}`
 
         await this.$axios.patch(url, {}, this.$defaultHeaders())
@@ -508,6 +518,7 @@ export default {
       }
 
       this.$nuxt.$loading.finish()
+      this.shouldPreventActions = false
     },
     async deleteGalleryImage() {
       this.$nuxt.$loading.start()

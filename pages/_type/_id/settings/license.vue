@@ -185,7 +185,7 @@ export default {
         id += 'LicenseRef-'
       id += this.license.short
       if (this.license.requiresOnlyOrLater)
-        id += this.allowOrLater ? 'or-later' : '-only'
+        id += this.allowOrLater ? '-or-later' : '-only'
       if (this.nonSpdxLicense && this.license.short === 'Custom')
         id.replaceAll(' ', '-')
       return id
