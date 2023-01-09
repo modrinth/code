@@ -3,6 +3,8 @@
     <template v-if="color">
       <span class="circle" /> {{ $capitalizeString(type) }}
     </template>
+
+    <!-- User roles -->
     <template v-else-if="type === 'admin'">
       <ModrinthIcon /> Modrinth Team
     </template>
@@ -10,8 +12,15 @@
       <ModeratorIcon /> Moderator
     </template>
     <template v-else-if="type === 'creator'"><CreatorIcon /> Creator</template>
+
+    <!-- Project statuses -->
     <template v-else-if="type === 'approved'"><ListIcon /> Listed</template>
+    <template v-else-if="type === 'withheld'"><EyeOffIcon /> Withheld</template>
     <template v-else-if="type === 'unlisted'"><EyeOffIcon /> Unlisted</template>
+    <template v-else-if="type === 'private'"><LockIcon /> Private</template>
+    <template v-else-if="type === 'scheduled'">
+      <CalendarIcon /> Scheduled
+    </template>
     <template v-else-if="type === 'draft'"><DraftIcon /> Draft</template>
     <template v-else-if="type === 'archived'">
       <ArchiveIcon /> Archived
@@ -20,6 +29,8 @@
     <template v-else-if="type === 'processing'">
       <ProcessingIcon /> Under review
     </template>
+
+    <!-- Team members -->
     <template v-else-if="type === 'accepted'"><CheckIcon /> Accepted</template>
     <template v-else-if="type === 'pending'">
       <ProcessingIcon /> Pending
@@ -41,6 +52,8 @@ import CrossIcon from '~/assets/images/utils/x.svg?inline'
 import ArchiveIcon from '~/assets/images/utils/archive.svg?inline'
 import ProcessingIcon from '~/assets/images/utils/updated.svg?inline'
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
+import LockIcon from '~/assets/images/utils/lock.svg?inline'
+import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 
 export default {
   name: 'Badge',
@@ -55,6 +68,8 @@ export default {
     ArchiveIcon,
     ProcessingIcon,
     CheckIcon,
+    LockIcon,
+    CalendarIcon,
   },
   props: {
     type: {
@@ -99,6 +114,7 @@ export default {
   &.type--pending,
   &.type--moderator,
   &.type--processing,
+  &.type--scheduled,
   &.orange {
     --badge-color: var(--color-special-orange);
   }
@@ -115,11 +131,13 @@ export default {
     color: var(--color-special-blue);
   }
 
+  &.type--withheld,
   &.type--unlisted,
   &.purple {
     color: var(--color-special-purple);
   }
 
+  &.type--private,
   &.gray {
     --badge-color: var(--color-special-gray);
   }

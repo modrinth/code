@@ -326,9 +326,7 @@
           <div class="buttons status-buttons">
             <button
               v-if="
-                project.status === 'rejected' ||
-                project.status === 'unlisted' ||
-                project.status === 'abandoned'
+                project.status === 'rejected' || project.status === 'withheld'
               "
               class="iconified-button brand-button"
               @click="submitForReview"
@@ -629,13 +627,12 @@
           :toggle-collapsed="toggleChecklistCollapse"
         />
         <div
-          v-if="project.status === 'unlisted'"
+          v-if="project.status === 'withheld'"
           class="card warning"
           aria-label="Warning"
         >
-          {{ project.title }} is not viewable in search — either because the
-          author has marked it as such or because it has been found to be in
-          violation of one of
+          {{ project.title }} is not viewable in search because it has been
+          found to be in violation of one of
           <nuxt-link to="/legal/rules">Modrinth's content rules</nuxt-link>.
           Modrinth makes no guarantees as to whether {{ project.title }} is safe
           for use in a multiplayer context.
@@ -648,15 +645,6 @@
           {{ project.title }} has been archived by the project author.
           {{ project.title }} will not receive any further updates unless the
           author decides to unarchive the project.
-        </div>
-        <div
-          v-if="project.status === 'abandoned'"
-          class="card warning"
-          aria-label="Warning"
-        >
-          {{ project.title }} has been marked as abandoned by Modrinth's
-          moderators. {{ project.title }} will not receive any further updates
-          unless the author decides to return.
         </div>
         <div
           v-if="project.project_type === 'modpack'"
@@ -692,7 +680,11 @@
           >.
         </div>
         <Advertisement
-          v-if="project.status === 'approved' || project.status === 'unlisted'"
+          v-if="
+            ['approved', 'unlisted', 'archived', 'private'].includes(
+              project.status
+            )
+          "
           type="banner"
           small-screen="square"
         />
