@@ -1594,6 +1594,7 @@ export default {
 
   .version-page__changelog {
     grid-area: changelog;
+    overflow-x: hidden;
   }
 
   .version-page__dependencies {
