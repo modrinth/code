@@ -1320,23 +1320,23 @@ tr.button-transparent {
 }
 
 .vue-notification {
-  background: var(--color-special-blue);
-  border-left: 5px solid var(--color-special-blue);
-  color: var(--color-brand-inverted);
+  background: var(--color-special-blue)!important;
+  border-left: 5px solid var(--color-special-blue)!important;
+  color: var(--color-brand-inverted)!important;
 
   &.success {
-    background: var(--color-special-green);
-    border-left-color: var(--color-special-green);
+    background: var(--color-special-green)!important;
+    border-left-color: var(--color-special-green)!important;
   }
 
   &.warn {
-    background: var(--color-special-orange);
-    border-left-color: var(--color-special-orange);
+    background: var(--color-special-orange)!important;
+    border-left-color: var(--color-special-orange)!important;
   }
 
   &.error {
-    background: var(--color-special-red);
-    border-left-color: var(--color-special-red);
+    background: var(--color-special-red)!important;
+    border-left-color: var(--color-special-red)!important;
   }
 }
 
