@@ -51,11 +51,11 @@
             :aria-hidden="n === 1"
             :class="{ offset: index % 2 }"
           >
-            <article
+            <nuxt-link
               v-for="project in row"
               :key="project.id"
-              class="project gradient-border"
-              @click="$router.push(`/${project.project_type}/${project.slug}`)"
+              class="project gradient-border button-animation"
+              :to="`/${project.project_type}/${project.slug}`"
             >
               <Avatar
                 :src="project.icon_url"
@@ -64,19 +64,14 @@
                 loading="lazy"
               />
               <div class="project-info">
-                <nuxt-link
-                  :to="`/${project.project_type}/${project.slug}`"
-                  class="title"
-                >
-                  <p>
-                    {{ project.title }}
-                  </p>
-                </nuxt-link>
+                <span class="title">
+                  {{ project.title }}
+                </span>
                 <span class="description">
                   {{ project.description }}
                 </span>
               </div>
-            </article>
+            </nuxt-link>
           </div>
         </div>
       </div>
@@ -780,7 +775,7 @@ export default {
         padding: 1rem;
         gap: 1rem;
         border-radius: 1rem;
-        transition: background 0.5s ease-in-out;
+        transition: background 0.5s ease-in-out, transform 0.05s ease-in-out;
         // Removed due to lag on mobile :(
         // backdrop-filter: blur(0.25rem);
 
@@ -797,7 +792,7 @@ export default {
           box-sizing: border-box;
         }
 
-        .title p {
+        .title {
           color: var(--landing-color-heading);
           max-width: 13.75rem;
           overflow: hidden;
