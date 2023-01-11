@@ -307,12 +307,14 @@
               v-model="maxResults"
               placeholder="Select one"
               class="labeled-control__control"
-              :options="[5, 10, 15, 20, 50, 100]"
+              :options="
+                maxResultsForView[$cosmetics.searchDisplayMode[projectType.id]]
+              "
               :searchable="false"
               :close-on-select="true"
               :show-labels="false"
               :allow-empty="false"
-              @input="onSearchChange(currentPage)"
+              @input="onMaxResultsChange(currentPage)"
             />
           </div>
           <button
@@ -472,6 +474,13 @@ export default {
       sortType: { display: 'Relevance', name: 'relevance' },
 
       maxResults: 20,
+      previousMaxResults: 20,
+
+      maxResultsForView: {
+        list: [5, 10, 15, 20, 50, 100],
+        grid: [6, 12, 18, 24, 48, 96],
+        gallery: [6, 10, 16, 20, 50, 100],
+      },
 
       sidebarMenuOpen: false,
       showAllLoaders: false,
@@ -511,7 +520,7 @@ export default {
           this.sortType.display = 'Downloads'
           break
         case 'newest':
-          this.sortType.display = 'Recently created'
+          this.sortType.display = 'Recently published'
           break
         case 'updated':
           this.sortType.display = 'Recently updated'
@@ -521,11 +530,13 @@ export default {
           break
       }
     }
+
     if (this.$route.query.m) {
       this.maxResults = this.$route.query.m
     }
-    if (this.$route.query.o)
+    if (this.$route.query.o) {
       this.currentPage = Math.ceil(this.$route.query.o / this.maxResults) + 1
+    }
 
     this.projectType = this.$tag.projectTypes.find(
       (x) => x.id === this.$route.name.substring(0, this.$route.name.length - 1)
@@ -600,6 +611,8 @@ export default {
         await this.clearFilters()
 
         this.isLoading = false
+
+        this.setClosestMaxResults()
       },
     },
   },
@@ -677,6 +690,19 @@ export default {
     async onSearchChangeToTop(newPageNumber) {
       if (process.client) window.scrollTo({ top: 0, behavior: 'smooth' })
 
+      await this.onSearchChange(newPageNumber)
+    },
+    async onMaxResultsChange(newPageNumber) {
+      newPageNumber = Math.max(
+        1,
+        Math.min(
+          Math.floor(
+            newPageNumber / (this.maxResults / this.previousMaxResults)
+          ),
+          this.pageCount
+        )
+      )
+      this.previousMaxResults = this.maxResults
       await this.onSearchChange(newPageNumber)
     },
     async onSearchChange(newPageNumber) {
@@ -841,6 +867,19 @@ export default {
         mode: newValue,
         $cookies: this.$cookies,
       })
+      this.setClosestMaxResults()
+    },
+    setClosestMaxResults() {
+      const view = this.$cosmetics.searchDisplayMode[this.projectType.id]
+      const maxResultsOptions = this.maxResultsForView[view] ?? [20]
+      const currentMax = this.maxResults
+      if (!maxResultsOptions.includes(currentMax)) {
+        this.maxResults = maxResultsOptions.reduce(function (prev, curr) {
+          return Math.abs(curr - currentMax) <= Math.abs(prev - currentMax)
+            ? curr
+            : prev
+        })
+      }
     },
   },
 }
