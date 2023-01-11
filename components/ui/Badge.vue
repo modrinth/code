@@ -15,8 +15,8 @@
 
     <!-- Project statuses -->
     <template v-else-if="type === 'approved'"><ListIcon /> Listed</template>
-    <template v-else-if="type === 'withheld'"><EyeOffIcon /> Withheld</template>
     <template v-else-if="type === 'unlisted'"><EyeOffIcon /> Unlisted</template>
+    <template v-else-if="type === 'withheld'"><EyeOffIcon /> Withheld</template>
     <template v-else-if="type === 'private'"><LockIcon /> Private</template>
     <template v-else-if="type === 'scheduled'">
       <CalendarIcon /> Scheduled
@@ -106,6 +106,7 @@ export default {
     margin-right: 0.25rem;
   }
 
+  &.type--withheld,
   &.type--rejected,
   &.red {
     --badge-color: var(--color-special-red);
@@ -131,7 +132,6 @@ export default {
     color: var(--color-special-blue);
   }
 
-  &.type--withheld,
   &.type--unlisted,
   &.purple {
     color: var(--color-special-purple);

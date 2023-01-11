@@ -200,6 +200,10 @@
       text-decoration: underline;
     }
   }
+
+  &.moderation-card {
+    background-color: var(--color-banner-bg);
+  }
 }
 
 .universal-labels {
@@ -1458,7 +1462,7 @@ h3 {
   }
 }
 
-.push-right {
+.push-right:not(.input-group), .push-right.input-group > :first-child {
   margin-left: auto;
   margin-right: 0;
 }

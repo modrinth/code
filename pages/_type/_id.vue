@@ -106,6 +106,12 @@
     </div>
   </div>
   <div v-else>
+    <ModalModeration
+      ref="modal_moderation"
+      :project="project"
+      :status="moderationStatus"
+      :on-close="resetProject"
+    />
     <Modal
       ref="modal_license"
       :header="project.license.name ? project.license.name : 'License'"
@@ -275,20 +281,20 @@
           v-if="
             currentMember &&
             ((project.status !== 'approved' &&
+              project.status !== 'unlisted' &&
               project.status !== 'draft' &&
               project.status !== 'processing') ||
               (project.moderator_message &&
                 (project.moderator_message.message ||
                   project.moderator_message.body)))
           "
-          class="project-status card"
+          class="universal-card"
         >
-          <h3 class="card-header">Project status</h3>
-          <div class="status-info"></div>
-          <p>
-            Your project is currently:
+          <h3 class="card-header">Moderation status</h3>
+          <div class="current-status">
+            Project status:
             <Badge :type="project.status" />
-          </p>
+          </div>
           <div class="message">
             <p v-if="project.status === 'rejected'">
               Your project has been rejected by Modrinth's staff. In most cases,
@@ -299,9 +305,7 @@
             <div v-if="project.moderator_message">
               <hr class="card-divider" />
               <div v-if="project.moderator_message.body">
-                <h3 class="card-header">
-                  Message from the Modrinth moderators:
-                </h3>
+                <h3 class="card-header">Message from the moderators:</h3>
                 <p
                   v-if="project.moderator_message.message"
                   class="mod-message__title"
@@ -315,18 +319,16 @@
                 />
               </div>
               <div v-else>
-                <h3 class="card-header">
-                  Message from the Modrinth moderators:
-                </h3>
+                <h3 class="card-header">Message from the moderators:</h3>
                 <p>{{ project.moderator_message.message }}</p>
               </div>
-              <hr class="card-divider" />
             </div>
           </div>
           <div class="buttons status-buttons">
             <button
               v-if="
-                project.status === 'rejected' || project.status === 'withheld'
+                !$tag.approvedStatuses.includes(project.status) &&
+                project.status !== 'processing'
               "
               class="iconified-button brand-button"
               @click="submitForReview"
@@ -335,7 +337,7 @@
               Resubmit for review
             </button>
             <button
-              v-if="project.status === 'approved'"
+              v-if="$tag.approvedStatuses.includes(project.status)"
               class="iconified-button"
               @click="clearMessage"
             >
@@ -361,6 +363,64 @@
                 Your project must have the supported environments selected.
               </li>
             </ul>
+          </div>
+        </div>
+        <div
+          v-if="
+            $auth.user &&
+            ($auth.user.role === 'admin' || $auth.user.role === 'moderator')
+          "
+          class="universal-card moderation-card"
+        >
+          <h3>Moderation actions</h3>
+          <div class="input-stack">
+            <button
+              v-if="
+                !$tag.approvedStatuses.includes(project.status) ||
+                project.status === 'processing'
+              "
+              class="iconified-button brand-button"
+              @click="
+                openModerationModal(
+                  project.requested_status
+                    ? project.requested_status
+                    : 'approved'
+                )
+              "
+            >
+              <CheckIcon />
+              Approve
+            </button>
+            <button
+              v-if="
+                $tag.approvedStatuses.includes(project.status) ||
+                project.status === 'processing'
+              "
+              class="iconified-button danger-button"
+              @click="openModerationModal('withheld')"
+            >
+              <EyeIcon />
+              Withhold
+            </button>
+            <button
+              v-if="
+                $tag.approvedStatuses.includes(project.status) ||
+                project.status === 'processing'
+              "
+              class="iconified-button danger-button"
+              @click="openModerationModal('rejected')"
+            >
+              <CrossIcon />
+              Reject
+            </button>
+            <button class="iconified-button" @click="openModerationModal(null)">
+              <EditIcon />
+              Edit message
+            </button>
+            <nuxt-link class="iconified-button" to="/moderation">
+              <ModerationIcon />
+              Visit moderation queue
+            </nuxt-link>
           </div>
         </div>
       </div>
@@ -680,11 +740,7 @@
           >.
         </div>
         <Advertisement
-          v-if="
-            ['approved', 'unlisted', 'archived', 'private'].includes(
-              project.status
-            )
-          "
+          v-if="$tag.approvedStatuses.includes(project.status)"
           type="banner"
           small-screen="square"
         />
@@ -769,6 +825,7 @@ import Categories from '~/components/ui/search/Categories'
 import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator'
 import Modal from '~/components/ui/Modal'
 import ModalReport from '~/components/ui/ModalReport'
+import ModalModeration from '~/components/ui/ModalModeration'
 import NavRow from '~/components/ui/NavRow'
 import CopyCode from '~/components/ui/CopyCode'
 import Avatar from '~/components/ui/Avatar'
@@ -783,6 +840,9 @@ import LinksIcon from '~/assets/images/utils/link.svg?inline'
 import LicenseIcon from '~/assets/images/utils/copyright.svg?inline'
 import GalleryIcon from '~/assets/images/utils/image.svg?inline'
 import VersionIcon from '~/assets/images/utils/version.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg?inline'
+import EditIcon from '~/assets/images/utils/edit.svg?inline'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
 
 export default {
   components: {
@@ -793,6 +853,7 @@ export default {
     Advertisement,
     Modal,
     ModalReport,
+    ModalModeration,
     ProjectPublishingChecklist,
     EnvironmentIndicator,
     IssuesIcon,
@@ -818,6 +879,9 @@ export default {
     NavStackItem,
     SettingsIcon,
     EyeIcon,
+    CrossIcon,
+    EditIcon,
+    ModerationIcon,
     GalleryIcon,
     VersionIcon,
     UsersIcon,
@@ -968,6 +1032,7 @@ export default {
       routeName: '',
       from: '',
       collapsedChecklist: false,
+      moderationStatus: null,
     }
   },
   fetch() {
@@ -1291,6 +1356,11 @@ export default {
       )
       this.project.icon_url = response.data.icon_url
     },
+    openModerationModal(status) {
+      this.moderationStatus = status
+
+      this.$refs.modal_moderation.show()
+    },
   },
 }
 </script>
@@ -1576,5 +1646,16 @@ export default {
       margin-bottom: var(--spacing-card-sm);
     }
   }
+}
+
+.current-status {
+  display: flex;
+  flex-direction: row;
+  gap: var(--spacing-card-sm);
+  margin-top: var(--spacing-card-md);
+}
+
+.normal-page__sidebar .mod-button {
+  margin-top: var(--spacing-card-sm);
 }
 </style>

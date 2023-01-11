@@ -1,58 +1,11 @@
 <template>
   <div>
-    <Modal ref="modal" header="Moderation Form">
-      <div v-if="currentProject !== null" class="moderation-modal">
-        <p>
-          Both of these fields are optional, but can be used to communicate
-          problems with a project's team members. The body supports markdown
-          formatting!
-        </p>
-        <div class="status">
-          <span>New project status: </span>
-          <Badge :type="currentProject.newStatus" />
-        </div>
-        <input
-          v-model="currentProject.moderation_message"
-          type="text"
-          placeholder="Enter the message..."
-        />
-        <h3>Body</h3>
-        <div class="textarea-wrapper">
-          <Chips
-            v-model="bodyViewMode"
-            class="separator"
-            :items="['source', 'preview']"
-          />
-          <textarea
-            v-if="bodyViewMode === 'source'"
-            id="body"
-            v-model="currentProject.moderation_message_body"
-          />
-          <div
-            v-else
-            v-highlightjs
-            class="markdown-body preview"
-            v-html="$xss($md.render(currentProject.moderation_message_body))"
-          ></div>
-        </div>
-        <div class="buttons">
-          <button
-            class="iconified-button"
-            @click="
-              $refs.modal.hide()
-              currentProject = null
-            "
-          >
-            <CrossIcon />
-            Cancel
-          </button>
-          <button class="iconified-button brand-button" @click="saveProject">
-            <CheckIcon />
-            Confirm
-          </button>
-        </div>
-      </div>
-    </Modal>
+    <ModalModeration
+      ref="modal"
+      :project="currentProject"
+      :status="currentStatus"
+      :on-close="onModalClose"
+    />
     <div class="normal-page">
       <div class="normal-page__sidebar">
         <aside class="universal-card">
@@ -175,9 +128,7 @@
 </template>
 
 <script>
-import Chips from '~/components/ui/Chips'
 import ProjectCard from '~/components/ui/ProjectCard'
-import Modal from '~/components/ui/Modal'
 import Badge from '~/components/ui/Badge'
 
 import CheckIcon from '~/assets/images/utils/check.svg?inline'
@@ -188,18 +139,18 @@ import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import Security from '~/assets/images/illustrations/security.svg?inline'
 import NavStack from '~/components/ui/NavStack'
 import NavStackItem from '~/components/ui/NavStackItem'
+import ModalModeration from '~/components/ui/ModalModeration'
 
 export default {
   name: 'Moderation',
   components: {
+    ModalModeration,
     NavStack,
     NavStackItem,
-    Chips,
     ProjectCard,
     CheckIcon,
     CrossIcon,
     UnlistIcon,
-    Modal,
     Badge,
     Security,
     TrashIcon,
@@ -287,8 +238,8 @@ export default {
   },
   data() {
     return {
-      bodyViewMode: 'source',
       currentProject: null,
+      currentStatus: null,
     }
   },
   head: {
@@ -311,47 +262,17 @@ export default {
   },
   methods: {
     setProjectStatus(project, status) {
-      project.moderation_message = ''
-      project.moderation_message_body = ''
-      project.newStatus = status
-
       this.currentProject = project
+      this.currentStatus = status
+
       this.$refs.modal.show()
     },
-    async saveProject() {
-      this.$nuxt.$loading.start()
-
-      try {
-        await this.$axios.patch(
-          `project/${this.currentProject.id}`,
-          {
-            moderation_message: this.currentProject.moderation_message
-              ? this.currentProject.moderation_message
-              : null,
-            moderation_message_body: this.currentProject.moderation_message_body
-              ? this.currentProject.moderation_message_body
-              : null,
-            status: this.currentProject.newStatus,
-          },
-          this.$defaultHeaders()
-        )
-
-        this.projects.splice(
-          this.projects.findIndex((x) => this.currentProject.id === x.id),
-          1
-        )
-        this.currentProject = null
-        this.$refs.modal.hide()
-      } catch (err) {
-        this.$notify({
-          group: 'main',
-          title: 'An error occurred',
-          text: err.response.data.description,
-          type: 'error',
-        })
-      }
-
-      this.$nuxt.$loading.finish()
+    onModalClose() {
+      this.projects.splice(
+        this.projects.findIndex((x) => this.project.id === x.id),
+        1
+      )
+      this.project = null
     },
     async deleteReport(index) {
       this.$nuxt.$loading.start()
@@ -379,43 +300,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.moderation-modal {
-  width: auto;
-  padding: var(--spacing-card-md) var(--spacing-card-lg);
-
-  .status {
-    display: flex;
-    align-items: center;
-    margin-bottom: 0.5rem;
-
-    span {
-      margin-right: 0.5rem;
-    }
-  }
-
-  .textarea-wrapper {
-    margin-top: 0.5rem;
-    height: 15rem;
-
-    .preview {
-      overflow-y: auto;
-    }
-  }
-
-  .separator {
-    margin: var(--spacing-card-sm) 0;
-  }
-
-  .buttons {
-    display: flex;
-    margin-top: 0.5rem;
-
-    :first-child {
-      margin-left: auto;
-    }
-  }
-}
-
 h1 {
   color: var(--color-text-dark);
 }

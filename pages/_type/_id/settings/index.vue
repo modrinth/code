@@ -161,7 +161,7 @@
           id="project-visibility"
           v-model="visibility"
           placeholder="Select one"
-          :options="statusOptions"
+          :options="$tag.approvedStatuses"
           :custom-label="(value) => $formatProjectStatus(value)"
           :searchable="false"
           :close-on-select="true"
@@ -298,7 +298,7 @@ export default {
     this.summary = this.project.description
     this.clientSide = this.project.client_side
     this.serverSide = this.project.server_side
-    this.visibility = this.statusOptions.includes(this.project.status)
+    this.visibility = this.$tag.approvedStatuses.includes(this.project.status)
       ? this.project.status
       : this.project.requested_status
   },
@@ -315,9 +315,6 @@ export default {
     },
     sideTypes() {
       return ['required', 'optional', 'unsupported']
-    },
-    statusOptions() {
-      return ['approved', 'archived', 'unlisted', 'private']
     },
     patchData() {
       const data = {}
@@ -337,12 +334,12 @@ export default {
       if (this.serverSide !== this.project.server_side) {
         data.server_side = this.serverSide
       }
-      if (this.visibility !== this.project.requested_status) {
-        if (!this.statusOptions.includes(this.project.status)) {
-          data.requested_status = this.visibility
-        } else {
+      if (this.$tag.approvedStatuses.includes(this.project.status)) {
+        if (this.visibility !== this.project.status) {
           data.status = this.visibility
         }
+      } else if (this.visibility !== this.project.requested_status) {
+        data.requested_status = this.visibility
       }
 
       return data
