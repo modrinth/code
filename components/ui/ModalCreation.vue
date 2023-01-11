@@ -153,10 +153,10 @@ export default {
       formData.append(
         'data',
         JSON.stringify({
-          title: this.name,
+          title: this.name.trim(),
           project_type: projectType.actual,
           slug: this.slug,
-          description: this.description,
+          description: this.description.trim(),
           body: `# Placeholder description
 This is your new ${projectType.display}, ${
             this.name
@@ -235,9 +235,11 @@ Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`
     updatedName() {
       if (!this.manualSlug) {
         this.slug = this.name
+          .trim()
           .toLowerCase()
           .replaceAll(' ', '-')
           .replaceAll(/[^a-zA-Z0-9!@$()`.+,_"-]/g, '')
+          .replaceAll(/--+/gm, '-')
       }
     },
   },

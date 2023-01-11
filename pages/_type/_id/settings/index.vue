@@ -323,13 +323,13 @@ export default {
       const data = {}
 
       if (this.name !== this.project.title) {
-        data.title = this.name
+        data.title = this.name.trim()
       }
       if (this.slug !== this.project.slug) {
-        data.slug = this.slug
+        data.slug = this.slug.trim()
       }
       if (this.summary !== this.project.description) {
-        data.description = this.summary
+        data.description = this.summary.trim()
       }
       if (this.clientSide !== this.project.client_side) {
         data.client_side = this.clientSide

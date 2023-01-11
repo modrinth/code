@@ -323,7 +323,7 @@ export default {
           .data
 
         const data = {
-          user_id: user.id,
+          user_id: user.id.trim(),
         }
 
         await this.$axios.post(
