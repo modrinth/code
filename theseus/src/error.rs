@@ -67,6 +67,9 @@ pub enum ErrorKind {
 
     #[error("Error: {0}")]
     OtherError(String),
+
+    #[error("Serialization error (TOML): {0}")]
+    TOMLError(#[from] toml::de::Error),
 }
 
 #[derive(Debug)]

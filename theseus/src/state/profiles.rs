@@ -1,5 +1,5 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::config::BINCODE_CONFIG;
+use crate::{config::BINCODE_CONFIG, model::mod_type::JARLoadedMod};
 use daedalus::modded::LoaderVersion;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -48,6 +48,7 @@ pub struct ProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
+    pub cached_mods: HashMap<String, JARLoadedMod>,
 }
 
 // TODO: Quilt?
@@ -84,6 +85,8 @@ pub struct JavaSettings {
 }
 
 impl Profile {
+
+    // Constructs a Profile with the given name, version, and path.
     #[tracing::instrument]
     pub async fn new(
         name: String,
@@ -106,6 +109,7 @@ impl Profile {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                cached_mods: HashMap::new()
             },
             java: None,
             memory: None,
@@ -196,9 +200,16 @@ impl Profile {
         self.hooks = hooks;
         self
     }
+
+    #[tracing::instrument]
+    pub fn with_installed_mods(&mut self, mod_data: HashMap<String, JARLoadedMod>) -> &mut Self {
+        self.metadata.cached_mods = mod_data;
+        self
+    }
 }
 
 impl Profiles {
+    // Initialize profile database.
     #[tracing::instrument(skip(db))]
     pub async fn init(db: &sled::Db) -> crate::Result<Self> {
         let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
@@ -230,6 +241,7 @@ impl Profiles {
         Ok(Self(profiles))
     }
 
+    // Append a profile.
     #[tracing::instrument(skip(self))]
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         self.0.insert(
@@ -246,6 +258,7 @@ impl Profiles {
         Ok(self)
     }
 
+    // Insert profile from path.
     #[tracing::instrument(skip(self))]
     pub async fn insert_from<'a>(
         &'a mut self,
@@ -254,6 +267,7 @@ impl Profiles {
         self.insert(Self::read_profile_from_dir(&path.canonicalize()?).await?)
     }
 
+    // Remove a profile.
     #[tracing::instrument(skip(self))]
     pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
         let path = PathBuf::from(path.canonicalize()?.to_str().unwrap());
@@ -261,6 +275,7 @@ impl Profiles {
         Ok(self)
     }
 
+    // Read profile given absolute path.
     #[tracing::instrument(skip_all)]
     pub async fn sync<'a>(
         &'a self,
@@ -271,9 +286,9 @@ impl Profiles {
             .try_for_each_concurrent(None, |(path, profile)| async move {
                 let json = serde_json::to_vec_pretty(&profile)?;
 
-                let json_path =
-                    Path::new(path.to_str().unwrap()).join(PROFILE_JSON_PATH);
-
+                let json_path = Path::new(path.to_str()
+                    .expect("Could not convert path to string."))
+                    .join(PROFILE_JSON_PATH);
                 fs::write(json_path, json).await?;
                 Ok::<_, crate::Error>(())
             })
@@ -289,6 +304,7 @@ impl Profiles {
         Ok(self)
     }
 
+    // Read profile given absolute path.
     async fn read_profile_from_dir(path: &Path) -> crate::Result<Profile> {
         let json = fs::read(path.join(PROFILE_JSON_PATH)).await?;
         let mut profile = serde_json::from_slice::<Profile>(&json)?;
@@ -314,6 +330,7 @@ mod tests {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                cached_mods: HashMap::new(),
             },
             java: Some(JavaSettings {
                 install: Some(PathBuf::from("/usr/bin/java")),
@@ -336,6 +353,7 @@ mod tests {
                 "game_version": "1.18.2",
                 "format_version": 1u32,
                 "loader": "vanilla",
+                "cached_mods": {},
             },
             "java": {
                 "extra_arguments": [],

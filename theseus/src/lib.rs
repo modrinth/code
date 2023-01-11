@@ -15,6 +15,7 @@ mod config;
 mod error;
 mod launcher;
 mod state;
+mod model;
 
 pub use api::*;
 pub use error::*;
