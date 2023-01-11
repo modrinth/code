@@ -133,10 +133,10 @@ export default {
           this.$defaultHeaders()
         )
 
+        this.$refs.modal.hide()
         if (this.onClose !== null) {
           this.onClose()
         }
-        this.$refs.modal.hide()
       } catch (err) {
         this.$notify({
           group: 'main',
@@ -151,11 +151,15 @@ export default {
     show() {
       this.$refs.modal.show()
       this.moderationMessage =
-        this.project && this.project.moderator_message.message
+        this.project &&
+        this.project.moderator_message &&
+        this.project.moderator_message.message
           ? this.project.moderator_message.message
           : ''
       this.moderationMessageBody =
-        this.project && this.project.moderator_message.body
+        this.project &&
+        this.project.moderator_message &&
+        this.project.moderator_message.body
           ? this.project.moderator_message.body
           : ''
     },

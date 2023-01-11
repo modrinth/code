@@ -280,9 +280,7 @@
         <div
           v-if="
             currentMember &&
-            ((project.status !== 'approved' &&
-              project.status !== 'unlisted' &&
-              project.status !== 'draft' &&
+            ((!$tag.approvedStatuses.includes(project.status) &&
               project.status !== 'processing') ||
               (project.moderator_message &&
                 (project.moderator_message.message ||

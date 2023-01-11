@@ -269,10 +269,10 @@ export default {
     },
     onModalClose() {
       this.projects.splice(
-        this.projects.findIndex((x) => this.project.id === x.id),
+        this.projects.findIndex((x) => this.currentProject.id === x.id),
         1
       )
-      this.project = null
+      this.currentProject = null
     },
     async deleteReport(index) {
       this.$nuxt.$loading.start()

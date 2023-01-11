@@ -514,12 +514,20 @@ export const createDataPackVersion = async function (
       binary += String.fromCharCode(classFile[i])
     }
 
+    let sanitizedId = project.id
+
+    if (project.id.match(/^(\d+)/g)) {
+      sanitizedId = '_' + sanitizedId
+    }
+
+    sanitizedId = sanitizedId.substring(0, 8)
+
     binary = binary
       .replace(
         String.fromCharCode(32) + 'needs1to1be1changed1modrinth1mod',
         String.fromCharCode(newSlug.length) + newSlug
       )
-      .replace('/wrappera/', `/${project.id.substring(0, 8)}/`)
+      .replace('/wrappera/', `/${sanitizedId}/`)
 
     const newArr = []
     for (let i = 0; i < binary.length; i++) {
@@ -527,7 +535,7 @@ export const createDataPackVersion = async function (
     }
 
     primaryZipReader.file(
-      `com/modrinth/${project.id.substring(0, 8)}/ModrinthWrapper.class`,
+      `com/modrinth/${sanitizedId}/ModrinthWrapper.class`,
       new Uint8Array(newArr)
     )
   }
