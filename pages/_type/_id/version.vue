@@ -1176,17 +1176,30 @@ export default {
           const project = (await this.$axios.get(`project/${newDependencyId}`))
             .data
 
-          this.version.dependencies.push({
-            project,
-            project_id: project.id,
-            dependency_type: newDependencyType,
-            link: `/${project.project_type}/${project.slug ?? project.id}`,
-          })
+          if (
+            this.version.dependencies.some(
+              (dep) => project.id === dep.project_id
+            )
+          ) {
+            this.$notify({
+              group: 'main',
+              title: 'Dependency already added',
+              text: 'You cannot add the same dependency twice.',
+              type: 'error',
+            })
+          } else {
+            this.version.dependencies.push({
+              project,
+              project_id: project.id,
+              dependency_type: newDependencyType,
+              link: `/${project.project_type}/${project.slug ?? project.id}`,
+            })
 
-          this.$emit('update:dependencies', {
-            projects: this.dependencies.projects.concat([project]),
-            versions: this.dependencies.versions,
-          })
+            this.$emit('update:dependencies', {
+              projects: this.dependencies.projects.concat([project]),
+              versions: this.dependencies.versions,
+            })
+          }
         } else if (dependencyAddMode === 'version') {
           const version = (
             await this.$axios.get(`version/${this.newDependencyId}`)
@@ -1196,21 +1209,34 @@ export default {
             await this.$axios.get(`project/${version.project_id}`)
           ).data
 
-          this.version.dependencies.push({
-            version,
-            project,
-            version_id: version.id,
-            project_id: project.id,
-            dependency_type: this.newDependencyType,
-            link: `/${project.project_type}/${
-              project.slug ?? project.id
-            }/version/${encodeURI(version.version_number)}`,
-          })
+          if (
+            this.version.dependencies.some(
+              (dep) => version.id === dep.version_id
+            )
+          ) {
+            this.$notify({
+              group: 'main',
+              title: 'Dependency already added',
+              text: 'You cannot add the same dependency twice.',
+              type: 'error',
+            })
+          } else {
+            this.version.dependencies.push({
+              version,
+              project,
+              version_id: version.id,
+              project_id: project.id,
+              dependency_type: this.newDependencyType,
+              link: `/${project.project_type}/${
+                project.slug ?? project.id
+              }/version/${encodeURI(version.version_number)}`,
+            })
 
-          this.$emit('update:dependencies', {
-            projects: this.dependencies.projects.concat([project]),
-            versions: this.dependencies.versions.concat([version]),
-          })
+            this.$emit('update:dependencies', {
+              projects: this.dependencies.projects.concat([project]),
+              versions: this.dependencies.versions.concat([version]),
+            })
+          }
         }
 
         this.newDependencyId = ''
