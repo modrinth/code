@@ -1,6 +1,7 @@
 //! Theseus utility functions
 pub mod fetch;
 pub mod platform;
+pub mod parser;
 
 /// Wrap a builder which uses a mut reference into one which outputs an owned value
 macro_rules! wrap_ref_builder {

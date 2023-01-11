@@ -3589,6 +3589,7 @@ dependencies = [
  "sha1",
  "sled",
  "sys-info",
+ "tempfile",
  "thiserror",
  "tokio",
  "tracing",

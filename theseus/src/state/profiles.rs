@@ -48,6 +48,7 @@ pub struct ProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
+    pub installed_mods: HashMap<String, String>,
 }
 
 // TODO: Quilt?
@@ -106,6 +107,7 @@ impl Profile {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                installed_mods: HashMap::new()
             },
             java: None,
             memory: None,
@@ -194,6 +196,12 @@ impl Profile {
     #[tracing::instrument]
     pub fn with_hooks(&mut self, hooks: Option<Hooks>) -> &mut Self {
         self.hooks = hooks;
+        self
+    }
+
+    #[tracing::instrument]
+    pub fn with_installed_mods(&mut self, mod_data: HashMap<String, String>) -> &mut Self {
+        self.metadata.installed_mods = mod_data;
         self
     }
 }
@@ -314,6 +322,10 @@ mod tests {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                installed_mods: HashMap::from([
+                    ("Fabric".to_owned(), "a010de5c6165e503fcfe680bacc4afd24637cb71".to_owned()),
+                    ("Extra Tooltips".to_owned(), "2067e9cfa9f6ef66ea6ad6b9e924187d928fc391".to_owned())
+                ]),
             },
             java: Some(JavaSettings {
                 install: Some(PathBuf::from("/usr/bin/java")),
@@ -336,6 +348,10 @@ mod tests {
                 "game_version": "1.18.2",
                 "format_version": 1u32,
                 "loader": "vanilla",
+                "installed_mods": {
+                    "Extra Tooltips": "2067e9cfa9f6ef66ea6ad6b9e924187d928fc391",
+                    "Fabric": "a010de5c6165e503fcfe680bacc4afd24637cb71"
+                },
             },
             "java": {
                 "extra_arguments": [],

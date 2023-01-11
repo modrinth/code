@@ -1,12 +1,13 @@
 //! Functions for fetching infromation from the Internet
 use crate::config::REQWEST_CLIENT;
 use futures::prelude::*;
-use std::{collections::LinkedList, convert::TryInto, path::Path, sync::Arc};
+use std::{collections::LinkedList, convert::TryInto, path::{Path, PathBuf}, sync::Arc, io::copy};
 use tokio::{
-    fs::{self, File},
+    fs::{self},
     io::AsyncWriteExt,
     sync::{Semaphore, SemaphorePermit},
 };
+use tempfile::Builder;
 
 const FETCH_ATTEMPTS: usize = 3;
 
@@ -83,14 +84,41 @@ pub async fn write<'a>(
         fs::create_dir_all(parent).await?;
     }
 
-    let mut file = File::create(path).await?;
+    let mut file = fs::File::create(path).await?;
     log::debug!("Done writing file {}", path.display());
     file.write_all(bytes).await?;
     Ok(())
 }
 
-async fn sha1_async(bytes: bytes::Bytes) -> String {
+pub async fn sha1_async(bytes: bytes::Bytes) -> String {
     tokio::task::spawn_blocking(move || sha1::Sha1::from(bytes).hexdigest())
         .await
         .unwrap()
+}
+
+/// Download file to temp storage
+/// Return path to file.
+#[tracing::instrument]
+pub async fn download_file(file_url: &String) -> crate::Result<String> {
+    let tmp_dir = Builder::new().prefix("temp").tempdir()?;
+    let response = reqwest::get(file_url).await?;
+
+    let f_path: PathBuf;
+
+    let mut dest = {
+        let fname = response
+            .url()
+            .path_segments()
+            .and_then(|segments| segments.last())
+            .and_then(|name| if name.is_empty() { None } else { Some(name) })
+            .unwrap_or("tmp.bin");
+
+        println!("file to download: '{}'", fname);
+        f_path = tmp_dir.path().join(fname);
+        println!("will be located under: '{:?}'", fname);
+        std::fs::File::create(fname)?
+    };
+    let content =  response.text().await?;
+    copy(&mut content.as_bytes(), &mut dest)?;
+    Ok(String::from(f_path.to_str().unwrap()))
 }

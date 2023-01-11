@@ -1,6 +1,8 @@
 //! API for interacting with Theseus
 pub mod auth;
 pub mod profile;
+pub mod mod_extraction;
+pub mod mod_sync;
 
 pub mod data {
     pub use crate::state::{
