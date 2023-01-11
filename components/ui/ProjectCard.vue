@@ -13,6 +13,7 @@
     </nuxt-link>
     <nuxt-link
       class="gallery"
+      :class="{ 'no-image': !featuredImage }"
       tabindex="-1"
       :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
       :style="color ? `background-color: ${toColor};` : ''"
@@ -295,7 +296,9 @@ export default {
     height: 10rem;
     background-color: var(--color-button-bg-active);
 
-    filter: brightness(0.7);
+    &.no-image {
+      filter: brightness(0.7);
+    }
 
     img {
       box-shadow: none;
