@@ -64,6 +64,7 @@
           class="version__title"
         >
           {{ version.name }}
+          <FeaturedIcon v-if="featuredVersionIds.includes(version.id)" />
         </nuxt-link>
         <div class="version__metadata">
           <VersionBadge
@@ -111,6 +112,7 @@ import { acceptFileFromProjectType } from '~/plugins/fileUtils'
 import DownloadIcon from '~/assets/images/utils/download.svg?inline'
 import UploadIcon from '~/assets/images/utils/upload.svg?inline'
 import InfoIcon from '~/assets/images/utils/info.svg?inline'
+import FeaturedIcon from '~/assets/images/utils/star.svg?inline'
 import VersionBadge from '~/components/ui/Badge'
 import FileInput from '~/components/ui/FileInput'
 import VersionFilterControl from '~/components/ui/VersionFilterControl'
@@ -122,6 +124,7 @@ export default {
     DownloadIcon,
     UploadIcon,
     InfoIcon,
+    FeaturedIcon,
     VersionBadge,
     VersionFilterControl,
     FileInput,
@@ -135,6 +138,12 @@ export default {
       },
     },
     versions: {
+      type: Array,
+      default() {
+        return []
+      },
+    },
+    featuredVersions: {
       type: Array,
       default() {
         return []
@@ -191,6 +200,11 @@ export default {
         },
       ],
     }
+  },
+  computed: {
+    featuredVersionIds() {
+      return this.featuredVersions.map((x) => x.id)
+    },
   },
   methods: {
     acceptFileFromProjectType,
@@ -275,6 +289,10 @@ export default {
     .version__title {
       grid-area: title;
       font-weight: bold;
+
+      svg {
+        vertical-align: top;
+      }
     }
     .version__metadata {
       grid-area: metadata;
