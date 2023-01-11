@@ -193,8 +193,8 @@ export default {
       id += this.license.short
       if (this.license.requiresOnlyOrLater)
         id += this.allowOrLater ? '-or-later' : '-only'
-      if (this.nonSpdxLicense && this.license.short === 'Custom')
-        id.replaceAll(' ', '-')
+      if (this.nonSpdxLicense && this.license.friendly === 'Custom')
+        id = id.replaceAll(' ', '-')
       return id
     },
     defaultLicenses() {
