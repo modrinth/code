@@ -106,17 +106,33 @@ export const inferVersionInfo = async function (
 
   const inferFunctions = {
     // Forge 1.13+
-    'META-INF/mods.toml': (file, zip) => {
+    'META-INF/mods.toml': async (file, zip) => {
       const metadata = TOML.parse(file)
-
-      // ${file.jarVersion} -> Implementation-Version from manifest
 
       // TODO: Parse minecraft version ranges, handle if version is set to value from manifest
       if (metadata.mods && metadata.mods.length > 0) {
+        let versionNum = metadata.mods[0].version
+
+        // ${file.jarVersion} -> Implementation-Version from manifest
+        const manifestFile = zip.file('META-INF/MANIFEST.MF')
+        if (
+          // eslint-disable-next-line no-template-curly-in-string
+          metadata.mods[0].version.includes('${file.jarVersion}') &&
+          manifestFile !== null
+        ) {
+          const manifestText = await manifestFile.async('text')
+          const regex = /Implementation-Version: (.*)$/m
+          const match = manifestText.match(regex)
+          if (match) {
+            // eslint-disable-next-line no-template-curly-in-string
+            versionNum = versionNum.replace('${file.jarVersion}', match[1])
+          }
+        }
+
         return {
-          name: `${project.title} ${metadata.mods[0].version}`,
-          version_number: metadata.mods[0].version,
-          version_type: versionType(metadata.mods[0].version),
+          name: `${project.title} ${versionNum}`,
+          version_number: versionNum,
+          version_type: versionType(versionNum),
           loaders: ['forge'],
         }
       } else {
