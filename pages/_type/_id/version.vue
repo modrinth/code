@@ -1072,29 +1072,46 @@ export default {
         this.isEditing = true
       }
 
-      this.version = this.versions.find(
-        (x) => x.id === this.$route.params.version
-      )
-
-      if (!this.version)
+      if (mode === 'latest') {
+        let versionList = this.versions
+        if (this.$route.query.loader) {
+          versionList = versionList.filter((x) =>
+            x.loaders.includes(this.$route.query.loader)
+          )
+        }
+        if (this.$route.query.version) {
+          versionList = versionList.filter((x) =>
+            x.game_versions.includes(this.$route.query.version)
+          )
+        }
+        this.version = versionList.reduce((a, b) =>
+          a.date_published > b.date_published ? a : b
+        )
+      } else {
         this.version = this.versions.find(
-          (x) => x.displayUrlEnding === this.$route.params.version
+          (x) => x.id === this.$route.params.version
         )
 
-      // LEGACY- to support old duplicate version URLs
-      const dashIndex = this.$route.params.version.indexOf('-')
-      if (!this.version && dashIndex !== -1) {
-        const version = this.versions.find(
-          (x) =>
-            x.displayUrlEnding ===
-            this.$route.params.version.substring(0, dashIndex)
-        )
+        if (!this.version)
+          this.version = this.versions.find(
+            (x) => x.displayUrlEnding === this.$route.params.version
+          )
 
-        this.$nuxt.context.redirect(
-          301,
-          `/${this.project.project_type}/${this.project.slug}/version/${version.version_number}`
-        )
-        return
+        // LEGACY- to support old duplicate version URLs
+        const dashIndex = this.$route.params.version.indexOf('-')
+        if (!this.version && dashIndex !== -1) {
+          const version = this.versions.find(
+            (x) =>
+              x.displayUrlEnding ===
+              this.$route.params.version.substring(0, dashIndex)
+          )
+
+          this.$nuxt.context.redirect(
+            301,
+            `/${this.project.project_type}/${this.project.slug}/version/${version.version_number}`
+          )
+          return
+        }
       }
 
       if (!this.version) {
