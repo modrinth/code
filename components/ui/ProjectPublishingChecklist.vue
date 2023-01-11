@@ -257,6 +257,20 @@ export default {
           },
         },
         {
+          condition: this.project.license.id === 'LicenseRef-Unknown',
+          title: 'Select license',
+          id: 'select-license',
+          description: `Select the license your ${this.$formatProjectType(
+            this.project.project_type
+          ).toLowerCase()} is distributed under.`,
+          status: 'required',
+          link: {
+            path: 'settings/license',
+            title: 'Visit license settings',
+            hide: this.routeName === 'type-id-settings-license',
+          },
+        },
+        {
           condition: this.project.status === 'draft',
           title: 'Submit for review',
           id: 'submit-for-review',

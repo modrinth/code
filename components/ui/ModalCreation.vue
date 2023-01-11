@@ -157,27 +157,7 @@ export default {
           project_type: projectType.actual,
           slug: this.slug,
           description: this.description.trim(),
-          body: `# Placeholder description
-This is your new ${projectType.display}, ${
-            this.name
-          }. A checklist below is provided to help prepare for release.
-
-### Before submitting for review
-- Upload at least one version
-- [Edit project description](https://modrinth.com/${this.getProjectType().id}/${
-            this.slug
-          }/edit)
-- Update metadata
-  - Select license
-  - Set up environments
-  - Choose categories
-  - Add source, wiki, Discord and donation links (optional)
-- Add images to gallery (optional)
-- Invite project team members (optional)
-
-> Submissions are normally reviewed within 24 hours, but may take up to 48 hours
-
-Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`,
+          body: '',
           initial_versions: [],
           team_members: [
             {
@@ -189,7 +169,7 @@ Questions? [Join the Modrinth Discord for support!](https://discord.gg/EUHuJHt)`
           categories: [],
           client_side: this.getClientSide(),
           server_side: this.getServerSide(),
-          license_id: 'LicenseRef-All-Rights-Reserved',
+          license_id: 'LicenseRef-Unknown',
           is_draft: true,
         })
       )

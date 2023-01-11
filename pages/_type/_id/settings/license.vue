@@ -88,7 +88,7 @@
             type="url"
             maxlength="2048"
             placeholder="License URL (optional)"
-            :disabled="!hasPermission"
+            :disabled="!hasPermission || licenseId === 'LicenseRef-Unknown'"
           />
         </div>
       </div>
@@ -168,6 +168,12 @@ export default {
       friendly: 'Custom',
       short: licenseId.replaceAll('LicenseRef-', ''),
     }
+    if (licenseId === 'LicenseRef-Unknown') {
+      this.license = {
+        friendly: 'Unknown',
+        short: licenseId.replaceAll('LicenseRef-', ''),
+      }
+    }
     this.allowOrLater = licenseId.includes('-or-later')
     this.nonSpdxLicense = licenseId.includes('LicenseRef-')
   },
@@ -180,7 +186,8 @@ export default {
       let id = ''
       if (
         (this.nonSpdxLicense && this.license.friendly === 'Custom') ||
-        this.license.short === 'All-Rights-Reserved'
+        this.license.short === 'All-Rights-Reserved' ||
+        this.license.short === 'Unknown'
       )
         id += 'LicenseRef-'
       id += this.license.short
