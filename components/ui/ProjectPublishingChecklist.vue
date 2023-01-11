@@ -122,7 +122,7 @@ export default {
     },
     currentMember: {
       type: Object,
-      required: true,
+      default: null,
     },
     isSettings: {
       type: Boolean,

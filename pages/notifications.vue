@@ -101,12 +101,6 @@ import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
 import NavStack from '~/components/ui/NavStack'
 import NavStackItem from '~/components/ui/NavStackItem'
-
-const NOTIFICATION_TYPES = {
-  team_invite: 'Team invites',
-  project_update: 'Project updates',
-}
-
 export default {
   name: 'Notifications',
   components: {
@@ -118,8 +112,6 @@ export default {
     UpToDate,
   },
   async fetch() {
-    this.NOTIFICATION_TYPES = NOTIFICATION_TYPES
-
     await this.$store.dispatch('user/fetchNotifications')
   },
   head: {
@@ -137,6 +129,13 @@ export default {
 
       return Object.keys(obj)
     },
+  },
+  created() {
+    this.NOTIFICATION_TYPES = {
+      team_invite: 'Team invites',
+      project_update: 'Project updates',
+      status_update: 'Status changes',
+    }
   },
   methods: {
     async clearNotifications() {
