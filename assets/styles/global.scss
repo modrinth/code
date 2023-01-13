@@ -111,6 +111,7 @@ html {
     rgba(129, 137, 175, 0.75) 0%,
     rgba(66, 71, 97, 0.34) 100%
   );
+  --landing-border-color: rgba(129, 137, 175, 0.55);
   --landing-creator-gradient: linear-gradient(
     180deg,
     #f8f8f8 0%,
@@ -242,6 +243,7 @@ html {
     rgba(168, 177, 221, 0.75) 0%,
     rgba(168, 177, 221, 0.18) 100%
   );
+  --landing-border-color: rgba(168, 177, 221, 0.55);
   --landing-creator-gradient: linear-gradient(180deg, #000000 0%, #0e101d 100%);
 
   --landing-blob-gradient: radial-gradient(

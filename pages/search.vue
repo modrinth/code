@@ -886,20 +886,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-// Mobile-first CSS: search page is grid on mobile...
-.search-page {
-  display: grid;
-  grid-template-rows: auto;
-  grid-template-columns: 100%;
-
-  // ...and flex on desktop
-  @media screen and (min-width: 1024px) {
-    display: flex;
-
-    // Note that the actual flex layout properties come from .normal-page
-  }
-}
-
 .normal-page__content {
   // Passthrough children as grid items on mobile
   display: contents;
