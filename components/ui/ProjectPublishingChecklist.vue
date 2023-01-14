@@ -236,6 +236,25 @@ export default {
           },
         },
         {
+          condition: !(
+            this.project.issues_url ||
+            this.project.source_url ||
+            this.project.wiki_url ||
+            this.project.discord_url ||
+            this.project.donation_urls.length > 0
+          ),
+          title: 'Add external links',
+          id: 'add-links',
+          description:
+            'Add any relevant links targeted outside of Modrinth, such as sources, issues, or a Discord invite.',
+          status: 'suggestion',
+          link: {
+            path: 'settings/links',
+            title: 'Visit links settings',
+            hide: this.routeName === 'type-id-settings-links',
+          },
+        },
+        {
           hide:
             this.project.project_type === 'resourcepack' ||
             this.project.project_type === 'plugin' ||
