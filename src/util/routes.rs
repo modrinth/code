@@ -37,9 +37,7 @@ pub async fn read_from_field(
         if bytes.len() >= cap {
             return Err(CreateError::InvalidInput(String::from(err_msg)));
         } else {
-            bytes.extend_from_slice(
-                &chunk.map_err(CreateError::MultipartError)?,
-            );
+            bytes.extend_from_slice(&chunk?);
         }
     }
     Ok(bytes)

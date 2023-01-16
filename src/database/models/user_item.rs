@@ -320,7 +320,7 @@ impl User {
             id as UserId,
         )
         .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id as i64)) })
+        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id)) })
         .try_collect::<Vec<i64>>()
         .await?;
 
@@ -442,7 +442,7 @@ impl User {
             id as UserId,
         )
         .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id as i64)) })
+        .try_filter_map(|e| async { Ok(e.right().map(|m| m.id)) })
         .try_collect::<Vec<i64>>()
         .await?;
 

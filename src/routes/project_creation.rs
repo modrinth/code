@@ -11,7 +11,6 @@ use crate::search::indexing::IndexingError;
 use crate::util::auth::{get_user_from_headers, AuthenticationError};
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
-use actix::fut::ready;
 use actix_multipart::{Field, Multipart};
 use actix_web::http::StatusCode;
 use actix_web::web::Data;
@@ -36,8 +35,8 @@ pub enum CreateError {
     DatabaseError(#[from] models::DatabaseError),
     #[error("Indexing Error: {0}")]
     IndexingError(#[from] IndexingError),
-    #[error("Error while parsing multipart payload")]
-    MultipartError(actix_multipart::MultipartError),
+    #[error("Error while parsing multipart payload: {0}")]
+    MultipartError(#[from] actix_multipart::MultipartError),
     #[error("Error while parsing JSON: {0}")]
     SerDeError(#[from] serde_json::Error),
     #[error("Error while validating input: {0}")]
@@ -287,9 +286,6 @@ pub async fn project_create(
         let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
         let rollback_result = transaction.rollback().await;
 
-        // fix multipart error bug:
-        payload.for_each(|_| ready(())).await;
-
         undo_result?;
         if let Err(e) = rollback_result {
             return Err(e.into());
@@ -475,128 +471,153 @@ pub async fn project_create_inner(
 
     let mut icon_data = None;
 
+    let mut error = None;
     while let Some(item) = payload.next().await {
-        let mut field: Field = item.map_err(CreateError::MultipartError)?;
-        let content_disposition = field.content_disposition().clone();
+        let mut field: Field = item?;
 
-        let name = content_disposition.get_name().ok_or_else(|| {
-            CreateError::MissingValueError("Missing content name".to_string())
-        })?;
-
-        let (file_name, file_extension) =
-            super::version_creation::get_name_ext(&content_disposition)?;
-
-        if name == "icon" {
-            if icon_data.is_some() {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Projects can only have one icon",
-                )));
-            }
-            // Upload the icon to the cdn
-            icon_data = Some(
-                process_icon_upload(
-                    uploaded_files,
-                    project_id,
-                    file_extension,
-                    file_host,
-                    field,
-                    &cdn_url,
-                )
-                .await?,
-            );
+        if error.is_some() {
             continue;
         }
 
-        if let Some(gallery_items) = &project_create_data.gallery_items {
-            if gallery_items.iter().filter(|a| a.featured).count() > 1 {
-                return Err(CreateError::InvalidInput(String::from(
-                    "Only one gallery image can be featured.",
-                )));
+        let result = async {
+            let content_disposition = field.content_disposition().clone();
+
+            let name = content_disposition.get_name().ok_or_else(|| {
+                CreateError::MissingValueError(
+                    "Missing content name".to_string(),
+                )
+            })?;
+
+            let (file_name, file_extension) =
+                super::version_creation::get_name_ext(&content_disposition)?;
+
+            if name == "icon" {
+                if icon_data.is_some() {
+                    return Err(CreateError::InvalidInput(String::from(
+                        "Projects can only have one icon",
+                    )));
+                }
+                // Upload the icon to the cdn
+                icon_data = Some(
+                    process_icon_upload(
+                        uploaded_files,
+                        project_id,
+                        file_extension,
+                        file_host,
+                        field,
+                        &cdn_url,
+                    )
+                    .await?,
+                );
+                return Ok(());
             }
 
-            if let Some(item) = gallery_items.iter().find(|x| x.item == name) {
-                let data = read_from_field(
-                    &mut field,
-                    5 * (1 << 20),
-                    "Gallery image exceeds the maximum of 5MiB.",
-                )
-                .await?;
+            if let Some(gallery_items) = &project_create_data.gallery_items {
+                if gallery_items.iter().filter(|a| a.featured).count() > 1 {
+                    return Err(CreateError::InvalidInput(String::from(
+                        "Only one gallery image can be featured.",
+                    )));
+                }
 
-                let hash = sha1::Sha1::from(&data).hexdigest();
-                let (_, file_extension) =
-                    super::version_creation::get_name_ext(
-                        &content_disposition,
-                    )?;
-                let content_type =
-                    crate::util::ext::get_image_content_type(file_extension)
+                if let Some(item) =
+                    gallery_items.iter().find(|x| x.item == name)
+                {
+                    let data = read_from_field(
+                        &mut field,
+                        5 * (1 << 20),
+                        "Gallery image exceeds the maximum of 5MiB.",
+                    )
+                    .await?;
+
+                    let hash = sha1::Sha1::from(&data).hexdigest();
+                    let (_, file_extension) =
+                        super::version_creation::get_name_ext(
+                            &content_disposition,
+                        )?;
+                    let content_type =
+                        crate::util::ext::get_image_content_type(
+                            file_extension,
+                        )
                         .ok_or_else(|| {
                             CreateError::InvalidIconFormat(
                                 file_extension.to_string(),
                             )
                         })?;
 
-                let url = format!(
-                    "data/{}/images/{}.{}",
-                    project_id, hash, file_extension
-                );
-                let upload_data = file_host
-                    .upload_file(content_type, &url, data.freeze())
-                    .await?;
+                    let url = format!(
+                        "data/{}/images/{}.{}",
+                        project_id, hash, file_extension
+                    );
+                    let upload_data = file_host
+                        .upload_file(content_type, &url, data.freeze())
+                        .await?;
 
-                uploaded_files.push(UploadedFile {
-                    file_id: upload_data.file_id,
-                    file_name: upload_data.file_name.clone(),
-                });
+                    uploaded_files.push(UploadedFile {
+                        file_id: upload_data.file_id,
+                        file_name: upload_data.file_name,
+                    });
 
-                gallery_urls.push(crate::models::projects::GalleryItem {
-                    url: format!("{}/{}", cdn_url, url),
-                    featured: item.featured,
-                    title: item.title.clone(),
-                    description: item.description.clone(),
-                    created: Utc::now(),
-                    ordering: item.ordering,
-                });
+                    gallery_urls.push(crate::models::projects::GalleryItem {
+                        url: format!("{}/{}", cdn_url, url),
+                        featured: item.featured,
+                        title: item.title.clone(),
+                        description: item.description.clone(),
+                        created: Utc::now(),
+                        ordering: item.ordering,
+                    });
 
-                continue;
+                    return Ok(());
+                }
             }
+
+            let index = if let Some(i) = versions_map.get(name) {
+                *i
+            } else {
+                return Err(CreateError::InvalidInput(format!(
+                    "File `{}` (field {}) isn't specified in the versions data",
+                    file_name, name
+                )));
+            };
+
+            // `index` is always valid for these lists
+            let created_version = versions.get_mut(index).unwrap();
+            let version_data =
+                project_create_data.initial_versions.get(index).unwrap();
+
+            // Upload the new jar file
+            super::version_creation::upload_file(
+                &mut field,
+                file_host,
+                version_data.file_parts.len(),
+                uploaded_files,
+                &mut created_version.files,
+                &mut created_version.dependencies,
+                &cdn_url,
+                &content_disposition,
+                project_id,
+                created_version.version_id.into(),
+                &project_create_data.project_type,
+                version_data.loaders.clone(),
+                version_data.game_versions.clone(),
+                all_game_versions.clone(),
+                version_data.primary_file.is_some(),
+                version_data.primary_file.as_deref() == Some(name),
+                None,
+                transaction,
+            )
+            .await?;
+
+            Ok(())
         }
+        .await;
 
-        let index = if let Some(i) = versions_map.get(name) {
-            *i
-        } else {
-            return Err(CreateError::InvalidInput(format!(
-                "File `{}` (field {}) isn't specified in the versions data",
-                file_name, name
-            )));
-        };
+        if result.is_err() {
+            error = result.err();
+        }
+    }
 
-        // `index` is always valid for these lists
-        let created_version = versions.get_mut(index).unwrap();
-        let version_data =
-            project_create_data.initial_versions.get(index).unwrap();
-
-        // Upload the new jar file
-        super::version_creation::upload_file(
-            &mut field,
-            file_host,
-            version_data.file_parts.len(),
-            uploaded_files,
-            &mut created_version.files,
-            &mut created_version.dependencies,
-            &cdn_url,
-            &content_disposition,
-            project_id,
-            created_version.version_id.into(),
-            &project_create_data.project_type,
-            version_data.loaders.clone(),
-            version_data.game_versions.clone(),
-            all_game_versions.clone(),
-            version_data.primary_file.is_some(),
-            version_data.primary_file.as_deref() == Some(name),
-            None,
-            transaction,
-        )
-        .await?;
+    if let Some(error) = error {
+        return Err(error);
     }
 
     {

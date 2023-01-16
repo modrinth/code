@@ -11,14 +11,14 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum ARError {
     /// Read/Write error on store
-    #[error("read/write operatiion failed: {0}")]
+    #[error("read/write operation failed: {0}")]
     ReadWrite(String),
 
     /// Identifier error
     #[error("client identification failed")]
     Identification,
     /// Limited Error
-    #[error("You are being ratelimited. Please wait {reset} seconds. {remaining}/{max_requests} remaining.")]
+    #[error("You are being rate-limited. Please wait {reset} seconds. {remaining}/{max_requests} remaining.")]
     Limited {
         max_requests: usize,
         remaining: usize,

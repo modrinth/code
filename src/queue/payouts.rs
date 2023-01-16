@@ -97,7 +97,9 @@ impl PayoutsQueue {
             })?;
         }
 
-        let fee = if payout.recipient_wallet == *"Venmo" {
+        let wallet = payout.recipient_wallet.clone();
+
+        let fee = if wallet == *"Venmo" {
             Decimal::ONE / Decimal::from(4)
         } else {
             std::cmp::min(
@@ -111,6 +113,7 @@ impl PayoutsQueue {
         };
 
         payout.amount.value -= fee;
+        payout.amount.value = payout.amount.value.round_dp(2);
 
         if payout.amount.value <= Decimal::ZERO {
             return Err(ApiError::InvalidInput(
@@ -153,7 +156,7 @@ impl PayoutsQueue {
                 "Error while registering payment in PayPal: {}",
                 body.body.message
             )));
-        } else {
+        } else if wallet != *"Venmo" {
             #[derive(Deserialize)]
             struct PayPalLink {
                 href: String,
