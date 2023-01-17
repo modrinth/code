@@ -61,8 +61,8 @@ pub async fn mod_search(
                 mod_id: format!("local-{}", x.project_id),
                 slug: x.slug,
                 author: x.author.clone(),
-                title: x.title,
-                description: x.description,
+                title: format!("[STOP USING API v1] {}", x.title),
+                description: format!("[STOP USING API v1] {}", x.description),
                 categories: x.categories,
                 versions: x.versions,
                 downloads: x.downloads,
@@ -85,6 +85,36 @@ pub async fn mod_search(
     }))
 }
 
+#[get("{id}")]
+pub async fn mod_get(
+    req: HttpRequest,
+    info: web::Path<(String,)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let string = info.into_inner().0;
+
+    let project_data =
+        database::models::Project::get_full_from_slug_or_project_id(
+            &string, &**pool,
+        )
+            .await?;
+
+    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+
+    if let Some(mut data) = project_data {
+        if is_authorized(&data.inner, &user_option, &pool).await? {
+            data.inner.title =
+                format!("[STOP USING API v1] {}", data.inner.title);
+            data.inner.description =
+                format!("[STOP USING API v1] {}", data.inner.description);
+            data.inner.body =
+                format!("# STOP USING API v1 - whatever application you're using right now is likely deprecated or abandoned\n{}", data.inner.body);
+            return Ok(HttpResponse::Ok().json(models::projects::Project::from(data)));
+        }
+    }
+    Ok(HttpResponse::NotFound().body(""))
+}
+
 #[get("mods")]
 pub async fn mods_get(
     req: HttpRequest,
@@ -105,8 +135,14 @@ pub async fn mods_get(
     let mut projects = Vec::with_capacity(projects_data.len());
 
     // can't use `map` and `collect` here since `is_authorized` must be async
-    for proj in projects_data {
+    for mut proj in projects_data {
         if is_authorized(&proj.inner, &user_option, &pool).await? {
+            proj.inner.title =
+                format!("[STOP USING API v1] {}", proj.inner.title);
+            proj.inner.description =
+                format!("[STOP USING API v1] {}", proj.inner.description);
+            proj.inner.body =
+                format!("# STOP USING API v1 - whatever application you're using right now is likely deprecated or abandoned\n{}", proj.inner.body);
             projects.push(crate::models::projects::Project::from(proj))
         }
     }

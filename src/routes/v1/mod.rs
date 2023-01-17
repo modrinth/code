@@ -37,7 +37,7 @@ pub fn mods_config(cfg: &mut web::ServiceConfig) {
 
     cfg.service(
         web::scope("mod")
-            .service(super::projects::project_get)
+            .service(mods::mod_get)
             .service(super::projects::project_delete)
             .service(super::projects::project_edit)
             .service(super::projects::project_icon_edit)
