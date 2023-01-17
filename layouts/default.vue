@@ -366,11 +366,13 @@
         <p>© Rinth, Inc.</p>
       </div>
       <div class="links links-1" role="region" aria-label="Legal">
-        <h4 aria-hidden="true">Legal</h4>
+        <h4 aria-hidden="true">Company</h4>
         <nuxt-link to="/legal/terms">Terms</nuxt-link>
         <nuxt-link to="/legal/privacy">Privacy</nuxt-link>
         <nuxt-link to="/legal/rules">Rules</nuxt-link>
-        <nuxt-link to="/legal/security">Security</nuxt-link>
+        <a :target="$external()" href="https://careers.modrinth.com">
+          Careers <span class="count-bubble">2</span>
+        </a>
       </div>
       <div class="links links-2" role="region" aria-label="Resources">
         <h4 aria-hidden="true">Resources</h4>
@@ -1167,6 +1169,15 @@ export default {
 
       &.links-3 {
         grid-area: links-3;
+      }
+
+      .count-bubble {
+        font-size: 1rem;
+        border-radius: 5rem;
+        background: var(--color-brand);
+        color: var(--color-text-inverted);
+        padding: 0 0.25rem;
+        margin-left: 0.25rem;
       }
     }
 
