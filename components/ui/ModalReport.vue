@@ -10,6 +10,12 @@
           <nuxt-link to="/legal/rules">Rules</nuxt-link>. Rest assured, we’ll
           keep your identifying information private.
         </p>
+        <p v-if="itemType === 'project' || itemType === 'version'">
+          Please <strong>do not</strong> use this to report bugs with the
+          project itself. This form is only for submitting a report to Modrinth
+          staff. If the project has an Issues link or a Discord invite, consider
+          reporting it there.
+        </p>
       </div>
       <label class="report-label" for="report-type">
         <span>

@@ -132,10 +132,7 @@
                     <span class="title">Settings</span>
                   </NuxtLink>
                   <NuxtLink
-                    v-if="
-                      $auth.user.role === 'moderator' ||
-                      $auth.user.role === 'admin'
-                    "
+                    v-if="$tag.staffRoles.includes($auth.user.role)"
                     class="item button-transparent"
                     to="/moderation"
                   >
@@ -297,10 +294,7 @@
               <span class="dropdown-item__text">Settings</span>
             </NuxtLink>
             <NuxtLink
-              v-if="
-                $auth.user &&
-                ($auth.user.role === 'moderator' || $auth.user.role === 'admin')
-              "
+              v-if="$auth.user && $tag.staffRoles.includes($auth.user.role)"
               class="iconified-button raised-button"
               to="/moderation"
             >
