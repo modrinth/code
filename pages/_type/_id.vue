@@ -303,16 +303,16 @@
               )
             "
           />
-        </div>
-        <div class="buttons status-buttons">
-          <button
-            v-if="$tag.approvedStatuses.includes(project.status)"
-            class="iconified-button"
-            @click="clearMessage"
-          >
-            <ClearIcon />
-            Clear message
-          </button>
+          <div class="buttons status-buttons">
+            <button
+              v-if="$tag.approvedStatuses.includes(project.status)"
+              class="iconified-button"
+              @click="clearMessage"
+            >
+              <ClearIcon />
+              Clear message
+            </button>
+          </div>
         </div>
         <div
           v-if="$auth.user && $tag.staffRoles.includes($auth.user.role)"
