@@ -220,7 +220,7 @@ export default {
           title: 'Feature a gallery image',
           id: 'feature-gallery-image',
           description:
-            'Featured gallery images may be the first impression of many users.',
+            'Featured gallery images may be the first impression for many users.',
           status: 'suggestion',
           link: {
             path: 'gallery',
