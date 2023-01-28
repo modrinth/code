@@ -21,7 +21,7 @@ pub async fn connect() -> Result<PgPool, sqlx::Error> {
                 .and_then(|x| x.parse().ok())
                 .unwrap_or(16),
         )
-        .max_lifetime(Some(Duration::from_secs(60 * 60 * 6)))
+        .max_lifetime(Some(Duration::from_secs(60 * 60)))
         .connect(&database_url)
         .await?;
 

@@ -301,6 +301,9 @@ pub async fn get_update_from_hash(
                     .map(|x| x.0)
                     .collect(),
             ),
+            None,
+            None,
+            None,
             &**pool,
         )
         .await?;
@@ -493,6 +496,9 @@ pub async fn update_files(
                     .map(|x| x.0.clone())
                     .collect(),
             ),
+            None,
+            None,
+            None,
             &**pool,
         )
         .await?;

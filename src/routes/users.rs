@@ -107,7 +107,7 @@ pub async fn projects_list(
             crate::database::Project::get_many_full(&project_data, &**pool)
                 .await?
                 .into_iter()
-                .filter(|x| can_view_private || x.inner.status.is_approved())
+                .filter(|x| can_view_private || x.inner.status.is_searchable())
                 .map(Project::from)
                 .collect();
 

@@ -76,6 +76,9 @@ pub async fn version_list(
                 .loaders
                 .as_ref()
                 .map(|x| serde_json::from_str(x).unwrap_or_default()),
+            filters.version_type,
+            filters.limit,
+            filters.offset,
             &**pool,
         )
         .await?;

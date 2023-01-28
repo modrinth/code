@@ -1,6 +1,6 @@
 use super::ids::*;
 use super::DatabaseError;
-use crate::models::projects::{FileType, VersionStatus};
+use crate::models::projects::{FileType, VersionStatus, VersionType};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
 use std::cmp::Ordering;
@@ -462,6 +462,18 @@ impl Version {
         )
         .execute(&mut *transaction)
         .await?;
+
+        crate::database::models::Project::update_game_versions(
+            ProjectId(project_id.mod_id),
+            &mut *transaction,
+        )
+        .await?;
+        crate::database::models::Project::update_loaders(
+            ProjectId(project_id.mod_id),
+            &mut *transaction,
+        )
+        .await?;
+
         Ok(Some(()))
     }
 
@@ -469,6 +481,9 @@ impl Version {
         project_id: ProjectId,
         game_versions: Option<Vec<String>>,
         loaders: Option<Vec<String>>,
+        version_type: Option<VersionType>,
+        limit: Option<u32>,
+        offset: Option<u32>,
         exec: E,
     ) -> Result<Vec<VersionId>, sqlx::Error>
     where
@@ -483,12 +498,16 @@ impl Version {
             INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))
             INNER JOIN loaders_versions lv ON lv.version_id = v.id
             INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
-            WHERE v.mod_id = $1
+            WHERE v.mod_id = $1 AND ($4 = NULL OR v.version_type = $4)
             ORDER BY v.date_published, v.id ASC
+            LIMIT $5 OFFSET $6
             ",
             project_id as ProjectId,
             &game_versions.unwrap_or_default(),
             &loaders.unwrap_or_default(),
+            version_type.map(|x| x.as_str()),
+            limit.map(|x| x as i64),
+            offset.map(|x| x as i64),
         )
         .fetch_many(exec)
         .try_filter_map(|e| async { Ok(e.right().map(|v| VersionId(v.version_id))) })

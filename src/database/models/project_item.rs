@@ -139,6 +139,8 @@ impl ProjectBuilder {
             flame_anvil_user: None,
             webhook_sent: false,
             color: self.color,
+            loaders: vec![],
+            game_versions: vec![],
         };
         project_struct.insert(&mut *transaction).await?;
 
@@ -181,6 +183,10 @@ impl ProjectBuilder {
                 .await?;
         }
 
+        Project::update_game_versions(self.project_id, &mut *transaction)
+            .await?;
+        Project::update_loaders(self.project_id, &mut *transaction).await?;
+
         Ok(self.project_id)
     }
 }
@@ -216,6 +222,8 @@ pub struct Project {
     pub flame_anvil_user: Option<UserId>,
     pub webhook_sent: bool,
     pub color: Option<u32>,
+    pub loaders: Vec<String>,
+    pub game_versions: Vec<String>,
 }
 
 impl Project {
@@ -283,7 +291,7 @@ impl Project {
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body, flame_anvil_project,
-                   flame_anvil_user, webhook_sent, color
+                   flame_anvil_user, webhook_sent, color, loaders, game_versions
             FROM mods
             WHERE id = $1
             ",
@@ -326,6 +334,8 @@ impl Project {
                 flame_anvil_user: row.flame_anvil_user.map(UserId),
                 webhook_sent: row.webhook_sent,
                 color: row.color.map(|x| x as u32),
+                loaders: row.loaders,
+                game_versions: row.game_versions,
             }))
         } else {
             Ok(None)
@@ -351,7 +361,7 @@ impl Project {
                    issues_url, source_url, wiki_url, discord_url, license_url,
                    team_id, client_side, server_side, license, slug,
                    moderation_message, moderation_message_body, flame_anvil_project,
-                   flame_anvil_user, webhook_sent, color
+                   flame_anvil_user, webhook_sent, color, loaders, game_versions
             FROM mods
             WHERE id = ANY($1)
             ",
@@ -394,6 +404,8 @@ impl Project {
                 flame_anvil_user: m.flame_anvil_user.map(UserId),
                 webhook_sent: m.webhook_sent,
                 color: m.color.map(|x| x as u32),
+                loaders: m.loaders,
+                game_versions: m.game_versions,
             }))
         })
         .try_collect::<Vec<Project>>()
@@ -673,6 +685,7 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent webhook_sent, m.color,
+            m.loaders loaders, m.game_versions game_versions,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
             JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
@@ -732,6 +745,8 @@ impl Project {
                     flame_anvil_user: m.flame_anvil_user.map(UserId),
                     webhook_sent: m.webhook_sent,
                     color: m.color.map(|x| x as u32),
+                    loaders: m.loaders,
+                    game_versions: m.game_versions,
                 },
                 project_type: m.project_type_name,
                 categories: m.categories.unwrap_or_default(),
@@ -802,6 +817,7 @@ impl Project {
             m.issues_url issues_url, m.source_url source_url, m.wiki_url wiki_url, m.discord_url discord_url, m.license_url license_url,
             m.team_id team_id, m.client_side client_side, m.server_side server_side, m.license license, m.slug slug, m.moderation_message moderation_message, m.moderation_message_body moderation_message_body,
             cs.name client_side_type, ss.name server_side_type, pt.name project_type_name, m.flame_anvil_project flame_anvil_project, m.flame_anvil_user flame_anvil_user, m.webhook_sent, m.color,
+            m.loaders loaders, m.game_versions game_versions,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is false) categories,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null and mc.is_additional is true) additional_categories,
             JSONB_AGG(DISTINCT jsonb_build_object('id', v.id, 'date_published', v.date_published)) filter (where v.id is not null) versions,
@@ -864,6 +880,8 @@ impl Project {
                             flame_anvil_user: m.flame_anvil_user.map(UserId),
                             webhook_sent: m.webhook_sent,
                             color: m.color.map(|x| x as u32),
+                            loaders: m.loaders,
+                            game_versions: m.game_versions,
                         },
                         project_type: m.project_type_name,
                         categories: m.categories.unwrap_or_default(),
@@ -903,6 +921,56 @@ impl Project {
             })
             .try_collect::<Vec<QueryProject>>()
             .await
+    }
+
+    pub async fn update_game_versions(
+        id: ProjectId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), sqlx::error::Error> {
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET game_versions = (
+                SELECT COALESCE(ARRAY_AGG(DISTINCT gv.version) filter (where gv.version is not null), array[]::varchar[])
+                FROM versions v
+                     INNER JOIN game_versions_versions gvv ON v.id = gvv.joining_version_id
+                     INNER JOIN game_versions gv on gvv.game_version_id = gv.id
+                WHERE v.mod_id = mods.id AND v.status != ANY($2)
+            )
+            WHERE id = $1
+            ",
+            id as ProjectId,
+            &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>()
+        )
+            .execute(&mut *transaction)
+            .await?;
+
+        Ok(())
+    }
+
+    pub async fn update_loaders(
+        id: ProjectId,
+        transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    ) -> Result<(), sqlx::error::Error> {
+        sqlx::query!(
+            "
+            UPDATE mods
+            SET loaders = (
+                SELECT COALESCE(ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null), array[]::varchar[])
+                FROM versions v
+                     INNER JOIN loaders_versions lv ON lv.version_id = v.id
+                     INNER JOIN loaders l on lv.loader_id = l.id
+                WHERE v.mod_id = mods.id AND v.status != ANY($2)
+            )
+            WHERE id = $1
+            ",
+            id as ProjectId,
+            &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>()
+        )
+            .execute(&mut *transaction)
+            .await?;
+
+        Ok(())
     }
 }
 

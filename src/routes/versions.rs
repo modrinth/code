@@ -1,7 +1,9 @@
 use super::ApiError;
 use crate::database;
 use crate::models;
-use crate::models::projects::{Dependency, FileType, Version, VersionStatus};
+use crate::models::projects::{
+    Dependency, FileType, Version, VersionStatus, VersionType,
+};
 use crate::models::teams::Permissions;
 use crate::util::auth::{
     get_user_from_headers, is_authorized, is_authorized_version,
@@ -19,6 +21,9 @@ pub struct VersionListFilters {
     pub game_versions: Option<String>,
     pub loaders: Option<String>,
     pub featured: Option<bool>,
+    pub version_type: Option<VersionType>,
+    pub limit: Option<u32>,
+    pub offset: Option<u32>,
 }
 
 #[get("version")]
@@ -54,6 +59,9 @@ pub async fn version_list(
                 .loaders
                 .as_ref()
                 .map(|x| serde_json::from_str(x).unwrap_or_default()),
+            filters.version_type,
+            filters.limit,
+            filters.offset,
             &**pool,
         )
         .await?;
@@ -393,6 +401,12 @@ pub async fn version_edit(
                     .execute(&mut *transaction)
                     .await?;
                 }
+
+                database::models::Project::update_game_versions(
+                    version_item.inner.project_id,
+                    &mut transaction,
+                )
+                .await?;
             }
 
             if let Some(loaders) = &new_version.loaders {
@@ -430,6 +444,12 @@ pub async fn version_edit(
                     .execute(&mut *transaction)
                     .await?;
                 }
+
+                database::models::Project::update_loaders(
+                    version_item.inner.project_id,
+                    &mut transaction,
+                )
+                .await?;
             }
 
             if let Some(featured) = &new_version.featured {

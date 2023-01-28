@@ -75,6 +75,11 @@ pub struct Project {
 
     /// A list of the categories that the project is in.
     pub additional_categories: Vec<String>,
+    /// A list of game versions this project supports
+    pub game_versions: Vec<String>,
+    /// A list of loaders this project supports
+    pub loaders: Vec<String>,
+
     /// A list of ids for versions of the project.
     pub versions: Vec<VersionId>,
     /// The URL of the icon of the project
@@ -154,6 +159,8 @@ impl From<QueryProject> for Project {
             followers: m.follows as u32,
             categories: data.categories,
             additional_categories: data.additional_categories,
+            game_versions: m.game_versions,
+            loaders: m.loaders,
             versions: data.versions.into_iter().map(|v| v.into()).collect(),
             icon_url: m.icon_url,
             issues_url: m.issues_url,

@@ -816,6 +816,8 @@ pub async fn project_create_inner(
             followers: 0,
             categories: project_create_data.categories,
             additional_categories: project_create_data.additional_categories,
+            game_versions: vec![],
+            loaders: vec![],
             versions: project_builder
                 .initial_versions
                 .iter()

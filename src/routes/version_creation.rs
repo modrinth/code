@@ -422,6 +422,14 @@ async fn version_create_inner(
     .insert_many(users, &mut *transaction)
     .await?;
 
+    models::Project::update_game_versions(
+        builder.project_id,
+        &mut *transaction,
+    )
+    .await?;
+    models::Project::update_loaders(builder.project_id, &mut *transaction)
+        .await?;
+
     let response = Version {
         id: builder.version_id.into(),
         project_id: builder.project_id.into(),

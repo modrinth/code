@@ -38,6 +38,9 @@ pub async fn forge_updates(
         project.id,
         None,
         Some(vec!["forge".to_string()]),
+        None,
+        None,
+        None,
         &**pool,
     )
     .await?;
