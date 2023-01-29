@@ -737,7 +737,7 @@
             }}
           </span>
         </div>
-        <div v-if="!isEditing">
+        <div v-if="!isEditing && version.author_member">
           <h4>Publisher</h4>
           <div
             class="team-member columns button-transparent"
@@ -757,9 +757,16 @@
                 :to="'/user/' + version.author_member.user.username"
                 class="name"
               >
-                <p>{{ version.author_member.name }}</p>
+                <p>
+                  {{ version.author_member.name }}
+                </p>
               </nuxt-link>
-              <p class="role">{{ version.author_member.role }}</p>
+              <p v-if="version.author_member.role" class="role">
+                {{ version.author_member.role }}
+              </p>
+              <p v-else-if="version.author_id === 'GVFjtWTf'" class="role">
+                Archivist
+              </p>
             </div>
           </div>
         </div>
@@ -1132,6 +1139,19 @@ export default {
       this.version.author_member = this.members.find(
         (x) => x.user.id === this.version.author_id
       )
+
+      if (!this.version.author_member) {
+        const response = await this.$axios.get(
+          `user/${this.version.author_id}`,
+          this.$defaultHeaders()
+        )
+        const user = response.data
+        this.version.author_member = {
+          user,
+          name: user.name,
+          avatar_url: user.avatar_url,
+        }
+      }
 
       for (const dependency of this.version.dependencies) {
         dependency.version = this.dependencies.versions.find(
