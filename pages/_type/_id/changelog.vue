@@ -98,13 +98,14 @@ export default {
   },
   data() {
     return {
-      filteredVersions: this.versions,
+      filteredVersions: this.$calculateDuplicates(this.versions),
       currentPage: 1,
     }
   },
   fetch() {
-    if (this.$route.query.page)
+    if (this.$route.query.page) {
       this.currentPage = parseInt(this.$route.query.page)
+    }
   },
   head() {
     const title = `${this.project.title} - Changelog`
@@ -154,7 +155,7 @@ export default {
       }
     },
     updateVersions(updatedVersions) {
-      this.filteredVersions = updatedVersions
+      this.filteredVersions = this.$calculateDuplicates(updatedVersions)
     },
   },
   auth: false,

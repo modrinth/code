@@ -32,6 +32,20 @@ export default (ctx, inject) => {
   inject('formatCategory', formatCategory)
   inject('formatCategoryHeader', formatCategoryHeader)
   inject('formatProjectStatus', formatProjectStatus)
+  inject('calculateDuplicates', (versions) =>
+    versions.map((version, index) => {
+      const nextVersion = versions[index + 1]
+      if (
+        nextVersion &&
+        version.changelog &&
+        nextVersion.changelog === version.changelog
+      ) {
+        return { duplicate: true, ...version }
+      } else {
+        return { duplicate: false, ...version }
+      }
+    })
+  )
   inject('computeVersions', (versions) => {
     const visitedVersions = []
     const returnVersions = []
@@ -52,18 +66,6 @@ export default (ctx, inject) => {
 
     return returnVersions
       .reverse()
-      .map((version, index) => {
-        const nextVersion = returnVersions[index + 1]
-        if (
-          nextVersion &&
-          version.changelog &&
-          nextVersion.changelog === version.changelog
-        ) {
-          return { duplicate: true, ...version }
-        } else {
-          return { duplicate: false, ...version }
-        }
-      })
       .sort(
         (a, b) => ctx.$dayjs(b.date_published) - ctx.$dayjs(a.date_published)
       )
