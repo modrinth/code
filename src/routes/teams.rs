@@ -345,16 +345,13 @@ pub async fn add_team_member(
         actions: vec![
             NotificationActionBuilder {
                 title: "Accept".to_string(),
-                action_route: (
-                    "POST".to_string(),
-                    format!("team/{}/join", team),
-                ),
+                action_route: ("POST".to_string(), format!("team/{team}/join")),
             },
             NotificationActionBuilder {
                 title: "Deny".to_string(),
                 action_route: (
                     "DELETE".to_string(),
-                    format!("team/{}/members/{}", team, new_member.user_id),
+                    format!("team/{team}/members/{}", new_member.user_id),
                 ),
             },
         ],

@@ -4695,37 +4695,6 @@
     },
     "query": "\n        SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split, pt.name project_type\n        FROM mods m\n        INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.id = ANY($1)\n        "
   },
-  "9768966125ca0d148944fb03894b3f90d64563cb56adee48e1fb5f27158c43ce": {
-    "describe": {
-      "columns": [
-        {
-          "name": "version_id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "date_published",
-          "ordinal": 1,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "VarcharArray",
-          "VarcharArray",
-          "Text",
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.date_published FROM versions v\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id\n            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n            WHERE v.mod_id = $1 AND ($4 = NULL OR v.version_type = $4)\n            ORDER BY v.date_published, v.id ASC\n            LIMIT $5 OFFSET $6\n            "
-  },
   "97690dda7edea8c985891cae5ad405f628ed81e333bc88df5493c928a4324d43": {
     "describe": {
       "columns": [
@@ -5097,26 +5066,6 @@
       }
     },
     "query": "\n                    SELECT id FROM users\n                    WHERE LOWER(username) = LOWER($1)\n                    "
-  },
-  "ac840a3ba466cfa1f914a1e44fcc9052bd1e0e908140e7147d1ff72d1794cfbf": {
-    "describe": {
-      "columns": [
-        {
-          "name": "exists",
-          "ordinal": 0,
-          "type_info": "Bool"
-        }
-      ],
-      "nullable": [
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n                            SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)\n                            "
   },
   "acbafe265c4b7a1c95b0494a0a03c8bd2cd778ae561ef5a662fa931ca26cf603": {
     "describe": {
@@ -7549,6 +7498,26 @@
     },
     "query": "\n            DELETE FROM team_members\n            WHERE user_id = $1\n            "
   },
+  "f34bbe639ad21801258dc8beaab9877229a451761be07f85a1dd04d027832329": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                        SELECT EXISTS(SELECT 1 FROM mods WHERE id=$1)\n                        "
+  },
   "f3a8ad4a802dde0eb9304078e0368066e7d48121dfe73a63b2911b0998840a79": {
     "describe": {
       "columns": [
@@ -7777,6 +7746,37 @@
       }
     },
     "query": "SELECT EXISTS(SELECT 1 FROM notifications WHERE id=$1)"
+  },
+  "fcc7bedf9709bf49ae152064240a6e8bfa8ff4d5a63707e8b1450d9d77fb6f14": {
+    "describe": {
+      "columns": [
+        {
+          "name": "version_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "date_published",
+          "ordinal": 1,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "VarcharArray",
+          "VarcharArray",
+          "Varchar",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.date_published FROM versions v\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id\n            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n            WHERE v.mod_id = $1 AND ($4::varchar IS NULL OR v.version_type = $4)\n            ORDER BY v.date_published, v.id ASC\n            LIMIT $5 OFFSET $6\n            "
   },
   "fcd15905507769ab7f9839d64d1be3ee3f61cd555aee57dace76f8e53e91d344": {
     "describe": {

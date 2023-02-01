@@ -97,7 +97,7 @@ pub async fn mod_get(
         database::models::Project::get_full_from_slug_or_project_id(
             &string, &**pool,
         )
-            .await?;
+        .await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -109,7 +109,9 @@ pub async fn mod_get(
                 format!("[STOP USING API v1] {}", data.inner.description);
             data.inner.body =
                 format!("# STOP USING API v1 - whatever application you're using right now is likely deprecated or abandoned\n{}", data.inner.body);
-            return Ok(HttpResponse::Ok().json(models::projects::Project::from(data)));
+            return Ok(
+                HttpResponse::Ok().json(models::projects::Project::from(data))
+            );
         }
     }
     Ok(HttpResponse::NotFound().body(""))

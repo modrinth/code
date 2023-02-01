@@ -43,7 +43,13 @@ async fn main() -> std::io::Result<()> {
 
     // DSN is from SENTRY_DSN env variable.
     // Has no effect if not set.
-    let sentry = sentry::init(());
+    let sentry = sentry::init(sentry::ClientOptions {
+        release: sentry::release_name!(),
+        traces_sample_rate: 0.1,
+        enable_profiling: true,
+        profiles_sample_rate: 0.1,
+        ..Default::default()
+    });
     if sentry.is_enabled() {
         info!("Enabled Sentry integration");
         std::env::set_var("RUST_BACKTRACE", "1");

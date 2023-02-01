@@ -875,7 +875,7 @@ pub async fn upload_file(
 
     version_files.push(VersionFileBuilder {
         filename: file_name.to_string(),
-        url: format!("{}/{}", cdn_url, file_path_encode),
+        url: format!("{cdn_url}/{file_path_encode}"),
         hashes: vec![
             models::version_item::HashBuilder {
                 algorithm: "sha1".to_string(),

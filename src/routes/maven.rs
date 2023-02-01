@@ -115,7 +115,7 @@ pub async fn maven_metadata(
 
     let respdata = Metadata {
         group_id: "maven.modrinth".to_string(),
-        artifact_id: format!("{}", project_id),
+        artifact_id: project_id.to_string(),
         versioning: Versioning {
             latest: new_versions
                 .last()

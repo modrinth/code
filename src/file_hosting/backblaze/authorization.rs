@@ -34,7 +34,7 @@ pub async fn authorize_account(
     key_id: &str,
     application_key: &str,
 ) -> Result<AuthorizationData, FileHostingError> {
-    let combined_key = format!("{}:{}", key_id, application_key);
+    let combined_key = format!("{key_id}:{application_key}");
     let formatted_key = format!("Basic {}", base64::encode(combined_key));
 
     let response = reqwest::Client::new()

@@ -537,8 +537,7 @@ pub async fn update_files(
                     version.inner.id.into();
 
                 return Err(ApiError::Database(DatabaseError::Other(format!(
-                    "Could not parse hash for version {}",
-                    version_id
+                    "Could not parse hash for version {version_id}"
                 ))));
             }
         }

@@ -498,7 +498,7 @@ impl Version {
             INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))
             INNER JOIN loaders_versions lv ON lv.version_id = v.id
             INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
-            WHERE v.mod_id = $1 AND ($4 = NULL OR v.version_type = $4)
+            WHERE v.mod_id = $1 AND ($4::varchar IS NULL OR v.version_type = $4)
             ORDER BY v.date_published, v.id ASC
             LIMIT $5 OFFSET $6
             ",

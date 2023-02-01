@@ -196,7 +196,7 @@ pub async fn search_for_project(
 
             let filters: Cow<_> =
                 match (info.filters.as_deref(), info.version.as_deref()) {
-                    (Some(f), Some(v)) => format!("({}) AND ({})", f, v).into(),
+                    (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
                     (Some(f), None) => f.into(),
                     (None, Some(v)) => v.into(),
                     (None, None) => "".into(),
@@ -224,7 +224,7 @@ pub async fn search_for_project(
                 filter_string.push(')');
 
                 if !filters.is_empty() {
-                    write!(filter_string, " AND ({})", filters)?;
+                    write!(filter_string, " AND ({filters})")?;
                 }
             } else {
                 filter_string.push_str(&filters);

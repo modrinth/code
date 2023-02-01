@@ -149,8 +149,7 @@ pub async fn validate_file(
         if visited {
             Err(ValidationError::InvalidInput(
                 format!(
-                    "File extension {} is invalid for input file",
-                    file_extension
+                    "File extension {file_extension} is invalid for input file"
                 )
                 .into(),
             ))

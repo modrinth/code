@@ -14,8 +14,11 @@ use std::sync::Arc;
 #[derive(Deserialize)]
 pub struct DownloadBody {
     pub url: String,
-    pub hash: ProjectId,
+    pub project_id: ProjectId,
     pub version_name: String,
+
+    pub ip: String,
+    pub headers: HashMap<String, String>,
 }
 
 // This is an internal route, cannot be used without key
@@ -26,7 +29,7 @@ pub async fn count_download(
     download_queue: web::Data<Arc<DownloadQueue>>,
 ) -> Result<HttpResponse, ApiError> {
     let project_id: crate::database::models::ids::ProjectId =
-        download_body.hash.into();
+        download_body.project_id.into();
 
     let id_option = crate::models::ids::base62_impl::parse_base62(
         &download_body.version_name,
@@ -81,8 +84,11 @@ pub async fn count_download(
         .post(format!("{}downloads", dotenvy::var("ARIADNE_URL")?))
         .header("Modrinth-Admin", dotenvy::var("ARIADNE_ADMIN_KEY")?)
         .json(&json!({
+            "ip": download_body.ip,
             "url": download_body.url,
-            "project_id": download_body.hash
+            "project_id": download_body.project_id,
+            "version_id": crate::models::projects::VersionId(version_id as u64).to_string(),
+            "headers": download_body.headers
         }))
         .send()
         .await

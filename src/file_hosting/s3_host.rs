@@ -69,7 +69,7 @@ impl FileHost for S3Host {
 
         self.bucket
             .put_object_with_content_type(
-                format!("/{}", file_name),
+                format!("/{file_name}"),
                 &file_bytes,
                 content_type,
             )
@@ -98,7 +98,7 @@ impl FileHost for S3Host {
         file_name: &str,
     ) -> Result<DeleteFileData, FileHostingError> {
         self.bucket
-            .delete_object(format!("/{}", file_name))
+            .delete_object(format!("/{file_name}"))
             .await
             .map_err(|_| {
                 FileHostingError::S3Error(

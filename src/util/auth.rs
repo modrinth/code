@@ -40,7 +40,7 @@ pub async fn get_github_user_from_token(
         .header(reqwest::header::USER_AGENT, "Modrinth")
         .header(
             reqwest::header::AUTHORIZATION,
-            format!("token {}", access_token),
+            format!("token {access_token}"),
         )
         .send()
         .await?

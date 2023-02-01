@@ -163,7 +163,7 @@ pub async fn handle_stripe_webhook(
                     )
                 })?;
 
-                key.update(format!("{}.{}", timestamp, body).as_bytes());
+                key.update(format!("{timestamp}.{body}").as_bytes());
 
                 key.verify(&signature).map_err(|_| {
                     ApiError::Crypto(

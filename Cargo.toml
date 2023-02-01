@@ -1,6 +1,6 @@
 [package]
 name = "labrinth"
-version = "2.6.0"
+version = "2.7.0"
 authors = ["geometrically <jai@modrinth.com>"]
 edition = "2018"
 license = "AGPL-3.0"
@@ -67,8 +67,8 @@ thiserror = "1.0.37"
 sqlx = { version = "0.6.2", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate", "decimal", "json"] }
 rust_decimal = { version = "1.26", features = ["serde-with-float", "serde-with-str"] }
 
-sentry = "0.29.1"
-sentry-actix = "0.29.1"
+sentry = { version = "0.29.2", features = ["profiling"] }
+sentry-actix = "0.29.2"
 
 image = "0.24.5"
 color-thief = "0.2.2"

@@ -61,7 +61,7 @@ pub async fn user_get(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
     let id_option: Option<UserId> =
-        serde_json::from_str(&format!("\"{}\"", string)).ok();
+        serde_json::from_str(&format!("\"{string}\"")).ok();
 
     let mut user_data;
 
@@ -222,8 +222,7 @@ pub async fn user_edit(
                     .await?;
                 } else {
                     return Err(ApiError::InvalidInput(format!(
-                        "Username {} is taken!",
-                        username
+                        "Username {username} is taken!"
                     )));
                 }
             }

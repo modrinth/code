@@ -545,8 +545,7 @@ pub async fn project_create_inner(
                         })?;
 
                     let url = format!(
-                        "data/{}/images/{}.{}",
-                        project_id, hash, file_extension
+                        "data/{project_id}/images/{hash}.{file_extension}"
                     );
                     let upload_data = file_host
                         .upload_file(content_type, &url, data.freeze())
@@ -558,7 +557,7 @@ pub async fn project_create_inner(
                     });
 
                     gallery_urls.push(crate::models::projects::GalleryItem {
-                        url: format!("{}/{}", cdn_url, url),
+                        url: format!("{cdn_url}/{url}"),
                         featured: item.featured,
                         title: item.title.clone(),
                         description: item.description.clone(),
@@ -574,8 +573,7 @@ pub async fn project_create_inner(
                 *i
             } else {
                 return Err(CreateError::InvalidInput(format!(
-                    "File `{}` (field {}) isn't specified in the versions data",
-                    file_name, name
+                    "File `{file_name}` (field {name}) isn't specified in the versions data"
                 )));
             };
 
@@ -720,8 +718,7 @@ pub async fn project_create_inner(
         )
         .map_err(|err| {
             CreateError::InvalidInput(format!(
-                "Invalid SPDX license identifier: {}",
-                err
+                "Invalid SPDX license identifier: {err}"
             ))
         })?;
 
@@ -960,7 +957,7 @@ async fn process_icon_upload(
         let upload_data = file_host
             .upload_file(
                 content_type,
-                &format!("data/{}/{}.{}", project_id, hash, file_extension),
+                &format!("data/{project_id}/{hash}.{file_extension}"),
                 data.freeze(),
             )
             .await?;
