@@ -375,22 +375,19 @@ export default {
     render: {
       routeDone(url, result, context) {
         setTimeout(() => {
-          if (process.env.NODE_ENV !== 'production') return
           axios
             .post(
               `${process.env.ARIADNE_URL || STAGING_ARIADNE_URL}view`,
               {
                 url: getDomain() + url,
+                ip:
+                  context.req.headers['CF-Connecting-IP'] ??
+                  context.req.connection.remoteAddress,
+                headers: context.req.headers,
               },
               {
                 headers: {
                   'Modrinth-Admin': process.env.ARIADNE_ADMIN_KEY || 'feedbeef',
-                  'User-Agent':
-                    context.req.rawHeaders[
-                      context.req.rawHeaders.findIndex(
-                        (x) => x === 'User-Agent'
-                      ) + 1
-                    ],
                 },
               }
             )
@@ -398,7 +395,7 @@ export default {
             .catch((e) => {
               console.error(
                 'An error occurred while registering the visit: ',
-                e
+                e.response.data
               )
             })
         })

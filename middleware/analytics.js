@@ -11,10 +11,6 @@ export default function (context) {
     return
   }
 
-  if (process.env.NODE_ENV !== 'production') {
-    return
-  }
-
   setTimeout(() => {
     context.$axios
       .post(`${context.$config.analytics.base_url}view`, {
