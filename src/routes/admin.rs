@@ -81,7 +81,7 @@ pub async fn count_download(
     let client = reqwest::Client::new();
 
     client
-        .post(format!("{}downloads", dotenvy::var("ARIADNE_URL")?))
+        .post(format!("{}download", dotenvy::var("ARIADNE_URL")?))
         .header("Modrinth-Admin", dotenvy::var("ARIADNE_ADMIN_KEY")?)
         .json(&json!({
             "ip": download_body.ip,
