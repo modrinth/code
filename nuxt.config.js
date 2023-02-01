@@ -395,7 +395,7 @@ export default {
             .catch((e) => {
               console.error(
                 'An error occurred while registering the visit: ',
-                e.response.data
+                e.response ? e.response.data : e
               )
             })
         })
