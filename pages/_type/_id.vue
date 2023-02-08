@@ -279,7 +279,7 @@
         </div>
         <div
           v-if="currentMember && project.moderator_message"
-          class="universal-card"
+          class="universal-card moderation-card"
         >
           <h3 class="card-header">Message from the moderators:</h3>
           <div v-if="project.moderator_message.body">
