@@ -5047,6 +5047,26 @@
     },
     "query": "\n            SELECT id FROM categories\n            WHERE category = $1 AND project_type = $2\n            "
   },
+  "abf790170e3a807ffe8b3a188da620c89e6398f38ff066220fdadffe8e7481c1": {
+    "describe": {
+      "columns": [
+        {
+          "name": "exists",
+          "ordinal": 0,
+          "type_info": "Bool"
+        }
+      ],
+      "nullable": [
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Text"
+        ]
+      }
+    },
+    "query": "\n                      SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))\n                      "
+  },
   "ac2d17b7d7147b14f072c15ffa214c14f32f27ffa6a3c2b2a5f80f3ad49ca5e9": {
     "describe": {
       "columns": [
