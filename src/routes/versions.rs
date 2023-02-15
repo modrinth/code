@@ -144,6 +144,31 @@ pub async fn version_list(
     }
 }
 
+// Given a project ID/slug and a version slug
+#[get("version/{slug}")]
+pub async fn version_project_get(
+    req: HttpRequest,
+    info: web::Path<(String, String)>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let id = info.into_inner();
+    let version_data =
+        database::models::Version::get_full_from_id_slug(&id.0, &id.1, &**pool)
+            .await?;
+
+    let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
+
+    if let Some(data) = version_data {
+        if is_authorized_version(&data.inner, &user_option, &pool).await? {
+            return Ok(
+                HttpResponse::Ok().json(models::projects::Version::from(data))
+            );
+        }
+    }
+
+    Ok(HttpResponse::NotFound().body(""))
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct VersionIds {
     pub ids: String,

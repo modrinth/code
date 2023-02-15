@@ -75,7 +75,8 @@ pub fn projects_config(cfg: &mut web::ServiceConfig) {
             .service(
                 web::scope("{project_id}")
                     .service(versions::version_list)
-                    .service(projects::dependency_list),
+                    .service(projects::dependency_list)
+                    .service(versions::version_project_get),
             ),
     );
 }

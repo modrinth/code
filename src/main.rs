@@ -277,6 +277,12 @@ async fn main() -> std::io::Result<()> {
                         dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok(),
                     ),
             )
+            .app_data(web::FormConfig::default().error_handler(|err, _req| {
+                routes::ApiError::Validation(err.to_string()).into()
+            }))
+            .app_data(web::PathConfig::default().error_handler(|err, _req| {
+                routes::ApiError::Validation(err.to_string()).into()
+            }))
             .app_data(web::QueryConfig::default().error_handler(|err, _req| {
                 routes::ApiError::Validation(err.to_string()).into()
             }))

@@ -308,7 +308,7 @@ pub async fn get_update_from_hash(
         )
         .await?;
 
-        if let Some(version_id) = version_ids.last() {
+        if let Some(version_id) = version_ids.first() {
             let version_data =
                 database::models::Version::get_full(*version_id, &**pool)
                     .await?;
@@ -503,7 +503,7 @@ pub async fn update_files(
         )
         .await?;
 
-        if let Some(latest_version) = updated_versions.last() {
+        if let Some(latest_version) = updated_versions.first() {
             let mut version_ids = version_ids.write().await;
 
             version_ids.insert(*latest_version, row.hash);

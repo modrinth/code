@@ -1,5 +1,6 @@
 use super::ids::*;
 use super::DatabaseError;
+use crate::models::ids::base62_impl::parse_base62;
 use crate::models::projects::{FileType, VersionStatus, VersionType};
 use chrono::{DateTime, Utc};
 use serde::Deserialize;
@@ -499,7 +500,7 @@ impl Version {
             INNER JOIN loaders_versions lv ON lv.version_id = v.id
             INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
             WHERE v.mod_id = $1 AND ($4::varchar IS NULL OR v.version_type = $4)
-            ORDER BY v.date_published, v.id ASC
+            ORDER BY v.date_published, v.id DESC
             LIMIT $5 OFFSET $6
             ",
             project_id as ProjectId,
@@ -904,6 +905,39 @@ impl Version {
             })
             .try_collect::<Vec<QueryVersion>>()
             .await
+    }
+
+    pub async fn get_full_from_id_slug<'a, 'b, E>(
+        project_id_or_slug: &str,
+        slug: &str,
+        executor: E,
+    ) -> Result<Option<QueryVersion>, sqlx::error::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+    {
+        let project_id_opt =
+            parse_base62(project_id_or_slug).ok().map(|x| x as i64);
+        let id_opt = parse_base62(slug).ok().map(|x| x as i64);
+        let id = sqlx::query!(
+            "
+            SELECT v.id FROM versions v
+            INNER JOIN mods m ON mod_id = m.id
+            WHERE (m.id = $1 OR m.slug = $2) AND (v.id = $3 OR v.version_number = $4)
+            ORDER BY date_published ASC
+            ",
+            project_id_opt,
+            project_id_or_slug,
+            id_opt,
+            slug
+        )
+        .fetch_optional(executor)
+        .await?;
+
+        if let Some(version_id) = id {
+            Version::get_full(VersionId(version_id.id), executor).await
+        } else {
+            Ok(None)
+        }
     }
 }
 
