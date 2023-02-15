@@ -42,12 +42,12 @@ pub fn validation_errors_to_string(
                     if let Some(error) = errors.get(0) {
                         if let Some(adder) = adder {
                             output.push_str(&format!(
-                                "Field {} {} failed validation with error {}",
+                                "Field {} {} failed validation with error: {}",
                                 field, adder, error.code
                             ));
                         } else {
                             output.push_str(&format!(
-                                "Field {} failed validation with error {}",
+                                "Field {} failed validation with error: {}",
                                 field, error.code
                             ));
                         }
