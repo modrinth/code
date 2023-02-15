@@ -235,6 +235,7 @@ async fn main() -> std::io::Result<()> {
     // Init App
     HttpServer::new(move || {
         App::new()
+            .wrap(actix_web::middleware::Compress::default())
             .wrap(
                 Cors::default()
                     .allow_any_origin()
