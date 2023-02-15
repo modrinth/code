@@ -79,7 +79,7 @@ pub async fn index_local(
                         downloads: m.downloads,
                         icon_url: m.icon_url.unwrap_or_default(),
                         author: m.username,
-                        date_created: m.published,
+                        date_created: m.approved.unwrap_or(m.published),
                         created_timestamp: m.approved.unwrap_or(m.published).timestamp(),
                         date_modified: m.updated,
                         modified_timestamp: m.updated.timestamp(),
