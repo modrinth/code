@@ -365,7 +365,7 @@
         <nuxt-link to="/legal/privacy">Privacy</nuxt-link>
         <nuxt-link to="/legal/rules">Rules</nuxt-link>
         <a :target="$external()" href="https://careers.modrinth.com">
-          Careers <span class="count-bubble">2</span>
+          Careers
         </a>
       </div>
       <div class="links links-2" role="region" aria-label="Resources">
