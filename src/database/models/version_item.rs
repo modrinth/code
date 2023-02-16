@@ -500,7 +500,7 @@ impl Version {
             INNER JOIN loaders_versions lv ON lv.version_id = v.id
             INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
             WHERE v.mod_id = $1 AND ($4::varchar IS NULL OR v.version_type = $4)
-            ORDER BY v.date_published, v.id DESC
+            ORDER BY v.date_published DESC, v.id
             LIMIT $5 OFFSET $6
             ",
             project_id as ProjectId,

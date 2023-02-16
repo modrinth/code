@@ -980,6 +980,37 @@
     },
     "query": "SELECT EXISTS(SELECT 1 FROM states WHERE id=$1)"
   },
+  "1cb2e27dc45e65fd6f2f5118cc3547860762ceef37a75c352ec0ac0ea4214c32": {
+    "describe": {
+      "columns": [
+        {
+          "name": "version_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "date_published",
+          "ordinal": 1,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "VarcharArray",
+          "VarcharArray",
+          "Varchar",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.date_published FROM versions v\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id\n            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n            WHERE v.mod_id = $1 AND ($4::varchar IS NULL OR v.version_type = $4)\n            ORDER BY v.date_published DESC, v.id\n            LIMIT $5 OFFSET $6\n            "
+  },
   "1ce90594000fa30876bf277d9ebe2901acf9afaf256dd4488166d55fdd950347": {
     "describe": {
       "columns": [],
@@ -7440,37 +7471,6 @@
       }
     },
     "query": "\n        SELECT name FROM project_types pt\n        INNER JOIN mods ON mods.project_type = pt.id\n        WHERE mods.id = $1\n        "
-  },
-  "ef9391658df31e28c53525c3338a05d9025bb31101547c4cb9d439f793bc7721": {
-    "describe": {
-      "columns": [
-        {
-          "name": "version_id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "date_published",
-          "ordinal": 1,
-          "type_info": "Timestamptz"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "VarcharArray",
-          "VarcharArray",
-          "Varchar",
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.date_published FROM versions v\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id\n            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n            WHERE v.mod_id = $1 AND ($4::varchar IS NULL OR v.version_type = $4)\n            ORDER BY v.date_published, v.id DESC\n            LIMIT $5 OFFSET $6\n            "
   },
   "f0db9d8606ccc2196a9cfafe0e7090dab42bf790f25e0469b8947fac1cf043d5": {
     "describe": {
