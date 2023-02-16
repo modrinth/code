@@ -1,0 +1,53 @@
+a,
+.clickable {
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out,
+  scale 0.05s ease-in-out, outline 0.2s ease-in-out;
+
+  &:active:not(&:disabled) {
+    scale: 0.95;
+  }
+}
+
+.button-base {
+  @extend .clickable;
+  font-weight: 500;
+  border: none;
+  outline: 2px solid transparent;
+
+  &:focus-visible:not(&:disabled),
+  &:hover:not(&:disabled) {
+    cursor: pointer;
+    filter: brightness(0.85);
+  }
+
+  &:active:not(&:disabled) {
+    filter: brightness(0.8);
+  }
+
+  &:disabled.quiet-disabled {
+    cursor: unset;
+  }
+
+  &:disabled:not(.quiet-disabled),
+  &[disabled]:not(.quiet-disabled) {
+    cursor: not-allowed;
+    filter: grayscale(50%);
+    opacity: 0.5;
+    box-shadow: none;
+  }
+}
+
+.standard-button {
+  box-sizing: border-box;
+
+  color: var(--color-contrast);
+  background-color: var(--color-button-bg);
+  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  border-radius: var(--radius-sm);
+}
+
+.standard-body {
+  :last-child {
+    margin-bottom: 0;
+  }
+}

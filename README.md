@@ -1,62 +1,46 @@
-# Omorphia
+# omorphia
 
-Omorphia is Modrinth's component, style, and utility library for Svelte projects. It includes:
+This template should help get you started developing with Vue 3 in Vite.
 
-- 🧩 Typed components which enhance HTML elements and provide a consistent UI
-- 🎨 CSS classes to easily style elements with a coherent style
-- 🧰 Typed utilities to solve common tasks quick and dependably
-- ⚙️ Configuration for SvelteKit and PostCSS to simplify setups
-- 🚚 A Rollup plugin to generate a cache of heavily used API requests and OpenAPI types
+## Recommended IDE Setup
 
-Read the documentation at [omorphia.modrinth.com.](https://omorphia.modrinth.com)
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
-## Developing
+## Type Support for `.vue` Imports in TS
 
-The library lives in the `src/` folder, and the documentation lives in the `docs/` folder.
+TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
 
-### Getting started
+If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
 
-Install [Node (16.5+)](https://docs.volta.sh/guide/getting-started) and [PNPM](https://pnpm.io/installation) prior to developing.
+1. Disable the built-in TypeScript Extension
+    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
+    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
+2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
 
-To start the dev server, install dependencies and run `pnpm dev`:
+## Customize configuration
 
-```bash
-pnpm install # Install dependencies
-pnpm dev # Run dev server
+See [Vite Configuration Reference](https://vitejs.dev/config/).
+
+## Project Setup
+
+```sh
+npm install
 ```
 
-To use the git hooks in the repo, which will save you waiting for CI to tell you that you forgot to lint, run this:
+### Compile and Hot-Reload for Development
 
-```bash
-git config core.hookspath .githooks
+```sh
+npm run dev
 ```
 
-### Adding new components
+### Type-Check, Compile and Minify for Production
 
-> Replace `ComponentName` with your component name in the steps below
+```sh
+npm run build
+```
 
-1. Create a `ComponentName.svelte` file in `src/components`
-2. Add an export for your component in [./src/index.ts](./src/index.ts)
-   ```
-   export { default as ComponentName } from './components/ComponentName.svelte'
-   ```
-3. Create a `ComponentName.md` file for documentation in `docs/routes/components`
-4. Add an example of your component in your `ComponentName.md` file, like so:
+### Lint with [ESLint](https://eslint.org/)
 
-   ````md
-   ```svelte example raised
-   <script lang="ts">
-   	import { ComponentName } from 'omorphia'
-   </script>
-
-   <ComponentName />
-   ```
-   ````
-
-## Building
-
-To build the documentation site, run:
-
-```bash
-pnpm build
+```sh
+npm run lint
 ```

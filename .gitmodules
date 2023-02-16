@@ -1,3 +1,0 @@
-[submodule "locales"]
-	path = locales
-	url = https://github.com/modrinth/translations

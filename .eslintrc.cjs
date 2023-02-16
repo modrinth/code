@@ -1,20 +1,15 @@
+/* eslint-env node */
+require("@rushstack/eslint-patch/modern-module-resolution");
+
 module.exports = {
 	root: true,
-	parser: '@typescript-eslint/parser',
-	extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
-	plugins: ['svelte3', '@typescript-eslint'],
-	ignorePatterns: ['*.cjs'],
-	overrides: [{ files: ['*.svelte'], processor: 'svelte3/svelte3' }],
-	settings: {
-		'svelte3/typescript': () => require('typescript'),
-	},
+	extends: [
+		"plugin:vue/vue3-essential",
+		"eslint:recommended",
+		"@vue/eslint-config-typescript",
+		"@vue/eslint-config-prettier",
+	],
 	parserOptions: {
-		sourceType: 'module',
-		ecmaVersion: 2020,
+		ecmaVersion: "latest",
 	},
-	env: {
-		browser: true,
-		es2017: true,
-		node: true,
-	},
-}
+};

@@ -1,0 +1,63 @@
+html {
+  @extend .dark-mode;
+  --dark-color-base: #b0bac5;
+  --dark-color-contrast: #ecf9fb;
+
+  --gap-xs: 0.25rem;
+  --gap-sm: 0.5rem;
+  --gap-md: 0.75rem;
+  --gap-lg: 1rem;
+  --gap-xl: 1.5rem;
+
+  --radius-xs: 0.25rem;
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-max: 999999999px;
+}
+
+.light-mode {
+  --color-bg: #e5e7eb;
+  --color-raised-bg: #ffffff;
+  --color-button-bg: hsl(220, 13%, 91%);
+
+  --color-base: hsl(221, 39%, 11%);
+  --color-contrast: #1a202c;
+  --color-accent-contrast: #ffffff;
+
+  --color-red: #cb2245;
+  --color-orange: #e08325;
+  --color-green: #00af5c;
+  --color-blue: #1f68c0;
+  --color-purple: #8e32f3;
+  --color-gray: #595b61;
+
+  --color-brand: var(--color-green);
+}
+
+.dark-mode {
+  --color-bg: #16181c;
+  --color-raised-bg: #26292f;
+  --color-button-bg: hsl(222, 13%, 30%);
+
+  --color-base: var(--dark-color-base);
+  --color-contrast: var(--dark-color-contrast);
+  --color-accent-contrast: #000000;
+
+  --color-red: #ff496e;
+  --color-orange: #ffa347;
+  --color-green: #1bd96a;
+  --color-blue: #4f9cff;
+  --color-purple: #c78aff;
+  --color-gray: #9fa4b3;
+
+  --color-brand: var(--color-green);
+}
+
+.oled-mode {
+  @extend .dark-mode;
+  --color-bg: #000000;
+  --color-raised-bg: #101013;
+  --color-button-bg: #222329;
+}
