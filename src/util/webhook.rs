@@ -78,7 +78,7 @@ pub async fn send_discord_webhook(
     let row =
         sqlx::query!(
             "
-            SELECT m.id id, m.title title, m.description description,
+            SELECT m.id id, m.title title, m.description description, m.color color,
             m.icon_url icon_url, m.slug slug, cs.name client_side_type, ss.name server_side_type,
             pt.name project_type, u.username username, u.avatar_url avatar_url,
             ARRAY_AGG(DISTINCT c.category) filter (where c.category is not null) categories,
@@ -222,7 +222,7 @@ pub async fn send_discord_webhook(
             title: project.title,
             description: project.description,
             timestamp: Utc::now(),
-            color: 0x1bd96a,
+            color: project.color.unwrap_or(0x1bd96a) as u32,
             fields,
             thumbnail: DiscordEmbedThumbnail {
                 url: project.icon_url,
