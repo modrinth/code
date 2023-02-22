@@ -108,11 +108,13 @@ pub async fn process_payout(
     pool: web::Data<PgPool>,
     data: web::Json<PayoutData>,
 ) -> Result<HttpResponse, ApiError> {
-    let start = data
-        .date
-        .date()
-        .and_hms_nano(0, 0, 0, 0)
-        .with_timezone(&Utc);
+    let start: DateTime<Utc> = DateTime::from_utc(
+        data.date
+            .date_naive()
+            .and_hms_nano_opt(0, 0, 0, 0)
+            .unwrap_or_default(),
+        Utc,
+    );
 
     let client = reqwest::Client::new();
     let mut transaction = pool.begin().await?;

@@ -4,7 +4,6 @@ use actix_web::http::StatusCode;
 use actix_web::HttpResponse;
 use chrono::{DateTime, Utc};
 use meilisearch_sdk::client::Client;
-use meilisearch_sdk::document::Document;
 use serde::{Deserialize, Serialize};
 use std::borrow::Cow;
 use std::cmp::min;
@@ -137,22 +136,6 @@ pub struct ResultSearchProject {
     pub color: Option<u32>,
 }
 
-impl Document for UploadSearchProject {
-    type UIDType = String;
-
-    fn get_uid(&self) -> &Self::UIDType {
-        &self.project_id
-    }
-}
-
-impl Document for ResultSearchProject {
-    type UIDType = String;
-
-    fn get_uid(&self) -> &Self::UIDType {
-        &self.project_id
-    }
-}
-
 pub async fn search_for_project(
     info: &SearchRequest,
     config: &SearchConfig,
@@ -240,8 +223,8 @@ pub async fn search_for_project(
 
     Ok(SearchResults {
         hits: results.hits.into_iter().map(|r| r.result).collect(),
-        offset: results.offset,
-        limit: results.limit,
-        total_hits: results.nb_hits,
+        offset: results.offset.unwrap_or_default(),
+        limit: results.limit.unwrap_or_default(),
+        total_hits: results.estimated_total_hits.unwrap_or_default(),
     })
 }

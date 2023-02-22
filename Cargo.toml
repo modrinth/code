@@ -12,35 +12,35 @@ path = "src/main.rs"
 
 [dependencies]
 actix = "0.13.0"
-actix-web = "4.2.1"
-actix-rt = "2.7.0"
-actix-multipart = "0.4.0"
+actix-web = "4.3.0"
+actix-rt = "2.8.0"
+actix-multipart = "0.5.0"
 actix-cors = "0.6.4"
 
-tokio = { version = "1.21.2", features = ["sync"] }
-tokio-stream = "0.1.10"
+tokio = { version = "1.25.0", features = ["sync"] }
+tokio-stream = "0.1.11"
 
-futures = "0.3.24"
+futures = "0.3.26"
 futures-timer = "3.0.2"
-async-trait = "0.1.57"
+async-trait = "0.1.64"
 dashmap = "5.4.0"
 lazy_static = "1.4.0"
 
-meilisearch-sdk = "0.15.0"
+meilisearch-sdk = "0.22.0"
 rust-s3 = "0.32.3"
-reqwest = { version = "0.11.12", features = ["json", "multipart"] }
+reqwest = { version = "0.11.14", features = ["json", "multipart"] }
 
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-serde_with = "2.0.1"
-chrono = { version = "0.4.22", features = ["serde"]}
+serde_with = "2.2.0"
+chrono = { version = "0.4.23", features = ["serde"]}
 yaserde = "0.8.0"
 yaserde_derive = "0.8.0"
 xml-rs = "0.8.4"
 
 rand = "0.8.5"
-bytes = "1.2.1"
-base64 = "0.20.0"
+bytes = "1.4.0"
+base64 = "0.21.0"
 sha1 = { version = "0.6.1", features = ["std"] }
 sha2 = "0.9.9"
 hmac = "0.11.0"
@@ -50,25 +50,25 @@ hex = "0.4.3"
 url = "2.3.1"
 urlencoding = "2.1.2"
 
-zip = "0.6.3"
+zip = "0.6.4"
 
 itertools = "0.10.5"
 
 validator = { version = "0.16.0", features = ["derive", "phone"] }
-regex = "1.6.0"
+regex = "1.7.1"
 censor = "0.3.0"
-spdx = { version = "0.9.0", features = ["text"] }
+spdx = { version = "0.10.0", features = ["text"] }
 
 dotenvy = "0.15.6"
 log = "0.4.17"
-env_logger = "0.9.1"
-thiserror = "1.0.37"
+env_logger = "0.10.0"
+thiserror = "1.0.38"
 
 sqlx = { version = "0.6.2", features = ["runtime-actix-rustls", "postgres", "chrono", "offline", "macros", "migrate", "decimal", "json"] }
-rust_decimal = { version = "1.26", features = ["serde-with-float", "serde-with-str"] }
+rust_decimal = { version = "1.28.1", features = ["serde-with-float", "serde-with-str"] }
 
-sentry = { version = "0.29.2", features = ["profiling"] }
-sentry-actix = "0.29.2"
+sentry = { version = "0.29.3", features = ["profiling"] }
+sentry-actix = "0.29.3"
 
 image = "0.24.5"
 color-thief = "0.2.2"

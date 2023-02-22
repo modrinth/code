@@ -22,7 +22,7 @@ impl super::Validator for QuiltValidator {
 
     fn get_supported_game_versions(&self) -> SupportedGameVersions {
         SupportedGameVersions::PastDate(DateTime::from_utc(
-            NaiveDateTime::from_timestamp(1646070100, 0),
+            NaiveDateTime::from_timestamp_opt(1646070100, 0).unwrap(),
             Utc,
         ))
     }

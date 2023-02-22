@@ -7,11 +7,11 @@ use crate::util::auth::get_user_from_headers;
 use crate::util::routes::ok_or_not_found;
 use crate::{database, models};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use futures::TryStreamExt;
 use itertools::Itertools;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use std::collections::HashMap;
-use tokio::sync::RwLock;
 
 #[derive(Deserialize)]
 pub struct HashQuery {
@@ -460,7 +460,7 @@ pub async fn update_files(
 
     let result = sqlx::query!(
         "
-        SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
+        SELECT h.hash, v.mod_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
         INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
         INNER JOIN mods m on v.mod_id = m.id
@@ -471,49 +471,52 @@ pub async fn update_files(
         update_data.algorithm,
         &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
     )
-        .fetch_all(&mut *transaction)
+        .fetch_many(&mut *transaction)
+        .try_filter_map(|e| async {
+            Ok(e.right().map(|m| (m.hash, database::models::ids::ProjectId(m.mod_id))))
+        })
+        .try_collect::<Vec<_>>()
         .await?;
 
-    let version_ids: RwLock<HashMap<database::models::VersionId, Vec<u8>>> =
-        RwLock::new(HashMap::new());
+    let mut version_ids: HashMap<database::models::VersionId, Vec<u8>> =
+        HashMap::new();
 
-    futures::future::try_join_all(result.into_iter().map(|row| async {
-        let updated_versions = database::models::Version::get_project_versions(
-            database::models::ProjectId(row.project_id),
-            Some(
-                update_data
-                    .game_versions
-                    .clone()
-                    .iter()
-                    .map(|x| x.0.clone())
-                    .collect(),
-            ),
-            Some(
-                update_data
-                    .loaders
-                    .clone()
-                    .iter()
-                    .map(|x| x.0.clone())
-                    .collect(),
-            ),
-            None,
-            None,
-            None,
-            &**pool,
-        )
-        .await?;
-
-        if let Some(latest_version) = updated_versions.first() {
-            let mut version_ids = version_ids.write().await;
-
-            version_ids.insert(*latest_version, row.hash);
-        }
-
-        Ok::<(), ApiError>(())
-    }))
+    let updated_versions = database::models::Version::get_projects_versions(
+        result
+            .iter()
+            .map(|x| x.1)
+            .collect::<Vec<database::models::ProjectId>>()
+            .clone(),
+        Some(
+            update_data
+                .game_versions
+                .clone()
+                .iter()
+                .map(|x| x.0.clone())
+                .collect(),
+        ),
+        Some(
+            update_data
+                .loaders
+                .clone()
+                .iter()
+                .map(|x| x.0.clone())
+                .collect(),
+        ),
+        None,
+        None,
+        None,
+        &**pool,
+    )
     .await?;
 
-    let version_ids = version_ids.into_inner();
+    for (hash, id) in result {
+        if let Some(latest_version) =
+            updated_versions.get(&id).and_then(|x| x.last())
+        {
+            version_ids.insert(*latest_version, hash);
+        }
+    }
 
     let versions = database::models::Version::get_many_full(
         version_ids.keys().copied().collect(),
@@ -533,8 +536,7 @@ pub async fn update_files(
                     models::projects::Version::from(version),
                 );
             } else {
-                let version_id: models::projects::VersionId =
-                    version.inner.id.into();
+                let version_id: VersionId = version.inner.id.into();
 
                 return Err(ApiError::Database(DatabaseError::Other(format!(
                     "Could not parse hash for version {version_id}"

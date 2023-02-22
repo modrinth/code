@@ -518,6 +518,56 @@ impl Version {
         Ok(vec)
     }
 
+    pub async fn get_projects_versions<'a, E>(
+        project_ids: Vec<ProjectId>,
+        game_versions: Option<Vec<String>>,
+        loaders: Option<Vec<String>>,
+        version_type: Option<VersionType>,
+        limit: Option<u32>,
+        offset: Option<u32>,
+        exec: E,
+    ) -> Result<HashMap<ProjectId, Vec<VersionId>>, sqlx::Error>
+    where
+        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    {
+        use futures::stream::TryStreamExt;
+
+        let vec = sqlx::query!(
+            "
+            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.mod_id, v.date_published FROM versions v
+            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
+            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))
+            INNER JOIN loaders_versions lv ON lv.version_id = v.id
+            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))
+            WHERE v.mod_id = ANY($1) AND ($4::varchar IS NULL OR v.version_type = $4)
+            ORDER BY v.date_published, v.id ASC
+            LIMIT $5 OFFSET $6
+            ",
+            &project_ids.into_iter().map(|x| x.0).collect::<Vec<i64>>(),
+            &game_versions.unwrap_or_default(),
+            &loaders.unwrap_or_default(),
+            version_type.map(|x| x.as_str()),
+            limit.map(|x| x as i64),
+            offset.map(|x| x as i64),
+        )
+            .fetch_many(exec)
+            .try_filter_map(|e| async { Ok(e.right().map(|v| (ProjectId(v.mod_id), VersionId(v.version_id)))) })
+            .try_collect::<Vec<(ProjectId, VersionId)>>()
+            .await?;
+
+        let mut map: HashMap<ProjectId, Vec<VersionId>> = HashMap::new();
+
+        for (project_id, version_id) in vec {
+            if let Some(value) = map.get_mut(&project_id) {
+                value.push(version_id);
+            } else {
+                map.insert(project_id, vec![version_id]);
+            }
+        }
+
+        Ok(map)
+    }
+
     pub async fn get<'a, 'b, E>(
         id: VersionId,
         executor: E,

@@ -1,4 +1,5 @@
 use crate::routes::ApiError;
+use base64::Engine;
 use chrono::{DateTime, Duration, Utc};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -51,7 +52,10 @@ impl PayoutsQueue {
             dotenvy::var("PAYPAL_CLIENT_ID")?,
             dotenvy::var("PAYPAL_CLIENT_SECRET")?
         );
-        let formatted_key = format!("Basic {}", base64::encode(combined_key));
+        let formatted_key = format!(
+            "Basic {}",
+            base64::engine::general_purpose::STANDARD.encode(combined_key)
+        );
 
         let mut form = HashMap::new();
         form.insert("grant_type", "client_credentials");

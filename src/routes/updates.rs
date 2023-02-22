@@ -5,11 +5,10 @@ use serde::Serialize;
 use sqlx::PgPool;
 
 use crate::database;
-use crate::models::projects::{Version, VersionType};
+use crate::models::projects::VersionType;
 use crate::util::auth::{
-    get_user_from_headers, is_authorized, is_authorized_version,
+    filter_authorized_versions, get_user_from_headers, is_authorized,
 };
-use futures::StreamExt;
 
 use super::ApiError;
 
@@ -48,22 +47,10 @@ pub async fn forge_updates(
     let versions =
         database::models::Version::get_many_full(version_ids, &**pool).await?;
 
-    let mut versions = futures::stream::iter(versions)
-        .filter_map(|data| async {
-            if is_authorized_version(&data.inner, &user_option, &pool)
-                .await
-                .ok()?
-            {
-                Some(data)
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<_>>()
-        .await;
+    let mut versions =
+        filter_authorized_versions(versions, &user_option, &pool).await?;
 
-    versions
-        .sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
+    versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
 
     #[derive(Serialize)]
     struct ForgeUpdates {
@@ -81,8 +68,6 @@ pub async fn forge_updates(
     };
 
     for version in versions {
-        let version = Version::from(version);
-
         if version.version_type == VersionType::Release {
             for game_version in &version.game_versions {
                 response

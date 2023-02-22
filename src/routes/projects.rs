@@ -9,15 +9,18 @@ use crate::models::projects::{
 use crate::models::teams::Permissions;
 use crate::routes::ApiError;
 use crate::search::{search_for_project, SearchConfig, SearchError};
-use crate::util::auth::{get_user_from_headers, is_authorized};
+use crate::util::auth::{
+    filter_authorized_projects, get_user_from_headers, is_authorized,
+};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
-use futures::{StreamExt, TryStreamExt};
+use futures::TryStreamExt;
+use meilisearch_sdk::indexes::IndexesResults;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-use sqlx::{PgPool, Row};
+use sqlx::PgPool;
 use std::sync::Arc;
 use validator::Validate;
 
@@ -91,16 +94,8 @@ pub async fn projects_get(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let projects: Vec<_> = futures::stream::iter(projects_data)
-        .filter_map(|data| async {
-            if is_authorized(&data.inner, &user_option, &pool).await.ok()? {
-                Some(Project::from(data))
-            } else {
-                None
-            }
-        })
-        .collect()
-        .await;
+    let projects =
+        filter_authorized_projects(projects_data, &user_option, &pool).await?;
 
     Ok(HttpResponse::Ok().json(projects))
 }
@@ -216,26 +211,25 @@ pub async fn dependency_list(
 
         use futures::stream::TryStreamExt;
 
-        //TODO: This query is not checked at compile time! Once SQLX parses this query correctly, please use the query! macro instead
-        let dependencies = sqlx::query(
+        let dependencies = sqlx::query!(
             "
-            SELECT d.dependency_id, vd.mod_id, d.mod_dependency_id
+            SELECT d.dependency_id, COALESCE(vd.mod_id, 0) mod_id, d.mod_dependency_id
             FROM versions v
             INNER JOIN dependencies d ON d.dependent_id = v.id
             LEFT JOIN versions vd ON d.dependency_id = vd.id
             WHERE v.mod_id = $1
             ",
+            id as database::models::ProjectId
         )
-        .bind(id as database::models::ProjectId)
         .fetch_many(&**pool)
         .try_filter_map(|e| async {
             Ok(e.right().map(|x| {
                 (
-                    x.get::<Option<i64>, usize>(0)
+                    x.dependency_id
                         .map(database::models::VersionId),
-                    x.get::<Option<i64>, usize>(1)
-                        .map(database::models::ProjectId),
-                    x.get::<Option<i64>, usize>(2)
+                    if x.mod_id == Some(0) { None } else { x.mod_id
+                        .map(database::models::ProjectId) },
+                    x.mod_dependency_id
                         .map(database::models::ProjectId),
                 )
             }))
@@ -262,19 +256,20 @@ pub async fn dependency_list(
             })
             .collect::<Vec<_>>();
 
-        let (projects_result, versions_result) = futures::join!(
-            database::Project::get_many_full(&project_ids, &**pool,),
+        let (projects_result, versions_result) = futures::future::try_join(
+            database::Project::get_many_full(&project_ids, &**pool),
             database::Version::get_many_full(
                 dependencies.iter().filter_map(|x| x.0).collect(),
                 &**pool,
-            )
-        );
+            ),
+        )
+        .await?;
 
-        let mut projects = projects_result?
+        let mut projects = projects_result
             .into_iter()
             .map(models::projects::Project::from)
             .collect::<Vec<_>>();
-        let mut versions = versions_result?
+        let mut versions = versions_result
             .into_iter()
             .map(models::projects::Version::from)
             .collect::<Vec<_>>();
@@ -2372,9 +2367,9 @@ pub async fn delete_from_index(
     let client =
         meilisearch_sdk::client::Client::new(&*config.address, &*config.key);
 
-    let indexes: Vec<meilisearch_sdk::indexes::Index> =
-        client.get_indexes().await?;
-    for index in indexes {
+    let indexes: IndexesResults = client.get_indexes().await?;
+
+    for index in indexes.results {
         index.delete_document(id.to_string()).await?;
     }
 

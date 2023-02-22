@@ -267,7 +267,8 @@ pub async fn handle_stripe_webhook(
 
             if let Some(item) = invoice.lines.data.first() {
                 let expires: DateTime<Utc> = DateTime::from_utc(
-                    NaiveDateTime::from_timestamp(item.period.end, 0),
+                    NaiveDateTime::from_timestamp_opt(item.period.end, 0)
+                        .unwrap_or_default(),
                     Utc,
                 ) + Duration::days(1);
 

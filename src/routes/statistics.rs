@@ -18,7 +18,8 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool);
+    .fetch_one(&**pool)
+    .await?;
 
     let versions = sqlx::query!(
         "
@@ -36,7 +37,8 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool);
+    .fetch_one(&**pool)
+    .await?;
 
     let authors = sqlx::query!(
         "
@@ -50,7 +52,8 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool);
+    .fetch_one(&**pool)
+    .await?;
 
     let files = sqlx::query!(
         "
@@ -67,10 +70,8 @@ pub async fn get_stats(
             .map(|x| x.to_string())
             .collect::<Vec<String>>(),
     )
-    .fetch_one(&**pool);
-
-    let (projects, versions, authors, files) =
-        futures::future::try_join4(projects, versions, authors, files).await?;
+    .fetch_one(&**pool)
+    .await?;
 
     let json = json!({
         "projects": projects.count,

@@ -2868,6 +2868,38 @@
     },
     "query": "\n                                INSERT INTO historical_payouts (user_id, amount, status)\n                                VALUES ($1, $2, $3)\n                                "
   },
+  "4838777a8ef4371f4f5bb4f4f038bb6d041455f0849a3972a5418d75165ae9c7": {
+    "describe": {
+      "columns": [
+        {
+          "name": "dependency_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "mod_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "mod_dependency_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        true,
+        null,
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            SELECT d.dependency_id, COALESCE(vd.mod_id, 0) mod_id, d.mod_dependency_id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            LEFT JOIN versions vd ON d.dependency_id = vd.id\n            WHERE v.mod_id = $1\n            "
+  },
   "49a5d21a1454afc6383b78e468fd0decc75b9163e7286f34ceab22d563a0d3f7": {
     "describe": {
       "columns": [],
@@ -2913,6 +2945,43 @@
       }
     },
     "query": "\n                    UPDATE mods\n                    SET server_side = $1\n                    WHERE (id = $2)\n                    "
+  },
+  "4ad05a5f35600c5dadedfe93e91374ef20ba55c6a9ac6016a01422f2ae8dbb72": {
+    "describe": {
+      "columns": [
+        {
+          "name": "version_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "mod_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "date_published",
+          "ordinal": 2,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "VarcharArray",
+          "VarcharArray",
+          "Varchar",
+          "Int8",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            SELECT DISTINCT ON(v.date_published, v.id) version_id, v.mod_id, v.date_published FROM versions v\n            INNER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id\n            INNER JOIN game_versions gv on gvv.game_version_id = gv.id AND (cardinality($2::varchar[]) = 0 OR gv.version = ANY($2::varchar[]))\n            INNER JOIN loaders_versions lv ON lv.version_id = v.id\n            INNER JOIN loaders l on lv.loader_id = l.id AND (cardinality($3::varchar[]) = 0 OR l.loader = ANY($3::varchar[]))\n            WHERE v.mod_id = ANY($1) AND ($4::varchar IS NULL OR v.version_type = $4)\n            ORDER BY v.date_published, v.id ASC\n            LIMIT $5 OFFSET $6\n            "
   },
   "4b14b5c69f6a0ee4e06e41d7cea425c7c34d6db45895275a2ce8adfa28dc8f72": {
     "describe": {
@@ -3727,6 +3796,27 @@
       }
     },
     "query": "\n            UPDATE dependencies\n            SET dependency_id = $2\n            WHERE id = ANY($1::bigint[])\n            "
+  },
+  "71abd207410d123f9a50345ddcddee335fea0d0cc6f28762713ee01a36aee8a0": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                SELECT m.id FROM mods m\n                INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2\n                WHERE m.id = ANY($1)\n                "
   },
   "72ad6f4be40d7620a0ec557e3806da41ce95335aeaa910fe35aca2ec7c3f09b6": {
     "describe": {
@@ -4642,6 +4732,35 @@
     },
     "query": "\n            DELETE FROM loaders\n            WHERE loader = $1\n            "
   },
+  "9284d7f22617e0a7daf91540ff31791d0921ec5d4eb4809846dc67567bec1a81": {
+    "describe": {
+      "columns": [
+        {
+          "name": "hash",
+          "ordinal": 0,
+          "type_info": "Bytea"
+        },
+        {
+          "name": "mod_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "TextArray",
+          "ByteaArray",
+          "Text",
+          "TextArray"
+        ]
+      }
+    },
+    "query": "\n        SELECT h.hash, v.mod_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)\n        INNER JOIN mods m on v.mod_id = m.id\n        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)\n        "
+  },
   "9348309884811e8b22f33786ae7c0f259f37f3c90e545f00761a641570107160": {
     "describe": {
       "columns": [
@@ -4751,6 +4870,33 @@
       }
     },
     "query": "SELECT EXISTS(SELECT 1 FROM reports WHERE id=$1)"
+  },
+  "980e2ebd1b77baecff5b302b063d8f359ddbdb68452c4c8f2a53dc8d6a2127a4": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "team_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                SELECT m.id id, m.team_id team_id FROM team_members tm\n                INNER JOIN mods m ON m.team_id = tm.team_id\n                WHERE tm.team_id = ANY($1) AND tm.user_id = $2\n                "
   },
   "99a1eac69d7f5a5139703df431e6a5c3012a90143a8c635f93632f04d0bc41d4": {
     "describe": {

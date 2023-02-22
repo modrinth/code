@@ -117,7 +117,7 @@ pub struct TeamId(pub i64);
 #[sqlx(transparent)]
 pub struct TeamMemberId(pub i64);
 
-#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, PartialEq, Eq, Deserialize, Hash)]
 #[sqlx(transparent)]
 pub struct ProjectId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]

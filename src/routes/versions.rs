@@ -2,16 +2,16 @@ use super::ApiError;
 use crate::database;
 use crate::models;
 use crate::models::projects::{
-    Dependency, FileType, Version, VersionStatus, VersionType,
+    Dependency, FileType, VersionStatus, VersionType,
 };
 use crate::models::teams::Permissions;
 use crate::util::auth::{
-    get_user_from_headers, is_authorized, is_authorized_version,
+    filter_authorized_versions, get_user_from_headers, is_authorized,
+    is_authorized_version,
 };
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::{DateTime, Utc};
-use futures::StreamExt;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use validator::Validate;
@@ -70,23 +70,16 @@ pub async fn version_list(
             database::models::Version::get_many_full(version_ids, &**pool)
                 .await?;
 
-        let mut response = futures::stream::iter(versions.clone())
-            .filter_map(|data| async {
-                if is_authorized_version(&data.inner, &user_option, &pool)
-                    .await
-                    .ok()?
-                    && filters
-                        .featured
-                        .map(|featured| featured == data.inner.featured)
-                        .unwrap_or(true)
-                {
-                    Some(Version::from(data))
-                } else {
-                    None
-                }
+        let mut response = versions
+            .iter()
+            .filter(|version| {
+                filters
+                    .featured
+                    .map(|featured| featured == version.inner.featured)
+                    .unwrap_or(true)
             })
-            .collect::<Vec<_>>()
-            .await;
+            .cloned()
+            .collect::<Vec<_>>();
 
         versions.sort_by(|a, b| {
             b.inner.date_published.cmp(&a.inner.date_published)
@@ -97,16 +90,15 @@ pub async fn version_list(
             && !versions.is_empty()
             && filters.featured.unwrap_or(false)
         {
-            let (loaders, game_versions) = futures::join!(
+            let (loaders, game_versions) = futures::future::try_join(
                 database::models::categories::Loader::list(&**pool),
                 database::models::categories::GameVersion::list_filter(
                     None,
                     Some(true),
-                    &**pool
-                )
-            );
-
-            let (loaders, game_versions) = (loaders?, game_versions?);
+                    &**pool,
+                ),
+            )
+            .await?;
 
             let mut joined_filters = Vec::new();
             for game_version in &game_versions {
@@ -122,21 +114,24 @@ pub async fn version_list(
                         version.game_versions.contains(&filter.0.version)
                             && version.loaders.contains(&filter.1.loader)
                     })
-                    .map(|version| {
-                        response.push(Version::from(version.clone()))
-                    })
+                    .map(|version| response.push(version.clone()))
                     .unwrap_or(());
             });
 
             if response.is_empty() {
                 versions
                     .into_iter()
-                    .for_each(|version| response.push(Version::from(version)));
+                    .for_each(|version| response.push(version));
             }
         }
 
-        response.sort_by(|a, b| b.date_published.cmp(&a.date_published));
-        response.dedup_by(|a, b| a.id == b.id);
+        response.sort_by(|a, b| {
+            b.inner.date_published.cmp(&a.inner.date_published)
+        });
+        response.dedup_by(|a, b| a.inner.id == b.inner.id);
+
+        let response =
+            filter_authorized_versions(response, &user_option, &pool).await?;
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -190,19 +185,8 @@ pub async fn versions_get(
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let versions: Vec<_> = futures::stream::iter(versions_data)
-        .filter_map(|data| async {
-            if is_authorized_version(&data.inner, &user_option, &pool)
-                .await
-                .ok()?
-            {
-                Some(Version::from(data))
-            } else {
-                None
-            }
-        })
-        .collect()
-        .await;
+    let versions =
+        filter_authorized_versions(versions_data, &user_option, &pool).await?;
 
     Ok(HttpResponse::Ok().json(versions))
 }
