@@ -69,7 +69,10 @@ pub enum ErrorKind {
     OtherError(String),
 
     #[error("Serialization error (TOML): {0}")]
-    TOMLError(#[from] toml::de::Error),
+    TOMLError (#[from] toml::de::Error),
+
+    #[error("Failed to extract mod: {0}")]
+    ModExtractionError(String)
 }
 
 #[derive(Debug)]

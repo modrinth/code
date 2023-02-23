@@ -17,8 +17,8 @@ pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
 pub const SUPPORTED_ICON_FORMATS: &[&'static str] = &[
-    "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
-    "mp4",
+"bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
+"mp4",
 ];
 
 // Represent a Minecraft instance.
@@ -132,15 +132,15 @@ impl Profile {
         icon: &'a Path,
     ) -> crate::Result<&'a mut Self> {
         let ext = icon
-            .extension()
-            .and_then(std::ffi::OsStr::to_str)
-            .unwrap_or("");
+        .extension()
+        .and_then(std::ffi::OsStr::to_str)
+        .unwrap_or("");
 
         if SUPPORTED_ICON_FORMATS.contains(&ext) {
             let file_name = format!("icon.{ext}");
             fs::copy(icon, &self.path.join(&file_name)).await?;
             self.metadata.icon =
-                Some(Path::new(&format!("./{file_name}")).to_owned());
+            Some(Path::new(&format!("./{file_name}")).to_owned());
 
             Ok(self)
         } else {
@@ -224,19 +224,19 @@ impl Profiles {
         )?;
 
         let profiles = stream::iter(profile_db.iter())
-            .then(|it| async move {
-                let path = PathBuf::from(it);
-                let prof = match Self::read_profile_from_dir(&path).await {
-                    Ok(prof) => Some(prof),
-                    Err(err) => {
-                        log::warn!("Error loading profile: {err}. Skipping...");
-                        None
-                    }
-                };
-                (path, prof)
-            })
-            .collect::<HashMap<PathBuf, Option<Profile>>>()
-            .await;
+        .then(|it| async move {
+            let path = PathBuf::from(it);
+            let prof = match Self::read_profile_from_dir(&path).await {
+                Ok(prof) => Some(prof),
+                Err(err) => {
+                    log::warn!("Error loading profile: {err}. Skipping...");
+                    None
+                }
+            };
+            (path, prof)
+        })
+        .collect::<HashMap<PathBuf, Option<Profile>>>()
+        .await;
 
         Ok(Self(profiles))
     }
@@ -246,13 +246,13 @@ impl Profiles {
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         self.0.insert(
             profile
-                .path
-                .canonicalize()?
-                .to_str()
-                .ok_or(
-                    crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
-                )?
-                .into(),
+            .path
+            .canonicalize()?
+            .to_str()
+            .ok_or(
+                crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
+            )?
+            .into(),
             Some(profile),
         );
         Ok(self)
@@ -270,8 +270,11 @@ impl Profiles {
     // Remove a profile.
     #[tracing::instrument(skip(self))]
     pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
-        let path = PathBuf::from(path.canonicalize()?.to_str().unwrap());
-        self.0.remove(&path);
+        if let Ok(canonicalized_path) = path.canonicalize() {
+            if let Some(path_str) = canonicalized_path.to_str() {
+                self.0.remove(&PathBuf::from(path_str));
+            }
+        }
         Ok(self)
     }
 
@@ -282,17 +285,21 @@ impl Profiles {
         batch: &'a mut sled::Batch,
     ) -> crate::Result<&Self> {
         stream::iter(self.0.iter())
-            .map(Ok::<_, crate::Error>)
-            .try_for_each_concurrent(None, |(path, profile)| async move {
-                let json = serde_json::to_vec_pretty(&profile)?;
+        .map(Ok::<_, crate::Error>)
+        .try_for_each_concurrent(None, |(path, profile)| async move {
+            let json = serde_json::to_vec_pretty(&profile)?;
 
-                let json_path = Path::new(path.to_str()
-                    .expect("Could not convert path to string."))
-                    .join(PROFILE_JSON_PATH);
-                fs::write(json_path, json).await?;
-                Ok::<_, crate::Error>(())
-            })
-            .await?;
+            let json_path = Path::new(&path
+                .canonicalize()?
+                .to_str()
+                .ok_or(
+                    crate::ErrorKind::InputError(format!("Invalid path: {}", path.display())).as_error(),
+                )?)
+            .join(PROFILE_JSON_PATH);
+            fs::write(json_path, json).await?;
+            Ok::<_, crate::Error>(())
+        })
+        .await?;
 
         batch.insert(
             PROFILE_SUBTREE,
@@ -360,7 +367,7 @@ mod tests {
                 "install": "/usr/bin/java",
             },
             "memory": {
-              "maximum": 8192u32,
+                "maximum": 8192u32,
             },
             "resolution": (1920u16, 1080u16),
             "hooks": {},

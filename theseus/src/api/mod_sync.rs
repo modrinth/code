@@ -1,6 +1,6 @@
 extern crate reqwest;
 
-use futures::StreamExt;
+use futures::{StreamExt, TryStreamExt};
 
 use crate::mod_extraction::extract_info_from_jar;
 use crate::model::mod_type::JARLoadedMod;
@@ -57,8 +57,7 @@ async fn get_local_mods(dir: &Path) -> crate::Result<Vec<JARLoadedMod>> {
     let stream = futures::stream::iter(jars);
     let mods = stream
         .then(|path| extract_info_from_jar(path))
-        .map(|res| res.expect("Could not extract info."))
-        .collect::<Vec<_>>().await;
+        .try_collect::<Vec<_>>().await?;
 
     Ok(mods)
 }

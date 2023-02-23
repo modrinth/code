@@ -95,28 +95,3 @@ pub async fn sha1_async(bytes: bytes::Bytes) -> String {
         .await
         .unwrap()
 }
-
-/// Download file to temp storage
-/// Return path to file.
-#[tracing::instrument]
-pub async fn download_file(file_url: &String) -> crate::Result<String> {
-    let tmp_dir = Builder::new().prefix("temp").tempdir()?;
-    let response = reqwest::get(file_url).await?;
-
-    let f_path: PathBuf;
-
-    let mut dest = {
-        let fname = response
-            .url()
-            .path_segments()
-            .and_then(|segments| segments.last())
-            .and_then(|name| if name.is_empty() { None } else { Some(name) })
-            .unwrap_or("tmp.bin");
-
-        f_path = tmp_dir.path().join(fname);
-        std::fs::File::create(fname)?
-    };
-    let content =  response.text().await?;
-    copy(&mut content.as_bytes(), &mut dest)?;
-    Ok(String::from(f_path.to_str().expect("No path found!")))
-}
