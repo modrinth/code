@@ -1,18 +1,7 @@
-# theseus_gui
+# Tauri + Vue 3
 
-## Developing
+This template should help get you started developing with Tauri + Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
 
-First, make sure [NodeJS](https://nodejs.org/en/download/package-manager/) & [pnpm](https://pnpm.io/installation#nodejs-is-preinstalled) are installed, then run:
+## Recommended IDE Setup
 
-```zsh
-pnpm install # Install dependencies
-pnpm dev # Start dev server
-```
-
-> If after quitting the dev process, you find that the SvelteKit process is still running (or preventing you from restarting the dev command), run `pnpm kill:dev`
-
-## Building
-
-```bash
-pnpm build
-```
+- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) + [Tauri](https://marketplace.visualstudio.com/items?itemName=tauri-apps.tauri-vscode) + [rust-analyzer](https://marketplace.visualstudio.com/items?itemName=rust-lang.rust-analyzer)
