@@ -3,12 +3,16 @@ body {
   background-color: var(--vp-c-bg);
 }
 
-.VPLink, .title, .pager-link, .link, .header-anchor {
+.VPLink,
+.title,
+.pager-link,
+.link,
+.header-anchor {
   color: inherit;
   transition: none;
 
   &:hover {
-     text-decoration: none;
+    text-decoration: none;
   }
 
   &:active:not(&:disabled) {

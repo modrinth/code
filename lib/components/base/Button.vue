@@ -1,5 +1,5 @@
 <script setup>
-import { IssuesIcon, ExternalIcon, UnknownIcon} from '@/components'
+import { ExternalIcon, UnknownIcon } from '@/components'
 
 import { computed } from 'vue'
 
@@ -27,7 +27,7 @@ const props = defineProps({
   iconOnly: {
     type: Boolean,
     default: false,
-  }
+  },
 })
 
 const defaultDesign = computed(() => props.design === 'default')
@@ -56,7 +56,7 @@ const accentedButton = computed(
   <!--  </nuxt-link>-->
   <a
     v-if="link"
-    class="omorphia__button button-base padding-block-sm padding-inline-lg radius-sm"
+    class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md"
     :class="{
       'standard-button': defaultDesign,
       'icon-only': props.iconOnly,
@@ -73,8 +73,8 @@ const accentedButton = computed(
     <UnknownIcon v-if="!$slots.default" />
   </a>
   <button
-    v-else-if="action"
-    class="omorphia__button button-base padding-block-sm padding-inline-lg radius-sm"
+    v-else
+    class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md"
     :class="{
       'standard-button': defaultDesign,
       'icon-only': props.iconOnly,
@@ -88,13 +88,6 @@ const accentedButton = computed(
     <slot />
     <UnknownIcon v-if="!$slots.default" />
   </button>
-  <div
-    v-else
-    class="omorphia__button button-base button-color-base padding-block-sm padding-inline-lg radius-sm bg-red color-accent-contrast"
-  >
-    <IssuesIcon />
-    Missing link or action!
-  </div>
 </template>
 
 <style lang="scss" scoped>

@@ -43,11 +43,43 @@ a,
   color: var(--color-contrast);
   background-color: var(--color-button-bg);
   box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
 }
 
 .standard-body {
   :last-child {
     margin-bottom: 0;
+  }
+}
+
+.button-within {
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+    outline 0.2s ease-in-out;
+
+  &:focus-visible:not(&.disabled),
+  &:hover:not(&.disabled) {
+    filter: brightness(0.85);
+  }
+
+  &:active:not(&.disabled) {
+    filter: brightness(0.8);
+  }
+
+  // For some reason this within the above block makes it universal and not only applied to children. SCSS bug maybe?
+  &:active:not(&.disabled) button:not(&:disabled) {
+    transform: scale(0.95);
+  }
+
+  &.disabled {
+    cursor: not-allowed;
+    filter: grayscale(50%);
+    opacity: 0.5;
+    box-shadow: none;
+
+    &disabled,
+    &[disabled] {
+      cursor: not-allowed;
+      box-shadow: none;
+    }
   }
 }
