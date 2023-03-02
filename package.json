@@ -1,5 +1,5 @@
 {
-  "name": "omorphia",
+  "name": "@modrinth/omorphia",
   "type": "module",
   "version": "0.0.0",
   "files": [
