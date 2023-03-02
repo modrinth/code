@@ -326,7 +326,7 @@ Get logged in user
     - Add project data to indexing queue
 */
 
-pub async fn project_create_inner(
+async fn project_create_inner(
     req: HttpRequest,
     payload: &mut Multipart,
     transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,

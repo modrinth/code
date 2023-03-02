@@ -1,20 +1,12 @@
-use crate::file_hosting::FileHost;
 use crate::models::projects::SearchRequest;
-use crate::routes::project_creation::{
-    project_create_inner, undo_uploads, CreateError,
-};
 use crate::routes::projects::ProjectIds;
 use crate::routes::ApiError;
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use crate::util::auth::{get_user_from_headers, is_authorized};
 use crate::{database, models};
-use actix_multipart::Multipart;
-use actix_web::web;
-use actix_web::web::Data;
-use actix_web::{get, post, HttpRequest, HttpResponse};
+use actix_web::{get, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
-use std::sync::Arc;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ResultSearchMod {
@@ -149,39 +141,4 @@ pub async fn mods_get(
         }
     }
     Ok(HttpResponse::Ok().json(projects))
-}
-
-#[post("mod")]
-pub async fn mod_create(
-    req: HttpRequest,
-    mut payload: Multipart,
-    client: Data<PgPool>,
-    file_host: Data<Arc<dyn FileHost + Send + Sync>>,
-) -> Result<HttpResponse, CreateError> {
-    let mut transaction = client.begin().await?;
-    let mut uploaded_files = Vec::new();
-
-    let result = project_create_inner(
-        req,
-        &mut payload,
-        &mut transaction,
-        &***file_host,
-        &mut uploaded_files,
-        &client,
-    )
-    .await;
-
-    if result.is_err() {
-        let undo_result = undo_uploads(&***file_host, &uploaded_files).await;
-        let rollback_result = transaction.rollback().await;
-
-        undo_result?;
-        if let Err(e) = rollback_result {
-            return Err(e.into());
-        }
-    } else {
-        transaction.commit().await?;
-    }
-
-    result
 }

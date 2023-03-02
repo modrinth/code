@@ -66,7 +66,7 @@ pub async fn report_create(
     };
 
     match new_report.item_type {
-        ItemType::Project | ItemType::Mod => {
+        ItemType::Project => {
             let project_id =
                 ProjectId(parse_base62(new_report.item_id.as_str())?);
 
