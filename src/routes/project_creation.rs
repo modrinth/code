@@ -140,7 +140,10 @@ fn default_requested_status() -> ProjectStatus {
 
 #[derive(Serialize, Deserialize, Validate, Clone)]
 struct ProjectCreateData {
-    #[validate(length(min = 3, max = 64))]
+    #[validate(
+        length(min = 3, max = 64),
+        custom(function = "crate::util::validate::validate_name")
+    )]
     #[serde(alias = "mod_name")]
     /// The title or name of the project.
     pub title: String,

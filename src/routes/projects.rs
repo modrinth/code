@@ -289,7 +289,10 @@ pub async fn dependency_list(
 /// A project returned from the API
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditProject {
-    #[validate(length(min = 3, max = 64))]
+    #[validate(
+        length(min = 3, max = 64),
+        custom(function = "crate::util::validate::validate_name")
+    )]
     pub title: Option<String>,
     #[validate(length(min = 3, max = 256))]
     pub description: Option<String>,
@@ -441,7 +444,7 @@ pub async fn project_edit(
                     SET title = $1
                     WHERE (id = $2)
                     ",
-                    title,
+                    title.trim(),
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)

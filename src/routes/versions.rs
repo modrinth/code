@@ -216,7 +216,10 @@ pub async fn version_get(
 
 #[derive(Serialize, Deserialize, Validate)]
 pub struct EditVersion {
-    #[validate(length(min = 1, max = 64))]
+    #[validate(
+        length(min = 1, max = 64),
+        custom(function = "crate::util::validate::validate_name")
+    )]
     pub name: Option<String>,
     #[validate(
         length(min = 1, max = 32),
@@ -309,7 +312,7 @@ pub async fn version_edit(
                     SET name = $1
                     WHERE (id = $2)
                     ",
-                    name,
+                    name.trim(),
                     id as database::models::ids::VersionId,
                 )
                 .execute(&mut *transaction)
