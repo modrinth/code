@@ -321,6 +321,7 @@ pub async fn license_list() -> HttpResponse {
 
 #[derive(serde::Serialize)]
 pub struct LicenseText {
+    title: String,
     body: String,
 }
 
@@ -332,12 +333,14 @@ pub async fn license_text(
 
     if license_id == *crate::models::projects::DEFAULT_LICENSE_ID {
         return Ok(HttpResponse::Ok().json(LicenseText {
+            title: "All Rights Reserved".to_string(),
             body: "All rights reserved unless explicitly stated.".to_string(),
         }));
     }
 
     if let Some(license) = spdx::license_id(&license_id) {
         return Ok(HttpResponse::Ok().json(LicenseText {
+            title: license.full_name.to_string(),
             body: license.text().to_string(),
         }));
     }
