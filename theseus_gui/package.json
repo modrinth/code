@@ -10,12 +10,13 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "vue": "^3.2.45",
-    "@tauri-apps/api": "^1.2.0"
+    "@modrinth/omorphia": "modrinth/omorphia",
+    "@tauri-apps/api": "^1.2.0",
+    "vue": "^3.2.45"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^1.2.2",
     "@vitejs/plugin-vue": "^4.0.0",
-    "vite": "^4.0.0",
-    "@tauri-apps/cli": "^1.2.2"
+    "vite": "^4.0.0"
   }
 }
