@@ -5,7 +5,7 @@ use crate::search::{SearchConfig, UploadSearchProject};
 use local_import::index_local;
 use meilisearch_sdk::client::Client;
 use meilisearch_sdk::indexes::Index;
-use meilisearch_sdk::settings::Settings;
+use meilisearch_sdk::settings::{PaginationSetting, Settings};
 use sqlx::postgres::PgPool;
 use thiserror::Error;
 
@@ -176,6 +176,9 @@ fn default_settings() -> Settings {
         .with_searchable_attributes(DEFAULT_SEARCHABLE_ATTRIBUTES)
         .with_sortable_attributes(DEFAULT_SORTABLE_ATTRIBUTES)
         .with_filterable_attributes(DEFAULT_ATTRIBUTES_FOR_FACETING)
+        .with_pagination(PaginationSetting {
+            max_total_hits: 2147483647,
+        })
 }
 
 const DEFAULT_DISPLAYED_ATTRIBUTES: &[&str] = &[
