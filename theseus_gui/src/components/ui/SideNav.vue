@@ -1,10 +1,13 @@
 <script setup>
-import { SunIcon, MoonIcon, SearchIcon, BookIcon, ClientIcon } from 'omorphia'
+import { SunIcon, MoonIcon, SearchIcon, BookIcon, ClientIcon, PlusIcon } from 'omorphia'
 import { useStore } from 'vuex'
 import { RouterLink } from 'vue-router'
 import UserSection from './UserSection.vue'
+import Instance from './Instance.vue'
 
 const { state, commit } = useStore()
+
+commit('fetchInstances')
 </script>
 
 <template>
@@ -30,7 +33,18 @@ const { state, commit } = useStore()
         <BookIcon />Library</RouterLink
       >
     </div>
-    <div id="instances"></div>
+    <div id="instances">
+      <p>Instances</p>
+      <Instance v-for="instance in state.instances" display="list" :instance="instance" />
+    </div>
+    <RouterLink
+      to="/add-instance"
+      class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
+      id="add-instance-btn"
+    >
+      <PlusIcon />
+      Create Instance
+    </RouterLink>
     <SunIcon v-if="!state.darkTheme" @click="commit('toggleTheme')" class="theme-icon" />
     <MoonIcon v-else @click="commit('toggleTheme')" class="theme-icon" />
   </div>
@@ -75,6 +89,21 @@ const { state, commit } = useStore()
     }
   }
 
+  #instances {
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    margin: 2rem;
+
+    p {
+      color: #b5b5b5;
+      margin-bottom: 1rem;
+      font-size: 11px;
+      line-height: 13px;
+      font-weight: 400;
+    }
+  }
+
   .theme-icon {
     align-self: flex-end;
     position: absolute;
@@ -84,11 +113,39 @@ const { state, commit } = useStore()
     font-size: larger;
     border-radius: 10px;
   }
+
+  #add-instance-btn {
+    background: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 80%;
+    font-size: 16px;
+
+    svg {
+      background: #32d874;
+      border-radius: 8px;
+      width: 30px;
+      height: auto;
+      box-shadow: 0px -1px 1px 0px #00000040 inset;
+    }
+
+    &:hover {
+      text-decoration: none;
+    }
+  }
 }
 
 .dark-mode {
   .nav-container {
     background: #17191c;
+
+    #add-instance-btn {
+      &:hover {
+        background-color: #2a2d32;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+      }
+    }
   }
 
   #pages > a:hover {

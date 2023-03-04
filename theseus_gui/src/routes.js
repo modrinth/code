@@ -6,27 +6,27 @@ export default new createRouter({
   routes: [
     {
       path: '/',
-      name: 'index',
+      name: 'Home',
       component: Index,
     },
     {
       path: '/browse',
-      name: 'browse',
+      name: 'Browse',
       component: Browse,
     },
     {
       path: '/library',
-      name: 'library',
+      name: 'Library',
       component: Library,
     },
     {
       path: '/add-instance',
-      name: 'add-instance',
+      name: 'Add Instance',
       component: AddInstance,
     },
     {
       path: '/project',
-      name: 'project',
+      name: 'Project',
       component: Project,
     },
   ],

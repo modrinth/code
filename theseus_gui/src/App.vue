@@ -3,6 +3,7 @@ import { watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
 import SideNav from './components/ui/SideNav.vue'
+import AppBar from './components/ui/AppBar.vue'
 import { toggleTheme } from './helpers/theme'
 
 const { state } = useStore()
@@ -17,14 +18,22 @@ watch(state, (newState) => {
 <template>
   <div class="container">
     <SideNav />
-    <RouterView />
+    <div class="view">
+      <AppBar />
+      <RouterView />
+    </div>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 .container {
   display: flex;
-  width: 100vw;
-  height: 100vh;
+  min-width: 100vw;
+  min-height: 100vh;
+
+  .view {
+    width: 100%;
+    height: 100%;
+  }
 }
 </style>

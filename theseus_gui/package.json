@@ -10,8 +10,8 @@
     "tauri": "tauri"
   },
   "dependencies": {
-    "@modrinth/omorphia": "modrinth/omorphia",
     "@tauri-apps/api": "^1.2.0",
+    "axios": "^1.3.4",
     "omorphia": "^0.0.1",
     "vue": "^3.2.45",
     "vue-router": "4",
