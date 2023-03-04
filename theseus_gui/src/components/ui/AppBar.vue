@@ -38,6 +38,13 @@ const router = useRouter()
     font-size: 18px;
     margin-left: 10px;
 
+    svg {
+      transition: all ease-in-out 0.1s;
+      &:hover {
+        filter: brightness(150%);
+      }
+    }
+
     p {
       margin-left: 0.5rem;
     }

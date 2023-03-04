@@ -29,7 +29,7 @@ const props = defineProps({
   justify-content: center;
   padding: 0;
   background: rgba(229, 229, 229, 0.1);
-  width: 384px;
+  width: 350px;
   height: 100px;
   margin: 10px 15px;
 
@@ -74,6 +74,17 @@ const props = defineProps({
 
       p {
         font-size: 12px;
+      }
+
+      a {
+        display: inline-block;
+        transition: all ease-in-out 0.2s;
+        width: 20px;
+        font-size: 18px;
+
+        &:hover {
+          transform: translate(2px);
+        }
       }
     }
   }

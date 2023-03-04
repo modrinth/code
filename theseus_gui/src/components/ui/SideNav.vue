@@ -1,5 +1,13 @@
 <script setup>
-import { SunIcon, MoonIcon, SearchIcon, BookIcon, ClientIcon, PlusIcon } from 'omorphia'
+import {
+  SunIcon,
+  MoonIcon,
+  SearchIcon,
+  BookIcon,
+  ClientIcon,
+  PlusIcon,
+  SettingsIcon,
+} from 'omorphia'
 import { useStore } from 'vuex'
 import { RouterLink } from 'vue-router'
 import UserSection from './UserSection.vue'
@@ -45,8 +53,16 @@ commit('fetchInstances')
       <PlusIcon />
       Create Instance
     </RouterLink>
-    <SunIcon v-if="!state.darkTheme" @click="commit('toggleTheme')" class="theme-icon" />
-    <MoonIcon v-else @click="commit('toggleTheme')" class="theme-icon" />
+
+    <div id="settings">
+      <RouterLink
+        to="/settings"
+        class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
+        ><SettingsIcon /> Settings</RouterLink
+      >
+      <SunIcon v-if="!state.darkTheme" @click="commit('toggleTheme')" class="theme-icon" />
+      <MoonIcon v-else @click="commit('toggleTheme')" class="theme-icon" />
+    </div>
   </div>
 </template>
 
@@ -93,25 +109,46 @@ commit('fetchInstances')
     display: flex;
     flex-direction: column;
     width: 80%;
-    margin: 2rem;
+    margin: 0.5rem;
 
     p {
       color: #b5b5b5;
-      margin-bottom: 1rem;
+      margin-bottom: 0.4rem;
       font-size: 11px;
       line-height: 13px;
       font-weight: 400;
     }
   }
 
-  .theme-icon {
-    align-self: flex-end;
+  #settings {
     position: absolute;
+    align-self: flex-end;
+    display: flex;
+    align-items: center;
     bottom: 20px;
-    margin-right: 1.5rem;
-    cursor: pointer;
-    font-size: larger;
-    border-radius: 10px;
+    margin-right: 1rem;
+    width: 150px;
+    justify-content: space-between;
+
+    a {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 80%;
+      margin: auto;
+      background: inherit;
+      margin-right: 1rem;
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .theme-icon {
+      cursor: pointer;
+      font-size: larger;
+      border-radius: 10px;
+    }
   }
 
   #add-instance-btn {

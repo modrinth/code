@@ -40,8 +40,8 @@ const handleInstanceClick = (id) => {
 }
 
 .instance-gallery-item {
-  width: 120px;
-  height: 120px;
+  width: 110px;
+  height: 110px;
   background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
   background-position: center;
   background-size: cover;

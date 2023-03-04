@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { Index, Browse, Library, AddInstance, Project } from './pages'
+import { Index, Browse, Library, AddInstance, Project, Settings } from './pages'
 
 export default new createRouter({
   history: createWebHistory(),
@@ -28,6 +28,11 @@ export default new createRouter({
       path: '/project',
       name: 'Project',
       component: Project,
+    },
+    {
+      path: '/settings',
+      name: 'Settings',
+      component: Settings,
     },
   ],
 })

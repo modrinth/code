@@ -28,8 +28,9 @@ watch(state, (newState) => {
 <style lang="scss" scoped>
 .container {
   display: flex;
-  min-width: 100vw;
+  min-width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
 
   .view {
     width: 100%;
