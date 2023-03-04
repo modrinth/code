@@ -62,7 +62,7 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "theseus_gui",
+        "title": "Modrinth Launcher",
         "width": 800
       }
     ]

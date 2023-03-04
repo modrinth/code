@@ -14,7 +14,8 @@
     "@tauri-apps/api": "^1.2.0",
     "omorphia": "^0.0.1",
     "vue": "^3.2.45",
-    "vue-router": "4"
+    "vue-router": "4",
+    "vuex": "^4.1.0"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^1.2.2",

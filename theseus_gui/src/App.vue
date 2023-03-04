@@ -1,17 +1,30 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
+import { watch } from 'vue'
+import { RouterView } from 'vue-router'
+import { useStore } from 'vuex'
+import SideNav from './components/ui/SideNav.vue'
+import { toggleTheme } from './helpers/theme'
 
-import Counter from './components/Counter.vue'
+const { state } = useStore()
+
+toggleTheme(state.darkTheme)
+
+watch(state, (newState) => {
+  toggleTheme(newState.darkTheme)
+})
 </script>
 
 <template>
   <div class="container">
-    <RouterLink to="/">Index</RouterLink>
-    <RouterLink to="/about">About</RouterLink>
-    <h1>Modrinth</h1>
-    <Counter />
-    <RouterView></RouterView>
+    <SideNav />
+    <RouterView />
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.container {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+}
+</style>

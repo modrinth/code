@@ -2,6 +2,6 @@
 
 <template>
   <div>
-    <p>About page</p>
+    <p>Project page</p>
   </div>
 </template>

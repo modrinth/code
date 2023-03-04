@@ -1,7 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-
-import Index from './pages/Index.vue'
-import About from './pages/About.vue'
+import { Index, Browse, Library, AddInstance, Project } from './pages'
 
 export default new createRouter({
   history: createWebHistory(),
@@ -12,9 +10,24 @@ export default new createRouter({
       component: Index,
     },
     {
-      path: '/about',
-      name: 'about',
-      component: About,
+      path: '/browse',
+      name: 'browse',
+      component: Browse,
+    },
+    {
+      path: '/library',
+      name: 'library',
+      component: Library,
+    },
+    {
+      path: '/add-instance',
+      name: 'add-instance',
+      component: AddInstance,
+    },
+    {
+      path: '/project',
+      name: 'project',
+      component: Project,
     },
   ],
 })
