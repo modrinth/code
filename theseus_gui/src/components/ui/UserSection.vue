@@ -26,7 +26,7 @@ import { Avatar } from 'omorphia'
     flex-direction: column;
     justify-content: flex-start;
     text-align: left;
-    margin-left: 1rem;
+    margin-left: 0.5rem;
   }
 
   #username {
@@ -37,7 +37,7 @@ import { Avatar } from 'omorphia'
   }
 
   a {
-    font-size: 14px;
+    font-size: 12px;
     font-weight: 400;
   }
 }

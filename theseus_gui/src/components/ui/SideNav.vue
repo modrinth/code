@@ -55,7 +55,7 @@ commit('fetchInstances')
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 252px;
+  width: 260px;
   height: 100vh;
   box-shadow: 0px 0px 8px 3px #00000026;
 
@@ -72,7 +72,7 @@ commit('fetchInstances')
       width: 80%;
       margin: 5px auto;
       text-align: left;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 400;
       background: inherit;
       transition: all ease-in-out 0.1s;
@@ -119,13 +119,13 @@ commit('fetchInstances')
     display: flex;
     align-items: center;
     justify-content: space-evenly;
-    width: 80%;
-    font-size: 16px;
+    width: 85%;
+    font-size: 14px;
 
     svg {
       background: #32d874;
       border-radius: 8px;
-      width: 30px;
+      width: 25px;
       height: auto;
       box-shadow: 0px -1px 1px 0px #00000040 inset;
     }

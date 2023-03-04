@@ -1,8 +1,11 @@
 <script setup>
 import { useStore } from 'vuex'
-import ModRowDisplay from '../components/ModRowDisplay.vue'
+import RowDisplay from '../components/RowDisplay.vue'
 
-const { state } = useStore()
+const { state, commit } = useStore()
+
+commit('fetchInstances')
+commit('fetchNews')
 
 const recentInstances = state.instances.slice(0, 4)
 const popularInstances = state.instances.filter((i) => i.downloads > 50)
@@ -10,8 +13,9 @@ const popularInstances = state.instances.filter((i) => i.downloads > 50)
 
 <template>
   <div class="page-container">
-    <ModRowDisplay label="Jump back in" :instances="recentInstances" />
-    <ModRowDisplay label="Popular packs" :instances="popularInstances" />
+    <RowDisplay label="Jump back in" :instances="recentInstances" />
+    <RowDisplay label="Popular packs" :instances="popularInstances" />
+    <RowDisplay label="News & updates" :news="state.news" />
   </div>
 </template>
 

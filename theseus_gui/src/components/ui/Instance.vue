@@ -19,8 +19,8 @@ const handleInstanceClick = (id) => {
       <p>{{ props.instance.name }}</p>
     </div>
     <div class="instance-gallery-item" v-else-if="display === 'gallery'">
-      <p>{{ props.instance.name }}</p>
       <p>{{ props.instance.version }}</p>
+      <p>{{ props.instance.name }}</p>
     </div>
   </div>
 </template>
@@ -30,6 +30,9 @@ const handleInstanceClick = (id) => {
   margin: 5px auto;
   cursor: pointer;
   transition: all ease-out 0.1s;
+  p {
+    font-size: 14px;
+  }
 
   &:hover {
     font-weight: bold;
@@ -37,9 +40,50 @@ const handleInstanceClick = (id) => {
 }
 
 .instance-gallery-item {
-  width: 100px;
-  height: 100px;
-  background: #fff;
+  width: 120px;
+  height: 120px;
+  background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
+  background-position: center;
+  background-size: cover;
   margin: 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 5px;
+  cursor: pointer;
+  transition: all ease-in-out 0.2s;
+  border-radius: 15px;
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    background-image: linear-gradient(to bottom right, rgba(50, 50, 50, 0.9), rgba(0, 0, 0, 0.9));
+    opacity: 0.5;
+    z-index: 10;
+    border-radius: inherit;
+  }
+
+  &:hover {
+    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  p {
+    font-weight: bold;
+    font-size: 12px;
+    color: #fff;
+    z-index: 11;
+    margin-bottom: 0.2rem;
+
+    &:nth-child(1) {
+      font-weight: normal;
+      color: #ddd;
+      font-size: 10px;
+    }
+  }
 }
 </style>

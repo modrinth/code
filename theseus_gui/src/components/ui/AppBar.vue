@@ -1,15 +1,16 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 
 const route = useRoute()
+const router = useRouter()
 </script>
 
 <template>
   <div class="appbar">
     <section class="navigation-controls">
-      <ChevronLeftIcon />
-      <ChevronRightIcon />
+      <ChevronLeftIcon @click="router.back()" />
+      <ChevronRightIcon @click="router.forward()" />
       <p>{{ route.name }}</p>
     </section>
     <section class="mod-stats">

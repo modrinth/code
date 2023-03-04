@@ -5,6 +5,7 @@ export default createStore({
     return {
       darkTheme: true,
       instances: [],
+      news: [],
     }
   },
   mutations: {
@@ -59,6 +60,25 @@ export default createStore({
       ]
 
       state.instances = [...instances]
+    },
+    fetchNews(state) {
+      // Fetch from backend.
+      const news = [
+        {
+          id: 1,
+          headline: 'Caves & Cliffs Update: Part II Dev Q&A',
+          blurb: 'Your questions, answered!',
+          source: 'From Minecraft.Net',
+        },
+        {
+          id: 2,
+          headline: 'Project of the WeeK: Gobblygook',
+          blurb: 'Your questions, answered!',
+          source: 'Modrinth Blog',
+        },
+      ]
+
+      state.news = [...news]
     },
   },
 })
