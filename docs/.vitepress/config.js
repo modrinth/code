@@ -28,6 +28,8 @@ export default {
           { text: 'Pagination', link: '/components/pagination' },
           { text: 'Animated Logo', link: '/components/animated-logo' },
           { text: 'Text Logo', link: '/components/text-logo' },
+          { text: 'Slider', link: '/components/slider' },
+          { text: 'Text Inputs', link: '/components/text-inputs' },
         ],
       },
     ],

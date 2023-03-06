@@ -15,6 +15,27 @@ body {
   font-weight: var(--font-weight-regular);
   margin: 0;
   padding: 0;
+
+  // Font Sizes
+  --font-size-xxs: 0.625rem; //10px
+  --font-size-xs: 0.75rem; //12px
+  --font-size-sm: 0.875rem; //14px
+  --font-size-nm: 1rem; //16px
+  --font-size-md: 1.125rem; //18px
+  --font-size-lg: 1.25rem; //20px
+  --font-size-xl: 1.5rem; //24px
+  --font-size-2xl: 2rem; //32px
+  --font-size-3xl: 3rem; //48px
+
+  // Font Weights
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  --font-weight-text: var(--font-weight-medium);
+  --font-weight-heading: var(--font-weight-extrabold);
+  --font-weight-title: var(--font-weight-extrabold);
 }
 
 a {
@@ -28,6 +49,69 @@ a {
 
 a.uncolored {
   color: inherit;
+}
+
+input[type="text"] {
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  // safari iOS rounds inputs by default
+  // set the appearance to none to prevent this
+  appearance: none !important;
+  background: var(--color-button-bg);
+  color: var(--color-base);
+  padding: 0.5rem 1rem;
+  font-weight: var(--font-weight-medium);
+  outline: 2px solid transparent;
+  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  transition: box-shadow 0.1s ease-in-out;
+  min-height: 40px;
+
+  &:focus,
+  &:focus-visible {
+    box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
+    color: var(--color-contrast);
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  &:focus::placeholder {
+    opacity: 0.8;
+  }
+
+  &::placeholder {
+    color: var(--color-contrast);
+    opacity: 0.6;
+  }
+}
+
+.iconified-input {
+  align-items: center;
+  display: inline-flex;
+  position: relative;
+
+  input {
+    padding-left: 2.25rem;
+    width: 100%;
+  }
+
+  &:focus-within svg {
+    color: var(--color-base);
+    opacity: 1;
+  }
+
+  :not(input) {
+    position: absolute;
+    left: 0.75rem;
+    height: 1.25rem;
+    width: 1.25rem;
+    z-index: 1;
+  }
 }
 
 svg {

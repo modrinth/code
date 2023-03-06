@@ -36,6 +36,8 @@ html {
 
   --color-brand: var(--color-green);
   --color-brand-highlight: rgba(0, 175, 92, 0.25);
+  --color-brand-shadow: rgba(0, 175, 92, 0.7);
+  --color-brand-inverted: #ffffff;
 
   --shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 11%, 0.1);
   --shadow-inset: inset 0px -2px 2px hsla(221, 39%, 11%, 0.05);
@@ -70,6 +72,8 @@ html {
 
   --color-brand: var(--color-green);
   --color-brand-highlight: rgba(27, 217, 106, 0.25);
+  --color-brand-shadow: rgba(27, 217, 106, 0.7);
+  --color-brand-inverted: #000;
 
   --shadow-inset-lg: inset 0px -2px 2px hsla(221, 39%, 11%, 0.1);
   --shadow-inset: inset 0px -2px 2px hsla(221, 39%, 11%, 0.05);
