@@ -2,7 +2,7 @@
 import { watch } from 'vue'
 import { RouterView } from 'vue-router'
 import { useStore } from 'vuex'
-import SideNav from './components/ui/SideNav.vue'
+import Navigation from './components/ui/Navigation.vue'
 import AppBar from './components/ui/AppBar.vue'
 import { toggleTheme } from './helpers/theme'
 
@@ -17,7 +17,7 @@ watch(state, (newState) => {
 
 <template>
   <div class="container">
-    <SideNav />
+    <Navigation class="navigation" />
     <div class="view">
       <AppBar />
       <RouterView />
@@ -32,9 +32,14 @@ watch(state, (newState) => {
   min-height: 100vh;
   overflow-x: hidden;
 
+  .navigation {
+    position: fixed;
+  }
+
   .view {
     width: 100%;
     height: 100%;
+    margin-left: 210px;
   }
 }
 </style>

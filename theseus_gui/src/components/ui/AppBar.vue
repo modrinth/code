@@ -40,6 +40,7 @@ const router = useRouter()
 
     svg {
       transition: all ease-in-out 0.1s;
+
       &:hover {
         filter: brightness(150%);
       }

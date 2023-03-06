@@ -57,6 +57,30 @@ export default createStore({
           version: '1.7.10',
           downloads: 1000,
         },
+        {
+          id: 8,
+          name: 'Birds',
+          version: '1.15.2',
+          downloads: 9,
+        },
+        {
+          id: 9,
+          name: 'Dogs',
+          version: '1.15.2',
+          downloads: 9,
+        },
+        {
+          id: 10,
+          name: 'Cats',
+          version: '1.15.2',
+          downloads: 9,
+        },
+        {
+          id: 11,
+          name: 'Rabbits',
+          version: '1.15.2',
+          downloads: 9,
+        },
       ]
 
       state.instances = [...instances]
@@ -74,6 +98,12 @@ export default createStore({
           id: 2,
           headline: 'Project of the WeeK: Gobblygook',
           blurb: 'Your questions, answered!',
+          source: 'Modrinth Blog',
+        },
+        {
+          id: 3,
+          headline: 'Oreo makes a launcher',
+          blurb: 'What did it take?',
           source: 'Modrinth Blog',
         },
       ]

@@ -7,7 +7,7 @@ const { state, commit } = useStore()
 commit('fetchInstances')
 commit('fetchNews')
 
-const recentInstances = state.instances.slice(0, 4)
+const recentInstances = state.instances.filter((i) => i.downloads <= 50)
 const popularInstances = state.instances.filter((i) => i.downloads > 50)
 </script>
 

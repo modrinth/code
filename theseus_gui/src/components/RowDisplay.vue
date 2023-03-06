@@ -1,4 +1,6 @@
 <script setup>
+import { ref, computed } from 'vue'
+import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from './ui/Instance.vue'
 import News from './ui/News.vue'
 
@@ -10,13 +12,25 @@ const props = defineProps({
 
 const shouldRenderInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
+
+const handleLeftPage = () => {
+  console.log('page left')
+}
+
+const handleRightPage = () => {
+  console.log('page right')
+}
 </script>
 
 <template>
   <div class="row">
     <div class="header">
       <p>{{ props.label }}</p>
-      <div aria-hidden="true"></div>
+      <hr aria-hidden="true" />
+      <div class="pagination">
+        <ChevronLeftIcon @click="handleLeftPage" />
+        <ChevronRightIcon @click="handleRightPage" />
+      </div>
     </div>
     <section class="mods" v-if="shouldRenderInstances">
       <Instance
@@ -36,7 +50,6 @@ const shouldRenderNews = props.news && props.news?.length !== 0
 .row {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
   width: 100%;
   margin-top: 2rem;
@@ -48,30 +61,48 @@ const shouldRenderNews = props.news && props.news?.length !== 0
 
   .header {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: inherit;
-    width: 90%;
+    width: 95%;
 
     p {
       font-size: 16px;
     }
 
-    div {
+    hr {
       background: #fff;
       height: 1px;
-      width: 85%;
+      width: 60%;
       border-radius: 5px;
+    }
+
+    .pagination {
+      width: 20%;
+      display: inherit;
+      align-items: inherit;
+
+      svg {
+        cursor: pointer;
+        margin-right: 0.5rem;
+        transition: all ease-in-out 0.1s;
+
+        &:hover {
+          filter: brightness(150%);
+        }
+      }
     }
   }
 
   section {
     display: flex;
-    justify-content: space-evenly;
     align-items: inherit;
+    transition: all ease-in-out 0.4s;
   }
 
   .mods {
+    width: 100%;
     margin: auto;
+    transition: all ease-in-out 0.4s;
   }
 
   .news {

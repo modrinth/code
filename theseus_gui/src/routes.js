@@ -1,38 +1,41 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { Index, Browse, Library, AddInstance, Project, Settings } from './pages'
+import * as Pages from './pages'
 
+/**
+ * Configures application routing. Add page to pages/index and then add to route table here.
+ */
 export default new createRouter({
   history: createWebHistory(),
   routes: [
     {
       path: '/',
       name: 'Home',
-      component: Index,
+      component: Pages.Index,
     },
     {
       path: '/browse',
       name: 'Browse',
-      component: Browse,
+      component: Pages.Browse,
     },
     {
       path: '/library',
       name: 'Library',
-      component: Library,
+      component: Pages.Library,
     },
     {
       path: '/add-instance',
       name: 'Add Instance',
-      component: AddInstance,
+      component: Pages.AddInstance,
     },
     {
       path: '/project',
       name: 'Project',
-      component: Project,
+      component: Pages.Project,
     },
     {
       path: '/settings',
       name: 'Settings',
-      component: Settings,
+      component: Pages.Settings,
     },
   ],
 })

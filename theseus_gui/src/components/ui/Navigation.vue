@@ -10,6 +10,7 @@ import {
 } from 'omorphia'
 import { useStore } from 'vuex'
 import { RouterLink } from 'vue-router'
+import SideNav from '../SideNav.vue'
 import UserSection from './UserSection.vue'
 import Instance from './Instance.vue'
 
@@ -19,7 +20,7 @@ commit('fetchInstances')
 </script>
 
 <template>
-  <div class="nav-container">
+  <SideNav class="navigation">
     <UserSection />
     <div id="pages">
       <RouterLink
@@ -63,125 +64,111 @@ commit('fetchInstances')
       <SunIcon v-if="!state.darkTheme" @click="commit('toggleTheme')" class="theme-icon" />
       <MoonIcon v-else @click="commit('toggleTheme')" class="theme-icon" />
     </div>
-  </div>
+  </SideNav>
 </template>
 
 <style lang="scss" scoped>
-.nav-container {
+#pages {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  width: 260px;
-  height: 100vh;
-  box-shadow: 0px 0px 8px 3px #00000026;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
 
-  #pages {
+  a {
     display: flex;
-    flex-direction: column;
     align-items: flex-start;
-    justify-content: flex-start;
-    width: 100%;
-
-    a {
-      display: flex;
-      align-items: flex-start;
-      width: 80%;
-      margin: 5px auto;
-      text-align: left;
-      font-size: 16px;
-      font-weight: 400;
-      background: inherit;
-      transition: all ease-in-out 0.1s;
-
-      &:hover {
-        background-color: #fff;
-        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-        text-decoration: none;
-      }
-
-      svg {
-        margin-right: 0.5rem;
-      }
-    }
-  }
-
-  #instances {
-    display: flex;
-    flex-direction: column;
     width: 80%;
-    margin: 0.5rem;
-
-    p {
-      color: #b5b5b5;
-      margin-bottom: 0.4rem;
-      font-size: 11px;
-      line-height: 13px;
-      font-weight: 400;
-    }
-  }
-
-  #settings {
-    position: absolute;
-    align-self: flex-end;
-    display: flex;
-    align-items: center;
-    bottom: 20px;
-    margin-right: 1rem;
-    width: 150px;
-    justify-content: space-between;
-
-    a {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      width: 80%;
-      margin: auto;
-      background: inherit;
-      margin-right: 1rem;
-
-      &:hover {
-        text-decoration: none;
-      }
-    }
-
-    .theme-icon {
-      cursor: pointer;
-      font-size: larger;
-      border-radius: 10px;
-    }
-  }
-
-  #add-instance-btn {
+    margin: 5px auto;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 400;
     background: inherit;
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 85%;
-    font-size: 14px;
+    transition: all ease-in-out 0.1s;
+
+    &:hover {
+      background-color: #fff;
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+      text-decoration: none;
+    }
 
     svg {
-      background: #32d874;
-      border-radius: 8px;
-      width: 25px;
-      height: auto;
-      box-shadow: 0px -1px 1px 0px #00000040 inset;
+      margin-right: 0.5rem;
     }
+  }
+}
+
+#instances {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin: 0.5rem;
+
+  p {
+    color: #b5b5b5;
+    margin-bottom: 0.4rem;
+    font-size: 11px;
+    line-height: 13px;
+    font-weight: 400;
+  }
+}
+
+#settings {
+  position: relative;
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+  width: 150px;
+  justify-content: space-between;
+
+  a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 80%;
+    margin: auto;
+    background: inherit;
+    margin-right: 1rem;
 
     &:hover {
       text-decoration: none;
     }
   }
+
+  .theme-icon {
+    cursor: pointer;
+    font-size: larger;
+    border-radius: 10px;
+  }
+}
+
+#add-instance-btn {
+  background: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 85%;
+  font-size: 14px;
+
+  svg {
+    background: #32d874;
+    border-radius: 8px;
+    width: 25px;
+    height: auto;
+    box-shadow: 0px -1px 1px 0px #00000040 inset;
+  }
+
+  &:hover {
+    text-decoration: none;
+  }
 }
 
 .dark-mode {
-  .nav-container {
-    background: #17191c;
-
-    #add-instance-btn {
-      &:hover {
-        background-color: #2a2d32;
-        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-      }
+  #add-instance-btn {
+    &:hover {
+      background-color: #2a2d32;
+      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
   }
 
