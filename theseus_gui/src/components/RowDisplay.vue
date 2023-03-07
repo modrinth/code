@@ -73,7 +73,6 @@ const handleRightPage = () => {
       background: #fff;
       height: 1px;
       width: 60%;
-      border-radius: var(--radius-x);
     }
 
     .pagination {
