@@ -34,7 +34,6 @@ watch(state, (newState) => {
 
   .navigation {
     position: fixed;
-    height: auto;
   }
 
   .view {

@@ -23,12 +23,12 @@ const router = useRouter()
 <style lang="scss" scoped>
 .appbar {
   display: flex;
-  justify-content: space-between;
+  justify-content: stretch;
   align-items: center;
   width: 100%;
   height: 30px;
-  background: #eee;
   border-bottom: 1px solid rgba(64, 67, 74, 0.2);
+  background: var(--color-raised-bg);
 
   .navigation-controls {
     display: inherit;
@@ -68,12 +68,6 @@ const router = useRouter()
     width: 50%;
     font-size: 0.8rem;
     margin-right: 1rem;
-  }
-}
-
-.dark-mode {
-  .appbar {
-    background: #40434a;
   }
 }
 </style>

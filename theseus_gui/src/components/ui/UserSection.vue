@@ -39,14 +39,7 @@ import { Avatar } from 'omorphia'
   a {
     font-size: 0.75rem;
     font-weight: 400;
-  }
-}
-
-.dark-mode {
-  .user-section {
-    a {
-      color: #c0c0c0;
-    }
+    color: var(--color-secondary);
   }
 }
 </style>

@@ -22,7 +22,7 @@ commit('fetchInstances')
 <template>
   <SideNav class="navigation">
     <UserSection />
-    <div id="pages">
+    <div class="pages-list">
       <RouterLink
         to="/"
         class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
@@ -42,7 +42,7 @@ commit('fetchInstances')
         <BookIcon />Library</RouterLink
       >
     </div>
-    <div id="instances">
+    <div class="instance-list">
       <p>Instances</p>
       <Instance v-for="instance in state.instances" display="list" :instance="instance" />
     </div>
@@ -68,7 +68,7 @@ commit('fetchInstances')
 </template>
 
 <style lang="scss" scoped>
-#pages {
+.pages-list {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -98,25 +98,28 @@ commit('fetchInstances')
   }
 }
 
-#instances {
+.instance-list {
   display: flex;
   flex-direction: column;
-  width: 80%;
-  margin: 0.5rem;
+  justify-content: center;
+  width: 70%;
+  margin: 0.4rem;
 
-  p {
-    color: #b5b5b5;
-    margin-bottom: 0.4rem;
-    font-size: 0.7rem;
+  & > p {
+    color: var(--color-primary);
+    margin-bottom: 0.6rem;
+    font-size: 1rem;
     line-height: 13px;
-    font-weight: 400;
+    font-weight: 500;
   }
 }
 
 #settings {
-  position: relative;
+  position: fixed;
   align-self: flex-end;
   display: flex;
+  bottom: 0.5rem;
+  left: 0.5rem;
   align-items: center;
   margin-right: 1rem;
   width: 150px;
@@ -150,13 +153,14 @@ commit('fetchInstances')
   justify-content: space-evenly;
   width: 85%;
   font-size: 0.9rem;
+  margin-top: 1rem;
 
   svg {
-    background: #32d874;
+    background: var(--color-green);
     border-radius: var(--radius-sm);
     width: 25px;
     height: auto;
-    box-shadow: 0px -1px 1px 0px #00000040 inset;
+    box-shadow: var(--shadow-inset);
   }
 
   &:hover {
@@ -167,13 +171,13 @@ commit('fetchInstances')
 .dark-mode {
   #add-instance-btn {
     &:hover {
-      background-color: #2a2d32;
+      background-color: var(--color-button-bg);
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
     }
   }
 
-  #pages > a:hover {
-    background-color: #2a2d32;
+  .pages-list > a:hover {
+    background-color: var(--color-button-bg);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   }
 }

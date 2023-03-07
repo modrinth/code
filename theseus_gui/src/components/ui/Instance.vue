@@ -27,15 +27,19 @@ const handleInstanceClick = (id) => {
 
 <style lang="scss" scoped>
 .instance-list-item {
+  display: inline-block;
   margin: 0.2rem auto;
   cursor: pointer;
   transition: all ease-out 0.1s;
+
   p {
     font-size: 0.8rem;
   }
 
   &:hover {
-    font-weight: bold;
+    // translate: transform(4px);
+    font-size: bold;
+    filter: brightness(150%);
   }
 }
 

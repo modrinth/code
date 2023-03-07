@@ -28,16 +28,21 @@ const props = defineProps({
   align-items: center;
   justify-content: center;
   padding: 0;
-  background: rgba(229, 229, 229, 0.1);
+  background: var(--color-bg);
   width: 350px;
   height: 100px;
   margin: 0.7rem 1rem;
+  box-shadow: var(--shadow-raised-lg);
+  cursor: pointer;
+
+  &:hover {
+    box-shadow: var(--shadow-floating);
+  }
 
   img {
     display: flex;
     width: 20%;
     height: 100%;
-    background: red;
     border-radius: 0.9rem 0 0 0.9rem;
   }
   .body {

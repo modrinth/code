@@ -16,7 +16,7 @@
 
 .dark-mode {
   .nav-container {
-    background: #17191c;
+    background: var(--color-bg);
   }
 }
 </style>

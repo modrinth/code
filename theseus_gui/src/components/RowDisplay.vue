@@ -56,7 +56,7 @@ const handleRightPage = () => {
   padding: 1rem 0;
 
   &:nth-child(odd) {
-    background: rgba(59, 59, 59, 0.5);
+    background: var(--color-raised-bg);
   }
 
   .header {
@@ -70,9 +70,10 @@ const handleRightPage = () => {
     }
 
     hr {
-      background: #fff;
+      background: var(--color-base);
       height: 1px;
       width: 60%;
+      border: none;
     }
 
     .pagination {
