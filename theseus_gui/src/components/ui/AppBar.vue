@@ -35,8 +35,8 @@ const router = useRouter()
     align-items: inherit;
     justify-content: stretch;
     width: 30%;
-    font-size: 18px;
-    margin-left: 10px;
+    font-size: 1.2rem;
+    margin-left: 0.5rem;
 
     svg {
       transition: all ease-in-out 0.1s;
@@ -66,7 +66,7 @@ const router = useRouter()
     align-items: inherit;
     justify-content: flex-end;
     width: 50%;
-    font-size: 14px;
+    font-size: 0.8rem;
     margin-right: 1rem;
   }
 }

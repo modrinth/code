@@ -30,14 +30,14 @@ import { Avatar } from 'omorphia'
   }
 
   #username {
-    margin-bottom: 5px;
-    font-size: 18px;
+    margin-bottom: 0.3rem;
+    font-size: 1.1rem;
     font-weight: 400;
     line-height: 19px;
   }
 
   a {
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 400;
   }
 }

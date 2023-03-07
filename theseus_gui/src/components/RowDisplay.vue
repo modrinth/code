@@ -53,7 +53,7 @@ const handleRightPage = () => {
   align-items: center;
   width: 100%;
   margin-top: 2rem;
-  padding: 10px 0;
+  padding: 1rem 0;
 
   &:nth-child(odd) {
     background: rgba(59, 59, 59, 0.5);
@@ -66,14 +66,14 @@ const handleRightPage = () => {
     width: 95%;
 
     p {
-      font-size: 16px;
+      font-size: 1rem;
     }
 
     hr {
       background: #fff;
       height: 1px;
       width: 60%;
-      border-radius: 5px;
+      border-radius: var(--radius-x);
     }
 
     .pagination {

@@ -79,9 +79,9 @@ commit('fetchInstances')
     display: flex;
     align-items: flex-start;
     width: 80%;
-    margin: 5px auto;
+    margin: 0.3rem auto;
     text-align: left;
-    font-size: 16px;
+    font-size: 1rem;
     font-weight: 400;
     background: inherit;
     transition: all ease-in-out 0.1s;
@@ -107,7 +107,7 @@ commit('fetchInstances')
   p {
     color: #b5b5b5;
     margin-bottom: 0.4rem;
-    font-size: 11px;
+    font-size: 0.7rem;
     line-height: 13px;
     font-weight: 400;
   }
@@ -139,7 +139,7 @@ commit('fetchInstances')
   .theme-icon {
     cursor: pointer;
     font-size: larger;
-    border-radius: 10px;
+    border-radius: var(--radius-sm);
   }
 }
 
@@ -149,11 +149,11 @@ commit('fetchInstances')
   align-items: center;
   justify-content: space-evenly;
   width: 85%;
-  font-size: 14px;
+  font-size: 0.9rem;
 
   svg {
     background: #32d874;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     width: 25px;
     height: auto;
     box-shadow: 0px -1px 1px 0px #00000040 inset;

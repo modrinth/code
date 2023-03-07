@@ -31,14 +31,14 @@ const props = defineProps({
   background: rgba(229, 229, 229, 0.1);
   width: 350px;
   height: 100px;
-  margin: 10px 15px;
+  margin: 0.7rem 1rem;
 
   img {
     display: flex;
     width: 20%;
     height: 100%;
     background: red;
-    border-radius: 15px 0 0 15px;
+    border-radius: 0.9rem 0 0 0.9rem;
   }
   .body {
     display: flex;
@@ -47,20 +47,20 @@ const props = defineProps({
     align-items: center;
     width: 80%;
     height: 100%;
-    margin: 15px;
+    margin: 0.9rem;
 
     .headline {
       display: inherit;
       flex-direction: inherit;
-      margin: 10px 0;
+      margin: 0.7rem 0;
 
       h2 {
-        font-size: 14px;
+        font-size: 0.8rem;
         text-transform: uppercase;
       }
 
       p {
-        font-size: 12px;
+        font-size: 0.7rem;
       }
     }
 
@@ -70,17 +70,17 @@ const props = defineProps({
       align-items: center;
       align-self: flex-end;
       width: 100%;
-      margin: 0px 0px 5px 5px;
+      margin: 0px 0px 0.2rem 0.2rem;
 
       p {
-        font-size: 12px;
+        font-size: 0.7rem;
       }
 
       a {
         display: inline-block;
         transition: all ease-in-out 0.2s;
         width: 20px;
-        font-size: 18px;
+        font-size: 1.1rem;
 
         &:hover {
           transform: translate(2px);

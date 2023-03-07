@@ -27,11 +27,11 @@ const handleInstanceClick = (id) => {
 
 <style lang="scss" scoped>
 .instance-list-item {
-  margin: 5px auto;
+  margin: 0.2rem auto;
   cursor: pointer;
   transition: all ease-out 0.1s;
   p {
-    font-size: 14px;
+    font-size: 0.8rem;
   }
 
   &:hover {
@@ -45,15 +45,15 @@ const handleInstanceClick = (id) => {
   background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
   background-position: center;
   background-size: cover;
-  margin: 20px;
+  margin: 1.3rem;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 5px;
+  padding: 0.3rem;
   cursor: pointer;
   transition: all ease-in-out 0.2s;
-  border-radius: 15px;
+  border-radius: var(--radius-md);
 
   &:before {
     content: '';
@@ -74,7 +74,7 @@ const handleInstanceClick = (id) => {
 
   p {
     font-weight: bold;
-    font-size: 12px;
+    font-size: 0.75rem;
     color: #fff;
     z-index: 11;
     margin-bottom: 0.2rem;
@@ -82,7 +82,7 @@ const handleInstanceClick = (id) => {
     &:nth-child(1) {
       font-weight: normal;
       color: #ddd;
-      font-size: 10px;
+      font-size: 0.6rem;
     }
   }
 }
