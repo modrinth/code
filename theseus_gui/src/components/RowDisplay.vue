@@ -1,5 +1,4 @@
 <script setup>
-import { ref, computed } from 'vue'
 import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from './ui/Instance.vue'
 import News from './ui/News.vue'
@@ -10,8 +9,11 @@ const props = defineProps({
   label: String,
 })
 
-const shouldRenderInstances = props.instances && props.instances?.length !== 0
+const shouldRenderNormalInstances =
+  props.instances && props.instances?.length !== 0 && props.instances?.some((i) => !i.trending)
 const shouldRenderNews = props.news && props.news?.length !== 0
+const shouldRenderTrending =
+  props.instances && props.instances?.length !== 0 && props.instances?.every((i) => i.trending)
 
 const handleLeftPage = () => {
   console.log('page left')
@@ -32,7 +34,7 @@ const handleRightPage = () => {
         <ChevronRightIcon @click="handleRightPage" />
       </div>
     </div>
-    <section class="mods" v-if="shouldRenderInstances">
+    <section class="mods" v-if="shouldRenderNormalInstances">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
@@ -42,6 +44,14 @@ const handleRightPage = () => {
     </section>
     <section class="news" v-else-if="shouldRenderNews">
       <News v-for="news in props.news" :key="news.id" :news="news" />
+    </section>
+    <section class="trending" v-else-if="shouldRenderTrending">
+      <Instance
+        v-for="instance in props.instances"
+        :key="instance.id"
+        display="card"
+        :instance="instance"
+      />
     </section>
   </div>
 </template>
@@ -108,6 +118,18 @@ const handleRightPage = () => {
   .news {
     margin: auto;
     width: 100%;
+  }
+
+  .trending {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    height: 160px;
+    margin-right: auto;
+    margin-top: 0.8rem;
   }
 }
 </style>

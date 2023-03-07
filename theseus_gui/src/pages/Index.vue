@@ -8,7 +8,9 @@ commit('fetchInstances')
 commit('fetchNews')
 
 const recentInstances = state.instances.filter((i) => i.downloads <= 50)
+console.log(recentInstances)
 const popularInstances = state.instances.filter((i) => i.downloads > 50)
+const trendingMods = state.instances.filter((i) => i.trending)
 </script>
 
 <template>
@@ -16,6 +18,7 @@ const popularInstances = state.instances.filter((i) => i.downloads > 50)
     <RowDisplay label="Jump back in" :instances="recentInstances" />
     <RowDisplay label="Popular packs" :instances="popularInstances" />
     <RowDisplay label="News & updates" :news="state.news" />
+    <RowDisplay label="Trending mods" :instances="trendingMods" />
   </div>
 </template>
 

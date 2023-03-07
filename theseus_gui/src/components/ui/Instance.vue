@@ -1,4 +1,6 @@
 <script setup>
+import { Card } from 'omorphia'
+
 const props = defineProps({
   display: String,
   instance: Object,
@@ -22,6 +24,10 @@ const handleInstanceClick = (id) => {
       <p>{{ props.instance.version }}</p>
       <p>{{ props.instance.name }}</p>
     </div>
+    <Card class="instance-card-item" v-else-if="display === 'card'">
+      <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
+      <p>{{ props.instance.name }}</p>
+    </Card>
   </div>
 </template>
 
@@ -37,7 +43,6 @@ const handleInstanceClick = (id) => {
   }
 
   &:hover {
-    // translate: transform(4px);
     font-size: bold;
     filter: brightness(150%);
   }
@@ -88,6 +93,32 @@ const handleInstanceClick = (id) => {
       color: #ddd;
       font-size: 0.6rem;
     }
+  }
+}
+
+.instance-card-item {
+  display: flex;
+  justify-content: space-between;
+  min-width: 250px;
+  padding: 0;
+  flex: 1 1 120px;
+  cursor: pointer;
+  transition: all ease-in-out 0.1s;
+
+  &:hover {
+    box-shadow: var(--shadow-raised-lg);
+  }
+
+  p {
+    font-size: 0.9rem;
+    display: inline-block;
+    padding: 1rem;
+  }
+
+  img {
+    width: 50px;
+    height: 100%;
+    border-radius: var(--radius-md);
   }
 }
 </style>
