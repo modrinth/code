@@ -8,7 +8,6 @@ commit('fetchInstances')
 commit('fetchNews')
 
 const recentInstances = state.instances.filter((i) => i.downloads <= 50)
-console.log(recentInstances)
 const popularInstances = state.instances.filter((i) => i.downloads > 50)
 const trendingMods = state.instances.filter((i) => i.trending)
 </script>
