@@ -311,8 +311,14 @@
     width: 15rem;
   }
 
-  > :where(input + *, .input-group + *, .textarea-wrapper + *, .chips
-      + *, .resizable-textarea-wrapper + *, .input-div + *) {
+  > :where(
+      input + *,
+      .input-group + *,
+      .textarea-wrapper + *,
+      .chips + *,
+      .resizable-textarea-wrapper + *,
+      .input-div + *
+    ) {
     margin-block-start: var(--spacing-card-md);
   }
 
@@ -1324,23 +1330,23 @@ tr.button-transparent {
 }
 
 .vue-notification {
-  background: var(--color-special-blue)!important;
-  border-left: 5px solid var(--color-special-blue)!important;
-  color: var(--color-brand-inverted)!important;
+  background: var(--color-special-blue) !important;
+  border-left: 5px solid var(--color-special-blue) !important;
+  color: var(--color-brand-inverted) !important;
 
   &.success {
-    background: var(--color-special-green)!important;
-    border-left-color: var(--color-special-green)!important;
+    background: var(--color-special-green) !important;
+    border-left-color: var(--color-special-green) !important;
   }
 
   &.warn {
-    background: var(--color-special-orange)!important;
-    border-left-color: var(--color-special-orange)!important;
+    background: var(--color-special-orange) !important;
+    border-left-color: var(--color-special-orange) !important;
   }
 
   &.error {
-    background: var(--color-special-red)!important;
-    border-left-color: var(--color-special-red)!important;
+    background: var(--color-special-red) !important;
+    border-left-color: var(--color-special-red) !important;
   }
 }
 
@@ -1462,7 +1468,8 @@ h3 {
   }
 }
 
-.push-right:not(.input-group), .push-right.input-group > :first-child {
+.push-right:not(.input-group),
+.push-right.input-group > :first-child {
   margin-left: auto;
   margin-right: 0;
 }
