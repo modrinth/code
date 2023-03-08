@@ -8,11 +8,11 @@ import {
   PlusIcon,
   SettingsIcon,
 } from 'omorphia'
-import { useTheming, useInstances } from '../../store/state'
+import { useTheming, useInstances } from '@/store/state'
 import { RouterLink } from 'vue-router'
-import SideNav from '../SideNav.vue'
-import UserSection from './UserSection.vue'
-import Instance from './Instance.vue'
+import SideNav from '@/components/SideNav.vue'
+import UserSection from '@/components/ui/UserSection.vue'
+import Instance from '@/components/ui/Instance.vue'
 
 const theme = useTheming()
 const instances = useInstances()

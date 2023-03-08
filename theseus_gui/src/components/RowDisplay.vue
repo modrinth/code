@@ -1,7 +1,7 @@
 <script setup>
 import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
-import Instance from './ui/Instance.vue'
-import News from './ui/News.vue'
+import Instance from '@/components/ui/Instance.vue'
+import News from '@/components/ui/News.vue'
 
 const props = defineProps({
   instances: Array,

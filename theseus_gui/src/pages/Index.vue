@@ -1,6 +1,6 @@
 <script setup>
-import { useInstances, useNews } from '../store/state'
-import RowDisplay from '../components/RowDisplay.vue'
+import { useInstances, useNews } from '@/store/state'
+import RowDisplay from '@/components/RowDisplay.vue'
 
 const instances = useInstances()
 const news = useNews()

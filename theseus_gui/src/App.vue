@@ -1,10 +1,10 @@
 <script setup>
 import { watch } from 'vue'
 import { RouterView } from 'vue-router'
-import { useTheming } from './store/state'
-import Navigation from './components/ui/Navigation.vue'
-import AppBar from './components/ui/AppBar.vue'
-import { toggleTheme } from './helpers/theme'
+import { useTheming } from '@/store/state'
+import Navigation from '@/components/ui/Navigation.vue'
+import AppBar from '@/components/ui/AppBar.vue'
+import { toggleTheme } from '@/helpers/theme'
 
 const theme = useTheming()
 
