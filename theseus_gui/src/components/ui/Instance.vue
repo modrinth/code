@@ -43,7 +43,7 @@ const handleInstanceClick = (id) => {
   }
 
   &:hover {
-    font-size: bold;
+    font-weight: bold;
     filter: brightness(150%);
   }
 }
