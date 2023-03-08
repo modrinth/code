@@ -1,18 +1,18 @@
-import { createStore } from 'vuex'
+import { defineStore } from 'pinia'
 
-export default createStore({
-  state() {
-    return {
-      darkTheme: true,
-      instances: [],
-      news: [],
-    }
-  },
-  mutations: {
-    toggleTheme(state) {
-      state.darkTheme = !state.darkTheme
+export const useTheming = defineStore('theme', {
+  state: () => ({ darkTheme: true }),
+  actions: {
+    toggleTheme() {
+      this.darkTheme = !this.darkTheme
     },
-    fetchInstances(state) {
+  },
+})
+
+export const useInstances = defineStore('instances', {
+  state: () => ({ instances: [] }),
+  actions: {
+    fetchInstances() {
       // Fetch from backend.
       const instances = [
         {
@@ -94,9 +94,15 @@ export default createStore({
         },
       ]
 
-      state.instances = [...instances]
+      this.instances = [...instances]
     },
-    fetchNews(state) {
+  },
+})
+
+export const useNews = defineStore('news', {
+  state: () => ({ news: [] }),
+  actions: {
+    fetchNews() {
       // Fetch from backend.
       const news = [
         {
@@ -119,7 +125,7 @@ export default createStore({
         },
       ]
 
-      state.news = [...news]
+      this.news = [...news]
     },
   },
 })

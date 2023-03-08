@@ -1,16 +1,16 @@
 <script setup>
 import { watch } from 'vue'
 import { RouterView } from 'vue-router'
-import { useStore } from 'vuex'
+import { useTheming } from './store/state'
 import Navigation from './components/ui/Navigation.vue'
 import AppBar from './components/ui/AppBar.vue'
 import { toggleTheme } from './helpers/theme'
 
-const { state } = useStore()
+const theme = useTheming()
 
-toggleTheme(state.darkTheme)
+toggleTheme(theme.darkTheme)
 
-watch(state, (newState) => {
+watch(theme, (newState) => {
   toggleTheme(newState.darkTheme)
 })
 </script>

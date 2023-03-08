@@ -8,15 +8,16 @@ import {
   PlusIcon,
   SettingsIcon,
 } from 'omorphia'
-import { useStore } from 'vuex'
+import { useTheming, useInstances } from '../../store/state'
 import { RouterLink } from 'vue-router'
 import SideNav from '../SideNav.vue'
 import UserSection from './UserSection.vue'
 import Instance from './Instance.vue'
 
-const { state, commit } = useStore()
+const theme = useTheming()
+const instances = useInstances()
 
-commit('fetchInstances')
+instances.fetchInstances()
 </script>
 
 <template>
@@ -44,7 +45,7 @@ commit('fetchInstances')
     </div>
     <div class="instance-list">
       <p>Instances</p>
-      <Instance v-for="instance in state.instances" display="list" :instance="instance" />
+      <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
     </div>
     <RouterLink
       to="/add-instance"
@@ -61,8 +62,8 @@ commit('fetchInstances')
         class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
         ><SettingsIcon /> Settings</RouterLink
       >
-      <SunIcon v-if="!state.darkTheme" @click="commit('toggleTheme')" class="theme-icon" />
-      <MoonIcon v-else @click="commit('toggleTheme')" class="theme-icon" />
+      <SunIcon v-if="!theme.darkTheme" @click="theme.toggleTheme()" class="theme-icon" />
+      <MoonIcon v-else @click="theme.toggleTheme()" class="theme-icon" />
     </div>
   </SideNav>
 </template>

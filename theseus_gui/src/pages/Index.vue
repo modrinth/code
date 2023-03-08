@@ -1,22 +1,22 @@
 <script setup>
-import { useStore } from 'vuex'
+import { useInstances, useNews } from '../store/state'
 import RowDisplay from '../components/RowDisplay.vue'
 
-const { state, commit } = useStore()
+const instances = useInstances()
+const news = useNews()
+instances.fetchInstances()
+news.fetchNews()
 
-commit('fetchInstances')
-commit('fetchNews')
-
-const recentInstances = state.instances.filter((i) => i.downloads <= 50)
-const popularInstances = state.instances.filter((i) => i.downloads > 50)
-const trendingMods = state.instances.filter((i) => i.trending)
+const recentInstances = instances.instances.filter((i) => i.downloads <= 50)
+const popularInstances = instances.instances.filter((i) => i.downloads > 50)
+const trendingMods = instances.instances.filter((i) => i.trending)
 </script>
 
 <template>
   <div class="page-container">
     <RowDisplay label="Jump back in" :instances="recentInstances" />
     <RowDisplay label="Popular packs" :instances="popularInstances" />
-    <RowDisplay label="News & updates" :news="state.news" />
+    <RowDisplay label="News & updates" :news="news.news" />
     <RowDisplay label="Trending mods" :instances="trendingMods" />
   </div>
 </template>
