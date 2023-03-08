@@ -427,7 +427,7 @@ export default defineComponent({
 
   h2 {
     font-weight: bolder;
-    color: white;
+    color: var(--color-contrast);
   }
 
   h2,
