@@ -11,22 +11,21 @@
         <aside class="universal-card">
           <h1>Moderation</h1>
           <NavStack>
-            <NavStackItem link="" label="All"> </NavStackItem>
+            <NavStackItem link="/moderation" label="All" />
             <NavStackItem
               v-for="type in moderationTypes"
               :key="type"
-              :link="'?type=' + type"
+              :link="'/moderation/' + type"
               :label="$formatProjectType(type) + 's'"
-            >
-            </NavStackItem>
+            />
           </NavStack>
         </aside>
       </div>
       <div class="normal-page__content">
         <div class="project-list display-mode--list">
           <ProjectCard
-            v-for="project in $route.query.type !== undefined
-              ? projects.filter((x) => x.project_type === $route.query.type)
+            v-for="project in $route.params.type !== undefined
+              ? projects.filter((x) => x.project_type === $route.params.type)
               : projects"
             :id="project.slug || project.id"
             :key="project.id"
@@ -47,56 +46,40 @@
               @click="
                 setProjectStatus(
                   project,
-                  project.requested_status
-                    ? project.requested_status
-                    : 'approved'
+                  project.requested_status ? project.requested_status : 'approved'
                 )
               "
             >
               <CheckIcon />
               Approve
             </button>
-            <button
-              class="iconified-button"
-              @click="setProjectStatus(project, 'withheld')"
-            >
+            <button class="iconified-button" @click="setProjectStatus(project, 'withheld')">
               <UnlistIcon />
               Withhold
             </button>
-            <button
-              class="iconified-button"
-              @click="setProjectStatus(project, 'rejected')"
-            >
+            <button class="iconified-button" @click="setProjectStatus(project, 'rejected')">
               <CrossIcon />
               Reject
             </button>
           </ProjectCard>
         </div>
         <div
-          v-if="
-            $route.query.type === 'report' || $route.query.type === undefined
-          "
+          v-if="$route.params.type === 'report' || $route.params.type === undefined"
           class="reports"
         >
-          <div
-            v-for="(item, index) in reports"
-            :key="index"
-            class="card report"
-          >
+          <div v-for="(item, index) in reports" :key="index" class="card report">
             <div class="info">
               <div class="title">
                 <h3>
                   {{ item.item_type }}
-                  <nuxt-link :to="item.url">{{ item.item_id }}</nuxt-link>
+                  <nuxt-link :to="item.url">
+                    {{ item.item_id }}
+                  </nuxt-link>
                 </h3>
                 reported by
                 <a :href="`/user/${item.reporter}`">{{ item.reporter }}</a>
               </div>
-              <div
-                v-highlightjs
-                class="markdown-body"
-                v-html="$xss($md.render(item.body))"
-              />
+              <div class="markdown-body" v-html="renderHighlightedString(item.body)" />
               <Badge :type="`Marked as ${item.report_type}`" color="orange" />
             </div>
             <div class="actions">
@@ -104,21 +87,17 @@
                 <TrashIcon /> Delete report
               </button>
               <span
-                v-tooltip="
-                  $dayjs(item.created).format(
-                    '[Created at] YYYY-MM-DD [at] HH:mm A'
-                  )
-                "
+                v-tooltip="$dayjs(item.created).format('[Created at] YYYY-MM-DD [at] HH:mm A')"
                 class="stat"
               >
                 <CalendarIcon />
-                Created {{ $dayjs(item.created).fromNow() }}
+                Created {{ fromNow(item.created) }}
               </span>
             </div>
           </div>
         </div>
         <div v-if="reports.length === 0 && projects.length === 0" class="error">
-          <Security class="icon"></Security>
+          <Security class="icon" />
           <br />
           <span class="text">You are up-to-date!</span>
         </div>
@@ -131,18 +110,18 @@
 import ProjectCard from '~/components/ui/ProjectCard'
 import Badge from '~/components/ui/Badge'
 
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
-import UnlistIcon from '~/assets/images/utils/eye-off.svg?inline'
-import CrossIcon from '~/assets/images/utils/x.svg?inline'
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
-import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
-import Security from '~/assets/images/illustrations/security.svg?inline'
+import CheckIcon from '~/assets/images/utils/check.svg'
+import UnlistIcon from '~/assets/images/utils/eye-off.svg'
+import CrossIcon from '~/assets/images/utils/x.svg'
+import TrashIcon from '~/assets/images/utils/trash.svg'
+import CalendarIcon from '~/assets/images/utils/calendar.svg'
+import Security from '~/assets/images/illustrations/security.svg'
 import NavStack from '~/components/ui/NavStack'
 import NavStackItem from '~/components/ui/NavStackItem'
 import ModalModeration from '~/components/ui/ModalModeration'
+import { renderHighlightedString } from '~/helpers/highlight'
 
-export default {
-  name: 'Moderation',
+export default defineNuxtComponent({
   components: {
     ModalModeration,
     NavStack,
@@ -156,13 +135,17 @@ export default {
     TrashIcon,
     CalendarIcon,
   },
-  async asyncData(data) {
-    const [projects, reports] = (
-      await Promise.all([
-        data.$axios.get(`moderation/projects`, data.$defaultHeaders()),
-        data.$axios.get(`report`, data.$defaultHeaders()),
-      ])
-    ).map((it) => it.data)
+  async setup() {
+    const data = useNuxtApp()
+
+    definePageMeta({
+      middleware: 'auth',
+    })
+
+    const [projects, reports] = await Promise.all([
+      useBaseFetch('moderation/projects', data.$defaultHeaders()),
+      useBaseFetch('report', data.$defaultHeaders()),
+    ])
 
     const newReports = await Promise.all(
       reports.map(async (report) => {
@@ -173,48 +156,26 @@ export default {
           let url = ''
 
           if (report.item_type === 'user') {
-            const user = (
-              await data.$axios.get(
-                `user/${report.item_id}`,
-                data.$defaultHeaders()
-              )
-            ).data
+            const user = await useBaseFetch(`user/${report.item_id}`, data.$defaultHeaders())
             url = `/user/${user.username}`
             report.item_id = user.username
           } else if (report.item_type === 'project') {
-            const project = (
-              await data.$axios.get(
-                `project/${report.item_id}`,
-                data.$defaultHeaders()
-              )
-            ).data
+            const project = await useBaseFetch(`project/${report.item_id}`, data.$defaultHeaders())
             report.item_id = project.slug || report.item_id
             url = `/${project.project_type}/${report.item_id}`
           } else if (report.item_type === 'version') {
-            const version = (
-              await data.$axios.get(
-                `version/${report.item_id}`,
-                data.$defaultHeaders()
-              )
-            ).data
-            const project = (
-              await data.$axios.get(
-                `project/${version.project_id}`,
-                data.$defaultHeaders()
-              )
-            ).data
+            const version = await useBaseFetch(`version/${report.item_id}`, data.$defaultHeaders())
+            const project = await useBaseFetch(
+              `project/${version.project_id}`,
+              data.$defaultHeaders()
+            )
             report.item_id = version.version_number || report.item_id
-            url = `/${project.project_type}/${
-              project.slug || project.id
-            }/version/${report.item_id}`
+            url = `/${project.project_type}/${project.slug || project.id}/version/${report.item_id}`
           }
 
           report.reporter = (
-            await data.$axios.get(
-              `user/${report.reporter}`,
-              data.$defaultHeaders()
-            )
-          ).data.username
+            await useBaseFetch(`user/${report.reporter}`, data.$defaultHeaders())
+          ).username
 
           return {
             ...report,
@@ -232,8 +193,8 @@ export default {
     )
 
     return {
-      projects,
-      reports: newReports,
+      projects: shallowRef(projects),
+      reports: ref(newReports),
     }
   },
   data() {
@@ -261,6 +222,7 @@ export default {
     },
   },
   methods: {
+    renderHighlightedString,
     setProjectStatus(project, status) {
       this.currentProject = project
       this.currentStatus = status
@@ -275,28 +237,28 @@ export default {
       this.currentProject = null
     },
     async deleteReport(index) {
-      this.$nuxt.$loading.start()
+      startLoading()
 
       try {
-        await this.$axios.delete(
-          `report/${this.reports[index].id}`,
-          this.$defaultHeaders()
-        )
-
+        await useBaseFetch(`report/${this.reports[index].id}`, {
+          method: 'DELETE',
+          ...this.$defaultHeaders(),
+        })
         this.reports.splice(index, 1)
       } catch (err) {
+        console.error(err)
         this.$notify({
           group: 'main',
           title: 'An error occurred',
-          text: err.response.data.description,
+          text: err.data.description,
           type: 'error',
         })
       }
 
-      this.$nuxt.$loading.finish()
+      stopLoading()
     },
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>

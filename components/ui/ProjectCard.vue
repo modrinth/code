@@ -1,10 +1,7 @@
 <template>
-  <article
-    class="project-card base-card padding-bg"
-    :aria-label="name"
-    role="listitem"
-  >
+  <article class="project-card base-card padding-bg" :aria-label="name" role="listitem">
     <nuxt-link
+      :title="name"
       class="icon"
       tabindex="-1"
       :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
@@ -18,7 +15,7 @@
       :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`"
       :style="color ? `background-color: ${toColor};` : ''"
     >
-      <img v-if="featuredImage" :src="featuredImage" alt="gallery image" />
+      <img v-if="featuredImage" :src="featuredImage" alt="gallery image" loading="lazy" />
     </nuxt-link>
     <div class="title">
       <nuxt-link :to="`/${$getProjectTypeForUrl(type, categories)}/${id}`">
@@ -28,24 +25,18 @@
       </nuxt-link>
       <p v-if="author" class="author">
         by
-        <nuxt-link class="title-link" :to="'/user/' + author"
-          >{{ author }}
+        <nuxt-link class="title-link" :to="'/user/' + author">
+          {{ author }}
         </nuxt-link>
       </p>
-      <Badge
-        v-if="status && status !== 'approved'"
-        :type="status"
-        class="status"
-      />
+      <Badge v-if="status && status !== 'approved'" :type="status" class="status" />
     </div>
     <p class="description">
       {{ description }}
     </p>
     <Categories
       :categories="
-        categories.filter(
-          (x) => !hideLoaders || !$tag.loaders.find((y) => y.name === x)
-        )
+        categories.filter((x) => !hideLoaders || !$tag.loaders.find((y) => y.name === x))
       "
       :type="type"
       class="tags"
@@ -64,18 +55,14 @@
         <DownloadIcon aria-hidden="true" />
         <p>
           <strong>{{ $formatNumber(downloads) }}</strong
-          ><span class="stat-label">
-            download<span v-if="downloads !== '1'">s</span></span
-          >
+          ><span class="stat-label"> download<span v-if="downloads !== '1'">s</span></span>
         </p>
       </div>
       <div v-if="follows" class="stat">
         <HeartIcon aria-hidden="true" />
         <p>
           <strong>{{ $formatNumber(follows) }}</strong
-          ><span class="stat-label">
-            follower<span v-if="follows !== '1'">s</span></span
-          >
+          ><span class="stat-label"> follower<span v-if="follows !== '1'">s</span></span>
         </p>
       </div>
       <div class="buttons">
@@ -87,8 +74,7 @@
         class="stat date"
       >
         <EditIcon aria-hidden="true" />
-        <span class="date-label">Updated </span
-        >{{ $dayjs(updatedAt).fromNow() }}
+        <span class="date-label">Updated </span>{{ fromNow(updatedAt) }}
       </div>
       <div
         v-else
@@ -96,8 +82,7 @@
         class="stat date"
       >
         <CalendarIcon aria-hidden="true" />
-        <span class="date-label">Published </span
-        >{{ $dayjs(createdAt).fromNow() }}
+        <span class="date-label">Published </span>{{ fromNow(createdAt) }}
       </div>
     </div>
   </article>
@@ -108,14 +93,13 @@ import Categories from '~/components/ui/search/Categories'
 import Badge from '~/components/ui/Badge'
 import EnvironmentIndicator from '~/components/ui/EnvironmentIndicator'
 
-import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
-import EditIcon from '~/assets/images/utils/updated.svg?inline'
-import DownloadIcon from '~/assets/images/utils/download.svg?inline'
-import HeartIcon from '~/assets/images/utils/heart.svg?inline'
+import CalendarIcon from '~/assets/images/utils/calendar.svg'
+import EditIcon from '~/assets/images/utils/updated.svg'
+import DownloadIcon from '~/assets/images/utils/download.svg'
+import HeartIcon from '~/assets/images/utils/heart.svg'
 import Avatar from '~/components/ui/Avatar'
 
 export default {
-  name: 'ProjectCard',
   components: {
     EnvironmentIndicator,
     Avatar,

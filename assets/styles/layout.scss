@@ -47,6 +47,10 @@
     'info'
     / 100%;
 
+  @media screen and (max-width: 1024px) {
+    margin-top: var(--spacing-card-md);
+  }
+
   .normal-page__sidebar {
     grid-area: sidebar;
   }

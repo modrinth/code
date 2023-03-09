@@ -2,9 +2,8 @@
   <Modal ref="modal" :header="'Transfer to ' + $formatWallet(wallet)">
     <div class="modal-transfer">
       <span
-        >You are initiating a transfer of your revenue from Modrinth's Creator
-        Monetization Program. How much of your
-        <strong>{{ $formatMoney(balance) }}</strong> balance would you like to
+        >You are initiating a transfer of your revenue from Modrinth's Creator Monetization Program.
+        How much of your <strong>{{ $formatMoney(balance) }}</strong> balance would you like to
         transfer?</span
       >
       <div class="confirmation-input">
@@ -19,40 +18,30 @@
       </div>
       <div class="confirm-text">
         <Checkbox
-          v-if="
-            isValidInput() &&
-            parseInput() >= minWithdraw &&
-            parseInput() <= balance
-          "
+          v-if="isValidInput() && parseInput() >= minWithdraw && parseInput() <= balance"
           v-model="consentedFee"
+          description="Consent to fee"
         >
-          <template v-if="wallet === 'venmo'"
-            >I acknowledge that $0.25 will be deducted from the amount I receive
-            to cover {{ $formatWallet(wallet) }} processing fees.</template
-          >
-          <template v-else
-            >I acknowledge that an estimated
-            {{ $formatMoney(calcProcessingFees()) }} will be deducted from the
-            amount I receive to cover {{ $formatWallet(wallet) }} processing
-            fees and that any excess will be returned to my Modrinth
-            balance.</template
-          >
+          <template v-if="wallet === 'venmo'">
+            I acknowledge that $0.25 will be deducted from the amount I receive to cover
+            {{ $formatWallet(wallet) }} processing fees.
+          </template>
+          <template v-else>
+            I acknowledge that an estimated
+            {{ $formatMoney(calcProcessingFees()) }} will be deducted from the amount I receive to
+            cover {{ $formatWallet(wallet) }} processing fees and that any excess will be returned
+            to my Modrinth balance.
+          </template>
         </Checkbox>
         <Checkbox
-          v-if="
-            isValidInput() &&
-            parseInput() >= minWithdraw &&
-            parseInput() <= balance
-          "
+          v-if="isValidInput() && parseInput() >= minWithdraw && parseInput() <= balance"
           v-model="consentedAccount"
+          description="Confirm transfer"
         >
           I confirm that I an initiating a transfer to the following
           {{ $formatWallet(wallet) }} account: {{ account }}
         </Checkbox>
-        <span
-          v-else-if="validInput && parseInput() < minWithdraw"
-          class="invalid"
-        >
+        <span v-else-if="validInput && parseInput() < minWithdraw" class="invalid">
           The amount must be at least {{ $formatMoney(minWithdraw) }}</span
         >
         <span v-else-if="validInput && parseInput() > balance" class="invalid">
@@ -84,14 +73,13 @@
 </template>
 
 <script>
-import CrossIcon from '~/assets/images/utils/x.svg?inline'
-import TransferIcon from '~/assets/images/utils/transfer.svg?inline'
-import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg'
+import TransferIcon from '~/assets/images/utils/transfer.svg'
+import SettingsIcon from '~/assets/images/utils/settings.svg'
 import Modal from '~/components/ui/Modal'
 import Checkbox from '~/components/ui/Checkbox'
 
 export default {
-  name: 'ModalTransfer',
   components: {
     Checkbox,
     CrossIcon,
@@ -138,29 +126,27 @@ export default {
       this.$refs.modal.hide()
     },
     async proceed() {
-      this.$nuxt.$loading.start()
+      startLoading()
       try {
-        await this.$axios.post(
-          `user/${this.$auth.user.id}/payouts`,
-          {
+        await useBaseFetch(`user/${this.$auth.user.id}/payouts`, {
+          method: 'POST',
+          body: {
             amount: Number(this.amount.replace('$', '')),
           },
-          this.$defaultHeaders()
-        )
-        await this.$store.dispatch('auth/fetchUser', {
-          token: this.$auth.token,
+          ...this.$defaultHeaders(),
         })
+        await useAuth(this.$auth.token)
 
         this.$refs.modal.hide()
       } catch (err) {
         this.$notify({
           group: 'main',
           title: 'An error occurred',
-          text: err.response.data.description,
+          text: err.data.description,
           type: 'error',
         })
       }
-      this.$nuxt.$loading.finish()
+      stopLoading()
     },
     show() {
       this.$refs.modal.show()

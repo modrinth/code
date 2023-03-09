@@ -11,7 +11,6 @@
 
 <script>
 export default {
-  name: 'Categories',
   props: {
     categories: {
       type: Array,
@@ -30,8 +29,7 @@ export default {
         .concat(this.$tag.loaders)
         .filter(
           (x) =>
-            this.categories.includes(x.name) &&
-            (!x.project_type || x.project_type === this.type)
+            this.categories.includes(x.name) && (!x.project_type || x.project_type === this.type)
         )
     },
   },
@@ -44,7 +42,7 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
 
-  span ::v-deep {
+  :deep(span) {
     display: flex;
     align-items: center;
     flex-direction: row;

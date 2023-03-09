@@ -4,24 +4,20 @@
       <aside class="universal-card">
         <h1>Notifications</h1>
         <NavStack>
-          <NavStackItem link="" label="All"> </NavStackItem>
+          <NavStackItem link="/notifications" label="All" :uses-query="true" />
           <NavStackItem
             v-for="type in notificationTypes"
             :key="type"
-            :link="'?type=' + type"
+            :link="'/notifications/' + type"
             :label="NOTIFICATION_TYPES[type]"
-          >
-          </NavStackItem>
+            :uses-query="true"
+          />
           <h3>Manage</h3>
-          <NavStackItem
-            link="/settings/follows"
-            label="Followed projects"
-            chevron
-          >
+          <NavStackItem link="/settings/follows" label="Followed projects" chevron>
             <SettingsIcon />
           </NavStackItem>
           <NavStackItem
-            v-if="$user.notifications.length > 0"
+            v-if="user.notifications.length > 0"
             :action="clearNotifications"
             label="Clear all"
             danger
@@ -34,30 +30,26 @@
     <div class="normal-page__content">
       <div class="notifications">
         <div
-          v-for="notification in $route.query.type !== undefined
-            ? $user.notifications.filter((x) => x.type === $route.query.type)
-            : $user.notifications"
+          v-for="notification in $route.params.type !== undefined
+            ? user.notifications.filter((x) => x.type === $route.params.type)
+            : user.notifications"
           :key="notification.id"
           class="universal-card adjacent-input"
         >
           <div class="label">
             <span class="label__title">
               <nuxt-link :to="notification.link">
-                <h3 v-html="$xss($md.render(notification.title))" />
+                <h3 v-html="renderString(notification.title)" />
               </nuxt-link>
             </span>
             <div class="label__description">
               <p>{{ notification.text }}</p>
               <span
-                v-tooltip="
-                  $dayjs(notification.created).format(
-                    'MMMM D, YYYY [at] h:mm:ss A'
-                  )
-                "
+                v-tooltip="$dayjs(notification.created).format('MMMM D, YYYY [at] h:mm:ss A')"
                 class="date"
               >
                 <CalendarIcon />
-                Received {{ $dayjs(notification.created).fromNow() }}</span
+                Received {{ fromNow(notification.created) }}</span
               >
             </div>
           </div>
@@ -66,12 +58,8 @@
               v-for="(action, actionIndex) in notification.actions"
               :key="actionIndex"
               class="iconified-button"
-              :class="`action-button-${action.title
-                .toLowerCase()
-                .replaceAll(' ', '-')}`"
-              @click="
-                performAction(notification, notificationIndex, actionIndex)
-              "
+              :class="`action-button-${action.title.toLowerCase().replaceAll(' ', '-')}`"
+              @click="performAction(notification, notificationIndex, actionIndex)"
             >
               {{ action.title }}
             </button>
@@ -84,8 +72,8 @@
             </button>
           </div>
         </div>
-        <div v-if="$user.notifications.length === 0" class="error">
-          <UpToDate class="icon"></UpToDate>
+        <div v-if="user.notifications.length === 0" class="error">
+          <UpToDate class="icon" />
           <br />
           <span class="text">You are up-to-date!</span>
         </div>
@@ -95,14 +83,15 @@
 </template>
 
 <script>
-import ClearIcon from '~/assets/images/utils/clear.svg?inline'
-import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
-import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
-import UpToDate from '~/assets/images/illustrations/up_to_date.svg?inline'
+import ClearIcon from '~/assets/images/utils/clear.svg'
+import SettingsIcon from '~/assets/images/utils/settings.svg'
+import CalendarIcon from '~/assets/images/utils/calendar.svg'
+import UpToDate from '~/assets/images/illustrations/up_to_date.svg'
 import NavStack from '~/components/ui/NavStack'
 import NavStackItem from '~/components/ui/NavStackItem'
-export default {
-  name: 'Notifications',
+import { renderString } from '~/helpers/parse'
+
+export default defineNuxtComponent({
   components: {
     NavStack,
     NavStackItem,
@@ -111,8 +100,17 @@ export default {
     CalendarIcon,
     UpToDate,
   },
-  async fetch() {
-    await this.$store.dispatch('user/fetchNotifications')
+  async setup() {
+    definePageMeta({
+      middleware: 'auth',
+    })
+
+    const user = await useUser()
+    if (process.client) {
+      await initUserNotifs()
+    }
+
+    return { user: ref(user) }
   },
   head: {
     title: 'Notifications - Modrinth',
@@ -121,9 +119,7 @@ export default {
     notificationTypes() {
       const obj = {}
 
-      for (const notification of this.$user.notifications.filter(
-        (it) => it.type !== null
-      )) {
+      for (const notification of this.user.notifications.filter((it) => it.type !== null)) {
         obj[notification.type] = true
       }
 
@@ -138,58 +134,56 @@ export default {
     }
   },
   methods: {
+    renderString,
     async clearNotifications() {
       try {
-        const ids = this.$user.notifications.map((x) => x.id)
+        const ids = this.user.notifications.map((x) => x.id)
 
-        await this.$axios.delete(
-          `notifications?ids=${JSON.stringify(ids)}`,
-          this.$defaultHeaders()
-        )
-
-        ids.forEach((x) => this.$store.dispatch('user/deleteNotification', x))
-      } catch (err) {
-        this.$notify({
-          group: 'main',
-          title: 'An error occurred',
-          text: err.response.data.description,
-          type: 'error',
+        await useBaseFetch(`notifications?ids=${JSON.stringify(ids)}`, {
+          method: 'DELETE',
+          ...this.$defaultHeaders(),
         })
-      }
-    },
-    async performAction(notification, notificationIndex, actionIndex) {
-      this.$nuxt.$loading.start()
-      try {
-        await this.$axios.delete(
-          `notification/${notification.id}`,
-          this.$defaultHeaders()
-        )
 
-        await this.$store.dispatch('user/deleteNotification', notification.id)
-
-        if (actionIndex !== null) {
-          const config = {
-            method:
-              notification.actions[actionIndex].action_route[0].toLowerCase(),
-            url: `${notification.actions[actionIndex].action_route[1]}`,
-            headers: {
-              Authorization: this.$auth.token,
-            },
-          }
-          await this.$axios(config)
+        for (const id of ids) {
+          await userDeleteNotification(id)
         }
       } catch (err) {
         this.$notify({
           group: 'main',
           title: 'An error occurred',
-          text: err.response.data.description,
+          text: err.data.description,
           type: 'error',
         })
       }
-      this.$nuxt.$loading.finish()
+    },
+    async performAction(notification, _notificationIndex, actionIndex) {
+      startLoading()
+      try {
+        await useBaseFetch(`notification/${notification.id}`, {
+          method: 'DELETE',
+          ...this.$defaultHeaders(),
+        })
+
+        await userDeleteNotification(notification.id)
+
+        if (actionIndex !== null) {
+          await useBaseFetch(`${notification.actions[actionIndex].action_route[1]}`, {
+            method: notification.actions[actionIndex].action_route[0].toUpperCase(),
+            ...this.$defaultHeaders(),
+          })
+        }
+      } catch (err) {
+        this.$notify({
+          group: 'main',
+          title: 'An error occurred',
+          text: err.data.description,
+          type: 'error',
+        })
+      }
+      stopLoading()
     },
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>
@@ -201,7 +195,7 @@ export default {
       align-items: baseline;
       margin-block-start: 0;
 
-      h3 ::v-deep {
+      :deep(h3) {
         margin: 0;
         p {
           margin: 0;

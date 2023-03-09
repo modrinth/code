@@ -9,12 +9,6 @@
   </div>
 </template>
 
-<script>
-export default {
-  auth: false,
-}
-</script>
-
 <style lang="scss" scoped>
 .card {
   width: calc(100% - 2 * var(--spacing-card-md));

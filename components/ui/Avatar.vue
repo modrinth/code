@@ -2,18 +2,14 @@
   <img
     v-if="src"
     ref="img"
-    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${
-      noShadow ? 'no-shadow' : ''
-    }`"
+    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''}`"
     :src="src"
     :alt="alt"
     :loading="loading"
   />
   <svg
     v-else
-    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${
-      noShadow ? 'no-shadow' : ''
-    }`"
+    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''}`"
     xml:space="preserve"
     fill-rule="evenodd"
     stroke-linecap="round"
@@ -35,7 +31,6 @@
 
 <script>
 export default {
-  name: 'Avatar',
   props: {
     src: {
       type: String,
@@ -68,10 +63,7 @@ export default {
   mounted() {
     if (this.$refs.img && this.$refs.img.naturalWidth) {
       const isPixelated = () => {
-        if (
-          this.$refs.img.naturalWidth < 96 &&
-          this.$refs.img.naturalWidth > 0
-        ) {
+        if (this.$refs.img.naturalWidth < 96 && this.$refs.img.naturalWidth > 0) {
           this.$refs.img.style.imageRendering = 'pixelated'
         }
       }

@@ -3,13 +3,13 @@
     <h1>Security Notice</h1>
 
     <p>
-      This is the security notice for all Modrinth repositories. The notice
-      explains how vulnerabilities should be reported.
+      This is the security notice for all Modrinth repositories. The notice explains how
+      vulnerabilities should be reported.
     </p>
     <h2>Reporting a Vulnerability</h2>
     <p>
-      If you've found a vulnerability, we would like to know so we can fix it
-      before it is released publicly.
+      If you've found a vulnerability, we would like to know so we can fix it before it is released
+      publicly.
       <strong>Do not open a GitHub issue for a found vulnerability</strong>.
     </p>
     <p>
@@ -17,15 +17,11 @@
       including:
     </p>
     <ul>
-      <li>
-        the website, page or repository where the vulnerability can be observed
-      </li>
+      <li>the website, page or repository where the vulnerability can be observed</li>
       <li>a brief description of the vulnerability</li>
       <li>
         optionally the type of vulnerability and any related
-        <a
-          href="https://www.owasp.org/index.php/Category:OWASP_Top_Ten_2017_Project"
-        >
+        <a href="https://www.owasp.org/index.php/Category:OWASP_Top_Ten_2017_Project">
           OWASP category
         </a>
       </li>
@@ -36,17 +32,15 @@
     <p>The following vulnerabilities <strong>are not</strong> in scope:</p>
     <ul>
       <li>
-        volumetric vulnerabilities, for example overwhelming a service with a
-        high volume of requests
+        volumetric vulnerabilities, for example overwhelming a service with a high volume of
+        requests
       </li>
       <li>
-        reports indicating that our services do not fully align with "best
-        practice", for example missing security headers
+        reports indicating that our services do not fully align with "best practice", for example
+        missing security headers
       </li>
     </ul>
-    <p>
-      If you aren't sure, you can still reach out via email or direct message.
-    </p>
+    <p>If you aren't sure, you can still reach out via email or direct message.</p>
     <hr />
     <p>
       This notice is inspired by the
@@ -59,8 +53,7 @@
 </template>
 
 <script>
-export default {
-  auth: false,
+export default defineNuxtComponent({
   head: {
     title: 'Security Notice - Modrinth',
     meta: [
@@ -83,11 +76,11 @@ export default {
       {
         hid: 'og:url',
         name: 'og:url',
-        content: `https://modrinth.com/legal/security`,
+        content: 'https://modrinth.com/legal/security',
       },
     ],
   },
-}
+})
 </script>
 
 <style lang="scss" scoped></style>

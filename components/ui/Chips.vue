@@ -14,15 +14,14 @@
 </template>
 
 <script>
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
+import CheckIcon from '~/assets/images/utils/check.svg'
 
 export default {
-  name: 'Chips',
   components: {
     CheckIcon,
   },
   props: {
-    value: {
+    modelValue: {
       required: true,
       type: String,
     },
@@ -39,13 +38,14 @@ export default {
       type: Function,
     },
   },
+  emits: ['update:modelValue'],
   computed: {
     selected: {
       get() {
-        return this.value
+        return this.modelValue
       },
       set(value) {
-        this.$emit('input', value)
+        this.$emit('update:modelValue', value)
       },
     },
   },

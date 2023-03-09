@@ -2,27 +2,18 @@
   <Modal ref="modal" header="Project moderation">
     <div v-if="project !== null" class="moderation-modal universal-body">
       <p>
-        A moderation message is optional, but it can be used to communicate
-        problems with a project's team members. The body is also optional and
-        supports markdown formatting!
+        A moderation message is optional, but it can be used to communicate problems with a
+        project's team members. The body is also optional and supports markdown formatting!
       </p>
       <div v-if="status" class="status">
         <span>New project status: </span>
         <Badge :type="status" />
       </div>
       <h3>Message title</h3>
-      <input
-        v-model="moderationMessage"
-        type="text"
-        placeholder="Enter the message..."
-      />
+      <input v-model="moderationMessage" type="text" placeholder="Enter the message..." />
       <h3>Message body</h3>
       <div class="textarea-wrapper">
-        <Chips
-          v-model="bodyViewMode"
-          class="separator"
-          :items="['source', 'preview']"
-        />
+        <Chips v-model="bodyViewMode" class="separator" :items="['source', 'preview']" />
         <textarea
           v-if="bodyViewMode === 'source'"
           id="body"
@@ -34,20 +25,17 @@
               : 'You must add a title before you add a body.'
           "
         />
-        <div
-          v-else
-          v-highlightjs
-          class="markdown-body preview"
-          v-html="$xss($md.render(moderationMessageBody))"
-        ></div>
+        <div v-else class="markdown-body preview" v-html="renderString(moderationMessageBody)" />
       </div>
       <div class="push-right input-group">
         <button
           v-if="moderationMessage || moderationMessageBody"
           class="iconified-button"
           @click="
-            moderationMessage = ''
-            moderationMessageBody = ''
+            () => {
+              moderationMessage = ''
+              moderationMessageBody = ''
+            }
           "
         >
           <TrashIcon />
@@ -67,15 +55,15 @@
 </template>
 
 <script>
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
-import CrossIcon from '~/assets/images/utils/x.svg?inline'
+import TrashIcon from '~/assets/images/utils/trash.svg'
+import CrossIcon from '~/assets/images/utils/x.svg'
 import Modal from '~/components/ui/Modal'
 import Chips from '~/components/ui/Chips'
 import Badge from '~/components/ui/Badge'
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
+import CheckIcon from '~/assets/images/utils/check.svg'
+import { renderString } from '~/helpers/parse'
 
 export default {
-  name: 'ModalModeration',
   components: {
     TrashIcon,
     CrossIcon,
@@ -102,9 +90,7 @@ export default {
     return {
       bodyViewMode: 'source',
       moderationMessage:
-        this.project && this.project.moderation_message
-          ? this.project.moderation_message
-          : '',
+        this.project && this.project.moderation_message ? this.project.moderation_message : '',
       moderationMessageBody:
         this.project && this.project.moderation_message_body
           ? this.project.moderation_message_body
@@ -112,26 +98,23 @@ export default {
     }
   },
   methods: {
+    renderString,
     async saveProject() {
-      this.$nuxt.$loading.start()
+      startLoading()
 
       try {
         const data = {
-          moderation_message: this.moderationMessage
-            ? this.moderationMessage
-            : null,
-          moderation_message_body: this.moderationMessageBody
-            ? this.moderationMessageBody
-            : null,
+          moderation_message: this.moderationMessage ? this.moderationMessage : null,
+          moderation_message_body: this.moderationMessageBody ? this.moderationMessageBody : null,
         }
         if (this.status) {
           data.status = this.status
         }
-        await this.$axios.patch(
-          `project/${this.project.id}`,
-          data,
-          this.$defaultHeaders()
-        )
+        await useBaseFetch(`project/${this.project.id}`, {
+          method: 'PATCH',
+          body: data,
+          ...this.$defaultHeaders(),
+        })
 
         this.$refs.modal.hide()
         if (this.onClose !== null) {
@@ -141,25 +124,21 @@ export default {
         this.$notify({
           group: 'main',
           title: 'An error occurred',
-          text: err.response ? err.response.data.description : err,
+          text: err.data ? err.data.description : err,
           type: 'error',
         })
       }
 
-      this.$nuxt.$loading.finish()
+      stopLoading()
     },
     show() {
       this.$refs.modal.show()
       this.moderationMessage =
-        this.project &&
-        this.project.moderator_message &&
-        this.project.moderator_message.message
+        this.project && this.project.moderator_message && this.project.moderator_message.message
           ? this.project.moderator_message.message
           : ''
       this.moderationMessageBody =
-        this.project &&
-        this.project.moderator_message &&
-        this.project.moderator_message.body
+        this.project && this.project.moderator_message && this.project.moderator_message.body
           ? this.project.moderator_message.body
           : ''
     },

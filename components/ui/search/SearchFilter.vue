@@ -1,13 +1,15 @@
 <template>
   <Checkbox
     class="filter"
-    :value="activeFilters.includes(facetName)"
+    :model-value="activeFilters.includes(facetName)"
     :description="displayName"
-    @input="toggle()"
+    @update:model-value="toggle()"
   >
     <div class="filter-text">
-      <div v-if="icon" aria-hidden="true" class="icon" v-html="icon"></div>
-      <div v-else class="icon"><slot /></div>
+      <div v-if="icon" aria-hidden="true" class="icon" v-html="icon" />
+      <div v-else class="icon">
+        <slot />
+      </div>
       <span aria-hidden="true"> {{ displayName }}</span>
     </div>
   </Checkbox>
@@ -17,7 +19,6 @@
 import Checkbox from '~/components/ui/Checkbox'
 
 export default {
-  name: 'SearchFilter',
   components: {
     Checkbox,
   },
@@ -41,6 +42,7 @@ export default {
       },
     },
   },
+  emits: ['toggle'],
   methods: {
     toggle() {
       this.$emit('toggle', this.facetName)
@@ -50,10 +52,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.filter ::v-deep {
+.filter {
   margin-bottom: 0.5rem;
 
-  .filter-text {
+  :deep(.filter-text) {
     display: flex;
     align-items: center;
 

@@ -1,57 +1,44 @@
-export default (ctx, inject) => {
-  inject('user', ctx.store.state.user)
-  inject('tag', ctx.store.state.tag)
-  inject('auth', ctx.store.state.auth)
-  inject('cosmetics', ctx.store.state.cosmetics)
-  inject('defaultHeaders', () => {
+export default defineNuxtPlugin((nuxtApp) => {
+  const tagStore = nuxtApp.$tag
+  const authStore = nuxtApp.$auth
+
+  nuxtApp.provide('defaultHeaders', () => {
     const obj = { headers: {} }
 
     if (process.server && process.env.RATE_LIMIT_IGNORE_KEY) {
       obj.headers['x-ratelimit-key'] = process.env.RATE_LIMIT_IGNORE_KEY || ''
     }
 
-    if (ctx.store.state.auth.user) {
-      obj.headers.Authorization = ctx.store.state.auth.token
+    if (authStore.user) {
+      obj.headers.Authorization = authStore.token
     }
 
     return obj
   })
-  inject('formatNumber', formatNumber)
-  inject('capitalizeString', capitalizeString)
-  inject('formatMoney', formatMoney)
-  inject('formatVersion', (versionsArray) =>
-    formatVersions(versionsArray, ctx.store)
-  )
-  inject('orElse', (first, otherwise) => first ?? otherwise)
-  inject('external', () =>
-    ctx.store.state.cosmetics.externalLinksNewTab ? '_blank' : ''
-  )
-  inject('formatBytes', formatBytes)
-  inject('formatWallet', formatWallet)
-  inject('formatProjectType', formatProjectType)
-  inject('formatCategory', formatCategory)
-  inject('formatCategoryHeader', formatCategoryHeader)
-  inject('formatProjectStatus', formatProjectStatus)
-  inject('calculateDuplicates', (versions) =>
-    versions.map((version, index) => {
-      const nextVersion = versions[index + 1]
-      if (
-        nextVersion &&
-        version.changelog &&
-        nextVersion.changelog === version.changelog
-      ) {
-        return { duplicate: true, ...version }
-      } else {
-        return { duplicate: false, ...version }
-      }
-    })
-  )
-  inject('computeVersions', (versions) => {
+  nuxtApp.provide('formatNumber', formatNumber)
+  nuxtApp.provide('capitalizeString', capitalizeString)
+  nuxtApp.provide('formatMoney', formatMoney)
+  nuxtApp.provide('formatVersion', (versionsArray) => formatVersions(versionsArray, tagStore))
+  nuxtApp.provide('orElse', (first, otherwise) => first ?? otherwise)
+  nuxtApp.provide('external', () => {
+    const cosmeticsStore = useCosmetics().value
+
+    return cosmeticsStore.externalLinksNewTab ? '_blank' : ''
+  })
+  nuxtApp.provide('formatBytes', formatBytes)
+  nuxtApp.provide('formatWallet', formatWallet)
+  nuxtApp.provide('formatProjectType', formatProjectType)
+  nuxtApp.provide('formatCategory', formatCategory)
+  nuxtApp.provide('formatCategoryHeader', formatCategoryHeader)
+  nuxtApp.provide('formatProjectStatus', formatProjectStatus)
+  nuxtApp.provide('computeVersions', (versions, members) => {
     const visitedVersions = []
     const returnVersions = []
 
+    const authorMembers = {}
+
     for (const version of versions.sort(
-      (a, b) => ctx.$dayjs(a.date_published) - ctx.$dayjs(b.date_published)
+      (a, b) => nuxtApp.$dayjs(a.date_published) - nuxtApp.$dayjs(b.date_published)
     )) {
       if (visitedVersions.includes(version.version_number)) {
         visitedVersions.push(version.version_number)
@@ -60,28 +47,39 @@ export default (ctx, inject) => {
         visitedVersions.push(version.version_number)
         version.displayUrlEnding = version.version_number
       }
+      version.primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
+
+      version.author = authorMembers[version.author_id]
+      if (!version.author) {
+        version.author = members.find((x) => x.user.id === version.author_id)
+        authorMembers[version.author_id] = version.author
+      }
 
       returnVersions.push(version)
     }
 
     return returnVersions
       .reverse()
-      .sort(
-        (a, b) => ctx.$dayjs(b.date_published) - ctx.$dayjs(a.date_published)
-      )
+      .map((version, index) => {
+        const nextVersion = returnVersions[index + 1]
+        if (nextVersion && version.changelog && nextVersion.changelog === version.changelog) {
+          return { duplicate: true, ...version }
+        } else {
+          return { duplicate: false, ...version }
+        }
+      })
+      .sort((a, b) => nuxtApp.$dayjs(b.date_published) - nuxtApp.$dayjs(a.date_published))
   })
-  inject('getProjectTypeForDisplay', (type, categories) => {
+  nuxtApp.provide('getProjectTypeForDisplay', (type, categories) => {
     if (type === 'mod') {
       const isPlugin = categories.some((category) => {
-        return ctx.store.state.tag.loaderData.allPluginLoaders.includes(
-          category
-        )
+        return tagStore.loaderData.allPluginLoaders.includes(category)
       })
       const isMod = categories.some((category) => {
-        return ctx.store.state.tag.loaderData.modLoaders.includes(category)
+        return tagStore.loaderData.modLoaders.includes(category)
       })
       const isDataPack = categories.some((category) => {
-        return ctx.store.state.tag.loaderData.dataPackLoaders.includes(category)
+        return tagStore.loaderData.dataPackLoaders.includes(category)
       })
 
       if (isMod && isPlugin && isDataPack) {
@@ -95,20 +93,18 @@ export default (ctx, inject) => {
 
     return type
   })
-  inject('getProjectTypeForUrl', (type, categories) => {
+  nuxtApp.provide('getProjectTypeForUrl', (type, categories) => {
     if (type === 'mod') {
       const isMod = categories.some((category) => {
-        return ctx.store.state.tag.loaderData.modLoaders.includes(category)
+        return tagStore.loaderData.modLoaders.includes(category)
       })
 
       const isPlugin = categories.some((category) => {
-        return ctx.store.state.tag.loaderData.allPluginLoaders.includes(
-          category
-        )
+        return tagStore.loaderData.allPluginLoaders.includes(category)
       })
 
       const isDataPack = categories.some((category) => {
-        return ctx.store.state.tag.loaderData.dataPackLoaders.includes(category)
+        return tagStore.loaderData.dataPackLoaders.includes(category)
       })
 
       if (isDataPack) {
@@ -124,29 +120,23 @@ export default (ctx, inject) => {
       return type
     }
   })
-  inject('cycleValue', cycleValue)
-  const sortedCategories = ctx.store.state.tag.categories
-    .slice()
-    .sort((a, b) => {
-      const headerCompare = a.header.localeCompare(b.header)
-      if (headerCompare !== 0) {
-        return headerCompare
-      }
-      if (a.header === 'resolutions' && b.header === 'resolutions') {
-        return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
-      } else if (
-        a.header === 'performance impact' &&
-        b.header === 'performance impact'
-      ) {
-        const x = ['potato', 'low', 'medium', 'high', 'screenshot']
+  nuxtApp.provide('cycleValue', cycleValue)
+  const sortedCategories = tagStore.categories.slice().sort((a, b) => {
+    const headerCompare = a.header.localeCompare(b.header)
+    if (headerCompare !== 0) {
+      return headerCompare
+    }
+    if (a.header === 'resolutions' && b.header === 'resolutions') {
+      return a.name.replace(/\D/g, '') - b.name.replace(/\D/g, '')
+    } else if (a.header === 'performance impact' && b.header === 'performance impact') {
+      const x = ['potato', 'low', 'medium', 'high', 'screenshot']
 
-        return x.indexOf(a.name) - x.indexOf(b.name)
-      }
-      return 0
-    })
-  inject('sortedCategories', sortedCategories)
-}
-
+      return x.indexOf(a.name) - x.indexOf(b.name)
+    }
+    return 0
+  })
+  nuxtApp.provide('sortedCategories', sortedCategories)
+})
 export const formatNumber = (number) => {
   const x = +number
   if (x >= 1000000) {
@@ -176,7 +166,9 @@ export const formatMoney = (number) => {
 }
 
 export const formatBytes = (bytes, decimals = 2) => {
-  if (bytes === 0) return '0 Bytes'
+  if (bytes === 0) {
+    return '0 Bytes'
+  }
 
   const k = 1024
   const dm = decimals < 0 ? 0 : decimals
@@ -258,8 +250,8 @@ export const formatProjectStatus = (name) => {
   return capitalizeString(name)
 }
 
-export const formatVersions = (versionArray, store) => {
-  const allVersions = store.state.tag.gameVersions.slice().reverse()
+export const formatVersions = (versionArray, tag) => {
+  const allVersions = tag.gameVersions.slice().reverse()
   const allReleases = allVersions.filter((x) => x.version_type === 'release')
 
   const intervals = []
@@ -267,9 +259,7 @@ export const formatVersions = (versionArray, store) => {
 
   for (let i = 0; i < versionArray.length; i++) {
     const index = allVersions.findIndex((x) => x.version === versionArray[i])
-    const releaseIndex = allReleases.findIndex(
-      (x) => x.version === versionArray[i]
-    )
+    const releaseIndex = allReleases.findIndex((x) => x.version === versionArray[i])
 
     if (i === 0) {
       intervals.push([[versionArray[i], index, releaseIndex]])
@@ -294,11 +284,7 @@ export const formatVersions = (versionArray, store) => {
   for (let i = 0; i < intervals.length; i++) {
     const interval = intervals[i]
 
-    if (
-      interval.length === 2 &&
-      interval[0][2] !== -1 &&
-      interval[1][2] === -1
-    ) {
+    if (interval.length === 2 && interval[0][2] !== -1 && interval[1][2] === -1) {
       let lastSnapshot = null
       for (let j = interval[1][1]; j > interval[0][1]; j--) {
         if (allVersions[j].version_type === 'release') {
@@ -307,17 +293,12 @@ export const formatVersions = (versionArray, store) => {
             [
               allVersions[j].version,
               j,
-              allReleases.findIndex(
-                (x) => x.version === allVersions[j].version
-              ),
+              allReleases.findIndex((x) => x.version === allVersions[j].version),
             ],
           ])
 
           if (lastSnapshot !== null && lastSnapshot !== j + 1) {
-            newIntervals.push([
-              [allVersions[lastSnapshot].version, lastSnapshot, -1],
-              interval[1],
-            ])
+            newIntervals.push([[allVersions[lastSnapshot].version, lastSnapshot, -1], interval[1]])
           } else {
             newIntervals.push([interval[1]])
           }

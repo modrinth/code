@@ -1,11 +1,4 @@
 {
-  "builds": [
-    {
-      "src": "nuxt.config.js",
-      "use": "@nuxtjs/vercel-builder@0.21.3",
-      "config": {}
-    }
-  ],
   "github": {
     "silent": true
   }

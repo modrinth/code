@@ -1,7 +1,7 @@
 <template>
-  <div v-if="$user.follows.length > 0" class="project-list display-mode--list">
+  <div v-if="user.follows.length > 0" class="project-list display-mode--list">
     <ProjectCard
-      v-for="project in $user.follows"
+      v-for="project in user.follows"
       :id="project.id"
       :key="project.id"
       :type="project.project_type"
@@ -16,10 +16,7 @@
       :server-side="project.server_side"
       :color="project.color"
     >
-      <button
-        class="iconified-button"
-        @click="$store.dispatch('user/unfollowProject', project)"
-      >
+      <button class="iconified-button" @click="userUnfollowProject(project)">
         <HeartIcon />
         Unfollow
       </button>
@@ -30,30 +27,25 @@
     <br />
     <span class="text"
       >You don't have any followed projects. <br />
-      Why don't you <nuxt-link class="link" to="/mods">search</nuxt-link> for
-      new ones?</span
+      Why don't you <nuxt-link class="link" to="/mods">search</nuxt-link> for new ones?</span
     >
   </div>
 </template>
 
-<script>
+<script setup>
 import ProjectCard from '~/components/ui/ProjectCard'
 
-import HeartIcon from '~/assets/images/utils/heart.svg?inline'
-import FollowIllustration from '~/assets/images/illustrations/follow_illustration.svg?inline'
+import HeartIcon from '~/assets/images/utils/heart.svg'
+import FollowIllustration from '~/assets/images/illustrations/follow_illustration.svg'
 
-export default {
-  components: {
-    ProjectCard,
-    HeartIcon,
-    FollowIllustration,
-  },
-  async fetch() {
-    await this.$store.dispatch('user/fetchFollows')
-  },
-  head: {
-    title: 'Followed projects - Modrinth',
-  },
+const user = await useUser()
+if (process.client) {
+  await initUserFollows()
 }
+
+useHead({ title: 'Followed projects - Modrinth' })
+definePageMeta({
+  middleware: 'auth',
+})
 </script>
 <style lang="scss" scoped></style>

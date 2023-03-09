@@ -67,9 +67,13 @@ html {
   --color-warning-bg: hsl(355, 70%, 88%);
   --color-warning-text: hsl(342, 70%, 35%);
 
-  --color-banner-text: hsl(0, 11%, 16%);
-  --color-banner-bg: hsl(0, 100%, 95%);
-  --color-banner-side: hsl(357, 78%, 40%);
+  --color-warning-banner-text: hsl(0, 11%, 16%);
+  --color-warning-banner-bg: hsl(0, 100%, 95%);
+  --color-warning-banner-side: hsl(357, 78%, 40%);
+
+  --color-info-banner-text: var(--color-text);
+  --color-info-banner-bg: var(--color-ad);
+  --color-info-banner-side: var(--color-special-blue);
 
   --color-block-quote: var(--color-tooltip-bg);
   --color-header-underline: var(--color-divider-dark);
@@ -86,9 +90,8 @@ html {
   --shadow-raised: 0.3px 0.5px 0.6px hsl(var(--shadow-color) / 0.15),
     1px 2px 2.2px -1.7px hsl(var(--shadow-color) / 0.12),
     4.4px 8.8px 9.7px -3.4px hsl(var(--shadow-color) / 0.09);
-  --shadow-floating: hsla(0, 0%, 0%, 0) 0px 0px 0px 0px,
-    hsla(0, 0%, 0%, 0) 0px 0px 0px 0px, hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px,
-    hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
+  --shadow-floating: hsla(0, 0%, 0%, 0) 0px 0px 0px 0px, hsla(0, 0%, 0%, 0) 0px 0px 0px 0px,
+    hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
 
@@ -112,11 +115,7 @@ html {
     rgba(66, 71, 97, 0.34) 100%
   );
   --landing-border-color: rgba(129, 137, 175, 0.55);
-  --landing-creator-gradient: linear-gradient(
-    180deg,
-    #f8f8f8 0%,
-    #f8f8f8 63.19%
-  );
+  --landing-creator-gradient: linear-gradient(180deg, #f8f8f8 0%, #f8f8f8 63.19%);
 
   --landing-blob-gradient: radial-gradient(
     50% 50% at 50% 50%,
@@ -196,9 +195,13 @@ html {
   --color-warning-bg: hsl(355, 70%, 20%);
   --color-warning-text: hsl(342, 70%, 75%);
 
-  --color-banner-text: hsl(0, 100%, 96%);
-  --color-banner-bg: hsl(356, 18%, 18%);
-  --color-banner-side: hsl(357, 78%, 40%);
+  --color-warning-banner-text: hsl(0, 100%, 96%);
+  --color-warning-banner-bg: hsl(356, 18%, 18%);
+  --color-warning-banner-side: hsl(357, 78%, 40%);
+
+  --color-info-banner-text: var(--color-text);
+  --color-info-banner-bg: var(--color-ad);
+  --color-info-banner-side: var(--color-special-blue);
 
   --color-block-quote: var(--color-code-bg);
   --color-header-underline: var(--color-divider-dark);
@@ -213,18 +216,13 @@ html {
 
   --shadow-raised-lg: 0px 2px 4px hsla(221, 39%, 11%, 0.2);
   --shadow-raised: 0px -2px 4px hsla(221, 39%, 11%, 0.1);
-  --shadow-floating: hsla(0, 0%, 0%, 0) 0px 0px 0px 0px,
-    hsla(0, 0%, 0%, 0) 0px 0px 0px 0px, hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px,
-    rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
+  --shadow-floating: hsla(0, 0%, 0%, 0) 0px 0px 0px 0px, hsla(0, 0%, 0%, 0) 0px 0px 0px 0px,
+    hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
 
   --landing-maze-bg: url('https://cdn.modrinth.com/landing/landing.png');
-  --landing-maze-gradient-bg: linear-gradient(
-      0deg,
-      #31375f 0%,
-      rgba(8, 14, 55, 0) 100%
-    ),
+  --landing-maze-gradient-bg: linear-gradient(0deg, #31375f 0%, rgba(8, 14, 55, 0) 100%),
     url('https://cdn.modrinth.com/landing/landing-lower.png');
   --landing-maze-outer-bg: linear-gradient(180deg, #06060d 0%, #000000 100%);
 
@@ -251,8 +249,7 @@ html {
     rgba(44, 48, 79, 0.35) 0%,
     rgba(32, 35, 50, 0.2695) 100%
   );
-  --landing-blob-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16),
-    inset 2px 2px 64px rgba(57, 61, 94, 0.45);
+  --landing-blob-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16), inset 2px 2px 64px rgba(57, 61, 94, 0.45);
 
   --landing-card-bg: rgba(59, 63, 85, 0.15);
   --landing-card-shadow: 2px 2px 12px rgba(0, 0, 0, 0.16);
@@ -280,10 +277,9 @@ body {
   // Defaults
   background-color: var(--color-bg);
   color: var(--color-text);
-  --font-standard: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen,
-    Ubuntu, Roboto, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  --mono-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
-    Liberation Mono, monospace;
+  --font-standard: Inter, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Roboto,
+    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  --mono-font: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas, Liberation Mono, monospace;
   font-family: var(--font-standard);
   font-size: 16px;
   font-weight: var(--font-weight-regular);
@@ -436,11 +432,12 @@ kbd {
   font-size: 0.85em !important;
 }
 
-@import '~assets/styles/highlightjs.scss';
-@import '~assets/styles/layout.scss';
-@import '~assets/styles/utils.scss';
-@import '~assets/styles/components.scss';
-@import '~assets/styles/normalize.scss';
+@import '~/assets/styles/highlightjs.scss';
+@import '~/assets/styles/layout.scss';
+@import '~/assets/styles/utils.scss';
+@import '~/assets/styles/components.scss';
+@import '~/assets/styles/normalize.scss';
+@import '~/assets/styles/inter.scss';
 
 button:focus-visible,
 a:focus-visible,

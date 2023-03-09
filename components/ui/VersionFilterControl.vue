@@ -1,12 +1,14 @@
 <template>
   <div
-    v-if="getValidLoaders().length > 1 || getValidVersions().length > 1"
+    v-if="
+      loaderFilters.length > 1 || gameVersionFilters.length > 1 || versionTypeFilters.length > 1
+    "
     class="card search-controls"
   >
     <Multiselect
-      v-if="getValidLoaders().length > 1"
+      v-if="loaderFilters.length > 1"
       v-model="selectedLoaders"
-      :options="getValidLoaders()"
+      :options="loaderFilters"
       :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
       :multiple="true"
       :searchable="false"
@@ -15,19 +17,16 @@
       :clear-search-on-select="false"
       :show-labels="false"
       :allow-empty="true"
-      :disabled="getValidLoaders().length === 1"
       placeholder="Filter loader..."
-      @input="updateVersionFilters()"
-    ></Multiselect>
+      @update:model-value="updateVersionFilters()"
+    />
     <Multiselect
-      v-if="getValidVersions().length > 1"
+      v-if="gameVersionFilters.length > 1"
       v-model="selectedGameVersions"
       :options="
-        showSnapshots
-          ? getValidVersions().map((x) => x.version)
-          : getValidVersions()
-              .filter((it) => it.version_type === 'release')
-              .map((x) => x.version)
+        includeSnapshots
+          ? gameVersionFilters.map((x) => x.version)
+          : gameVersionFilters.filter((it) => it.version_type === 'release').map((x) => x.version)
       "
       :multiple="true"
       :searchable="true"
@@ -37,12 +36,12 @@
       :hide-selected="true"
       :selectable="() => selectedGameVersions.length <= 6"
       placeholder="Filter versions..."
-      @input="updateVersionFilters()"
-    ></Multiselect>
+      @update:model-value="updateVersionFilters()"
+    />
     <Multiselect
-      v-if="getValidChannels().length > 1"
-      v-model="selectedChannels"
-      :options="getValidChannels()"
+      v-if="versionTypeFilters.length > 1"
+      v-model="selectedVersionTypes"
+      :options="versionTypeFilters"
       :custom-label="(x) => $capitalizeString(x)"
       :multiple="true"
       :searchable="false"
@@ -52,29 +51,30 @@
       :show-labels="false"
       :allow-empty="true"
       placeholder="Filter channels..."
-      @input="updateVersionFilters()"
-    ></Multiselect>
+      @update:model-value="updateVersionFilters()"
+    />
     <Checkbox
       v-if="
-        getValidVersions().length > 1 &&
-        getValidVersions().some((v) => v.version_type !== 'release')
+        gameVersionFilters.length > 1 &&
+        gameVersionFilters.some((v) => v.version_type !== 'release')
       "
-      v-model="showSnapshots"
+      v-model="includeSnapshots"
       label="Include snapshots"
       description="Include snapshots"
       :border="false"
-      @input="updateQuery"
+      @update:model-value="updateQuery"
     />
     <button
       title="Clear filters"
-      :disabled="
-        selectedLoaders.length === 0 && selectedGameVersions.length === 0
-      "
+      :disabled="selectedLoaders.length === 0 && selectedGameVersions.length === 0"
       class="iconified-button"
       @click="
-        selectedLoaders = []
-        selectedGameVersions = []
-        updateVersionFilters()
+        () => {
+          selectedLoaders = []
+          selectedGameVersions = []
+          selectedVersionTypes = []
+          updateVersionFilters()
+        }
       "
     >
       <ClearIcon />
@@ -83,125 +83,81 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import Multiselect from 'vue-multiselect'
 import Checkbox from '~/components/ui/Checkbox'
-import ClearIcon from '~/assets/images/utils/clear.svg?inline'
-export default {
-  name: 'VersionFilterControl',
-  components: {
-    Multiselect,
-    Checkbox,
-    ClearIcon,
-  },
-  props: {
-    versions: {
-      type: Array,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      query: '',
-      showSnapshots: false,
-      cachedValidChannels: null,
-      cachedValidVersions: null,
-      cachedValidLoaders: null,
-      selectedGameVersions: [],
-      selectedLoaders: [],
-      selectedChannels: [],
-    }
-  },
-  fetch() {
-    this.selectedLoaders = this.$route.query.l?.split(',') || []
-    this.selectedGameVersions = this.$route.query.g?.split(',') || []
-    this.selectedChannels = this.$route.query.c?.split(',') || []
-    this.showSnapshots = this.$route.query.s === 'true'
-    this.updateVersionFilters()
-  },
-  methods: {
-    getValidChannels() {
-      if (!this.cachedValidChannels) {
-        this.cachedValidChannels = ['release', 'beta', 'alpha'].filter(
-          (channel) =>
-            this.versions.some((projVer) => projVer.version_type === channel)
-        )
-      }
-      return this.cachedValidChannels
-    },
-    getValidVersions() {
-      if (!this.cachedValidVersions) {
-        this.cachedValidVersions = this.$tag.gameVersions.filter((gameVer) =>
-          this.versions.some((projVer) =>
-            projVer.game_versions.includes(gameVer.version)
-          )
-        )
-      }
-      return this.cachedValidVersions
-    },
-    getValidLoaders() {
-      if (!this.cachedValidLoaders) {
-        const temp = new Set()
-        for (const version of this.versions) {
-          version.loaders.forEach((v) => {
-            temp.add(v)
-          })
-        }
-        this.cachedValidLoaders = Array.from(temp)
-        this.cachedValidLoaders.sort()
-      }
-      return this.cachedValidLoaders
-    },
-    async updateVersionFilters() {
-      this.selectedChannels = this.selectedChannels.filter((channel) =>
-        this.getValidChannels().includes(channel)
-      )
-      this.selectedLoaders = this.selectedLoaders.filter((loader) =>
-        this.getValidLoaders().includes(loader)
-      )
-      this.selectedGameVersions = this.selectedGameVersions.filter((version) =>
-        this.getValidVersions().some(
-          (validVersion) => validVersion.version === version
-        )
-      )
+import ClearIcon from '~/assets/images/utils/clear.svg'
 
-      const temp = this.versions.filter(
-        (projectVersion) =>
-          (this.selectedGameVersions.length === 0 ||
-            this.selectedGameVersions.some((gameVersion) =>
-              projectVersion.game_versions.includes(gameVersion)
-            )) &&
-          (this.selectedLoaders.length === 0 ||
-            this.selectedLoaders.some((loader) =>
-              projectVersion.loaders.includes(loader)
-            )) &&
-          (this.selectedChannels.length === 0 ||
-            this.selectedChannels.includes(projectVersion.version_type))
-      )
-      await this.updateQuery()
-      this.$emit('updateVersions', temp)
-    },
-    async updateQuery() {
-      await this.$router.replace({
-        query: {
-          ...this.$route.query,
-          l:
-            this.selectedLoaders.length === 0
-              ? undefined
-              : this.selectedLoaders.join(','),
-          g:
-            this.selectedGameVersions.length === 0
-              ? undefined
-              : this.selectedGameVersions.join(','),
-          c:
-            this.selectedChannels.length === 0
-              ? undefined
-              : this.selectedChannels.join(','),
-          s: this.showSnapshots ? true : undefined,
-        },
-      })
+const emit = defineEmits(['updateVersions'])
+const props = defineProps({
+  versions: {
+    type: Array,
+    default() {
+      return []
     },
   },
+})
+
+const data = useNuxtApp()
+const route = useRoute()
+
+const tempLoaders = new Set()
+let tempVersions = new Set()
+const tempReleaseChannels = new Set()
+
+for (const version of props.versions) {
+  for (const loader of version.loaders) {
+    tempLoaders.add(loader)
+  }
+  for (const gameVersion of version.game_versions) {
+    tempVersions.add(gameVersion)
+  }
+  tempReleaseChannels.add(version.version_type)
+}
+
+tempVersions = Array.from(tempVersions)
+
+const loaderFilters = shallowRef(Array.from(tempLoaders))
+const gameVersionFilters = shallowRef(
+  data.$tag.gameVersions.filter((gameVer) => tempVersions.includes(gameVer.version))
+)
+const versionTypeFilters = shallowRef(Array.from(tempReleaseChannels))
+const includeSnapshots = ref(route.query.s === 'true')
+
+const selectedGameVersions = shallowRef(route.query.g ?? [])
+const selectedLoaders = shallowRef(route.query.l ?? [])
+const selectedVersionTypes = shallowRef(route.query.c ?? [])
+
+async function updateVersionFilters() {
+  const temp = props.versions.filter(
+    (projectVersion) =>
+      (selectedGameVersions.value.length === 0 ||
+        selectedGameVersions.value.some((gameVersion) =>
+          projectVersion.game_versions.includes(gameVersion)
+        )) &&
+      (selectedLoaders.value.length === 0 ||
+        selectedLoaders.value.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (selectedVersionTypes.value.length === 0 ||
+        selectedVersionTypes.value.includes(projectVersion.version_type))
+  )
+
+  await updateQuery()
+  emit('updateVersions', temp)
+}
+
+async function updateQuery() {
+  const router = useRouter()
+  const route = useRoute()
+
+  await router.replace({
+    query: {
+      ...route.query,
+      l: selectedLoaders.value.length === 0 ? undefined : selectedLoaders.value,
+      g: selectedGameVersions.value.length === 0 ? undefined : selectedGameVersions.value,
+      c: selectedVersionTypes.value.length === 0 ? undefined : selectedVersionTypes.value,
+      s: includeSnapshots.value ? true : undefined,
+    },
+  })
 }
 </script>
 
@@ -217,27 +173,6 @@ export default {
   }
   .checkbox-outer {
     min-width: fit-content;
-  }
-}
-.circle-button {
-  display: flex;
-  max-width: 2rem;
-  padding: 0.5rem;
-  background-color: var(--color-button-bg);
-  border-radius: var(--size-rounded-max);
-  box-shadow: inset 0px -1px 1px rgba(17, 24, 39, 0.1);
-  &:hover,
-  &:focus-visible {
-    background-color: var(--color-button-bg-hover);
-    color: var(--color-button-text-hover);
-  }
-  &:active {
-    background-color: var(--color-button-bg-active);
-    color: var(--color-button-text-active);
-  }
-  svg {
-    height: 1rem;
-    width: 1rem;
   }
 }
 </style>

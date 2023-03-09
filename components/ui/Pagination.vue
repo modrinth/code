@@ -2,6 +2,7 @@
   <div v-if="count > 1" class="columns paginates">
     <a
       :class="{ disabled: page === 1 }"
+      :tabindex="page === 1 ? -1 : 0"
       class="left-arrow paginate has-icon"
       aria-label="Previous Page"
       :href="linkFunction(page - 1)"
@@ -38,12 +39,11 @@
       :class="{
         disabled: page === pages[pages.length - 1],
       }"
+      :tabindex="page === pages[pages.length - 1] ? -1 : 0"
       class="right-arrow paginate has-icon"
       aria-label="Next Page"
       :href="linkFunction(page + 1)"
-      @click.prevent="
-        page !== pages[pages.length - 1] ? switchPage(page + 1) : null
-      "
+      @click.prevent="page !== pages[pages.length - 1] ? switchPage(page + 1) : null"
     >
       <RightArrowIcon />
     </a>
@@ -51,12 +51,11 @@
 </template>
 
 <script>
-import GapIcon from '~/assets/images/utils/gap.svg?inline'
-import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg?inline'
-import RightArrowIcon from '~/assets/images/utils/right-arrow.svg?inline'
+import GapIcon from '~/assets/images/utils/gap.svg'
+import LeftArrowIcon from '~/assets/images/utils/left-arrow.svg'
+import RightArrowIcon from '~/assets/images/utils/right-arrow.svg'
 
 export default {
-  name: 'Pagination',
   components: {
     GapIcon,
     LeftArrowIcon,
@@ -78,6 +77,7 @@ export default {
       },
     },
   },
+  emits: ['switch-page'],
   computed: {
     pages() {
       let pages = []
@@ -94,15 +94,7 @@ export default {
             this.count,
           ]
         } else if (this.page > 4) {
-          pages = [
-            1,
-            '-',
-            this.page - 1,
-            this.page,
-            this.page + 1,
-            '-',
-            this.count,
-          ]
+          pages = [1, '-', this.page - 1, this.page, this.page + 1, '-', this.count]
         } else {
           pages = [1, 2, 3, 4, 5, '-', this.count]
         }
@@ -131,8 +123,8 @@ a {
   border-radius: 2rem;
   background: var(--color-raised-bg);
 
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out,
-    transform 0.05s ease-in-out, outline 0.2s ease-in-out;
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, transform 0.05s ease-in-out,
+    outline 0.2s ease-in-out;
 
   &.page-number.current {
     background: var(--color-brand);

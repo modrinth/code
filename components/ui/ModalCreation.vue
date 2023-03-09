@@ -2,15 +2,10 @@
   <Modal ref="modal" header="Create a project">
     <div class="modal-creation universal-labels">
       <div class="markdown-body">
-        <p>
-          New projects are created as drafts and can be found under your profile
-          page.
-        </p>
+        <p>New projects are created as drafts and can be found under your profile page.</p>
       </div>
       <label for="project-type">
-        <span class="label__title"
-          >Project type<span class="required">*</span></span
-        >
+        <span class="label__title">Project type<span class="required">*</span></span>
       </label>
       <Chips
         id="project-type"
@@ -34,9 +29,7 @@
       </label>
       <div class="text-input-wrapper">
         <div class="text-input-wrapper__before">
-          https://modrinth.com/{{
-            getProjectType() ? getProjectType().id : '???'
-          }}/
+          https://modrinth.com/{{ getProjectType() ? getProjectType().id : '???' }}/
         </div>
         <input
           id="slug"
@@ -50,16 +43,11 @@
       <label for="additional-information">
         <span class="label__title">Summary<span class="required">*</span></span>
         <span class="label__description"
-          >This appears in search and on the sidebar of your project's
-          page.</span
+          >This appears in search and on the sidebar of your project's page.</span
         >
       </label>
       <div class="textarea-wrapper">
-        <textarea
-          id="additional-information"
-          v-model="description"
-          maxlength="256"
-        />
+        <textarea id="additional-information" v-model="description" maxlength="256" />
       </div>
       <div class="push-right input-group">
         <button class="iconified-button" @click="cancel">
@@ -76,13 +64,12 @@
 </template>
 
 <script>
-import CrossIcon from '~/assets/images/utils/x.svg?inline'
-import CheckIcon from '~/assets/images/utils/right-arrow.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg'
+import CheckIcon from '~/assets/images/utils/right-arrow.svg'
 import Modal from '~/components/ui/Modal'
 import Chips from '~/components/ui/Chips'
 
 export default {
-  name: 'ModalCreation',
   components: {
     Chips,
     CrossIcon,
@@ -144,7 +131,7 @@ export default {
       }
     },
     async createProject() {
-      this.$nuxt.$loading.start()
+      startLoading()
 
       const projectType = this.getProjectType()
 
@@ -175,12 +162,11 @@ export default {
       )
 
       try {
-        await this.$axios({
-          url: 'project',
+        await useBaseFetch('project', {
           method: 'POST',
-          data: formData,
+          body: formData,
           headers: {
-            'Content-Type': 'multipart/form-data',
+            'Content-Disposition': formData,
             Authorization: this.$auth.token,
           },
         })
@@ -191,6 +177,8 @@ export default {
           params: {
             type: projectType.id,
             id: this.slug,
+          },
+          state: {
             overrideProjectType: projectType.id,
           },
         })
@@ -198,11 +186,11 @@ export default {
         this.$notify({
           group: 'main',
           title: 'An error occurred',
-          text: err.response.data.description,
+          text: err.data.description,
           type: 'error',
         })
       }
-      this.$nuxt.$loading.finish()
+      stopLoading()
     },
     show() {
       this.projectType = this.$tag.projectTypes[0].display

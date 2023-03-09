@@ -4,8 +4,7 @@
       $auth.user &&
       currentMember &&
       nags.filter((x) => x.condition).length > 0 &&
-      (project.status === 'draft' ||
-        $tag.rejectedStatuses.includes(project.status))
+      (project.status === 'draft' || $tag.rejectedStatuses.includes(project.status))
     "
     class="author-actions universal-card"
   >
@@ -19,6 +18,7 @@
               v-for="nag in nags"
               :key="`checklist-${nag.id}`"
               v-tooltip="nag.title"
+              :aria-label="nag.title"
               class="circle"
               :class="'circle ' + (!nag.condition ? 'done ' : '') + nag.status"
             >
@@ -41,25 +41,24 @@
       </div>
     </div>
     <div v-if="!collapsed" class="grid-display width-16">
-      <div
-        v-for="nag in nags.filter((x) => x.condition)"
-        :key="nag.id"
-        class="grid-display__item"
-      >
+      <div v-for="nag in nags.filter((x) => x.condition)" :key="nag.id" class="grid-display__item">
         <span class="label">
           <RequiredIcon
             v-if="nag.status === 'required'"
             v-tooltip="'Required'"
+            aria-label="Required"
             :class="nag.status"
           />
           <SuggestionIcon
             v-else-if="nag.status === 'suggestion'"
             v-tooltip="'Suggestion'"
+            aria-label="Suggestion"
             :class="nag.status"
           />
           <ModerationIcon
             v-else-if="nag.status === 'review'"
             v-tooltip="'Review'"
+            aria-label="Review"
             :class="nag.status"
           />{{ nag.title }}</span
         >
@@ -71,6 +70,7 @@
             $tag.rejectedStatuses.includes(project.status)
           "
           v-model="acknowledgedMessage"
+          description="Acknowledge staff message in sidebar"
         >
           I acknowledge that I have addressed the staff's message on the sidebar
         </Checkbox>
@@ -78,15 +78,12 @@
           v-if="nag.link"
           :class="{ invisible: nag.link.hide }"
           class="goto-link"
-          :to="`/${project.project_type}/${
-            project.slug ? project.slug : project.id
-          }/${nag.link.path}`"
+          :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/${
+            nag.link.path
+          }`"
         >
           {{ nag.link.title }}
-          <ChevronRightIcon
-            class="featured-header-chevron"
-            aria-hidden="true"
-          />
+          <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
         </NuxtLink>
         <button
           v-else-if="nag.action"
@@ -103,17 +100,16 @@
 </template>
 
 <script>
-import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg?inline'
-import DropdownIcon from '~/assets/images/utils/dropdown.svg?inline'
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
-import RequiredIcon from '~/assets/images/utils/asterisk.svg?inline'
-import SuggestionIcon from '~/assets/images/utils/lightbulb.svg?inline'
-import ModerationIcon from '~/assets/images/sidebar/admin.svg?inline'
-import SendIcon from '~/assets/images/utils/send.svg?inline'
+import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
+import DropdownIcon from '~/assets/images/utils/dropdown.svg'
+import CheckIcon from '~/assets/images/utils/check.svg'
+import RequiredIcon from '~/assets/images/utils/asterisk.svg'
+import SuggestionIcon from '~/assets/images/utils/lightbulb.svg'
+import ModerationIcon from '~/assets/images/sidebar/admin.svg'
+import SendIcon from '~/assets/images/utils/send.svg'
 import Checkbox from '~/components/ui/Checkbox'
 
 export default {
-  name: 'ProjectPublishingChecklist',
   components: {
     Checkbox,
     ChevronRightIcon,
@@ -131,7 +127,9 @@ export default {
     },
     versions: {
       type: Array,
-      required: true,
+      default() {
+        return []
+      },
     },
     currentMember: {
       type: Object,
@@ -189,8 +187,7 @@ export default {
       return [
         {
           condition:
-            this.project.body === '' ||
-            this.project.body.startsWith('# Placeholder description'),
+            this.project.body === '' || this.project.body.startsWith('# Placeholder description'),
           title: 'Add a description',
           id: 'add-description',
           description:
@@ -219,8 +216,7 @@ export default {
           condition: !this.featuredGalleryImage,
           title: 'Feature a gallery image',
           id: 'feature-gallery-image',
-          description:
-            'Featured gallery images may be the first impression for many users.',
+          description: 'Featured gallery images may be the first impression of many users.',
           status: 'suggestion',
           link: {
             path: 'gallery',
@@ -232,8 +228,7 @@ export default {
           condition: this.versions.length < 1,
           title: 'Upload a version',
           id: 'upload-version',
-          description:
-            'At least one version is required for a project to be submitted for review.',
+          description: 'At least one version is required for a project to be submitted for review.',
           status: 'required',
           link: {
             path: 'versions',
@@ -279,8 +274,7 @@ export default {
             this.project.project_type === 'shader' ||
             this.project.project_type === 'datapack',
           condition:
-            this.project.client_side === 'unknown' ||
-            this.project.server_side === 'unknown',
+            this.project.client_side === 'unknown' || this.project.server_side === 'unknown',
           title: 'Select supported environments',
           id: 'select-environments',
           description: `Select if the ${this.$formatProjectType(
@@ -320,8 +314,7 @@ export default {
             onClick: this.submitForReview,
             title: 'Submit for review',
             disabled: () =>
-              this.nags.filter((x) => x.condition && x.status === 'required')
-                .length > 0,
+              this.nags.filter((x) => x.condition && x.status === 'required').length > 0,
           },
         },
         {
@@ -339,8 +332,7 @@ export default {
             title: 'Resubmit for review',
             disabled: () =>
               !this.acknowledgedMessage ||
-              this.nags.filter((x) => x.condition && x.status === 'required')
-                .length > 0,
+              this.nags.filter((x) => x.condition && x.status === 'required').length > 0,
           },
         },
       ]
@@ -380,8 +372,7 @@ export default {
     async submitForReview() {
       if (
         !this.acknowledgedMessage ||
-        this.nags.filter((x) => x.condition && x.status === 'required')
-          .length === 0
+        this.nags.filter((x) => x.condition && x.status === 'required').length === 0
       ) {
         await this.setProcessing()
       }

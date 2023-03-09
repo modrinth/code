@@ -1,16 +1,10 @@
 <template>
   <span :class="'version-badge ' + color + ' type--' + type">
-    <template v-if="color">
-      <span class="circle" /> {{ $capitalizeString(type) }}
-    </template>
+    <template v-if="color"> <span class="circle" /> {{ $capitalizeString(type) }} </template>
 
     <!-- User roles -->
-    <template v-else-if="type === 'admin'">
-      <ModrinthIcon /> Modrinth Team
-    </template>
-    <template v-else-if="type === 'moderator'">
-      <ModeratorIcon /> Moderator
-    </template>
+    <template v-else-if="type === 'admin'"> <ModrinthIcon /> Modrinth Team </template>
+    <template v-else-if="type === 'moderator'"> <ModeratorIcon /> Moderator </template>
     <template v-else-if="type === 'creator'"><CreatorIcon /> Creator</template>
 
     <!-- Project statuses -->
@@ -18,45 +12,34 @@
     <template v-else-if="type === 'unlisted'"><EyeOffIcon /> Unlisted</template>
     <template v-else-if="type === 'withheld'"><EyeOffIcon /> Withheld</template>
     <template v-else-if="type === 'private'"><LockIcon /> Private</template>
-    <template v-else-if="type === 'scheduled'">
-      <CalendarIcon /> Scheduled
-    </template>
+    <template v-else-if="type === 'scheduled'"> <CalendarIcon /> Scheduled </template>
     <template v-else-if="type === 'draft'"><DraftIcon /> Draft</template>
-    <template v-else-if="type === 'archived'">
-      <ArchiveIcon /> Archived
-    </template>
+    <template v-else-if="type === 'archived'"> <ArchiveIcon /> Archived </template>
     <template v-else-if="type === 'rejected'"><CrossIcon /> Rejected</template>
-    <template v-else-if="type === 'processing'">
-      <ProcessingIcon /> Under review
-    </template>
+    <template v-else-if="type === 'processing'"> <ProcessingIcon /> Under review </template>
 
     <!-- Team members -->
     <template v-else-if="type === 'accepted'"><CheckIcon /> Accepted</template>
-    <template v-else-if="type === 'pending'">
-      <ProcessingIcon /> Pending
-    </template>
-    <template v-else>
-      <span class="circle" /> {{ $capitalizeString(type) }}
-    </template>
+    <template v-else-if="type === 'pending'"> <ProcessingIcon /> Pending </template>
+    <template v-else> <span class="circle" /> {{ $capitalizeString(type) }} </template>
   </span>
 </template>
 
 <script>
-import ModrinthIcon from '~/assets/images/logo.svg?inline'
-import ModeratorIcon from '~/assets/images/sidebar/admin.svg?inline'
-import CreatorIcon from '~/assets/images/utils/box.svg?inline'
-import ListIcon from '~/assets/images/utils/list.svg?inline'
-import EyeOffIcon from '~/assets/images/utils/eye-off.svg?inline'
-import DraftIcon from '~/assets/images/utils/file-text.svg?inline'
-import CrossIcon from '~/assets/images/utils/x.svg?inline'
-import ArchiveIcon from '~/assets/images/utils/archive.svg?inline'
-import ProcessingIcon from '~/assets/images/utils/updated.svg?inline'
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
-import LockIcon from '~/assets/images/utils/lock.svg?inline'
-import CalendarIcon from '~/assets/images/utils/calendar.svg?inline'
+import ModrinthIcon from '~/assets/images/logo.svg'
+import ModeratorIcon from '~/assets/images/sidebar/admin.svg'
+import CreatorIcon from '~/assets/images/utils/box.svg'
+import ListIcon from '~/assets/images/utils/list.svg'
+import EyeOffIcon from '~/assets/images/utils/eye-off.svg'
+import DraftIcon from '~/assets/images/utils/file-text.svg'
+import CrossIcon from '~/assets/images/utils/x.svg'
+import ArchiveIcon from '~/assets/images/utils/archive.svg'
+import ProcessingIcon from '~/assets/images/utils/updated.svg'
+import CheckIcon from '~/assets/images/utils/check.svg'
+import LockIcon from '~/assets/images/utils/lock.svg'
+import CalendarIcon from '~/assets/images/utils/calendar.svg'
 
 export default {
-  name: 'Badge',
   components: {
     ModrinthIcon,
     ListIcon,

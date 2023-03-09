@@ -3,18 +3,16 @@
     <div class="modal-report legacy-label-styles">
       <div class="markdown-body">
         <p>
-          Modding should be safe for everyone, so we take abuse and malicious
-          intent seriously at Modrinth. We want to hear about harmful content on
-          the site that violates our
-          <nuxt-link to="/legal/terms">ToS</nuxt-link> and
-          <nuxt-link to="/legal/rules">Rules</nuxt-link>. Rest assured, we’ll
-          keep your identifying information private.
+          Modding should be safe for everyone, so we take abuse and malicious intent seriously at
+          Modrinth. We want to hear about harmful content on the site that violates our
+          <nuxt-link to="/legal/terms"> ToS </nuxt-link> and
+          <nuxt-link to="/legal/rules"> Rules </nuxt-link>. Rest assured, we’ll keep your
+          identifying information private.
         </p>
         <p v-if="itemType === 'project' || itemType === 'version'">
-          Please <strong>do not</strong> use this to report bugs with the
-          project itself. This form is only for submitting a report to Modrinth
-          staff. If the project has an Issues link or a Discord invite, consider
-          reporting it there.
+          Please <strong>do not</strong> use this to report bugs with the project itself. This form
+          is only for submitting a report to Modrinth staff. If the project has an Issues link or a
+          Discord invite, consider reporting it there.
         </p>
       </div>
       <label class="report-label" for="report-type">
@@ -25,10 +23,8 @@
       <multiselect
         id="report-type"
         v-model="reportType"
-        :options="$store.state.tag.reportTypes"
-        :custom-label="
-          (value) => value.charAt(0).toUpperCase() + value.slice(1)
-        "
+        :options="$tag.reportTypes"
+        :custom-label="(value) => value.charAt(0).toUpperCase() + value.slice(1)"
         :multiple="false"
         :searchable="false"
         :show-no-results="false"
@@ -37,26 +33,14 @@
       />
       <label class="report-label" for="additional-information">
         <strong>Additional information</strong>
-        <span>
-          Include links and images if possible. Markdown formatting is
-          supported.
-        </span>
+        <span> Include links and images if possible. Markdown formatting is supported. </span>
       </label>
       <div class="textarea-wrapper">
-        <Chips
-          v-model="bodyViewType"
-          class="separator"
-          :items="['source', 'preview']"
-        />
+        <Chips v-model="bodyViewType" class="separator" :items="['source', 'preview']" />
         <div v-if="bodyViewType === 'source'" class="textarea-wrapper">
           <textarea id="body" v-model="body" spellcheck="true" />
         </div>
-        <div
-          v-else
-          v-highlightjs
-          class="preview"
-          v-html="$xss($md.render(body))"
-        ></div>
+        <div v-else class="preview" v-html="renderString(body)" />
       </div>
       <div class="button-group">
         <button class="iconified-button" @click="cancel">
@@ -74,13 +58,13 @@
 
 <script>
 import Multiselect from 'vue-multiselect'
-import CrossIcon from '~/assets/images/utils/x.svg?inline'
-import CheckIcon from '~/assets/images/utils/check.svg?inline'
+import CrossIcon from '~/assets/images/utils/x.svg'
+import CheckIcon from '~/assets/images/utils/check.svg'
 import Modal from '~/components/ui/Modal'
 import Chips from '~/components/ui/Chips'
+import { renderString } from '~/helpers/parse'
 
 export default {
-  name: 'ModalReport',
   components: {
     Chips,
     CrossIcon,
@@ -106,6 +90,7 @@ export default {
     }
   },
   methods: {
+    renderString,
     cancel() {
       this.reportType = ''
       this.body = ''
@@ -114,7 +99,7 @@ export default {
       this.$refs.modal.hide()
     },
     async submitReport() {
-      this.$nuxt.$loading.start()
+      startLoading()
       try {
         const data = {
           report_type: this.reportType,
@@ -122,18 +107,22 @@ export default {
           item_type: this.itemType,
           body: this.body,
         }
-        await this.$axios.post('report', data, this.$defaultHeaders())
+        await useBaseFetch('report', {
+          method: 'POST',
+          body: data,
+          ...this.$defaultHeaders(),
+        })
 
         this.$refs.modal.hide()
       } catch (err) {
         this.$notify({
           group: 'main',
           title: 'An error occurred',
-          text: err.response.data.description,
+          text: err.data.description,
           type: 'error',
         })
       }
-      this.$nuxt.$loading.finish()
+      stopLoading()
     },
     show() {
       this.$refs.modal.show()

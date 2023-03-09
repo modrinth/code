@@ -1,5 +1,5 @@
 <template>
-  <nav class="navigation" :class="{ 'use-animation': useAnimation }">
+  <nav class="navigation">
     <NuxtLink
       v-for="(link, index) in filteredLinks"
       v-show="link.shown === undefined ? true : link.shown"
@@ -7,32 +7,24 @@
       ref="linkElements"
       :to="query ? (link.href ? `?${query}=${link.href}` : '?') : link.href"
       class="nav-link button-animation"
-      :class="{ 'is-active': index === activeIndex }"
     >
       <span>{{ link.label }}</span>
     </NuxtLink>
-
     <div
       class="nav-indicator"
-      :style="`visibility: ${
-        useAnimation && activeIndex !== -1 ? 'visible' : 'hidden'
-      }; left: ${indicator.left}px; right: ${indicator.right}px;
-          top: ${indicator.top}px; transition: left 350ms ${
-        indicator.direction === 'left'
-          ? 'cubic-bezier(1,0,.3,1) -140ms'
-          : 'cubic-bezier(.75,-0.01,.24,.99) -40ms'
-      },right 350ms ${
-        indicator.direction === 'right'
-          ? 'cubic-bezier(1,0,.3,1) -140ms'
-          : 'cubic-bezier(.75,-0.01,.24,.99) -40ms'
-      }, top 100ms ease-in-out`"
-    />
+      :style="{
+        left: positionToMoveX,
+        top: positionToMoveY,
+        width: sliderWidth,
+        opacity: activeIndex === -1 ? 0 : 1,
+      }"
+      aria-hidden="true"
+    ></div>
   </nav>
 </template>
 
 <script>
 export default {
-  name: 'NavRow',
   props: {
     links: {
       default: () => [],
@@ -45,20 +37,25 @@ export default {
   },
   data() {
     return {
-      useAnimation: false,
-      oldIndex: -1,
+      sliderPositionX: 0,
+      sliderPositionY: 18,
+      selectedElementWidth: 0,
       activeIndex: -1,
-      indicator: {
-        left: 0,
-        right: 0,
-        top: 22,
-        direction: 'right',
-      },
+      oldIndex: -1,
     }
   },
   computed: {
     filteredLinks() {
       return this.links.filter((x) => (x.shown === undefined ? true : x.shown))
+    },
+    positionToMoveX() {
+      return `${this.sliderPositionX}px`
+    },
+    positionToMoveY() {
+      return `${this.sliderPositionY}px`
+    },
+    sliderWidth() {
+      return `${this.selectedElementWidth}px`
     },
   },
   watch: {
@@ -74,53 +71,34 @@ export default {
     },
   },
   mounted() {
+    window.addEventListener('resize', this.pickLink)
     this.pickLink()
+  },
+  unmounted() {
+    window.removeEventListener('resize', this.pickLink)
   },
   methods: {
     pickLink() {
-      if (this.oldIndex === -1) {
-        this.useAnimation = false
-
-        setTimeout(() => {
-          this.useAnimation = true
-        }, 300)
-      }
-
       this.activeIndex = this.query
         ? this.filteredLinks.findIndex(
-            (x) =>
-              (x.href === '' ? undefined : x.href) ===
-              this.$route.query[this.query]
+            (x) => (x.href === '' ? undefined : x.href) === this.$route.path[this.query]
           )
-        : this.filteredLinks.findIndex(
-            (x) => x.href === decodeURIComponent(this.$route.path)
-          )
+        : this.filteredLinks.findIndex((x) => x.href === decodeURIComponent(this.$route.path))
 
       if (this.activeIndex !== -1) {
         this.startAnimation()
       } else {
         this.oldIndex = -1
+        this.sliderPositionX = 0
+        this.selectedElementWidth = 0
       }
     },
     startAnimation() {
-      if (this.$refs.linkElements[this.activeIndex]) {
-        this.indicator.direction =
-          this.activeIndex < this.oldIndex ? 'left' : 'right'
+      const el = this.$refs.linkElements[this.activeIndex].$el
 
-        this.indicator.left =
-          this.$refs.linkElements[this.activeIndex].$el.offsetLeft
-        this.indicator.right =
-          this.$refs.linkElements[this.activeIndex].$el.parentElement
-            .offsetWidth -
-          this.$refs.linkElements[this.activeIndex].$el.offsetLeft -
-          this.$refs.linkElements[this.activeIndex].$el.offsetWidth
-        this.indicator.top =
-          this.$refs.linkElements[this.activeIndex].$el.offsetTop +
-          this.$refs.linkElements[this.activeIndex].$el.offsetHeight +
-          1
-      }
-
-      this.oldIndex = this.activeIndex
+      this.sliderPositionX = el.offsetLeft
+      this.sliderPositionY = el.offsetTop + el.offsetHeight
+      this.selectedElementWidth = el.offsetWidth
     },
   },
 }
@@ -141,19 +119,6 @@ export default {
     color: var(--color-text);
     position: relative;
 
-    &::after {
-      content: '';
-      display: block;
-      position: absolute;
-      bottom: -5px;
-      width: 100%;
-      border-radius: var(--size-rounded-max);
-      height: 0.25rem;
-      transition: opacity 0.1s ease-in-out;
-      background-color: var(--color-brand);
-      opacity: 0;
-    }
-
     &:hover {
       color: var(--color-text);
 
@@ -166,7 +131,7 @@ export default {
       opacity: 0.2;
     }
 
-    &.is-active {
+    &.router-link-exact-active {
       color: var(--color-text);
 
       &::after {
@@ -186,11 +151,12 @@ export default {
   .nav-indicator {
     position: absolute;
     height: 0.25rem;
+    bottom: -5px;
+    left: 0;
+    width: 3rem;
+    transition: all ease-in-out 0.2s;
     border-radius: var(--size-rounded-max);
     background-color: var(--color-brand);
-    transition-property: left, right, top;
-    transition-duration: 350ms;
-    visibility: hidden;
 
     @media (prefers-reduced-motion) {
       transition: none !important;

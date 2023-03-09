@@ -9,11 +9,10 @@
     </section>
     <section class="universal-card">
       <h2 class="title">Enrollment</h2>
-      <template v-if="!enrolled && !$auth.user.email">
+      <template v-if="!enrolled && !auth.user.email">
         <p v-if="!enrolled">
-          You are not currently enrolled in Modrinth's Creator Monetization
-          Program. In order to enroll, you must first add a valid email address
-          to your account.
+          You are not currently enrolled in Modrinth's Creator Monetization Program. In order to
+          enroll, you must first add a valid email address to your account.
         </p>
         <NuxtLink class="iconified-button" to="/settings/account">
           <SettingsIcon /> Visit account settings
@@ -21,9 +20,8 @@
       </template>
       <template v-else-if="editing || !enrolled">
         <p v-if="!enrolled">
-          You are not currently enrolled in Modrinth's Creator Monetization
-          Program. Setup a method of receiving payments below to enable
-          monetization.
+          You are not currently enrolled in Modrinth's Creator Monetization Program. Setup a method
+          of receiving payments below to enable monetization.
         </p>
         <div class="enroll universal-body">
           <Chips
@@ -31,13 +29,13 @@
             :starting-value="selectedWallet"
             :items="wallets"
             :format-label="$formatWallet"
-            @input="onChangeWallet()"
+            @update:model-value="onChangeWallet()"
           />
 
           <p>
             Enter the information for the
-            {{ $formatWallet(selectedWallet) }} account you would like to
-            receive your revenue from the Creator Monetization Program:
+            {{ $formatWallet(selectedWallet) }} account you would like to receive your revenue from
+            the Creator Monetization Program:
           </p>
           <div class="input-group">
             <Multiselect
@@ -52,26 +50,20 @@
 
             <label class="hidden" for="account-input"
               >{{ $formatWallet(selectedWallet) }}
-              {{ formatAccountType(accountType).toLowerCase() }} input
-              field</label
+              {{ formatAccountType(accountType).toLowerCase() }} input field</label
             >
             <input
               id="account-input"
               v-model="account"
-              :placeholder="`Enter your ${$formatWallet(
-                selectedWallet
-              )} ${formatAccountType(accountType).toLowerCase()}...`"
+              :placeholder="`Enter your ${$formatWallet(selectedWallet)} ${formatAccountType(
+                accountType
+              ).toLowerCase()}...`"
               :type="accountType === 'email' ? 'email' : ''"
             />
-            <span v-if="accountType === 'phone'">
-              Format: +18888888888 or +1-888-888-8888
-            </span>
+            <span v-if="accountType === 'phone'"> Format: +18888888888 or +1-888-888-8888 </span>
           </div>
           <div class="input-group">
-            <button
-              class="iconified-button brand-button"
-              @click="updatePayoutData(false)"
-            >
+            <button class="iconified-button brand-button" @click="updatePayoutData(false)">
               <SaveIcon /> Save information
             </button>
             <button
@@ -100,13 +92,13 @@
 <script>
 import Multiselect from 'vue-multiselect'
 import Chips from '~/components/ui/Chips'
-import SaveIcon from '~/assets/images/utils/save.svg?inline'
-import TrashIcon from '~/assets/images/utils/trash.svg?inline'
-import EditIcon from '~/assets/images/utils/edit.svg?inline'
-import ChartIcon from '~/assets/images/utils/chart.svg?inline'
-import SettingsIcon from '~/assets/images/utils/settings.svg?inline'
+import SaveIcon from '~/assets/images/utils/save.svg'
+import TrashIcon from '~/assets/images/utils/trash.svg'
+import EditIcon from '~/assets/images/utils/edit.svg'
+import ChartIcon from '~/assets/images/utils/chart.svg'
+import SettingsIcon from '~/assets/images/utils/settings.svg'
 
-export default {
+export default defineNuxtComponent({
   components: {
     Multiselect,
     Chips,
@@ -116,19 +108,24 @@ export default {
     ChartIcon,
     SettingsIcon,
   },
+  async setup() {
+    definePageMeta({
+      middleware: 'auth',
+    })
+    const auth = await useAuth()
+    return { auth }
+  },
   data() {
     return {
       editing: false,
       enrolled:
-        this.$auth.user.payout_data.payout_wallet &&
-        this.$auth.user.payout_data.payout_wallet_type &&
-        this.$auth.user.payout_data.payout_address,
+        this.auth.user.payout_data.payout_wallet &&
+        this.auth.user.payout_data.payout_wallet_type &&
+        this.auth.user.payout_data.payout_address,
       wallets: ['paypal', 'venmo'],
-      selectedWallet: this.$auth.user.payout_data.payout_wallet ?? 'paypal',
-      accountType:
-        this.$auth.user.payout_data.payout_wallet_type ??
-        this.getAccountTypes()[0],
-      account: this.$auth.user.payout_data.payout_address ?? '',
+      selectedWallet: this.auth.user.payout_data.payout_wallet ?? 'paypal',
+      accountType: this.auth.user.payout_data.payout_wallet_type ?? this.getAccountTypes()[0],
+      account: this.auth.user.payout_data.payout_address ?? '',
     }
   },
   head: {
@@ -167,7 +164,7 @@ export default {
       }
     },
     async updatePayoutData(unenroll) {
-      this.$nuxt.$loading.start()
+      startLoading()
       if (unenroll) {
         this.selectedWallet = 'paypal'
         this.accountType = this.getAccountTypes()[0]
@@ -184,14 +181,12 @@ export default {
               },
         }
 
-        await this.$axios.patch(
-          `user/${this.$auth.user.id}`,
-          data,
-          this.$defaultHeaders()
-        )
-        await this.$store.dispatch('auth/fetchUser', {
-          token: this.$auth.token,
+        await useBaseFetch(`user/${this.auth.user.id}`, {
+          method: 'PATCH',
+          body: data,
+          ...this.$defaultHeaders(),
         })
+        await useAuth(this.auth.token)
 
         this.editing = false
         this.enrolled = !unenroll
@@ -199,13 +194,13 @@ export default {
         this.$notify({
           group: 'main',
           title: 'An error occurred',
-          text: err.response.data.description,
+          text: err.data.description,
           type: 'error',
         })
       }
-      this.$nuxt.$loading.finish()
+      stopLoading()
     },
   },
-}
+})
 </script>
 <style lang="scss" scoped></style>
