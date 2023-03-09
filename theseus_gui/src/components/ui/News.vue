@@ -31,7 +31,6 @@ const props = defineProps({
   background: var(--color-bg);
   width: 350px;
   height: 100px;
-  margin: 0.7rem 1rem;
   box-shadow: var(--shadow-raised-lg);
   cursor: pointer;
 
@@ -41,7 +40,6 @@ const props = defineProps({
 
   img {
     display: flex;
-    width: 20%;
     height: 100%;
     border-radius: 0.9rem 0 0 0.9rem;
   }
@@ -50,7 +48,7 @@ const props = defineProps({
     flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width: 80%;
+    width: 100%;
     height: 100%;
     margin: 0.9rem;
 
@@ -58,6 +56,7 @@ const props = defineProps({
       display: inherit;
       flex-direction: inherit;
       margin: 0.7rem 0;
+      width: 100%;
 
       h2 {
         font-size: 0.8rem;
