@@ -62,8 +62,7 @@ const handleRightPage = () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 2rem;
-  padding: 1rem 0;
+  padding: 1rem;
 
   &:nth-child(odd) {
     background: var(--color-raised-bg);
@@ -71,23 +70,25 @@ const handleRightPage = () => {
 
   .header {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: inherit;
-    width: 95%;
+    width: 100%;
+    margin-bottom: 1rem;
+    gap: 1rem;
 
     p {
       font-size: 1rem;
+      white-space: nowrap;
     }
 
     hr {
       background: var(--color-base);
       height: 1px;
-      width: 60%;
+      width: 100%;
       border: none;
     }
 
     .pagination {
-      width: 20%;
       display: inherit;
       align-items: inherit;
 
@@ -107,6 +108,7 @@ const handleRightPage = () => {
     display: flex;
     align-items: inherit;
     transition: all ease-in-out 0.4s;
+    gap: 1rem;
   }
 
   .mods {
