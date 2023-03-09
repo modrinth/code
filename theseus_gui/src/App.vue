@@ -6,11 +6,11 @@ import Navigation from '@/components/ui/Navigation.vue'
 import AppBar from '@/components/ui/AppBar.vue'
 import { toggleTheme } from '@/helpers/theme'
 
-const theme = useTheming()
+const themeStore = useTheming()
 
-toggleTheme(theme.darkTheme)
+toggleTheme(themeStore.darkTheme)
 
-watch(theme, (newState) => {
+watch(themeStore, (newState) => {
   toggleTheme(newState.darkTheme)
 })
 </script>

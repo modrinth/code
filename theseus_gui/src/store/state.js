@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 
-export const useTheming = defineStore('theme', {
+export const useTheming = defineStore('themeStore', {
   state: () => ({ darkTheme: true }),
   actions: {
     toggleTheme() {
@@ -9,8 +9,8 @@ export const useTheming = defineStore('theme', {
   },
 })
 
-export const useInstances = defineStore('instances', {
-  state: () => ({ instances: [] }),
+export const useInstances = defineStore('instanceStore', {
+  state: () => ({ instances: [], filter: '' }),
   actions: {
     fetchInstances() {
       // Fetch from backend.
@@ -96,10 +96,26 @@ export const useInstances = defineStore('instances', {
 
       this.instances = [...instances]
     },
+    setFilter(newFilter) {
+      this.filter = newFilter
+    },
+  },
+  getters: {
+    getFilteredInstances: (state) => {
+      const filteredInstances = state.instances.filter((i) => {
+        // When time comes, do more advanced fitlering here
+        const normalizedInstanceName = i.name?.toLowerCase()
+        if (normalizedInstanceName.includes(state.filter.toLowerCase())) return i
+      })
+
+      if (filteredInstances && filteredInstances.length > 0) return filteredInstances
+
+      return state.instances
+    },
   },
 })
 
-export const useNews = defineStore('news', {
+export const useNews = defineStore('newsStore', {
   state: () => ({ news: [] }),
   actions: {
     fetchNews() {

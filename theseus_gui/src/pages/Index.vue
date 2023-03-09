@@ -2,21 +2,21 @@
 import { useInstances, useNews } from '@/store/state'
 import RowDisplay from '@/components/RowDisplay.vue'
 
-const instances = useInstances()
-const news = useNews()
-instances.fetchInstances()
-news.fetchNews()
+const instanceStore = useInstances()
+const newsStore = useNews()
+instanceStore.fetchInstances()
+newsStore.fetchNews()
 
-const recentInstances = instances.instances.filter((i) => i.downloads <= 50)
-const popularInstances = instances.instances.filter((i) => i.downloads > 50)
-const trendingMods = instances.instances.filter((i) => i.trending)
+const recentInstances = instanceStore.instances.filter((i) => i.downloads <= 50)
+const popularInstances = instanceStore.instances.filter((i) => i.downloads > 50)
+const trendingMods = instanceStore.instances.filter((i) => i.trending)
 </script>
 
 <template>
   <div class="page-container">
     <RowDisplay label="Jump back in" :instances="recentInstances" />
     <RowDisplay label="Popular packs" :instances="popularInstances" />
-    <RowDisplay label="News & updates" :news="news.news" />
+    <RowDisplay label="News & updates" :news="newsStore.news" />
     <RowDisplay label="Trending mods" :instances="trendingMods" />
   </div>
 </template>

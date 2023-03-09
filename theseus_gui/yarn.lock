@@ -137,6 +137,18 @@
   resolved "https://registry.yarnpkg.com/@eslint/js/-/js-8.35.0.tgz#b7569632b0b788a0ca0e438235154e45d42813a7"
   integrity sha512-JXdzbRiWclLVoD8sNUjR443VVlYqiYmDVT6rGUEIEHU5YJW0gaVZwV2xgM7D4arkvASqD0IlLUVjHiFuxaftRw==
 
+"@floating-ui/core@^0.3.0":
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/@floating-ui/core/-/core-0.3.1.tgz#3dde0ad0724d4b730567c92f49f0950910e18871"
+  integrity sha512-ensKY7Ub59u16qsVIFEo2hwTCqZ/r9oZZFh51ivcLGHfUwTn8l1Xzng8RJUe91H/UP8PeqeBronAGx0qmzwk2g==
+
+"@floating-ui/dom@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@floating-ui/dom/-/dom-0.1.10.tgz#ce304136a52c71ef157826d2ebf52d68fa2deed5"
+  integrity sha512-4kAVoogvQm2N0XE0G6APQJuCNuErjOfPW8Ux7DFxh8+AfugWflwVJ5LDlHOwrwut7z/30NUvdtHzQ3zSip4EzQ==
+  dependencies:
+    "@floating-ui/core" "^0.3.0"
+
 "@humanwhocodes/config-array@^0.11.8":
   version "0.11.8"
   resolved "https://registry.yarnpkg.com/@humanwhocodes/config-array/-/config-array-0.11.8.tgz#03595ac2075a4dc0f191cc2131de14fbd7d410b9"
@@ -535,6 +547,11 @@ csstype@^2.6.8:
   resolved "https://registry.yarnpkg.com/csstype/-/csstype-2.6.21.tgz#2efb85b7cc55c80017c66a5ad7cbd931fda3a90e"
   integrity sha512-Z1PhmomIfypOpoMjRQB70jfvy/wxT50qW08YXO5lMIJkrdq4yOTR+AW7FqutScmB9NkLwxo+jU+kZLbofZZq/w==
 
+dayjs@^1.11.7:
+  version "1.11.7"
+  resolved "https://registry.yarnpkg.com/dayjs/-/dayjs-1.11.7.tgz#4b296922642f70999544d1144a2c25730fce63e2"
+  integrity sha512-+Yw9U6YO5TQohxLcIkrXBeY73WP3ejHWVvx8XCk3gxvQDCTEmS48ZrSZCKciI7Bhl/uCMyxYtE9UqRILmFphkQ==
+
 debug@^4.1.1, debug@^4.3.2, debug@^4.3.4:
   version "4.3.4"
   resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.4.tgz#1319f6579357f2338d3337d2cdd4914bb5dcc865"
@@ -775,6 +792,14 @@ flatted@^3.1.0:
   version "3.2.7"
   resolved "https://registry.yarnpkg.com/flatted/-/flatted-3.2.7.tgz#609f39207cb614b89d0765b477cb2d437fbf9787"
   integrity sha512-5nqDSxl8nn5BSNxyR3n4I6eDmbolI6WT+QqR547RwxQapgjQBmtktdP+HTBb/a/zLsbzERTONyUB5pefh5TtjQ==
+
+floating-vue@^2.0.0-beta.20:
+  version "2.0.0-beta.20"
+  resolved "https://registry.yarnpkg.com/floating-vue/-/floating-vue-2.0.0-beta.20.tgz#c96df528afb952cdeee54f17183333ac6558628f"
+  integrity sha512-N68otcpp6WwcYC7zP8GeJqNZVdfvS7tEY88lwmuAHeqRgnfWx1Un8enzLxROyVnBDZ3TwUoUdj5IFg+bUT7JeA==
+  dependencies:
+    "@floating-ui/dom" "^0.1.10"
+    vue-resize "^2.0.0-alpha.1"
 
 follow-redirects@^1.15.0:
   version "1.15.2"
@@ -1039,11 +1064,13 @@ nth-check@^2.0.1:
   dependencies:
     boolbase "^1.0.0"
 
-omorphia@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/omorphia/-/omorphia-0.0.1.tgz#f5d6c81e881dd472945ad94f66198e19c89c480b"
-  integrity sha512-F56heLS86DXkQQaf5ISyz5WIWvwtFLS9vL5YenLveojmUQ7T7UHIluZV99KPFuAcwFnLrckME7YkNeahKSsNqg==
+omorphia@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/omorphia/-/omorphia-0.3.0.tgz#a6a5a70c1f466c64b62f787884e6ed05a3fe678d"
+  integrity sha512-HmLZtoNXYBZQ8tAV2hBQbhCWzZVy6puEy7z6oadb4N4xeQF8/vFxtnmxjVH0JNnZmTVOJwSsn+3YhkGVK6R/lw==
   dependencies:
+    dayjs "^1.11.7"
+    floating-vue "^2.0.0-beta.20"
     vue "^3.2.45"
     vue-router "^4.1.6"
 
@@ -1372,6 +1399,11 @@ vue-eslint-parser@^9.0.1:
     esquery "^1.4.0"
     lodash "^4.17.21"
     semver "^7.3.6"
+
+vue-resize@^2.0.0-alpha.1:
+  version "2.0.0-alpha.1"
+  resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-2.0.0-alpha.1.tgz#43eeb79e74febe932b9b20c5c57e0ebc14e2df3a"
+  integrity sha512-7+iqOueLU7uc9NrMfrzbG8hwMqchfVfSzpVlCMeJQe4pyibqyoifDNbKTZvwxZKDvGkB+PdFeKvnGZMoEb8esg==
 
 vue-router@4, vue-router@^4.1.6:
   version "4.1.6"

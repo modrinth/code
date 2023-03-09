@@ -14,10 +14,10 @@ import SideNav from '@/components/SideNav.vue'
 import UserSection from '@/components/ui/UserSection.vue'
 import Instance from '@/components/ui/Instance.vue'
 
-const theme = useTheming()
-const instances = useInstances()
+const themeStore = useTheming()
+const instanceStore = useInstances()
 
-instances.fetchInstances()
+instanceStore.fetchInstances()
 </script>
 
 <template>
@@ -45,7 +45,7 @@ instances.fetchInstances()
     </div>
     <div class="instance-list">
       <p>Instances</p>
-      <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
+      <Instance v-for="instance in instanceStore.instances" display="list" :instance="instance" />
     </div>
     <RouterLink
       to="/add-instance"
@@ -62,8 +62,8 @@ instances.fetchInstances()
         class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
         ><SettingsIcon /> Settings</RouterLink
       >
-      <SunIcon v-if="!theme.darkTheme" @click="theme.toggleTheme()" class="theme-icon" />
-      <MoonIcon v-else @click="theme.toggleTheme()" class="theme-icon" />
+      <SunIcon v-if="!themeStore.darkTheme" @click="themeStore.toggleTheme()" class="theme-icon" />
+      <MoonIcon v-else @click="themeStore.toggleTheme()" class="theme-icon" />
     </div>
   </SideNav>
 </template>
