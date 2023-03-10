@@ -1,4 +1,4 @@
-import TOML from 'toml'
+import TOML from '@ltd/j-toml'
 import JSZip from 'jszip'
 import yaml from 'js-yaml'
 

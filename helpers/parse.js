@@ -103,8 +103,9 @@ export const md = (options = {}) => {
     if (index !== -1) {
       const src = token.attrs[index][1]
 
-      const url = new URL(src)
       try {
+        const url = new URL(src)
+
         const allowedHostnames = [
           'i.imgur.com',
           'cdn-raw.modrinth.com',

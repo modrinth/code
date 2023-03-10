@@ -5,8 +5,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.provide('defaultHeaders', () => {
     const obj = { headers: {} }
 
-    if (process.server && process.env.RATE_LIMIT_IGNORE_KEY) {
-      obj.headers['x-ratelimit-key'] = process.env.RATE_LIMIT_IGNORE_KEY || ''
+    if (process.server) {
+      const config = useRuntimeConfig()
+      if (config.rateLimitKey) {
+        obj.headers['x-ratelimit-key'] = config.rateLimitKey || ''
+      }
     }
 
     if (authStore.user) {
