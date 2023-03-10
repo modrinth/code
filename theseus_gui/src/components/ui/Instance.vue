@@ -1,33 +1,32 @@
 <script setup>
 import { Card } from 'omorphia'
+import { RouterLink } from 'vue-router'
 
 const props = defineProps({
   display: String,
   instance: Object,
 })
 
-const handleInstanceClick = (id) => {
-  console.log(id)
-}
 </script>
 
 <template>
   <div>
-    <div
-      @click="handleInstanceClick(props.instance.id)"
-      class="instance-list-item"
-      v-if="display === 'list'"
-    >
-      <p>{{ props.instance.name }}</p>
-    </div>
-    <div class="instance-gallery-item" v-else-if="display === 'gallery'">
-      <p>{{ props.instance.version }}</p>
-      <p>{{ props.instance.name }}</p>
-    </div>
-    <Card class="instance-card-item" v-else-if="display === 'card'">
-      <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
-      <p>{{ props.instance.name }}</p>
-    </Card>
+    <RouterLink to="/instance/{{ props.instance.id }}">
+      <div
+          class="instance-list-item"
+          v-if="display === 'list'"
+      >
+        <p>{{ props.instance.name }}</p>
+      </div>
+      <div class="instance-gallery-item" v-else-if="display === 'gallery'">
+        <p>{{ props.instance.version }}</p>
+        <p>{{ props.instance.name }}</p>
+      </div>
+      <Card class="instance-card-item" v-else-if="display === 'card'">
+        <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
+        <p>{{ props.instance.name }}</p>
+      </Card>
+    </RouterLink>
   </div>
 </template>
 
@@ -49,8 +48,8 @@ const handleInstanceClick = (id) => {
 }
 
 .instance-gallery-item {
-  width: 110px;
-  height: 110px;
+  width: 9rem;
+  height: 9rem;
   background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
   background-position: center;
   background-size: cover;

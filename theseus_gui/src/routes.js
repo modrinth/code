@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
+import * as Instance from '@/pages/instance'
 
 /**
  * Configures application routing. Add page to pages/index and then add to route table here.
@@ -37,5 +38,10 @@ export default new createRouter({
       name: 'Settings',
       component: Pages.Settings,
     },
+    {
+      path: '/instance/:id',
+      name: 'Instance',
+      component: Instance.Index,
+    }
   ],
 })
