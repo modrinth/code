@@ -2,18 +2,49 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import News from '@/components/ui/News.vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps({
   instances: Array,
   news: Array,
   label: String,
+  canPaginate: Boolean,
 })
+
+const allowPagination = ref(false)
+const modsRow = ref(null)
+const newsRow = ref(null)
+const trendingRow = ref(null)
 
 const shouldRenderNormalInstances =
   props.instances && props.instances?.length !== 0 && props.instances?.some((i) => !i.trending)
 const shouldRenderNews = props.news && props.news?.length !== 0
 const shouldRenderTrending =
   props.instances && props.instances?.length !== 0 && props.instances?.every((i) => i.trending)
+
+const handlePaginationDisplay = () => {
+  let parentsRow
+  if (shouldRenderNormalInstances) parentsRow = modsRow.value
+  if (shouldRenderNews) parentsRow = newsRow.value
+  else if (shouldRenderTrending) parentsRow = trendingRow.value
+
+  if (!parentsRow) return
+
+  const children = parentsRow.children
+  const lastChild = children[children.length - 1]
+  const childBox = lastChild.getBoundingClientRect()
+
+  if (childBox.x + childBox.width > window.innerWidth) allowPagination.value = true
+  else allowPagination.value = false
+}
+
+onMounted(() => {
+  if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
+})
+
+onUnmounted(() => {
+  if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
+})
 
 const handleLeftPage = () => {
   console.log('page left')
@@ -29,12 +60,12 @@ const handleRightPage = () => {
     <div class="header">
       <p>{{ props.label }}</p>
       <hr aria-hidden="true" />
-      <div class="pagination">
+      <div v-if="allowPagination" class="pagination">
         <ChevronLeftIcon @click="handleLeftPage" />
         <ChevronRightIcon @click="handleRightPage" />
       </div>
     </div>
-    <section class="mods" v-if="shouldRenderNormalInstances">
+    <section ref="modsRow" class="mods" v-if="shouldRenderNormalInstances">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
@@ -42,10 +73,10 @@ const handleRightPage = () => {
         :instance="instance"
       />
     </section>
-    <section class="news" v-else-if="shouldRenderNews">
+    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
       <News v-for="news in props.news" :key="news.id" :news="news" />
     </section>
-    <section class="trending" v-else-if="shouldRenderTrending">
+    <section ref="trendingRow" class="trending" v-else-if="shouldRenderTrending">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
@@ -77,7 +108,7 @@ const handleRightPage = () => {
     gap: 1rem;
 
     p {
-      font-size: 1rem;
+      font-size: 0.85rem;
       white-space: nowrap;
     }
 
