@@ -1,6 +1,5 @@
 <script setup>
 import { Card } from 'omorphia'
-import { RouterLink } from 'vue-router'
 
 const props = defineProps({
   display: String,
@@ -11,7 +10,7 @@ const props = defineProps({
 
 <template>
   <div>
-    <RouterLink to="/instance/{{ props.instance.id }}">
+    <RouterLink :to="'/instance/' + props.instance.id">
       <div
           class="instance-list-item"
           v-if="display === 'list'"

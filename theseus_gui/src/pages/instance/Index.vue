@@ -1,17 +1,8 @@
 <template>
-{{ id }}
+{{$route.params.id}}
 </template>
-
 <script>
-export default {
-  name: "Index",
-  props: {
-    id: {
-      type: String,
-      default: null,
-    },
-  }
-}
+export default {}
 </script>
 
 <style scoped>

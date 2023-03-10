@@ -38,6 +38,7 @@ watch(theme, (newState) => {
   .view {
     height: 100%;
     margin-left: 210px;
+    background-color: var(--color-raised-bg);
   }
 }
 </style>

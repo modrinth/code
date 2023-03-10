@@ -28,7 +28,7 @@ const router = useRouter()
   width: 100%;
   height: 30px;
   border-bottom: 1px solid rgba(64, 67, 74, 0.2);
-  background: var(--color-raised-bg);
+  background: var(--color-button-bg);
 
   .navigation-controls {
     display: inherit;

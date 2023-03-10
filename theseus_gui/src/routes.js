@@ -42,6 +42,7 @@ export default new createRouter({
       path: '/instance/:id',
       name: 'Instance',
       component: Instance.Index,
+      props: true,
     }
   ],
 })

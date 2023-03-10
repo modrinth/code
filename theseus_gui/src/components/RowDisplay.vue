@@ -65,7 +65,7 @@ const handleRightPage = () => {
   padding: 1rem;
 
   &:nth-child(odd) {
-    background: var(--color-raised-bg);
+    background: rgba(22, 24, 28, 0.7);
   }
 
   .header {
@@ -77,6 +77,7 @@ const handleRightPage = () => {
     gap: 1rem;
 
     p {
+      color: var(--color-contrast);
       font-size: 1rem;
       white-space: nowrap;
     }
@@ -129,7 +130,6 @@ const handleRightPage = () => {
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 1rem;
-    height: 160px;
     margin-right: auto;
     margin-top: 0.8rem;
   }
