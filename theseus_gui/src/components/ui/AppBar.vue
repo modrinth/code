@@ -29,16 +29,17 @@ const router = useRouter()
   height: 30px;
   border-bottom: 1px solid rgba(64, 67, 74, 0.2);
   background: var(--color-button-bg);
+  padding: 1.2rem;
 
   .navigation-controls {
     display: inherit;
     align-items: inherit;
     justify-content: stretch;
     width: 30%;
-    font-size: 1.2rem;
-    margin-left: 0.5rem;
+    font-size: 0.9rem;
 
     svg {
+      width: 10.68px;
       transition: all ease-in-out 0.1s;
 
       &:hover {
