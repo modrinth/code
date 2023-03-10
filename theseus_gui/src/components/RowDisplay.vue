@@ -47,11 +47,15 @@ onUnmounted(() => {
 })
 
 const handleLeftPage = () => {
-  console.log('page left')
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 100
+  else if (shouldRenderNews) newsRow.value.scrollLeft -= 100
+  else if (shouldRenderTrending) trendingRow.value.scrollLeft -= 100
 }
 
 const handleRightPage = () => {
-  console.log('page right')
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 100
+  else if (shouldRenderNews) newsRow.value.scrollLeft += 100
+  else if (shouldRenderTrending) trendingRow.value.scrollLeft += 100
 }
 </script>
 
@@ -146,11 +150,27 @@ const handleRightPage = () => {
     width: 100%;
     margin: auto;
     transition: all ease-in-out 0.4s;
+    scroll-behavior: smooth;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
   }
 
   .news {
     margin: auto;
     width: 100%;
+    scroll-behavior: smooth;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
   }
 
   .trending {
@@ -163,6 +183,15 @@ const handleRightPage = () => {
     height: 160px;
     margin-right: auto;
     margin-top: 0.8rem;
+    scroll-behavior: smooth;
+
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
   }
 }
 
