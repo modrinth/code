@@ -1,25 +1,18 @@
 <script setup>
+import { RouterLink } from 'vue-router'
 import { Card } from 'omorphia'
 
 const props = defineProps({
   display: String,
   instance: Object,
 })
-
-const handleInstanceClick = (id) => {
-  console.log(id)
-}
 </script>
 
 <template>
   <div>
-    <div
-      @click="handleInstanceClick(props.instance.id)"
-      class="instance-list-item"
-      v-if="display === 'list'"
-    >
-      <p>{{ props.instance.name }}</p>
-    </div>
+    <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`${props.instance.id}`">{{
+      props.instance.name
+    }}</RouterLink>
     <div class="instance-gallery-item" v-else-if="display === 'gallery'">
       <p>{{ props.instance.version }}</p>
       <p>{{ props.instance.name }}</p>
@@ -37,13 +30,16 @@ const handleInstanceClick = (id) => {
   margin: 0.2rem auto;
   cursor: pointer;
   transition: all ease-out 0.1s;
+  font-size: 0.8rem;
+  color: var(--color-primary);
 
-  p {
-    font-size: 0.8rem;
-  }
+  // p {
+  //   font-size: 0.8rem;
+  // }
 
   &:hover {
     font-weight: bold;
+    text-decoration: none;
     filter: brightness(150%);
   }
 }

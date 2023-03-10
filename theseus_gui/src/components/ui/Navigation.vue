@@ -1,20 +1,10 @@
 <script setup>
-import {
-  SunIcon,
-  MoonIcon,
-  SearchIcon,
-  BookIcon,
-  ClientIcon,
-  PlusIcon,
-  SettingsIcon,
-} from 'omorphia'
-import { useTheming, useInstances } from '@/store/state'
+import { SearchIcon, BookIcon, ClientIcon, PlusIcon, SettingsIcon } from 'omorphia'
+import { useInstances } from '@/store/state'
 import { RouterLink } from 'vue-router'
 import SideNav from '@/components/SideNav.vue'
 import UserSection from '@/components/ui/UserSection.vue'
 import Instance from '@/components/ui/Instance.vue'
-
-const theme = useTheming()
 const instances = useInstances()
 
 instances.fetchInstances()
@@ -62,8 +52,6 @@ instances.fetchInstances()
         class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
         ><SettingsIcon /> Settings</RouterLink
       >
-      <SunIcon v-if="!theme.darkTheme" @click="theme.toggleTheme()" class="theme-icon" />
-      <MoonIcon v-else @click="theme.toggleTheme()" class="theme-icon" />
     </div>
   </SideNav>
 </template>
@@ -155,6 +143,7 @@ instances.fetchInstances()
   width: 85%;
   font-size: 0.9rem;
   margin-top: 1rem;
+  color: var(--bg-color);
 
   svg {
     background: var(--color-green);

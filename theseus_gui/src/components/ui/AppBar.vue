@@ -23,7 +23,7 @@ const router = useRouter()
 <style lang="scss" scoped>
 .appbar {
   display: flex;
-  justify-content: stretch;
+  justify-content: space-between;
   align-items: center;
   width: 100%;
   height: 30px;
