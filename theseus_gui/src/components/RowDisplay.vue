@@ -134,4 +134,12 @@ const handleRightPage = () => {
     margin-top: 0.8rem;
   }
 }
+
+.dark-mode {
+  .row {
+    &:nth-child(even) {
+      background-color: rgba(22, 24, 28, 0.3);
+    }
+  }
+}
 </style>

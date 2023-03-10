@@ -1,13 +1,14 @@
 <script setup>
 import { SearchIcon, BookIcon, ClientIcon, PlusIcon, SettingsIcon } from 'omorphia'
 import { useInstances } from '@/store/state'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRoute } from 'vue-router'
 import SideNav from '@/components/SideNav.vue'
 import UserSection from '@/components/ui/UserSection.vue'
 import Instance from '@/components/ui/Instance.vue'
 const instances = useInstances()
 
 instances.fetchInstances()
+const route = useRoute()
 </script>
 
 <template>
@@ -76,7 +77,7 @@ instances.fetchInstances()
     transition: all ease-in-out 0.1s;
 
     &:hover {
-      background-color: #fff;
+      background-color: var(--color-button-bg);
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
       text-decoration: none;
     }
@@ -96,21 +97,20 @@ instances.fetchInstances()
 
   & > p {
     color: var(--color-primary);
-    margin-bottom: 0.6rem;
-    font-size: 1rem;
+    margin: 1rem 0;
+    font-size: 1.2rem;
     line-height: 13px;
     font-weight: 500;
+    text-transform: uppercase;
   }
 }
 
 #settings {
-  position: fixed;
-  align-self: flex-end;
   display: flex;
   bottom: 0.5rem;
   left: 0.5rem;
   align-items: center;
-  margin-right: 1rem;
+  margin: auto 1rem 0.5rem 1rem;
   width: 150px;
   justify-content: space-between;
 
@@ -127,12 +127,6 @@ instances.fetchInstances()
       text-decoration: none;
     }
   }
-
-  .theme-icon {
-    cursor: pointer;
-    font-size: larger;
-    border-radius: var(--radius-sm);
-  }
 }
 
 #add-instance-btn {
@@ -143,7 +137,7 @@ instances.fetchInstances()
   width: 85%;
   font-size: 0.9rem;
   margin-top: 1rem;
-  color: var(--bg-color);
+  color: var(--color-primary);
 
   svg {
     background: var(--color-green);
@@ -151,22 +145,11 @@ instances.fetchInstances()
     width: 25px;
     height: auto;
     box-shadow: var(--shadow-inset);
+    color: var(--color-bg);
   }
 
   &:hover {
     text-decoration: none;
-  }
-}
-
-.dark-mode {
-  #add-instance-btn {
-    &:hover {
-      background-color: var(--color-button-bg);
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
-    }
-  }
-
-  .pages-list > a:hover {
     background-color: var(--color-button-bg);
     box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   }
