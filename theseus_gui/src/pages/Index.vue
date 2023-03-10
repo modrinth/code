@@ -7,17 +7,17 @@ const news = useNews()
 instances.fetchInstances()
 news.fetchNews()
 
-const recentInstances = instances.instances.filter((i) => i.downloads <= 50)
+const recentInstances = instances.instances.slice(0, 4)
 const popularInstances = instances.instances.filter((i) => i.downloads > 50)
 const trendingMods = instances.instances.filter((i) => i.trending)
 </script>
 
 <template>
   <div class="page-container">
-    <RowDisplay label="Jump back in" :instances="recentInstances" />
-    <RowDisplay label="Popular packs" :instances="popularInstances" />
-    <RowDisplay label="News & updates" :news="news.news" />
-    <RowDisplay label="Trending mods" :instances="trendingMods" />
+    <RowDisplay label="Jump back in" :instances="recentInstances" :canPaginate="false" />
+    <RowDisplay label="Popular packs" :instances="popularInstances" :canPaginate="true" />
+    <RowDisplay label="News & updates" :news="news.news" :canPaginate="true" />
+    <RowDisplay label="Trending mods" :instances="trendingMods" :canPaginate="true" />
   </div>
 </template>
 
