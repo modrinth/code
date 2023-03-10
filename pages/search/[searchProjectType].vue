@@ -284,7 +284,8 @@
         class="pagination-before"
         @switch-page="onSearchChange"
       />
-      <div v-if="results && results.hits && results.hits.length === 0" class="no-results">
+      <LogoAnimated v-if="searchLoading && !noLoad"></LogoAnimated>
+      <div v-else-if="results && results.hits && results.hits.length === 0" class="no-results">
         <p>No results found for your query!</p>
       </div>
       <div v-else class="search-results-container">
@@ -336,6 +337,7 @@ import ProjectCard from '~/components/ui/ProjectCard'
 import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'
 import Checkbox from '~/components/ui/Checkbox'
+import LogoAnimated from '~/components/brand/LogoAnimated'
 
 import ClientIcon from '~/assets/images/categories/client.svg'
 import ServerIcon from '~/assets/images/categories/server.svg'
@@ -351,6 +353,7 @@ import Promotion from '~/components/ads/Promotion.vue'
 
 export default defineNuxtComponent({
   components: {
+    LogoAnimated,
     Promotion,
     ProjectCard,
     Pagination,
@@ -465,118 +468,121 @@ export default defineNuxtComponent({
       (x) => x.id === route.path.substring(1, route.path.length - 1)
     )
 
+    const noLoad = ref(false)
     const {
       data: rawResults,
       refresh: refreshSearch,
-      pending,
-    } = useLazyFetch(() => {
-      const config = useRuntimeConfig()
-      const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl
+      pending: searchLoading,
+    } = useLazyFetch(
+      () => {
+        const config = useRuntimeConfig()
+        const base = process.server ? config.apiBaseUrl : config.public.apiBaseUrl
 
-      const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
+        const params = [`limit=${maxResults.value}`, `index=${sortType.value.name}`]
 
-      if (query.value.length > 0) {
-        params.push(`query=${query.value.replace(/ /g, '+')}`)
-      }
-
-      if (
-        facets.value.length > 0 ||
-        orFacets.value.length > 0 ||
-        selectedVersions.value.length > 0 ||
-        selectedEnvironments.value.length > 0 ||
-        projectType.value
-      ) {
-        let formattedFacets = []
-        for (const facet of facets.value) {
-          formattedFacets.push([facet])
+        if (query.value.length > 0) {
+          params.push(`query=${query.value.replace(/ /g, '+')}`)
         }
 
-        // loaders specifier
-        if (orFacets.value.length > 0) {
-          formattedFacets.push(orFacets.value)
-        } else if (projectType.value.id === 'plugin') {
-          formattedFacets.push(
-            data.$tag.loaderData.allPluginLoaders.map(
-              (x) => `categories:'${encodeURIComponent(x)}'`
+        if (
+          facets.value.length > 0 ||
+          orFacets.value.length > 0 ||
+          selectedVersions.value.length > 0 ||
+          selectedEnvironments.value.length > 0 ||
+          projectType.value
+        ) {
+          let formattedFacets = []
+          for (const facet of facets.value) {
+            formattedFacets.push([facet])
+          }
+
+          // loaders specifier
+          if (orFacets.value.length > 0) {
+            formattedFacets.push(orFacets.value)
+          } else if (projectType.value.id === 'plugin') {
+            formattedFacets.push(
+              data.$tag.loaderData.allPluginLoaders.map(
+                (x) => `categories:'${encodeURIComponent(x)}'`
+              )
             )
-          )
-        } else if (projectType.value.id === 'mod') {
-          formattedFacets.push(
-            data.$tag.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
-          )
-        } else if (projectType.value.id === 'datapack') {
-          formattedFacets.push(
-            data.$tag.loaderData.dataPackLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
-          )
-        }
-
-        if (selectedVersions.value.length > 0) {
-          const versionFacets = []
-          for (const facet of selectedVersions.value) {
-            versionFacets.push('versions:' + facet)
-          }
-          formattedFacets.push(versionFacets)
-        }
-
-        if (onlyOpenSource.value) {
-          formattedFacets.push(['open_source:true'])
-        }
-
-        if (selectedEnvironments.value.length > 0) {
-          let environmentFacets = []
-
-          const includesClient = selectedEnvironments.value.includes('client')
-          const includesServer = selectedEnvironments.value.includes('server')
-          if (includesClient && includesServer) {
-            environmentFacets = [['client_side:required'], ['server_side:required']]
-          } else {
-            if (includesClient) {
-              environmentFacets = [
-                ['client_side:optional', 'client_side:required'],
-                ['server_side:optional', 'server_side:unsupported'],
-              ]
-            }
-            if (includesServer) {
-              environmentFacets = [
-                ['client_side:optional', 'client_side:unsupported'],
-                ['server_side:optional', 'server_side:required'],
-              ]
-            }
+          } else if (projectType.value.id === 'mod') {
+            formattedFacets.push(
+              data.$tag.loaderData.modLoaders.map((x) => `categories:'${encodeURIComponent(x)}'`)
+            )
+          } else if (projectType.value.id === 'datapack') {
+            formattedFacets.push(
+              data.$tag.loaderData.dataPackLoaders.map(
+                (x) => `categories:'${encodeURIComponent(x)}'`
+              )
+            )
           }
 
-          formattedFacets = [...formattedFacets, ...environmentFacets]
+          if (selectedVersions.value.length > 0) {
+            const versionFacets = []
+            for (const facet of selectedVersions.value) {
+              versionFacets.push('versions:' + facet)
+            }
+            formattedFacets.push(versionFacets)
+          }
+
+          if (onlyOpenSource.value) {
+            formattedFacets.push(['open_source:true'])
+          }
+
+          if (selectedEnvironments.value.length > 0) {
+            let environmentFacets = []
+
+            const includesClient = selectedEnvironments.value.includes('client')
+            const includesServer = selectedEnvironments.value.includes('server')
+            if (includesClient && includesServer) {
+              environmentFacets = [['client_side:required'], ['server_side:required']]
+            } else {
+              if (includesClient) {
+                environmentFacets = [
+                  ['client_side:optional', 'client_side:required'],
+                  ['server_side:optional', 'server_side:unsupported'],
+                ]
+              }
+              if (includesServer) {
+                environmentFacets = [
+                  ['client_side:optional', 'client_side:unsupported'],
+                  ['server_side:optional', 'server_side:required'],
+                ]
+              }
+            }
+
+            formattedFacets = [...formattedFacets, ...environmentFacets]
+          }
+
+          if (projectType.value) {
+            formattedFacets.push([`project_type:${projectType.value.actual}`])
+          }
+
+          params.push(`facets=${JSON.stringify(formattedFacets)}`)
         }
 
-        if (projectType.value) {
-          formattedFacets.push([`project_type:${projectType.value.actual}`])
+        const offset = (currentPage.value - 1) * maxResults.value
+        if (currentPage.value !== 1) {
+          params.push(`offset=${offset}`)
         }
 
-        params.push(`facets=${JSON.stringify(formattedFacets)}`)
-      }
+        let url = 'search'
 
-      const offset = (currentPage.value - 1) * maxResults.value
-      if (currentPage.value !== 1) {
-        params.push(`offset=${offset}`)
-      }
-
-      let url = 'search'
-
-      if (params.length > 0) {
-        for (let i = 0; i < params.length; i++) {
-          url += i === 0 ? `?${params[i]}` : `&${params[i]}`
+        if (params.length > 0) {
+          for (let i = 0; i < params.length; i++) {
+            url += i === 0 ? `?${params[i]}` : `&${params[i]}`
+          }
         }
-      }
 
-      return `${base}${url}`
-    })
-
-    watch(pending, (newVal) => {
-      if (newVal) {
-        startLoading()
-      } else {
-        stopLoading()
+        return `${base}${url}`
+      },
+      {
+        transform(hits) {
+          noLoad.value = false
+          return hits
+        },
       }
-    })
+    )
 
     const results = shallowRef(toRaw(rawResults))
     const pageCount = computed(() =>
@@ -584,6 +590,9 @@ export default defineNuxtComponent({
     )
 
     const onSearchChange = (newPageNumber) => {
+      noLoad.value = true
+      console.log(noLoad.value)
+
       currentPage.value = newPageNumber
 
       if (query.value === null) {
@@ -674,6 +683,8 @@ export default defineNuxtComponent({
       projectType,
       onSearchChange,
       getSearchUrl,
+      searchLoading,
+      noLoad,
     }
   },
   computed: {
