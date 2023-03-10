@@ -27,7 +27,6 @@ watch(theme, (newState) => {
 
 <style lang="scss" scoped>
 .container {
-  display: flex;
   min-width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
@@ -37,7 +36,6 @@ watch(theme, (newState) => {
   }
 
   .view {
-    width: 100%;
     height: 100%;
     margin-left: 210px;
   }
