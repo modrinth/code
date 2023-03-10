@@ -50,7 +50,6 @@ const props = defineProps({
   background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
   background-position: center;
   background-size: cover;
-  margin: 1.3rem;
   position: relative;
   display: flex;
   flex-direction: column;
