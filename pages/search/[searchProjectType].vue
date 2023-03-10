@@ -591,7 +591,6 @@ export default defineNuxtComponent({
 
     const onSearchChange = (newPageNumber) => {
       noLoad.value = true
-      console.log(noLoad.value)
 
       currentPage.value = newPageNumber
 

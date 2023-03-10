@@ -144,7 +144,7 @@ const props = defineProps({
   currentMember: {
     type: Object,
     default() {
-      return {}
+      return null
     },
   },
 })
