@@ -43,6 +43,13 @@ export default new createRouter({
       name: 'Instance',
       component: Instance.Index,
       props: true,
+      children: [
+        {
+            path: '',
+            name: 'Mods',
+            component: Instance.Mods,
+        }
+      ]
     }
   ],
 })

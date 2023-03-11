@@ -21,7 +21,7 @@ const handleRightPage = () => {
 <template>
   <div class="row">
     <div class="header">
-      <h3>{{ props.label }}</h3>
+      <p>{{ props.label }}</p>
     </div>
     <section class="mods">
       <Instance
@@ -42,10 +42,9 @@ const handleRightPage = () => {
   width: 100%;
   padding: 1rem;
 
-  &:nth-child(odd) {
-    background: var(--color-raised-bg);
+  &:nth-child(even) {
+    background-color: var(--color-raised-bg);
   }
-
   .header {
     display: flex;
     justify-content: space-between;
@@ -55,15 +54,9 @@ const handleRightPage = () => {
     gap: 1rem;
 
     p {
+      color: var(--color-contrast);
       font-size: 1rem;
       white-space: nowrap;
-    }
-
-    hr {
-      background: var(--color-base);
-      height: 1px;
-      width: 100%;
-      border: none;
     }
 
     .pagination {

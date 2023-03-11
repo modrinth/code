@@ -1,3 +1,4 @@
 import Index from './Index.vue'
+import Mods from "./Mods.vue";
 
-export { Index }
+export { Index, Mods }
