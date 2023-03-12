@@ -425,14 +425,6 @@ async fn version_create_inner(
     .insert_many(users, &mut *transaction)
     .await?;
 
-    models::Project::update_game_versions(
-        builder.project_id,
-        &mut *transaction,
-    )
-    .await?;
-    models::Project::update_loaders(builder.project_id, &mut *transaction)
-        .await?;
-
     let response = Version {
         id: builder.version_id.into(),
         project_id: builder.project_id.into(),
@@ -477,7 +469,12 @@ async fn version_create_inner(
         loaders: version_data.loaders,
     };
 
+    let project_id = builder.project_id;
     builder.insert(transaction).await?;
+
+    models::Project::update_game_versions(project_id, &mut *transaction)
+        .await?;
+    models::Project::update_loaders(project_id, &mut *transaction).await?;
 
     Ok(HttpResponse::Ok().json(response))
 }
