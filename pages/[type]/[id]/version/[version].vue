@@ -800,6 +800,10 @@ export default defineNuxtComponent({
 
     let replaceFile = null
 
+    if (mode === 'edit') {
+      isEditing = true
+    }
+
     if (route.params.version === 'create') {
       isCreating = true
       isEditing = true
@@ -839,8 +843,6 @@ export default defineNuxtComponent({
           console.error('Error parsing version file data', err)
         }
       }
-    } else if (mode === 'edit') {
-      isEditing = true
     } else if (route.params.version === 'latest') {
       let versionList = props.versions
       if (route.query.loader) {

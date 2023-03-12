@@ -256,6 +256,9 @@ export default defineNuxtConfig({
         children: [],
       })
     },
+    'app:created'() {
+      console.log('beforeeeee')
+    },
   },
   runtimeConfig: {
     apiBaseUrl: process.env.BASE_URL ?? getApiUrl(),
