@@ -176,10 +176,8 @@ const handleRightPage = () => {
 
   .trending {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
     gap: 1rem;
     margin-right: auto;
     margin-top: 0.8rem;

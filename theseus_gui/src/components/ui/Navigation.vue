@@ -71,10 +71,11 @@ const route = useRoute()
     width: 80%;
     margin: 0.3rem auto;
     text-align: left;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 400;
     background: inherit;
     transition: all ease-in-out 0.1s;
+    color: var(--color-primary);
 
     &:hover {
       background-color: var(--color-button-bg);
@@ -83,7 +84,7 @@ const route = useRoute()
     }
 
     svg {
-      margin-right: 0.5rem;
+      margin-right: 0.25rem;
     }
   }
 }
@@ -96,7 +97,7 @@ const route = useRoute()
   margin: 0.4rem;
 
   & > p {
-    color: var(--color-primary);
+    color: var(--color-base);
     margin: 1rem 0;
     font-size: 1.2rem;
     line-height: 13px;
@@ -107,21 +108,18 @@ const route = useRoute()
 
 #settings {
   display: flex;
-  bottom: 0.5rem;
-  left: 0.5rem;
   align-items: center;
   margin: auto 1rem 0.5rem 1rem;
   width: 150px;
-  justify-content: space-between;
 
   a {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
     align-items: center;
     width: 80%;
     margin: auto;
     background: inherit;
-    margin-right: 1rem;
+    color: var(--color-primary);
 
     &:hover {
       text-decoration: none;

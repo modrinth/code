@@ -25,12 +25,11 @@ const props = defineProps({
 <style lang="scss" scoped>
 .news-cta {
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: 0;
   background: var(--color-bg);
-  width: 350px;
-  height: 100px;
+  min-width: 386px; /* from wireframe */
+  min-height: 136px; /* from wireframe */
   box-shadow: var(--shadow-raised-lg);
   cursor: pointer;
 
@@ -40,26 +39,25 @@ const props = defineProps({
 
   img {
     display: flex;
-    height: 100%;
+    width: 135px; /* from wireframe */
+    height: 136px; /* from wireframe */
     border-radius: 0.9rem 0 0 0.9rem;
   }
   .body {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
     width: 100%;
-    height: 100%;
-    margin: 0.9rem;
+    height: 136px; /* from wireframe */
+    padding: 0.45rem;
 
     .headline {
       display: inherit;
       flex-direction: inherit;
-      margin: 0.7rem 0;
+      margin: 0.4rem 0;
       width: 100%;
 
       h2 {
-        font-size: 0.8rem;
+        font-size: 1rem;
         text-transform: uppercase;
       }
 
@@ -72,22 +70,22 @@ const props = defineProps({
       display: flex;
       justify-content: space-between;
       align-items: center;
-      align-self: flex-end;
       width: 100%;
-      margin: 0px 0px 0.2rem 0.2rem;
+      margin-top: auto;
 
       p {
         font-size: 0.7rem;
       }
 
       a {
-        display: inline-block;
         transition: all ease-in-out 0.2s;
-        width: 20px;
-        font-size: 1.1rem;
+        width: 24px;
+        color: var(--color-primary);
+        font-size: 1.3rem;
 
         &:hover {
-          transform: translate(2px);
+          transform: translate(1px);
+          filter: brightness(150%);
         }
       }
     }

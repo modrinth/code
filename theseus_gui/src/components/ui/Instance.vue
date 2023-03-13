@@ -10,22 +10,20 @@ const props = defineProps({
 
 <template>
   <div>
-    <RouterLink :to="'/instance/' + props.instance.id">
-      <div
-          class="instance-list-item"
-          v-if="display === 'list'"
-      >
-        <p>{{ props.instance.name }}</p>
+    <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`/instance/${props.instance.id}`">{{
+      props.instance.name
+    }}</RouterLink>
+    <div class="instance-gallery-item" v-else-if="display === 'gallery'">
+      <p>{{ props.instance.version }}</p>
+      <p>{{ props.instance.name }}</p>
+    </div>
+    <Card class="instance-card-item" v-else-if="display === 'card'">
+      <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
+      <div class="project-info">
+        <p class="title">{{ props.instance.name }}</p>
+        <p class="description">{{ props.instance.description }}</p>
       </div>
-      <div class="instance-gallery-item" v-else-if="display === 'gallery'">
-        <p>{{ props.instance.version }}</p>
-        <p>{{ props.instance.name }}</p>
-      </div>
-      <Card class="instance-card-item" v-else-if="display === 'card'">
-        <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
-        <p>{{ props.instance.name }}</p>
-      </Card>
-    </RouterLink>
+    </Card>
   </div>
 </template>
 
@@ -93,29 +91,55 @@ const props = defineProps({
   }
 }
 
+/* from Knossos */
 .instance-card-item {
+  position: relative;
   display: flex;
-  justify-content: space-between;
-  min-width: 250px;
-  padding: 0;
-  flex: 1 1 120px;
+
   cursor: pointer;
-  transition: all ease-in-out 0.1s;
+  padding: 1rem;
+  gap: 1rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-raised-bg);
+  transition: background 0.1s ease-in-out, transform 0.02s ease-in-out;
 
   &:hover {
-    box-shadow: var(--shadow-raised-lg);
-  }
-
-  p {
-    font-size: 0.9rem;
-    display: inline-block;
-    padding: 1rem;
+    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.5);
   }
 
   img {
-    width: 50px;
-    height: 100%;
-    border-radius: var(--radius-md);
+    height: 3rem;
+  }
+
+  .project-info {
+    box-sizing: border-box;
+  }
+
+  .title {
+    color: var(--color-primary);
+    max-width: 13.75rem;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.25rem;
+    line-height: 110%;
+    display: block;
+  }
+
+  .description {
+    width: 13.75rem;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+    font-weight: 500;
+    font-size: 0.875rem;
+    line-height: 125%;
+    margin: 0.25rem 0 0;
   }
 }
 </style>
