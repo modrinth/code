@@ -1123,19 +1123,7 @@ export default defineNuxtComponent({
           })
         }
 
-        const [versions, featuredVersions, dependencies] = await Promise.all([
-          useBaseFetch(`project/${this.version.project_id}/version`, this.$defaultHeaders()),
-          useBaseFetch(
-            `project/${this.version.project_id}/version?featured=true`,
-            this.$defaultHeaders()
-          ),
-          useBaseFetch(`project/${this.version.project_id}/dependencies`, this.$defaultHeaders()),
-        ])
-
-        const newEditedVersions = this.$computeVersions(versions, this.members)
-        this.$emit('update:versions', newEditedVersions)
-        this.$emit('update:featuredVersions', this.$computeVersions(featuredVersions, this.members))
-        this.$emit('update:dependencies', dependencies)
+        const newEditedVersions = await this.resetProjectVersions()
 
         await this.$router.replace(
           `/${this.project.project_type}/${
@@ -1240,19 +1228,7 @@ export default defineNuxtComponent({
         },
       })
 
-      const [versions, featuredVersions, dependencies] = await Promise.all([
-        useBaseFetch(`project/${this.version.project_id}/version`, this.$defaultHeaders()),
-        useBaseFetch(
-          `project/${this.version.project_id}/version?featured=true`,
-          this.$defaultHeaders()
-        ),
-        useBaseFetch(`project/${this.version.project_id}/dependencies`, this.$defaultHeaders()),
-      ])
-
-      const newCreatedVersions = this.$computeVersions(versions, this.members)
-      this.$emit('update:versions', newCreatedVersions)
-      this.$emit('update:featuredVersions', this.$computeVersions(featuredVersions, this.members))
-      this.$emit('update:dependencies', dependencies)
+      await this.resetProjectVersions()
 
       await this.$router.push(
         `/${this.project.project_type}/${
@@ -1268,6 +1244,7 @@ export default defineNuxtComponent({
         ...this.$defaultHeaders(),
       })
 
+      await this.resetProjectVersions()
       await this.$router.replace(`/${this.project.project_type}/${this.project.id}/versions`)
       stopLoading()
     },
@@ -1322,6 +1299,23 @@ export default defineNuxtComponent({
       }
       stopLoading()
       this.shouldPreventActions = false
+    },
+    async resetProjectVersions() {
+      const [versions, featuredVersions, dependencies] = await Promise.all([
+        useBaseFetch(`project/${this.version.project_id}/version`, this.$defaultHeaders()),
+        useBaseFetch(
+          `project/${this.version.project_id}/version?featured=true`,
+          this.$defaultHeaders()
+        ),
+        useBaseFetch(`project/${this.version.project_id}/dependencies`, this.$defaultHeaders()),
+      ])
+
+      const newCreatedVersions = this.$computeVersions(versions, this.members)
+      this.$emit('update:versions', newCreatedVersions)
+      this.$emit('update:featuredVersions', this.$computeVersions(featuredVersions, this.members))
+      this.$emit('update:dependencies', dependencies)
+
+      return newCreatedVersions
     },
   },
 })

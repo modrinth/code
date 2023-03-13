@@ -435,12 +435,6 @@
       margin-bottom: var(--spacing-card-md);
     }
   }
-
-  //> .label:first-child :where(> :first-child, .label__title),
-  //> label:first-child :where(> :first-child, .label__title),
-  //> .adjacent-input:first-child :where(> :first-child, .label__title) {
-  //  margin-block-start: 0;
-  //}
 }
 
 .universal-card {

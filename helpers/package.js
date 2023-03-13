@@ -137,7 +137,9 @@ export const createDataPackVersion = async function (
     primaryZipReader.file('quilt.mod.json', JSON.stringify(quiltModJson))
   }
   if (loaders.includes('forge')) {
-    primaryZipReader.file('META-INF/mods.toml', TOML.stringify(forgeModsToml))
+    console.log(forgeModsToml)
+    console.log(TOML.stringify(forgeModsToml, { newline: '\n' }))
+    primaryZipReader.file('META-INF/mods.toml', TOML.stringify(forgeModsToml, { newline: '\n' }))
   }
 
   if (!newForge && loaders.includes('forge')) {
