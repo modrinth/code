@@ -29,12 +29,11 @@ function toggleCollapsed() {
 
 <template>
   <div
-    class="omorphia__card standard-body padding-xl bg-raised radius-lg margin-bottom-md"
-    :class="{ 'auto-body': !noAutoBody }"
+    class="card"
   >
     <div v-if="!!$slots.header || collapsible" class="header">
       <slot name="header"></slot>
-      <div v-if="collapsible" class="button-group margin-left-auto margin-right-0">
+      <div v-if="collapsible" class="btn-group">
         <Button :action="toggleCollapsed">
           <DropdownIcon :style="{ transform: `rotate(${state.collapsed ? 0 : 180}deg)` }" />
         </Button>
@@ -45,9 +44,6 @@ function toggleCollapsed() {
 </template>
 
 <style lang="scss" scoped>
-.omorphia__card {
-}
-
 .header {
   display: flex;
 
@@ -58,5 +54,10 @@ function toggleCollapsed() {
   &:not(:last-child) {
     margin-bottom: var(--gap-lg);
   }
+}
+
+.btn-group {
+  margin-left: auto;
+  margin-right: 0;
 }
 </style>

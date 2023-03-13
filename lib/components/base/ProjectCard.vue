@@ -1,6 +1,6 @@
 <template>
   <article
-    class="project-card base-card padding-bg"
+    class="project-card base-card"
     :aria-label="name"
     role="listitem"
   >
@@ -18,7 +18,7 @@
       :to="`/${projectTypeUrl}/${id}`"
       :style="color ? `background-color: ${toColor};` : ''"
     >
-      <img v-if="featuredImage" :src="featuredImage" alt="gallery image" />
+      <img v-if="featuredImage" :src="featuredImage" alt="gallery image" loading="lazy" />
     </router-link>
     <div class="title">
       <router-link :to="`/${projectTypeUrl}/${id}`">
@@ -307,7 +307,7 @@ export default defineComponent({
     display: inline-block;
     width: 100%;
     height: 10rem;
-    background-color: var(--color-button-bg-active);
+    background-color: var(--color-button-bg);
 
     &.no-image {
       filter: brightness(0.7);
@@ -596,7 +596,7 @@ export default defineComponent({
 
     a {
       /* Uses active color to increase contrast */
-      color: var(--color-link-active);
+      color: var(--color-blue);
       text-decoration: underline;
     }
   }

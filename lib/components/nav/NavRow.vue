@@ -5,7 +5,7 @@ defineProps({})
 <template>
   <div class="omorphia__navrow">
     <slot />
-    <div class="margin-left-auto">
+    <div class="right-slot">
       <slot name="right" />
     </div>
   </div>
@@ -16,7 +16,11 @@ defineProps({})
   display: flex;
   flex-direction: row;
 
-  :deep(.omorphia__button) {
+  .right-slot {
+    margin-left: auto;
+  }
+
+  :deep(.btn) {
     position: relative;
 
     &::after {

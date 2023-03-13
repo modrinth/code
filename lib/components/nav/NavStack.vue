@@ -13,7 +13,7 @@ defineProps({})
   display: flex;
   flex-direction: column;
 
-  :deep(.omorphia__button) {
+  :deep(.btn) {
     position: relative;
     width: 100%;
 
