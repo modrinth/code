@@ -32,13 +32,13 @@
 
 <script>
 export default {
-  name: "TextLogo",
+  name: 'TextLogo',
   props: {
     animate: {
       type: Boolean,
-      default: false
-    }
-  }
+      default: false,
+    },
+  },
 }
 </script>
 

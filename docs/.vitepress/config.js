@@ -4,9 +4,7 @@ import svgLoader from 'vite-svg-loader'
 export default {
   title: 'Omorphia',
   description: 'A components library used for Modrinth.',
-  head: [
-    ['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-  ],
+  head: [['link', { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]],
   themeConfig: {
     sidebar: [
       {

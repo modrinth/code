@@ -6,7 +6,7 @@ module.exports = {
       transform(prefix, _selector) {
         const [selector, pseudo = ''] = _selector.split(/(:\S*)$/)
         return selector + prefix + pseudo
-      }
-    }
-  }
+      },
+    },
+  },
 }

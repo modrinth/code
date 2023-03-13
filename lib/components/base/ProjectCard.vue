@@ -1,14 +1,6 @@
 <template>
-  <article
-    class="project-card base-card"
-    :aria-label="name"
-    role="listitem"
-  >
-    <router-link
-      class="icon"
-      tabindex="-1"
-      :to="`/${projectTypeUrl}/${id}`"
-    >
+  <article class="project-card base-card" :aria-label="name" role="listitem">
+    <router-link class="icon" tabindex="-1" :to="`/${projectTypeUrl}/${id}`">
       <Avatar :src="iconUrl" :alt="name" size="md" no-shadow loading="lazy" />
     </router-link>
     <router-link
@@ -28,24 +20,14 @@
       </router-link>
       <p v-if="author" class="author">
         by
-        <router-link class="title-link" :to="'/user/' + author"
-          >{{ author }}
-        </router-link>
+        <router-link class="title-link" :to="'/user/' + author">{{ author }} </router-link>
       </p>
-      <Badge
-        v-if="status && status !== 'approved'"
-        :type="status"
-        class="status"
-      />
+      <Badge v-if="status && status !== 'approved'" :type="status" class="status" />
     </div>
     <p class="description">
       {{ description }}
     </p>
-    <Categories
-      :categories="categories"
-      :type="type"
-      class="tags"
-    >
+    <Categories :categories="categories" :type="type" class="tags">
       <EnvironmentIndicator
         :type-only="moderation"
         :client-side="clientSide"
@@ -59,53 +41,48 @@
         <DownloadIcon aria-hidden="true" />
         <p>
           <strong>{{ formatNumber(downloads) }}</strong
-          ><span class="stat-label">
-            download<span v-if="downloads !== '1'">s</span></span
-          >
+          ><span class="stat-label"> download<span v-if="downloads !== '1'">s</span></span>
         </p>
       </div>
       <div v-if="follows" class="stat">
         <HeartIcon aria-hidden="true" />
         <p>
           <strong>{{ formatNumber(follows) }}</strong
-          ><span class="stat-label">
-            follower<span v-if="follows !== '1'">s</span></span
-          >
+          ><span class="stat-label"> follower<span v-if="follows !== '1'">s</span></span>
         </p>
       </div>
       <div class="buttons">
         <slot />
       </div>
-      <div
-        v-if="showUpdatedDate"
-        v-tooltip="updatedDate"
-        class="stat date"
-      >
+      <div v-if="showUpdatedDate" v-tooltip="updatedDate" class="stat date">
         <EditIcon aria-hidden="true" />
-        <span class="date-label">Updated </span
-        > {{ sinceUpdated }}
+        <span class="date-label">Updated </span> {{ sinceUpdated }}
       </div>
-      <div
-        v-else
-        v-tooltip="createdDate"
-        class="stat date"
-      >
+      <div v-else v-tooltip="createdDate" class="stat date">
         <CalendarIcon aria-hidden="true" />
-        <span class="date-label">Published </span
-        >{{ sinceCreation }}
+        <span class="date-label">Published </span>{{ sinceCreation }}
       </div>
     </div>
   </article>
 </template>
 <script setup>
-import { Badge, HeartIcon, DownloadIcon, EditIcon, CalendarIcon, Avatar, Categories, EnvironmentIndicator } from '@/components'
+import {
+  Badge,
+  HeartIcon,
+  DownloadIcon,
+  EditIcon,
+  CalendarIcon,
+  Avatar,
+  Categories,
+  EnvironmentIndicator,
+} from '@/components'
 import { formatNumber } from '@/components/utils'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)
 </script>
 <script>
-import {defineComponent} from "vue";
+import { defineComponent } from 'vue'
 export default defineComponent({
   props: {
     id: {
@@ -218,7 +195,7 @@ export default defineComponent({
       type: Number,
       required: false,
       default: null,
-    }
+    },
   },
   computed: {
     toColor() {
@@ -241,12 +218,12 @@ export default defineComponent({
     },
     sinceUpdated() {
       return dayjs(this.updatedAt).fromNow()
-    }
+    },
   },
   methods: {
-    formatNumber
+    formatNumber,
   },
-});
+})
 </script>
 
 <style lang="scss" scoped>
@@ -326,7 +303,8 @@ export default defineComponent({
     margin-top: -3rem;
     z-index: 1;
 
-    img, svg {
+    img,
+    svg {
       border-radius: var(--radius-lg);
       border: 4px solid var(--color-raised-bg);
       border-bottom: none;

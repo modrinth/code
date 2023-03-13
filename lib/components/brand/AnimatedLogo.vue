@@ -7,12 +7,7 @@
       viewBox="0 0 590 591"
       xmlns="http://www.w3.org/2000/svg"
       xml:space="preserve"
-      style="
-        fill-rule: evenodd;
-        clip-rule: evenodd;
-        stroke-linejoin: round;
-        stroke-miterlimit: 2;
-      "
+      style="fill-rule: evenodd; clip-rule: evenodd; stroke-linejoin: round; stroke-miterlimit: 2"
     >
       <g transform="matrix(1,0,0,1,652.392,-0.400578)">
         <g transform="matrix(4.16667,0,0,4.16667,-735.553,0)">
@@ -25,19 +20,14 @@
         </g>
       </g></svg
     ><svg
-    class="rotate inner"
-    width="100%"
-    height="100%"
-    viewBox="0 0 590 591"
-    xmlns="http://www.w3.org/2000/svg"
-    xml:space="preserve"
-    style="
-        fill-rule: evenodd;
-        clip-rule: evenodd;
-        stroke-linejoin: round;
-        stroke-miterlimit: 2;
-      "
-  >
+      class="rotate inner"
+      width="100%"
+      height="100%"
+      viewBox="0 0 590 591"
+      xmlns="http://www.w3.org/2000/svg"
+      xml:space="preserve"
+      style="fill-rule: evenodd; clip-rule: evenodd; stroke-linejoin: round; stroke-miterlimit: 2"
+    >
       <g transform="matrix(1,0,0,1,652.392,-0.400578)">
         <g transform="matrix(4.16667,0,0,4.16667,-735.553,0)">
           <g transform="matrix(0.24,0,0,0.24,0,0)">
@@ -58,12 +48,7 @@
       xmlns:xlink="http://www.w3.org/1999/xlink"
       xml:space="preserve"
       xmlns:serif="http://www.serif.com/"
-      style="
-        fill-rule: evenodd;
-        clip-rule: evenodd;
-        stroke-linejoin: round;
-        stroke-miterlimit: 2;
-      "
+      style="fill-rule: evenodd; clip-rule: evenodd; stroke-linejoin: round; stroke-miterlimit: 2"
     >
       <g transform="matrix(1,0,0,1,652.392,-0.400578)">
         <g transform="matrix(4.16667,0,0,4.16667,-735.553,0)">
@@ -89,7 +74,7 @@
 
 <script>
 export default {
-  name: "AnimatedLogo"
+  name: 'AnimatedLogo',
 }
 </script>
 

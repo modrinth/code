@@ -4,19 +4,14 @@
     A {{ type }}
   </span>
   <span
-    v-else-if="
-      !['resourcepack', 'shader'].includes(type) &&
-      !(type === 'plugin' && search)
-    "
+    v-else-if="!['resourcepack', 'shader'].includes(type) && !(type === 'plugin' && search)"
     class="environment"
   >
     <template v-if="clientSide === 'optional' && serverSide === 'optional'">
       <GlobeIcon aria-hidden="true" />
       Client or server
     </template>
-    <template
-      v-else-if="clientSide === 'required' && serverSide === 'required'"
-    >
+    <template v-else-if="clientSide === 'required' && serverSide === 'required'">
       <GlobeIcon aria-hidden="true" />
       Client and server
     </template>
@@ -38,9 +33,7 @@
       <ServerIcon aria-hidden="true" />
       Server
     </template>
-    <template
-      v-else-if="serverSide === 'unsupported' && clientSide === 'unsupported'"
-    >
+    <template v-else-if="serverSide === 'unsupported' && clientSide === 'unsupported'">
       <GlobeIcon aria-hidden="true" />
       Unsupported
     </template>
@@ -51,10 +44,10 @@
   </span>
 </template>
 <script setup>
-import { GlobeIcon, ClientIcon, ServerIcon, InfoIcon} from "@/components";
+import { GlobeIcon, ClientIcon, ServerIcon, InfoIcon } from '@/components'
 </script>
 <script>
-import {defineComponent} from "vue";
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   props: {
@@ -86,9 +79,9 @@ export default defineComponent({
       type: Boolean,
       required: false,
       default: false,
-    }
+    },
   },
-});
+})
 </script>
 <style lang="scss" scoped>
 .environment {
