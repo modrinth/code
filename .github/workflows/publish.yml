@@ -19,7 +19,10 @@ jobs:
           node-version: 18.x
           registry-url: https://registry.npmjs.org/
 
-      - name: Install deps
+      - name: Install dependencies
+        run: yarn install --immutable --immutable-cache --check-cache
+
+      - name: Build package
         run: npm run build
 
       - name: Publish package
