@@ -406,14 +406,6 @@ export default defineNuxtComponent({
     const currentPage = ref(1)
     const projectType = ref({ id: 'mod', display: 'mod', actual: 'mod' })
 
-    function getArrayOrString(x) {
-      if (typeof x === 'string' || x instanceof String) {
-        return [x]
-      } else {
-        return x
-      }
-    }
-
     if (route.query.q) {
       query.value = route.query.q
     }

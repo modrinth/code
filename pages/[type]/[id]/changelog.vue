@@ -7,15 +7,7 @@
       <Meta name="apple-mobile-web-app-title" :content="`${props.project.title} - Changelog`" />
       <Meta name="og:description" :content="metaDescription" />
     </Head>
-    <VersionFilterControl
-      :versions="props.versions"
-      @update-versions="
-        (v) => {
-          filteredVersions = v
-          switchPage(1)
-        }
-      "
-    />
+    <VersionFilterControl :versions="props.versions" />
     <Pagination
       :page="currentPage"
       :count="Math.ceil(filteredVersions.length / 20)"
@@ -114,15 +106,32 @@ const metaDescription = computed(
 
 const route = useRoute()
 const currentPage = ref(Number(route.query.p ?? 1))
-const filteredVersions = shallowRef(props.versions)
+const filteredVersions = computed(() => {
+  const selectedGameVersions = getArrayOrString(route.query.g) ?? []
+  const selectedLoaders = getArrayOrString(route.query.l) ?? []
+  const selectedVersionTypes = getArrayOrString(route.query.c) ?? []
 
-async function switchPage(page) {
+  currentPage.value = 1
+  return props.versions.filter(
+    (projectVersion) =>
+      (selectedGameVersions.length === 0 ||
+        selectedGameVersions.some((gameVersion) =>
+          projectVersion.game_versions.includes(gameVersion)
+        )) &&
+      (selectedLoaders.length === 0 ||
+        selectedLoaders.some((loader) => projectVersion.loaders.includes(loader))) &&
+      (selectedVersionTypes.length === 0 ||
+        selectedVersionTypes.includes(projectVersion.version_type))
+  )
+})
+
+function switchPage(page) {
   currentPage.value = page
 
   const router = useRouter()
   const route = useRoute()
 
-  await router.replace({
+  router.replace({
     query: {
       ...route.query,
       p: currentPage.value !== 1 ? currentPage.value : undefined,

@@ -18,7 +18,7 @@
       :show-labels="false"
       :allow-empty="true"
       placeholder="Filter loader..."
-      @update:model-value="updateVersionFilters()"
+      @update:model-value="updateQuery"
     />
     <Multiselect
       v-if="gameVersionFilters.length > 1"
@@ -36,7 +36,7 @@
       :hide-selected="true"
       :selectable="() => selectedGameVersions.length <= 6"
       placeholder="Filter versions..."
-      @update:model-value="updateVersionFilters()"
+      @update:model-value="updateQuery"
     />
     <Multiselect
       v-if="versionTypeFilters.length > 1"
@@ -51,7 +51,7 @@
       :show-labels="false"
       :allow-empty="true"
       placeholder="Filter channels..."
-      @update:model-value="updateVersionFilters()"
+      @update:model-value="updateQuery"
     />
     <Checkbox
       v-if="
@@ -73,7 +73,7 @@
           selectedLoaders = []
           selectedGameVersions = []
           selectedVersionTypes = []
-          updateVersionFilters()
+          updateQuery()
         }
       "
     >
@@ -88,7 +88,6 @@ import Multiselect from 'vue-multiselect'
 import Checkbox from '~/components/ui/Checkbox'
 import ClearIcon from '~/assets/images/utils/clear.svg'
 
-const emit = defineEmits(['updateVersions'])
 const props = defineProps({
   versions: {
     type: Array,
@@ -124,26 +123,9 @@ const gameVersionFilters = shallowRef(
 const versionTypeFilters = shallowRef(Array.from(tempReleaseChannels))
 const includeSnapshots = ref(route.query.s === 'true')
 
-const selectedGameVersions = shallowRef(route.query.g ?? [])
-const selectedLoaders = shallowRef(route.query.l ?? [])
-const selectedVersionTypes = shallowRef(route.query.c ?? [])
-
-async function updateVersionFilters() {
-  const temp = props.versions.filter(
-    (projectVersion) =>
-      (selectedGameVersions.value.length === 0 ||
-        selectedGameVersions.value.some((gameVersion) =>
-          projectVersion.game_versions.includes(gameVersion)
-        )) &&
-      (selectedLoaders.value.length === 0 ||
-        selectedLoaders.value.some((loader) => projectVersion.loaders.includes(loader))) &&
-      (selectedVersionTypes.value.length === 0 ||
-        selectedVersionTypes.value.includes(projectVersion.version_type))
-  )
-
-  await updateQuery()
-  emit('updateVersions', temp)
-}
+const selectedGameVersions = shallowRef(getArrayOrString(route.query.g) ?? [])
+const selectedLoaders = shallowRef(getArrayOrString(route.query.l) ?? [])
+const selectedVersionTypes = shallowRef(getArrayOrString(route.query.c) ?? [])
 
 async function updateQuery() {
   const router = useRouter()
