@@ -39,7 +39,7 @@ export default {
   flex-wrap: wrap;
   gap: var(--gap-sm);
 
-  span ::v-deep {
+  :deep(span) {
     display: flex;
     flex-direction: row;
     color: var(--color-icon);
