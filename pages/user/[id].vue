@@ -528,4 +528,10 @@ export default defineNuxtComponent({
 .textarea-wrapper {
   height: 10rem;
 }
+
+@media (max-width: 400px) {
+  .sidebar {
+    padding-top: 3rem;
+  }
+}
 </style>
