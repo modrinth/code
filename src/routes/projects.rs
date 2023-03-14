@@ -884,9 +884,11 @@ pub async fn project_edit(
                     }
                 }
 
-                {
+                // Make sure the new slug is different from the old one
+                // We are able to unwrap here because the slug is always set
+                if !slug.eq(&project_item.inner.slug.unwrap_or_default()) {
                     let results = sqlx::query!(
-                        "
+                      "
                       SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))
                       ",
                         slug
