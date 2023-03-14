@@ -2,7 +2,7 @@ export const useCosmetics = () =>
   useState('cosmetics', () => {
     const cosmetics = useCookie('cosmetics', {
       maxAge: 60 * 60 * 24 * 365 * 10,
-      sameSite: 'Strict',
+      sameSite: 'lax',
       secure: true,
       httpOnly: false,
       path: '/',
@@ -36,7 +36,7 @@ export const saveCosmetics = () => {
 
   const cosmeticsCookie = useCookie('cosmetics', {
     maxAge: 60 * 60 * 24 * 365 * 10,
-    sameSite: 'Strict',
+    sameSite: 'lax',
     secure: true,
     httpOnly: false,
     path: '/',

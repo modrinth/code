@@ -2,7 +2,7 @@ export const useTheme = () =>
   useState('theme', () => {
     const colorMode = useCookie('color-mode', {
       maxAge: 60 * 60 * 24 * 365 * 10,
-      sameSite: 'Strict',
+      sameSite: 'lax',
       secure: true,
       httpOnly: false,
       path: '/',
@@ -27,7 +27,7 @@ export const updateTheme = (value, updatePreference = false) => {
 
   const themeCookie = useCookie('color-mode', {
     maxAge: 60 * 60 * 24 * 365 * 10,
-    sameSite: 'Strict',
+    sameSite: 'lax',
     secure: true,
     httpOnly: false,
     path: '/',

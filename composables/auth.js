@@ -20,10 +20,10 @@ export const initAuth = async (oldToken = null) => {
   }
   const route = useRoute()
   const authCookie = useCookie('auth-token', {
+    maxAge: 60 * 60 * 24 * 365 * 10,
+    sameSite: 'lax',
     secure: true,
-    sameSite: 'Strict',
     httpOnly: false,
-    expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
     path: '/',
   })
 
