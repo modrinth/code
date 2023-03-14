@@ -23,11 +23,6 @@ export default new createRouter({
       component: Pages.Library,
     },
     {
-      path: '/add-instance',
-      name: 'Add Instance',
-      component: Pages.AddInstance,
-    },
-    {
       path: '/project',
       name: 'Project',
       component: Pages.Project,

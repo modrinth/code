@@ -11,7 +11,7 @@
   align-items: center;
   width: 210px;
   height: 100vh;
-  box-shadow: 0px 0px 8px 3px #00000026;
+  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
 }
 
 .dark-mode {

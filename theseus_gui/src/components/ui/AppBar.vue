@@ -39,7 +39,7 @@ const router = useRouter()
     font-size: 0.9rem;
 
     svg {
-      width: 10.68px;
+      width: 18px;
       transition: all ease-in-out 0.1s;
 
       &:hover {
@@ -48,11 +48,11 @@ const router = useRouter()
     }
 
     p {
-      margin-left: 0.5rem;
+      margin-left: 0.3rem;
     }
 
     svg {
-      margin: auto 0.2rem;
+      margin: auto 0.1rem;
       transition: all ease-in-out 0.1s;
       cursor: pointer;
 

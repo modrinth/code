@@ -1,5 +1,5 @@
 <script setup>
-import { SearchIcon, BookIcon, ClientIcon, PlusIcon, SettingsIcon } from 'omorphia'
+import { SearchIcon, BookIcon, ClientIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useInstances } from '@/store/state'
 import { RouterLink, useRoute } from 'vue-router'
 import SideNav from '@/components/SideNav.vue'
@@ -8,51 +8,27 @@ import Instance from '@/components/ui/Instance.vue'
 const instances = useInstances()
 
 instances.fetchInstances()
-const route = useRoute()
 </script>
 
 <template>
   <SideNav class="navigation">
     <UserSection />
     <div class="pages-list">
-      <RouterLink
-        to="/"
-        class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
-      >
-        <ClientIcon />Home</RouterLink
-      >
-      <RouterLink
-        to="/browse"
-        class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
-      >
-        <SearchIcon />Browse</RouterLink
-      >
-      <RouterLink
-        to="/library"
-        class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
-      >
-        <BookIcon />Library</RouterLink
-      >
+      <RouterLink to="/" class="btn"> <ClientIcon />Home</RouterLink>
+      <RouterLink to="/browse" class="btn"> <SearchIcon />Browse</RouterLink>
+      <RouterLink to="/library" class="btn"> <BookIcon />Library</RouterLink>
     </div>
     <div class="instance-list">
       <p>Instances</p>
       <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
     </div>
-    <RouterLink
-      to="/add-instance"
-      class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
-      id="add-instance-btn"
-    >
+    <Button color="raised">
       <PlusIcon />
       Create Instance
-    </RouterLink>
+    </Button>
 
     <div id="settings">
-      <RouterLink
-        to="/settings"
-        class="omorphia__button button-base padding-block-sm padding-inline-lg radius-md standard-button"
-        ><SettingsIcon /> Settings</RouterLink
-      >
+      <RouterLink to="/settings" class="btn"><SettingsIcon /> Settings</RouterLink>
     </div>
   </SideNav>
 </template>
@@ -124,32 +100,6 @@ const route = useRoute()
     &:hover {
       text-decoration: none;
     }
-  }
-}
-
-#add-instance-btn {
-  background: inherit;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
-  width: 85%;
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  color: var(--color-primary);
-
-  svg {
-    background: var(--color-green);
-    border-radius: var(--radius-sm);
-    width: 25px;
-    height: auto;
-    box-shadow: var(--shadow-inset);
-    color: var(--color-bg);
-  }
-
-  &:hover {
-    text-decoration: none;
-    background-color: var(--color-button-bg);
-    box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
   }
 }
 </style>

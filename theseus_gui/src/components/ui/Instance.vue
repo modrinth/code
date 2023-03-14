@@ -90,55 +90,52 @@ const props = defineProps({
   }
 }
 
-/* from Knossos */
 .instance-card-item {
-  position: relative;
   display: flex;
-
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  padding: 1rem;
-  gap: 1rem;
-  border-radius: 1rem;
-  border: 1px solid var(--color-raised-bg);
-  transition: background 0.1s ease-in-out, transform 0.02s ease-in-out;
+  width: 190px;
+  transition: 0.1s ease-in-out all;
 
   &:hover {
-    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.5);
+    filter: brightness(0.85);
   }
 
   img {
-    height: 3rem;
+    width: 160px;
+    border-radius: var(--radius-sm);
+    filter: none !important;
   }
 
   .project-info {
-    box-sizing: border-box;
-  }
+    margin-top: 1rem;
+    width: 100%;
 
-  .title {
-    color: var(--color-primary);
-    max-width: 13.75rem;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    margin: 0;
-    font-weight: 600;
-    font-size: 1.25rem;
-    line-height: 110%;
-    display: block;
-  }
+    .title {
+      color: var(--color-contrast);
+      max-width: 6rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin: 0;
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 110%;
+      display: inline-block;
+    }
 
-  .description {
-    width: 13.75rem;
-
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-
-    font-weight: 500;
-    font-size: 0.875rem;
-    line-height: 125%;
-    margin: 0.25rem 0 0;
+    .description {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-weight: 500;
+      font-size: 0.775rem;
+      line-height: 125%;
+      margin: 0.25rem 0 0;
+    }
   }
 }
 </style>
