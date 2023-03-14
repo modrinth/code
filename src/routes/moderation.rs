@@ -30,7 +30,7 @@ pub async fn get_projects(
         "
         SELECT id FROM mods
         WHERE status = $1
-        ORDER BY updated ASC
+        ORDER BY queued ASC
         LIMIT $2;
         ",
         ProjectStatus::Processing.as_str(),

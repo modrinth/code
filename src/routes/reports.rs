@@ -184,7 +184,8 @@ pub async fn reports(
     .await?;
 
     let query_reports = crate::database::models::report_item::Report::get_many(
-        report_ids, &**pool,
+        &report_ids,
+        &**pool,
     )
     .await?;
 

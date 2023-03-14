@@ -121,11 +121,11 @@ pub async fn teams_get(
         .collect::<Vec<crate::database::models::ids::TeamId>>();
 
     let teams_data =
-        TeamMember::get_from_team_full_many(team_ids.clone(), &**pool).await?;
+        TeamMember::get_from_team_full_many(&team_ids, &**pool).await?;
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
     let accepted = if let Some(user) = current_user {
-        TeamMember::get_from_user_id_many(team_ids, user.id.into(), &**pool)
+        TeamMember::get_from_user_id_many(&team_ids, user.id.into(), &**pool)
             .await?
             .into_iter()
             .map(|m| m.team_id.0)

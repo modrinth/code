@@ -48,6 +48,8 @@ pub struct Project {
     /// The date at which the project was first approved.
     //pub approved: Option<DateTime<Utc>>,
     pub approved: Option<DateTime<Utc>>,
+    /// The date at which the project entered the moderation queue
+    pub queued: Option<DateTime<Utc>>,
 
     /// The status of the project
     pub status: ProjectStatus,
@@ -122,6 +124,7 @@ impl From<QueryProject> for Project {
             published: m.published,
             updated: m.updated,
             approved: m.approved,
+            queued: m.queued,
             status: m.status,
             requested_status: m.requested_status,
             moderator_message: if let Some(message) = m.moderation_message {

@@ -44,9 +44,9 @@ pub async fn users_get(
     let user_ids = serde_json::from_str::<Vec<UserId>>(&ids.ids)?
         .into_iter()
         .map(|x| x.into())
-        .collect();
+        .collect::<Vec<crate::database::models::UserId>>();
 
-    let users_data = User::get_many(user_ids, &**pool).await?;
+    let users_data = User::get_many(&user_ids, &**pool).await?;
 
     let users: Vec<crate::models::users::User> =
         users_data.into_iter().map(From::from).collect();

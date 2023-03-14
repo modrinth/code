@@ -63,14 +63,12 @@ pub async fn get_version_from_hash(
     .fetch_all(&**pool)
     .await?;
 
-    let versions_data = database::models::Version::get_many_full(
-        result
-            .iter()
-            .map(|x| database::models::VersionId(x.version_id))
-            .collect(),
-        &**pool,
-    )
-    .await?;
+    let version_ids = result
+        .iter()
+        .map(|x| database::models::VersionId(x.version_id))
+        .collect::<Vec<_>>();
+    let versions_data =
+        database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     if let Some(first) = versions_data.first() {
         if hash_query.multiple {
@@ -357,14 +355,12 @@ pub async fn get_versions_from_hashes(
     .fetch_all(&**pool)
     .await?;
 
-    let versions_data = database::models::Version::get_many_full(
-        result
-            .iter()
-            .map(|x| database::models::VersionId(x.version_id))
-            .collect(),
-        &**pool,
-    )
-    .await?;
+    let version_ids = result
+        .iter()
+        .map(|x| database::models::VersionId(x.version_id))
+        .collect::<Vec<_>>();
+    let versions_data =
+        database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     let response: Result<HashMap<String, Version>, ApiError> = result
         .into_iter()
@@ -518,11 +514,10 @@ pub async fn update_files(
         }
     }
 
-    let versions = database::models::Version::get_many_full(
-        version_ids.keys().copied().collect(),
-        &**pool,
-    )
-    .await?;
+    let query_version_ids = version_ids.keys().copied().collect::<Vec<_>>();
+    let versions =
+        database::models::Version::get_many_full(&query_version_ids, &**pool)
+            .await?;
 
     let mut response = HashMap::new();
 

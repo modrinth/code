@@ -55,6 +55,7 @@ struct DiscordWebhook {
     pub avatar_url: Option<String>,
     pub username: Option<String>,
     pub embeds: Vec<DiscordEmbed>,
+    pub content: Option<String>,
 }
 
 const PLUGIN_LOADERS: &[&str] = &[
@@ -72,6 +73,7 @@ pub async fn send_discord_webhook(
     project_id: ProjectId,
     pool: &PgPool,
     webhook_url: String,
+    message: Option<String>,
 ) -> Result<(), ApiError> {
     let all_game_versions = GameVersion::list(pool).await?;
 
@@ -257,6 +259,7 @@ pub async fn send_discord_webhook(
                 ),
                 username: Some("Modrinth Release".to_string()),
                 embeds: vec![embed],
+                content: message,
             })
             .send()
             .await

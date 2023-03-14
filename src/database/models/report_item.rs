@@ -60,36 +60,13 @@ impl Report {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created
-            FROM reports r
-            INNER JOIN report_types rt ON rt.id = r.report_type_id
-            WHERE r.id = $1
-            ",
-            id as ReportId,
-        )
-        .fetch_optional(exec)
-        .await?;
-
-        if let Some(row) = result {
-            Ok(Some(QueryReport {
-                id,
-                report_type: row.name,
-                project_id: row.mod_id.map(ProjectId),
-                version_id: row.version_id.map(VersionId),
-                user_id: row.user_id.map(UserId),
-                body: row.body,
-                reporter: UserId(row.reporter),
-                created: row.created,
-            }))
-        } else {
-            Ok(None)
-        }
+        Self::get_many(&[id], exec)
+            .await
+            .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many<'a, E>(
-        report_ids: Vec<ReportId>,
+        report_ids: &[ReportId],
         exec: E,
     ) -> Result<Vec<QueryReport>, sqlx::Error>
     where
@@ -98,7 +75,7 @@ impl Report {
         use futures::stream::TryStreamExt;
 
         let report_ids_parsed: Vec<i64> =
-            report_ids.into_iter().map(|x| x.0).collect();
+            report_ids.iter().map(|x| x.0).collect();
         let reports = sqlx::query!(
             "
             SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created

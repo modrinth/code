@@ -31,7 +31,7 @@ pub async fn mods_list(
         let project_data = User::get_projects(id, &**pool).await?;
 
         let response: Vec<_> =
-            crate::database::Project::get_many(project_data, &**pool)
+            crate::database::Project::get_many(&project_data, &**pool)
                 .await?
                 .into_iter()
                 .filter(|x| can_view_private || x.status.is_approved())

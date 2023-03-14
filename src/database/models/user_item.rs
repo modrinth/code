@@ -56,49 +56,11 @@ impl User {
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT u.github_id, u.name, u.email,
-                u.avatar_url, u.username, u.bio,
-                u.created, u.role, u.badges,
-                u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address, u.flame_anvil_key
-            FROM users u
-            WHERE u.id = $1
-            ",
-            id as UserId,
-        )
-        .fetch_optional(executor)
-        .await?;
-
-        if let Some(row) = result {
-            Ok(Some(User {
-                id,
-                github_id: row.github_id,
-                name: row.name,
-                email: row.email,
-                avatar_url: row.avatar_url,
-                username: row.username,
-                bio: row.bio,
-                created: row.created,
-                role: row.role,
-                badges: Badges::from_bits(row.badges as u64)
-                    .unwrap_or_default(),
-                balance: row.balance,
-                payout_wallet: row
-                    .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&x)),
-                payout_wallet_type: row
-                    .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&x)),
-                payout_address: row.payout_address,
-                flame_anvil_key: row.flame_anvil_key,
-            }))
-        } else {
-            Ok(None)
-        }
+        Self::get_many(&[id], executor)
+            .await
+            .map(|x| x.into_iter().next())
     }
 
     pub async fn get_from_github_id<'a, 'b, E>(
@@ -202,7 +164,7 @@ impl User {
     }
 
     pub async fn get_many<'a, E>(
-        user_ids: Vec<UserId>,
+        user_ids: &[UserId],
         exec: E,
     ) -> Result<Vec<User>, sqlx::Error>
     where
@@ -210,8 +172,7 @@ impl User {
     {
         use futures::stream::TryStreamExt;
 
-        let user_ids_parsed: Vec<i64> =
-            user_ids.into_iter().map(|x| x.0).collect();
+        let user_ids_parsed: Vec<i64> = user_ids.iter().map(|x| x.0).collect();
         let users = sqlx::query!(
             "
             SELECT u.id, u.github_id, u.name, u.email,

@@ -45,7 +45,7 @@ pub async fn forge_updates(
     .await?;
 
     let versions =
-        database::models::Version::get_many_full(version_ids, &**pool).await?;
+        database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     let mut versions =
         filter_authorized_versions(versions, &user_option, &pool).await?;

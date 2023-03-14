@@ -32,7 +32,7 @@ pub async fn notifications_get(
 
     let notifications_data: Vec<DBNotification> =
         database::models::notification_item::Notification::get_many(
-            notification_ids,
+            &notification_ids,
             &**pool,
         )
         .await?;
@@ -127,13 +127,13 @@ pub async fn notifications_delete(
         serde_json::from_str::<Vec<NotificationId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
-            .collect();
+            .collect::<Vec<_>>();
 
     let mut transaction = pool.begin().await?;
 
     let notifications_data =
         database::models::notification_item::Notification::get_many(
-            notification_ids,
+            &notification_ids,
             &**pool,
         )
         .await?;
@@ -148,7 +148,7 @@ pub async fn notifications_delete(
     }
 
     database::models::notification_item::Notification::remove_many(
-        notifications,
+        &notifications,
         &mut transaction,
     )
     .await?;

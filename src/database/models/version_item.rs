@@ -573,46 +573,15 @@ impl Version {
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT v.mod_id, v.author_id, v.name, v.version_number,
-                v.changelog, v.date_published, v.downloads,
-                v.version_type, v.featured, v.status, v.requested_status
-            FROM versions v
-            WHERE v.id = $1
-            ",
-            id as VersionId,
-        )
-        .fetch_optional(executor)
-        .await?;
-
-        if let Some(row) = result {
-            Ok(Some(Version {
-                id,
-                project_id: ProjectId(row.mod_id),
-                author_id: UserId(row.author_id),
-                name: row.name,
-                version_number: row.version_number,
-                changelog: row.changelog,
-                changelog_url: None,
-                date_published: row.date_published,
-                downloads: row.downloads,
-                version_type: row.version_type,
-                featured: row.featured,
-                status: VersionStatus::from_str(&row.status),
-                requested_status: row
-                    .requested_status
-                    .map(|x| VersionStatus::from_str(&x)),
-            }))
-        } else {
-            Ok(None)
-        }
+        Self::get_many(&[id], executor)
+            .await
+            .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many<'a, E>(
-        version_ids: Vec<VersionId>,
+        version_ids: &[VersionId],
         exec: E,
     ) -> Result<Vec<Version>, sqlx::Error>
     where
@@ -621,7 +590,7 @@ impl Version {
         use futures::stream::TryStreamExt;
 
         let version_ids_parsed: Vec<i64> =
-            version_ids.into_iter().map(|x| x.0).collect();
+            version_ids.iter().map(|x| x.0).collect();
         let versions = sqlx::query!(
             "
             SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
@@ -664,151 +633,15 @@ impl Version {
         executor: E,
     ) -> Result<Option<QueryVersion>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
-            v.changelog changelog, v.date_published date_published, v.downloads downloads,
-            v.version_type version_type, v.featured featured, v.status status, v.requested_status requested_status,
-            JSONB_AGG(DISTINCT jsonb_build_object('version', gv.version, 'created', gv.created)) filter (where gv.version is not null) game_versions,
-            ARRAY_AGG(DISTINCT l.loader) filter (where l.loader is not null) loaders,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', f.id, 'url', f.url, 'filename', f.filename, 'primary', f.is_primary, 'size', f.size, 'file_type', f.file_type))  filter (where f.id is not null) files,
-            JSONB_AGG(DISTINCT jsonb_build_object('algorithm', h.algorithm, 'hash', encode(h.hash, 'escape'), 'file_id', h.file_id)) filter (where h.hash is not null) hashes,
-            JSONB_AGG(DISTINCT jsonb_build_object('project_id', d.mod_dependency_id, 'version_id', d.dependency_id, 'dependency_type', d.dependency_type,'file_name', dependency_file_name)) filter (where d.dependency_type is not null) dependencies
-            FROM versions v
-            LEFT OUTER JOIN game_versions_versions gvv on v.id = gvv.joining_version_id
-            LEFT OUTER JOIN game_versions gv on gvv.game_version_id = gv.id
-            LEFT OUTER JOIN loaders_versions lv on v.id = lv.version_id
-            LEFT OUTER JOIN loaders l on lv.loader_id = l.id
-            LEFT OUTER JOIN files f on v.id = f.version_id
-            LEFT OUTER JOIN hashes h on f.id = h.file_id
-            LEFT OUTER JOIN dependencies d on v.id = d.dependent_id
-            WHERE v.id = $1
-            GROUP BY v.id;
-            ",
-            id as VersionId,
-        )
-            .fetch_optional(executor)
-            .await?;
-
-        if let Some(v) = result {
-            Ok(Some(QueryVersion {
-                inner: Version {
-                    id: VersionId(v.id),
-                    project_id: ProjectId(v.mod_id),
-                    author_id: UserId(v.author_id),
-                    name: v.version_name,
-                    version_number: v.version_number,
-                    changelog: v.changelog,
-                    changelog_url: None,
-                    date_published: v.date_published,
-                    downloads: v.downloads,
-                    version_type: v.version_type,
-                    featured: v.featured,
-                    status: VersionStatus::from_str(&v.status),
-                    requested_status: v
-                        .requested_status
-                        .map(|x| VersionStatus::from_str(&x)),
-                },
-                files: {
-                    #[derive(Deserialize, Debug)]
-                    struct Hash {
-                        pub file_id: FileId,
-                        pub algorithm: String,
-                        pub hash: String,
-                    }
-
-                    #[derive(Deserialize, Debug)]
-                    struct File {
-                        pub id: FileId,
-                        pub url: String,
-                        pub filename: String,
-                        pub primary: bool,
-                        pub size: u32,
-                        pub file_type: Option<FileType>,
-                    }
-
-                    let hashes: Vec<Hash> =
-                        serde_json::from_value(v.hashes.unwrap_or_default())
-                            .ok()
-                            .unwrap_or_default();
-
-                    let files: Vec<File> =
-                        serde_json::from_value(v.files.unwrap_or_default())
-                            .ok()
-                            .unwrap_or_default();
-
-                    let mut files = files
-                        .into_iter()
-                        .map(|x| {
-                            let mut file_hashes = HashMap::new();
-
-                            for hash in &hashes {
-                                if hash.file_id == x.id {
-                                    file_hashes.insert(
-                                        hash.algorithm.clone(),
-                                        hash.hash.clone(),
-                                    );
-                                }
-                            }
-
-                            QueryFile {
-                                id: x.id,
-                                url: x.url,
-                                filename: x.filename,
-                                hashes: file_hashes,
-                                primary: x.primary,
-                                size: x.size,
-                                file_type: x.file_type,
-                            }
-                        })
-                        .collect::<Vec<_>>();
-
-                    files.sort_by(|a, b| {
-                        if a.primary {
-                            Ordering::Less
-                        } else if b.primary {
-                            Ordering::Greater
-                        } else {
-                            a.filename.cmp(&b.filename)
-                        }
-                    });
-
-                    files
-                },
-                game_versions: {
-                    #[derive(Deserialize)]
-                    struct GameVersion {
-                        pub version: String,
-                        pub created: DateTime<Utc>,
-                    }
-
-                    let mut game_versions: Vec<GameVersion> =
-                        serde_json::from_value(
-                            v.game_versions.unwrap_or_default(),
-                        )
-                        .ok()
-                        .unwrap_or_default();
-
-                    game_versions.sort_by(|a, b| a.created.cmp(&b.created));
-
-                    game_versions.into_iter().map(|x| x.version).collect()
-                },
-                loaders: v.loaders.unwrap_or_default(),
-                dependencies: serde_json::from_value(
-                    v.dependencies.unwrap_or_default(),
-                )
-                .ok()
-                .unwrap_or_default(),
-            }))
-        } else {
-            Ok(None)
-        }
+        Self::get_many_full(&[id], executor)
+            .await
+            .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many_full<'a, E>(
-        version_ids: Vec<VersionId>,
+        version_ids: &[VersionId],
         exec: E,
     ) -> Result<Vec<QueryVersion>, sqlx::Error>
     where
@@ -817,7 +650,7 @@ impl Version {
         use futures::stream::TryStreamExt;
 
         let version_ids_parsed: Vec<i64> =
-            version_ids.into_iter().map(|x| x.0).collect();
+            version_ids.iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,

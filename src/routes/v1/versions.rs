@@ -84,7 +84,7 @@ pub async fn version_list(
         .await?;
 
         let mut versions =
-            database::models::Version::get_many_full(version_ids, &**pool)
+            database::models::Version::get_many_full(&version_ids, &**pool)
                 .await?;
 
         let mut response = versions
@@ -165,9 +165,9 @@ pub async fn versions_get(
     let version_ids = serde_json::from_str::<Vec<VersionId>>(&ids.ids)?
         .into_iter()
         .map(|x| x.into())
-        .collect();
+        .collect::<Vec<database::models::VersionId>>();
     let versions_data =
-        database::models::Version::get_many_full(version_ids, &**pool).await?;
+        database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     let mut versions = Vec::new();
 

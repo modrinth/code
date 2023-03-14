@@ -67,7 +67,7 @@ pub async fn version_list(
         .await?;
 
         let mut versions =
-            database::models::Version::get_many_full(version_ids, &**pool)
+            database::models::Version::get_many_full(&version_ids, &**pool)
                 .await?;
 
         let mut response = versions
@@ -179,9 +179,9 @@ pub async fn versions_get(
         serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
             .into_iter()
             .map(|x| x.into())
-            .collect();
+            .collect::<Vec<database::models::VersionId>>();
     let versions_data =
-        database::models::Version::get_many_full(version_ids, &**pool).await?;
+        database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 

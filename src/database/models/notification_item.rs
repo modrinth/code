@@ -121,45 +121,15 @@ impl Notification {
         executor: E,
     ) -> Result<Option<Self>, sqlx::error::Error>
     where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let result = sqlx::query!(
-            "
-            SELECT n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions
-            FROM notifications n
-            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id
-            WHERE n.id = $1
-            GROUP BY n.id, n.user_id;
-            ",
-            id as NotificationId,
-        )
-            .fetch_optional(executor)
-            .await?;
-
-        if let Some(row) = result {
-            Ok(Some(Notification {
-                id,
-                user_id: UserId(row.user_id),
-                notification_type: row.notification_type,
-                title: row.title,
-                text: row.text,
-                link: row.link,
-                read: row.read,
-                created: row.created,
-                actions: serde_json::from_value(
-                    row.actions.unwrap_or_default(),
-                )
-                .ok()
-                .unwrap_or_default(),
-            }))
-        } else {
-            Ok(None)
-        }
+        Self::get_many(&[id], executor)
+            .await
+            .map(|x| x.into_iter().next())
     }
 
     pub async fn get_many<'a, E>(
-        notification_ids: Vec<NotificationId>,
+        notification_ids: &[NotificationId],
         exec: E,
     ) -> Result<Vec<Notification>, sqlx::Error>
     where
@@ -168,7 +138,7 @@ impl Notification {
         use futures::stream::TryStreamExt;
 
         let notification_ids_parsed: Vec<i64> =
-            notification_ids.into_iter().map(|x| x.0).collect();
+            notification_ids.iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,
@@ -257,35 +227,15 @@ impl Notification {
         id: NotificationId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, sqlx::error::Error> {
-        sqlx::query!(
-            "
-            DELETE FROM notifications_actions
-            WHERE notification_id = $1
-            ",
-            id as NotificationId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        sqlx::query!(
-            "
-            DELETE FROM notifications
-            WHERE id = $1
-            ",
-            id as NotificationId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
-        Ok(Some(()))
+        Self::remove_many(&[id], transaction).await
     }
 
     pub async fn remove_many(
-        notification_ids: Vec<NotificationId>,
+        notification_ids: &[NotificationId],
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<Option<()>, sqlx::error::Error> {
         let notification_ids_parsed: Vec<i64> =
-            notification_ids.into_iter().map(|x| x.0).collect();
+            notification_ids.iter().map(|x| x.0).collect();
 
         sqlx::query!(
             "
