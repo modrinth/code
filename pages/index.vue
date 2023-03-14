@@ -1222,9 +1222,10 @@ const [
             font-size: 1.5rem;
           }
         }
+
         .blob-demonstration {
           .demo-search {
-            height: 37.5rem;
+            min-height: 37.5rem;
           }
 
           .launcher-view {
