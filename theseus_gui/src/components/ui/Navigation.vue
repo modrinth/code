@@ -21,12 +21,12 @@ instances.fetchInstances()
       <p>Instances</p>
       <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
     </div>
-    <Button color="raised">
+    <Button class="add-instance-btn">
       <PlusIcon />
       Create Instance
     </Button>
 
-    <div id="settings">
+    <div class="settings">
       <RouterLink to="/settings" class="btn"><SettingsIcon /> Settings</RouterLink>
     </div>
   </div>
@@ -58,13 +58,18 @@ instances.fetchInstances()
     display: flex;
     align-items: flex-start;
     width: 80%;
-    margin: 0.3rem auto;
+    margin: 0.2rem auto;
     text-align: left;
     font-size: 0.9rem;
     font-weight: 400;
+    word-spacing: 3px;
     background: inherit;
     transition: all ease-in-out 0.1s;
     color: var(--color-primary);
+
+    &.router-link-active {
+      color: #000;
+    }
 
     &:hover {
       background-color: var(--color-button-bg);
@@ -73,7 +78,17 @@ instances.fetchInstances()
     }
 
     svg {
-      margin-right: 0.25rem;
+      margin-right: 1rem;
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+  }
+}
+
+.dark-mode {
+  .pages-list {
+    a.router-link-active {
+      color: #fff;
     }
   }
 }
@@ -87,28 +102,42 @@ instances.fetchInstances()
 
   & > p {
     color: var(--color-base);
-    margin: 1rem 0;
-    font-size: 1.2rem;
+    margin: 0.8rem 0;
+    font-size: 0.7rem;
     line-height: 13px;
     font-weight: 500;
     text-transform: uppercase;
   }
 }
 
-#settings {
+.add-instance-btn {
+  background-color: var(--color-bg);
+  font-size: 0.9rem;
+  margin-right: 0.6rem;
+
+  svg {
+    background-color: var(--color-green);
+    width: 1.5rem;
+    height: 1.5rem;
+    color: var(--color-accent-contrast);
+    border-radius: var(--radius-xs);
+  }
+}
+
+.settings {
   display: flex;
   align-items: center;
-  margin: auto 1rem 0.5rem 1rem;
+  margin: auto auto 0.5rem 1rem;
   width: 150px;
 
   a {
     display: flex;
-    justify-content: space-evenly;
-    align-items: center;
-    width: 80%;
-    margin: auto;
     background: inherit;
     color: var(--color-primary);
+
+    svg {
+      margin-right: 0.9em;
+    }
 
     &:hover {
       text-decoration: none;

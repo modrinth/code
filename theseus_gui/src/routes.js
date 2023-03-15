@@ -33,4 +33,6 @@ export default new createRouter({
       component: Pages.Settings,
     },
   ],
+  linkActiveClass: 'router-link-active',
+  linkExactActiveClass: 'router-link-exact-active',
 })

@@ -4,9 +4,9 @@ import { Avatar } from 'omorphia'
 
 <template>
   <section class="user-section">
-    <Avatar size="sm" circle src="https://cdn.modrinth.com/data/AANobbMI/icon.png" />
+    <Avatar size="sm" src="https://cdn.modrinth.com/data/AANobbMI/icon.png" />
     <section>
-      <p id="username">OreoViking</p>
+      <p class="username">OreoViking</p>
       <a href="#">Manage accounts</a>
     </section>
   </section>
@@ -29,11 +29,12 @@ import { Avatar } from 'omorphia'
     margin-left: 0.5rem;
   }
 
-  #username {
+  .username {
     margin-bottom: 0.3rem;
     font-size: 1.1rem;
     font-weight: 400;
     line-height: 19px;
+    color: var(--color-contrast);
   }
 
   a {
