@@ -40,6 +40,9 @@ const handlePaginationDisplay = () => {
 
 onMounted(() => {
   if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
+
+  // Check if pagination should be rendered on mount
+  handlePaginationDisplay()
 })
 
 onUnmounted(() => {
@@ -112,12 +115,12 @@ const handleRightPage = () => {
     gap: 1rem;
 
     p {
-      font-size: 0.85rem;
+      font-size: 1rem;
       white-space: nowrap;
     }
 
     hr {
-      background: var(--color-base);
+      background-color: #000;
       height: 1px;
       width: 100%;
       border: none;
@@ -196,6 +199,10 @@ const handleRightPage = () => {
   .row {
     &:nth-child(even) {
       background-color: rgba(22, 24, 28, 0.3);
+    }
+
+    hr {
+      background-color: #fff;
     }
   }
 }

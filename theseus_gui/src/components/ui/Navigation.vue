@@ -1,8 +1,7 @@
 <script setup>
 import { SearchIcon, BookIcon, ClientIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useInstances } from '@/store/state'
-import { RouterLink, useRoute } from 'vue-router'
-import SideNav from '@/components/SideNav.vue'
+import { RouterLink } from 'vue-router'
 import UserSection from '@/components/ui/UserSection.vue'
 import Instance from '@/components/ui/Instance.vue'
 const instances = useInstances()
@@ -11,7 +10,7 @@ instances.fetchInstances()
 </script>
 
 <template>
-  <SideNav class="navigation">
+  <div class="nav-container">
     <UserSection />
     <div class="pages-list">
       <RouterLink to="/" class="btn"> <ClientIcon />Home</RouterLink>
@@ -30,10 +29,24 @@ instances.fetchInstances()
     <div id="settings">
       <RouterLink to="/settings" class="btn"><SettingsIcon /> Settings</RouterLink>
     </div>
-  </SideNav>
+  </div>
 </template>
 
 <style lang="scss" scoped>
+.nav-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 210px;
+  height: 100vh;
+  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+}
+
+.dark-mode {
+  .nav-container {
+    background: var(--color-bg);
+  }
+}
 .pages-list {
   display: flex;
   flex-direction: column;

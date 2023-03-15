@@ -30,14 +30,13 @@ const props = defineProps({
 <style lang="scss" scoped>
 .instance-list-item {
   display: inline-block;
-  margin: 0.2rem auto;
+  margin: 0.25rem auto;
   cursor: pointer;
   transition: all ease-out 0.1s;
   font-size: 0.8rem;
   color: var(--color-primary);
 
   &:hover {
-    font-weight: bold;
     text-decoration: none;
     filter: brightness(150%);
   }
