@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { Card, LogOutIcon, PlusIcon } from 'omorphia'
+import { Card, PlusIcon } from 'omorphia'
 
 const props = defineProps({
   display: String,
@@ -13,17 +13,6 @@ const props = defineProps({
     <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`${props.instance.id}`">{{
       props.instance.name
     }}</RouterLink>
-    <div
-      class="instance-gallery-item"
-      :style="{
-        backgroundImage: `url(${props.instance.img})`,
-      }"
-      v-else-if="display === 'gallery'"
-    >
-      <p>{{ props.instance.version }}</p>
-      <p>{{ props.instance.name }}</p>
-      <div class="cta"><LogOutIcon /></div>
-    </div>
     <Card class="instance-card-item" v-else-if="display === 'card'">
       <img :src="props.instance.img" alt="Trending mod card" />
       <div class="project-info">

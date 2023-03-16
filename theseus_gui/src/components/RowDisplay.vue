@@ -14,24 +14,15 @@ const props = defineProps({
 const allowPagination = ref(false)
 const modsRow = ref(null)
 const newsRow = ref(null)
-const trendingRow = ref(null)
 
-const shouldRenderNormalInstances =
-  props.instances &&
-  props.instances?.length !== 0 &&
-  !props.canPaginate &&
-  props.instances?.some((i) => !i.trending)
+// Remove after state is populated with real data
+const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
-const shouldRenderTrending =
-  props.instances &&
-  props.instances?.length !== 0 &&
-  props.instances?.every((i) => i.trending || i.downloads > 50)
 
 const handlePaginationDisplay = () => {
   let parentsRow
   if (shouldRenderNormalInstances) parentsRow = modsRow.value
   if (shouldRenderNews) parentsRow = newsRow.value
-  else if (shouldRenderTrending) parentsRow = trendingRow.value
 
   if (!parentsRow) return
 
@@ -57,13 +48,11 @@ onUnmounted(() => {
 const handleLeftPage = () => {
   if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
   else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
-  else if (shouldRenderTrending) trendingRow.value.scrollLeft -= 170
 }
 
 const handleRightPage = () => {
   if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 170
   else if (shouldRenderNews) newsRow.value.scrollLeft += 170
-  else if (shouldRenderTrending) trendingRow.value.scrollLeft += 170
 }
 </script>
 
@@ -77,24 +66,16 @@ const handleRightPage = () => {
         <ChevronRightIcon @click="handleRightPage" />
       </div>
     </div>
-    <section ref="modsRow" class="mods" v-if="shouldRenderNormalInstances">
-      <Instance
-        v-for="instance in props.instances"
-        :key="instance.id"
-        display="gallery"
-        :instance="instance"
-      />
-    </section>
-    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
-      <News v-for="news in props.news" :key="news.id" :news="news" />
-    </section>
-    <section ref="trendingRow" class="trending" v-else-if="shouldRenderTrending">
+    <section ref="modsRow" class="instances" v-if="shouldRenderNormalInstances">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
         display="card"
         :instance="instance"
       />
+    </section>
+    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
+      <News v-for="news in props.news" :key="news.id" :news="news" />
     </section>
   </div>
 </template>
@@ -107,8 +88,8 @@ const handleRightPage = () => {
   width: 100%;
   padding: 1rem;
 
-  &:nth-child(odd) {
-    background: var(--color-raised-bg);
+  &:nth-child(even) {
+    background: var(--color-bg);
   }
 
   .header {
@@ -122,10 +103,11 @@ const handleRightPage = () => {
     p {
       font-size: 1rem;
       white-space: nowrap;
+      color: var(--color-contrast);
     }
 
     hr {
-      background-color: #000;
+      background-color: var(--color-gray);
       height: 1px;
       width: 100%;
       border: none;
@@ -136,6 +118,10 @@ const handleRightPage = () => {
       align-items: inherit;
 
       svg {
+        background: var(--color-raised-bg);
+        border-radius: var(--radius-lg);
+        width: 1.3rem;
+        height: 1.2rem;
         cursor: pointer;
         margin-right: 0.5rem;
         transition: all ease-in-out 0.1s;
@@ -154,21 +140,6 @@ const handleRightPage = () => {
     gap: 1rem;
   }
 
-  .mods {
-    width: 100%;
-    height: 8.75rem;
-    margin: auto;
-    transition: all ease-in-out 0.4s;
-    scroll-behavior: smooth;
-    overflow-x: scroll;
-    overflow-y: hidden;
-
-    &::-webkit-scrollbar {
-      width: 0px;
-      background: transparent;
-    }
-  }
-
   .news {
     margin: auto;
     width: 100%;
@@ -182,7 +153,7 @@ const handleRightPage = () => {
     }
   }
 
-  .trending {
+  .instances {
     display: flex;
     flex-direction: row;
     width: 100%;
@@ -203,12 +174,8 @@ const handleRightPage = () => {
 
 .dark-mode {
   .row {
-    &:nth-child(even) {
+    &:nth-child(odd) {
       background-color: rgb(30, 31, 34);
-    }
-
-    hr {
-      background-color: #fff;
     }
   }
 }

@@ -18,7 +18,7 @@ import { Avatar } from 'omorphia'
   justify-content: flex-start;
   align-items: center;
   width: 100%;
-  height: 70px;
+  height: 4.375rem;
   margin-left: 3rem;
 
   section {
@@ -33,7 +33,7 @@ import { Avatar } from 'omorphia'
     margin-bottom: 0.3rem;
     font-size: 1.1rem;
     font-weight: 400;
-    line-height: 19px;
+    line-height: 1.25rem;
     color: var(--color-contrast);
   }
 

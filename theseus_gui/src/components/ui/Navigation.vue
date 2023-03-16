@@ -74,6 +74,7 @@ instances.fetchInstances()
 
     &:hover {
       background-color: var(--color-button-bg);
+      color: var(--color-contrast);
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
       text-decoration: none;
     }
@@ -101,11 +102,15 @@ instances.fetchInstances()
   width: 70%;
   margin: 0.4rem;
 
+  p:nth-child(1) {
+    font-size: 0.6rem;
+  }
+
   & > p {
     color: var(--color-base);
     margin: 0.8rem 0;
     font-size: 0.7rem;
-    line-height: 13px;
+    line-height: 0.8125rem;
     font-weight: 500;
     text-transform: uppercase;
   }
@@ -129,7 +134,7 @@ instances.fetchInstances()
   display: flex;
   align-items: center;
   margin: auto auto 0.5rem 1rem;
-  width: 150px;
+  width: 9.375rem;
 
   a {
     display: flex;

@@ -27,9 +27,9 @@ const props = defineProps({
   display: flex;
   justify-content: center;
   padding: 0;
-  background: var(--color-bg);
-  min-width: 386px; /* from wireframe */
-  min-height: 136px; /* from wireframe */
+  background: var(--color-raised-bg);
+  min-width: 24.125rem; /* from wireframe */
+  min-height: 8.5rem; /* from wireframe */
   box-shadow: var(--shadow-raised-lg);
   cursor: pointer;
 
@@ -40,8 +40,8 @@ const props = defineProps({
 
   img {
     display: flex;
-    width: 135px; /* from wireframe */
-    height: 136px; /* from wireframe */
+    width: 8.4375rem; /* from wireframe */
+    height: 8.5rem; /* from wireframe */
     border-radius: 0.9rem 0 0 0.9rem;
   }
 
@@ -49,7 +49,7 @@ const props = defineProps({
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 136px; /* from wireframe */
+    height: 8.5rem; /* from wireframe */
     padding: 0.45rem;
 
     .headline {
@@ -81,7 +81,7 @@ const props = defineProps({
 
       a {
         transition: all ease-in-out 0.2s;
-        width: 24px;
+        width: 1.5rem;
         color: var(--color-primary);
         font-size: 1.3rem;
 

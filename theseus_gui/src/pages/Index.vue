@@ -7,6 +7,7 @@ const news = useNews()
 instances.fetchInstances()
 news.fetchNews()
 
+// Remove once state is populated with real data
 const recentInstances = instances.instances.slice(0, 4)
 const popularInstances = instances.instances.filter((i) => i.downloads > 50 || i.trending)
 </script>
