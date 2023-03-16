@@ -6,6 +6,15 @@ use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use serde::Deserialize;
 use sqlx::PgPool;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("moderation")
+            .service(get_projects)
+            .service(ban_user)
+            .service(unban_user),
+    );
+}
+
 #[derive(Deserialize)]
 pub struct ResultCount {
     #[serde(default = "default_count")]

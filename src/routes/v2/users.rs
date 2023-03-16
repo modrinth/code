@@ -22,6 +22,24 @@ use std::sync::Arc;
 use tokio::sync::Mutex;
 use validator::Validate;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(user_auth_get);
+    cfg.service(users_get);
+
+    cfg.service(
+        web::scope("user")
+            .service(user_get)
+            .service(projects_list)
+            .service(user_delete)
+            .service(user_edit)
+            .service(user_icon_edit)
+            .service(user_notifications)
+            .service(user_follows)
+            .service(user_payouts)
+            .service(user_payouts_request),
+    );
+}
+
 #[get("user")]
 pub async fn user_auth_get(
     req: HttpRequest,

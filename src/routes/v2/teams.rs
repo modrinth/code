@@ -12,6 +12,22 @@ use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(teams_get);
+
+    cfg.service(
+        web::scope("team")
+            .service(team_members_get)
+            .service(edit_team_member)
+            .service(transfer_ownership)
+            .service(add_team_member)
+            .service(join_team)
+            .service(remove_team_member),
+    );
+
+    cfg.service(web::scope("project").service(team_members_get_project));
+}
+
 #[get("{id}/members")]
 pub async fn team_members_get_project(
     req: HttpRequest,

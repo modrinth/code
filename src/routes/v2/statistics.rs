@@ -3,6 +3,10 @@ use actix_web::{get, web, HttpResponse};
 use serde_json::json;
 use sqlx::PgPool;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(get_stats);
+}
+
 #[get("statistics")]
 pub async fn get_stats(
     pool: web::Data<PgPool>,

@@ -9,6 +9,13 @@ use sqlx::PgPool;
 use std::collections::HashSet;
 use yaserde_derive::YaSerialize;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(maven_metadata);
+    cfg.service(version_file_sha512);
+    cfg.service(version_file_sha1);
+    cfg.service(version_file);
+}
+
 #[derive(Default, Debug, Clone, YaSerialize)]
 #[yaserde(root = "metadata", rename = "metadata")]
 pub struct Metadata {
@@ -18,6 +25,7 @@ pub struct Metadata {
     artifact_id: String,
     versioning: Versioning,
 }
+
 #[derive(Default, Debug, Clone, YaSerialize)]
 #[yaserde(rename = "versioning")]
 pub struct Versioning {
@@ -27,12 +35,14 @@ pub struct Versioning {
     #[yaserde(rename = "lastUpdated")]
     last_updated: String,
 }
+
 #[derive(Default, Debug, Clone, YaSerialize)]
 #[yaserde(rename = "versions")]
 pub struct Versions {
     #[yaserde(rename = "version")]
     versions: Vec<String>,
 }
+
 #[derive(Default, Debug, Clone, YaSerialize)]
 #[yaserde(rename = "project", namespace = "http://maven.apache.org/POM/4.0.0")]
 pub struct MavenPom {

@@ -7,6 +7,17 @@ use actix_web::{delete, get, web, HttpRequest, HttpResponse};
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(notifications_get);
+    cfg.service(notifications_delete);
+
+    cfg.service(
+        web::scope("notification")
+            .service(notification_get)
+            .service(notification_delete),
+    );
+}
+
 #[derive(Serialize, Deserialize)]
 pub struct NotificationIds {
     pub ids: String,

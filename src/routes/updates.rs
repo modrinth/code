@@ -12,6 +12,10 @@ use crate::util::auth::{
 
 use super::ApiError;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(forge_updates);
+}
+
 #[get("{id}/forge_updates.json")]
 pub async fn forge_updates(
     req: HttpRequest,

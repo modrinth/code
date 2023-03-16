@@ -9,6 +9,15 @@ use serde::Deserialize;
 use serde_json::{json, Value};
 use sqlx::PgPool;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("midas")
+            .service(init_checkout)
+            .service(init_customer_portal)
+            .service(handle_stripe_webhook),
+    );
+}
+
 #[derive(Deserialize)]
 pub struct CheckoutData {
     pub price_id: String,

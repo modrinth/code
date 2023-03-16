@@ -1,3 +1,4 @@
+use super::version_creation::InitialVersionData;
 use crate::database::models;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
@@ -6,7 +7,6 @@ use crate::models::projects::{
     VersionStatus,
 };
 use crate::models::users::UserId;
-use crate::routes::version_creation::InitialVersionData;
 use crate::search::indexing::IndexingError;
 use crate::util::auth::{get_user_from_headers, AuthenticationError};
 use crate::util::routes::read_from_field;
@@ -24,6 +24,10 @@ use sqlx::postgres::PgPool;
 use std::sync::Arc;
 use thiserror::Error;
 use validator::Validate;
+
+pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
+    cfg.service(project_create);
+}
 
 #[derive(Error, Debug)]
 pub enum CreateError {

@@ -11,6 +11,14 @@ use sqlx::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(
+        web::scope("admin")
+            .service(count_download)
+            .service(process_payout),
+    );
+}
+
 #[derive(Deserialize)]
 pub struct DownloadBody {
     pub url: String,

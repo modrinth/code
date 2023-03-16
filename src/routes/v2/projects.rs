@@ -24,6 +24,30 @@ use sqlx::PgPool;
 use std::sync::Arc;
 use validator::Validate;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(project_search);
+    cfg.service(projects_get);
+    cfg.service(projects_edit);
+    cfg.service(random_projects_get);
+
+    cfg.service(
+        web::scope("project")
+            .service(project_get)
+            .service(project_get_check)
+            .service(project_delete)
+            .service(project_edit)
+            .service(project_icon_edit)
+            .service(delete_project_icon)
+            .service(add_gallery_item)
+            .service(edit_gallery_item)
+            .service(delete_gallery_item)
+            .service(project_follow)
+            .service(project_unfollow)
+            .service(project_schedule)
+            .service(web::scope("{project_id}").service(dependency_list)),
+    );
+}
+
 #[get("search")]
 pub async fn project_search(
     web::Query(info): web::Query<SearchRequest>,

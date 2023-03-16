@@ -1,3 +1,4 @@
+use super::project_creation::{CreateError, UploadedFile};
 use crate::database::models;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::version_item::{
@@ -10,7 +11,6 @@ use crate::models::projects::{
     Version, VersionFile, VersionId, VersionStatus, VersionType,
 };
 use crate::models::teams::Permissions;
-use crate::routes::project_creation::{CreateError, UploadedFile};
 use crate::util::auth::get_user_from_headers;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
@@ -25,6 +25,12 @@ use sqlx::postgres::PgPool;
 use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
+
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(version_create);
+
+    cfg.service(web::scope("version").service(upload_file_to_version));
+}
 
 fn default_requested_status() -> VersionStatus {
     VersionStatus::Listed

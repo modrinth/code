@@ -12,6 +12,12 @@ use futures::StreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
 
+pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(reports);
+    cfg.service(report_create);
+    cfg.service(delete_report);
+}
+
 #[derive(Deserialize)]
 pub struct CreateReport {
     pub report_type: String,
