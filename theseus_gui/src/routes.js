@@ -23,11 +23,6 @@ export default new createRouter({
       component: Pages.Library,
     },
     {
-      path: '/add-instance',
-      name: 'Add Instance',
-      component: Pages.AddInstance,
-    },
-    {
       path: '/project',
       name: 'Project',
       component: Pages.Project,
@@ -38,4 +33,6 @@ export default new createRouter({
       component: Pages.Settings,
     },
   ],
+  linkActiveClass: 'router-link-active',
+  linkExactActiveClass: 'router-link-exact-active',
 })

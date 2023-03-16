@@ -8,7 +8,7 @@ const props = defineProps({
 
 <template>
   <Card class="news-cta">
-    <img src="https://avatars1.githubusercontent.com/u/6166773?v=4" alt="News Image" />
+    <img :src="props.news.img" alt="News Image" />
     <div class="body">
       <div class="headline">
         <h2>{{ props.news.headline }}</h2>
@@ -25,42 +25,41 @@ const props = defineProps({
 <style lang="scss" scoped>
 .news-cta {
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: 0;
-  background: var(--color-bg);
-  width: 350px;
-  height: 100px;
-  margin: 0.7rem 1rem;
+  background: var(--color-raised-bg);
+  min-width: 24.125rem; /* from wireframe */
+  min-height: 8.5rem; /* from wireframe */
   box-shadow: var(--shadow-raised-lg);
   cursor: pointer;
 
   &:hover {
     box-shadow: var(--shadow-floating);
+    filter: brightness(0.85);
   }
 
   img {
     display: flex;
-    width: 20%;
-    height: 100%;
+    width: 8.4375rem; /* from wireframe */
+    height: 8.5rem; /* from wireframe */
     border-radius: 0.9rem 0 0 0.9rem;
   }
+
   .body {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 80%;
-    height: 100%;
-    margin: 0.9rem;
+    width: 100%;
+    height: 8.5rem; /* from wireframe */
+    padding: 0.45rem;
 
     .headline {
       display: inherit;
       flex-direction: inherit;
-      margin: 0.7rem 0;
+      margin: 0.4rem 0;
+      width: 100%;
 
       h2 {
-        font-size: 0.8rem;
+        font-size: 1rem;
         text-transform: uppercase;
       }
 
@@ -73,22 +72,22 @@ const props = defineProps({
       display: flex;
       justify-content: space-between;
       align-items: center;
-      align-self: flex-end;
       width: 100%;
-      margin: 0px 0px 0.2rem 0.2rem;
+      margin-top: auto;
 
       p {
         font-size: 0.7rem;
       }
 
       a {
-        display: inline-block;
         transition: all ease-in-out 0.2s;
-        width: 20px;
-        font-size: 1.1rem;
+        width: 1.5rem;
+        color: var(--color-primary);
+        font-size: 1.3rem;
 
         &:hover {
-          transform: translate(2px);
+          transform: translate(1px);
+          filter: brightness(150%);
         }
       }
     }

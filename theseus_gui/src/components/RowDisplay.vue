@@ -2,25 +2,57 @@
 import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import News from '@/components/ui/News.vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps({
   instances: Array,
   news: Array,
   label: String,
+  canPaginate: Boolean,
 })
 
-const shouldRenderNormalInstances =
-  props.instances && props.instances?.length !== 0 && props.instances?.some((i) => !i.trending)
+const allowPagination = ref(false)
+const modsRow = ref(null)
+const newsRow = ref(null)
+
+// Remove after state is populated with real data
+const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
-const shouldRenderTrending =
-  props.instances && props.instances?.length !== 0 && props.instances?.every((i) => i.trending)
+
+const handlePaginationDisplay = () => {
+  let parentsRow
+  if (shouldRenderNormalInstances) parentsRow = modsRow.value
+  if (shouldRenderNews) parentsRow = newsRow.value
+
+  if (!parentsRow) return
+
+  const children = parentsRow.children
+  const lastChild = children[children.length - 1]
+  const childBox = lastChild.getBoundingClientRect()
+
+  if (childBox.x + childBox.width > window.innerWidth) allowPagination.value = true
+  else allowPagination.value = false
+}
+
+onMounted(() => {
+  if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
+
+  // Check if pagination should be rendered on mount
+  handlePaginationDisplay()
+})
+
+onUnmounted(() => {
+  if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
+})
 
 const handleLeftPage = () => {
-  console.log('page left')
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
+  else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
 }
 
 const handleRightPage = () => {
-  console.log('page right')
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 170
+  else if (shouldRenderNews) newsRow.value.scrollLeft += 170
 }
 </script>
 
@@ -29,29 +61,21 @@ const handleRightPage = () => {
     <div class="header">
       <p>{{ props.label }}</p>
       <hr aria-hidden="true" />
-      <div class="pagination">
+      <div v-if="allowPagination" class="pagination">
         <ChevronLeftIcon @click="handleLeftPage" />
         <ChevronRightIcon @click="handleRightPage" />
       </div>
     </div>
-    <section class="mods" v-if="shouldRenderNormalInstances">
-      <Instance
-        v-for="instance in props.instances"
-        :key="instance.id"
-        display="gallery"
-        :instance="instance"
-      />
-    </section>
-    <section class="news" v-else-if="shouldRenderNews">
-      <News v-for="news in props.news" :key="news.id" :news="news" />
-    </section>
-    <section class="trending" v-else-if="shouldRenderTrending">
+    <section ref="modsRow" class="instances" v-if="shouldRenderNormalInstances">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
         display="card"
         :instance="instance"
       />
+    </section>
+    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
+      <News v-for="news in props.news" :key="news.id" :news="news" />
     </section>
   </div>
 </template>
@@ -62,36 +86,42 @@ const handleRightPage = () => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 2rem;
-  padding: 1rem 0;
+  padding: 1rem;
 
-  &:nth-child(odd) {
-    background: var(--color-raised-bg);
+  &:nth-child(even) {
+    background: var(--color-bg);
   }
 
   .header {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
     align-items: inherit;
-    width: 95%;
+    width: 100%;
+    margin-bottom: 1rem;
+    gap: 1rem;
 
     p {
       font-size: 1rem;
+      white-space: nowrap;
+      color: var(--color-contrast);
     }
 
     hr {
-      background: var(--color-base);
+      background-color: var(--color-gray);
       height: 1px;
-      width: 60%;
+      width: 100%;
       border: none;
     }
 
     .pagination {
-      width: 20%;
       display: inherit;
       align-items: inherit;
 
       svg {
+        background: var(--color-raised-bg);
+        border-radius: var(--radius-lg);
+        width: 1.3rem;
+        height: 1.2rem;
         cursor: pointer;
         margin-right: 0.5rem;
         transition: all ease-in-out 0.1s;
@@ -107,29 +137,46 @@ const handleRightPage = () => {
     display: flex;
     align-items: inherit;
     transition: all ease-in-out 0.4s;
-  }
-
-  .mods {
-    width: 100%;
-    margin: auto;
-    transition: all ease-in-out 0.4s;
+    gap: 1rem;
   }
 
   .news {
     margin: auto;
     width: 100%;
+    scroll-behavior: smooth;
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
   }
 
-  .trending {
+  .instances {
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-wrap: wrap;
+    flex-direction: row;
+    width: 100%;
     gap: 1rem;
-    height: 160px;
     margin-right: auto;
     margin-top: 0.8rem;
+    scroll-behavior: smooth;
+
+    overflow-x: scroll;
+    overflow-y: hidden;
+
+    &::-webkit-scrollbar {
+      width: 0px;
+      background: transparent;
+    }
+  }
+}
+
+.dark-mode {
+  .row {
+    &:nth-child(odd) {
+      background-color: rgb(30, 31, 34);
+    }
   }
 }
 </style>

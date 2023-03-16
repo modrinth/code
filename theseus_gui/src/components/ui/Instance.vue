@@ -1,32 +1,25 @@
 <script setup>
-import { Card, ProjectCard } from 'omorphia'
+import { RouterLink } from 'vue-router'
+import { Card, PlusIcon } from 'omorphia'
 
 const props = defineProps({
   display: String,
   instance: Object,
 })
-
-const handleInstanceClick = (id) => {
-  console.log(id)
-}
 </script>
 
 <template>
   <div>
-    <div
-      @click="handleInstanceClick(props.instance.id)"
-      class="instance-list-item"
-      v-if="display === 'list'"
-    >
-      <p>{{ props.instance.name }}</p>
-    </div>
-    <div class="instance-gallery-item" v-else-if="display === 'gallery'">
-      <p>{{ props.instance.version }}</p>
-      <p>{{ props.instance.name }}</p>
-    </div>
+    <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`${props.instance.id}`">{{
+      props.instance.name
+    }}</RouterLink>
     <Card class="instance-card-item" v-else-if="display === 'card'">
-      <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
-      <p>{{ props.instance.name }}</p>
+      <img :src="props.instance.img" alt="Trending mod card" />
+      <div class="project-info">
+        <p class="title">{{ props.instance.name }}</p>
+        <p class="description">{{ props.instance.version }}</p>
+      </div>
+      <div class="cta"><PlusIcon /></div>
     </Card>
     <ProjectCard
       v-else-if="display === 'project'"
@@ -71,16 +64,14 @@ const handleInstanceClick = (id) => {
 <style lang="scss" scoped>
 .instance-list-item {
   display: inline-block;
-  margin: 0.2rem auto;
+  margin: 0.25rem auto;
   cursor: pointer;
   transition: all ease-out 0.1s;
-
-  p {
-    font-size: 0.8rem;
-  }
+  font-size: 0.8rem;
+  color: var(--color-primary);
 
   &:hover {
-    font-weight: bold;
+    text-decoration: none;
     filter: brightness(150%);
   }
 }
@@ -88,18 +79,50 @@ const handleInstanceClick = (id) => {
 .instance-gallery-item {
   width: 110px;
   height: 110px;
-  background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
   background-position: center;
   background-size: cover;
-  margin: 1.3rem;
   position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  margin-left: 0.3rem;
   padding: 0.3rem;
   cursor: pointer;
   transition: all ease-in-out 0.2s;
   border-radius: var(--radius-md);
+
+  &:hover {
+    .cta {
+      opacity: 1;
+      top: 0.3rem;
+    }
+  }
+
+  .cta {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-brand);
+    border-radius: var(--radius-lg);
+    width: 2rem;
+    height: 2rem;
+    right: 0.5rem;
+    top: 0.8rem;
+    opacity: 0;
+    transition: 0.2s ease-in-out top, 0.1s ease-in-out opacity;
+    cursor: pointer;
+    z-index: 15;
+
+    svg {
+      color: #fff;
+    }
+
+    &:hover {
+      filter: brightness(0.75);
+      box-shadow: var(--shadow-floating);
+    }
+  }
 
   &:before {
     content: '';
@@ -135,27 +158,87 @@ const handleInstanceClick = (id) => {
 
 .instance-card-item {
   display: flex;
-  justify-content: space-between;
-  min-width: 250px;
-  padding: 0;
-  flex: 1 1 120px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  transition: all ease-in-out 0.1s;
+  width: 180px;
+  padding: 0.75rem;
+  transition: 0.1s ease-in-out all;
 
   &:hover {
-    box-shadow: var(--shadow-raised-lg);
+    filter: brightness(0.85);
+
+    .cta {
+      opacity: 1;
+      bottom: 4.5rem;
+    }
   }
 
-  p {
-    font-size: 0.9rem;
-    display: inline-block;
-    padding: 1rem;
+  .cta {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-brand);
+    border-radius: var(--radius-lg);
+    width: 3rem;
+    height: 3rem;
+    right: 1rem;
+    bottom: 3.5rem;
+    opacity: 0;
+    transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
+    cursor: pointer;
+
+    svg {
+      color: #fff;
+    }
+
+    &:hover {
+      filter: brightness(0.75);
+      box-shadow: var(--shadow-floating);
+    }
   }
 
   img {
-    width: 50px;
-    height: 100%;
-    border-radius: var(--radius-md);
+    width: 160px;
+    border-radius: var(--radius-sm);
+    filter: none !important;
+  }
+
+  .project-info {
+    margin-top: 1rem;
+    width: 100%;
+
+    .title {
+      color: var(--color-contrast);
+      max-width: 6rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      margin: 0;
+      font-weight: 600;
+      font-size: 1rem;
+      line-height: 110%;
+      display: inline-block;
+    }
+
+    .description {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      font-weight: 500;
+      font-size: 0.775rem;
+      line-height: 125%;
+      margin: 0.25rem 0 0;
+    }
+  }
+}
+
+.dark-mode {
+  .cta > svg {
+    color: #000;
   }
 }
 
