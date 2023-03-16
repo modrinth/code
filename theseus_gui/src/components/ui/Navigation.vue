@@ -50,13 +50,13 @@ instances.fetchInstances()
 .pages-list {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: center;
   justify-content: flex-start;
   width: 100%;
 
   a {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     width: 80%;
     margin: 0.2rem auto;
     text-align: left;
@@ -69,6 +69,7 @@ instances.fetchInstances()
 
     &.router-link-active {
       color: #000;
+      background: var(--color-button-bg);
     }
 
     &:hover {

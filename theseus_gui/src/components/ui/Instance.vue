@@ -21,7 +21,7 @@ const props = defineProps({
       <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>
-        <p class="description">{{ props.instance.description }}</p>
+        <p class="description">{{ props.instance.version }}</p>
       </div>
     </Card>
   </div>
@@ -52,6 +52,7 @@ const props = defineProps({
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
+  margin-left: 0.3rem;
   padding: 0.3rem;
   cursor: pointer;
   transition: all ease-in-out 0.2s;
@@ -95,7 +96,8 @@ const props = defineProps({
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: 190px;
+  width: 180px;
+  padding: 0.75rem;
   transition: 0.1s ease-in-out all;
 
   &:hover {

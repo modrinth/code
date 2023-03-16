@@ -17,10 +17,15 @@ const newsRow = ref(null)
 const trendingRow = ref(null)
 
 const shouldRenderNormalInstances =
-  props.instances && props.instances?.length !== 0 && props.instances?.some((i) => !i.trending)
+  props.instances &&
+  props.instances?.length !== 0 &&
+  !props.canPaginate &&
+  props.instances?.some((i) => !i.trending)
 const shouldRenderNews = props.news && props.news?.length !== 0
 const shouldRenderTrending =
-  props.instances && props.instances?.length !== 0 && props.instances?.every((i) => i.trending)
+  props.instances &&
+  props.instances?.length !== 0 &&
+  props.instances?.every((i) => i.trending || i.downloads > 50)
 
 const handlePaginationDisplay = () => {
   let parentsRow
@@ -50,15 +55,15 @@ onUnmounted(() => {
 })
 
 const handleLeftPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 100
-  else if (shouldRenderNews) newsRow.value.scrollLeft -= 100
-  else if (shouldRenderTrending) trendingRow.value.scrollLeft -= 100
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
+  else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
+  else if (shouldRenderTrending) trendingRow.value.scrollLeft -= 170
 }
 
 const handleRightPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 100
-  else if (shouldRenderNews) newsRow.value.scrollLeft += 100
-  else if (shouldRenderTrending) trendingRow.value.scrollLeft += 100
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 170
+  else if (shouldRenderNews) newsRow.value.scrollLeft += 170
+  else if (shouldRenderTrending) trendingRow.value.scrollLeft += 170
 }
 </script>
 
@@ -151,6 +156,7 @@ const handleRightPage = () => {
 
   .mods {
     width: 100%;
+    height: 8.75rem;
     margin: auto;
     transition: all ease-in-out 0.4s;
     scroll-behavior: smooth;
@@ -198,7 +204,7 @@ const handleRightPage = () => {
 .dark-mode {
   .row {
     &:nth-child(even) {
-      background-color: rgba(22, 24, 28, 0.3);
+      background-color: rgb(30, 31, 34);
     }
 
     hr {

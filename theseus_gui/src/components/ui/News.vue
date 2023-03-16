@@ -35,6 +35,7 @@ const props = defineProps({
 
   &:hover {
     box-shadow: var(--shadow-floating);
+    filter: brightness(0.85);
   }
 
   img {
@@ -43,6 +44,7 @@ const props = defineProps({
     height: 136px; /* from wireframe */
     border-radius: 0.9rem 0 0 0.9rem;
   }
+
   .body {
     display: flex;
     flex-direction: column;
