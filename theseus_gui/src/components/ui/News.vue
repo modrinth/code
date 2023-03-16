@@ -8,7 +8,7 @@ const props = defineProps({
 
 <template>
   <Card class="news-cta">
-    <img src="https://avatars1.githubusercontent.com/u/6166773?v=4" alt="News Image" />
+    <img :src="props.news.img" alt="News Image" />
     <div class="body">
       <div class="headline">
         <h2>{{ props.news.headline }}</h2>

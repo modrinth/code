@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { Card } from 'omorphia'
+import { Card, LogOutIcon, PlusIcon } from 'omorphia'
 
 const props = defineProps({
   display: String,
@@ -13,16 +13,24 @@ const props = defineProps({
     <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`${props.instance.id}`">{{
       props.instance.name
     }}</RouterLink>
-    <div class="instance-gallery-item" v-else-if="display === 'gallery'">
+    <div
+      class="instance-gallery-item"
+      :style="{
+        backgroundImage: `url(${props.instance.img})`,
+      }"
+      v-else-if="display === 'gallery'"
+    >
       <p>{{ props.instance.version }}</p>
       <p>{{ props.instance.name }}</p>
+      <div class="cta"><LogOutIcon /></div>
     </div>
     <Card class="instance-card-item" v-else-if="display === 'card'">
-      <img src="https://cdn.modrinth.com/data/AANobbMI/icon.png" alt="Trending mod card" />
+      <img :src="props.instance.img" alt="Trending mod card" />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>
         <p class="description">{{ props.instance.version }}</p>
       </div>
+      <div class="cta"><PlusIcon /></div>
     </Card>
   </div>
 </template>
@@ -45,7 +53,6 @@ const props = defineProps({
 .instance-gallery-item {
   width: 110px;
   height: 110px;
-  background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
   background-position: center;
   background-size: cover;
   position: relative;
@@ -57,6 +64,39 @@ const props = defineProps({
   cursor: pointer;
   transition: all ease-in-out 0.2s;
   border-radius: var(--radius-md);
+
+  &:hover {
+    .cta {
+      opacity: 1;
+      top: 0.3rem;
+    }
+  }
+
+  .cta {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-brand);
+    border-radius: var(--radius-lg);
+    width: 2rem;
+    height: 2rem;
+    right: 0.5rem;
+    top: 0.8rem;
+    opacity: 0;
+    transition: 0.2s ease-in-out top, 0.1s ease-in-out opacity;
+    cursor: pointer;
+    z-index: 15;
+
+    svg {
+      color: #fff;
+    }
+
+    &:hover {
+      filter: brightness(0.75);
+      box-shadow: var(--shadow-floating);
+    }
+  }
 
   &:before {
     content: '';
@@ -102,6 +142,36 @@ const props = defineProps({
 
   &:hover {
     filter: brightness(0.85);
+
+    .cta {
+      opacity: 1;
+      bottom: 4.5rem;
+    }
+  }
+
+  .cta {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-brand);
+    border-radius: var(--radius-lg);
+    width: 3rem;
+    height: 3rem;
+    right: 1rem;
+    bottom: 3.5rem;
+    opacity: 0;
+    transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
+    cursor: pointer;
+
+    svg {
+      color: #fff;
+    }
+
+    &:hover {
+      filter: brightness(0.75);
+      box-shadow: var(--shadow-floating);
+    }
   }
 
   img {
@@ -137,6 +207,12 @@ const props = defineProps({
       line-height: 125%;
       margin: 0.25rem 0 0;
     }
+  }
+}
+
+.dark-mode {
+  .cta > svg {
+    color: #000;
   }
 }
 </style>
