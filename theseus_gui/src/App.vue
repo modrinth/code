@@ -19,9 +19,9 @@ import Instance from '@/components/ui/Instance.vue'
 const route = useRoute()
 const router = useRouter()
 
-const theme = useTheming()
-const instances = useInstances()
-instances.fetchInstances()
+const themeStore = useTheming()
+const instanceStore = useInstances()
+instanceStore.fetchInstances()
 
 toggleTheme(themeStore.darkTheme)
 
@@ -48,7 +48,11 @@ watch(themeStore, (newState) => {
         </div>
         <div class="instance-list">
           <p>Instances</p>
-          <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
+          <Instance
+            v-for="instance in instanceStore.instances"
+            display="list"
+            :instance="instance"
+          />
         </div>
         <Button class="add-instance-btn">
           <PlusIcon />

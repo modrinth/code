@@ -4,6 +4,7 @@ import Instance from '@/components/ui/Instance.vue'
 import { useInstances } from '@/store/state'
 
 const instanceStore = useInstances()
+console.log(instanceStore.getFilteredInstances)
 </script>
 
 <template>

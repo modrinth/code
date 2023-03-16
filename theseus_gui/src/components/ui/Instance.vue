@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { Card, PlusIcon } from 'omorphia'
+import { Card, PlusIcon, ProjectCard } from 'omorphia'
 
 const props = defineProps({
   display: String,
