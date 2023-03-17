@@ -235,7 +235,7 @@ async fn main() -> std::io::Result<()> {
 
                 let mut webhook_message_sent_ref = webhook_message_sent_ref.lock().await;
 
-                webhook_message_sent_ref.retain(|x| Utc::now() - x.1 > chrono::Duration::hours(12));
+                webhook_message_sent_ref.retain(|x| Utc::now() - x.1 < chrono::Duration::hours(12));
 
                 for project in project_ids {
                     if webhook_message_sent_ref.iter().any(|x| x.0 == project) { continue; }
