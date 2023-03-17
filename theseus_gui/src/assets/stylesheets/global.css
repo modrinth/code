@@ -1,0 +1,11 @@
+@import url('https://rsms.me/inter/inter.css');
+
+:root {
+  font-family: var(--font-standard);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
