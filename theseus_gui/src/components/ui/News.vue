@@ -32,6 +32,7 @@ const props = defineProps({
   min-height: 8.5rem; /* from wireframe */
   box-shadow: var(--shadow-raised-lg);
   cursor: pointer;
+  transition: all ease-in-out 0.1s;
 
   &:hover {
     box-shadow: var(--shadow-floating);
