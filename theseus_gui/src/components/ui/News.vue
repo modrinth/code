@@ -8,7 +8,7 @@ const props = defineProps({
 
 <template>
   <Card class="news-cta">
-    <img src="https://avatars1.githubusercontent.com/u/6166773?v=4" alt="News Image" />
+    <img :src="props.news.img" alt="News Image" />
     <div class="body">
       <div class="headline">
         <h2>{{ props.news.headline }}</h2>
@@ -27,27 +27,30 @@ const props = defineProps({
   display: flex;
   justify-content: center;
   padding: 0;
-  background: var(--color-bg);
-  min-width: 386px; /* from wireframe */
-  min-height: 136px; /* from wireframe */
+  background: var(--color-raised-bg);
+  min-width: 24.125rem; /* from wireframe */
+  min-height: 8.5rem; /* from wireframe */
   box-shadow: var(--shadow-raised-lg);
   cursor: pointer;
+  transition: all ease-in-out 0.1s;
 
   &:hover {
     box-shadow: var(--shadow-floating);
+    filter: brightness(0.85);
   }
 
   img {
     display: flex;
-    width: 135px; /* from wireframe */
-    height: 136px; /* from wireframe */
+    width: 8.4375rem; /* from wireframe */
+    height: 8.5rem; /* from wireframe */
     border-radius: 0.9rem 0 0 0.9rem;
   }
+
   .body {
     display: flex;
     flex-direction: column;
     width: 100%;
-    height: 136px; /* from wireframe */
+    height: 8.5rem; /* from wireframe */
     padding: 0.45rem;
 
     .headline {
@@ -79,7 +82,7 @@ const props = defineProps({
 
       a {
         transition: all ease-in-out 0.2s;
-        width: 24px;
+        width: 1.5rem;
         color: var(--color-primary);
         font-size: 1.3rem;
 

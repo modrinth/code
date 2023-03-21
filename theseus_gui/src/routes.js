@@ -52,4 +52,6 @@ export default new createRouter({
       ]
     }
   ],
+  linkActiveClass: 'router-link-active',
+  linkExactActiveClass: 'router-link-exact-active',
 })

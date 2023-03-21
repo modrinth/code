@@ -7,9 +7,9 @@ const news = useNews()
 instances.fetchInstances()
 news.fetchNews()
 
+// Remove once state is populated with real data
 const recentInstances = instances.instances.slice(0, 4)
-const popularInstances = instances.instances.filter((i) => i.downloads > 50)
-const trendingMods = instances.instances.filter((i) => i.trending)
+const popularInstances = instances.instances.filter((i) => i.downloads > 50 || i.trending)
 </script>
 
 <template>
@@ -17,7 +17,6 @@ const trendingMods = instances.instances.filter((i) => i.trending)
     <RowDisplay label="Jump back in" :instances="recentInstances" :canPaginate="false" />
     <RowDisplay label="Popular packs" :instances="popularInstances" :canPaginate="true" />
     <RowDisplay label="News & updates" :news="news.news" :canPaginate="true" />
-    <RowDisplay label="Trending mods" :instances="trendingMods" :canPaginate="true" />
   </div>
 </template>
 

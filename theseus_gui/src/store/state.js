@@ -22,6 +22,7 @@ export const useInstances = defineStore('instances', {
           version: '1.18.1',
           downloads: 10,
           trending: true,
+          img: 'https://cdn.modrinth.com/user/MpxzqsyW/eb0038489a55e7e7a188a5b50462f0b10dfc1613.jpeg',
         },
         {
           id: 2,
@@ -30,6 +31,7 @@ export const useInstances = defineStore('instances', {
           version: '1.18 ',
           downloads: 8,
           trending: true,
+          img: 'https://cdn.modrinth.com/data/ssUbhMkL/icon.png',
         },
         {
           id: 3,
@@ -38,6 +40,7 @@ export const useInstances = defineStore('instances', {
           version: '1.16.5',
           downloads: 4,
           trending: true,
+          img: 'https://avatars1.githubusercontent.com/u/6166773?v=4',
         },
         {
           id: 4,
@@ -46,6 +49,7 @@ export const useInstances = defineStore('instances', {
           version: '1.15.2',
           downloads: 9,
           trending: false,
+          img: 'https://cdn.modrinth.com/data/ssUbhMkL/icon.png',
         },
         {
           id: 5,
@@ -54,6 +58,7 @@ export const useInstances = defineStore('instances', {
           version: '1.12.2',
           downloads: 1000,
           trending: false,
+          img: 'https://cdn.modrinth.com/user/MpxzqsyW/eb0038489a55e7e7a188a5b50462f0b10dfc1613.jpeg',
         },
         {
           id: 6,
@@ -62,6 +67,7 @@ export const useInstances = defineStore('instances', {
           version: '1.12.2',
           downloads: 10000,
           trending: false,
+          img: 'https://avatars1.githubusercontent.com/u/6166773?v=4',
         },
         {
           id: 7,
@@ -70,6 +76,7 @@ export const useInstances = defineStore('instances', {
           version: '1.7.10',
           downloads: 1000,
           trending: false,
+          img: 'https://cdn.modrinth.com/data/ssUbhMkL/icon.png',
         },
         {
           id: 8,
@@ -78,6 +85,7 @@ export const useInstances = defineStore('instances', {
           version: '1.15.2',
           downloads: 9,
           trending: false,
+          img: 'https://avatars.githubusercontent.com/u/83074853?v=4',
         },
         {
           id: 9,
@@ -86,6 +94,7 @@ export const useInstances = defineStore('instances', {
           version: '1.15.2',
           downloads: 9,
           trending: false,
+          img: 'https://cdn.modrinth.com/user/MpxzqsyW/eb0038489a55e7e7a188a5b50462f0b10dfc1613.jpeg',
         },
         {
           id: 10,
@@ -94,6 +103,7 @@ export const useInstances = defineStore('instances', {
           version: '1.15.2',
           downloads: 9,
           trending: false,
+          img: 'https://cdn.modrinth.com/data/ssUbhMkL/icon.png',
         },
         {
           id: 11,
@@ -102,6 +112,7 @@ export const useInstances = defineStore('instances', {
           version: '1.15.2',
           downloads: 9,
           trending: false,
+          img: 'https://avatars1.githubusercontent.com/u/6166773?v=4',
         },
       ]
 
@@ -121,18 +132,21 @@ export const useNews = defineStore('news', {
           headline: 'Caves & Cliffs Update: Part II Dev Q&A',
           blurb: 'Your questions, answered!',
           source: 'From Minecraft.Net',
+          img: 'https://avatars1.githubusercontent.com/u/6166773?v=4',
         },
         {
           id: 2,
           headline: 'Project of the WeeK: Gobblygook',
           blurb: 'Your questions, answered!',
           source: 'Modrinth Blog',
+          img: 'https://avatars.githubusercontent.com/t/3923733?s=280&v=4',
         },
         {
           id: 3,
           headline: 'Oreo makes a launcher',
           blurb: 'What did it take?',
           source: 'Modrinth Blog',
+          img: 'https://avatars.githubusercontent.com/u/30800863?v=4',
         },
       ]
 

@@ -14,20 +14,14 @@ const props = defineProps({
 const allowPagination = ref(false)
 const modsRow = ref(null)
 const newsRow = ref(null)
-const trendingRow = ref(null)
-
-const shouldRenderNormalInstances =
-  props.instances && props.instances?.length !== 0 && props.instances?.some((i) => !i.trending)
+// Remove after state is populated with real data
+const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
-const shouldRenderTrending =
-  props.instances && props.instances?.length !== 0 && props.instances?.every((i) => i.trending)
 
 const handlePaginationDisplay = () => {
   let parentsRow
   if (shouldRenderNormalInstances) parentsRow = modsRow.value
   if (shouldRenderNews) parentsRow = newsRow.value
-  else if (shouldRenderTrending) parentsRow = trendingRow.value
-
   if (!parentsRow) return
 
   const children = parentsRow.children
@@ -40,6 +34,9 @@ const handlePaginationDisplay = () => {
 
 onMounted(() => {
   if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
+
+  // Check if pagination should be rendered on mount
+  handlePaginationDisplay()
 })
 
 onUnmounted(() => {
@@ -47,15 +44,13 @@ onUnmounted(() => {
 })
 
 const handleLeftPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 100
-  else if (shouldRenderNews) newsRow.value.scrollLeft -= 100
-  else if (shouldRenderTrending) trendingRow.value.scrollLeft -= 100
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
+  else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
 }
 
 const handleRightPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 100
-  else if (shouldRenderNews) newsRow.value.scrollLeft += 100
-  else if (shouldRenderTrending) trendingRow.value.scrollLeft += 100
+  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 170
+  else if (shouldRenderNews) newsRow.value.scrollLeft += 170
 }
 </script>
 
@@ -88,6 +83,9 @@ const handleRightPage = () => {
         :instance="instance"
       />
     </section>
+    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
+      <News v-for="news in props.news" :key="news.id" :news="news" />
+    </section>
   </div>
 </template>
 
@@ -99,8 +97,8 @@ const handleRightPage = () => {
   width: 100%;
   padding: 1rem;
 
-  &:nth-child(odd) {
-    background: rgba(22, 24, 28, 0.7);
+  &:nth-child(even) {
+    background: var(--color-bg);
   }
 
   .header {
@@ -112,13 +110,13 @@ const handleRightPage = () => {
     gap: 1rem;
 
     p {
-      color: var(--color-contrast);
       font-size: 1rem;
       white-space: nowrap;
+      color: var(--color-contrast);
     }
 
     hr {
-      background: var(--color-base);
+      background-color: var(--color-gray);
       height: 1px;
       width: 100%;
       border: none;
@@ -129,6 +127,10 @@ const handleRightPage = () => {
       align-items: inherit;
 
       svg {
+        background: var(--color-raised-bg);
+        border-radius: var(--radius-lg);
+        width: 1.3rem;
+        height: 1.2rem;
         cursor: pointer;
         margin-right: 0.5rem;
         transition: all ease-in-out 0.1s;

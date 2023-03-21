@@ -3,6 +3,7 @@ import { useInstances } from '@/store/state'
 import GridDisplay from '@/components/GridDisplay.vue'
 
 const instances = useInstances()
+instances.fetchInstances()
 </script>
 
 <template>
