@@ -1,13 +1,17 @@
 <script setup>
-import { Card } from 'omorphia'
 import { RouterLink } from 'vue-router'
+import { Card, PlusIcon } from 'omorphia'
+const props = defineProps({
+  display: String,
+  instance: Object,
+})
 </script>
 
 <template>
   <div>
-    <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`${props.instance.id}`">{{
-      props.instance.name
-    }}</RouterLink>
+    <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`/instance/${props.instance.id}`">{{
+        props.instance.name
+      }}</RouterLink>
     <Card class="instance-card-item" v-else-if="display === 'card'">
       <img :src="props.instance.img" alt="Trending mod card" />
       <div class="project-info">
@@ -27,13 +31,11 @@ import { RouterLink } from 'vue-router'
   transition: all ease-out 0.1s;
   font-size: 0.8rem;
   color: var(--color-primary);
-
   &:hover {
     text-decoration: none;
     filter: brightness(150%);
   }
 }
-
 .instance-card-item {
   display: flex;
   flex-direction: column;
@@ -43,16 +45,13 @@ import { RouterLink } from 'vue-router'
   width: 180px;
   padding: 0.75rem;
   transition: 0.1s ease-in-out all;
-
   &:hover {
     filter: brightness(0.85);
-
     .cta {
       opacity: 1;
       bottom: 4.5rem;
     }
   }
-
   .cta {
     position: absolute;
     display: flex;
@@ -67,27 +66,22 @@ import { RouterLink } from 'vue-router'
     opacity: 0;
     transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
     cursor: pointer;
-
     svg {
       color: #fff;
     }
-
     &:hover {
       filter: brightness(0.75);
       box-shadow: var(--shadow-floating);
     }
   }
-
   img {
     width: 160px;
     border-radius: var(--radius-sm);
     filter: none !important;
   }
-
   .project-info {
     margin-top: 1rem;
     width: 100%;
-
     .title {
       color: var(--color-contrast);
       max-width: 6rem;
@@ -100,7 +94,6 @@ import { RouterLink } from 'vue-router'
       line-height: 110%;
       display: inline-block;
     }
-
     .description {
       display: -webkit-box;
       -webkit-line-clamp: 2;
@@ -113,7 +106,6 @@ import { RouterLink } from 'vue-router'
     }
   }
 }
-
 .dark-mode {
   .cta > svg {
     color: #000;
