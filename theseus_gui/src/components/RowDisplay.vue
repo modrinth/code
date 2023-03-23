@@ -89,7 +89,7 @@ const handleRightPage = () => {
   padding: 1rem;
 
   &:nth-child(even) {
-    background: var(--color-bg);
+    background: #212227;
   }
 
   .header {
@@ -148,7 +148,7 @@ const handleRightPage = () => {
     overflow-y: hidden;
 
     &::-webkit-scrollbar {
-      width: 0px;
+      width: 0;
       background: transparent;
     }
   }
@@ -166,7 +166,7 @@ const handleRightPage = () => {
     overflow-y: hidden;
 
     &::-webkit-scrollbar {
-      width: 0px;
+      width: 0;
       background: transparent;
     }
   }
@@ -175,7 +175,7 @@ const handleRightPage = () => {
 .dark-mode {
   .row {
     &:nth-child(odd) {
-      background-color: rgb(30, 31, 34);
+      background-color: #2A2D32;
     }
   }
 }

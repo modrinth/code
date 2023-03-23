@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { Card, PlusIcon } from 'omorphia'
+import { Card, PlusIcon, Avatar } from 'omorphia'
 
 const props = defineProps({
   display: String,
@@ -14,7 +14,7 @@ const props = defineProps({
       props.instance.name
     }}</RouterLink>
     <Card class="instance-card-item" v-else-if="display === 'card'">
-      <img :src="props.instance.img" alt="Trending mod card" />
+      <Avatar size="lg" :src="props.instance.img" alt="Trending mod card" />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>
         <p class="description">{{ props.instance.version }}</p>
@@ -45,7 +45,7 @@ const props = defineProps({
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: 180px;
+  //width: 180px;
   padding: 0.75rem;
   transition: 0.1s ease-in-out all;
 
@@ -84,7 +84,6 @@ const props = defineProps({
   }
 
   img {
-    width: 160px;
     border-radius: var(--radius-sm);
     filter: none !important;
   }
@@ -95,7 +94,7 @@ const props = defineProps({
 
     .title {
       color: var(--color-contrast);
-      max-width: 6rem;
+      max-width: 10rem;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
