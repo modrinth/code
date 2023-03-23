@@ -24,8 +24,6 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(join_team)
             .service(remove_team_member),
     );
-
-    cfg.service(web::scope("project").service(team_members_get_project));
 }
 
 #[get("{id}/members")]

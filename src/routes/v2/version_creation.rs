@@ -26,12 +26,6 @@ use std::collections::HashMap;
 use std::sync::Arc;
 use validator::Validate;
 
-pub fn config(cfg: &mut web::ServiceConfig) {
-    cfg.service(version_create);
-
-    cfg.service(web::scope("version").service(upload_file_to_version));
-}
-
 fn default_requested_status() -> VersionStatus {
     VersionStatus::Listed
 }

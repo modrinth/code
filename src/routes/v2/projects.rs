@@ -44,7 +44,11 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(project_follow)
             .service(project_unfollow)
             .service(project_schedule)
-            .service(web::scope("{project_id}").service(dependency_list)),
+            .service(super::teams::team_members_get_project)
+            .service(web::scope("{project_id}")
+                .service(super::versions::version_list)
+                .service(super::versions::version_project_get)
+                .service(dependency_list)),
     );
 }
 

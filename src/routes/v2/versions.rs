@@ -18,19 +18,15 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(versions_get);
+    cfg.service(super::version_creation::version_create);
 
     cfg.service(
         web::scope("version")
             .service(version_get)
             .service(version_delete)
             .service(version_edit)
-            .service(version_schedule),
-    );
-
-    cfg.service(
-        web::scope("project/{project_id}")
-            .service(version_list)
-            .service(version_project_get),
+            .service(version_schedule)
+            .service(super::version_creation::upload_file_to_version),
     );
 }
 

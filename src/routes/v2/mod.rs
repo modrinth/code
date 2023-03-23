@@ -31,7 +31,6 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(tags::config)
             .configure(teams::config)
             .configure(users::config)
-            .configure(version_creation::config)
             .configure(version_file::config)
             .configure(versions::config),
     );
