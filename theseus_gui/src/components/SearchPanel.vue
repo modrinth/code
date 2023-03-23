@@ -9,11 +9,15 @@ import {
   TransferIcon,
   ServerIcon,
 } from 'omorphia'
-import { useInstances } from '@/store/state'
-
-const searchText = ref('')
+import { useInstances } from '@/store/instancesStore'
 
 const instanceStore = useInstances()
+const searchText = ref('')
+
+const searchHandler = async () => {
+  instanceStore.setSearchInput(searchText.value)
+  await instanceStore.searchInstances()
+}
 </script>
 
 <template>
@@ -21,12 +25,7 @@ const instanceStore = useInstances()
     <div class="search-panel">
       <div class="iconified-input">
         <SearchIcon />
-        <input
-          type="text"
-          placeholder="Search.."
-          v-model="searchText"
-          @input="instanceStore.setFilter(searchText)"
-        />
+        <input type="text" placeholder="Search.." v-model="searchText" @input="searchHandler" />
       </div>
       <Button>Search by relevance</Button>
     </div>
@@ -48,7 +47,7 @@ const instanceStore = useInstances()
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin: auto;
+  margin: 0 auto 1rem auto;
 
   .search-panel {
     display: flex;

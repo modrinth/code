@@ -49,7 +49,7 @@ watch(themeStore, (newState) => {
         <div class="instance-list">
           <p>Instances</p>
           <Instance
-            v-for="instance in instanceStore.instances"
+            v-for="instance in instanceStore.fakeInstances"
             display="list"
             :instance="instance"
           />
@@ -76,7 +76,9 @@ watch(themeStore, (newState) => {
           <p>123 mods installed</p>
         </section>
       </div>
-      <RouterView />
+      <Suspense>
+        <RouterView />
+      </Suspense>
     </div>
   </div>
 </template>

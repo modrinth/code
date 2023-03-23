@@ -35,7 +35,7 @@ import { ProjectCard } from 'omorphia'
         },
       ]"
       projectTypeDisplay="mod"
-      projectTypeUrl="/mod"
+      projectTypeUrl="mod"
       serverSide="required"
       clientSide="required"
       :showUpdatedDate="false"

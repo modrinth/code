@@ -1,19 +1,30 @@
 <script setup>
+import { ref } from 'vue'
+import { Pagination } from 'omorphia'
 import SearchPanel from '@/components/SearchPanel.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { useInstances } from '@/store/state'
 
+const currentPage = ref(1)
+
 const instanceStore = useInstances()
-console.log(instanceStore.getFilteredInstances)
+await instanceStore.searchInstances()
+
+const switchPage = async (page) => {
+  currentPage.value = page
+  instanceStore.setCurrentPage(page)
+  await instanceStore.searchInstances()
+}
 </script>
 
 <template>
   <div class="search-container">
     <SearchPanel />
+    <Pagination :page="currentPage" :count="instanceStore.pageCount" @switch-page="switchPage" />
     <section class="project-list display-mode--list instance-results">
       <Instance
-        v-for="instance in instanceStore.getFilteredInstances"
-        :id="instance.id"
+        v-for="instance in instanceStore.instances"
+        :id="instance.project_id"
         :instance="instance"
         display="project"
       />
