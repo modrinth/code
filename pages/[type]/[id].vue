@@ -442,7 +442,9 @@
             <h2 class="card-header">Featured versions</h2>
             <nuxt-link
               v-if="versions.length > 0 || currentMember"
-              :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
+              :to="`/${project.project_type}/${
+                project.slug ? project.slug : project.id
+              }/versions#all-versions`"
               class="goto-link"
             >
               See all
