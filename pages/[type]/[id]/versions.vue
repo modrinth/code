@@ -85,7 +85,7 @@
         <div class="version__stats">
           <span>
             <strong>{{ $formatNumber(version.downloads) }}</strong>
-            downloads
+            download<span v-if="version.downloads !== 1">s</span>
           </span>
           <span>
             Published on
