@@ -51,7 +51,8 @@ a.uncolored {
   color: inherit;
 }
 
-input[type='text'] {
+input[type='text'],
+textarea {
   border-radius: var(--radius-md);
   box-sizing: border-box;
   border: 2px solid transparent;
@@ -141,6 +142,20 @@ svg {
 
   &:active:not(&:disabled) {
     transform: scale(0.95);
+  }
+}
+
+input,
+button {
+  &:disabled {
+    cursor: not-allowed !important;
+  }
+}
+
+@media (prefers-reduced-motion) {
+  .button-animation,
+  button {
+    transform: none !important;
   }
 }
 

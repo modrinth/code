@@ -26,8 +26,11 @@
   "dependencies": {
     "dayjs": "^1.11.7",
     "floating-vue": "^2.0.0-beta.20",
+    "markdown-it": "^13.0.1",
     "vue": "^3.2.45",
-    "vue-router": "^4.1.6"
+    "vue-router": "^4.1.6",
+    "vue-select": "^4.0.0-beta.6",
+    "xss": "^1.0.14"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",

@@ -26,6 +26,8 @@ export default {
           { text: 'Drop Area', link: '/components/drop-area' },
           { text: 'Icons', link: '/components/icons' },
           { text: 'Pagination', link: '/components/pagination' },
+          { text: 'Modal', link: '/components/modal' },
+          { text: 'Dropdown Select', link: '/components/dropdown-select' },
           { text: 'Project Card', link: '/components/project-card' },
           { text: 'Environment Indicator', link: '/components/environment-indicator' },
           { text: 'Categories', link: '/components/categories' },

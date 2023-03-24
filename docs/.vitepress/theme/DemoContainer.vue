@@ -2,10 +2,6 @@
   <div class="demo"><slot /></div>
 </template>
 
-<script>
-export default {}
-</script>
-
 <style lang="scss" scoped>
 .demo {
   background: var(--color-raised-bg);
@@ -16,5 +12,8 @@ export default {}
   gap: var(--gap-md);
   align-items: center;
   flex-wrap: wrap;
+  background: var(--color-raised-bg);
+  border-radius: var(--radius-lg);
+  padding: var(--gap-md);
 }
 </style>
