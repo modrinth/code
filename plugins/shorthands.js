@@ -326,7 +326,7 @@ export const formatVersions = (versionArray, tag) => {
     }
   }
 
-  return output.join(', ')
+  return (output.length === 0 ? versionArray : output).join(', ')
 }
 
 export const cycleValue = (value, values) => {
