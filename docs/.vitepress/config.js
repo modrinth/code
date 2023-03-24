@@ -36,6 +36,7 @@ export default {
           { text: 'Slider', link: '/components/slider' },
           { text: 'Text Inputs', link: '/components/text-inputs' },
           { text: 'Search Filter', link: '/components/search-filter' },
+          { text: 'Toggle', link: '/components/toggle' },
         ],
       },
     ],
