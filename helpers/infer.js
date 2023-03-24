@@ -238,6 +238,12 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
           case 10:
             newGameVersions = getRange('1.19', '1.19.3')
             break
+          case 11:
+            newGameVersions = getRange('23w03a', '23w05a')
+            break
+          case 12:
+            newGameVersions.push('1.19.4')
+            break
           default:
         }
       }
@@ -278,6 +284,9 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
             break
           case 12:
             newGameVersions.push('1.19.3')
+            break
+          case 13:
+            newGameVersions.push('1.19.4')
             break
           default:
         }

@@ -85,6 +85,14 @@
         :key="`donation-link-${index}`"
         class="input-group donation-link-group"
       >
+        <input
+          v-model="donationLink.url"
+          type="url"
+          maxlength="2048"
+          placeholder="Enter a valid URL"
+          :disabled="!hasPermission"
+          @input="updateDonationLinks"
+        />
         <Multiselect
           v-model="donationLink.platform"
           placeholder="Select platform"
@@ -94,14 +102,6 @@
           :show-labels="false"
           :disabled="!hasPermission"
           @update:model-value="updateDonationLinks"
-        />
-        <input
-          v-model="donationLink.url"
-          type="url"
-          maxlength="2048"
-          placeholder="Enter a valid URL"
-          :disabled="!hasPermission"
-          @input="updateDonationLinks"
         />
       </div>
       <div class="button-group">
@@ -235,9 +235,9 @@ export default defineNuxtComponent({
             link.platform = 'Patreon'
           } else if (url.includes('ko-fi.com')) {
             link.platform = 'Ko-fi'
-          } else if (url.includes('paypal.com')) {
-            link.platform = 'Paypal'
-          } else if (url.includes('buymeacoffee.com')) {
+          } else if (url.includes('paypal.com') || url.includes('paypal.me')) {
+            link.platform = 'PayPal'
+          } else if (url.includes('buymeacoffee.com') || url.includes('buymeacoff.ee')) {
             link.platform = 'Buy Me a Coffee'
           } else if (url.includes('github.com/sponsors')) {
             link.platform = 'GitHub Sponsors'

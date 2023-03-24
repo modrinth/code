@@ -31,6 +31,10 @@ export const configuredXss = new xss.FilterXSS({
             /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}(\?&autoplay=[0-1]{1})?$/,
           remove: ['&autoplay=1'], // Prevents autoplay
         },
+        {
+          regex: /^https?:\/\/(www\.)?discord\.com\/widget\?id=\d{18,19}(&theme=\w+)?$/,
+          remove: [/&theme=\w+/],
+        },
       ]
 
       for (const source of allowedSources) {
@@ -107,13 +111,16 @@ export const md = (options = {}) => {
         const url = new URL(src)
 
         const allowedHostnames = [
+          'imgur.com',
           'i.imgur.com',
           'cdn-raw.modrinth.com',
           'cdn.modrinth.com',
           'staging-cdn-raw.modrinth.com',
           'staging-cdn.modrinth.com',
+          'github.com',
           'raw.githubusercontent.com',
           'img.shields.io',
+          'i.postimg.cc',
         ]
 
         if (allowedHostnames.includes(url.hostname)) {
