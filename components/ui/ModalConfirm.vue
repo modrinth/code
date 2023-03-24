@@ -114,6 +114,7 @@ export default {
 
   .confirmation-text {
     padding-right: 0.25ch;
+    margin: 0 0.25rem;
   }
 
   .confirmation-input {
