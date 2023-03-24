@@ -6,7 +6,7 @@ The source code of the omorphia repository is licensed under the GNU General Pub
 
 Any files depicting the Modrinth branding, including the wrench-in-labyrinth logo, the landing image, and variations thereof, are licensed as follows:
 
-> All rights reserved. © 2020-2022 Rinth, Inc.
+> All rights reserved. © 2020-2023 Rinth, Inc.
 
 This includes, but may not be limited to, the following files:
 
