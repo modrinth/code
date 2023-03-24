@@ -60,6 +60,7 @@ const handleRightPage = () => {
           :key="instance.id"
           display="card"
           :instance="instance"
+          class="row-instance"
       />
     </section>
     <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
@@ -164,5 +165,10 @@ const handleRightPage = () => {
       background-color: rgb(30, 31, 34);
     }
   }
+}
+
+.row-instance {
+  min-width: 12rem;
+  max-width: 12rem;
 }
 </style>

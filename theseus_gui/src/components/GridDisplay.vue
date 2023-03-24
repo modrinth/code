@@ -16,22 +16,6 @@ const newsRow = ref(null)
 // Remove after state is populated with real data
 const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
-const handlePaginationDisplay = () => {
-  let parentsRow
-  if (shouldRenderNormalInstances) parentsRow = modsRow.value
-  if (shouldRenderNews) parentsRow = newsRow.value
-  if (!parentsRow) return
-  const children = parentsRow.children
-  const lastChild = children[children.length - 1]
-  const childBox = lastChild.getBoundingClientRect()
-  if (childBox.x + childBox.width > window.innerWidth) allowPagination.value = true
-  else allowPagination.value = false
-}
-onMounted(() => {
-  if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
-  // Check if pagination should be rendered on mount
-  handlePaginationDisplay()
-})
 onUnmounted(() => {
   if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
 })
@@ -48,22 +32,19 @@ const handleRightPage = () => {
   <div class="row">
     <div class="header">
       <p>{{ props.label }}</p>
-      <hr aria-hidden="true"/>
+      <hr>
       <div v-if="allowPagination" class="pagination">
         <ChevronLeftIcon @click="handleLeftPage"/>
         <ChevronRightIcon @click="handleRightPage"/>
       </div>
     </div>
-    <section ref="modsRow" class="instances" v-if="shouldRenderNormalInstances">
+    <section ref="modsRow" class="instances">
       <Instance
-          v-for="instance in props.instances"
-          :key="instance.id"
-          display="card"
-          :instance="instance"
+        v-for="instance in props.instances"
+        :key="instance.id"
+        display="card"
+        :instance="instance"
       />
-    </section>
-    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
-      <News v-for="news in props.news" :key="news.id" :news="news"/>
     </section>
   </div>
 </template>
@@ -74,10 +55,6 @@ const handleRightPage = () => {
   align-items: center;
   width: 100%;
   padding: 1rem;
-
-  &:nth-child(even) {
-    background: var(--color-bg);
-  }
 
   .header {
     display: flex;
@@ -127,22 +104,9 @@ const handleRightPage = () => {
     gap: 1rem;
   }
 
-  .news {
-    margin: auto;
-    width: 100%;
-    scroll-behavior: smooth;
-    overflow-x: scroll;
-    overflow-y: hidden;
-
-    &::-webkit-scrollbar {
-      width: 0px;
-      background: transparent;
-    }
-  }
-
   .instances {
-    display: flex;
-    flex-direction: row;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
     width: 100%;
     gap: 1rem;
     margin-right: auto;

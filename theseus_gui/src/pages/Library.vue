@@ -9,6 +9,6 @@ instances.fetchInstances()
 <template>
   <div>
     <GridDisplay label="Instances" :instances="instances.instances" />
-    <GridDisplay label="Instances" :instances="instances.instances" />
+    <GridDisplay label="Modpacks" :instances="instances.instances" />
   </div>
 </template>

@@ -28,7 +28,7 @@
       <div class="table-row table-head">
         <div class="table-cell table-text">
           <Button color="success" iconOnly>
-            <DownloadIcon />
+            <UpdatedIcon />
           </Button>
         </div>
         <div class="table-cell table-text name-cell"> Name </div>
@@ -38,8 +38,11 @@
       </div>
       <div class="table-row" v-for="mod in mods" :key="mod.name">
         <div class="table-cell table-text">
-          <Button color="success" iconOnly>
-            <DownloadIcon />
+          <Button v-if="mod.outdated" iconOnly>
+            <UpdatedIcon />
+          </Button>
+          <Button v-else disabled iconOnly>
+            <CheckCircleIcon/>
           </Button>
         </div>
         <div class="table-cell table-text name-cell">
@@ -51,7 +54,7 @@
         <div class="table-cell table-text"> {{ mod.version }} </div>
         <div class="table-cell table-text"> {{ mod.author }} </div>
         <div class="table-cell table-text manage">
-          <Button color="danger" iconOnly>
+          <Button iconOnly>
             <TrashIcon />
           </Button>
           <input
@@ -72,42 +75,47 @@ export default {
 }
 </script>
 <script setup>
-import { Avatar, Button, TrashIcon, PlusIcon, Card, DownloadIcon, SearchIcon } from 'omorphia'
+import { Avatar, Button, TrashIcon, PlusIcon, Card, CheckCircleIcon, SearchIcon, UpdatedIcon } from 'omorphia'
 const mods = [
   {
     name: "Fabric API",
     icon: "https://cdn.modrinth.com/data/P7dR8mSH/icon.png",
     version: "0.76.0+1.19.4",
     author: "modmuss50",
-    description: "Lightweight and modular API providing common hooks and intercompatibility measures utilized by mods using the Fabric toolchain."
+    description: "Lightweight and modular API providing common hooks and intercompatibility measures utilized by mods using the Fabric toolchain.",
+    outdated: true
   },
   {
     name: "Spirit",
     icon: "https://cdn.modrinth.com/data/b1LdOZlE/465598dc5d89f67fb8f8de6def21240fa35e3a54.png",
     version: "2.2.4",
     author: "CodexAdrian",
-    description: "Create your own configurable mob spawner!"
+    description: "Create your own configurable mob spawner!",
+    outdated: true
   },
   {
     name: "Botarium",
     icon: "https://cdn.modrinth.com/data/2u6LRnMa/98b286b0d541ad4f9409e0af3df82ad09403f179.gif",
     version: "2.0.5",
     author: "CodexAdrian",
-    description: "A crossplatform API for devs that makes transfer and storage of items, fluids and energy easier, as well as some other helpful things"
+    description: "A crossplatform API for devs that makes transfer and storage of items, fluids and energy easier, as well as some other helpful things",
+    outdated: true
   },
   {
     name: "Tempad",
     icon: "https://cdn.modrinth.com/data/gKNwt7xu/icon.gif",
     version: "2.2.4",
     author: "CodexAdrian",
-    description: "Create a portal to anywhere from anywhere"
+    description: "Create a portal to anywhere from anywhere",
+    outdated: false
   },
   {
     name: "Sodium",
     icon: "https://cdn.modrinth.com/data/AANobbMI/icon.png",
     version: "0.4.10",
     author: "jellysquid3",
-    description: "Modern rendering engine and client-side optimization mod for Minecraft"
+    description: "Modern rendering engine and client-side optimization mod for Minecraft",
+    outdated: false
   }
 ]
 </script>
@@ -154,12 +162,8 @@ const mods = [
 .mod-text {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 1rem;
   color: var(--color-contrast);
-
-  .version {
-    color: var(--color-base);
-  }
 }
 
 .table-row:nth-child(even) .table-cell {

@@ -48,6 +48,16 @@ export default new createRouter({
             path: '',
             name: 'Mods',
             component: Instance.Mods,
+        },
+        {
+          path: 'options',
+          name: 'Options',
+          component: Instance.Options,
+        },
+        {
+          path: 'logs',
+          name: 'Logs',
+          component: Instance.Logs,
         }
       ]
     }

@@ -59,7 +59,9 @@
         "height": 650,
         "resizable": true,
         "title": "Modrinth Launcher",
-        "width": 1140
+        "width": 1140,
+        "minHeight": 630,
+        "minWidth": 1100
       }
     ]
   }

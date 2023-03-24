@@ -1,6 +1,7 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { Card, PlusIcon } from 'omorphia'
+import { Card } from 'omorphia'
+import { PlayIcon } from '@/assets/icons'
 const props = defineProps({
   display: String,
   instance: Object,
@@ -12,13 +13,13 @@ const props = defineProps({
     <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`/instance/${props.instance.id}`">{{
         props.instance.name
       }}</RouterLink>
-    <Card class="instance-card-item" v-else-if="display === 'card'">
+    <Card class="instance-card-item" v-else-if="display === 'card'" @click="this.$router.push(`/instance/${props.instance.id}`)">
       <img :src="props.instance.img" alt="Trending mod card" />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>
         <p class="description">{{ props.instance.version }}</p>
       </div>
-      <div class="cta"><PlusIcon /></div>
+      <div class="cta"><PlayIcon /></div>
     </Card>
   </div>
 </template>
@@ -42,7 +43,6 @@ const props = defineProps({
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  width: 180px;
   padding: 0.75rem;
   transition: 0.1s ease-in-out all;
   &:hover {
@@ -68,6 +68,8 @@ const props = defineProps({
     cursor: pointer;
     svg {
       color: #fff;
+      width: 1.5rem;
+      height: 1.5rem;
     }
     &:hover {
       filter: brightness(0.75);
@@ -75,7 +77,7 @@ const props = defineProps({
     }
   }
   img {
-    width: 160px;
+    width: 100%;
     border-radius: var(--radius-sm);
     filter: none !important;
   }
