@@ -107,13 +107,15 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
+  width: 100%;
 }
 
 .slide-container .slider {
-  width: 12rem;
+  width: 100%;
 }
 
-.slider-component .slide-container {
+.slider-component,
+.slide-container {
   width: 100%;
 }
 
