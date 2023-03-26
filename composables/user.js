@@ -82,6 +82,7 @@ export const userFollowProject = async (project) => {
   const user = (await useUser()).value
 
   user.follows = user.follows.concat(project)
+  project.followers++
 
   setTimeout(() => {
     useBaseFetch(`project/${project.id}/follow`, {
@@ -96,6 +97,7 @@ export const userUnfollowProject = async (project) => {
   const user = (await useUser()).value
 
   user.follows = user.follows.filter((x) => x.id !== project.id)
+  project.followers--
 
   setTimeout(() => {
     useBaseFetch(`project/${project.id}/follow`, {
