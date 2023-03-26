@@ -495,23 +495,21 @@
           <hr class="card-divider" />
         </template>
         <h2 class="card-header">Project members</h2>
-        <div
+        <nuxt-link
           v-for="member in members"
           :key="member.user.id"
           class="team-member columns button-transparent"
-          @click="$router.push('/user/' + member.user.username)"
+          :to="'/user/' + member.user.username"
         >
           <Avatar :src="member.avatar_url" :alt="member.username" size="sm" circle />
 
           <div class="member-info">
-            <nuxt-link :to="'/user/' + member.user.username" class="name">
-              <p>{{ member.name }}</p>
-            </nuxt-link>
+            <p class="name">{{ member.name }}</p>
             <p class="role">
               {{ member.role }}
             </p>
           </div>
-        </div>
+        </nuxt-link>
         <hr class="card-divider" />
         <h2 class="card-header">Technical information</h2>
         <div class="infos">
