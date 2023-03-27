@@ -38,6 +38,7 @@ lazy_static = "1.4.0"
 
 [target.'cfg(windows)'.dependencies] 
 winreg = "0.11.0"
+dunce = "1.0.3"
 
 [dev-dependencies]
 argh = "0.1.6"

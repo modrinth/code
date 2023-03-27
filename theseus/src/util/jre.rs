@@ -5,6 +5,18 @@ use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 
+#[cfg(target_os = "windows")]
+use winreg::{
+    enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
+    RegKey,
+};
+
+// Uses dunce canonicaliztion to resolve symlinks without UNC prefixes
+#[cfg(target_os = "windows")]
+use dunce::canonicalize;
+#[cfg(not(target_os = "windows"))]
+use std::fs::canonicalize;
+
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct JavaVersion {
     pub path: String,
@@ -16,13 +28,6 @@ pub struct JavaVersion {
 #[cfg(target_os = "windows")]
 #[tracing::instrument]
 pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
-    use winreg::{
-        enums::{
-            HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY,
-        },
-        RegKey,
-    };
-
     // Use HashSet to avoid duplicates
     let mut jres = HashSet::new();
 
@@ -191,8 +196,10 @@ const JAVA_BIN: &'static str = "java";
 pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
-    let Ok(path) = path.canonicalize() else { return None };
+    let Ok(path) = canonicalize(path) else { return None };
     let Some(path_str) = path.to_str() else { return None };
+
+    println!("{}", path_str);
 
     // Checks for existence of Java at this filepath
     let java = path.join(JAVA_BIN);
