@@ -3361,6 +3361,7 @@ dependencies = [
  "chrono",
  "daedalus",
  "dirs",
+ "dunce",
  "futures",
  "lazy_static",
  "log",
