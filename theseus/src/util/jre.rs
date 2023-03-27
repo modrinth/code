@@ -11,7 +11,7 @@ use winreg::{
     RegKey,
 };
 
-// Uses dunce canonicaliztion to resolve symlinks without UNC prefixes
+// Uses dunce canonicalization to resolve symlinks without UNC prefixes
 #[cfg(target_os = "windows")]
 use dunce::canonicalize;
 #[cfg(not(target_os = "windows"))]
@@ -192,14 +192,14 @@ const JAVA_BIN: &'static str = "java.exe";
 #[allow(dead_code)]
 const JAVA_BIN: &'static str = "java";
 
+// For example filepath 'path', attempt to resolve it and get a Java version at this path
+// If no such path exists, or no such valid java at this path exists, returns None 
 #[tracing::instrument]
 pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
     let Ok(path) = canonicalize(path) else { return None };
     let Some(path_str) = path.to_str() else { return None };
-
-    println!("{}", path_str);
 
     // Checks for existence of Java at this filepath
     let java = path.join(JAVA_BIN);
@@ -238,16 +238,4 @@ pub enum JREError {
 
     #[error("Env error: {0}")]
     EnvError(#[from] env::VarError),
-}
-
-#[cfg(test)]
-mod tests {
-    use super::{get_all_jre, JREError};
-
-    #[test]
-    fn find_jre() -> Result<(), JREError> {
-        let jres = get_all_jre()?;
-        dbg!(&jres);
-        panic!("fail");
-    }
 }
