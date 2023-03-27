@@ -1,23 +1,27 @@
+use lazy_static::lazy_static;
+use regex::Regex;
+use std::collections::HashSet;
 use std::env;
 use std::path::PathBuf;
-use regex::Regex;
-use lazy_static::lazy_static;
-use winreg::RegKey;
 use std::process::Command;
-use std::collections::HashSet;
 
-#[derive(Debug, PartialEq ,Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash)]
 pub struct JavaVersion {
-    path: String,
-    version: String,
+    pub path: String,
+    pub version: String,
 }
 
 // Entrypoint function (Windows)
 // Returns a Vec of unique JavaVersions from the PATH, Windows Registry Keys and common Java locations
 #[cfg(target_os = "windows")]
 #[tracing::instrument]
-pub fn get_all_jre  () -> Result<Vec<JavaVersion>,JREError> {
-    use winreg::{RegKey, enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY}};
+pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
+    use winreg::{
+        enums::{
+            HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY,
+        },
+        RegKey,
+    };
 
     // Use HashSet to avoid duplicates
     let mut jres = HashSet::new();
@@ -30,10 +34,11 @@ pub fn get_all_jre  () -> Result<Vec<JavaVersion>,JREError> {
         r"C:/Program Files/Java/jre7",
         r"C:/Program Files/Java/jre8",
         r"C:/Program Files (x86)/Java/jre7",
-        r"C:/Program Files (x86)/Java/jre8"
+        r"C:/Program Files (x86)/Java/jre8",
     ];
     for path in java_paths {
-        if let Some(j) = java_filepath_to_javaversion(PathBuf::from(path).join("bin")) {
+        if let Some(j) = check_java_at_filepath(PathBuf::from(path).join("bin"))
+        {
             jres.insert(j);
             break;
         }
@@ -46,17 +51,19 @@ pub fn get_all_jre  () -> Result<Vec<JavaVersion>,JREError> {
         r"SOFTWARE\\JavaSoft\\JRE", // Oracle
         r"SOFTWARE\\JavaSoft\\JDK",
         r"SOFTWARE\\Eclipse Foundation\\JDK", // Eclipse
-        r"SOFTWARE\\Eclipse Adoptium\\JRE", // Eclipse
+        r"SOFTWARE\\Eclipse Adoptium\\JRE",   // Eclipse
         r"SOFTWARE\\Eclipse Foundation\\JDK", // Eclipse
-        r"SOFTWARE\\Microsoft\\JDK", // Microsoft
+        r"SOFTWARE\\Microsoft\\JDK",          // Microsoft
     ];
     for key in key_paths {
-        if let Ok(jre_key) =  RegKey::predef(HKEY_LOCAL_MACHINE)
-            .open_subkey_with_flags(key, KEY_READ | KEY_WOW64_32KEY) {
+        if let Ok(jre_key) = RegKey::predef(HKEY_LOCAL_MACHINE)
+            .open_subkey_with_flags(key, KEY_READ | KEY_WOW64_32KEY)
+        {
             jres.extend(get_all_jre_winregkey(jre_key)?);
         }
-        if let Ok(jre_key) =  RegKey::predef(HKEY_LOCAL_MACHINE)
-            .open_subkey_with_flags(key, KEY_READ | KEY_WOW64_64KEY) {
+        if let Ok(jre_key) = RegKey::predef(HKEY_LOCAL_MACHINE)
+            .open_subkey_with_flags(key, KEY_READ | KEY_WOW64_64KEY)
+        {
             jres.extend(get_all_jre_winregkey(jre_key)?);
         }
     }
@@ -66,29 +73,30 @@ pub fn get_all_jre  () -> Result<Vec<JavaVersion>,JREError> {
 
 #[cfg(target_os = "windows")]
 #[tracing::instrument]
-pub fn get_all_jre_winregkey(jre_key : RegKey) -> Result<HashSet<JavaVersion>,JREError> {
-
+pub fn get_all_jre_winregkey(
+    jre_key: RegKey,
+) -> Result<HashSet<JavaVersion>, JREError> {
     let mut jres = HashSet::new();
 
     for subkey in jre_key.enum_keys() {
         let subkey = subkey?;
         let subkey = jre_key.open_subkey(subkey)?;
 
-        let subkey_value_names = [
-            r"JavaHome",
-            r"InstallationPath",
-            r"\\hotspot\\MSI",
-        ];
-    
+        let subkey_value_names =
+            [r"JavaHome", r"InstallationPath", r"\\hotspot\\MSI"];
+
         for subkey_value in subkey_value_names {
-            let path : Result<String, std::io::Error> = subkey.get_value(subkey_value);
+            let path: Result<String, std::io::Error> =
+                subkey.get_value(subkey_value);
             let Ok(path) = path else {continue};
-            if let Some(j) = java_filepath_to_javaversion(PathBuf::from(path).join("bin")) {
+            if let Some(j) =
+                check_java_at_filepath(PathBuf::from(path).join("bin"))
+            {
                 jres.insert(j);
                 break;
             }
         }
-    }     
+    }
     Ok(jres)
 }
 
@@ -96,7 +104,7 @@ pub fn get_all_jre_winregkey(jre_key : RegKey) -> Result<HashSet<JavaVersion>,JR
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations
 #[cfg(target_os = "macos")]
 #[tracing::instrument]
-pub fn get_all_jre() -> Result<Vec<JavaVersion>,JREError> {
+pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     // Use HashSet to avoid duplicates
     let mut jres = HashSet::new();
 
@@ -108,11 +116,12 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>,JREError> {
         r"/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/MacOS/itms/java",
         r"/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home",
         r"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands",
-        r"C:/Program Files (x86)/Java/jre8"
+        r"C:/Program Files (x86)/Java/jre8",
     ];
     for path in java_paths {
-        if let Some(j) = java_filepath_to_javaversion(PathBuf::from(path).join("bin")) {
-            jres.push(j);
+        if let Some(j) = check_java_at_filepath(PathBuf::from(path).join("bin"))
+        {
+            jres.insert(j);
             break;
         }
     }
@@ -125,7 +134,7 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>,JREError> {
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations
 #[cfg(target_os = "linux")]
 #[tracing::instrument]
-pub fn get_all_jre() -> Result<Vec<JavaVersion>,JREError> {
+pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     // Use HashSet to avoid duplicates
     let mut jres = HashSet::new();
 
@@ -134,35 +143,38 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>,JREError> {
 
     // Hard paths for locations for commonly installed locations
     let java_paths = [
+        r"/usr",
         r"/usr/java",
         r"/usr/lib/jvm",
         r"/usr/lib64/jvm",
         r"/opt/jdk",
-        r"/opt/jdks"
+        r"/opt/jdks",
     ];
     for path in java_paths {
-        if let Some(j) = java_filepath_to_javaversion(PathBuf::from(path).join("jre/bin")) {
-            jres.push(j);
+        if let Some(j) =
+            check_java_at_filepath(PathBuf::from(path).join("jre").join("bin"))
+        {
+            jres.insert(j);
             break;
         }
-        if let Some(j) = java_filepath_to_javaversion(PathBuf::from(path).join("bin")) {
-            jres.push(j);
+        if let Some(j) = check_java_at_filepath(PathBuf::from(path).join("bin"))
+        {
+            jres.insert(j);
             break;
         }
     }
     Ok(jres.into_iter().collect())
 }
 
-
 #[tracing::instrument]
-pub fn get_all_jre_path() -> Result<HashSet<JavaVersion>,JREError> {
+pub fn get_all_jre_path() -> Result<HashSet<JavaVersion>, JREError> {
     // Iterate over values in PATH variable, where accessible JREs are referenced
     let paths = env::var("PATH")?;
     let paths = env::split_paths(&paths);
 
     let mut jres = HashSet::new();
     for path in paths {
-        if let Some(j) = java_filepath_to_javaversion(path) {
+        if let Some(j) = check_java_at_filepath(path) {
             jres.insert(j);
         }
     }
@@ -171,17 +183,22 @@ pub fn get_all_jre_path() -> Result<HashSet<JavaVersion>,JREError> {
 
 #[cfg(target_os = "windows")]
 #[allow(dead_code)]
-const JAVA_BIN : &'static str = "java.exe";
+const JAVA_BIN: &'static str = "java.exe";
 
 #[cfg(not(target_os = "windows"))]
 #[allow(dead_code)]
-const JAVA_BIN : &'static str = "java";
+const JAVA_BIN: &'static str = "java";
 
 #[tracing::instrument]
-pub fn java_filepath_to_javaversion(path : PathBuf) -> Option<JavaVersion> {
+pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
+    // Attempt to canonicalize the potential java filepath
+    // If it fails, this path does not exist and None is returned (no Java here)
+    let Ok(path) = path.canonicalize() else { return None };
     let Some(path_str) = path.to_str() else { return None };
+
+    // Checks for existence of Java at this filepath
     let java = path.join(JAVA_BIN);
-    if !java.exists() { 
+    if !java.exists() {
         return None;
     };
 
@@ -189,10 +206,11 @@ pub fn java_filepath_to_javaversion(path : PathBuf) -> Option<JavaVersion> {
     let output = Command::new(&java).arg("-version").output().ok()?;
     let stderr = String::from_utf8_lossy(&output.stderr);
 
-    // Match: java version "1.8.0_361"
+    // Match: version "1.8.0_361"
     // Extracting version numbers
     lazy_static! {
-        static ref JAVA_VERSION_CAPTURE : Regex = Regex::new(r#"^java version "([\d\._]+)""#).unwrap();
+        static ref JAVA_VERSION_CAPTURE: Regex =
+            Regex::new(r#"version "([\d\._]+)""#).unwrap();
     }
 
     // Extract version info from it
@@ -201,8 +219,8 @@ pub fn java_filepath_to_javaversion(path : PathBuf) -> Option<JavaVersion> {
             let path = path_str.to_string();
             return Some(JavaVersion {
                 path,
-                version: version.as_str().to_string()
-            });        
+                version: version.as_str().to_string(),
+            });
         }
     }
     None
@@ -217,14 +235,13 @@ pub enum JREError {
     EnvError(#[from] env::VarError),
 }
 
-
 #[cfg(test)]
 mod tests {
-    use super::get_all_jre;
+    use super::{get_all_jre, JREError};
 
     #[test]
-    fn find_jre() {
-        let jres = get_all_jre().unwrap();
+    fn find_jre() -> Result<(), JREError> {
+        let jres = get_all_jre()?;
         dbg!(&jres);
         panic!("fail");
     }
