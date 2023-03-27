@@ -10,5 +10,10 @@ Any files depicting the Modrinth branding, including the wrench-in-labyrinth log
 
 This includes, but may not be limited to, the following files:
 
-- assets/branding/*
+- lib/assets/branding/*
 
+## External logos
+
+The following files are owned by their respective copyright holders and must be used within each of their Brand Guidelines:
+
+- lib/assets/external/*
