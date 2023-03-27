@@ -35,17 +35,17 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     jres.extend(get_all_jre_path()?);
 
     // Hard paths for locations for commonly installed .exes
-    let java_paths = [
-        r"C:/Program Files/Java/jre7",
-        r"C:/Program Files/Java/jre8",
-        r"C:/Program Files (x86)/Java/jre7",
-        r"C:/Program Files (x86)/Java/jre8",
-    ];
-    for path in java_paths {
-        if let Some(j) = check_java_at_filepath(PathBuf::from(path).join("bin"))
-        {
-            jres.insert(j);
-            break;
+    let java_paths = [r"C:/Program Files/Java", r"C:/Program Files (x86)/Java"];
+    for java_path in java_paths {
+        let Ok(java_subpaths) = std::fs::read_dir(java_path) else {continue };
+        for java_subpath in java_subpaths {
+            let path = java_subpath?.path();
+            if let Some(j) =
+                check_java_at_filepath(PathBuf::from(path).join("bin"))
+            {
+                jres.insert(j);
+                break;
+            }
         }
     }
 
@@ -121,7 +121,6 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/MacOS/itms/java",
         r"/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home",
         r"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands",
-        r"C:/Program Files (x86)/Java/jre8",
     ];
     for path in java_paths {
         if let Some(j) = check_java_at_filepath(PathBuf::from(path).join("bin"))
