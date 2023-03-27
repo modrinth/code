@@ -193,7 +193,7 @@ const JAVA_BIN: &'static str = "java.exe";
 const JAVA_BIN: &'static str = "java";
 
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
-// If no such path exists, or no such valid java at this path exists, returns None 
+// If no such path exists, or no such valid java at this path exists, returns None
 #[tracing::instrument]
 pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
