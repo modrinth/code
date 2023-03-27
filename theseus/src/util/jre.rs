@@ -125,8 +125,6 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
             break;
         }
     }
-
-    jres.extend(get_all_jre_search()?);
     Ok(jres.into_iter().collect())
 }
 
