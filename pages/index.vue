@@ -199,13 +199,13 @@
             <div class="launcher-view">
               <img
                 v-if="$colorMode.value === 'light'"
-                src="https://cdn.modrinth.com/landing/launcher-light.png"
+                src="https://cdn.modrinth.com/landing-new/launcher-light.webp"
                 alt="launcher graphic"
                 class="minecraft-screen"
               />
               <img
                 v-else
-                src="https://cdn.modrinth.com/landing/launcher.png"
+                src="https://cdn.modrinth.com/landing-new/launcher.webp"
                 alt="launcher graphic"
                 class="minecraft-screen"
               />
@@ -224,7 +224,12 @@
                   class="graphic gradient-border"
                   title="MultiMC"
                 >
-                  <img src="~/assets/images/external/multimc.png" alt="multimc launcher logo" />
+                  <img
+                    src="~/assets/images/external/multimc.webp"
+                    alt="multimc launcher logo"
+                    width="68"
+                    height="68"
+                  />
                 </a>
                 <a
                   rel="noopener"
@@ -530,7 +535,7 @@ const [
   { data: searchProjects, refresh: updateSearchProjects },
   { data: notifications },
 ] = await Promise.all([
-  useAsyncData('projects', () => useBaseFetch('projects_random?count=70'), {
+  useAsyncData('projects', () => useBaseFetch('projects_random?count=40'), {
     transform: (result) => {
       const val = Math.ceil(result.length / 3)
 
@@ -651,7 +656,7 @@ const [
         display: flex;
         min-width: 100%;
         gap: var(--gap);
-        animation: scroll 100s linear infinite;
+        animation: scroll 40s linear infinite;
 
         @media (prefers-reduced-motion) {
           animation-play-state: paused !important;
@@ -667,7 +672,7 @@ const [
         }
 
         &.offset {
-          animation: scroll-inverse 100s linear infinite;
+          animation: scroll-inverse 40s linear infinite;
           transform: translateX(-100%);
 
           @keyframes scroll-inverse {
@@ -932,6 +937,7 @@ const [
           .minecraft-screen {
             width: 100%;
             border-radius: 0.5rem;
+            aspect-ratio: 530 / 303;
           }
 
           .launcher-graphics {

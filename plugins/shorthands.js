@@ -52,6 +52,20 @@ export default defineNuxtPlugin((nuxtApp) => {
       }
       version.primaryFile = version.files.find((file) => file.primary) ?? version.files[0]
 
+      if (!version.primaryFile) {
+        version.primaryFile = {
+          hashes: {
+            sha1: '',
+            sha512: '',
+          },
+          url: '#',
+          filename: 'unknown',
+          primary: false,
+          size: 0,
+          file_type: null,
+        }
+      }
+
       version.author = authorMembers[version.author_id]
       if (!version.author) {
         version.author = members.find((x) => x.user.id === version.author_id)

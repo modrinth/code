@@ -193,7 +193,7 @@ export default defineNuxtComponent({
     )
 
     return {
-      projects: shallowRef(projects),
+      projects: shallowRef(projects.sort((a, b) => data.$dayjs(a.queued) - data.$dayjs(b.queued))),
       reports: ref(newReports),
     }
   },

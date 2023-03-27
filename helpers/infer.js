@@ -58,9 +58,9 @@ export const inferVersionInfo = async function (rawFile, project, gameVersions) 
   const inferFunctions = {
     // Forge 1.13+
     'META-INF/mods.toml': async (file, zip) => {
-      const metadata = TOML.parse(file)
+      const metadata = TOML.parse(file, { joiner: '\n' })
 
-      // TODO: Parse minecraft version ranges, handle if version is set to value from manifest
+      // TODO: Parse minecraft version ranges
       if (metadata.mods && metadata.mods.length > 0) {
         let versionNum = metadata.mods[0].version
 

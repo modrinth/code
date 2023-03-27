@@ -196,7 +196,7 @@
               {{ project.description }}
             </p>
             <Categories
-              :categories="project.categories"
+              :categories="project.categories.concat(project.additional_categories)"
               :type="project.actualProjectType"
               class="categories"
             >

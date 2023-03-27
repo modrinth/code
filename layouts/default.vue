@@ -431,9 +431,7 @@ export default defineNuxtComponent({
           },
         })
           .then(() => {})
-          .catch((e) => {
-            console.error('An error occurred while registering the visit: ', e)
-          })
+          .catch(() => {})
       })
     },
     toggleMobileMenu() {
