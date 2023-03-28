@@ -23,7 +23,6 @@ thiserror = "1.0"
 
 tokio-stream = { version = "0.1", features = ["fs"] }
 futures = "0.3"
-eyre = "0.6"
 daedalus = {version = "0.1.15", features = ["bincode"] }
 
 [features]

@@ -1,61 +1,63 @@
+use crate::api::{Result, TheseusGuiError::ProfileCreation};
 use daedalus::modded::LoaderVersion;
-use eyre::{ensure, bail};
 use futures::prelude::*;
 use std::path::PathBuf;
 use theseus::prelude::*;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
-use crate::api::{Result,TheseusGuiError::ProfileCreationError};
 
-const DEFAULT_NAME : &'static str = "";
-const PROFILE_FILE_PATH : &'static str = "";
+const DEFAULT_NAME: &'static str = "Untitled Instance";
+const PROFILE_FILE_PATH: &'static str = "../.minecraft";
 
+// Generic basic profile creation tool.
+// Creates an essentially empty dummy profile with profile_create
 #[tauri::command]
-pub async fn profile_create_empty()-> Result<()> {
-    Ok(profile_create(        
-        PathBuf::from("test"), // the path of the newly created profile
-        String::from("untilted"), // the name of the profile
-        String::from("1.8"), // the game version of the profile
-        None, // the icon for the profile
-        ModLoader::Vanilla,    // the modloader to use
-        String::from("stable"),  // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-    ).await?)
+pub async fn profile_create_empty() -> Result<Profile> {
+    Ok(profile_create(
+        PathBuf::from(PROFILE_FILE_PATH), // the path of the newly created profile
+        String::from(DEFAULT_NAME),       // the name of the profile
+        String::from("1.8"),              // the game version of the profile
+        None,                             // the icon for the profile
+        ModLoader::Vanilla,               // the modloader to use
+        String::from("stable"), // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
+    )
+    .await?)
 }
 
-
-// Add a profile to the in-memory state
+// Creates a profile at  the given filepath and adds it to the in-memory state
+// This is reused mostly from the CLI. TODO: touch up.
 // invoke('profile_add',profile)
 #[tauri::command]
-pub async fn profile_create  (
-  
-    path: PathBuf, // the path of the newly created profile
-    name: String, // the name of the profile
-    game_version: String, // the game version of the profile
-    icon: Option<PathBuf>, // the icon for the profile
-    modloader: ModLoader,    // the modloader to use
-    loader_version: String,  // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-
-) -> Result<()> {
+pub async fn profile_create(
+    path: PathBuf,          // the path of the newly created profile
+    name: String,           // the name of the profile
+    game_version: String,   // the game version of the profile
+    icon: Option<PathBuf>,  // the icon for the profile
+    modloader: ModLoader,   // the modloader to use
+    loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
+) -> Result<Profile> {
     // TODO: validate inputs from args early
     let state = State::get().await?;
 
     if path.exists() {
-        // return Err(ProfileCreationError("Attempted to create profile in something other than a folder!".to_string()));
-        ensure!(
-            path.is_dir(),
-            ProfileCreationError
-        );
-        ensure!(
-            !path.join("profile.json").exists(),
-            "Profile already exists! Perhaps you want `profile add` instead?"
-        );
+        if path.is_dir() {
+            return Err(ProfileCreation(
+                "Attempted to create profile in something other than a folder!"
+                    .to_string(),
+            ));
+        }
+        if !path.join("profile.json").exists() {}
+
         if ReadDirStream::new(fs::read_dir(&path).await?)
             .next()
             .await
             .is_some()
         {
             // TODO: in CLI, we have manual override for this
-            bail!("You are trying to create a profile in a non-empty directory.");
+            return Err(ProfileCreation(
+                "You are trying to create a profile in a non-empty directory!"
+                    .to_string(),
+            ));
         }
     } else {
         fs::create_dir_all(&path).await?;
@@ -64,7 +66,6 @@ pub async fn profile_create  (
         "Creating profile at path {}",
         &path.canonicalize()?.display()
     );
-
 
     let loader = modloader;
     let loader = if loader != ModLoader::Vanilla {
@@ -79,20 +80,20 @@ pub async fn profile_create  (
         let loader_data = match loader {
             ModLoader::Forge => &state.metadata.forge,
             ModLoader::Fabric => &state.metadata.fabric,
-            _ => eyre::bail!("Could not get manifest for loader {loader}. This is a bug in the GUI!"),
+            _ => return Err(ProfileCreation(format!("Could not get manifest for loader {loader}. This is a bug in the GUI!")))
         };
 
         let ref loaders = loader_data.game_versions
             .iter()
             .find(|it| it.id == game_version)
-            .ok_or_else(|| eyre::eyre!("Modloader {loader} unsupported for Minecraft version {game_version}"))?
+            .ok_or_else(|| ProfileCreation(format!("Modloader {loader} unsupported for Minecraft version {game_version}!")))?
             .loaders;
 
         let loader_version =
             loaders.iter().cloned().find(filter).ok_or_else(|| {
-                eyre::eyre!(
+                ProfileCreation(format!(
                     "Invalid version {version} for modloader {loader}"
-                )
+                ))
             })?;
 
         Some((loader_version, loader))
@@ -100,8 +101,7 @@ pub async fn profile_create  (
         None
     };
 
-    let mut profile =
-        Profile::new(name, game_version, path.clone()).await?;
+    let mut profile = Profile::new(name, game_version, path.clone()).await?;
 
     if let Some(ref icon) = icon {
         profile.with_icon(icon).await?;
@@ -111,9 +111,8 @@ pub async fn profile_create  (
         profile.with_loader(loader, Some(loader_version));
     }
 
-    profile::add(profile).await?;
+    profile::add(profile.clone()).await?;
     State::sync().await?;
 
-    Ok(())
-
+    Ok(profile)
 }

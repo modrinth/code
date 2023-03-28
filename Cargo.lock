@@ -3411,7 +3411,6 @@ name = "theseus_gui"
 version = "0.0.0"
 dependencies = [
  "daedalus",
- "eyre",
  "futures",
  "serde",
  "serde_json",
