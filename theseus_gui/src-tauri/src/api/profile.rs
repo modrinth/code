@@ -63,17 +63,13 @@ pub async fn profile_run(
     Ok(profile::run(path, &credentials).await?.into())
 }
 
-// TODO: We need to create a version of these functions in the API that are able to kill/wait for from the SerializableChild
-// Kill a running minecraft process
-// invoke('profile_kill')
-// #[tauri::command]
-// pub async fn profile_kill(running: &mut SerializableChild) -> Result<()> {
-//     Ok(profile::kill(running).await?)
-// }
-
-// Wait for a running process
+// Run Minecraft using a profile, and wait for the result
 // invoke('profile_wait_for')
-// #[tauri::command]
-// pub async fn profile_wait_for(running: &mut Child) -> Result<()> {
-//     Ok(profile::wait_for(running).await?)
-// }
+#[tauri::command]
+pub async fn profile_run_wait(
+    path: &Path,
+    credentials: theseus::auth::Credentials,
+) -> Result<()> {
+    let mut proc = profile::run(path, &credentials).await?;
+    Ok(profile::wait_for(&mut proc).await?)
+}
