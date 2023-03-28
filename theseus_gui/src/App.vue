@@ -15,6 +15,8 @@ import {
 import { useTheming, useInstances } from '@/store/state'
 import { toggleTheme } from '@/helpers/theme'
 import Instance from '@/components/ui/Instance.vue'
+import { invokeArrayFns } from '@vue/shared'
+import { invoke } from '@tauri-apps/api/tauri';
 
 const route = useRoute()
 const router = useRouter()
@@ -28,6 +30,27 @@ toggleTheme(theme.darkTheme)
 watch(theme, (newState) => {
   toggleTheme(newState.darkTheme)
 })
+
+async function addInstanceHandler() {
+  console.log("feafsefae");
+  try {
+    const resultValue = await invoke('profile_create_empty');
+    console.log(resultValue);
+  } catch (error) {
+    console.error(error);
+  }
+}
+async function greetHandler() {
+  console.log("feafsefae");
+  try {
+    const resultValue = await invoke('greet');
+    console.log(resultValue);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+
 </script>
 
 <template>
@@ -50,9 +73,13 @@ watch(theme, (newState) => {
           <p>Instances</p>
           <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
         </div>
-        <Button class="add-instance-btn">
+        <Button class="add-instance-btn" @click="addInstanceHandler">
           <PlusIcon />
-          Create Instance
+          Create Instance2
+        </Button>
+        <Button class="add-instance-btn" @click="greetHandler">
+          <PlusIcon />
+          Greet
         </Button>
 
         <div class="settings">

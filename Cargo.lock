@@ -3410,10 +3410,17 @@ dependencies = [
 name = "theseus_gui"
 version = "0.0.0"
 dependencies = [
+ "daedalus",
+ "eyre",
+ "futures",
  "serde",
  "serde_json",
  "tauri",
  "tauri-build",
+ "theseus",
+ "thiserror",
+ "tokio",
+ "tokio-stream",
 ]
 
 [[package]]
