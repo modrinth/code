@@ -29,7 +29,6 @@ toggleTheme(theme.darkTheme)
 watch(theme, (newState) => {
   toggleTheme(newState.darkTheme)
 })
-
 </script>
 
 <template>

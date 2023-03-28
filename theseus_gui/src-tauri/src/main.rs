@@ -11,7 +11,6 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             api::profile_create::profile_create_empty,
             api::profile_create::profile_create,
-            
             api::profile::profile_add,
             api::profile::profile_add_path,
             api::profile::profile_remove,
