@@ -9,7 +9,7 @@
   </div>
 </template>
 <script setup>
-import { formatCategory } from '@/components/utils'
+import { formatCategory } from '@/helpers/utils.js'
 </script>
 <script>
 export default {
