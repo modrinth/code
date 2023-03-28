@@ -3,6 +3,7 @@ use tokio::process::Child;
 
 #[derive(Debug)]
 pub struct SerializableChild {
+    #[allow(dead_code)]
     child: Child,
     pid: u32,
     exit_code: Option<i32>,

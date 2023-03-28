@@ -3,9 +3,6 @@ use crate::models::serializable_child::SerializableChild;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 
-const DEFAULT_NAME: &'static str = "";
-const PROFILE_FILE_PATH: &'static str = "";
-
 // Add a profile to the in-memory state
 // invoke('profile_add',profile)
 #[tauri::command]
