@@ -76,7 +76,7 @@ import {
   Categories,
   EnvironmentIndicator,
 } from '@/components'
-import { formatNumber } from '@/components/utils'
+import { formatNumber } from '@/helpers/utils.js'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 dayjs.extend(relativeTime)

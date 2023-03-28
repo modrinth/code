@@ -56,7 +56,7 @@
 </template>
 <script setup>
 import { Modal, Chips, XIcon, CheckIcon, DropdownSelect } from '@/components'
-import { renderString } from '@/components/parse.js'
+import { renderString } from '@/helpers/parse.js'
 import { ref } from 'vue'
 
 const modal = ref('modal')
