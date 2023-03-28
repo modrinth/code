@@ -116,11 +116,11 @@ export default {
   .nav-link {
     text-transform: capitalize;
     font-weight: var(--font-weight-bold);
-    color: var(--color-text);
+    color: var(--color-base);
     position: relative;
 
     &:hover {
-      color: var(--color-text);
+      color: var(--color-base);
 
       &::after {
         opacity: 0.4;
@@ -132,7 +132,7 @@ export default {
     }
 
     &.router-link-exact-active {
-      color: var(--color-text);
+      color: var(--color-base);
 
       &::after {
         opacity: 1;
@@ -155,7 +155,7 @@ export default {
     left: 0;
     width: 3rem;
     transition: all ease-in-out 0.2s;
-    border-radius: var(--size-rounded-max);
+    border-radius: var(--radius-max);
     background-color: var(--color-brand);
 
     @media (prefers-reduced-motion) {
