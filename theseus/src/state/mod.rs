@@ -16,6 +16,9 @@ pub use self::profiles::*;
 mod settings;
 pub use self::settings::*;
 
+mod projects;
+pub use self::projects::*;
+
 mod users;
 pub use self::users::*;
 
