@@ -7,7 +7,9 @@ WixTools
 .direnv/
 .DS_Store
 .pnpm-debug.log
-.minecraft
+
+minecraft
+config
 
 [#]*[#]
 

@@ -206,8 +206,9 @@ pub fn get_minecraft_arguments(
 
         Ok(parsed_arguments)
     } else if let Some(legacy_arguments) = legacy_arguments {
+        let temporary_replace_char = "\n";
         Ok(parse_minecraft_argument(
-            legacy_arguments,
+            &legacy_arguments.replace(" ", temporary_replace_char),
             &credentials.access_token,
             &credentials.username,
             &credentials.id,
@@ -304,12 +305,13 @@ fn parse_arguments<F>(
 where
     F: Fn(&str) -> crate::Result<String>,
 {
+    let temporary_replace_char = "\n";
     for argument in arguments {
         match argument {
             Argument::Normal(arg) => {
-                let parsed = parse_function(arg)?;
 
-                for arg in parsed.split(' ') {
+                let parsed = parse_function(&arg.replace(" ", temporary_replace_char))?;
+                for arg in parsed.split(temporary_replace_char) {
                     parsed_arguments.push(arg.to_string());
                 }
             }
@@ -317,11 +319,11 @@ where
                 if rules.iter().all(parse_rule) {
                     match value {
                         ArgumentValue::Single(arg) => {
-                            parsed_arguments.push(parse_function(arg)?);
+                            parsed_arguments.push(parse_function(&arg.replace(" ", temporary_replace_char))?);
                         }
                         ArgumentValue::Many(args) => {
                             for arg in args {
-                                parsed_arguments.push(parse_function(arg)?);
+                                parsed_arguments.push(parse_function(&arg.replace(" ", temporary_replace_char))?);
                             }
                         }
                     }

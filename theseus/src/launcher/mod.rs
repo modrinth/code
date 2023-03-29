@@ -170,7 +170,6 @@ pub async fn launch_minecraft(
         }
         None => Command::new(String::from(java_install.to_string_lossy())),
     };
-
     command
         .args(args::get_jvm_arguments(
             args.get(&d::minecraft::ArgumentType::Jvm)
@@ -185,7 +184,9 @@ pub async fn launch_minecraft(
             &version_jar,
             *memory,
             Vec::from(java_args),
-        )?)
+        )?
+            .into_iter().map(|r| r.replace(" ", r"\ "))
+        )
         .arg(version_info.main_class.clone())
         .args(args::get_minecraft_arguments(
             args.get(&d::minecraft::ArgumentType::Game)
@@ -198,7 +199,9 @@ pub async fn launch_minecraft(
             &state.directories.assets_dir(),
             &version.type_,
             *resolution,
-        )?)
+        )?
+        .into_iter().map(|r| r.replace(" ", r"\ "))
+    )
         .current_dir(instance_path.clone())
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());

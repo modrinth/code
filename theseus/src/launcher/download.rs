@@ -142,7 +142,7 @@ pub async fn download_assets(
 
     stream::iter(index.objects.iter())
         .map(Ok::<(&String, &Asset), crate::Error>)
-        .try_for_each_concurrent(None, |(name, asset)| async move {
+        .try_for_each_concurrent(Some(10), |(name, asset)| async move {
             let ref hash = asset.hash;
             let resource_path = st.directories.object_dir(hash);
             let url = format!(
@@ -202,7 +202,7 @@ pub async fn download_libraries(
 
     stream::iter(libraries.iter())
         .map(Ok::<&Library, crate::Error>)
-        .try_for_each_concurrent(None, |library| async move {
+        .try_for_each_concurrent(Some(10), |library| async move {
             if let Some(rules) = &library.rules {
                 if !rules.iter().all(super::parse_rule) {
                     return Ok(());
