@@ -1,11 +1,16 @@
 # Dropdown
+<script setup>
+import { ref } from "vue";
+
+const value = ref(null)
+</script>
 
 <DemoContainer>
   <DropdownSelect
     id="report-type"
-    v-model="reportType"
+    v-model="value"
     :options="['Daily', 'Weekly', 'Monthly']"
-    defaultValue="Choose Frequency"
+    placeholder="Choose Frequency"
   />
 </DemoContainer>
 
@@ -14,6 +19,6 @@
   id="report-type"
   v-model="reportType"
   :options="['Daily', 'Weekly', 'Monthly']"
-  defaultValue="Choose Frequency"
+  placeholder="Choose Frequency"
 />
 ```
