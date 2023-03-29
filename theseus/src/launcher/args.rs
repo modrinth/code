@@ -309,8 +309,8 @@ where
     for argument in arguments {
         match argument {
             Argument::Normal(arg) => {
-
-                let parsed = parse_function(&arg.replace(" ", temporary_replace_char))?;
+                let parsed =
+                    parse_function(&arg.replace(" ", temporary_replace_char))?;
                 for arg in parsed.split(temporary_replace_char) {
                     parsed_arguments.push(arg.to_string());
                 }
@@ -319,11 +319,15 @@ where
                 if rules.iter().all(parse_rule) {
                     match value {
                         ArgumentValue::Single(arg) => {
-                            parsed_arguments.push(parse_function(&arg.replace(" ", temporary_replace_char))?);
+                            parsed_arguments.push(parse_function(
+                                &arg.replace(" ", temporary_replace_char),
+                            )?);
                         }
                         ArgumentValue::Many(args) => {
                             for arg in args {
-                                parsed_arguments.push(parse_function(&arg.replace(" ", temporary_replace_char))?);
+                                parsed_arguments.push(parse_function(
+                                    &arg.replace(" ", temporary_replace_char),
+                                )?);
                             }
                         }
                     }

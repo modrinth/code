@@ -3,7 +3,10 @@
     windows_subsystem = "windows"
 )]
 
-use std::{path::{Path, PathBuf}, collections::HashSet};
+use std::{
+    collections::HashSet,
+    path::{Path, PathBuf},
+};
 use theseus::prelude::*;
 use tokio::sync::oneshot;
 
@@ -73,7 +76,6 @@ async fn main() -> theseus::Result<()> {
         }),
     };
     profile::add(profile).await?;
-
 
     // Attempt to create credentials.
     let credentials = authenticate_run().await?;
