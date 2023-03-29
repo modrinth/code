@@ -62,8 +62,8 @@ const handleRightPage = () => {
       <p>{{ props.label }}</p>
       <hr aria-hidden="true" />
       <div v-if="allowPagination" class="pagination">
-        <ChevronLeftIcon @click="handleLeftPage" />
-        <ChevronRightIcon @click="handleRightPage" />
+        <ChevronLeftIcon role="button" @click="handleLeftPage" />
+        <ChevronRightIcon role="button" @click="handleRightPage" />
       </div>
     </div>
     <section ref="modsRow" class="instances" v-if="shouldRenderNormalInstances">

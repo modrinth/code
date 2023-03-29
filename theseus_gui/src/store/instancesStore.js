@@ -12,6 +12,40 @@ export const useInstances = defineStore('instanceStore', {
     pageCount: 1,
     offset: 0,
     filter: '',
+    categories: {
+      adventure: { label: 'Adventure', enabled: false },
+      cursed: { label: 'Cursed', enabled: false },
+      decoration: { label: 'Decoration', enabled: false },
+      economy: { label: 'Economy', enabled: false },
+      equipment: { label: 'Equipment', enabled: false },
+      food: { label: 'Food', enabled: false },
+      gameMechanics: { label: 'Game Mechanics', enabled: false },
+      library: { label: 'Library', enabled: false },
+      magic: { label: 'Magic', enabled: false },
+      management: { label: 'Management', enabled: false },
+      minigame: { label: 'Minigame', enabled: false },
+      mobs: { label: 'Mobs', enabled: false },
+      optimization: { label: 'Optimization', enabled: false },
+      social: { label: 'Social', enabled: false },
+      storage: { label: 'Storage', enabled: false },
+      technology: { label: 'Technology', enabled: false },
+      transportation: { label: 'Transportation', enabled: false },
+      utility: { label: 'Utility', enabled: false },
+      worldGeneration: { label: 'World Generation', enabled: false },
+    },
+    loaders: {
+      fabric: { label: 'Fabric', enabled: false },
+      forge: { label: 'Forge', enabled: false },
+      quilt: { label: 'Quilt', enabled: false },
+      rift: { label: 'Rift', enabled: false },
+      liteLoader: { label: 'LiteLoader', enabled: false },
+      risugami: { label: 'Risugami ModLoader', enabled: false },
+    },
+    environments: {
+      client: false,
+      server: false,
+    },
+    activeVersions: [],
   }),
   actions: {
     fetchInstances() {
@@ -121,10 +155,30 @@ export const useInstances = defineStore('instanceStore', {
       this.fakeInstances = [...instances]
     },
     async searchInstances() {
+      const activeCategories = Object.keys(this.categories).filter(
+        (cat) => this.categories[cat].enabled === true
+      )
+      const activeLoaders = Object.keys(this.loaders).filter(
+        (loader) => this.loaders[loader].enabled === true
+      )
+      const activeEnvs = Object.keys(this.environments).filter(
+        (env) => this.environments[env] === true
+      )
+
+      let facets = ''
+      if (activeCategories.length > 0 || activeLoaders.length > 0 || activeEnvs.length > 0) {
+        facets = '&facets=['
+        activeCategories.forEach((cat) => (facets += `["categories:${cat}"],`))
+        activeLoaders.forEach((loader) => (facets += `["categories:${loader}"],`))
+        activeEnvs.forEach((env) => (facets += `[environments:${env}"],`))
+        facets = facets.slice(0, facets.length - 1)
+        facets += ']'
+      }
+
       const response = await ofetch(
         `https://staging-api.modrinth.com/v2/search?query=${this.searchInput || ''}&offset=${
           this.offset || 0
-        }`
+        }${facets || ''}`
       )
       this.instances = [...response.hits]
       this.totalHits = response.total_hits
@@ -142,6 +196,35 @@ export const useInstances = defineStore('instanceStore', {
     },
     setFilter(newFilter) {
       this.filter = newFilter
+    },
+    toggleCategory(cat) {
+      this.categories[cat] = !this.categories[cat]
+    },
+    toggleLoader(loader) {
+      this.loaders[loader] = !this.loaders[loader]
+    },
+    toggleEnv(env) {
+      this.environments[env] = !this.environments[env]
+    },
+    addVersion(version) {
+      if (this.activeVersions.includes(version)) return
+      this.activeVersions.push(version)
+    },
+    removeVersion(version) {
+      if (!this.activeVersions.includes(version)) return
+      this.activeVersions = this.activeVersions.filter((ver) => ver !== version)
+    },
+    resetFilters() {
+      Object.keys(this.categories).forEach((cat) => {
+        this.categories[cat].enabled = false
+      })
+      Object.keys(this.loaders).forEach((loader) => {
+        this.loaders[loader].enabled = false
+      })
+      Object.keys(this.environments).forEach((env) => {
+        this.environments[env] = false
+      })
+      this.activeVersions = []
     },
   },
   getters: {
@@ -179,6 +262,39 @@ export const useInstances = defineStore('instanceStore', {
         })
 
         return results
+      }
+    },
+    getIconByFilter: (_) => {
+      return (filter) => {
+        let iconObj = categoryIcons.categories.find((c) => {
+          if (c.name === filter) return c
+        })
+
+        if (iconObj) return iconObj.icon
+
+        iconObj = categoryIcons.loaders.find((l) => {
+          if (l.name === filter) return l
+        })
+
+        if (iconObj) return iconObj.icon
+
+        if (filter === 'client')
+          return '<svg data-v-d754391f="" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"></path></svg>'
+
+        if (filter === 'server')
+          return '<svg data-v-d754391f="" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12H2M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11zM6 16h.01M10 16h.01"></path></svg>'
+
+        if (filter === 'gameMechanics')
+          return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"></line><line x1="4" y1="10" x2="4" y2="3"></line><line x1="12" y1="21" x2="12" y2="12"></line><line x1="12" y1="8" x2="12" y2="3"></line><line x1="20" y1="21" x2="20" y2="16"></line><line x1="20" y1="12" x2="20" y2="3"></line><line x1="1" y1="14" x2="7" y2="14"></line><line x1="9" y1="8" x2="15" y2="8"></line><line x1="17" y1="16" x2="23" y2="16"></line></svg>'
+        if (filter === 'worldGeneration')
+          return '<svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>'
+
+        if (filter === 'liteLoader')
+          return '<svg clip-rule="evenodd" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="1.5" version="1.1" viewBox="0 0 24 24" xml:space="preserve" xmlns="http://www.w3.org/2000/svg"><rect width="24" height="24" fill="none"></rect><path d="m3.924 21.537s3.561-1.111 8.076-6.365c2.544-2.959 2.311-1.986 4-4.172" fill="none" stroke="currentColor" stroke-width="2px"></path><path d="m7.778 19s1.208-0.48 4.222 0c2.283 0.364 6.037-4.602 6.825-6.702 1.939-5.165 0.894-10.431 0.894-10.431s-4.277 4.936-6.855 7.133c-5.105 4.352-6.509 11-6.509 11" fill="none" stroke="currentColor" stroke-width="2px"></path></svg>'
+
+        if (filter === 'risugami')
+          return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" xml:space="preserve"><path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M1.4 18V6h3.8v1.5h1.5V9h1.5V7.5h1.5V6h3.8v12H9.7v-5.3H9v1.5H6v-1.5h-.8V18H1.4zm12.1 0V6h3.8v9h5.3v3h-9.1z"></path></svg>'
+        return '<div />'
       }
     },
   },

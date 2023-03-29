@@ -1,14 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import {
-  SearchIcon,
-  Button,
-  BoxIcon,
-  BookIcon,
-  ContractIcon,
-  TransferIcon,
-  ServerIcon,
-} from 'omorphia'
+import { SearchIcon, Button } from 'omorphia'
 import { useInstances } from '@/store/instancesStore'
 
 const instanceStore = useInstances()
@@ -27,15 +19,8 @@ const searchHandler = async () => {
         <SearchIcon />
         <input type="text" placeholder="Search.." v-model="searchText" @input="searchHandler" />
       </div>
-      <Button>Search by relevance</Button>
-    </div>
-    <!-- Open a modal onClick to filter these things? -->
-    <div class="filter-panel">
-      <Button><BoxIcon />Minecraft version</Button>
-      <Button><ContractIcon />Categories</Button>
-      <Button><ServerIcon />Environment</Button>
-      <Button><TransferIcon />Mod loaders</Button>
-      <Button><BookIcon />License</Button>
+      Sort by
+      <Button>Relevance</Button>
     </div>
   </div>
 </template>
@@ -47,7 +32,6 @@ const searchHandler = async () => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin: 0 auto 1rem auto;
 
   .search-panel {
     display: flex;
