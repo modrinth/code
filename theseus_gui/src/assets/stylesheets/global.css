@@ -9,3 +9,12 @@
   margin: 0;
   padding: 0;
 }
+
+
+.card-divider {
+  background-color: var(--color-button-bg);
+  border: none;
+  color: var(--color-button-bg);
+  height: 1px;
+  margin: var(--gap-sm) 0;
+}

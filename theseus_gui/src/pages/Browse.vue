@@ -2,6 +2,6 @@
 
 <template>
   <div>
-    <p>Browse page</p>
+    <RouterLink to="/project/spirit"> Spirit </RouterLink>
   </div>
 </template>
