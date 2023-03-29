@@ -40,7 +40,7 @@ export const useTags = () =>
       },
     ],
     loaderData: {
-      pluginLoaders: ['bukkit', 'spigot', 'paper', 'purpur', 'sponge'],
+      pluginLoaders: ['bukkit', 'spigot', 'paper', 'purpur', 'sponge', 'folia'],
       pluginPlatformLoaders: ['bungeecord', 'waterfall', 'velocity'],
       allPluginLoaders: [
         'bukkit',
@@ -51,6 +51,7 @@ export const useTags = () =>
         'bungeecord',
         'waterfall',
         'velocity',
+        'folia',
       ],
       dataPackLoaders: ['datapack'],
       modLoaders: ['forge', 'fabric', 'quilt', 'liteloader', 'modloader', 'rift'],
