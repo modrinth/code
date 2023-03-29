@@ -57,6 +57,9 @@ pub enum ErrorKind {
     #[error("Invalid input: {0}")]
     InputError(String),
 
+    #[error("Recv error: {0}")]
+    RecvError(#[from] tokio::sync::oneshot::error::RecvError),
+
     #[error(
         "Tried to access unloaded profile {0}, loading it probably failed"
     )]

@@ -5,7 +5,7 @@ use thiserror::Error;
 pub mod profile;
 pub mod profile_create;
 
-type Result<T> = std::result::Result<T, TheseusGuiError>;
+pub type Result<T> = std::result::Result<T, TheseusGuiError>;
 
 // Main returnable Theseus GUI error
 // Needs to be Serializable to be returned to the JavaScript side

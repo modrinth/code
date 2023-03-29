@@ -402,7 +402,8 @@ impl ProfileRun {
             .await?;
         let credentials = auth::refresh(id, false).await?;
 
-        let mut proc = profile::run(&path, &credentials).await?;
+        let proc_lock = profile::run(&path, &credentials).await?;
+        let mut proc = proc_lock.write().await; 
         profile::wait_for(&mut proc).await?;
 
         success!("Process exited successfully!");

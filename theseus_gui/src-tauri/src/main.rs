@@ -3,12 +3,23 @@
     windows_subsystem = "windows"
 )]
 
+use theseus::prelude::*;
+
 mod api;
-mod models;
+
+// Should be called in launcher initialization
+#[tauri::command]
+async fn initialize_state() -> api::Result<()> {
+    State::get().await?;
+    Ok(())
+}
 
 fn main() {
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
+            initialize_state,
+            api::profile_create::profile_create_empty,
             api::profile_create::profile_create_empty,
             api::profile_create::profile_create,
             api::profile::profile_add,
@@ -18,7 +29,7 @@ fn main() {
             api::profile::profile_is_managed,
             api::profile::profile_is_loaded,
             api::profile::profile_list,
-            api::profile::profile_run,
+            api::profile::profile_run_wait,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

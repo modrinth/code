@@ -6,9 +6,9 @@ pub use crate::{
 use daedalus as d;
 use std::{
     future::Future,
-    path::{Path, PathBuf},
+    path::{Path, PathBuf}, sync::Arc,
 };
-use tokio::process::{Child, Command};
+use tokio::{process::{Child, Command}, sync::RwLock};
 
 /// Add a profile to the in-memory state
 #[tracing::instrument]
@@ -110,11 +110,12 @@ pub async fn list(
 }
 
 /// Run Minecraft using a profile
+/// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip_all)]
 pub async fn run(
     path: &Path,
     credentials: &crate::auth::Credentials,
-) -> crate::Result<Child> {
+) -> crate::Result<Arc<RwLock<Child>>> {
     let state = State::get().await.unwrap();
     let settings = state.settings.read().await;
     let profile = get(path).await?.ok_or_else(|| {
@@ -204,7 +205,7 @@ pub async fn run(
     let ref memory = profile.memory.unwrap_or(settings.memory);
     let ref resolution = profile.resolution.unwrap_or(settings.game_resolution);
 
-    crate::launcher::launch_minecraft(
+    let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
@@ -215,7 +216,16 @@ pub async fn run(
         resolution,
         credentials,
     )
-    .await
+    .await?;
+
+    // Insert child into state
+    let mut state_children = state.children.write().await;
+    let pid = mc_process.id().ok_or_else(|| crate::ErrorKind::LauncherError(format!(
+        "Process failed to stay open."
+    )))?;
+    let child_arc = state_children.insert(pid, mc_process);
+
+    Ok(child_arc)
 }
 
 #[tracing::instrument]

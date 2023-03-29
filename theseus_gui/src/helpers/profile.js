@@ -15,7 +15,6 @@ export async function create() {
     return await invoke('profile_create');
 }
 
-
 // Add a profile to the in-memory state
 export async function add(profile) {
     return await invoke('profile_add', profile);
