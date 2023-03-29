@@ -23,7 +23,15 @@ pub async fn profile_create(
     modloader: ModLoader,   // the modloader to use
     loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
 ) -> Result<Profile> {
-    let res = profile_create::profile_create(path, name, game_version, icon, modloader, loader_version).await?;
+    let res = profile_create::profile_create(
+        path,
+        name,
+        game_version,
+        icon,
+        modloader,
+        loader_version,
+    )
+    .await?;
     State::sync().await?;
     Ok(res)
 }

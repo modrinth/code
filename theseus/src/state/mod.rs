@@ -37,7 +37,7 @@ pub struct State {
     /// Launcher configuration
     pub settings: RwLock<Settings>,
     /// Reference to process children
-    pub children : RwLock<Children>,
+    pub children: RwLock<Children>,
     /// Launcher profile metadata
     pub(crate) profiles: RwLock<Profiles>,
     /// Launcher user account info
@@ -54,7 +54,10 @@ impl State {
                     // Directories
                     let directories = DirectoryInfo::init().await?;
 
-                    println!("Directory database {}",directories.database_file().to_string_lossy());
+                    println!(
+                        "Directory database {}",
+                        directories.database_file().to_string_lossy()
+                    );
                     // Database
                     // TODO: make database versioned
                     let database = sled_config()

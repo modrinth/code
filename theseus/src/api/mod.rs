@@ -15,7 +15,6 @@ pub mod prelude {
         auth::{self, Credentials},
         data::*,
         profile::{self, Profile},
-        profile_create,
-        State,
+        profile_create, State,
     };
 }

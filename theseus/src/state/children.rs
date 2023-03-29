@@ -14,7 +14,11 @@ impl Children {
 
     // Inserts and returns a ref to the child
     // Unlike a Hashmap, this directly returns the reference to the Child rather than any previously stored Child that may exist
-    pub fn insert(&mut self, pid: u32, child: tokio::process::Child) -> Arc<RwLock<Child>> {
+    pub fn insert(
+        &mut self,
+        pid: u32,
+        child: tokio::process::Child,
+    ) -> Arc<RwLock<Child>> {
         let child = Arc::new(RwLock::new(child));
         self.0.insert(pid, child.clone());
         child
@@ -24,5 +28,4 @@ impl Children {
     pub fn get(&self, pid: &u32) -> Option<Arc<RwLock<Child>>> {
         self.0.get(&pid).map(|a| a.clone())
     }
-
 }

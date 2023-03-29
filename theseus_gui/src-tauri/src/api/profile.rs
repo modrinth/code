@@ -76,12 +76,13 @@ pub async fn profile_run(
     credentials: theseus::auth::Credentials,
 ) -> Result<u32> {
     let proc_lock = profile::run(path, &credentials).await?;
-    let pid = proc_lock.read().await.id().ok_or_else(||theseus::Error::from(theseus::ErrorKind::LauncherError(format!(
-        "Process failed to stay open."
-    ))))?;
+    let pid = proc_lock.read().await.id().ok_or_else(|| {
+        theseus::Error::from(theseus::ErrorKind::LauncherError(format!(
+            "Process failed to stay open."
+        )))
+    })?;
     Ok(pid)
 }
-
 
 // Run Minecraft using a profile, and wait for the result
 // invoke('profile_wait_for', path, credentials)
@@ -91,6 +92,6 @@ pub async fn profile_run_wait(
     credentials: theseus::auth::Credentials,
 ) -> Result<()> {
     let proc_lock = profile::run(path, &credentials).await?;
-    let mut proc = proc_lock.write().await; 
+    let mut proc = proc_lock.write().await;
     Ok(profile::wait_for(&mut proc).await?)
 }

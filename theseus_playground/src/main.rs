@@ -8,7 +8,6 @@ use std::path::Path;
 use theseus::prelude::*;
 use tokio::sync::oneshot;
 
-
 pub async fn authenticate_run() -> theseus::Result<Credentials> {
     println!("Adding new user account to Theseus");
     println!("A browser window will now open, follow the login flow there.");
@@ -24,23 +23,21 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
     Ok(credentials)
 }
 
-
 #[tokio::main]
 async fn main() -> theseus::Result<()> {
     // Initialize state
-    let state = State::get().await?;
-
+    State::get().await?;
 
     // Clear profiles
     let h = profile::list().await?;
-    for (path,_) in h.into_iter() {
+    for (path, _) in h.into_iter() {
         profile::remove(&path).await?;
     }
 
     // Craete vanilla minecraft instance
     // let profile = profile_create::profile_create_empty().await?;
     let path = Path::new("../.minecraft");
-    let profile = profile::add_path(path).await?;
+    profile::add_path(path).await?;
 
     // Dummy authentication
     let credentials = authenticate_run().await?;

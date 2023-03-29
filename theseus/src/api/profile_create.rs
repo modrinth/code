@@ -4,9 +4,9 @@ pub use crate::{
     state::{JavaSettings, Profile},
     State,
 };
-use std::path::PathBuf;
 use daedalus::modded::LoaderVersion;
 use futures::prelude::*;
+use std::path::PathBuf;
 // use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
@@ -48,14 +48,15 @@ pub async fn profile_create(
         if !path.is_dir() {
             return Err(crate::ErrorKind::OtherError(format!(
                 "Attempted to create profile in something other than a folder"
-            )).as_error());
+            ))
+            .as_error());
         }
         if path.join("profile.json").exists() {
             return Err(crate::ErrorKind::OtherError(format!(
                 "Profile already exists! Perhaps you want `profile add` instead"
-            )).as_error());
+            ))
+            .as_error());
         }
-
 
         if ReadDirStream::new(fs::read_dir(&path).await?)
             .next()
@@ -65,7 +66,8 @@ pub async fn profile_create(
             // TODO: in CLI, we have manual override for this
             return Err(crate::ErrorKind::OtherError(format!(
                 "You are trying to create a profile in a non-empty directory"
-            )).as_error());
+            ))
+            .as_error());
         }
     } else {
         fs::create_dir_all(&path).await?;
@@ -105,7 +107,8 @@ pub async fn profile_create(
             loaders.iter().cloned().find(filter).ok_or_else(|| {
                 crate::ErrorKind::OtherError(format!(
                     "Invalid version {version} for modloader {loader}"
-                )).as_error()
+                ))
+                .as_error()
             })?;
 
         Some((loader_version, loader))

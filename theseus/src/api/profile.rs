@@ -6,9 +6,13 @@ pub use crate::{
 use daedalus as d;
 use std::{
     future::Future,
-    path::{Path, PathBuf}, sync::Arc,
+    path::{Path, PathBuf},
+    sync::Arc,
 };
-use tokio::{process::{Child, Command}, sync::RwLock};
+use tokio::{
+    process::{Child, Command},
+    sync::RwLock,
+};
 
 /// Add a profile to the in-memory state
 #[tracing::instrument]
@@ -220,9 +224,9 @@ pub async fn run(
 
     // Insert child into state
     let mut state_children = state.children.write().await;
-    let pid = mc_process.id().ok_or_else(|| crate::ErrorKind::LauncherError(format!(
-        "Process failed to stay open."
-    )))?;
+    let pid = mc_process.id().ok_or_else(|| {
+        crate::ErrorKind::LauncherError(format!("Process failed to stay open."))
+    })?;
     let child_arc = state_children.insert(pid, mc_process);
 
     Ok(child_arc)
