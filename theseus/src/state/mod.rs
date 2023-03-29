@@ -54,10 +54,6 @@ impl State {
                     // Directories
                     let directories = DirectoryInfo::init().await?;
 
-                    println!(
-                        "Directory database {}",
-                        directories.database_file().to_string_lossy()
-                    );
                     // Database
                     // TODO: make database versioned
                     let database = sled_config()
