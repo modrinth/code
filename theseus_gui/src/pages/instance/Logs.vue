@@ -1,11 +1,7 @@
 <template>
   <Card class="log-card">
     <div class="button-row">
-      <div>
-        <Button>
-          logs/latest.log
-        </Button>
-      </div>
+      <DropdownSelect :options="['logs/latest.log']" />
       <div class="button-group">
         <Button>
           <ClipboardCopyIcon/>
@@ -28,7 +24,7 @@
 </template>
 
 <script setup>
-import { Card, Button, TrashIcon, SendIcon, ClipboardCopyIcon } from 'omorphia'
+import { Card, Button, TrashIcon, SendIcon, ClipboardCopyIcon, DropdownSelect } from 'omorphia'
 </script>
 <script>
 

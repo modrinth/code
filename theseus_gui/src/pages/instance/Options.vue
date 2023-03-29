@@ -38,26 +38,22 @@
     <hr class="card-divider">
     <div class="settings-group">
       <div class="sliders">
-          <span>
+          <span class="slider">
             Minimum Memory
             <Slider
                 v-model="javaMemory"
                 :min="1024"
                 :max="8192"
                 :step="1024"
-                :show-value="true"
-                class="slider"
             />
           </span>
-        <span>
+        <span class="slider">
             Maximum Memory
             <Slider
                 v-model="javaMemory"
                 :min="1024"
                 :max="8192"
                 :step="1024"
-                :show-value="true"
-                class="slider"
             />
           </span>
       </div>
@@ -68,26 +64,22 @@
     <div class="settings-group">
       <div class="settings-group">
         <div class="sliders">
-          <span>
+          <span class="slider">
             Width
             <Slider
                 v-model="javaMemory"
                 :min="1024"
                 :max="8192"
                 :step="1024"
-                :show-value="true"
-                class="slider"
             />
           </span>
-          <span>
+          <span class="slider">
             Height
             <Slider
                 v-model="javaMemory"
                 :min="1024"
                 :max="8192"
                 :step="1024"
-                :show-value="true"
-                class="slider"
             />
           </span>
         </div>
@@ -216,6 +208,7 @@ import {BrowseIcon, PlayIcon} from "@/assets/icons";
   width: 100%;
 
   .slider {
+    flex-grow: 1;
   }
 }
 

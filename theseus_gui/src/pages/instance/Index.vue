@@ -33,15 +33,13 @@
       </div>
     </div>
     <div class="content">
-      <Card class="">
-        We could put an ad here too
-      </Card>
+      <Promotion />
       <router-view/>
     </div>
   </div>
 </template>
 <script setup>
-import {BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Categories, DownloadIcon, TrashIcon} from 'omorphia'
+import {BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion} from 'omorphia'
 import {PlayIcon, OpenFolderIcon} from "@/assets/icons";
 import {useInstances} from '@/store/state'
 
@@ -59,54 +57,6 @@ export default {
 </script>
 
 <style scoped lang="scss">
-.instance-gallery-item {
-  width: 9rem;
-  height: 9rem;
-  background: url('https://avatars1.githubusercontent.com/u/6166773?v=4');
-  background-position: center;
-  background-size: cover;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0.3rem;
-  cursor: pointer;
-  transition: all ease-in-out 0.2s;
-  border-radius: var(--radius-md);
-
-
-  &:before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    background-image: linear-gradient(to bottom right, rgba(50, 50, 50, 0.9), rgba(0, 0, 0, 0.9));
-    opacity: 0.5;
-    z-index: 10;
-    border-radius: inherit;
-  }
-
-  &:hover {
-    box-shadow: 0 0 4px 4px rgba(0, 0, 0, 0.5);
-  }
-
-  p {
-    font-weight: bold;
-    font-size: 0.75rem;
-    color: #fff;
-    z-index: 11;
-    margin-bottom: 0.2rem;
-
-    &:nth-child(1) {
-      font-weight: normal;
-      color: #ddd;
-      font-size: 0.6rem;
-    }
-  }
-}
-
 .instance-card {
   background: var(--color-bg);
   display: flex;
@@ -251,9 +201,6 @@ Button {
   flex-direction: column;
   justify-content: flex-start;
   gap: 0.5rem;
-
-  button {
-  }
 }
 
 .content {
