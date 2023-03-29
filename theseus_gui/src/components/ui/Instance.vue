@@ -1,16 +1,11 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { storeToRefs } from 'pinia'
-import { Card, PlusIcon, ProjectCard } from 'omorphia'
-import { useInstances } from '@/store/instancesStore'
+import { Card, PlusIcon } from 'omorphia'
 
 const props = defineProps({
   display: String,
   instance: Object,
 })
-
-const instanceStore = useInstances()
-const { getCategoriesByInstanceId } = storeToRefs(instanceStore)
 </script>
 
 <template>
@@ -26,27 +21,6 @@ const { getCategoriesByInstanceId } = storeToRefs(instanceStore)
       </div>
       <div class="cta"><PlusIcon /></div>
     </Card>
-    <ProjectCard
-      v-else-if="display === 'project'"
-      class="instance-project-item"
-      :id="props.instance?.slug"
-      :type="props.instance?.project_type"
-      :name="props.instance?.title"
-      :description="props.instance?.description"
-      :iconUrl="props.instance?.icon_url"
-      :downloads="props.instance?.downloads?.toString()"
-      :follows="props.instance?.follows"
-      :createdAt="props.instance?.date_created"
-      :updatedAt="props.instance?.date_modified"
-      :categories="getCategoriesByInstanceId(props.instance?.project_id)"
-      :projectTypeDisplay="props.instance?.project_type"
-      projectTypeUrl="mod"
-      :serverSide="props.instance?.server_side"
-      :clientSide="props.instance?.client_side"
-      :showUpdatedDate="false"
-      :color="props.instance?.color"
-    >
-    </ProjectCard>
   </div>
 </template>
 
@@ -148,18 +122,6 @@ const { getCategoriesByInstanceId } = storeToRefs(instanceStore)
 .dark-mode {
   .cta > svg {
     color: #000;
-  }
-}
-
-.instance-project-item {
-  width: 100%;
-  height: auto;
-  margin: 2rem auto;
-  cursor: pointer;
-  transition: all ease-in-out 0.1s;
-
-  &:hover {
-    filter: brightness(0.85);
   }
 }
 </style>
