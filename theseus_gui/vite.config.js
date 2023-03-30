@@ -3,7 +3,7 @@ import vue from '@vitejs/plugin-vue'
 import alias from '@rollup/plugin-alias'
 import { resolve } from 'path'
 import eslint from 'vite-plugin-eslint'
-import svgLoader from "vite-svg-loader"
+import svgLoader from 'vite-svg-loader'
 
 const projectRootDir = resolve(__dirname)
 

@@ -18,10 +18,17 @@ const props = defineProps({
 
 <template>
   <div>
-    <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`/instance/${props.instance.id}`">{{
-        props.instance.name
-      }}</RouterLink>
-    <Card class="instance-card-item" v-else-if="display === 'card'" @click="this.$router.push(`/instance/${props.instance.id}`)">
+    <RouterLink
+      v-if="display === 'list'"
+      class="instance-list-item"
+      :to="`/instance/${props.instance.id}`"
+      >{{ props.instance.name }}</RouterLink
+    >
+    <Card
+      v-else-if="display === 'card'"
+      class="instance-card-item"
+      @click="$router.push(`/instance/${props.instance.id}`)"
+    >
       <img :src="props.instance.img" alt="Trending mod card" />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>

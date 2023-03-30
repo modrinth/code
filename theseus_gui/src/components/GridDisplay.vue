@@ -1,13 +1,25 @@
 <script setup>
-import {ChevronLeftIcon, ChevronRightIcon} from 'omorphia'
+import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
-import News from '@/components/ui/News.vue'
-import {onMounted, onUnmounted, ref} from 'vue'
+import { ref } from 'vue'
 
 const props = defineProps({
-  instances: Array,
-  news: Array,
-  label: String,
+  instances: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  news: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  label: {
+    type: String,
+    default: '',
+  },
   canPaginate: Boolean,
 })
 const allowPagination = ref(false)
@@ -16,9 +28,6 @@ const newsRow = ref(null)
 // Remove after state is populated with real data
 const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
-onUnmounted(() => {
-  if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
-})
 const handleLeftPage = () => {
   if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
   else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
@@ -32,10 +41,10 @@ const handleRightPage = () => {
   <div class="row">
     <div class="header">
       <p>{{ props.label }}</p>
-      <hr>
+      <hr />
       <div v-if="allowPagination" class="pagination">
-        <ChevronLeftIcon @click="handleLeftPage"/>
-        <ChevronRightIcon @click="handleRightPage"/>
+        <ChevronLeftIcon @click="handleLeftPage" />
+        <ChevronRightIcon @click="handleRightPage" />
       </div>
     </div>
     <section ref="modsRow" class="instances">
