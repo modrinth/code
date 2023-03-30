@@ -57,7 +57,7 @@ impl Metadata {
 
         if let Some(ref meta_bin) = db.get(METADATA_DB_FIELD)? {
             match bincode::decode_from_slice::<Self, _>(
-                &meta_bin,
+                meta_bin,
                 *BINCODE_CONFIG,
             ) {
                 Ok((meta, _)) => metadata = Some(meta),

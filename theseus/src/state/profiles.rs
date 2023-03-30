@@ -18,7 +18,7 @@ pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
-pub const SUPPORTED_ICON_FORMATS: &[&'static str] = &[
+pub const SUPPORTED_ICON_FORMATS: &[&str] = &[
     "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
     "mp4",
 ];
@@ -54,26 +54,23 @@ pub struct ProfileMetadata {
 }
 
 // TODO: Quilt?
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
+#[derive(
+    Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Default,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ModLoader {
+    #[default]
     Vanilla,
     Forge,
     Fabric,
 }
 
-impl Default for ModLoader {
-    fn default() -> Self {
-        ModLoader::Vanilla
-    }
-}
-
 impl std::fmt::Display for ModLoader {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match self {
-            &Self::Vanilla => "Vanilla",
-            &Self::Forge => "Forge",
-            &Self::Fabric => "Fabric",
+        f.write_str(match *self {
+            Self::Vanilla => "Vanilla",
+            Self::Forge => "Forge",
+            Self::Fabric => "Fabric",
         })
     }
 }
@@ -237,7 +234,7 @@ impl Profiles {
         // project path, parent profile path
         let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
         {
-            for (profile_path, _profile_optZA) in profiles.iter() {
+            for (profile_path, _profile_opt) in profiles.iter() {
                 let mut read_paths = |path: &str| {
                     for path in std::fs::read_dir(profile_path.join(path))? {
                         files.insert(path?.path(), profile_path.clone());
@@ -252,17 +249,15 @@ impl Profiles {
             }
         }
         let inferred = super::projects::infer_data_from_files(
-            files.keys().into_iter().cloned().collect(),
+            files.keys().cloned().collect(),
             dirs.caches_dir(),
         )
         .await?;
 
         for (key, value) in inferred {
             if let Some(profile_path) = files.get(&key) {
-                if let Some(profile) = profiles.get_mut(profile_path) {
-                    if let Some(profile) = profile {
-                        profile.projects.insert(key, value);
-                    }
+                if let Some(Some(profile)) = profiles.get_mut(profile_path) {
+                    profile.projects.insert(key, value);
                 }
             }
         }

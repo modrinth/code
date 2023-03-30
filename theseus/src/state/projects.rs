@@ -52,7 +52,7 @@ pub struct ModrinthProject {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ProjectMetadata {
-    Modrinth(ModrinthProject),
+    Modrinth(Box<ModrinthProject>),
     Inferred {
         title: Option<String>,
         description: Option<String>,
@@ -126,7 +126,9 @@ pub async fn infer_data_from_files(
                     Project {
                         sha512: hash,
                         disabled: false,
-                        metadata: ProjectMetadata::Modrinth(project.clone()),
+                        metadata: ProjectMetadata::Modrinth(Box::new(
+                            project.clone(),
+                        )),
                     },
                 );
                 continue;
@@ -342,10 +344,7 @@ pub async fn infer_data_from_files(
             if file.read_to_string(&mut file_str).is_ok() {
                 if let Ok(pack) = serde_json::from_str::<QuiltMod>(&file_str) {
                     let icon = read_icon_from_file(
-                        pack.metadata
-                            .as_ref()
-                            .map(|x| x.icon.clone())
-                            .flatten(),
+                        pack.metadata.as_ref().and_then(|x| x.icon.clone()),
                     )?;
 
                     return_projects.insert(
@@ -357,15 +356,13 @@ pub async fn infer_data_from_files(
                                 title: Some(
                                     pack.metadata
                                         .as_ref()
-                                        .map(|x| x.name.clone())
-                                        .flatten()
+                                        .and_then(|x| x.name.clone())
                                         .unwrap_or(pack.id),
                                 ),
                                 description: pack
                                     .metadata
                                     .as_ref()
-                                    .map(|x| x.description.clone())
-                                    .flatten(),
+                                    .and_then(|x| x.description.clone()),
                                 authors: pack
                                     .metadata
                                     .map(|x| {
