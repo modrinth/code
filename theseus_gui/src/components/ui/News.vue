@@ -1,7 +1,12 @@
 <script setup>
 import { Card, ChevronRightIcon } from 'omorphia'
 const props = defineProps({
-  news: Object,
+  news: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
 })
 </script>
 

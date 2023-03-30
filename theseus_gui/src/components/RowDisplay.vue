@@ -1,13 +1,26 @@
 <script setup>
-import {ChevronLeftIcon, ChevronRightIcon} from 'omorphia'
+import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import News from '@/components/ui/News.vue'
-import {onMounted, onUnmounted, ref} from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps({
-  instances: Array,
-  news: Array,
-  label: String,
+  instances: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  news: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  label: {
+    type: String,
+    default: '',
+  },
   canPaginate: Boolean,
 })
 const allowPagination = ref(false)
@@ -48,23 +61,23 @@ const handleRightPage = () => {
   <div class="row">
     <div class="header">
       <p>{{ props.label }}</p>
-      <hr aria-hidden="true"/>
+      <hr aria-hidden="true" />
       <div v-if="allowPagination" class="pagination">
-        <ChevronLeftIcon @click="handleLeftPage"/>
-        <ChevronRightIcon @click="handleRightPage"/>
+        <ChevronLeftIcon @click="handleLeftPage" />
+        <ChevronRightIcon @click="handleRightPage" />
       </div>
     </div>
-    <section ref="modsRow" class="instances" v-if="shouldRenderNormalInstances">
+    <section v-if="shouldRenderNormalInstances" ref="modsRow" class="instances">
       <Instance
-          v-for="instance in props.instances"
-          :key="instance.id"
-          display="card"
-          :instance="instance"
-          class="row-instance"
+        v-for="instance in props.instances"
+        :key="instance.id"
+        display="card"
+        :instance="instance"
+        class="row-instance"
       />
     </section>
-    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
-      <News v-for="news in props.news" :key="news.id" :news="news"/>
+    <section v-else-if="shouldRenderNews" ref="newsRow" class="news">
+      <News v-for="actualNews in props.news" :key="actualNews.id" :news="actualNews" />
     </section>
   </div>
 </template>

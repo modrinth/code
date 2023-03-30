@@ -16,6 +16,9 @@ pub use self::profiles::*;
 mod settings;
 pub use self::settings::*;
 
+mod projects;
+pub use self::projects::*;
+
 mod users;
 pub use self::users::*;
 
@@ -62,7 +65,7 @@ impl State {
                     // Launcher data
                     let (metadata, profiles) = tokio::try_join! {
                         Metadata::init(&database),
-                        Profiles::init(&database),
+                        Profiles::init(&database, &directories),
                     }?;
                     let users = Users::init(&database)?;
 

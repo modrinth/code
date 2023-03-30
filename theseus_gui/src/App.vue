@@ -9,12 +9,10 @@ import {
   ClientIcon,
   PlusIcon,
   SettingsIcon,
-  Button,
   Avatar,
 } from 'omorphia'
 import { useTheming, useInstances } from '@/store/state'
 import { toggleTheme } from '@/helpers/theme'
-import Instance from '@/components/ui/Instance.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -39,7 +37,9 @@ watch(theme, (newState) => {
           <RouterLink to="/" class="button-base nav-button"><ClientIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
           <RouterLink to="/library" class="button-base nav-button"> <BookIcon /></RouterLink>
-          <button color="primary" class="button-base primary nav-button" icon-only><PlusIcon /></button>
+          <button color="primary" class="button-base primary nav-button" icon-only>
+            <PlusIcon />
+          </button>
         </div>
       </div>
       <div class="settings pages-list">
@@ -194,7 +194,7 @@ watch(theme, (newState) => {
 .nav-button {
   height: 3rem;
   width: 3rem;
-  padding: .75rem;
+  padding: 0.75rem;
   border-radius: var(--radius-md);
 
   svg {

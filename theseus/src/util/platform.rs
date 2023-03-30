@@ -31,11 +31,7 @@ pub fn os_rule(rule: &OsRule) -> bool {
     let mut rule_match = true;
 
     if let Some(ref arch) = rule.arch {
-        rule_match &= match arch.as_str() {
-            "x86" => cfg!(any(target_arch = "x86", target_arch = "x86_64")),
-            "arm" => cfg!(target_arch = "arm"),
-            _ => true,
-        };
+        rule_match &= !matches!(arch.as_str(), "x86" | "arm");
     }
 
     if let Some(name) = &rule.name {

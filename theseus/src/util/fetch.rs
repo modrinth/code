@@ -57,7 +57,7 @@ pub async fn fetch_mirrors(
     let _permits = sem.acquire_many(permits).await.unwrap();
     let sem = Arc::new(Semaphore::new(permits.try_into().unwrap()));
 
-    future::select_ok(urls.into_iter().map(|url| {
+    future::select_ok(urls.iter().map(|url| {
         let sha1 = sha1.map(String::from);
         let url = String::from(*url);
         let sem = Arc::clone(&sem);
