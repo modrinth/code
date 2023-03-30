@@ -1,4 +1,4 @@
-name: Build + Lint
+name: GUI Build + Lint
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Rust building
+name: CLI Build
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Rust building
+name: Library Build
 
 on:
   push:
