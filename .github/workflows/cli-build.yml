@@ -32,4 +32,4 @@ jobs:
         name: Build program
         with:
           command: build
-          args: -bin theseus_cli
+          args: --bin theseus_cli
