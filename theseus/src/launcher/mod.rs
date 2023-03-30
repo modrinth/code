@@ -45,6 +45,7 @@ macro_rules! processor_rules {
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all, fields(path = ?instance_path))]
 pub async fn    launch_minecraft(
     game_version: &str,
@@ -76,7 +77,7 @@ pub async fn    launch_minecraft(
 
     let mut version_info = download::download_version_info(
         &state,
-        &version,
+        version,
         loader_version.as_ref(),
     )
     .await?;

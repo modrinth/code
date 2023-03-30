@@ -1,3 +1,0 @@
-[submodule "theseus_gui/locales"]
-	path = theseus_gui/locales
-	url = git@github.com:modrinth/translations.git

@@ -128,6 +128,12 @@ impl DirectoryInfo {
         self.config_dir.join("settings.json")
     }
 
+    /// Get the cache directory for Theseus
+    #[inline]
+    pub fn caches_dir(&self) -> PathBuf {
+        self.config_dir.join("caches")
+    }
+
     /// Get path from environment variable
     #[inline]
     fn env_path(name: &str) -> Option<PathBuf> {

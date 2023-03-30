@@ -45,9 +45,9 @@ export default new createRouter({
       props: true,
       children: [
         {
-            path: '',
-            name: 'Mods',
-            component: Instance.Mods,
+          path: '',
+          name: 'Mods',
+          component: Instance.Mods,
         },
         {
           path: 'options',
@@ -58,9 +58,9 @@ export default new createRouter({
           path: 'logs',
           name: 'Logs',
           component: Instance.Logs,
-        }
-      ]
-    }
+        },
+      ],
+    },
   ],
   linkActiveClass: 'router-link-active',
   linkExactActiveClass: 'router-link-exact-active',

@@ -2,9 +2,9 @@
   <div class="instance-container">
     <div class="side-cards">
       <Card class="instance-card">
-        <Avatar size="lg" :src="getInstance(instances).img"/>
+        <Avatar size="lg" :src="getInstance(instances).img" />
         <div class="instance-info">
-          <h2 class="name">{{getInstance(instances).name}}</h2>
+          <h2 class="name">{{ getInstance(instances).name }}</h2>
           Fabric {{ getInstance(instances).version }}
         </div>
         <span class="button-group">
@@ -18,40 +18,40 @@
         </span>
       </Card>
       <div class="pages-list">
-        <RouterLink :to="`/instance/${this.$route.params.id}/`" class="btn">
-          <BoxIcon/>
+        <RouterLink :to="`/instance/${$route.params.id}/`" class="btn">
+          <BoxIcon />
           Mods
         </RouterLink>
-        <RouterLink :to="`/instance/${this.$route.params.id}/options`" class="btn">
-          <SettingsIcon/>
+        <RouterLink :to="`/instance/${$route.params.id}/options`" class="btn">
+          <SettingsIcon />
           Options
         </RouterLink>
-        <RouterLink :to="`/instance/${this.$route.params.id}/logs`" class="btn">
-          <FileIcon/>
+        <RouterLink :to="`/instance/${$route.params.id}/logs`" class="btn">
+          <FileIcon />
           Logs
         </RouterLink>
       </div>
     </div>
     <div class="content">
       <Promotion />
-      <router-view/>
+      <router-view />
     </div>
   </div>
 </template>
 <script setup>
-import {BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion} from 'omorphia'
-import {PlayIcon, OpenFolderIcon} from "@/assets/icons";
-import {useInstances} from '@/store/state'
+import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from 'omorphia'
+import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
+import { useInstances } from '@/store/state'
 
-const instances = useInstances();
-instances.fetchInstances();
+const instances = useInstances()
+instances.fetchInstances()
 </script>
 <script>
 export default {
   methods: {
     getInstance(instances) {
-      return instances.instances.find((i) => i.id === parseInt(this.$route.params.id));
-    }
+      return instances.instances.find((i) => i.id === parseInt(this.$route.params.id))
+    },
   },
 }
 </script>

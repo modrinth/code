@@ -4,21 +4,21 @@
       <DropdownSelect :options="['logs/latest.log']" />
       <div class="button-group">
         <Button>
-          <ClipboardCopyIcon/>
+          <ClipboardCopyIcon />
           Copy
         </Button>
         <Button color="primary">
-          <SendIcon/>
+          <SendIcon />
           Share
         </Button>
         <Button color="danger">
-          <TrashIcon/>
+          <TrashIcon />
           Delete
         </Button>
       </div>
     </div>
     <div class="log-text">
-      <div v-for="line in fileContents.value.split('\n')"> {{ line }} </div>
+      <div v-for="(line, index) in fileContents.value.split('\n')" :key="index">{{ line }}</div>
     </div>
   </Card>
 </template>
@@ -27,66 +27,66 @@
 import { Card, Button, TrashIcon, SendIcon, ClipboardCopyIcon, DropdownSelect } from 'omorphia'
 </script>
 <script>
-
-  export default {
-    data() {
-      return {
-        fileContents: {
-          value: "'ServerLevel[New World]'/minecraft:the_end\n" +
-              "[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n" +
-              "[22:13:02] [Server thread/INFO]: venashial left the game\n" +
-              "[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n" +
-              "[22:13:02] [Server thread/INFO]: Stopping server\n" +
-              "[22:13:02] [Server thread/INFO]: Saving players\n" +
-              "[22:13:02] [Server thread/INFO]: Saving worlds\n" +
-              "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
-              "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
-              "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n" +
-              "[22:13:06] [Render thread/INFO]: Stopping worker threads\n" +
-              "[22:13:07] [Render thread/INFO]: Stopping!\n" +
-              "[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...\n" +
-              "'ServerLevel[New World]'/minecraft:the_end\n" +
-              "[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n" +
-              "[22:13:02] [Server thread/INFO]: venashial left the game\n" +
-              "[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n" +
-              "[22:13:02] [Server thread/INFO]: Stopping server\n" +
-              "[22:13:02] [Server thread/INFO]: Saving players\n" +
-              "[22:13:02] [Server thread/INFO]: Saving worlds\n" +
-              "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
-              "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
-              "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n" +
-              "[22:13:06] [Render thread/INFO]: Stopping worker threads\n" +
-              "[22:13:07] [Render thread/INFO]: Stopping!\n" +
-              "[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...\n" +
-              "'ServerLevel[New World]'/minecraft:the_end\n" +
-              "[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n" +
-              "[22:13:02] [Server thread/INFO]: venashial left the game\n" +
-              "[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n" +
-              "[22:13:02] [Server thread/INFO]: Stopping server\n" +
-              "[22:13:02] [Server thread/INFO]: Saving players\n" +
-              "[22:13:02] [Server thread/INFO]: Saving worlds\n" +
-              "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
-              "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
-              "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n" +
-              "[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n" +
-              "[22:13:06] [Render thread/INFO]: Stopping worker threads\n" +
-              "[22:13:07] [Render thread/INFO]: Stopping!\n" +
-              "[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence..."
-        }
-      };
+export default {
+  data() {
+    return {
+      fileContents: {
+        value:
+          "'ServerLevel[New World]'/minecraft:the_end\n" +
+          '[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n' +
+          '[22:13:02] [Server thread/INFO]: venashial left the game\n' +
+          '[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n' +
+          '[22:13:02] [Server thread/INFO]: Stopping server\n' +
+          '[22:13:02] [Server thread/INFO]: Saving players\n' +
+          '[22:13:02] [Server thread/INFO]: Saving worlds\n' +
+          "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
+          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
+          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n' +
+          '[22:13:06] [Render thread/INFO]: Stopping worker threads\n' +
+          '[22:13:07] [Render thread/INFO]: Stopping!\n' +
+          '[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...\n' +
+          "'ServerLevel[New World]'/minecraft:the_end\n" +
+          '[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n' +
+          '[22:13:02] [Server thread/INFO]: venashial left the game\n' +
+          '[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n' +
+          '[22:13:02] [Server thread/INFO]: Stopping server\n' +
+          '[22:13:02] [Server thread/INFO]: Saving players\n' +
+          '[22:13:02] [Server thread/INFO]: Saving worlds\n' +
+          "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
+          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
+          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n' +
+          '[22:13:06] [Render thread/INFO]: Stopping worker threads\n' +
+          '[22:13:07] [Render thread/INFO]: Stopping!\n' +
+          '[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...\n' +
+          "'ServerLevel[New World]'/minecraft:the_end\n" +
+          '[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n' +
+          '[22:13:02] [Server thread/INFO]: venashial left the game\n' +
+          '[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n' +
+          '[22:13:02] [Server thread/INFO]: Stopping server\n' +
+          '[22:13:02] [Server thread/INFO]: Saving players\n' +
+          '[22:13:02] [Server thread/INFO]: Saving worlds\n' +
+          "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
+          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
+          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n' +
+          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n' +
+          '[22:13:06] [Render thread/INFO]: Stopping worker threads\n' +
+          '[22:13:07] [Render thread/INFO]: Stopping!\n' +
+          '[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...',
+      },
     }
-  };
+  },
+}
 </script>
 
 <style scoped lang="scss">

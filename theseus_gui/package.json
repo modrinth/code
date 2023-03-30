@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "lint:js": "eslint --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
+    "lint": "npm run lint:js && prettier --check .",
+    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue ."
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
@@ -25,7 +28,7 @@
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-vue": "^9.9.0",
-    "prettier": "^2.8.4",
+    "prettier": "^2.8.7",
     "sass": "^1.58.3",
     "vite": "^4.0.0",
     "vite-plugin-eslint": "^1.8.1"

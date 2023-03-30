@@ -103,7 +103,7 @@ impl Default for WindowSize {
 }
 
 /// Game initialization hooks
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(default)]
 pub struct Hooks {
     #[serde(skip_serializing_if = "HashSet::is_empty")]
@@ -112,14 +112,4 @@ pub struct Hooks {
     pub wrapper: Option<String>,
     #[serde(skip_serializing_if = "HashSet::is_empty")]
     pub post_exit: HashSet<String>,
-}
-
-impl Default for Hooks {
-    fn default() -> Self {
-        Self {
-            pre_launch: HashSet::<String>::new(),
-            wrapper: None,
-            post_exit: HashSet::<String>::new(),
-        }
-    }
 }

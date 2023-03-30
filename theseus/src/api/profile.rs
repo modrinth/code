@@ -72,12 +72,7 @@ pub async fn is_managed(profile: &Path) -> crate::Result<bool> {
 pub async fn is_loaded(profile: &Path) -> crate::Result<bool> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
-    Ok(profiles
-        .0
-        .get(profile)
-        .map(Option::as_ref)
-        .flatten()
-        .is_some())
+    Ok(profiles.0.get(profile).and_then(Option::as_ref).is_some())
 }
 
 /// Edit a profile using a given asynchronous closure
@@ -143,8 +138,8 @@ pub async fn run(
         })?;
     let version_info = d::minecraft::fetch_version_info(version).await?;
 
-    let ref pre_launch_hooks =
-        profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
+    let pre_launch_hooks =
+        &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
     for hook in pre_launch_hooks.iter() {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
@@ -195,7 +190,7 @@ pub async fn run(
         .as_error());
     }
 
-    let ref java_args = profile
+    let java_args = profile
         .java
         .as_ref()
         .and_then(|it| it.extra_arguments.as_ref())
@@ -206,18 +201,18 @@ pub async fn run(
         .as_ref()
         .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
 
-    let ref memory = profile.memory.unwrap_or(settings.memory);
-    let ref resolution = profile.resolution.unwrap_or(settings.game_resolution);
+    let memory = profile.memory.unwrap_or(settings.memory);
+    let resolution = profile.resolution.unwrap_or(settings.game_resolution);
 
     let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
-        &java_install,
-        &java_args,
-        &wrapper,
-        memory,
-        resolution,
+        java_install,
+        java_args,
+        wrapper,
+        &memory,
+        &resolution,
         credentials,
     )
     .await?;
