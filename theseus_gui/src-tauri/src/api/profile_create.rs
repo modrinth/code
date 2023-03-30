@@ -5,7 +5,7 @@ use theseus::prelude::*;
 // Generic basic profile creation tool.
 // Creates an essentially empty dummy profile with profile_create
 #[tauri::command]
-pub async fn profile_create_empty() -> Result<Profile> {
+pub async fn profile_create_empty() -> Result<PathBuf> {
     let res = profile_create::profile_create_empty().await?;
     State::sync().await?;
     Ok(res)
@@ -20,7 +20,7 @@ pub async fn profile_create(
     modloader: ModLoader,   // the modloader to use
     loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
     icon: Option<PathBuf>,  // the icon for the profile
-) -> Result<Profile> {
+) -> Result<PathBuf> {
     let res = profile_create::profile_create(
         name,
         game_version,
