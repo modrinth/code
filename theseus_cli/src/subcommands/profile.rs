@@ -202,7 +202,7 @@ impl ProfileInit {
             let filter = |it: &LoaderVersion| match version.as_str() {
                 "latest" => true,
                 "stable" => it.stable,
-                id => it.id == String::from(id),
+                id => it.id == *id,
             };
 
             let loader_data = match loader {
@@ -211,7 +211,7 @@ impl ProfileInit {
                 _ => eyre::bail!("Could not get manifest for loader {loader}. This is a bug in the CLI!"),
             };
 
-            let ref loaders = loader_data.game_versions
+            let loaders = &loader_data.game_versions
                 .iter()
                 .find(|it| it.id == game_version)
                 .ok_or_else(|| eyre::eyre!("Modloader {loader} unsupported for Minecraft version {game_version}"))?

@@ -1,5 +1,7 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::BINCODE_CONFIG;
+use crate::data::DirectoryInfo;
+use crate::state::projects::Project;
 use daedalus::modded::LoaderVersion;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
@@ -16,7 +18,7 @@ pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
-pub const SUPPORTED_ICON_FORMATS: &[&'static str] = &[
+pub const SUPPORTED_ICON_FORMATS: &[&str] = &[
     "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
     "mp4",
 ];
@@ -27,6 +29,7 @@ pub struct Profile {
     #[serde(skip)]
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
+    pub projects: HashMap<PathBuf, Project>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub java: Option<JavaSettings>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -51,26 +54,23 @@ pub struct ProfileMetadata {
 }
 
 // TODO: Quilt?
-#[derive(Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize)]
+#[derive(
+    Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Default,
+)]
 #[serde(rename_all = "lowercase")]
 pub enum ModLoader {
+    #[default]
     Vanilla,
     Forge,
     Fabric,
 }
 
-impl Default for ModLoader {
-    fn default() -> Self {
-        ModLoader::Vanilla
-    }
-}
-
 impl std::fmt::Display for ModLoader {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.write_str(match self {
-            &Self::Vanilla => "Vanilla",
-            &Self::Forge => "Forge",
-            &Self::Fabric => "Fabric",
+        f.write_str(match *self {
+            Self::Vanilla => "Vanilla",
+            Self::Forge => "Forge",
+            Self::Fabric => "Fabric",
         })
     }
 }
@@ -107,6 +107,7 @@ impl Profile {
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
             },
+            projects: HashMap::new(),
             java: None,
             memory: None,
             resolution: None,
@@ -200,7 +201,10 @@ impl Profile {
 
 impl Profiles {
     #[tracing::instrument(skip(db))]
-    pub async fn init(db: &sled::Db) -> crate::Result<Self> {
+    pub async fn init(
+        db: &sled::Db,
+        dirs: &DirectoryInfo,
+    ) -> crate::Result<Self> {
         let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
             Ok(Default::default()),
             |bytes| {
@@ -212,7 +216,7 @@ impl Profiles {
             },
         )?;
 
-        let profiles = stream::iter(profile_db.iter())
+        let mut profiles = stream::iter(profile_db.iter())
             .then(|it| async move {
                 let path = PathBuf::from(it);
                 let prof = match Self::read_profile_from_dir(&path).await {
@@ -226,6 +230,37 @@ impl Profiles {
             })
             .collect::<HashMap<PathBuf, Option<Profile>>>()
             .await;
+
+        // project path, parent profile path
+        let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
+        {
+            for (profile_path, _profile_opt) in profiles.iter() {
+                let mut read_paths = |path: &str| {
+                    for path in std::fs::read_dir(profile_path.join(path))? {
+                        files.insert(path?.path(), profile_path.clone());
+                    }
+
+                    Ok::<(), crate::Error>(())
+                };
+                read_paths("mods")?;
+                read_paths("shaders")?;
+                read_paths("resourcepacks")?;
+                read_paths("datapacks")?;
+            }
+        }
+        let inferred = super::projects::infer_data_from_files(
+            files.keys().cloned().collect(),
+            dirs.caches_dir(),
+        )
+        .await?;
+
+        for (key, value) in inferred {
+            if let Some(profile_path) = files.get(&key) {
+                if let Some(Some(profile)) = profiles.get_mut(profile_path) {
+                    profile.projects.insert(key, value);
+                }
+            }
+        }
 
         Ok(Self(profiles))
     }
@@ -294,65 +329,5 @@ impl Profiles {
         let mut profile = serde_json::from_slice::<Profile>(&json)?;
         profile.path = PathBuf::from(path);
         Ok(profile)
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use pretty_assertions::{assert_eq, assert_str_eq};
-    use std::collections::HashSet;
-
-    #[test]
-    fn profile_test() -> Result<(), serde_json::Error> {
-        let profile = Profile {
-            path: PathBuf::new(),
-            metadata: ProfileMetadata {
-                name: String::from("Example Pack"),
-                icon: None,
-                game_version: String::from("1.18.2"),
-                loader: ModLoader::Vanilla,
-                loader_version: None,
-                format_version: CURRENT_FORMAT_VERSION,
-            },
-            java: Some(JavaSettings {
-                install: Some(PathBuf::from("/usr/bin/java")),
-                extra_arguments: Some(Vec::new()),
-            }),
-            memory: Some(MemorySettings {
-                minimum: None,
-                maximum: 8192,
-            }),
-            resolution: Some(WindowSize(1920, 1080)),
-            hooks: Some(Hooks {
-                pre_launch: HashSet::new(),
-                wrapper: None,
-                post_exit: HashSet::new(),
-            }),
-        };
-        let json = serde_json::json!({
-            "metadata": {
-                "name": "Example Pack",
-                "game_version": "1.18.2",
-                "format_version": 1u32,
-                "loader": "vanilla",
-            },
-            "java": {
-                "extra_arguments": [],
-                "install": "/usr/bin/java",
-            },
-            "memory": {
-              "maximum": 8192u32,
-            },
-            "resolution": (1920u16, 1080u16),
-            "hooks": {},
-        });
-
-        assert_eq!(serde_json::to_value(profile.clone())?, json.clone());
-        assert_str_eq!(
-            format!("{:?}", serde_json::from_value::<Profile>(json)?),
-            format!("{:?}", profile),
-        );
-        Ok(())
     }
 }

@@ -68,7 +68,7 @@ pub fn get_class_paths_jar<T: AsRef<str>>(
 pub fn get_lib_path(libraries_path: &Path, lib: &str) -> crate::Result<String> {
     let mut path = libraries_path.to_path_buf();
 
-    path.push(get_path_from_artifact(lib.as_ref())?);
+    path.push(get_path_from_artifact(lib)?);
 
     let path = &path.canonicalize().map_err(|_| {
         crate::ErrorKind::LauncherError(format!(
@@ -164,8 +164,7 @@ fn parse_jvm_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_string(),
+                .to_string_lossy(),
         )
         .replace("${classpath_separator}", classpath_separator())
         .replace("${launcher_name}", "theseus")
@@ -219,7 +218,6 @@ pub fn get_minecraft_arguments(
             resolution,
         )?
         .split(' ')
-        .into_iter()
         .map(|x| x.to_string())
         .collect())
     } else {
@@ -260,8 +258,7 @@ fn parse_minecraft_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_owned(),
+                .to_string_lossy(),
         )
         .replace(
             "${assets_root}",
@@ -274,8 +271,7 @@ fn parse_minecraft_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_owned(),
+                .to_string_lossy(),
         )
         .replace(
             "${game_assets}",
@@ -288,8 +284,7 @@ fn parse_minecraft_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_owned(),
+                .to_string_lossy(),
         )
         .replace("${version_type}", version_type.as_str())
         .replace("${resolution_width}", &resolution.0.to_string())
@@ -366,7 +361,7 @@ pub fn get_processor_arguments<T: AsRef<str>>(
 pub async fn get_processor_main_class(
     path: String,
 ) -> crate::Result<Option<String>> {
-    Ok(tokio::task::spawn_blocking(move || {
+    tokio::task::spawn_blocking(move || {
         let zipfile = std::fs::File::open(&path)?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
@@ -400,5 +395,5 @@ pub async fn get_processor_main_class(
         Ok::<Option<String>, crate::Error>(None)
     })
     .await
-    .unwrap()?)
+    .unwrap()
 }
