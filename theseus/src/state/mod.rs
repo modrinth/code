@@ -65,7 +65,7 @@ impl State {
                     // Launcher data
                     let (metadata, profiles) = tokio::try_join! {
                         Metadata::init(&database),
-                        Profiles::init(&database),
+                        Profiles::init(&database, &directories),
                     }?;
                     let users = Users::init(&database)?;
 

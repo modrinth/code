@@ -234,14 +234,38 @@ impl Profiles {
             .collect::<HashMap<PathBuf, Option<Profile>>>()
             .await;
 
-        // {
-        //     for (path, profile_opt) in profiles.iter_mut() {
-        //         if let Some(profile) = profile_opt {
-        //
-        //         }
-        //     }
-        // }
-        // dirs.caches_dir()
+        // project path, parent profile path
+        let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
+        {
+            for (profile_path, _profile_optZA) in profiles.iter() {
+                let mut read_paths = |path: &str| {
+                    for path in std::fs::read_dir(profile_path.join(path))? {
+                        files.insert(path?.path(), profile_path.clone());
+                    }
+
+                    Ok::<(), crate::Error>(())
+                };
+                read_paths("mods")?;
+                read_paths("shaders")?;
+                read_paths("resourcepacks")?;
+                read_paths("datapacks")?;
+            }
+        }
+        let inferred = super::projects::infer_data_from_files(
+            files.keys().into_iter().cloned().collect(),
+            dirs.caches_dir(),
+        )
+        .await?;
+
+        for (key, value) in inferred {
+            if let Some(profile_path) = files.get(&key) {
+                if let Some(profile) = profiles.get_mut(profile_path) {
+                    if let Some(profile) = profile {
+                        profile.projects.insert(key, value);
+                    }
+                }
+            }
+        }
 
         Ok(Self(profiles))
     }

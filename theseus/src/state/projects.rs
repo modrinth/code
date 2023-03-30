@@ -200,29 +200,36 @@ pub async fn infer_data_from_files(
 
             let mut file_str = String::new();
             if file.read_to_string(&mut file_str).is_ok() {
-                if let Ok(pack) = serde_json::from_str::<ForgeMod>(&file_str) {
-                    let icon = read_icon_from_file(pack.logo_file)?;
+                if let Ok(pack) =
+                    serde_json::from_str::<ForgeModInfo>(&file_str)
+                {
+                    if let Some(pack) = pack.mods.first() {
+                        let icon = read_icon_from_file(pack.logo_file.clone())?;
 
-                    return_projects.insert(
-                        path.clone(),
-                        Project {
-                            sha512: hash,
-                            disabled: false,
-                            metadata: ProjectMetadata::Inferred {
-                                title: Some(
-                                    pack.display_name.unwrap_or(pack.mod_id),
-                                ),
-                                description: pack.description,
-                                authors: pack
-                                    .authors
-                                    .map(|x| vec![x])
-                                    .unwrap_or_default(),
-                                version: pack.version,
-                                icon,
+                        return_projects.insert(
+                            path.clone(),
+                            Project {
+                                sha512: hash,
+                                disabled: false,
+                                metadata: ProjectMetadata::Inferred {
+                                    title: Some(
+                                        pack.display_name
+                                            .clone()
+                                            .unwrap_or(pack.mod_id.clone()),
+                                    ),
+                                    description: pack.description.clone(),
+                                    authors: pack
+                                        .authors
+                                        .clone()
+                                        .map(|x| vec![x])
+                                        .unwrap_or_default(),
+                                    version: pack.version.clone(),
+                                    icon,
+                                },
                             },
-                        },
-                    );
-                    continue;
+                        );
+                        continue;
+                    }
                 }
             }
         }
