@@ -1,6 +1,8 @@
 //! Theseus error type
 use tracing_error::InstrumentError;
 
+use crate::profile_create;
+
 #[derive(thiserror::Error, Debug)]
 pub enum ErrorKind {
     #[error("Filesystem error: {0}")]
@@ -69,7 +71,7 @@ pub enum ErrorKind {
     UnmanagedProfileError(String),
 
     #[error("Could not create profile: {0}")]
-    ProfileCreationError(String),
+    ProfileCreationError(#[from] profile_create::ProfileCreationError),
 
     #[error("Error: {0}")]
     OtherError(String),

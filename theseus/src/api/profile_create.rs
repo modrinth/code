@@ -16,7 +16,7 @@ const DEFAULT_NAME: &'static str = "Untitled Instance";
 // Generic basic profile creation tool.
 // Creates an essentially empty dummy profile with profile_create
 #[tracing::instrument]
-pub async fn profile_create_empty() -> crate::Result<Profile> {
+pub async fn profile_create_empty() -> crate::Result<PathBuf> {
     Ok(profile_create(
         String::from(DEFAULT_NAME), // the name/path of the profile
         String::from("1.8.2"),      // the game version of the profile
@@ -28,8 +28,7 @@ pub async fn profile_create_empty() -> crate::Result<Profile> {
 }
 
 // Creates a profile at  the given filepath and adds it to the in-memory state
-// This is reused mostly from the CLI. TODO: touch up.
-// invoke('profile_add',profile)
+// Returns filepath at which it can be accessed in the State
 #[tracing::instrument]
 pub async fn profile_create(
     name: String,           // the name of the profile, and relative path
@@ -37,23 +36,19 @@ pub async fn profile_create(
     modloader: ModLoader,   // the modloader to use
     loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
     icon: Option<PathBuf>,  // the icon for the profile
-) -> crate::Result<Profile> {
-    let state = State::get().await?;
+) -> crate::Result<PathBuf> {
 
+    let state = State::get().await?;
+    
     let path = state.directories.profiles_dir().join(&name);
 
     if path.exists() {
         if !path.is_dir() {
-            return Err(crate::ErrorKind::ProfileCreationError(format!(
-                "Attempted to create profile in something other than a folder"
-            ))
-            .as_error());
+            return Err(
+                ProfileCreationError::NotFolder.into());
         }
         if path.join("profile.json").exists() {
-            return Err(crate::ErrorKind::ProfileCreationError(format!(
-                "Profile already exists! Perhaps you want `profile add` instead"
-            ))
-            .as_error());
+            return Err(ProfileCreationError::ProfileExistsError(path.join("profile.json")).into());
         }
 
         if ReadDirStream::new(fs::read_dir(&path).await?)
@@ -61,10 +56,7 @@ pub async fn profile_create(
             .await
             .is_some()
         {
-            return Err(crate::ErrorKind::ProfileCreationError(format!(
-                "You are trying to create a profile in a non-empty directory"
-            ))
-            .as_error());
+            return Err(ProfileCreationError::NotEmptyFolder.into());
         }
     } else {
         fs::create_dir_all(&path).await?;
@@ -87,25 +79,18 @@ pub async fn profile_create(
         let loader_data = match loader {
             ModLoader::Forge => &state.metadata.forge,
             ModLoader::Fabric => &state.metadata.fabric,
-            _ => return Err(crate::ErrorKind::ProfileCreationError(format!(
-                "Could not get manifest for loader {loader}. This is a bug in the GUI"
-            )).as_error())
+            _ => return Err(ProfileCreationError::NoManifest(loader.to_string()).into())
         };
 
         let ref loaders = loader_data.game_versions
             .iter()
             .find(|it| it.id == game_version)
-            .ok_or_else(|| crate::ErrorKind::ProfileCreationError(format!(
-                "Modloader {loader} unsupported for Minecraft version {game_version}!"
-            )).as_error())?
+            .ok_or_else(|| ProfileCreationError::ModloaderUnsupported(loader.to_string(),game_version.clone()))?
             .loaders;
 
         let loader_version =
             loaders.iter().cloned().find(filter).ok_or_else(|| {
-                crate::ErrorKind::ProfileCreationError(format!(
-                    "Invalid version {version} for modloader {loader}"
-                ))
-                .as_error()
+                ProfileCreationError::InvalidVersionModloader(version, loader.to_string())
             })?;
 
         Some((loader_version, loader))
@@ -119,8 +104,32 @@ pub async fn profile_create(
     if let Some((loader_version, loader)) = loader {
         profile.with_loader(loader, Some(loader_version));
     }
-    profile::add(profile.clone()).await?;
+
+    profile::add(profile).await?;
     State::sync().await?;
 
-    Ok(profile)
+    Ok(path)
+}
+
+
+#[derive(thiserror::Error, Debug)]
+pub enum ProfileCreationError {
+    #[error("Profile .json exists: {0}")]
+    ProfileExistsError(PathBuf),
+    #[error("Modloader {0} unsupported for Minecraft version {1}")]
+    ModloaderUnsupported(String, String),
+    #[error("Invalid version {0} for modloader {1}")]
+    InvalidVersionModloader(String,String),
+    #[error("Could not get manifest for loader {0}. This is a bug in the GUI")]
+    NoManifest(String),
+    #[error("Could not get State.")]
+    NoState,
+
+    #[error("Attempted to create project in something other than a folder.")]
+    NotFolder,
+    #[error("You are trying to create a profile in a non-empty directory")]
+    NotEmptyFolder,
+    
+    #[error("IO error: {0}")]
+    IOError(#[from] std::io::Error)
 }
