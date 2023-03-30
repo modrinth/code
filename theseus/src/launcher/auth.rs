@@ -4,7 +4,7 @@ use bincode::{Decode, Encode};
 use chrono::{prelude::*, Duration};
 use futures::prelude::*;
 use lazy_static::lazy_static;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use url::Url;
 
 lazy_static! {

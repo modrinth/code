@@ -37,7 +37,10 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 #[tokio::main]
 async fn main() -> theseus::Result<()> {
     // Initialize state
-    let _ = State::get().await?;
+    let st = State::get().await?;
+
+    // Set max concurrent downloads to 10
+    st.settings.write().await.max_concurrent_downloads = 10;
 
     // Example variables for simple project case
     let name = "Example".to_string();
@@ -68,7 +71,8 @@ async fn main() -> theseus::Result<()> {
         modloader,
         loader_version,
         icon,
-    ).await?;
+    )
+    .await?;
     State::sync().await?;
 
     //  async closure for testing any desired edits
@@ -76,7 +80,10 @@ async fn main() -> theseus::Result<()> {
     println!("Editing.");
     profile::edit(&profile_path, |profile| {
         // Eg: Java. TODO: hook up to jre.rs class to pick optimal java
-        profile.java = Some(JavaSettings { install: Some(Path::new("/usr/bin/java").to_path_buf()), extra_arguments: None } );
+        profile.java = Some(JavaSettings {
+            install: Some(Path::new("/usr/bin/java").to_path_buf()),
+            extra_arguments: None,
+        });
         async { Ok(()) }
     })
     .await?;

@@ -13,9 +13,6 @@ pub type Result<T> = std::result::Result<T, TheseusGuiError>;
 pub enum TheseusGuiError {
     #[error(transparent)]
     Serializable(TheseusSerializableError),
-
-    #[error("Error creating profile {0}")]
-    ProfileCreation(String),
 }
 
 // Serializable error intermediary, so TheseusGuiError can be Serializable (eg: so that we can return theseus::Errors in Tauri directly)

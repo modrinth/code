@@ -27,6 +27,7 @@ fn main() {
             api::profile::profile_is_managed,
             api::profile::profile_is_loaded,
             api::profile::profile_list,
+            api::profile::profile_run,
             api::profile::profile_run_wait,
         ])
         .run(tauri::generate_context!())
