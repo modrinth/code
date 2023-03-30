@@ -1,7 +1,14 @@
-<script setup></script>
+<script setup>
+import { useInstances } from '@/store/state'
+import GridDisplay from '@/components/GridDisplay.vue'
+
+const instances = useInstances()
+instances.fetchInstances()
+</script>
 
 <template>
   <div>
-    <p>Library</p>
+    <GridDisplay label="Instances" :instances="instances.instances" />
+    <GridDisplay label="Modpacks" :instances="instances.instances" />
   </div>
 </template>

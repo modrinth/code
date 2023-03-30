@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import alias from '@rollup/plugin-alias'
 import { resolve } from 'path'
+import svgLoader from "vite-svg-loader";
 
 const projectRootDir = resolve(__dirname)
 
@@ -16,6 +17,20 @@ export default defineConfig({
           replacement: resolve(projectRootDir, 'src'),
         },
       ],
+    }),
+    svgLoader({
+      svgoConfig: {
+        plugins: [
+          {
+            name: 'preset-default',
+            params: {
+              overrides: {
+                removeViewBox: false,
+              },
+            },
+          },
+        ],
+      },
     }),
   ],
 
