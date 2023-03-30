@@ -89,8 +89,8 @@ async fn main() -> theseus::Result<()> {
     // Attempt to create credentials.
     // let credentials = authenticate_run().await?;
     // Attempt to load credentials. Use if ^ is giving rate limit.
-    let users =  auth::users().await.unwrap();
-    let credentials =  users.first().unwrap();
+    let users = auth::users().await.unwrap();
+    let credentials = users.first().unwrap();
 
     // Run MC
     profile::run(&canonicalize(&path)?, &credentials).await?;
