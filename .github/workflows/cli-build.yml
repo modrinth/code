@@ -31,4 +31,4 @@ jobs:
       - uses: actions-rs/cargo@v1
         name: Build program
         with:
-          command: build
+          command: build --bin theseus_cli
