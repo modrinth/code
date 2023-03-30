@@ -11,12 +11,7 @@ use tabled::Tabled;
 use theseus::prelude::*;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
 use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "profile")]

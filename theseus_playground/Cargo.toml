@@ -15,10 +15,8 @@ tokio = { version = "1", features = ["full"] }
 thiserror = "1.0"
 url = "2.2"
 webbrowser = "0.7"
+dunce = "1.0.3"
 
 tokio-stream = { version = "0.1", features = ["fs"] }
 futures = "0.3"
 daedalus = {version = "0.1.15", features = ["bincode"] }
-
-[target.'cfg(windows)'.dependencies] 
-dunce = "1.0.3"

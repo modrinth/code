@@ -13,12 +13,7 @@ use daedalus::{
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
 use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 pub fn get_class_paths(
     libraries_path: &Path,

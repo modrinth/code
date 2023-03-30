@@ -37,10 +37,10 @@ tokio = { version = "1", features = ["full"] }
 tokio-stream = { version = "0.1", features = ["fs"] }
 
 lazy_static = "1.4.0"
+dunce = "1.0.3"
 
 [target.'cfg(windows)'.dependencies] 
 winreg = "0.11.0"
-dunce = "1.0.3"
 
 [dev-dependencies]
 argh = "0.1.6"

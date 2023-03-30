@@ -9,12 +9,7 @@ use futures::prelude::*;
 use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
 use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 const DEFAULT_NAME: &'static str = "Untitled Instance";
 const PROFILE_FILE_PATH: &'static str = "../.minecraft";

@@ -8,12 +8,7 @@ use std::{
     path::{Path, PathBuf},
 };
 use tokio::fs;
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
 use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";

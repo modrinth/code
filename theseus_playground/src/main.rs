@@ -9,12 +9,7 @@ use std::{
 };
 use theseus::prelude::*;
 use tokio::sync::oneshot;
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
 use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 // We use this function directly to call authentication procedure
 // Note: "let url = match url" logic is handled differently, so that if there is a rate limit in the other set causing that one to end early,

@@ -3,18 +3,13 @@ use crate::state as st;
 use daedalus as d;
 use std::{path::Path, process::Stdio};
 use tokio::process::{Child, Command};
+use dunce::canonicalize;
 
 mod args;
 
 pub mod auth;
 
 mod download;
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
-use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 #[tracing::instrument]
 pub fn parse_rule(rule: &d::minecraft::Rule) -> bool {
