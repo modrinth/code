@@ -8,7 +8,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        platform: [macos-latest, ubuntu-20.04, windows-latest]
+        platform: [macos-latest, windows-latest]
 
     runs-on: ${{ matrix.platform }}
     defaults:
@@ -36,7 +36,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ../target/**
-          key: ${{ runner.os }}-theseus-gui-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-theseus
       - name: Get yarn cache
         id: yarn-cache
         run: echo "::set-output name=dir::$(yarn cache dir)"

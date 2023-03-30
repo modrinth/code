@@ -23,7 +23,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: ../target/**
-          key: ${{ runner.os }}-theseus-cli-${{ hashFiles('Cargo.lock') }}
+          key: ${{ runner.os }}-theseus
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
         with:
