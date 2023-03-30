@@ -6,6 +6,7 @@ import { useInstances } from '@/store/instancesStore'
 const instanceStore = useInstances()
 const searchText = ref('')
 const sort = ref('Relevance')
+const limit = ref(20)
 
 const searchHandler = async () => {
   instanceStore.setSearchInput(searchText.value)
@@ -15,6 +16,12 @@ const searchHandler = async () => {
 const handleSort = async (e) => {
   sort.value = e.option
   instanceStore.setFilter(sort.value)
+  await instanceStore.searchInstances()
+}
+
+const handleLimit = async (e) => {
+  limit.value = e.option
+  instanceStore.setLimit(limit.value)
   await instanceStore.searchInstances()
 }
 </script>
@@ -40,6 +47,14 @@ const handleSort = async (e) => {
         @change="handleSort"
         :modelValue="sort"
       />
+      Show per page
+      <DropdownSelect
+        name="Limit dropdown"
+        :options="[5, 10, 15, 20, 50, 100]"
+        :defaultValue="limit"
+        @change="handleLimit"
+        :modelValue="limit"
+      />
     </div>
   </div>
 </template>
@@ -61,7 +76,7 @@ const handleSort = async (e) => {
     margin: 1rem auto;
 
     .iconified-input {
-      width: 60%;
+      width: 50%;
     }
   }
 

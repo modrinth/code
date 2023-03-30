@@ -15,6 +15,7 @@
     "omorphia": "^0.4.1",
     "pinia": "^2.0.33",
     "vue": "^3.2.45",
+    "vue-multiselect": "^3.0.0-alpha.2",
     "vue-router": "4"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ofetch } from 'ofetch'
-import categoryIcons from '@/categoryIcons'
+import generated from '@/generated'
 
 export const useInstances = defineStore('instanceStore', {
   state: () => ({
@@ -46,6 +46,8 @@ export const useInstances = defineStore('instanceStore', {
       server: false,
     },
     activeVersions: [],
+    openSource: false,
+    limit: 20,
   }),
   actions: {
     fetchInstances() {
@@ -166,11 +168,29 @@ export const useInstances = defineStore('instanceStore', {
       )
 
       let facets = ''
-      if (activeCategories.length > 0 || activeLoaders.length > 0 || activeEnvs.length > 0) {
+      if (
+        activeCategories.length > 0 ||
+        activeLoaders.length > 0 ||
+        activeEnvs.length > 0 ||
+        this.activeVersions.length > 0 ||
+        this.openSource === true
+      ) {
         facets = '&facets=['
         activeCategories.forEach((cat) => (facets += `["categories:${cat}"],`))
         activeLoaders.forEach((loader) => (facets += `["categories:${loader}"],`))
-        activeEnvs.forEach((env) => (facets += `[environments:${env}"],`))
+        this.activeVersions.forEach((ver) => (facets += `["versions:${ver}"],`))
+
+        if (this.environments.client === true) {
+          facets +=
+            '["client_side:optional"],["client_side:required"],["server_side:optional"],["server_side:unsupported"],'
+        }
+        if (this.environments.server === true) {
+          facets +=
+            '["server_side:optional"],["server_side:required"],["client_side:optional"],["client_side:unsupported"],'
+        }
+
+        if (this.openSource === true) facets += '["open_source:true"],'
+
         facets = facets.slice(0, facets.length - 1)
         facets += ']'
       }
@@ -194,9 +214,9 @@ export const useInstances = defineStore('instanceStore', {
       }
 
       const response = await ofetch(
-        `https://api.modrinth.com/v2/search?query=${this.searchInput || ''}&offset=${
-          this.offset || 0
-        }${facets || ''}&index=${indexSort}`
+        `https://api.modrinth.com/v2/search?query=${this.searchInput || ''}&limit=${
+          this.limit
+        }&offset=${this.offset || 0}${facets || ''}&index=${indexSort}`
       )
       this.instances = [...response.hits]
       this.totalHits = response.total_hits
@@ -224,13 +244,11 @@ export const useInstances = defineStore('instanceStore', {
     toggleEnv(env) {
       this.environments[env] = !this.environments[env]
     },
-    addVersion(version) {
-      if (this.activeVersions.includes(version)) return
-      this.activeVersions.push(version)
+    setVersions(versions) {
+      this.activeVersions = versions
     },
-    removeVersion(version) {
-      if (!this.activeVersions.includes(version)) return
-      this.activeVersions = this.activeVersions.filter((ver) => ver !== version)
+    setLimit(newLimit) {
+      this.limit = newLimit
     },
     resetFilters() {
       Object.keys(this.categories).forEach((cat) => {
@@ -264,13 +282,13 @@ export const useInstances = defineStore('instanceStore', {
 
         instance.categories?.forEach((cat) => {
           // First look for an icon in the categories array
-          let iconObj = categoryIcons.categories.find((c) => {
+          let iconObj = generated.categories.find((c) => {
             if (c.name === cat) return c
           })
 
           // If an icon wasn't found in categories, search the loaders array
           if (!iconObj) {
-            iconObj = categoryIcons.loaders.find((l) => {
+            iconObj = generated.loaders.find((l) => {
               if (l.name === cat) return l
             })
           }
@@ -284,13 +302,13 @@ export const useInstances = defineStore('instanceStore', {
     },
     getIconByFilter: (_) => {
       return (filter) => {
-        let iconObj = categoryIcons.categories.find((c) => {
+        let iconObj = generated.categories.find((c) => {
           if (c.name === filter) return c
         })
 
         if (iconObj) return iconObj.icon
 
-        iconObj = categoryIcons.loaders.find((l) => {
+        iconObj = generated.loaders.find((l) => {
           if (l.name === filter) return l
         })
 

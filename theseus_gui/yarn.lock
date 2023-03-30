@@ -1414,6 +1414,11 @@ vue-eslint-parser@^9.0.1:
     lodash "^4.17.21"
     semver "^7.3.6"
 
+vue-multiselect@^3.0.0-alpha.2:
+  version "3.0.0-beta.1"
+  resolved "https://registry.yarnpkg.com/vue-multiselect/-/vue-multiselect-3.0.0-beta.1.tgz#f5c33677237fa9af0105f94783c3175330731e5a"
+  integrity sha512-V+jpydtjyHcQ+yjHsEWEBrDAopOx/pufNkSAXNVDAGQ+ESDEJ7wYejNd9H1RiCnFOYK4yf1XSGqE+Mp3HJXmdg==
+
 vue-resize@^2.0.0-alpha.1:
   version "2.0.0-alpha.1"
   resolved "https://registry.yarnpkg.com/vue-resize/-/vue-resize-2.0.0-alpha.1.tgz#43eeb79e74febe932b9b20c5c57e0ebc14e2df3a"
