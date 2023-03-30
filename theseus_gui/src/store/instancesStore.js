@@ -176,7 +176,7 @@ export const useInstances = defineStore('instanceStore', {
       }
 
       const response = await ofetch(
-        `https://staging-api.modrinth.com/v2/search?query=${this.searchInput || ''}&offset=${
+        `https://api.modrinth.com/v2/search?query=${this.searchInput || ''}&offset=${
           this.offset || 0
         }${facets || ''}`
       )
