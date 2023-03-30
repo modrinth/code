@@ -1,9 +1,9 @@
 //! Logic for launching Minecraft
 use crate::state as st;
 use daedalus as d;
+use dunce::canonicalize;
 use std::{path::Path, process::Stdio};
 use tokio::process::{Child, Command};
-use dunce::canonicalize;
 
 mod args;
 
@@ -208,6 +208,7 @@ pub async fn launch_minecraft(
             .map(|r| r.replace(" ", r"\ ")),
         )
         .current_dir(instance_path.clone())
+        .env_clear()
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
 

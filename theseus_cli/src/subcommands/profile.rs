@@ -3,15 +3,15 @@ use crate::util::{
     confirm_async, prompt_async, select_async, table, table_path_display,
 };
 use daedalus::modded::LoaderVersion;
+use dunce::canonicalize;
 use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
-use std::{path::{Path, PathBuf}};
+use std::path::{Path, PathBuf};
 use tabled::Tabled;
 use theseus::prelude::*;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
-use dunce::canonicalize;
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "profile")]

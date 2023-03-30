@@ -1,10 +1,10 @@
+use dunce::canonicalize;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashSet;
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
-use dunce::canonicalize;
 
 #[cfg(target_os = "windows")]
 use winreg::{

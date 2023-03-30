@@ -1,6 +1,7 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::BINCODE_CONFIG;
 use daedalus::modded::LoaderVersion;
+use dunce::canonicalize;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -8,7 +9,6 @@ use std::{
     path::{Path, PathBuf},
 };
 use tokio::fs;
-use dunce::canonicalize;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";

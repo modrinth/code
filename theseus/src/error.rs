@@ -68,6 +68,9 @@ pub enum ErrorKind {
     #[error("Profile {0} is not managed by Theseus!")]
     UnmanagedProfileError(String),
 
+    #[error("Could not create profile: {0}")]
+    ProfileCreationError(String),
+
     #[error("Error: {0}")]
     OtherError(String),
 }

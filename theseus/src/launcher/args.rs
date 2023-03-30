@@ -10,10 +10,10 @@ use daedalus::{
     minecraft::{Argument, ArgumentValue, Library, VersionType},
     modded::SidedDataEntry,
 };
+use dunce::canonicalize;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
-use dunce::canonicalize;
 
 pub fn get_class_paths(
     libraries_path: &Path,

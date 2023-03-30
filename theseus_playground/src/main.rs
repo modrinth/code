@@ -3,13 +3,13 @@
     windows_subsystem = "windows"
 )]
 
+use dunce::canonicalize;
 use std::{
     collections::HashSet,
     path::{Path, PathBuf},
 };
 use theseus::prelude::*;
 use tokio::sync::oneshot;
-use dunce::canonicalize;
 
 // We use this function directly to call authentication procedure
 // Note: "let url = match url" logic is handled differently, so that if there is a rate limit in the other set causing that one to end early,
