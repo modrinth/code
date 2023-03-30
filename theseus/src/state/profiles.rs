@@ -9,6 +9,12 @@ use std::{
 };
 use tokio::fs;
 
+// Uses dunce canonicalization to resolve symlinks without UNC prefixes
+#[cfg(target_os = "windows")]
+use dunce::canonicalize;
+#[cfg(not(target_os = "windows"))]
+use std::fs::canonicalize;
+
 const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";
 
@@ -98,7 +104,7 @@ impl Profile {
         }
 
         Ok(Self {
-            path: path.canonicalize()?,
+            path: canonicalize(path)?,
             metadata: ProfileMetadata {
                 name,
                 icon: None,
@@ -233,9 +239,7 @@ impl Profiles {
     #[tracing::instrument(skip(self))]
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         self.0.insert(
-            profile
-                .path
-                .canonicalize()?
+            canonicalize(&profile.path)?
                 .to_str()
                 .ok_or(
                     crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
@@ -251,12 +255,12 @@ impl Profiles {
         &'a mut self,
         path: &'a Path,
     ) -> crate::Result<&Self> {
-        self.insert(Self::read_profile_from_dir(&path.canonicalize()?).await?)
+        self.insert(Self::read_profile_from_dir(&canonicalize(path)?).await?)
     }
 
     #[tracing::instrument(skip(self))]
     pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
-        let path = PathBuf::from(path.canonicalize()?.to_str().unwrap());
+        let path = PathBuf::from(&canonicalize(path)?.to_str().unwrap());
         self.0.remove(&path);
         Ok(self)
     }

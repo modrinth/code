@@ -10,6 +10,12 @@ pub mod auth;
 
 mod download;
 
+// Uses dunce canonicalization to resolve symlinks without UNC prefixes
+#[cfg(target_os = "windows")]
+use dunce::canonicalize;
+#[cfg(not(target_os = "windows"))]
+use std::fs::canonicalize;
+
 #[tracing::instrument]
 pub fn parse_rule(rule: &d::minecraft::Rule) -> bool {
     use d::minecraft::{Rule, RuleAction};
@@ -57,7 +63,7 @@ pub async fn launch_minecraft(
     credentials: &auth::Credentials,
 ) -> crate::Result<Child> {
     let state = st::State::get().await?;
-    let instance_path = instance_path.canonicalize()?;
+    let instance_path = &canonicalize(instance_path)?;
 
     let version = state
         .metadata

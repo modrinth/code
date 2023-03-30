@@ -28,3 +28,7 @@ tracing-futures = "0.2"
 tracing-subscriber = {version = "0.3", features = ["env-filter"]}
 
 webbrowser = "0.7"
+
+[target.'cfg(windows)'.dependencies] 
+winreg = "0.11.0"
+dunce = "1.0.3"

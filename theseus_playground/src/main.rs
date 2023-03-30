@@ -10,6 +10,12 @@ use std::{
 use theseus::prelude::*;
 use tokio::sync::oneshot;
 
+// Uses dunce canonicalization to resolve symlinks without UNC prefixes
+#[cfg(target_os = "windows")]
+use dunce::canonicalize;
+#[cfg(not(target_os = "windows"))]
+use std::fs::canonicalize;
+
 // We use this function directly to call authentication procedure
 // Note: "let url = match url" logic is handled differently, so that if there is a rate limit in the other set causing that one to end early,
 // we can see the error message in this thread rather than a Recv error on 'rx' when the receiver is mysteriously droppped
@@ -61,7 +67,10 @@ async fn main() -> theseus::Result<()> {
             format_version: 1,
         },
         java: Some(JavaSettings {
+            // // Mac, linux
             install: Some(PathBuf::from("/usr/bin/java")),
+            // // Windows
+            // install: Some(PathBuf::from(r"C:\Program Files\Java\jdk-17\bin\java.exe")),
             extra_arguments: Some(Vec::new()),
         }),
         memory: Some(MemorySettings {
@@ -78,12 +87,12 @@ async fn main() -> theseus::Result<()> {
     profile::add(profile).await?;
 
     // Attempt to create credentials.
-    let credentials = authenticate_run().await?;
+    // let credentials = authenticate_run().await?;
     // Attempt to load credentials. Use if ^ is giving rate limit.
-    // let users =  users().await.unwrap();
-    // let credentials =  users.first().unwrap();
+    let users =  auth::users().await.unwrap();
+    let credentials =  users.first().unwrap();
 
     // Run MC
-    profile::run(&path.canonicalize()?, &credentials).await?;
+    profile::run(&canonicalize(&path)?, &credentials).await?;
     Ok(())
 }

@@ -6,11 +6,17 @@ use daedalus::modded::LoaderVersion;
 use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
-use std::path::{Path, PathBuf};
+use std::{path::{Path, PathBuf}};
 use tabled::Tabled;
 use theseus::prelude::*;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
+
+// Uses dunce canonicalization to resolve symlinks without UNC prefixes
+#[cfg(target_os = "windows")]
+use dunce::canonicalize;
+#[cfg(not(target_os = "windows"))]
+use std::fs::canonicalize;
 
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand, name = "profile")]
@@ -50,7 +56,7 @@ impl ProfileAdd {
             self.profile.display()
         );
 
-        let profile = self.profile.canonicalize()?;
+        let profile = canonicalize(&self.profile)?;
         let json_path = profile.join("profile.json");
 
         ensure!(
@@ -137,7 +143,7 @@ impl ProfileInit {
         }
         info!(
             "Creating profile at path {}",
-            &self.path.canonicalize()?.display()
+            &canonicalize(&self.path)?.display()
         );
 
         // TODO: abstract default prompting
@@ -343,7 +349,7 @@ impl ProfileRemove {
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
-        let profile = self.profile.canonicalize()?;
+        let profile = canonicalize(&self.profile)?;
         info!("Removing profile {} from Theseus", self.profile.display());
 
         if confirm_async(String::from("Do you wish to continue"), true).await? {
@@ -382,7 +388,7 @@ impl ProfileRun {
         _largs: &ProfileCommand,
     ) -> Result<()> {
         info!("Starting profile at path {}...", self.profile.display());
-        let path = self.profile.canonicalize()?;
+        let path = canonicalize(&self.profile)?;
 
         ensure!(
            profile::is_managed(&path).await?,

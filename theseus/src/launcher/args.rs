@@ -14,6 +14,12 @@ use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
 
+// Uses dunce canonicalization to resolve symlinks without UNC prefixes
+#[cfg(target_os = "windows")]
+use dunce::canonicalize;
+#[cfg(not(target_os = "windows"))]
+use std::fs::canonicalize;
+
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
@@ -37,8 +43,7 @@ pub fn get_class_paths(
         .collect::<Result<Vec<_>, _>>()?;
 
     cps.push(
-        client_path
-            .canonicalize()
+        canonicalize(&client_path)
             .map_err(|_| {
                 crate::ErrorKind::LauncherError(format!(
                     "Specified class path {} does not exist",
@@ -70,7 +75,7 @@ pub fn get_lib_path(libraries_path: &Path, lib: &str) -> crate::Result<String> {
 
     path.push(get_path_from_artifact(lib.as_ref())?);
 
-    let path = &path.canonicalize().map_err(|_| {
+    let path = &canonicalize(&path).map_err(|_| {
         crate::ErrorKind::LauncherError(format!(
             "Library file at path {} does not exist",
             path.to_string_lossy()
@@ -104,8 +109,7 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            &natives_path
-                .canonicalize()
+            canonicalize(&natives_path)
                 .map_err(|_| crate::ErrorKind::LauncherError(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
@@ -142,8 +146,7 @@ fn parse_jvm_argument(
     Ok(argument
         .replace(
             "${natives_directory}",
-            &natives_path
-                .canonicalize()
+            &canonicalize(&natives_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified natives path {} does not exist",
@@ -155,8 +158,7 @@ fn parse_jvm_argument(
         )
         .replace(
             "${library_directory}",
-            &libraries_path
-                .canonicalize()
+            &canonicalize(&libraries_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified libraries path {} does not exist",
@@ -252,8 +254,7 @@ fn parse_minecraft_argument(
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &game_directory
-                .canonicalize()
+            &canonicalize(&game_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified game directory {} does not exist",
@@ -266,8 +267,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${assets_root}",
-            &assets_directory
-                .canonicalize()
+            &canonicalize(&assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
@@ -280,8 +280,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${game_assets}",
-            &assets_directory
-                .canonicalize()
+            &canonicalize(&assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
