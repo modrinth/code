@@ -9,13 +9,16 @@ env:
 jobs:
   build:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./theseus_cli
     steps:
       - uses: actions/checkout@v2
       - name: Get build cache
         id: cache-build
         uses: actions/cache@v2
         with:
-          path: target/**
+          path: ../target/**
           key: ${{ runner.os }}-build-cache
       - name: Install toolchain
         uses: actions-rs/toolchain@v1
@@ -23,6 +26,5 @@ jobs:
           toolchain: stable
       - uses: actions-rs/cargo@v1
         name: Build program
-        working-directory: ./theseus_cli
         with:
           command: build
