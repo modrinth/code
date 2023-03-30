@@ -5,9 +5,22 @@ import News from '@/components/ui/News.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps({
-  instances: Array,
-  news: Array,
-  label: String,
+  instances: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  news: {
+    type: Array,
+    default() {
+      return []
+    },
+  },
+  label: {
+    type: String,
+    default: '',
+  },
   canPaginate: Boolean,
 })
 
@@ -66,7 +79,7 @@ const handleRightPage = () => {
         <ChevronRightIcon @click="handleRightPage" />
       </div>
     </div>
-    <section ref="modsRow" class="instances" v-if="shouldRenderNormalInstances">
+    <section v-if="shouldRenderNormalInstances" ref="modsRow" class="instances">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
@@ -74,8 +87,8 @@ const handleRightPage = () => {
         :instance="instance"
       />
     </section>
-    <section ref="newsRow" class="news" v-else-if="shouldRenderNews">
-      <News v-for="news in props.news" :key="news.id" :news="news" />
+    <section v-else-if="shouldRenderNews" ref="newsRow" class="news">
+      <News v-for="newsValue in props.news" :key="newsValue.id" :news="newsValue" />
     </section>
   </div>
 </template>

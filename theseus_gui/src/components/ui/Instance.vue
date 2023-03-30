@@ -3,8 +3,16 @@ import { RouterLink } from 'vue-router'
 import { Card, PlusIcon } from 'omorphia'
 
 const props = defineProps({
-  display: String,
-  instance: Object,
+  display: {
+    type: String,
+    default: '',
+  },
+  instance: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
 })
 </script>
 
@@ -13,7 +21,7 @@ const props = defineProps({
     <RouterLink v-if="display === 'list'" class="instance-list-item" :to="`${props.instance.id}`">{{
       props.instance.name
     }}</RouterLink>
-    <Card class="instance-card-item" v-else-if="display === 'card'">
+    <Card v-else-if="display === 'card'" class="instance-card-item">
       <img :src="props.instance.img" alt="Trending mod card" />
       <div class="project-info">
         <p class="title">{{ props.instance.name }}</p>

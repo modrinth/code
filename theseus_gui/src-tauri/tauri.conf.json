@@ -26,9 +26,7 @@
         "depends": []
       },
       "externalBin": [],
-      "icon": [
-        "icons/favicon.ico"
-      ],
+      "icon": ["icons/favicon.ico"],
       "identifier": "com.tauri.dev",
       "longDescription": "",
       "macOS": {

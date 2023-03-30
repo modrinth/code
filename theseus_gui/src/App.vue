@@ -48,7 +48,12 @@ watch(theme, (newState) => {
         </div>
         <div class="instance-list">
           <p>Instances</p>
-          <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
+          <Instance
+            v-for="instance in instances.instances"
+            :key="instance.id"
+            display="list"
+            :instance="instance"
+          />
         </div>
         <Button class="add-instance-btn">
           <PlusIcon />
