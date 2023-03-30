@@ -11,7 +11,7 @@ export const useInstances = defineStore('instanceStore', {
     currentPage: 1,
     pageCount: 1,
     offset: 0,
-    filter: '',
+    filter: 'Relevance',
     categories: {
       adventure: { label: 'Adventure', enabled: false },
       cursed: { label: 'Cursed', enabled: false },
@@ -175,10 +175,28 @@ export const useInstances = defineStore('instanceStore', {
         facets += ']'
       }
 
+      let indexSort
+      switch (this.filter) {
+        case 'Download count':
+          indexSort = 'downloads'
+          break
+        case 'Follow count':
+          indexSort = 'follows'
+          break
+        case 'Recently published':
+          indexSort = 'newest'
+          break
+        case 'Recently updated':
+          indexSort = 'updated'
+          break
+        default:
+          indexSort = 'relevance'
+      }
+
       const response = await ofetch(
         `https://api.modrinth.com/v2/search?query=${this.searchInput || ''}&offset=${
           this.offset || 0
-        }${facets || ''}`
+        }${facets || ''}&index=${indexSort}`
       )
       this.instances = [...response.hits]
       this.totalHits = response.total_hits
