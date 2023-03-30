@@ -37,7 +37,7 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 #[tokio::main]
 async fn main() -> theseus::Result<()> {
     // Initialize state
-    let state = State::get().await?;
+    let _ = State::get().await?;
 
     // Example variables for simple project case
     let name = "Example".to_string();
@@ -62,28 +62,21 @@ async fn main() -> theseus::Result<()> {
     println!("Creating/adding profile.");
     // Attempt to create a profile. If that fails, try adding one from the same path.
     // TODO: actually do a nested error check for the correct profile error.
-    let profile_create_attempt = profile_create(
+    let profile_path = profile_create(
         name.clone(),
         game_version,
         modloader,
         loader_version,
         icon,
-    )
-    .await;
-    let profile_path = match profile_create_attempt {
-        Ok(p) => p,
-        Err(_) => {
-            let path = state.directories.profiles_dir().join(&name);
-            profile::add_path(&path).await?;
-            canonicalize(&path)?
-        }
-    };
+    ).await?;
     State::sync().await?;
 
-    // Empty async closure for testing any desired edits
+    //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
-    profile::edit(&profile_path, |_profile| {
-        println!("Editing nothing.");
+    println!("Editing.");
+    profile::edit(&profile_path, |profile| {
+        // Eg: Java. TODO: hook up to jre.rs class to pick optimal java
+        profile.java = Some(JavaSettings { install: Some(Path::new("/usr/bin/java").to_path_buf()), extra_arguments: None } );
         async { Ok(()) }
     })
     .await?;
@@ -96,7 +89,8 @@ async fn main() -> theseus::Result<()> {
             println!("Running.");
             profile::run(&canonicalize(&profile_path)?, &credentials).await
         }
-        Err(_) => {
+        Err(e) => {
+            println!("Could not authenticate: {}.\nAttempting stored authentication.",e);
             // Attempt to load credentials if Hydra is down/rate limit hit
             let users = auth::users().await.unwrap();
             let credentials = users.first().unwrap();

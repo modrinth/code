@@ -7,6 +7,7 @@ pub use crate::{
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
+use uuid::Uuid;
 use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
@@ -39,8 +40,9 @@ pub async fn profile_create(
 ) -> crate::Result<PathBuf> {
 
     let state = State::get().await?;
-    
-    let path = state.directories.profiles_dir().join(&name);
+
+    let uuid = Uuid::new_v4();
+    let path = state.directories.profiles_dir().join(uuid.to_string());
 
     if path.exists() {
         if !path.is_dir() {
@@ -97,6 +99,9 @@ pub async fn profile_create(
     } else {
         None
     };
+
+    // Fully canonicalize now that its created for storing purposes
+    let path = canonicalize(&path)?;
     let mut profile = Profile::new(name, game_version, path.clone()).await?;
     if let Some(ref icon) = icon {
         profile.with_icon(icon).await?;
