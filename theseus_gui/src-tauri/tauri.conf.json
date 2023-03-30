@@ -27,7 +27,7 @@
       },
       "externalBin": [],
       "icon": ["icons/favicon.ico"],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.modrinth.theseus",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
