@@ -16,8 +16,14 @@ pub use self::profiles::*;
 mod settings;
 pub use self::settings::*;
 
+mod projects;
+pub use self::projects::*;
+
 mod users;
 pub use self::users::*;
+
+mod children;
+pub use self::children::*;
 
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -33,6 +39,8 @@ pub struct State {
     // TODO: settings API
     /// Launcher configuration
     pub settings: RwLock<Settings>,
+    /// Reference to process children
+    pub children: RwLock<Children>,
     /// Launcher profile metadata
     pub(crate) profiles: RwLock<Profiles>,
     /// Launcher user account info
@@ -62,13 +70,15 @@ impl State {
                     // Launcher data
                     let (metadata, profiles) = tokio::try_join! {
                         Metadata::init(&database),
-                        Profiles::init(&database),
+                        Profiles::init(&database, &directories),
                     }?;
                     let users = Users::init(&database)?;
 
                     // Loose initializations
                     let io_semaphore =
                         Semaphore::new(settings.max_concurrent_downloads);
+
+                    let children = Children::new();
 
                     Ok(Arc::new(Self {
                         database,
@@ -78,6 +88,7 @@ impl State {
                         settings: RwLock::new(settings),
                         profiles: RwLock::new(profiles),
                         users: RwLock::new(users),
+                        children: RwLock::new(children),
                     }))
                 }
             })

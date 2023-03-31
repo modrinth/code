@@ -75,7 +75,7 @@ pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
 ) -> crate::Result<()> {
-    let ref version = version_info.id;
+    let version = &version_info.id;
     log::debug!("Locating client for version {version}");
     let client_download = version_info
         .downloads
@@ -139,11 +139,10 @@ pub async fn download_assets(
     index: &AssetsIndex,
 ) -> crate::Result<()> {
     log::debug!("Loading assets");
-
     stream::iter(index.objects.iter())
         .map(Ok::<(&String, &Asset), crate::Error>)
-        .try_for_each_concurrent(None, |(name, asset)| async move {
-            let ref hash = asset.hash;
+        .try_for_each_concurrent(Some(st.settings.read().await.max_concurrent_downloads), |(name, asset)| async move {
+            let hash = &asset.hash;
             let resource_path = st.directories.object_dir(hash);
             let url = format!(
                 "https://resources.download.minecraft.net/{sub_hash}/{hash}",
@@ -158,7 +157,7 @@ pub async fn download_assets(
                         let resource = fetch_cell
                             .get_or_try_init(|| fetch(&url, Some(hash), &permit))
                             .await?;
-                        write(&resource_path, &resource, &permit).await?;
+                        write(&resource_path, resource, &permit).await?;
                         log::info!("Fetched asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
@@ -172,7 +171,7 @@ pub async fn download_assets(
                         let resource_path = st.directories.legacy_assets_dir().join(
                             name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
                         );
-                        write(&resource_path, &resource, &permit).await?;
+                        write(&resource_path, resource, &permit).await?;
                         log::info!("Fetched legacy asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
@@ -202,7 +201,7 @@ pub async fn download_libraries(
 
     stream::iter(libraries.iter())
         .map(Ok::<&Library, crate::Error>)
-        .try_for_each_concurrent(None, |library| async move {
+        .try_for_each_concurrent(Some(st.settings.read().await.max_concurrent_downloads), |library| async move {
             if let Some(rules) = &library.rules {
                 if !rules.iter().all(super::parse_rule) {
                     return Ok(());

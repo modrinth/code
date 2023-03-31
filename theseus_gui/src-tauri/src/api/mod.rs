@@ -6,7 +6,7 @@ pub mod auth;
 pub mod profile;
 pub mod profile_create;
 
-type Result<T> = std::result::Result<T, TheseusGuiError>;
+pub type Result<T> = std::result::Result<T, TheseusGuiError>;
 
 // Main returnable Theseus GUI error
 // Needs to be Serializable to be returned to the JavaScript side
@@ -14,9 +14,6 @@ type Result<T> = std::result::Result<T, TheseusGuiError>;
 pub enum TheseusGuiError {
     #[error(transparent)]
     Serializable(TheseusSerializableError),
-
-    #[error("Error creating profile {0}")]
-    ProfileCreation(String),
 }
 
 // Serializable error intermediary, so TheseusGuiError can be Serializable (eg: so that we can return theseus::Errors in Tauri directly)

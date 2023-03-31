@@ -17,6 +17,8 @@ pub static REQWEST_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
         .unwrap()
 });
 
+pub const MODRINTH_API_URL: &str = "https://api.modrinth.com/v2/";
+
 pub fn sled_config() -> sled::Config {
     sled::Config::default().use_compression(true)
 }

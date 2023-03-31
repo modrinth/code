@@ -9,14 +9,11 @@ import {
   ClientIcon,
   PlusIcon,
   SettingsIcon,
-  Button,
   Avatar,
 } from 'omorphia'
 import { useTheming, useInstances } from '@/store/state'
 import { toggleTheme } from '@/helpers/theme'
-import Instance from '@/components/ui/Instance.vue'
-import { invokeArrayFns } from '@vue/shared'
-import { addDefaultInstance } from '@/helpers/profile'
+
 const route = useRoute()
 const router = useRouter()
 
@@ -33,32 +30,20 @@ watch(theme, (newState) => {
 
 <template>
   <div class="container">
-    <div class="navigation">
-      <div class="nav-container">
-        <section class="user-section">
-          <Avatar size="sm" src="https://cdn.modrinth.com/data/AANobbMI/icon.png" />
-          <section>
-            <p class="username">OreoViking</p>
-            <a href="#">Manage accounts</a>
-          </section>
-        </section>
+    <div class="nav-container">
+      <div class="nav-section">
+        <Avatar size="sm" src="https://cdn.modrinth.com/data/AANobbMI/icon.png" />
         <div class="pages-list">
-          <RouterLink to="/" class="btn"> <ClientIcon />Home</RouterLink>
-          <RouterLink to="/browse" class="btn"> <SearchIcon />Browse</RouterLink>
-          <RouterLink to="/library" class="btn"> <BookIcon />Library</RouterLink>
+          <RouterLink to="/" class="button-base nav-button"><ClientIcon /></RouterLink>
+          <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
+          <RouterLink to="/library" class="button-base nav-button"> <BookIcon /></RouterLink>
+          <button color="primary" class="button-base primary nav-button" icon-only>
+            <PlusIcon />
+          </button>
         </div>
-        <div class="instance-list">
-          <p>Instances</p>
-          <Instance v-for="instance in instances.instances" display="list" :instance="instance" />
-        </div>
-        <Button class="add-instance-btn" @click="addDefaultInstance">
-          <PlusIcon />
-          Create Instance
-        </Button>
-
-        <div class="settings">
-          <RouterLink to="/settings" class="btn"><SettingsIcon /> Settings</RouterLink>
-        </div>
+      </div>
+      <div class="settings pages-list">
+        <RouterLink to="/settings" class="button-base nav-button"><SettingsIcon /></RouterLink>
       </div>
     </div>
     <div class="view">
@@ -73,34 +58,42 @@ watch(theme, (newState) => {
           <p>123 mods installed</p>
         </section>
       </div>
-      <RouterView />
+      <div class="router-view">
+        <RouterView />
+      </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
 .container {
-  min-width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+  overflow: hidden;
 
-  .navigation {
-    position: fixed;
+  .router-view {
+    width: 100%;
+    height: calc(100% - 2rem);
+    overflow: auto;
+    overflow-x: hidden;
+    margin-top: 2rem;
   }
 
   .view {
-    height: 100%;
-    margin-left: 210px;
-
+    margin-left: 5rem;
+    width: calc(100% - 5rem);
+    height: calc(100%);
     .appbar {
+      position: absolute;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      width: 100%;
-      height: 30px;
+      height: 2rem;
+      width: calc(100% - 5rem);
       border-bottom: 1px solid rgba(64, 67, 74, 0.2);
       background: var(--color-button-bg);
-      padding: 1.2rem;
+      text-align: center;
 
       .navigation-controls {
         display: inherit;
@@ -150,12 +143,14 @@ watch(theme, (newState) => {
 }
 
 .nav-container {
+  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 210px;
-  height: 100vh;
+  justify-content: space-between;
+  height: 100%;
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+  padding: 1rem;
 }
 
 .dark-mode {
@@ -163,28 +158,27 @@ watch(theme, (newState) => {
     background: var(--color-bg);
   }
 }
+
 .pages-list {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
+  gap: 0.5rem;
 
   a {
     display: flex;
     align-items: center;
-    width: 80%;
-    margin: 0.2rem auto;
-    text-align: left;
     font-size: 0.9rem;
     font-weight: 400;
     word-spacing: 3px;
     background: inherit;
     transition: all ease-in-out 0.1s;
-    color: var(--color-primary);
+    color: var(--color-base);
 
     &.router-link-active {
-      color: #000;
+      color: var(--color-accent-contrast);
       background: var(--color-button-bg);
     }
 
@@ -194,12 +188,25 @@ watch(theme, (newState) => {
       box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
       text-decoration: none;
     }
+  }
+}
 
-    svg {
-      margin-right: 1rem;
-      width: 1.2rem;
-      height: 1.2rem;
-    }
+.nav-button {
+  height: 3rem;
+  width: 3rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+
+  svg {
+    width: 1.5rem;
+    height: 1.5rem;
+    max-width: 1.5rem;
+    max-height: 1.5rem;
+  }
+
+  &.primary {
+    color: var(--color-accent-contrast);
+    background-color: var(--color-brand);
   }
 }
 
@@ -247,19 +254,12 @@ watch(theme, (newState) => {
 }
 
 .settings {
-  display: flex;
-  align-items: center;
-  margin: auto auto 0.5rem 1rem;
-  width: 9.375rem;
-
   a {
     display: flex;
-    background: inherit;
-    color: var(--color-primary);
-
-    svg {
-      margin-right: 0.9em;
-    }
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 1rem;
 
     &:hover {
       text-decoration: none;
@@ -273,7 +273,6 @@ watch(theme, (newState) => {
   align-items: center;
   width: 100%;
   height: 4.375rem;
-  margin-left: 3rem;
 
   section {
     display: flex;
@@ -296,5 +295,15 @@ watch(theme, (newState) => {
     font-weight: 400;
     color: var(--color-secondary);
   }
+}
+
+.nav-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  gap: 1rem;
 }
 </style>

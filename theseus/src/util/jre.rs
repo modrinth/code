@@ -1,3 +1,4 @@
+use dunce::canonicalize;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashSet;
@@ -10,12 +11,6 @@ use winreg::{
     enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
     RegKey,
 };
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
-use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct JavaVersion {
@@ -185,11 +180,11 @@ pub fn get_all_jre_path() -> Result<HashSet<JavaVersion>, JREError> {
 
 #[cfg(target_os = "windows")]
 #[allow(dead_code)]
-const JAVA_BIN: &'static str = "java.exe";
+const JAVA_BIN: &str = "java.exe";
 
 #[cfg(not(target_os = "windows"))]
 #[allow(dead_code)]
-const JAVA_BIN: &'static str = "java";
+const JAVA_BIN: &str = "java";
 
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
 // If no such path exists, or no such valid java at this path exists, returns None
