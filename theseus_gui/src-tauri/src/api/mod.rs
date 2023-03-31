@@ -2,7 +2,6 @@ use serde::ser::SerializeStruct;
 use serde::{Serialize, Serializer};
 use thiserror::Error;
 
-pub mod auth;
 pub mod profile;
 pub mod profile_create;
 
