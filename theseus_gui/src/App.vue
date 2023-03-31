@@ -13,7 +13,6 @@ import {
 } from 'omorphia'
 import { useTheming, useInstances } from '@/store/state'
 import { toggleTheme } from '@/helpers/theme'
-import { authenticate } from '@/helpers/auth'
 
 const route = useRoute()
 const router = useRouter()
