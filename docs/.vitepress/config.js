@@ -38,7 +38,7 @@ export default {
           { text: 'Search Filter', link: '/components/search-filter' },
           { text: 'Toggle', link: '/components/toggle' },
           { text: 'Promotion', link: '/components/promotion' },
-          { text: 'Navigation Row', link: '/components/nav-row' },
+          { text: 'Markdown', link: '/components/markdown' },
         ],
       },
     ],

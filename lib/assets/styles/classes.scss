@@ -587,7 +587,7 @@ a,
   h1,
   h2 {
     padding: 10px 0 5px;
-    border-bottom: 1px solid var(--color-header-underline);
+    border-bottom: 1px solid var(--color-gray);
   }
 
   h1,
@@ -604,21 +604,23 @@ a,
 
   blockquote {
     padding: 0 1em;
-    color: var(--color-text);
-    border-left: 0.25em solid var(--color-block-quote);
+    color: var(--color-base);
+    border-left: 0.25em solid var(--color-button-bg);
   }
 
   a {
     cursor: pointer;
-    color: var(--color-link);
+    color: var(--color-blue);
 
     &:focus-visible,
     &:hover {
-      color: var(--color-link-hover);
+      filter: brightness(1.2);
+      text-decoration: none;
     }
 
     &:active {
-      color: var(--color-link-active);
+      filter: brightness(1.1);
+      text-decoration: none;
     }
   }
 
@@ -638,8 +640,8 @@ a,
   pre {
     margin-top: 1rem;
     padding: 14px;
-    border-radius: var(--size-rounded-sm);
-    background-color: var(--color-code-bg);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-button-bg);
     overflow-x: auto;
 
     code {
@@ -652,14 +654,14 @@ a,
   code {
     padding: 0.2em 0.4em;
     font-size: 80%;
-    border-radius: var(--size-rounded-sm);
-    background-color: var(--color-code-bg);
-    color: var(--color-code-text);
+    border-radius: var(--radius-sm);
+    background-color: var(--color-button-bg);
+    color: var(--color-contrast);
   }
 
   hr {
     margin: 20px 0;
-    color: var(--color-divider);
+    color: var(--color-button-bg);
   }
 
   table {
@@ -670,8 +672,8 @@ a,
     border-collapse: separate;
     border-spacing: 0;
     line-height: 1.5;
-    border: 0.05rem solid var(--color-table-border);
-    border-radius: var(--size-rounded-sm);
+    border: 0.05rem solid var(--color-button-bg);
+    border-radius: var(--radius-sm);
 
     th {
       font-weight: 600;
@@ -680,33 +682,33 @@ a,
     td,
     th {
       padding: 0.4rem 0.85rem;
-      border: 0.05rem solid var(--color-table-border);
+      border: 0.05rem solid var(--color-button-bg);
     }
 
     tr:nth-child(2n) {
-      background-color: var(--color-table-alternate-row);
+      background-color: var(--color-accent-contrast);
     }
 
     th:first-of-type {
-      border-top-left-radius: var(--size-rounded-sm);
+      border-top-left-radius: var(--radius-sm);
     }
 
     th:last-of-type {
-      border-top-right-radius: var(--size-rounded-sm);
+      border-top-right-radius: var(--radius-sm);
     }
 
     tr:last-of-type td:first-of-type {
-      border-bottom-left-radius: var(--size-rounded-sm);
+      border-bottom-left-radius: var(--radius-sm);
     }
 
     tr:last-of-type td:last-of-type {
-      border-bottom-right-radius: var(--size-rounded-sm);
+      border-bottom-right-radius: var(--radius-sm);
     }
   }
 
   details {
     border: 0.15rem solid var(--color-button-bg);
-    border-radius: var(--size-rounded-sm);
+    border-radius: var(--radius-sm);
     padding: 0.5rem 0.5rem 0;
 
     summary {
@@ -715,10 +717,10 @@ a,
       padding: 0.5rem 0.8rem;
       cursor: pointer;
       background-color: var(--color-button-bg);
-      border-radius: var(--size-rounded-xs);
+      border-radius: var(--radius-xs);
 
       &:hover {
-        background-color: var(--color-button-bg-hover);
+        filter: brightness(0.85);
       }
     }
 
@@ -727,7 +729,7 @@ a,
 
       summary {
         margin-bottom: 0.5rem;
-        border-radius: var(--size-rounded-xs) var(--size-rounded-xs) 0 0;
+        border-radius: var(--radius-xs) var(--radius-xs) 0 0;
       }
 
       > :last-child:not(summary) {
@@ -763,9 +765,7 @@ select {
   -moz-border-radius: 3px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
-  background: url(http://dropdown/arrow/url/) no-repeat;
-  background-position: right center;
-  background-color: #cccccc;
+  background: #cccccc url(http://dropdown/arrow/url/) no-repeat right center;
   color: #000000;
   border: 1px solid #000000;
 }
