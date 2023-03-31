@@ -26,7 +26,7 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
             return Err(e.into());
         }
     };
-
+    println!("URL {}", url.as_str());
     webbrowser::open(url.as_str())?;
     let credentials = flow.await.unwrap()?;
     State::sync().await?;

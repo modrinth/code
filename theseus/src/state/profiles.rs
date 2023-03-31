@@ -237,10 +237,13 @@ impl Profiles {
         {
             for (profile_path, _profile_opt) in profiles.iter() {
                 let mut read_paths = |path: &str| {
-                    for path in std::fs::read_dir(profile_path.join(path))? {
-                        files.insert(path?.path(), profile_path.clone());
+                    let new_path = profile_path.join(path);
+                    if new_path.exists() {
+                        for path in std::fs::read_dir(profile_path.join(path))?
+                        {
+                            files.insert(path?.path(), profile_path.clone());
+                        }
                     }
-
                     Ok::<(), crate::Error>(())
                 };
                 read_paths("mods")?;

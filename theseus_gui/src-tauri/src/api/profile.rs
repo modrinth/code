@@ -99,29 +99,26 @@ pub async fn profile_run_wait(
 // Wait for a running minecraft process (a Child)
 // invoke('profile_wait_for', pid)
 #[tauri::command]
-pub async fn profile_wait_for( pid: u32,
-) -> Result<()> {
+pub async fn profile_wait_for(pid: u32) -> Result<()> {
     let st = State::get().await?;
     if let Some(proc_lock) = st.children.blocking_read().get(&pid) {
         let mut proc = proc_lock.write().await;
         return Ok(profile::wait_for(&mut proc).await?);
-    } 
-    // If child is gone from state, it's not tracked or already finished    
+    }
+    // If child is gone from state, it's not tracked or already finished
     Ok(())
 }
-
 
 // Tries to kill a running minecraft process (if PID is still stored)
 // invoke('profile_kill', pid)
 #[tauri::command]
-pub async fn profile_kill( pid: u32,
-) -> Result<()> {
+pub async fn profile_kill(pid: u32) -> Result<()> {
     let st = State::get().await?;
     let st = State::get().await?;
     if let Some(proc_lock) = st.children.blocking_read().get(&pid) {
         let mut proc = proc_lock.write().await;
         return Ok(profile::kill(&mut proc).await?);
-    } 
-    // If child is gone from state, it's not tracked or already finished    
+    }
+    // If child is gone from state, it's not tracked or already finished
     Ok(())
 }
