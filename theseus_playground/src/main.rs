@@ -36,6 +36,8 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 
 #[tokio::main]
 async fn main() -> theseus::Result<()> {
+    println!("Starting.");
+
     // Initialize state
     let st = State::get().await?;
 

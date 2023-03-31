@@ -51,16 +51,22 @@ export async function list() {
 }
 
 // Run Minecraft using a pathed profile
+// Returns PID of child
 export async function run(path, credentials) {
-    return await invoke('profile_run', path);
+    return await invoke('profile_run', path, credentials);
 }
 
-// Kill a running minecraft process (a Child)
-export async function kill(running_child) {
-    return await invoke('profile_kill', running_child);
+// Run Minecraft using a pathed profile
+export async function run(path_wait, credentials) {
+    return await invoke('path_wait', path, credentials);
+}
+
+// Tries to kill a running minecraft process (if PID is still stored)
+export async function kill(child_pid) {
+    return await invoke('profile_kill', child_pid);
 }
 
 // Wait for a running minecraft process (a Child)
-export async function wait_for(running_child) {
-    return await invoke('profile_wait_for', running_child);
+export async function wait_for(child_pid) {
+    return await invoke('profile_wait_for', child_pid);
 }
