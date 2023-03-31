@@ -172,52 +172,45 @@ pub async fn launch_minecraft(
         }
         None => Command::new(String::from(java_install.to_string_lossy())),
     };
-    let test_args = args::get_jvm_arguments(
-        args.get(&d::minecraft::ArgumentType::Jvm)
-            .map(|x| x.as_slice()),
-        &state.directories.version_natives_dir(&version.id),
-        &state.directories.libraries_dir(),
-        &args::get_class_paths(
-            &state.directories.libraries_dir(),
-            version_info.libraries.as_slice(),
-            &client_path,
-        )?,
-        &version_jar,
-        *memory,
-        Vec::from(java_args),
-    )?
-    .into_iter()
-    .map(|r| r.replace(' ', r"\ "))
-    .collect::<Vec<_>>();
-
-    let test_args2 = args::get_minecraft_arguments(
-        args.get(&d::minecraft::ArgumentType::Game)
-            .map(|x| x.as_slice()),
-        version_info.minecraft_arguments.as_deref(),
-        credentials,
-        &version.id,
-        &version_info.asset_index.id,
-        instance_path,
-        &state.directories.assets_dir(),
-        &version.type_,
-        *resolution,
-    )?
-    .into_iter()
-    .map(|r| r.replace(' ', r"\ "))
-    .collect::<Vec<_>>();
-
-    println!(
-        "{} {} {} {}",
-        String::from(java_install.to_string_lossy()),
-        test_args.join(" "),
-        version_info.main_class.clone(),
-        test_args2.join(" ")
-    );
 
     command
-        .args(test_args)
+        .args(
+            args::get_jvm_arguments(
+                args.get(&d::minecraft::ArgumentType::Jvm)
+                    .map(|x| x.as_slice()),
+                &state.directories.version_natives_dir(&version.id),
+                &state.directories.libraries_dir(),
+                &args::get_class_paths(
+                    &state.directories.libraries_dir(),
+                    version_info.libraries.as_slice(),
+                    &client_path,
+                )?,
+                &version_jar,
+                *memory,
+                Vec::from(java_args),
+            )?
+            .into_iter()
+            .map(|r| r.replace(' ', r"\ "))
+            .collect::<Vec<_>>(),
+        )
         .arg(version_info.main_class.clone())
-        .args(test_args2)
+        .args(
+            args::get_minecraft_arguments(
+                args.get(&d::minecraft::ArgumentType::Game)
+                    .map(|x| x.as_slice()),
+                version_info.minecraft_arguments.as_deref(),
+                credentials,
+                &version.id,
+                &version_info.asset_index.id,
+                instance_path,
+                &state.directories.assets_dir(),
+                &version.type_,
+                *resolution,
+            )?
+            .into_iter()
+            .map(|r| r.replace(' ', r"\ "))
+            .collect::<Vec<_>>(),
+        )
         .current_dir(instance_path.clone())
         .env_clear()
         .stdout(Stdio::inherit())

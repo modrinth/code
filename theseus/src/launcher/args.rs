@@ -15,6 +15,9 @@ use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
 
+// Replaces the space separator with a newline character, as to not split the arguments
+const TEMPORARY_REPLACE_CHAR: &str = "\n";
+
 pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
@@ -201,9 +204,8 @@ pub fn get_minecraft_arguments(
 
         Ok(parsed_arguments)
     } else if let Some(legacy_arguments) = legacy_arguments {
-        let temporary_replace_char = "\n";
         Ok(parse_minecraft_argument(
-            &legacy_arguments.replace(' ', temporary_replace_char),
+            &legacy_arguments.replace(' ', TEMPORARY_REPLACE_CHAR),
             &credentials.access_token,
             &credentials.username,
             &credentials.id,
@@ -293,13 +295,12 @@ fn parse_arguments<F>(
 where
     F: Fn(&str) -> crate::Result<String>,
 {
-    let temporary_replace_char = "\n";
     for argument in arguments {
         match argument {
             Argument::Normal(arg) => {
                 let parsed =
-                    parse_function(&arg.replace(' ', temporary_replace_char))?;
-                for arg in parsed.split(temporary_replace_char) {
+                    parse_function(&arg.replace(' ', TEMPORARY_REPLACE_CHAR))?;
+                for arg in parsed.split(TEMPORARY_REPLACE_CHAR) {
                     parsed_arguments.push(arg.to_string());
                 }
             }
@@ -308,13 +309,13 @@ where
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(
-                                &arg.replace(' ', temporary_replace_char),
+                                &arg.replace(' ', TEMPORARY_REPLACE_CHAR),
                             )?);
                         }
                         ArgumentValue::Many(args) => {
                             for arg in args {
                                 parsed_arguments.push(parse_function(
-                                    &arg.replace(' ', temporary_replace_char),
+                                    &arg.replace(' ', TEMPORARY_REPLACE_CHAR),
                                 )?);
                             }
                         }

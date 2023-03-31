@@ -6,7 +6,8 @@
 use dunce::canonicalize;
 use std::path::Path;
 use theseus::{prelude::*, profile_create::profile_create};
-use tokio::sync::oneshot;
+use tokio::process::Child;
+use tokio::sync::{oneshot, RwLockWriteGuard};
 
 // We use this function directly to call authentication procedure
 // Note: "let url = match url" logic is handled differently, so that if there is a rate limit in the other set causing that one to end early,
@@ -93,7 +94,7 @@ async fn main() -> theseus::Result<()> {
 
     println!("Authenticating.");
     // Attempt to create credentials and run.
-    let _child_process = match authenticate_run().await {
+    let proc_lock = match authenticate_run().await {
         Ok(credentials) => {
             println!("Running.");
             profile::run(&canonicalize(&profile_path)?, &credentials).await
@@ -108,6 +109,10 @@ async fn main() -> theseus::Result<()> {
             profile::run(&canonicalize(&profile_path)?, credentials).await
         }
     }?;
+
+    println!("Started. Waiting...");
+    let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;
+    profile::wait_for(&mut proc).await?;
 
     // Run MC
     Ok(())

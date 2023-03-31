@@ -20,7 +20,7 @@ const DEFAULT_NAME: &str = "Untitled Instance";
 pub async fn profile_create_empty() -> crate::Result<PathBuf> {
     profile_create(
         String::from(DEFAULT_NAME), // the name/path of the profile
-        String::from("1.8.2"),      // the game version of the profile
+        String::from("1.19.2"),     // the game version of the profile
         ModLoader::Vanilla,         // the modloader to use
         String::from("stable"), // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
         None,                   // the icon for the profile
@@ -102,8 +102,19 @@ pub async fn profile_create(
             })?
             .loaders;
 
-        let loader_version =
-            loaders.iter().cloned().find(filter).ok_or_else(|| {
+        let loader_version = loaders
+            .iter()
+            .cloned()
+            .find(filter)
+            .or(
+                // If stable was searched for but not found, return latest by default
+                if version == "stable" {
+                    loaders.iter().next().cloned()
+                } else {
+                    None
+                },
+            )
+            .ok_or_else(|| {
                 ProfileCreationError::InvalidVersionModloader(
                     version,
                     loader.to_string(),
