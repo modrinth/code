@@ -1,5 +1,5 @@
-import { useInstances } from './instancesStore'
-import { useTheming } from './themeStore'
-import { useNews } from './newsStore'
+import { useInstances } from './instances'
+import { useTheming } from './theme'
+import { useNews } from './news'
 
 export { useInstances, useTheming, useNews }

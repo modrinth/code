@@ -1,9 +1,16 @@
 <script setup>
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
-import { Pagination, ProjectCard, Checkbox, Button, ClearIcon } from 'omorphia'
+import {
+  Pagination,
+  ProjectCard,
+  Checkbox,
+  Button,
+  ClearIcon,
+  SearchIcon,
+  DropdownSelect,
+} from 'omorphia'
 import Multiselect from 'vue-multiselect'
-import SearchPanel from '@/components/SearchPanel.vue'
 import { useInstances } from '@/store/state'
 import generated from '@/generated'
 
@@ -15,8 +22,28 @@ const { getIconByFilter } = storeToRefs(instanceStore)
 const currentPage = ref(1)
 const selectedVersions = ref([])
 const showSnapshots = ref(false)
+const searchText = ref('')
+const sort = ref('Relevance')
+const limit = ref(20)
 
 const availableGameVersions = generated.gameVersions
+
+const searchHandler = async () => {
+  instanceStore.setSearchInput(searchText.value)
+  await instanceStore.searchInstances()
+}
+
+const handleSort = async (e) => {
+  sort.value = e.option
+  instanceStore.setFilter(sort.value)
+  await instanceStore.searchInstances()
+}
+
+const handleLimit = async (e) => {
+  limit.value = e.option
+  instanceStore.setLimit(limit.value)
+  await instanceStore.searchInstances()
+}
 
 const switchPage = async (page) => {
   currentPage.value = page
@@ -52,7 +79,7 @@ const handleReset = async () => {
             @click="handleCheckbox"
             class="filter-checkbox"
           >
-            <div v-html="getIconByFilter(category)" />
+            <div class="checkbox-icon" v-html="getIconByFilter(category)" />
             {{ val.label }}
           </Checkbox>
         </div>
@@ -79,7 +106,7 @@ const handleReset = async () => {
             @click="handleCheckbox"
             class="filter-checkbox"
           >
-            <div v-html="getIconByFilter(env)" />
+            <div class="checkbox-icon" v-html="getIconByFilter(env)" />
 
             {{ env }}
           </Checkbox>
@@ -107,13 +134,49 @@ const handleReset = async () => {
           placeholder="Choose versions..."
           @update:model-value="handleVersionSelect"
         />
-        <Checkbox v-model="instanceStore.openSource" @click="handleCheckbox" class="filter-checkbox"
-          >Open source</Checkbox
+      </div>
+      <div class="open-source">
+        <h2>Open source</h2>
+        <Checkbox
+          v-model="instanceStore.openSource"
+          @click="handleCheckbox"
+          class="filter-checkbox"
         >
+          Open source
+        </Checkbox>
       </div>
     </aside>
     <div class="search">
-      <SearchPanel />
+      <div class="search-panel-container">
+        <div class="search-panel">
+          <div class="iconified-input">
+            <SearchIcon />
+            <input type="text" placeholder="Search.." v-model="searchText" @input="searchHandler" />
+          </div>
+          Sort by
+          <DropdownSelect
+            name="Sort dropdown"
+            :options="[
+              'Relevance',
+              'Download count',
+              'Follow count',
+              'Recently published',
+              'Recently updated',
+            ]"
+            :defaultValue="sort"
+            @change="handleSort"
+            :modelValue="sort"
+          />
+          Show per page
+          <DropdownSelect
+            name="Limit dropdown"
+            :options="[5, 10, 15, 20, 50, 100]"
+            :defaultValue="limit"
+            @change="handleLimit"
+            :modelValue="limit"
+          />
+        </div>
+      </div>
       <Pagination :page="currentPage" :count="instanceStore.pageCount" @switch-page="switchPage" />
       <section class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
@@ -144,6 +207,43 @@ const handleReset = async () => {
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
+.search-panel-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  .search-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    gap: 1.3rem;
+    margin: 1rem auto;
+
+    .iconified-input {
+      width: 50%;
+    }
+  }
+
+  .filter-panel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+
+    button {
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+
+      svg {
+        margin-right: 0.4rem;
+      }
+    }
+  }
+}
+
 .search-container {
   display: flex;
 
@@ -168,11 +268,14 @@ const handleReset = async () => {
       font-size: 1rem;
       text-transform: capitalize;
 
+      .checkbox-icon {
+        margin-right: 0.4rem;
+      }
+
       svg {
         display: flex;
         align-self: center;
         justify-self: center;
-        margin-right: 0.3rem;
       }
 
       button.checkbox {
