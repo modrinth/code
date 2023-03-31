@@ -105,7 +105,7 @@ async fn main() -> theseus::Result<()> {
             let credentials = users.first().unwrap();
 
             println!("Running.");
-            profile::run(&canonicalize(&profile_path)?, &credentials).await
+            profile::run(&canonicalize(&profile_path)?, credentials).await
         }
     }?;
 
