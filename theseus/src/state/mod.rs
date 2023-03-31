@@ -42,7 +42,7 @@ pub struct State {
     // TODO: settings API
     /// Launcher configuration
     pub settings: RwLock<Settings>,
-    /// Reference to process minecraft children
+    /// Reference to minecraft process children
     pub children: RwLock<Children>,
     /// Authentication flow
     pub auth_flow: RwLock<AuthTask>,
