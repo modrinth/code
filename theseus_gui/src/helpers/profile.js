@@ -57,8 +57,9 @@ export async function run(path, credentials) {
 }
 
 // Run Minecraft using a pathed profile
-export async function run(path_wait, credentials) {
-    return await invoke('path_wait', path, credentials);
+// Waits for end
+export async function run_wait(path, credentials) {
+    return await invoke('run_wait', path, credentials);
 }
 
 // Tries to kill a running minecraft process (if PID is still stored)
