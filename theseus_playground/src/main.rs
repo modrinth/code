@@ -16,7 +16,7 @@ use tokio::sync::RwLockWriteGuard;
 pub async fn authenticate_run() -> theseus::Result<Credentials> {
     println!("A browser window will now open, follow the login flow there.");
     let url = auth::authenticate_begin_flow().await?;
-    
+
     println!("URL {}", url.as_str());
     webbrowser::open(url.as_str())?;
 
@@ -105,8 +105,12 @@ async fn main() -> theseus::Result<()> {
         Err(e) => {
             // If Hydra could not be accessed, for testing, attempt to load credentials from disk and do the same
             println!("Could not authenticate: {}.\nAttempting stored authentication.",e);
-            let users = auth::users().await.expect("Could not access any stored users- state was dropped.");
-            let credentials = users.first().expect("Hydra failed, and no stored users were found.");
+            let users = auth::users().await.expect(
+                "Could not access any stored users- state was dropped.",
+            );
+            let credentials = users
+                .first()
+                .expect("Hydra failed, and no stored users were found.");
             println!("Preparing to run Minecraft.");
             profile::run(&canonicalize(&profile_path)?, credentials).await
         }

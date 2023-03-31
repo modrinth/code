@@ -54,4 +54,3 @@ pub async fn auth_users() -> Result<Box<[Credentials]>> {
 pub async fn auth_get_user(user: uuid::Uuid) -> Result<Credentials> {
     Ok(auth::get_user(user).await?)
 }
-

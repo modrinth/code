@@ -22,11 +22,8 @@ pub async fn authenticate_begin_flow() -> crate::Result<url::Url> {
 /// to call authenticate and call the flow from the frontend.
 pub async fn authenticate_await_complete_flow() -> crate::Result<Credentials> {
     let st = State::get().await?.clone();
-    let credentials = st
-        .auth_flow
-        .write().await
-        .await_auth_completion()
-        .await?;
+    let credentials =
+        st.auth_flow.write().await.await_auth_completion().await?;
     Ok(credentials)
 }
 
@@ -88,9 +85,6 @@ pub async fn refresh(
     })
     .await
 }
-
-
-
 
 /// Remove a user account from the database
 #[tracing::instrument]
