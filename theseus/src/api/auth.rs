@@ -88,7 +88,7 @@ pub async fn has_user(user: uuid::Uuid) -> crate::Result<bool> {
     let state = State::get().await?;
     let users = state.users.read().await;
 
-    Ok(users.contains(user)?)
+    users.contains(user)
 }
 
 /// Get a copy of the list of all user credentials
