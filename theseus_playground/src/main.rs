@@ -50,12 +50,12 @@ async fn main() -> theseus::Result<()> {
     let modloader = ModLoader::Vanilla;
     let loader_version = "stable".to_string();
 
-    let icon = Some(
-        Path::new("../icon_test.png")
-            .canonicalize()
-            .expect("Icon could be not be found. If not using, set to None"),
-    );
-    // let icon = None;
+    // let icon = Some(
+    //     Path::new("../icon_test.png")
+    //         .canonicalize()
+    //         .expect("Icon could be not be found. If not using, set to None"),
+    // );
+    let icon = None;
 
     // Clear profiles
     println!("Clearing profiles.");
