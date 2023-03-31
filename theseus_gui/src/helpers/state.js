@@ -3,11 +3,10 @@
  * So, for example, addDefaultInstance creates a blank Profile object, where the Rust struct is serialized,
  *  and deserialized into a usable JS object.
  */
-import { invoke } from '@tauri-apps/api/tauri';
+import { invoke } from '@tauri-apps/api/tauri'
 
 // Initialize the theseus API state
 // This should be called during the initializion/opening of the launcher
 export async function initialize_state() {
-    return await invoke('initialize_state');
+  return await invoke('initialize_state')
 }
-
