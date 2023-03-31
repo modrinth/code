@@ -10,9 +10,13 @@ use daedalus::{
     minecraft::{Argument, ArgumentValue, Library, VersionType},
     modded::SidedDataEntry,
 };
+use dunce::canonicalize;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
+
+// Replaces the space separator with a newline character, as to not split the arguments
+const TEMPORARY_REPLACE_CHAR: &str = "\n";
 
 pub fn get_class_paths(
     libraries_path: &Path,
@@ -37,8 +41,7 @@ pub fn get_class_paths(
         .collect::<Result<Vec<_>, _>>()?;
 
     cps.push(
-        client_path
-            .canonicalize()
+        canonicalize(client_path)
             .map_err(|_| {
                 crate::ErrorKind::LauncherError(format!(
                     "Specified class path {} does not exist",
@@ -70,7 +73,7 @@ pub fn get_lib_path(libraries_path: &Path, lib: &str) -> crate::Result<String> {
 
     path.push(get_path_from_artifact(lib)?);
 
-    let path = &path.canonicalize().map_err(|_| {
+    let path = &canonicalize(&path).map_err(|_| {
         crate::ErrorKind::LauncherError(format!(
             "Library file at path {} does not exist",
             path.to_string_lossy()
@@ -104,15 +107,13 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            &natives_path
-                .canonicalize()
+            canonicalize(natives_path)
                 .map_err(|_| crate::ErrorKind::LauncherError(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
                 ))
                 .as_error())?
                 .to_string_lossy()
-                .to_string()
         ));
         parsed_arguments.push("-cp".to_string());
         parsed_arguments.push(class_paths.to_string());
@@ -142,8 +143,7 @@ fn parse_jvm_argument(
     Ok(argument
         .replace(
             "${natives_directory}",
-            &natives_path
-                .canonicalize()
+            &canonicalize(natives_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified natives path {} does not exist",
@@ -155,8 +155,7 @@ fn parse_jvm_argument(
         )
         .replace(
             "${library_directory}",
-            &libraries_path
-                .canonicalize()
+            &canonicalize(libraries_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified libraries path {} does not exist",
@@ -206,7 +205,7 @@ pub fn get_minecraft_arguments(
         Ok(parsed_arguments)
     } else if let Some(legacy_arguments) = legacy_arguments {
         Ok(parse_minecraft_argument(
-            legacy_arguments,
+            &legacy_arguments.replace(' ', TEMPORARY_REPLACE_CHAR),
             &credentials.access_token,
             &credentials.username,
             &credentials.id,
@@ -249,8 +248,7 @@ fn parse_minecraft_argument(
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &game_directory
-                .canonicalize()
+            &canonicalize(game_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified game directory {} does not exist",
@@ -262,8 +260,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${assets_root}",
-            &assets_directory
-                .canonicalize()
+            &canonicalize(assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
@@ -275,8 +272,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${game_assets}",
-            &assets_directory
-                .canonicalize()
+            &canonicalize(assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
@@ -302,9 +298,9 @@ where
     for argument in arguments {
         match argument {
             Argument::Normal(arg) => {
-                let parsed = parse_function(arg)?;
-
-                for arg in parsed.split(' ') {
+                let parsed =
+                    parse_function(&arg.replace(' ', TEMPORARY_REPLACE_CHAR))?;
+                for arg in parsed.split(TEMPORARY_REPLACE_CHAR) {
                     parsed_arguments.push(arg.to_string());
                 }
             }
@@ -312,11 +308,15 @@ where
                 if rules.iter().all(parse_rule) {
                     match value {
                         ArgumentValue::Single(arg) => {
-                            parsed_arguments.push(parse_function(arg)?);
+                            parsed_arguments.push(parse_function(
+                                &arg.replace(' ', TEMPORARY_REPLACE_CHAR),
+                            )?);
                         }
                         ArgumentValue::Many(args) => {
                             for arg in args {
-                                parsed_arguments.push(parse_function(arg)?);
+                                parsed_arguments.push(parse_function(
+                                    &arg.replace(' ', TEMPORARY_REPLACE_CHAR),
+                                )?);
                             }
                         }
                     }

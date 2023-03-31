@@ -3,6 +3,7 @@ use crate::util::{
     confirm_async, prompt_async, select_async, table, table_path_display,
 };
 use daedalus::modded::LoaderVersion;
+use dunce::canonicalize;
 use eyre::{ensure, Result};
 use futures::prelude::*;
 use paris::*;
@@ -50,7 +51,7 @@ impl ProfileAdd {
             self.profile.display()
         );
 
-        let profile = self.profile.canonicalize()?;
+        let profile = canonicalize(&self.profile)?;
         let json_path = profile.join("profile.json");
 
         ensure!(
@@ -137,7 +138,7 @@ impl ProfileInit {
         }
         info!(
             "Creating profile at path {}",
-            &self.path.canonicalize()?.display()
+            &canonicalize(&self.path)?.display()
         );
 
         // TODO: abstract default prompting
@@ -343,7 +344,7 @@ impl ProfileRemove {
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
-        let profile = self.profile.canonicalize()?;
+        let profile = canonicalize(&self.profile)?;
         info!("Removing profile {} from Theseus", self.profile.display());
 
         if confirm_async(String::from("Do you wish to continue"), true).await? {
@@ -382,7 +383,7 @@ impl ProfileRun {
         _largs: &ProfileCommand,
     ) -> Result<()> {
         info!("Starting profile at path {}...", self.profile.display());
-        let path = self.profile.canonicalize()?;
+        let path = canonicalize(&self.profile)?;
 
         ensure!(
            profile::is_managed(&path).await?,
@@ -402,7 +403,8 @@ impl ProfileRun {
             .await?;
         let credentials = auth::refresh(id, false).await?;
 
-        let mut proc = profile::run(&path, &credentials).await?;
+        let proc_lock = profile::run(&path, &credentials).await?;
+        let mut proc = proc_lock.write().await;
         profile::wait_for(&mut proc).await?;
 
         success!("Process exited successfully!");

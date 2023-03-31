@@ -3,6 +3,7 @@
 members = [
     "theseus",
     "theseus_cli",
+    "theseus_playground",
     "theseus_gui/src-tauri"
 ]
 

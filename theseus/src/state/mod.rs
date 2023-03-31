@@ -22,6 +22,9 @@ pub use self::projects::*;
 mod users;
 pub use self::users::*;
 
+mod children;
+pub use self::children::*;
+
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
@@ -36,6 +39,8 @@ pub struct State {
     // TODO: settings API
     /// Launcher configuration
     pub settings: RwLock<Settings>,
+    /// Reference to process children
+    pub children: RwLock<Children>,
     /// Launcher profile metadata
     pub(crate) profiles: RwLock<Profiles>,
     /// Launcher user account info
@@ -73,6 +78,8 @@ impl State {
                     let io_semaphore =
                         Semaphore::new(settings.max_concurrent_downloads);
 
+                    let children = Children::new();
+
                     Ok(Arc::new(Self {
                         database,
                         directories,
@@ -81,6 +88,7 @@ impl State {
                         settings: RwLock::new(settings),
                         profiles: RwLock::new(profiles),
                         users: RwLock::new(users),
+                        children: RwLock::new(children),
                     }))
                 }
             })

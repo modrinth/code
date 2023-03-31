@@ -1,6 +1,8 @@
 //! Theseus error type
 use tracing_error::InstrumentError;
 
+use crate::profile_create;
+
 #[derive(thiserror::Error, Debug)]
 pub enum ErrorKind {
     #[error("Filesystem error: {0}")]
@@ -57,6 +59,9 @@ pub enum ErrorKind {
     #[error("Invalid input: {0}")]
     InputError(String),
 
+    #[error("Recv error: {0}")]
+    RecvError(#[from] tokio::sync::oneshot::error::RecvError),
+
     #[error(
         "Tried to access unloaded profile {0}, loading it probably failed"
     )]
@@ -64,6 +69,9 @@ pub enum ErrorKind {
 
     #[error("Profile {0} is not managed by Theseus!")]
     UnmanagedProfileError(String),
+
+    #[error("Could not create profile: {0}")]
+    ProfileCreationError(#[from] profile_create::ProfileCreationError),
 
     #[error("Error: {0}")]
     OtherError(String),

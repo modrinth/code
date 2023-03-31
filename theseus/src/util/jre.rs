@@ -1,3 +1,4 @@
+use dunce::canonicalize;
 use lazy_static::lazy_static;
 use regex::Regex;
 use std::collections::HashSet;
@@ -10,12 +11,6 @@ use winreg::{
     enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
     RegKey,
 };
-
-// Uses dunce canonicalization to resolve symlinks without UNC prefixes
-#[cfg(target_os = "windows")]
-use dunce::canonicalize;
-#[cfg(not(target_os = "windows"))]
-use std::fs::canonicalize;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct JavaVersion {
