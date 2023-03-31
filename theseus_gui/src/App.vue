@@ -13,6 +13,7 @@ import {
 } from 'omorphia'
 import { useTheming, useInstances } from '@/store/state'
 import { toggleTheme } from '@/helpers/theme'
+import { authenticate } from '@/helpers/auth'
 
 const route = useRoute()
 const router = useRouter()
@@ -37,7 +38,12 @@ watch(theme, (newState) => {
           <RouterLink to="/" class="button-base nav-button"><ClientIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
           <RouterLink to="/library" class="button-base nav-button"> <BookIcon /></RouterLink>
-          <button color="primary" class="button-base primary nav-button" icon-only>
+          <button
+            color="primary"
+            class="button-base primary nav-button"
+            icon-only
+            @click="authenticate"
+          >
             <PlusIcon />
           </button>
         </div>

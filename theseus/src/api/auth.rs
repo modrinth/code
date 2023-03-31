@@ -12,7 +12,7 @@ pub use inner::Credentials;
 /// Visit the URL in a browser, then call and await 'authenticate_await_complete_flow'.
 pub async fn authenticate_begin_flow() -> crate::Result<url::Url> {
     let st = State::get().await?.clone();
-    let url = st.auth_flow.blocking_write().begin_auth().await?;
+    let url = st.auth_flow.write().await.begin_auth().await?;
     Ok(url)
 }
 
@@ -24,7 +24,7 @@ pub async fn authenticate_await_complete_flow() -> crate::Result<Credentials> {
     let st = State::get().await?.clone();
     let credentials = st
         .auth_flow
-        .blocking_write()
+        .write().await
         .await_auth_completion()
         .await?;
     Ok(credentials)
@@ -61,6 +61,7 @@ pub async fn authenticate(
 }
 
 /// Refresh some credentials using Hydra, if needed
+/// This is the primary desired way to get credentials, as it will also refresh them.
 #[tracing::instrument]
 pub async fn refresh(
     user: uuid::Uuid,
@@ -87,6 +88,9 @@ pub async fn refresh(
     })
     .await
 }
+
+
+
 
 /// Remove a user account from the database
 #[tracing::instrument]
@@ -122,4 +126,19 @@ pub async fn users() -> crate::Result<Box<[Credentials]>> {
     let state = State::get().await?;
     let users = state.users.read().await;
     users.iter().collect()
+}
+
+/// Get a specific user by user ID
+/// Prefer to use 'refresh' instead of this function
+#[tracing::instrument]
+pub async fn get_user(user: uuid::Uuid) -> crate::Result<Credentials> {
+    let state = State::get().await?;
+    let users = state.users.read().await;
+    let user = users.get(user)?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to get nonexistent user with ID {user}"
+        ))
+        .as_error()
+    })?;
+    Ok(user)
 }

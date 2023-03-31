@@ -37,6 +37,7 @@ fn main() {
             api::auth::auth_remove_user,
             api::auth::auth_has_user,
             api::auth::auth_users,
+            api::auth::auth_get_user,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

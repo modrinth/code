@@ -101,7 +101,7 @@ pub async fn profile_run_wait(
 #[tauri::command]
 pub async fn profile_wait_for(pid: u32) -> Result<()> {
     let st = State::get().await?;
-    if let Some(proc_lock) = st.children.blocking_read().get(&pid) {
+    if let Some(proc_lock) = st.children.read().await.get(&pid) {
         let mut proc = proc_lock.write().await;
         return Ok(profile::wait_for(&mut proc).await?);
     }
@@ -114,7 +114,7 @@ pub async fn profile_wait_for(pid: u32) -> Result<()> {
 #[tauri::command]
 pub async fn profile_kill(pid: u32) -> Result<()> {
     let st = State::get().await?;
-    if let Some(proc_lock) = st.children.blocking_read().get(&pid) {
+    if let Some(proc_lock) = st.children.read().await.get(&pid) {
         let mut proc = proc_lock.write().await;
         return Ok(profile::kill(&mut proc).await?);
     }

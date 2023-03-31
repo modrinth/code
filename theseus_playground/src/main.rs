@@ -7,30 +7,22 @@ use dunce::canonicalize;
 use std::path::Path;
 use theseus::{prelude::*, profile_create::profile_create};
 use tokio::process::Child;
-use tokio::sync::{oneshot, RwLockWriteGuard};
+use tokio::sync::RwLockWriteGuard;
 
-// We use this function directly to call authentication procedure
-// Note: "let url = match url" logic is handled differently, so that if there is a rate limit in the other set causing that one to end early,
-// we can see the error message in this thread rather than a Recv error on 'rx' when the receiver is mysteriously droppped
+// A simple Rust implementation of the authentication run
+// 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
+// 2) open the URL in a browser
+// 3) call the authenticate_await_complete_flow() function to get the credentials (like you would in the frontend)
 pub async fn authenticate_run() -> theseus::Result<Credentials> {
-    println!("Adding new user account to Theseus");
     println!("A browser window will now open, follow the login flow there.");
-
-    let (tx, rx) = oneshot::channel::<url::Url>();
-    let flow = tokio::spawn(auth::authenticate(tx));
-
-    let url = rx.await;
-    let url = match url {
-        Ok(url) => url,
-        Err(e) => {
-            flow.await.unwrap()?;
-            return Err(e.into());
-        }
-    };
+    let url = auth::authenticate_begin_flow().await?;
+    
     println!("URL {}", url.as_str());
     webbrowser::open(url.as_str())?;
-    let credentials = flow.await.unwrap()?;
+
+    let credentials = auth::authenticate_await_complete_flow().await?;
     State::sync().await?;
+
     println!("Logged in user {}.", credentials.username);
     Ok(credentials)
 }
@@ -92,14 +84,14 @@ async fn main() -> theseus::Result<()> {
     .await?;
     State::sync().await?;
 
-    println!("Authenticating.");
-
     // Attempt to get the default user, if it exists, and refresh their credentials
     let settings = st.settings.read().await;
     let default_user_uuid = settings.default_user;
     let credentials = if let Some(uuid) = default_user_uuid {
+        println!("Attempting to refresh existing authentication.");
         auth::refresh(uuid, false).await
     } else {
+        println!("Freshly authenticating.");
         authenticate_run().await
     };
 
@@ -107,15 +99,15 @@ async fn main() -> theseus::Result<()> {
     // If successful, run the profile and store the RwLock to the process
     let proc_lock = match credentials {
         Ok(credentials) => {
-            println!("Running.");
+            println!("Preparing to run Minecraft.");
             profile::run(&canonicalize(&profile_path)?, &credentials).await
         }
         Err(e) => {
             // If Hydra could not be accessed, for testing, attempt to load credentials from disk and do the same
             println!("Could not authenticate: {}.\nAttempting stored authentication.",e);
-            let users = auth::users().await.unwrap();
-            let credentials = users.first().unwrap();
-            println!("Running.");
+            let users = auth::users().await.expect("Could not access any stored users- state was dropped.");
+            let credentials = users.first().expect("Hydra failed, and no stored users were found.");
+            println!("Preparing to run Minecraft.");
             profile::run(&canonicalize(&profile_path)?, credentials).await
         }
     }?;

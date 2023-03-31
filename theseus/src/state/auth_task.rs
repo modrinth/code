@@ -18,9 +18,20 @@ impl AuthTask {
         let (tx, rx) = tokio::sync::oneshot::channel::<url::Url>();
         let task = tokio::spawn(crate::auth::authenticate(tx));
 
-        // Sets the task handle in the state
+        // If receiver is dropped, try to get Hydra error
+        let url = rx.await;
+        let url = match url {
+            Ok(url) => url,
+            Err(e) => {
+                task.await??;
+                return Err(e.into()); // truly a dropped receiver
+            }
+        };
+
+        // Flow is going, store in state and return
         self.0 = Some(task);
-        Ok(rx.await?)
+
+        Ok(url)
     }
 
     pub async fn await_auth_completion(

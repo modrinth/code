@@ -46,3 +46,12 @@ pub async fn auth_has_user(user: uuid::Uuid) -> Result<bool> {
 pub async fn auth_users() -> Result<Box<[Credentials]>> {
     Ok(auth::users().await?)
 }
+
+/// Get a user from the UUID
+/// Prefer to use refresh instead, as it will refresh the credentials as well
+// invoke('auth_users',user)
+#[tauri::command]
+pub async fn auth_get_user(user: uuid::Uuid) -> Result<Credentials> {
+    Ok(auth::get_user(user).await?)
+}
+

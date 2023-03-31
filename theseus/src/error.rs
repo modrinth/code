@@ -61,6 +61,9 @@ pub enum ErrorKind {
     #[error("Invalid input: {0}")]
     InputError(String),
 
+    #[error("Join handle error: {0}")]
+    JoinError(#[from] tokio::task::JoinError),
+
     #[error("Recv error: {0}")]
     RecvError(#[from] tokio::sync::oneshot::error::RecvError),
 

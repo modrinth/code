@@ -212,7 +212,7 @@ pub async fn launch_minecraft(
             .collect::<Vec<_>>(),
         )
         .current_dir(instance_path.clone())
-        .env_clear()
+        // .env_clear()
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
 
