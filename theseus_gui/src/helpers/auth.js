@@ -6,8 +6,13 @@
 import { invoke } from '@tauri-apps/api/tauri';
 
 /// Authenticate a user with Hydra
-export async function authenticate(browser_url) {
-    return await invoke('auth_authenticate', browser_url);
+export async function authenticate_begin_flow() {
+    return await invoke('auth_authenticate_begin_flow');
+}
+
+/// Authenticate a user with Hydra
+export async function authenticate_await_completion() {
+    return await invoke('auth_authenticate_await_completion');
 }
 
 /// Refresh some credentials using Hydra, if needed

@@ -93,27 +93,37 @@ async fn main() -> theseus::Result<()> {
     State::sync().await?;
 
     println!("Authenticating.");
-    // Attempt to create credentials and run.
-    let proc_lock = match authenticate_run().await {
+
+    // Attempt to get the default user, if it exists, and refresh their credentials
+    let settings = st.settings.read().await;
+    let default_user_uuid = settings.default_user;
+    let credentials = if let Some(uuid) = default_user_uuid {
+        auth::refresh(uuid, false).await
+    } else {
+        authenticate_run().await
+    };
+
+    // Check attempt to get Credentials
+    // If successful, run the profile and store the RwLock to the process
+    let proc_lock = match credentials {
         Ok(credentials) => {
             println!("Running.");
             profile::run(&canonicalize(&profile_path)?, &credentials).await
         }
         Err(e) => {
+            // If Hydra could not be accessed, for testing, attempt to load credentials from disk and do the same
             println!("Could not authenticate: {}.\nAttempting stored authentication.",e);
-            // Attempt to load credentials if Hydra is down/rate limit hit
             let users = auth::users().await.unwrap();
             let credentials = users.first().unwrap();
-
             println!("Running.");
             profile::run(&canonicalize(&profile_path)?, credentials).await
         }
     }?;
 
-    println!("Started. Waiting...");
+    // Spawn a thread and hold the lock to the process until it ends
+    println!("Started Minecraft. Waiting for process to end...");
     let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;
     profile::wait_for(&mut proc).await?;
 
-    // Run MC
     Ok(())
 }

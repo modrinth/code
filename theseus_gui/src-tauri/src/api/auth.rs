@@ -1,18 +1,19 @@
 use crate::api::Result;
-use tokio::sync::oneshot;
-
 use theseus::prelude::*;
 
-/// Authenticate a user with Hydra
-/// TODO
-/// To run this, you need to first spawn this function as a task, then
-/// open a browser to the given URL and finally wait on the spawned future
-/// with the ability to cancel in case the browser is closed before finishing
+/// Authenticate a user with Hydra - part 1
+/// This begins the authentication flow quasi-synchronously, returning a URL to visit (that the user will sign in at)
 #[tauri::command]
-pub async fn auth_authenticate_get_browser(
-    browser_url: oneshot::Sender<url::Url>,
-) -> Result<Credentials> {
-    Ok(auth::authenticate(browser_url).await?)
+pub async fn auth_authenticate_begin_flow() -> Result<url::Url> {
+    Ok(auth::authenticate_begin_flow().await?)
+}
+
+/// Authenticate a user with Hydra - part 2
+/// This completes the authentication flow quasi-synchronously, returning the sign-in credentials
+/// (and also adding the credentials to the state)
+#[tauri::command]
+pub async fn auth_authenticate_await_completion() -> Result<Credentials> {
+    Ok(auth::authenticate_await_complete_flow().await?)
 }
 
 /// Refresh some credentials using Hydra, if needed

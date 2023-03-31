@@ -5,6 +5,31 @@ use tokio::sync::oneshot;
 
 pub use inner::Credentials;
 
+/// Authenticate a user with Hydra - part 1
+/// This begins the authentication flow quasi-synchronously, returning a URL
+/// This can be used in conjunction with 'authenticate_await_complete_flow'
+/// to call authenticate and call the flow from the frontend.
+/// Visit the URL in a browser, then call and await 'authenticate_await_complete_flow'.
+pub async fn authenticate_begin_flow() -> crate::Result<url::Url> {
+    let st = State::get().await?.clone();
+    let url = st.auth_flow.blocking_write().begin_auth().await?;
+    Ok(url)
+}
+
+/// Authenticate a user with Hydra - part 2
+/// This completes the authentication flow quasi-synchronously, returning the credentials
+/// This can be used in conjunction with 'authenticate_begin_flow'
+/// to call authenticate and call the flow from the frontend.
+pub async fn authenticate_await_complete_flow() -> crate::Result<Credentials> {
+    let st = State::get().await?.clone();
+    let credentials = st
+        .auth_flow
+        .blocking_write()
+        .await_auth_completion()
+        .await?;
+    Ok(credentials)
+}
+
 /// Authenticate a user with Hydra
 /// To run this, you need to first spawn this function as a task, then
 /// open a browser to the given URL and finally wait on the spawned future

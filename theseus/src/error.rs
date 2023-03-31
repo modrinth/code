@@ -1,7 +1,6 @@
 //! Theseus error type
-use tracing_error::InstrumentError;
-
 use crate::profile_create;
+use tracing_error::InstrumentError;
 
 #[derive(thiserror::Error, Debug)]
 pub enum ErrorKind {
@@ -32,8 +31,11 @@ pub enum ErrorKind {
     #[error("Metadata error: {0}")]
     MetadataError(#[from] daedalus::Error),
 
-    #[error("Minecraft authentication error: {0}")]
+    #[error("Minecraft authentication Hydra error: {0}")]
     HydraError(String),
+
+    #[error("Minecraft authentication task error: {0}")]
+    AuthTaskError(#[from] crate::state::AuthTaskError),
 
     #[error("I/O error: {0}")]
     IOError(#[from] std::io::Error),
