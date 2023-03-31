@@ -47,7 +47,7 @@ macro_rules! processor_rules {
 
 #[allow(clippy::too_many_arguments)]
 #[tracing::instrument(skip_all, fields(path = ?instance_path))]
-pub async fn    launch_minecraft(
+pub async fn launch_minecraft(
     game_version: &str,
     loader_version: &Option<d::modded::LoaderVersion>,
     instance_path: &Path,
@@ -187,7 +187,7 @@ pub async fn    launch_minecraft(
         Vec::from(java_args),
     )?
     .into_iter()
-    .map(|r| r.replace(" ", r"\ "))
+    .map(|r| r.replace(' ', r"\ "))
     .collect::<Vec<_>>();
 
     let test_args2 = args::get_minecraft_arguments(
@@ -197,13 +197,13 @@ pub async fn    launch_minecraft(
         credentials,
         &version.id,
         &version_info.asset_index.id,
-        &instance_path,
+        instance_path,
         &state.directories.assets_dir(),
         &version.type_,
         *resolution,
     )?
     .into_iter()
-    .map(|r| r.replace(" ", r"\ "))
+    .map(|r| r.replace(' ', r"\ "))
     .collect::<Vec<_>>();
 
     println!(

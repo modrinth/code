@@ -7,25 +7,25 @@ pub use crate::{
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
-use uuid::Uuid;
 use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
+use uuid::Uuid;
 
-const DEFAULT_NAME: &'static str = "Untitled Instance";
+const DEFAULT_NAME: &str = "Untitled Instance";
 
 // Generic basic profile creation tool.
 // Creates an essentially empty dummy profile with profile_create
 #[tracing::instrument]
 pub async fn profile_create_empty() -> crate::Result<PathBuf> {
-    Ok(profile_create(
+    profile_create(
         String::from(DEFAULT_NAME), // the name/path of the profile
         String::from("1.8.2"),      // the game version of the profile
         ModLoader::Vanilla,         // the modloader to use
         String::from("stable"), // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
         None,                   // the icon for the profile
     )
-    .await?)
+    .await
 }
 
 // Creates a profile at  the given filepath and adds it to the in-memory state
@@ -38,7 +38,6 @@ pub async fn profile_create(
     loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
     icon: Option<PathBuf>,  // the icon for the profile
 ) -> crate::Result<PathBuf> {
-
     let state = State::get().await?;
 
     let uuid = Uuid::new_v4();
@@ -46,11 +45,13 @@ pub async fn profile_create(
 
     if path.exists() {
         if !path.is_dir() {
-            return Err(
-                ProfileCreationError::NotFolder.into());
+            return Err(ProfileCreationError::NotFolder.into());
         }
         if path.join("profile.json").exists() {
-            return Err(ProfileCreationError::ProfileExistsError(path.join("profile.json")).into());
+            return Err(ProfileCreationError::ProfileExistsError(
+                path.join("profile.json"),
+            )
+            .into());
         }
 
         if ReadDirStream::new(fs::read_dir(&path).await?)
@@ -75,24 +76,38 @@ pub async fn profile_create(
         let filter = |it: &LoaderVersion| match version.as_str() {
             "latest" => true,
             "stable" => it.stable,
-            id => it.id == String::from(id),
+            id => it.id == *id,
         };
 
         let loader_data = match loader {
             ModLoader::Forge => &state.metadata.forge,
             ModLoader::Fabric => &state.metadata.fabric,
-            _ => return Err(ProfileCreationError::NoManifest(loader.to_string()).into())
+            _ => {
+                return Err(ProfileCreationError::NoManifest(
+                    loader.to_string(),
+                )
+                .into())
+            }
         };
 
-        let ref loaders = loader_data.game_versions
+        let loaders = &loader_data
+            .game_versions
             .iter()
             .find(|it| it.id == game_version)
-            .ok_or_else(|| ProfileCreationError::ModloaderUnsupported(loader.to_string(),game_version.clone()))?
+            .ok_or_else(|| {
+                ProfileCreationError::ModloaderUnsupported(
+                    loader.to_string(),
+                    game_version.clone(),
+                )
+            })?
             .loaders;
 
         let loader_version =
             loaders.iter().cloned().find(filter).ok_or_else(|| {
-                ProfileCreationError::InvalidVersionModloader(version, loader.to_string())
+                ProfileCreationError::InvalidVersionModloader(
+                    version,
+                    loader.to_string(),
+                )
             })?;
 
         Some((loader_version, loader))
@@ -116,7 +131,6 @@ pub async fn profile_create(
     Ok(path)
 }
 
-
 #[derive(thiserror::Error, Debug)]
 pub enum ProfileCreationError {
     #[error("Profile .json exists: {0}")]
@@ -124,7 +138,7 @@ pub enum ProfileCreationError {
     #[error("Modloader {0} unsupported for Minecraft version {1}")]
     ModloaderUnsupported(String, String),
     #[error("Invalid version {0} for modloader {1}")]
-    InvalidVersionModloader(String,String),
+    InvalidVersionModloader(String, String),
     #[error("Could not get manifest for loader {0}. This is a bug in the GUI")]
     NoManifest(String),
     #[error("Could not get State.")]
@@ -134,7 +148,7 @@ pub enum ProfileCreationError {
     NotFolder,
     #[error("You are trying to create a profile in a non-empty directory")]
     NotEmptyFolder,
-    
+
     #[error("IO error: {0}")]
-    IOError(#[from] std::io::Error)
+    IOError(#[from] std::io::Error),
 }

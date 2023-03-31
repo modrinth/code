@@ -26,6 +26,12 @@ impl Children {
 
     // Returns a ref to the child
     pub fn get(&self, pid: &u32) -> Option<Arc<RwLock<Child>>> {
-        self.0.get(&pid).map(|a| a.clone())
+        self.0.get(pid).cloned()
+    }
+}
+
+impl Default for Children {
+    fn default() -> Self {
+        Self::new()
     }
 }

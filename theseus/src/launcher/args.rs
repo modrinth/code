@@ -38,7 +38,7 @@ pub fn get_class_paths(
         .collect::<Result<Vec<_>, _>>()?;
 
     cps.push(
-        canonicalize(&client_path)
+        canonicalize(client_path)
             .map_err(|_| {
                 crate::ErrorKind::LauncherError(format!(
                     "Specified class path {} does not exist",
@@ -104,14 +104,13 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            canonicalize(&natives_path)
+            canonicalize(natives_path)
                 .map_err(|_| crate::ErrorKind::LauncherError(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
                 ))
                 .as_error())?
                 .to_string_lossy()
-                .to_string()
         ));
         parsed_arguments.push("-cp".to_string());
         parsed_arguments.push(class_paths.to_string());
@@ -141,7 +140,7 @@ fn parse_jvm_argument(
     Ok(argument
         .replace(
             "${natives_directory}",
-            &canonicalize(&natives_path)
+            &canonicalize(natives_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified natives path {} does not exist",
@@ -153,7 +152,7 @@ fn parse_jvm_argument(
         )
         .replace(
             "${library_directory}",
-            &canonicalize(&libraries_path)
+            &canonicalize(libraries_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified libraries path {} does not exist",
@@ -204,7 +203,7 @@ pub fn get_minecraft_arguments(
     } else if let Some(legacy_arguments) = legacy_arguments {
         let temporary_replace_char = "\n";
         Ok(parse_minecraft_argument(
-            &legacy_arguments.replace(" ", temporary_replace_char),
+            &legacy_arguments.replace(' ', temporary_replace_char),
             &credentials.access_token,
             &credentials.username,
             &credentials.id,
@@ -247,7 +246,7 @@ fn parse_minecraft_argument(
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &canonicalize(&game_directory)
+            &canonicalize(game_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified game directory {} does not exist",
@@ -259,7 +258,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${assets_root}",
-            &canonicalize(&assets_directory)
+            &canonicalize(assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
@@ -271,7 +270,7 @@ fn parse_minecraft_argument(
         )
         .replace(
             "${game_assets}",
-            &canonicalize(&assets_directory)
+            &canonicalize(assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
@@ -299,7 +298,7 @@ where
         match argument {
             Argument::Normal(arg) => {
                 let parsed =
-                    parse_function(&arg.replace(" ", temporary_replace_char))?;
+                    parse_function(&arg.replace(' ', temporary_replace_char))?;
                 for arg in parsed.split(temporary_replace_char) {
                     parsed_arguments.push(arg.to_string());
                 }
@@ -309,13 +308,13 @@ where
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(
-                                &arg.replace(" ", temporary_replace_char),
+                                &arg.replace(' ', temporary_replace_char),
                             )?);
                         }
                         ArgumentValue::Many(args) => {
                             for arg in args {
                                 parsed_arguments.push(parse_function(
-                                    &arg.replace(" ", temporary_replace_char),
+                                    &arg.replace(' ', temporary_replace_char),
                                 )?);
                             }
                         }
