@@ -28,6 +28,9 @@ pub use self::children::*;
 mod auth_task;
 pub use self::auth_task::*;
 
+mod tags;
+pub use self::tags::*;
+
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
