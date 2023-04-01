@@ -25,6 +25,9 @@ pub use self::users::*;
 mod children;
 pub use self::children::*;
 
+mod auth_task;
+pub use self::auth_task::*;
+
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
@@ -39,8 +42,10 @@ pub struct State {
     // TODO: settings API
     /// Launcher configuration
     pub settings: RwLock<Settings>,
-    /// Reference to process children
+    /// Reference to minecraft process children
     pub children: RwLock<Children>,
+    /// Authentication flow
+    pub auth_flow: RwLock<AuthTask>,
     /// Launcher profile metadata
     pub(crate) profiles: RwLock<Profiles>,
     /// Launcher user account info
@@ -80,6 +85,8 @@ impl State {
 
                     let children = Children::new();
 
+                    let auth_flow = AuthTask::new();
+
                     Ok(Arc::new(Self {
                         database,
                         directories,
@@ -89,6 +96,7 @@ impl State {
                         profiles: RwLock::new(profiles),
                         users: RwLock::new(users),
                         children: RwLock::new(children),
+                        auth_flow: RwLock::new(auth_flow),
                     }))
                 }
             })
