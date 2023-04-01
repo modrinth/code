@@ -1,5 +1,6 @@
 import { useInstances } from './instances'
+import { useSearch } from './search'
 import { useTheming } from './theme'
 import { useNews } from './news'
 
-export { useInstances, useTheming, useNews }
+export { useInstances, useSearch, useTheming, useNews }

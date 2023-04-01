@@ -12,14 +12,14 @@ import {
   SearchFilter,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
-import { useInstances } from '@/store/state'
+import { useSearch } from '@/store/state'
 import generated from '@/generated'
 
-const instanceStore = useInstances()
-instanceStore.initFacets()
-await instanceStore.searchInstances()
-const { getCategoriesByInstanceId } = storeToRefs(instanceStore)
-const { getIconByFilter } = storeToRefs(instanceStore)
+const searchStore = useSearch()
+searchStore.initFacets()
+await searchStore.searchModpacks()
+const { getCategoriesByResultId } = storeToRefs(searchStore)
+const { getIconByFilter } = storeToRefs(searchStore)
 
 const currentPage = ref(1)
 const selectedVersions = ref([])
@@ -31,41 +31,41 @@ const limit = ref(20)
 const availableGameVersions = generated.gameVersions
 
 const searchHandler = async () => {
-  instanceStore.setSearchInput(searchText.value)
-  await instanceStore.searchInstances()
+  searchStore.setSearchInput(searchText.value)
+  await searchStore.searchModpacks()
 }
 
 const handleSort = async (e) => {
   sort.value = e.option
-  instanceStore.setFilter(sort.value)
-  await instanceStore.searchInstances()
+  searchStore.setFilter(sort.value)
+  await searchStore.searchModpacks()
 }
 
 const handleLimit = async (e) => {
   limit.value = e.option
-  instanceStore.setLimit(limit.value)
-  await instanceStore.searchInstances()
+  searchStore.setLimit(limit.value)
+  await searchStore.searchModpacks()
 }
 
 const switchPage = async (page) => {
   currentPage.value = page
-  instanceStore.setCurrentPage(page)
-  await instanceStore.searchInstances()
+  searchStore.setCurrentPage(page)
+  await searchStore.searchModpacks()
 }
 
 const handleCheckbox = async () => {
-  await instanceStore.searchInstances()
+  await searchStore.searchModpacks()
 }
 
 const handleVersionSelect = async () => {
-  instanceStore.setVersions(selectedVersions.value.map((ver) => ver))
-  await instanceStore.searchInstances()
+  searchStore.setVersions(selectedVersions.value.map((ver) => ver))
+  await searchStore.searchModpacks()
 }
 
 const handleReset = async () => {
-  instanceStore.resetFilters()
+  searchStore.resetFilters()
   selectedVersions.value = []
-  await instanceStore.searchInstances()
+  await searchStore.searchModpacks()
 }
 </script>
 
@@ -75,9 +75,9 @@ const handleReset = async () => {
       <Button @click="handleReset"><ClearIcon />Clear Filters</Button>
       <div class="categories">
         <h2>Categories</h2>
-        <div v-for="(val, category) in instanceStore.categories" :key="category">
+        <div v-for="(val, category) in searchStore.categories" :key="category">
           <SearchFilter
-            v-model="instanceStore.categories[category].enabled"
+            v-model="searchStore.categories[category].enabled"
             :icon="val.icon"
             :displayName="val.name"
             :facetName="category"
@@ -88,9 +88,9 @@ const handleReset = async () => {
       </div>
       <div class="loaders">
         <h2>Loaders</h2>
-        <div v-for="(val, loader) in instanceStore.loaders" :key="loader">
+        <div v-for="(val, loader) in searchStore.loaders" :key="loader">
           <SearchFilter
-            v-model="instanceStore.loaders[loader].enabled"
+            v-model="searchStore.loaders[loader].enabled"
             :icon="val.icon"
             :displayName="val.name"
             :facetName="loader"
@@ -101,9 +101,9 @@ const handleReset = async () => {
       </div>
       <div class="environment">
         <h2>Environments</h2>
-        <div v-for="(_, env) in instanceStore.environments" :key="env">
+        <div v-for="(_, env) in searchStore.environments" :key="env">
           <SearchFilter
-            v-model="instanceStore.environments[env]"
+            v-model="searchStore.environments[env]"
             :icon="getIconByFilter(env)"
             :displayName="env"
             :facetName="env"
@@ -137,11 +137,7 @@ const handleReset = async () => {
       </div>
       <div class="open-source">
         <h2>Open source</h2>
-        <Checkbox
-          v-model="instanceStore.openSource"
-          @click="handleCheckbox"
-          class="filter-checkbox"
-        >
+        <Checkbox v-model="searchStore.openSource" @click="handleCheckbox" class="filter-checkbox">
           Open source
         </Checkbox>
       </div>
@@ -177,27 +173,27 @@ const handleReset = async () => {
           />
         </div>
       </div>
-      <Pagination :page="currentPage" :count="instanceStore.pageCount" @switch-page="switchPage" />
+      <Pagination :page="currentPage" :count="searchStore.pageCount" @switch-page="switchPage" />
       <section class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
-          v-for="instance in instanceStore.instances"
-          class="instance-project-item"
-          :id="instance?.slug"
-          :type="instance?.project_type"
-          :name="instance?.title"
-          :description="instance?.description"
-          :iconUrl="instance?.icon_url"
-          :downloads="instance?.downloads?.toString()"
-          :follows="instance?.follows"
-          :createdAt="instance?.date_created"
-          :updatedAt="instance?.date_modified"
-          :categories="getCategoriesByInstanceId(instance?.project_id)"
-          :projectTypeDisplay="instance?.project_type"
+          v-for="result in searchStore.searchResults"
+          class="result-project-item"
+          :id="result?.slug"
+          :type="result?.project_type"
+          :name="result?.title"
+          :description="result?.description"
+          :iconUrl="result?.icon_url"
+          :downloads="result?.downloads?.toString()"
+          :follows="result?.follows"
+          :createdAt="result?.date_created"
+          :updatedAt="result?.date_modified"
+          :categories="getCategoriesByResultId(result?.project_id)"
+          :projectTypeDisplay="result?.project_type"
           projectTypeUrl="mod"
-          :serverSide="instance?.server_side"
-          :clientSide="instance?.client_side"
+          :serverSide="result?.server_side"
+          :clientSide="result?.client_side"
           :showUpdatedDate="false"
-          :color="instance?.color"
+          :color="result?.color"
         >
         </ProjectCard>
       </section>
