@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
+import { ofetch } from 'ofetch'
 import {
   Pagination,
   ProjectCard,
@@ -16,9 +17,10 @@ import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import generated from '@/generated'
 
+// Pull search store and initialize modpack cats and loaders
 const searchStore = useSearch()
 searchStore.initFacets()
-await searchStore.searchModpacks()
+// Pull getter methods
 const { getCategoriesByResultId } = storeToRefs(searchStore)
 const { getIconByFilter } = storeToRefs(searchStore)
 
@@ -31,42 +33,77 @@ const limit = ref(20)
 
 const availableGameVersions = generated.gameVersions
 
-const searchHandler = async () => {
+/**
+ * Makes the API request to labrinth
+ */
+const getSearchResults = async () => {
+  const queryString = searchStore.getQueryString()
+  const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
+
+  searchStore.setSearchResults(response)
+}
+await getSearchResults()
+
+/**
+ * For when user enters input in search bar
+ */
+const handleQueryInput = async () => {
   searchStore.setSearchInput(searchText.value)
-  await searchStore.searchModpacks()
+  await getSearchResults()
 }
 
+/**
+ * For when the user changes the Sort dropdown
+ * @param {Object} e Event param to see selected option
+ */
 const handleSort = async (e) => {
   sort.value = e.option
   searchStore.setFilter(sort.value)
-  await searchStore.searchModpacks()
+  await getSearchResults()
 }
 
+/**
+ * For when user changes Limit dropdown
+ * @param {Object} e Event param to see selected option
+ */
 const handleLimit = async (e) => {
   limit.value = e.option
   searchStore.setLimit(limit.value)
-  await searchStore.searchModpacks()
+  await getSearchResults()
 }
 
+/**
+ * For when user pages results
+ * @param {Number} page The new page to display
+ */
 const switchPage = async (page) => {
   currentPage.value = page
   searchStore.setCurrentPage(page)
-  await searchStore.searchModpacks()
+  await getSearchResults()
 }
 
+/**
+ * For when user toggles a checkbox in the sidepane
+ */
 const handleCheckbox = async () => {
-  await searchStore.searchModpacks()
+  await getSearchResults()
 }
 
+/**
+ * For when a user interacts with version filters
+ */
 const handleVersionSelect = async () => {
   searchStore.setVersions(selectedVersions.value.map((ver) => ver))
-  await searchStore.searchModpacks()
+  await getSearchResults()
 }
 
+/**
+ * For when user resets all filters
+ */
 const handleReset = async () => {
   searchStore.resetFilters()
   selectedVersions.value = []
-  await searchStore.searchModpacks()
+  await getSearchResults()
 }
 </script>
 
@@ -148,7 +185,12 @@ const handleReset = async () => {
         <div class="search-panel">
           <div class="iconified-input">
             <SearchIcon />
-            <input v-model="searchText" type="text" placeholder="Search.." @input="searchHandler" />
+            <input
+              v-model="searchText"
+              type="text"
+              placeholder="Search.."
+              @input="handleQueryInput"
+            />
           </div>
           Sort by
           <DropdownSelect

@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { ofetch } from 'ofetch'
 import generated from '@/generated'
 
 export const useSearch = defineStore('searchStore', {
@@ -47,7 +46,7 @@ export const useSearch = defineStore('searchStore', {
         }
       })
     },
-    async searchModpacks() {
+    getQueryString() {
       const activeCategories = Object.keys(this.categories).filter(
         (cat) => this.categories[cat].enabled === true
       )
@@ -103,15 +102,17 @@ export const useSearch = defineStore('searchStore', {
           indexSort = 'relevance'
       }
 
-      const response = await ofetch(
-        `https://api.modrinth.com/v2/search?query=${this.searchInput || ''}&limit=${
-          this.limit
-        }&offset=${this.offset || 0}${facets || ''}&index=${indexSort}`
-      )
+      return `?query=${this.searchInput || ''}&limit=${this.limit}&offset=${this.offset || 0}${
+        facets || ''
+      }&index=${indexSort}`
+    },
+    setSearchResults(response) {
       this.searchResults = [...response.hits]
       this.totalHits = response.total_hits
       this.offset = response.offset
-      this.pageCount = Math.ceil(this.totalHits / 10)
+      this.pageCount = Math.ceil(this.totalHits / this.limit)
+
+      console.log(this.searchResults)
     },
     setSearchInput(newInput) {
       this.searchInput = newInput
