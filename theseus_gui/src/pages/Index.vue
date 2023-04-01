@@ -8,15 +8,15 @@ instanceStore.fetchInstances()
 newsStore.fetchNews()
 
 // Remove once state is populated with real data
-const recentInstances = instanceStore.fakeInstances.slice(0, 4)
-const popularInstances = instanceStore.fakeInstances.filter((i) => i.downloads > 50 || i.trending)
+const recentInstances = instanceStore.instances.slice(0, 4)
+const popularInstances = instanceStore.instances.filter((i) => i.downloads > 50 || i.trending)
 </script>
 
 <template>
   <div class="page-container">
     <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
     <RowDisplay label="Popular packs" :instances="popularInstances" :can-paginate="true" />
-    <RowDisplay label="News & updates" :news="news.news" :can-paginate="true" />
+    <RowDisplay label="News & updates" :news="newsStore.news" :can-paginate="true" />
   </div>
 </template>
 

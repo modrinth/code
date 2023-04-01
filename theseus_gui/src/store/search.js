@@ -180,7 +180,7 @@ export const useSearch = defineStore('searchStore', {
         return results
       }
     },
-    getIconByFilter: (_) => {
+    getIconByFilter: () => {
       // Fallback method for getting icons that aren't in generated.js
       return (filter) => {
         switch (filter) {

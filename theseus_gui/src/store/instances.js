@@ -2,7 +2,7 @@ import { defineStore } from 'pinia'
 
 export const useInstances = defineStore('instanceStore', {
   state: () => ({
-    fakeInstances: [],
+    instances: [],
   }),
   actions: {
     fetchInstances() {
@@ -109,7 +109,7 @@ export const useInstances = defineStore('instanceStore', {
         },
       ]
 
-      this.fakeInstances = [...instances]
+      this.instances = [...instances]
     },
   },
 })

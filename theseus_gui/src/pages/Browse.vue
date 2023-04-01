@@ -80,10 +80,10 @@ const handleReset = async () => {
           <SearchFilter
             v-model="searchStore.categories[category].enabled"
             :icon="val.icon"
-            :displayName="val.name"
-            :facetName="category"
-            @click="handleCheckbox"
+            :display-name="val.name"
+            :facet-name="category"
             class="filter-checkbox"
+            @click="handleCheckbox"
           />
         </div>
       </div>
@@ -93,10 +93,10 @@ const handleReset = async () => {
           <SearchFilter
             v-model="searchStore.loaders[loader].enabled"
             :icon="val.icon"
-            :displayName="val.name"
-            :facetName="loader"
-            @click="handleCheckbox"
+            :display-name="val.name"
+            :facet-name="loader"
             class="filter-checkbox"
+            @click="handleCheckbox"
           />
         </div>
       </div>
@@ -106,10 +106,10 @@ const handleReset = async () => {
           <SearchFilter
             v-model="searchStore.environments[env]"
             :icon="getIconByFilter(env)"
-            :displayName="env"
-            :facetName="env"
-            @click="handleCheckbox"
+            :display-name="env"
+            :facet-name="env"
             class="filter-checkbox"
+            @click="handleCheckbox"
           />
         </div>
       </div>
@@ -138,7 +138,7 @@ const handleReset = async () => {
       </div>
       <div class="open-source">
         <h2>Open source</h2>
-        <Checkbox v-model="searchStore.openSource" @click="handleCheckbox" class="filter-checkbox">
+        <Checkbox v-model="searchStore.openSource" class="filter-checkbox" @click="handleCheckbox">
           Open source
         </Checkbox>
       </div>
@@ -148,7 +148,7 @@ const handleReset = async () => {
         <div class="search-panel">
           <div class="iconified-input">
             <SearchIcon />
-            <input type="text" placeholder="Search.." v-model="searchText" @input="searchHandler" />
+            <input v-model="searchText" type="text" placeholder="Search.." @input="searchHandler" />
           </div>
           Sort by
           <DropdownSelect
@@ -160,17 +160,17 @@ const handleReset = async () => {
               'Recently published',
               'Recently updated',
             ]"
-            :defaultValue="sort"
+            :default-value="sort"
+            :model-value="sort"
             @change="handleSort"
-            :modelValue="sort"
           />
           Show per page
           <DropdownSelect
             name="Limit dropdown"
             :options="[5, 10, 15, 20, 50, 100]"
-            :defaultValue="limit"
+            :default-value="limit"
+            :model-value="limit"
             @change="handleLimit"
-            :modelValue="limit"
           />
         </div>
       </Card>
@@ -178,22 +178,23 @@ const handleReset = async () => {
       <section class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
-          class="result-project-item"
           :id="result?.slug"
+          :key="result?.project_id"
+          class="result-project-item"
           :type="result?.project_type"
           :name="result?.title"
           :description="result?.description"
-          :iconUrl="result?.icon_url"
+          :icon-url="result?.icon_url"
           :downloads="result?.downloads?.toString()"
           :follows="result?.follows"
-          :createdAt="result?.date_created"
-          :updatedAt="result?.date_modified"
+          :created-at="result?.date_created"
+          :updated-at="result?.date_modified"
           :categories="getCategoriesByResultId(result?.project_id)"
-          :projectTypeDisplay="result?.project_type"
-          projectTypeUrl="mod"
-          :serverSide="result?.server_side"
-          :clientSide="result?.client_side"
-          :showUpdatedDate="false"
+          :project-type-display="result?.project_type"
+          project-type-url="mod"
+          :server-side="result?.server_side"
+          :client-side="result?.client_side"
+          :show-updated-date="false"
           :color="result?.color"
         >
         </ProjectCard>
@@ -293,6 +294,16 @@ const handleReset = async () => {
   color: var(--color-base) !important;
   outline: 2px solid transparent;
 
+  .multiselect__input:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    font-weight: normal !important;
+    margin-left: 0.5rem;
+    margin-bottom: 10px;
+  }
+
   input {
     background: transparent;
     box-shadow: none;
@@ -314,7 +325,7 @@ const handleReset = async () => {
     border: none;
     cursor: pointer;
     padding-left: 0.5rem;
-    padding-top: 10px;
+    font-size: 1rem;
 
     transition: background-color 0.1s ease-in-out;
 
