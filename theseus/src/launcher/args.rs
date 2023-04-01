@@ -10,9 +10,13 @@ use daedalus::{
     minecraft::{Argument, ArgumentValue, Library, VersionType},
     modded::SidedDataEntry,
 };
+use dunce::canonicalize;
 use std::io::{BufRead, BufReader};
 use std::{collections::HashMap, path::Path};
 use uuid::Uuid;
+
+// Replaces the space separator with a newline character, as to not split the arguments
+const TEMPORARY_REPLACE_CHAR: &str = "\n";
 
 pub fn get_class_paths(
     libraries_path: &Path,
@@ -37,8 +41,7 @@ pub fn get_class_paths(
         .collect::<Result<Vec<_>, _>>()?;
 
     cps.push(
-        client_path
-            .canonicalize()
+        canonicalize(client_path)
             .map_err(|_| {
                 crate::ErrorKind::LauncherError(format!(
                     "Specified class path {} does not exist",
@@ -68,9 +71,9 @@ pub fn get_class_paths_jar<T: AsRef<str>>(
 pub fn get_lib_path(libraries_path: &Path, lib: &str) -> crate::Result<String> {
     let mut path = libraries_path.to_path_buf();
 
-    path.push(get_path_from_artifact(lib.as_ref())?);
+    path.push(get_path_from_artifact(lib)?);
 
-    let path = &path.canonicalize().map_err(|_| {
+    let path = &canonicalize(&path).map_err(|_| {
         crate::ErrorKind::LauncherError(format!(
             "Library file at path {} does not exist",
             path.to_string_lossy()
@@ -104,15 +107,13 @@ pub fn get_jvm_arguments(
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
-            &natives_path
-                .canonicalize()
+            canonicalize(natives_path)
                 .map_err(|_| crate::ErrorKind::LauncherError(format!(
                     "Specified natives path {} does not exist",
                     natives_path.to_string_lossy()
                 ))
                 .as_error())?
                 .to_string_lossy()
-                .to_string()
         ));
         parsed_arguments.push("-cp".to_string());
         parsed_arguments.push(class_paths.to_string());
@@ -142,8 +143,7 @@ fn parse_jvm_argument(
     Ok(argument
         .replace(
             "${natives_directory}",
-            &natives_path
-                .canonicalize()
+            &canonicalize(natives_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified natives path {} does not exist",
@@ -155,8 +155,7 @@ fn parse_jvm_argument(
         )
         .replace(
             "${library_directory}",
-            &libraries_path
-                .canonicalize()
+            &canonicalize(libraries_path)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified libraries path {} does not exist",
@@ -164,8 +163,7 @@ fn parse_jvm_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_string(),
+                .to_string_lossy(),
         )
         .replace("${classpath_separator}", classpath_separator())
         .replace("${launcher_name}", "theseus")
@@ -207,7 +205,7 @@ pub fn get_minecraft_arguments(
         Ok(parsed_arguments)
     } else if let Some(legacy_arguments) = legacy_arguments {
         Ok(parse_minecraft_argument(
-            legacy_arguments,
+            &legacy_arguments.replace(' ', TEMPORARY_REPLACE_CHAR),
             &credentials.access_token,
             &credentials.username,
             &credentials.id,
@@ -219,7 +217,6 @@ pub fn get_minecraft_arguments(
             resolution,
         )?
         .split(' ')
-        .into_iter()
         .map(|x| x.to_string())
         .collect())
     } else {
@@ -251,8 +248,7 @@ fn parse_minecraft_argument(
         .replace("${assets_index_name}", asset_index_name)
         .replace(
             "${game_directory}",
-            &game_directory
-                .canonicalize()
+            &canonicalize(game_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified game directory {} does not exist",
@@ -260,13 +256,11 @@ fn parse_minecraft_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_owned(),
+                .to_string_lossy(),
         )
         .replace(
             "${assets_root}",
-            &assets_directory
-                .canonicalize()
+            &canonicalize(assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
@@ -274,13 +268,11 @@ fn parse_minecraft_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_owned(),
+                .to_string_lossy(),
         )
         .replace(
             "${game_assets}",
-            &assets_directory
-                .canonicalize()
+            &canonicalize(assets_directory)
                 .map_err(|_| {
                     crate::ErrorKind::LauncherError(format!(
                         "Specified assets directory {} does not exist",
@@ -288,8 +280,7 @@ fn parse_minecraft_argument(
                     ))
                     .as_error()
                 })?
-                .to_string_lossy()
-                .to_owned(),
+                .to_string_lossy(),
         )
         .replace("${version_type}", version_type.as_str())
         .replace("${resolution_width}", &resolution.0.to_string())
@@ -307,9 +298,9 @@ where
     for argument in arguments {
         match argument {
             Argument::Normal(arg) => {
-                let parsed = parse_function(arg)?;
-
-                for arg in parsed.split(' ') {
+                let parsed =
+                    parse_function(&arg.replace(' ', TEMPORARY_REPLACE_CHAR))?;
+                for arg in parsed.split(TEMPORARY_REPLACE_CHAR) {
                     parsed_arguments.push(arg.to_string());
                 }
             }
@@ -317,11 +308,15 @@ where
                 if rules.iter().all(parse_rule) {
                     match value {
                         ArgumentValue::Single(arg) => {
-                            parsed_arguments.push(parse_function(arg)?);
+                            parsed_arguments.push(parse_function(
+                                &arg.replace(' ', TEMPORARY_REPLACE_CHAR),
+                            )?);
                         }
                         ArgumentValue::Many(args) => {
                             for arg in args {
-                                parsed_arguments.push(parse_function(arg)?);
+                                parsed_arguments.push(parse_function(
+                                    &arg.replace(' ', TEMPORARY_REPLACE_CHAR),
+                                )?);
                             }
                         }
                     }
@@ -366,7 +361,7 @@ pub fn get_processor_arguments<T: AsRef<str>>(
 pub async fn get_processor_main_class(
     path: String,
 ) -> crate::Result<Option<String>> {
-    Ok(tokio::task::spawn_blocking(move || {
+    tokio::task::spawn_blocking(move || {
         let zipfile = std::fs::File::open(&path)?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
@@ -400,5 +395,5 @@ pub async fn get_processor_main_class(
         Ok::<Option<String>, crate::Error>(None)
     })
     .await
-    .unwrap()?)
+    .unwrap()
 }

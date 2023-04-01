@@ -3,12 +3,14 @@ use async_tungstenite as ws;
 use bincode::{Decode, Encode};
 use chrono::{prelude::*, Duration};
 use futures::prelude::*;
-use once_cell::sync::*;
-use serde::Deserialize;
+use lazy_static::lazy_static;
+use serde::{Deserialize, Serialize};
 use url::Url;
 
-pub const HYDRA_URL: Lazy<Url> =
-    Lazy::new(|| Url::parse("https://hydra.modrinth.com").unwrap());
+lazy_static! {
+    static ref HYDRA_URL: Url =
+        Url::parse("https://hydra.modrinth.com").unwrap();
+}
 
 // Socket messages
 #[derive(Deserialize)]
@@ -45,7 +47,7 @@ struct ProfileInfoJSON {
 }
 
 // Login information
-#[derive(Encode, Decode)]
+#[derive(Encode, Decode, Serialize, Deserialize)]
 pub struct Credentials {
     #[bincode(with_serde)]
     pub id: uuid::Uuid,
@@ -65,7 +67,7 @@ pub struct HydraAuthFlow<S: AsyncRead + AsyncWrite + Unpin> {
 impl HydraAuthFlow<ws::tokio::ConnectStream> {
     pub async fn new() -> crate::Result<Self> {
         let sock_url = wrap_ref_builder!(
-            it = HYDRA_URL =>
+            it = HYDRA_URL.clone() =>
             { it.set_scheme("wss").ok() }
         );
         let (socket, _) = ws::tokio::connect_async(sock_url.clone()).await?;

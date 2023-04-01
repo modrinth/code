@@ -7,8 +7,12 @@ use daedalus as d;
 use std::{
     future::Future,
     path::{Path, PathBuf},
+    sync::Arc,
 };
-use tokio::process::{Child, Command};
+use tokio::{
+    process::{Child, Command},
+    sync::RwLock,
+};
 
 /// Add a profile to the in-memory state
 #[tracing::instrument]
@@ -68,12 +72,7 @@ pub async fn is_managed(profile: &Path) -> crate::Result<bool> {
 pub async fn is_loaded(profile: &Path) -> crate::Result<bool> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
-    Ok(profiles
-        .0
-        .get(profile)
-        .map(Option::as_ref)
-        .flatten()
-        .is_some())
+    Ok(profiles.0.get(profile).and_then(Option::as_ref).is_some())
 }
 
 /// Edit a profile using a given asynchronous closure
@@ -110,11 +109,12 @@ pub async fn list(
 }
 
 /// Run Minecraft using a profile
+/// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip_all)]
 pub async fn run(
     path: &Path,
     credentials: &crate::auth::Credentials,
-) -> crate::Result<Child> {
+) -> crate::Result<Arc<RwLock<Child>>> {
     let state = State::get().await.unwrap();
     let settings = state.settings.read().await;
     let profile = get(path).await?.ok_or_else(|| {
@@ -138,8 +138,8 @@ pub async fn run(
         })?;
     let version_info = d::minecraft::fetch_version_info(version).await?;
 
-    let ref pre_launch_hooks =
-        profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
+    let pre_launch_hooks =
+        &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
     for hook in pre_launch_hooks.iter() {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
@@ -190,7 +190,7 @@ pub async fn run(
         .as_error());
     }
 
-    let ref java_args = profile
+    let java_args = profile
         .java
         .as_ref()
         .and_then(|it| it.extra_arguments.as_ref())
@@ -201,21 +201,32 @@ pub async fn run(
         .as_ref()
         .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
 
-    let ref memory = profile.memory.unwrap_or(settings.memory);
-    let ref resolution = profile.resolution.unwrap_or(settings.game_resolution);
+    let memory = profile.memory.unwrap_or(settings.memory);
+    let resolution = profile.resolution.unwrap_or(settings.game_resolution);
 
-    crate::launcher::launch_minecraft(
+    let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
-        &java_install,
-        &java_args,
-        &wrapper,
-        memory,
-        resolution,
+        java_install,
+        java_args,
+        wrapper,
+        &memory,
+        &resolution,
         credentials,
     )
-    .await
+    .await?;
+
+    // Insert child into state
+    let mut state_children = state.children.write().await;
+    let pid = mc_process.id().ok_or_else(|| {
+        crate::ErrorKind::LauncherError(
+            "Process failed to stay open.".to_string(),
+        )
+    })?;
+    let child_arc = state_children.insert(pid, mc_process);
+
+    Ok(child_arc)
 }
 
 #[tracing::instrument]

@@ -14,9 +14,9 @@ const popularInstances = instanceStore.fakeInstances.filter((i) => i.downloads >
 
 <template>
   <div class="page-container">
-    <RowDisplay label="Jump back in" :instances="recentInstances" :canPaginate="false" />
-    <RowDisplay label="Popular packs" :instances="popularInstances" :canPaginate="true" />
-    <RowDisplay label="News & updates" :news="newsStore.news" :canPaginate="true" />
+    <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
+    <RowDisplay label="Popular packs" :instances="popularInstances" :can-paginate="true" />
+    <RowDisplay label="News & updates" :news="news.news" :can-paginate="true" />
   </div>
 </template>
 

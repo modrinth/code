@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "theseus_gui",
+    "productName": "theseus",
     "version": "0.0.0"
   },
   "tauri": {
@@ -27,9 +27,13 @@
       },
       "externalBin": [],
       "icon": [
-        "icons/favicon.ico"
+        "icons/32x32.png",
+        "icons/128x128.png",
+        "icons/128x128@2x.png",
+        "icons/icon.icns",
+        "icons/icon.ico"
       ],
-      "identifier": "com.tauri.dev",
+      "identifier": "com.modrinth.theseus",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -59,7 +63,9 @@
         "height": 650,
         "resizable": true,
         "title": "Modrinth Launcher",
-        "width": 1140
+        "width": 1140,
+        "minHeight": 630,
+        "minWidth": 1100
       }
     ]
   }

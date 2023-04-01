@@ -3,5 +3,12 @@
 members = [
     "theseus",
     "theseus_cli",
+    "theseus_playground",
     "theseus_gui/src-tauri"
 ]
+
+# Optimize for speed and reduce size on release builds
+[profile.release]
+codegen-units = 1
+lto = true
+strip = true

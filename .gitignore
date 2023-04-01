@@ -8,6 +8,9 @@ WixTools
 .DS_Store
 .pnpm-debug.log
 
+minecraft
+config
+
 [#]*[#]
 
 # TEMPORARY: ignore my test instance and metadata

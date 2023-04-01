@@ -5,6 +5,28 @@ use tokio::sync::oneshot;
 
 pub use inner::Credentials;
 
+/// Authenticate a user with Hydra - part 1
+/// This begins the authentication flow quasi-synchronously, returning a URL
+/// This can be used in conjunction with 'authenticate_await_complete_flow'
+/// to call authenticate and call the flow from the frontend.
+/// Visit the URL in a browser, then call and await 'authenticate_await_complete_flow'.
+pub async fn authenticate_begin_flow() -> crate::Result<url::Url> {
+    let st = State::get().await?.clone();
+    let url = st.auth_flow.write().await.begin_auth().await?;
+    Ok(url)
+}
+
+/// Authenticate a user with Hydra - part 2
+/// This completes the authentication flow quasi-synchronously, returning the credentials
+/// This can be used in conjunction with 'authenticate_begin_flow'
+/// to call authenticate and call the flow from the frontend.
+pub async fn authenticate_await_complete_flow() -> crate::Result<Credentials> {
+    let st = State::get().await?.clone();
+    let credentials =
+        st.auth_flow.write().await.await_auth_completion().await?;
+    Ok(credentials)
+}
+
 /// Authenticate a user with Hydra
 /// To run this, you need to first spawn this function as a task, then
 /// open a browser to the given URL and finally wait on the spawned future
@@ -36,6 +58,7 @@ pub async fn authenticate(
 }
 
 /// Refresh some credentials using Hydra, if needed
+/// This is the primary desired way to get credentials, as it will also refresh them.
 #[tracing::instrument]
 pub async fn refresh(
     user: uuid::Uuid,
@@ -88,7 +111,7 @@ pub async fn has_user(user: uuid::Uuid) -> crate::Result<bool> {
     let state = State::get().await?;
     let users = state.users.read().await;
 
-    Ok(users.contains(user)?)
+    users.contains(user)
 }
 
 /// Get a copy of the list of all user credentials
@@ -97,4 +120,19 @@ pub async fn users() -> crate::Result<Box<[Credentials]>> {
     let state = State::get().await?;
     let users = state.users.read().await;
     users.iter().collect()
+}
+
+/// Get a specific user by user ID
+/// Prefer to use 'refresh' instead of this function
+#[tracing::instrument]
+pub async fn get_user(user: uuid::Uuid) -> crate::Result<Credentials> {
+    let state = State::get().await?;
+    let users = state.users.read().await;
+    let user = users.get(user)?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to get nonexistent user with ID {user}"
+        ))
+        .as_error()
+    })?;
+    Ok(user)
 }
