@@ -10,6 +10,7 @@ import {
   SearchIcon,
   DropdownSelect,
   SearchFilter,
+  Card,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
@@ -143,7 +144,7 @@ const handleReset = async () => {
       </div>
     </aside>
     <div class="search">
-      <div class="search-panel-container">
+      <Card class="search-panel-container">
         <div class="search-panel">
           <div class="iconified-input">
             <SearchIcon />
@@ -172,7 +173,7 @@ const handleReset = async () => {
             :modelValue="limit"
           />
         </div>
-      </div>
+      </Card>
       <Pagination :page="currentPage" :count="searchStore.pageCount" @switch-page="switchPage" />
       <section class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
@@ -209,6 +210,7 @@ const handleReset = async () => {
   align-items: center;
   justify-content: center;
   width: 100%;
+  margin-top: 2rem;
 
   .search-panel {
     display: flex;
@@ -256,7 +258,7 @@ const handleReset = async () => {
       color: var(--color-contrast);
       margin-top: 1rem;
       margin-bottom: 0.5rem;
-      font-size: 0.9rem;
+      font-size: 1.16rem;
     }
 
     .filter-checkbox {
