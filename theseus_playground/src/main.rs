@@ -84,6 +84,8 @@ async fn main() -> theseus::Result<()> {
     .await?;
     State::sync().await?;
 
+    panic!("Testing complete. (Comment out this line to run the profile.");
+
     // Attempt to get the default user, if it exists, and refresh their credentials
     let settings = st.settings.read().await;
     let default_user_uuid = settings.default_user;

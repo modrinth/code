@@ -53,6 +53,8 @@ pub struct State {
     pub(crate) profiles: RwLock<Profiles>,
     /// Launcher user account info
     pub(crate) users: RwLock<Users>,
+    /// Launcher tags
+    pub(crate) tags: RwLock<Tags>,
 }
 
 impl State {
@@ -90,6 +92,18 @@ impl State {
 
                     let auth_flow = AuthTask::new();
 
+                    // On launcher initialization, attempt a tag fetch after tags init
+                    let mut tags = Tags::init(&database)?;
+                    if let Err(tag_fetch_err) = tags.fetch_update().await {
+                        tracing::error!(
+                            "Failed to fetch tags on launcher init: {}",
+                            tag_fetch_err
+                        );
+                    };
+
+                    let debug_inner_tags = tags.get()?;
+                    dbg!("init tags: ", debug_inner_tags);
+
                     Ok(Arc::new(Self {
                         database,
                         directories,
@@ -100,6 +114,7 @@ impl State {
                         users: RwLock::new(users),
                         children: RwLock::new(children),
                         auth_flow: RwLock::new(auth_flow),
+                        tags: RwLock::new(tags),
                     }))
                 }
             })
