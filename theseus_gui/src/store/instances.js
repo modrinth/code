@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ofetch } from 'ofetch'
 import generated from '@/generated'
+import { format } from 'prettier'
 
 export const useInstances = defineStore('instanceStore', {
   state: () => ({
@@ -13,33 +14,33 @@ export const useInstances = defineStore('instanceStore', {
     offset: 0,
     filter: 'Relevance',
     categories: {
-      adventure: { label: 'Adventure', enabled: false },
-      cursed: { label: 'Cursed', enabled: false },
-      decoration: { label: 'Decoration', enabled: false },
-      economy: { label: 'Economy', enabled: false },
-      equipment: { label: 'Equipment', enabled: false },
-      food: { label: 'Food', enabled: false },
-      'game-mechanics': { label: 'Game Mechanics', enabled: false },
-      library: { label: 'Library', enabled: false },
-      magic: { label: 'Magic', enabled: false },
-      management: { label: 'Management', enabled: false },
-      minigame: { label: 'Minigame', enabled: false },
-      mobs: { label: 'Mobs', enabled: false },
-      optimization: { label: 'Optimization', enabled: false },
-      social: { label: 'Social', enabled: false },
-      storage: { label: 'Storage', enabled: false },
-      technology: { label: 'Technology', enabled: false },
-      transportation: { label: 'Transportation', enabled: false },
-      utility: { label: 'Utility', enabled: false },
-      worldgen: { label: 'World Generation', enabled: false },
+      //   adventure: { label: 'Adventure', enabled: false },
+      //   cursed: { label: 'Cursed', enabled: false },
+      //   decoration: { label: 'Decoration', enabled: false },
+      //   economy: { label: 'Economy', enabled: false },
+      //   equipment: { label: 'Equipment', enabled: false },
+      //   food: { label: 'Food', enabled: false },
+      //   'game-mechanics': { label: 'Game Mechanics', enabled: false },
+      //   library: { label: 'Library', enabled: false },
+      //   magic: { label: 'Magic', enabled: false },
+      //   management: { label: 'Management', enabled: false },
+      //   minigame: { label: 'Minigame', enabled: false },
+      //   mobs: { label: 'Mobs', enabled: false },
+      //   optimization: { label: 'Optimization', enabled: false },
+      //   social: { label: 'Social', enabled: false },
+      //   storage: { label: 'Storage', enabled: false },
+      //   technology: { label: 'Technology', enabled: false },
+      //   transportation: { label: 'Transportation', enabled: false },
+      //   utility: { label: 'Utility', enabled: false },
+      //   worldgen: { label: 'World Generation', enabled: false },
     },
     loaders: {
-      fabric: { label: 'Fabric', enabled: false },
-      forge: { label: 'Forge', enabled: false },
-      quilt: { label: 'Quilt', enabled: false },
-      rift: { label: 'Rift', enabled: false },
-      liteloader: { label: 'LiteLoader', enabled: false },
-      risugami: { label: 'Risugami ModLoader', enabled: false },
+      // fabric: { label: 'Fabric', enabled: false },
+      // forge: { label: 'Forge', enabled: false },
+      // quilt: { label: 'Quilt', enabled: false },
+      // rift: { label: 'Rift', enabled: false },
+      // liteloader: { label: 'LiteLoader', enabled: false },
+      // risugami: { label: 'Risugami ModLoader', enabled: false },
     },
     environments: {
       client: false,
@@ -156,6 +157,31 @@ export const useInstances = defineStore('instanceStore', {
 
       this.fakeInstances = [...instances]
     },
+    initFacets() {
+      var categories = generated.categories.filter((cat) => cat.project_type === 'modpack')
+
+      var loaders = generated.loaders.filter((loader) => {
+        // Some loaders don't have any supported proj types set
+        if (!loader.supported_project_types) return
+        if (loader.supported_project_types.includes('modpack')) return loader
+      })
+
+      categories.forEach((cat) => {
+        this.categories[cat.name] = {
+          icon: cat.icon,
+          name: cat.name,
+          enabled: false,
+        }
+      })
+
+      loaders.forEach((loader) => {
+        this.loaders[loader.name] = {
+          icon: loader.icon,
+          name: loader.name,
+          enabled: false,
+        }
+      })
+    },
     async searchInstances() {
       const activeCategories = Object.keys(this.categories).filter(
         (cat) => this.categories[cat].enabled === true
@@ -167,7 +193,8 @@ export const useInstances = defineStore('instanceStore', {
         (env) => this.environments[env] === true
       )
 
-      let facets = ''
+      let formattedFacets = ['project_type:modpack']
+      let envFacets = []
       if (
         activeCategories.length > 0 ||
         activeLoaders.length > 0 ||
@@ -175,25 +202,26 @@ export const useInstances = defineStore('instanceStore', {
         this.activeVersions.length > 0 ||
         this.openSource === true
       ) {
-        facets = '&facets=['
-        activeCategories.forEach((cat) => (facets += `["categories:${cat}"],`))
-        activeLoaders.forEach((loader) => (facets += `["categories:${loader}"],`))
-        this.activeVersions.forEach((ver) => (facets += `["versions:${ver}"],`))
+        activeCategories.forEach((cat) => formattedFacets.push(`categories:${cat}`))
+        activeCategories.forEach((cat) => formattedFacets.push(`categories:${cat}`))
+        activeLoaders.forEach((loader) => formattedFacets.push(`categories:${loader}`))
+        this.activeVersions.forEach((ver) => formattedFacets.push(`versions:${ver}`))
 
-        if (this.environments.client === true) {
-          facets +=
-            '["client_side:optional"],["client_side:required"],["server_side:optional"],["server_side:unsupported"],'
-        }
-        if (this.environments.server === true) {
-          facets +=
-            '["server_side:optional"],["server_side:required"],["client_side:optional"],["client_side:unsupported"],'
-        }
+        // If both are on or off, adding filters is pointless
+        if (this.environments.client === true && this.environments.server === false)
+          formattedFacets.push('client_side:required')
+        if (this.environments.client === false && this.environments.server === true)
+          formattedFacets.push('server_side:required')
 
-        if (this.openSource === true) facets += '["open_source:true"],'
+        if (this.openSource === true) formattedFacets.push('open_source:true')
 
-        facets = facets.slice(0, facets.length - 1)
-        facets += ']'
+        formattedFacets = [...formattedFacets, ...envFacets]
       }
+
+      let facets = '&facets=['
+      formattedFacets.forEach((facet) => (facets += `["${facet}"],`))
+      facets = facets.slice(0, facets.length - 1)
+      facets += ']'
 
       let indexSort
       switch (this.filter) {

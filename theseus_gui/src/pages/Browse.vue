@@ -9,12 +9,14 @@ import {
   ClearIcon,
   SearchIcon,
   DropdownSelect,
+  SearchFilter,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useInstances } from '@/store/state'
 import generated from '@/generated'
 
 const instanceStore = useInstances()
+instanceStore.initFacets()
 await instanceStore.searchInstances()
 const { getCategoriesByInstanceId } = storeToRefs(instanceStore)
 const { getIconByFilter } = storeToRefs(instanceStore)
@@ -74,42 +76,40 @@ const handleReset = async () => {
       <div class="categories">
         <h2>Categories</h2>
         <div v-for="(val, category) in instanceStore.categories" :key="category">
-          <Checkbox
+          <SearchFilter
             v-model="instanceStore.categories[category].enabled"
+            :icon="val.icon"
+            :displayName="val.name"
+            :facetName="category"
             @click="handleCheckbox"
             class="filter-checkbox"
-          >
-            <div class="checkbox-icon" v-html="getIconByFilter(category)" />
-            {{ val.label }}
-          </Checkbox>
+          />
         </div>
       </div>
       <div class="loaders">
         <h2>Loaders</h2>
         <div v-for="(val, loader) in instanceStore.loaders" :key="loader">
-          <Checkbox
+          <SearchFilter
             v-model="instanceStore.loaders[loader].enabled"
+            :icon="val.icon"
+            :displayName="val.name"
+            :facetName="loader"
             @click="handleCheckbox"
             class="filter-checkbox"
-          >
-            <div role="icon" class="checkbox-icon" v-html="getIconByFilter(loader)" />
-
-            {{ val.label }}
-          </Checkbox>
+          />
         </div>
       </div>
       <div class="environment">
         <h2>Environments</h2>
         <div v-for="(_, env) in instanceStore.environments" :key="env">
-          <Checkbox
+          <SearchFilter
             v-model="instanceStore.environments[env]"
+            :icon="getIconByFilter(env)"
+            :displayName="env"
+            :facetName="env"
             @click="handleCheckbox"
             class="filter-checkbox"
-          >
-            <div class="checkbox-icon" v-html="getIconByFilter(env)" />
-
-            {{ env }}
-          </Checkbox>
+          />
         </div>
       </div>
       <div class="versions">
@@ -267,10 +267,6 @@ const handleReset = async () => {
       margin-bottom: 0.3rem;
       font-size: 1rem;
       text-transform: capitalize;
-
-      .checkbox-icon {
-        margin-right: 0.4rem;
-      }
 
       svg {
         display: flex;
