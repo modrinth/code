@@ -46,10 +46,7 @@ pub struct State {
     /// Launcher configuration
     pub settings: RwLock<Settings>,
     /// Reference to minecraft process children
-    /// Reference to minecraft process children
     pub children: RwLock<Children>,
-    /// Authentication flow
-    pub auth_flow: RwLock<AuthTask>,
     /// Authentication flow
     pub auth_flow: RwLock<AuthTask>,
     /// Launcher profile metadata
