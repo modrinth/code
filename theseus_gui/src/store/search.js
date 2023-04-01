@@ -111,8 +111,6 @@ export const useSearch = defineStore('searchStore', {
       this.totalHits = response.total_hits
       this.offset = response.offset
       this.pageCount = Math.ceil(this.totalHits / this.limit)
-
-      console.log(this.searchResults)
     },
     setSearchInput(newInput) {
       this.searchInput = newInput

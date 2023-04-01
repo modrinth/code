@@ -192,7 +192,7 @@ const handleReset = async () => {
               @input="handleQueryInput"
             />
           </div>
-          Sort by
+          <span>Sort by</span>
           <DropdownSelect
             name="Sort dropdown"
             :options="[
@@ -206,12 +206,13 @@ const handleReset = async () => {
             :model-value="sort"
             @change="handleSort"
           />
-          Show per page
+          <span>Show per page</span>
           <DropdownSelect
             name="Limit dropdown"
             :options="[5, 10, 15, 20, 50, 100]"
             :default-value="limit"
             :model-value="limit"
+            class="limit-dropdown"
             @change="handleLimit"
           />
         </div>
@@ -220,7 +221,7 @@ const handleReset = async () => {
       <section class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
-          :id="result?.slug"
+          :id="result?.project_id"
           :key="result?.project_id"
           class="result-project-item"
           :type="result?.project_type"
@@ -233,7 +234,7 @@ const handleReset = async () => {
           :updated-at="result?.date_modified"
           :categories="getCategoriesByResultId(result?.project_id)"
           :project-type-display="result?.project_type"
-          project-type-url="mod"
+          project-type-url="instance"
           :server-side="result?.server_side"
           :client-side="result?.client_side"
           :show-updated-date="false"
@@ -258,21 +259,25 @@ const handleReset = async () => {
   .search-panel {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     width: 100%;
     gap: 1.3rem;
     margin: 1rem auto;
 
+    .limit-dropdown {
+      width: 5rem;
+    }
+
     .iconified-input {
-      width: 50%;
+      width: 75%;
+
+      input {
+        flex-basis: initial;
+      }
     }
   }
 
   .filter-panel {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-
     button {
       display: flex;
       align-items: center;
@@ -289,13 +294,16 @@ const handleReset = async () => {
   display: flex;
 
   .filter-panel {
-    min-width: 16rem;
+    position: fixed;
+    width: 16rem;
     background: var(--color-raised-bg);
-    padding: 1rem;
-    border-radius: var(--radius-sm);
-    margin: 1rem;
+    padding: 1rem 1rem 3rem 1rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
     height: fit-content;
-    display: block;
+    max-height: 100%;
+    overflow-y: auto;
 
     h2 {
       color: var(--color-contrast);
@@ -322,7 +330,7 @@ const handleReset = async () => {
   }
 
   .search {
-    margin: 0 2rem;
+    margin: 0 2rem 0 18rem;
 
     .instance-project-item {
       width: 100%;
