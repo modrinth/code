@@ -62,10 +62,11 @@ pub enum ErrorKind {
     #[error("Recv error: {0}")]
     RecvError(#[from] tokio::sync::oneshot::error::RecvError),
 
-    #[error(
-        "Tried to access unloaded profile {0}, loading it probably failed"
-    )]
-    UnloadedProfileError(String),
+    #[error("Task join error: {0}")]
+    JoinError(#[from] tokio::task::JoinError),
+
+    #[error("Error acquiring semaphore: {0}")]
+    AcquireError(#[from] tokio::sync::AcquireError),
 
     #[error("Profile {0} is not managed by Theseus!")]
     UnmanagedProfileError(String),

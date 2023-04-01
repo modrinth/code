@@ -36,7 +36,7 @@ pub fn get_class_paths(
                 return None;
             }
 
-            Some(get_lib_path(libraries_path, &library.name))
+            Some(get_lib_path(libraries_path, &library.name, false))
         })
         .collect::<Result<Vec<_>, _>>()?;
 
@@ -62,16 +62,24 @@ pub fn get_class_paths_jar<T: AsRef<str>>(
 ) -> crate::Result<String> {
     let cps = libraries
         .iter()
-        .map(|library| get_lib_path(libraries_path, library.as_ref()))
+        .map(|library| get_lib_path(libraries_path, library.as_ref(), false))
         .collect::<Result<Vec<_>, _>>()?;
 
     Ok(cps.join(classpath_separator()))
 }
 
-pub fn get_lib_path(libraries_path: &Path, lib: &str) -> crate::Result<String> {
+pub fn get_lib_path(
+    libraries_path: &Path,
+    lib: &str,
+    allow_not_exist: bool,
+) -> crate::Result<String> {
     let mut path = libraries_path.to_path_buf();
 
     path.push(get_path_from_artifact(lib)?);
+
+    if !path.exists() && allow_not_exist {
+        return Ok(path.to_string_lossy().to_string());
+    }
 
     let path = &canonicalize(&path).map_err(|_| {
         crate::ErrorKind::LauncherError(format!(
@@ -343,13 +351,14 @@ pub fn get_processor_arguments<T: AsRef<str>>(
                     get_lib_path(
                         libraries_path,
                         &entry.client[1..entry.client.len() - 1],
+                        true,
                     )?
                 } else {
                     entry.client.clone()
                 })
             }
         } else if argument.as_ref().starts_with('[') {
-            new_arguments.push(get_lib_path(libraries_path, trimmed_arg)?)
+            new_arguments.push(get_lib_path(libraries_path, trimmed_arg, true)?)
         } else {
             new_arguments.push(argument.as_ref().to_string())
         }
@@ -361,7 +370,7 @@ pub fn get_processor_arguments<T: AsRef<str>>(
 pub async fn get_processor_main_class(
     path: String,
 ) -> crate::Result<Option<String>> {
-    tokio::task::spawn_blocking(move || {
+    let main_class = tokio::task::spawn_blocking(move || {
         let zipfile = std::fs::File::open(&path)?;
         let mut archive = zip::ZipArchive::new(zipfile).map_err(|_| {
             crate::ErrorKind::LauncherError(format!(
@@ -394,6 +403,7 @@ pub async fn get_processor_main_class(
 
         Ok::<Option<String>, crate::Error>(None)
     })
-    .await
-    .unwrap()
+    .await??;
+
+    Ok(main_class)
 }

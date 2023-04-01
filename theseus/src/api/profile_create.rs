@@ -22,8 +22,8 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
         String::from(DEFAULT_NAME), // the name/path of the profile
         String::from("1.19.2"),     // the game version of the profile
         ModLoader::Vanilla,         // the modloader to use
-        String::from("stable"), // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-        None,                   // the icon for the profile
+        None, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
+        None, // the icon for the profile
     )
     .await
 }
@@ -32,11 +32,11 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
 // Returns filepath at which it can be accessed in the State
 #[tracing::instrument]
 pub async fn profile_create(
-    name: String,           // the name of the profile, and relative path
-    game_version: String,   // the game version of the profile
-    modloader: ModLoader,   // the modloader to use
-    loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-    icon: Option<PathBuf>,  // the icon for the profile
+    name: String,         // the name of the profile, and relative path
+    game_version: String, // the game version of the profile
+    modloader: ModLoader, // the modloader to use
+    loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
+    icon: Option<PathBuf>,          // the icon for the profile
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
@@ -71,7 +71,7 @@ pub async fn profile_create(
 
     let loader = modloader;
     let loader = if loader != ModLoader::Vanilla {
-        let version = loader_version;
+        let version = loader_version.unwrap_or_else(|| "latest".to_string());
 
         let filter = |it: &LoaderVersion| match version.as_str() {
             "latest" => true,
@@ -130,10 +130,11 @@ pub async fn profile_create(
     let path = canonicalize(&path)?;
     let mut profile = Profile::new(name, game_version, path.clone()).await?;
     if let Some(ref icon) = icon {
-        profile.with_icon(icon).await?;
+        profile.set_icon(icon).await?;
     }
     if let Some((loader_version, loader)) = loader {
-        profile.with_loader(loader, Some(loader_version));
+        profile.metadata.loader = loader;
+        profile.metadata.loader_version = Some(loader_version);
     }
 
     profile::add(profile).await?;

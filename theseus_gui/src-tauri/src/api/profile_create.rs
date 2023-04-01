@@ -25,10 +25,9 @@ pub async fn profile_create(
         name,
         game_version,
         modloader,
-        loader_version,
+        Some(loader_version),
         icon,
     )
     .await?;
-    State::sync().await?;
     Ok(res)
 }

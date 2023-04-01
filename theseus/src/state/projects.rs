@@ -33,8 +33,8 @@ pub struct ModrinthProject {
     pub published: DateTime<Utc>,
     pub updated: DateTime<Utc>,
 
-    pub client_side: String,
-    pub server_side: String,
+    pub client_side: SideType,
+    pub server_side: SideType,
 
     pub downloads: u32,
     pub followers: u32,
@@ -47,6 +47,74 @@ pub struct ModrinthProject {
     pub versions: Vec<String>,
 
     pub icon_url: String,
+}
+
+/// A specific version of a project
+#[derive(Serialize, Deserialize)]
+pub struct ModrinthVersion {
+    pub id: String,
+    pub project_id: String,
+    pub author_id: String,
+
+    pub featured: bool,
+
+    pub name: String,
+    pub version_number: String,
+    pub changelog: String,
+    pub changelog_url: Option<String>,
+
+    pub date_published: DateTime<Utc>,
+    pub downloads: u32,
+    pub version_type: String,
+
+    pub files: Vec<ModrinthVersionFile>,
+    pub dependencies: Vec<Dependency>,
+    pub game_versions: Vec<String>,
+    pub loaders: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ModrinthVersionFile {
+    pub hashes: HashMap<String, String>,
+    pub url: String,
+    pub filename: String,
+    pub primary: bool,
+    pub size: u32,
+    pub file_type: Option<FileType>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Dependency {
+    pub version_id: Option<String>,
+    pub project_id: Option<String>,
+    pub file_name: Option<String>,
+    pub dependency_type: DependencyType,
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum DependencyType {
+    Required,
+    Optional,
+    Incompatible,
+    Embedded,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum SideType {
+    Required,
+    Optional,
+    Unsupported,
+    Unknown,
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[serde(rename_all = "kebab-case")]
+pub enum FileType {
+    RequiredResourcePack,
+    OptionalResourcePack,
+    Unknown,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -141,8 +209,19 @@ pub async fn infer_data_from_files(
     for (hash, path) in further_analyze_projects {
         let file = File::open(path.clone())?;
 
-        // TODO: get rid of below unwrap
-        let mut zip = ZipArchive::new(file).unwrap();
+        let mut zip = if let Ok(zip) = ZipArchive::new(file) {
+            zip
+        } else {
+            return_projects.insert(
+                path.clone(),
+                Project {
+                    sha512: hash,
+                    disabled: path.ends_with(".disabled"),
+                    metadata: ProjectMetadata::Unknown,
+                },
+            );
+            continue;
+        };
 
         let read_icon_from_file =
             |icon_path: Option<String>| -> crate::Result<Option<PathBuf>> {
@@ -212,7 +291,7 @@ pub async fn infer_data_from_files(
                             path.clone(),
                             Project {
                                 sha512: hash,
-                                disabled: false,
+                                disabled: path.ends_with(".disabled"),
                                 metadata: ProjectMetadata::Inferred {
                                     title: Some(
                                         pack.display_name
@@ -257,7 +336,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(if pack.name.is_empty() {
                                     pack.modid
@@ -303,7 +382,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(pack.name.unwrap_or(pack.id)),
                                 description: pack.description,
@@ -351,7 +430,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(
                                     pack.metadata
@@ -399,7 +478,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: None,
                                 description: pack.description,
@@ -415,10 +494,10 @@ pub async fn infer_data_from_files(
         }
 
         return_projects.insert(
-            path,
+            path.clone(),
             Project {
                 sha512: hash,
-                disabled: false,
+                disabled: path.ends_with(".disabled"),
                 metadata: ProjectMetadata::Unknown,
             },
         );

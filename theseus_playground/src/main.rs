@@ -43,12 +43,12 @@ async fn main() -> theseus::Result<()> {
     let st = State::get().await?;
 
     // Set max concurrent downloads to 10
-    st.settings.write().await.max_concurrent_downloads = 10;
+    st.settings.write().await.max_concurrent_downloads = 100;
 
     // Example variables for simple project case
     let name = "Example".to_string();
     let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Vanilla;
+    let modloader = ModLoader::Fabric;
     let loader_version = "stable".to_string();
 
     // let icon = Some(
@@ -56,7 +56,7 @@ async fn main() -> theseus::Result<()> {
     //         .canonicalize()
     //         .expect("Icon could be not be found. If not using, set to None"),
     // );
-    let icon = None;
+    //let icon = None;
 
     // Clear profiles
     println!("Clearing profiles.");
@@ -68,14 +68,21 @@ async fn main() -> theseus::Result<()> {
     println!("Creating/adding profile.");
     // Attempt to create a profile. If that fails, try adding one from the same path.
     // TODO: actually do a nested error check for the correct profile error.
-    let profile_path = profile_create(
-        name.clone(),
-        game_version,
-        modloader,
-        loader_version,
-        icon,
-    )
-    .await?;
+    // let profile_path = profile_create(
+    //     name.clone(),
+    //     game_version,
+    //     modloader,
+    //     Some(loader_version),
+    //     icon,
+    // )
+    // .await?;
+    let profile_path =
+        modpacks::install_modpack_from_version_id("KcPpJLaW".to_string())
+            .await
+            .unwrap();
+
+    // let profiles = profile::list().await?;
+    // let profile_path = profiles.keys().next().unwrap();
     State::sync().await?;
 
     //  async closure for testing any desired edits
@@ -93,22 +100,19 @@ async fn main() -> theseus::Result<()> {
     State::sync().await?;
 
     println!("Authenticating.");
-    // Attempt to create credentials and run.
-    let proc_lock = match authenticate_run().await {
-        Ok(credentials) => {
-            println!("Running.");
-            profile::run(&canonicalize(&profile_path)?, &credentials).await
-        }
-        Err(e) => {
-            println!("Could not authenticate: {}.\nAttempting stored authentication.",e);
-            // Attempt to load credentials if Hydra is down/rate limit hit
-            let users = auth::users().await.unwrap();
-            let credentials = users.first().unwrap();
+    // Attempt to create credentials and run
 
-            println!("Running.");
-            profile::run(&canonicalize(&profile_path)?, credentials).await
-        }
-    }?;
+    let users = auth::users().await.unwrap();
+    let proc_lock = if let Some(credentials) = users.first() {
+        println!("Running.");
+        profile::run(&canonicalize(&profile_path)?, credentials).await
+    } else {
+        println!("No stored profile. Authenticating normally.",);
+        let credentials = authenticate_run().await.unwrap();
+        println!("Running.");
+        profile::run(&canonicalize(&profile_path)?, &credentials).await
+    }
+    .unwrap();
 
     println!("Started. Waiting...");
     let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;

@@ -61,7 +61,7 @@ pub async fn download_version_info(
             info.id = loader.id.clone();
         }
 
-        let permit = st.io_semaphore.acquire().await.unwrap();
+        let permit = st.io_semaphore.acquire().await?;
         write(&path, &serde_json::to_vec(&info)?, &permit).await?;
         Ok(info)
     }?;
@@ -92,7 +92,7 @@ pub async fn download_client(
         .join(format!("{version}.jar"));
 
     if !path.exists() {
-        let permit = st.io_semaphore.acquire().await.unwrap();
+        let permit = st.io_semaphore.acquire().await?;
         let bytes =
             fetch(&client_download.url, Some(&client_download.sha1), &permit)
                 .await?;
@@ -122,7 +122,7 @@ pub async fn download_assets_index(
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
         let index = d::minecraft::fetch_assets_index(version).await?;
-        let permit = st.io_semaphore.acquire().await.unwrap();
+        let permit = st.io_semaphore.acquire().await?;
         write(&path, &serde_json::to_vec(&index)?, &permit).await?;
         log::info!("Fetched assets index");
         Ok(index)
@@ -141,7 +141,7 @@ pub async fn download_assets(
     log::debug!("Loading assets");
     stream::iter(index.objects.iter())
         .map(Ok::<(&String, &Asset), crate::Error>)
-        .try_for_each_concurrent(Some(st.settings.read().await.max_concurrent_downloads), |(name, asset)| async move {
+        .try_for_each_concurrent(None, |(name, asset)| async move {
             let hash = &asset.hash;
             let resource_path = st.directories.object_dir(hash);
             let url = format!(
@@ -153,7 +153,7 @@ pub async fn download_assets(
             tokio::try_join! {
                 async {
                     if !resource_path.exists() {
-                        let permit = st.io_semaphore.acquire().await.unwrap();
+                        let permit = st.io_semaphore.acquire().await?;
                         let resource = fetch_cell
                             .get_or_try_init(|| fetch(&url, Some(hash), &permit))
                             .await?;
@@ -164,7 +164,7 @@ pub async fn download_assets(
                 },
                 async {
                     if with_legacy {
-                        let permit = st.io_semaphore.acquire().await.unwrap();
+                        let permit = st.io_semaphore.acquire().await?;
                         let resource = fetch_cell
                             .get_or_try_init(|| fetch(&url, Some(hash), &permit))
                             .await?;
@@ -201,7 +201,7 @@ pub async fn download_libraries(
 
     stream::iter(libraries.iter())
         .map(Ok::<&Library, crate::Error>)
-        .try_for_each_concurrent(Some(st.settings.read().await.max_concurrent_downloads), |library| async move {
+        .try_for_each_concurrent(None, |library| async move {
             if let Some(rules) = &library.rules {
                 if !rules.iter().all(super::parse_rule) {
                     return Ok(());
@@ -218,7 +218,7 @@ pub async fn download_libraries(
                             artifact: Some(ref artifact),
                             ..
                         }) => {
-                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let permit = st.io_semaphore.acquire().await?;
                             let bytes = fetch(&artifact.url, Some(&artifact.sha1), &permit)
                                 .await?;
                             write(&path, &bytes, &permit).await?;
@@ -234,7 +234,7 @@ pub async fn download_libraries(
                                 &artifact_path
                             ].concat();
 
-                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let permit = st.io_semaphore.acquire().await?;
                             let bytes = fetch(&url, None, &permit).await?;
                             write(&path, &bytes, &permit).await?;
                             log::info!("Fetched library {}", &library.name);
@@ -262,12 +262,17 @@ pub async fn download_libraries(
                         );
 
                         if let Some(native) = classifiers.get(&parsed_key) {
-                            let permit = st.io_semaphore.acquire().await.unwrap();
+                            let permit = st.io_semaphore.acquire().await?;
                             let data = fetch(&native.url, Some(&native.sha1), &permit).await?;
                             let reader = std::io::Cursor::new(&data);
-                            let mut archive = zip::ZipArchive::new(reader).unwrap();
-                            archive.extract(&st.directories.version_natives_dir(version)).unwrap();
-                            log::info!("Fetched native {}", &library.name);
+                            if let Ok(mut archive) = zip::ZipArchive::new(reader) {
+                                match archive.extract(&st.directories.version_natives_dir(version)) {
+                                    Ok(_) => log::info!("Fetched native {}", &library.name),
+                                    Err(err) => log::error!("Failed extracting native {}. err: {}", &library.name, err)
+                                }
+                            } else {
+                                log::error!("Failed extracting native {}", &library.name)
+                            }
                         }
                     }
 

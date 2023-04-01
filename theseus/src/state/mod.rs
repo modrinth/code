@@ -110,8 +110,7 @@ impl State {
                 reader.sync(&state.directories.settings_file()).await?;
                 Ok::<_, crate::Error>(())
             })
-            .await
-            .unwrap()
+            .await?
         };
 
         let sync_profiles = async {
@@ -125,15 +124,16 @@ impl State {
                 profiles.sync(&mut batch).await?;
                 Ok::<_, crate::Error>(())
             })
-            .await
-            .unwrap()
+            .await?
         };
 
         tokio::try_join!(sync_settings, sync_profiles)?;
 
-        state
-            .database
-            .apply_batch(Arc::try_unwrap(batch).unwrap().into_inner())?;
+        state.database.apply_batch(
+            Arc::try_unwrap(batch)
+                .expect("Error saving state by acquiring Arc")
+                .into_inner(),
+        )?;
         state.database.flush_async().await?;
 
         Ok(())

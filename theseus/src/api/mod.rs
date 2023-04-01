@@ -1,5 +1,6 @@
 //! API for interacting with Theseus
 pub mod auth;
+pub mod modpacks;
 pub mod profile;
 pub mod profile_create;
 
@@ -14,6 +15,7 @@ pub mod prelude {
     pub use crate::{
         auth::{self, Credentials},
         data::*,
+        modpacks,
         profile::{self, Profile},
         profile_create, State,
     };

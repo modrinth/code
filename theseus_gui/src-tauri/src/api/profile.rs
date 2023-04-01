@@ -34,7 +34,6 @@ pub async fn profile_remove(path: &Path) -> Result<()> {
 #[tauri::command]
 pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
     let res = profile::get(path).await?;
-    State::sync().await?;
     Ok(res)
 }
 
@@ -43,7 +42,6 @@ pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
 #[tauri::command]
 pub async fn profile_is_managed(profile: &Path) -> Result<bool> {
     let res = profile::is_managed(profile).await?;
-    State::sync().await?;
     Ok(res)
 }
 
@@ -52,7 +50,6 @@ pub async fn profile_is_managed(profile: &Path) -> Result<bool> {
 #[tauri::command]
 pub async fn profile_is_loaded(profile: &Path) -> Result<bool> {
     let res = profile::is_loaded(profile).await?;
-    State::sync().await?;
     Ok(res)
 }
 
@@ -60,9 +57,8 @@ pub async fn profile_is_loaded(profile: &Path) -> Result<bool> {
 // invoke('profile_list')
 #[tauri::command]
 pub async fn profile_list(
-) -> Result<std::collections::HashMap<PathBuf, Option<Profile>>> {
+) -> Result<std::collections::HashMap<PathBuf, Profile>> {
     let res = profile::list().await?;
-    State::sync().await?;
     Ok(res)
 }
 
@@ -71,10 +67,7 @@ pub async fn profile_list(
 // for the actual Child in the state.
 // invoke('profile_run')
 #[tauri::command]
-pub async fn profile_run(
-    path: &Path,
-    credentials: theseus::auth::Credentials,
-) -> Result<u32> {
+pub async fn profile_run(path: &Path, credentials: Credentials) -> Result<u32> {
     let proc_lock = profile::run(path, &credentials).await?;
     let pid = proc_lock.read().await.id().ok_or_else(|| {
         theseus::Error::from(theseus::ErrorKind::LauncherError(format!(
@@ -89,7 +82,7 @@ pub async fn profile_run(
 #[tauri::command]
 pub async fn profile_run_wait(
     path: &Path,
-    credentials: theseus::auth::Credentials,
+    credentials: Credentials,
 ) -> Result<()> {
     let proc_lock = profile::run(path, &credentials).await?;
     let mut proc = proc_lock.write().await;
@@ -113,7 +106,6 @@ pub async fn profile_wait_for(pid: u32) -> Result<()> {
 // invoke('profile_kill', pid)
 #[tauri::command]
 pub async fn profile_kill(pid: u32) -> Result<()> {
-    let st = State::get().await?;
     let st = State::get().await?;
     if let Some(proc_lock) = st.children.blocking_read().get(&pid) {
         let mut proc = proc_lock.write().await;

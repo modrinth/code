@@ -247,7 +247,8 @@ impl ProfileInit {
         }
 
         if let Some((loader_version, loader)) = loader {
-            profile.with_loader(loader, Some(loader_version));
+            profile.metadata.loader = loader;
+            profile.metadata.loader_version = Some(loader_version);
         }
 
         profile::add(profile).await?;

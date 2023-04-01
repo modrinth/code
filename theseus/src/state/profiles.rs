@@ -15,7 +15,7 @@ use tokio::fs;
 const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";
 
-pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
+pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -30,7 +30,6 @@ pub struct Profile {
     #[serde(skip)]
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
-    pub projects: HashMap<PathBuf, Project>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub java: Option<JavaSettings>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,6 +38,7 @@ pub struct Profile {
     pub resolution: Option<WindowSize>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hooks: Option<Hooks>,
+    pub projects: HashMap<PathBuf, Project>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -64,6 +64,7 @@ pub enum ModLoader {
     Vanilla,
     Forge,
     Fabric,
+    Quilt,
 }
 
 impl std::fmt::Display for ModLoader {
@@ -72,6 +73,7 @@ impl std::fmt::Display for ModLoader {
             Self::Vanilla => "Vanilla",
             Self::Forge => "Forge",
             Self::Fabric => "Fabric",
+            Self::Quilt => "Quilt",
         })
     }
 }
@@ -116,16 +118,8 @@ impl Profile {
         })
     }
 
-    // TODO: deduplicate these builder methods
-    // They are flat like this in order to allow builder-style usage
     #[tracing::instrument]
-    pub fn with_name(&mut self, name: String) -> &mut Self {
-        self.metadata.name = name;
-        self
-    }
-
-    #[tracing::instrument]
-    pub async fn with_icon<'a>(
+    pub async fn set_icon<'a>(
         &'a mut self,
         icon: &'a Path,
     ) -> crate::Result<&'a mut Self> {
@@ -147,56 +141,6 @@ impl Profile {
             ))
             .into())
         }
-    }
-
-    #[tracing::instrument]
-    pub fn with_game_version(&mut self, version: String) -> &mut Self {
-        self.metadata.game_version = version;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_loader(
-        &mut self,
-        loader: ModLoader,
-        version: Option<LoaderVersion>,
-    ) -> &mut Self {
-        self.metadata.loader = loader;
-        self.metadata.loader_version = version;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_java_settings(
-        &mut self,
-        settings: Option<JavaSettings>,
-    ) -> &mut Self {
-        self.java = settings;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_memory(
-        &mut self,
-        settings: Option<MemorySettings>,
-    ) -> &mut Self {
-        self.memory = settings;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_resolution(
-        &mut self,
-        resolution: Option<WindowSize>,
-    ) -> &mut Self {
-        self.resolution = resolution;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_hooks(&mut self, hooks: Option<Hooks>) -> &mut Self {
-        self.hooks = hooks;
-        self
     }
 }
 
@@ -229,7 +173,10 @@ impl Profiles {
                 };
                 (path, prof)
             })
-            .collect::<HashMap<PathBuf, Option<Profile>>>()
+            .filter_map(|(key, opt_value)| async move {
+                opt_value.map(|value| (key, value))
+            })
+            .collect::<HashMap<PathBuf, Profile>>()
             .await;
 
         // project path, parent profile path
@@ -260,7 +207,7 @@ impl Profiles {
 
         for (key, value) in inferred {
             if let Some(profile_path) = files.get(&key) {
-                if let Some(Some(profile)) = profiles.get_mut(profile_path) {
+                if let Some(profile) = profiles.get_mut(profile_path) {
                     profile.projects.insert(key, value);
                 }
             }
@@ -278,7 +225,7 @@ impl Profiles {
                     crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
                 )?
                 .into(),
-            Some(profile),
+            profile,
         );
         Ok(self)
     }
@@ -292,9 +239,15 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip(self))]
-    pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
-        let path = PathBuf::from(&canonicalize(path)?.to_str().unwrap());
+    pub async fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
+        let path =
+            PathBuf::from(&canonicalize(path)?.to_string_lossy().to_string());
         self.0.remove(&path);
+
+        if path.exists() {
+            fs::remove_dir_all(path).await?;
+        }
+
         Ok(self)
     }
 
@@ -308,8 +261,8 @@ impl Profiles {
             .try_for_each_concurrent(None, |(path, profile)| async move {
                 let json = serde_json::to_vec_pretty(&profile)?;
 
-                let json_path =
-                    Path::new(path.to_str().unwrap()).join(PROFILE_JSON_PATH);
+                let json_path = Path::new(&path.to_string_lossy().to_string())
+                    .join(PROFILE_JSON_PATH);
 
                 fs::write(json_path, json).await?;
                 Ok::<_, crate::Error>(())

@@ -14,7 +14,7 @@ pub static REQWEST_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
     reqwest::Client::builder()
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
         .build()
-        .unwrap()
+        .expect("Reqwest Client Building Failed")
 });
 
 pub const MODRINTH_API_URL: &str = "https://api.modrinth.com/v2/";
