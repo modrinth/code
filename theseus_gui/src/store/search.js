@@ -179,18 +179,5 @@ export const useSearch = defineStore('searchStore', {
         return results
       }
     },
-    getIconByFilter: () => {
-      // Fallback method for getting icons that aren't in generated.js
-      return (filter) => {
-        switch (filter) {
-          case 'client':
-            return '<svg data-v-d754391f="" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17 9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z"></path></svg>'
-          case 'server':
-            return '<svg data-v-d754391f="" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 12H2M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11zM6 16h.01M10 16h.01"></path></svg>'
-          default:
-            return '<div />'
-        }
-      }
-    },
   },
 })

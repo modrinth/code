@@ -12,6 +12,8 @@ import {
   DropdownSelect,
   SearchFilter,
   Card,
+  ClientIcon,
+  ServerIcon,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
@@ -22,7 +24,6 @@ const searchStore = useSearch()
 searchStore.initFacets()
 // Pull getter methods
 const { getCategoriesByResultId } = storeToRefs(searchStore)
-const { getIconByFilter } = storeToRefs(searchStore)
 
 const currentPage = ref(1)
 const selectedVersions = ref([])
@@ -139,16 +140,24 @@ const handleReset = async () => {
       </div>
       <div class="environment">
         <h2>Environments</h2>
-        <div v-for="(_, env) in searchStore.environments" :key="env">
-          <SearchFilter
-            v-model="searchStore.environments[env]"
-            :icon="getIconByFilter(env)"
-            :display-name="env"
-            :facet-name="env"
-            class="filter-checkbox"
-            @click="handleCheckbox"
-          />
-        </div>
+        <SearchFilter
+          v-model="searchStore.environments.client"
+          display-name="Client"
+          :facet-name="client"
+          class="filter-checkbox"
+          @click="handleCheckbox"
+        >
+          <ClientIcon />
+        </SearchFilter>
+        <SearchFilter
+          v-model="searchStore.environments.server"
+          display-name="Server"
+          :facet-name="server"
+          class="filter-checkbox"
+          @click="handleCheckbox"
+        >
+          <ServerIcon />
+        </SearchFilter>
       </div>
       <div class="versions">
         <h2>Minecraft versions</h2>
