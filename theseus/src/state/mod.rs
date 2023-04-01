@@ -101,9 +101,6 @@ impl State {
                         );
                     };
 
-                    let debug_inner_tags = tags.get()?;
-                    dbg!("init tags: ", debug_inner_tags);
-
                     Ok(Arc::new(Self {
                         database,
                         directories,
