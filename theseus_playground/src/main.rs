@@ -5,7 +5,7 @@
 
 use dunce::canonicalize;
 use std::path::Path;
-use theseus::{prelude::*, profile_create::profile_create};
+use theseus::prelude::*;
 use tokio::process::Child;
 use tokio::sync::{oneshot, RwLockWriteGuard};
 
@@ -77,7 +77,7 @@ async fn main() -> theseus::Result<()> {
     // )
     // .await?;
     let profile_path =
-        modpacks::install_modpack_from_version_id("KcPpJLaW".to_string())
+        pack::install_pack_from_version_id("KcPpJLaW".to_string())
             .await
             .unwrap();
 

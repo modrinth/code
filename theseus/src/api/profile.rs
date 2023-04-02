@@ -14,37 +14,12 @@ use tokio::{
     sync::RwLock,
 };
 
-/// Add a profile to the in-memory state
-#[tracing::instrument]
-pub async fn add(profile: Profile) -> crate::Result<()> {
-    let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
-    profiles.insert(profile)?;
-    //State::sync().await?;
-
-    Ok(())
-}
-
-/// Add a path as a profile in-memory
-#[tracing::instrument]
-pub async fn add_path(path: &Path) -> crate::Result<()> {
-    let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
-    profiles.insert_from(path).await?;
-
-    //State::sync().await?;
-
-    Ok(())
-}
-
 /// Remove a profile
 #[tracing::instrument]
 pub async fn remove(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
     profiles.remove(path).await?;
-
-    //State::sync().await?;
 
     Ok(())
 }
@@ -56,22 +31,6 @@ pub async fn get(path: &Path) -> crate::Result<Option<Profile>> {
     let profiles = state.profiles.read().await;
 
     Ok(profiles.0.get(path).cloned())
-}
-
-/// Check if a profile is already managed by Theseus
-#[tracing::instrument]
-pub async fn is_managed(profile: &Path) -> crate::Result<bool> {
-    let state = State::get().await?;
-    let profiles = state.profiles.read().await;
-    Ok(profiles.0.contains_key(profile))
-}
-
-/// Check if a profile is loaded
-#[tracing::instrument]
-pub async fn is_loaded(profile: &Path) -> crate::Result<bool> {
-    let state = State::get().await?;
-    let profiles = state.profiles.read().await;
-    Ok(profiles.0.get(profile).is_some())
 }
 
 /// Edit a profile using a given asynchronous closure

@@ -1,13 +1,14 @@
 use crate::config::{MODRINTH_API_URL, REQWEST_CLIENT};
 use crate::data::ModLoader;
-use crate::state::{ModrinthVersion, SideType};
-use crate::util::fetch::{fetch, fetch_mirrors, write};
+use crate::state::{ModrinthProject, ModrinthVersion, SideType};
+use crate::util::fetch::{fetch, fetch_mirrors, write, write_cached_icon};
 use crate::State;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io::{Cursor, Read};
 use std::path::{Component, PathBuf};
+use tokio::fs;
 use zip::ZipArchive;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
@@ -66,7 +67,7 @@ enum PackDependency {
     Minecraft,
 }
 
-pub async fn install_modpack_from_version_id(
+pub async fn install_pack_from_version_id(
     version_id: String,
 ) -> crate::Result<PathBuf> {
     let version: ModrinthVersion = REQWEST_CLIENT
@@ -79,10 +80,11 @@ pub async fn install_modpack_from_version_id(
     let (url, hash) =
         if let Some(file) = version.files.iter().find(|x| x.primary) {
             Some((file.url.clone(), file.hashes.get("sha1")))
-        } else if let Some(file) = version.files.first() {
-            Some((file.url.clone(), file.hashes.get("sha1")))
         } else {
-            None
+            version
+                .files
+                .first()
+                .map(|file| (file.url.clone(), file.hashes.get("sha1")))
         }
         .ok_or_else(|| {
             crate::ErrorKind::InputError(
@@ -93,23 +95,60 @@ pub async fn install_modpack_from_version_id(
     let file = async {
         let state = &State::get().await?;
         let semaphore = state.io_semaphore.acquire().await?;
-        fetch(&*url, hash.map(|x| &**x), &semaphore).await
+        fetch(&url, hash.map(|x| &**x), &semaphore).await
     }
     .await?;
 
-    // TODO: fetch icon and pass it here
-    install_pack(file, None).await
+    let project: ModrinthProject = REQWEST_CLIENT
+        .get(format!(
+            "{}project/{}",
+            MODRINTH_API_URL, version.project_id
+        ))
+        .send()
+        .await?
+        .json()
+        .await?;
+
+    let icon = {
+        let state = State::get().await?;
+        let semaphore = state.io_semaphore.acquire().await?;
+
+        let icon_bytes = fetch(&project.icon_url, None, &semaphore).await?;
+
+        let filename = project.icon_url.rsplit('/').next();
+
+        if let Some(filename) = filename {
+            Some(
+                write_cached_icon(
+                    filename,
+                    &state.directories.caches_dir(),
+                    icon_bytes,
+                    &semaphore,
+                )
+                .await?,
+            )
+        } else {
+            None
+        }
+    };
+
+    install_pack(file, icon, Some(version.project_id)).await
 }
-//
-// pub fn install_modpack_from_file(path: PathBuf) -> crate::Result<()> {}
+
+pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
+    let file = fs::read(path).await?;
+
+    install_pack(bytes::Bytes::from(file), None, None).await
+}
 
 async fn install_pack(
     file: bytes::Bytes,
     icon: Option<PathBuf>,
+    project_id: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = &State::get().await?;
 
-    let reader = Cursor::new(file);
+    let reader = Cursor::new(&file);
     let mut zip = ZipArchive::new(reader).map_err(|_| {
         crate::Error::from(crate::ErrorKind::InputError(
             "Failed to read input modpack zip".to_string(),
@@ -118,10 +157,10 @@ async fn install_pack(
 
     let index_json = zip.by_name("modrinth.index.json");
     if let Ok(mut zip_file) = index_json {
-        let mut file = String::new();
-        zip_file.read_to_string(&mut file)?;
+        let mut manifest = String::new();
+        zip_file.read_to_string(&mut manifest)?;
 
-        let pack: PackFormat = serde_json::from_str(&file)?;
+        let pack: PackFormat = serde_json::from_str(&manifest)?;
 
         if &*pack.game != "minecraft" {
             return Err(crate::ErrorKind::InputError(
@@ -166,18 +205,28 @@ async fn install_pack(
             mod_loader.unwrap_or(ModLoader::Vanilla),
             loader_version.map(|x| format!("{game_version}-{x}")),
             icon,
+            project_id,
         )
         .await?;
-
-        println!("finished path profile");
 
         use futures::StreamExt;
         futures::stream::iter(pack.files.into_iter())
             .map(Ok::<PackFile, crate::Error>)
             .try_for_each_concurrent(None, |project| {
                 let profile = profile.clone();
+
                 async move {
-                    println!("started downloading {:?}", project.path);
+                    // TODO: Future update: prompt user for optional files in a modpack
+                    if let Some(env) = project.env {
+                        if env
+                            .get(&EnvType::Client)
+                            .map(|x| x == &SideType::Unsupported)
+                            .unwrap_or(false)
+                        {
+                            return Ok(());
+                        }
+                    }
+
                     let permit = state.io_semaphore.acquire().await?;
 
                     let file = fetch_mirrors(
@@ -197,7 +246,7 @@ async fn install_pack(
                         match path {
                             Component::CurDir | Component::Normal(_) => {
                                 let path = profile.join(project.path);
-                                write(&path, &*file, &permit).await?;
+                                write(&path, &file, &permit).await?;
                                 println!("finished downloading {:?}", path);
                             }
                             _ => {}
@@ -209,16 +258,45 @@ async fn install_pack(
             })
             .await?;
 
-        // for i in 0..zip.len() {
-        //     let mut file = zip.by_index(i).unwrap();
-        //
-        //     let file_path = file.mangled_name();
-        //     println!("{:?}", file_path);
-        //     if file_path.starts_with("overrides") && !file_path.ends_with("/") {
-        //         let mut content = Vec::new();
-        //         file.read_to_end(&mut content)?;
-        //     }
-        // }
+        let extract_overrides = |overrides: String| async {
+            let reader = Cursor::new(&file);
+            let mut zip = ZipArchive::new(reader).unwrap();
+            let profile = profile.clone();
+            async move {
+                for i in 0..zip.len() {
+                    let mut file = zip.by_index(i).unwrap();
+
+                    let file_path = file.mangled_name();
+                    if file_path.starts_with(overrides.clone())
+                        && !file_path.ends_with("/")
+                    {
+                        let mut content = Vec::new();
+                        file.read_to_end(&mut content)?;
+
+                        let mut new_path = PathBuf::new();
+                        let components = file_path.components().skip(1);
+
+                        for component in components {
+                            new_path.push(component);
+                        }
+
+                        if new_path.is_file() {
+                            let permit = state.io_semaphore.acquire().await?;
+                            write(&profile.join(new_path), &content, &permit)
+                                .await?;
+                        }
+                    }
+                }
+
+                Ok::<(), crate::Error>(())
+            }
+            .await
+        };
+
+        extract_overrides("overrides".to_string()).await?;
+        extract_overrides("client_overrides".to_string()).await?;
+
+        State::sync().await?;
 
         Ok(profile)
     } else {
@@ -226,6 +304,4 @@ async fn install_pack(
             "No pack manifest found in mrpack".to_string(),
         )))
     }
-
-    //todo: env checking for projects
 }

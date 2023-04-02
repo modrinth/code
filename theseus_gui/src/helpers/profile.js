@@ -15,16 +15,6 @@ export async function create() {
   return await invoke('profile_create')
 }
 
-// Add a profile to the in-memory state
-export async function add(profile) {
-  return await invoke('profile_add', profile)
-}
-
-// Add a path as a profile in-memory
-export async function add_path(path) {
-  return await invoke('profile_add_path', path)
-}
-
 // Remove a profile
 export async function remove(path) {
   return await invoke('profile_remove', path)
@@ -33,16 +23,6 @@ export async function remove(path) {
 // Get a profile by path
 export async function get(path) {
   return await invoke('profile_get', path)
-}
-
-// Check if a pathed profile is already managed by Theseus
-export async function is_managed(path) {
-  return await invoke('profile_is_managed', path)
-}
-
-// Check if a pathed profile is loaded
-export async function is_loaded(path) {
-  return await invoke('profile_is_loaded', path)
 }
 
 // Get a copy of the profile set

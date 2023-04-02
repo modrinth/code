@@ -10,6 +10,7 @@ use paris::*;
 use std::path::{Path, PathBuf};
 use tabled::Tabled;
 use theseus::prelude::*;
+use theseus::profile_create::profile_create;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
 
@@ -24,51 +25,10 @@ pub struct ProfileCommand {
 #[derive(argh::FromArgs, Debug)]
 #[argh(subcommand)]
 pub enum ProfileSubcommand {
-    Add(ProfileAdd),
     Init(ProfileInit),
     List(ProfileList),
     Remove(ProfileRemove),
     Run(ProfileRun),
-}
-
-#[derive(argh::FromArgs, Debug)]
-#[argh(subcommand, name = "add")]
-/// add a new profile to Theseus
-pub struct ProfileAdd {
-    #[argh(positional, default = "std::env::current_dir().unwrap()")]
-    /// the profile to add
-    profile: PathBuf,
-}
-
-impl ProfileAdd {
-    pub async fn run(
-        &self,
-        _args: &crate::Args,
-        _largs: &ProfileCommand,
-    ) -> Result<()> {
-        info!(
-            "Adding profile at path '{}' to Theseus",
-            self.profile.display()
-        );
-
-        let profile = canonicalize(&self.profile)?;
-        let json_path = profile.join("profile.json");
-
-        ensure!(
-            json_path.exists(),
-            "Profile json does not exist. Perhaps you wanted `profile init` or `profile fetch`?"
-        );
-        ensure!(
-            !profile::is_managed(&profile).await?,
-            "Profile already managed by Theseus. If the contents of the profile are invalid or missing, the profile can be regenerated using `profile init` or `profile fetch`"
-        );
-
-        profile::add_path(&profile).await?;
-        State::sync().await?;
-        success!("Profile added!");
-
-        Ok(())
-    }
 }
 
 #[derive(argh::FromArgs, Debug)]
@@ -230,29 +190,15 @@ impl ProfileInit {
             None
         };
 
-        let icon = match &self.icon {
-            Some(icon) => Some(icon.clone()),
-            None => Some(
-                prompt_async("Icon".to_owned(), Some(String::new())).await?,
-            )
-            .filter(|it| !it.trim().is_empty())
-            .map(PathBuf::from),
-        };
-
-        let mut profile =
-            Profile::new(name, game_version, self.path.clone()).await?;
-
-        if let Some(ref icon) = icon {
-            profile.with_icon(icon).await?;
-        }
-
-        if let Some((loader_version, loader)) = loader {
-            profile.metadata.loader = loader;
-            profile.metadata.loader_version = Some(loader_version);
-        }
-
-        profile::add(profile).await?;
-        State::sync().await?;
+        profile_create(
+            name,
+            game_version,
+            loader.clone().map(|x| x.1).unwrap_or(ModLoader::Vanilla),
+            loader.map(|x| x.0.id),
+            None,
+            None,
+        )
+        .await?;
 
         success!(
             "Successfully created instance, it is now available to use with Theseus!"
@@ -313,12 +259,7 @@ impl ProfileList {
         _largs: &ProfileCommand,
     ) -> Result<()> {
         let profiles = profile::list().await?;
-        let rows = profiles.iter().map(|(path, prof)| {
-            prof.as_ref().map_or_else(
-                || ProfileRow::from(path.as_path()),
-                ProfileRow::from,
-            )
-        });
+        let rows = profiles.iter().map(|(path, prof)| ProfileRow::from(prof));
 
         let table = table(rows).with(
             tabled::Modify::new(tabled::Column(1..=1))
@@ -349,13 +290,9 @@ impl ProfileRemove {
         info!("Removing profile {} from Theseus", self.profile.display());
 
         if confirm_async(String::from("Do you wish to continue"), true).await? {
-            if !profile::is_managed(&profile).await? {
-                warn!("Profile was not managed by Theseus!");
-            } else {
-                profile::remove(&profile).await?;
-                State::sync().await?;
-                success!("Profile removed!");
-            }
+            profile::remove(&profile).await?;
+            State::sync().await?;
+            success!("Profile removed!");
         } else {
             error!("Aborted!");
         }
@@ -386,11 +323,6 @@ impl ProfileRun {
         info!("Starting profile at path {}...", self.profile.display());
         let path = canonicalize(&self.profile)?;
 
-        ensure!(
-           profile::is_managed(&path).await?,
-           "Profile not managed by Theseus (if it exists, try using `profile add` first!)",
-        );
-
         let id = future::ready(self.user.ok_or(()))
             .or_else(|_| async move {
                 let state = State::get().await?;
@@ -416,7 +348,6 @@ impl ProfileRun {
 impl ProfileCommand {
     pub async fn run(&self, args: &crate::Args) -> Result<()> {
         dispatch!(&self.action, (args, self) => {
-            ProfileSubcommand::Add,
             ProfileSubcommand::Init,
             ProfileSubcommand::List,
             ProfileSubcommand::Remove,

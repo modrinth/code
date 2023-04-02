@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::{prelude::ModLoader, profile};
+use crate::prelude::ModLoader;
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -24,6 +24,7 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
         ModLoader::Vanilla,         // the modloader to use
         None, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
         None, // the icon for the profile
+        None,
     )
     .await
 }
@@ -37,6 +38,7 @@ pub async fn profile_create(
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
     icon: Option<PathBuf>,          // the icon for the profile
+    linked_project_id: Option<String>, // the linked project ID (mainly for modpacks)- used for updating
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
@@ -137,7 +139,11 @@ pub async fn profile_create(
         profile.metadata.loader_version = Some(loader_version);
     }
 
-    profile::add(profile).await?;
+    profile.metadata.linked_project_id = linked_project_id;
+
+    let mut profiles = state.profiles.write().await;
+    profiles.insert(profile)?;
+
     State::sync().await?;
 
     Ok(path)

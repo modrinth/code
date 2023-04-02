@@ -1,6 +1,8 @@
 //! Functions for fetching infromation from the Internet
 use crate::config::REQWEST_CLIENT;
-use std::path::Path;
+use bytes::Bytes;
+use std::ffi::OsStr;
+use std::path::{Path, PathBuf};
 use tokio::{
     fs::{self, File},
     io::AsyncWriteExt,
@@ -96,7 +98,27 @@ pub async fn write<'a>(
     Ok(())
 }
 
-async fn sha1_async(bytes: bytes::Bytes) -> crate::Result<String> {
+#[tracing::instrument(skip(bytes, permit))]
+pub async fn write_cached_icon<'a>(
+    icon_path: &str,
+    cache_dir: &Path,
+    bytes: Bytes,
+    permit: &SemaphorePermit<'a>,
+) -> crate::Result<PathBuf> {
+    let extension = Path::new(&icon_path).extension().and_then(OsStr::to_str);
+    let hash = sha1_async(bytes.clone()).await?;
+    let path = cache_dir.join("icons").join(if let Some(ext) = extension {
+        format!("{hash}.{ext}")
+    } else {
+        hash
+    });
+
+    write(&path, &bytes, permit).await?;
+
+    Ok(path)
+}
+
+async fn sha1_async(bytes: Bytes) -> crate::Result<String> {
     let hash = tokio::task::spawn_blocking(move || {
         sha1::Sha1::from(bytes).hexdigest()
     })

@@ -11,6 +11,7 @@ use std::{
     path::{Path, PathBuf},
 };
 use tokio::fs;
+use tokio::sync::Semaphore;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";
@@ -52,6 +53,7 @@ pub struct ProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
+    pub linked_project_id: Option<String>,
 }
 
 // TODO: Quilt?
@@ -109,6 +111,7 @@ impl Profile {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                linked_project_id: None,
             },
             projects: HashMap::new(),
             java: None,
@@ -149,6 +152,7 @@ impl Profiles {
     pub async fn init(
         db: &sled::Db,
         dirs: &DirectoryInfo,
+        io_sempahore: &Semaphore,
     ) -> crate::Result<Self> {
         let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
             Ok(Default::default()),
@@ -202,6 +206,7 @@ impl Profiles {
         let inferred = super::projects::infer_data_from_files(
             files.keys().cloned().collect(),
             dirs.caches_dir(),
+            io_sempahore,
         )
         .await?;
 

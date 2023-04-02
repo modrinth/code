@@ -2,30 +2,11 @@ use crate::api::Result;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 
-// Add a profile to the in-memory state
-// invoke('profile_add',profile)
-#[tauri::command]
-pub async fn profile_add(profile: Profile) -> Result<()> {
-    let res = profile::add(profile).await?;
-    State::sync().await?;
-    Ok(res)
-}
-
-// Add a path as a profile in-memory
-// invoke('profile_add_path',path)
-#[tauri::command]
-pub async fn profile_add_path(path: &Path) -> Result<()> {
-    let res = profile::add_path(path).await?;
-    State::sync().await?;
-    Ok(res)
-}
-
 // Remove a profile
 // invoke('profile_add_path',path)
 #[tauri::command]
 pub async fn profile_remove(path: &Path) -> Result<()> {
     let res = profile::remove(path).await?;
-    State::sync().await?;
     Ok(res)
 }
 
@@ -34,22 +15,6 @@ pub async fn profile_remove(path: &Path) -> Result<()> {
 #[tauri::command]
 pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
     let res = profile::get(path).await?;
-    Ok(res)
-}
-
-// Check if a profile is already managed by Theseus
-// invoke('profile_is_managed',profile)
-#[tauri::command]
-pub async fn profile_is_managed(profile: &Path) -> Result<bool> {
-    let res = profile::is_managed(profile).await?;
-    Ok(res)
-}
-
-// Check if a profile is loaded
-// invoke('profile_is_loaded',profile)
-#[tauri::command]
-pub async fn profile_is_loaded(profile: &Path) -> Result<bool> {
-    let res = profile::is_loaded(profile).await?;
     Ok(res)
 }
 

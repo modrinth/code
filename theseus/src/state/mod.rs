@@ -67,16 +67,16 @@ impl State {
                     let settings =
                         Settings::init(&directories.settings_file()).await?;
 
-                    // Launcher data
-                    let (metadata, profiles) = tokio::try_join! {
-                        Metadata::init(&database),
-                        Profiles::init(&database, &directories),
-                    }?;
-                    let users = Users::init(&database)?;
-
                     // Loose initializations
                     let io_semaphore =
                         Semaphore::new(settings.max_concurrent_downloads);
+
+                    // Launcher data
+                    let (metadata, profiles) = tokio::try_join! {
+                        Metadata::init(&database),
+                        Profiles::init(&database, &directories, &io_semaphore),
+                    }?;
+                    let users = Users::init(&database)?;
 
                     let children = Children::new();
 

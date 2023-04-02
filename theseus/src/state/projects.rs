@@ -1,16 +1,17 @@
 //! Project management + inference
 
 use crate::config::{MODRINTH_API_URL, REQWEST_CLIENT};
+use crate::util::fetch::write_cached_icon;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
 use std::collections::HashMap;
-use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
+use tokio::sync::Semaphore;
 use zip::ZipArchive;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -131,9 +132,40 @@ pub enum ProjectMetadata {
     Unknown,
 }
 
+async fn read_icon_from_file(
+    icon_path: Option<String>,
+    cache_dir: &Path,
+    path: &PathBuf,
+    io_semaphore: &Semaphore,
+) -> crate::Result<Option<PathBuf>> {
+    if let Some(icon_path) = icon_path {
+        // we have to repoen the zip twice here :(
+        let zip_file = File::open(path)?;
+        if let Ok(mut zip) = ZipArchive::new(zip_file) {
+            if let Ok(mut file) = zip.by_name(&icon_path) {
+                let mut bytes = Vec::new();
+                if file.read_to_end(&mut bytes).is_ok() {
+                    let bytes = bytes::Bytes::from(bytes);
+
+                    let permit = io_semaphore.acquire().await?;
+                    let path = write_cached_icon(
+                        &icon_path, cache_dir, bytes, &permit,
+                    )
+                    .await?;
+
+                    return Ok(Some(path));
+                }
+            };
+        }
+    }
+
+    Ok(None)
+}
+
 pub async fn infer_data_from_files(
     paths: Vec<PathBuf>,
     cache_dir: PathBuf,
+    io_semaphore: &Semaphore,
 ) -> crate::Result<HashMap<PathBuf, Project>> {
     let mut file_path_hashes = HashMap::new();
 
@@ -223,45 +255,6 @@ pub async fn infer_data_from_files(
             continue;
         };
 
-        let read_icon_from_file =
-            |icon_path: Option<String>| -> crate::Result<Option<PathBuf>> {
-                if let Some(icon_path) = icon_path {
-                    // we have to repoen the zip twice here :(
-                    let zip_file = File::open(path.clone())?;
-                    if let Ok(mut zip) = ZipArchive::new(zip_file) {
-                        if let Ok(mut file) = zip.by_name(&icon_path) {
-                            let mut bytes = Vec::new();
-                            if file.read_to_end(&mut bytes).is_ok() {
-                                let extension = Path::new(&icon_path)
-                                    .extension()
-                                    .and_then(OsStr::to_str);
-                                let hash = sha1::Sha1::from(&bytes).hexdigest();
-                                let path = cache_dir.join("icons").join(
-                                    if let Some(ext) = extension {
-                                        format!("{hash}.{ext}")
-                                    } else {
-                                        hash
-                                    },
-                                );
-
-                                if !path.exists() {
-                                    if let Some(parent) = path.parent() {
-                                        std::fs::create_dir_all(parent)?;
-                                    }
-
-                                    let mut file = File::create(path.clone())?;
-                                    file.write_all(&bytes)?;
-                                }
-
-                                return Ok(Some(path));
-                            }
-                        };
-                    }
-                }
-
-                Ok(None)
-            };
-
         if let Ok(mut file) = zip.by_name("META-INF/mods.toml") {
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
@@ -285,7 +278,13 @@ pub async fn infer_data_from_files(
                     serde_json::from_str::<ForgeModInfo>(&file_str)
                 {
                     if let Some(pack) = pack.mods.first() {
-                        let icon = read_icon_from_file(pack.logo_file.clone())?;
+                        let icon = read_icon_from_file(
+                            pack.logo_file.clone(),
+                            &cache_dir,
+                            &path,
+                            io_semaphore,
+                        )
+                        .await?;
 
                         return_projects.insert(
                             path.clone(),
@@ -330,7 +329,13 @@ pub async fn infer_data_from_files(
             let mut file_str = String::new();
             if file.read_to_string(&mut file_str).is_ok() {
                 if let Ok(pack) = serde_json::from_str::<ForgeMod>(&file_str) {
-                    let icon = read_icon_from_file(pack.logo_file)?;
+                    let icon = read_icon_from_file(
+                        pack.logo_file,
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
 
                     return_projects.insert(
                         path.clone(),
@@ -376,7 +381,13 @@ pub async fn infer_data_from_files(
             let mut file_str = String::new();
             if file.read_to_string(&mut file_str).is_ok() {
                 if let Ok(pack) = serde_json::from_str::<FabricMod>(&file_str) {
-                    let icon = read_icon_from_file(pack.icon)?;
+                    let icon = read_icon_from_file(
+                        pack.icon,
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
 
                     return_projects.insert(
                         path.clone(),
@@ -424,7 +435,11 @@ pub async fn infer_data_from_files(
                 if let Ok(pack) = serde_json::from_str::<QuiltMod>(&file_str) {
                     let icon = read_icon_from_file(
                         pack.metadata.as_ref().and_then(|x| x.icon.clone()),
-                    )?;
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
 
                     return_projects.insert(
                         path.clone(),
@@ -471,9 +486,13 @@ pub async fn infer_data_from_files(
             let mut file_str = String::new();
             if file.read_to_string(&mut file_str).is_ok() {
                 if let Ok(pack) = serde_json::from_str::<Pack>(&file_str) {
-                    let icon =
-                        read_icon_from_file(Some("pack.png".to_string()))?;
-
+                    let icon = read_icon_from_file(
+                        Some("pack.png".to_string()),
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
                     return_projects.insert(
                         path.clone(),
                         Project {
