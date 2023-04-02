@@ -25,7 +25,6 @@ export const useCosmetics = () =>
           datapack: 'list',
           user: 'list',
         },
-        hideBetaPrompt: false,
       }
     }
 

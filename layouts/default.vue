@@ -242,12 +242,6 @@
       </section>
     </header>
     <main>
-      <div v-if="$orElse(!$cosmetics.hideBetaPrompt, true)" class="beta-prompt universal-card">
-        <span class="text">The <span class="colored">NEW</span> Modrinth Technologies™ website BETA is now live!!</span>
-        <a href="https://blog.modrinth.com/p/new-site-beta" class="iconified-button" target="_blank">Learn more</a>
-        <a href="https://beta.modrinth.com/" class="iconified-button primary">Try it out</a>
-        <button class="square-button" aria-label="Close banner" @click="$cosmetics.hideBetaPrompt = true;saveCosmetics()"><CrossIcon/></button>
-      </div>
       <ModalCreation v-if="auth.user" ref="modal_creation" />
       <slot id="main" />
     </main>
@@ -1080,56 +1074,6 @@ export default defineNuxtComponent({
         }
       }
     }
-  }
-}
-.beta-prompt {
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  background-color: #002B4B;
-  border-radius: 0;
-  border: 1px solid #14679E;
-  font-family: serif;
-  color: white;
-  font-size: 1.5rem;
-  font-weight: bold;
-  gap: 1rem;
-  flex-wrap: wrap;
-  max-width: 20rem;
-  z-index: 100;
-  margin: 1rem;
-
-  .colored {
-    color: #BDA9FF;
-  }
-
-  .iconified-button, .square-button {
-    background-color: #00111e;
-    border-radius: 0;
-    color: white;
-    flex-shrink: 0;
-
-    &.primary {
-      background-color: #7EFFAD;
-      color: black;
-    }
-  }
-
-  .square-button {
-    background-color: transparent;
-
-    &:hover, &:active {
-      background-color: rgba(0, 17, 30, 0.3);
-    }
-  }
-}
-
-@media screen and (max-width: 1024px) {
-  .beta-prompt {
-    display: none;
   }
 }
 </style>
