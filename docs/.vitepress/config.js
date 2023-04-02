@@ -39,6 +39,7 @@ export default {
           { text: 'Toggle', link: '/components/toggle' },
           { text: 'Promotion', link: '/components/promotion' },
           { text: 'Markdown', link: '/components/markdown' },
+          { text: 'Copy Code', link: '/components/copy-code' },
         ],
       },
     ],
