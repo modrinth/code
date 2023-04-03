@@ -413,9 +413,10 @@ export default defineNuxtComponent({
       this.runAnalytics()
     },
   },
-  mounted() {
+  async mounted() {
     this.runAnalytics()
     if (this.$route.query.code) {
+      await useAuth(this.$route.query.code)
       window.history.replaceState(history.state, null, this.$route.path)
     }
   },
