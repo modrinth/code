@@ -25,14 +25,34 @@ searchStore.initFacets()
 // Pull getter methods
 const { getCategoriesByResultId } = storeToRefs(searchStore)
 
-const currentPage = ref(1)
 const selectedVersions = ref([])
 const showSnapshots = ref(false)
-const searchText = ref('')
-const sort = ref('Relevance')
-const limit = ref(20)
+const isClearDisabled = ref(true)
 
 const availableGameVersions = generated.gameVersions
+
+/**
+ * Determines if the Clear Filters button should be disabled
+ */
+const checkFilterState = () => {
+  let areFiltersSet = false
+
+  Object.keys(searchStore.categories).forEach((cat) => {
+    if (searchStore.categories[cat].enabled === true) areFiltersSet = true
+  })
+
+  Object.keys(searchStore.loaders).forEach((loader) => {
+    console.log(loader)
+    if (searchStore.loaders[loader].enabled === true) areFiltersSet = true
+  })
+
+  if (searchStore.environments.server === true || searchStore.environments.client === true)
+    areFiltersSet = true
+  if (searchStore.openSource === true) areFiltersSet = true
+  if (selectedVersions.value.length > 0) areFiltersSet = true
+
+  isClearDisabled.value = !areFiltersSet
+}
 
 /**
  * Makes the API request to labrinth
@@ -48,8 +68,8 @@ await getSearchResults()
 /**
  * For when user enters input in search bar
  */
-const handleQueryInput = async () => {
-  searchStore.setSearchInput(searchText.value)
+const refreshSearch = async () => {
+  checkFilterState()
   await getSearchResults()
 }
 
@@ -58,8 +78,8 @@ const handleQueryInput = async () => {
  * @param {Object} e Event param to see selected option
  */
 const handleSort = async (e) => {
-  sort.value = e.option
-  searchStore.setFilter(sort.value)
+  searchStore.filter = e.option
+  checkFilterState()
   await getSearchResults()
 }
 
@@ -68,8 +88,8 @@ const handleSort = async (e) => {
  * @param {Object} e Event param to see selected option
  */
 const handleLimit = async (e) => {
-  limit.value = e.option
-  searchStore.setLimit(limit.value)
+  searchStore.limit = e.option
+  checkFilterState()
   await getSearchResults()
 }
 
@@ -78,15 +98,10 @@ const handleLimit = async (e) => {
  * @param {Number} page The new page to display
  */
 const switchPage = async (page) => {
-  currentPage.value = page
-  searchStore.setCurrentPage(page)
-  await getSearchResults()
-}
-
-/**
- * For when user toggles a checkbox in the sidepane
- */
-const handleCheckbox = async () => {
+  checkFilterState()
+  searchStore.currentPage = parseInt(page)
+  if (page === 1) searchStore.offset = 0
+  else searchStore.offset = searchStore.currentPage * 10 - 10
   await getSearchResults()
 }
 
@@ -94,6 +109,7 @@ const handleCheckbox = async () => {
  * For when a user interacts with version filters
  */
 const handleVersionSelect = async () => {
+  checkFilterState()
   searchStore.setVersions(selectedVersions.value.map((ver) => ver))
   await getSearchResults()
 }
@@ -104,6 +120,7 @@ const handleVersionSelect = async () => {
 const handleReset = async () => {
   searchStore.resetFilters()
   selectedVersions.value = []
+  isClearDisabled.value = true
   await getSearchResults()
 }
 </script>
@@ -111,7 +128,7 @@ const handleReset = async () => {
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Button @click="handleReset"><ClearIcon />Clear Filters</Button>
+      <Button :disabled="isClearDisabled" @click="handleReset"><ClearIcon />Clear Filters</Button>
       <div class="categories">
         <h2>Categories</h2>
         <div v-for="(val, category) in searchStore.categories" :key="category">
@@ -121,7 +138,7 @@ const handleReset = async () => {
             :display-name="val.name"
             :facet-name="category"
             class="filter-checkbox"
-            @click="handleCheckbox"
+            @click="refreshSearch"
           />
         </div>
       </div>
@@ -134,7 +151,7 @@ const handleReset = async () => {
             :display-name="val.name"
             :facet-name="loader"
             class="filter-checkbox"
-            @click="handleCheckbox"
+            @click="refreshSearch"
           />
         </div>
       </div>
@@ -145,7 +162,7 @@ const handleReset = async () => {
           display-name="Client"
           :facet-name="client"
           class="filter-checkbox"
-          @click="handleCheckbox"
+          @click="refreshSearch"
         >
           <ClientIcon />
         </SearchFilter>
@@ -154,7 +171,7 @@ const handleReset = async () => {
           display-name="Server"
           :facet-name="server"
           class="filter-checkbox"
-          @click="handleCheckbox"
+          @click="refreshSearch"
         >
           <ServerIcon />
         </SearchFilter>
@@ -184,7 +201,7 @@ const handleReset = async () => {
       </div>
       <div class="open-source">
         <h2>Open source</h2>
-        <Checkbox v-model="searchStore.openSource" class="filter-checkbox" @click="handleCheckbox">
+        <Checkbox v-model="searchStore.openSource" class="filter-checkbox" @click="refreshSearch">
           Open source
         </Checkbox>
       </div>
@@ -195,10 +212,10 @@ const handleReset = async () => {
           <div class="iconified-input">
             <SearchIcon />
             <input
-              v-model="searchText"
+              v-model="searchStore.searchInput"
               type="text"
               placeholder="Search.."
-              @input="handleQueryInput"
+              @input="refreshSearch"
             />
           </div>
           <span>Sort by</span>
@@ -211,22 +228,26 @@ const handleReset = async () => {
               'Recently published',
               'Recently updated',
             ]"
-            :default-value="sort"
-            :model-value="sort"
+            :default-value="searchStore.filter"
+            :model-value="searchStore.filter"
             @change="handleSort"
           />
           <span>Show per page</span>
           <DropdownSelect
             name="Limit dropdown"
-            :options="[5, 10, 15, 20, 50, 100]"
-            :default-value="limit"
-            :model-value="limit"
+            :options="['5', '10', '15', '20', '50', '100']"
+            :default-value="searchStore.limit.toString()"
+            :model-value="searchStore.limit.toString()"
             class="limit-dropdown"
             @change="handleLimit"
           />
         </div>
       </Card>
-      <Pagination :page="currentPage" :count="searchStore.pageCount" @switch-page="switchPage" />
+      <Pagination
+        :page="searchStore.currentPage"
+        :count="searchStore.pageCount"
+        @switch-page="switchPage"
+      />
       <section class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
@@ -238,7 +259,7 @@ const handleReset = async () => {
           :description="result?.description"
           :icon-url="result?.icon_url"
           :downloads="result?.downloads?.toString()"
-          :follows="result?.follows"
+          :follows="result?.follows?.toString()"
           :created-at="result?.date_created"
           :updated-at="result?.date_modified"
           :categories="getCategoriesByResultId(result?.project_id)"
@@ -263,15 +284,17 @@ const handleReset = async () => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-top: 2rem;
+  margin-top: 1rem;
+  padding: 0.8rem !important;
 
   .search-panel {
     display: flex;
     align-items: center;
     justify-content: space-evenly;
     width: 100%;
-    gap: 1.3rem;
+    gap: 1rem;
     margin: 1rem auto;
+    white-space: nowrap;
 
     .limit-dropdown {
       width: 5rem;
@@ -339,7 +362,7 @@ const handleReset = async () => {
   }
 
   .search {
-    margin: 0 2rem 0 18rem;
+    margin: 0 1rem 0 17rem;
 
     .instance-project-item {
       width: 100%;

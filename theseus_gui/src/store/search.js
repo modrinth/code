@@ -45,6 +45,9 @@ export const useSearch = defineStore('searchStore', {
           enabled: false,
         }
       })
+
+      console.log(this.categories)
+      console.log(this.loaders)
     },
     getQueryString() {
       const activeCategories = Object.keys(this.categories).filter(
@@ -112,18 +115,6 @@ export const useSearch = defineStore('searchStore', {
       this.offset = response.offset
       this.pageCount = Math.ceil(this.totalHits / this.limit)
     },
-    setSearchInput(newInput) {
-      this.searchInput = newInput
-    },
-    setCurrentPage(newPage) {
-      this.currentPage = newPage
-
-      if (newPage === 1) this.offset = 0
-      else this.offset = this.currentPage * 10 - 10
-    },
-    setFilter(newFilter) {
-      this.filter = newFilter
-    },
     toggleCategory(cat) {
       this.categories[cat] = !this.categories[cat]
     },
@@ -135,9 +126,6 @@ export const useSearch = defineStore('searchStore', {
     },
     setVersions(versions) {
       this.activeVersions = versions
-    },
-    setLimit(newLimit) {
-      this.limit = newLimit
     },
     resetFilters() {
       Object.keys(this.categories).forEach((cat) => {
