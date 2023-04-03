@@ -139,33 +139,35 @@ async fn read_icon_from_file(
 ) -> crate::Result<Option<PathBuf>> {
     if let Some(icon_path) = icon_path {
         // we have to repoen the zip twice here :(
-        let zip_file_reader = ZipFileReader::new(path).await?;
-        // Get index of icon file and open it
-        let zip_index_option = zip_file_reader
-            .file()
-            .entries()
-            .iter()
-            .position(|f| f.entry().filename() == &icon_path);
-        if let Some(index) = zip_index_option {
-            let entry =
-                zip_file_reader.file().entries().get(index).unwrap().entry();
-            let mut bytes = Vec::new();
-            if zip_file_reader
-                .entry(zip_index_option.unwrap())
-                .await?
-                .read_to_end_checked(&mut bytes, entry)
-                .await
-                .is_ok()
-            {
-                let bytes = bytes::Bytes::from(bytes);
-                let permit = io_semaphore.acquire().await?;
-                let path =
-                    write_cached_icon(&icon_path, cache_dir, bytes, &permit)
-                        .await?;
+        let zip_file_reader = ZipFileReader::new(path).await;
+        if let Ok(zip_file_reader) = zip_file_reader {
+            // Get index of icon file and open it
+            let zip_index_option = zip_file_reader
+                .file()
+                .entries()
+                .iter()
+                .position(|f| f.entry().filename() == &icon_path);
+            if let Some(index) = zip_index_option {
+                let entry =
+                    zip_file_reader.file().entries().get(index).unwrap().entry();
+                let mut bytes = Vec::new();
+                if zip_file_reader
+                    .entry(zip_index_option.unwrap())
+                    .await?
+                    .read_to_end_checked(&mut bytes, entry)
+                    .await
+                    .is_ok()
+                {
+                    let bytes = bytes::Bytes::from(bytes);
+                    let permit = io_semaphore.acquire().await?;
+                    let path =
+                        write_cached_icon(&icon_path, cache_dir, bytes, &permit)
+                            .await?;
 
-                return Ok(Some(path));
-            }
-        };
+                    return Ok(Some(path));
+                }
+            };
+        }
     }
 
     Ok(None)
