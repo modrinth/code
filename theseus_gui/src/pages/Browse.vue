@@ -18,9 +18,8 @@ import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import generated from '@/generated'
 
-// Pull search store and initialize modpack cats and loaders
+// Pull search store
 const searchStore = useSearch()
-searchStore.initFacets()
 
 const selectedVersions = ref([])
 const showSnapshots = ref(false)
@@ -29,19 +28,41 @@ const isClearDisabled = ref(true)
 const availableGameVersions = generated.gameVersions
 
 /**
+ * Adds or removes facets from state
+ * @param {String} facet The facet to commit to state
+ */
+const toggleFacet = async (facet) => {
+  const index = searchStore.facets.indexOf(facet)
+
+  if (index !== -1) searchStore.facets.splice(index, 1)
+  else searchStore.facets.push(facet)
+
+  checkFilterState()
+  await getSearchResults()
+}
+
+/**
+ * Adds or removes orFacets from state
+ * @param {String} orFacet The orFacet to commit to state
+ */
+const toggleOrFacet = async (orFacet) => {
+  const index = searchStore.orFacets.indexOf(orFacet)
+
+  if (index !== -1) searchStore.orFacets.splice(index, 1)
+  else searchStore.orFacets.push(orFacet)
+
+  checkFilterState()
+  await getSearchResults()
+}
+
+/**
  * Determines if the Clear Filters button should be disabled
  */
 const checkFilterState = () => {
   let areFiltersSet = false
 
-  Object.keys(searchStore.categories).forEach((cat) => {
-    if (searchStore.categories[cat].enabled === true) areFiltersSet = true
-  })
-
-  Object.keys(searchStore.loaders).forEach((loader) => {
-    console.log(loader)
-    if (searchStore.loaders[loader].enabled === true) areFiltersSet = true
-  })
+  if (searchStore.facets.length > 0) areFiltersSet = true
+  if (searchStore.orFacets.length > 0) areFiltersSet = true
 
   if (searchStore.environments.server === true || searchStore.environments.client === true)
     areFiltersSet = true
@@ -107,7 +128,7 @@ const switchPage = async (page) => {
  */
 const handleVersionSelect = async () => {
   checkFilterState()
-  searchStore.setVersions(selectedVersions.value.map((ver) => ver))
+  searchStore.activeVersions = selectedVersions.value.map((ver) => ver)
   await getSearchResults()
 }
 
@@ -125,30 +146,40 @@ const handleReset = async () => {
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Button :disabled="isClearDisabled" @click="handleReset"><ClearIcon />Clear Filters</Button>
+      <Button role="button" :disabled="isClearDisabled" @click="handleReset"
+        ><ClearIcon />Clear Filters</Button
+      >
       <div class="categories">
         <h2>Categories</h2>
-        <div v-for="(val, category) in searchStore.categories" :key="category">
+        <div
+          v-for="category in generated.categories.filter((cat) => cat.project_type === 'modpack')"
+          :key="category.name"
+        >
           <SearchFilter
-            v-model="searchStore.categories[category].enabled"
-            :icon="val.icon"
-            :display-name="val.name"
-            :facet-name="category"
+            :active-filters="searchStore.facets"
+            :icon="category.icon"
+            :display-name="category.name"
+            :facet-name="`categories:${encodeURIComponent(category.name)}`"
             class="filter-checkbox"
-            @click="refreshSearch"
+            @toggle="toggleFacet"
           />
         </div>
       </div>
       <div class="loaders">
         <h2>Loaders</h2>
-        <div v-for="(val, loader) in searchStore.loaders" :key="loader">
+        <div
+          v-for="loader in generated.loaders.filter((l) =>
+            l.supported_project_types?.includes('modpack')
+          )"
+          :key="loader"
+        >
           <SearchFilter
-            v-model="searchStore.loaders[loader].enabled"
-            :icon="val.icon"
-            :display-name="val.name"
-            :facet-name="loader"
+            :active-filters="searchStore.orFacets"
+            :icon="loader.icon"
+            :display-name="loader.name"
+            :facet-name="`categories:${encodeURIComponent(loader.name)}`"
             class="filter-checkbox"
-            @click="refreshSearch"
+            @toggle="toggleOrFacet"
           />
         </div>
       </div>
@@ -161,7 +192,7 @@ const handleReset = async () => {
           class="filter-checkbox"
           @click="refreshSearch"
         >
-          <ClientIcon />
+          <ClientIcon aria-hidden="true" />
         </SearchFilter>
         <SearchFilter
           v-model="searchStore.environments.server"
@@ -170,7 +201,7 @@ const handleReset = async () => {
           class="filter-checkbox"
           @click="refreshSearch"
         >
-          <ServerIcon />
+          <ServerIcon aria-hidden="true" />
         </SearchFilter>
       </div>
       <div class="versions">
@@ -207,7 +238,7 @@ const handleReset = async () => {
       <Card class="search-panel-container">
         <div class="search-panel">
           <div class="iconified-input">
-            <SearchIcon />
+            <SearchIcon aria-hidden="true" />
             <input
               v-model="searchStore.searchInput"
               type="text"
@@ -260,9 +291,14 @@ const handleReset = async () => {
           :created-at="result?.date_created"
           :updated-at="result?.date_modified"
           :categories="[
-            ...generated.categories.filter((cat) => result?.display_categories.includes(cat.name)),
-            ...generated.loaders.filter((loader) =>
-              result?.display_categories.includes(loader.name)
+            ...generated.categories.filter(
+              (cat) =>
+                result?.display_categories.includes(cat.name) && cat.project_type === 'modpack'
+            ),
+            ...generated.loaders.filter(
+              (loader) =>
+                result?.display_categories.includes(loader.name) &&
+                loader.supported_project_types?.includes('modpack')
             ),
           ]"
           :project-type-display="result?.project_type"
@@ -365,6 +401,7 @@ const handleReset = async () => {
 
   .search {
     margin: 0 1rem 0 17rem;
+    width: 100%;
 
     .instance-project-item {
       width: 100%;

@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import generated from '@/generated'
 
 export const useSearch = defineStore('searchStore', {
   state: () => ({
@@ -10,8 +9,8 @@ export const useSearch = defineStore('searchStore', {
     pageCount: 1,
     offset: 0,
     filter: 'Relevance',
-    categories: {},
-    loaders: {},
+    facets: [],
+    orFacets: [],
     environments: {
       client: false,
       server: false,
@@ -21,69 +20,49 @@ export const useSearch = defineStore('searchStore', {
     limit: 20,
   }),
   actions: {
-    initFacets() {
-      var categories = generated.categories.filter((cat) => cat.project_type === 'modpack')
-
-      var loaders = generated.loaders.filter((loader) => {
-        // Some loaders don't have any supported proj types set
-        if (!loader.supported_project_types) return
-        if (loader.supported_project_types.includes('modpack')) return loader
-      })
-
-      categories.forEach((cat) => {
-        this.categories[cat.name] = {
-          icon: cat.icon,
-          name: cat.name,
-          enabled: false,
-        }
-      })
-
-      loaders.forEach((loader) => {
-        this.loaders[loader.name] = {
-          icon: loader.icon,
-          name: loader.name,
-          enabled: false,
-        }
-      })
-    },
     getQueryString() {
-      const activeCategories = Object.keys(this.categories).filter(
-        (cat) => this.categories[cat].enabled === true
-      )
-      const activeLoaders = Object.keys(this.loaders).filter(
-        (loader) => this.loaders[loader].enabled === true
-      )
-      const activeEnvs = Object.keys(this.environments).filter(
-        (env) => this.environments[env] === true
-      )
+      let andFacets = ['project_type:modpack']
 
-      let formattedFacets = ['project_type:modpack']
-      if (
-        activeCategories.length > 0 ||
-        activeLoaders.length > 0 ||
-        activeEnvs.length > 0 ||
-        this.activeVersions.length > 0 ||
-        this.openSource === true
-      ) {
-        activeCategories.forEach((cat) => formattedFacets.push(`categories:${cat}`))
-        activeCategories.forEach((cat) => formattedFacets.push(`categories:${cat}`))
-        activeLoaders.forEach((loader) => formattedFacets.push(`categories:${loader}`))
-        this.activeVersions.forEach((ver) => formattedFacets.push(`versions:${ver}`))
+      // Iterate through possible andFacets
+      this.facets.forEach((facet) => {
+        andFacets.push(facet)
+      })
+      // Add open source to andFacets if enabled
+      if (this.openSource) andFacets.push('open_source:true')
 
-        // If both are on or off, adding filters is pointless
-        if (this.environments.client === true && this.environments.server === false)
-          formattedFacets.push('client_side:required')
-        if (this.environments.client === false && this.environments.server === true)
-          formattedFacets.push('server_side:required')
+      // Create andFacet string
+      let formattedAndFacets = ''
+      andFacets.forEach((f) => (formattedAndFacets += `["${f}"],`))
+      formattedAndFacets = formattedAndFacets.slice(0, formattedAndFacets.length - 1)
+      formattedAndFacets += ''
 
-        if (this.openSource === true) formattedFacets.push('open_source:true')
+      // If orFacets are present, start building formatted orFacet filter
+      let formattedOrFacets = ''
+      if (this.orFacets.length > 0 || this.activeVersions.length > 0) {
+        formattedOrFacets += '['
+        // Aggregate normal orFacets
+        this.orFacets.forEach((orF) => (formattedOrFacets += `"${orF}",`))
+
+        // Add version list to orFacets
+        if (this.activeVersions.length > 0)
+          this.activeVersions.forEach((ver) => (formattedOrFacets += `"versions:${ver}",`))
+
+        // Add environments to orFacets if enabled
+        if (this.environments.client)
+          formattedOrFacets += '"client_side:optional","client_side:required,"'
+        if (this.environments.server)
+          formattedOrFacets += '"server_side:optional","server_side:required,"'
+
+        formattedOrFacets = formattedOrFacets.slice(0, formattedOrFacets.length - 1)
+        formattedOrFacets += ']'
       }
 
-      let facets = '&facets=['
-      formattedFacets.forEach((facet) => (facets += `["${facet}"],`))
-      facets = facets.slice(0, facets.length - 1)
-      facets += ']'
+      // Aggregate facet query string
+      const facets = `&facets=[${formattedAndFacets}${
+        formattedOrFacets.length > 0 ? `,${formattedOrFacets}` : ''
+      }]`
 
+      // Configure results sorting
       let indexSort
       switch (this.filter) {
         case 'Download count':
@@ -125,16 +104,13 @@ export const useSearch = defineStore('searchStore', {
       this.activeVersions = versions
     },
     resetFilters() {
-      Object.keys(this.categories).forEach((cat) => {
-        this.categories[cat].enabled = false
-      })
-      Object.keys(this.loaders).forEach((loader) => {
-        this.loaders[loader].enabled = false
-      })
+      this.facets = []
+      this.orFacets = []
       Object.keys(this.environments).forEach((env) => {
         this.environments[env] = false
       })
       this.activeVersions = []
+      this.openSource = false
     },
   },
 })
