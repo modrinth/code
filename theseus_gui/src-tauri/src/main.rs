@@ -45,6 +45,8 @@ fn main() {
             api::tags::tags_get_license_tags,
             api::tags::tags_get_report_type_tags,
             api::tags::tags_get_tag_bundle,
+            api::settings::settings_get,
+            api::settings::settings_set,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

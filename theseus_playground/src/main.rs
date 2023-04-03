@@ -85,8 +85,10 @@ async fn main() -> theseus::Result<()> {
     State::sync().await?;
 
     // Attempt to get the default user, if it exists, and refresh their credentials
-    let settings = st.settings.read().await;
-    let default_user_uuid = settings.default_user;
+    let default_user_uuid = {
+        let settings = st.settings.read().await;
+        settings.default_user
+    };
     let credentials = if let Some(uuid) = default_user_uuid {
         println!("Attempting to refresh existing authentication.");
         auth::refresh(uuid, false).await

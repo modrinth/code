@@ -204,12 +204,15 @@ pub async fn run(
     let memory = profile.memory.unwrap_or(settings.memory);
     let resolution = profile.resolution.unwrap_or(settings.game_resolution);
 
+    let env_args = &settings.custom_env_args;
+
     let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
         java_install,
         java_args,
+        env_args,
         wrapper,
         &memory,
         &resolution,
