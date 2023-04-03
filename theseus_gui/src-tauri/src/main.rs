@@ -29,8 +29,6 @@ fn main() {
             api::profile::profile_list,
             api::profile::profile_run,
             api::profile::profile_run_wait,
-            api::profile::profile_kill,
-            api::profile::profile_wait_for,
             api::auth::auth_authenticate_begin_flow,
             api::auth::auth_authenticate_await_completion,
             api::auth::auth_refresh,

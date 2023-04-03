@@ -66,13 +66,3 @@ export async function run(path, credentials) {
 export async function run_wait(path, credentials) {
   return await invoke('profile_run_wait', { path, credentials })
 }
-
-// Tries to kill a running minecraft process (if PID is still stored)
-export async function kill(child_pid) {
-  return await invoke('profile_kill', { child_pid })
-}
-
-// Wait for a running minecraft process (a Child)
-export async function wait_for(child_pid) {
-  return await invoke('profile_wait_for', { child_pid })
-}

@@ -232,26 +232,3 @@ pub async fn run(
     Ok(child_arc)
 }
 
-#[tracing::instrument]
-pub async fn kill(running: &mut Child) -> crate::Result<()> {
-    running.kill().await?;
-    wait_for(running).await
-}
-
-#[tracing::instrument]
-pub async fn wait_for(running: &mut Child) -> crate::Result<()> {
-    let result = running.wait().await.map_err(|err| {
-        crate::ErrorKind::LauncherError(format!(
-            "Error running minecraft: {err}"
-        ))
-    })?;
-
-    match result.success() {
-        false => Err(crate::ErrorKind::LauncherError(format!(
-            "Minecraft exited with non-zero code {}",
-            result.code().unwrap_or(-1)
-        ))
-        .as_error()),
-        true => Ok(()),
-    }
-}

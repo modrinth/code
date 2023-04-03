@@ -121,7 +121,7 @@ async fn main() -> theseus::Result<()> {
     // Spawn a thread and hold the lock to the process until it ends
     println!("Started Minecraft. Waiting for process to end...");
     let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;
-    profile::wait_for(&mut proc).await?;
+    process::wait_for(&mut proc).await?;
 
     Ok(())
 }
