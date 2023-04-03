@@ -38,6 +38,8 @@ fn main() {
             api::auth::auth_has_user,
             api::auth::auth_users,
             api::auth::auth_get_user,
+            api::settings::settings_get,
+            api::settings::settings_set,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
