@@ -30,19 +30,19 @@ export async function authenticate_await_completion() {
 // user is UUID
 // update_name is bool
 export async function refresh(user, update_name) {
-  return await invoke('auth_refresh', user, update_name)
+  return await invoke('auth_refresh', { user, update_name })
 }
 
 /// Remove a user account from the database
 // user is UUID
 export async function remove_user(user) {
-  return await invoke('auth_remove_user', user)
+  return await invoke('auth_remove_user', { user })
 }
 
 // Add a path as a profile in-memory
 // user is UUID
 export async function has_user(user) {
-  return await invoke('auth_has_user', user)
+  return await invoke('auth_has_user', { user })
 }
 
 // Remove a profile
@@ -54,5 +54,5 @@ export async function users() {
 // Prefer to use refresh() instead of this because it will refresh the credentials
 // user is UUID
 export async function get_user(user) {
-  return await invoke('auth_get_user', user)
+  return await invoke('auth_get_user', { user })
 }
