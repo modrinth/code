@@ -45,9 +45,6 @@ export const useSearch = defineStore('searchStore', {
           enabled: false,
         }
       })
-
-      console.log(this.categories)
-      console.log(this.loaders)
     },
     getQueryString() {
       const activeCategories = Object.keys(this.categories).filter(
