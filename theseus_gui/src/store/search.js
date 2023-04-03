@@ -140,32 +140,4 @@ export const useSearch = defineStore('searchStore', {
       this.activeVersions = []
     },
   },
-  getters: {
-    getCategoriesByResultId: (state) => {
-      // Pulls all icons possible from generated.js for passing as props to ProjectCard
-      return (id) => {
-        let results = []
-        const result = state.searchResults?.find((i) => i.project_id === id)
-
-        result.categories?.forEach((cat) => {
-          // First look for an icon in the categories array
-          let iconObj = generated.categories.find((c) => {
-            if (c.name === cat) return c
-          })
-
-          // If an icon wasn't found in categories, search the loaders array
-          if (!iconObj) {
-            iconObj = generated.loaders.find((l) => {
-              if (l.name === cat) return l
-            })
-          }
-
-          // Push the category for display if an icon was found
-          results.push({ name: cat, icon: iconObj?.icon })
-        })
-
-        return results
-      }
-    },
-  },
 })

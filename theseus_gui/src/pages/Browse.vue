@@ -1,6 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-import { storeToRefs } from 'pinia'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
@@ -22,8 +21,6 @@ import generated from '@/generated'
 // Pull search store and initialize modpack cats and loaders
 const searchStore = useSearch()
 searchStore.initFacets()
-// Pull getter methods
-const { getCategoriesByResultId } = storeToRefs(searchStore)
 
 const selectedVersions = ref([])
 const showSnapshots = ref(false)
@@ -262,7 +259,12 @@ const handleReset = async () => {
           :follows="result?.follows?.toString()"
           :created-at="result?.date_created"
           :updated-at="result?.date_modified"
-          :categories="getCategoriesByResultId(result?.project_id)"
+          :categories="[
+            ...generated.categories.filter((cat) => result?.display_categories.includes(cat.name)),
+            ...generated.loaders.filter((loader) =>
+              result?.display_categories.includes(loader.name)
+            ),
+          ]"
           :project-type-display="result?.project_type"
           project-type-url="instance"
           :server-side="result?.server_side"
