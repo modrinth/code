@@ -10,7 +10,8 @@ export async function addDefaultInstance() {
   return await invoke('profile_create_empty')
 }
 
-// Add empty default instance
+/// Add empty default instance
+/// Returns a path to the profile created
 export async function create() {
   return await invoke('profile_create')
 }
@@ -31,21 +32,25 @@ export async function remove(path) {
 }
 
 // Get a profile by path
+// Returns a Profile
 export async function get(path) {
   return await invoke('profile_get', { path })
 }
 
 // Check if a pathed profile is already managed by Theseus
+// Returns bool
 export async function is_managed(path) {
   return await invoke('profile_is_managed', { path })
 }
 
 // Check if a pathed profile is loaded
+// Returns bool
 export async function is_loaded(path) {
   return await invoke('profile_is_loaded', { path })
 }
 
 // Get a copy of the profile set
+// Returns hashmap of path -> Profile
 export async function list() {
   return await invoke('profile_list')
 }
