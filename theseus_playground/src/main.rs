@@ -40,10 +40,12 @@ async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
     // Initialize state
-    let st = State::get().await?;
+    {
+        let st = State::get().await?;
+        st.settings.write().await.max_concurrent_downloads = 100;
+    }
 
     // Set max concurrent downloads to 10
-    st.settings.write().await.max_concurrent_downloads = 100;
 
     // Example variables for simple project case
     let name = "Example".to_string();
@@ -60,9 +62,11 @@ async fn main() -> theseus::Result<()> {
 
     // Clear profiles
     println!("Clearing profiles.");
-    let h = profile::list().await?;
-    for (path, _) in h.into_iter() {
-        profile::remove(&path).await?;
+    {
+        let h = profile::list().await?;
+        for (path, _) in h.into_iter() {
+            profile::remove(&path).await?;
+        }
     }
 
     println!("Creating/adding profile.");

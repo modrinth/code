@@ -74,6 +74,9 @@ pub enum ErrorKind {
     #[error("Could not create profile: {0}")]
     ProfileCreationError(#[from] profile_create::ProfileCreationError),
 
+    #[error("Zip error: {0}")]
+    ZipError(#[from] async_zip::error::ZipError),
+
     #[error("Error: {0}")]
     OtherError(String),
 }

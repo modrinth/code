@@ -18,6 +18,7 @@ sled = { version = "0.34.7", features = ["compression"] }
 url = "2.2"
 uuid = { version = "1.1", features = ["serde", "v4"] }
 zip = "0.5"
+async_zip = { version = "0.0.13", features = ["full"] }
 
 chrono = { version = "0.4.19", features = ["serde"] }
 daedalus = { version = "0.1.16", features = ["bincode"] }

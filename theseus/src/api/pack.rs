@@ -3,13 +3,13 @@ use crate::data::ModLoader;
 use crate::state::{ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{fetch, fetch_mirrors, write, write_cached_icon};
 use crate::State;
+use async_zip::tokio::read::seek::ZipFileReader;
 use futures::TryStreamExt;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use std::io::{Cursor, Read};
+use std::io::Cursor;
 use std::path::{Component, PathBuf};
 use tokio::fs;
-use zip::ZipArchive;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
@@ -149,16 +149,31 @@ async fn install_pack(
     let state = &State::get().await?;
 
     let reader = Cursor::new(&file);
-    let mut zip = ZipArchive::new(reader).map_err(|_| {
+
+    // Create zip reader around file
+    let mut zip_reader = ZipFileReader::new(reader).await.map_err(|_| {
         crate::Error::from(crate::ErrorKind::InputError(
             "Failed to read input modpack zip".to_string(),
         ))
     })?;
 
-    let index_json = zip.by_name("modrinth.index.json");
-    if let Ok(mut zip_file) = index_json {
+    // Extract index of modrinth.index.json
+    let zip_index_option = zip_reader
+        .file()
+        .entries()
+        .iter()
+        .position(|f| f.entry().filename() == "modrinth.index.json");
+    if let Some(zip_index) = zip_index_option {
         let mut manifest = String::new();
-        zip_file.read_to_string(&mut manifest)?;
+        let entry = zip_reader
+            .file()
+            .entries()
+            .get(zip_index)
+            .unwrap()
+            .entry()
+            .clone();
+        let mut reader = zip_reader.entry(zip_index).await?;
+        reader.read_to_string_checked(&mut manifest, &entry).await?;
 
         let pack: PackFormat = serde_json::from_str(&manifest)?;
 
@@ -260,18 +275,35 @@ async fn install_pack(
 
         let extract_overrides = |overrides: String| async {
             let reader = Cursor::new(&file);
-            let mut zip = ZipArchive::new(reader).unwrap();
+
+            let mut overrides_zip =
+                ZipFileReader::new(reader).await.map_err(|_| {
+                    crate::Error::from(crate::ErrorKind::InputError(
+                        "Failed extract overrides Zip".to_string(),
+                    ))
+                })?;
+
             let profile = profile.clone();
             async move {
-                for i in 0..zip.len() {
-                    let mut file = zip.by_index(i).unwrap();
+                for index in 0..overrides_zip.file().entries().len() {
+                    let mut file = overrides_zip
+                        .file()
+                        .entries()
+                        .get(index)
+                        .unwrap()
+                        .entry()
+                        .clone();
 
-                    let file_path = file.mangled_name();
-                    if file_path.starts_with(overrides.clone())
+                    let file_path = PathBuf::from(file.filename());
+                    if file_path.starts_with(&overrides)
                         && !file_path.ends_with("/")
                     {
+                        // Reads the file into the 'content' variable
                         let mut content = Vec::new();
-                        file.read_to_end(&mut content)?;
+                        let mut reader = overrides_zip.entry(index).await?;
+                        reader
+                            .read_to_end_checked(&mut content, &mut file)
+                            .await?;
 
                         let mut new_path = PathBuf::new();
                         let components = file_path.components().skip(1);
