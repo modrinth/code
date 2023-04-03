@@ -44,7 +44,6 @@ pub async fn profile_create(
 
     let uuid = Uuid::new_v4();
     let path = state.directories.profiles_dir().join(uuid.to_string());
-
     if path.exists() {
         if !path.is_dir() {
             return Err(ProfileCreationError::NotFolder.into());
@@ -66,6 +65,7 @@ pub async fn profile_create(
     } else {
         fs::create_dir_all(&path).await?;
     }
+
     println!(
         "Creating profile at path {}",
         &canonicalize(&path)?.display()
@@ -140,9 +140,10 @@ pub async fn profile_create(
     }
 
     profile.metadata.linked_project_id = linked_project_id;
-
-    let mut profiles = state.profiles.write().await;
-    profiles.insert(profile)?;
+    {
+        let mut profiles = state.profiles.write().await;
+        profiles.insert(profile)?;
+    }
 
     State::sync().await?;
 

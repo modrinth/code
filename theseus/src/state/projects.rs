@@ -7,7 +7,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
 use std::collections::HashMap;
-use std::fs::File;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
 use tokio::sync::Semaphore;
@@ -142,17 +141,27 @@ async fn read_icon_from_file(
         // we have to repoen the zip twice here :(
         let zip_file_reader = ZipFileReader::new(path).await?;
         // Get index of icon file and open it
-        let zip_index_option = zip_file_reader.file().entries().iter().position(|f| f.entry().filename() == &icon_path);
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == &icon_path);
         if let Some(index) = zip_index_option {
-            let entry = zip_file_reader.file().entries().get(index).unwrap().entry();
+            let entry =
+                zip_file_reader.file().entries().get(index).unwrap().entry();
             let mut bytes = Vec::new();
-            if zip_file_reader.entry(zip_index_option.unwrap()).await?.read_to_end_checked(&mut bytes, entry).await.is_ok() {
+            if zip_file_reader
+                .entry(zip_index_option.unwrap())
+                .await?
+                .read_to_end_checked(&mut bytes, entry)
+                .await
+                .is_ok()
+            {
                 let bytes = bytes::Bytes::from(bytes);
                 let permit = io_semaphore.acquire().await?;
-                let path = write_cached_icon(
-                    &icon_path, cache_dir, bytes, &permit,
-                )
-                .await?;
+                let path =
+                    write_cached_icon(&icon_path, cache_dir, bytes, &permit)
+                        .await?;
 
                 return Ok(Some(path));
             }
@@ -239,9 +248,9 @@ pub async fn infer_data_from_files(
     }
 
     for (hash, path) in further_analyze_projects {
-        let file = File::open(path.clone())?;
-
-        let zip_file_reader = if let Ok(zip_file_reader) = ZipFileReader::new(path.clone()).await {
+        let zip_file_reader = if let Ok(zip_file_reader) =
+            ZipFileReader::new(path.clone()).await
+        {
             zip_file_reader
         } else {
             return_projects.insert(
@@ -254,7 +263,11 @@ pub async fn infer_data_from_files(
             );
             continue;
         };
-        let zip_index_option = zip_file_reader.file().entries().iter().position(|f| f.entry().filename() == "META-INF/mods.toml");
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "META-INF/mods.toml");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -274,7 +287,13 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if zip_file_reader.entry(index).await?.read_to_string_checked(&mut file_str, file.entry()).await.is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) =
                     serde_json::from_str::<ForgeModInfo>(&file_str)
                 {
@@ -315,7 +334,11 @@ pub async fn infer_data_from_files(
             }
         }
 
-        let zip_index_option = zip_file_reader.file().entries().iter().position(|f| f.entry().filename() == "mcmod.info");
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "mcmod.info");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -330,7 +353,13 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if zip_file_reader.entry(index).await?.read_to_string_checked(&mut file_str, file.entry()).await.is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<ForgeMod>(&file_str) {
                     let icon = read_icon_from_file(
                         pack.logo_file,
@@ -363,7 +392,11 @@ pub async fn infer_data_from_files(
             }
         }
 
-        let zip_index_option = zip_file_reader.file().entries().iter().position(|f| f.entry().filename() == "fabric.mod.json");
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "fabric.mod.json");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -384,7 +417,13 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if zip_file_reader.entry(index).await?.read_to_string_checked(&mut file_str, file.entry()).await.is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<FabricMod>(&file_str) {
                     let icon = read_icon_from_file(
                         pack.icon,
@@ -420,7 +459,11 @@ pub async fn infer_data_from_files(
             }
         }
 
-        let zip_index_option = zip_file_reader.file().entries().iter().position(|f| f.entry().filename() == "quilt.mod.json");
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "quilt.mod.json");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -438,7 +481,13 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if zip_file_reader.entry(index).await?.read_to_string_checked(&mut file_str, file.entry()).await.is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<QuiltMod>(&file_str) {
                     let icon = read_icon_from_file(
                         pack.metadata.as_ref().and_then(|x| x.icon.clone()),
@@ -484,7 +533,11 @@ pub async fn infer_data_from_files(
             }
         }
 
-        let zip_index_option = zip_file_reader.file().entries().iter().position(|f| f.entry().filename() == "pack.mcdata");
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "pack.mcdata");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -493,7 +546,13 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if zip_file_reader.entry(index).await?.read_to_string_checked(&mut file_str, file.entry()).await.is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<Pack>(&file_str) {
                     let icon = read_icon_from_file(
                         Some("pack.png".to_string()),

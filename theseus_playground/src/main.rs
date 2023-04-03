@@ -66,7 +66,7 @@ async fn main() -> theseus::Result<()> {
         let h = profile::list().await?;
         for (path, _) in h.into_iter() {
             profile::remove(&path).await?;
-        }    
+        }
     }
 
     println!("Creating/adding profile.");
