@@ -117,7 +117,6 @@ async fn main() -> theseus::Result<()> {
             profile::run(&canonicalize(&profile_path)?, credentials).await
         }
     }?;
-
     // Spawn a thread and hold the lock to the process until it ends
     println!("Started Minecraft. Waiting for process to end...");
     let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;

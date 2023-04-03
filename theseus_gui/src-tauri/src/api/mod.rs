@@ -3,9 +3,9 @@ use serde::{Serialize, Serializer};
 use thiserror::Error;
 
 pub mod auth;
-
 pub mod profile;
 pub mod profile_create;
+pub mod tags;
 pub mod settings;
 
 pub type Result<T> = std::result::Result<T, TheseusGuiError>;
