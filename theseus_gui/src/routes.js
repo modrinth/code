@@ -56,6 +56,12 @@ export default new createRouter({
           component: Project.Versions,
         },
         {
+          path: 'version/:version',
+          name: 'Version',
+          component: Project.Version,
+          props: true,
+        },
+        {
           path: 'gallery',
           name: 'Gallery',
           component: Project.Gallery,
@@ -69,6 +75,7 @@ export default new createRouter({
       props: true,
       children: [
         {
+          path: '',
           name: 'Mods',
           component: Instance.Mods,
         },

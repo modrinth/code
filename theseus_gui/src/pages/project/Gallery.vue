@@ -1,7 +1,9 @@
 <template>
-  <div class="gallery">
-    <Card v-for="image in gallery" :key="image.url" class="gallery-item">
-      <img :src="image.url"  :alt="image.title" class="gallery-image"/>
+  <div v-if="gallery[0 ]" class="gallery">
+    <Card v-for="(image, index) in gallery" :key="image.url" class="gallery-item">
+      <a @click="expandImage(image, index)">
+        <img :src="image.url" :alt="image.title" class="gallery-image"/>
+      </a>
       <div class="gallery-body">
         <h3>{{ image.title }} </h3>
         {{ image.description }}
@@ -12,137 +14,149 @@
       </span>
     </Card>
   </div>
+  <div
+    v-if="expandedGalleryItem"
+    class="expanded-image-modal"
+    @click="expandedGalleryItem = null"
+  >
+    <div class="content">
+      <img
+        class="image"
+        :class="{ 'zoomed-in': zoomedIn }"
+        :src="
+            expandedGalleryItem.url
+              ? expandedGalleryItem.url
+              : 'https://cdn.modrinth.com/placeholder-banner.svg'
+          "
+        :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
+        @click.stop=""
+      />
+
+      <div class="floating" @click.stop="">
+        <div class="text">
+          <h2 v-if="expandedGalleryItem.title">
+            {{ expandedGalleryItem.title }}
+          </h2>
+          <p v-if="expandedGalleryItem.description">
+            {{ expandedGalleryItem.description }}
+          </p>
+        </div>
+        <div class="controls">
+          <div class="buttons">
+            <Button class="close" @click="expandedGalleryItem = null" icon-only>
+              <XIcon aria-hidden="true" />
+            </Button>
+            <a
+              class="open btn icon-only"
+              target="_blank"
+              :href="
+                  expandedGalleryItem.url
+                    ? expandedGalleryItem.url
+                    : 'https://cdn.modrinth.com/placeholder-banner.svg'
+                "
+            >
+              <ExternalIcon aria-hidden="true" />
+            </a>
+            <Button @click="zoomedIn = !zoomedIn" icon-only>
+              <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
+              <ContractIcon v-else aria-hidden="true" />
+            </Button>
+            <Button
+              v-if="gallery.length > 1"
+              class="previous"
+              @click="previousImage()"
+              icon-only
+            >
+              <LeftArrowIcon aria-hidden="true" />
+            </Button>
+            <Button
+              v-if="gallery.length > 1"
+              class="next"
+              @click="nextImage()"
+              icon-only
+            >
+              <RightArrowIcon aria-hidden="true" />
+            </Button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { Card, CalendarIcon } from 'omorphia'
-const gallery = [
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/b057daaf50b2a44649022aad767d260725117cd4.png",
-    "featured": false,
-    "title": "Badlands Creeper",
-    "description": "What a nice hat :)",
-    "created": "2023-03-03T15:38:11.363404Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/d756f75abf41c80a56d64299f5147d373b4d430d.png",
-    "featured": false,
-    "title": "Bamboo Creeper",
-    "description": "They prefer to hide. But if you plan on making one angry, be sure to bring a panda!",
-    "created": "2023-03-03T15:38:38.995796Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/a945a63109b11d0d3769879a6a9828878c57098b.png",
-    "featured": false,
-    "title": "Beach Creeper",
-    "description": "They like to carry their favourite shells on their heads\n\n",
-    "created": "2023-03-03T15:39:30.971764Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/137ff566df99319ec7b5289532dac45a4fd98ca2.png",
-    "featured": false,
-    "title": "Cave Creeper",
-    "description": "Just as good at hiding as the bamboo creeper, but much more dangerous :0",
-    "created": "2023-03-03T15:40:01.159656Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/61db8a9ec8ffd039ef5af31ae04953c107b6a1a0.png",
-    "featured": false,
-    "title": "Dark Oak Creeper",
-    "description": "Spooky ;-;",
-    "created": "2023-03-03T15:40:39.509341Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/2c62df063f68b0e4db19d212abe5199f65275833.png",
-    "featured": false,
-    "title": "Desert Creeper",
-    "description": "More cactus hats!",
-    "created": "2023-03-03T15:41:46.434844Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/5a52270c74001bbbfc98b2c504ce100569d7451c.png",
-    "featured": false,
-    "title": "Dripstone Creeper",
-    "description": "Dripped out",
-    "created": "2023-03-03T15:42:20.720273Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/4471e9377d224b6cc8e29cfa41db9cb84bacadfd.png",
-    "featured": false,
-    "title": "Hills Creeper",
-    "description": "Admiring the view",
-    "created": "2023-03-03T15:42:54.085186Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/7e33e32ade4ad14d941227e6d3d75d5727859c02.png",
-    "featured": false,
-    "title": "Jungle creeper",
-    "description": "Needs a haircut",
-    "created": "2023-03-03T15:43:27.998064Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/effc972c752bb61c883bef31e366d17d34342102.png",
-    "featured": false,
-    "title": "Mushroom Creeper",
-    "description": "They are just here to be your friends :)",
-    "created": "2023-03-03T15:43:51.228804Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/6c60c62a950f2a8b20dcf7fc2f71bb022445715d.png",
-    "featured": false,
-    "title": "Ocean Creeper",
-    "description": "Just don't touch them and you should be fine",
-    "created": "2023-03-03T15:47:12.058613Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/8aa82db07532a30e4744cca4981f96e70dbcb901.png",
-    "featured": false,
-    "title": "Savannah creeper",
-    "description": "Walking totem poles o-o",
-    "created": "2023-03-03T15:44:43.161356Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/bc2078d7ea2ae5309d619ae5a67148db79548176.png",
-    "featured": false,
-    "title": "Snowy Creeper",
-    "description": "As long as you don't hurt them, they are pretty chill :) They even help you fight strays!",
-    "created": "2023-03-03T15:45:13.367963Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/086fb5d867a9383cf044529f2fce0eec7817735d.png",
-    "featured": false,
-    "title": "Spruce Creeper",
-    "description": "Just little lads :)",
-    "created": "2023-03-03T15:45:53.063057Z",
-    "ordering": 0
-  },
-  {
-    "url": "https://cdn.modrinth.com/data/MI1LWe93/images/ebd3e997f5159108adc53515f320441692c836f8.png",
-    "featured": false,
-    "title": "Swamp Creeper",
-    "description": "Where did they get the skull ;0;",
-    "created": "2023-03-03T15:46:20.690629Z",
-    "ordering": 0
-  }
-]
+import { Card, ExpandIcon, RightArrowIcon, LeftArrowIcon, ExternalIcon, ContractIcon, XIcon, CalendarIcon, Button } from 'omorphia'
 </script>
 
 <script>
 export default {
-  name: "Gallery"
+  async mounted() {
+    const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}`);
+    this.gallery = (await response.json()).gallery;
+  },
+  data() {
+    return {
+      gallery: [],
+      expandedGalleryItem: null,
+      expandedGalleryIndex: 0,
+      zoomedIn: false,
+
+      deleteIndex: -1,
+
+      editIndex: -1,
+      editTitle: '',
+      editDescription: '',
+      editFeatured: false,
+      editOrder: null,
+      editFile: null,
+      previewImage: null,
+      shouldPreventActions: false,
+    }
+  },
+  computed: {
+    acceptFileTypes() {
+      return 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
+    },
+  },
+  methods: {
+    nextImage() {
+      this.expandedGalleryIndex++
+      if (this.expandedGalleryIndex >= this.gallery.length) {
+        this.expandedGalleryIndex = 0
+      }
+      this.expandedGalleryItem = this.gallery[this.expandedGalleryIndex]
+    },
+    previousImage() {
+      this.expandedGalleryIndex--
+      if (this.expandedGalleryIndex < 0) {
+        this.expandedGalleryIndex = this.gallery.length - 1
+      }
+      this.expandedGalleryItem = this.gallery[this.expandedGalleryIndex]
+    },
+    expandImage(item, index) {
+      this.expandedGalleryItem = item
+      this.expandedGalleryIndex = index
+      this.zoomedIn = false
+    },
+    resetEdit() {
+      this.editIndex = -1
+      this.editTitle = ''
+      this.editDescription = ''
+      this.editFeatured = false
+      this.editOrder = null
+      this.editFile = null
+      this.previewImage = null
+    },
+    showPreviewImage() {
+      const reader = new FileReader()
+      if (this.editFile instanceof Blob) {
+        reader.readAsDataURL(this.editFile)
+        reader.onload = (event) => {
+          this.previewImage = event.target.result
+        }
+      }
+    },
+  },
 }
 </script>
 
@@ -166,7 +180,6 @@ export default {
     aspect-ratio: 2/1;
     object-fit: cover;
     object-position: center;
-    cursor: pointer;
   }
 
   .gallery-body {
@@ -178,5 +191,137 @@ export default {
     padding: 0 1rem 1rem;
     vertical-align: center;
   }
+}
+
+.expanded-image-modal {
+  position: fixed;
+  z-index: 20;
+  overflow: auto;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #000000;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .content {
+    position: relative;
+    width: calc(100vw - 2 * var(--gap-lg));
+    height: calc(100vh - 2 * var(--gap-lg));
+
+    .circle-button {
+      padding: 0.5rem;
+      line-height: 1;
+      display: flex;
+      max-width: 2rem;
+      color: var(--color-button-text);
+      background-color: var(--color-button-bg);
+      border-radius: var(--size-rounded-max);
+      margin: 0;
+      box-shadow: inset 0px -1px 1px rgb(17 24 39 / 10%);
+
+      &:not(:last-child) {
+        margin-right: 0.5rem;
+      }
+
+      &:hover {
+        background-color: var(--color-button-bg-hover) !important;
+
+        svg {
+          color: var(--color-button-text-hover) !important;
+        }
+      }
+
+      &:active {
+        background-color: var(--color-button-bg-active) !important;
+
+        svg {
+          color: var(--color-button-text-active) !important;
+        }
+      }
+
+      svg {
+        height: 1rem;
+        width: 1rem;
+      }
+    }
+
+    .image {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      max-width: calc(100vw - 2 * var(--gap-lg));
+      max-height: calc(100vh - 2 * var(--gap-lg));
+      border-radius: var(--radius-lg);
+
+      &.zoomed-in {
+        object-fit: cover;
+        width: auto;
+        height: calc(100vh - 2 * var(--gap-lg));
+        max-width: calc(100vw - 2 * var(--gap-lg));
+      }
+    }
+    .floating {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: var(--gap-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--gap-md);
+      transition: opacity 0.25s ease-in-out;
+      opacity: 1;
+      padding: 2rem 2rem 0 2rem;
+
+      &:not(&:hover) {
+        opacity: 0.4;
+        .text {
+          transform: translateY(2.5rem) scale(0.8);
+          opacity: 0;
+        }
+        .controls {
+          transform: translateY(0.25rem) scale(0.9);
+        }
+      }
+
+      .text {
+        display: flex;
+        flex-direction: column;
+        max-width: 40rem;
+        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+        text-shadow: 1px 1px 10px #000000d4;
+        margin-bottom: 0.25rem;
+        gap: 0.5rem;
+
+        h2 {
+          color: var(--dark-color-base);
+          font-size: 1.25rem;
+          text-align: center;
+          margin: 0;
+        }
+
+        p {
+          color: var(--dark-color-base);
+          margin: 0;
+        }
+      }
+      .controls {
+        background-color: var(--color-raised-bg);
+        padding: var(--gap-md);
+        border-radius: var(--radius-md);
+        transition: opacity 0.25s ease-in-out, transform 0.25s ease-in-out;
+      }
+    }
+  }
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
 }
 </style>

@@ -18,3 +18,16 @@
   height: 1px;
   margin: var(--gap-sm) 0;
 }
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: none;
+  }
+}

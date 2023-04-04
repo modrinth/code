@@ -43,10 +43,10 @@
           </Button>
         </div>
         <div class="table-cell table-text name-cell">
-          <span class="mod-text">
+          <router-link :to="`/project/${mod.slug}`" class="mod-text">
             <Avatar :src="mod.icon" />
             {{ mod.name }}
-          </span>
+          </router-link>
         </div>
         <div class="table-cell table-text">{{ mod.version }}</div>
         <div class="table-cell table-text">{{ mod.author }}</div>
@@ -71,6 +71,7 @@ export default {
       mods: [
         {
           name: 'Fabric API',
+          slug: 'fabric-api',
           icon: 'https://cdn.modrinth.com/data/P7dR8mSH/icon.png',
           version: '0.76.0+1.19.4',
           author: 'modmuss50',
@@ -80,6 +81,7 @@ export default {
         },
         {
           name: 'Spirit',
+          slug: 'spirit',
           icon: 'https://cdn.modrinth.com/data/b1LdOZlE/465598dc5d89f67fb8f8de6def21240fa35e3a54.png',
           version: '2.2.4',
           author: 'CodexAdrian',
@@ -88,6 +90,7 @@ export default {
         },
         {
           name: 'Botarium',
+          slug: 'botarium',
           icon: 'https://cdn.modrinth.com/data/2u6LRnMa/98b286b0d541ad4f9409e0af3df82ad09403f179.gif',
           version: '2.0.5',
           author: 'CodexAdrian',
@@ -97,6 +100,7 @@ export default {
         },
         {
           name: 'Tempad',
+          slug: 'tempad',
           icon: 'https://cdn.modrinth.com/data/gKNwt7xu/icon.gif',
           version: '2.2.4',
           author: 'CodexAdrian',
@@ -105,6 +109,7 @@ export default {
         },
         {
           name: 'Sodium',
+          slug: 'sodium',
           icon: 'https://cdn.modrinth.com/data/AANobbMI/icon.png',
           version: '0.4.10',
           author: 'jellysquid3',

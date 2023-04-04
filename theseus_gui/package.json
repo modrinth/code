@@ -15,11 +15,12 @@
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
     "axios": "^1.3.4",
-    "omorphia": "^0.4.2",
+    "omorphia": "^0.4.3",
     "pinia": "^2.0.33",
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.2.45",
-    "vue-router": "4"
+    "vue-router": "4",
+    "dayjs": "^1.11.7"
   },
   "devDependencies": {
     "@rollup/plugin-alias": "^4.0.3",
