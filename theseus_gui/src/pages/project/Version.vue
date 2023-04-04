@@ -90,7 +90,7 @@
             {{ new Date(version.date_published).toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true})}}
           </span>
         </div>
-        <div class="metadata-item" v-if="author">
+        <div v-if="author" class="metadata-item">
           <span class="metadata-label">Author</span>
           <a :href="`https://modrinth.com/user/${author.user.username}`" rel="external" target="_blank" class="metadata-value btn author">
             <Avatar size="sm" :src="author.user.avatar_url" circle/>

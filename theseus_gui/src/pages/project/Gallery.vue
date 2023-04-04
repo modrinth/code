@@ -43,7 +43,7 @@
         </div>
         <div class="controls">
           <div class="buttons">
-            <Button class="close" @click="expandedGalleryItem = null" icon-only>
+            <Button class="close" icon-only @click="expandedGalleryItem = null">
               <XIcon aria-hidden="true" />
             </Button>
             <a
@@ -57,23 +57,23 @@
             >
               <ExternalIcon aria-hidden="true" />
             </a>
-            <Button @click="zoomedIn = !zoomedIn" icon-only>
+            <Button icon-only @click="zoomedIn = !zoomedIn">
               <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
               <ContractIcon v-else aria-hidden="true" />
             </Button>
             <Button
               v-if="gallery.length > 1"
               class="previous"
-              @click="previousImage()"
               icon-only
+              @click="previousImage()"
             >
               <LeftArrowIcon aria-hidden="true" />
             </Button>
             <Button
               v-if="gallery.length > 1"
               class="next"
-              @click="nextImage()"
               icon-only
+              @click="nextImage()"
             >
               <RightArrowIcon aria-hidden="true" />
             </Button>
@@ -90,10 +90,6 @@ import { Card, ExpandIcon, RightArrowIcon, LeftArrowIcon, ExternalIcon, Contract
 
 <script>
 export default {
-  async mounted() {
-    const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}`);
-    this.gallery = (await response.json()).gallery;
-  },
   data() {
     return {
       gallery: [],
@@ -117,6 +113,10 @@ export default {
     acceptFileTypes() {
       return 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
     },
+  },
+  async mounted() {
+    const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}`);
+    this.gallery = (await response.json()).gallery;
   },
   methods: {
     nextImage() {
