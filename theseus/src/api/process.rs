@@ -18,7 +18,10 @@ pub async fn has_finished_by_pid(pid: u32) -> crate::Result<bool> {
 pub async fn get_exit_status_by_pid(pid: u32) -> crate::Result<Option<i32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
-    Ok(children.exit_status(&pid).await?.map(|f| f.code()).flatten())
+    Ok(children
+        .exit_status(&pid)
+        .await?
+        .and_then(|f| f.code()))
 }
 
 // Gets the PID of each stored process in the state
@@ -31,17 +34,15 @@ pub async fn get_all_pids() -> crate::Result<Vec<u32>> {
 
 // Gets the PID of each *running* stored process in the state
 #[tracing::instrument]
-pub async fn get_all_running_pids() -> crate::Result<Vec<u32>> 
-{
+pub async fn get_all_running_pids() -> crate::Result<Vec<u32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
     Ok(children.running_keys().await)
 }
 
-
 // Gets stdout of a child process stored in the state by PID, as a string
 #[tracing::instrument]
-pub async fn get_stdout_by_pid(pid : u32) -> crate::Result<String> {
+pub async fn get_stdout_by_pid(pid: u32) -> crate::Result<String> {
     let state = State::get().await?;
     // Get stdout from child
     let children = state.children.read().await;
@@ -61,7 +62,7 @@ pub async fn get_stdout_by_pid(pid : u32) -> crate::Result<String> {
 
 // Gets stderr of a child process stored in the state by PID, as a string
 #[tracing::instrument]
-pub async fn get_stderr_by_pid(pid : u32) -> crate::Result<String> {
+pub async fn get_stderr_by_pid(pid: u32) -> crate::Result<String> {
     let state = State::get().await?;
     // Get stdout from child
     let children = state.children.read().await;

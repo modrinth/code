@@ -117,7 +117,12 @@ async fn main() -> theseus::Result<()> {
         }
     }?;
 
-    let pid = proc_lock.read().await.child.id().expect("Could not get PID from process.");
+    let pid = proc_lock
+        .read()
+        .await
+        .child
+        .id()
+        .expect("Could not get PID from process.");
     println!("Minecraft PID: {}", pid);
 
     // Wait 5 seconds

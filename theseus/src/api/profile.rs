@@ -10,10 +10,7 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use tokio::{
-    process::Command,
-    sync::RwLock,
-};
+use tokio::{process::Command, sync::RwLock};
 
 /// Add a profile to the in-memory state
 #[tracing::instrument]
@@ -232,4 +229,3 @@ pub async fn run(
 
     Ok(mchild_arc)
 }
-
