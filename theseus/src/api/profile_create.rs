@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::{prelude::ModLoader, profile};
+use crate::{prelude::ModLoader, profile, jre::detect_optimal_jre};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -134,6 +134,11 @@ pub async fn profile_create(
     }
     if let Some((loader_version, loader)) = loader {
         profile.with_loader(loader, Some(loader_version));
+    }
+    if let Ok(java_settings) = detect_optimal_jre(&profile).await {
+        profile.with_java_path(java_settings.path.into());
+    } else {
+        println!("Could not detect optimal JRE, using default");
     }
 
     profile::add(profile).await?;

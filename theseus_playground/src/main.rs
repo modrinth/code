@@ -4,8 +4,7 @@
 )]
 
 use dunce::canonicalize;
-use std::path::Path;
-use theseus::{jre,prelude::*, profile_create::profile_create};
+use theseus::{prelude::*, profile_create::profile_create};
 use tokio::process::Child;
 use tokio::sync::RwLockWriteGuard;
 
@@ -70,20 +69,16 @@ async fn main() -> theseus::Result<()> {
     .await?;
     State::sync().await?;
 
-    // Get optimal jre
-    let optimal_jre = jre::detect_optimal_jre(&profile::get(&profile_path).await?.unwrap()).await;
-    dbg!("Optimal JRE:",optimal_jre);
-
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
     println!("Editing.");
-    profile::edit(&profile_path, |profile| {
-        // Eg: Java. TODO: hook up to jre.rs class to pick optimal java
-        profile.java = Some(JavaSettings {
-            install: Some(Path::new("/usr/bin/java").to_path_buf()),
-            extra_arguments: None,
-        });
+    profile::edit(&profile_path, |_profile| {
+        // Eg: Java- this would let you change the java runtime of the profile instead of using the default
+        // profile.java = Some(JavaSettings {
+        // install: Some(Path::new("/usr/bin/java").to_path_buf()),
+        //     extra_arguments: None,
+        // });
         async { Ok(()) }
     })
     .await?;

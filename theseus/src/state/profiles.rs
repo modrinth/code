@@ -176,6 +176,25 @@ impl Profile {
         self
     }
 
+    // Sets path only
+    #[tracing::instrument]
+    pub fn with_java_path(
+        &mut self,
+        path: PathBuf,
+    ) -> &mut Self {
+        self.java = match self.java {
+            Some(ref mut java) => {
+                java.install = Some(path);
+                return self;
+            }
+            None => Some(JavaSettings {
+                install: Some(path),
+                extra_arguments: None,
+            }),
+        };
+        self
+    }
+
     #[tracing::instrument]
     pub fn with_memory(
         &mut self,

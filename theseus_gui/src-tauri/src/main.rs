@@ -47,6 +47,9 @@ fn main() {
             api::tags::tags_get_tag_bundle,
             api::settings::settings_get,
             api::settings::settings_set,
+            api::jre::jre_get_all_jre,
+            api::jre::jre_detect_optimal_jre,
+            api::jre::jre_get_all_allowable_jre,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

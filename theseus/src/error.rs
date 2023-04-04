@@ -1,5 +1,5 @@
 //! Theseus error type
-use crate::{profile_create};
+use crate::profile_create;
 use tracing_error::InstrumentError;
 
 #[derive(thiserror::Error, Debug)]

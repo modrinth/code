@@ -17,6 +17,8 @@ pub mod prelude {
     pub use crate::{
         auth::{self, Credentials},
         data::*,
+        jre,
+        util::jre::JavaVersion,
         profile::{self, Profile},
         profile_create, settings, State,
     };

@@ -269,10 +269,10 @@ impl PartialOrd for GameVersionString {
                 (Some(self_part), Some(other_part)) => {
                     let self_part = self_part.parse::<u32>().unwrap();
                     let other_part = other_part.parse::<u32>().unwrap();
-                    if self_part < other_part {
-                        return Some(std::cmp::Ordering::Less);
-                    } else if self_part > other_part {
-                        return Some(std::cmp::Ordering::Greater);
+                    match self_part.cmp(&other_part) {
+                        std::cmp::Ordering::Equal => continue,
+                        std::cmp::Ordering::Less => return Some(std::cmp::Ordering::Less),
+                        std::cmp::Ordering::Greater => return Some(std::cmp::Ordering::Greater),
                     }
                 }
                 (Some(_), None) => return Some(std::cmp::Ordering::Greater),

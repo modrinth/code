@@ -1,6 +1,7 @@
 use dunce::canonicalize;
 use lazy_static::lazy_static;
 use regex::Regex;
+use serde::{Serialize, Deserialize};
 use std::collections::HashSet;
 use std::env;
 use std::path::PathBuf;
@@ -12,7 +13,7 @@ use winreg::{
     RegKey,
 };
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct JavaVersion {
     pub path: String,
     pub version: String,
@@ -194,7 +195,6 @@ pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
     let Ok(path) = canonicalize(path) else { return None };
-    let Some(path_str) = path.to_str() else { return None };
 
     // Checks for existence of Java at this filepath
     let java = path.join(JAVA_BIN);
@@ -216,7 +216,8 @@ pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
     // Extract version info from it
     if let Some(captures) = JAVA_VERSION_CAPTURE.captures(&stderr) {
         if let Some(version) = captures.get(1) {
-            let path = path_str.to_string();
+            let Some(path) = java.to_str() else { return None };
+            let path = path.to_string();
             return Some(JavaVersion {
                 path,
                 version: version.as_str().to_string(),
@@ -224,6 +225,17 @@ pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
         }
     }
     None
+}
+
+/// Extract major/minor version from a java version string
+/// Gets the minor version or an error, and assumes 1 for major version if it could not find
+/// "1.8.0_361" -> (1, 8)
+/// "20" -> (1, 20)
+pub fn extract_java_majorminor_version(version: &str) -> Result<(u8, u8), JREError> {
+    let mut split = version.split('.').rev();
+    let minor = split.next().ok_or_else(|| JREError::InvalidJREVersion(version.to_string()))?.parse::<u8>()?;
+    let major = split.next().unwrap_or("1").parse::<u8>()?;
+    Ok((major, minor))
 }
 
 #[derive(thiserror::Error, Debug)]
@@ -236,4 +248,10 @@ pub enum JREError {
 
     #[error("No JRE found for required version: {0}")]
     NoJREFound(String),
+
+    #[error("Invalid JRE version string: {0}")]
+    InvalidJREVersion(String),
+
+    #[error("Parsing error: {0}")]
+    ParseError(#[from] std::num::ParseIntError),
 }
