@@ -163,8 +163,9 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     Ok(jres.into_iter().collect())
 }
 
+// Gets all JREs from the PATH env variable
 #[tracing::instrument]
-pub fn get_all_jre_path() -> Result<HashSet<JavaVersion>, JREError> {
+fn get_all_jre_path() -> Result<HashSet<JavaVersion>, JREError> {
     // Iterate over values in PATH variable, where accessible JREs are referenced
     let paths = env::var("PATH")?;
     let paths = env::split_paths(&paths);
@@ -232,4 +233,7 @@ pub enum JREError {
 
     #[error("Env error: {0}")]
     EnvError(#[from] env::VarError),
+
+    #[error("No JRE found for required version: {0}")]
+    NoJREFound(String),
 }

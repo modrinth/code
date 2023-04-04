@@ -129,7 +129,7 @@ pub async fn run(
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == profile.metadata.game_version.as_ref())
+        .find(|it| it.id == profile.metadata.game_version.0.as_ref())
         .ok_or_else(|| {
             crate::ErrorKind::LauncherError(format!(
                 "Invalid or unknown Minecraft version: {}",
@@ -207,7 +207,7 @@ pub async fn run(
     let env_args = &settings.custom_env_args;
 
     let mc_process = crate::launcher::launch_minecraft(
-        &profile.metadata.game_version,
+        &profile.metadata.game_version.0,
         &profile.metadata.loader_version,
         &profile.path,
         java_install,

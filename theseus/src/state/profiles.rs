@@ -1,4 +1,4 @@
-use super::settings::{Hooks, MemorySettings, WindowSize};
+use super::{settings::{Hooks, MemorySettings, WindowSize}, GameVersionString};
 use crate::config::BINCODE_CONFIG;
 use crate::data::DirectoryInfo;
 use crate::state::projects::Project;
@@ -46,13 +46,14 @@ pub struct ProfileMetadata {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<PathBuf>,
-    pub game_version: String,
+    pub game_version: GameVersionString,
     #[serde(default)]
     pub loader: ModLoader,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
 }
+
 
 // TODO: Quilt?
 #[derive(
@@ -103,7 +104,7 @@ impl Profile {
             metadata: ProfileMetadata {
                 name,
                 icon: None,
-                game_version: version,
+                game_version: version.into(),
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
@@ -151,7 +152,7 @@ impl Profile {
 
     #[tracing::instrument]
     pub fn with_game_version(&mut self, version: String) -> &mut Self {
-        self.metadata.game_version = version;
+        self.metadata.game_version = version.into();
         self
     }
 

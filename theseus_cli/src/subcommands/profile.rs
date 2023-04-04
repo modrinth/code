@@ -282,7 +282,7 @@ impl<'a> From<&'a Profile> for ProfileRow<'a> {
         Self {
             name: &it.metadata.name,
             path: &it.path,
-            game_version: &it.metadata.game_version,
+            game_version: &it.metadata.game_version.0,
             loader: &it.metadata.loader,
             loader_version: it
                 .metadata

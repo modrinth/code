@@ -1,5 +1,5 @@
 //! Theseus error type
-use crate::profile_create;
+use crate::{profile_create};
 use tracing_error::InstrumentError;
 
 #[derive(thiserror::Error, Debug)]
@@ -77,6 +77,9 @@ pub enum ErrorKind {
 
     #[error("Could not create profile: {0}")]
     ProfileCreationError(#[from] profile_create::ProfileCreationError),
+
+    #[error("JRE error: {0}")]
+    JREError (#[from] crate::util::jre::JREError),
 
     #[error("Error: {0}")]
     OtherError(String),

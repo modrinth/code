@@ -1,5 +1,6 @@
 //! API for interacting with Theseus
 pub mod auth;
+pub mod jre;
 pub mod profile;
 pub mod profile_create;
 pub mod tags;
