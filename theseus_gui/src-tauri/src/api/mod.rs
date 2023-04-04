@@ -6,6 +6,7 @@ pub mod auth;
 
 pub mod profile;
 pub mod profile_create;
+pub mod process;
 pub mod settings;
 
 pub type Result<T> = std::result::Result<T, TheseusGuiError>;

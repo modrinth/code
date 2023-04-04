@@ -38,6 +38,14 @@ fn main() {
             api::auth::auth_get_user,
             api::settings::settings_get,
             api::settings::settings_set,
+            api::process::process_get_all_pids,
+            api::process::process_get_all_running_pids,
+            api::process::process_get_exit_status_by_pid,
+            api::process::process_has_finished_by_pid,
+            api::process::process_get_stderr_by_pid,
+            api::process::process_get_stdout_by_pid,
+            api::process::process_kill_by_pid,
+            api::process::process_wait_for_by_pid,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
