@@ -5,7 +5,7 @@
 
 use dunce::canonicalize;
 use std::path::Path;
-use theseus::{prelude::*, profile_create::profile_create};
+use theseus::{jre,prelude::*, profile_create::profile_create};
 use tokio::process::Child;
 use tokio::sync::RwLockWriteGuard;
 
@@ -69,6 +69,11 @@ async fn main() -> theseus::Result<()> {
     )
     .await?;
     State::sync().await?;
+
+    // Get optimal jre
+    let optimal_jre = jre::detect_optimal_jre(&profile::get(&profile_path).await?.unwrap()).await;
+    dbg!("Optimal JRE:",optimal_jre);
+
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
