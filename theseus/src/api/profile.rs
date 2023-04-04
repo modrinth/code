@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::state::MinecraftChild;
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -10,7 +11,7 @@ use std::{
     sync::Arc,
 };
 use tokio::{
-    process::{Child, Command},
+    process::Command,
     sync::RwLock,
 };
 
@@ -114,7 +115,7 @@ pub async fn list(
 pub async fn run(
     path: &Path,
     credentials: &crate::auth::Credentials,
-) -> crate::Result<Arc<RwLock<Child>>> {
+) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await.unwrap();
     let settings = state.settings.read().await;
     let profile = get(path).await?.ok_or_else(|| {
@@ -227,8 +228,8 @@ pub async fn run(
             "Process failed to stay open.".to_string(),
         )
     })?;
-    let child_arc = state_children.insert(pid, mc_process);
+    let mchild_arc = state_children.insert_process(pid, mc_process);
 
-    Ok(child_arc)
+    Ok(mchild_arc)
 }
 

@@ -6,8 +6,7 @@
 use dunce::canonicalize;
 use std::path::Path;
 use theseus::{prelude::*, profile_create::profile_create};
-use tokio::process::Child;
-use tokio::sync::RwLockWriteGuard;
+use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -118,9 +117,18 @@ async fn main() -> theseus::Result<()> {
         }
     }?;
 
+    let pid = proc_lock.read().await.child.id().expect("Could not get PID from process.");
+    println!("Minecraft PID: {}", pid);
+
+    // Wait 5 seconds
+    println!("Waiting 10 seconds to gather logs...");
+    sleep(Duration::from_secs(10)).await;
+    let stdout = process::get_stdout_by_pid(pid).await?;
+    println!("Logs after 5sec <<< {stdout} >>> end stdout");
+
     // Spawn a thread and hold the lock to the process until it ends
-    println!("Started Minecraft. Waiting for process to end...");
-    let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;
+    println!("Waiting for process to end...");
+    let mut proc = proc_lock.write().await;
     process::wait_for(&mut proc).await?;
 
     Ok(())

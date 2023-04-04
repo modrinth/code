@@ -76,7 +76,7 @@ pub async fn profile_run(
     credentials: theseus::auth::Credentials,
 ) -> Result<u32> {
     let proc_lock = profile::run(path, &credentials).await?;
-    let pid = proc_lock.read().await.id().ok_or_else(|| {
+    let pid = proc_lock.read().await.child.id().ok_or_else(|| {
         theseus::Error::from(theseus::ErrorKind::LauncherError(
             "Process failed to stay open.".to_string(),
         ))

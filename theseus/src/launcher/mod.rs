@@ -217,8 +217,8 @@ pub async fn launch_minecraft(
         .current_dir(instance_path.clone())
         .env_clear()
         .envs(env_args)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
     command.spawn().map_err(|err| {
         crate::ErrorKind::LauncherError(format!(
