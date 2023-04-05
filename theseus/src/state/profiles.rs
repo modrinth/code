@@ -79,7 +79,7 @@ impl std::fmt::Display for ModLoader {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JavaSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub install: Option<PathBuf>,
+    pub jre_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra_arguments: Option<Vec<String>>,
 }
@@ -172,22 +172,6 @@ impl Profile {
         settings: Option<JavaSettings>,
     ) -> &mut Self {
         self.java = settings;
-        self
-    }
-
-    // Sets path only
-    #[tracing::instrument]
-    pub fn with_java_path(&mut self, path: PathBuf) -> &mut Self {
-        self.java = match self.java {
-            Some(ref mut java) => {
-                java.install = Some(path);
-                return self;
-            }
-            None => Some(JavaSettings {
-                install: Some(path),
-                extra_arguments: None,
-            }),
-        };
         self
     }
 

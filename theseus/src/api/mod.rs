@@ -20,6 +20,7 @@ pub mod prelude {
         data::*,
         jre,
         process,
+        state::JavaGlobals,
         profile::{self, Profile},
         profile_create, settings,
         util::jre::JavaVersion,

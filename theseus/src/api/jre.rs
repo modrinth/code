@@ -1,126 +1,114 @@
 //! Authentication flow interface
 use crate::{
     prelude::Profile,
-    util::jre::{self, JREError, JavaVersion},
-    State,
+    util::jre::{self, JavaVersion, extract_java_majorminor_version},
+    State, state::JavaGlobals,
 };
-use chrono::{DateTime, Utc};
+use daedalus as d;
 
-/// Detect the optimal JRE for the given profile
-#[tracing::instrument]
-pub async fn detect_optimal_jre(
-    profile: &Profile,
-) -> crate::Result<JavaVersion> {
-    // Get all JREs that exist on the system and are allowed for the given game version
-    // If Ok(...), guaranteed to have at least one result
-    let usable_jres = get_all_allowable_jre(profile).await?;
+pub const JAVA_8_KEY : &str = "JAVA_8";
+pub const JAVA_17PLUS_KEY : &str = "JAVA_17PLUS";
 
-    // TODO: with equally viable JREs, have a better system of choosing
-    let optimal_jre = usable_jres
+
+// Autodetect JavaSettings default
+// Make a guess for what the default Java global settings should be
+pub fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
+    let mut java_8 = find_java8_jres()?;
+    let mut java_17plus = find_java17plus_jres()?;
+
+    println!("java 8 and java 17");
+    dbg!(&java_8);
+    dbg!(&java_17plus);
+
+    // Simply select last one found for initial guess
+    let mut java_globals = JavaGlobals::new();
+    if let Some(jre) = java_8.pop() {
+        java_globals.insert(JAVA_8_KEY.to_string(), jre);
+    } 
+    if let Some(jre) = java_17plus.pop() {
+        java_globals.insert(JAVA_17PLUS_KEY.to_string(), jre);
+    } 
+    dbg!(&java_globals);
+
+    Ok(java_globals)
+}
+
+// Gets the optimal JRE key for the given profile, using Daedalus
+// Generally this would be used for profile_create, to get the optimal JRE key
+// this can be overwritten by the user a profile-by-profile basis
+pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
+    let state = State::get().await?;
+
+    // Fetch version info from stored profile game_version
+    let version = state
+        .metadata
+        .minecraft
+        .versions
+        .iter()
+        .find(|it| it.id == profile.metadata.game_version.as_ref())
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "Invalid or unknown Minecraft version: {}",
+                profile.metadata.game_version
+            ))
+        })?;
+    
+    // Get detailed manifest info from Daedalus 
+    let version_info = d::minecraft::fetch_version_info(&version).await?;
+    let optimal_key = if version_info
+            .java_version
+            .as_ref()
+            .filter(|it| it.major_version >= 17)
+            .is_some()
+    {
+        JAVA_17PLUS_KEY.to_string()
+    } else {
+        JAVA_8_KEY.to_string()
+    };
+    Ok(optimal_key)
+}
+
+
+// Searches for jres on the system that are 1.17 or higher
+pub fn find_java17plus_jres() -> crate::Result<Vec<JavaVersion>> {
+    let version = extract_java_majorminor_version("1.17")?;
+    let jres = jre::get_all_jre()?;
+
+    // Filter out JREs that are not 1.17 or higher
+    Ok(jres
         .into_iter()
-        .max_by_key(|jre| jre.version.clone())
-        .unwrap();
-    Ok(optimal_jre)
+        .filter(|jre| {
+            let jre_version = extract_java_majorminor_version(&jre.version);
+            dbg!("Comparing JRE version {} to {}", &jre_version, &version);
+            if let Ok(jre_version) = jre_version {
+                jre_version >= version
+            } else {
+                false
+            }
+        })
+        .collect())
+}
+
+// Searches for jres on the system that are 1.8 exactly
+pub fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
+    let version = extract_java_majorminor_version("1.8")?;
+    let jres = jre::get_all_jre()?;
+
+    // Filter out JREs that are not 1.8
+    Ok(jres
+        .into_iter()
+        .filter(|jre| {
+            let jre_version = extract_java_majorminor_version(&jre.version);
+            if let Ok(jre_version) = jre_version {
+                jre_version == version
+            } else {
+                false
+            }
+        })
+        .collect())
 }
 
 // Get all JREs that exist on the system
 pub fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
     Ok(jre::get_all_jre()?)
-}
-
-// Get all allowed JREs for a given game version that exist on the system
-// If Ok(...), guaranteed to have at least one result
-pub async fn get_all_allowable_jre(
-    profile: &Profile,
-) -> crate::Result<Vec<JavaVersion>> {
-    let needed_versions = match compare_minecraft_game_versions(
-        &profile.metadata.game_version,
-        "1.17",
-    )
-    .await?
-    {
-        std::cmp::Ordering::Greater | std::cmp::Ordering::Equal => {
-            // Java versions allowable if game version is 1.17 or higher
-            vec!["1.17"] // 20 converts to 1.20
-        }
-        std::cmp::Ordering::Less => {
-            // Java versions allowable if game version is 1.16 or lower
-            vec!["1.8"]
-        }
-    };
-
-    let needed_version_tuples: Result<Vec<(u8, u8)>, JREError> =
-        needed_versions
-            .iter()
-            .map(|v| jre::extract_java_majorminor_version(v))
-            .collect();
-    let needed_version_tuples = needed_version_tuples?;
-
-    // Get all JREs that exist on the system
-    let jres = jre::get_all_jre()?;
-
-    let usable_jres = jres.into_iter().filter(|jre| {
-        // Rather than breaking on a bad JRE, just skip it
-        needed_version_tuples.contains(
-            &jre::extract_java_majorminor_version(&jre.version)
-                .unwrap_or((0, 0)),
-        )
-    });
-    let usable_jres = usable_jres.collect::<Vec<JavaVersion>>();
-
-    if usable_jres.is_empty() {
-        return Err(JREError::NoJREFound(needed_versions.join(",")).into());
-    }
-    Ok(usable_jres)
-}
-
-async fn compare_minecraft_game_versions(
-    version1: &str,
-    version2: &str,
-) -> crate::Result<std::cmp::Ordering> {
-    let state = State::get().await?;
-    let game_versions = state.tags.read().await.get_game_versions()?;
-
-    let game_version_1 = game_versions
-        .iter()
-        .find(|v| v.version == version1)
-        .ok_or_else(|| {
-        JREError::NoMinecraftVersionFound(version1.to_string())
-    })?;
-    let game_version_2 = game_versions
-        .iter()
-        .find(|v| v.version == version2)
-        .ok_or_else(|| {
-        JREError::NoMinecraftVersionFound(version2.to_string())
-    })?;
-
-    // Convert the inner dates to DateTime<Utc> for comparison
-    let game_version_1 =
-        DateTime::parse_from_rfc3339(&game_version_1.date)?.with_timezone(&Utc);
-    let game_version_2 =
-        DateTime::parse_from_rfc3339(&game_version_2.date)?.with_timezone(&Utc);
-
-    Ok(game_version_1.cmp(&game_version_2))
-}
-
-pub fn find_jre_8() -> crate::Result<Option<JavaVersion>> {
-    let jres = jre::get_all_jre()?;
-    Ok(jres.into_iter().find(|jre| jre.version == "1.8"))
-}
-
-pub fn find_jre_17plus() -> crate::Result<Option<JavaVersion>> {
-    let jres = jre::get_all_jre()?;
-    let jres_17plus = jres.into_iter().find(|jre| {
-        let version = jre::extract_java_majorminor_version(&jre.version)
-            .unwrap_or((0, 0));
-        version.0 >= 1 && version.1 >= 17
-    });
-
-    // Pick highest minor version if multiple 1.17+ JREs are found
-    let highest_jre = jres_17plus.into_iter().max_by_key(|jre| {
-        jre::extract_java_majorminor_version(&jre.version)
-            .unwrap_or((0, 0))
-            .1
-    });
-    Ok(highest_jre)
 }

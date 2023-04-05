@@ -2,7 +2,7 @@ use dunce::canonicalize;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::collections::HashSet;
+use std::{collections::HashSet, path::Path};
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
@@ -13,7 +13,7 @@ use winreg::{
     RegKey,
 };
 
-#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Debug, PartialEq, Eq, Hash, Serialize, Deserialize, Clone)]
 pub struct JavaVersion {
     pub path: String,
     pub version: String,
@@ -150,12 +150,12 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     ];
     for path in java_paths {
         if let Some(j) =
-            check_java_at_filepath(PathBuf::from(path).join("jre").join("bin"))
+            check_java_at_filepath(&PathBuf::from(path).join("jre").join("bin"))
         {
             jres.insert(j);
             break;
         }
-        if let Some(j) = check_java_at_filepath(PathBuf::from(path).join("bin"))
+        if let Some(j) = check_java_at_filepath(&PathBuf::from(path).join("bin"))
         {
             jres.insert(j);
             break;
@@ -173,7 +173,7 @@ fn get_all_jre_path() -> Result<HashSet<JavaVersion>, JREError> {
 
     let mut jres = HashSet::new();
     for path in paths {
-        if let Some(j) = check_java_at_filepath(path) {
+        if let Some(j) = check_java_at_filepath(&path) {
             jres.insert(j);
         }
     }
@@ -191,13 +191,19 @@ const JAVA_BIN: &str = "java";
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
 // If no such path exists, or no such valid java at this path exists, returns None
 #[tracing::instrument]
-pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
+pub fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)
     let Ok(path) = canonicalize(path) else { return None };
 
     // Checks for existence of Java at this filepath
-    let java = path.join(JAVA_BIN);
+    // Adds JAVA_BIN to the end of the path if it is not already there
+    let java = if path.file_name()?.to_str()? != JAVA_BIN {
+        path.join(JAVA_BIN)
+    } else {
+        path
+    };
+
     if !java.exists() {
         return None;
     };

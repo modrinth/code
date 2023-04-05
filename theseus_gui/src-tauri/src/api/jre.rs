@@ -2,8 +2,6 @@ use std::path::Path;
 
 use crate::api::Result;
 use theseus::prelude::*;
-
-use super::TheseusSerializableError;
 use theseus::prelude::JavaVersion;
 
 /// Get all JREs that exist on the system
@@ -14,43 +12,34 @@ pub async fn jre_get_all_jre() -> Result<Vec<JavaVersion>> {
 
 // Finds the isntallation of Java 7, if it exists
 #[tauri::command]
-pub async fn jre_find_jre_8() -> Result<Option<JavaVersion>> {
-    Ok(jre::find_jre_8()?)
+pub async fn jre_find_jre_8_jres() -> Result<Vec<JavaVersion>> {
+    Ok(jre::find_java8_jres()?)
 }
 
 // Finds the highest version of Java 17+, if it exists
 #[tauri::command]
-pub async fn jre_find_jre_17plus() -> Result<Option<JavaVersion>> {
-    Ok(jre::find_jre_17plus()?)
+pub async fn jre_find_jre_17plus_jres() -> Result<Vec<JavaVersion>> {
+    Ok(jre::find_java17plus_jres()?)
 }
 
-/// From a Path to a profile, returns the JavaVersion of the optimal JRE to use
-/// Returns an error if the profile is not managed by Theseus, or if the optimal JRE could not be detected
+// Autodetect Java globals, by searching the users computer.
+// Returns a *NEW* JavaGlobals that can be put into Settings
 #[tauri::command]
-pub async fn jre_detect_optimal_jre(path: &Path) -> Result<JavaVersion> {
-    let profile = profile::get(path).await?;
-    if let Some(profile) = profile {
-        Ok(jre::detect_optimal_jre(&profile).await?)
-    } else {
-        Err(TheseusSerializableError::NoProfileFound(
-            path.display().to_string(),
-        )
-        .into())
-    }
+pub async fn jre_autodetect_java_globals() -> Result<JavaGlobals> {
+    Ok(jre::autodetect_java_globals()?)
 }
 
-/// Get all allowed JREs for a given game version that exist on the system
+// Gets key for the optimal JRE to use, for a given profile Profile
+// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
 #[tauri::command]
-pub async fn jre_get_all_allowable_jre(
-    path: &Path,
-) -> Result<Vec<JavaVersion>> {
-    let profile = profile::get(path).await?;
-    if let Some(profile) = profile {
-        Ok(jre::get_all_allowable_jre(&profile).await?)
-    } else {
-        Err(TheseusSerializableError::NoProfileFound(
-            path.display().to_string(),
-        )
-        .into())
-    }
+pub async fn jre_get_optimal_jre_key(profile: Profile) -> Result<String> {
+    Ok(jre::get_optimal_jre_key(&profile).await?)
+}
+
+// Gets key for the optimal JRE to use, for a given profile path
+// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
+#[tauri::command]
+pub async fn jre_get_optimal_jre_key_by_path(path: &Path) -> Result<String> {
+    let profile = profile::get(path).await?.ok_or_else(|| theseus::Error::from(theseus::ErrorKind::UnmanagedProfileError(path.display().to_string())))?;
+    Ok(jre::get_optimal_jre_key(&profile).await?)
 }

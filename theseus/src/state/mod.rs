@@ -1,5 +1,6 @@
 //! Theseus state management system
 use crate::config::sled_config;
+use crate::jre;
 use std::sync::Arc;
 use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
 
@@ -30,6 +31,9 @@ pub use self::auth_task::*;
 
 mod tags;
 pub use self::tags::*;
+
+mod java_globals;
+pub use self::java_globals::*;
 
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -102,22 +106,14 @@ impl State {
                     };
 
                     // On launcher initialization, if global java variables are unset, try to find and set them
-                    if settings.java_8_path.is_none() {
-                        if let Some(java_8_path) = crate::jre::find_jre_8()? {
-                            settings.java_8_path =
-                                Some(java_8_path.path.into());
-                        }
-                    }
-                    if settings.java_17_path.is_none() {
-                        if let Some(java_16_path) =
-                            crate::jre::find_jre_17plus()?
-                        {
-                            settings.java_17_path =
-                                Some(java_16_path.path.into());
-                        }
+                    // (they are required for the game to launch)
+                    dbg!("Java globals", &settings.java_globals);
+                    if settings.java_globals.count() == 0 {
+                        settings.java_globals = jre::autodetect_java_globals()?;
+                        dbg!("Java globals after", &settings.java_globals);
                     }
 
-                    dbg!("settings", &settings);
+                    dbg!("Settings", &settings);
 
                     Ok(Arc::new(Self {
                         database,

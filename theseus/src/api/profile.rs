@@ -157,29 +157,37 @@ pub async fn run(
         }
     }
 
-    let java_install = match profile.java {
+    dbg!("Profile java settings: {:?}", &profile.java);
+    let java_version = match profile.java {
+        // Load profile-specific Java implementation choice
+        // (This defaults to Daedalus-decided key on init, but can be changed by the user)
         Some(JavaSettings {
-            install: Some(ref install),
+            jre_key: Some(ref jre_key),
             ..
-        }) => install,
+        }) => settings.java_globals.get(jre_key),
+        // Fall back to Daedalus-decided key if no profile-specific key is set
         _ => if version_info
             .java_version
             .as_ref()
-            .filter(|it| it.major_version >= 16)
+            .filter(|it| it.major_version >= 17)
             .is_some()
         {
-            settings.java_17_path.as_ref()
+            settings.java_globals.get(&crate::jre::JAVA_17PLUS_KEY.to_string())
         } else {
-            settings.java_8_path.as_ref()
+            settings.java_globals.get(&crate::jre::JAVA_8_KEY.to_string())
         }
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "No Java installed for version {}",
-                version_info.java_version.map_or(8, |it| it.major_version),
-            ))
-        })?,
     };
+    dbg!("Intermediate java version: {:?}", &java_version);
+    let java_version = java_version.as_ref().ok_or_else(|| {
+        crate::ErrorKind::LauncherError(format!(
+            "No Java stored for version {}",
+            version_info.java_version.map_or(8, |it| it.major_version),
+        ))
+    })?;
 
+    // Get the path to the Java executable from the chosen Java implementation key
+    let java_install: &Path = &PathBuf::from(&java_version.path);
+    dbg!("Java install: {}", &java_install.display());
     if !java_install.exists() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Could not find Java install: {}",
@@ -187,7 +195,7 @@ pub async fn run(
         ))
         .as_error());
     }
-
+    dbg!("Sccess. java!");
     let java_args = profile
         .java
         .as_ref()
@@ -208,7 +216,7 @@ pub async fn run(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
-        java_install,
+        &java_install,
         java_args,
         env_args,
         wrapper,

@@ -4,7 +4,9 @@ use std::{
     collections::HashSet,
     path::{Path, PathBuf},
 };
-use tokio::fs;
+use tokio::{fs, sync::RwLock};
+
+use super::JavaGlobals;
 
 // TODO: convert to semver?
 const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -18,8 +20,7 @@ pub struct Settings {
     pub game_resolution: WindowSize,
     pub custom_java_args: Vec<String>,
     pub custom_env_args: Vec<(String, String)>,
-    pub java_8_path: Option<PathBuf>,
-    pub java_17_path: Option<PathBuf>,
+    pub java_globals : JavaGlobals,
     pub default_user: Option<uuid::Uuid>,
     pub hooks: Hooks,
     pub max_concurrent_downloads: usize,
@@ -33,8 +34,7 @@ impl Default for Settings {
             game_resolution: WindowSize::default(),
             custom_java_args: Vec::new(),
             custom_env_args: Vec::new(),
-            java_8_path: None,
-            java_17_path: None,
+            java_globals: JavaGlobals::new(),
             default_user: None,
             hooks: Hooks::default(),
             max_concurrent_downloads: 64,
