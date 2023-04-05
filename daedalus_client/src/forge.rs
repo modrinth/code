@@ -514,8 +514,6 @@ pub async fn retrieve_data(
             }
         }
 
-        println!("{:?}", versions);
-
         upload_file_to_bucket(
             format!(
                 "forge/v{}/manifest.json",

@@ -77,12 +77,17 @@ async fn main() {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
-            match forge::retrieve_data(&manifest, &mut uploaded_files, semaphore.clone()).await {
+            match forge::retrieve_data(
+                &manifest,
+                &mut uploaded_files,
+                semaphore.clone(),
+            )
+            .await
+            {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
         }
-        break;
     }
 }
 
@@ -202,10 +207,7 @@ pub async fn download_file(
     semaphore: Arc<Semaphore>,
 ) -> Result<bytes::Bytes, Error> {
     let _permit = semaphore.acquire().await?;
-    println!("{} url start", url);
-
     let val = daedalus::download_file(url, sha1).await?;
-    println!("{} url end", url);
     Ok(val)
 }
 

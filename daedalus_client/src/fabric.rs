@@ -63,7 +63,6 @@ pub async fn retrieve_data(
                 )
                 .await?;
 
-                //println!("{}", loader);
                 Ok::<Option<(Box<bool>, String, PartialVersionInfo)>, Error>(
                     Some((stable, loader, version)),
                 )
