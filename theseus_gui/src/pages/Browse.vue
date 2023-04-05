@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
@@ -16,25 +16,31 @@ import {
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
-import generated from '@/generated'
-// import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
-import { get_tag_bundle } from '@/helpers/tags'
+import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 
 // Pull search store
 const searchStore = useSearch()
 
 const selectedVersions = ref([])
 const showSnapshots = ref(false)
-const isClearDisabled = ref(true)
 
-// const categories = await get_categories()
-// const loaders = await get_loaders()
-// const availableGameVersions = await get_game_versions()
-const tags = await get_tag_bundle()
+// Sets the clear button's disabled attr
+const isClearDisabled = computed({
+  get() {
+    if (searchStore.facets.length > 0) return false
+    if (searchStore.orFacets.length > 0) return false
 
-console.log('tags', tags)
+    if (searchStore.environments.server === true || searchStore.environments.client === true)
+      return false
+    if (searchStore.openSource === true) return false
+    if (selectedVersions.value.length > 0) return false
+    return true
+  },
+})
 
-const availableGameVersions = generated.gameVersions
+const categories = await get_categories()
+const loaders = await get_loaders()
+const availableGameVersions = await get_game_versions()
 
 /**
  * Adds or removes facets from state
@@ -46,7 +52,6 @@ const toggleFacet = async (facet) => {
   if (index !== -1) searchStore.facets.splice(index, 1)
   else searchStore.facets.push(facet)
 
-  checkFilterState()
   await getSearchResults()
 }
 
@@ -60,25 +65,7 @@ const toggleOrFacet = async (orFacet) => {
   if (index !== -1) searchStore.orFacets.splice(index, 1)
   else searchStore.orFacets.push(orFacet)
 
-  checkFilterState()
   await getSearchResults()
-}
-
-/**
- * Determines if the Clear Filters button should be disabled
- */
-const checkFilterState = () => {
-  let areFiltersSet = false
-
-  if (searchStore.facets.length > 0) areFiltersSet = true
-  if (searchStore.orFacets.length > 0) areFiltersSet = true
-
-  if (searchStore.environments.server === true || searchStore.environments.client === true)
-    areFiltersSet = true
-  if (searchStore.openSource === true) areFiltersSet = true
-  if (selectedVersions.value.length > 0) areFiltersSet = true
-
-  isClearDisabled.value = !areFiltersSet
 }
 
 /**
@@ -96,7 +83,6 @@ await getSearchResults()
  * For when user enters input in search bar
  */
 const refreshSearch = async () => {
-  checkFilterState()
   await getSearchResults()
 }
 
@@ -106,7 +92,6 @@ const refreshSearch = async () => {
  */
 const handleSort = async (e) => {
   searchStore.filter = e.option
-  checkFilterState()
   await getSearchResults()
 }
 
@@ -116,7 +101,6 @@ const handleSort = async (e) => {
  */
 const handleLimit = async (e) => {
   searchStore.limit = e.option
-  checkFilterState()
   await getSearchResults()
 }
 
@@ -125,7 +109,6 @@ const handleLimit = async (e) => {
  * @param {Number} page The new page to display
  */
 const switchPage = async (page) => {
-  checkFilterState()
   searchStore.currentPage = parseInt(page)
   if (page === 1) searchStore.offset = 0
   else searchStore.offset = searchStore.currentPage * 10 - 10
@@ -136,7 +119,6 @@ const switchPage = async (page) => {
  * For when a user interacts with version filters
  */
 const handleVersionSelect = async () => {
-  checkFilterState()
   searchStore.activeVersions = selectedVersions.value.map((ver) => ver)
   await getSearchResults()
 }
@@ -161,7 +143,7 @@ const handleReset = async () => {
       <div class="categories">
         <h2>Categories</h2>
         <div
-          v-for="category in generated.categories.filter((cat) => cat.project_type === 'modpack')"
+          v-for="category in categories.filter((cat) => cat.project_type === 'modpack')"
           :key="category.name"
         >
           <SearchFilter
@@ -177,9 +159,7 @@ const handleReset = async () => {
       <div class="loaders">
         <h2>Loaders</h2>
         <div
-          v-for="loader in generated.loaders.filter((l) =>
-            l.supported_project_types?.includes('modpack')
-          )"
+          v-for="loader in loaders.filter((l) => l.supported_project_types?.includes('modpack'))"
           :key="loader"
         >
           <SearchFilter
@@ -267,6 +247,7 @@ const handleReset = async () => {
             ]"
             :default-value="searchStore.filter"
             :model-value="searchStore.filter"
+            class="sort-dropdown"
             @change="handleSort"
           />
           <span>Show per page</span>
@@ -300,11 +281,11 @@ const handleReset = async () => {
           :created-at="result?.date_created"
           :updated-at="result?.date_modified"
           :categories="[
-            ...generated.categories.filter(
+            ...categories.filter(
               (cat) =>
                 result?.display_categories.includes(cat.name) && cat.project_type === 'modpack'
             ),
-            ...generated.loaders.filter(
+            ...loaders.filter(
               (loader) =>
                 result?.display_categories.includes(loader.name) &&
                 loader.supported_project_types?.includes('modpack')
@@ -342,6 +323,10 @@ const handleReset = async () => {
     gap: 1rem;
     margin: 1rem auto;
     white-space: nowrap;
+
+    .sort-dropdown {
+      min-width: 12.18rem;
+    }
 
     .limit-dropdown {
       width: 5rem;
@@ -416,6 +401,14 @@ const handleReset = async () => {
       width: 100%;
       height: auto;
       cursor: pointer;
+    }
+
+    .result-project-item {
+      a {
+        &:hover {
+          text-decoration: none !important;
+        }
+      }
     }
   }
 }
