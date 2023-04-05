@@ -87,7 +87,7 @@ async fn main() -> theseus::Result<()> {
     // Attempt to get the default user, if it exists, and refresh their credentials
     let default_user_uuid = {
         let settings = st.settings.read().await;
-        settings.default_user.clone()    
+        settings.default_user
     };
     let credentials = if let Some(uuid) = default_user_uuid {
         println!("Attempting to refresh existing authentication.");
@@ -117,7 +117,6 @@ async fn main() -> theseus::Result<()> {
             profile::run(&canonicalize(&profile_path)?, credentials).await
         }
     }?;
-
     // Spawn a thread and hold the lock to the process until it ends
     println!("Started Minecraft. Waiting for process to end...");
     let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;

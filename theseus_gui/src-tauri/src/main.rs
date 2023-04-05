@@ -38,6 +38,15 @@ fn main() {
             api::auth::auth_has_user,
             api::auth::auth_users,
             api::auth::auth_get_user,
+            api::tags::tags_get_category_tags,
+            api::tags::tags_get_donation_platform_tags,
+            api::tags::tags_get_game_version_tags,
+            api::tags::tags_get_loader_tags,
+            api::tags::tags_get_license_tags,
+            api::tags::tags_get_report_type_tags,
+            api::tags::tags_get_tag_bundle,
+            api::settings::settings_get,
+            api::settings::settings_set,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -53,6 +53,7 @@ pub async fn launch_minecraft(
     instance_path: &Path,
     java_install: &Path,
     java_args: &[String],
+    env_args: &[(String, String)],
     wrapper: &Option<String>,
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
@@ -173,6 +174,8 @@ pub async fn launch_minecraft(
         None => Command::new(String::from(java_install.to_string_lossy())),
     };
 
+    let env_args = Vec::from(env_args);
+
     command
         .args(
             args::get_jvm_arguments(
@@ -213,6 +216,7 @@ pub async fn launch_minecraft(
         )
         .current_dir(instance_path.clone())
         .env_clear()
+        .envs(env_args)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
 
