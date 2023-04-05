@@ -272,6 +272,7 @@ const handleReset = async () => {
           :id="result?.project_id"
           :key="result?.project_id"
           class="result-project-item"
+          :tooltip="result?.slug"
           :type="result?.project_type"
           :name="result?.title"
           :description="result?.description"
