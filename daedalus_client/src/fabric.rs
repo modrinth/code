@@ -82,6 +82,7 @@ pub async fn retrieve_data(
                             visited_artifacts_mutex.lock().await;
 
                         if visited_assets.contains(&lib.name) {
+                            lib.name = lib.name.replace(DUMMY_GAME_VERSION, DUMMY_REPLACE_STRING);
                             lib.url = Some(format_url("maven/"));
 
                             return Ok(lib);
@@ -92,7 +93,6 @@ pub async fn retrieve_data(
 
                     if lib.name.contains(DUMMY_GAME_VERSION) {
                         lib.name = lib.name.replace(DUMMY_GAME_VERSION, DUMMY_REPLACE_STRING);
-                        lib.url = Some(format_url("maven/"));
                         futures::future::try_join_all(list.game.clone().into_iter().map(|game_version| async {
                             let semaphore = semaphore.clone();
                             let uploaded_files_mutex = uploaded_files_mutex.clone();
@@ -130,6 +130,7 @@ pub async fn retrieve_data(
 
                             Ok::<(), Error>(())
                         })).await?;
+                        lib.url = Some(format_url("maven/"));
 
                         return Ok(lib);
                     }

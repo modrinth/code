@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io::Read;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tokio::sync::{Mutex, Semaphore};
 
 lazy_static! {
@@ -93,7 +93,7 @@ pub async fn retrieve_data(
 
         if !loaders.is_empty() {
             version_futures.push(async {
-                let loaders_versions = Vec::new();
+                let mut loaders_versions = Vec::new();
 
                 {
                     let loaders_futures = loaders.into_iter().map(|(loader_version_full, version)| async {
@@ -464,8 +464,9 @@ pub async fn retrieve_data(
                         while versions.peek().is_some() {
                             let now = Instant::now();
 
-                            let chunk: Vec<_> = versions.by_ref().take(1).collect();
-                            futures::future::try_join_all(chunk).await?;
+                            let chunk: Vec<_> = versions.by_ref().take(10).collect();
+                            let res = futures::future::try_join_all(chunk).await?;
+                            loaders_versions.extend(res.into_iter().flatten());
 
                             chunk_index += 1;
 
@@ -493,7 +494,7 @@ pub async fn retrieve_data(
         while versions.peek().is_some() {
             let now = Instant::now();
 
-            let chunk: Vec<_> = versions.by_ref().take(10).collect();
+            let chunk: Vec<_> = versions.by_ref().take(1).collect();
             futures::future::try_join_all(chunk).await?;
 
             chunk_index += 1;

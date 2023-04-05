@@ -131,7 +131,7 @@ pub fn merge_partial_version(
         asset_index: merge.asset_index,
         assets: merge.assets,
         downloads: merge.downloads,
-        id: merge.id,
+        id: partial.id.replace(DUMMY_REPLACE_STRING, &merge_id),
         java_version: merge.java_version,
         libraries: partial
             .libraries

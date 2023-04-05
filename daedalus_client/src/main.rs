@@ -44,7 +44,7 @@ async fn main() {
         return;
     }
 
-    let mut timer = tokio::time::interval(Duration::from_secs(30 * 60));
+    let mut timer = tokio::time::interval(Duration::from_secs(60 * 60));
     let semaphore = Arc::new(Semaphore::new(50));
 
     loop {
@@ -189,11 +189,7 @@ pub async fn upload_file_to_bucket(
 }
 
 pub fn format_url(path: &str) -> String {
-    format!(
-        "{}/{}",
-        &*dotenvy::var("BASE_URL").unwrap(),
-        path
-    )
+    format!("{}/{}", &*dotenvy::var("BASE_URL").unwrap(), path)
 }
 
 pub async fn download_file(
