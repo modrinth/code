@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::state::MinecraftChild;
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -9,10 +10,7 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use tokio::{
-    process::{Child, Command},
-    sync::RwLock,
-};
+use tokio::{process::Command, sync::RwLock};
 
 /// Remove a profile
 #[tracing::instrument]
@@ -96,7 +94,7 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
 pub async fn run(
     path: &Path,
     credentials: &crate::auth::Credentials,
-) -> crate::Result<Arc<RwLock<Child>>> {
+) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
     let settings = state.settings.read().await;
     let profile = get(path).await?.ok_or_else(|| {
@@ -188,12 +186,15 @@ pub async fn run(
     let memory = profile.memory.unwrap_or(settings.memory);
     let resolution = profile.resolution.unwrap_or(settings.game_resolution);
 
+    let env_args = &settings.custom_env_args;
+
     let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
         java_install,
         java_args,
+        env_args,
         wrapper,
         &memory,
         &resolution,
@@ -208,31 +209,8 @@ pub async fn run(
             "Process failed to stay open.".to_string(),
         )
     })?;
-    let child_arc = state_children.insert(pid, mc_process);
+    let mchild_arc =
+        state_children.insert_process(pid, path.to_path_buf(), mc_process);
 
-    Ok(child_arc)
-}
-
-#[tracing::instrument]
-pub async fn kill(running: &mut Child) -> crate::Result<()> {
-    running.kill().await?;
-    wait_for(running).await
-}
-
-#[tracing::instrument]
-pub async fn wait_for(running: &mut Child) -> crate::Result<()> {
-    let result = running.wait().await.map_err(|err| {
-        crate::ErrorKind::LauncherError(format!(
-            "Error running minecraft: {err}"
-        ))
-    })?;
-
-    match result.success() {
-        false => Err(crate::ErrorKind::LauncherError(format!(
-            "Minecraft exited with non-zero code {}",
-            result.code().unwrap_or(-1)
-        ))
-        .as_error()),
-        true => Ok(()),
-    }
+    Ok(mchild_arc)
 }

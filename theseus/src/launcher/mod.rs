@@ -1,5 +1,5 @@
 //! Logic for launching Minecraft
-use crate::state as st;
+use crate::{process, state as st};
 use daedalus as d;
 use dunce::canonicalize;
 use std::{path::Path, process::Stdio};
@@ -53,6 +53,7 @@ pub async fn launch_minecraft(
     instance_path: &Path,
     java_install: &Path,
     java_args: &[String],
+    env_args: &[(String, String)],
     wrapper: &Option<String>,
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
@@ -175,6 +176,20 @@ pub async fn launch_minecraft(
         None => Command::new(String::from(java_install.to_string_lossy())),
     };
 
+    let env_args = Vec::from(env_args);
+
+    // Check if profile has a running profile, and reject running the command if it does
+    // Done late so a quick double call doesn't launch two instances
+    let existing_processes =
+        process::get_pids_by_profile_path(instance_path).await?;
+    if let Some(pid) = existing_processes.first() {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Profile {} is already running at PID: {pid}",
+            instance_path.display()
+        ))
+        .as_error());
+    }
+
     command
         .args(
             args::get_jvm_arguments(
@@ -213,8 +228,9 @@ pub async fn launch_minecraft(
         )
         .current_dir(instance_path.clone())
         .env_clear()
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
+        .envs(env_args)
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
     command.spawn().map_err(|err| {
         crate::ErrorKind::LauncherError(format!(

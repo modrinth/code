@@ -11,19 +11,17 @@ import {
   SettingsIcon,
   Avatar,
 } from 'omorphia'
-import { useTheming, useInstances } from '@/store/state'
+import { useTheming } from '@/store/state'
 import { toggleTheme } from '@/helpers/theme'
 
 const route = useRoute()
 const router = useRouter()
 
-const theme = useTheming()
-const instances = useInstances()
-instances.fetchInstances()
+const themeStore = useTheming()
 
-toggleTheme(theme.darkTheme)
+toggleTheme(themeStore.darkTheme)
 
-watch(theme, (newState) => {
+watch(themeStore, (newState) => {
   toggleTheme(newState.darkTheme)
 })
 </script>
@@ -59,7 +57,9 @@ watch(theme, (newState) => {
         </section>
       </div>
       <div class="router-view">
-        <RouterView />
+        <Suspense>
+          <RouterView />
+        </Suspense>
       </div>
     </div>
   </div>
