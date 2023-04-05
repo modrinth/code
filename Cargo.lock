@@ -3574,6 +3574,7 @@ version = "0.0.0"
 dependencies = [
  "daedalus",
  "futures",
+ "regex",
  "serde",
  "serde_json",
  "tauri",

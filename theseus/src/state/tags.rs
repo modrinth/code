@@ -160,34 +160,43 @@ impl Tags {
         // Store the tags in the database
         self.0.categories.insert(
             "categories",
-            bincode::encode_to_vec(categories.json().await?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                categories.json::<Vec<Category>>().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
         self.0.loaders.insert(
             "loaders",
-            bincode::encode_to_vec(loaders.json().await?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                loaders.json::<Vec<Loader>>().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
         self.0.game_versions.insert(
             "game_versions",
             bincode::encode_to_vec(
-                game_versions.json().await?,
+                game_versions.json::<Vec<GameVersion>>().await?,
                 *BINCODE_CONFIG,
             )?,
         )?;
         self.0.licenses.insert(
             "licenses",
-            bincode::encode_to_vec(licenses.json().await?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                licenses.json::<Vec<License>>().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
         self.0.donation_platforms.insert(
             "donation_platforms",
             bincode::encode_to_vec(
-                donation_platforms.json().await?,
+                donation_platforms.json::<Vec<DonationPlatform>>().await?,
                 *BINCODE_CONFIG,
             )?,
         )?;
         self.0.report_types.insert(
             "report_types",
             bincode::encode_to_vec(
-                report_types.json().await?,
+                report_types.json::<Vec<String>>().await?,
                 *BINCODE_CONFIG,
             )?,
         )?;
