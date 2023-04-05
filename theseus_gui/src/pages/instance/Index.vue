@@ -2,10 +2,10 @@
   <div class="instance-container">
     <div class="side-cards">
       <Card class="instance-card">
-        <Avatar size="lg" :src="getInstance(instances).img" />
+        <Avatar size="lg" :src="getInstance(instanceStore).img" />
         <div class="instance-info">
-          <h2 class="name">{{ getInstance(instances).name }}</h2>
-          Fabric {{ getInstance(instances).version }}
+          <h2 class="name">{{ getInstance(instanceStore).name }}</h2>
+          Fabric {{ getInstance(instanceStore).version }}
         </div>
         <span class="button-group">
           <Button color="primary" class="instance-button">
@@ -43,14 +43,14 @@ import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { useInstances } from '@/store/state'
 
-const instances = useInstances()
-instances.fetchInstances()
+const instanceStore = useInstances()
+instanceStore.fetchInstances()
 </script>
 <script>
 export default {
   methods: {
-    getInstance(instances) {
-      return instances.instances.find((i) => i.id === parseInt(this.$route.params.id))
+    getInstance(instanceStore) {
+      return instanceStore.instances.find((i) => i.id === parseInt(this.$route.params.id))
     },
   },
 }
