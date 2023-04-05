@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io::Read;
 use std::sync::Arc;
-use std::time::Instant;
+use std::time::{Duration, Instant};
 use tokio::sync::{Mutex, Semaphore};
 
 lazy_static! {
@@ -458,7 +458,22 @@ pub async fn retrieve_data(
                         }.await
                     });
 
-                    futures::future::try_join_all(loaders_futures).await?;
+                    {
+                        let mut versions = loaders_futures.into_iter().peekable();
+                        let mut chunk_index = 0;
+                        while versions.peek().is_some() {
+                            let now = Instant::now();
+
+                            let chunk: Vec<_> = versions.by_ref().take(1).collect();
+                            futures::future::try_join_all(chunk).await?;
+
+                            chunk_index += 1;
+
+                            let elapsed = now.elapsed();
+                            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+                        }
+                    }
+                    //futures::future::try_join_all(loaders_futures).await?;
                 }
 
                 versions.lock().await.push(daedalus::modded::Version {
@@ -472,7 +487,22 @@ pub async fn retrieve_data(
         }
     }
 
-    futures::future::try_join_all(version_futures).await?;
+    {
+        let mut versions = version_futures.into_iter().peekable();
+        let mut chunk_index = 0;
+        while versions.peek().is_some() {
+            let now = Instant::now();
+
+            let chunk: Vec<_> = versions.by_ref().take(10).collect();
+            futures::future::try_join_all(chunk).await?;
+
+            chunk_index += 1;
+
+            let elapsed = now.elapsed();
+            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+        }
+    }
+    //futures::future::try_join_all(version_futures).await?;
 
     if let Ok(versions) = Arc::try_unwrap(versions) {
         let mut versions = versions.into_inner();

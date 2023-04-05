@@ -147,7 +147,22 @@ pub async fn retrieve_data(
         })
     }
 
-    futures::future::try_join_all(version_futures).await?;
+    {
+        let mut versions = version_futures.into_iter().peekable();
+        let mut chunk_index = 0;
+        while versions.peek().is_some() {
+            let now = Instant::now();
+
+            let chunk: Vec<_> = versions.by_ref().take(100).collect();
+            futures::future::try_join_all(chunk).await?;
+
+            chunk_index += 1;
+
+            let elapsed = now.elapsed();
+            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+        }
+    }
+    //futures::future::try_join_all(version_futures).await?;
 
     upload_file_to_bucket(
         format!(

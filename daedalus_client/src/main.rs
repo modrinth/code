@@ -1,4 +1,4 @@
-use log::{error, warn};
+use log::{error, info, warn};
 use s3::creds::Credentials;
 use s3::error::S3Error;
 use s3::{Bucket, Region};
@@ -112,7 +112,6 @@ fn check_env_vars() -> bool {
     }
 
     failed |= check_var::<String>("BASE_URL");
-    failed |= check_var::<String>("BASE_FOLDER");
 
     failed |= check_var::<String>("S3_ACCESS_TOKEN");
     failed |= check_var::<String>("S3_SECRET");
@@ -154,7 +153,8 @@ pub async fn upload_file_to_bucket(
     semaphore: Arc<Semaphore>,
 ) -> Result<(), Error> {
     let _permit = semaphore.acquire().await?;
-    let key = format!("{}/{}", &*dotenvy::var("BASE_FOLDER").unwrap(), path);
+    info!("{} started uploading", path);
+    let key = path.clone();
 
     for attempt in 1..=4 {
         let result = if let Some(ref content_type) = content_type {
@@ -166,16 +166,13 @@ pub async fn upload_file_to_bucket(
         }
         .map_err(|err| Error::S3Error {
             inner: err,
-            file: format!(
-                "{}/{}",
-                &*dotenvy::var("BASE_FOLDER").unwrap(),
-                path
-            ),
+            file: path.clone(),
         });
 
         match result {
             Ok(_) => {
                 {
+                    info!("{} done uploading", path);
                     let mut uploaded_files = uploaded_files.lock().await;
                     uploaded_files.push(key);
                 }
@@ -188,15 +185,13 @@ pub async fn upload_file_to_bucket(
             }
         }
     }
-
     unreachable!()
 }
 
 pub fn format_url(path: &str) -> String {
     format!(
-        "{}/{}/{}",
+        "{}/{}",
         &*dotenvy::var("BASE_URL").unwrap(),
-        &*dotenvy::var("BASE_FOLDER").unwrap(),
         path
     )
 }
@@ -207,7 +202,9 @@ pub async fn download_file(
     semaphore: Arc<Semaphore>,
 ) -> Result<bytes::Bytes, Error> {
     let _permit = semaphore.acquire().await?;
+    info!("{} started downloading", url);
     let val = daedalus::download_file(url, sha1).await?;
+    info!("{} finished downloading", url);
     Ok(val)
 }
 
@@ -218,8 +215,9 @@ pub async fn download_file_mirrors(
     semaphore: Arc<Semaphore>,
 ) -> Result<bytes::Bytes, Error> {
     let _permit = semaphore.acquire().await?;
-
+    info!("{} started downloading", base);
     let val = daedalus::download_file_mirrors(base, mirrors, sha1).await?;
+    info!("{} finished downloading", base);
 
     Ok(val)
 }
