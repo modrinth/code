@@ -14,4 +14,3 @@ export async function install(version_id) {
 export async function install_from_file(path) {
   return await invoke('pack_install_file', path)
 }
-
