@@ -4,6 +4,8 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
 
+use super::Profile;
+
 // Child processes (instances of Minecraft)
 // A wrapper over a Hashmap connecting PID -> MinecraftChild
 pub struct Children(HashMap<u32, Arc<RwLock<MinecraftChild>>>);
@@ -122,6 +124,42 @@ impl Children {
             }
         }
         Ok(keys)
+    }
+
+    // Gets all profiles of running children
+    pub async fn running_profile_paths(&self) -> crate::Result<Vec<PathBuf>> {
+        let mut profiles = Vec::new();
+        for key in self.keys() {
+            if let Some(child) = self.get(&key) {
+                let child = child.clone();
+                let mut child = child.write().await;
+                if child.child.try_wait()?.is_none() {
+                    profiles.push(child.profile_path.clone());
+                }
+            }
+        }
+        Ok(profiles)
+    }
+
+    // Gets all profiles of running children
+    // Returns clones because it would be serialized anyway
+    pub async fn running_profiles(&self) -> crate::Result<Vec<Profile>> {
+        let mut profiles = Vec::new();
+        for key in self.keys() {
+            if let Some(child) = self.get(&key) {
+                let child = child.clone();
+                let mut child = child.write().await;
+                if child.child.try_wait()?.is_none() {
+                    if let Some(prof) =
+                        crate::api::profile::get(&child.profile_path.clone())
+                            .await?
+                    {
+                        profiles.push(prof);
+                    }
+                }
+            }
+        }
+        Ok(profiles)
     }
 }
 

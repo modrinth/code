@@ -12,7 +12,7 @@ export async function get_tag_bundle() {
 
 // Gets cached category tags
 export async function get_categories() {
-  return await invoke('tags_get_categories')
+  return await invoke('tags_get_category_tags')
 }
 
 // Gets cached loaders tags

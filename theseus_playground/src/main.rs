@@ -131,7 +131,20 @@ async fn main() -> theseus::Result<()> {
     let stdout = process::get_stdout_by_pid(pid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");
 
-    // Spawn a thread and hold the lock to the process until it ends
+    println!(
+        "All running process PIDs {:?}",
+        process::get_all_running_pids().await?
+    );
+    println!(
+        "All running process paths {:?}",
+        process::get_all_running_profile_paths().await?
+    );
+    println!(
+        "All running process profiles {:?}",
+        process::get_all_running_profiles().await?
+    );
+
+    // hold the lock to the process until it ends
     println!("Waiting for process to end...");
     let mut proc = proc_lock.write().await;
     process::wait_for(&mut proc).await?;

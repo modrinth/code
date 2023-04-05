@@ -48,6 +48,8 @@ fn main() {
             api::process::process_get_all_pids,
             api::process::process_get_all_running_pids,
             api::process::process_get_pids_by_profile_path,
+            api::process::process_get_all_running_profile_paths,
+            api::process::process_get_all_running_profiles,
             api::process::process_get_exit_status_by_pid,
             api::process::process_has_finished_by_pid,
             api::process::process_get_stderr_by_pid,

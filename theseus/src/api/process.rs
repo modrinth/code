@@ -1,5 +1,5 @@
 //! Theseus process management interface
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use crate::state::MinecraftChild;
 pub use crate::{
@@ -37,6 +37,22 @@ pub async fn get_all_running_pids() -> crate::Result<Vec<u32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
     children.running_keys().await
+}
+
+// Gets the Profile paths of each *running* stored process in the state
+#[tracing::instrument]
+pub async fn get_all_running_profile_paths() -> crate::Result<Vec<PathBuf>> {
+    let state = State::get().await?;
+    let children = state.children.read().await;
+    children.running_profile_paths().await
+}
+
+// Gets the Profiles (cloned) of each *running* stored process in the state
+#[tracing::instrument]
+pub async fn get_all_running_profiles() -> crate::Result<Vec<Profile>> {
+    let state = State::get().await?;
+    let children = state.children.read().await;
+    children.running_profiles().await
 }
 
 // Gets the PID of each stored process in the state by profile path

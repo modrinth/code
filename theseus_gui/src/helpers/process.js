@@ -35,6 +35,18 @@ export async function get_pids_by_profile_path(profile_path) {
   return await invoke('process_get_pids_by_profile_path', { profile_path })
 }
 
+/// Gets all running process IDs with a given profile path
+/// Returns [u32]
+export async function get_all_running_profile_paths(profile_path) {
+  return await invoke('process_get_all_running_profile_paths', { profile_path })
+}
+
+/// Gets all running process IDs with a given profile path
+/// Returns [u32]
+export async function get_all_running_profiles(profile_path) {
+  return await invoke('process_get_all_running_profiles', { profile_path })
+}
+
 /// Gets process stderr by PID
 /// Returns String
 export async function get_stderr_by_pid(pid) {
