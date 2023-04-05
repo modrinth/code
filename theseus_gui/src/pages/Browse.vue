@@ -17,6 +17,8 @@ import {
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import generated from '@/generated'
+// import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
+import { get_tag_bundle } from '@/helpers/tags'
 
 // Pull search store
 const searchStore = useSearch()
@@ -24,6 +26,13 @@ const searchStore = useSearch()
 const selectedVersions = ref([])
 const showSnapshots = ref(false)
 const isClearDisabled = ref(true)
+
+// const categories = await get_categories()
+// const loaders = await get_loaders()
+// const availableGameVersions = await get_game_versions()
+const tags = await get_tag_bundle()
+
+console.log('tags', tags)
 
 const availableGameVersions = generated.gameVersions
 
