@@ -4,8 +4,11 @@ use thiserror::Error;
 
 pub mod auth;
 
+pub mod process;
 pub mod profile;
 pub mod profile_create;
+pub mod settings;
+pub mod tags;
 
 pub type Result<T> = std::result::Result<T, TheseusGuiError>;
 

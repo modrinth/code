@@ -6,8 +6,7 @@
 use dunce::canonicalize;
 use std::path::Path;
 use theseus::{prelude::*, profile_create::profile_create};
-use tokio::process::Child;
-use tokio::sync::RwLockWriteGuard;
+use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -87,7 +86,7 @@ async fn main() -> theseus::Result<()> {
     // Attempt to get the default user, if it exists, and refresh their credentials
     let default_user_uuid = {
         let settings = st.settings.read().await;
-        settings.default_user.clone()    
+        settings.default_user
     };
     let credentials = if let Some(uuid) = default_user_uuid {
         println!("Attempting to refresh existing authentication.");
@@ -118,10 +117,37 @@ async fn main() -> theseus::Result<()> {
         }
     }?;
 
-    // Spawn a thread and hold the lock to the process until it ends
-    println!("Started Minecraft. Waiting for process to end...");
-    let mut proc: RwLockWriteGuard<Child> = proc_lock.write().await;
-    profile::wait_for(&mut proc).await?;
+    let pid = proc_lock
+        .read()
+        .await
+        .child
+        .id()
+        .expect("Could not get PID from process.");
+    println!("Minecraft PID: {}", pid);
+
+    // Wait 5 seconds
+    println!("Waiting 10 seconds to gather logs...");
+    sleep(Duration::from_secs(10)).await;
+    let stdout = process::get_stdout_by_pid(pid).await?;
+    println!("Logs after 5sec <<< {stdout} >>> end stdout");
+
+    println!(
+        "All running process PIDs {:?}",
+        process::get_all_running_pids().await?
+    );
+    println!(
+        "All running process paths {:?}",
+        process::get_all_running_profile_paths().await?
+    );
+    println!(
+        "All running process profiles {:?}",
+        process::get_all_running_profiles().await?
+    );
+
+    // hold the lock to the process until it ends
+    println!("Waiting for process to end...");
+    let mut proc = proc_lock.write().await;
+    process::wait_for(&mut proc).await?;
 
     Ok(())
 }

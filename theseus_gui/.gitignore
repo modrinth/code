@@ -12,7 +12,6 @@ lerna-debug.log*
 generated.js
 
 node_modules
-dist
 dist-ssr
 *.local
 
@@ -26,3 +25,5 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+generated.js

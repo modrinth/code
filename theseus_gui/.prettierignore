@@ -7,6 +7,7 @@ node_modules
 .env
 dist
 *.md
+package.json
 
 generated/
 !.gitkeep
