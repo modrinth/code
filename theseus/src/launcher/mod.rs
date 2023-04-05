@@ -1,5 +1,5 @@
 //! Logic for launching Minecraft
-use crate::state as st;
+use crate::{process, state as st};
 use daedalus as d;
 use dunce::canonicalize;
 use std::{path::Path, process::Stdio};
@@ -176,6 +176,18 @@ pub async fn launch_minecraft(
 
     let env_args = Vec::from(env_args);
 
+    // Check if profile has a running profile, and reject running the command if it does
+    // Done late so a quick double call doesn't launch two instances
+    let existing_processes =
+        process::get_pids_by_profile_path(instance_path).await?;
+    if let Some(pid) = existing_processes.first() {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Profile {} is already running at PID: {pid}",
+            instance_path.display()
+        ))
+        .as_error());
+    }
+
     command
         .args(
             args::get_jvm_arguments(
@@ -217,8 +229,8 @@ pub async fn launch_minecraft(
         .current_dir(instance_path.clone())
         .env_clear()
         .envs(env_args)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
     command.spawn().map_err(|err| {
         crate::ErrorKind::LauncherError(format!(
