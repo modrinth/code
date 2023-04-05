@@ -105,7 +105,7 @@ async fn compare_minecraft_game_versions(
 
 pub fn find_jre_8() -> crate::Result<Option<JavaVersion>> {
     let jres = jre::get_all_jre()?;
-    Ok(jres.into_iter().find(|jre| jre.version == "1.7"))
+    Ok(jres.into_iter().find(|jre| jre.version == "1.8"))
 }
 
 pub fn find_jre_17plus() -> crate::Result<Option<JavaVersion>> {
