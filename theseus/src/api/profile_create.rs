@@ -95,7 +95,12 @@ pub async fn profile_create(
         let loaders = &loader_data
             .game_versions
             .iter()
-            .find(|it| it.id == game_version)
+            .find(|it| {
+                it.id.replace(
+                    daedalus::modded::DUMMY_REPLACE_STRING,
+                    &game_version,
+                ) == game_version
+            })
             .ok_or_else(|| {
                 ProfileCreationError::ModloaderUnsupported(
                     loader.to_string(),

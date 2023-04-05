@@ -46,7 +46,7 @@ pub struct ModrinthProject {
 
     pub versions: Vec<String>,
 
-    pub icon_url: String,
+    pub icon_url: Option<String>,
 }
 
 /// A specific version of a project
@@ -146,10 +146,14 @@ async fn read_icon_from_file(
                 .file()
                 .entries()
                 .iter()
-                .position(|f| f.entry().filename() == &icon_path);
+                .position(|f| f.entry().filename() == icon_path);
             if let Some(index) = zip_index_option {
-                let entry =
-                    zip_file_reader.file().entries().get(index).unwrap().entry();
+                let entry = zip_file_reader
+                    .file()
+                    .entries()
+                    .get(index)
+                    .unwrap()
+                    .entry();
                 let mut bytes = Vec::new();
                 if zip_file_reader
                     .entry(zip_index_option.unwrap())
@@ -160,9 +164,10 @@ async fn read_icon_from_file(
                 {
                     let bytes = bytes::Bytes::from(bytes);
                     let permit = io_semaphore.acquire().await?;
-                    let path =
-                        write_cached_icon(&icon_path, cache_dir, bytes, &permit)
-                            .await?;
+                    let path = write_cached_icon(
+                        &icon_path, cache_dir, bytes, &permit,
+                    )
+                    .await?;
 
                     return Ok(Some(path));
                 }

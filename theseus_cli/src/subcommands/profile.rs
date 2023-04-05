@@ -47,10 +47,6 @@ pub struct ProfileInit {
     /// the game version of the profile
     game_version: Option<String>,
 
-    #[argh(option)]
-    /// the icon for the profile
-    icon: Option<PathBuf>,
-
     #[argh(option, from_str_fn(modloader_from_str))]
     /// the modloader to use
     modloader: Option<ModLoader>,
@@ -259,7 +255,7 @@ impl ProfileList {
         _largs: &ProfileCommand,
     ) -> Result<()> {
         let profiles = profile::list().await?;
-        let rows = profiles.iter().map(|(path, prof)| ProfileRow::from(prof));
+        let rows = profiles.values().map(ProfileRow::from);
 
         let table = table(rows).with(
             tabled::Modify::new(tabled::Column(1..=1))

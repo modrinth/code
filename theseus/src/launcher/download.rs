@@ -39,11 +39,12 @@ pub async fn download_version_info(
     version: &GameVersion,
     loader: Option<&LoaderVersion>,
 ) -> crate::Result<GameVersionInfo> {
-    let version_id = loader.map_or(&version.id, |it| &it.id);
+    let version_id = loader
+        .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
     log::debug!("Loading version info for Minecraft {version_id}");
     let path = st
         .directories
-        .version_dir(version_id)
+        .version_dir(&version_id)
         .join(format!("{version_id}.json"));
 
     let res = if path.exists() {
@@ -58,8 +59,8 @@ pub async fn download_version_info(
         if let Some(loader) = loader {
             let partial = d::modded::fetch_partial_version(&loader.url).await?;
             info = d::modded::merge_partial_version(partial, info);
-            info.id = loader.id.clone();
         }
+        info.id = version_id.clone();
 
         let permit = st.io_semaphore.acquire().await?;
         write(&path, &serde_json::to_vec(&info)?, &permit).await?;

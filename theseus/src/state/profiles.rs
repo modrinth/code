@@ -145,6 +145,26 @@ impl Profile {
             .into())
         }
     }
+
+    pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
+        let mut files = Vec::new();
+        let mut read_paths = |path: &str| {
+            let new_path = self.path.join(path);
+            if new_path.exists() {
+                for path in std::fs::read_dir(self.path.join(path))? {
+                    files.push(path?.path());
+                }
+            }
+            Ok::<(), crate::Error>(())
+        };
+
+        read_paths("mods")?;
+        read_paths("shaders")?;
+        read_paths("resourcepacks")?;
+        read_paths("datapacks")?;
+
+        Ok(files)
+    }
 }
 
 impl Profiles {
@@ -186,23 +206,15 @@ impl Profiles {
         // project path, parent profile path
         let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
         {
-            for (profile_path, _profile_opt) in profiles.iter() {
-                let mut read_paths = |path: &str| {
-                    let new_path = profile_path.join(path);
-                    if new_path.exists() {
-                        for path in std::fs::read_dir(profile_path.join(path))?
-                        {
-                            files.insert(path?.path(), profile_path.clone());
-                        }
-                    }
-                    Ok::<(), crate::Error>(())
-                };
-                read_paths("mods")?;
-                read_paths("shaders")?;
-                read_paths("resourcepacks")?;
-                read_paths("datapacks")?;
+            for (profile_path, profile) in profiles.iter() {
+                let paths = profile.get_profile_project_paths()?;
+
+                for path in paths {
+                    files.insert(path, profile_path.clone());
+                }
             }
         }
+
         let inferred = super::projects::infer_data_from_files(
             files.keys().cloned().collect(),
             dirs.caches_dir(),

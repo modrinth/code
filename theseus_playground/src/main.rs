@@ -81,7 +81,7 @@ async fn main() -> theseus::Result<()> {
     // )
     // .await?;
     let profile_path =
-        pack::install_pack_from_version_id("KcPpJLaW".to_string())
+        pack::install_pack_from_version_id("hZ6f9Ij9".to_string())
             .await
             .unwrap();
 

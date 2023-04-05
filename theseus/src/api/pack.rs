@@ -109,13 +109,13 @@ pub async fn install_pack_from_version_id(
         .json()
         .await?;
 
-    let icon = {
+    let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
         let semaphore = state.io_semaphore.acquire().await?;
 
-        let icon_bytes = fetch(&project.icon_url, None, &semaphore).await?;
+        let icon_bytes = fetch(&icon_url, None, &semaphore).await?;
 
-        let filename = project.icon_url.rsplit('/').next();
+        let filename = icon_url.rsplit('/').next();
 
         if let Some(filename) = filename {
             Some(
@@ -130,6 +130,8 @@ pub async fn install_pack_from_version_id(
         } else {
             None
         }
+    } else {
+        None
     };
 
     install_pack(file, icon, Some(version.project_id)).await
@@ -218,7 +220,7 @@ async fn install_pack(
             pack.name,
             game_version.clone(),
             mod_loader.unwrap_or(ModLoader::Vanilla),
-            loader_version.map(|x| format!("{game_version}-{x}")),
+            loader_version,
             icon,
             project_id,
         )
@@ -262,7 +264,6 @@ async fn install_pack(
                             Component::CurDir | Component::Normal(_) => {
                                 let path = profile.join(project.path);
                                 write(&path, &file, &permit).await?;
-                                println!("finished downloading {:?}", path);
                             }
                             _ => {}
                         };
@@ -295,15 +296,13 @@ async fn install_pack(
                         .clone();
 
                     let file_path = PathBuf::from(file.filename());
-                    if file_path.starts_with(&overrides)
-                        && !file_path.ends_with("/")
+                    if file.filename().starts_with(&overrides)
+                        && !file.filename().ends_with('/')
                     {
                         // Reads the file into the 'content' variable
                         let mut content = Vec::new();
                         let mut reader = overrides_zip.entry(index).await?;
-                        reader
-                            .read_to_end_checked(&mut content, &mut file)
-                            .await?;
+                        reader.read_to_end_checked(&mut content, &file).await?;
 
                         let mut new_path = PathBuf::new();
                         let components = file_path.components().skip(1);
@@ -312,7 +311,7 @@ async fn install_pack(
                             new_path.push(component);
                         }
 
-                        if new_path.is_file() {
+                        if new_path.file_name().is_some() {
                             let permit = state.io_semaphore.acquire().await?;
                             write(&profile.join(new_path), &content, &permit)
                                 .await?;
@@ -328,7 +327,7 @@ async fn install_pack(
         extract_overrides("overrides".to_string()).await?;
         extract_overrides("client_overrides".to_string()).await?;
 
-        State::sync().await?;
+        super::profile::sync(&profile).await?;
 
         Ok(profile)
     } else {

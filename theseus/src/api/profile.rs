@@ -62,6 +62,34 @@ pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>
     Ok(profiles.0.clone())
 }
 
+/// Query + sync profile's projects with the UI from the FS
+#[tracing::instrument]
+pub async fn sync(path: &Path) -> crate::Result<()> {
+    let state = State::get().await?;
+
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(path) {
+        let paths = profile.get_profile_project_paths()?;
+        let projects = crate::state::infer_data_from_files(
+            paths,
+            state.directories.caches_dir(),
+            &state.io_semaphore,
+        )
+        .await?;
+
+        profile.projects = projects;
+        State::sync().await?;
+
+        Ok(())
+    } else {
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(path.display().to_string())
+                .as_error(),
+        )
+    }
+}
+
 /// Run Minecraft using a profile
 /// Returns Arc pointer to RwLock to Child
 #[tracing::instrument(skip_all)]

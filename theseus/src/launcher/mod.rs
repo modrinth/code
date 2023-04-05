@@ -71,9 +71,10 @@ pub async fn launch_minecraft(
             "Invalid game version: {game_version}"
         )))?;
 
-    let version_jar = loader_version
-        .as_ref()
-        .map_or(version.id.clone(), |it| it.id.clone());
+    let version_jar =
+        loader_version.as_ref().map_or(version.id.clone(), |it| {
+            format!("{}-{}", version.id.clone(), it.id.clone())
+        });
 
     let mut version_info = download::download_version_info(
         &state,
