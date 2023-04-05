@@ -74,7 +74,7 @@ impl State {
                         .open()?;
 
                     // Settings
-                    let settings =
+                    let mut settings =
                         Settings::init(&directories.settings_file()).await?;
 
                     // Launcher data
@@ -100,6 +100,24 @@ impl State {
                             tag_fetch_err
                         );
                     };
+
+                    // On launcher initialization, if global java variables are unset, try to find and set them
+                    if settings.java_8_path.is_none() {
+                        if let Some(java_8_path) = crate::jre::find_jre_8()? {
+                            settings.java_8_path =
+                                Some(java_8_path.path.into());
+                        }
+                    }
+                    if settings.java_17_path.is_none() {
+                        if let Some(java_16_path) =
+                            crate::jre::find_jre_17plus()?
+                        {
+                            settings.java_17_path =
+                                Some(java_16_path.path.into());
+                        }
+                    }
+
+                    dbg!("settings", &settings);
 
                     Ok(Arc::new(Self {
                         database,

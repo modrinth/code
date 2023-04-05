@@ -6,8 +6,8 @@ pub mod auth;
 pub mod jre;
 pub mod profile;
 pub mod profile_create;
-pub mod tags;
 pub mod settings;
+pub mod tags;
 
 pub type Result<T> = std::result::Result<T, TheseusGuiError>;
 
@@ -30,7 +30,6 @@ pub enum TheseusSerializableError {
 
     #[error("No profile found at {0}")]
     NoProfileFound(String),
-
 }
 
 // Generic implementation of From<T> for ErrorTypeA

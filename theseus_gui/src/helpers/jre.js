@@ -20,6 +20,18 @@ export async function get_all_jre() {
   return await invoke('jre_get_all_jre')
 }
 
+// Finds the installation of Java 7, if it exists
+// Returns a JavaVersion
+export async function find_jre_8() {
+  return await invoke('jre_find_jre_8')
+}
+
+// Finds the highest version of Java 17+, if it exists
+// Returns a JavaVersion
+export async function find_jre_17plus() {
+  return await invoke('jre_find_jre_17plus')
+}
+
 /// From a Path to a profile, returns the JavaVersion of the optimal JRE to use
 /// Returns an error if the profile is not managed by Theseus, or if the optimal JRE could not be detected
 /// If successful, returns the optimal JavaVersion

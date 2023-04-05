@@ -50,6 +50,8 @@ fn main() {
             api::jre::jre_get_all_jre,
             api::jre::jre_detect_optimal_jre,
             api::jre::jre_get_all_allowable_jre,
+            api::jre::jre_find_jre_8,
+            api::jre::jre_find_jre_17plus
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -3,8 +3,8 @@ pub mod auth;
 pub mod jre;
 pub mod profile;
 pub mod profile_create;
-pub mod tags;
 pub mod settings;
+pub mod tags;
 
 pub mod data {
     pub use crate::state::{
@@ -18,8 +18,9 @@ pub mod prelude {
         auth::{self, Credentials},
         data::*,
         jre,
-        util::jre::JavaVersion,
         profile::{self, Profile},
-        profile_create, settings, State,
+        profile_create, settings,
+        util::jre::JavaVersion,
+        State,
     };
 }

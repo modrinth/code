@@ -79,7 +79,10 @@ pub enum ErrorKind {
     ProfileCreationError(#[from] profile_create::ProfileCreationError),
 
     #[error("JRE error: {0}")]
-    JREError (#[from] crate::util::jre::JREError),
+    JREError(#[from] crate::util::jre::JREError),
+
+    #[error("Error parsing date: {0}")]
+    ChronoParseError(#[from] chrono::ParseError),
 
     #[error("Error: {0}")]
     OtherError(String),

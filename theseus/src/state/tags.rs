@@ -247,52 +247,7 @@ pub struct DonationPlatform {
 #[derive(Debug, Clone, Decode, Encode, Serialize, Deserialize)]
 pub struct GameVersion {
     pub version: String,
-    pub version_type: GameVersionString,
+    pub version_type: String,
     pub date: String,
     pub major: bool,
-}
-
-// GameVersionString is a newtype wrapper around a string that allows it to be sorted by Minecraft version
-#[derive(Serialize, Deserialize, Decode, Encode, Clone, Debug, PartialEq)]
-#[serde(transparent)] // types that use this need to encode it as a String, so thats what we do
-pub struct GameVersionString(pub String);
-impl PartialOrd for GameVersionString {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        let self_parts : Vec<&str> = self.0.split('.').collect();
-        let other_parts : Vec<&str> = other.0.split('.').collect();
-        let mut self_iter = self_parts.iter();
-        let mut other_iter = other_parts.iter();
-        loop {
-            let self_part = self_iter.next();
-            let other_part = other_iter.next();
-            match (self_part, other_part) {
-                (Some(self_part), Some(other_part)) => {
-                    let self_part = self_part.parse::<u32>().unwrap();
-                    let other_part = other_part.parse::<u32>().unwrap();
-                    match self_part.cmp(&other_part) {
-                        std::cmp::Ordering::Equal => continue,
-                        std::cmp::Ordering::Less => return Some(std::cmp::Ordering::Less),
-                        std::cmp::Ordering::Greater => return Some(std::cmp::Ordering::Greater),
-                    }
-                }
-                (Some(_), None) => return Some(std::cmp::Ordering::Greater),
-                (None, Some(_)) => return Some(std::cmp::Ordering::Less),
-                (None, None) => return Some(std::cmp::Ordering::Equal),
-            }
-        }
-    }
-}
-
-// From String
-impl From<String> for GameVersionString {
-    fn from(s: String) -> Self {
-        Self(s)
-    }
-}
-
-// Display 
-impl std::fmt::Display for GameVersionString {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.0)
-    }
 }

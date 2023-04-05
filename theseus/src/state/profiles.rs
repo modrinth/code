@@ -1,4 +1,4 @@
-use super::{settings::{Hooks, MemorySettings, WindowSize}, GameVersionString};
+use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::BINCODE_CONFIG;
 use crate::data::DirectoryInfo;
 use crate::state::projects::Project;
@@ -46,14 +46,13 @@ pub struct ProfileMetadata {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<PathBuf>,
-    pub game_version: GameVersionString,
+    pub game_version: String,
     #[serde(default)]
     pub loader: ModLoader,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
 }
-
 
 // TODO: Quilt?
 #[derive(
@@ -104,7 +103,7 @@ impl Profile {
             metadata: ProfileMetadata {
                 name,
                 icon: None,
-                game_version: version.into(),
+                game_version: version,
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
@@ -152,7 +151,7 @@ impl Profile {
 
     #[tracing::instrument]
     pub fn with_game_version(&mut self, version: String) -> &mut Self {
-        self.metadata.game_version = version.into();
+        self.metadata.game_version = version;
         self
     }
 
@@ -178,10 +177,7 @@ impl Profile {
 
     // Sets path only
     #[tracing::instrument]
-    pub fn with_java_path(
-        &mut self,
-        path: PathBuf,
-    ) -> &mut Self {
+    pub fn with_java_path(&mut self, path: PathBuf) -> &mut Self {
         self.java = match self.java {
             Some(ref mut java) => {
                 java.install = Some(path);

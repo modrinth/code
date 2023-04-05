@@ -1,7 +1,7 @@
 use dunce::canonicalize;
 use lazy_static::lazy_static;
 use regex::Regex;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 use std::env;
 use std::path::PathBuf;
@@ -231,9 +231,14 @@ pub fn check_java_at_filepath(path: PathBuf) -> Option<JavaVersion> {
 /// Gets the minor version or an error, and assumes 1 for major version if it could not find
 /// "1.8.0_361" -> (1, 8)
 /// "20" -> (1, 20)
-pub fn extract_java_majorminor_version(version: &str) -> Result<(u8, u8), JREError> {
+pub fn extract_java_majorminor_version(
+    version: &str,
+) -> Result<(u8, u8), JREError> {
     let mut split = version.split('.').rev();
-    let minor = split.next().ok_or_else(|| JREError::InvalidJREVersion(version.to_string()))?.parse::<u8>()?;
+    let minor = split
+        .next()
+        .ok_or_else(|| JREError::InvalidJREVersion(version.to_string()))?
+        .parse::<u8>()?;
     let major = split.next().unwrap_or("1").parse::<u8>()?;
     Ok((major, minor))
 }
@@ -254,4 +259,7 @@ pub enum JREError {
 
     #[error("Parsing error: {0}")]
     ParseError(#[from] std::num::ParseIntError),
+
+    #[error("No stored tag for Minecraft Version {0}")]
+    NoMinecraftVersionFound(String),
 }

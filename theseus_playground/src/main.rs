@@ -69,7 +69,6 @@ async fn main() -> theseus::Result<()> {
     .await?;
     State::sync().await?;
 
-
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
     // println!("Editing.");

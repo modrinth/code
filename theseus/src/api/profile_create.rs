@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::{prelude::ModLoader, profile, jre::detect_optimal_jre};
+use crate::{jre::detect_optimal_jre, prelude::ModLoader, profile};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
