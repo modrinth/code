@@ -44,7 +44,7 @@ async fn main() {
         return;
     }
 
-    let mut timer = tokio::time::interval(Duration::from_secs(30 * 60));
+    let mut timer = tokio::time::interval(Duration::from_secs(60 * 60));
     let semaphore = Arc::new(Semaphore::new(50));
 
     loop {
