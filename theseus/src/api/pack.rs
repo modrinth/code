@@ -287,7 +287,7 @@ async fn install_pack(
             let profile = profile.clone();
             async move {
                 for index in 0..overrides_zip.file().entries().len() {
-                    let mut file = overrides_zip
+                    let file = overrides_zip
                         .file()
                         .entries()
                         .get(index)

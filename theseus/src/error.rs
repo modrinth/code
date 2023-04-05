@@ -67,9 +67,6 @@ pub enum ErrorKind {
     #[error("Recv error: {0}")]
     RecvError(#[from] tokio::sync::oneshot::error::RecvError),
 
-    #[error("Task join error: {0}")]
-    JoinError(#[from] tokio::task::JoinError),
-
     #[error("Error acquiring semaphore: {0}")]
     AcquireError(#[from] tokio::sync::AcquireError),
 

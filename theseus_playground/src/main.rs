@@ -31,25 +31,8 @@ async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
     // Initialize state
-    {
-        let st = State::get().await?;
-        st.settings.write().await.max_concurrent_downloads = 100;
-    }
-
-    // Set max concurrent downloads to 10
-
-    // Example variables for simple project case
-    let name = "Example".to_string();
-    let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Fabric;
-    let loader_version = "stable".to_string();
-
-    // let icon = Some(
-    //     Path::new("../icon_test.png")
-    //         .canonicalize()
-    //         .expect("Icon could be not be found. If not using, set to None"),
-    // );
-    //let icon = None;
+    let st = State::get().await?;
+    st.settings.write().await.max_concurrent_downloads = 100;
 
     // Clear profiles
     println!("Clearing profiles.");
@@ -61,24 +44,11 @@ async fn main() -> theseus::Result<()> {
     }
 
     println!("Creating/adding profile.");
-    // Attempt to create a profile. If that fails, try adding one from the same path.
-    // TODO: actually do a nested error check for the correct profile error.
-    // let profile_path = profile_create(
-    //     name.clone(),
-    //     game_version,
-    //     modloader,
-    //     Some(loader_version),
-    //     icon,
-    // )
-    // .await?;
+
     let profile_path =
         pack::install_pack_from_version_id("hZ6f9Ij9".to_string())
             .await
             .unwrap();
-
-    // let profiles = profile::list().await?;
-    // let profile_path = profiles.keys().next().unwrap();
-    State::sync().await?;
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
