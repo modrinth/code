@@ -168,7 +168,10 @@ impl Tags {
         )?;
         self.0.game_versions.insert(
             "game_versions",
-            bincode::encode_to_vec(game_versions.json().await?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                game_versions.json().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
         self.0.licenses.insert(
             "licenses",
@@ -176,11 +179,17 @@ impl Tags {
         )?;
         self.0.donation_platforms.insert(
             "donation_platforms",
-            bincode::encode_to_vec(donation_platforms.json().await?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                donation_platforms.json().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
         self.0.report_types.insert(
             "report_types",
-            bincode::encode_to_vec(report_types.json().await?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                report_types.json().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
 
         Ok(())
@@ -190,12 +199,9 @@ impl Tags {
     pub async fn fetch_tag(
         &self,
         tag_type: &str,
-    ) -> Result<reqwest::Response, reqwest::Error>    {
+    ) -> Result<reqwest::Response, reqwest::Error> {
         let url = &format!("{MODRINTH_API_URL}tag/{}", tag_type);
-        let content = REQWEST_CLIENT
-            .get(url)
-            .send()
-            .await?;
+        let content = REQWEST_CLIENT.get(url).send().await?;
         Ok(content)
     }
 }
