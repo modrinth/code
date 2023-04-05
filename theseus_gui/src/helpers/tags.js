@@ -12,17 +12,17 @@ export async function get_tag_bundle() {
 
 // Gets cached category tags
 export async function get_categories() {
-  return await invoke('tags_get_category_tags')
+  return await invoke('tags_get_categories')
 }
 
 // Gets cached loaders tags
 export async function get_loaders() {
-  return await invoke('tags_get_loader_tags')
+  return await invoke('tags_get_loaders')
 }
 
 // Gets cached game_versions tags
 export async function get_game_versions() {
-  return await invoke('tags_get_game_version_tags')
+  return await invoke('tags_get_game_versions')
 }
 
 // Gets cached licenses tags
