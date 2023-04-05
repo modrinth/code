@@ -4,6 +4,8 @@ use thiserror::Error;
 
 pub mod auth;
 pub mod jre;
+
+pub mod process;
 pub mod profile;
 pub mod profile_create;
 pub mod settings;

@@ -1,6 +1,7 @@
 //! API for interacting with Theseus
 pub mod auth;
 pub mod jre;
+pub mod process;
 pub mod profile;
 pub mod profile_create;
 pub mod settings;
@@ -18,6 +19,7 @@ pub mod prelude {
         auth::{self, Credentials},
         data::*,
         jre,
+        process,
         profile::{self, Profile},
         profile_create, settings,
         util::jre::JavaVersion,

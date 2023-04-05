@@ -29,8 +29,6 @@ fn main() {
             api::profile::profile_list,
             api::profile::profile_run,
             api::profile::profile_run_wait,
-            api::profile::profile_kill,
-            api::profile::profile_wait_for,
             api::auth::auth_authenticate_begin_flow,
             api::auth::auth_authenticate_await_completion,
             api::auth::auth_refresh,
@@ -51,7 +49,18 @@ fn main() {
             api::jre::jre_detect_optimal_jre,
             api::jre::jre_get_all_allowable_jre,
             api::jre::jre_find_jre_8,
-            api::jre::jre_find_jre_17plus
+            api::jre::jre_find_jre_17plus,
+            api::process::process_get_all_pids,
+            api::process::process_get_all_running_pids,
+            api::process::process_get_pids_by_profile_path,
+            api::process::process_get_all_running_profile_paths,
+            api::process::process_get_all_running_profiles,
+            api::process::process_get_exit_status_by_pid,
+            api::process::process_has_finished_by_pid,
+            api::process::process_get_stderr_by_pid,
+            api::process::process_get_stdout_by_pid,
+            api::process::process_kill_by_pid,
+            api::process::process_wait_for_by_pid,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
