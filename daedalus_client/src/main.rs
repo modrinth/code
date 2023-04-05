@@ -1,8 +1,10 @@
 use log::{error, warn};
-use std::time::Duration;
-use s3::{Bucket, Region};
 use s3::creds::Credentials;
 use s3::error::S3Error;
+use s3::{Bucket, Region};
+use std::sync::Arc;
+use std::time::Duration;
+use tokio::sync::Semaphore;
 
 mod fabric;
 mod forge;
@@ -19,10 +21,7 @@ pub enum Error {
     #[error("Error while managing asynchronous tasks")]
     TaskError(#[from] tokio::task::JoinError),
     #[error("Error while uploading file to S3")]
-    S3Error {
-        inner: S3Error,
-        file: String,
-    },
+    S3Error { inner: S3Error, file: String },
     #[error("Error while parsing version as semver: {0}")]
     SemVerError(#[from] semver::Error),
     #[error("Error while reading zip file: {0}")]
@@ -31,6 +30,8 @@ pub enum Error {
     IoError(#[from] std::io::Error),
     #[error("Error while obtaining strong reference to Arc")]
     ArcError,
+    #[error("Error acquiring semaphore: {0}")]
+    AcquireError(#[from] tokio::sync::AcquireError),
 }
 
 #[tokio::main]
@@ -43,14 +44,20 @@ async fn main() {
         return;
     }
 
-    let mut timer = tokio::time::interval(Duration::from_secs(10 * 60));
+    let mut timer = tokio::time::interval(Duration::from_secs(30 * 60));
+    let semaphore = Arc::new(Semaphore::new(50));
 
     loop {
         timer.tick().await;
 
         let mut uploaded_files = Vec::new();
 
-        let versions = match minecraft::retrieve_data(&mut uploaded_files).await {
+        let versions = match minecraft::retrieve_data(
+            &mut uploaded_files,
+            semaphore.clone(),
+        )
+        .await
+        {
             Ok(res) => Some(res),
             Err(err) => {
                 error!("{:?}", err);
@@ -60,15 +67,22 @@ async fn main() {
         };
 
         if let Some(manifest) = versions {
-            match fabric::retrieve_data(&manifest, &mut uploaded_files).await {
+            match fabric::retrieve_data(
+                &manifest,
+                &mut uploaded_files,
+                semaphore.clone(),
+            )
+            .await
+            {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
-            match forge::retrieve_data(&manifest, &mut uploaded_files).await {
+            match forge::retrieve_data(&manifest, &mut uploaded_files, semaphore.clone()).await {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
             };
         }
+        break;
     }
 }
 
@@ -104,7 +118,6 @@ fn check_env_vars() -> bool {
     failed
 }
 
-
 lazy_static::lazy_static! {
     static ref CLIENT : Bucket = Bucket::new(
         &dotenvy::var("S3_BUCKET_NAME").unwrap(),
@@ -133,24 +146,26 @@ pub async fn upload_file_to_bucket(
     bytes: Vec<u8>,
     content_type: Option<String>,
     uploaded_files: &tokio::sync::Mutex<Vec<String>>,
+    semaphore: Arc<Semaphore>,
 ) -> Result<(), Error> {
+    let _permit = semaphore.acquire().await?;
     let key = format!("{}/{}", &*dotenvy::var("BASE_FOLDER").unwrap(), path);
 
     for attempt in 1..=4 {
         let result = if let Some(ref content_type) = content_type {
-            CLIENT.put_object_with_content_type(
-                key.clone(),
-                &bytes,
-                content_type,
-            ).await
+            CLIENT
+                .put_object_with_content_type(key.clone(), &bytes, content_type)
+                .await
         } else {
-            CLIENT.put_object(
-                key.clone(),
-                &bytes,
-            ).await
-        }.map_err(|err| Error::S3Error {
+            CLIENT.put_object(key.clone(), &bytes).await
+        }
+        .map_err(|err| Error::S3Error {
             inner: err,
-            file: format!("{}/{}", &*dotenvy::var("BASE_FOLDER").unwrap(), path),
+            file: format!(
+                "{}/{}",
+                &*dotenvy::var("BASE_FOLDER").unwrap(),
+                path
+            ),
         });
 
         match result {
@@ -179,4 +194,30 @@ pub fn format_url(path: &str) -> String {
         &*dotenvy::var("BASE_FOLDER").unwrap(),
         path
     )
+}
+
+pub async fn download_file(
+    url: &str,
+    sha1: Option<&str>,
+    semaphore: Arc<Semaphore>,
+) -> Result<bytes::Bytes, Error> {
+    let _permit = semaphore.acquire().await?;
+    println!("{} url start", url);
+
+    let val = daedalus::download_file(url, sha1).await?;
+    println!("{} url end", url);
+    Ok(val)
+}
+
+pub async fn download_file_mirrors(
+    base: &str,
+    mirrors: &[&str],
+    sha1: Option<&str>,
+    semaphore: Arc<Semaphore>,
+) -> Result<bytes::Bytes, Error> {
+    let _permit = semaphore.acquire().await?;
+
+    let val = daedalus::download_file_mirrors(base, mirrors, sha1).await?;
+
+    Ok(val)
 }

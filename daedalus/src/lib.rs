@@ -46,22 +46,34 @@ pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
     let name_items = artifact.split(':').collect::<Vec<&str>>();
 
     let package = name_items.first().ok_or_else(|| {
-        Error::ParseError(format!("Unable to find package for library {}", &artifact))
+        Error::ParseError(format!(
+            "Unable to find package for library {}",
+            &artifact
+        ))
     })?;
     let name = name_items.get(1).ok_or_else(|| {
-        Error::ParseError(format!("Unable to find name for library {}", &artifact))
+        Error::ParseError(format!(
+            "Unable to find name for library {}",
+            &artifact
+        ))
     })?;
 
     if name_items.len() == 3 {
         let version_ext = name_items
             .get(2)
             .ok_or_else(|| {
-                Error::ParseError(format!("Unable to find version for library {}", &artifact))
+                Error::ParseError(format!(
+                    "Unable to find version for library {}",
+                    &artifact
+                ))
             })?
             .split('@')
             .collect::<Vec<&str>>();
         let version = version_ext.first().ok_or_else(|| {
-            Error::ParseError(format!("Unable to find version for library {}", &artifact))
+            Error::ParseError(format!(
+                "Unable to find version for library {}",
+                &artifact
+            ))
         })?;
         let ext = version_ext.get(1);
 
@@ -76,18 +88,27 @@ pub fn get_path_from_artifact(artifact: &str) -> Result<String, Error> {
         ))
     } else {
         let version = name_items.get(2).ok_or_else(|| {
-            Error::ParseError(format!("Unable to find version for library {}", &artifact))
+            Error::ParseError(format!(
+                "Unable to find version for library {}",
+                &artifact
+            ))
         })?;
 
         let data_ext = name_items
             .get(3)
             .ok_or_else(|| {
-                Error::ParseError(format!("Unable to find data for library {}", &artifact))
+                Error::ParseError(format!(
+                    "Unable to find data for library {}",
+                    &artifact
+                ))
             })?
             .split('@')
             .collect::<Vec<&str>>();
         let data = data_ext.first().ok_or_else(|| {
-            Error::ParseError(format!("Unable to find data for library {}", &artifact))
+            Error::ParseError(format!(
+                "Unable to find data for library {}",
+                &artifact
+            ))
         })?;
         let ext = data_ext.get(1);
 
@@ -126,10 +147,21 @@ pub async fn download_file_mirrors(
 }
 
 /// Downloads a file with retry and checksum functionality
-pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes, Error> {
+pub async fn download_file(
+    url: &str,
+    sha1: Option<&str>,
+) -> Result<bytes::Bytes, Error> {
+    let mut headers = reqwest::header::HeaderMap::new();
+    if let Ok(header) = reqwest::header::HeaderValue::from_str(&format!(
+        "modrinth/daedalus/{} (support@modrinth.com)",
+        env!("CARGO_PKG_VERSION")
+    )) {
+        headers.insert(reqwest::header::USER_AGENT, header);
+    }
     let client = reqwest::Client::builder()
         .tcp_keepalive(Some(std::time::Duration::from_secs(10)))
         .timeout(std::time::Duration::from_secs(15))
+        .default_headers(headers)
         .build()
         .map_err(|err| Error::FetchError {
             inner: err,
@@ -183,7 +215,9 @@ pub async fn download_file(url: &str, sha1: Option<&str>) -> Result<bytes::Bytes
 
 /// Computes a checksum of the input bytes
 pub async fn get_hash(bytes: bytes::Bytes) -> Result<String, Error> {
-    let hash = tokio::task::spawn_blocking(|| sha1::Sha1::from(bytes).hexdigest()).await?;
+    let hash =
+        tokio::task::spawn_blocking(|| sha1::Sha1::from(bytes).hexdigest())
+            .await?;
 
     Ok(hash)
 }

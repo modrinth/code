@@ -15,6 +15,9 @@ pub const CURRENT_FABRIC_FORMAT_VERSION: usize = 0;
 /// The latest version of the format the fabric model structs deserialize to
 pub const CURRENT_FORGE_FORMAT_VERSION: usize = 0;
 
+/// The dummy replace string library names, inheritsFrom, and version names should be replaced with
+pub const DUMMY_REPLACE_STRING: &str = "${modrinth.gameVersion}";
+
 /// A data variable entry that depends on the side of the installation
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug)]
@@ -93,6 +96,8 @@ pub fn merge_partial_version(
     partial: PartialVersionInfo,
     merge: VersionInfo,
 ) -> VersionInfo {
+    let merge_id = merge.id.clone();
+
     VersionInfo {
         arguments: if let Some(partial_args) = partial.arguments {
             if let Some(merge_args) = merge.arguments {
@@ -126,12 +131,22 @@ pub fn merge_partial_version(
         asset_index: merge.asset_index,
         assets: merge.assets,
         downloads: merge.downloads,
-        id: partial.id,
+        id: merge.id,
         java_version: merge.java_version,
         libraries: partial
             .libraries
             .into_iter()
             .chain(merge.libraries)
+            .map(|x| Library {
+                downloads: x.downloads,
+                extract: x.extract,
+                name: x.name.replace(DUMMY_REPLACE_STRING, &merge_id),
+                url: x.url,
+                natives: x.natives,
+                rules: x.rules,
+                checksums: x.checksums,
+                include_in_classpath: x.include_in_classpath,
+            })
             .collect::<Vec<_>>(),
         main_class: if let Some(main_class) = partial.main_class {
             main_class
@@ -163,6 +178,8 @@ pub struct Manifest {
 pub struct Version {
     /// The minecraft version ID
     pub id: String,
+    /// Whether the release is stable or not
+    pub stable: bool,
     /// A map that contains loader versions for the game version
     pub loaders: Vec<LoaderVersion>,
 }
