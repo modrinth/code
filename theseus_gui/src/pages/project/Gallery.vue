@@ -114,7 +114,7 @@ export default {
       return 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
     },
   },
-  async mounted() {
+  async created() {
     const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}`);
     this.gallery = (await response.json()).gallery;
   },

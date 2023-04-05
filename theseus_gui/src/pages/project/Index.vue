@@ -7,7 +7,21 @@
           <h2 class="name">{{ data.title }}</h2>
           {{ data.description }}
         </div>
-        <Categories :categories="categories" :type="type" class="tags">
+        <Categories
+          class="tags"
+          type=""
+          :categories="[
+            ...categories.filter(
+              (cat) =>
+                data.categories.includes(cat.name) && cat.project_type === 'mod'
+            ),
+            ...loaders.filter(
+              (loader) =>
+                data.categories.includes(loader.name) &&
+                loader.supported_project_types?.includes('modpack')
+            )
+          ]"
+        >
           <EnvironmentIndicator
               :type-only="moderation"
               :client-side="data.client_side"
@@ -187,16 +201,10 @@ import {
   ExternalIcon
 } from "omorphia";
 import {BuyMeACoffeeIcon, DiscordIcon, PatreonIcon, PaypalIcon, KoFiIcon, OpenCollectiveIcon} from "@/assets/external";
-const categories = [
-  {
-    name: 'magic',
-    icon: '<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><path d=\'M15 4V2\'></path><path d=\'M15 16v-2\'></path><path d=\'M8 9h2\'></path><path d=\'M20 9h2\'></path><path d=\'M17.8 11.8 19 13\'></path><path d=\'M15 9h0\'></path><path d=\'M17.8 6.2 19 5\'></path><path d=\'m3 21 9-9\'></path><path d=\'M12.2 6.2 11 5\'></path></svg>',
-  },
-  {
-    icon: '<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'currentColor\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'><rect x=\'2\' y=\'7\' width=\'20\' height=\'14\' rx=\'2\' ry=\'2\'/><path d=\'M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16\'/></svg>',
-    name: 'utility',
-  }
-]
+import {get_categories, get_loaders} from "@/helpers/tags";
+
+const categories = await get_categories()
+const loaders = await get_loaders()
 
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -211,7 +219,7 @@ export default {
       data: null
     }
   },
-  async mounted() {
+  async created() {
     const response = await fetch('https://api.modrinth.com/v2/project/' + this.$route.params.id)
     this.data = await response.json()
   },

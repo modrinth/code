@@ -22,14 +22,14 @@
         <div class="table-cell table-text">Supports</div>
         <div class="table-cell table-text">Stats</div>
       </div>
-      <div v-for="(version) in versions" :key="version.id" class="table-row" >
+      <router-link v-for="(version) in versions" :key="version.id" class="button-base table-row" :to="`/project/${$route.params.id}/version/${version.id}`">
         <div class="table-cell table-text">
           <Button color="primary" icon-only>
             <DownloadIcon />
           </Button>
         </div>
         <div class="name-cell table-cell table-text">
-          <router-link :to="`/project/${$route.params.id}/version/${version.id}`" class="version-link">
+          <div class="version-link">
             {{ version.name.charAt(0).toUpperCase() + version.name.slice(1) }}
             <div class="version-badge">
               <div class="channel-indicator">
@@ -39,7 +39,7 @@
                 {{ version.version_number }}
               </div>
             </div>
-          </router-link>
+          </div>
         </div>
         <div class="table-cell table-text stacked-text">
           <span>
@@ -67,7 +67,7 @@
             </span>
           </div>
         </div>
-      </div>
+      </router-link>
     </div>
   </Card>
 </template>
@@ -123,6 +123,7 @@ export default {
   height: 100%;
   align-items: center;
   display: flex;
+  background-color: var(--color-raised-bg);
 }
 
 .name-cell {

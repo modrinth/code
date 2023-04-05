@@ -8,7 +8,7 @@
       <div class="button-group">
         <Button color="primary">
           <DownloadIcon/>
-          Download
+          Install
         </Button>
         <Button :link="`/project/${$route.params.id}/versions`">
           <LeftArrowIcon/>
@@ -47,7 +47,7 @@
           </span>
           <Button class="download">
             <DownloadIcon/>
-            Download
+            Install
           </Button>
         </Card>
       </Card>
