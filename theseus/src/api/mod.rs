@@ -3,8 +3,8 @@ pub mod auth;
 pub mod process;
 pub mod profile;
 pub mod profile_create;
-pub mod tags;
 pub mod settings;
+pub mod tags;
 
 pub mod data {
     pub use crate::state::{

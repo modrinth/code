@@ -20,10 +20,7 @@ pub async fn has_finished_by_pid(pid: u32) -> crate::Result<bool> {
 pub async fn get_exit_status_by_pid(pid: u32) -> crate::Result<Option<i32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
-    Ok(children
-        .exit_status(&pid)
-        .await?
-        .and_then(|f| f.code()))
+    Ok(children.exit_status(&pid).await?.and_then(|f| f.code()))
 }
 
 // Gets the PID of each stored process in the state
@@ -39,7 +36,7 @@ pub async fn get_all_pids() -> crate::Result<Vec<u32>> {
 pub async fn get_all_running_pids() -> crate::Result<Vec<u32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
-    Ok(children.running_keys().await?)
+    children.running_keys().await
 }
 
 // Gets the PID of each stored process in the state by profile path
@@ -49,7 +46,7 @@ pub async fn get_pids_by_profile_path(
 ) -> crate::Result<Vec<u32>> {
     let state = State::get().await?;
     let children = state.children.read().await;
-    Ok(children.running_keys_with_profile(profile_path).await?)
+    children.running_keys_with_profile(profile_path).await
 }
 
 // Gets stdout of a child process stored in the state by PID, as a string

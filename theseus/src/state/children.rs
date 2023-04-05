@@ -1,4 +1,4 @@
-use std::path::{PathBuf, Path};
+use std::path::{Path, PathBuf};
 use std::{collections::HashMap, sync::Arc};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{ChildStderr, ChildStdout};
@@ -12,7 +12,7 @@ pub struct Children(HashMap<u32, Arc<RwLock<MinecraftChild>>>);
 #[derive(Debug)]
 pub struct MinecraftChild {
     pub pid: u32,
-    pub profile_path : PathBuf, //todo: make UUID when profiles are recognized by UUID
+    pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub child: tokio::process::Child,
     pub stdout: SharedOutput,
     pub stderr: SharedOutput,
@@ -29,7 +29,7 @@ impl Children {
     pub fn insert_process(
         &mut self,
         pid: u32,
-        profile_path : PathBuf,
+        profile_path: PathBuf,
         mut child: tokio::process::Child,
     ) -> Arc<RwLock<MinecraftChild>> {
         // Create std watcher threads for stdout and stderr
@@ -106,7 +106,10 @@ impl Children {
     }
 
     // Gets all PID keys of running children with a given profile path
-    pub async fn running_keys_with_profile(&self, profile_path : &Path) -> crate::Result<Vec<u32>> {
+    pub async fn running_keys_with_profile(
+        &self,
+        profile_path: &Path,
+    ) -> crate::Result<Vec<u32>> {
         let running_keys = self.running_keys().await?;
         let mut keys = Vec::new();
         for key in running_keys {
