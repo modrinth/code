@@ -1,6 +1,7 @@
 //! Logic for launching Minecraft
 use crate::state as st;
 use daedalus as d;
+use dunce::canonicalize;
 use std::{path::Path, process::Stdio};
 use tokio::process::{Child, Command};
 
@@ -52,13 +53,14 @@ pub async fn launch_minecraft(
     instance_path: &Path,
     java_install: &Path,
     java_args: &[String],
+    env_args: &[(String, String)],
     wrapper: &Option<String>,
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
 ) -> crate::Result<Child> {
     let state = st::State::get().await?;
-    let instance_path = instance_path.canonicalize()?;
+    let instance_path = &canonicalize(instance_path)?;
 
     let version = state
         .metadata
@@ -172,35 +174,49 @@ pub async fn launch_minecraft(
         None => Command::new(String::from(java_install.to_string_lossy())),
     };
 
+    let env_args = Vec::from(env_args);
+
     command
-        .args(args::get_jvm_arguments(
-            args.get(&d::minecraft::ArgumentType::Jvm)
-                .map(|x| x.as_slice()),
-            &state.directories.version_natives_dir(&version.id),
-            &state.directories.libraries_dir(),
-            &args::get_class_paths(
+        .args(
+            args::get_jvm_arguments(
+                args.get(&d::minecraft::ArgumentType::Jvm)
+                    .map(|x| x.as_slice()),
+                &state.directories.version_natives_dir(&version.id),
                 &state.directories.libraries_dir(),
-                version_info.libraries.as_slice(),
-                &client_path,
-            )?,
-            &version_jar,
-            *memory,
-            Vec::from(java_args),
-        )?)
+                &args::get_class_paths(
+                    &state.directories.libraries_dir(),
+                    version_info.libraries.as_slice(),
+                    &client_path,
+                )?,
+                &version_jar,
+                *memory,
+                Vec::from(java_args),
+            )?
+            .into_iter()
+            .map(|r| r.replace(' ', r"\ "))
+            .collect::<Vec<_>>(),
+        )
         .arg(version_info.main_class.clone())
-        .args(args::get_minecraft_arguments(
-            args.get(&d::minecraft::ArgumentType::Game)
-                .map(|x| x.as_slice()),
-            version_info.minecraft_arguments.as_deref(),
-            credentials,
-            &version.id,
-            &version_info.asset_index.id,
-            &instance_path,
-            &state.directories.assets_dir(),
-            &version.type_,
-            *resolution,
-        )?)
+        .args(
+            args::get_minecraft_arguments(
+                args.get(&d::minecraft::ArgumentType::Game)
+                    .map(|x| x.as_slice()),
+                version_info.minecraft_arguments.as_deref(),
+                credentials,
+                &version.id,
+                &version_info.asset_index.id,
+                instance_path,
+                &state.directories.assets_dir(),
+                &version.type_,
+                *resolution,
+            )?
+            .into_iter()
+            .map(|r| r.replace(' ', r"\ "))
+            .collect::<Vec<_>>(),
+        )
         .current_dir(instance_path.clone())
+        .env_clear()
+        .envs(env_args)
         .stdout(Stdio::inherit())
         .stderr(Stdio::inherit());
 

@@ -1,4 +1,5 @@
 //! Theseus error type
+use crate::profile_create;
 use tracing_error::InstrumentError;
 
 #[derive(thiserror::Error, Debug)]
@@ -30,8 +31,11 @@ pub enum ErrorKind {
     #[error("Metadata error: {0}")]
     MetadataError(#[from] daedalus::Error),
 
-    #[error("Minecraft authentication error: {0}")]
+    #[error("Minecraft authentication Hydra error: {0}")]
     HydraError(String),
+
+    #[error("Minecraft authentication task error: {0}")]
+    AuthTaskError(#[from] crate::state::AuthTaskError),
 
     #[error("I/O error: {0}")]
     IOError(#[from] std::io::Error),
@@ -57,6 +61,12 @@ pub enum ErrorKind {
     #[error("Invalid input: {0}")]
     InputError(String),
 
+    #[error("Join handle error: {0}")]
+    JoinError(#[from] tokio::task::JoinError),
+
+    #[error("Recv error: {0}")]
+    RecvError(#[from] tokio::sync::oneshot::error::RecvError),
+
     #[error(
         "Tried to access unloaded profile {0}, loading it probably failed"
     )]
@@ -64,6 +74,9 @@ pub enum ErrorKind {
 
     #[error("Profile {0} is not managed by Theseus!")]
     UnmanagedProfileError(String),
+
+    #[error("Could not create profile: {0}")]
+    ProfileCreationError(#[from] profile_create::ProfileCreationError),
 
     #[error("Error: {0}")]
     OtherError(String),

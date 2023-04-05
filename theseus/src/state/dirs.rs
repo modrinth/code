@@ -110,6 +110,12 @@ impl DirectoryInfo {
         self.config_dir.join("icons")
     }
 
+    /// Get the profiles directory for created profiles
+    #[inline]
+    pub fn profiles_dir(&self) -> PathBuf {
+        self.config_dir.join("profiles")
+    }
+
     /// Get the file containing the global database
     #[inline]
     pub fn database_file(&self) -> PathBuf {

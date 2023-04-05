@@ -7,7 +7,7 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "theseus_gui",
+    "productName": "theseus",
     "version": "0.0.0"
   },
   "tauri": {

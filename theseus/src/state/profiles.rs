@@ -3,6 +3,7 @@ use crate::config::BINCODE_CONFIG;
 use crate::data::DirectoryInfo;
 use crate::state::projects::Project;
 use daedalus::modded::LoaderVersion;
+use dunce::canonicalize;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::{
@@ -98,7 +99,7 @@ impl Profile {
         }
 
         Ok(Self {
-            path: path.canonicalize()?,
+            path: canonicalize(path)?,
             metadata: ProfileMetadata {
                 name,
                 icon: None,
@@ -236,10 +237,13 @@ impl Profiles {
         {
             for (profile_path, _profile_opt) in profiles.iter() {
                 let mut read_paths = |path: &str| {
-                    for path in std::fs::read_dir(profile_path.join(path))? {
-                        files.insert(path?.path(), profile_path.clone());
+                    let new_path = profile_path.join(path);
+                    if new_path.exists() {
+                        for path in std::fs::read_dir(profile_path.join(path))?
+                        {
+                            files.insert(path?.path(), profile_path.clone());
+                        }
                     }
-
                     Ok::<(), crate::Error>(())
                 };
                 read_paths("mods")?;
@@ -268,9 +272,7 @@ impl Profiles {
     #[tracing::instrument(skip(self))]
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         self.0.insert(
-            profile
-                .path
-                .canonicalize()?
+            canonicalize(&profile.path)?
                 .to_str()
                 .ok_or(
                     crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
@@ -286,12 +288,12 @@ impl Profiles {
         &'a mut self,
         path: &'a Path,
     ) -> crate::Result<&Self> {
-        self.insert(Self::read_profile_from_dir(&path.canonicalize()?).await?)
+        self.insert(Self::read_profile_from_dir(&canonicalize(path)?).await?)
     }
 
     #[tracing::instrument(skip(self))]
     pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
-        let path = PathBuf::from(path.canonicalize()?.to_str().unwrap());
+        let path = PathBuf::from(&canonicalize(path)?.to_str().unwrap());
         self.0.remove(&path);
         Ok(self)
     }
