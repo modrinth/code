@@ -16,7 +16,7 @@ use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io::Read;
 use std::sync::Arc;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tokio::sync::{Mutex, Semaphore};
 
 lazy_static! {
@@ -544,8 +544,6 @@ pub async fn retrieve_data(
                 })
             }
         }
-
-        println!("{}", serde_json::to_string(&versions).unwrap());
 
         upload_file_to_bucket(
             format!(

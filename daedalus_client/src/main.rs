@@ -189,11 +189,7 @@ pub async fn upload_file_to_bucket(
 }
 
 pub fn format_url(path: &str) -> String {
-    format!(
-        "{}/{}",
-        &*dotenvy::var("BASE_URL").unwrap(),
-        path
-    )
+    format!("{}/{}", &*dotenvy::var("BASE_URL").unwrap(), path)
 }
 
 pub async fn download_file(
