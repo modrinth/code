@@ -134,13 +134,12 @@ impl Tags {
     // Fetches the tags from the Modrinth API and stores them in the database
     #[tracing::instrument(skip(self))]
     pub async fn fetch_update(&mut self) -> crate::Result<()> {
-        let categories = self.fetch_tag::<Category>("category");
-        let loaders = self.fetch_tag::<Loader>("loader");
-        let game_versions = self.fetch_tag::<GameVersion>("game_version");
-        let licenses = self.fetch_tag::<License>("license");
-        let donation_platforms =
-            self.fetch_tag::<DonationPlatform>("donation_platform");
-        let report_types = self.fetch_tag::<String>("report_type");
+        let categories = self.fetch_tag("category");
+        let loaders = self.fetch_tag("loader");
+        let game_versions = self.fetch_tag("game_version");
+        let licenses = self.fetch_tag("license");
+        let donation_platforms = self.fetch_tag("donation_platform");
+        let report_types = self.fetch_tag("report_type");
 
         let (
             categories,
@@ -149,59 +148,60 @@ impl Tags {
             licenses,
             donation_platforms,
             report_types,
-        ) = futures::join!(
+        ) = tokio::try_join!(
             categories,
             loaders,
             game_versions,
             licenses,
             donation_platforms,
             report_types
-        );
+        )?;
 
         // Store the tags in the database
         self.0.categories.insert(
             "categories",
-            bincode::encode_to_vec(categories?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(categories.json().await?, *BINCODE_CONFIG)?,
         )?;
         self.0.loaders.insert(
             "loaders",
-            bincode::encode_to_vec(loaders?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(loaders.json().await?, *BINCODE_CONFIG)?,
         )?;
         self.0.game_versions.insert(
             "game_versions",
-            bincode::encode_to_vec(game_versions?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                game_versions.json().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
         self.0.licenses.insert(
             "licenses",
-            bincode::encode_to_vec(licenses?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(licenses.json().await?, *BINCODE_CONFIG)?,
         )?;
         self.0.donation_platforms.insert(
             "donation_platforms",
-            bincode::encode_to_vec(donation_platforms?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                donation_platforms.json().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
         self.0.report_types.insert(
             "report_types",
-            bincode::encode_to_vec(report_types?, *BINCODE_CONFIG)?,
+            bincode::encode_to_vec(
+                report_types.json().await?,
+                *BINCODE_CONFIG,
+            )?,
         )?;
 
         Ok(())
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn fetch_tag<T>(
+    pub async fn fetch_tag(
         &self,
         tag_type: &str,
-    ) -> Result<Vec<T>, reqwest::Error>
-    where
-        T: serde::de::DeserializeOwned,
-    {
+    ) -> Result<reqwest::Response, reqwest::Error> {
         let url = &format!("{MODRINTH_API_URL}tag/{}", tag_type);
-        let content = REQWEST_CLIENT
-            .get(url)
-            .send()
-            .await?
-            .json::<Vec<T>>()
-            .await?;
+        let content = REQWEST_CLIENT.get(url).send().await?;
         Ok(content)
     }
 }
