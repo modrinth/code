@@ -225,7 +225,7 @@ pub async fn run(
             "Process failed to stay open.".to_string(),
         )
     })?;
-    let mchild_arc = state_children.insert_process(pid, mc_process);
+    let mchild_arc = state_children.insert_process(pid, path.to_path_buf(), mc_process);
 
     Ok(mchild_arc)
 }

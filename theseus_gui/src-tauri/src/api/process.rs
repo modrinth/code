@@ -1,3 +1,5 @@
+use std::path::Path;
+
 use crate::api::Result;
 use theseus::prelude::*;
 
@@ -25,6 +27,13 @@ pub async fn process_get_all_running_pids() -> Result<Vec<u32>> {
     Ok(process::get_all_running_pids().await?)
 }
 
+// Gets all process PIDs by profile path
+#[tauri::command]
+pub async fn process_get_pids_by_profile_path(
+    profile_path: &Path,
+) -> Result<Vec<u32>> {
+    Ok(process::get_pids_by_profile_path(profile_path).await?)
+}
 // Gets process stderr by process PID
 #[tauri::command]
 pub async fn process_get_stderr_by_pid(pid: u32) -> Result<String> {

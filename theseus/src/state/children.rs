@@ -1,4 +1,4 @@
-use futures::stream::{self, StreamExt};
+use std::path::{PathBuf, Path};
 use std::{collections::HashMap, sync::Arc};
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{ChildStderr, ChildStdout};
@@ -12,6 +12,7 @@ pub struct Children(HashMap<u32, Arc<RwLock<MinecraftChild>>>);
 #[derive(Debug)]
 pub struct MinecraftChild {
     pub pid: u32,
+    pub profile_path : PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub child: tokio::process::Child,
     pub stdout: SharedOutput,
     pub stderr: SharedOutput,
@@ -28,6 +29,7 @@ impl Children {
     pub fn insert_process(
         &mut self,
         pid: u32,
+        profile_path : PathBuf,
         mut child: tokio::process::Child,
     ) -> Arc<RwLock<MinecraftChild>> {
         // Create std watcher threads for stdout and stderr
@@ -35,20 +37,25 @@ impl Children {
         if let Some(child_stdout) = child.stdout.take() {
             let stdout_clone = stdout.clone();
             tokio::spawn(async move {
-                stdout_clone.read_stdout(child_stdout).await.unwrap();
+                if let Err(e) = stdout_clone.read_stdout(child_stdout).await {
+                    eprintln!("Stdout process died with error: {}", e);
+                }
             });
         }
         let stderr = SharedOutput::new();
         if let Some(child_stderr) = child.stderr.take() {
             let stderr_clone = stderr.clone();
             tokio::spawn(async move {
-                stderr_clone.read_stderr(child_stderr).await.unwrap();
+                if let Err(e) = stderr_clone.read_stderr(child_stderr).await {
+                    eprintln!("Stderr thread died with error: {}", e);
+                }
             });
         }
 
         // Create MinecraftChild
         let mchild = MinecraftChild {
             pid,
+            profile_path,
             child,
             stdout,
             stderr,
@@ -84,16 +91,34 @@ impl Children {
     }
 
     // Gets all PID keys of running children
-    // If an error was collected in accessing the lock/child, that PID is discarded
-    pub async fn running_keys(&self) -> Vec<u32> {
-        stream::iter(self.0.iter())
-            .filter(|(_, child)| {
-                let child = <&Arc<RwLock<MinecraftChild>>>::clone(child);
-                async move { child.write().await.child.try_wait().ok().is_none() }
-            })
-            .map(|(pid, _)| *pid)
-            .collect()
-            .await
+    pub async fn running_keys(&self) -> crate::Result<Vec<u32>> {
+        let mut keys = Vec::new();
+        for key in self.keys() {
+            if let Some(child) = self.get(&key) {
+                let child = child.clone();
+                let mut child = child.write().await;
+                if child.child.try_wait()?.is_none() {
+                    keys.push(key);
+                }
+            }
+        }
+        Ok(keys)
+    }
+
+    // Gets all PID keys of running children with a given profile path
+    pub async fn running_keys_with_profile(&self, profile_path : &Path) -> crate::Result<Vec<u32>> {
+        let running_keys = self.running_keys().await?;
+        let mut keys = Vec::new();
+        for key in running_keys {
+            if let Some(child) = self.get(&key) {
+                let child = child.clone();
+                let child = child.read().await;
+                if child.profile_path == profile_path {
+                    keys.push(key);
+                }
+            }
+        }
+        Ok(keys)
     }
 }
 
