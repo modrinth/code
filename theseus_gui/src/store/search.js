@@ -91,18 +91,6 @@ export const useSearch = defineStore('searchStore', {
       this.offset = response.offset
       this.pageCount = Math.ceil(this.totalHits / this.limit)
     },
-    toggleCategory(cat) {
-      this.categories[cat] = !this.categories[cat]
-    },
-    toggleLoader(loader) {
-      this.loaders[loader] = !this.loaders[loader]
-    },
-    toggleEnv(env) {
-      this.environments[env] = !this.environments[env]
-    },
-    setVersions(versions) {
-      this.activeVersions = versions
-    },
     resetFilters() {
       this.facets = []
       this.orFacets = []

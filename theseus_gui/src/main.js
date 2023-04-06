@@ -4,7 +4,8 @@ import App from '@/App.vue'
 import { createPinia } from 'pinia'
 import '../node_modules/omorphia/dist/style.css'
 import '@/assets/stylesheets/global.css'
+import FloatingVue from 'floating-vue'
 
 const pinia = createPinia()
 
-createApp(App).use(router).use(pinia).mount('#app')
+createApp(App).use(router).use(pinia).use(FloatingVue).mount('#app')

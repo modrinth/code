@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
@@ -13,39 +13,35 @@ import {
   Card,
   ClientIcon,
   ServerIcon,
+  AnimatedLogo,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 
-// Pull search store
 const searchStore = useSearch()
 
-const selectedVersions = ref([])
 const showSnapshots = ref(false)
+const loading = ref(true)
 
-// Sets the clear button's disabled attr
-const isClearDisabled = computed({
-  get() {
-    if (searchStore.facets.length > 0) return false
-    if (searchStore.orFacets.length > 0) return false
+const [categories, loaders, availableGameVersions] = await Promise.all([
+  get_categories(),
+  get_loaders(),
+  get_game_versions(),
+])
 
-    if (searchStore.environments.server === true || searchStore.environments.client === true)
-      return false
-    if (searchStore.openSource === true) return false
-    if (selectedVersions.value.length > 0) return false
-    return true
-  },
-})
+const getSearchResults = async (shouldLoad = false) => {
+  const queryString = searchStore.getQueryString()
+  if (!shouldLoad) {
+    loading.value = true
+  }
+  const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
+  loading.value = false
+  searchStore.setSearchResults(response)
+}
 
-const categories = await get_categories()
-const loaders = await get_loaders()
-const availableGameVersions = await get_game_versions()
+getSearchResults()
 
-/**
- * Adds or removes facets from state
- * @param {String} facet The facet to commit to state
- */
 const toggleFacet = async (facet) => {
   const index = searchStore.facets.indexOf(facet)
 
@@ -55,10 +51,6 @@ const toggleFacet = async (facet) => {
   await getSearchResults()
 }
 
-/**
- * Adds or removes orFacets from state
- * @param {String} orFacet The orFacet to commit to state
- */
 const toggleOrFacet = async (orFacet) => {
   const index = searchStore.orFacets.indexOf(orFacet)
 
@@ -68,68 +60,15 @@ const toggleOrFacet = async (orFacet) => {
   await getSearchResults()
 }
 
-/**
- * Makes the API request to labrinth
- */
-const getSearchResults = async () => {
-  const queryString = searchStore.getQueryString()
-  const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
-
-  searchStore.setSearchResults(response)
-}
-await getSearchResults()
-
-/**
- * For when user enters input in search bar
- */
-const refreshSearch = async () => {
-  await getSearchResults()
-}
-
-/**
- * For when the user changes the Sort dropdown
- * @param {Object} e Event param to see selected option
- */
-const handleSort = async (e) => {
-  searchStore.filter = e.option
-  await getSearchResults()
-}
-
-/**
- * For when user changes Limit dropdown
- * @param {Object} e Event param to see selected option
- */
-const handleLimit = async (e) => {
-  searchStore.limit = e.option
-  await getSearchResults()
-}
-
-/**
- * For when user pages results
- * @param {Number} page The new page to display
- */
 const switchPage = async (page) => {
   searchStore.currentPage = parseInt(page)
   if (page === 1) searchStore.offset = 0
-  else searchStore.offset = searchStore.currentPage * 10 - 10
+  else searchStore.offset = (searchStore.currentPage - 1) * searchStore.limit
   await getSearchResults()
 }
 
-/**
- * For when a user interacts with version filters
- */
-const handleVersionSelect = async () => {
-  searchStore.activeVersions = selectedVersions.value.map((ver) => ver)
-  await getSearchResults()
-}
-
-/**
- * For when user resets all filters
- */
 const handleReset = async () => {
   searchStore.resetFilters()
-  selectedVersions.value = []
-  isClearDisabled.value = true
   await getSearchResults()
 }
 </script>
@@ -137,7 +76,19 @@ const handleReset = async () => {
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Button role="button" :disabled="isClearDisabled" @click="handleReset"
+      <Button
+        role="button"
+        :disabled="
+          !(
+            searchStore.facets.length > 0 ||
+            searchStore.orFacets.length > 0 ||
+            searchStore.environments.server === true ||
+            searchStore.environments.client === true ||
+            searchStore.openSource === true ||
+            searchStore.activeVersions.length > 0
+          )
+        "
+        @click="handleReset"
         ><ClearIcon />Clear Filters</Button
       >
       <div class="categories">
@@ -177,18 +128,18 @@ const handleReset = async () => {
         <SearchFilter
           v-model="searchStore.environments.client"
           display-name="Client"
-          :facet-name="client"
+          facet-name="client"
           class="filter-checkbox"
-          @click="refreshSearch"
+          @click="getSearchResults"
         >
           <ClientIcon aria-hidden="true" />
         </SearchFilter>
         <SearchFilter
           v-model="searchStore.environments.server"
           display-name="Server"
-          :facet-name="server"
+          facet-name="server"
           class="filter-checkbox"
-          @click="refreshSearch"
+          @click="getSearchResults"
         >
           <ServerIcon aria-hidden="true" />
         </SearchFilter>
@@ -197,7 +148,7 @@ const handleReset = async () => {
         <h2>Minecraft versions</h2>
         <Checkbox v-model="showSnapshots" class="filter-checkbox">Show snapshots</Checkbox>
         <multiselect
-          v-model="selectedVersions"
+          v-model="searchStore.activeVersions"
           :options="
             showSnapshots
               ? availableGameVersions.map((x) => x.version)
@@ -211,14 +162,17 @@ const handleReset = async () => {
           :close-on-select="false"
           :clear-search-on-select="false"
           :show-labels="false"
-          :selectable="() => selectedVersions.length <= 6"
           placeholder="Choose versions..."
-          @update:model-value="handleVersionSelect"
+          @update:model-value="getSearchResults"
         />
       </div>
       <div class="open-source">
         <h2>Open source</h2>
-        <Checkbox v-model="searchStore.openSource" class="filter-checkbox" @click="refreshSearch">
+        <Checkbox
+          v-model="searchStore.openSource"
+          class="filter-checkbox"
+          @click="getSearchResults"
+        >
           Open source
         </Checkbox>
       </div>
@@ -231,12 +185,13 @@ const handleReset = async () => {
             <input
               v-model="searchStore.searchInput"
               type="text"
-              placeholder="Search.."
-              @input="refreshSearch"
+              placeholder="Search modpacks..."
+              @input="getSearchResults"
             />
           </div>
           <span>Sort by</span>
           <DropdownSelect
+            v-model="searchStore.filter"
             name="Sort dropdown"
             :options="[
               'Relevance',
@@ -245,19 +200,18 @@ const handleReset = async () => {
               'Recently published',
               'Recently updated',
             ]"
-            :default-value="searchStore.filter"
-            :model-value="searchStore.filter"
             class="sort-dropdown"
-            @change="handleSort"
+            @change="getSearchResults"
           />
           <span>Show per page</span>
           <DropdownSelect
+            v-model="searchStore.limit"
             name="Limit dropdown"
-            :options="['5', '10', '15', '20', '50', '100']"
+            :options="[5, 10, 15, 20, 50, 100]"
             :default-value="searchStore.limit.toString()"
             :model-value="searchStore.limit.toString()"
             class="limit-dropdown"
-            @change="handleLimit"
+            @change="getSearchResults"
           />
         </div>
       </Card>
@@ -266,7 +220,8 @@ const handleReset = async () => {
         :count="searchStore.pageCount"
         @switch-page="switchPage"
       />
-      <section class="project-list display-mode--list instance-results" role="list">
+      <AnimatedLogo v-if="loading" class="loading" />
+      <section v-else class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
           :id="result?.project_id"
@@ -397,10 +352,9 @@ const handleReset = async () => {
     margin: 0 1rem 0 17rem;
     width: 100%;
 
-    .instance-project-item {
-      width: 100%;
-      height: auto;
-      cursor: pointer;
+    .loading {
+      margin: 2rem;
+      text-align: center;
     }
 
     .result-project-item {
