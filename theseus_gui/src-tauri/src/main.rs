@@ -48,6 +48,7 @@ fn main() {
             api::jre::jre_find_jre_18plus_jres,
             api::jre::jre_find_jre_17_jres,
             api::jre::jre_find_jre_8_jres,
+            api::jre::jre_validate_globals,
             api::jre::jre_get_optimal_jre_key,
             api::jre::jre_get_optimal_jre_key_by_path,
             api::process::process_get_all_pids,

@@ -53,3 +53,10 @@ pub async fn jre_get_optimal_jre_key_by_path(path: &Path) -> Result<String> {
     })?;
     Ok(jre::get_optimal_jre_key(&profile).await?)
 }
+
+// Validates java globals, by checking if the paths exist
+// If false, recommend to direct them to reassign, or to re-guess
+#[tauri::command]
+pub async fn jre_validate_globals() -> Result<bool> {
+    Ok(jre::validate_globals().await?)
+}

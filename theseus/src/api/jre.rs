@@ -129,12 +129,8 @@ pub fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
     Ok(jre::get_all_jre()?)
 }
 
-// test
-#[cfg(test)]
-mod tests {
-    #[test]
-    pub fn test() {
-        let jres = super::get_all_jre().unwrap();
-        println!("{:?}", jres);
-    }
+pub async fn validate_globals() -> crate::Result<bool> {
+    let state = State::get().await?;
+    let settings = state.settings.read().await;
+    Ok(settings.java_globals.is_all_valid())
 }

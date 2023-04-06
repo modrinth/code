@@ -38,6 +38,12 @@ export async function find_jre_18plus_jres() {
   return await invoke('jre_find_jre_18plus_jres')
 }
 
+// Validates globals. Recommend directing the user to reassigned the globals if this returns false
+// Returns [JavaVersion]
+export async function validate_globals() {
+  return await invoke('jre_validate_globals')
+}
+
 // Gets key for the optimal JRE to use, for a given profile path
 // The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
 export async function get_optimal_jre_key_by_path(path) {
