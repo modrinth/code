@@ -1,17 +1,17 @@
 //! Project management + inference
 
 use crate::config::{MODRINTH_API_URL, REQWEST_CLIENT};
+use crate::util::fetch::write_cached_icon;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
 use std::collections::HashMap;
-use std::ffi::OsStr;
-use std::fs::File;
-use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
-use zip::ZipArchive;
+use tokio::sync::Semaphore;
+// use zip::ZipArchive;
+use async_zip::tokio::read::fs::ZipFileReader;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Project {
@@ -33,8 +33,8 @@ pub struct ModrinthProject {
     pub published: DateTime<Utc>,
     pub updated: DateTime<Utc>,
 
-    pub client_side: String,
-    pub server_side: String,
+    pub client_side: SideType,
+    pub server_side: SideType,
 
     pub downloads: u32,
     pub followers: u32,
@@ -46,7 +46,75 @@ pub struct ModrinthProject {
 
     pub versions: Vec<String>,
 
-    pub icon_url: String,
+    pub icon_url: Option<String>,
+}
+
+/// A specific version of a project
+#[derive(Serialize, Deserialize)]
+pub struct ModrinthVersion {
+    pub id: String,
+    pub project_id: String,
+    pub author_id: String,
+
+    pub featured: bool,
+
+    pub name: String,
+    pub version_number: String,
+    pub changelog: String,
+    pub changelog_url: Option<String>,
+
+    pub date_published: DateTime<Utc>,
+    pub downloads: u32,
+    pub version_type: String,
+
+    pub files: Vec<ModrinthVersionFile>,
+    pub dependencies: Vec<Dependency>,
+    pub game_versions: Vec<String>,
+    pub loaders: Vec<String>,
+}
+
+#[derive(Serialize, Deserialize)]
+pub struct ModrinthVersionFile {
+    pub hashes: HashMap<String, String>,
+    pub url: String,
+    pub filename: String,
+    pub primary: bool,
+    pub size: u32,
+    pub file_type: Option<FileType>,
+}
+
+#[derive(Serialize, Deserialize, Clone)]
+pub struct Dependency {
+    pub version_id: Option<String>,
+    pub project_id: Option<String>,
+    pub file_name: Option<String>,
+    pub dependency_type: DependencyType,
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone)]
+#[serde(rename_all = "lowercase")]
+pub enum DependencyType {
+    Required,
+    Optional,
+    Incompatible,
+    Embedded,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum SideType {
+    Required,
+    Optional,
+    Unsupported,
+    Unknown,
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
+#[serde(rename_all = "kebab-case")]
+pub enum FileType {
+    RequiredResourcePack,
+    OptionalResourcePack,
+    Unknown,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -63,9 +131,57 @@ pub enum ProjectMetadata {
     Unknown,
 }
 
+async fn read_icon_from_file(
+    icon_path: Option<String>,
+    cache_dir: &Path,
+    path: &PathBuf,
+    io_semaphore: &Semaphore,
+) -> crate::Result<Option<PathBuf>> {
+    if let Some(icon_path) = icon_path {
+        // we have to repoen the zip twice here :(
+        let zip_file_reader = ZipFileReader::new(path).await;
+        if let Ok(zip_file_reader) = zip_file_reader {
+            // Get index of icon file and open it
+            let zip_index_option = zip_file_reader
+                .file()
+                .entries()
+                .iter()
+                .position(|f| f.entry().filename() == icon_path);
+            if let Some(index) = zip_index_option {
+                let entry = zip_file_reader
+                    .file()
+                    .entries()
+                    .get(index)
+                    .unwrap()
+                    .entry();
+                let mut bytes = Vec::new();
+                if zip_file_reader
+                    .entry(zip_index_option.unwrap())
+                    .await?
+                    .read_to_end_checked(&mut bytes, entry)
+                    .await
+                    .is_ok()
+                {
+                    let bytes = bytes::Bytes::from(bytes);
+                    let permit = io_semaphore.acquire().await?;
+                    let path = write_cached_icon(
+                        &icon_path, cache_dir, bytes, &permit,
+                    )
+                    .await?;
+
+                    return Ok(Some(path));
+                }
+            };
+        }
+    }
+
+    Ok(None)
+}
+
 pub async fn infer_data_from_files(
     paths: Vec<PathBuf>,
     cache_dir: PathBuf,
+    io_semaphore: &Semaphore,
 ) -> crate::Result<HashMap<PathBuf, Project>> {
     let mut file_path_hashes = HashMap::new();
 
@@ -139,51 +255,28 @@ pub async fn infer_data_from_files(
     }
 
     for (hash, path) in further_analyze_projects {
-        let file = File::open(path.clone())?;
-
-        // TODO: get rid of below unwrap
-        let mut zip = ZipArchive::new(file).unwrap();
-
-        let read_icon_from_file =
-            |icon_path: Option<String>| -> crate::Result<Option<PathBuf>> {
-                if let Some(icon_path) = icon_path {
-                    // we have to repoen the zip twice here :(
-                    let zip_file = File::open(path.clone())?;
-                    if let Ok(mut zip) = ZipArchive::new(zip_file) {
-                        if let Ok(mut file) = zip.by_name(&icon_path) {
-                            let mut bytes = Vec::new();
-                            if file.read_to_end(&mut bytes).is_ok() {
-                                let extension = Path::new(&icon_path)
-                                    .extension()
-                                    .and_then(OsStr::to_str);
-                                let hash = sha1::Sha1::from(&bytes).hexdigest();
-                                let path = cache_dir.join("icons").join(
-                                    if let Some(ext) = extension {
-                                        format!("{hash}.{ext}")
-                                    } else {
-                                        hash
-                                    },
-                                );
-
-                                if !path.exists() {
-                                    if let Some(parent) = path.parent() {
-                                        std::fs::create_dir_all(parent)?;
-                                    }
-
-                                    let mut file = File::create(path.clone())?;
-                                    file.write_all(&bytes)?;
-                                }
-
-                                return Ok(Some(path));
-                            }
-                        };
-                    }
-                }
-
-                Ok(None)
-            };
-
-        if let Ok(mut file) = zip.by_name("META-INF/mods.toml") {
+        let zip_file_reader = if let Ok(zip_file_reader) =
+            ZipFileReader::new(path.clone()).await
+        {
+            zip_file_reader
+        } else {
+            return_projects.insert(
+                path.clone(),
+                Project {
+                    sha512: hash,
+                    disabled: path.ends_with(".disabled"),
+                    metadata: ProjectMetadata::Unknown,
+                },
+            );
+            continue;
+        };
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "META-INF/mods.toml");
+        if let Some(index) = zip_index_option {
+            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
             struct ForgeModInfo {
@@ -201,18 +294,30 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if file.read_to_string(&mut file_str).is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) =
                     serde_json::from_str::<ForgeModInfo>(&file_str)
                 {
                     if let Some(pack) = pack.mods.first() {
-                        let icon = read_icon_from_file(pack.logo_file.clone())?;
+                        let icon = read_icon_from_file(
+                            pack.logo_file.clone(),
+                            &cache_dir,
+                            &path,
+                            io_semaphore,
+                        )
+                        .await?;
 
                         return_projects.insert(
                             path.clone(),
                             Project {
                                 sha512: hash,
-                                disabled: false,
+                                disabled: path.ends_with(".disabled"),
                                 metadata: ProjectMetadata::Inferred {
                                     title: Some(
                                         pack.display_name
@@ -236,7 +341,13 @@ pub async fn infer_data_from_files(
             }
         }
 
-        if let Ok(mut file) = zip.by_name("mcmod.info") {
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "mcmod.info");
+        if let Some(index) = zip_index_option {
+            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
             struct ForgeMod {
@@ -249,15 +360,27 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if file.read_to_string(&mut file_str).is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<ForgeMod>(&file_str) {
-                    let icon = read_icon_from_file(pack.logo_file)?;
+                    let icon = read_icon_from_file(
+                        pack.logo_file,
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
 
                     return_projects.insert(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(if pack.name.is_empty() {
                                     pack.modid
@@ -276,7 +399,13 @@ pub async fn infer_data_from_files(
             }
         }
 
-        if let Ok(mut file) = zip.by_name("fabric.mod.json") {
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "fabric.mod.json");
+        if let Some(index) = zip_index_option {
+            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             #[serde(untagged)]
             enum FabricAuthor {
@@ -295,15 +424,27 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if file.read_to_string(&mut file_str).is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<FabricMod>(&file_str) {
-                    let icon = read_icon_from_file(pack.icon)?;
+                    let icon = read_icon_from_file(
+                        pack.icon,
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
 
                     return_projects.insert(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(pack.name.unwrap_or(pack.id)),
                                 description: pack.description,
@@ -325,7 +466,13 @@ pub async fn infer_data_from_files(
             }
         }
 
-        if let Ok(mut file) = zip.by_name("quilt.mod.json") {
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "quilt.mod.json");
+        if let Some(index) = zip_index_option {
+            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             struct QuiltMetadata {
                 pub name: Option<String>,
@@ -341,17 +488,27 @@ pub async fn infer_data_from_files(
             }
 
             let mut file_str = String::new();
-            if file.read_to_string(&mut file_str).is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<QuiltMod>(&file_str) {
                     let icon = read_icon_from_file(
                         pack.metadata.as_ref().and_then(|x| x.icon.clone()),
-                    )?;
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
 
                     return_projects.insert(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(
                                     pack.metadata
@@ -383,23 +540,39 @@ pub async fn infer_data_from_files(
             }
         }
 
-        if let Ok(mut file) = zip.by_name("pack.mcmeta") {
+        let zip_index_option = zip_file_reader
+            .file()
+            .entries()
+            .iter()
+            .position(|f| f.entry().filename() == "pack.mcdata");
+        if let Some(index) = zip_index_option {
+            let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
             struct Pack {
                 description: Option<String>,
             }
 
             let mut file_str = String::new();
-            if file.read_to_string(&mut file_str).is_ok() {
+            if zip_file_reader
+                .entry(index)
+                .await?
+                .read_to_string_checked(&mut file_str, file.entry())
+                .await
+                .is_ok()
+            {
                 if let Ok(pack) = serde_json::from_str::<Pack>(&file_str) {
-                    let icon =
-                        read_icon_from_file(Some("pack.png".to_string()))?;
-
+                    let icon = read_icon_from_file(
+                        Some("pack.png".to_string()),
+                        &cache_dir,
+                        &path,
+                        io_semaphore,
+                    )
+                    .await?;
                     return_projects.insert(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: false,
+                            disabled: path.ends_with(".disabled"),
                             metadata: ProjectMetadata::Inferred {
                                 title: None,
                                 description: pack.description,
@@ -415,10 +588,10 @@ pub async fn infer_data_from_files(
         }
 
         return_projects.insert(
-            path,
+            path.clone(),
             Project {
                 sha512: hash,
-                disabled: false,
+                disabled: path.ends_with(".disabled"),
                 metadata: ProjectMetadata::Unknown,
             },
         );

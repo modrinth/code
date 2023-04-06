@@ -12,32 +12,12 @@ use std::{
 };
 use tokio::{process::Command, sync::RwLock};
 
-/// Add a profile to the in-memory state
-#[tracing::instrument]
-pub async fn add(profile: Profile) -> crate::Result<()> {
-    let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
-    profiles.insert(profile)?;
-
-    Ok(())
-}
-
-/// Add a path as a profile in-memory
-#[tracing::instrument]
-pub async fn add_path(path: &Path) -> crate::Result<()> {
-    let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
-    profiles.insert_from(path).await?;
-
-    Ok(())
-}
-
 /// Remove a profile
 #[tracing::instrument]
 pub async fn remove(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
-    profiles.remove(path)?;
+    profiles.remove(path).await?;
 
     Ok(())
 }
@@ -48,29 +28,7 @@ pub async fn get(path: &Path) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
 
-    profiles.0.get(path).map_or(Ok(None), |prof| match prof {
-        Some(prof) => Ok(Some(prof.clone())),
-        None => Err(crate::ErrorKind::UnloadedProfileError(
-            path.display().to_string(),
-        )
-        .as_error()),
-    })
-}
-
-/// Check if a profile is already managed by Theseus
-#[tracing::instrument]
-pub async fn is_managed(profile: &Path) -> crate::Result<bool> {
-    let state = State::get().await?;
-    let profiles = state.profiles.read().await;
-    Ok(profiles.0.contains_key(profile))
-}
-
-/// Check if a profile is loaded
-#[tracing::instrument]
-pub async fn is_loaded(profile: &Path) -> crate::Result<bool> {
-    let state = State::get().await?;
-    let profiles = state.profiles.read().await;
-    Ok(profiles.0.get(profile).and_then(Option::as_ref).is_some())
+    Ok(profiles.0.get(path).cloned())
 }
 
 /// Edit a profile using a given asynchronous closure
@@ -85,11 +43,7 @@ where
     let mut profiles = state.profiles.write().await;
 
     match profiles.0.get_mut(path) {
-        Some(&mut Some(ref mut profile)) => action(profile).await,
-        Some(&mut None) => Err(crate::ErrorKind::UnloadedProfileError(
-            path.display().to_string(),
-        )
-        .as_error()),
+        Some(ref mut profile) => action(profile).await,
         None => Err(crate::ErrorKind::UnmanagedProfileError(
             path.display().to_string(),
         )
@@ -99,11 +53,43 @@ where
 
 /// Get a copy of the profile set
 #[tracing::instrument]
-pub async fn list(
-) -> crate::Result<std::collections::HashMap<PathBuf, Option<Profile>>> {
+pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>>
+{
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
     Ok(profiles.0.clone())
+}
+
+/// Query + sync profile's projects with the UI from the FS
+#[tracing::instrument]
+pub async fn sync(path: &Path) -> crate::Result<()> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path).await? {
+        let paths = profile.get_profile_project_paths()?;
+        let projects = crate::state::infer_data_from_files(
+            paths,
+            state.directories.caches_dir(),
+            &state.io_semaphore,
+        )
+        .await?;
+
+        {
+            let mut profiles = state.profiles.write().await;
+            if let Some(profile) = profiles.0.get_mut(path) {
+                profile.projects = projects;
+            }
+        }
+
+        State::sync().await?;
+
+        Ok(())
+    } else {
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(path.display().to_string())
+                .as_error(),
+        )
+    }
 }
 
 /// Run Minecraft using a profile
@@ -113,7 +99,7 @@ pub async fn run(
     path: &Path,
     credentials: &crate::auth::Credentials,
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
-    let state = State::get().await.unwrap();
+    let state = State::get().await?;
     let settings = state.settings.read().await;
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
@@ -141,19 +127,21 @@ pub async fn run(
     for hook in pre_launch_hooks.iter() {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
-        let result = Command::new(cmd.next().unwrap())
-            .args(&cmd.collect::<Vec<&str>>())
-            .current_dir(path)
-            .spawn()?
-            .wait()
-            .await?;
+        if let Some(command) = cmd.next() {
+            let result = Command::new(command)
+                .args(&cmd.collect::<Vec<&str>>())
+                .current_dir(path)
+                .spawn()?
+                .wait()
+                .await?;
 
-        if !result.success() {
-            return Err(crate::ErrorKind::LauncherError(format!(
-                "Non-zero exit code for pre-launch hook: {}",
-                result.code().unwrap_or(-1)
-            ))
-            .as_error());
+            if !result.success() {
+                return Err(crate::ErrorKind::LauncherError(format!(
+                    "Non-zero exit code for pre-launch hook: {}",
+                    result.code().unwrap_or(-1)
+                ))
+                .as_error());
+            }
         }
     }
 

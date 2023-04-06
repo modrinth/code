@@ -217,7 +217,8 @@ pub fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Extracting version numbers
     lazy_static! {
         static ref JAVA_VERSION_CAPTURE: Regex =
-            Regex::new(r#"version "([\d\._]+)""#).unwrap();
+            Regex::new(r#"version "([\d\._]+)""#)
+                .expect("Error creating java version capture regex");
     }
 
     // Extract version info from it
