@@ -269,7 +269,7 @@ const handleReset = async () => {
       <section class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
-          :id="result?.project_id"
+          :id="`${result?.project_id}/`"
           :key="result?.project_id"
           class="result-project-item"
           :type="result?.project_type"

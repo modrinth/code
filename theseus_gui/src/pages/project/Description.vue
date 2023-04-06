@@ -1,13 +1,18 @@
 <template>
   <Card>
-    <div class="markdown-body" v-html="renderHighlightedString(body)" />
+    <div class="markdown-body" v-html="renderHighlightedString(project.body)" />
   </Card>
 </template>
 
 <script setup>
 import { Card, renderHighlightedString } from 'omorphia'
-import { useProjectStore } from '@/store/project'
-const body = useProjectStore().project.body
+
+defineProps({
+  project: {
+    type: Object,
+    default: () => {},
+  },
+})
 </script>
 
 <script>
@@ -16,4 +21,16 @@ export default {
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.markdown-body {
+  :deep(hr),
+  :deep(h1),
+  :deep(h2) {
+    max-width: max(60rem, 90%);
+  }
+
+  :deep(ul) {
+    margin-left: 2rem;
+  }
+}
+</style>

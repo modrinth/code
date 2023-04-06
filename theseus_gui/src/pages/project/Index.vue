@@ -169,7 +169,7 @@
           ]"
         />
       </Card>
-      <RouterView />
+      <RouterView :project="data" :versions="versions" />
     </div>
   </div>
 </template>
@@ -204,21 +204,20 @@ import {
   OpenCollectiveIcon,
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
-import { useProjectStore } from '@/store/project'
-const data = useProjectStore().project
-
-const categories = await get_categories()
-const loaders = await get_loaders()
-
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-dayjs.extend(relativeTime)
-</script>
+import { ofetch } from 'ofetch'
+import { useRoute } from 'vue-router'
 
-<script>
-export default {
-  name: 'Index',
-}
+const route = useRoute()
+
+const loaders = await get_loaders()
+const categories = await get_categories()
+const [data, versions] = await Promise.all([
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`),
+])
+dayjs.extend(relativeTime)
 </script>
 
 <style scoped lang="scss">

@@ -10,18 +10,6 @@
   padding: 0;
 }
 
-.markdown-body {
-  :deep(hr),
-  :deep(h1),
-  :deep(h2) {
-    max-width: max(60rem, 90%);
-  }
-
-  :deep(ul) {
-    margin-left: 2rem;
-  }
-}
-
 .card-divider {
   background-color: var(--color-button-bg);
   border: none;

@@ -134,33 +134,23 @@ import {
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
-</script>
 
-<script>
-export default {
-  name: 'Versions',
-  data() {
-    return {
-      versions: [],
-      filterVersions: null,
-      filterLoader: null,
-      filterCompatible: false,
-    }
-  },
-  async mounted() {
-    const response = await fetch(
-      `https://api.modrinth.com/v2/project/${this.$route.params.id}/version`
-    )
-    this.versions = await response.json()
-  },
-  methods: {
-    clearFilters() {
-      this.filterVersions = null
-      this.filterLoader = null
-      this.filterCompatible = false
-    },
-  },
+let filterVersions = null
+let filterLoader = null
+let filterCompatible = false
+
+const clearFilters = () => {
+  filterVersions = null
+  filterLoader = null
+  filterCompatible = false
 }
+
+defineProps({
+  versions: {
+    type: Array,
+    required: true,
+  },
+})
 </script>
 
 <style scoped lang="scss">

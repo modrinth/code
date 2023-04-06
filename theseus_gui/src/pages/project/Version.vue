@@ -59,7 +59,7 @@
             </Button>
           </Card>
         </Card>
-        <Card v-if="true">
+        <Card v-if="displayDependencies[0]">
           <h2>Dependencies</h2>
           <router-link
             v-for="dependency in displayDependencies"
@@ -172,62 +172,39 @@ import {
   renderString,
 } from 'omorphia'
 import { releaseColor } from '@/helpers/utils'
-</script>
+import { ofetch } from 'ofetch'
+import { useRoute } from 'vue-router'
 
-<script>
-const url = (id) => `https://api.modrinth.com/v2/version/${id}`
-const deps = (id) => `https://api.modrinth.com/v2/project/${id}/dependencies`
-const user = (id) => `https://api.modrinth.com/v2/project/${id}/members`
+const route = useRoute()
 
-export default {
-  data() {
+const [version, members, dependencies] = await Promise.all([
+  ofetch(`https://api.modrinth.com/v2/version/${route.params.version}`),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`),
+])
+
+const author = members.find((member) => member.user.id === version.author_id)
+
+const displayDependencies = version.dependencies.map((dependency) => {
+  const version = dependencies.versions.find((obj) => obj.id === dependency.version_id)
+  if (version) {
+    const project = dependencies.projects.find(
+      (obj) => obj.id === version.project_id || obj.id === dependency.project_id
+    )
     return {
-      version: null,
-      author: null,
-      dependencies: null,
-      displayDependencies: null,
+      icon: project?.icon_url,
+      title: project?.title || project?.name,
+      subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
+      link: `/project/${project.slug}/version/${version.id}`,
     }
-  },
-  async created() {
-    try {
-      const response = await fetch(url(this.$route.params.version))
-      this.version = await response.json()
-
-      const userResponse = await fetch(user(this.$route.params.id))
-      this.author = (await userResponse.json()).find(
-        (obj) => obj.user.id === this.version.author_id
-      )
-
-      const depsResponse = await fetch(deps(this.$route.params.id))
-      this.dependencies = await depsResponse.json()
-
-      this.displayDependencies = this.version.dependencies.map((dependency) => {
-        const version = this.dependencies.versions.find((obj) => obj.id === dependency.version_id)
-        if (version) {
-          const project = this.dependencies.projects.find(
-            (obj) => obj.id === version.project_id || obj.id === dependency.project_id
-          )
-          return {
-            icon: project?.icon_url,
-            title: project?.title || project?.name,
-            subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
-            link: `/project/${project.slug}/version/${version.id}`,
-          }
-        } else
-          return {
-            icon: null,
-            title: dependency.file_name,
-            subtitle: `Added via overrides`,
-            link: `project/${this.$route.params.id}/`,
-          }
-      })
-
-      console.log(this.displayDependencies)
-    } catch (error) {
-      console.log(error)
+  } else
+    return {
+      icon: null,
+      title: dependency.file_name,
+      subtitle: `Added via overrides`,
+      link: `project/${route.params.id}/`,
     }
-  },
-}
+})
 </script>
 
 <style scoped lang="scss">
@@ -356,5 +333,18 @@ export default {
   padding: 0.5rem;
   width: 100%;
   box-shadow: none;
+}
+
+.markdown-body {
+  :deep(hr),
+  :deep(h1),
+  :deep(h2),
+  img {
+    max-width: max(60rem, 90%) !important;
+  }
+
+  :deep(ul) {
+    margin-left: 2rem;
+  }
 }
 </style>

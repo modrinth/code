@@ -88,77 +88,41 @@ import {
   CalendarIcon,
   Button,
 } from 'omorphia'
-</script>
+import { computed } from 'vue'
 
-<script>
-export default {
-  data() {
-    return {
-      gallery: [],
-      expandedGalleryItem: null,
-      expandedGalleryIndex: 0,
-      zoomedIn: false,
+const props = defineProps({
+  project: {
+    type: Object,
+    default: () => {},
+  },
+})
 
-      deleteIndex: -1,
+const gallery = computed(() => props.project.gallery).value
 
-      editIndex: -1,
-      editTitle: '',
-      editDescription: '',
-      editFeatured: false,
-      editOrder: null,
-      editFile: null,
-      previewImage: null,
-      shouldPreventActions: false,
-    }
-  },
-  computed: {
-    acceptFileTypes() {
-      return 'image/png,image/jpeg,image/gif,image/webp,.png,.jpeg,.gif,.webp'
-    },
-  },
-  async created() {
-    const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}`)
-    this.gallery = (await response.json()).gallery
-  },
-  methods: {
-    nextImage() {
-      this.expandedGalleryIndex++
-      if (this.expandedGalleryIndex >= this.gallery.length) {
-        this.expandedGalleryIndex = 0
-      }
-      this.expandedGalleryItem = this.gallery[this.expandedGalleryIndex]
-    },
-    previousImage() {
-      this.expandedGalleryIndex--
-      if (this.expandedGalleryIndex < 0) {
-        this.expandedGalleryIndex = this.gallery.length - 1
-      }
-      this.expandedGalleryItem = this.gallery[this.expandedGalleryIndex]
-    },
-    expandImage(item, index) {
-      this.expandedGalleryItem = item
-      this.expandedGalleryIndex = index
-      this.zoomedIn = false
-    },
-    resetEdit() {
-      this.editIndex = -1
-      this.editTitle = ''
-      this.editDescription = ''
-      this.editFeatured = false
-      this.editOrder = null
-      this.editFile = null
-      this.previewImage = null
-    },
-    showPreviewImage() {
-      const reader = new FileReader()
-      if (this.editFile instanceof Blob) {
-        reader.readAsDataURL(this.editFile)
-        reader.onload = (event) => {
-          this.previewImage = event.target.result
-        }
-      }
-    },
-  },
+let expandedGalleryItem
+let expandedGalleryIndex
+let zoomedIn = false
+
+const nextImage = () => {
+  expandedGalleryIndex++
+  if (expandedGalleryIndex >= gallery.length) {
+    expandedGalleryIndex = 0
+  }
+  expandedGalleryItem = gallery[expandedGalleryItem]
+}
+
+const previousImage = () => {
+  expandedGalleryIndex--
+  if (expandedGalleryIndex < 0) {
+    expandedGalleryIndex = gallery.length - 1
+  }
+  expandedGalleryItem = gallery[expandedGalleryItem]
+}
+
+const expandImage = (item, index) => {
+  expandedGalleryIndex = index
+  expandedGalleryItem = item
+  zoomedIn = false
 }
 </script>
 
