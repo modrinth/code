@@ -1,12 +1,12 @@
-use std::path::PathBuf;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
-use serde::{Serialize, Deserialize};
+use std::path::PathBuf;
 
 use crate::prelude::JavaVersion;
 use crate::util::jre;
 
 // All stored Java versions, chosen by the user
-// A wrapper over a Hashmap connecting key -> java version 
+// A wrapper over a Hashmap connecting key -> java version
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct JavaGlobals(HashMap<String, JavaVersion>);
 
@@ -39,8 +39,10 @@ impl JavaGlobals {
     // If false, when checked, the user should be prompted to reselect the Java version
     pub fn is_all_valid(&self) -> bool {
         for (_, java) in self.0.iter() {
-        let jre = jre::check_java_at_filepath(PathBuf::from( &java.path).as_path());
-            if let Some(jre) = jre{ 
+            let jre = jre::check_java_at_filepath(
+                PathBuf::from(&java.path).as_path(),
+            );
+            if let Some(jre) = jre {
                 if jre.version != java.version {
                     return false;
                 }
@@ -50,7 +52,10 @@ impl JavaGlobals {
         }
         true
     }
+}
 
-    
-  
+impl Default for JavaGlobals {
+    fn default() -> Self {
+        Self::new()
+    }
 }

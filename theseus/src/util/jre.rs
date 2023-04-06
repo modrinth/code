@@ -2,10 +2,10 @@ use dunce::canonicalize;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, path::Path};
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
+use std::{collections::HashSet, path::Path};
 
 #[cfg(target_os = "windows")]
 use winreg::{
@@ -37,7 +37,7 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         for java_subpath in java_subpaths {
             let path = java_subpath?.path();
             if let Some(j) =
-                check_java_at_filepath(&PathBuf::from(path).join("bin"))
+                check_java_at_filepath(&path.join("bin"))
             {
                 jres.insert(j);
                 break;
@@ -155,7 +155,8 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
             jres.insert(j);
             break;
         }
-        if let Some(j) = check_java_at_filepath(&PathBuf::from(path).join("bin"))
+        if let Some(j) =
+            check_java_at_filepath(&PathBuf::from(path).join("bin"))
         {
             jres.insert(j);
             break;
@@ -242,7 +243,7 @@ pub fn extract_java_majorminor_version(
 ) -> Result<(u32, u32), JREError> {
     let mut split = version.split('.');
     let major_opt = split.next();
-    
+
     let mut major;
     // Try minor. If doesn't exist, in format like "20" so use major
     let mut minor = if let Some(minor) = split.next() {
@@ -251,14 +252,16 @@ pub fn extract_java_majorminor_version(
     } else {
         // Formatted like "20", only one value means that is minor version
         major = 1;
-        major_opt.ok_or_else(|| JREError::InvalidJREVersion(version.to_string()))?.parse::<u32>()?
+        major_opt
+            .ok_or_else(|| JREError::InvalidJREVersion(version.to_string()))?
+            .parse::<u32>()?
     };
-    
+
     // Java start should always be 1. If more than 1, it is formatted like "17.0.1.2" and starts with minor version
     if major > 1 {
         minor = major;
         major = 1;
-    } 
+    }
 
     Ok((major, minor))
 }
@@ -290,9 +293,12 @@ mod tests {
 
     #[test]
     pub fn java_version_parsing() {
-        assert_eq!(extract_java_majorminor_version("1.8").unwrap(),(1,8));
-        assert_eq!(extract_java_majorminor_version("17.0.6").unwrap(),(1,17));
-        assert_eq!(extract_java_majorminor_version("20").unwrap(),(1,20));
-        assert_eq!(extract_java_majorminor_version("1.8.0_361").unwrap(),(1,8));
+        assert_eq!(extract_java_majorminor_version("1.8").unwrap(), (1, 8));
+        assert_eq!(extract_java_majorminor_version("17.0.6").unwrap(), (1, 17));
+        assert_eq!(extract_java_majorminor_version("20").unwrap(), (1, 20));
+        assert_eq!(
+            extract_java_majorminor_version("1.8.0_361").unwrap(),
+            (1, 8)
+        );
     }
 }

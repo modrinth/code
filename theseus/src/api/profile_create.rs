@@ -143,7 +143,7 @@ pub async fn profile_create(
     if settings.java_globals.get(&optimal_version_key).is_some() {
         profile.with_java_settings(Some(JavaSettings {
             jre_key: Some(optimal_version_key),
-            extra_arguments: None
+            extra_arguments: None,
         }));
     } else {
         println!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.");

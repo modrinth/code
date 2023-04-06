@@ -165,15 +165,21 @@ pub async fn run(
             ..
         }) => settings.java_globals.get(jre_key),
         // Fall back to Daedalus-decided key if no profile-specific key is set
-        _ => if version_info
-            .java_version
-            .as_ref()
-            .filter(|it| it.major_version >= 17)
-            .is_some()
-        {
-            settings.java_globals.get(&crate::jre::JAVA_17PLUS_KEY.to_string())
-        } else {
-            settings.java_globals.get(&crate::jre::JAVA_8_KEY.to_string())
+        _ => {
+            if version_info
+                .java_version
+                .as_ref()
+                .filter(|it| it.major_version >= 17)
+                .is_some()
+            {
+                settings
+                    .java_globals
+                    .get(&crate::jre::JAVA_17PLUS_KEY.to_string())
+            } else {
+                settings
+                    .java_globals
+                    .get(&crate::jre::JAVA_8_KEY.to_string())
+            }
         }
     };
     let java_version = java_version.as_ref().ok_or_else(|| {
@@ -212,7 +218,7 @@ pub async fn run(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
-        &java_install,
+        java_install,
         java_args,
         env_args,
         wrapper,

@@ -1,9 +1,6 @@
 //! Theseus settings file
 use serde::{Deserialize, Serialize};
-use std::{
-    collections::HashSet,
-    path::Path,
-};
+use std::{collections::HashSet, path::Path};
 use tokio::fs;
 
 use super::JavaGlobals;
@@ -20,7 +17,7 @@ pub struct Settings {
     pub game_resolution: WindowSize,
     pub custom_java_args: Vec<String>,
     pub custom_env_args: Vec<(String, String)>,
-    pub java_globals : JavaGlobals,
+    pub java_globals: JavaGlobals,
     pub default_user: Option<uuid::Uuid>,
     pub hooks: Hooks,
     pub max_concurrent_downloads: usize,

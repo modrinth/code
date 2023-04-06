@@ -18,11 +18,10 @@ pub mod prelude {
     pub use crate::{
         auth::{self, Credentials},
         data::*,
-        jre,
-        process,
-        state::JavaGlobals,
+        jre, process,
         profile::{self, Profile},
         profile_create, settings,
+        state::JavaGlobals,
         util::jre::JavaVersion,
         State,
     };

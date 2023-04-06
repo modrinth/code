@@ -1,14 +1,14 @@
 //! Authentication flow interface
 use crate::{
     prelude::Profile,
-    util::jre::{self, JavaVersion, extract_java_majorminor_version},
-    State, state::JavaGlobals,
+    state::JavaGlobals,
+    util::jre::{self, extract_java_majorminor_version, JavaVersion},
+    State,
 };
 use daedalus as d;
 
-pub const JAVA_8_KEY : &str = "JAVA_8";
-pub const JAVA_17PLUS_KEY : &str = "JAVA_17PLUS";
-
+pub const JAVA_8_KEY: &str = "JAVA_8";
+pub const JAVA_17PLUS_KEY: &str = "JAVA_17PLUS";
 
 // Autodetect JavaSettings default
 // Make a guess for what the default Java global settings should be
@@ -20,10 +20,10 @@ pub fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
     let mut java_globals = JavaGlobals::new();
     if let Some(jre) = java_8.pop() {
         java_globals.insert(JAVA_8_KEY.to_string(), jre);
-    } 
+    }
     if let Some(jre) = java_17plus.pop() {
         java_globals.insert(JAVA_17PLUS_KEY.to_string(), jre);
-    } 
+    }
 
     Ok(java_globals)
 }
@@ -47,14 +47,14 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
                 profile.metadata.game_version
             ))
         })?;
-    
-    // Get detailed manifest info from Daedalus 
-    let version_info = d::minecraft::fetch_version_info(&version).await?;
+
+    // Get detailed manifest info from Daedalus
+    let version_info = d::minecraft::fetch_version_info(version).await?;
     let optimal_key = if version_info
-            .java_version
-            .as_ref()
-            .filter(|it| it.major_version >= 17)
-            .is_some()
+        .java_version
+        .as_ref()
+        .filter(|it| it.major_version >= 17)
+        .is_some()
     {
         JAVA_17PLUS_KEY.to_string()
     } else {
@@ -62,7 +62,6 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
     };
     Ok(optimal_key)
 }
-
 
 // Searches for jres on the system that are 1.17 or higher
 pub fn find_java17plus_jres() -> crate::Result<Vec<JavaVersion>> {
