@@ -52,7 +52,7 @@ async fn main() -> theseus::Result<()> {
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
     // println!("Editing.");
-    profile::edit(&profile_path, |profile| {
+    profile::edit(&profile_path, |_profile| {
         // Eg: Java- this would let you change the java runtime of the profile instead of using the default
         // use theseus::prelude::jre::JAVA__KEY;
         // profile.java = Some(JavaSettings {

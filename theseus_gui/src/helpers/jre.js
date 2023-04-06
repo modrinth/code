@@ -26,10 +26,16 @@ export async function find_jre_8_jres() {
   return await invoke('jre_find_jre_8_jres')
 }
 
-// Finds the highest version of Java 17+, if it exists
+// Finds the installation of Java 17, if it exists
 // Returns [JavaVersion]
-export async function find_jre_17plus_jres() {
-  return await invoke('jre_find_jre_17plus_jres')
+export async function find_jre_17_jres() {
+  return await invoke('jre_find_jre_17_jres')
+}
+
+// Finds the highest version of Java 18+, if it exists
+// Returns [JavaVersion]
+export async function find_jre_18plus_jres() {
+  return await invoke('jre_find_jre_18plus_jres')
 }
 
 // Gets key for the optimal JRE to use, for a given profile path

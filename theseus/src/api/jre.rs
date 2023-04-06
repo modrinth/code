@@ -58,7 +58,7 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
     let optimal_key = match version_info
         .java_version
         .as_ref()
-        .map(|it| it.major_version )
+        .map(|it| it.major_version)
         .unwrap_or(0)
     {
         0..=16 => JAVA_8_KEY.to_string(),
@@ -129,8 +129,7 @@ pub fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
     Ok(jre::get_all_jre()?)
 }
 
-
-// test 
+// test
 #[cfg(test)]
 mod tests {
     #[test]

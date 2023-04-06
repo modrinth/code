@@ -36,9 +36,7 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         let Ok(java_subpaths) = std::fs::read_dir(java_path) else {continue };
         for java_subpath in java_subpaths {
             let path = java_subpath?.path();
-            if let Some(j) =
-                check_java_at_filepath(&path.join("bin"))
-            {
+            if let Some(j) = check_java_at_filepath(&path.join("bin")) {
                 jres.insert(j);
             }
         }
@@ -117,17 +115,18 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands",
     ];
     for path in java_paths {
-        if let Some(j) = check_java_at_filepath(&PathBuf::from(path).join("bin"))
+        if let Some(j) =
+            check_java_at_filepath(&PathBuf::from(path).join("bin"))
         {
             jres.insert(j);
         }
     }
-    // Iterate over JavaVirtualMachines/(something)/Contents/Home/bin 
+    // Iterate over JavaVirtualMachines/(something)/Contents/Home/bin
     let base_path = PathBuf::from("/Library/Java/JavaVirtualMachines/");
     if base_path.is_dir() {
         for entry in std::fs::read_dir(base_path)? {
             let entry = entry?.path().join("Contents/Home/bin");
-            if let Some(j) =check_java_at_filepath(entry.as_path()){
+            if let Some(j) = check_java_at_filepath(entry.as_path()) {
                 jres.insert(j);
             }
         }
@@ -135,7 +134,6 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
     Ok(jres.into_iter().collect())
 }
-
 
 // Entrypoint function (Linux)
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations

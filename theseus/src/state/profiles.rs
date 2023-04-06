@@ -147,7 +147,10 @@ impl Profile {
     }
 
     #[tracing::instrument]
-    pub fn set_java_settings(&mut self, java: Option<JavaSettings>) -> crate::Result<()> {
+    pub fn set_java_settings(
+        &mut self,
+        java: Option<JavaSettings>,
+    ) -> crate::Result<()> {
         self.java = java;
         Ok(())
     }

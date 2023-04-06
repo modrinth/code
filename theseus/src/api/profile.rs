@@ -157,12 +157,18 @@ pub async fn run(
             match version_info
                 .java_version
                 .as_ref()
-                .map(|it| it.major_version )
+                .map(|it| it.major_version)
                 .unwrap_or(0)
-                    {
-                0..=16 => settings.java_globals.get(&crate::jre::JAVA_8_KEY.to_string()),
-                17 => settings.java_globals.get(&crate::jre::JAVA_17_KEY.to_string()),
-                _ => settings.java_globals.get(&crate::jre::JAVA_18PLUS_KEY.to_string()),
+            {
+                0..=16 => settings
+                    .java_globals
+                    .get(&crate::jre::JAVA_8_KEY.to_string()),
+                17 => settings
+                    .java_globals
+                    .get(&crate::jre::JAVA_17_KEY.to_string()),
+                _ => settings
+                    .java_globals
+                    .get(&crate::jre::JAVA_18PLUS_KEY.to_string()),
             }
         }
     };
