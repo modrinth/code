@@ -11,11 +11,12 @@ use std::{
     path::{Path, PathBuf},
 };
 use tokio::fs;
+use tokio::sync::Semaphore;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 const PROFILE_SUBTREE: &[u8] = b"profiles";
 
-pub(crate) struct Profiles(pub HashMap<PathBuf, Option<Profile>>);
+pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
@@ -30,7 +31,6 @@ pub struct Profile {
     #[serde(skip)]
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
-    pub projects: HashMap<PathBuf, Project>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub java: Option<JavaSettings>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -39,6 +39,7 @@ pub struct Profile {
     pub resolution: Option<WindowSize>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub hooks: Option<Hooks>,
+    pub projects: HashMap<PathBuf, Project>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -52,6 +53,7 @@ pub struct ProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
+    pub linked_project_id: Option<String>,
 }
 
 // TODO: Quilt?
@@ -64,6 +66,7 @@ pub enum ModLoader {
     Vanilla,
     Forge,
     Fabric,
+    Quilt,
 }
 
 impl std::fmt::Display for ModLoader {
@@ -72,6 +75,7 @@ impl std::fmt::Display for ModLoader {
             Self::Vanilla => "Vanilla",
             Self::Forge => "Forge",
             Self::Fabric => "Fabric",
+            Self::Quilt => "Quilt",
         })
     }
 }
@@ -107,6 +111,7 @@ impl Profile {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
+                linked_project_id: None,
             },
             projects: HashMap::new(),
             java: None,
@@ -116,16 +121,8 @@ impl Profile {
         })
     }
 
-    // TODO: deduplicate these builder methods
-    // They are flat like this in order to allow builder-style usage
     #[tracing::instrument]
-    pub fn with_name(&mut self, name: String) -> &mut Self {
-        self.metadata.name = name;
-        self
-    }
-
-    #[tracing::instrument]
-    pub async fn with_icon<'a>(
+    pub async fn set_icon<'a>(
         &'a mut self,
         icon: &'a Path,
     ) -> crate::Result<&'a mut Self> {
@@ -149,54 +146,24 @@ impl Profile {
         }
     }
 
-    #[tracing::instrument]
-    pub fn with_game_version(&mut self, version: String) -> &mut Self {
-        self.metadata.game_version = version;
-        self
-    }
+    pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
+        let mut files = Vec::new();
+        let mut read_paths = |path: &str| {
+            let new_path = self.path.join(path);
+            if new_path.exists() {
+                for path in std::fs::read_dir(self.path.join(path))? {
+                    files.push(path?.path());
+                }
+            }
+            Ok::<(), crate::Error>(())
+        };
 
-    #[tracing::instrument]
-    pub fn with_loader(
-        &mut self,
-        loader: ModLoader,
-        version: Option<LoaderVersion>,
-    ) -> &mut Self {
-        self.metadata.loader = loader;
-        self.metadata.loader_version = version;
-        self
-    }
+        read_paths("mods")?;
+        read_paths("shaders")?;
+        read_paths("resourcepacks")?;
+        read_paths("datapacks")?;
 
-    #[tracing::instrument]
-    pub fn with_java_settings(
-        &mut self,
-        settings: Option<JavaSettings>,
-    ) -> &mut Self {
-        self.java = settings;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_memory(
-        &mut self,
-        settings: Option<MemorySettings>,
-    ) -> &mut Self {
-        self.memory = settings;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_resolution(
-        &mut self,
-        resolution: Option<WindowSize>,
-    ) -> &mut Self {
-        self.resolution = resolution;
-        self
-    }
-
-    #[tracing::instrument]
-    pub fn with_hooks(&mut self, hooks: Option<Hooks>) -> &mut Self {
-        self.hooks = hooks;
-        self
+        Ok(files)
     }
 }
 
@@ -205,6 +172,7 @@ impl Profiles {
     pub async fn init(
         db: &sled::Db,
         dirs: &DirectoryInfo,
+        io_sempahore: &Semaphore,
     ) -> crate::Result<Self> {
         let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
             Ok(Default::default()),
@@ -229,38 +197,34 @@ impl Profiles {
                 };
                 (path, prof)
             })
-            .collect::<HashMap<PathBuf, Option<Profile>>>()
+            .filter_map(|(key, opt_value)| async move {
+                opt_value.map(|value| (key, value))
+            })
+            .collect::<HashMap<PathBuf, Profile>>()
             .await;
 
         // project path, parent profile path
         let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
         {
-            for (profile_path, _profile_opt) in profiles.iter() {
-                let mut read_paths = |path: &str| {
-                    let new_path = profile_path.join(path);
-                    if new_path.exists() {
-                        for path in std::fs::read_dir(profile_path.join(path))?
-                        {
-                            files.insert(path?.path(), profile_path.clone());
-                        }
-                    }
-                    Ok::<(), crate::Error>(())
-                };
-                read_paths("mods")?;
-                read_paths("shaders")?;
-                read_paths("resourcepacks")?;
-                read_paths("datapacks")?;
+            for (profile_path, profile) in profiles.iter() {
+                let paths = profile.get_profile_project_paths()?;
+
+                for path in paths {
+                    files.insert(path, profile_path.clone());
+                }
             }
         }
+
         let inferred = super::projects::infer_data_from_files(
             files.keys().cloned().collect(),
             dirs.caches_dir(),
+            io_sempahore,
         )
         .await?;
 
         for (key, value) in inferred {
             if let Some(profile_path) = files.get(&key) {
-                if let Some(Some(profile)) = profiles.get_mut(profile_path) {
+                if let Some(profile) = profiles.get_mut(profile_path) {
                     profile.projects.insert(key, value);
                 }
             }
@@ -278,7 +242,7 @@ impl Profiles {
                     crate::ErrorKind::UTFError(profile.path.clone()).as_error(),
                 )?
                 .into(),
-            Some(profile),
+            profile,
         );
         Ok(self)
     }
@@ -292,9 +256,15 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip(self))]
-    pub fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
-        let path = PathBuf::from(&canonicalize(path)?.to_str().unwrap());
+    pub async fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
+        let path =
+            PathBuf::from(&canonicalize(path)?.to_string_lossy().to_string());
         self.0.remove(&path);
+
+        if path.exists() {
+            fs::remove_dir_all(path).await?;
+        }
+
         Ok(self)
     }
 
@@ -308,8 +278,8 @@ impl Profiles {
             .try_for_each_concurrent(None, |(path, profile)| async move {
                 let json = serde_json::to_vec_pretty(&profile)?;
 
-                let json_path =
-                    Path::new(path.to_str().unwrap()).join(PROFILE_JSON_PATH);
+                let json_path = Path::new(&path.to_string_lossy().to_string())
+                    .join(PROFILE_JSON_PATH);
 
                 fs::write(json_path, json).await?;
                 Ok::<_, crate::Error>(())

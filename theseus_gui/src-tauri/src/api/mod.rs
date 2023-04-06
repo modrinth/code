@@ -4,6 +4,7 @@ use thiserror::Error;
 
 pub mod auth;
 
+pub mod pack;
 pub mod process;
 pub mod profile;
 pub mod profile_create;

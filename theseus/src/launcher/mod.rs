@@ -72,9 +72,10 @@ pub async fn launch_minecraft(
             "Invalid game version: {game_version}"
         )))?;
 
-    let version_jar = loader_version
-        .as_ref()
-        .map_or(version.id.clone(), |it| it.id.clone());
+    let version_jar =
+        loader_version.as_ref().map_or(version.id.clone(), |it| {
+            format!("{}-{}", version.id.clone(), it.id.clone())
+        });
 
     let mut version_info = download::download_version_info(
         &state,
@@ -85,7 +86,7 @@ pub async fn launch_minecraft(
 
     let client_path = state
         .directories
-        .version_dir(&version.id)
+        .version_dir(&version_jar)
         .join(format!("{version_jar}.jar"));
 
     download::download_minecraft(&state, &version_info).await?;
@@ -133,6 +134,7 @@ pub async fn launch_minecraft(
                         args::get_processor_main_class(args::get_lib_path(
                             &state.directories.libraries_dir(),
                             &processor.jar,
+                            false,
                         )?)
                         .await?
                         .ok_or_else(|| {
@@ -193,7 +195,7 @@ pub async fn launch_minecraft(
             args::get_jvm_arguments(
                 args.get(&d::minecraft::ArgumentType::Jvm)
                     .map(|x| x.as_slice()),
-                &state.directories.version_natives_dir(&version.id),
+                &state.directories.version_natives_dir(&version_jar),
                 &state.directories.libraries_dir(),
                 &args::get_class_paths(
                     &state.directories.libraries_dir(),
@@ -205,7 +207,6 @@ pub async fn launch_minecraft(
                 Vec::from(java_args),
             )?
             .into_iter()
-            .map(|r| r.replace(' ', r"\ "))
             .collect::<Vec<_>>(),
         )
         .arg(version_info.main_class.clone())
@@ -223,7 +224,6 @@ pub async fn launch_minecraft(
                 *resolution,
             )?
             .into_iter()
-            .map(|r| r.replace(' ', r"\ "))
             .collect::<Vec<_>>(),
         )
         .current_dir(instance_path.clone())

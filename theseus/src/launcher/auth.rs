@@ -8,8 +8,8 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 lazy_static! {
-    static ref HYDRA_URL: Url =
-        Url::parse("https://hydra.modrinth.com").unwrap();
+    static ref HYDRA_URL: Url = Url::parse("https://hydra.modrinth.com")
+        .expect("Hydra URL parse failed");
 }
 
 // Socket messages
