@@ -140,7 +140,6 @@ impl Tags {
         let licenses = self.fetch_tag("license");
         let donation_platforms = self.fetch_tag("donation_platform");
         let report_types = self.fetch_tag("report_type");
-
         let (
             categories,
             loaders,

@@ -44,7 +44,6 @@ export async function get_optimal_jre_ke(path) {
   return await invoke('jre_get_optimal_jre_key', { path })
 }
 
-
 // Autodetect Java globals, by searching the users computer.
 // Returns a *NEW* JavaGlobals that can be put into Settings
 export async function autodetect_java_globals(path) {
