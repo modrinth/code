@@ -2,30 +2,11 @@ use crate::api::Result;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 
-// Add a profile to the in-memory state
-// invoke('profile_add',profile)
-#[tauri::command]
-pub async fn profile_add(profile: Profile) -> Result<()> {
-    profile::add(profile).await?;
-    State::sync().await?;
-    Ok(())
-}
-
-// Add a path as a profile in-memory
-// invoke('profile_add_path',path)
-#[tauri::command]
-pub async fn profile_add_path(path: &Path) -> Result<()> {
-    profile::add_path(path).await?;
-    State::sync().await?;
-    Ok(())
-}
-
 // Remove a profile
 // invoke('profile_add_path',path)
 #[tauri::command]
 pub async fn profile_remove(path: &Path) -> Result<()> {
     profile::remove(path).await?;
-    State::sync().await?;
     Ok(())
 }
 
@@ -34,25 +15,6 @@ pub async fn profile_remove(path: &Path) -> Result<()> {
 #[tauri::command]
 pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
     let res = profile::get(path).await?;
-    State::sync().await?;
-    Ok(res)
-}
-
-// Check if a profile is already managed by Theseus
-// invoke('profile_is_managed',profile)
-#[tauri::command]
-pub async fn profile_is_managed(profile: &Path) -> Result<bool> {
-    let res = profile::is_managed(profile).await?;
-    State::sync().await?;
-    Ok(res)
-}
-
-// Check if a profile is loaded
-// invoke('profile_is_loaded',profile)
-#[tauri::command]
-pub async fn profile_is_loaded(profile: &Path) -> Result<bool> {
-    let res = profile::is_loaded(profile).await?;
-    State::sync().await?;
     Ok(res)
 }
 
@@ -60,9 +22,8 @@ pub async fn profile_is_loaded(profile: &Path) -> Result<bool> {
 // invoke('profile_list')
 #[tauri::command]
 pub async fn profile_list(
-) -> Result<std::collections::HashMap<PathBuf, Option<Profile>>> {
+) -> Result<std::collections::HashMap<PathBuf, Profile>> {
     let res = profile::list().await?;
-    State::sync().await?;
     Ok(res)
 }
 
@@ -71,10 +32,7 @@ pub async fn profile_list(
 // for the actual Child in the state.
 // invoke('profile_run')
 #[tauri::command]
-pub async fn profile_run(
-    path: &Path,
-    credentials: theseus::auth::Credentials,
-) -> Result<u32> {
+pub async fn profile_run(path: &Path, credentials: Credentials) -> Result<u32> {
     let proc_lock = profile::run(path, &credentials).await?;
     let pid = proc_lock.read().await.child.id().ok_or_else(|| {
         theseus::Error::from(theseus::ErrorKind::LauncherError(
@@ -89,7 +47,7 @@ pub async fn profile_run(
 #[tauri::command]
 pub async fn profile_run_wait(
     path: &Path,
-    credentials: theseus::auth::Credentials,
+    credentials: Credentials,
 ) -> Result<()> {
     let proc_lock = profile::run(path, &credentials).await?;
     let mut proc = proc_lock.write().await;

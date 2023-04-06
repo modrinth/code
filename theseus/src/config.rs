@@ -11,10 +11,19 @@ pub static BINCODE_CONFIG: Lazy<bincode::config::Configuration> =
     });
 
 pub static REQWEST_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
+    let mut headers = reqwest::header::HeaderMap::new();
+    let header = reqwest::header::HeaderValue::from_str(&format!(
+        "modrinth/daedalus/{} (support@modrinth.com)",
+        env!("CARGO_PKG_VERSION")
+    ))
+    .unwrap();
+    headers.insert(reqwest::header::USER_AGENT, header);
     reqwest::Client::builder()
+        .timeout(time::Duration::from_secs(15))
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
+        .default_headers(headers)
         .build()
-        .unwrap()
+        .expect("Reqwest Client Building Failed")
 });
 
 pub const MODRINTH_API_URL: &str = "https://api.modrinth.com/v2/";

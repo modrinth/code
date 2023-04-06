@@ -67,16 +67,17 @@ pub enum ErrorKind {
     #[error("Recv error: {0}")]
     RecvError(#[from] tokio::sync::oneshot::error::RecvError),
 
-    #[error(
-        "Tried to access unloaded profile {0}, loading it probably failed"
-    )]
-    UnloadedProfileError(String),
+    #[error("Error acquiring semaphore: {0}")]
+    AcquireError(#[from] tokio::sync::AcquireError),
 
     #[error("Profile {0} is not managed by Theseus!")]
     UnmanagedProfileError(String),
 
     #[error("Could not create profile: {0}")]
     ProfileCreationError(#[from] profile_create::ProfileCreationError),
+
+    #[error("Zip error: {0}")]
+    ZipError(#[from] async_zip::error::ZipError),
 
     #[error("Error: {0}")]
     OtherError(String),
