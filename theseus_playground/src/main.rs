@@ -4,7 +4,7 @@
 )]
 
 use dunce::canonicalize;
-use theseus::{prelude::*, profile_create::profile_create};
+use theseus::{prelude::*};
 use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run

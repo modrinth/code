@@ -146,6 +146,12 @@ impl Profile {
         }
     }
 
+    #[tracing::instrument]
+    pub fn set_java_settings(&mut self, java: Option<JavaSettings>) -> crate::Result<()> {
+        self.java = java;
+        Ok(())
+    }
+
     pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
         let mut files = Vec::new();
         let mut read_paths = |path: &str| {
