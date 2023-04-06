@@ -134,15 +134,16 @@ import {
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
+import { ref } from 'vue'
 
-let filterVersions = null
-let filterLoader = null
-let filterCompatible = false
+let filterVersions = ref(null)
+let filterLoader = ref(null)
+let filterCompatible = ref(false)
 
 const clearFilters = () => {
-  filterVersions = null
-  filterLoader = null
-  filterCompatible = false
+  filterVersions.value = null
+  filterLoader.value = null
+  filterCompatible.value = false
 }
 
 defineProps({

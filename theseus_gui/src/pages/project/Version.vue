@@ -1,5 +1,5 @@
 <template>
-  <div v-if="version">
+  <div>
     <Card>
       <div class="version-title">
         <h2>{{ version.name }}</h2>
@@ -10,7 +10,7 @@
           <DownloadIcon />
           Install
         </Button>
-        <Button :link="`/project/${$route.params.id}/versions`">
+        <Button :link="`/project/${route.params.id}/versions`">
           <LeftArrowIcon />
           Back to list
         </Button>
@@ -19,7 +19,7 @@
           Report
         </Button>
         <a
-          :href="`https://modrinth.com/mod/${$route.params.id}/version/${$route.params.version}`"
+          :href="`https://modrinth.com/mod/${route.params.id}/version/${route.params.version}`"
           rel="external"
           target="_blank"
           class="btn"
@@ -33,7 +33,7 @@
       <div class="description-cards">
         <Card>
           <h3 class="card-title">Changelog</h3>
-          <div class="markdown-body" v-html="renderString(version.changelog)" />
+          <div class="markdown-body" v-html="renderString(version.changelog ?? '')" />
         </Card>
         <Card>
           <h3 class="card-title">Files</h3>
@@ -59,7 +59,7 @@
             </Button>
           </Card>
         </Card>
-        <Card v-if="displayDependencies[0]">
+        <Card>
           <h2>Dependencies</h2>
           <router-link
             v-for="dependency in displayDependencies"
@@ -149,7 +149,7 @@
           </div>
           <div class="metadata-item">
             <span class="metadata-label">Version ID</span>
-            <span class="metadata-value">{{ version.downloads }}</span>
+            <span class="metadata-value"></span>
           </div>
         </div>
       </Card>
@@ -172,39 +172,50 @@ import {
   renderString,
 } from 'omorphia'
 import { releaseColor } from '@/helpers/utils'
-import { ofetch } from 'ofetch'
+import { ref, defineProps } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-const [version, members, dependencies] = await Promise.all([
-  ofetch(`https://api.modrinth.com/v2/version/${route.params.version}`),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`),
-])
-
-const author = members.find((member) => member.user.id === version.author_id)
-
-const displayDependencies = version.dependencies.map((dependency) => {
-  const version = dependencies.versions.find((obj) => obj.id === dependency.version_id)
-  if (version) {
-    const project = dependencies.projects.find(
-      (obj) => obj.id === version.project_id || obj.id === dependency.project_id
-    )
-    return {
-      icon: project?.icon_url,
-      title: project?.title || project?.name,
-      subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
-      link: `/project/${project.slug}/version/${version.id}`,
-    }
-  } else
-    return {
-      icon: null,
-      title: dependency.file_name,
-      subtitle: `Added via overrides`,
-      link: `project/${route.params.id}/`,
-    }
+const props = defineProps({
+  versions: {
+    type: Array,
+    required: true,
+  },
+  dependencies: {
+    type: Object,
+    required: true,
+  },
+  members: {
+    type: Array,
+    required: true,
+  },
 })
+
+const version = ref(props.versions.find((version) => version.id === route.params.version))
+const author = ref(props.members.find((member) => member.user.id === version.value.author_id))
+const displayDependencies = ref(
+  version.value.dependencies.map((dependency) => {
+    const version = props.dependencies.versions.find((obj) => obj.id === dependency.version_id)
+    if (version) {
+      const project = props.dependencies.projects.find(
+        (obj) => obj.id === version.project_id || obj.id === dependency.project_id
+      )
+      return {
+        icon: project?.icon_url,
+        title: project?.title || project?.name,
+        subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
+        link: `/project/${project.slug}/version/${version.id}`,
+      }
+    } else
+      return {
+        icon: null,
+        title: dependency.file_name,
+        subtitle: `Added via overrides`,
+        link: `project/${route.params.id}/`,
+      }
+  })
+)
 </script>
 
 <style scoped lang="scss">

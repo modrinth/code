@@ -1,6 +1,6 @@
 <template>
-  <div v-if="gallery[0]" class="gallery">
-    <Card v-for="(image, index) in gallery" :key="image.url" class="gallery-item">
+  <div class="gallery">
+    <Card v-for="(image, index) in project.gallery" :key="image.url" class="gallery-item">
       <a @click="expandImage(image, index)">
         <img :src="image.url" :alt="image.title" class="gallery-image" />
       </a>
@@ -63,10 +63,15 @@
               <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
               <ContractIcon v-else aria-hidden="true" />
             </Button>
-            <Button v-if="gallery.length > 1" class="previous" icon-only @click="previousImage()">
+            <Button
+              v-if="project.gallery.length > 1"
+              class="previous"
+              icon-only
+              @click="previousImage()"
+            >
               <LeftArrowIcon aria-hidden="true" />
             </Button>
-            <Button v-if="gallery.length > 1" class="next" icon-only @click="nextImage()">
+            <Button v-if="project.gallery.length > 1" class="next" icon-only @click="nextImage()">
               <RightArrowIcon aria-hidden="true" />
             </Button>
           </div>
@@ -88,7 +93,7 @@ import {
   CalendarIcon,
   Button,
 } from 'omorphia'
-import { computed } from 'vue'
+import { ref } from 'vue'
 
 const props = defineProps({
   project: {
@@ -97,32 +102,30 @@ const props = defineProps({
   },
 })
 
-const gallery = computed(() => props.project.gallery).value
-
-let expandedGalleryItem
-let expandedGalleryIndex
-let zoomedIn = false
+let expandedGalleryItem = ref(null)
+let expandedGalleryIndex = ref(0)
+let zoomedIn = ref(false)
 
 const nextImage = () => {
-  expandedGalleryIndex++
-  if (expandedGalleryIndex >= gallery.length) {
-    expandedGalleryIndex = 0
+  expandedGalleryIndex.value++
+  if (expandedGalleryIndex.value >= props.project.gallery.length) {
+    expandedGalleryIndex.value = 0
   }
-  expandedGalleryItem = gallery[expandedGalleryItem]
+  expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
 }
 
 const previousImage = () => {
-  expandedGalleryIndex--
-  if (expandedGalleryIndex < 0) {
-    expandedGalleryIndex = gallery.length - 1
+  expandedGalleryIndex.value--
+  if (expandedGalleryIndex.value < 0) {
+    expandedGalleryIndex.value = props.project.gallery.length - 1
   }
-  expandedGalleryItem = gallery[expandedGalleryItem]
+  expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
 }
 
 const expandImage = (item, index) => {
-  expandedGalleryIndex = index
-  expandedGalleryItem = item
-  zoomedIn = false
+  expandedGalleryItem.value = item
+  expandedGalleryIndex.value = index
+  zoomedIn.value = false
 }
 </script>
 

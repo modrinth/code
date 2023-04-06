@@ -169,7 +169,12 @@
           ]"
         />
       </Card>
-      <RouterView :project="data" :versions="versions" />
+      <RouterView
+        :project="data"
+        :versions="versions"
+        :members="members"
+        :dependencies="dependencies"
+      />
     </div>
   </div>
 </template>
@@ -208,15 +213,19 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute } from 'vue-router'
+import { ref, shallowRef } from 'vue'
 
 const route = useRoute()
 
-const loaders = await get_loaders()
-const categories = await get_categories()
-const [data, versions] = await Promise.all([
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`),
+const loaders = ref(await get_loaders())
+const categories = ref(await get_categories())
+const [data, versions, members, dependencies] = await Promise.all([
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ])
+
 dayjs.extend(relativeTime)
 </script>
 
