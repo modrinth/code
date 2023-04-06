@@ -6,31 +6,15 @@
 
 <script setup>
 import {Card, renderHighlightedString} from 'omorphia'
+import { useProjectStore } from '@/store/project';
+const body = useProjectStore().project.body;
 </script>
 
 <script>
 export default {
-  name: "Description",
-  data() {
-    return {
-      body: "",
-    };
-  },
-  async created() {
-    const response = await fetch('https://api.modrinth.com/v2/project/' + this.$route.params.id)
-    this.body = (await response.json()).body;
-  }
+  name: "Description"
 }
 </script>
 
 <style scoped lang="scss">
-.markdown-body {
-  :deep(hr), :deep(h1), :deep(h2) {
-    max-width: max(60rem, 90%);
-  }
-
-  :deep(ul) {
-    margin-left: 2rem;
-  }
-}
 </style>

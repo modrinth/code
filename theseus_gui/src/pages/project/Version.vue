@@ -51,12 +51,15 @@
           </Button>
         </Card>
       </Card>
-      <Card v-if="dependencies[0]">
+      <Card v-if="true">
         <h2>Dependencies</h2>
-        <div v-for="dependency in dependencies" :key="dependency.id" class="btn dependency">
-          <Avatar size="sm" :src="dependency.icon_url"/>
-          <span> {{ dependency.title }} </span>
-        </div>
+        <router-link v-for="dependency in displayDependencies" :key="dependency.title" class="btn dependency" :to="dependency.link">
+          <Avatar size="sm" :src="dependency.icon"/>
+          <div>
+            <span class="title"> {{ dependency.title }} </span> <br/>
+            <span> {{ dependency.subtitle }} </span>
+          </div>
+        </router-link>
       </Card>
     </div>
     <Card class="metadata-card">
@@ -120,8 +123,7 @@ import { releaseColor } from '@/helpers/utils'
 
 <script>
 const url = (id) => `https://api.modrinth.com/v2/version/${id}`;
-const projects = (id) => `https://api.modrinth.com/v2/projects?ids=[${id}]`;
-const project = (id) => `https://api.modrinth.com/v2/project/${id}`;
+const deps = (id) => `https://api.modrinth.com/v2/project/${id}/dependencies`;
 const user = (id) => `https://api.modrinth.com/v2/project/${id}/members`;
 
 export default {
@@ -129,34 +131,44 @@ export default {
     return {
       version: null,
       author: null,
-      dependencies: []
+      dependencies: null,
+      displayDependencies: null
     }
   },
-  async mounted() {
+  async created() {
     try {
       const response = await fetch(url(this.$route.params.version));
-      const data = await response.json();
-
-      this.version = data;
+      this.version = await response.json();
 
       const userResponse = await fetch(user(this.$route.params.id));
-      this.author = (await userResponse.json()).find(obj => obj.user.id === data.author_id);
+      this.author = (await userResponse.json()).find(obj => obj.user.id === this.version.author_id);
 
-      if (data.dependencies) {
-        if (data.dependencies.length > 1) {
-          const depIds = data.dependencies.map(dep => `"${dep.project_id}"`).toString();
-          const projectsResponse = await fetch(projects(depIds));
-          this.dependencies = await projectsResponse.json();
-        } else {
-          const projectId = data.dependencies[0].project_id;
-          const projectResponse = await fetch(project(projectId));
-          this.dependencies = [(await projectResponse.json())];
+      const depsResponse = await fetch(deps(this.$route.params.id));
+      this.dependencies = await depsResponse.json();
+
+      this.displayDependencies = this.version.dependencies.map((dependency) => {
+        const version = this.dependencies.versions.find((obj) => obj.id === dependency.version_id);
+        if(version) {
+          const project = this.dependencies.projects.find((obj) => obj.id === version.project_id || obj.id === dependency.project_id);
+          return {
+            icon: project?.icon_url,
+            title: project?.title || project?.name,
+            subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
+            link: `/project/${project.slug}/version/${version.id}`
+          }
+        } else return {
+          icon: null,
+          title: dependency.file_name,
+          subtitle: `Added via overrides`,
+          link: `project/${this.$route.params.id}/`
         }
-      }
+      });
+
+      console.log(this.displayDependencies);
     } catch (error) {
       console.log(error);
     }
-  }
+  },
 }
 </script>
 
@@ -182,6 +194,16 @@ export default {
   padding: 0.5rem 1rem 0.5rem 0.5rem;
   gap: 0.5rem;
   background: var(--color-raised-bg);
+  color: var(--color-base);
+  width: 100%;
+
+  .title {
+    font-weight: bolder;
+  }
+
+  :deep(svg) {
+    margin-right: 0 !important;
+  }
 }
 
 .file {

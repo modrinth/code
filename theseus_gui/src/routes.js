@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { useProjectStore } from '@/store/project';
 import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
@@ -44,6 +45,14 @@ export default new createRouter({
       name: 'Project',
       component: Project.Index,
       props: true,
+      async beforeEnter(to, from, next) {
+        const projectId = to.params.id;
+        const projectStore = useProjectStore();
+
+        await projectStore.fetchProject(projectId);
+
+        next();
+      },
       children: [
         {
           path: '',

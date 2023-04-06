@@ -2,16 +2,36 @@
   <Card>
     <div class="filter-header">
       <div class="manage">
-        <DropdownSelect id="filterLoader" placeholder="Filter loader..." :options="versions.flatMap(value => value.loaders).filter((value, index, self) => self.indexOf(value) === index)" class="select no-wrap"/>
-        <DropdownSelect id="filterVersions" placeholder="Filter versions..."  :options="versions.flatMap(value => value.game_versions).filter((value, index, self) => self.indexOf(value) === index)" class="select no-wrap"/>
+        <multiselect
+          v-model="filterVersions"
+          :options="versions.flatMap(value => value.loaders).filter((value, index, self) => self.indexOf(value) === index)"
+          :multiple="true"
+          :searchable="true"
+          :show-no-results="false"
+          :close-on-select="false"
+          :clear-search-on-select="false"
+          :show-labels="false"
+          :selectable="() => versions.length <= 6"
+          placeholder="Filter loader..."
+        />
+        <multiselect
+          v-model="filterLoader"
+          :options="versions.flatMap(value => value.game_versions).filter((value, index, self) => self.indexOf(value) === index)"
+          :multiple="true"
+          :searchable="true"
+          :show-no-results="false"
+          :close-on-select="false"
+          :clear-search-on-select="false"
+          :show-labels="false"
+          :selectable="() => versions.length <= 6"
+          placeholder="Filter versions..."
+        />
       </div>
-      <div class="manage">
-        <Checkbox id="filterCompatible" label="Only show compatible versions" />
-        <Button class="no-wrap">
-          <CheckCircleIcon />
-          Clear Filters
-        </Button>
-      </div>
+      <Checkbox v-model="filterCompatible" label="Only show compatible versions" class="filter-checkbox"/>
+      <Button class="no-wrap clear-filters" :disabled="!filterLoader && !filterVersions && !filterCompatible" :action="clearFilters">
+        <CheckCircleIcon />
+        Clear Filters
+      </Button>
     </div>
   </Card>
   <Card class="mod-card">
@@ -73,7 +93,8 @@
 </template>
 
 <script setup>
-import { Card, Button, DropdownSelect, CheckCircleIcon, Badge, DownloadIcon, Checkbox, formatNumber } from 'omorphia'
+import { Card, Button, CheckCircleIcon, Badge, DownloadIcon, Checkbox, formatNumber } from 'omorphia'
+import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
 </script>
 
@@ -83,20 +104,32 @@ export default {
   data() {
     return {
       versions: [],
+      filterVersions: null,
+      filterLoader: null,
+      filterCompatible: false,
     };
   },
   async mounted() {
     const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}/version`);
     this.versions = await response.json();
   },
+  methods: {
+    clearFilters() {
+      this.filterVersions = null;
+      this.filterLoader = null;
+      this.filterCompatible = false;
+    },
+  }
 }
 </script>
 
 <style scoped lang="scss">
 .filter-header {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  gap: 0.5rem;
 }
 
 .table-container {
@@ -140,7 +173,10 @@ export default {
   display: flex;
   gap: 0.5rem;
   flex-grow: 1;
-  margin-right: 0.5rem;
+
+  .multiselect {
+    flex-grow: 1;
+  }
 }
 
 .mod-text {
@@ -204,5 +240,11 @@ export default {
 .download-cell {
   width: 4rem;
   padding: 1rem;
+}
+
+.filter-checkbox {
+  :deep(.checkbox) {
+    border: none;
+  }
 }
 </style>

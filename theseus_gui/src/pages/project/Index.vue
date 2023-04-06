@@ -202,6 +202,8 @@ import {
 } from "omorphia";
 import {BuyMeACoffeeIcon, DiscordIcon, PatreonIcon, PaypalIcon, KoFiIcon, OpenCollectiveIcon} from "@/assets/external";
 import {get_categories, get_loaders} from "@/helpers/tags";
+import { useProjectStore } from '@/store/project';
+const data = useProjectStore().project;
 
 const categories = await get_categories()
 const loaders = await get_loaders()
@@ -214,15 +216,6 @@ dayjs.extend(relativeTime)
 <script>
 export default {
   name: "Index",
-  data() {
-    return {
-      data: null
-    }
-  },
-  async created() {
-    const response = await fetch('https://api.modrinth.com/v2/project/' + this.$route.params.id)
-    this.data = await response.json()
-  },
 }
 </script>
 
