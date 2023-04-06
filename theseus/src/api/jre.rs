@@ -68,7 +68,7 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
     Ok(optimal_key)
 }
 
-// Searches for jres on the system that are 1.17 or higher
+// Searches for jres on the system that are 1.18 or higher
 pub fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.18")?;
     let jres = jre::get_all_jre()?;
