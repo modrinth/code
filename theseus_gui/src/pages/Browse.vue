@@ -32,7 +32,7 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
 
 const getSearchResults = async (shouldLoad = false) => {
   const queryString = searchStore.getQueryString()
-  if (!shouldLoad) {
+  if (shouldLoad === true) {
     loading.value = true
   }
   const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
@@ -40,7 +40,7 @@ const getSearchResults = async (shouldLoad = false) => {
   searchStore.setSearchResults(response)
 }
 
-getSearchResults()
+getSearchResults(true)
 
 const toggleFacet = async (facet) => {
   const index = searchStore.facets.indexOf(facet)
