@@ -8,21 +8,26 @@ use crate::{
 use daedalus as d;
 
 pub const JAVA_8_KEY: &str = "JAVA_8";
-pub const JAVA_17PLUS_KEY: &str = "JAVA_17PLUS";
+pub const JAVA_17_KEY: &str = "JAVA_17";
+pub const JAVA_18PLUS_KEY: &str = "JAVA_18PLUS";
 
 // Autodetect JavaSettings default
 // Make a guess for what the default Java global settings should be
 pub fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
     let mut java_8 = find_java8_jres()?;
-    let mut java_17plus = find_java17plus_jres()?;
+    let mut java_17 = find_java17_jres()?;
+    let mut java_18plus = find_java18plus_jres()?;
 
     // Simply select last one found for initial guess
     let mut java_globals = JavaGlobals::new();
     if let Some(jre) = java_8.pop() {
         java_globals.insert(JAVA_8_KEY.to_string(), jre);
     }
-    if let Some(jre) = java_17plus.pop() {
-        java_globals.insert(JAVA_17PLUS_KEY.to_string(), jre);
+    if let Some(jre) = java_17.pop() {
+        java_globals.insert(JAVA_17_KEY.to_string(), jre);
+    }
+    if let Some(jre) = java_18plus.pop() {
+        java_globals.insert(JAVA_18PLUS_KEY.to_string(), jre);
     }
 
     Ok(java_globals)
@@ -50,22 +55,22 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
 
     // Get detailed manifest info from Daedalus
     let version_info = d::minecraft::fetch_version_info(version).await?;
-    let optimal_key = if version_info
+    let optimal_key = match version_info
         .java_version
         .as_ref()
-        .filter(|it| it.major_version >= 17)
-        .is_some()
+        .map(|it| it.major_version )
+        .unwrap_or(0)
     {
-        JAVA_17PLUS_KEY.to_string()
-    } else {
-        JAVA_8_KEY.to_string()
+        0..=16 => JAVA_8_KEY.to_string(),
+        17 => JAVA_17_KEY.to_string(),
+        _ => JAVA_18PLUS_KEY.to_string(),
     };
     Ok(optimal_key)
 }
 
 // Searches for jres on the system that are 1.17 or higher
-pub fn find_java17plus_jres() -> crate::Result<Vec<JavaVersion>> {
-    let version = extract_java_majorminor_version("1.17")?;
+pub fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
+    let version = extract_java_majorminor_version("1.18")?;
     let jres = jre::get_all_jre()?;
     // Filter out JREs that are not 1.17 or higher
     Ok(jres
@@ -100,7 +105,37 @@ pub fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
         .collect())
 }
 
+// Searches for jres on the system that are 1.17 exactly
+pub fn find_java17_jres() -> crate::Result<Vec<JavaVersion>> {
+    let version = extract_java_majorminor_version("1.17")?;
+    let jres = jre::get_all_jre()?;
+
+    // Filter out JREs that are not 1.8
+    Ok(jres
+        .into_iter()
+        .filter(|jre| {
+            let jre_version = extract_java_majorminor_version(&jre.version);
+            if let Ok(jre_version) = jre_version {
+                jre_version == version
+            } else {
+                false
+            }
+        })
+        .collect())
+}
+
 // Get all JREs that exist on the system
 pub fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
     Ok(jre::get_all_jre()?)
+}
+
+
+// test 
+#[cfg(test)]
+mod tests {
+    #[test]
+    pub fn test() {
+        let jres = super::get_all_jre().unwrap();
+        println!("{:?}", jres);
+    }
 }

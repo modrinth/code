@@ -19,7 +19,6 @@ pub static REQWEST_CLIENT: Lazy<reqwest::Client> = Lazy::new(|| {
     .unwrap();
     headers.insert(reqwest::header::USER_AGENT, header);
     reqwest::Client::builder()
-        .timeout(time::Duration::from_secs(15))
         .tcp_keepalive(Some(time::Duration::from_secs(10)))
         .default_headers(headers)
         .build()

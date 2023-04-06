@@ -18,10 +18,16 @@ pub async fn jre_find_jre_8_jres() -> Result<Vec<JavaVersion>> {
     Ok(jre::find_java8_jres()?)
 }
 
-// Finds the highest version of Java 17+, if it exists
+// finds the installation of Java 17, if it exists
 #[tauri::command]
-pub async fn jre_find_jre_17plus_jres() -> Result<Vec<JavaVersion>> {
-    Ok(jre::find_java17plus_jres()?)
+pub async fn jre_find_jre_17_jres() -> Result<Vec<JavaVersion>> {
+    Ok(jre::find_java17_jres()?)
+}
+
+// Finds the highest version of Java 18+, if it exists
+#[tauri::command]
+pub async fn jre_find_jre_18plus_jres() -> Result<Vec<JavaVersion>> {
+    Ok(jre::find_java18plus_jres()?)
 }
 
 // Autodetect Java globals, by searching the users computer.

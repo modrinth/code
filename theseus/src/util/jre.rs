@@ -40,7 +40,6 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
                 check_java_at_filepath(&path.join("bin"))
             {
                 jres.insert(j);
-                break;
             }
         }
     }
@@ -94,7 +93,6 @@ pub fn get_all_jre_winregkey(
                 check_java_at_filepath(&PathBuf::from(path).join("bin"))
             {
                 jres.insert(j);
-                break;
             }
         }
     }
@@ -119,14 +117,25 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands",
     ];
     for path in java_paths {
-        if let Some(j) = check_java_at_filepath(PathBuf::from(path).join("bin"))
+        if let Some(j) = check_java_at_filepath(&PathBuf::from(path).join("bin"))
         {
             jres.insert(j);
-            break;
         }
     }
+    // Iterate over JavaVirtualMachines/(something)/Contents/Home/bin 
+    let base_path = PathBuf::from("/Library/Java/JavaVirtualMachines/");
+    if base_path.is_dir() {
+        for entry in std::fs::read_dir(base_path)? {
+            let entry = entry?.path().join("Contents/Home/bin");
+            if let Some(j) =check_java_at_filepath(entry.as_path()){
+                jres.insert(j);
+            }
+        }
+    }
+
     Ok(jres.into_iter().collect())
 }
+
 
 // Entrypoint function (Linux)
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations
@@ -153,13 +162,11 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
             check_java_at_filepath(&PathBuf::from(path).join("jre").join("bin"))
         {
             jres.insert(j);
-            break;
         }
         if let Some(j) =
             check_java_at_filepath(&PathBuf::from(path).join("bin"))
         {
             jres.insert(j);
-            break;
         }
     }
     Ok(jres.into_iter().collect())

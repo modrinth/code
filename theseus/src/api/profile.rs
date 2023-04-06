@@ -154,19 +154,15 @@ pub async fn run(
         }) => settings.java_globals.get(jre_key),
         // Fall back to Daedalus-decided key if no profile-specific key is set
         _ => {
-            if version_info
+            match version_info
                 .java_version
                 .as_ref()
-                .filter(|it| it.major_version >= 17)
-                .is_some()
-            {
-                settings
-                    .java_globals
-                    .get(&crate::jre::JAVA_17PLUS_KEY.to_string())
-            } else {
-                settings
-                    .java_globals
-                    .get(&crate::jre::JAVA_8_KEY.to_string())
+                .map(|it| it.major_version )
+                .unwrap_or(0)
+                    {
+                0..=16 => settings.java_globals.get(&crate::jre::JAVA_8_KEY.to_string()),
+                17 => settings.java_globals.get(&crate::jre::JAVA_17_KEY.to_string()),
+                _ => settings.java_globals.get(&crate::jre::JAVA_18PLUS_KEY.to_string()),
             }
         }
     };
