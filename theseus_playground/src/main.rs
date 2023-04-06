@@ -5,7 +5,7 @@
 
 use dunce::canonicalize;
 use std::path::Path;
-use theseus::{prelude::*, profile_create::profile_create};
+use theseus::prelude::*;
 use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run
@@ -46,7 +46,7 @@ async fn main() -> theseus::Result<()> {
     println!("Creating/adding profile.");
 
     let profile_path =
-        pack::install_pack_from_version_id("hZ6f9Ij9".to_string())
+        pack::install_pack_from_version_id("KxUUUFh5".to_string())
             .await
             .unwrap();
 

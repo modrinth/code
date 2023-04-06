@@ -18,8 +18,7 @@ pub mod prelude {
     pub use crate::{
         auth::{self, Credentials},
         data::*,
-        pack,
-        process,
+        pack, process,
         profile::{self, Profile},
         profile_create, settings, State,
     };

@@ -65,9 +65,7 @@ pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>
 pub async fn sync(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
 
-    let mut profiles = state.profiles.write().await;
-
-    if let Some(profile) = profiles.0.get_mut(path) {
+    if let Some(profile) = get(path).await? {
         let paths = profile.get_profile_project_paths()?;
         let projects = crate::state::infer_data_from_files(
             paths,
@@ -76,7 +74,13 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
         )
         .await?;
 
-        profile.projects = projects;
+        {
+            let mut profiles = state.profiles.write().await;
+            if let Some(profile) = profiles.0.get_mut(path) {
+                profile.projects = projects;
+            }
+        }
+
         State::sync().await?;
 
         Ok(())

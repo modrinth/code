@@ -78,7 +78,7 @@ pub async fn profile_create(
         let filter = |it: &LoaderVersion| match version.as_str() {
             "latest" => true,
             "stable" => it.stable,
-            id => it.id == *id,
+            id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
         };
 
         let loader_data = match loader {
