@@ -9,6 +9,6 @@ import { initialize_state } from '@/helpers/state'
 
 const pinia = createPinia()
 
-await initialize_state();
-
-createApp(App).use(router).use(pinia).use(FloatingVue).mount('#app')
+initialize_state().then(() => {
+  createApp(App).use(router).use(pinia).use(FloatingVue).mount('#app')
+});

@@ -62,8 +62,7 @@ pub async fn download_version_info(
         }
         info.id = version_id.clone();
 
-        let permit = st.io_semaphore.acquire().await?;
-        write(&path, &serde_json::to_vec(&info)?, &permit).await?;
+        write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
         Ok(info)
     }?;
 
@@ -93,11 +92,13 @@ pub async fn download_client(
         .join(format!("{version}.jar"));
 
     if !path.exists() {
-        let permit = st.io_semaphore.acquire().await?;
-        let bytes =
-            fetch(&client_download.url, Some(&client_download.sha1), &permit)
-                .await?;
-        write(&path, &bytes, &permit).await?;
+        let bytes = fetch(
+            &client_download.url,
+            Some(&client_download.sha1),
+            &st.io_semaphore,
+        )
+        .await?;
+        write(&path, &bytes, &st.io_semaphore).await?;
         log::info!("Fetched client version {version}");
     }
 
@@ -123,8 +124,7 @@ pub async fn download_assets_index(
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
         let index = d::minecraft::fetch_assets_index(version).await?;
-        let permit = st.io_semaphore.acquire().await?;
-        write(&path, &serde_json::to_vec(&index)?, &permit).await?;
+        write(&path, &serde_json::to_vec(&index)?, &st.io_semaphore).await?;
         log::info!("Fetched assets index");
         Ok(index)
     }?;
@@ -154,25 +154,23 @@ pub async fn download_assets(
             tokio::try_join! {
                 async {
                     if !resource_path.exists() {
-                        let permit = st.io_semaphore.acquire().await?;
                         let resource = fetch_cell
-                            .get_or_try_init(|| fetch(&url, Some(hash), &permit))
+                            .get_or_try_init(|| fetch(&url, Some(hash), &st.io_semaphore))
                             .await?;
-                        write(&resource_path, resource, &permit).await?;
+                        write(&resource_path, resource, &st.io_semaphore).await?;
                         log::info!("Fetched asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
                 },
                 async {
                     if with_legacy {
-                        let permit = st.io_semaphore.acquire().await?;
                         let resource = fetch_cell
-                            .get_or_try_init(|| fetch(&url, Some(hash), &permit))
+                            .get_or_try_init(|| fetch(&url, Some(hash), &st.io_semaphore))
                             .await?;
                         let resource_path = st.directories.legacy_assets_dir().join(
                             name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
                         );
-                        write(&resource_path, resource, &permit).await?;
+                        write(&resource_path, resource, &st.io_semaphore).await?;
                         log::info!("Fetched legacy asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
@@ -219,10 +217,9 @@ pub async fn download_libraries(
                             artifact: Some(ref artifact),
                             ..
                         }) => {
-                            let permit = st.io_semaphore.acquire().await?;
-                            let bytes = fetch(&artifact.url, Some(&artifact.sha1), &permit)
+                            let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.io_semaphore)
                                 .await?;
-                            write(&path, &bytes, &permit).await?;
+                            write(&path, &bytes, &st.io_semaphore).await?;
                             log::info!("Fetched library {}", &library.name);
                             Ok::<_, crate::Error>(())
                         }
@@ -235,9 +232,8 @@ pub async fn download_libraries(
                                 &artifact_path
                             ].concat();
 
-                            let permit = st.io_semaphore.acquire().await?;
-                            let bytes = fetch(&url, None, &permit).await?;
-                            write(&path, &bytes, &permit).await?;
+                            let bytes = fetch(&url, None, &st.io_semaphore).await?;
+                            write(&path, &bytes, &st.io_semaphore).await?;
                             log::info!("Fetched library {}", &library.name);
                             Ok::<_, crate::Error>(())
                         }
@@ -263,8 +259,7 @@ pub async fn download_libraries(
                         );
 
                         if let Some(native) = classifiers.get(&parsed_key) {
-                            let permit = st.io_semaphore.acquire().await?;
-                            let data = fetch(&native.url, Some(&native.sha1), &permit).await?;
+                            let data = fetch(&native.url, Some(&native.sha1), &st.io_semaphore).await?;
                             let reader = std::io::Cursor::new(&data);
                             if let Ok(mut archive) = zip::ZipArchive::new(reader) {
                                 match archive.extract(&st.directories.version_natives_dir(version)) {

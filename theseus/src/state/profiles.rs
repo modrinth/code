@@ -134,9 +134,7 @@ impl Profile {
         if SUPPORTED_ICON_FORMATS.contains(&ext) {
             let file_name = format!("icon.{ext}");
             fs::copy(icon, &self.path.join(&file_name)).await?;
-            self.metadata.icon =
-                Some(Path::new(&format!("./{file_name}")).to_owned());
-
+            self.metadata.icon = Some(self.path.join(&file_name));
             Ok(self)
         } else {
             Err(crate::ErrorKind::InputError(format!(

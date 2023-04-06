@@ -163,9 +163,11 @@ async fn read_icon_from_file(
                     .is_ok()
                 {
                     let bytes = bytes::Bytes::from(bytes);
-                    let permit = io_semaphore.acquire().await?;
                     let path = write_cached_icon(
-                        &icon_path, cache_dir, bytes, &permit,
+                        &icon_path,
+                        cache_dir,
+                        bytes,
+                        &io_semaphore,
                     )
                     .await?;
 

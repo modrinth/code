@@ -2,6 +2,8 @@
 import { RouterLink } from 'vue-router'
 import { Card } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
+import { convertFileSrc } from '@tauri-apps/api/tauri';
+
 const props = defineProps({
   display: {
     type: String,
@@ -29,10 +31,10 @@ const props = defineProps({
       class="instance-card-item"
       @click="$router.push(`/instance/${props.instance.id}`)"
     >
-      <img :src="props.instance.img" alt="Trending mod card" />
+      <img :src="convertFileSrc(props.instance.metadata.icon)" alt="Trending mod card" />
       <div class="project-info">
-        <p class="title">{{ props.instance.name }}</p>
-        <p class="description">{{ props.instance.version }}</p>
+        <p class="title">{{ props.instance.metadata.name }}</p>
+        <p class="description">{{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}</p>
       </div>
       <div class="cta"><PlayIcon /></div>
     </Card>
@@ -101,7 +103,7 @@ const props = defineProps({
     width: 100%;
     .title {
       color: var(--color-contrast);
-      max-width: 6rem;
+      //max-width: 10rem;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
@@ -120,6 +122,7 @@ const props = defineProps({
       font-size: 0.775rem;
       line-height: 125%;
       margin: 0.25rem 0 0;
+      text-transform: capitalize;
     }
   }
 }

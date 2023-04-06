@@ -32,7 +32,7 @@ async fn main() -> theseus::Result<()> {
 
     // Initialize state
     let st = State::get().await?;
-    st.settings.write().await.max_concurrent_downloads = 100;
+    st.settings.write().await.max_concurrent_downloads = 10;
 
     // Clear profiles
     println!("Clearing profiles.");
