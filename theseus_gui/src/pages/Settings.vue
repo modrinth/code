@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { Card, SunIcon, MoonIcon, Button, Slider } from 'omorphia'
+import { Card, Button, Slider, DropdownSelect } from 'omorphia'
 import { useTheming } from '@/store/state'
 
 const javaMemory = ref(1024)
@@ -8,7 +8,9 @@ const javaArgs = ref('')
 const javaPath = ref('')
 const fullscreen = ref(false)
 
-const theme = useTheming()
+const themeStore = useTheming()
+
+const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
 </script>
 
 <template>
@@ -20,16 +22,14 @@ const theme = useTheming()
           <h3>Color theme</h3>
           <p>Change the global launcher color theme.</p>
         </div>
-        <Button class="theme-toggle" @click="theme.toggleTheme">
-          <div v-if="theme.darkTheme === false">
-            <SunIcon />
-            <span>Light</span>
-          </div>
-          <div v-else>
-            <MoonIcon />
-            <span>Dark</span>
-          </div>
-        </Button>
+        <DropdownSelect
+          name="Theme dropdown"
+          :options="themeStore.themeOptions"
+          :default-value="themeStore.selectedTheme"
+          :model-value="themeStore.selectedTheme"
+          class="theme-dropdown"
+          @change="handleTheme"
+        />
       </div>
     </Card>
     <Card class="settings-card">
@@ -169,8 +169,7 @@ const theme = useTheming()
 
 .theming,
 .settings-card {
-  width: 90%;
-  margin: 2rem auto;
+  margin: 1rem;
   display: flex;
   flex-direction: column;
 }
@@ -201,29 +200,8 @@ const theme = useTheming()
     flex-basis: 24rem;
   }
 
-  .theme-toggle {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    width: 20%;
-    font-size: 1.25rem;
-    cursor: pointer;
-    transition: all 0.1s ease-in-out;
-
-    div {
-      display: flex;
-      align-items: inherit;
-      justify-content: center;
-
-      span {
-        font-size: 1.1rem;
-      }
-
-      svg {
-        width: 1.5rem;
-        height: 1.5rem;
-      }
-    }
+  .theme-dropdown {
+    text-transform: capitalize;
   }
 }
 

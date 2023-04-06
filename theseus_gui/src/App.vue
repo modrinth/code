@@ -1,5 +1,4 @@
 <script setup>
-import { watch } from 'vue'
 import { RouterView, useRoute, useRouter, RouterLink } from 'vue-router'
 import {
   ChevronLeftIcon,
@@ -12,18 +11,12 @@ import {
   Avatar,
 } from 'omorphia'
 import { useTheming } from '@/store/state'
-import { toggleTheme } from '@/helpers/theme'
 
 const route = useRoute()
 const router = useRouter()
 
 const themeStore = useTheming()
-
-toggleTheme(themeStore.darkTheme)
-
-watch(themeStore, (newState) => {
-  toggleTheme(newState.darkTheme)
-})
+themeStore.setThemeClass()
 </script>
 
 <template>
