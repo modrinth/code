@@ -107,13 +107,9 @@ impl State {
 
                     // On launcher initialization, if global java variables are unset, try to find and set them
                     // (they are required for the game to launch)
-                    dbg!("Java globals", &settings.java_globals);
                     if settings.java_globals.count() == 0 {
                         settings.java_globals = jre::autodetect_java_globals()?;
-                        dbg!("Java globals after", &settings.java_globals);
                     }
-
-                    dbg!("Settings", &settings);
 
                     Ok(Arc::new(Self {
                         database,

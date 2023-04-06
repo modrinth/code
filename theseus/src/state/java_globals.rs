@@ -1,14 +1,9 @@
-use std::path::{Path, PathBuf};
-use std::{collections::HashMap, sync::Arc};
+use std::path::PathBuf;
+use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
-use tokio::io::{AsyncBufReadExt, BufReader};
-use tokio::process::{ChildStderr, ChildStdout};
-use tokio::sync::RwLock;
 
 use crate::prelude::JavaVersion;
 use crate::util::jre;
-
-use super::Profile;
 
 // All stored Java versions, chosen by the user
 // A wrapper over a Hashmap connecting key -> java version 

@@ -16,10 +16,6 @@ pub fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
     let mut java_8 = find_java8_jres()?;
     let mut java_17plus = find_java17plus_jres()?;
 
-    println!("java 8 and java 17");
-    dbg!(&java_8);
-    dbg!(&java_17plus);
-
     // Simply select last one found for initial guess
     let mut java_globals = JavaGlobals::new();
     if let Some(jre) = java_8.pop() {
@@ -28,7 +24,6 @@ pub fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
     if let Some(jre) = java_17plus.pop() {
         java_globals.insert(JAVA_17PLUS_KEY.to_string(), jre);
     } 
-    dbg!(&java_globals);
 
     Ok(java_globals)
 }
@@ -73,13 +68,11 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
 pub fn find_java17plus_jres() -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.17")?;
     let jres = jre::get_all_jre()?;
-
     // Filter out JREs that are not 1.17 or higher
     Ok(jres
         .into_iter()
         .filter(|jre| {
             let jre_version = extract_java_majorminor_version(&jre.version);
-            dbg!("Comparing JRE version {} to {}", &jre_version, &version);
             if let Ok(jre_version) = jre_version {
                 jre_version >= version
             } else {

@@ -4,6 +4,8 @@ use crate::api::Result;
 use theseus::prelude::*;
 use theseus::prelude::JavaVersion;
 
+use super::TheseusSerializableError;
+
 /// Get all JREs that exist on the system
 #[tauri::command]
 pub async fn jre_get_all_jre() -> Result<Vec<JavaVersion>> {
@@ -40,6 +42,6 @@ pub async fn jre_get_optimal_jre_key(profile: Profile) -> Result<String> {
 // The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
 #[tauri::command]
 pub async fn jre_get_optimal_jre_key_by_path(path: &Path) -> Result<String> {
-    let profile = profile::get(path).await?.ok_or_else(|| theseus::Error::from(theseus::ErrorKind::UnmanagedProfileError(path.display().to_string())))?;
+    let profile = profile::get(path).await?.ok_or_else(|| TheseusSerializableError::NoProfileFound(path.display().to_string()))?;
     Ok(jre::get_optimal_jre_key(&profile).await?)
 }

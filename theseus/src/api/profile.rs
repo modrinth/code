@@ -157,7 +157,6 @@ pub async fn run(
         }
     }
 
-    dbg!("Profile java settings: {:?}", &profile.java);
     let java_version = match profile.java {
         // Load profile-specific Java implementation choice
         // (This defaults to Daedalus-decided key on init, but can be changed by the user)
@@ -177,7 +176,6 @@ pub async fn run(
             settings.java_globals.get(&crate::jre::JAVA_8_KEY.to_string())
         }
     };
-    dbg!("Intermediate java version: {:?}", &java_version);
     let java_version = java_version.as_ref().ok_or_else(|| {
         crate::ErrorKind::LauncherError(format!(
             "No Java stored for version {}",
@@ -187,7 +185,6 @@ pub async fn run(
 
     // Get the path to the Java executable from the chosen Java implementation key
     let java_install: &Path = &PathBuf::from(&java_version.path);
-    dbg!("Java install: {}", &java_install.display());
     if !java_install.exists() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Could not find Java install: {}",
@@ -195,7 +192,6 @@ pub async fn run(
         ))
         .as_error());
     }
-    dbg!("Sccess. java!");
     let java_args = profile
         .java
         .as_ref()

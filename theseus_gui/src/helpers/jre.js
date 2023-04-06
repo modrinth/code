@@ -20,27 +20,33 @@ export async function get_all_jre() {
   return await invoke('jre_get_all_jre')
 }
 
-// Finds the installation of Java 7, if it exists
-// Returns a JavaVersion
-export async function find_jre_8() {
-  return await invoke('jre_find_jre_8')
+// Finds all the installation of Java 7, if it exists
+// Returns [JavaVersion]
+export async function find_jre_8_jres() {
+  return await invoke('jre_find_jre_8_jres')
 }
 
 // Finds the highest version of Java 17+, if it exists
-// Returns a JavaVersion
-export async function find_jre_17plus() {
-  return await invoke('jre_find_jre_17plus')
+// Returns [JavaVersion]
+export async function find_jre_17plus_jres() {
+  return await invoke('jre_find_jre_17plus_jres')
 }
 
-/// From a Path to a profile, returns the JavaVersion of the optimal JRE to use
-/// Returns an error if the profile is not managed by Theseus, or if the optimal JRE could not be detected
-/// If successful, returns the optimal JavaVersion
-export async function detect_optimal_jre(path) {
-  return await invoke('jre_detect_optimal_jre', { path })
+// Gets key for the optimal JRE to use, for a given profile path
+// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
+export async function get_optimal_jre_key_by_path(path) {
+  return await invoke('jre_get_optimal_jre_key_by_path', { path })
 }
 
-/// Get all allowed JREs for a given game version that exist on the system
-/// Returns an array of JavaVersion
-export async function get_all_allowable_jre(path) {
-  return await invoke('jre_get_all_allowable_jre', { path })
+// Gets key for the optimal JRE to use, for a given profile
+// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
+export async function get_optimal_jre_ke(path) {
+  return await invoke('jre_get_optimal_jre_key', { path })
+}
+
+
+// Autodetect Java globals, by searching the users computer.
+// Returns a *NEW* JavaGlobals that can be put into Settings
+export async function autodetect_java_globals(path) {
+  return await invoke('jre_autodetect_java_globals', { path })
 }

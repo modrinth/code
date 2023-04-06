@@ -2,9 +2,9 @@
 use serde::{Deserialize, Serialize};
 use std::{
     collections::HashSet,
-    path::{Path, PathBuf},
+    path::Path,
 };
-use tokio::{fs, sync::RwLock};
+use tokio::fs;
 
 use super::JavaGlobals;
 
