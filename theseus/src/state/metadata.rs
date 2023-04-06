@@ -10,7 +10,7 @@ use daedalus::{
 use futures::prelude::*;
 use std::collections::LinkedList;
 
-const METADATA_URL: &str = "https://meta.modrinth.com/gamedata";
+const METADATA_URL: &str = "https://meta.modrinth.com";
 const METADATA_DB_FIELD: &[u8] = b"metadata";
 const RETRY_ATTEMPTS: i32 = 3;
 

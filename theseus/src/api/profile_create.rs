@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::{prelude::ModLoader, profile};
+use crate::prelude::ModLoader;
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -22,8 +22,9 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
         String::from(DEFAULT_NAME), // the name/path of the profile
         String::from("1.19.2"),     // the game version of the profile
         ModLoader::Vanilla,         // the modloader to use
-        String::from("stable"), // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-        None,                   // the icon for the profile
+        None, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
+        None, // the icon for the profile
+        None,
     )
     .await
 }
@@ -32,17 +33,17 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
 // Returns filepath at which it can be accessed in the State
 #[tracing::instrument]
 pub async fn profile_create(
-    name: String,           // the name of the profile, and relative path
-    game_version: String,   // the game version of the profile
-    modloader: ModLoader,   // the modloader to use
-    loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
-    icon: Option<PathBuf>,  // the icon for the profile
+    name: String,         // the name of the profile, and relative path
+    game_version: String, // the game version of the profile
+    modloader: ModLoader, // the modloader to use
+    loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
+    icon: Option<PathBuf>,          // the icon for the profile
+    linked_project_id: Option<String>, // the linked project ID (mainly for modpacks)- used for updating
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
     let uuid = Uuid::new_v4();
     let path = state.directories.profiles_dir().join(uuid.to_string());
-
     if path.exists() {
         if !path.is_dir() {
             return Err(ProfileCreationError::NotFolder.into());
@@ -64,6 +65,7 @@ pub async fn profile_create(
     } else {
         fs::create_dir_all(&path).await?;
     }
+
     println!(
         "Creating profile at path {}",
         &canonicalize(&path)?.display()
@@ -71,12 +73,12 @@ pub async fn profile_create(
 
     let loader = modloader;
     let loader = if loader != ModLoader::Vanilla {
-        let version = loader_version;
+        let version = loader_version.unwrap_or_else(|| "latest".to_string());
 
         let filter = |it: &LoaderVersion| match version.as_str() {
             "latest" => true,
             "stable" => it.stable,
-            id => it.id == *id,
+            id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
         };
 
         let loader_data = match loader {
@@ -93,7 +95,12 @@ pub async fn profile_create(
         let loaders = &loader_data
             .game_versions
             .iter()
-            .find(|it| it.id == game_version)
+            .find(|it| {
+                it.id.replace(
+                    daedalus::modded::DUMMY_REPLACE_STRING,
+                    &game_version,
+                ) == game_version
+            })
             .ok_or_else(|| {
                 ProfileCreationError::ModloaderUnsupported(
                     loader.to_string(),
@@ -130,13 +137,19 @@ pub async fn profile_create(
     let path = canonicalize(&path)?;
     let mut profile = Profile::new(name, game_version, path.clone()).await?;
     if let Some(ref icon) = icon {
-        profile.with_icon(icon).await?;
+        profile.set_icon(icon).await?;
     }
     if let Some((loader_version, loader)) = loader {
-        profile.with_loader(loader, Some(loader_version));
+        profile.metadata.loader = loader;
+        profile.metadata.loader_version = Some(loader_version);
     }
 
-    profile::add(profile).await?;
+    profile.metadata.linked_project_id = linked_project_id;
+    {
+        let mut profiles = state.profiles.write().await;
+        profiles.insert(profile)?;
+    }
+
     State::sync().await?;
 
     Ok(path)
