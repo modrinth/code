@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { useProjectStore } from '@/store/project';
+import { useProjectStore } from '@/store/project'
 import * as Pages from '@/pages'
 import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
@@ -46,12 +46,12 @@ export default new createRouter({
       component: Project.Index,
       props: true,
       async beforeEnter(to, from, next) {
-        const projectId = to.params.id;
-        const projectStore = useProjectStore();
+        const projectId = to.params.id
+        const projectStore = useProjectStore()
 
-        await projectStore.fetchProject(projectId);
+        await projectStore.fetchProject(projectId)
 
-        next();
+        next()
       },
       children: [
         {
@@ -74,8 +74,8 @@ export default new createRouter({
           path: 'gallery',
           name: 'Gallery',
           component: Project.Gallery,
-        }
-      ]
+        },
+      ],
     },
     {
       path: '/instance/:id',

@@ -7,124 +7,177 @@
       </div>
       <div class="button-group">
         <Button color="primary">
-          <DownloadIcon/>
+          <DownloadIcon />
           Install
         </Button>
         <Button :link="`/project/${$route.params.id}/versions`">
-          <LeftArrowIcon/>
+          <LeftArrowIcon />
           Back to list
         </Button>
         <Button>
-          <ReportIcon/>
+          <ReportIcon />
           Report
         </Button>
-        <a :href="`https://modrinth.com/mod/${$route.params.id}/version/${$route.params.version}`" rel="external" target="_blank" class="btn">
-          <ExternalIcon/>
+        <a
+          :href="`https://modrinth.com/mod/${$route.params.id}/version/${$route.params.version}`"
+          rel="external"
+          target="_blank"
+          class="btn"
+        >
+          <ExternalIcon />
           Modrinth Website
         </a>
       </div>
     </Card>
-  <div class="version-container">
-    <div class="description-cards">
-      <Card >
-        <h3 class="card-title">Changelog</h3>
-        <div class="markdown-body" v-html="renderString(version.changelog)"/>
-      </Card>
-      <Card >
-        <h3 class="card-title">Files</h3>
-        <Card v-for="file in version.files"  :key="file.id" :class="{'primary': file.primary}" class="file">
-          <span class="label">
-            <FileIcon/>
-            <span>
-              <span class="title">
-                {{ file.filename }}
-              </span>
-              ({{ formatBytes(file.size) }})
-              <span v-if="file.primary" class="primary-label">
-                Primary
+    <div class="version-container">
+      <div class="description-cards">
+        <Card>
+          <h3 class="card-title">Changelog</h3>
+          <div class="markdown-body" v-html="renderString(version.changelog)" />
+        </Card>
+        <Card>
+          <h3 class="card-title">Files</h3>
+          <Card
+            v-for="file in version.files"
+            :key="file.id"
+            :class="{ primary: file.primary }"
+            class="file"
+          >
+            <span class="label">
+              <FileIcon />
+              <span>
+                <span class="title">
+                  {{ file.filename }}
+                </span>
+                ({{ formatBytes(file.size) }})
+                <span v-if="file.primary" class="primary-label"> Primary </span>
               </span>
             </span>
-          </span>
-          <Button class="download">
-            <DownloadIcon/>
-            Install
-          </Button>
+            <Button class="download">
+              <DownloadIcon />
+              Install
+            </Button>
+          </Card>
         </Card>
-      </Card>
-      <Card v-if="true">
-        <h2>Dependencies</h2>
-        <router-link v-for="dependency in displayDependencies" :key="dependency.title" class="btn dependency" :to="dependency.link">
-          <Avatar size="sm" :src="dependency.icon"/>
-          <div>
-            <span class="title"> {{ dependency.title }} </span> <br/>
-            <span> {{ dependency.subtitle }} </span>
+        <Card v-if="true">
+          <h2>Dependencies</h2>
+          <router-link
+            v-for="dependency in displayDependencies"
+            :key="dependency.title"
+            class="btn dependency"
+            :to="dependency.link"
+          >
+            <Avatar size="sm" :src="dependency.icon" />
+            <div>
+              <span class="title"> {{ dependency.title }} </span> <br />
+              <span> {{ dependency.subtitle }} </span>
+            </div>
+          </router-link>
+        </Card>
+      </div>
+      <Card class="metadata-card">
+        <h3 class="card-title">Metadata</h3>
+        <div class="metadata">
+          <div class="metadata-item">
+            <span class="metadata-label">Release Channel</span>
+            <span class="metadata-value"
+              ><Badge
+                :color="releaseColor(version.version_type)"
+                :type="
+                  version.version_type.charAt(0).toUpperCase() + version.version_type.slice(1)
+                "
+            /></span>
           </div>
-        </router-link>
+          <div class="metadata-item">
+            <span class="metadata-label">Version Number</span>
+            <span class="metadata-value">{{ version.version_number }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Loaders</span>
+            <span class="metadata-value">{{
+              version.loaders
+                .map((loader) => loader.charAt(0).toUpperCase() + loader.slice(1))
+                .join(', ')
+            }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Game Versions</span>
+            <span class="metadata-value"> {{ version.game_versions.join(', ') }} </span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Downloads</span>
+            <span class="metadata-value">{{ version.downloads }}</span>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Publication Date</span>
+            <span class="metadata-value">
+              {{
+                new Date(version.date_published).toLocaleString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })
+              }}
+              at
+              {{
+                new Date(version.date_published).toLocaleString('en-US', {
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  second: 'numeric',
+                  hour12: true,
+                })
+              }}
+            </span>
+          </div>
+          <div v-if="author" class="metadata-item">
+            <span class="metadata-label">Author</span>
+            <a
+              :href="`https://modrinth.com/user/${author.user.username}`"
+              rel="external"
+              target="_blank"
+              class="metadata-value btn author"
+            >
+              <Avatar size="sm" :src="author.user.avatar_url" circle />
+              <span>
+                <strong>
+                  {{ author.user.username }}
+                </strong>
+                <br />
+                {{ author.role }}
+              </span>
+            </a>
+          </div>
+          <div class="metadata-item">
+            <span class="metadata-label">Version ID</span>
+            <span class="metadata-value">{{ version.downloads }}</span>
+          </div>
+        </div>
       </Card>
     </div>
-    <Card class="metadata-card">
-      <h3 class="card-title">Metadata</h3>
-      <div class="metadata">
-        <div class="metadata-item">
-          <span class="metadata-label">Release Channel</span>
-          <span class="metadata-value"><Badge :color="releaseColor(version.version_type)" :type="version.version_type.charAt(0).toUpperCase() + version.version_type.slice(1)"/></span>
-        </div>
-        <div class="metadata-item">
-          <span class="metadata-label">Version Number</span>
-          <span class="metadata-value">{{ version.version_number }}</span>
-        </div>
-        <div class="metadata-item">
-          <span class="metadata-label">Loaders</span>
-          <span class="metadata-value">{{ version.loaders.map(loader => loader.charAt(0).toUpperCase() + loader.slice(1)).join(', ') }}</span>
-        </div>
-        <div class="metadata-item">
-          <span class="metadata-label">Game Versions</span>
-          <span class="metadata-value"> {{version.game_versions.join(', ')}} </span>
-        </div>
-        <div class="metadata-item">
-          <span class="metadata-label">Downloads</span>
-          <span class="metadata-value">{{ version.downloads }}</span>
-        </div>
-        <div class="metadata-item">
-          <span class="metadata-label">Publication Date</span>
-          <span class="metadata-value">
-            {{ new Date(version.date_published).toLocaleString('en-US', {month: 'long', day: 'numeric', year: 'numeric',})}}
-            at
-            {{ new Date(version.date_published).toLocaleString('en-US', {hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true})}}
-          </span>
-        </div>
-        <div v-if="author" class="metadata-item">
-          <span class="metadata-label">Author</span>
-          <a :href="`https://modrinth.com/user/${author.user.username}`" rel="external" target="_blank" class="metadata-value btn author">
-            <Avatar size="sm" :src="author.user.avatar_url" circle/>
-            <span>
-              <strong>
-                {{ author.user.username }}
-              </strong>
-              <br/>
-              {{ author.role }}
-            </span>
-          </a>
-        </div>
-        <div class="metadata-item">
-          <span class="metadata-label">Version ID</span>
-          <span class="metadata-value">{{ version.downloads }}</span>
-        </div>
-      </div>
-    </Card>
-  </div>
   </div>
 </template>
 
 <script setup>
-import {Card, Button, DownloadIcon, FileIcon, Avatar, LeftArrowIcon, ReportIcon, Badge, ExternalIcon, formatBytes, renderString} from 'omorphia'
+import {
+  Card,
+  Button,
+  DownloadIcon,
+  FileIcon,
+  Avatar,
+  LeftArrowIcon,
+  ReportIcon,
+  Badge,
+  ExternalIcon,
+  formatBytes,
+  renderString,
+} from 'omorphia'
 import { releaseColor } from '@/helpers/utils'
 </script>
 
 <script>
-const url = (id) => `https://api.modrinth.com/v2/version/${id}`;
-const deps = (id) => `https://api.modrinth.com/v2/project/${id}/dependencies`;
-const user = (id) => `https://api.modrinth.com/v2/project/${id}/members`;
+const url = (id) => `https://api.modrinth.com/v2/version/${id}`
+const deps = (id) => `https://api.modrinth.com/v2/project/${id}/dependencies`
+const user = (id) => `https://api.modrinth.com/v2/project/${id}/members`
 
 export default {
   data() {
@@ -132,41 +185,46 @@ export default {
       version: null,
       author: null,
       dependencies: null,
-      displayDependencies: null
+      displayDependencies: null,
     }
   },
   async created() {
     try {
-      const response = await fetch(url(this.$route.params.version));
-      this.version = await response.json();
+      const response = await fetch(url(this.$route.params.version))
+      this.version = await response.json()
 
-      const userResponse = await fetch(user(this.$route.params.id));
-      this.author = (await userResponse.json()).find(obj => obj.user.id === this.version.author_id);
+      const userResponse = await fetch(user(this.$route.params.id))
+      this.author = (await userResponse.json()).find(
+        (obj) => obj.user.id === this.version.author_id
+      )
 
-      const depsResponse = await fetch(deps(this.$route.params.id));
-      this.dependencies = await depsResponse.json();
+      const depsResponse = await fetch(deps(this.$route.params.id))
+      this.dependencies = await depsResponse.json()
 
       this.displayDependencies = this.version.dependencies.map((dependency) => {
-        const version = this.dependencies.versions.find((obj) => obj.id === dependency.version_id);
-        if(version) {
-          const project = this.dependencies.projects.find((obj) => obj.id === version.project_id || obj.id === dependency.project_id);
+        const version = this.dependencies.versions.find((obj) => obj.id === dependency.version_id)
+        if (version) {
+          const project = this.dependencies.projects.find(
+            (obj) => obj.id === version.project_id || obj.id === dependency.project_id
+          )
           return {
             icon: project?.icon_url,
             title: project?.title || project?.name,
             subtitle: `Version ${version.version_number} is ${dependency.dependency_type}`,
-            link: `/project/${project.slug}/version/${version.id}`
+            link: `/project/${project.slug}/version/${version.id}`,
           }
-        } else return {
-          icon: null,
-          title: dependency.file_name,
-          subtitle: `Added via overrides`,
-          link: `project/${this.$route.params.id}/`
-        }
-      });
+        } else
+          return {
+            icon: null,
+            title: dependency.file_name,
+            subtitle: `Added via overrides`,
+            link: `project/${this.$route.params.id}/`,
+          }
+      })
 
-      console.log(this.displayDependencies);
+      console.log(this.displayDependencies)
     } catch (error) {
-      console.log(error);
+      console.log(error)
     }
   },
 }
@@ -247,7 +305,6 @@ export default {
   background: var(--color-brand-highlight);
   color: var(--color-contrast);
 }
-
 
 .button-group {
   display: flex;

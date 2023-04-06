@@ -11,7 +11,9 @@
 }
 
 .markdown-body {
-  :deep(hr), :deep(h1), :deep(h2) {
+  :deep(hr),
+  :deep(h1),
+  :deep(h2) {
     max-width: max(60rem, 90%);
   }
 

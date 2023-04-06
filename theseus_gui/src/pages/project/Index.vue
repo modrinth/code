@@ -2,7 +2,7 @@
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
       <Card class="sidebar-card">
-        <Avatar size="lg" :src="data.icon_url"/>
+        <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
           <h2 class="name">{{ data.title }}</h2>
           {{ data.description }}
@@ -12,35 +12,39 @@
           type=""
           :categories="[
             ...categories.filter(
-              (cat) =>
-                data.categories.includes(cat.name) && cat.project_type === 'mod'
+              (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
             ),
             ...loaders.filter(
               (loader) =>
                 data.categories.includes(loader.name) &&
                 loader.supported_project_types?.includes('modpack')
-            )
+            ),
           ]"
         >
           <EnvironmentIndicator
-              :type-only="moderation"
-              :client-side="data.client_side"
-              :server-side="data.server_side"
-              :type="data.project_type"
+            :type-only="moderation"
+            :client-side="data.client_side"
+            :server-side="data.server_side"
+            :type="data.project_type"
           />
         </Categories>
-        <hr class="card-divider">
+        <hr class="card-divider" />
         <div class="button-group">
           <Button color="primary" class="instance-button">
-            <DownloadIcon/>
+            <DownloadIcon />
             Install
           </Button>
-          <a :href="`https://modrinth.com/${data.project_type}/${data.slug}`" rel="external" target="_blank" class="btn">
-            <ExternalIcon/>
+          <a
+            :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
+            rel="external"
+            target="_blank"
+            class="btn"
+          >
+            <ExternalIcon />
             Website
           </a>
         </div>
-        <hr class="card-divider">
+        <hr class="card-divider" />
         <div class="stats">
           <div class="stat">
             <DownloadIcon aria-hidden="true" />
@@ -58,76 +62,67 @@
           </div>
           <div class="stat date">
             <CalendarIcon aria-hidden="true" />
-            <span><span class="date-label">Created </span> {{ dayjs(data.published).fromNow() }}</span>
+            <span
+              ><span class="date-label">Created </span> {{ dayjs(data.published).fromNow() }}</span
+            >
           </div>
           <div class="stat date">
             <UpdatedIcon aria-hidden="true" />
-            <span><span class="date-label">Updated </span> {{ dayjs(data.updated).fromNow() }}</span>
+            <span
+              ><span class="date-label">Updated </span> {{ dayjs(data.updated).fromNow() }}</span
+            >
           </div>
         </div>
-        <hr class="card-divider">
-          <div class="button-group">
-            <Button class="instance-button">
-              <ReportIcon/>
-              Report
-            </Button>
-            <Button class="instance-button">
-              <HeartIcon/>
-              Follow
-            </Button>
-          </div>
-        <hr class="card-divider">
+        <hr class="card-divider" />
+        <div class="button-group">
+          <Button class="instance-button">
+            <ReportIcon />
+            Report
+          </Button>
+          <Button class="instance-button">
+            <HeartIcon />
+            Follow
+          </Button>
+        </div>
+        <hr class="card-divider" />
         <div class="links">
           <a
-              v-if="data.issues_url"
-              :href="data.issues_url"
-              class="title"
-              rel="noopener nofollow ugc"
+            v-if="data.issues_url"
+            :href="data.issues_url"
+            class="title"
+            rel="noopener nofollow ugc"
           >
             <IssuesIcon aria-hidden="true" />
             <span>Issues</span>
           </a>
           <a
-              v-if="data.source_url"
-              :href="data.source_url"
-              class="title"
-              rel="noopener nofollow ugc"
+            v-if="data.source_url"
+            :href="data.source_url"
+            class="title"
+            rel="noopener nofollow ugc"
           >
             <CodeIcon aria-hidden="true" />
             <span>Source</span>
           </a>
-          <a
-              v-if="data.wiki_url"
-              :href="data.wiki_url"
-              class="title"
-              rel="noopener nofollow ugc"
-          >
+          <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
             <WikiIcon aria-hidden="true" />
             <span>Wiki</span>
           </a>
-          <a
-              v-if="data.wiki_url"
-              :href="data.wiki_url"
-              class="title"
-              rel="noopener nofollow ugc"
-          >
+          <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
             <DiscordIcon aria-hidden="true" />
             <span>Discord</span>
           </a>
           <a
-              v-for="(donation, index) in data.donation_urls"
-              :key="index"
-              :href="donation.url"
-              rel="noopener nofollow ugc"
+            v-for="(donation, index) in data.donation_urls"
+            :key="index"
+            :href="donation.url"
+            rel="noopener nofollow ugc"
           >
             <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
             <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />
             <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true" />
             <PaypalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
-            <OpenCollectiveIcon
-                v-else-if="donation.id === 'open-collective'"
-                aria-hidden="true"
-            />
+            <OpenCollectiveIcon v-else-if="donation.id === 'open-collective'" aria-hidden="true" />
             <HeartIcon v-else-if="donation.id === 'github'" />
             <CoinsIcon v-else />
             <span v-if="donation.id === 'bmac'">Buy Me a Coffee</span>
@@ -157,7 +152,7 @@
             {
               label: 'Gallery',
               href: `/project/${$route.params.id}/gallery`,
-            }
+            },
           ]"
         />
         <NavRow
@@ -170,11 +165,11 @@
             {
               label: 'Versions',
               href: `/project/${$route.params.id}/versions`,
-            }
+            },
           ]"
         />
       </Card>
-      <RouterView/>
+      <RouterView />
     </div>
   </div>
 </template>
@@ -198,12 +193,19 @@ import {
   CoinsIcon,
   CodeIcon,
   formatNumber,
-  ExternalIcon
-} from "omorphia";
-import {BuyMeACoffeeIcon, DiscordIcon, PatreonIcon, PaypalIcon, KoFiIcon, OpenCollectiveIcon} from "@/assets/external";
-import {get_categories, get_loaders} from "@/helpers/tags";
-import { useProjectStore } from '@/store/project';
-const data = useProjectStore().project;
+  ExternalIcon,
+} from 'omorphia'
+import {
+  BuyMeACoffeeIcon,
+  DiscordIcon,
+  PatreonIcon,
+  PaypalIcon,
+  KoFiIcon,
+  OpenCollectiveIcon,
+} from '@/assets/external'
+import { get_categories, get_loaders } from '@/helpers/tags'
+import { useProjectStore } from '@/store/project'
+const data = useProjectStore().project
 
 const categories = await get_categories()
 const loaders = await get_loaders()
@@ -215,7 +217,7 @@ dayjs.extend(relativeTime)
 
 <script>
 export default {
-  name: "Index",
+  name: 'Index',
 }
 </script>
 

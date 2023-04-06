@@ -1,33 +1,35 @@
 <template>
-  <div v-if="gallery[0 ]" class="gallery">
+  <div v-if="gallery[0]" class="gallery">
     <Card v-for="(image, index) in gallery" :key="image.url" class="gallery-item">
       <a @click="expandImage(image, index)">
-        <img :src="image.url" :alt="image.title" class="gallery-image"/>
+        <img :src="image.url" :alt="image.title" class="gallery-image" />
       </a>
       <div class="gallery-body">
-        <h3>{{ image.title }} </h3>
+        <h3>{{ image.title }}</h3>
         {{ image.description }}
       </div>
       <span class="gallery-time">
         <CalendarIcon />
-        {{new Date(image.created).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}}
+        {{
+          new Date(image.created).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })
+        }}
       </span>
     </Card>
   </div>
-  <div
-    v-if="expandedGalleryItem"
-    class="expanded-image-modal"
-    @click="expandedGalleryItem = null"
-  >
+  <div v-if="expandedGalleryItem" class="expanded-image-modal" @click="expandedGalleryItem = null">
     <div class="content">
       <img
         class="image"
         :class="{ 'zoomed-in': zoomedIn }"
         :src="
-            expandedGalleryItem.url
-              ? expandedGalleryItem.url
-              : 'https://cdn.modrinth.com/placeholder-banner.svg'
-          "
+          expandedGalleryItem.url
+            ? expandedGalleryItem.url
+            : 'https://cdn.modrinth.com/placeholder-banner.svg'
+        "
         :alt="expandedGalleryItem.title ? expandedGalleryItem.title : 'gallery-image'"
         @click.stop=""
       />
@@ -50,10 +52,10 @@
               class="open btn icon-only"
               target="_blank"
               :href="
-                  expandedGalleryItem.url
-                    ? expandedGalleryItem.url
-                    : 'https://cdn.modrinth.com/placeholder-banner.svg'
-                "
+                expandedGalleryItem.url
+                  ? expandedGalleryItem.url
+                  : 'https://cdn.modrinth.com/placeholder-banner.svg'
+              "
             >
               <ExternalIcon aria-hidden="true" />
             </a>
@@ -61,20 +63,10 @@
               <ExpandIcon v-if="!zoomedIn" aria-hidden="true" />
               <ContractIcon v-else aria-hidden="true" />
             </Button>
-            <Button
-              v-if="gallery.length > 1"
-              class="previous"
-              icon-only
-              @click="previousImage()"
-            >
+            <Button v-if="gallery.length > 1" class="previous" icon-only @click="previousImage()">
               <LeftArrowIcon aria-hidden="true" />
             </Button>
-            <Button
-              v-if="gallery.length > 1"
-              class="next"
-              icon-only
-              @click="nextImage()"
-            >
+            <Button v-if="gallery.length > 1" class="next" icon-only @click="nextImage()">
               <RightArrowIcon aria-hidden="true" />
             </Button>
           </div>
@@ -85,7 +77,17 @@
 </template>
 
 <script setup>
-import { Card, ExpandIcon, RightArrowIcon, LeftArrowIcon, ExternalIcon, ContractIcon, XIcon, CalendarIcon, Button } from 'omorphia'
+import {
+  Card,
+  ExpandIcon,
+  RightArrowIcon,
+  LeftArrowIcon,
+  ExternalIcon,
+  ContractIcon,
+  XIcon,
+  CalendarIcon,
+  Button,
+} from 'omorphia'
 </script>
 
 <script>
@@ -115,8 +117,8 @@ export default {
     },
   },
   async created() {
-    const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}`);
-    this.gallery = (await response.json()).gallery;
+    const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}`)
+    this.gallery = (await response.json()).gallery
   },
   methods: {
     nextImage() {

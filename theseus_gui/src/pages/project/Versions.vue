@@ -4,7 +4,11 @@
       <div class="manage">
         <multiselect
           v-model="filterVersions"
-          :options="versions.flatMap(value => value.loaders).filter((value, index, self) => self.indexOf(value) === index)"
+          :options="
+            versions
+              .flatMap((value) => value.loaders)
+              .filter((value, index, self) => self.indexOf(value) === index)
+          "
           :multiple="true"
           :searchable="true"
           :show-no-results="false"
@@ -16,7 +20,11 @@
         />
         <multiselect
           v-model="filterLoader"
-          :options="versions.flatMap(value => value.game_versions).filter((value, index, self) => self.indexOf(value) === index)"
+          :options="
+            versions
+              .flatMap((value) => value.game_versions)
+              .filter((value, index, self) => self.indexOf(value) === index)
+          "
           :multiple="true"
           :searchable="true"
           :show-no-results="false"
@@ -27,8 +35,16 @@
           placeholder="Filter versions..."
         />
       </div>
-      <Checkbox v-model="filterCompatible" label="Only show compatible versions" class="filter-checkbox"/>
-      <Button class="no-wrap clear-filters" :disabled="!filterLoader && !filterVersions && !filterCompatible" :action="clearFilters">
+      <Checkbox
+        v-model="filterCompatible"
+        label="Only show compatible versions"
+        class="filter-checkbox"
+      />
+      <Button
+        class="no-wrap clear-filters"
+        :disabled="!filterLoader && !filterVersions && !filterCompatible"
+        :action="clearFilters"
+      >
         <CheckCircleIcon />
         Clear Filters
       </Button>
@@ -42,7 +58,12 @@
         <div class="table-cell table-text">Supports</div>
         <div class="table-cell table-text">Stats</div>
       </div>
-      <router-link v-for="(version) in versions" :key="version.id" class="button-base table-row" :to="`/project/${$route.params.id}/version/${version.id}`">
+      <router-link
+        v-for="version in versions"
+        :key="version.id"
+        class="button-base table-row"
+        :to="`/project/${$route.params.id}/version/${version.id}`"
+      >
         <div class="table-cell table-text">
           <Button color="primary" icon-only>
             <DownloadIcon />
@@ -53,7 +74,12 @@
             {{ version.name.charAt(0).toUpperCase() + version.name.slice(1) }}
             <div class="version-badge">
               <div class="channel-indicator">
-                <Badge :color="releaseColor(version.version_type)" :type="version.version_type.charAt(0).toUpperCase() + version.version_type.slice(1)" />
+                <Badge
+                  :color="releaseColor(version.version_type)"
+                  :type="
+                    version.version_type.charAt(0).toUpperCase() + version.version_type.slice(1)
+                  "
+                />
               </div>
               <div>
                 {{ version.version_number }}
@@ -63,7 +89,9 @@
         </div>
         <div class="table-cell table-text stacked-text">
           <span>
-            {{ version.loaders.map(str => str.charAt(0).toUpperCase() + str.slice(1)).join(', ') }}
+            {{
+              version.loaders.map((str) => str.charAt(0).toUpperCase() + str.slice(1)).join(', ')
+            }}
           </span>
           <span>
             {{ version.game_versions.join(', ') }}
@@ -71,20 +99,22 @@
         </div>
         <div class="table-cell table-text stacked-text">
           <div>
-            <span>
-              Published on
-            </span>
+            <span> Published on </span>
             <strong>
-              {{ new Date(version.date_published).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) }}
+              {{
+                new Date(version.date_published).toLocaleDateString('en-US', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                })
+              }}
             </strong>
           </div>
           <div>
             <strong>
               {{ formatNumber(version.downloads) }}
             </strong>
-            <span>
-              Downloads
-            </span>
+            <span> Downloads </span>
           </div>
         </div>
       </router-link>
@@ -93,33 +123,43 @@
 </template>
 
 <script setup>
-import { Card, Button, CheckCircleIcon, Badge, DownloadIcon, Checkbox, formatNumber } from 'omorphia'
+import {
+  Card,
+  Button,
+  CheckCircleIcon,
+  Badge,
+  DownloadIcon,
+  Checkbox,
+  formatNumber,
+} from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
 </script>
 
 <script>
 export default {
-  name: "Versions",
+  name: 'Versions',
   data() {
     return {
       versions: [],
       filterVersions: null,
       filterLoader: null,
       filterCompatible: false,
-    };
+    }
   },
   async mounted() {
-    const response = await fetch(`https://api.modrinth.com/v2/project/${this.$route.params.id}/version`);
-    this.versions = await response.json();
+    const response = await fetch(
+      `https://api.modrinth.com/v2/project/${this.$route.params.id}/version`
+    )
+    this.versions = await response.json()
   },
   methods: {
     clearFilters() {
-      this.filterVersions = null;
-      this.filterLoader = null;
-      this.filterCompatible = false;
+      this.filterVersions = null
+      this.filterLoader = null
+      this.filterCompatible = false
     },
-  }
+  },
 }
 </script>
 

@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 
 export const useProjectStore = defineStore({
   id: 'project',
@@ -9,12 +9,12 @@ export const useProjectStore = defineStore({
 
   actions: {
     async fetchProject(id) {
-      const apiUrl = `https://api.modrinth.com/v2/project/${id}`;
+      const apiUrl = `https://api.modrinth.com/v2/project/${id}`
 
-      const response = await fetch(apiUrl);
-      const data = await response.json();
+      const response = await fetch(apiUrl)
+      const data = await response.json()
 
-      this.project = data;
+      this.project = data
     },
   },
-});
+})

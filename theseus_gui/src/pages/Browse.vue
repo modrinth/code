@@ -297,7 +297,7 @@ const handleReset = async () => {
           :client-side="result?.client_side"
           :show-updated-date="false"
           :color="result?.color"
-          />
+        />
       </section>
     </div>
   </div>
