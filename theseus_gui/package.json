@@ -19,6 +19,7 @@
     "pinia": "^2.0.33",
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.2.45",
+    "dayjs": "^1.11.7",
     "vue-multiselect": "^3.0.0-alpha.2",
     "vue-router": "4"
   },

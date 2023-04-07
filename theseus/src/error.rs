@@ -76,6 +76,12 @@ pub enum ErrorKind {
     #[error("Could not create profile: {0}")]
     ProfileCreationError(#[from] profile_create::ProfileCreationError),
 
+    #[error("JRE error: {0}")]
+    JREError(#[from] crate::util::jre::JREError),
+
+    #[error("Error parsing date: {0}")]
+    ChronoParseError(#[from] chrono::ParseError),
+
     #[error("Zip error: {0}")]
     ZipError(#[from] async_zip::error::ZipError),
 

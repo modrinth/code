@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import * as Pages from '@/pages'
+import * as Project from '@/pages/project'
 import * as Instance from '@/pages/instance'
 
 /**
@@ -37,6 +38,35 @@ export default new createRouter({
       path: '/settings',
       name: 'Settings',
       component: Pages.Settings,
+    },
+    {
+      path: '/project/:id',
+      name: 'Project',
+      component: Project.Index,
+      props: true,
+      children: [
+        {
+          path: '',
+          name: 'Description',
+          component: Project.Description,
+        },
+        {
+          path: 'versions',
+          name: 'Versions',
+          component: Project.Versions,
+        },
+        {
+          path: 'version/:version',
+          name: 'Version',
+          component: Project.Version,
+          props: true,
+        },
+        {
+          path: 'gallery',
+          name: 'Gallery',
+          component: Project.Gallery,
+        },
+      ],
     },
     {
       path: '/instance/:id',
