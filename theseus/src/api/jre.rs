@@ -1,11 +1,11 @@
 //! Authentication flow interface
 use crate::{
+    launcher::download,
     prelude::Profile,
     state::JavaGlobals,
     util::jre::{self, extract_java_majorminor_version, JavaVersion},
     State,
 };
-use daedalus as d;
 
 pub const JAVA_8_KEY: &str = "JAVA_8";
 pub const JAVA_17_KEY: &str = "JAVA_17";
@@ -54,7 +54,8 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
         })?;
 
     // Get detailed manifest info from Daedalus
-    let version_info = d::minecraft::fetch_version_info(version).await?;
+    let version_info =
+        download::download_version_info(&state, version, None).await?;
     let optimal_key = match version_info
         .java_version
         .as_ref()

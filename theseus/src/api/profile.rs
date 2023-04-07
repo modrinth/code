@@ -1,10 +1,9 @@
 //! Theseus profile management interface
-use crate::state::MinecraftChild;
+use crate::{launcher::download, state::MinecraftChild};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
 };
-use daedalus as d;
 use std::{
     future::Future,
     path::{Path, PathBuf},
@@ -120,8 +119,8 @@ pub async fn run(
                 profile.metadata.game_version
             ))
         })?;
-    let version_info = d::minecraft::fetch_version_info(version).await?;
-
+    let version_info =
+        download::download_version_info(&state, version, None).await?;
     let pre_launch_hooks =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
     for hook in pre_launch_hooks.iter() {
