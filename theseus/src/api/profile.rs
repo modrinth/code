@@ -120,7 +120,7 @@ pub async fn run(
             ))
         })?;
     let version_info =
-        download::download_version_info(&state, version, None).await?;
+        download::download_version_info(&state, version, profile.metadata.loader_version.as_ref()).await?;
     let pre_launch_hooks =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
     for hook in pre_launch_hooks.iter() {
