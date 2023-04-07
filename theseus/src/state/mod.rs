@@ -1,7 +1,7 @@
 //! Theseus state management system
 use crate::config::sled_config;
 use std::sync::Arc;
-use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
+use tokio::sync::{OnceCell, RwLock, Semaphore};
 
 // Submodules
 mod dirs;
@@ -34,8 +34,6 @@ pub use self::tags::*;
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
-    /// Database, used to store some information
-    pub(self) database: sled::Db,
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
     /// Semaphore used to limit concurrent I/O and avoid errors
@@ -102,7 +100,6 @@ impl State {
                     };
 
                     Ok(Arc::new(Self {
-                        database,
                         directories,
                         io_semaphore,
                         metadata,
@@ -148,13 +145,6 @@ impl State {
         };
 
         tokio::try_join!(sync_settings, sync_profiles)?;
-
-        state.database.apply_batch(
-            Arc::try_unwrap(batch)
-                .expect("Error saving state by acquiring Arc")
-                .into_inner(),
-        )?;
-        state.database.flush_async().await?;
 
         Ok(())
     }
