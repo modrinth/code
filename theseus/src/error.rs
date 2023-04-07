@@ -76,6 +76,9 @@ pub enum ErrorKind {
     #[error("Could not create profile: {0}")]
     ProfileCreationError(#[from] profile_create::ProfileCreationError),
 
+    #[error("User is not logged in, no credentials available!")]
+    NoCredentialsError,
+
     #[error("JRE error: {0}")]
     JREError(#[from] crate::util::jre::JREError),
 

@@ -64,39 +64,16 @@ async fn main() -> theseus::Result<()> {
     .await?;
     State::sync().await?;
 
-    // Attempt to get the default user, if it exists, and refresh their credentials
-    let default_user_uuid = {
-        let settings = st.settings.read().await;
-        settings.default_user
-    };
-    let credentials = if let Some(uuid) = default_user_uuid {
-        println!("Attempting to refresh existing authentication.");
-        auth::refresh(uuid, false).await
-    } else {
-        println!("Freshly authenticating.");
-        authenticate_run().await
-    };
 
-    // Check attempt to get Credentials
-    // If successful, run the profile and store the RwLock to the process
-    let proc_lock = match credentials {
-        Ok(credentials) => {
-            println!("Preparing to run Minecraft.");
-            profile::run(&canonicalize(&profile_path)?, &credentials).await
-        }
-        Err(e) => {
-            // If Hydra could not be accessed, for testing, attempt to load credentials from disk and do the same
-            println!("Could not authenticate: {}.\nAttempting stored authentication.",e);
-            let users = auth::users().await.expect(
-                "Could not access any stored users- state was dropped.",
-            );
-            let credentials = users
-                .first()
-                .expect("Hydra failed, and no stored users were found.");
-            println!("Preparing to run Minecraft.");
-            profile::run(&canonicalize(&profile_path)?, credentials).await
-        }
-    }?;
+
+    // Attempt to run game
+    if auth::users().await?.len() == 0 {
+        println!("No users found, authenticating.");
+        authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
+    }
+
+    // Run a profile, running minecraft and store the RwLock to the process
+    let proc_lock = profile::run(&canonicalize(&profile_path)?).await?;
 
     let pid = proc_lock
         .read()
