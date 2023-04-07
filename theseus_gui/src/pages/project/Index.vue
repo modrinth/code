@@ -229,13 +229,7 @@ const [data, versions, members, dependencies] = await Promise.all([
 
 watch(
   () => route.params.id,
-  async () => {
-    data.value = await ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`)
-    versions.value = await ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`)
-    members.value = await ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`)
-    dependencies.value = await ofetch(
-      `https://api.modrinth.com/v2/project/${route.params.id}/dependencies`
-    )
+  () => {
     router.go()
   }
 )
