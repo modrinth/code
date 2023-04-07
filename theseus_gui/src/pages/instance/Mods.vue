@@ -43,10 +43,10 @@
           </Button>
         </div>
         <div class="table-cell table-text name-cell">
-          <span class="mod-text">
+          <router-link :to="`/project/${mod.slug}/`" class="mod-text">
             <Avatar :src="mod.icon" />
             {{ mod.name }}
-          </span>
+          </router-link>
         </div>
         <div class="table-cell table-text">{{ mod.version }}</div>
         <div class="table-cell table-text">{{ mod.author }}</div>

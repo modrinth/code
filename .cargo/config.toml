@@ -1,0 +1,3 @@
+# Windows has stack overflows when calling from Tauri, so we increase compiler size
+[target.'cfg(windows)']
+rustflags = ["-C", "link-args=/STACK:4194304"]

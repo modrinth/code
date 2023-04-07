@@ -224,7 +224,7 @@ const handleReset = async () => {
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
-          :id="result?.project_id"
+          :id="`${result?.project_id}/`"
           :key="result?.project_id"
           class="result-project-item"
           :type="result?.project_type"
@@ -247,13 +247,12 @@ const handleReset = async () => {
             ),
           ]"
           :project-type-display="result?.project_type"
-          project-type-url="instance"
+          project-type-url="project"
           :server-side="result?.server_side"
           :client-side="result?.client_side"
           :show-updated-date="false"
           :color="result?.color"
-        >
-        </ProjectCard>
+        />
       </section>
     </div>
   </div>
@@ -357,126 +356,5 @@ const handleReset = async () => {
       text-align: center;
     }
   }
-}
-
-.multiselect {
-  color: var(--color-base) !important;
-  outline: 2px solid transparent;
-
-  .multiselect__input:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    min-height: 0 !important;
-    font-weight: normal !important;
-    margin-left: 0.5rem;
-    margin-bottom: 10px;
-  }
-
-  input {
-    background: transparent;
-    box-shadow: none;
-    border: none !important;
-
-    &:focus {
-      box-shadow: none;
-    }
-  }
-
-  input::placeholder {
-    color: var(--color-base);
-  }
-
-  .multiselect__tags {
-    border-radius: var(--radius-md);
-    background: var(--color-button-bg);
-    box-shadow: var(--shadow-inset-sm);
-    border: none;
-    cursor: pointer;
-    padding-left: 0.5rem;
-    font-size: 1rem;
-
-    transition: background-color 0.1s ease-in-out;
-
-    &:active {
-      filter: brightness(1.25);
-
-      .multiselect__spinner {
-        filter: brightness(1.25);
-      }
-    }
-
-    .multiselect__single {
-      background: transparent;
-    }
-
-    .multiselect__tag {
-      border-radius: var(--radius-md);
-      color: var(--color-base);
-      background: transparent;
-      border: 2px solid var(--color-brand);
-    }
-
-    .multiselect__tag-icon {
-      background: transparent;
-
-      &:after {
-        color: var(--color-contrast);
-      }
-    }
-
-    .multiselect__placeholder {
-      color: var(--color-base);
-      margin-left: 0.5rem;
-      opacity: 0.6;
-      font-size: 1rem;
-      line-height: 1.25rem;
-    }
-  }
-
-  .multiselect__content-wrapper {
-    background: var(--color-button-bg);
-    border: none;
-    overflow-x: hidden;
-    box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-    width: 100%;
-
-    .multiselect__element {
-      .multiselect__option--highlight {
-        background: var(--color-button-bg);
-        filter: brightness(1.25);
-        color: var(--color-contrast);
-      }
-
-      .multiselect__option--selected {
-        background: var(--color-brand);
-        font-weight: bold;
-        color: var(--color-accent-contrast);
-      }
-    }
-  }
-
-  .multiselect__spinner {
-    background: var(--color-button-bg);
-
-    &:active {
-      filter: brightness(1.25);
-    }
-  }
-
-  &.multiselect--disabled {
-    background: none;
-
-    .multiselect__current,
-    .multiselect__select {
-      background: none;
-    }
-  }
-}
-
-.multiselect--above .multiselect__content-wrapper {
-  border-top: none !important;
-  border-top-left-radius: var(--radius-md) !important;
-  border-top-right-radius: var(--radius-md) !important;
 }
 </style>
