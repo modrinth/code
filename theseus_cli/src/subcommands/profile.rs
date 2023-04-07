@@ -332,7 +332,7 @@ impl ProfileRun {
             .await?;
         let credentials = auth::refresh(id, false).await?;
 
-        let proc_lock = profile::run(&path, &credentials).await?;
+        let proc_lock = profile::run_credentials(&path, &credentials).await?;
         let mut proc = proc_lock.write().await;
         process::wait_for(&mut proc).await?;
 
