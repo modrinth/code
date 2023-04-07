@@ -1220,10 +1220,10 @@ ofetch@^1.0.1:
     node-fetch-native "^1.0.2"
     ufo "^1.1.0"
 
-omorphia@^0.4.3:
-  version "0.4.3"
-  resolved "https://registry.yarnpkg.com/omorphia/-/omorphia-0.4.3.tgz#a247e2e15b77b4b5f55fe766f1c64419bb6fbc72"
-  integrity sha512-aGjtYhUrWNgjKM3HiL+MF5DdXfrllfDxql2mzu7JRzpjTB20xnksHKvU71x17FS9P1QXxumzADVF5v2rn9lb6A==
+omorphia@^0.4.4:
+  version "0.4.4"
+  resolved "https://registry.yarnpkg.com/omorphia/-/omorphia-0.4.4.tgz#788e5953eb1ae81c8a65ce277a5086668acf50a4"
+  integrity sha512-HnIZahQVQmH6kHPzeb5iQTzgPhWu8VUwgNnCIUzWhudFqgB32NNUHNQW3seHgM8pmLSeIA3/2fjqkTrzK9EQvw==
   dependencies:
     dayjs "^1.11.7"
     floating-vue "^2.0.0-beta.20"

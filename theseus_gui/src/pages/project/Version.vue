@@ -59,20 +59,24 @@
             </Button>
           </Card>
         </Card>
-        <Card>
+        <Card v-if="displayDependencies[0]">
           <h2>Dependencies</h2>
-          <router-link
-            v-for="dependency in displayDependencies"
-            :key="dependency.title"
-            class="btn dependency"
-            :to="dependency.link"
-          >
-            <Avatar size="sm" :src="dependency.icon" />
-            <div>
-              <span class="title"> {{ dependency.title }} </span> <br />
-              <span> {{ dependency.subtitle }} </span>
+          <div v-for="dependency in displayDependencies" :key="dependency.title">
+            <router-link v-if="dependency.link" class="btn dependency" :to="dependency.link">
+              <Avatar size="sm" :src="dependency.icon" />
+              <div>
+                <span class="title"> {{ dependency.title }} </span> <br />
+                <span> {{ dependency.subtitle }} </span>
+              </div>
+            </router-link>
+            <div v-else class="dependency disabled" disabled="">
+              <Avatar size="sm" :src="dependency.icon" />
+              <div class="text">
+                <div class="title">{{ dependency.title }}</div>
+                <div>{{ dependency.subtitle }}</div>
+              </div>
             </div>
-          </router-link>
+          </div>
         </Card>
       </div>
       <Card class="metadata-card">
@@ -149,7 +153,7 @@
           </div>
           <div class="metadata-item">
             <span class="metadata-label">Version ID</span>
-            <span class="metadata-value"></span>
+            <span class="metadata-value"><CopyCode class="copycode" :text="version.id" /></span>
           </div>
         </div>
       </Card>
@@ -168,6 +172,7 @@ import {
   ReportIcon,
   Badge,
   ExternalIcon,
+  CopyCode,
   formatBytes,
   renderString,
 } from 'omorphia'
@@ -212,7 +217,7 @@ const displayDependencies = ref(
         icon: null,
         title: dependency.file_name,
         subtitle: `Added via overrides`,
-        link: `project/${route.params.id}/`,
+        link: null,
       }
   })
 )
@@ -354,8 +359,27 @@ const displayDependencies = ref(
     max-width: max(60rem, 90%) !important;
   }
 
-  :deep(ul) {
+  :deep(ul),
+  :deep(ol) {
     margin-left: 2rem;
+  }
+}
+
+.copycode {
+  border: 0;
+  color: var(--color-contrast);
+}
+
+.disabled {
+  display: flex;
+  flex-direction: row;
+  vertical-align: center;
+  align-items: center;
+  cursor: not-allowed;
+  border-radius: var(--radius-lg);
+
+  .text {
+    filter: brightness(0.5);
   }
 }
 </style>

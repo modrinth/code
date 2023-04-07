@@ -212,10 +212,11 @@ import { get_categories, get_loaders } from '@/helpers/tags'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
-import { useRoute } from 'vue-router'
-import { ref, shallowRef } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ref, shallowRef, watch } from 'vue'
 
 const route = useRoute()
+const router = useRouter()
 
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
@@ -225,6 +226,19 @@ const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ])
+
+watch(
+  () => route.params.id,
+  async () => {
+    data.value = await ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`)
+    versions.value = await ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`)
+    members.value = await ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`)
+    dependencies.value = await ofetch(
+      `https://api.modrinth.com/v2/project/${route.params.id}/dependencies`
+    )
+    router.go()
+  }
+)
 
 dayjs.extend(relativeTime)
 </script>

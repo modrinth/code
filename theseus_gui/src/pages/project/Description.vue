@@ -29,7 +29,8 @@ export default {
     max-width: max(60rem, 90%);
   }
 
-  :deep(ul) {
+  :deep(ul),
+  :deep(ol) {
     margin-left: 2rem;
   }
 }
