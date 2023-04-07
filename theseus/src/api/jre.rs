@@ -55,7 +55,7 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
 
     // Get detailed manifest info from Daedalus
     let version_info =
-        download::download_version_info(&state, version, None).await?;
+        download::download_version_info(&state, version, profile.metadata.loader_version.as_ref()).await?;
     let optimal_key = match version_info
         .java_version
         .as_ref()
