@@ -42,7 +42,7 @@ impl AuthTask {
 
         // Waits for the task to complete, and returns the credentials
         let credentials = task
-            .ok_or_else(|| AuthTaskError::TaskMissing)?
+            .ok_or(AuthTaskError::TaskMissing)?
             .await
             .map_err(AuthTaskError::from)??;
 

@@ -8,8 +8,7 @@ use tokio::process::{Child, Command};
 mod args;
 
 pub mod auth;
-
-mod download;
+pub mod download;
 
 #[tracing::instrument]
 pub fn parse_rule(rule: &d::minecraft::Rule) -> bool {

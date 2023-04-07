@@ -322,7 +322,9 @@ pub async fn infer_data_from_files(
                                     title: Some(
                                         pack.display_name
                                             .clone()
-                                            .unwrap_or(pack.mod_id.clone()),
+                                            .unwrap_or_else(|| {
+                                                pack.mod_id.clone()
+                                            }),
                                     ),
                                     description: pack.description.clone(),
                                     authors: pack

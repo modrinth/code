@@ -3,6 +3,7 @@ use serde::{Serialize, Serializer};
 use thiserror::Error;
 
 pub mod auth;
+pub mod jre;
 
 pub mod pack;
 pub mod process;
@@ -29,6 +30,9 @@ pub enum TheseusSerializableError {
 
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
+
+    #[error("No profile found at {0}")]
+    NoProfileFound(String),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -69,4 +73,5 @@ macro_rules! impl_serialize {
 impl_serialize! {
     Theseus,
     IO,
+    NoProfileFound,
 }

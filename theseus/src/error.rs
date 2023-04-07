@@ -79,6 +79,12 @@ pub enum ErrorKind {
     #[error("User is not logged in, no credentials available!")]
     NoCredentialsError,
 
+    #[error("JRE error: {0}")]
+    JREError(#[from] crate::util::jre::JREError),
+
+    #[error("Error parsing date: {0}")]
+    ChronoParseError(#[from] chrono::ParseError),
+
     #[error("Zip error: {0}")]
     ZipError(#[from] async_zip::error::ZipError),
 
