@@ -1,5 +1,6 @@
 //! Theseus state management system
 use crate::config::sled_config;
+use crate::jre;
 use std::sync::Arc;
 use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
 
@@ -30,6 +31,9 @@ pub use self::auth_task::*;
 
 mod tags;
 pub use self::tags::*;
+
+mod java_globals;
+pub use self::java_globals::*;
 
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
@@ -74,7 +78,7 @@ impl State {
                         .open()?;
 
                     // Settings
-                    let settings =
+                    let mut settings =
                         Settings::init(&directories.settings_file()).await?;
 
                     // Loose initializations
@@ -100,6 +104,12 @@ impl State {
                             tag_fetch_err
                         );
                     };
+
+                    // On launcher initialization, if global java variables are unset, try to find and set them
+                    // (they are required for the game to launch)
+                    if settings.java_globals.count() == 0 {
+                        settings.java_globals = jre::autodetect_java_globals()?;
+                    }
 
                     Ok(Arc::new(Self {
                         database,

@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::prelude::ModLoader;
+use crate::{jre, prelude::ModLoader};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -153,6 +153,20 @@ pub async fn profile_create(
     }
 
     profile.metadata.linked_project_id = linked_project_id;
+
+    // Attempts to find optimal JRE for the profile from the JavaGlobals
+    // Finds optimal key, and see if key has been set in JavaGlobals
+    let settings = state.settings.read().await;
+    let optimal_version_key = jre::get_optimal_jre_key(&profile).await?;
+    if settings.java_globals.get(&optimal_version_key).is_some() {
+        profile.set_java_settings(Some(JavaSettings {
+            jre_key: Some(optimal_version_key),
+            extra_arguments: None,
+        }))?;
+    } else {
+        println!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.");
+    }
+
     {
         let mut profiles = state.profiles.write().await;
         profiles.insert(profile)?;
