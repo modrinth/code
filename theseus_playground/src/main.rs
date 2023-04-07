@@ -4,7 +4,6 @@
 )]
 
 use dunce::canonicalize;
-use std::path::Path;
 use theseus::prelude::*;
 use tokio::time::{sleep, Duration};
 
@@ -52,13 +51,14 @@ async fn main() -> theseus::Result<()> {
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
-    println!("Editing.");
-    profile::edit(&profile_path, |profile| {
-        // Eg: Java. TODO: hook up to jre.rs class to pick optimal java
-        profile.java = Some(JavaSettings {
-            install: Some(Path::new("/usr/bin/java").to_path_buf()),
-            extra_arguments: None,
-        });
+    // println!("Editing.");
+    profile::edit(&profile_path, |_profile| {
+        // Eg: Java- this would let you change the java runtime of the profile instead of using the default
+        // use theseus::prelude::jre::JAVA__KEY;
+        // profile.java = Some(JavaSettings {
+        // jre_key: Some(JAVA_17_KEY.to_string()),
+        //     extra_arguments: None,
+        // });
         async { Ok(()) }
     })
     .await?;
@@ -107,8 +107,8 @@ async fn main() -> theseus::Result<()> {
     println!("Minecraft PID: {}", pid);
 
     // Wait 5 seconds
-    println!("Waiting 10 seconds to gather logs...");
-    sleep(Duration::from_secs(10)).await;
+    println!("Waiting 20 seconds to gather logs...");
+    sleep(Duration::from_secs(20)).await;
     let stdout = process::get_stdout_by_pid(pid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");
 

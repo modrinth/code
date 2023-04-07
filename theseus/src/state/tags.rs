@@ -140,7 +140,6 @@ impl Tags {
         let licenses = self.fetch_tag("license");
         let donation_platforms = self.fetch_tag("donation_platform");
         let report_types = self.fetch_tag("report_type");
-
         let (
             categories,
             loaders,
@@ -242,14 +241,6 @@ pub struct Loader {
 }
 
 #[derive(Debug, Clone, Decode, Encode, Serialize, Deserialize)]
-pub struct GameVersion {
-    pub version: String,
-    pub version_type: String,
-    pub date: String,
-    pub major: bool,
-}
-
-#[derive(Debug, Clone, Decode, Encode, Serialize, Deserialize)]
 pub struct License {
     pub short: String,
     pub name: String,
@@ -259,4 +250,12 @@ pub struct License {
 pub struct DonationPlatform {
     pub short: String,
     pub name: String,
+}
+
+#[derive(Debug, Clone, Decode, Encode, Serialize, Deserialize)]
+pub struct GameVersion {
+    pub version: String,
+    pub version_type: String,
+    pub date: String,
+    pub major: bool,
 }

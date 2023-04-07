@@ -77,7 +77,7 @@ impl std::fmt::Display for ModLoader {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JavaSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub install: Option<PathBuf>,
+    pub jre_key: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra_arguments: Option<Vec<String>>,
 }
@@ -127,6 +127,15 @@ impl Profile {
             write_cached_icon(file_name, cache_dir, icon, &semaphore).await?;
         self.metadata.icon = Some(file);
         Ok(self)
+    }
+
+    #[tracing::instrument]
+    pub fn set_java_settings(
+        &mut self,
+        java: Option<JavaSettings>,
+    ) -> crate::Result<()> {
+        self.java = java;
+        Ok(())
     }
 
     pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
