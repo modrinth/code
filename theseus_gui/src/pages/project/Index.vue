@@ -230,8 +230,7 @@ const [data, versions, members, dependencies] = await Promise.all([
 watch(
   () => route.params.id,
   () => {
-    if (route.params.id)
-      router.go()
+    if (route.params.id) router.go()
   }
 )
 
@@ -242,7 +241,7 @@ async function install() {
     let id = await pack_install(versions.value[0].id)
 
     let router = useRouter()
-    await router.push(`/instance/${encodeURIComponent(id)}`)
+    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
   }
 }
 </script>

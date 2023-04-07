@@ -10,7 +10,7 @@
           >
         </div>
         <span class="button-group">
-          <Button color="primary" class="instance-button">
+          <Button color="primary" class="instance-button" @click="run($route.params.id)">
             <PlayIcon />
             Play
           </Button>
@@ -43,7 +43,7 @@
 <script setup>
 import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
-import { get } from '@/helpers/profile'
+import { get, run } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'

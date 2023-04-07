@@ -10,6 +10,7 @@
           Sort By
           <DropdownSelect
             v-model="sortFilter"
+            name="sort-by"
             :options="['Name', 'Version', 'Author']"
             default-value="Name"
             class="dropdown"
@@ -43,10 +44,14 @@
           </Button>
         </div>
         <div class="table-cell table-text name-cell">
-          <router-link :to="`/project/${mod.slug}/`" class="mod-text">
+          <router-link v-if="mod.slug" :to="`/project/${mod.slug}/`" class="mod-text">
             <Avatar :src="mod.icon" />
             {{ mod.name }}
           </router-link>
+          <div v-else class="mod-text">
+            <Avatar :src="mod.icon" />
+            {{ mod.name }}
+          </div>
         </div>
         <div class="table-cell table-text">{{ mod.version }}</div>
         <div class="table-cell table-text">{{ mod.author }}</div>
@@ -54,7 +59,12 @@
           <Button icon-only>
             <TrashIcon />
           </Button>
-          <input id="switch-1" type="checkbox" class="switch stylized-toggle" :checked="mod.disabled" />
+          <input
+            id="switch-1"
+            type="checkbox"
+            class="switch stylized-toggle"
+            :checked="mod.disabled"
+          />
         </div>
       </div>
     </div>

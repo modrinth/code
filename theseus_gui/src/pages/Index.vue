@@ -11,6 +11,7 @@ const recentInstances = shallowRef(Object.values(profiles))
   <div class="page-container">
     <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
     <RowDisplay label="Popular packs" :instances="recentInstances" :can-paginate="true" />
+    <RowDisplay label="Test" :instances="recentInstances" :can-paginate="true" />
   </div>
 </template>
 

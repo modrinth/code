@@ -144,7 +144,10 @@ impl Profile {
             let new_path = self.path.join(path);
             if new_path.exists() {
                 for path in std::fs::read_dir(self.path.join(path))? {
-                    files.push(path?.path());
+                    let path = path?.path();
+                    if path.is_file() {
+                        files.push(path);
+                    }
                 }
             }
             Ok::<(), crate::Error>(())
@@ -170,7 +173,6 @@ impl Profiles {
 
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
-            println!("{:?}", path);
             if path.is_dir() {
                 let prof = match Self::read_profile_from_dir(&path).await {
                     Ok(prof) => Some(prof),
@@ -180,6 +182,7 @@ impl Profiles {
                     }
                 };
                 if let Some(profile) = prof {
+                    let path = canonicalize(path)?;
                     profiles.insert(path, profile);
                 }
             }
