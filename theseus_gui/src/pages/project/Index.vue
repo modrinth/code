@@ -242,7 +242,6 @@ async function install() {
     let id = await pack_install(versions.value[0].id)
 
     let router = useRouter()
-    console.log(id)
     await router.push(`/instance/${encodeURIComponent(id)}`)
   }
 }
