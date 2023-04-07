@@ -1,0 +1,6 @@
+export { default as BuyMeACoffeeIcon } from './bmac.svg'
+export { default as DiscordIcon } from './discord.svg'
+export { default as KoFiIcon } from './kofi.svg'
+export { default as PatreonIcon } from './patreon.svg'
+export { default as PaypalIcon } from './paypal.svg'
+export { default as OpenCollectiveIcon } from './opencollective.svg'
