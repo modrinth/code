@@ -1,9 +1,21 @@
 # Slider
 
+<script setup>
+import { ref } from "vue"; 
+
+const value = ref(0)
+</script>
+
 <DemoContainer>
-  <Slider :min="1000" :max="10000" :step="1000"/>
+  <Slider v-model="value" :min="1000" :max="10000" :step="1000"/>
 </DemoContainer>
 
 ```vue
-<Slider :min="1000" :max="10000" :step="1000"/>
+<script setup>
+import { ref } from "vue";
+
+const value = ref(0)
+</script>
+
+<Slider v-model="value" :min="1000" :max="10000" :step="1000"/>
 ```

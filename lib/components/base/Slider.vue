@@ -37,68 +37,52 @@
   </div>
 </template>
 
-<script>
-export default {
-  name: 'Slider',
-  props: {
-    value: {
-      type: Number,
-      default: 0,
-    },
-    min: {
-      type: Number,
-      default: 0,
-    },
-    max: {
-      type: Number,
-      default: 100,
-    },
-    step: {
-      type: Number,
-      default: 10,
-    },
-    forceStep: {
-      type: Boolean,
-      default: true,
-    },
+<script setup>
+import { ref } from 'vue'
+
+const emit = defineEmits(['update:modelValue'])
+
+const props = defineProps({
+  modelValue: {
+    type: Number,
+    default: 0,
   },
-  emits: ['input'],
-  data() {
-    return {
-      sliderWidth: 0,
-      objectPosition: 0,
-      startOffset: 0,
-      currentValue: Math.max(this.min, this.value).toString(),
-    }
+  min: {
+    type: Number,
+    default: 0,
   },
-  computed: {
-    inputValueValid: {
-      get() {
-        return this.$refs.value.value
-      },
-      set(newValue) {
-        const parsedValue = parseInt(newValue)
-        if (parsedValue < this.min) {
-          this.currentValue = this.min.toString()
-        } else if (parsedValue > this.max) {
-          this.currentValue = this.max.toString()
-        } else if (!parsedValue) {
-          this.currentValue = this.min.toString()
-        } else {
-          this.currentValue = (
-            parsedValue - (this.forceStep ? parsedValue % this.step : 0)
-          ).toString()
-        }
-        this.$refs.value.value = this.currentValue
-        this.$emit('input', parseInt(this.currentValue))
-      },
-    },
+  max: {
+    type: Number,
+    default: 100,
   },
-  methods: {
-    onInput(value) {
-      this.inputValueValid = parseInt(value)
-    },
+  step: {
+    type: Number,
+    default: 10,
   },
+  forceStep: {
+    type: Boolean,
+    default: true,
+  },
+})
+
+let currentValue = ref(Math.max(props.min, props.modelValue).toString())
+
+const inputValueValid = (newValue) => {
+  const parsedValue = parseInt(newValue)
+  if (parsedValue < props.min) {
+    currentValue.value = props.min.toString()
+  } else if (parsedValue > props.max) {
+    currentValue.value = props.max.toString()
+  } else if (!parsedValue) {
+    currentValue.value = props.min.toString()
+  } else {
+    currentValue.value = (parsedValue - (props.forceStep ? parsedValue % props.step : 0)).toString()
+  }
+  emit('update:modelValue', parseInt(currentValue.value))
+}
+
+const onInput = (value) => {
+  inputValueValid(value)
 }
 </script>
 
