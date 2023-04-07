@@ -84,7 +84,7 @@ impl State {
                     // Launcher data
                     let (metadata, profiles) = tokio::try_join! {
                         Metadata::init(&database),
-                        Profiles::init(&database, &directories, &io_semaphore),
+                        Profiles::init(&directories, &io_semaphore),
                     }?;
                     let users = Users::init(&database)?;
 
@@ -123,7 +123,6 @@ impl State {
     /// Synchronize in-memory state with persistent state
     pub async fn sync() -> crate::Result<()> {
         let state = Self::get().await?;
-        let batch = Arc::new(Mutex::new(sled::Batch::default()));
 
         let sync_settings = async {
             let state = Arc::clone(&state);
@@ -138,13 +137,11 @@ impl State {
 
         let sync_profiles = async {
             let state = Arc::clone(&state);
-            let batch = Arc::clone(&batch);
 
             tokio::spawn(async move {
                 let profiles = state.profiles.read().await;
-                let mut batch = batch.lock().await;
 
-                profiles.sync(&mut batch).await?;
+                profiles.sync().await?;
                 Ok::<_, crate::Error>(())
             })
             .await?

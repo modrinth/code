@@ -1,5 +1,4 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::config::BINCODE_CONFIG;
 use crate::data::DirectoryInfo;
 use crate::state::projects::Project;
 use crate::util::fetch::write_cached_icon;
@@ -15,7 +14,6 @@ use tokio::fs;
 use tokio::sync::Semaphore;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
-const PROFILE_SUBTREE: &[u8] = b"profiles";
 
 pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
 
@@ -153,26 +151,18 @@ impl Profile {
 }
 
 impl Profiles {
-    #[tracing::instrument(skip(db))]
+    #[tracing::instrument]
     pub async fn init(
-        db: &sled::Db,
         dirs: &DirectoryInfo,
         io_sempahore: &Semaphore,
     ) -> crate::Result<Self> {
-        let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
-            Ok(Default::default()),
-            |bytes| {
-                bincode::decode_from_slice::<Box<[PathBuf]>, _>(
-                    &bytes,
-                    *BINCODE_CONFIG,
-                )
-                .map(|it| it.0)
-            },
-        )?;
+        let mut profiles = HashMap::new();
+        let mut entries = fs::read_dir(dirs.profiles_dir()).await?;
 
-        let mut profiles = stream::iter(profile_db.iter())
-            .then(|it| async move {
-                let path = PathBuf::from(it);
+        while let Some(entry) = entries.next_entry().await? {
+            let path = entry.path();
+            println!("{:?}", path);
+            if path.is_dir() {
                 let prof = match Self::read_profile_from_dir(&path).await {
                     Ok(prof) => Some(prof),
                     Err(err) => {
@@ -180,13 +170,11 @@ impl Profiles {
                         None
                     }
                 };
-                (path, prof)
-            })
-            .filter_map(|(key, opt_value)| async move {
-                opt_value.map(|value| (key, value))
-            })
-            .collect::<HashMap<PathBuf, Profile>>()
-            .await;
+                if let Some(profile) = prof {
+                    profiles.insert(path, profile);
+                }
+            }
+        }
 
         // project path, parent profile path
         let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
@@ -254,10 +242,7 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn sync<'a>(
-        &'a self,
-        batch: &'a mut sled::Batch,
-    ) -> crate::Result<&Self> {
+    pub async fn sync(&self) -> crate::Result<&Self> {
         stream::iter(self.0.iter())
             .map(Ok::<_, crate::Error>)
             .try_for_each_concurrent(None, |(path, profile)| async move {
@@ -271,13 +256,6 @@ impl Profiles {
             })
             .await?;
 
-        batch.insert(
-            PROFILE_SUBTREE,
-            bincode::encode_to_vec(
-                self.0.keys().collect::<Box<[_]>>(),
-                *BINCODE_CONFIG,
-            )?,
-        );
         Ok(self)
     }
 
