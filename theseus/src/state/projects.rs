@@ -2,6 +2,7 @@
 
 use crate::config::{MODRINTH_API_URL, REQWEST_CLIENT};
 use crate::util::fetch::write_cached_icon;
+use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -10,8 +11,6 @@ use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
 use tokio::sync::Semaphore;
-// use zip::ZipArchive;
-use async_zip::tokio::read::fs::ZipFileReader;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Project {
@@ -19,6 +18,7 @@ pub struct Project {
     pub disabled: bool,
     pub metadata: ProjectMetadata,
     pub file_name: String,
+    pub update_available: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -92,6 +92,26 @@ pub struct Dependency {
     pub dependency_type: DependencyType,
 }
 
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ModrinthTeamMember {
+    pub team_id: String,
+    pub user: ModrinthUser,
+    pub role: String,
+    pub ordering: i64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ModrinthUser {
+    pub id: String,
+    pub github_id: Option<u64>,
+    pub username: String,
+    pub name: Option<String>,
+    pub avatar_url: Option<String>,
+    pub bio: Option<String>,
+    pub created: DateTime<Utc>,
+    pub role: String,
+}
+
 #[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
@@ -124,6 +144,7 @@ pub enum ProjectMetadata {
     Modrinth {
         project: Box<ModrinthProject>,
         version: Box<ModrinthVersion>,
+        members: Box<Vec<ModrinthTeamMember>>,
     },
     Inferred {
         title: Option<String>,
@@ -229,6 +250,22 @@ pub async fn infer_data_from_files(
         .json()
         .await?;
 
+    let teams: Vec<ModrinthTeamMember> = REQWEST_CLIENT
+        .get(format!(
+            "{}teams?ids={}",
+            MODRINTH_API_URL,
+            serde_json::to_string(
+                &projects.iter().map(|x| x.team.clone()).collect::<Vec<_>>()
+            )?
+        ))
+        .send()
+        .await?
+        .json::<Vec<Vec<ModrinthTeamMember>>>()
+        .await?
+        .into_iter()
+        .flat_map(|x| x)
+        .collect();
+
     let mut return_projects = HashMap::new();
     let mut further_analyze_projects: Vec<(String, PathBuf)> = Vec::new();
 
@@ -243,6 +280,12 @@ pub async fn infer_data_from_files(
                     .to_string_lossy()
                     .to_string();
 
+                let team_members = teams
+                    .iter()
+                    .filter(|x| x.team_id == project.team)
+                    .cloned()
+                    .collect::<Vec<_>>();
+
                 return_projects.insert(
                     path,
                     Project {
@@ -251,8 +294,10 @@ pub async fn infer_data_from_files(
                         metadata: ProjectMetadata::Modrinth {
                             project: Box::new(project.clone()),
                             version: Box::new(version.clone()),
+                            members: Box::new(team_members),
                         },
                         file_name,
+                        update_available: false,
                     },
                 );
                 continue;
@@ -281,6 +326,7 @@ pub async fn infer_data_from_files(
                     disabled: path.ends_with(".disabled"),
                     metadata: ProjectMetadata::Unknown,
                     file_name,
+                    update_available: false,
                 },
             );
             continue;
@@ -334,6 +380,7 @@ pub async fn infer_data_from_files(
                                 sha512: hash,
                                 disabled: path.ends_with(".disabled"),
                                 file_name,
+                                update_available: false,
                                 metadata: ProjectMetadata::Inferred {
                                     title: Some(
                                         pack.display_name
@@ -398,6 +445,7 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(if pack.name.is_empty() {
                                     pack.modid
@@ -463,6 +511,7 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(pack.name.unwrap_or(pack.id)),
                                 description: pack.description,
@@ -528,6 +577,7 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(
                                     pack.metadata
@@ -593,6 +643,7 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: None,
                                 description: pack.description,
@@ -613,6 +664,7 @@ pub async fn infer_data_from_files(
                 sha512: hash,
                 disabled: path.ends_with(".disabled"),
                 file_name,
+                update_available: false,
                 metadata: ProjectMetadata::Unknown,
             },
         );

@@ -20,15 +20,15 @@
         </span>
       </Card>
       <div class="pages-list">
-        <RouterLink :to="`/instance/${$route.params.id}/`" class="btn">
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
           <BoxIcon />
           Mods
         </RouterLink>
-        <RouterLink :to="`/instance/${$route.params.id}/options`" class="btn">
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
           <SettingsIcon />
           Options
         </RouterLink>
-        <RouterLink :to="`/instance/${$route.params.id}/logs`" class="btn">
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
           <FileIcon />
           Logs
         </RouterLink>

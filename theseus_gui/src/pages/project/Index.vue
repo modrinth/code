@@ -22,7 +22,6 @@
           ]"
         >
           <EnvironmentIndicator
-            :type-only="moderation"
             :client-side="data.client_side"
             :server-side="data.server_side"
             :type="data.project_type"
@@ -30,7 +29,7 @@
         </Categories>
         <hr class="card-divider" />
         <div class="button-group">
-          <Button color="primary" class="instance-button">
+          <Button color="primary" class="instance-button" @click="install">
             <DownloadIcon />
             Install
           </Button>
@@ -209,6 +208,7 @@ import {
   OpenCollectiveIcon,
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
+import { install as pack_install } from '@/helpers/pack'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
@@ -230,11 +230,22 @@ const [data, versions, members, dependencies] = await Promise.all([
 watch(
   () => route.params.id,
   () => {
-    router.go()
+    if (route.params.id)
+      router.go()
   }
 )
 
 dayjs.extend(relativeTime)
+
+async function install() {
+  if (data.value.project_type === 'modpack') {
+    let id = await pack_install(versions.value[0].id)
+
+    let router = useRouter()
+    console.log(id)
+    await router.push(`/instance/${encodeURIComponent(id)}`)
+  }
+}
 </script>
 
 <style scoped lang="scss">

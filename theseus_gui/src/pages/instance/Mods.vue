@@ -54,7 +54,7 @@
           <Button icon-only>
             <TrashIcon />
           </Button>
-          <input id="switch-1" type="checkbox" class="switch stylized-toggle" checked />
+          <input id="switch-1" type="checkbox" class="switch stylized-toggle" :checked="mod.disabled" />
         </div>
       </div>
     </div>
@@ -88,9 +88,11 @@ const projects = shallowRef([])
 for (const project of Object.values(props.instance.projects)) {
   console.log(project)
   if (project.metadata.type === 'modrinth') {
+    let owner = project.metadata.members.find((x) => x.role === 'Owner')
     projects.value.push({
       name: project.metadata.project.title,
-      author: '',
+      slug: project.metadata.project.slug,
+      author: owner ? owner.user.username : null,
       version: project.metadata.version.version_number,
       file_name: project.file_name,
       icon: project.metadata.project.icon_url,
