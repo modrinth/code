@@ -1,11 +1,9 @@
 use std::path::PathBuf;
 
 use bincode::{Decode, Encode};
-use reqwest::Method;
 use serde::{Deserialize, Serialize};
 
 use crate::config::{BINCODE_CONFIG, MODRINTH_API_URL, REQWEST_CLIENT};
-use crate::util::fetch::fetch_json;
 
 const CATEGORIES_DB_TREE: &[u8] = b"categories";
 const LOADERS_DB_TREE: &[u8] = b"loaders";

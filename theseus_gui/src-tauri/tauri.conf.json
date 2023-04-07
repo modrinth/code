@@ -13,9 +13,9 @@
   "tauri": {
     "allowlist": {
       "all": false,
-      "shell": {
-        "all": false,
-        "open": true
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$APPDATA/caches/icons/*"]
       }
     },
     "bundle": {

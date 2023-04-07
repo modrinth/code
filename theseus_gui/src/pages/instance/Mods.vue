@@ -33,9 +33,9 @@
         <div class="table-cell table-text">Author</div>
         <div class="table-cell table-text">Actions</div>
       </div>
-      <div v-for="mod in search" :key="mod.name" class="table-row">
+      <div v-for="mod in search" :key="mod.file_name" class="table-row">
         <div class="table-cell table-text">
-          <Button v-if="mod.outdated" icon-only>
+          <Button v-if="true" icon-only>
             <UpdatedIcon />
           </Button>
           <Button v-else disabled icon-only>
@@ -60,107 +60,6 @@
     </div>
   </Card>
 </template>
-
-<script>
-export default {
-  name: 'Mods',
-  data() {
-    return {
-      searchFilter: '',
-      sortFilter: '',
-      mods: [
-        {
-          name: 'Fabric API',
-          icon: 'https://cdn.modrinth.com/data/P7dR8mSH/icon.png',
-          version: '0.76.0+1.19.4',
-          author: 'modmuss50',
-          description:
-            'Lightweight and modular API providing common hooks and intercompatibility measures utilized by mods using the Fabric toolchain.',
-          outdated: true,
-        },
-        {
-          name: 'Spirit',
-          icon: 'https://cdn.modrinth.com/data/b1LdOZlE/465598dc5d89f67fb8f8de6def21240fa35e3a54.png',
-          version: '2.2.4',
-          author: 'CodexAdrian',
-          description: 'Create your own configurable mob spawner!',
-          outdated: true,
-        },
-        {
-          name: 'Botarium',
-          icon: 'https://cdn.modrinth.com/data/2u6LRnMa/98b286b0d541ad4f9409e0af3df82ad09403f179.gif',
-          version: '2.0.5',
-          author: 'CodexAdrian',
-          description:
-            'A crossplatform API for devs that makes transfer and storage of items, fluids and energy easier, as well as some other helpful things',
-          outdated: true,
-        },
-        {
-          name: 'Tempad',
-          icon: 'https://cdn.modrinth.com/data/gKNwt7xu/icon.gif',
-          version: '2.2.4',
-          author: 'CodexAdrian',
-          description: 'Create a portal to anywhere from anywhere',
-          outdated: false,
-        },
-        {
-          name: 'Sodium',
-          icon: 'https://cdn.modrinth.com/data/AANobbMI/icon.png',
-          version: '0.4.10',
-          author: 'jellysquid3',
-          description: 'Modern rendering engine and client-side optimization mod for Minecraft',
-          outdated: false,
-        },
-      ],
-    }
-  },
-  computed: {
-    search() {
-      const filtered = this.mods.filter((mod) => {
-        return mod.name.toLowerCase().includes(this.searchFilter.toLowerCase())
-      })
-
-      return this.updateSort(filtered, this.sortFilter)
-    },
-  },
-  methods: {
-    updateSort(projects, sort) {
-      switch (sort) {
-        case 'Version':
-          return projects.slice().sort((a, b) => {
-            if (a.version < b.version) {
-              return -1
-            }
-            if (a.version > b.version) {
-              return 1
-            }
-            return 0
-          })
-        case 'Author':
-          return projects.slice().sort((a, b) => {
-            if (a.author < b.author) {
-              return -1
-            }
-            if (a.author > b.author) {
-              return 1
-            }
-            return 0
-          })
-        default:
-          return projects.slice().sort((a, b) => {
-            if (a.name < b.name) {
-              return -1
-            }
-            if (a.name > b.name) {
-              return 1
-            }
-            return 0
-          })
-      }
-    },
-  },
-}
-</script>
 <script setup>
 import {
   Avatar,
@@ -173,6 +72,96 @@ import {
   UpdatedIcon,
   DropdownSelect,
 } from 'omorphia'
+import { computed, ref, shallowRef } from 'vue'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
+
+const props = defineProps({
+  instance: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
+})
+
+const projects = shallowRef([])
+for (const project of Object.values(props.instance.projects)) {
+  console.log(project)
+  if (project.metadata.type === 'modrinth') {
+    projects.value.push({
+      name: project.metadata.project.title,
+      author: '',
+      version: project.metadata.version.version_number,
+      file_name: project.file_name,
+      icon: project.metadata.project.icon_url,
+      disabled: project.disabled,
+    })
+  } else if (project.metadata.type === 'inferred') {
+    projects.value.push({
+      name: project.metadata.title ?? project.file_name,
+      author: project.metadata.authors[0],
+      version: project.metadata.version,
+      file_name: project.file_name,
+      icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
+      disabled: project.disabled,
+    })
+  } else {
+    projects.value.push({
+      name: project.file_name,
+      author: '',
+      version: null,
+      file_name: project.file_name,
+      icon: null,
+      disabled: project.disabled,
+    })
+  }
+}
+
+const searchFilter = ref('')
+const sortFilter = ref('')
+
+const search = computed(() => {
+  const filtered = projects.value.filter((mod) => {
+    return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+  })
+
+  return updateSort(filtered, sortFilter.value)
+})
+
+function updateSort(projects, sort) {
+  switch (sort) {
+    case 'Version':
+      return projects.slice().sort((a, b) => {
+        if (a.version < b.version) {
+          return -1
+        }
+        if (a.version > b.version) {
+          return 1
+        }
+        return 0
+      })
+    case 'Author':
+      return projects.slice().sort((a, b) => {
+        if (a.author < b.author) {
+          return -1
+        }
+        if (a.author > b.author) {
+          return 1
+        }
+        return 0
+      })
+    default:
+      return projects.slice().sort((a, b) => {
+        if (a.name < b.name) {
+          return -1
+        }
+        if (a.name > b.name) {
+          return 1
+        }
+        return 0
+      })
+  }
+}
 </script>
 
 <style scoped lang="scss">

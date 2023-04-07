@@ -2,13 +2,9 @@
 import { RouterLink } from 'vue-router'
 import { Card } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
-import { convertFileSrc } from '@tauri-apps/api/tauri';
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const props = defineProps({
-  display: {
-    type: String,
-    default: '',
-  },
   instance: {
     type: Object,
     default() {
@@ -20,40 +16,22 @@ const props = defineProps({
 
 <template>
   <div>
-    <RouterLink
-      v-if="display === 'list'"
-      class="instance-list-item"
-      :to="`/instance/${props.instance.id}`"
-      >{{ props.instance.name }}</RouterLink
-    >
-    <Card
-      v-else-if="display === 'card'"
-      class="instance-card-item"
-      @click="$router.push(`/instance/${props.instance.id}`)"
-    >
-      <img :src="convertFileSrc(props.instance.metadata.icon)" alt="Trending mod card" />
-      <div class="project-info">
-        <p class="title">{{ props.instance.metadata.name }}</p>
-        <p class="description">{{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}</p>
-      </div>
-      <div class="cta"><PlayIcon /></div>
-    </Card>
+    <RouterLink :to="`/instance/${encodeURIComponent(props.instance.path)}`">
+      <Card class="instance-card-item">
+        <img :src="convertFileSrc(props.instance.metadata.icon)" alt="Trending mod card" />
+        <div class="project-info">
+          <p class="title">{{ props.instance.metadata.name }}</p>
+          <p class="description">
+            {{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}
+          </p>
+        </div>
+        <div class="cta"><PlayIcon /></div>
+      </Card>
+    </RouterLink>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.instance-list-item {
-  display: inline-block;
-  margin: 0.25rem auto;
-  cursor: pointer;
-  transition: all ease-out 0.1s;
-  font-size: 0.8rem;
-  color: var(--color-primary);
-  &:hover {
-    text-decoration: none;
-    filter: brightness(150%);
-  }
-}
 .instance-card-item {
   display: flex;
   flex-direction: column;
@@ -62,6 +40,7 @@ const props = defineProps({
   cursor: pointer;
   padding: 0.75rem;
   transition: 0.1s ease-in-out all;
+
   &:hover {
     filter: brightness(0.85);
     .cta {
@@ -69,6 +48,7 @@ const props = defineProps({
       bottom: 4.5rem;
     }
   }
+
   .cta {
     position: absolute;
     display: flex;
@@ -84,7 +64,7 @@ const props = defineProps({
     transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
     cursor: pointer;
     svg {
-      color: #fff;
+      color: var(--color-accent-contrast);
       width: 1.5rem;
       height: 1.5rem;
     }
@@ -114,6 +94,7 @@ const props = defineProps({
       display: inline-block;
     }
     .description {
+      color: var(--color-base);
       display: -webkit-box;
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
@@ -124,11 +105,6 @@ const props = defineProps({
       margin: 0.25rem 0 0;
       text-transform: capitalize;
     }
-  }
-}
-.dark-mode {
-  .cta > svg {
-    color: #000;
   }
 }
 </style>

@@ -18,6 +18,7 @@ pub struct Project {
     pub sha512: String,
     pub disabled: bool,
     pub metadata: ProjectMetadata,
+    pub file_name: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -50,7 +51,7 @@ pub struct ModrinthProject {
 }
 
 /// A specific version of a project
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthVersion {
     pub id: String,
     pub project_id: String,
@@ -73,7 +74,7 @@ pub struct ModrinthVersion {
     pub loaders: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthVersionFile {
     pub hashes: HashMap<String, String>,
     pub url: String,
@@ -83,7 +84,7 @@ pub struct ModrinthVersionFile {
     pub file_type: Option<FileType>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Dependency {
     pub version_id: Option<String>,
     pub project_id: Option<String>,
@@ -91,7 +92,7 @@ pub struct Dependency {
     pub dependency_type: DependencyType,
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone)]
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
     Required,
@@ -120,7 +121,10 @@ pub enum FileType {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ProjectMetadata {
-    Modrinth(Box<ModrinthProject>),
+    Modrinth {
+        project: Box<ModrinthProject>,
+        version: Box<ModrinthVersion>,
+    },
     Inferred {
         title: Option<String>,
         description: Option<String>,
@@ -198,12 +202,6 @@ pub async fn infer_data_from_files(
         file_path_hashes.insert(hash, path.clone());
     }
 
-    // TODO: add disabled mods
-    // TODO: add retrying
-    #[derive(Deserialize)]
-    pub struct ModrinthVersion {
-        pub project_id: String,
-    }
     let files: HashMap<String, ModrinthVersion> = REQWEST_CLIENT
         .post(format!("{}version_files", MODRINTH_API_URL))
         .json(&json!({
@@ -235,18 +233,26 @@ pub async fn infer_data_from_files(
     let mut further_analyze_projects: Vec<(String, PathBuf)> = Vec::new();
 
     for (hash, path) in file_path_hashes {
-        if let Some(file) = files.get(&hash) {
+        if let Some(version) = files.get(&hash) {
             if let Some(project) =
-                projects.iter().find(|x| file.project_id == x.id)
+                projects.iter().find(|x| version.project_id == x.id)
             {
+                let file_name = path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string();
+
                 return_projects.insert(
                     path,
                     Project {
                         sha512: hash,
                         disabled: false,
-                        metadata: ProjectMetadata::Modrinth(Box::new(
-                            project.clone(),
-                        )),
+                        metadata: ProjectMetadata::Modrinth {
+                            project: Box::new(project.clone()),
+                            version: Box::new(version.clone()),
+                        },
+                        file_name,
                     },
                 );
                 continue;
@@ -257,6 +263,12 @@ pub async fn infer_data_from_files(
     }
 
     for (hash, path) in further_analyze_projects {
+        let file_name = path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string();
+
         let zip_file_reader = if let Ok(zip_file_reader) =
             ZipFileReader::new(path.clone()).await
         {
@@ -268,6 +280,7 @@ pub async fn infer_data_from_files(
                     sha512: hash,
                     disabled: path.ends_with(".disabled"),
                     metadata: ProjectMetadata::Unknown,
+                    file_name,
                 },
             );
             continue;
@@ -320,6 +333,7 @@ pub async fn infer_data_from_files(
                             Project {
                                 sha512: hash,
                                 disabled: path.ends_with(".disabled"),
+                                file_name,
                                 metadata: ProjectMetadata::Inferred {
                                     title: Some(
                                         pack.display_name
@@ -383,6 +397,7 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(if pack.name.is_empty() {
                                     pack.modid
@@ -447,6 +462,7 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(pack.name.unwrap_or(pack.id)),
                                 description: pack.description,
@@ -511,6 +527,7 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(
                                     pack.metadata
@@ -575,6 +592,7 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: None,
                                 description: pack.description,
@@ -594,6 +612,7 @@ pub async fn infer_data_from_files(
             Project {
                 sha512: hash,
                 disabled: path.ends_with(".disabled"),
+                file_name,
                 metadata: ProjectMetadata::Unknown,
             },
         );

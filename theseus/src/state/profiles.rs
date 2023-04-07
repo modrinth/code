@@ -2,6 +2,7 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::BINCODE_CONFIG;
 use crate::data::DirectoryInfo;
 use crate::state::projects::Project;
+use crate::util::fetch::write_cached_icon;
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
@@ -20,15 +21,10 @@ pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
-pub const SUPPORTED_ICON_FORMATS: &[&str] = &[
-    "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
-    "mp4",
-];
 
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
-    #[serde(skip)]
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -124,24 +120,15 @@ impl Profile {
     #[tracing::instrument]
     pub async fn set_icon<'a>(
         &'a mut self,
-        icon: &'a Path,
+        cache_dir: &Path,
+        semaphore: &Semaphore,
+        icon: bytes::Bytes,
+        file_name: &str,
     ) -> crate::Result<&'a mut Self> {
-        let ext = icon
-            .extension()
-            .and_then(std::ffi::OsStr::to_str)
-            .unwrap_or("");
-
-        if SUPPORTED_ICON_FORMATS.contains(&ext) {
-            let file_name = format!("icon.{ext}");
-            fs::copy(icon, &self.path.join(&file_name)).await?;
-            self.metadata.icon = Some(self.path.join(&file_name));
-            Ok(self)
-        } else {
-            Err(crate::ErrorKind::InputError(format!(
-                "Unsupported image type: {ext}"
-            ))
-            .into())
-        }
+        let file =
+            write_cached_icon(file_name, cache_dir, icon, &semaphore).await?;
+        self.metadata.icon = Some(file);
+        Ok(self)
     }
 
     pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {

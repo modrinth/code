@@ -1,9 +1,9 @@
 <script setup>
 import GridDisplay from '@/components/GridDisplay.vue'
-import {shallowRef} from 'vue'
+import { shallowRef } from 'vue'
 import { list } from '@/helpers/profile.js'
 
-const profiles = await list();
+const profiles = await list()
 const instances = shallowRef(Object.values(profiles))
 </script>
 

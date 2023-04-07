@@ -356,14 +356,6 @@ const handleReset = async () => {
       margin: 2rem;
       text-align: center;
     }
-
-    .result-project-item {
-      a {
-        &:hover {
-          text-decoration: none !important;
-        }
-      }
-    }
   }
 }
 

@@ -137,7 +137,15 @@ pub async fn profile_create(
     let path = canonicalize(&path)?;
     let mut profile = Profile::new(name, game_version, path.clone()).await?;
     if let Some(ref icon) = icon {
-        profile.set_icon(icon).await?;
+        let bytes = tokio::fs::read(icon).await?;
+        profile
+            .set_icon(
+                &*state.directories.caches_dir(),
+                &state.io_semaphore,
+                bytes::Bytes::from(bytes),
+                &*icon.to_string_lossy().to_string(),
+            )
+            .await?;
     }
     if let Some((loader_version, loader)) = loader {
         profile.metadata.loader = loader;
