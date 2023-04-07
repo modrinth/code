@@ -1,20 +1,46 @@
 <script setup>
-import { ref } from 'vue'
-import { Card, Button, Slider, DropdownSelect } from 'omorphia'
+import { ref, watch } from 'vue'
+import { Card, Slider, DropdownSelect, Button, SearchIcon, PlayIcon } from 'omorphia'
+import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
+import { get, set, deepEqual } from '@/helpers/settings'
 
-const javaMemory = ref(1024)
-const javaArgs = ref('')
-const javaPath = ref('')
-const fullscreen = ref(false)
+// Original object to track changes
+const originalSettings = ref(await get())
+// Object to bind
+const settings = ref(await get())
+
+const saveButton = ref(null)
+
+watch(settings.value, (newSettings) => {
+  // Validate the changed state
+  if (newSettings.custom_java_args.length === 0) settings.value.custom_java_args = []
+  if (newSettings.custom_env_args.length === 0) settings.value.custom_env_args = []
+  if (newSettings.java_8_path === '') settings.value.java_8_path = null
+  if (newSettings.java_17_path === '') settings.value.java_17_path = null
+  if (newSettings.hooks.pre_launch === '') delete settings.value.hooks.pre_launch
+  if (newSettings.hooks.wrapper === '') delete settings.value.hooks.wrapper
+  if (newSettings.hooks.post_exit === '') delete settings.value.hooks.post_exit
+
+  settings.value.max_concurrent_downloads = parseInt(newSettings.max_concurrent_downloads)
+
+  if (deepEqual(originalSettings.value, settings.value)) saveButton.value.$el.style.opacity = 0
+  else saveButton.value.$el.style.opacity = 1
+})
 
 const themeStore = useTheming()
 
 const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
+const saveJavaPath = () => {}
+const saveSettings = async () => {
+  await set(settings.value)
+  saveButton.value.$el.style.opacity = 0
+}
 </script>
 
 <template>
   <div>
+    <Button ref="saveButton" color="primary" class="save-btn" @click="saveSettings">Save</Button>
     <Card class="theming">
       <h2>Themes</h2>
       <div class="setting-row">
@@ -35,103 +61,103 @@ const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
     <Card class="settings-card">
       <h2 class="settings-title">Java</h2>
       <div class="settings-group">
-        <h3>Installation</h3>
-        <input
-          v-model="javaPath"
-          type="text"
-          class="input installation-input"
-          placeholder="/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home"
-        />
-        <span class="installation-buttons">
-          <Button @click="saveJavaPath">
-            <SearchIcon />
-            Auto Detect
-          </Button>
-          <Button @click="saveJavaPath">
-            <BrowseIcon />
-            Browse
-          </Button>
-          <Button @click="saveJavaPath">
-            <PlayIcon />
-            Test
-          </Button>
-        </span>
+        <h3>Java 17 Location</h3>
+        <div class="toggle-setting">
+          <input
+            v-model="settings.java_17_path"
+            type="text"
+            class="input installation-input"
+            placeholder="/path/to/java17"
+          />
+          <span class="installation-buttons">
+            <Button @click="saveJavaPath">
+              <SearchIcon />
+              Auto Detect
+            </Button>
+            <Button @click="saveJavaPath">
+              <BrowseIcon />
+              Browse
+            </Button>
+            <Button @click="saveJavaPath">
+              <PlayIcon />
+              Test
+            </Button>
+          </span>
+        </div>
+      </div>
+      <div class="settings-group">
+        <h3>Java 8 Location</h3>
+        <div class="toggle-setting">
+          <input
+            v-model="settings.java_8_path"
+            type="text"
+            class="input installation-input"
+            placeholder="/path/to/java8"
+          />
+          <span class="installation-buttons">
+            <Button @click="saveJavaPath">
+              <SearchIcon />
+              Auto Detect
+            </Button>
+            <Button @click="saveJavaPath">
+              <BrowseIcon />
+              Browse
+            </Button>
+            <Button @click="saveJavaPath">
+              <PlayIcon />
+              Test
+            </Button>
+          </span>
+        </div>
       </div>
       <hr class="card-divider" />
-      <div class="settings-group">
-        <h3>Arguments</h3>
-        <input v-model="javaArgs" type="text" class="input installation-input" />
+      <div class="toggle-setting">
+        <h3>Java Arguments</h3>
+        <input v-model="settings.custom_java_args" type="text" class="input installation-input" />
+      </div>
+      <div class="toggle-setting">
+        <h3>Environment Arguments</h3>
+        <input v-model="settings.custom_env_args" type="text" class="input installation-input" />
       </div>
       <hr class="card-divider" />
       <div class="settings-group">
         <div class="sliders">
           <span class="slider">
             Minimum Memory
-            <Slider v-model="javaMemory" :min="1024" :max="8192" :step="1024" />
+            <Slider v-model="settings.memory.minimum" :min="1024" :max="8192" :step="1024" />
           </span>
           <span class="slider">
             Maximum Memory
-            <Slider v-model="javaMemory" :min="1024" :max="8192" :step="1024" />
+            <Slider v-model="settings.memory.maximum" :min="1024" :max="8192" :step="1024" />
           </span>
         </div>
       </div>
     </Card>
     <Card class="settings-card">
-      <h2 class="settings-title">Window</h2>
+      <h2 class="settings-title">Window Size</h2>
       <div class="settings-group">
         <div class="settings-group">
           <div class="sliders">
             <span class="slider">
               Width
-              <Slider v-model="javaMemory" :min="1024" :max="8192" :step="1024" />
+              <Slider v-model="settings.game_resolution[0]" :min="400" :max="2562" :step="2" />
             </span>
             <span class="slider">
               Height
-              <Slider v-model="javaMemory" :min="1024" :max="8192" :step="1024" />
+              <Slider v-model="settings.game_resolution[1]" :min="400" :max="2562" :step="2" />
             </span>
-          </div>
-          <div class="toggle-setting">
-            Start in Fullscreen
-            <input
-              id="fullscreen"
-              v-model="fullscreen"
-              type="checkbox"
-              name="fullscreen"
-              class="switch stylized-toggle"
-            />
           </div>
         </div>
         <hr class="card-divider" />
         <div class="settings-group">
           <h3>Console</h3>
           <div class="toggle-setting">
-            Show console while game is running
+            Maximum Concurrent Downloads
             <input
-              id="fullscreen"
-              v-model="fullscreen"
-              type="checkbox"
-              name="fullscreen"
-              class="switch stylized-toggle"
-            />
-          </div>
-          <div class="toggle-setting">
-            Close console when game quits
-            <input
-              id="fullscreen"
-              v-model="fullscreen"
-              type="checkbox"
-              name="fullscreen"
-              class="switch stylized-toggle"
-            />
-          </div>
-          <div class="toggle-setting">
-            Show console when game crashes
-            <input
-              id="fullscreen"
-              v-model="fullscreen"
-              type="checkbox"
-              name="fullscreen"
-              class="switch stylized-toggle"
+              v-model="settings.max_concurrent_downloads"
+              type="text"
+              name="concurrent-downloads"
+              class="concurrent_downloads"
             />
           </div>
         </div>
@@ -142,15 +168,15 @@ const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
       <div class="settings-group">
         <div class="toggle-setting">
           Pre Launch
-          <input v-model="javaArgs" type="text" class="input" />
+          <input ref="javaArgs" v-model="settings.hooks.pre_launch" type="text" class="input" />
         </div>
         <div class="toggle-setting">
           Wrapper
-          <input v-model="javaArgs" type="text" class="input" />
+          <input ref="javaArgs" v-model="settings.hooks.wrapper" type="text" class="input" />
         </div>
         <div class="toggle-setting">
           Post Launch
-          <input v-model="javaArgs" type="text" class="input" />
+          <input ref="javaArgs" v-model="settings.hooks.post_exit" type="text" class="input" />
         </div>
       </div>
     </Card>
@@ -158,9 +184,22 @@ const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
 </template>
 
 <style lang="scss">
+.save-btn {
+  position: absolute !important;
+  z-index: 100;
+  top: 4rem;
+  right: 4rem;
+  opacity: 0;
+  transition: 0.2s ease-in-out all;
+}
+
 .slider-input {
-  width: 4rem !important;
+  width: 5rem !important;
   flex-basis: 5rem !important;
+}
+
+.concurrent_downloads {
+  width: 4rem !important;
 }
 
 .installation-input {
