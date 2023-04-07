@@ -1,5 +1,8 @@
 //! Theseus profile management interface
-use crate::{state::MinecraftChild, auth::{refresh, self}};
+use crate::{
+    auth::{self, refresh},
+    state::MinecraftChild,
+};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -92,7 +95,6 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
     }
 }
 
-
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument(skip_all)]
@@ -100,7 +102,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
 
     // Get default account and refresh credentials (preferred way to log in)
-    let default_account = state.settings.read().await.default_user.clone();
+    let default_account = state.settings.read().await.default_user;
     let credentials = if let Some(default_account) = default_account {
         refresh(default_account, false).await?
     } else {
