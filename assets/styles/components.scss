@@ -561,6 +561,14 @@
     margin-bottom: 16px;
   }
 
+  ul,
+  ol {
+    ul,
+    ol {
+      margin-bottom: 0;
+    }
+  }
+
   li,
   p {
     padding: 0;
