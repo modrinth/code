@@ -1,8 +1,19 @@
 <template>
-  <label :class="{ 'long-style': longStyle }" @drop.prevent="handleDrop" @dragover.prevent>
+  <label
+    :class="{ 'long-style': longStyle }"
+    :disabled="disabled"
+    @drop.prevent="handleDrop"
+    @dragover.prevent
+  >
     <slot />
     {{ prompt }}
-    <input type="file" :multiple="multiple" :accept="accept" @change="handleChange" />
+    <input
+      type="file"
+      :multiple="multiple"
+      :accept="accept"
+      :disabled="disabled"
+      @change="handleChange"
+    />
   </label>
 </template>
 
@@ -40,6 +51,10 @@ export default {
       default: false,
     },
     longStyle: {
+      type: Boolean,
+      default: false,
+    },
+    disabled: {
       type: Boolean,
       default: false,
     },
