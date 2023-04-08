@@ -17,6 +17,7 @@ import {
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
+import { loading_listener } from '@/helpers/events'
 
 // Pull search store
 const searchStore = useSearch()
@@ -36,6 +37,13 @@ const isClearDisabled = computed({
     if (selectedVersions.value.length > 0) return false
     return true
   },
+})
+
+await loading_listener((event) => {
+  // event.event is the event name (useful if you want to use a single callback fn for multiple event types)
+  // event.payload is the payload object
+  console.log('listenr')
+  console.log(event)
 })
 
 const categories = await get_categories()
