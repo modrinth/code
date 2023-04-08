@@ -144,7 +144,7 @@ pub enum ProjectMetadata {
     Modrinth {
         project: Box<ModrinthProject>,
         version: Box<ModrinthVersion>,
-        members: Box<Vec<ModrinthTeamMember>>,
+        members: Vec<ModrinthTeamMember>,
     },
     Inferred {
         title: Option<String>,
@@ -192,7 +192,7 @@ async fn read_icon_from_file(
                         &icon_path,
                         cache_dir,
                         bytes,
-                        &io_semaphore,
+                        io_semaphore,
                     )
                     .await?;
 
@@ -263,7 +263,7 @@ pub async fn infer_data_from_files(
         .json::<Vec<Vec<ModrinthTeamMember>>>()
         .await?
         .into_iter()
-        .flat_map(|x| x)
+        .flatten()
         .collect();
 
     let mut return_projects = HashMap::new();
@@ -294,7 +294,7 @@ pub async fn infer_data_from_files(
                         metadata: ProjectMetadata::Modrinth {
                             project: Box::new(project.clone()),
                             version: Box::new(version.clone()),
-                            members: Box::new(team_members),
+                            members: team_members,
                         },
                         file_name,
                         update_available: false,

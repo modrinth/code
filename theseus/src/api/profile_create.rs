@@ -140,10 +140,10 @@ pub async fn profile_create(
         let bytes = tokio::fs::read(icon).await?;
         profile
             .set_icon(
-                &*state.directories.caches_dir(),
+                &state.directories.caches_dir(),
                 &state.io_semaphore,
                 bytes::Bytes::from(bytes),
-                &*icon.to_string_lossy().to_string(),
+                &icon.to_string_lossy(),
             )
             .await?;
     }

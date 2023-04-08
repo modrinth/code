@@ -33,7 +33,6 @@ async fn main() -> theseus::Result<()> {
     let st = State::get().await?;
     st.settings.write().await.max_concurrent_downloads = 10;
 
-    return Ok(());
     // Clear profiles
     println!("Clearing profiles.");
     {

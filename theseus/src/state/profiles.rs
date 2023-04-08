@@ -124,7 +124,7 @@ impl Profile {
         file_name: &str,
     ) -> crate::Result<&'a mut Self> {
         let file =
-            write_cached_icon(file_name, cache_dir, icon, &semaphore).await?;
+            write_cached_icon(file_name, cache_dir, icon, semaphore).await?;
         self.metadata.icon = Some(file);
         Ok(self)
     }
