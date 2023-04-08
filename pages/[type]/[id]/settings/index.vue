@@ -15,7 +15,7 @@
           <span class="label__title size-card-header">Project information</span>
         </h3>
       </div>
-      <label for="project-name">
+      <label for="project-icon">
         <span class="label__title">Icon</span>
       </label>
       <div class="input-group">
@@ -27,6 +27,7 @@
         />
         <div class="input-stack">
           <FileInput
+            id="project-icon"
             :max-size="262144"
             :show-icon="true"
             accept="image/png,image/jpeg,image/gif,image/webp"
