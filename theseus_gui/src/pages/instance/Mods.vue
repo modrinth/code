@@ -96,7 +96,6 @@ const props = defineProps({
 
 const projects = shallowRef([])
 for (const project of Object.values(props.instance.projects)) {
-  console.log(project)
   if (project.metadata.type === 'modrinth') {
     let owner = project.metadata.members.find((x) => x.role === 'Owner')
     projects.value.push({
