@@ -95,7 +95,7 @@ list().then(
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #40434A;
+      background: #40434a;
       text-align: center;
       padding: 0.5rem 1rem;
 
