@@ -34,6 +34,11 @@ export default defineNuxtPlugin((nuxtApp) => {
   nuxtApp.provide('formatCategory', formatCategory)
   nuxtApp.provide('formatCategoryHeader', formatCategoryHeader)
   nuxtApp.provide('formatProjectStatus', formatProjectStatus)
+
+  /*
+    Only use on the complete list of versions for a project, partial lists will generate
+    the wrong version slugs
+  */
   nuxtApp.provide('computeVersions', (versions, members) => {
     const visitedVersions = []
     const returnVersions = []

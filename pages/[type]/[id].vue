@@ -834,7 +834,14 @@ if (
 }
 
 versions.value = data.$computeVersions(versions.value, allMembers.value)
-featuredVersions.value = data.$computeVersions(featuredVersions.value, allMembers.value)
+
+// Q: Why do this instead of computing the versions of featuredVersions?
+// A: It will incorrectly generate the version slugs because it doesn't have the full context of
+//    all the versions. For example, if version 1.1.0 for Forge is featured but 1.1.0 for Fabric
+//    is not, but the Fabric one was uploaded first, the Forge version would link to the Fabric
+///   version
+const featuredIds = featuredVersions.value.map((x) => x.id)
+featuredVersions.value = versions.value.filter((version) => featuredIds.includes(version.id))
 
 featuredVersions.value.sort((a, b) => {
   const aLatest = a.game_versions[a.game_versions.length - 1]

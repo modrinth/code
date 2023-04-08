@@ -1311,8 +1311,12 @@ export default defineNuxtComponent({
       ])
 
       const newCreatedVersions = this.$computeVersions(versions, this.members)
+      const featuredIds = featuredVersions.map((x) => x.id)
       this.$emit('update:versions', newCreatedVersions)
-      this.$emit('update:featuredVersions', this.$computeVersions(featuredVersions, this.members))
+      this.$emit(
+        'update:featuredVersions',
+        newCreatedVersions.filter((version) => featuredIds.includes(version.id))
+      )
       this.$emit('update:dependencies', dependencies)
 
       return newCreatedVersions
