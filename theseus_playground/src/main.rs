@@ -31,7 +31,7 @@ async fn main() -> theseus::Result<()> {
 
     // Initialize state
     let st = State::get().await?;
-    st.settings.write().await.max_concurrent_downloads = 1;
+    st.settings.write().await.max_concurrent_downloads = 10;
 
     // Clear profiles
     println!("Clearing profiles.");
@@ -63,8 +63,6 @@ async fn main() -> theseus::Result<()> {
     })
     .await?;
     State::sync().await?;
-
-
 
     // Attempt to run game
     if auth::users().await?.len() == 0 {

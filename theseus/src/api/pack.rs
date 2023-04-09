@@ -1,10 +1,13 @@
-use crate::config::{MODRINTH_API_URL, REQWEST_CLIENT};
+use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::state::{ModrinthProject, ModrinthVersion, SideType};
-use crate::util::fetch::{fetch, fetch_mirrors, write, write_cached_icon};
+use crate::util::fetch::{
+    fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
+};
 use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
 use futures::TryStreamExt;
+use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::io::Cursor;
@@ -70,12 +73,15 @@ enum PackDependency {
 pub async fn install_pack_from_version_id(
     version_id: String,
 ) -> crate::Result<PathBuf> {
-    let version: ModrinthVersion = REQWEST_CLIENT
-        .get(format!("{}version/{}", MODRINTH_API_URL, version_id))
-        .send()
-        .await?
-        .json()
-        .await?;
+    let state = State::get().await?;
+
+    let version: ModrinthVersion = fetch_json(
+        Method::GET,
+        &format!("{}version/{}", MODRINTH_API_URL, version_id),
+        None,
+        &state.io_semaphore,
+    )
+    .await?;
 
     let (url, hash) =
         if let Some(file) = version.files.iter().find(|x| x.primary) {
@@ -92,28 +98,19 @@ pub async fn install_pack_from_version_id(
             )
         })?;
 
-    let file = async {
-        let state = &State::get().await?;
-        let semaphore = state.io_semaphore.acquire().await?;
-        fetch(&url, hash.map(|x| &**x), &semaphore).await
-    }
-    .await?;
+    let file = fetch(&url, hash.map(|x| &**x), &state.io_semaphore).await?;
 
-    let project: ModrinthProject = REQWEST_CLIENT
-        .get(format!(
-            "{}project/{}",
-            MODRINTH_API_URL, version.project_id
-        ))
-        .send()
-        .await?
-        .json()
-        .await?;
+    let project: ModrinthProject = fetch_json(
+        Method::GET,
+        &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
+        None,
+        &state.io_semaphore,
+    )
+    .await?;
 
     let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
-        let semaphore = state.io_semaphore.acquire().await?;
-
-        let icon_bytes = fetch(&icon_url, None, &semaphore).await?;
+        let icon_bytes = fetch(&icon_url, None, &state.io_semaphore).await?;
 
         let filename = icon_url.rsplit('/').next();
 
@@ -123,7 +120,7 @@ pub async fn install_pack_from_version_id(
                     filename,
                     &state.directories.caches_dir(),
                     icon_bytes,
-                    &semaphore,
+                    &state.io_semaphore,
                 )
                 .await?,
             )
@@ -244,8 +241,6 @@ async fn install_pack(
                         }
                     }
 
-                    let permit = state.io_semaphore.acquire().await?;
-
                     let file = fetch_mirrors(
                         &project
                             .downloads
@@ -253,7 +248,7 @@ async fn install_pack(
                             .map(|x| &**x)
                             .collect::<Vec<&str>>(),
                         project.hashes.get(&PackFileHash::Sha1).map(|x| &**x),
-                        &permit,
+                        &state.io_semaphore,
                     )
                     .await?;
 
@@ -263,7 +258,8 @@ async fn install_pack(
                         match path {
                             Component::CurDir | Component::Normal(_) => {
                                 let path = profile.join(project.path);
-                                write(&path, &file, &permit).await?;
+                                write(&path, &file, &state.io_semaphore)
+                                    .await?;
                             }
                             _ => {}
                         };
@@ -312,9 +308,12 @@ async fn install_pack(
                         }
 
                         if new_path.file_name().is_some() {
-                            let permit = state.io_semaphore.acquire().await?;
-                            write(&profile.join(new_path), &content, &permit)
-                                .await?;
+                            write(
+                                &profile.join(new_path),
+                                &content,
+                                &state.io_semaphore,
+                            )
+                            .await?;
                         }
                     }
                 }

@@ -13,9 +13,9 @@
   "tauri": {
     "allowlist": {
       "all": false,
-      "shell": {
-        "all": false,
-        "open": true
+      "protocol": {
+        "asset": true,
+        "assetScope": ["$APPDATA/caches/icons/*"]
       }
     },
     "bundle": {
@@ -52,7 +52,7 @@
       }
     },
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
     },
     "updater": {
       "active": false

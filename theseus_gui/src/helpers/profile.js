@@ -35,12 +35,12 @@ export async function list() {
 
 // Run Minecraft using a pathed profile
 // Returns PID of child
-export async function run(path, credentials) {
-  return await invoke('profile_run', { path, credentials })
+export async function run(path) {
+  return await invoke('profile_run', { path })
 }
 
 // Run Minecraft using a pathed profile
 // Waits for end
-export async function run_wait(path, credentials) {
-  return await invoke('profile_run_wait', { path, credentials })
+export async function run_wait(path) {
+  return await invoke('profile_run_wait', { path })
 }
