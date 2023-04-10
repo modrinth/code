@@ -12,3 +12,15 @@ import { appWindow } from '@tauri-apps/api/window'
 export async function loading_listener(callback) {
   return await appWindow.listen('loading', (event) => callback(event.payload))
 }
+
+export async function process_listener(callback) {
+  return await appWindow.listen('process', (event) => callback(event.payload))
+}
+
+export async function profile_listener(callback) {
+  return await appWindow.listen('profile', (event) => callback(event.payload))
+}
+
+export async function warning_listener(callback) {
+  return await appWindow.listen('warning', (event) => callback(event.payload))
+}

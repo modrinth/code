@@ -139,7 +139,7 @@ pub async fn run_credentials(
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == profile.metadata.game_version.as_ref())
+        .find(|it| it.id == profile.metadata.game_version)
         .ok_or_else(|| {
             crate::ErrorKind::LauncherError(format!(
                 "Invalid or unknown Minecraft version: {}",

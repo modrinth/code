@@ -1,9 +1,7 @@
 use crate::api::Result;
 use theseus::{tags::{
     Category, DonationPlatform, GameVersion, License, Loader, TagBundle,
-}, window_scoped, loading, WINDOW};
-use tokio::task::LocalKey;
-
+}, window_scoped};
 
 /// Gets cached category tags from the database
 #[tauri::command]
