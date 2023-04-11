@@ -9,17 +9,16 @@ import { get, set, deepEqual } from '@/helpers/settings'
 const originalSettings = ref(await get())
 // Object to bind
 const settings = ref(await get())
-console.log(settings.value)
 
 const saveButton = ref(null)
 
-if (!settings.value.java_globals.JAVA_8) settings.value.java_globals.JAVA_8 = { path: '' }
-if (!settings.value.java_globals.JAVA_17) settings.value.java_globals.JAVA_17 = { path: '' }
+if (!settings.value.java_globals.JAVA_8)
+  settings.value.java_globals.JAVA_8 = { path: '', version: '' }
+if (!settings.value.java_globals.JAVA_17)
+  settings.value.java_globals.JAVA_17 = { path: '', version: '' }
 
 watch(settings.value, (newSettings) => {
   // Validate the changed state
-  if (newSettings.java_globals.JAVA_8?.path === '') delete settings.value.java_globals.JAVA_8
-  if (newSettings.java_globals.JAVA_17?.path === '') delete settings.value.java_globals.JAVA_17
   if (newSettings.hooks.pre_launch === '') delete settings.value.hooks.pre_launch
   if (newSettings.hooks.wrapper === '') delete settings.value.hooks.wrapper
   if (newSettings.hooks.post_exit === '') delete settings.value.hooks.post_exit
@@ -29,8 +28,10 @@ watch(settings.value, (newSettings) => {
   if (deepEqual(originalSettings.value, settings.value)) saveButton.value.$el.style.opacity = 0
   else saveButton.value.$el.style.opacity = 1
 
-  if (!settings.value.java_globals.JAVA_8) settings.value.java_globals.JAVA_8 = { path: '' }
-  if (!settings.value.java_globals.JAVA_17) settings.value.java_globals.JAVA_17 = { path: '' }
+  if (!settings.value.java_globals.JAVA_8)
+    settings.value.java_globals.JAVA_8 = { path: '', version: '' }
+  if (!settings.value.java_globals.JAVA_17)
+    settings.value.java_globals.JAVA_17 = { path: '', version: '' }
 })
 
 const themeStore = useTheming()
@@ -38,7 +39,6 @@ const themeStore = useTheming()
 const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
 const saveJavaPath = () => {}
 const saveSettings = async () => {
-  console.log('saving', settings.value)
   await set(settings.value)
   saveButton.value.$el.style.opacity = 0
 }
