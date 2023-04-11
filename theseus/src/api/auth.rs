@@ -57,7 +57,6 @@ pub async fn authenticate(
     Ok(credentials)
 }
 
-
 /// Refresh some credentials using Hydra, if needed
 /// This is the primary desired way to get credentials, as it will also refresh them.
 #[tracing::instrument]

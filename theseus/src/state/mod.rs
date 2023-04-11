@@ -2,7 +2,7 @@
 use crate::config::sled_config;
 use crate::jre;
 use std::sync::Arc;
-use tokio::sync::{Mutex, OnceCell, RwLock, Semaphore};
+use tokio::sync::{OnceCell, RwLock, Semaphore};
 
 // Submodules
 mod dirs;
@@ -38,12 +38,12 @@ pub use self::java_globals::*;
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
-    /// Database, used to store some information
-    pub(self) database: sled::Db,
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
     /// Semaphore used to limit concurrent I/O and avoid errors
-    pub io_semaphore: Semaphore,
+    pub io_semaphore: RwLock<Semaphore>,
+    /// Stored maximum number of sempahores of current io_semaphore
+    pub io_semaphore_max: RwLock<u32>,
     /// Launcher metadata
     pub metadata: Metadata,
     // TODO: settings API
@@ -82,13 +82,15 @@ impl State {
                         Settings::init(&directories.settings_file()).await?;
 
                     // Loose initializations
+                    let io_semaphore_max = settings.max_concurrent_downloads;
+
                     let io_semaphore =
-                        Semaphore::new(settings.max_concurrent_downloads);
+                        RwLock::new(Semaphore::new(io_semaphore_max));
 
                     // Launcher data
                     let (metadata, profiles) = tokio::try_join! {
                         Metadata::init(&database),
-                        Profiles::init(&database, &directories, &io_semaphore),
+                        Profiles::init(&directories, &io_semaphore),
                     }?;
                     let users = Users::init(&database)?;
 
@@ -112,9 +114,9 @@ impl State {
                     }
 
                     Ok(Arc::new(Self {
-                        database,
                         directories,
                         io_semaphore,
+                        io_semaphore_max: RwLock::new(io_semaphore_max as u32),
                         metadata,
                         settings: RwLock::new(settings),
                         profiles: RwLock::new(profiles),
@@ -133,7 +135,6 @@ impl State {
     /// Synchronize in-memory state with persistent state
     pub async fn sync() -> crate::Result<()> {
         let state = Self::get().await?;
-        let batch = Arc::new(Mutex::new(sled::Batch::default()));
 
         let sync_settings = async {
             let state = Arc::clone(&state);
@@ -148,13 +149,11 @@ impl State {
 
         let sync_profiles = async {
             let state = Arc::clone(&state);
-            let batch = Arc::clone(&batch);
 
             tokio::spawn(async move {
                 let profiles = state.profiles.read().await;
-                let mut batch = batch.lock().await;
 
-                profiles.sync(&mut batch).await?;
+                profiles.sync().await?;
                 Ok::<_, crate::Error>(())
             })
             .await?
@@ -162,13 +161,23 @@ impl State {
 
         tokio::try_join!(sync_settings, sync_profiles)?;
 
-        state.database.apply_batch(
-            Arc::try_unwrap(batch)
-                .expect("Error saving state by acquiring Arc")
-                .into_inner(),
-        )?;
-        state.database.flush_async().await?;
-
         Ok(())
+    }
+
+    /// Reset semaphores to default values
+    /// This will block until all uses of the semaphore are complete, so it should only be called
+    /// when we are not in the middle of downloading something (ie: changing the settings!)
+    pub async fn reset_semaphore(&self) {
+        let settings = self.settings.read().await;
+        let mut io_semaphore = self.io_semaphore.write().await;
+        let mut total_permits = self.io_semaphore_max.write().await;
+
+        // Wait to get all permits back
+        let _ = io_semaphore.acquire_many(*total_permits).await;
+
+        // Reset the semaphore
+        io_semaphore.close();
+        *total_permits = settings.max_concurrent_downloads as u32;
+        *io_semaphore = Semaphore::new(settings.max_concurrent_downloads);
     }
 }

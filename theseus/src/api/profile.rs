@@ -146,8 +146,12 @@ pub async fn run_credentials(
                 profile.metadata.game_version
             ))
         })?;
-    let version_info =
-        download::download_version_info(&state, version, profile.metadata.loader_version.as_ref()).await?;
+    let version_info = download::download_version_info(
+        &state,
+        version,
+        profile.metadata.loader_version.as_ref(),
+    )
+    .await?;
     let pre_launch_hooks =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
     for hook in pre_launch_hooks.iter() {

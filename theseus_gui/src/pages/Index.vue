@@ -1,22 +1,17 @@
 <script setup>
-import { useInstances, useNews } from '@/store/state'
 import RowDisplay from '@/components/RowDisplay.vue'
+import { shallowRef } from 'vue'
+import { list } from '@/helpers/profile.js'
 
-const instanceStore = useInstances()
-const newsStore = useNews()
-instanceStore.fetchInstances()
-newsStore.fetchNews()
-
-// Remove once state is populated with real data
-const recentInstances = instanceStore.instances.slice(0, 4)
-const popularInstances = instanceStore.instances.filter((i) => i.downloads > 50 || i.trending)
+const profiles = await list()
+const recentInstances = shallowRef(Object.values(profiles))
 </script>
 
 <template>
   <div class="page-container">
     <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
-    <RowDisplay label="Popular packs" :instances="popularInstances" :can-paginate="true" />
-    <RowDisplay label="News & updates" :news="newsStore.news" :can-paginate="true" />
+    <RowDisplay label="Popular packs" :instances="recentInstances" :can-paginate="true" />
+    <RowDisplay label="Test" :instances="recentInstances" :can-paginate="true" />
   </div>
 </template>
 

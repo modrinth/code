@@ -2,6 +2,7 @@
 
 use crate::config::{MODRINTH_API_URL, REQWEST_CLIENT};
 use crate::util::fetch::write_cached_icon;
+use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -9,15 +10,15 @@ use sha2::Digest;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
-use tokio::sync::Semaphore;
-// use zip::ZipArchive;
-use async_zip::tokio::read::fs::ZipFileReader;
+use tokio::sync::{RwLock, Semaphore};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Project {
     pub sha512: String,
     pub disabled: bool,
     pub metadata: ProjectMetadata,
+    pub file_name: String,
+    pub update_available: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -50,7 +51,7 @@ pub struct ModrinthProject {
 }
 
 /// A specific version of a project
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthVersion {
     pub id: String,
     pub project_id: String,
@@ -73,7 +74,7 @@ pub struct ModrinthVersion {
     pub loaders: Vec<String>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct ModrinthVersionFile {
     pub hashes: HashMap<String, String>,
     pub url: String,
@@ -83,7 +84,7 @@ pub struct ModrinthVersionFile {
     pub file_type: Option<FileType>,
 }
 
-#[derive(Serialize, Deserialize, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Dependency {
     pub version_id: Option<String>,
     pub project_id: Option<String>,
@@ -91,7 +92,27 @@ pub struct Dependency {
     pub dependency_type: DependencyType,
 }
 
-#[derive(Serialize, Deserialize, Copy, Clone)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ModrinthTeamMember {
+    pub team_id: String,
+    pub user: ModrinthUser,
+    pub role: String,
+    pub ordering: i64,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ModrinthUser {
+    pub id: String,
+    pub github_id: Option<u64>,
+    pub username: String,
+    pub name: Option<String>,
+    pub avatar_url: Option<String>,
+    pub bio: Option<String>,
+    pub created: DateTime<Utc>,
+    pub role: String,
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
 pub enum DependencyType {
     Required,
@@ -120,7 +141,11 @@ pub enum FileType {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(tag = "type", rename_all = "snake_case")]
 pub enum ProjectMetadata {
-    Modrinth(Box<ModrinthProject>),
+    Modrinth {
+        project: Box<ModrinthProject>,
+        version: Box<ModrinthVersion>,
+        members: Vec<ModrinthTeamMember>,
+    },
     Inferred {
         title: Option<String>,
         description: Option<String>,
@@ -135,7 +160,7 @@ async fn read_icon_from_file(
     icon_path: Option<String>,
     cache_dir: &Path,
     path: &PathBuf,
-    io_semaphore: &Semaphore,
+    io_semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Option<PathBuf>> {
     if let Some(icon_path) = icon_path {
         // we have to repoen the zip twice here :(
@@ -163,9 +188,11 @@ async fn read_icon_from_file(
                     .is_ok()
                 {
                     let bytes = bytes::Bytes::from(bytes);
-                    let permit = io_semaphore.acquire().await?;
                     let path = write_cached_icon(
-                        &icon_path, cache_dir, bytes, &permit,
+                        &icon_path,
+                        cache_dir,
+                        bytes,
+                        io_semaphore,
                     )
                     .await?;
 
@@ -181,7 +208,7 @@ async fn read_icon_from_file(
 pub async fn infer_data_from_files(
     paths: Vec<PathBuf>,
     cache_dir: PathBuf,
-    io_semaphore: &Semaphore,
+    io_semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<HashMap<PathBuf, Project>> {
     let mut file_path_hashes = HashMap::new();
 
@@ -196,12 +223,6 @@ pub async fn infer_data_from_files(
         file_path_hashes.insert(hash, path.clone());
     }
 
-    // TODO: add disabled mods
-    // TODO: add retrying
-    #[derive(Deserialize)]
-    pub struct ModrinthVersion {
-        pub project_id: String,
-    }
     let files: HashMap<String, ModrinthVersion> = REQWEST_CLIENT
         .post(format!("{}version_files", MODRINTH_API_URL))
         .json(&json!({
@@ -229,22 +250,54 @@ pub async fn infer_data_from_files(
         .json()
         .await?;
 
+    let teams: Vec<ModrinthTeamMember> = REQWEST_CLIENT
+        .get(format!(
+            "{}teams?ids={}",
+            MODRINTH_API_URL,
+            serde_json::to_string(
+                &projects.iter().map(|x| x.team.clone()).collect::<Vec<_>>()
+            )?
+        ))
+        .send()
+        .await?
+        .json::<Vec<Vec<ModrinthTeamMember>>>()
+        .await?
+        .into_iter()
+        .flatten()
+        .collect();
+
     let mut return_projects = HashMap::new();
     let mut further_analyze_projects: Vec<(String, PathBuf)> = Vec::new();
 
     for (hash, path) in file_path_hashes {
-        if let Some(file) = files.get(&hash) {
+        if let Some(version) = files.get(&hash) {
             if let Some(project) =
-                projects.iter().find(|x| file.project_id == x.id)
+                projects.iter().find(|x| version.project_id == x.id)
             {
+                let file_name = path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string();
+
+                let team_members = teams
+                    .iter()
+                    .filter(|x| x.team_id == project.team)
+                    .cloned()
+                    .collect::<Vec<_>>();
+
                 return_projects.insert(
                     path,
                     Project {
                         sha512: hash,
                         disabled: false,
-                        metadata: ProjectMetadata::Modrinth(Box::new(
-                            project.clone(),
-                        )),
+                        metadata: ProjectMetadata::Modrinth {
+                            project: Box::new(project.clone()),
+                            version: Box::new(version.clone()),
+                            members: team_members,
+                        },
+                        file_name,
+                        update_available: false,
                     },
                 );
                 continue;
@@ -255,6 +308,12 @@ pub async fn infer_data_from_files(
     }
 
     for (hash, path) in further_analyze_projects {
+        let file_name = path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string();
+
         let zip_file_reader = if let Ok(zip_file_reader) =
             ZipFileReader::new(path.clone()).await
         {
@@ -266,6 +325,8 @@ pub async fn infer_data_from_files(
                     sha512: hash,
                     disabled: path.ends_with(".disabled"),
                     metadata: ProjectMetadata::Unknown,
+                    file_name,
+                    update_available: false,
                 },
             );
             continue;
@@ -318,6 +379,8 @@ pub async fn infer_data_from_files(
                             Project {
                                 sha512: hash,
                                 disabled: path.ends_with(".disabled"),
+                                file_name,
+                                update_available: false,
                                 metadata: ProjectMetadata::Inferred {
                                     title: Some(
                                         pack.display_name
@@ -383,6 +446,8 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(if pack.name.is_empty() {
                                     pack.modid
@@ -447,6 +512,8 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(pack.name.unwrap_or(pack.id)),
                                 description: pack.description,
@@ -511,6 +578,8 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(
                                     pack.metadata
@@ -575,6 +644,8 @@ pub async fn infer_data_from_files(
                         Project {
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
+                            file_name,
+                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: None,
                                 description: pack.description,
@@ -594,6 +665,8 @@ pub async fn infer_data_from_files(
             Project {
                 sha512: hash,
                 disabled: path.ends_with(".disabled"),
+                file_name,
+                update_available: false,
                 metadata: ProjectMetadata::Unknown,
             },
         );

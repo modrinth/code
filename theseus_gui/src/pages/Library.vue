@@ -1,14 +1,15 @@
 <script setup>
-import { useInstances } from '@/store/state'
 import GridDisplay from '@/components/GridDisplay.vue'
+import { shallowRef } from 'vue'
+import { list } from '@/helpers/profile.js'
 
-const instances = useInstances()
-instances.fetchInstances()
+const profiles = await list()
+const instances = shallowRef(Object.values(profiles))
 </script>
 
 <template>
   <div>
-    <GridDisplay label="Instances" :instances="instances.instances" />
-    <GridDisplay label="Modpacks" :instances="instances.instances" />
+    <GridDisplay label="Instances" :instances="instances" />
+    <GridDisplay label="Modpacks" :instances="instances" />
   </div>
 </template>

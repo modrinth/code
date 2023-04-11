@@ -1,7 +1,7 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::config::BINCODE_CONFIG;
 use crate::data::DirectoryInfo;
 use crate::state::projects::Project;
+use crate::util::fetch::write_cached_icon;
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
@@ -10,25 +10,19 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-use tokio::fs;
 use tokio::sync::Semaphore;
+use tokio::{fs, sync::RwLock};
 
 const PROFILE_JSON_PATH: &str = "profile.json";
-const PROFILE_SUBTREE: &[u8] = b"profiles";
 
 pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
 
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
-pub const SUPPORTED_ICON_FORMATS: &[&str] = &[
-    "bmp", "gif", "jpeg", "jpg", "jpe", "png", "svg", "svgz", "webp", "rgb",
-    "mp4",
-];
 
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
-    #[serde(skip)]
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -124,26 +118,15 @@ impl Profile {
     #[tracing::instrument]
     pub async fn set_icon<'a>(
         &'a mut self,
-        icon: &'a Path,
+        cache_dir: &Path,
+        semaphore: &RwLock<Semaphore>,
+        icon: bytes::Bytes,
+        file_name: &str,
     ) -> crate::Result<&'a mut Self> {
-        let ext = icon
-            .extension()
-            .and_then(std::ffi::OsStr::to_str)
-            .unwrap_or("");
-
-        if SUPPORTED_ICON_FORMATS.contains(&ext) {
-            let file_name = format!("icon.{ext}");
-            fs::copy(icon, &self.path.join(&file_name)).await?;
-            self.metadata.icon =
-                Some(Path::new(&format!("./{file_name}")).to_owned());
-
-            Ok(self)
-        } else {
-            Err(crate::ErrorKind::InputError(format!(
-                "Unsupported image type: {ext}"
-            ))
-            .into())
-        }
+        let file =
+            write_cached_icon(file_name, cache_dir, icon, semaphore).await?;
+        self.metadata.icon = Some(file);
+        Ok(self)
     }
 
     #[tracing::instrument]
@@ -161,7 +144,10 @@ impl Profile {
             let new_path = self.path.join(path);
             if new_path.exists() {
                 for path in std::fs::read_dir(self.path.join(path))? {
-                    files.push(path?.path());
+                    let path = path?.path();
+                    if path.is_file() {
+                        files.push(path);
+                    }
                 }
             }
             Ok::<(), crate::Error>(())
@@ -177,26 +163,17 @@ impl Profile {
 }
 
 impl Profiles {
-    #[tracing::instrument(skip(db))]
+    #[tracing::instrument]
     pub async fn init(
-        db: &sled::Db,
         dirs: &DirectoryInfo,
-        io_sempahore: &Semaphore,
+        io_sempahore: &RwLock<Semaphore>,
     ) -> crate::Result<Self> {
-        let profile_db = db.get(PROFILE_SUBTREE)?.map_or(
-            Ok(Default::default()),
-            |bytes| {
-                bincode::decode_from_slice::<Box<[PathBuf]>, _>(
-                    &bytes,
-                    *BINCODE_CONFIG,
-                )
-                .map(|it| it.0)
-            },
-        )?;
-
-        let mut profiles = stream::iter(profile_db.iter())
-            .then(|it| async move {
-                let path = PathBuf::from(it);
+        let mut profiles = HashMap::new();
+        fs::create_dir_all(dirs.profiles_dir()).await?;
+        let mut entries = fs::read_dir(dirs.profiles_dir()).await?;
+        while let Some(entry) = entries.next_entry().await? {
+            let path = entry.path();
+            if path.is_dir() {
                 let prof = match Self::read_profile_from_dir(&path).await {
                     Ok(prof) => Some(prof),
                     Err(err) => {
@@ -204,13 +181,12 @@ impl Profiles {
                         None
                     }
                 };
-                (path, prof)
-            })
-            .filter_map(|(key, opt_value)| async move {
-                opt_value.map(|value| (key, value))
-            })
-            .collect::<HashMap<PathBuf, Profile>>()
-            .await;
+                if let Some(profile) = prof {
+                    let path = canonicalize(path)?;
+                    profiles.insert(path, profile);
+                }
+            }
+        }
 
         // project path, parent profile path
         let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
@@ -278,10 +254,7 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip_all)]
-    pub async fn sync<'a>(
-        &'a self,
-        batch: &'a mut sled::Batch,
-    ) -> crate::Result<&Self> {
+    pub async fn sync(&self) -> crate::Result<&Self> {
         stream::iter(self.0.iter())
             .map(Ok::<_, crate::Error>)
             .try_for_each_concurrent(None, |(path, profile)| async move {
@@ -295,13 +268,6 @@ impl Profiles {
             })
             .await?;
 
-        batch.insert(
-            PROFILE_SUBTREE,
-            bincode::encode_to_vec(
-                self.0.keys().collect::<Box<[_]>>(),
-                *BINCODE_CONFIG,
-            )?,
-        );
         Ok(self)
     }
 
