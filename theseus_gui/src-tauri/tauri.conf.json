@@ -16,6 +16,9 @@
       "protocol": {
         "asset": true,
         "assetScope": ["$APPDATA/caches/icons/*"]
+      },
+      "window" : {
+        "create": true
       }
     },
     "bundle": {
