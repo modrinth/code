@@ -9,13 +9,13 @@
   <transition name="fade">
     <Card v-if="showCard" ref="card" class="account-card">
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://crafthead.net/avatar/${selectedAccount.username}`"/>
+        <Avatar size="xs" :src="`https://crafthead.net/helm/${selectedAccount.username}`" />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
         </div>
         <Button icon-only color="danger" @click="logout(selectedAccount.id)">
-          <LogOutIcon/>
+          <LogOutIcon />
         </Button>
       </div>
       <div v-else class="logged-out account">
@@ -23,24 +23,24 @@
           <h4>Not signed in</h4>
         </div>
         <Button icon-only color="primary" @click="login()">
-          <LoginIcon/>
+          <LoginIcon />
         </Button>
       </div>
       <div v-if="displayAccounts > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
-            <Avatar :src="account.profile_picture" class="icon"/>
+            <Avatar :src="account.profile_picture" class="icon" />
             <div>
               <p>{{ account.username }}</p>
             </div>
           </Button>
           <Button icon-only color="danger" @click="logout(account.id)">
-            <LogOutIcon/>
+            <LogOutIcon />
           </Button>
         </div>
       </div>
       <Button v-if="accounts.length > 0" @click="login()">
-        <PlusIcon/>
+        <PlusIcon />
         Add Account
       </Button>
     </Card>
@@ -48,19 +48,19 @@
 </template>
 
 <script setup>
-import {Avatar, Button, Card, PlusIcon, LogOutIcon} from "omorphia";
-import {LoginIcon} from "@/assets/icons";
-import {ref, computed, onMounted, onBeforeUnmount} from "vue";
+import { Avatar, Button, Card, PlusIcon, LogOutIcon } from 'omorphia'
+import { LoginIcon } from '@/assets/icons'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
   remove_user,
   authenticate_begin_flow,
-  authenticate_await_completion
+  authenticate_await_completion,
 } from '@/helpers/auth'
-import {get, set} from '@/helpers/settings'
-import {WebviewWindow} from '@tauri-apps/api/window'
+import { get, set } from '@/helpers/settings'
+import { WebviewWindow } from '@tauri-apps/api/window'
 
-const settings = ref(await get());
+const settings = ref(await get())
 
 const appendProfiles = (accounts) => {
   return accounts.map((account) => {
@@ -71,88 +71,89 @@ const appendProfiles = (accounts) => {
   })
 }
 
-const accounts = ref(await users().then(appendProfiles));
+const accounts = ref(await users())
 
-const displayAccounts = computed(() => accounts.value.filter(account => settings.value.default_user !== account.id));
+const displayAccounts = computed(() =>
+  accounts.value.filter((account) => settings.value.default_user !== account.id)
+)
 
-const selectedAccount = ref(await users().then(accounts => accounts.find(account => account.id === settings.value.default_user)));
+const selectedAccount = ref(
+  await users().then((accounts) =>
+    accounts.find((account) => account.id === settings.value.default_user)
+  )
+)
 
 const refreshValues = async () => {
-  accounts.value = await users().then(appendProfiles);
-  selectedAccount.value = accounts.value.find(account => account.id === settings.value.default_user);
+  accounts.value = await users().then(appendProfiles)
+  selectedAccount.value = accounts.value.find(
+    (account) => account.id === settings.value.default_user
+  )
 }
 
-let showCard = ref(false);
-let card = ref(null);
-let avatar = ref(null);
+let showCard = ref(false)
+let card = ref(null)
+let avatar = ref(null)
 
 const setAccount = async (account) => {
-  settings.value.default_user = account.id;
-  selectedAccount.value = account;
-  await set(settings.value);
+  settings.value.default_user = account.id
+  selectedAccount.value = account
+  await set(settings.value)
 }
 
 const login = async () => {
   console.log('login process')
-  try {
-    const url = await authenticate_begin_flow();
-    console.log(url);
+  const url = await authenticate_begin_flow()
+  console.log(url)
 
-    const window = new WebviewWindow('loginWindow', {
-      url: url,
-    });
+  const window = new WebviewWindow('loginWindow', {
+    url: url,
+  })
 
-    window.once('tauri://created', function () {
-      console.log('webview created')
-    })
+  window.once('tauri://created', function () {
+    console.log('webview created')
+  })
 
-    window.once('tauri://error', function (e) {
-      console.log('webview error', e)
-    })
+  window.once('tauri://error', function (e) {
+    console.log('webview error', e)
+  })
 
-  } catch (e) {
-    console.log(e);
-  }
-
-  const loggedIn = await authenticate_await_completion();
-  await setAccount(loggedIn);
-  await refreshValues();
+  const loggedIn = await authenticate_await_completion().then(await window.close())
+  await setAccount(loggedIn)
+  await refreshValues()
 }
 
 const logout = async (id) => {
-  await remove_user(id);
-  await refreshValues();
+  await remove_user(id)
+  await refreshValues()
 }
 
 const toggle = () => {
-  showCard.value = !showCard.value;
+  showCard.value = !showCard.value
 }
 
 const handleClickOutside = (event) => {
-  if (card.value && avatar.value.$el !== event.target) {
-    showCard.value = false;
+  if (card.value && avatar.value.$el !== event.target && !card.value.$el.contains(event.target)) {
+    showCard.value = false
   }
-};
+}
 
 onMounted(() => {
-  window.addEventListener("click", handleClickOutside);
-});
+  window.addEventListener('click', handleClickOutside)
+})
 
 onBeforeUnmount(() => {
-  window.removeEventListener("click", handleClickOutside);
-});
+  window.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped lang="scss">
 .selected {
-  width: 100%;
   background: var(--color-brand-highlight);
   border-radius: var(--radius-lg);
   color: var(--color-contrast);
 }
 
 .logged-out {
-  width: 100%;
   background: var(--color-bg);
   border-radius: var(--radius-lg);
 }
@@ -185,6 +186,7 @@ onBeforeUnmount(() => {
 }
 
 .account {
+  width: 100%;
   display: flex;
   align-items: center;
   gap: 1rem;

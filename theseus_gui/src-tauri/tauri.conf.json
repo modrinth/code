@@ -17,8 +17,9 @@
         "asset": true,
         "assetScope": ["$APPDATA/caches/icons/*"]
       },
-      "window" : {
-        "create": true
+      "window": {
+        "create": true,
+        "close": true
       }
     },
     "bundle": {

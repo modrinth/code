@@ -39,7 +39,7 @@ list().then(
     <div class="nav-container">
       <div class="nav-section">
         <suspense>
-          <AccountsCard ref="accounts"/>
+          <AccountsCard ref="accounts" />
         </suspense>
         <div class="pages-list">
           <RouterLink to="/" class="button-base nav-button"><ClientIcon /></RouterLink>
