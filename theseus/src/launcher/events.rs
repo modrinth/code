@@ -9,7 +9,7 @@ tokio::task_local! {
 
 #[derive(Serialize, Clone)]
 pub struct LoadingPayload {
-    pub fraction: f64,
+    pub fraction: Option<f64>, // by convention, if optional, it means the loading is done 
     pub message: String,
 }
 
@@ -53,7 +53,19 @@ macro_rules! window_scoped {
     ($window:expr, $x:expr) => {{
         use tokio::task::LocalKey;        
         $crate::WINDOW.scope($window, async move {
-            $x.await
+            let res = $x.await;
+            
+            if let Err(e) = $crate::WINDOW.with(|f| { 
+                f.emit("loading", $crate::LoadingPayload {
+                    fraction: None,
+                    message: "Done loading.".to_string(),
+                }) 
+            }) {
+                eprintln!("Error emitting loading event to Tauri: {}", e);
+            }
+
+            res
+            
         })
     }};
 }
@@ -66,7 +78,7 @@ macro_rules! window_scoped {
 pub fn emit_loading(loading_frac : f64, message : &str) {
     if let Err(e) = WINDOW.with(|f| { 
         f.emit("loading", LoadingPayload {
-            fraction: loading_frac,
+            fraction: Some(loading_frac),
             message: message.to_string(),
         }) 
     }) {
