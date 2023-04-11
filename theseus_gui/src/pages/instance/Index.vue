@@ -2,13 +2,15 @@
   <div class="instance-container">
     <div class="side-cards">
       <Card class="instance-card">
-        <Avatar size="lg" :src="getInstance(instanceStore).img" />
+        <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
         <div class="instance-info">
-          <h2 class="name">{{ getInstance(instanceStore).name }}</h2>
-          Fabric {{ getInstance(instanceStore).version }}
+          <h2 class="name">{{ instance.metadata.name }}</h2>
+          <span class="metadata"
+            >{{ instance.metadata.loader }} {{ instance.metadata.game_version }}</span
+          >
         </div>
         <span class="button-group">
-          <Button color="primary" class="instance-button">
+          <Button color="primary" class="instance-button" @click="run($route.params.id)">
             <PlayIcon />
             Play
           </Button>
@@ -18,15 +20,15 @@
         </span>
       </Card>
       <div class="pages-list">
-        <RouterLink :to="`/instance/${$route.params.id}/`" class="btn">
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
           <BoxIcon />
           Mods
         </RouterLink>
-        <RouterLink :to="`/instance/${$route.params.id}/options`" class="btn">
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
           <SettingsIcon />
           Options
         </RouterLink>
-        <RouterLink :to="`/instance/${$route.params.id}/logs`" class="btn">
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
           <FileIcon />
           Logs
         </RouterLink>
@@ -34,26 +36,20 @@
     </div>
     <div class="content">
       <Promotion />
-      <router-view />
+      <router-view :instance="instance" />
     </div>
   </div>
 </template>
 <script setup>
 import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
-import { useInstances } from '@/store/state'
+import { get, run } from '@/helpers/profile'
+import { useRoute } from 'vue-router'
+import { shallowRef } from 'vue'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
-const instanceStore = useInstances()
-instanceStore.fetchInstances()
-</script>
-<script>
-export default {
-  methods: {
-    getInstance(instanceStore) {
-      return instanceStore.instances.find((i) => i.id === parseInt(this.$route.params.id))
-    },
-  },
-}
+const route = useRoute()
+const instance = shallowRef(await get(route.params.id))
 </script>
 
 <style scoped lang="scss">
@@ -99,6 +95,10 @@ Button {
 .name {
   font-size: 1.25rem;
   color: var(--color-contrast);
+}
+
+.metadata {
+  text-transform: capitalize;
 }
 
 .instance-container {

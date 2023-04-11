@@ -1,5 +1,6 @@
 <script setup>
-import { RouterView, useRoute, useRouter, RouterLink } from 'vue-router'
+import { ref } from 'vue'
+import { RouterView, RouterLink } from 'vue-router'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
@@ -12,11 +13,17 @@ import {
 } from 'omorphia'
 import { useTheming } from '@/store/state'
 
-const route = useRoute()
-const router = useRouter()
-
 const themeStore = useTheming()
 themeStore.setThemeClass()
+stalledMods = ref(0)
+list().then(
+  (profiles) =>
+    (installedMods.value = Object.values(profiles).reduce(
+      (acc, val) => acc + Object.keys(val.projects).length,
+      0
+    ))
+)
+// TODO: add event when profiles update to update installed mods count
 </script>
 
 <template>
@@ -40,13 +47,12 @@ themeStore.setThemeClass()
     <div class="view">
       <div class="appbar">
         <section class="navigation-controls">
-          <ChevronLeftIcon @click="router.back()" />
-          <ChevronRightIcon @click="router.forward()" />
-          <p>{{ route.name }}</p>
+          <ChevronLeftIcon @click="$router.back()" />
+          <ChevronRightIcon @click="$router.forward()" />
+          <p>{{ $route.name }}</p>
         </section>
         <section class="mod-stats">
-          <p>Updating 2 mods...</p>
-          <p>123 mods installed</p>
+          <p>{{ installedMods }} mods installed</p>
         </section>
       </div>
       <div class="router-view">
@@ -67,36 +73,32 @@ themeStore.setThemeClass()
 
   .router-view {
     width: 100%;
-    height: calc(100% - 2rem);
+    height: 100%;
     overflow: auto;
     overflow-x: hidden;
-    margin-top: 2rem;
   }
 
   .view {
     margin-left: 5rem;
     width: calc(100% - 5rem);
     height: calc(100%);
+
     .appbar {
-      position: absolute;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 2rem;
-      width: calc(100% - 5rem);
-      border-bottom: 1px solid rgba(64, 67, 74, 0.2);
-      background: var(--color-button-bg);
+      background: #40434a;
       text-align: center;
+      padding: 0.5rem 1rem;
 
       .navigation-controls {
         display: inherit;
         align-items: inherit;
         justify-content: stretch;
-        width: 30%;
-        font-size: 0.9rem;
 
         svg {
-          width: 18px;
+          width: 1.25rem;
+          height: 1.25rem;
           transition: all ease-in-out 0.1s;
 
           &:hover {
@@ -123,13 +125,6 @@ themeStore.setThemeClass()
         display: inherit;
         align-items: inherit;
         justify-content: flex-end;
-        width: 50%;
-        font-size: 0.8rem;
-        margin-right: 1rem;
-
-        p:nth-child(1) {
-          margin-right: 0.55rem;
-        }
       }
     }
   }

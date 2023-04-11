@@ -36,6 +36,7 @@ export const useSearch = defineStore('searchStore', {
       formattedAndFacets = formattedAndFacets.slice(0, formattedAndFacets.length - 1)
       formattedAndFacets += ''
 
+      // TODO: fix me - ask jai
       // If orFacets are present, start building formatted orFacet filter
       let formattedOrFacets = ''
       if (this.orFacets.length > 0 || this.activeVersions.length > 0) {
@@ -90,18 +91,6 @@ export const useSearch = defineStore('searchStore', {
       this.totalHits = response.total_hits
       this.offset = response.offset
       this.pageCount = Math.ceil(this.totalHits / this.limit)
-    },
-    toggleCategory(cat) {
-      this.categories[cat] = !this.categories[cat]
-    },
-    toggleLoader(loader) {
-      this.loaders[loader] = !this.loaders[loader]
-    },
-    toggleEnv(env) {
-      this.environments[env] = !this.environments[env]
-    },
-    setVersions(versions) {
-      this.activeVersions = versions
     },
     resetFilters() {
       this.facets = []

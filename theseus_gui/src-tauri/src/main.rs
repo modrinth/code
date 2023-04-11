@@ -25,6 +25,8 @@ fn main() {
             api::profile::profile_list,
             api::profile::profile_run,
             api::profile::profile_run_wait,
+            api::profile::profile_run_credentials,
+            api::profile::profile_run_wait_credentials,
             api::pack::pack_install_version_id,
             api::pack::pack_install_file,
             api::auth::auth_authenticate_begin_flow,

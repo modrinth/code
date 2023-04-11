@@ -21,7 +21,7 @@ impl DirectoryInfo {
 
         // Config directory
         let config_dir = Self::env_path("THESEUS_CONFIG_DIR")
-            .or_else(|| Some(dirs::config_dir()?.join("theseus")))
+            .or_else(|| Some(dirs::config_dir()?.join("com.modrinth.theseus")))
             .ok_or(crate::ErrorKind::FSError(
                 "Could not find valid config dir".to_string(),
             ))?;
