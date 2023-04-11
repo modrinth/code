@@ -14,7 +14,7 @@
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
         </div>
-        <Button icon-only color="danger" @click="logout(selectedAccount.id)">
+        <Button icon-only color="raised" @click="logout(selectedAccount.id)">
           <LogOutIcon />
         </Button>
       </div>
@@ -28,9 +28,7 @@
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
             <Avatar :src="account.profile_picture" class="icon" />
-            <div>
-              <p>{{ account.username }}</p>
-            </div>
+            <p>{{ account.username }}</p>
           </Button>
           <Button icon-only @click="logout(account.id)">
             <LogOutIcon />
@@ -89,6 +87,7 @@ const refreshValues = async () => {
 }
 
 let showCard = ref(false)
+console.log('show card intitialized')
 let card = ref(null)
 let avatar = ref(null)
 
@@ -132,6 +131,7 @@ const logout = async (id) => {
 
 const toggle = () => {
   showCard.value = !showCard.value
+  console.log('toggled')
 }
 
 const handleClickOutside = (event) => {
@@ -139,7 +139,7 @@ const handleClickOutside = (event) => {
     card.value &&
     avatar.value.$el !== event.target &&
     card.value.$el !== event.target &&
-    !card.value.$el.contains(event.target)
+    !document.elementsFromPoint(event.clientX, event.clientY).includes(card.value.$el)
   ) {
     showCard.value = false
   }
@@ -187,6 +187,9 @@ onBeforeUnmount(() => {
   padding: 1rem;
   border: 1px solid var(--color-button-bg);
   width: max-content;
+  user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 
   &.hidden {
     display: none;
