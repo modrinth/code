@@ -56,7 +56,7 @@ import {
   authenticate_await_completion,
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
-//import { WebviewWindow } from '@tauri-apps/api/window'
+import { WebviewWindow } from '@tauri-apps/api/window'
 
 const settings = ref(await get())
 
@@ -103,7 +103,6 @@ const login = async () => {
   const url = await authenticate_begin_flow()
   console.log(url)
 
-  /*
   const window = new WebviewWindow('loginWindow', {
     url: url,
   })
@@ -115,12 +114,11 @@ const login = async () => {
   window.once('tauri://error', function (e) {
     console.log('webview error', e)
   })
-   */
 
   const loggedIn = await authenticate_await_completion()
   await setAccount(loggedIn)
   await refreshValues()
-  // await window.close()
+  await window.close()
 }
 
 const logout = async (id) => {
