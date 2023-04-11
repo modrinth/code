@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use serde::Serialize;
 
+#[cfg(feature = "tauri")]
 tokio::task_local! {
     pub static WINDOW: tauri::Window;
 }
@@ -46,7 +47,7 @@ pub enum ProfilePayloadType {
 // Runs an synchronous function in the tokio task local scope
 // All event-related macros used within this asynchronous task,
 // no matter how deeply nested will be scoped to the window passed here
-
+#[cfg(feature = "tauri")]
 #[macro_export]
 macro_rules! window_scoped {
     ($window:expr, $x:expr) => {{
@@ -61,6 +62,7 @@ macro_rules! window_scoped {
 // Passes the a LoadingPayload to the frontend in the window stored by the window_scoped! macro
 // By convention, fraction is the fraction of the progress bar that is filled
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
+#[cfg(feature = "tauri")]
 pub fn emit_loading(loading_frac : f64, message : &str) {
     if let Err(e) = WINDOW.with(|f| { 
         f.emit("loading", LoadingPayload {
@@ -71,10 +73,13 @@ pub fn emit_loading(loading_frac : f64, message : &str) {
         eprintln!("Error emitting loading event to Tauri: {}", e);
     }
 }
+#[cfg(not(feature = "tauri"))]
+pub fn emit_loading(_loading_frac : f64, _message : &str) {}
 
 // emit_warning(message)
 // Passes the a WarningPayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
+#[cfg(feature = "tauri")]
 pub fn emit_warning(message : &str) {
     if let Err(e) = WINDOW.with(|f| { 
         f.emit("warning", WarningPayload {
@@ -84,10 +89,13 @@ pub fn emit_warning(message : &str) {
         eprintln!("Error emitting warning event to Tauri: {}", e);
     }
 }
+#[cfg(not(feature = "tauri"))]
+pub fn emit_warning(_message : &str) {}
 
 // emit_process(pid, event, message)
 // Passes the a ProcessPayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
+#[cfg(feature = "tauri")]
 pub fn emit_process(pid : u32, event : ProcessPayloadType, message : &str) {
     if let Err(e) = WINDOW.with(|f| { 
         f.emit("process", ProcessPayload {
@@ -100,9 +108,13 @@ pub fn emit_process(pid : u32, event : ProcessPayloadType, message : &str) {
     }
 }
 
+#[cfg(not(feature = "tauri"))]
+pub fn emit_process(_pid : u32, _event : ProcessPayloadType, _message : &str) {}
+
 // emit_profile(path, event)
 // Passes the a ProfilePayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
+#[cfg(feature = "tauri")]
 pub fn emit_profile(path : PathBuf, event : ProfilePayloadType) {
     if let Err(e) = WINDOW.with(|f| { 
         f.emit("profile", ProfilePayload {
@@ -114,6 +126,9 @@ pub fn emit_profile(path : PathBuf, event : ProfilePayloadType) {
     }
 }
 
+#[cfg(not(feature = "tauri"))]
+pub fn emit_profile(_path : PathBuf, _event : ProfilePayloadType) {}
+
 // loading_join! macro
 // loading_join!(i,j,message; task1, task2, task3...)
 // task1, task2, task3 are async tasks that yuo want to to join on await on
@@ -123,6 +138,8 @@ pub fn emit_profile(path : PathBuf, event : ProfilePayloadType) {
 // loading_join!(0.0, 0.3; task1, task2, task3)
 // This will await on each of the tasks, and as each completes, it will emit a loading event for 0.1, 0.2, 0.3, etc
 // This should function as a drop-in replacement for tokio::try_join_all! in most cases
+
+#[cfg(feature = "tauri")]
 #[macro_export]
 macro_rules! loading_join {
     ($start:expr, $end:expr, $message:expr; $($future:expr $(,)?)+) => {{
@@ -167,16 +184,31 @@ macro_rules! loading_join {
                 }
             }
 
-            // Generate results as tuple
-            let mut resolved_iter = resolved_values.into_iter();
-            (
-                $(
-                    {
-                        let _ = $future;
-                        resolved_iter.next().unwrap() // uwnrap here acceptable as numbers of futures and resolved values is guaranteed to be the same
+            // Turn Vec<Result<_,_>> into Result<Vec<_>,_>
+            let res: Result<Vec<_>, _> = resolved_values.into_iter().collect();
+            match res {
+                Ok(resolved_iter) => {
+                    let mut resolved_iter = resolved_iter.into_iter();
+                    Ok((
+                        $(
+                            {
+                                let _ = $future;
+                                resolved_iter.next().unwrap() // uwnrap here acceptable as numbers of futures and resolved values is guaranteed to be the same
+                            },
+                        )*
+                    ))
                     },
-                )*
-            )
+                Err(e) => {
+                    Err(e)
+                }
+            }       
     }};
 }
 
+#[cfg(not(feature = "tauri"))]
+#[macro_export]
+macro_rules! loading_join {
+    ($start:expr, $end:expr, $message:expr; $($future:expr $(,)?)+) => {{
+        tokio::try_join!($($future),+)
+    }};
+}
