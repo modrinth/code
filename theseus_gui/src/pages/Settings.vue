@@ -9,32 +9,28 @@ import { get, set, deepEqual } from '@/helpers/settings'
 const originalSettings = ref(await get())
 // Object to bind
 const settings = ref(await get())
-settings.value.custom_java_args = settings.value.custom_java_args.join(' ')
-settings.value.custom_env_args = settings.value.custom_env_args.join(' ')
+console.log(settings.value)
 
 const saveButton = ref(null)
 
+if (!settings.value.java_globals.JAVA_8) settings.value.java_globals.JAVA_8 = { path: '' }
+if (!settings.value.java_globals.JAVA_17) settings.value.java_globals.JAVA_17 = { path: '' }
+
 watch(settings.value, (newSettings) => {
   // Validate the changed state
-  if (newSettings.custom_java_args.length === 0) settings.value.custom_java_args = []
-  if (newSettings.custom_env_args.length === 0) settings.value.custom_env_args = []
-  if (newSettings.java_8_path === '') settings.value.java_8_path = null
-  if (newSettings.java_17_path === '') settings.value.java_17_path = null
+  if (newSettings.java_globals.JAVA_8?.path === '') delete settings.value.java_globals.JAVA_8
+  if (newSettings.java_globals.JAVA_17?.path === '') delete settings.value.java_globals.JAVA_17
   if (newSettings.hooks.pre_launch === '') delete settings.value.hooks.pre_launch
   if (newSettings.hooks.wrapper === '') delete settings.value.hooks.wrapper
   if (newSettings.hooks.post_exit === '') delete settings.value.hooks.post_exit
-
-  console.log(newSettings.custom_java_args)
-
-  if (newSettings.custom_java_args.length > 0 && typeof newSettings.custom_java_args === 'string')
-    settings.value.custom_java_args = newSettings.custom_java_args.split(' ')
-  if (newSettings.custom_env_args.length > 0 && typeof newSettings.custom_java_args === 'string')
-    settings.value.custom_env_args = newSettings.custom_env_args.split(' ')
 
   settings.value.max_concurrent_downloads = parseInt(newSettings.max_concurrent_downloads)
 
   if (deepEqual(originalSettings.value, settings.value)) saveButton.value.$el.style.opacity = 0
   else saveButton.value.$el.style.opacity = 1
+
+  if (!settings.value.java_globals.JAVA_8) settings.value.java_globals.JAVA_8 = { path: '' }
+  if (!settings.value.java_globals.JAVA_17) settings.value.java_globals.JAVA_17 = { path: '' }
 })
 
 const themeStore = useTheming()
@@ -42,6 +38,7 @@ const themeStore = useTheming()
 const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
 const saveJavaPath = () => {}
 const saveSettings = async () => {
+  console.log('saving', settings.value)
   await set(settings.value)
   saveButton.value.$el.style.opacity = 0
 }
@@ -73,7 +70,7 @@ const saveSettings = async () => {
         <h3>Java 17 Location</h3>
         <div class="toggle-setting">
           <input
-            v-model="settings.java_17_path"
+            v-model="settings.java_globals.JAVA_17.path"
             type="text"
             class="input installation-input"
             placeholder="/path/to/java17"
@@ -98,7 +95,7 @@ const saveSettings = async () => {
         <h3>Java 8 Location</h3>
         <div class="toggle-setting">
           <input
-            v-model="settings.java_8_path"
+            v-model="settings.java_globals.JAVA_8.path"
             type="text"
             class="input installation-input"
             placeholder="/path/to/java8"

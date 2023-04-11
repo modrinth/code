@@ -12,10 +12,11 @@ import {
   Avatar,
 } from 'omorphia'
 import { useTheming } from '@/store/state'
+import { list } from '@/helpers/profile'
 
 const themeStore = useTheming()
 themeStore.setThemeClass()
-stalledMods = ref(0)
+const installedMods = ref(0)
 list().then(
   (profiles) =>
     (installedMods.value = Object.values(profiles).reduce(
