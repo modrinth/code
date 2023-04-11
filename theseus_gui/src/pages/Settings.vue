@@ -9,6 +9,8 @@ import { get, set, deepEqual } from '@/helpers/settings'
 const originalSettings = ref(await get())
 // Object to bind
 const settings = ref(await get())
+settings.value.custom_java_args = settings.value.custom_java_args.join(' ')
+settings.value.custom_env_args = settings.value.custom_env_args.join(' ')
 
 const saveButton = ref(null)
 
@@ -21,6 +23,13 @@ watch(settings.value, (newSettings) => {
   if (newSettings.hooks.pre_launch === '') delete settings.value.hooks.pre_launch
   if (newSettings.hooks.wrapper === '') delete settings.value.hooks.wrapper
   if (newSettings.hooks.post_exit === '') delete settings.value.hooks.post_exit
+
+  console.log(newSettings.custom_java_args)
+
+  if (newSettings.custom_java_args.length > 0 && typeof newSettings.custom_java_args === 'string')
+    settings.value.custom_java_args = newSettings.custom_java_args.split(' ')
+  if (newSettings.custom_env_args.length > 0 && typeof newSettings.custom_java_args === 'string')
+    settings.value.custom_env_args = newSettings.custom_env_args.split(' ')
 
   settings.value.max_concurrent_downloads = parseInt(newSettings.max_concurrent_downloads)
 
@@ -111,13 +120,23 @@ const saveSettings = async () => {
         </div>
       </div>
       <hr class="card-divider" />
-      <div class="toggle-setting">
+      <div class="settings-group">
         <h3>Java Arguments</h3>
-        <input v-model="settings.custom_java_args" type="text" class="input installation-input" />
+        <input
+          v-model="settings.custom_java_args"
+          type="text"
+          class="input installation-input"
+          placeholder="-Xms10G -Xmx10G -XX:+UseG1GC -XX:+ParallelRefProcEnabled"
+        />
       </div>
-      <div class="toggle-setting">
+      <div class="settings-group">
         <h3>Environment Arguments</h3>
-        <input v-model="settings.custom_env_args" type="text" class="input installation-input" />
+        <input
+          v-model="settings.custom_env_args"
+          type="text"
+          class="input installation-input"
+          placeholder="-Xms10G -Xmx10G -XX:+UseG1GC -XX:+ParallelRefProcEnabled"
+        />
       </div>
       <hr class="card-divider" />
       <div class="settings-group">
@@ -203,7 +222,7 @@ const saveSettings = async () => {
 }
 
 .installation-input {
-  width: 100%;
+  width: 100% !important;
 }
 
 .theming,
