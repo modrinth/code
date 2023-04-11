@@ -3,13 +3,13 @@
     class="button-base"
     ref="avatar"
     size="sm"
-    :src="selectedAccount ? `https://crafthead.net/avatar/${selectedAccount.username}` : ''"
+    :src="selectedAccount ? `https://crafthead.net/helm/${selectedAccount.id}` : ''"
     @click="toggle()"
   />
   <transition name="fade">
     <Card v-if="showCard" ref="card" class="account-card">
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://crafthead.net/helm/${selectedAccount.username}`" />
+        <Avatar size="xs" :src="`https://crafthead.net/helm/${selectedAccount.id}`" />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
