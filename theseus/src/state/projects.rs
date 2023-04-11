@@ -10,7 +10,7 @@ use sha2::Digest;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
-use tokio::sync::Semaphore;
+use tokio::sync::{Semaphore, RwLock};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Project {
@@ -160,7 +160,7 @@ async fn read_icon_from_file(
     icon_path: Option<String>,
     cache_dir: &Path,
     path: &PathBuf,
-    io_semaphore: &Semaphore,
+    io_semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Option<PathBuf>> {
     if let Some(icon_path) = icon_path {
         // we have to repoen the zip twice here :(
@@ -208,7 +208,7 @@ async fn read_icon_from_file(
 pub async fn infer_data_from_files(
     paths: Vec<PathBuf>,
     cache_dir: PathBuf,
-    io_semaphore: &Semaphore,
+    io_semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<HashMap<PathBuf, Project>> {
     let mut file_path_hashes = HashMap::new();
 

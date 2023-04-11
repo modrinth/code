@@ -30,9 +30,11 @@ async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
     // Initialize state
-    let st = State::get().await?;
-    st.settings.write().await.max_concurrent_downloads = 10;
-
+    let st = State::get().await?;    
+    st.settings.write().await.max_concurrent_downloads = 5;
+    // Changed the settings, so need to reset the semaphore
+    st.reset_semaphore().await;
+    
     // Clear profiles
     println!("Clearing profiles.");
     {

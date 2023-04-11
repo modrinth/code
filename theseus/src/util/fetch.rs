@@ -5,7 +5,7 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use tokio::sync::Semaphore;
+use tokio::sync::{Semaphore, RwLock};
 use tokio::{
     fs::{self, File},
     io::AsyncWriteExt,
@@ -16,7 +16,7 @@ const FETCH_ATTEMPTS: usize = 3;
 pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
-    semaphore: &Semaphore,
+    semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Bytes> {
     fetch_advanced(Method::GET, url, sha1, semaphore).await
 }
@@ -25,7 +25,7 @@ pub async fn fetch_json<T>(
     method: Method,
     url: &str,
     sha1: Option<&str>,
-    semaphore: &Semaphore,
+    semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
@@ -41,9 +41,10 @@ pub async fn fetch_advanced(
     method: Method,
     url: &str,
     sha1: Option<&str>,
-    semaphore: &Semaphore,
+    semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Bytes> {
-    let _permit = semaphore.acquire().await?;
+    let io_semaphore = semaphore.read().await;            
+    let _permit = io_semaphore.acquire().await?;
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
         let result = REQWEST_CLIENT.request(method.clone(), url).send().await;
 
@@ -90,7 +91,7 @@ pub async fn fetch_advanced(
 pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
-    semaphore: &Semaphore,
+    semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Bytes> {
     if mirrors.is_empty() {
         return Err(crate::ErrorKind::InputError(
@@ -114,9 +115,11 @@ pub async fn fetch_mirrors(
 pub async fn write<'a>(
     path: &Path,
     bytes: &[u8],
-    semaphore: &Semaphore,
+    semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<()> {
-    let _permit = semaphore.acquire().await?;
+    let io_semaphore = semaphore.read().await;            
+    let _permit = io_semaphore.acquire().await?;
+
     if let Some(parent) = path.parent() {
         fs::create_dir_all(parent).await?;
     }
@@ -132,7 +135,7 @@ pub async fn write_cached_icon(
     icon_path: &str,
     cache_dir: &Path,
     bytes: Bytes,
-    semaphore: &Semaphore,
+    semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<PathBuf> {
     let extension = Path::new(&icon_path).extension().and_then(OsStr::to_str);
     let hash = sha1_async(bytes.clone()).await?;

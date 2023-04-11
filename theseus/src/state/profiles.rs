@@ -10,7 +10,7 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-use tokio::fs;
+use tokio::{fs, sync::RwLock};
 use tokio::sync::Semaphore;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
@@ -119,7 +119,7 @@ impl Profile {
     pub async fn set_icon<'a>(
         &'a mut self,
         cache_dir: &Path,
-        semaphore: &Semaphore,
+        semaphore: &RwLock<Semaphore>,
         icon: bytes::Bytes,
         file_name: &str,
     ) -> crate::Result<&'a mut Self> {
@@ -166,11 +166,11 @@ impl Profiles {
     #[tracing::instrument]
     pub async fn init(
         dirs: &DirectoryInfo,
-        io_sempahore: &Semaphore,
+        io_sempahore: &RwLock<Semaphore>,
     ) -> crate::Result<Self> {
         let mut profiles = HashMap::new();
+        fs::create_dir_all(dirs.profiles_dir()).await?;
         let mut entries = fs::read_dir(dirs.profiles_dir()).await?;
-
         while let Some(entry) = entries.next_entry().await? {
             let path = entry.path();
             if path.is_dir() {
