@@ -77,6 +77,7 @@ const props = defineProps({
     width: 100%;
     border-radius: var(--radius-sm);
     filter: none !important;
+    aspect-ratio: 1;
   }
   .project-info {
     margin-top: 1rem;
