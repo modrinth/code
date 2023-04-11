@@ -24,7 +24,7 @@
           <LoginIcon />
         </Button>
       </div>
-      <div v-if="displayAccounts > 0" class="account-group">
+      <div v-if="displayAccounts.length > 0" class="account-group">
         <div v-for="account in displayAccounts" :key="account.id" class="account-row">
           <Button class="option account" @click="setAccount(account)">
             <Avatar :src="account.profile_picture" class="icon" />
@@ -32,7 +32,7 @@
               <p>{{ account.username }}</p>
             </div>
           </Button>
-          <Button icon-only color="danger" @click="logout(account.id)">
+          <Button icon-only @click="logout(account.id)">
             <LogOutIcon />
           </Button>
         </div>
@@ -56,7 +56,7 @@ import {
   authenticate_await_completion,
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
-import { WebviewWindow } from '@tauri-apps/api/window'
+//import { WebviewWindow } from '@tauri-apps/api/window'
 
 const settings = ref(await get())
 
@@ -64,12 +64,12 @@ const appendProfiles = (accounts) => {
   return accounts.map((account) => {
     return {
       ...account,
-      profile_picture: `https://crafthead.net/avatar/${account.username}/128`,
+      profile_picture: `https://crafthead.net/helm/${account.username}/128`,
     }
   })
 }
 
-const accounts = ref(await users())
+const accounts = ref(await users().then(appendProfiles))
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => settings.value.default_user !== account.id)
@@ -103,6 +103,7 @@ const login = async () => {
   const url = await authenticate_begin_flow()
   console.log(url)
 
+  /*
   const window = new WebviewWindow('loginWindow', {
     url: url,
   })
@@ -114,16 +115,22 @@ const login = async () => {
   window.once('tauri://error', function (e) {
     console.log('webview error', e)
   })
+   */
 
   const loggedIn = await authenticate_await_completion()
   await setAccount(loggedIn)
   await refreshValues()
-  await window.close()
+  // await window.close()
+
 }
 
 const logout = async (id) => {
   await remove_user(id)
-  await refreshValues()
+  await refreshValues();
+  if (!selectedAccount.value && accounts.value.length > 0) {
+    await setAccount(accounts.value[0])
+    await refreshValues()
+  }
 }
 
 const toggle = () => {
@@ -131,7 +138,7 @@ const toggle = () => {
 }
 
 const handleClickOutside = (event) => {
-  if (card.value && avatar.value.$el !== event.target && !card.value.$el.contains(event.target)) {
+  if (card.value && avatar.value.$el !== event.target && card.value.$el !== event.target && !card.value.$el.contains(event.target)) {
     showCard.value = false
   }
 }
@@ -150,18 +157,19 @@ onBeforeUnmount(() => {
   background: var(--color-brand-highlight);
   border-radius: var(--radius-lg);
   color: var(--color-contrast);
+  gap: 1rem;
 }
 
 .logged-out {
   background: var(--color-bg);
   border-radius: var(--radius-lg);
+  gap: 1rem;
 }
 
 .account {
   width: max-content;
   display: flex;
   align-items: center;
-  gap: 1rem;
   text-align: left;
   padding: 0.5rem 1rem;
 }
@@ -176,6 +184,7 @@ onBeforeUnmount(() => {
   gap: 0.5rem;
   padding: 1rem;
   border: 1px solid var(--color-button-bg);
+  width: max-content;
 
   &.hidden {
     display: none;
@@ -188,16 +197,21 @@ onBeforeUnmount(() => {
 }
 
 .account-group {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
 
 .option {
-  width: calc(100% - 2rem);
+  width: calc(100% - 2.25rem);
   background: var(--color-raised-bg);
   color: var(--color-base);
   box-shadow: none;
+
+  img {
+    margin-right: 0.5rem;
+  }
 }
 
 .icon {
@@ -207,7 +221,6 @@ onBeforeUnmount(() => {
 .account-row {
   display: flex;
   flex-direction: row;
-  width: 100%;
   gap: 0.5rem;
   vertical-align: center;
   justify-content: space-between;
