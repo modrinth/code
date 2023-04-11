@@ -121,12 +121,11 @@ const login = async () => {
   await setAccount(loggedIn)
   await refreshValues()
   // await window.close()
-
 }
 
 const logout = async (id) => {
   await remove_user(id)
-  await refreshValues();
+  await refreshValues()
   if (!selectedAccount.value && accounts.value.length > 0) {
     await setAccount(accounts.value[0])
     await refreshValues()
@@ -138,7 +137,12 @@ const toggle = () => {
 }
 
 const handleClickOutside = (event) => {
-  if (card.value && avatar.value.$el !== event.target && card.value.$el !== event.target && !card.value.$el.contains(event.target)) {
+  if (
+    card.value &&
+    avatar.value.$el !== event.target &&
+    card.value.$el !== event.target &&
+    !card.value.$el.contains(event.target)
+  ) {
     showCard.value = false
   }
 }
