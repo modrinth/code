@@ -1,15 +1,15 @@
 <template>
   <Avatar
-    class="button-base"
     ref="avatar"
+    class="button-base"
     size="sm"
-    :src="selectedAccount ? `https://crafthead.net/helm/${selectedAccount.id}` : ''"
+    :src="selectedAccount.profile_picture"
     @click="toggle()"
   />
   <transition name="fade">
     <Card v-if="showCard" ref="card" class="account-card">
       <div v-if="selectedAccount" class="selected account">
-        <Avatar size="xs" :src="`https://crafthead.net/helm/${selectedAccount.id}`" />
+        <Avatar size="xs" :src="selectedAccount.profile_picture" />
         <div>
           <h4>{{ selectedAccount.username }}</h4>
           <p>Selected</p>
@@ -87,7 +87,6 @@ const refreshValues = async () => {
 }
 
 let showCard = ref(false)
-console.log('show card intitialized')
 let card = ref(null)
 let avatar = ref(null)
 
