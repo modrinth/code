@@ -56,7 +56,10 @@ pub async fn profile_run_wait(path: &Path) -> Result<()> {
 // for the actual Child in the state.
 // invoke('profile_run_credentials', {path, credentials})')
 #[tauri::command]
-pub async fn profile_run_credentials(path: &Path, credentials: Credentials) -> Result<u32> {
+pub async fn profile_run_credentials(
+    path: &Path,
+    credentials: Credentials,
+) -> Result<u32> {
     let proc_lock = profile::run_credentials(path, &credentials).await?;
     let pid = proc_lock.read().await.child.id().ok_or_else(|| {
         theseus::Error::from(theseus::ErrorKind::LauncherError(

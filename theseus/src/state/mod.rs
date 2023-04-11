@@ -41,7 +41,9 @@ pub struct State {
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
     /// Semaphore used to limit concurrent I/O and avoid errors
-    pub io_semaphore: Semaphore,
+    pub io_semaphore: RwLock<Semaphore>,
+    /// Stored maximum number of sempahores of current io_semaphore
+    pub io_semaphore_max: RwLock<u32>,
     /// Launcher metadata
     pub metadata: Metadata,
     // TODO: settings API
@@ -80,8 +82,10 @@ impl State {
                         Settings::init(&directories.settings_file()).await?;
 
                     // Loose initializations
+                    let io_semaphore_max = settings.max_concurrent_downloads;
+
                     let io_semaphore =
-                        Semaphore::new(settings.max_concurrent_downloads);
+                        RwLock::new(Semaphore::new(io_semaphore_max));
 
                     // Launcher data
                     let (metadata, profiles) = tokio::try_join! {
@@ -112,6 +116,7 @@ impl State {
                     Ok(Arc::new(Self {
                         directories,
                         io_semaphore,
+                        io_semaphore_max: RwLock::new(io_semaphore_max as u32),
                         metadata,
                         settings: RwLock::new(settings),
                         profiles: RwLock::new(profiles),
@@ -157,5 +162,22 @@ impl State {
         tokio::try_join!(sync_settings, sync_profiles)?;
 
         Ok(())
+    }
+
+    /// Reset semaphores to default values
+    /// This will block until all uses of the semaphore are complete, so it should only be called
+    /// when we are not in the middle of downloading something (ie: changing the settings!)
+    pub async fn reset_semaphore(&self) {
+        let settings = self.settings.read().await;
+        let mut io_semaphore = self.io_semaphore.write().await;
+        let mut total_permits = self.io_semaphore_max.write().await;
+
+        // Wait to get all permits back
+        let _ = io_semaphore.acquire_many(*total_permits).await;
+
+        // Reset the semaphore
+        io_semaphore.close();
+        *total_permits = settings.max_concurrent_downloads as u32;
+        *io_semaphore = Semaphore::new(settings.max_concurrent_downloads);
     }
 }
