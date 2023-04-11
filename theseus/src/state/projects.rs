@@ -10,7 +10,7 @@ use sha2::Digest;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
-use tokio::sync::{Semaphore, RwLock};
+use tokio::sync::{RwLock, Semaphore};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Project {

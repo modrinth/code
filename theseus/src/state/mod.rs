@@ -173,7 +173,7 @@ impl State {
         let mut total_permits = self.io_semaphore_max.write().await;
 
         // Wait to get all permits back
-        let _ = io_semaphore.acquire_many(*total_permits);
+        let _ = io_semaphore.acquire_many(*total_permits).await;
 
         // Reset the semaphore
         io_semaphore.close();

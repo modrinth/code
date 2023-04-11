@@ -10,8 +10,8 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-use tokio::{fs, sync::RwLock};
 use tokio::sync::Semaphore;
+use tokio::{fs, sync::RwLock};
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 

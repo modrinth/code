@@ -5,7 +5,7 @@ use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
-use tokio::sync::{Semaphore, RwLock};
+use tokio::sync::{RwLock, Semaphore};
 use tokio::{
     fs::{self, File},
     io::AsyncWriteExt,
@@ -43,7 +43,7 @@ pub async fn fetch_advanced(
     sha1: Option<&str>,
     semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Bytes> {
-    let io_semaphore = semaphore.read().await;            
+    let io_semaphore = semaphore.read().await;
     let _permit = io_semaphore.acquire().await?;
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
         let result = REQWEST_CLIENT.request(method.clone(), url).send().await;
@@ -117,7 +117,7 @@ pub async fn write<'a>(
     bytes: &[u8],
     semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<()> {
-    let io_semaphore = semaphore.read().await;            
+    let io_semaphore = semaphore.read().await;
     let _permit = io_semaphore.acquire().await?;
 
     if let Some(parent) = path.parent() {
