@@ -149,7 +149,7 @@ pub fn emit_profile(_path : PathBuf, _event : ProfilePayloadType) {}
 // For example, if you want the tasks to range as 0.1, 0.2, 0.3 (of the progress bar), you would do:
 // loading_join!(0.0, 0.3; task1, task2, task3)
 // This will await on each of the tasks, and as each completes, it will emit a loading event for 0.1, 0.2, 0.3, etc
-// This should function as a drop-in replacement for tokio::try_join_all! in most cases
+// This should function as a drop-in replacement for tokio::try_join_all! in most cases- except the function *itself* calls ? rather than needing it.
 
 #[cfg(feature = "tauri")]
 #[macro_export]
@@ -175,20 +175,18 @@ macro_rules! loading_join {
             )*
             $(
                 paste::paste! {
-                    let mut [<done_ $future>] = false;
+                    let mut [<result_ $future>] = None;
                 }
             )*
 
             // Resolve each future and call respective loading as each resolves in any order
-            let mut resolved_values = vec![];
             for i in 0..num_futures {
                 paste::paste! {
                     tokio::select! {
                         $(
-                            v = &mut [<unique_name_ $future>], if ![<done_$future>] => {
-                                [<done_ $future>] = true;
+                            v = &mut [<unique_name_ $future>], if ![<result_$future>].is_some() => {
                                 $crate::emit_loading(($start + (i as f64 * increment)), $message);
-                                resolved_values.push(v)
+                                [<result_ $future>] = Some(v);
                             },
                         )*
                         else => break,
@@ -196,24 +194,18 @@ macro_rules! loading_join {
                 }
             }
 
-            // Turn Vec<Result<_,_>> into Result<Vec<_>,_>
-            let res: Result<Vec<_>, _> = resolved_values.into_iter().collect();
-            match res {
-                Ok(resolved_iter) => {
-                    let mut resolved_iter = resolved_iter.into_iter();
-                    Ok((
-                        $(
-                            {
-                                let _ = $future;
-                                resolved_iter.next().unwrap() // uwnrap here acceptable as numbers of futures and resolved values is guaranteed to be the same
-                            },
-                        )*
-                    ))
-                    },
-                Err(e) => {
-                    Err(e)
+            // Extract values out of option, then out of error, returning if any errors happened
+            $(
+                paste::paste! {
+                    let [<result_ $future>] = [<result_ $future>].take().unwrap()?; // unwrap here acceptable as numbers of futures and resolved values is guaranteed to be the same
                 }
-            }       
+            )*
+
+            paste::paste!{
+                ($(
+                    [<result_ $future>], // unwrap here acceptable as numbers of futures and resolved values is guaranteed to be the same
+                )+)
+            }
     }};
 }
 

@@ -3,7 +3,7 @@ use std::path::PathBuf;
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
-use crate::{config::{BINCODE_CONFIG, MODRINTH_API_URL, REQWEST_CLIENT}, loading_join, emit_loading};
+use crate::{config::{BINCODE_CONFIG, MODRINTH_API_URL, REQWEST_CLIENT}, loading_join};
 
 const CATEGORIES_DB_TREE: &[u8] = b"categories";
 const LOADERS_DB_TREE: &[u8] = b"loaders";
@@ -134,15 +134,12 @@ impl Tags {
     // Fetches the tags from the Modrinth API and stores them in the database
     #[tracing::instrument(skip(self))]
     pub async fn fetch_update(&mut self) -> crate::Result<()> {
-        emit_loading(0.1, "starting");
-
         let categories = self.fetch_tag("category");
         let loaders = self.fetch_tag("loader");
         let game_versions = self.fetch_tag("game_version");
         let licenses = self.fetch_tag("license");
         let donation_platforms = self.fetch_tag("donation_platform");
         let report_types = self.fetch_tag("report_type");
-        emit_loading(0.2, "got futures");
 
         let (
             categories,
@@ -151,15 +148,14 @@ impl Tags {
             licenses,
             donation_platforms,
             report_types,
-        ) = loading_join!(0.2, 0.5, "loading tags";
+        ) = loading_join!(0.5, 0.9, "Loading tags from Modrinth...";
             categories,
             loaders,
             game_versions,
             licenses,
             donation_platforms,
             report_types
-        )?;
-        emit_loading(0.6, "starting");
+        );
 
         // Store the tags in the database
         self.0.categories.insert(
@@ -204,7 +200,6 @@ impl Tags {
                 *BINCODE_CONFIG,
             )?,
         )?;
-        emit_loading(0.7, "done getting!!!");
 
         Ok(())
     }

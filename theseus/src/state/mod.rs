@@ -1,6 +1,8 @@
 //! Theseus state management system
 use crate::config::sled_config;
+use crate::emit_loading;
 use crate::jre;
+use crate::loading_join;
 use std::sync::Arc;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
@@ -77,6 +79,9 @@ impl State {
                         .path(directories.database_file())
                         .open()?;
 
+                    
+                    emit_loading(0.1, "Initializing settings...");
+
                     // Settings
                     let mut settings =
                         Settings::init(&directories.settings_file()).await?;
@@ -87,11 +92,17 @@ impl State {
                     let io_semaphore =
                         RwLock::new(Semaphore::new(io_semaphore_max));
 
+
+                    let metadata_fut = Metadata::init(&database);
+                    let profiles_fut = Profiles::init(&directories, &io_semaphore);
+
                     // Launcher data
-                    let (metadata, profiles) = tokio::try_join! {
-                        Metadata::init(&database),
-                        Profiles::init(&directories, &io_semaphore),
-                    }?;
+                    let (metadata, profiles) = loading_join! {
+                        0.1, 0.4, "Initializing metadata and profiles...";
+                        metadata_fut, profiles_fut
+                    };
+
+                    emit_loading(0.5, "Initializing users...");
                     let users = Users::init(&database)?;
 
                     let children = Children::new();
@@ -106,6 +117,8 @@ impl State {
                             tag_fetch_err
                         );
                     };
+
+                    emit_loading(0.9, "Detecting java...");
 
                     // On launcher initialization, if global java variables are unset, try to find and set them
                     // (they are required for the game to launch)
