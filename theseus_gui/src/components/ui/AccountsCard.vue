@@ -19,9 +19,7 @@
         </Button>
       </div>
       <div v-else class="logged-out account">
-        <div>
-          <h4>Not signed in</h4>
-        </div>
+        <h4>Not signed in</h4>
         <Button icon-only color="primary" @click="login()">
           <LoginIcon />
         </Button>
@@ -117,9 +115,10 @@ const login = async () => {
     console.log('webview error', e)
   })
 
-  const loggedIn = await authenticate_await_completion().then(await window.close())
+  const loggedIn = await authenticate_await_completion()
   await setAccount(loggedIn)
   await refreshValues()
+  await window.close()
 }
 
 const logout = async (id) => {
@@ -158,6 +157,15 @@ onBeforeUnmount(() => {
   border-radius: var(--radius-lg);
 }
 
+.account {
+  width: max-content;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-align: left;
+  padding: 0.5rem 1rem;
+}
+
 .account-card {
   position: absolute;
   display: flex;
@@ -183,15 +191,6 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.account {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  text-align: left;
-  padding: 0.5rem 1rem;
 }
 
 .option {
