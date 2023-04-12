@@ -91,16 +91,8 @@ async fn main() -> theseus::Result<()> {
     // println!("Logs after 5sec <<< {stdout} >>> end stdout");
 
     println!(
-        "All running process PIDs {:?}",
-        process::get_all_running_pids().await?
-    );
-    println!(
         "All running process paths {:?}",
         process::get_all_running_profile_paths().await?
-    );
-    println!(
-        "All running process profiles {:?}",
-        process::get_all_running_profiles().await?
     );
 
     // hold the lock to the process until it ends

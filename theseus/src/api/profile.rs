@@ -2,7 +2,7 @@
 use crate::{
     auth::{self, refresh},
     launcher::download,
-    state::MinecraftChild,
+    state::MinecraftChild, emit_profile, ProfilePayloadType,
 };
 pub use crate::{
     state::{JavaSettings, Profile},
@@ -20,6 +20,11 @@ use tokio::{process::Command, sync::RwLock};
 pub async fn remove(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get(path) {
+        emit_profile(profile.uuid, profile.path.clone(), &profile.metadata.name, ProfilePayloadType::Removed);
+    }
+
     profiles.remove(path).await?;
 
     Ok(())
@@ -46,7 +51,11 @@ where
     let mut profiles = state.profiles.write().await;
 
     match profiles.0.get_mut(path) {
-        Some(ref mut profile) => action(profile).await,
+        Some(ref mut profile) => {
+            emit_profile(profile.uuid, profile.path.clone(), &profile.metadata.name, ProfilePayloadType::Edited);
+        
+            action(profile).await
+        },
         None => Err(crate::ErrorKind::UnmanagedProfileError(
             path.display().to_string(),
         )

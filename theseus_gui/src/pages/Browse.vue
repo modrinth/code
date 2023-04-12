@@ -18,7 +18,6 @@ import {
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
-import { loading_listener } from '@/helpers/events'
 
 const searchStore = useSearch()
 
@@ -40,12 +39,6 @@ const getSearchResults = async (shouldLoad = false) => {
   loading.value = false
   searchStore.setSearchResults(response)
 }
-
-await loading_listener((event) => {
-  // event.event is the event name (useful if you want to use a single callback fn for multiple event types)
-  // event.payload is the payload object
-  console.log(event)
-})
 
 getSearchResults(true)
 

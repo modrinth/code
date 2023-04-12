@@ -1,4 +1,5 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
+use crate::{emit_profile, ProfilePayloadType};
 use crate::state::projects::Project;
 use crate::util::fetch::write_cached_icon;
 use crate::{data::DirectoryInfo, loading_try_for_each_concurrent};
@@ -6,6 +7,7 @@ use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
@@ -23,6 +25,8 @@ pub const CURRENT_FORMAT_VERSION: u32 = 1;
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
+    #[serde(default="create_uuid")]
+    pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -48,6 +52,10 @@ pub struct ProfileMetadata {
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
     pub linked_project_id: Option<String>,
+}
+
+pub fn create_uuid() -> Uuid {
+    Uuid::new_v4()
 }
 
 // TODO: Quilt?
@@ -97,6 +105,7 @@ impl Profile {
         }
 
         Ok(Self {
+            uuid: create_uuid(),
             path: canonicalize(path)?,
             metadata: ProfileMetadata {
                 name,
@@ -220,6 +229,7 @@ impl Profiles {
 
     #[tracing::instrument(skip(self))]
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
+        emit_profile(profile.uuid, profile.path.clone(), &profile.metadata.name, ProfilePayloadType::Added);
         self.0.insert(
             canonicalize(&profile.path)?
                 .to_str()

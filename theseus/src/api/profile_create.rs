@@ -1,5 +1,5 @@
 //! Theseus profile management interface
-use crate::{jre, prelude::ModLoader};
+use crate::{jre, prelude::ModLoader, emit_profile, ProfilePayloadType};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -167,6 +167,7 @@ pub async fn profile_create(
         println!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.");
     }
 
+    emit_profile(uuid, path.clone(), &profile.metadata.name, ProfilePayloadType::Created);
     {
         let mut profiles = state.profiles.write().await;
         profiles.insert(profile)?;

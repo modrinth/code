@@ -22,6 +22,7 @@ pub struct WarningPayload {
 
 #[derive(Serialize, Clone)]
 pub struct ProcessPayload {
+    pub uuid: uuid::Uuid, // processes in state are going to be identified by UUIDs, as they might change to different processes
     pub pid: u32,
     pub event: ProcessPayloadType,
     pub message: String,
@@ -29,20 +30,23 @@ pub struct ProcessPayload {
 #[derive(Serialize, Clone)]
 pub enum ProcessPayloadType {
     Launched,
-    Finished,
+    Finishing, // TODO: process restructing incoming, currently this is never emitted
+    Finished, // TODO: process restructing incoming, currently this is never emitted
 }
 
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
+    pub uuid : uuid::Uuid,
     pub path: PathBuf,
+    pub name : String,
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]
 pub enum ProfilePayloadType {
     Created,
     Added, // also triggered when Created
-    Changed,
-    Deleted,
+    Edited,
+    Removed,
 }
 
 // window_scoped!(window, task)
@@ -101,6 +105,7 @@ pub fn emit_loading(_loading_frac: f64, _message: &str) {}
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
 pub fn emit_warning(message: &str) {
+    println!("Warning: {} ", message);
     if let Err(e) = WINDOW.try_with(|f| {
         f.emit(
             "warning",
@@ -119,11 +124,14 @@ pub fn emit_warning(_message: &str) {}
 // Passes the a ProcessPayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_process(pid: u32, event: ProcessPayloadType, message: &str) {
+pub fn emit_process(uuid: uuid::Uuid, pid: u32, event: ProcessPayloadType, message: &str) {
+    println!("Process: {} ({})", uuid, message);
+
     if let Err(e) = WINDOW.try_with(|f| {
         f.emit(
             "process",
             ProcessPayload {
+                uuid,
                 pid,
                 event,
                 message: message.to_string(),
@@ -135,22 +143,23 @@ pub fn emit_process(pid: u32, event: ProcessPayloadType, message: &str) {
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_process(_pid: u32, _event: ProcessPayloadType, _message: &str) {}
+pub fn emit_process(_uuid: uuid::Uuid, _pid: u32, _event: ProcessPayloadType, _message: &str) {}
 
 // emit_profile(path, event)
 // Passes the a ProfilePayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_profile(path: PathBuf, event: ProfilePayloadType) {
+pub fn emit_profile(uuid: uuid::Uuid, path: PathBuf, name: &str, event: ProfilePayloadType) {
+    println!("Profile: {} ({})", uuid, name);
     if let Err(e) =
-        WINDOW.try_with(|f| f.emit("profile", ProfilePayload { path, event }))
+        WINDOW.try_with(|f| f.emit("profile", ProfilePayload { uuid, path, name: name.to_string(), event }))
     {
         eprintln!("Error emitting profile event to Tauri: {}", e);
     }
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_profile(_path: PathBuf, _event: ProfilePayloadType) {}
+pub fn emit_profile(_uuid: uuid::Uuid, _path: PathBuf, _event: ProfilePayloadType) {}
 
 // loading_join! macro
 // loading_join!(i,j,message; task1, task2, task3...)

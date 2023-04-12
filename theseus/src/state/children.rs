@@ -4,6 +4,8 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
 
+use crate::emit_process;
+
 use super::Profile;
 
 // Child processes (instances of Minecraft)
@@ -13,6 +15,7 @@ pub struct Children(HashMap<u32, Arc<RwLock<MinecraftChild>>>);
 // Minecraft Child, bundles together the PID, the actual Child, and the easily queryable stdout and stderr streams
 #[derive(Debug)]
 pub struct MinecraftChild {
+    pub uuid: uuid::Uuid,
     pub pid: u32,
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub child: tokio::process::Child,
@@ -34,6 +37,9 @@ impl Children {
         profile_path: PathBuf,
         mut child: tokio::process::Child,
     ) -> Arc<RwLock<MinecraftChild>> {
+
+        let uuid = uuid::Uuid::new_v4();
+
         // Create std watcher threads for stdout and stderr
         let stdout = SharedOutput::new();
         if let Some(child_stdout) = child.stdout.take() {
@@ -54,8 +60,11 @@ impl Children {
             });
         }
 
+        emit_process(uuid, pid, crate::ProcessPayloadType::Launched, "Launched Minecraft");
+
         // Create MinecraftChild
         let mchild = MinecraftChild {
+            uuid,
             pid,
             profile_path,
             child,
