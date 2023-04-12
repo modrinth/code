@@ -1,6 +1,16 @@
 <script setup>
 import { ref, watch } from 'vue'
-import { Card, Slider, DropdownSelect, Button, SearchIcon, PlayIcon, Modal } from 'omorphia'
+import {
+  Card,
+  Slider,
+  DropdownSelect,
+  Button,
+  SearchIcon,
+  PlayIcon,
+  Modal,
+  CheckIcon,
+  PlusIcon,
+} from 'omorphia'
 import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
 import { get, set, deepEqual } from '@/helpers/settings'
@@ -34,7 +44,7 @@ watch(settings.value, (newSettings) => {
   if (newSettings.hooks.wrapper === '') delete settings.value.hooks.wrapper
   if (newSettings.hooks.post_exit === '') delete settings.value.hooks.post_exit
 
-  settings.value.max_concurrent_downloads = parseInt(newSettings.max_concurrent_downloads)
+  settings.value.max_concurrent_downloads = newSettings.max_concurrent_downloads
 
   if (deepEqual(originalSettings.value, settings.value)) saveButton.value.$el.style.opacity = 0
   else saveButton.value.$el.style.opacity = 1
@@ -67,51 +77,74 @@ const handleJava8FileInput = async () => {
   }
 }
 
-const setJava17Install = (chosenInstall) => (settings.value.java_globals.JAVA_17 = chosenInstall)
-const setJava8Install = (chosenInstall) => (settings.value.java_globals.JAVA_8 = chosenInstall)
+const setJava17Install = (chosenInstall) => {
+  settings.value.java_globals.JAVA_17 = chosenInstall
+  detectJava17Modal.value.hide()
+}
+const setJava8Install = (chosenInstall) => {
+  settings.value.java_globals.JAVA_8 = chosenInstall
+  detectJava8Modal.value.hide()
+}
 </script>
 
 <template>
   <div>
     <Button ref="saveButton" color="primary" class="save-btn" @click="saveSettings">Save</Button>
     <Modal ref="detectJava17Modal" header="Auto Detect Java Version" class="auto-detect-modal">
-      <div class="version-table">
-        <div class="header">
-          <span>Version</span>
-          <span>Path</span>
+      <div class="table-container">
+        <div class="table-row table-head">
+          <div class="table-cell table-text">Version</div>
+          <div class="table-cell table-text">Path</div>
+          <div class="table-cell table-text">Actions</div>
         </div>
         <div
           v-for="java17Install in java17InstallOptions"
           :key="java17Install.path"
-          class="row"
-          :class="[settings.java_globals.JAVA_17.path === java17Install.path ? 'active' : '']"
-          @click="() => setJava17Install(java17Install)"
+          class="table-row"
         >
-          <span>{{ java17Install.version }}</span>
-          <span>{{ java17Install.path }}</span>
+          <div class="table-cell table-text">
+            <span>{{ java17Install.version }}</span>
+          </div>
+          <div class="table-cell table-text">
+            <span>{{ java17Install.path }}</span>
+          </div>
+          <div class="table-cell table-text manage">
+            <Button
+              :disabled="settings.java_globals.JAVA_17.path === java17Install.path"
+              @click="() => setJava17Install(java17Install)"
+            >
+              <CheckIcon v-if="settings.java_globals.JAVA_17.path === java17Install.path" />
+              <span v-else><PlusIcon />Select</span>
+            </Button>
+          </div>
         </div>
       </div>
-
-      <Button color="primary" @click="() => detectJava17Modal.hide()">Select</Button>
     </Modal>
     <Modal ref="detectJava8Modal" header="Auto Detect Java Version" class="auto-detect-modal">
-      <div class="version-table">
-        <div class="header">
-          <span>Version</span>
-          <span>Path</span>
+      <div class="table-container">
+        <div class="table-row table-head">
+          <div class="table-cell table-text">Version</div>
+          <div class="table-cell table-text">Path</div>
+          <div class="table-cell table-text">Actions</div>
         </div>
-        <div
-          v-for="java8Install in java8InstallOptions"
-          :key="java8Install.path"
-          class="row"
-          :class="[settings.java_globals.JAVA_8.path === java8Install.path ? 'active' : '']"
-          @click="() => setJava8Install(java8Install)"
-        >
-          <span>{{ java8Install.version }}</span>
-          <span>{{ java8Install.path }}</span>
+        <div v-for="java8Install in java8InstallOptions" :key="java8Install.path" class="table-row">
+          <div class="table-cell table-text">
+            {{ java8Install.version }}
+          </div>
+          <div class="table-cell table-text">
+            {{ java8Install.path }}
+          </div>
+          <div class="table-cell table-text manage">
+            <Button
+              :disabled="settings.java_globals.JAVA_8.path === java8Install.path"
+              @click="() => setJava8Install(java8Install)"
+            >
+              <CheckIcon v-if="settings.java_globals.JAVA_8.path === java8Install.path" />
+              <span v-else><PlusIcon />Select</span>
+            </Button>
+          </div>
         </div>
       </div>
-      <Button color="primary" @click="() => detectJava8Modal.hide()">Select</Button>
     </Modal>
     <Card class="theming">
       <h2>Themes</h2>
@@ -206,11 +239,11 @@ const setJava8Install = (chosenInstall) => (settings.value.java_globals.JAVA_8 =
         <div class="sliders">
           <span class="slider">
             Minimum Memory
-            <Slider v-model="settings.memory.minimum" :min="1024" :max="8192" :step="1024" />
+            <Slider v-model="settings.memory.minimum" :min="1000" :max="8200" :step="10" />
           </span>
           <span class="slider">
             Maximum Memory
-            <Slider v-model="settings.memory.maximum" :min="1024" :max="8192" :step="1024" />
+            <Slider v-model="settings.memory.maximum" :min="1000" :max="8200" :step="10" />
           </span>
         </div>
       </div>
@@ -239,7 +272,7 @@ const setJava8Install = (chosenInstall) => (settings.value.java_globals.JAVA_8 =
               v-model="settings.max_concurrent_downloads"
               type="number"
               name="concurrent-downloads"
-              class="concurrent_downloads"
+              class="concurrent-downloads"
             />
           </div>
         </div>
@@ -270,61 +303,68 @@ const setJava8Install = (chosenInstall) => (settings.value.java_globals.JAVA_8 =
   background: var(--color-brand-highlight) !important;
 }
 
+.concurrent-downloads {
+  border-radius: var(--radius-md);
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  // safari iOS rounds inputs by default
+  // set the appearance to none to prevent this
+  appearance: none !important;
+  background: var(--color-button-bg);
+  color: var(--color-base);
+  padding: 0.5rem 1rem;
+  font-weight: var(--font-weight-medium);
+  outline: 2px solid transparent;
+  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  transition: box-shadow 0.1s ease-in-out;
+  min-height: 40px;
+  max-width: 3.6rem !important;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  &:focus,
+  &:focus-visible {
+    box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
+    color: var(--color-contrast);
+  }
+
+  &:disabled,
+  &[disabled] {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+
+  &:focus::placeholder {
+    opacity: 0.8;
+  }
+
+  &::placeholder {
+    color: var(--color-contrast);
+    opacity: 0.6;
+  }
+}
+
 .auto-detect-modal {
   .modal-body {
+    width: 45rem !important;
     .content {
-      padding: 1.5rem;
+      padding: 1rem;
 
-      .version-table {
-        border: 1px solid var(--color-contrast);
+      button {
         width: 100%;
-        overflow: hidden;
-        padding: 0.3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
-        .header {
-          display: flex;
-          gap: 2rem;
-          width: 100%;
-          margin-bottom: 0.3rem;
-
-          span:first-child {
-            width: 5rem !important;
-          }
-
-          span {
-            white-space: nowrap;
-            color: var(--color-contrast);
-          }
-
-          span:first-child {
-            border-right: 1px solid var(--color-contrast);
-          }
-        }
-
-        .row {
-          display: flex;
-          gap: 2rem;
-          width: 100%;
-          max-height: 100%;
-          white-space: nowrap;
-          margin-bottom: 0.2rem;
-          cursor: pointer;
-          transition: 0.1s ease-in-out all;
-
-          &:hover {
-            background: var(--color-brand-highlight);
-          }
-
-          span:first-child {
-            width: 5rem !important;
-          }
-
-          span:nth-child(2) {
-            display: inline-block;
-            width: 25rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-          }
+        span {
+          display: inherit;
+          align-items: center;
+          justify-content: center;
         }
       }
     }
@@ -344,12 +384,9 @@ const setJava8Install = (chosenInstall) => (settings.value.java_globals.JAVA_8 =
   flex-basis: 5rem !important;
 }
 
-.concurrent_downloads {
-  width: 4rem !important;
-}
-
 .installation-input {
   width: 100% !important;
+  flex-grow: 1;
 }
 
 .theming,
@@ -445,5 +482,54 @@ const setJava8Install = (chosenInstall) => (settings.value.java_globals.JAVA_8 =
   color: var(--color-button-bg);
   height: 1px;
   margin: var(--gap-sm) 0;
+}
+
+.table-container {
+  display: grid;
+  grid-template-rows: repeat(auto-fill, auto);
+  width: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: 1fr 4fr 1.5fr;
+}
+
+.table-head {
+  .table-cell {
+    background-color: var(--color-accent-contrast);
+  }
+}
+
+.table-cell {
+  padding: 1rem;
+  height: 100%;
+  align-items: center;
+  vertical-align: center;
+  display: flex;
+}
+
+.table-text {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  display: flex;
+
+  span {
+    display: inline-block;
+    text-overflow: ellipsis;
+    overflow: hidden;
+  }
+}
+
+.manage {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.table-row:nth-child(even) .table-cell {
+  background-color: var(--color-bg);
 }
 </style>
