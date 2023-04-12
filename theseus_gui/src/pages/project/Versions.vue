@@ -65,7 +65,7 @@
         @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
       >
         <div class="table-cell table-text">
-          <Button color="primary" class="install" icon-only @click.stop="() => install(version.id)">
+          <Button color="primary" icon-only @click.stop="() => install(version.id)">
             <DownloadIcon />
           </Button>
         </div>
