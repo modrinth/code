@@ -79,7 +79,6 @@ impl State {
                         .path(directories.database_file())
                         .open()?;
 
-                    
                     emit_loading(0.1, "Initializing settings...");
 
                     // Settings
@@ -92,9 +91,9 @@ impl State {
                     let io_semaphore =
                         RwLock::new(Semaphore::new(io_semaphore_max));
 
-
                     let metadata_fut = Metadata::init(&database);
-                    let profiles_fut = Profiles::init(&directories, &io_semaphore);
+                    let profiles_fut =
+                        Profiles::init(&directories, &io_semaphore);
 
                     // Launcher data
                     let (metadata, profiles) = loading_join! {

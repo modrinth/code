@@ -3,7 +3,10 @@ use std::path::PathBuf;
 use bincode::{Decode, Encode};
 use serde::{Deserialize, Serialize};
 
-use crate::{config::{BINCODE_CONFIG, MODRINTH_API_URL, REQWEST_CLIENT}, loading_join};
+use crate::{
+    config::{BINCODE_CONFIG, MODRINTH_API_URL, REQWEST_CLIENT},
+    loading_join,
+};
 
 const CATEGORIES_DB_TREE: &[u8] = b"categories";
 const LOADERS_DB_TREE: &[u8] = b"loaders";

@@ -1,5 +1,5 @@
 use crate::api::Result;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use theseus::{prelude::*, window_scoped};
 
 // Identical to theseus::settings::Settings except for the custom_java_args field
@@ -21,7 +21,7 @@ pub struct FrontendSettings {
 // invoke('settings_get')
 #[tauri::command]
 pub async fn settings_get(window: tauri::Window) -> Result<FrontendSettings> {
-    let backend_settings = window_scoped!(window,settings::get()).await?;
+    let backend_settings = window_scoped!(window, settings::get()).await?;
     let frontend_settings = FrontendSettings {
         memory: backend_settings.memory,
         game_resolution: backend_settings.game_resolution,
@@ -39,11 +39,18 @@ pub async fn settings_get(window: tauri::Window) -> Result<FrontendSettings> {
 // Set full settings
 // invoke('settings_set', settings)
 #[tauri::command]
-pub async fn settings_set(window: tauri::Window, settings: FrontendSettings) -> Result<()> {
+pub async fn settings_set(
+    window: tauri::Window,
+    settings: FrontendSettings,
+) -> Result<()> {
     let backend_settings = Settings {
         memory: settings.memory,
         game_resolution: settings.game_resolution,
-        custom_java_args: settings.custom_java_args.split_whitespace().map(|s| s.to_string()).collect(),
+        custom_java_args: settings
+            .custom_java_args
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect(),
         custom_env_args: settings.custom_env_args,
         java_globals: settings.java_globals,
         default_user: settings.default_user,

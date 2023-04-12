@@ -1,8 +1,8 @@
-use std::path::PathBuf;
 use futures::prelude::*;
-use tauri::async_runtime::RwLock;
-use std::sync::Arc;
 use serde::Serialize;
+use std::path::PathBuf;
+use std::sync::Arc;
+use tauri::async_runtime::RwLock;
 
 #[cfg(feature = "tauri")]
 tokio::task_local! {
@@ -11,7 +11,7 @@ tokio::task_local! {
 
 #[derive(Serialize, Clone)]
 pub struct LoadingPayload {
-    pub fraction: Option<f64>, // by convention, if optional, it means the loading is done 
+    pub fraction: Option<f64>, // by convention, if optional, it means the loading is done
     pub message: String,
 }
 
@@ -22,14 +22,14 @@ pub struct WarningPayload {
 
 #[derive(Serialize, Clone)]
 pub struct ProcessPayload {
-    pub pid : u32,
+    pub pid: u32,
     pub event: ProcessPayloadType,
     pub message: String,
 }
 #[derive(Serialize, Clone)]
 pub enum ProcessPayloadType {
     Launched,
-    Finished
+    Finished,
 }
 
 #[derive(Serialize, Clone)]
@@ -42,7 +42,7 @@ pub enum ProfilePayloadType {
     Created,
     Added, // also triggered when Created
     Changed,
-    Deleted
+    Deleted,
 }
 
 // window_scoped!(window, task)
@@ -53,21 +53,23 @@ pub enum ProfilePayloadType {
 #[macro_export]
 macro_rules! window_scoped {
     ($window:expr, $x:expr) => {{
-        use tokio::task::LocalKey;        
+        use tokio::task::LocalKey;
         $crate::WINDOW.scope($window, async move {
             let res = $x.await;
-            
-            if let Err(e) = $crate::WINDOW.try_with(|f| { 
-                f.emit("loading", $crate::LoadingPayload {
-                    fraction: None,
-                    message: "Done loading.".to_string(),
-                }) 
+
+            if let Err(e) = $crate::WINDOW.try_with(|f| {
+                f.emit(
+                    "loading",
+                    $crate::LoadingPayload {
+                        fraction: None,
+                        message: "Done loading.".to_string(),
+                    },
+                )
             }) {
                 eprintln!("Error emitting loading event to Tauri: {}", e);
             }
 
             res
-            
         })
     }};
 }
@@ -77,73 +79,78 @@ macro_rules! window_scoped {
 // By convention, fraction is the fraction of the progress bar that is filled
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_loading(loading_frac : f64, message : &str) {
-    
+pub fn emit_loading(loading_frac: f64, message: &str) {
     println!("Loading: {} ({})", message, loading_frac);
-    if let Err(e) = WINDOW.try_with(|f| { 
-        f.emit("loading", LoadingPayload {
-            fraction: Some(loading_frac),
-            message: message.to_string(),
-        }) 
+    if let Err(e) = WINDOW.try_with(|f| {
+        f.emit(
+            "loading",
+            LoadingPayload {
+                fraction: Some(loading_frac),
+                message: message.to_string(),
+            },
+        )
     }) {
         eprintln!("Error emitting loading event to Tauri: {}", e);
     }
 }
 #[cfg(not(feature = "tauri"))]
-pub fn emit_loading(_loading_frac : f64, _message : &str) {}
+pub fn emit_loading(_loading_frac: f64, _message: &str) {}
 
 // emit_warning(message)
 // Passes the a WarningPayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_warning(message : &str) {
-    if let Err(e) = WINDOW.try_with(|f| { 
-        f.emit("warning", WarningPayload {
-            message: message.to_string(),
-        }) 
+pub fn emit_warning(message: &str) {
+    if let Err(e) = WINDOW.try_with(|f| {
+        f.emit(
+            "warning",
+            WarningPayload {
+                message: message.to_string(),
+            },
+        )
     }) {
         eprintln!("Error emitting warning event to Tauri: {}", e);
     }
 }
 #[cfg(not(feature = "tauri"))]
-pub fn emit_warning(_message : &str) {}
+pub fn emit_warning(_message: &str) {}
 
 // emit_process(pid, event, message)
 // Passes the a ProcessPayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_process(pid : u32, event : ProcessPayloadType, message : &str) {
-    if let Err(e) = WINDOW.try_with(|f| { 
-        f.emit("process", ProcessPayload {
-            pid,
-            event,
-            message: message.to_string(),
-        }) 
+pub fn emit_process(pid: u32, event: ProcessPayloadType, message: &str) {
+    if let Err(e) = WINDOW.try_with(|f| {
+        f.emit(
+            "process",
+            ProcessPayload {
+                pid,
+                event,
+                message: message.to_string(),
+            },
+        )
     }) {
         eprintln!("Error emitting process event to Tauri: {}", e);
     }
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_process(_pid : u32, _event : ProcessPayloadType, _message : &str) {}
+pub fn emit_process(_pid: u32, _event: ProcessPayloadType, _message: &str) {}
 
 // emit_profile(path, event)
 // Passes the a ProfilePayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_profile(path : PathBuf, event : ProfilePayloadType) {
-    if let Err(e) = WINDOW.try_with(|f| { 
-        f.emit("profile", ProfilePayload {
-            path,
-            event,
-        }) 
-    }) {
+pub fn emit_profile(path: PathBuf, event: ProfilePayloadType) {
+    if let Err(e) =
+        WINDOW.try_with(|f| f.emit("profile", ProfilePayload { path, event }))
+    {
         eprintln!("Error emitting profile event to Tauri: {}", e);
     }
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_profile(_path : PathBuf, _event : ProfilePayloadType) {}
+pub fn emit_profile(_path: PathBuf, _event: ProfilePayloadType) {}
 
 // loading_join! macro
 // loading_join!(i,j,message; task1, task2, task3...)
@@ -174,7 +181,7 @@ macro_rules! loading_join {
                 paste::paste! {
                     tokio::pin! {
                         let [<unique_name_ $future>] = $future;
-                    }   
+                    }
                 }
             )*
             $(
@@ -222,8 +229,7 @@ macro_rules! loading_join {
 }
 
 #[cfg(feature = "tauri")]
-pub async fn loading_try_for_each_concurrent
-<I, F, Fut, T>(
+pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,
     loading_frac_start: f64,
@@ -240,27 +246,29 @@ where
 {
     let futs_count = Arc::new(RwLock::new(0.0));
     let mut f = f;
-    
-    stream.try_for_each_concurrent(limit, |item| {
-        let f = f(item);
-        let futs_count = futs_count.clone();
-        async move {
-            f.await?;
-            let loading_frac = {
-                let mut futs_count = futs_count.write().await;
-                *futs_count += 1.0;
-                (loading_frac_end-loading_frac_start) * (*futs_count / num_futs as f64) + loading_frac_start
-            };
-            emit_loading(loading_frac, message);
-            Ok(())
-        }
-    }).await
 
+    stream
+        .try_for_each_concurrent(limit, |item| {
+            let f = f(item);
+            let futs_count = futs_count.clone();
+            async move {
+                f.await?;
+                let loading_frac = {
+                    let mut futs_count = futs_count.write().await;
+                    *futs_count += 1.0;
+                    (loading_frac_end - loading_frac_start)
+                        * (*futs_count / num_futs as f64)
+                        + loading_frac_start
+                };
+                emit_loading(loading_frac, message);
+                Ok(())
+            }
+        })
+        .await
 }
 
 #[cfg(not(feature = "tauri"))]
-pub async fn loading_try_for_each_concurrent
-<I, F, Fut, T>(
+pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,
     _loading_frac_start: f64,
@@ -270,18 +278,21 @@ pub async fn loading_try_for_each_concurrent
     f: F,
 ) -> crate::Result<()>
 where
-    I: futures::TryStreamExt<Error = crate::Error> + TryStream<Ok = T> + Iterator,
+    I: futures::TryStreamExt<Error = crate::Error>
+        + TryStream<Ok = T>
+        + Iterator,
     F: FnMut(T) -> Fut + Send + 'static,
     Fut: Future<Output = crate::Result<()>> + Send + 'static,
     T: Send + 'static,
 {
     let mut f = f;
-    stream.try_for_each_concurrent(limit, |item| {
-        let f = f(item);
-        async move {
-            f.await?;
-            Ok(())
-        }
-    }).await
-
+    stream
+        .try_for_each_concurrent(limit, |item| {
+            let f = f(item);
+            async move {
+                f.await?;
+                Ok(())
+            }
+        })
+        .await
 }

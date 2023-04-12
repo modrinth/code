@@ -1,8 +1,9 @@
 //! Downloader for Minecraft data
 
 use crate::{
+    loading_try_for_each_concurrent,
     state::State,
-    util::{fetch::*, platform::OsExt}, loading_try_for_each_concurrent,
+    util::{fetch::*, platform::OsExt},
 };
 use daedalus::{
     self as d,
@@ -142,7 +143,7 @@ pub async fn download_assets(
     log::debug!("Loading assets");
     let num_futs = index.objects.len();
     let assets = stream::iter(index.objects.iter())
-    .map(Ok::<(&String, &Asset), crate::Error>);
+        .map(Ok::<(&String, &Asset), crate::Error>);
 
     loading_try_for_each_concurrent(   
         assets

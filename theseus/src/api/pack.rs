@@ -4,7 +4,7 @@ use crate::state::{ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
-use crate::{State, loading_try_for_each_concurrent};
+use crate::{loading_try_for_each_concurrent, State};
 use async_zip::tokio::read::seek::ZipFileReader;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -224,9 +224,15 @@ async fn install_pack(
 
         let num_files = pack.files.len();
         use futures::StreamExt;
-        loading_try_for_each_concurrent(        futures::stream::iter(pack.files.into_iter())
-        .map(Ok::<PackFile, crate::Error>)
-, None, 0.0,1.0, num_files, "Downloading pack...", |project| {
+        loading_try_for_each_concurrent(
+            futures::stream::iter(pack.files.into_iter())
+                .map(Ok::<PackFile, crate::Error>),
+            None,
+            0.0,
+            1.0,
+            num_files,
+            "Downloading pack...",
+            |project| {
                 let profile = profile.clone();
                 async move {
                     // TODO: Future update: prompt user for optional files in a modpack
@@ -265,8 +271,9 @@ async fn install_pack(
                     }
                     Ok(())
                 }
-            })
-            .await?;
+            },
+        )
+        .await?;
 
         let extract_overrides = |overrides: String| async {
             let reader = Cursor::new(&file);
