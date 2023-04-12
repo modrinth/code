@@ -22,10 +22,13 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import { XIcon } from '@/components'
+</script>
+<script>
+import { defineComponent } from 'vue'
 
-export default {
+export default defineComponent({
   props: {
     header: {
       type: String,
@@ -49,7 +52,7 @@ export default {
       this.shown = false
     },
   },
-}
+})
 </script>
 
 <style lang="scss" scoped>
