@@ -177,7 +177,7 @@
       />
     </div>
   </div>
-  <InstallConfirmModal ref="confirmModal"/>
+  <InstallConfirmModal ref="confirmModal" />
 </template>
 
 <script setup>
@@ -217,7 +217,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
-import InstallConfirmModal from "@/components/ui/InstallConfirmModal.vue";
+import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -243,13 +243,16 @@ dayjs.extend(relativeTime)
 
 async function install(version) {
   if (data.value.project_type === 'modpack') {
-    const packs = Object.values(await list());
-    console.log(packs);
-    if (packs.length === 0 || !packs.map(value => value.metadata).find((pack) => pack.linked_project_id === data.value.id)) {
+    const packs = Object.values(await list())
+    console.log(packs)
+    if (
+      packs.length === 0 ||
+      !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
+    ) {
       let id = await pack_install(version)
-      await router.push({path: `/instance/${encodeURIComponent(id)}`})
+      await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
-      confirmModal.value.show(version);
+      confirmModal.value.show(version)
     }
   }
 }

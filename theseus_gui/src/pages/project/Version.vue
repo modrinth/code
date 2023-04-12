@@ -53,7 +53,11 @@
                 <span class="primary-label"> Primary </span>
               </span>
             </span>
-            <Button v-if="project.project_type !== 'modpack' || file.primary" class="download" :action="() => install(version.id)">
+            <Button
+              v-if="project.project_type !== 'modpack' || file.primary"
+              class="download"
+              :action="() => install(version.id)"
+            >
               <DownloadIcon />
               Install
             </Button>
@@ -202,7 +206,7 @@ const props = defineProps({
   install: {
     type: Function,
     required: true,
-  }
+  },
 })
 
 const version = ref(props.versions.find((version) => version.id === route.params.version))
