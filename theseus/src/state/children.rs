@@ -1,9 +1,13 @@
 use std::path::{Path, PathBuf};
 use std::{collections::HashMap, sync::Arc};
+use futures::Future;
 use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
-
+use tokio::task::JoinHandle;
+use tokio::process::Command;
+use crate::Error;
+use tokio::process::Child;
 use super::Profile;
 
 // Child processes (instances of Minecraft)
@@ -13,11 +17,45 @@ pub struct Children(HashMap<u32, Arc<RwLock<MinecraftChild>>>);
 // Minecraft Child, bundles together the PID, the actual Child, and the easily queryable stdout and stderr streams
 #[derive(Debug)]
 pub struct MinecraftChild {
-    pub pid: u32,
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
-    pub child: tokio::process::Child,
-    pub stdout: SharedOutput,
-    pub stderr: SharedOutput,
+    pub uuid: uuid::Uuid,
+    pub manager: JoinHandle<Result<Child,Error>>,
+    current_child: Arc<RwLock<Option<Child>>>,
+    pub post_commands: Vec<String>,
+    pub stdout: Option<SharedOutput>,
+    pub stderr: Option<SharedOutput>,
+}
+
+impl MinecraftChild {
+    pub async fn build_and_run(m_process: Child, post_commands : Vec<Command>) -> Self {
+        let current_child = Arc::new(RwLock::new(None));
+        // let m = minecraft_commands[0].spawn();
+
+        let manager = tokio::spawn(|minecraft_commands : Vec<Command>|  async move  {
+            let mut current_child = current_child.clone();
+            // for m_command in minecraft_commands {
+            //     let mut current_child = current_child.write();
+            //     let m = m_command.spawn();
+            // }
+            minecraft_commands[0].spawn()
+        });
+
+        MinecraftChild {
+            uuid,
+            profile_path,
+            current_child: minecraft_process,
+            post_commands,
+            stdout,
+            stderr,
+            manager,
+        }
+    }
+
+
+    pub fn wait_for() {
+
+    }
+
 }
 
 impl Children {
@@ -30,7 +68,7 @@ impl Children {
     // Unlike a Hashmap's 'insert', this directly returns the reference to the Child rather than any previously stored Child that may exist
     pub fn insert_process(
         &mut self,
-        pid: u32,
+        uuid: uuid::Uuid,
         profile_path: PathBuf,
         mut child: tokio::process::Child,
     ) -> Arc<RwLock<MinecraftChild>> {
@@ -56,20 +94,20 @@ impl Children {
 
         // Create MinecraftChild
         let mchild = MinecraftChild {
-            pid,
+            uuid,
             profile_path,
             child,
             stdout,
             stderr,
         };
         let mchild = Arc::new(RwLock::new(mchild));
-        self.0.insert(pid, mchild.clone());
+        self.0.insert(uuid, mchild.clone());
         mchild
     }
 
     // Returns a ref to the child
-    pub fn get(&self, pid: &u32) -> Option<Arc<RwLock<MinecraftChild>>> {
-        self.0.get(pid).cloned()
+    pub fn get(&self, uuid: &u32) -> Option<Arc<RwLock<MinecraftChild>>> {
+        self.0.get(uuid).cloned()
     }
 
     // Gets all PID keys
@@ -81,9 +119,9 @@ impl Children {
     // Returns None if the child is still running
     pub async fn exit_status(
         &self,
-        pid: &u32,
+        uuid: &u32,
     ) -> crate::Result<Option<std::process::ExitStatus>> {
-        if let Some(child) = self.get(pid) {
+        if let Some(child) = self.get(uuid) {
             let child = child.clone();
             let mut child = child.write().await;
             Ok(child.child.try_wait()?)

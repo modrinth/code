@@ -231,6 +231,8 @@ pub async fn launch_minecraft(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
+    // Run terminal command "echo test" after command is complete
+    
     command.spawn().map_err(|err| {
         crate::ErrorKind::LauncherError(format!(
             "Error running Minecraft (minecraft-{} @ {}): {err}",
@@ -239,4 +241,44 @@ pub async fn launch_minecraft(
         ))
         .as_error()
     })
+}
+
+
+use std::sync::{Arc, Mutex};
+
+async fn chain_commands(
+    first_command: Command,
+    second_command: Command,
+    chained_child: Arc<Mutex<Option<Child>>>,
+) {
+    let mut first_child = first_command.spawn().expect("Failed to spawn first command");
+    let status = first_child.wait().await.expect("Failed to wait for the first child");
+
+    println!("First command completed");
+
+    if status.success() {
+        let second_child = second_command.spawn().expect("Failed to spawn second command");
+
+        // Replace the first child with the second child
+        *chained_child.lock().unwrap() = Some(second_child);
+    } else {
+        println!("First command failed. Not running the second command.");
+    }
+}
+
+#[tokio::main]
+async fn main() {
+    let first_command = Command::new("your-first-command").arg("arg1");
+    let second_command = Command::new("your-second-command").arg("arg2");
+
+    let child = Arc::new(Mutex::new(Some(first_command.spawn().expect("Failed to spawn first command"))));
+    let chained_child = Arc::clone(&child);
+
+
+    // Some stuff...
+
+    // Wait for the chained commands to finish if they haven't yet
+    if let Some(mut child) = child.lock().unwrap().take() {
+        let _ = child.wait().await.expect("Failed to wait for the child");
+    }
 }

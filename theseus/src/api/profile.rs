@@ -234,7 +234,7 @@ pub async fn run_credentials(
 
     let env_args = &settings.custom_env_args;
 
-    let mc_process = crate::launcher::launch_minecraft(
+    let mut mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
         &profile.path,
@@ -248,6 +248,33 @@ pub async fn run_credentials(
     )
     .await?;
 
+    // Post post exit hooks
+    let post_exit_hooks =
+        &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
+    for hook in pre_launch_hooks.iter() {
+        // TODO: hook parameters
+        let mut cmd = hook.split(' ');
+        if let Some(command) = cmd.next() {
+            
+            mc_process = mc_process.then()
+            let result = Command::new(command)
+                .args(&cmd.collect::<Vec<&str>>())
+                .current_dir(path)
+                .spawn()?
+                .wait()
+                .await?;
+
+            if !result.success() {
+                return Err(crate::ErrorKind::LauncherError(format!(
+                    "Non-zero exit code for pre-launch hook: {}",
+                    result.code().unwrap_or(-1)
+                ))
+                .as_error());
+            }
+        }
+    }
+
+
     // Insert child into state
     let mut state_children = state.children.write().await;
     let pid = mc_process.id().ok_or_else(|| {
@@ -257,6 +284,7 @@ pub async fn run_credentials(
     })?;
     let mchild_arc =
         state_children.insert_process(pid, path.to_path_buf(), mc_process);
+
 
     Ok(mchild_arc)
 }
