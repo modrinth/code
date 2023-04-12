@@ -2,7 +2,7 @@
 
 use crate::{
     state::State,
-    util::{fetch::*, platform::OsExt},
+    util::{fetch::*, platform::OsExt}, loading_try_for_each_concurrent,
 };
 use daedalus::{
     self as d,
@@ -140,9 +140,15 @@ pub async fn download_assets(
     index: &AssetsIndex,
 ) -> crate::Result<()> {
     log::debug!("Loading assets");
-    stream::iter(index.objects.iter())
-        .map(Ok::<(&String, &Asset), crate::Error>)
-        .try_for_each_concurrent(None, |(name, asset)| async move {
+    let num_futs = index.objects.len();
+    let assets = stream::iter(index.objects.iter())
+    .map(Ok::<(&String, &Asset), crate::Error>);
+
+    loading_try_for_each_concurrent(   
+        assets
+        , None, 0.0, 1.0, num_futs, "Loading assets...", 
+        
+        |(name, asset)| async move {
             let hash = &asset.hash;
             let resource_path = st.directories.object_dir(hash);
             let url = format!(
@@ -197,10 +203,10 @@ pub async fn download_libraries(
         fs::create_dir_all(st.directories.libraries_dir()),
         fs::create_dir_all(st.directories.version_natives_dir(version))
     }?;
-
+    let num_files = libraries.len();
+    loading_try_for_each_concurrent(
     stream::iter(libraries.iter())
-        .map(Ok::<&Library, crate::Error>)
-        .try_for_each_concurrent(None, |library| async move {
+        .map(Ok::<&Library, crate::Error>), None,0.0,1.0, num_files, "Downloading libraries...",|library| async move {
             if let Some(rules) = &library.rules {
                 if !rules.iter().all(super::parse_rule) {
                     return Ok(());

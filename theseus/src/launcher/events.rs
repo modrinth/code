@@ -1,5 +1,7 @@
 use std::path::PathBuf;
-
+use futures::prelude::*;
+use tauri::async_runtime::RwLock;
+use std::sync::Arc;
 use serde::Serialize;
 
 #[cfg(feature = "tauri")]
@@ -55,7 +57,7 @@ macro_rules! window_scoped {
         $crate::WINDOW.scope($window, async move {
             let res = $x.await;
             
-            if let Err(e) = $crate::WINDOW.with(|f| { 
+            if let Err(e) = $crate::WINDOW.try_with(|f| { 
                 f.emit("loading", $crate::LoadingPayload {
                     fraction: None,
                     message: "Done loading.".to_string(),
@@ -76,7 +78,9 @@ macro_rules! window_scoped {
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
 pub fn emit_loading(loading_frac : f64, message : &str) {
-    if let Err(e) = WINDOW.with(|f| { 
+    
+    println!("Loading: {} ({})", message, loading_frac);
+    if let Err(e) = WINDOW.try_with(|f| { 
         f.emit("loading", LoadingPayload {
             fraction: Some(loading_frac),
             message: message.to_string(),
@@ -93,7 +97,7 @@ pub fn emit_loading(_loading_frac : f64, _message : &str) {}
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
 pub fn emit_warning(message : &str) {
-    if let Err(e) = WINDOW.with(|f| { 
+    if let Err(e) = WINDOW.try_with(|f| { 
         f.emit("warning", WarningPayload {
             message: message.to_string(),
         }) 
@@ -109,7 +113,7 @@ pub fn emit_warning(_message : &str) {}
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
 pub fn emit_process(pid : u32, event : ProcessPayloadType, message : &str) {
-    if let Err(e) = WINDOW.with(|f| { 
+    if let Err(e) = WINDOW.try_with(|f| { 
         f.emit("process", ProcessPayload {
             pid,
             event,
@@ -128,7 +132,7 @@ pub fn emit_process(_pid : u32, _event : ProcessPayloadType, _message : &str) {}
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
 pub fn emit_profile(path : PathBuf, event : ProfilePayloadType) {
-    if let Err(e) = WINDOW.with(|f| { 
+    if let Err(e) = WINDOW.try_with(|f| { 
         f.emit("profile", ProfilePayload {
             path,
             event,
@@ -215,4 +219,69 @@ macro_rules! loading_join {
     ($start:expr, $end:expr, $message:expr; $($future:expr $(,)?)+) => {{
         tokio::try_join!($($future),+)
     }};
+}
+
+#[cfg(feature = "tauri")]
+pub async fn loading_try_for_each_concurrent
+<I, F, Fut, T>(
+    stream: I,
+    limit: Option<usize>,
+    loading_frac_start: f64,
+    loading_frac_end: f64,
+    num_futs: usize, // num is in here as we allow Iterator to be passed in, which doesn't have a size
+    message: &str,
+    f: F,
+) -> crate::Result<()>
+where
+    I: futures::TryStreamExt<Error = crate::Error> + TryStream<Ok = T>,
+    F: FnMut(T) -> Fut + Send,
+    Fut: Future<Output = crate::Result<()>> + Send,
+    T: Send,
+{
+    let futs_count = Arc::new(RwLock::new(0.0));
+    let mut f = f;
+    
+    stream.try_for_each_concurrent(limit, |item| {
+        let f = f(item);
+        let futs_count = futs_count.clone();
+        async move {
+            f.await?;
+            let loading_frac = {
+                let mut futs_count = futs_count.write().await;
+                *futs_count += 1.0;
+                (loading_frac_end-loading_frac_start) * (*futs_count / num_futs as f64) + loading_frac_start
+            };
+            emit_loading(loading_frac, message);
+            Ok(())
+        }
+    }).await
+
+}
+
+#[cfg(not(feature = "tauri"))]
+pub async fn loading_try_for_each_concurrent2
+<I, F, Fut, T>(
+    stream: I,
+    limit: Option<usize>,
+    _loading_frac_start: f64,
+    _loading_frac_end: f64,
+    _num_futs: usize, // num is in here as we allow Iterator to be passed in, which doesn't have a size
+    _message: &str,
+    f: F,
+) -> crate::Result<()>
+where
+    I: futures::TryStreamExt<Error = crate::Error> + TryStream<Ok = T> + Iterator,
+    F: FnMut(T) -> Fut + Send + 'static,
+    Fut: Future<Output = crate::Result<()>> + Send + 'static,
+    T: Send + 'static,
+{
+    let mut f = f;
+    stream.try_for_each_concurrent(limit, |item| {
+        let f = f(item);
+        async move {
+            f.await?;
+            Ok(())
+        }
+    }).await
+
 }
