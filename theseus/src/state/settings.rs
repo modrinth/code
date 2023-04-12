@@ -13,6 +13,7 @@ const CURRENT_FORMAT_VERSION: u32 = 1;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(default)]
 pub struct Settings {
+    pub theme : Theme,
     pub memory: MemorySettings,
     pub game_resolution: WindowSize,
     pub custom_java_args: Vec<String>,
@@ -27,6 +28,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            theme: Theme::Dark,
             memory: MemorySettings::default(),
             game_resolution: WindowSize::default(),
             custom_java_args: Vec::new(),
@@ -72,6 +74,14 @@ impl Settings {
                 .as_error()
             })
     }
+}
+
+/// Theseus theme
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub enum Theme {
+    Dark,
+    Light,
+    Oled
 }
 
 /// Minecraft memory settings
