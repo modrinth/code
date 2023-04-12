@@ -4,6 +4,7 @@ import { shallowRef } from 'vue'
 import { list } from '@/helpers/profile.js'
 
 const profiles = await list()
+console.log(profiles)
 const instances = shallowRef(Object.values(profiles))
 </script>
 

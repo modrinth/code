@@ -1,5 +1,4 @@
 <script setup>
-import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import { ref } from 'vue'
 
@@ -22,30 +21,13 @@ const props = defineProps({
   },
   canPaginate: Boolean,
 })
-const allowPagination = ref(false)
 const modsRow = ref(null)
-const newsRow = ref(null)
-// Remove after state is populated with real data
-const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
-const shouldRenderNews = props.news && props.news?.length !== 0
-const handleLeftPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
-  else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
-}
-const handleRightPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 170
-  else if (shouldRenderNews) newsRow.value.scrollLeft += 170
-}
 </script>
 <template>
   <div class="row">
     <div class="header">
       <p>{{ props.label }}</p>
       <hr />
-      <div v-if="allowPagination" class="pagination">
-        <ChevronLeftIcon @click="handleLeftPage" />
-        <ChevronRightIcon @click="handleRightPage" />
-      </div>
     </div>
     <section ref="modsRow" class="instances">
       <Instance

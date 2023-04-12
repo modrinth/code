@@ -58,14 +58,14 @@
         <div class="table-cell table-text">Supports</div>
         <div class="table-cell table-text">Stats</div>
       </div>
-      <router-link
+      <div
         v-for="version in versions"
         :key="version.id"
         class="button-base table-row"
-        :to="`/project/${$route.params.id}/version/${version.id}`"
+        @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
       >
         <div class="table-cell table-text">
-          <Button color="primary" icon-only>
+          <Button color="primary" class="install" icon-only @click.stop="() => install(version.id)">
             <DownloadIcon />
           </Button>
         </div>
@@ -117,7 +117,7 @@
             <span> Downloads </span>
           </div>
         </div>
-      </router-link>
+      </div>
     </div>
   </Card>
 </template>
@@ -149,6 +149,10 @@ const clearFilters = () => {
 defineProps({
   versions: {
     type: Array,
+    required: true,
+  },
+  install: {
+    type: Function,
     required: true,
   },
 })

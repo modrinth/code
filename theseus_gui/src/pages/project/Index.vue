@@ -29,7 +29,7 @@
         </Categories>
         <hr class="card-divider" />
         <div class="button-group">
-          <Button color="primary" class="instance-button" @click="install">
+          <Button color="primary" class="instance-button" @click="install(data.versions[0].id)">
             <DownloadIcon />
             Install
           </Button>
@@ -173,9 +173,11 @@
         :versions="versions"
         :members="members"
         :dependencies="dependencies"
+        :install="install"
       />
     </div>
   </div>
+  <InstallConfirmModal ref="confirmModal"/>
 </template>
 
 <script setup>
@@ -209,15 +211,18 @@ import {
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
 import { install as pack_install } from '@/helpers/pack'
+import { list } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
+import InstallConfirmModal from "@/components/ui/InstallConfirmModal.vue";
 
 const route = useRoute()
 const router = useRouter()
 
+const confirmModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
 const [data, versions, members, dependencies] = await Promise.all([
@@ -236,12 +241,16 @@ watch(
 
 dayjs.extend(relativeTime)
 
-async function install() {
+async function install(version) {
   if (data.value.project_type === 'modpack') {
-    let id = await pack_install(versions.value[0].id)
-
-    let router = useRouter()
-    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+    const packs = Object.values(await list());
+    console.log(packs);
+    if (packs.length === 0 || !packs.map(value => value.metadata).find((pack) => pack.linked_project_id === data.value.id)) {
+      let id = await pack_install(version)
+      await router.push({path: `/instance/${encodeURIComponent(id)}`})
+    } else {
+      confirmModal.value.show(version);
+    }
   }
 }
 </script>

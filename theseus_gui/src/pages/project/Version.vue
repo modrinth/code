@@ -6,7 +6,7 @@
         <span v-if="version.featured">Auto-Featured</span>
       </div>
       <div class="button-group">
-        <Button color="primary">
+        <Button color="primary" :action="() => install(version.id)">
           <DownloadIcon />
           Install
         </Button>
@@ -50,10 +50,10 @@
                   {{ file.filename }}
                 </span>
                 ({{ formatBytes(file.size) }})
-                <span v-if="file.primary" class="primary-label"> Primary </span>
+                <span class="primary-label"> Primary </span>
               </span>
             </span>
-            <Button class="download">
+            <Button v-if="project.project_type !== 'modpack' || file.primary" class="download" :action="() => install(version.id)">
               <DownloadIcon />
               Install
             </Button>
@@ -183,6 +183,10 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const props = defineProps({
+  project: {
+    type: Object,
+    required: true,
+  },
   versions: {
     type: Array,
     required: true,
@@ -195,6 +199,10 @@ const props = defineProps({
     type: Array,
     required: true,
   },
+  install: {
+    type: Function,
+    required: true,
+  }
 })
 
 const version = ref(props.versions.find((version) => version.id === route.params.version))
