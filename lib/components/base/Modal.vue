@@ -23,6 +23,8 @@
 </template>
 
 <script>
+import { XIcon } from '@/components'
+
 export default {
   props: {
     header: {
