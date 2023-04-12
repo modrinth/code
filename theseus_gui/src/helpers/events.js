@@ -21,7 +21,6 @@
 */
 import { appWindow } from '@tauri-apps/api/window'
 
-
 /// Payload for the 'loading' event
 /*
     LoadingPayload {
