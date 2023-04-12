@@ -1,6 +1,6 @@
 use crate::api::Result;
 use serde::{Serialize, Deserialize};
-use theseus::prelude::*;
+use theseus::{prelude::*, window_scoped};
 
 // Identical to theseus::settings::Settings except for the custom_java_args field
 // This allows us to split the custom_java_args string into a Vec<String> here and join it back into a string in the backend
@@ -20,8 +20,8 @@ pub struct FrontendSettings {
 // Get full settings
 // invoke('settings_get')
 #[tauri::command]
-pub async fn settings_get() -> Result<FrontendSettings> {
-    let backend_settings = settings::get().await?;
+pub async fn settings_get(window: tauri::Window) -> Result<FrontendSettings> {
+    let backend_settings = window_scoped!(window,settings::get()).await?;
     let frontend_settings = FrontendSettings {
         memory: backend_settings.memory,
         game_resolution: backend_settings.game_resolution,
@@ -39,7 +39,7 @@ pub async fn settings_get() -> Result<FrontendSettings> {
 // Set full settings
 // invoke('settings_set', settings)
 #[tauri::command]
-pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
+pub async fn settings_set(window: tauri::Window, settings: FrontendSettings) -> Result<()> {
     let backend_settings = Settings {
         memory: settings.memory,
         game_resolution: settings.game_resolution,
@@ -51,6 +51,6 @@ pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
         max_concurrent_downloads: settings.max_concurrent_downloads,
         version: settings.version,
     };
-    settings::set(backend_settings).await?;
+    window_scoped!(window, settings::set(backend_settings)).await?;
     Ok(())
 }

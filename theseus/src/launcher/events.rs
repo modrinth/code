@@ -259,7 +259,7 @@ where
 }
 
 #[cfg(not(feature = "tauri"))]
-pub async fn loading_try_for_each_concurrent2
+pub async fn loading_try_for_each_concurrent
 <I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,

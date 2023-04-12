@@ -2,9 +2,11 @@ use std::path::Path;
 
 use crate::api::Result;
 use theseus::prelude::JavaVersion;
-use theseus::prelude::*;
+use theseus::{prelude::*, window_scoped};
 
 use super::TheseusSerializableError;
+
+// No futures for many of these, so we do not do window_scoped! (function will either return immediately or error)
 
 /// Get all JREs that exist on the system
 #[tauri::command]
@@ -40,18 +42,18 @@ pub async fn jre_autodetect_java_globals() -> Result<JavaGlobals> {
 // Gets key for the optimal JRE to use, for a given profile Profile
 // The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
 #[tauri::command]
-pub async fn jre_get_optimal_jre_key(profile: Profile) -> Result<String> {
-    Ok(jre::get_optimal_jre_key(&profile).await?)
+pub async fn jre_get_optimal_jre_key(window : tauri::Window, profile: Profile) -> Result<String> {
+    Ok(window_scoped!(window,jre::get_optimal_jre_key(&profile)).await?)
 }
 
 // Gets key for the optimal JRE to use, for a given profile path
 // The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
 #[tauri::command]
-pub async fn jre_get_optimal_jre_key_by_path(path: &Path) -> Result<String> {
+pub async fn jre_get_optimal_jre_key_by_path(window: tauri::Window, path: &Path) -> Result<String> {
     let profile = profile::get(path).await?.ok_or_else(|| {
         TheseusSerializableError::NoProfileFound(path.display().to_string())
     })?;
-    Ok(jre::get_optimal_jre_key(&profile).await?)
+    Ok(window_scoped!(window,jre::get_optimal_jre_key(&profile)).await?)
 }
 
 // Validates java globals, by checking if the paths exist
