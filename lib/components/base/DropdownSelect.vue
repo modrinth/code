@@ -1,8 +1,8 @@
 <template>
   <div
+    ref="dropdown"
     tabindex="0"
     role="combobox"
-    ref="dropdown"
     :aria-expanded="dropdownVisible"
     class="animated-dropdown"
     @focus="onFocus"
