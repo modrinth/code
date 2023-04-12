@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { setDarkTheme, setLightTheme } from '@/helpers/theme'
 
 export const useTheming = defineStore('themeStore', {
   state: () => ({ themeOptions: ['light', 'dark'], selectedTheme: 'dark', darkTheme: true }),
@@ -11,8 +10,9 @@ export const useTheming = defineStore('themeStore', {
       this.setThemeClass()
     },
     setThemeClass() {
-      if (this.selectedTheme === 'dark') setDarkTheme()
-      else if (this.selectedTheme === 'light') setLightTheme()
+      document.getElementsByTagName('html')[0].classList.remove('dark-mode')
+      document.getElementsByTagName('html')[0].classList.remove('light-mode')
+      document.getElementsByTagName('html')[0].classList.add(`${this.selectedTheme}-mode`)
     },
   },
 })

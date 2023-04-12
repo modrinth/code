@@ -113,7 +113,10 @@ const setJava8Install = (chosenInstall) => {
               :disabled="settings.java_globals.JAVA_17.path === java17Install.path"
               @click="() => setJava17Install(java17Install)"
             >
-              <CheckIcon v-if="settings.java_globals.JAVA_17.path === java17Install.path" />
+              <span v-if="settings.java_globals.JAVA_17.path === java17Install.path"
+                ><CheckIcon />Selected</span
+              >
+
               <span v-else><PlusIcon />Select</span>
             </Button>
           </div>
@@ -139,7 +142,9 @@ const setJava8Install = (chosenInstall) => {
               :disabled="settings.java_globals.JAVA_8.path === java8Install.path"
               @click="() => setJava8Install(java8Install)"
             >
-              <CheckIcon v-if="settings.java_globals.JAVA_8.path === java8Install.path" />
+              <span v-if="settings.java_globals.JAVA_8.path === java8Install.path"
+                ><CheckIcon />Selected</span
+              >
               <span v-else><PlusIcon />Select</span>
             </Button>
           </div>
@@ -148,7 +153,7 @@ const setJava8Install = (chosenInstall) => {
     </Modal>
     <Card class="theming">
       <h2>Themes</h2>
-      <div class="setting-row">
+      <div class="toggle-setting" style="display: flex">
         <div class="description">
           <h3>Color theme</h3>
           <p>Change the global launcher color theme.</p>
@@ -396,35 +401,8 @@ const setJava8Install = (chosenInstall) => {
   flex-direction: column;
 }
 
-.setting-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-
-  .slider {
-    width: 40%;
-  }
-
-  .description {
-    line-height: 1.2rem;
-    font-size: 1.05rem;
-    width: 40%;
-
-    h3 {
-      font-size: 1.1rem;
-      margin-bottom: 0.5rem;
-    }
-  }
-
-  .input {
-    width: 60%;
-    flex-basis: 24rem;
-  }
-
-  .theme-dropdown {
-    text-transform: capitalize;
-  }
+.theme-dropdown {
+  text-transform: capitalize;
 }
 
 .settings-card {
