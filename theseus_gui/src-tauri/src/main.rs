@@ -9,8 +9,8 @@ mod api;
 
 // Should be called in launcher initialization
 #[tauri::command]
-async fn initialize_state(window : tauri::Window) -> api::Result<()> {
-    window_scoped!(window,State::get()).await?;
+async fn initialize_state(window: tauri::Window) -> api::Result<()> {
+    window_scoped!(window, State::get()).await?;
     Ok(())
 }
 

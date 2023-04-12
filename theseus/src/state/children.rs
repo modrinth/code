@@ -37,7 +37,6 @@ impl Children {
         profile_path: PathBuf,
         mut child: tokio::process::Child,
     ) -> Arc<RwLock<MinecraftChild>> {
-
         let uuid = uuid::Uuid::new_v4();
 
         // Create std watcher threads for stdout and stderr
@@ -60,7 +59,12 @@ impl Children {
             });
         }
 
-        emit_process(uuid, pid, crate::ProcessPayloadType::Launched, "Launched Minecraft");
+        emit_process(
+            uuid,
+            pid,
+            crate::ProcessPayloadType::Launched,
+            "Launched Minecraft",
+        );
 
         // Create MinecraftChild
         let mchild = MinecraftChild {

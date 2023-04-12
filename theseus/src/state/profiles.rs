@@ -1,19 +1,19 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
-use crate::{emit_profile, ProfilePayloadType};
 use crate::state::projects::Project;
 use crate::util::fetch::write_cached_icon;
 use crate::{data::DirectoryInfo, loading_try_for_each_concurrent};
+use crate::{emit_profile, ProfilePayloadType};
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
 use serde::{Deserialize, Serialize};
-use uuid::Uuid;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
 use tokio::sync::Semaphore;
 use tokio::{fs, sync::RwLock};
+use uuid::Uuid;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
 
@@ -25,7 +25,7 @@ pub const CURRENT_FORMAT_VERSION: u32 = 1;
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
-    #[serde(default="create_uuid")]
+    #[serde(default = "create_uuid")]
     pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
@@ -229,7 +229,12 @@ impl Profiles {
 
     #[tracing::instrument(skip(self))]
     pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
-        emit_profile(profile.uuid, profile.path.clone(), &profile.metadata.name, ProfilePayloadType::Added);
+        emit_profile(
+            profile.uuid,
+            profile.path.clone(),
+            &profile.metadata.name,
+            ProfilePayloadType::Added,
+        );
         self.0.insert(
             canonicalize(&profile.path)?
                 .to_str()

@@ -36,9 +36,9 @@ pub enum ProcessPayloadType {
 
 #[derive(Serialize, Clone)]
 pub struct ProfilePayload {
-    pub uuid : uuid::Uuid,
+    pub uuid: uuid::Uuid,
     pub path: PathBuf,
-    pub name : String,
+    pub name: String,
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]
@@ -124,7 +124,12 @@ pub fn emit_warning(_message: &str) {}
 // Passes the a ProcessPayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_process(uuid: uuid::Uuid, pid: u32, event: ProcessPayloadType, message: &str) {
+pub fn emit_process(
+    uuid: uuid::Uuid,
+    pid: u32,
+    event: ProcessPayloadType,
+    message: &str,
+) {
     println!("Process: {} ({})", uuid, message);
 
     if let Err(e) = WINDOW.try_with(|f| {
@@ -143,23 +148,47 @@ pub fn emit_process(uuid: uuid::Uuid, pid: u32, event: ProcessPayloadType, messa
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_process(_uuid: uuid::Uuid, _pid: u32, _event: ProcessPayloadType, _message: &str) {}
+pub fn emit_process(
+    _uuid: uuid::Uuid,
+    _pid: u32,
+    _event: ProcessPayloadType,
+    _message: &str,
+) {
+}
 
 // emit_profile(path, event)
 // Passes the a ProfilePayload to the frontend in the window stored by the window_scoped! macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub fn emit_profile(uuid: uuid::Uuid, path: PathBuf, name: &str, event: ProfilePayloadType) {
+pub fn emit_profile(
+    uuid: uuid::Uuid,
+    path: PathBuf,
+    name: &str,
+    event: ProfilePayloadType,
+) {
     println!("Profile: {} ({})", uuid, name);
-    if let Err(e) =
-        WINDOW.try_with(|f| f.emit("profile", ProfilePayload { uuid, path, name: name.to_string(), event }))
-    {
+    if let Err(e) = WINDOW.try_with(|f| {
+        f.emit(
+            "profile",
+            ProfilePayload {
+                uuid,
+                path,
+                name: name.to_string(),
+                event,
+            },
+        )
+    }) {
         eprintln!("Error emitting profile event to Tauri: {}", e);
     }
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_profile(_uuid: uuid::Uuid, _path: PathBuf, _event: ProfilePayloadType) {}
+pub fn emit_profile(
+    _uuid: uuid::Uuid,
+    _path: PathBuf,
+    _event: ProfilePayloadType,
+) {
+}
 
 // loading_join! macro
 // loading_join!(i,j,message; task1, task2, task3...)

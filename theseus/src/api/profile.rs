@@ -1,8 +1,10 @@
 //! Theseus profile management interface
 use crate::{
     auth::{self, refresh},
+    emit_profile,
     launcher::download,
-    state::MinecraftChild, emit_profile, ProfilePayloadType,
+    state::MinecraftChild,
+    ProfilePayloadType,
 };
 pub use crate::{
     state::{JavaSettings, Profile},
@@ -22,7 +24,12 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.0.get(path) {
-        emit_profile(profile.uuid, profile.path.clone(), &profile.metadata.name, ProfilePayloadType::Removed);
+        emit_profile(
+            profile.uuid,
+            profile.path.clone(),
+            &profile.metadata.name,
+            ProfilePayloadType::Removed,
+        );
     }
 
     profiles.remove(path).await?;
@@ -52,10 +59,15 @@ where
 
     match profiles.0.get_mut(path) {
         Some(ref mut profile) => {
-            emit_profile(profile.uuid, profile.path.clone(), &profile.metadata.name, ProfilePayloadType::Edited);
-        
+            emit_profile(
+                profile.uuid,
+                profile.path.clone(),
+                &profile.metadata.name,
+                ProfilePayloadType::Edited,
+            );
+
             action(profile).await
-        },
+        }
         None => Err(crate::ErrorKind::UnmanagedProfileError(
             path.display().to_string(),
         )

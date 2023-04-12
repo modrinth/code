@@ -145,10 +145,7 @@ pub async fn download_assets(
     let assets = stream::iter(index.objects.iter())
         .map(Ok::<(&String, &Asset), crate::Error>);
 
-    loading_try_for_each_concurrent(   
-        assets
-        , None, 0.0, 1.0, num_futs, "Loading assets...", 
-        
+    loading_try_for_each_concurrent(assets, None, 0.0, 1.0, num_futs, "Loading assets...", 
         |(name, asset)| async move {
             let hash = &asset.hash;
             let resource_path = st.directories.object_dir(hash);
