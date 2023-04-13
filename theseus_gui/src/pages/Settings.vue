@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import {
   Card,
   Slider,
@@ -10,17 +10,16 @@ import {
   Modal,
   CheckIcon,
   PlusIcon,
+  SaveIcon,
 } from 'omorphia'
 import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
-import { get, set, deepEqual } from '@/helpers/settings'
+import { get, set } from '@/helpers/settings'
 import { find_jre_8_jres, find_jre_17_jres } from '@/helpers/jre'
 import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
 
-// Original object to track changes
-const originalSettings = ref(await get())
 // Object to bind
 const settings = ref(await get())
 // Finding possible Java 8 and 17 installations
@@ -36,31 +35,10 @@ if (!settings.value.java_globals.JAVA_17)
 // DOM refs
 const detectJava17Modal = ref(null)
 const detectJava8Modal = ref(null)
-const saveButton = ref(null)
-
-watch(settings.value, (newSettings) => {
-  // Validate the changed state
-  if (newSettings.hooks.pre_launch === '') delete settings.value.hooks.pre_launch
-  if (newSettings.hooks.wrapper === '') delete settings.value.hooks.wrapper
-  if (newSettings.hooks.post_exit === '') delete settings.value.hooks.post_exit
-
-  settings.value.max_concurrent_downloads = newSettings.max_concurrent_downloads
-
-  if (deepEqual(originalSettings.value, settings.value)) saveButton.value.$el.style.opacity = 0
-  else saveButton.value.$el.style.opacity = 1
-
-  if (!settings.value.java_globals.JAVA_8)
-    settings.value.java_globals.JAVA_8 = { path: '', version: '' }
-  if (!settings.value.java_globals.JAVA_17)
-    settings.value.java_globals.JAVA_17 = { path: '', version: '' }
-})
 
 const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
 const saveJavaPath = () => {}
-const saveSettings = async () => {
-  await set(settings.value)
-  saveButton.value.$el.style.opacity = 0
-}
+const saveSettings = async () => await set(settings.value)
 
 const handleJava17FileInput = async () => {
   let filePath = await open()
@@ -88,8 +66,7 @@ const setJava8Install = (chosenInstall) => {
 </script>
 
 <template>
-  <div>
-    <Button ref="saveButton" color="primary" class="save-btn" @click="saveSettings">Save</Button>
+  <div style="margin-bottom: 3.5rem">
     <Modal ref="detectJava17Modal" header="Auto Detect Java Version" class="auto-detect-modal">
       <div class="table-container">
         <div class="table-row table-head">
@@ -268,22 +245,24 @@ const setJava8Install = (chosenInstall) => {
             </span>
           </div>
         </div>
-        <hr class="card-divider" />
-        <div class="settings-group">
-          <h3>Console</h3>
-          <div class="toggle-setting">
-            Maximum Concurrent Downloads
-            <input
-              v-model="settings.max_concurrent_downloads"
-              type="number"
-              name="concurrent-downloads"
-              class="concurrent-downloads"
-            />
-          </div>
+      </div>
+    </Card>
+    <Card class="settings-card">
+      <h2 class="settings-title">Launcher Settings</h2>
+      <div class="settings-group">
+        <h3>Console</h3>
+        <div class="toggle-setting">
+          Maximum Concurrent Downloads
+          <input
+            v-model="settings.max_concurrent_downloads"
+            type="number"
+            name="concurrent-downloads"
+            class="concurrent-downloads"
+          />
         </div>
       </div>
     </Card>
-    <Card class="settings-card" style="margin-bottom: 3.5rem">
+    <Card class="settings-card">
       <h2 class="settings-title">Commands</h2>
       <div class="settings-group">
         <div class="toggle-setting">
@@ -300,6 +279,7 @@ const setJava8Install = (chosenInstall) => {
         </div>
       </div>
     </Card>
+    <Button color="primary" class="save-btn" @click="saveSettings"><SaveIcon />Save changes</Button>
   </div>
 </template>
 
@@ -375,13 +355,9 @@ const setJava8Install = (chosenInstall) => {
     }
   }
 }
+
 .save-btn {
-  position: absolute !important;
-  z-index: 100;
-  top: 4rem;
-  right: 4rem;
-  opacity: 0;
-  transition: 0.2s ease-in-out all;
+  margin: 1rem;
 }
 
 .slider-input {
