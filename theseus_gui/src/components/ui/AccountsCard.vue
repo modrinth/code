@@ -3,7 +3,7 @@
     ref="avatar"
     class="button-base"
     size="sm"
-    :src="selectedAccount.profile_picture"
+    :src="selectedAccount?.profile_picture ?? ''"
     @click="toggle()"
   />
   <transition name="fade">
@@ -74,9 +74,7 @@ const displayAccounts = computed(() =>
 )
 
 const selectedAccount = ref(
-  await users().then((accounts) =>
-    accounts.find((account) => account.id === settings.value.default_user)
-  )
+  accounts.value.find((account) => account.id === settings.value.default_user)
 )
 
 const refreshValues = async () => {
