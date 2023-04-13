@@ -13,7 +13,7 @@ const CURRENT_FORMAT_VERSION: u32 = 1;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(default)]
 pub struct Settings {
-    pub theme : Theme,
+    pub theme: Theme,
     pub memory: MemorySettings,
     pub game_resolution: WindowSize,
     pub custom_java_args: Vec<String>,
@@ -81,7 +81,7 @@ impl Settings {
 pub enum Theme {
     Dark,
     Light,
-    Oled
+    Oled,
 }
 
 /// Minecraft memory settings

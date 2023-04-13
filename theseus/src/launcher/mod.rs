@@ -1,9 +1,12 @@
 //! Logic for launching Minecraft
-use crate::{process, state as st};
+use crate::{
+    process,
+    state::{self as st, MinecraftChild},
+};
 use daedalus as d;
 use dunce::canonicalize;
-use std::{path::Path, process::Stdio};
-use tokio::process::{Child, Command};
+use std::{path::Path, process::Stdio, sync::Arc};
+use tokio::process::Command;
 
 mod args;
 
@@ -57,7 +60,8 @@ pub async fn launch_minecraft(
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
-) -> crate::Result<Child> {
+    post_exit_hooks: Vec<Command>,
+) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
     let state = st::State::get().await?;
     let instance_path = &canonicalize(instance_path)?;
 
@@ -180,7 +184,7 @@ pub async fn launch_minecraft(
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
     let existing_processes =
-        process::get_pids_by_profile_path(instance_path).await?;
+        process::get_uuids_by_profile_path(instance_path).await?;
     if let Some(pid) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
             "Profile {} is already running at PID: {pid}",
@@ -231,54 +235,13 @@ pub async fn launch_minecraft(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    // Run terminal command "echo test" after command is complete
-    
-    command.spawn().map_err(|err| {
-        crate::ErrorKind::LauncherError(format!(
-            "Error running Minecraft (minecraft-{} @ {}): {err}",
-            &version.id,
-            instance_path.display()
-        ))
-        .as_error()
-    })
-}
-
-
-use std::sync::{Arc, Mutex};
-
-async fn chain_commands(
-    first_command: Command,
-    second_command: Command,
-    chained_child: Arc<Mutex<Option<Child>>>,
-) {
-    let mut first_child = first_command.spawn().expect("Failed to spawn first command");
-    let status = first_child.wait().await.expect("Failed to wait for the first child");
-
-    println!("First command completed");
-
-    if status.success() {
-        let second_child = second_command.spawn().expect("Failed to spawn second command");
-
-        // Replace the first child with the second child
-        *chained_child.lock().unwrap() = Some(second_child);
-    } else {
-        println!("First command failed. Not running the second command.");
-    }
-}
-
-#[tokio::main]
-async fn main() {
-    let first_command = Command::new("your-first-command").arg("arg1");
-    let second_command = Command::new("your-second-command").arg("arg2");
-
-    let child = Arc::new(Mutex::new(Some(first_command.spawn().expect("Failed to spawn first command"))));
-    let chained_child = Arc::clone(&child);
-
-
-    // Some stuff...
-
-    // Wait for the chained commands to finish if they haven't yet
-    if let Some(mut child) = child.lock().unwrap().take() {
-        let _ = child.wait().await.expect("Failed to wait for the child");
-    }
+    // Create Minecraft child by inserting it into the state
+    // This also spawns the process and prepares the subsequent processes
+    let mut state_children = state.children.write().await;
+    state_children.insert_process(
+        uuid::Uuid::new_v4(),
+        instance_path.to_path_buf(),
+        command,
+        post_exit_hooks,
+    )
 }

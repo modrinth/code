@@ -1,5 +1,5 @@
 use crate::api::Result;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use theseus::prelude::*;
 
 use super::TheseusSerializableError;
@@ -30,7 +30,12 @@ pub async fn settings_get() -> Result<FrontendSettings> {
         memory: backend_settings.memory,
         game_resolution: backend_settings.game_resolution,
         custom_java_args: backend_settings.custom_java_args.join(" "),
-        custom_env_args: backend_settings.custom_env_args.into_iter().map(|(s1, s2)| format!("{s1}={s2}")).collect::<Vec<String>>().join(","),
+        custom_env_args: backend_settings
+            .custom_env_args
+            .into_iter()
+            .map(|(s1, s2)| format!("{s1}={s2}"))
+            .collect::<Vec<String>>()
+            .join(","),
         java_globals: backend_settings.java_globals,
         default_user: backend_settings.default_user,
         hooks: backend_settings.hooks,
@@ -44,23 +49,32 @@ pub async fn settings_get() -> Result<FrontendSettings> {
 // invoke('settings_set', settings)
 #[tauri::command]
 pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
-
-    let custom_env_args : Vec<(String, String)> = settings.custom_env_args.split_whitespace().map(|s| s.to_string())
-    .map(|f| {
-        let mut split = f.split('=');
-        if let (Some(name), Some(value)) = (split.next(), split.next()) {
-            Ok((name.to_string(), value.to_string()))
-        } else {
-            Err(TheseusSerializableError::BadEnvVars("Invalid environment variable: {}".to_string()).into())
-        }
-
-    }).collect::<Result<Vec<(String,String)>>>()?;
+    let custom_env_args: Vec<(String, String)> = settings
+        .custom_env_args
+        .split_whitespace()
+        .map(|s| s.to_string())
+        .map(|f| {
+            let mut split = f.split('=');
+            if let (Some(name), Some(value)) = (split.next(), split.next()) {
+                Ok((name.to_string(), value.to_string()))
+            } else {
+                Err(TheseusSerializableError::BadEnvVars(
+                    "Invalid environment variable: {}".to_string(),
+                )
+                .into())
+            }
+        })
+        .collect::<Result<Vec<(String, String)>>>()?;
 
     let backend_settings = Settings {
         theme: settings.theme,
         memory: settings.memory,
         game_resolution: settings.game_resolution,
-        custom_java_args: settings.custom_java_args.split_whitespace().map(|s| s.to_string()).collect(),
+        custom_java_args: settings
+            .custom_java_args
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect(),
         custom_env_args,
         java_globals: settings.java_globals,
         default_user: settings.default_user,

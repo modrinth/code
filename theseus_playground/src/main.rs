@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+use std::collections::HashSet;
+
 use dunce::canonicalize;
 use theseus::prelude::*;
 use tokio::time::{sleep, Duration};
@@ -54,13 +56,19 @@ async fn main() -> theseus::Result<()> {
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
     // println!("Editing.");
-    profile::edit(&profile_path, |_profile| {
-        // Eg: Java- this would let you change the java runtime of the profile instead of using the default
-        // use theseus::prelude::jre::JAVA__KEY;
-        // profile.java = Some(JavaSettings {
-        // jre_key: Some(JAVA_17_KEY.to_string()),
-        //     extra_arguments: None,
-        // });
+    profile::edit(&profile_path, |profile| {
+        // Add some hooks, for instance!
+        let mut pre = HashSet::new();
+        pre.insert("echo This is before Minecraft runs!".to_string());
+
+        let mut post = HashSet::new();
+        post.insert("echo This is after Minecraft runs!".to_string());
+
+        profile.hooks = Some(Hooks {
+            pre_launch: pre,
+            wrapper: None,
+            post_exit: post,
+        });
         async { Ok(()) }
     })
     .await?;
@@ -74,24 +82,21 @@ async fn main() -> theseus::Result<()> {
 
     // Run a profile, running minecraft and store the RwLock to the process
     let proc_lock = profile::run(&canonicalize(&profile_path)?).await?;
+    let uuid = proc_lock.read().await.uuid;
+    let pid = proc_lock.read().await.current_child.read().await.id();
 
-    let pid = proc_lock
-        .read()
-        .await
-        .child
-        .id()
-        .expect("Could not get PID from process.");
-    println!("Minecraft PID: {}", pid);
+    println!("Minecraft UUID: {}", uuid);
+    println!("Minecraft PID: {:?}", pid);
 
     // Wait 5 seconds
     println!("Waiting 20 seconds to gather logs...");
     sleep(Duration::from_secs(20)).await;
-    let stdout = process::get_stdout_by_pid(pid).await?;
+    let stdout = process::get_stdout_by_uuid(&uuid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");
 
     println!(
-        "All running process PIDs {:?}",
-        process::get_all_running_pids().await?
+        "All running process UUID {:?}",
+        process::get_all_running_uuids().await?
     );
     println!(
         "All running process paths {:?}",
