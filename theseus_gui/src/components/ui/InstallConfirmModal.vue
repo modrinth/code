@@ -24,14 +24,14 @@ async function install() {
 </script>
 
 <template>
-  <Modal header="Are you sure?" ref="confirmModal">
+  <Modal ref="confirmModal" header="Are you sure?">
     <div class="modal-body">
       <p>
         This project is already installed on your system. Are you sure you want to install it again?
       </p>
       <div class="button-group">
         <Button @click="() => $refs.confirmModal.hide()"><XIcon />Cancel</Button>
-        <Button @click="install()" color="primary"><DownloadIcon /> Install</Button>
+        <Button color="primary" @click="install()"><DownloadIcon /> Install</Button>
       </div>
     </div>
   </Modal>
