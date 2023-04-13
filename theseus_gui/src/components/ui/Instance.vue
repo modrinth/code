@@ -1,8 +1,12 @@
 <script setup>
-import { RouterLink } from 'vue-router'
-import { Card } from 'omorphia'
+import { shallowRef } from 'vue'
+import { useRouter, RouterLink } from 'vue-router'
+import { ofetch } from 'ofetch'
+import { Card, SaveIcon } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { install as pack_install } from '@/helpers/pack'
+import { run } from '@/helpers/profile'
 
 const props = defineProps({
   instance: {
@@ -12,20 +16,66 @@ const props = defineProps({
     },
   },
 })
+
+const router = useRouter()
+
+const install = async () => {
+  const [data, versions] = await Promise.all([
+    ofetch(
+      `https://api.modrinth.com/v2/project/${
+        props.instance.metadata
+          ? props.instance.metadata?.linked_project_id
+          : props.instance.project_id
+      }`
+    ).then(shallowRef),
+    ofetch(
+      `https://api.modrinth.com/v2/project/${
+        props.instance.metadata
+          ? props.instance.metadata?.linked_project_id
+          : props.instance.project_id
+      }/version`
+    ).then(shallowRef),
+  ])
+
+  if (data.value.project_type === 'modpack') {
+    const id = await pack_install(versions.value[0].id)
+    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+  }
+  // TODO: Add condition for installing a mod
+}
+
+const play = () => {
+  run(props.instance.metadata?.linked_project_id)
+}
 </script>
 
 <template>
   <div>
-    <RouterLink :to="`/instance/${encodeURIComponent(props.instance.path)}`">
+    <RouterLink
+      :to="
+        props.instance.metadata
+          ? `/instance/${encodeURIComponent(props.instance.path)}`
+          : `/project/${encodeURIComponent(props.instance.project_id)}`
+      "
+    >
       <Card class="instance-card-item">
-        <img :src="convertFileSrc(props.instance.metadata.icon)" alt="Trending mod card" />
+        <img
+          :src="
+            props.instance.metadata
+              ? convertFileSrc(props.instance.metadata?.icon)
+              : props.instance.icon_url
+          "
+          alt="Trending mod card"
+        />
         <div class="project-info">
-          <p class="title">{{ props.instance.metadata.name }}</p>
+          <p class="title">{{ props.instance.metadata?.name || props.instance.title }}</p>
           <p class="description">
-            {{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}
+            {{ props.instance.metadata?.loader }}
+            {{ props.instance.metadata?.game_version || props.instance.latest_version }}
           </p>
         </div>
-        <div class="cta"><PlayIcon /></div>
+        <div v-if="props.instance.metadata" class="cta" @click="play"><PlayIcon /></div>
+        <div v-else class="cta" @click="install"><SaveIcon /></div>
       </Card>
     </RouterLink>
   </div>
@@ -87,6 +137,7 @@ const props = defineProps({
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+      width: 100%;
       margin: 0;
       font-weight: 600;
       font-size: 1rem;

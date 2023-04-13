@@ -36,8 +36,9 @@ const handlePaginationDisplay = () => {
   if (!parentsRow) return
   const children = parentsRow.children
   const lastChild = children[children.length - 1]
-  const childBox = lastChild.getBoundingClientRect()
-  if (childBox.x + childBox.width > window.innerWidth) allowPagination.value = true
+  const childBox = lastChild?.getBoundingClientRect()
+  if (childBox?.x + childBox?.width > window.innerWidth && props.canPaginate)
+    allowPagination.value = true
   else allowPagination.value = false
 }
 onMounted(() => {
