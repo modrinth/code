@@ -1,11 +1,13 @@
 use super::version_creation::InitialVersionData;
 use crate::database::models;
+use crate::database::models::thread_item::ThreadBuilder;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::projects::{
     DonationLink, License, ProjectId, ProjectStatus, SideType, VersionId,
     VersionStatus,
 };
+use crate::models::threads::ThreadType;
 use crate::models::users::UserId;
 use crate::search::indexing::IndexingError;
 use crate::util::auth::{get_user_from_headers, AuthenticationError};
@@ -464,8 +466,8 @@ async fn project_create_inner(
         project_create_data = create_data;
     }
 
-    let project_type_id = models::ProjectTypeId::get_id(
-        project_create_data.project_type.clone(),
+    let project_type_id = models::categories::ProjectType::get_id(
+        project_create_data.project_type.as_str(),
         &mut *transaction,
     )
     .await?
@@ -698,8 +700,8 @@ async fn project_create_inner(
             )));
         }
 
-        let client_side_id = models::SideTypeId::get_id(
-            &project_create_data.client_side,
+        let client_side_id = models::categories::SideType::get_id(
+            project_create_data.client_side.as_str(),
             &mut *transaction,
         )
         .await?
@@ -709,8 +711,8 @@ async fn project_create_inner(
             )
         })?;
 
-        let server_side_id = models::SideTypeId::get_id(
-            &project_create_data.server_side,
+        let server_side_id = models::categories::SideType::get_id(
+            project_create_data.server_side.as_str(),
             &mut *transaction,
         )
         .await?
@@ -733,7 +735,7 @@ async fn project_create_inner(
 
         if let Some(urls) = &project_create_data.donation_urls {
             for url in urls {
-                let platform_id = models::DonationPlatformId::get_id(
+                let platform_id = models::categories::DonationPlatform::get_id(
                     &url.id,
                     &mut *transaction,
                 )
@@ -753,6 +755,13 @@ async fn project_create_inner(
                 })
             }
         }
+
+        let thread_id = ThreadBuilder {
+            type_: ThreadType::Project,
+            members: vec![],
+        }
+        .insert(&mut *transaction)
+        .await?;
 
         let project_builder = models::project_item::ProjectBuilder {
             project_id: project_id.into(),
@@ -790,6 +799,7 @@ async fn project_create_inner(
                 })
                 .collect(),
             color: icon_data.and_then(|x| x.1),
+            thread_id,
         };
 
         let now = Utc::now();
@@ -838,6 +848,7 @@ async fn project_create_inner(
             flame_anvil_project: None,
             flame_anvil_user: None,
             color: project_builder.color,
+            thread_id: Some(project_builder.thread_id.into()),
         };
 
         let _project_id = project_builder.insert(&mut *transaction).await?;

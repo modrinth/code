@@ -9,6 +9,7 @@ mod reports;
 mod statistics;
 mod tags;
 mod teams;
+mod threads;
 mod users;
 mod version_creation;
 mod version_file;
@@ -30,6 +31,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(statistics::config)
             .configure(tags::config)
             .configure(teams::config)
+            .configure(threads::config)
             .configure(users::config)
             .configure(version_file::config)
             .configure(versions::config),

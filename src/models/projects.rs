@@ -3,6 +3,7 @@ use super::teams::TeamId;
 use super::users::UserId;
 use crate::database::models::project_item::QueryProject;
 use crate::database::models::version_item::QueryVersion;
+use crate::models::threads::ThreadId;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use validator::Validate;
@@ -56,6 +57,7 @@ pub struct Project {
     /// The requested status of this projct
     pub requested_status: Option<ProjectStatus>,
 
+    /// DEPRECATED: moved to threads system
     /// The rejection data of the project
     pub moderator_message: Option<ModeratorMessage>,
 
@@ -107,6 +109,9 @@ pub struct Project {
 
     /// The color of the project (picked from icon)
     pub color: Option<u32>,
+
+    /// The thread of the moderation messages of the project
+    pub thread_id: Option<ThreadId>,
 }
 
 impl From<QueryProject> for Project {
@@ -195,6 +200,7 @@ impl From<QueryProject> for Project {
             flame_anvil_project: m.flame_anvil_project,
             flame_anvil_user: m.flame_anvil_user.map(|x| x.into()),
             color: m.color,
+            thread_id: m.thread_id.map(|x| x.into()),
         }
     }
 }

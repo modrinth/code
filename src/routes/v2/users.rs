@@ -203,11 +203,8 @@ pub async fn user_edit(
         ApiError::Validation(validation_errors_to_string(err, None))
     })?;
 
-    let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &info.into_inner().0,
-        &**pool,
-    )
-    .await?;
+    let id_option =
+        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         let user_id: UserId = id.into();
@@ -217,10 +214,7 @@ pub async fn user_edit(
 
             if let Some(username) = &new_user.username {
                 let existing_user_id_option =
-                    crate::database::models::User::get_id_from_username_or_id(
-                        username, &**pool,
-                    )
-                    .await?;
+                    User::get_id_from_username_or_id(username, &**pool).await?;
 
                 if existing_user_id_option
                     .map(UserId::from)
@@ -754,6 +748,8 @@ pub async fn user_payouts_request(
     data: web::Json<PayoutData>,
     payouts_queue: web::Data<Arc<Mutex<PayoutsQueue>>>,
 ) -> Result<HttpResponse, ApiError> {
+    let mut payouts_queue = payouts_queue.lock().await;
+
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id_option =
         User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
@@ -774,8 +770,6 @@ pub async fn user_payouts_request(
                     if let Some(payout_wallet) = payouts_data.payout_wallet {
                         return if data.amount < payouts_data.balance {
                             let mut transaction = pool.begin().await?;
-
-                            let mut payouts_queue = payouts_queue.lock().await;
 
                             let leftover = payouts_queue
                                 .send_payout(PayoutItem {

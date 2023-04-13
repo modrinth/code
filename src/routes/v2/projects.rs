@@ -1,5 +1,6 @@
 use crate::database;
 use crate::database::models::notification_item::NotificationBuilder;
+use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::base62_impl::parse_base62;
@@ -7,6 +8,7 @@ use crate::models::projects::{
     DonationLink, Project, ProjectId, ProjectStatus, SearchRequest, SideType,
 };
 use crate::models::teams::Permissions;
+use crate::models::threads::MessageBody;
 use crate::routes::ApiError;
 use crate::search::{search_for_project, SearchConfig, SearchError};
 use crate::util::auth::{
@@ -45,10 +47,12 @@ pub fn config(cfg: &mut web::ServiceConfig) {
             .service(project_unfollow)
             .service(project_schedule)
             .service(super::teams::team_members_get_project)
-            .service(web::scope("{project_id}")
-                .service(super::versions::version_list)
-                .service(super::versions::version_project_get)
-                .service(dependency_list)),
+            .service(
+                web::scope("{project_id}")
+                    .service(super::versions::version_list)
+                    .service(super::versions::version_project_get)
+                    .service(dependency_list),
+            ),
     );
 }
 
@@ -160,7 +164,7 @@ pub async fn project_get_check(
 ) -> Result<HttpResponse, ApiError> {
     let slug = info.into_inner().0;
 
-    let id_option = models::ids::base62_impl::parse_base62(&slug).ok();
+    let id_option = parse_base62(&slug).ok();
 
     let id = if let Some(id) = id_option {
         let id = sqlx::query!(
@@ -315,8 +319,7 @@ pub async fn dependency_list(
     }
 }
 
-/// A project returned from the API
-#[derive(Serialize, Deserialize, Validate)]
+#[derive(Deserialize, Validate)]
 pub struct EditProject {
     #[validate(
         length(min = 3, max = 64),
@@ -634,6 +637,20 @@ pub async fn project_edit(
                     .await?;
                 }
 
+                if let Some(thread) = project_item.inner.thread_id {
+                    ThreadMessageBuilder {
+                        author_id: Some(user.id.into()),
+                        body: MessageBody::StatusChange {
+                            new_status: *status,
+                            old_status: project_item.inner.status,
+                        },
+                        thread_id: thread,
+                        show_in_mod_inbox: None,
+                    }
+                    .insert(&mut transaction)
+                    .await?;
+                }
+
                 sqlx::query!(
                     "
                     UPDATE mods
@@ -916,7 +933,7 @@ pub async fn project_edit(
                 // We are able to unwrap here because the slug is always set
                 if !slug.eq(&project_item.inner.slug.unwrap_or_default()) {
                     let results = sqlx::query!(
-                      "
+                        "
                       SELECT EXISTS(SELECT 1 FROM mods WHERE slug = LOWER($1))
                       ",
                         slug
@@ -953,12 +970,13 @@ pub async fn project_edit(
                     ));
                 }
 
-                let side_type_id = database::models::SideTypeId::get_id(
-                    new_side,
-                    &mut *transaction,
-                )
-                .await?
-                .expect("No database entry found for side type");
+                let side_type_id =
+                    database::models::categories::SideType::get_id(
+                        new_side.as_str(),
+                        &mut *transaction,
+                    )
+                    .await?
+                    .expect("No database entry found for side type");
 
                 sqlx::query!(
                     "
@@ -981,12 +999,13 @@ pub async fn project_edit(
                     ));
                 }
 
-                let side_type_id = database::models::SideTypeId::get_id(
-                    new_side,
-                    &mut *transaction,
-                )
-                .await?
-                .expect("No database entry found for side type");
+                let side_type_id =
+                    database::models::categories::SideType::get_id(
+                        new_side.as_str(),
+                        &mut *transaction,
+                    )
+                    .await?
+                    .expect("No database entry found for side type");
 
                 sqlx::query!(
                     "
@@ -1054,7 +1073,7 @@ pub async fn project_edit(
 
                 for donation in donations {
                     let platform_id =
-                        database::models::DonationPlatformId::get_id(
+                        database::models::categories::DonationPlatform::get_id(
                             &donation.id,
                             &mut *transaction,
                         )

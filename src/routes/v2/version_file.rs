@@ -1,7 +1,7 @@
 use super::ApiError;
 use crate::database::models::{version_item::QueryVersion, DatabaseError};
 use crate::models::ids::VersionId;
-use crate::models::projects::{GameVersion, Loader, Version};
+use crate::models::projects::{GameVersion, Loader, Project, Version};
 use crate::models::teams::Permissions;
 use crate::util::auth::get_user_from_headers;
 use crate::util::routes::ok_or_not_found;
@@ -396,6 +396,65 @@ pub async fn get_versions_from_hashes(
                         Err(ApiError::Database(DatabaseError::Other(format!(
                             "Could not parse hash for version {}",
                             row.version_id
+                        ))))
+                    }
+                })
+        })
+        .collect();
+    Ok(HttpResponse::Ok().json(response?))
+}
+
+#[post("project")]
+pub async fn get_projects_from_hashes(
+    pool: web::Data<PgPool>,
+    file_data: web::Json<FileHashes>,
+) -> Result<HttpResponse, ApiError> {
+    let hashes_parsed: Vec<Vec<u8>> = file_data
+        .hashes
+        .iter()
+        .map(|x| x.to_lowercase().as_bytes().to_vec())
+        .collect();
+
+    let result = sqlx::query!(
+        "
+        SELECT h.hash hash, h.algorithm algorithm, m.id project_id FROM hashes h
+        INNER JOIN files f ON h.file_id = f.id
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
+        INNER JOIN mods m on v.mod_id = m.id
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
+        ",
+        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        hashes_parsed.as_slice(),
+        file_data.algorithm,
+        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+    )
+        .fetch_all(&**pool)
+        .await?;
+
+    let project_ids = result
+        .iter()
+        .map(|x| database::models::ProjectId(x.project_id))
+        .collect::<Vec<_>>();
+    let versions_data =
+        database::models::Project::get_many_full(&project_ids, &**pool).await?;
+
+    let response: Result<HashMap<String, Project>, ApiError> = result
+        .into_iter()
+        .filter_map(|row| {
+            versions_data
+                .clone()
+                .into_iter()
+                .find(|x| x.inner.id.0 == row.project_id)
+                .map(|v| {
+                    if let Ok(parsed_hash) = String::from_utf8(row.hash) {
+                        Ok((
+                            parsed_hash,
+                            crate::models::projects::Project::from(v),
+                        ))
+                    } else {
+                        Err(ApiError::Database(DatabaseError::Other(format!(
+                            "Could not parse hash for version {}",
+                            row.project_id
                         ))))
                     }
                 })

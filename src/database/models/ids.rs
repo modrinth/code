@@ -106,7 +106,22 @@ generate_ids!(
     NotificationId
 );
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Type)]
+generate_ids!(
+    pub generate_thread_id,
+    ThreadId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM threads WHERE id=$1)",
+    ThreadId
+);
+generate_ids!(
+    pub generate_thread_message_id,
+    ThreadMessageId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM threads_messages WHERE id=$1)",
+    ThreadMessageId
+);
+
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Type, Deserialize)]
 #[sqlx(transparent)]
 pub struct UserId(pub i64);
 
@@ -169,6 +184,13 @@ pub struct NotificationId(pub i64);
 #[sqlx(transparent)]
 pub struct NotificationActionId(pub i32);
 
+#[derive(Copy, Clone, Debug, Type, Deserialize)]
+#[sqlx(transparent)]
+pub struct ThreadId(pub i64);
+#[derive(Copy, Clone, Debug, Type, Deserialize)]
+#[sqlx(transparent)]
+pub struct ThreadMessageId(pub i64);
+
 use crate::models::ids;
 
 impl From<ids::ProjectId> for ProjectId {
@@ -229,5 +251,25 @@ impl From<ids::NotificationId> for NotificationId {
 impl From<NotificationId> for ids::NotificationId {
     fn from(id: NotificationId) -> Self {
         ids::NotificationId(id.0 as u64)
+    }
+}
+impl From<ids::ThreadId> for ThreadId {
+    fn from(id: ids::ThreadId) -> Self {
+        ThreadId(id.0 as i64)
+    }
+}
+impl From<ThreadId> for ids::ThreadId {
+    fn from(id: ThreadId) -> Self {
+        ids::ThreadId(id.0 as u64)
+    }
+}
+impl From<ids::ThreadMessageId> for ThreadMessageId {
+    fn from(id: ids::ThreadMessageId) -> Self {
+        ThreadMessageId(id.0 as i64)
+    }
+}
+impl From<ThreadMessageId> for ids::ThreadMessageId {
+    fn from(id: ThreadMessageId) -> Self {
+        ids::ThreadMessageId(id.0 as u64)
     }
 }

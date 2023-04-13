@@ -5,4 +5,5 @@ pub mod pack;
 pub mod projects;
 pub mod reports;
 pub mod teams;
+pub mod threads;
 pub mod users;

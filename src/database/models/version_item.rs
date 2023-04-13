@@ -568,66 +568,6 @@ impl Version {
         Ok(map)
     }
 
-    pub async fn get<'a, 'b, E>(
-        id: VersionId,
-        executor: E,
-    ) -> Result<Option<Self>, sqlx::error::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        Self::get_many(&[id], executor)
-            .await
-            .map(|x| x.into_iter().next())
-    }
-
-    pub async fn get_many<'a, E>(
-        version_ids: &[VersionId],
-        exec: E,
-    ) -> Result<Vec<Version>, sqlx::Error>
-    where
-        E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
-    {
-        use futures::stream::TryStreamExt;
-
-        let version_ids_parsed: Vec<i64> =
-            version_ids.iter().map(|x| x.0).collect();
-        let versions = sqlx::query!(
-            "
-            SELECT v.id, v.mod_id, v.author_id, v.name, v.version_number,
-                v.changelog, v.date_published, v.downloads,
-                v.version_type, v.featured, v.status, v.requested_status
-            FROM versions v
-            WHERE v.id = ANY($1)
-            ORDER BY v.date_published ASC
-            ",
-            &version_ids_parsed
-        )
-        .fetch_many(exec)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|v| Version {
-                id: VersionId(v.id),
-                project_id: ProjectId(v.mod_id),
-                author_id: UserId(v.author_id),
-                name: v.name,
-                version_number: v.version_number,
-                changelog: v.changelog,
-                changelog_url: None,
-                date_published: v.date_published,
-                downloads: v.downloads,
-                featured: v.featured,
-                version_type: v.version_type,
-                status: VersionStatus::from_str(&v.status),
-                requested_status: v
-                    .requested_status
-                    .map(|x| VersionStatus::from_str(&x)),
-            }))
-        })
-        .try_collect::<Vec<Version>>()
-        .await?;
-
-        Ok(versions)
-    }
-
     pub async fn get_full<'a, 'b, E>(
         id: VersionId,
         executor: E,

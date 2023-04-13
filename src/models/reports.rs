@@ -1,5 +1,5 @@
 use super::ids::Base62Id;
-use crate::models::ids::UserId;
+use crate::models::ids::{ThreadId, UserId};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -17,6 +17,8 @@ pub struct Report {
     pub reporter: UserId,
     pub body: String,
     pub created: DateTime<Utc>,
+    pub closed: bool,
+    pub thread_id: Option<ThreadId>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]

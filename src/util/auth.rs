@@ -117,21 +117,6 @@ where
     }
 }
 
-pub async fn check_is_admin_from_headers<'a, 'b, E>(
-    headers: &HeaderMap,
-    executor: E,
-) -> Result<User, AuthenticationError>
-where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-{
-    let user = get_user_from_headers(headers, executor).await?;
-
-    match user.role {
-        Role::Admin => Ok(user),
-        _ => Err(AuthenticationError::InvalidCredentials),
-    }
-}
-
 pub async fn is_authorized(
     project_data: &Project,
     user_option: &Option<User>,
