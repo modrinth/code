@@ -52,6 +52,7 @@ a.uncolored {
 }
 
 input[type='text'],
+input[type='number'],
 textarea {
   border-radius: var(--radius-md);
   box-sizing: border-box;
@@ -88,6 +89,14 @@ textarea {
   &::placeholder {
     color: var(--color-contrast);
     opacity: 0.6;
+  }
+}
+
+input[type='number'] {
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
   }
 }
 

@@ -35,6 +35,7 @@ export default {
           { text: 'Text Logo', link: '/components/text-logo' },
           { text: 'Slider', link: '/components/slider' },
           { text: 'Text Inputs', link: '/components/text-inputs' },
+          { text: 'Number Inputs', link: '/components/number-inputs' },
           { text: 'Search Filter', link: '/components/search-filter' },
           { text: 'Toggle', link: '/components/toggle' },
           { text: 'Promotion', link: '/components/promotion' },
