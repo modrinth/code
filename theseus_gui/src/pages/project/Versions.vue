@@ -61,7 +61,7 @@
       <div
         v-for="version in versions"
         :key="version.id"
-        class="button-base table-row"
+        class="table-row selectable"
         @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
       >
         <div class="table-cell table-text">
@@ -178,6 +178,19 @@ defineProps({
 .table-row {
   display: grid;
   grid-template-columns: min-content 1fr 1fr 1.5fr;
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
+  outline 0.2s ease-in-out;
+
+  &.selectable:focus-visible:not(&:disabled),
+  &.selectable:hover:not(&:disabled) {
+    cursor: pointer;
+    filter: brightness(0.85);
+  }
+
+  &.selectable:active:not(&:disabled) {
+    filter: brightness(0.8);
+    scale: 0.99;
+  }
 }
 
 .table-head {
