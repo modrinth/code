@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 import {
   Card,
   Slider,
@@ -11,6 +11,7 @@ import {
   CheckIcon,
   PlusIcon,
   SaveIcon,
+  AnimatedLogo,
 } from 'omorphia'
 import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
@@ -20,17 +21,26 @@ import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
 
-// Object to bind
-const settings = ref(await get())
-// Finding possible Java 8 and 17 installations
-const java8InstallOptions = ref(await find_jre_8_jres())
-const java17InstallOptions = ref(await find_jre_17_jres())
+const loading = ref(false)
+const settings = ref({})
+const java8InstallOptions = ref([])
+const java17InstallOptions = ref([])
 
-// Setting java version defaults
-if (!settings.value.java_globals.JAVA_8)
-  settings.value.java_globals.JAVA_8 = { path: '', version: '' }
-if (!settings.value.java_globals.JAVA_17)
-  settings.value.java_globals.JAVA_17 = { path: '', version: '' }
+onBeforeMount(async () => {
+  loading.value = true
+  settings.value = await get()
+
+  // Finding possible Java 8 and 17 installations
+  java8InstallOptions.value = await find_jre_8_jres()
+  java17InstallOptions.value = await find_jre_17_jres()
+
+  // Setting java version defaults. These can come as NULL from Tauri.
+  if (!settings.value.java_globals?.JAVA_8)
+    settings.value.java_globals.JAVA_8 = { path: '', version: '' }
+  if (!settings.value.java_globals?.JAVA_17)
+    settings.value.java_globals.JAVA_17 = { path: '', version: '' }
+  loading.value = false
+})
 
 // DOM refs
 const detectJava17Modal = ref(null)
@@ -66,7 +76,8 @@ const setJava8Install = (chosenInstall) => {
 </script>
 
 <template>
-  <div style="margin-bottom: 3.5rem">
+  <AnimatedLogo v-if="loading" class="loading" />
+  <div v-else style="margin-bottom: 3.5rem">
     <Modal ref="detectJava17Modal" header="Auto Detect Java Version" class="auto-detect-modal">
       <div class="table-container">
         <div class="table-row table-head">
@@ -485,5 +496,12 @@ const setJava8Install = (chosenInstall) => {
 
 .table-row:nth-child(even) .table-cell {
   background-color: var(--color-bg);
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }
 </style>
