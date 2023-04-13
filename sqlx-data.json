@@ -1387,6 +1387,27 @@
     },
     "query": "\n            DELETE FROM notifications_actions\n             WHERE notification_id = ANY($1)\n            "
   },
+  "281e3faffa65b51fadc93108ccc93d3d19934c8f26efb568f4794e4c6f16cefe": {
+    "describe": {
+      "columns": [
+        {
+          "name": "thread_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                SELECT m.thread_id FROM mods m\n                INNER JOIN team_members tm ON tm.team_id = m.team_id AND user_id = $2\n                WHERE m.thread_id = ANY($1)\n                "
+  },
   "28b9d32b6d200f34e86f890ce477be0b8717f7ad92dc9cffa56eda4b12ee0df2": {
     "describe": {
       "columns": [
@@ -6669,6 +6690,27 @@
       }
     },
     "query": "\n        SELECT id, version_number, version_type\n        FROM versions\n        WHERE mod_id = $1 AND status = ANY($2)\n        ORDER BY date_published ASC\n        "
+  },
+  "f44572d8ef6ff10fb27a72233792f48cbf825bc58ecf1bc84dcc0aeeba3c12a0": {
+    "describe": {
+      "columns": [
+        {
+          "name": "thread_id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        true
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n                SELECT thread_id FROM reports\n                WHERE thread_id = ANY($1) AND reporter = $2\n                "
   },
   "f453b43772c4d2d9d09dc389eb95482cc75e7f0eaf9dc7ff48cf40f22f1497cc": {
     "describe": {

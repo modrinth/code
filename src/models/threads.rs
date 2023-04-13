@@ -36,6 +36,9 @@ pub struct ThreadMessage {
 pub enum MessageBody {
     Text {
         body: String,
+        #[serde(default)]
+        private: bool,
+        replying_to: Option<ThreadMessageId>,
     },
     StatusChange {
         new_status: ProjectStatus,

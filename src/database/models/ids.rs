@@ -184,7 +184,7 @@ pub struct NotificationId(pub i64);
 #[sqlx(transparent)]
 pub struct NotificationActionId(pub i32);
 
-#[derive(Copy, Clone, Debug, Type, Deserialize)]
+#[derive(Copy, Clone, Debug, Type, Deserialize, Eq, PartialEq)]
 #[sqlx(transparent)]
 pub struct ThreadId(pub i64);
 #[derive(Copy, Clone, Debug, Type, Deserialize)]

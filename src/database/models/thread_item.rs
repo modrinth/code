@@ -9,6 +9,7 @@ pub struct ThreadBuilder {
     pub members: Vec<UserId>,
 }
 
+#[derive(Clone)]
 pub struct Thread {
     pub id: ThreadId,
     pub type_: ThreadType,
@@ -23,7 +24,7 @@ pub struct ThreadMessageBuilder {
     pub show_in_mod_inbox: bool,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Clone)]
 pub struct ThreadMessage {
     pub id: ThreadMessageId,
     pub thread_id: ThreadId,
