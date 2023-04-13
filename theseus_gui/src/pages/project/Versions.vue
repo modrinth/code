@@ -181,13 +181,13 @@ defineProps({
   transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
   outline 0.2s ease-in-out;
 
-  &.selectable:focus-visible:not(&:disabled),
-  &.selectable:hover:not(&:disabled) {
+  &.selectable:focus-visible,
+  &.selectable:hover {
     cursor: pointer;
     filter: brightness(0.85);
   }
 
-  &.selectable:active:not(&:disabled) {
+  &.selectable:active {
     filter: brightness(0.8);
     scale: 0.99;
   }
