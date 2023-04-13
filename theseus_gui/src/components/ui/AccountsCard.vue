@@ -62,7 +62,7 @@ const appendProfiles = (accounts) => {
   return accounts.map((account) => {
     return {
       ...account,
-      profile_picture: `https://crafthead.net/helm/${account.username}/128`,
+      profile_picture: `https://crafthead.net/helm/${account.id}/128`,
     }
   })
 }
