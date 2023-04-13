@@ -29,7 +29,7 @@
         </Categories>
         <hr class="card-divider" />
         <div class="button-group">
-          <Button color="primary" class="instance-button" @click="install(data.versions[0].id)">
+          <Button color="primary" class="instance-button" @click="install(versions[0].id)">
             <DownloadIcon />
             Install
           </Button>
@@ -244,7 +244,6 @@ dayjs.extend(relativeTime)
 async function install(version) {
   if (data.value.project_type === 'modpack') {
     const packs = Object.values(await list())
-    console.log(packs)
     if (
       packs.length === 0 ||
       !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
