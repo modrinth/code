@@ -645,7 +645,7 @@ pub async fn project_edit(
                             old_status: project_item.inner.status,
                         },
                         thread_id: thread,
-                        show_in_mod_inbox: None,
+                        show_in_mod_inbox: false,
                     }
                     .insert(&mut transaction)
                     .await?;

@@ -20,7 +20,7 @@ pub struct ThreadMessageBuilder {
     pub author_id: Option<UserId>,
     pub body: MessageBody,
     pub thread_id: ThreadId,
-    pub show_in_mod_inbox: Option<bool>,
+    pub show_in_mod_inbox: bool,
 }
 
 #[derive(Deserialize)]
@@ -148,11 +148,15 @@ impl Thread {
             Ok(e.right().map(|x| Thread {
                 id: ThreadId(x.id),
                 type_: ThreadType::from_str(&x.thread_type),
-                messages: serde_json::from_value(
-                    x.messages.unwrap_or_default(),
-                )
-                    .ok()
-                    .unwrap_or_default(),
+                messages: {
+                    let mut messages: Vec<ThreadMessage> = serde_json::from_value(
+                        x.messages.unwrap_or_default(),
+                    )
+                        .ok()
+                        .unwrap_or_default();
+                    messages.sort_by(|a, b| a.created.cmp(&b.created));
+                    messages
+                },
                 members: x.members.unwrap_or_default().into_iter().map(UserId).collect(),
             }))
         })

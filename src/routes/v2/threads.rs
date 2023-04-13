@@ -100,12 +100,11 @@ pub async fn thread_get(
                     .into_iter()
                     .map(|x| ThreadMessage {
                         id: x.id.into(),
-                        author_id: if thread_type == ThreadType::Report
-                            && users
-                                .iter()
-                                .find(|y| x.author_id == Some(y.id.into()))
-                                .map(|x| x.role.is_mod())
-                                .unwrap_or(false)
+                        author_id: if users
+                            .iter()
+                            .find(|y| x.author_id == Some(y.id.into()))
+                            .map(|x| x.role.is_mod())
+                            .unwrap_or(false)
                         {
                             None
                         } else {
@@ -152,6 +151,16 @@ pub async fn thread_send_message(
             return Ok(HttpResponse::NotFound().body(""));
         }
 
+        match &new_message.body {
+            MessageBody::Text { .. } => {}
+            _ => {
+                return Err(ApiError::InvalidInput(
+                    "You may only send text messages through this route!"
+                        .to_string(),
+                ))
+            }
+        }
+
         let mod_notif = if thread.type_ == ThreadType::Project {
             let status = sqlx::query!(
                 "SELECT m.status FROM mods m WHERE thread_id = $1",
@@ -172,7 +181,7 @@ pub async fn thread_send_message(
             author_id: Some(user.id.into()),
             body: new_message.body.clone(),
             thread_id: thread.id,
-            show_in_mod_inbox: Some(mod_notif),
+            show_in_mod_inbox: mod_notif,
         }
         .insert(&mut transaction)
         .await?;
