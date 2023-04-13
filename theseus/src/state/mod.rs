@@ -100,13 +100,14 @@ impl State {
 
                     // On launcher initialization, attempt a tag fetch after tags init
                     let mut tags = Tags::init(&database)?;
-                    if let Err(tag_fetch_err) = tags.fetch_update().await {
+                    if let Err(tag_fetch_err) =
+                        tags.fetch_update(&io_semaphore).await
+                    {
                         tracing::error!(
                             "Failed to fetch tags on launcher init: {}",
                             tag_fetch_err
                         );
                     };
-
                     // On launcher initialization, if global java variables are unset, try to find and set them
                     // (they are required for the game to launch)
                     if settings.java_globals.count() == 0 {
