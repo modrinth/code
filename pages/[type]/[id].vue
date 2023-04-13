@@ -132,6 +132,7 @@
       />
     </Head>
     <ModalModeration
+      v-if="$auth.user"
       ref="modalModeration"
       :project="project"
       :status="moderationStatus"

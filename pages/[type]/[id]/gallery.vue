@@ -1,7 +1,7 @@
 <template>
   <div>
     <Head>
-      <Title> {{ project.title }} - Gallery </Title>
+      <Title>{{ project.title }} - Gallery</Title>
       <Meta name="og:title" :content="`${project.title} - Gallery`" />
       <Meta name="description" :content="metaDescription" />
       <Meta name="apple-mobile-web-app-title" :content="`${project.title} - Gallery`" />

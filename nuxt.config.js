@@ -135,6 +135,7 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [
+      eslintPlugin(),
       svgLoader({
         svgoConfig: {
           plugins: [
@@ -149,7 +150,6 @@ export default defineNuxtConfig({
           ],
         },
       }),
-      eslintPlugin(),
     ],
   },
   dayjs: {

@@ -6,6 +6,16 @@
       'alt-layout': $cosmetics.searchLayout,
     }"
   >
+    <Head>
+      <Title>Search {{ $formatProjectType(projectType.display) }}s - Modrinth</Title>
+      <Meta name="og:title" :content="`Search ${$formatProjectType(projectType.display)}s`" />
+      <Meta name="description" :content="metaDescription" />
+      <Meta
+        name="apple-mobile-web-app-title"
+        :content="`Search ${$formatProjectType(projectType.display)}s`"
+      />
+      <Meta name="og:description" :content="metaDescription" />
+    </Head>
     <aside
       :class="{
         'normal-page__sidebar': true,
@@ -406,6 +416,14 @@ export default defineNuxtComponent({
     const currentPage = ref(1)
     const projectType = ref({ id: 'mod', display: 'mod', actual: 'mod' })
 
+    const metaDescription = computed(
+      () =>
+        `Search and browse thousands of Minecraft ${data.$formatProjectType(
+          projectType.value.display
+        )}s on Modrinth with instant, accurate search results. Our filters help you quickly find the best Minecraft ${data.$formatProjectType(
+          projectType.value.display
+        )}s.`
+    )
     if (route.query.q) {
       query.value = route.query.q
     }
@@ -676,6 +694,7 @@ export default defineNuxtComponent({
       getSearchUrl,
       searchLoading,
       noLoad,
+      metaDescription,
     }
   },
   computed: {

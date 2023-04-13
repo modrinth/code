@@ -1,14 +1,14 @@
 <template>
-  <div>
+  <div v-if="shown">
     <div
       :class="{
-        shown: shown,
+        shown: actuallyShown,
         noblur: !$orElse($cosmetics.advancedRendering, true),
       }"
       class="modal-overlay"
       @click="hide"
     />
-    <div class="modal-container" :class="{ shown }">
+    <div class="modal-container" :class="{ shown: actuallyShown }">
       <div class="modal-body">
         <div v-if="header" class="header">
           <h1>{{ header }}</h1>
@@ -22,6 +22,7 @@
       </div>
     </div>
   </div>
+  <div v-else />
 </template>
 
 <script>
@@ -40,14 +41,21 @@ export default {
   data() {
     return {
       shown: false,
+      actuallyShown: false,
     }
   },
   methods: {
     show() {
       this.shown = true
+      setTimeout(() => {
+        this.actuallyShown = true
+      }, 50)
     },
     hide() {
-      this.shown = false
+      this.actuallyShown = false
+      setTimeout(() => {
+        this.shown = false
+      }, 300)
     },
   },
 }
