@@ -35,7 +35,7 @@ pub async fn settings_get() -> Result<FrontendSettings> {
             .into_iter()
             .map(|(s1, s2)| format!("{s1}={s2}"))
             .collect::<Vec<String>>()
-            .join(","),
+            .join(" "),
         java_globals: backend_settings.java_globals,
         default_user: backend_settings.default_user,
         hooks: backend_settings.hooks,

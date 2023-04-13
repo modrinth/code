@@ -32,6 +32,7 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     let st = State::get().await?;
     st.settings.write().await.max_concurrent_downloads = 5;
+    st.settings.write().await.hooks.post_exit = Some("echo This is after Minecraft runs- global setting!".to_string());
     // Changed the settings, so need to reset the semaphore
     st.reset_semaphore().await;
 
@@ -47,7 +48,7 @@ async fn main() -> theseus::Result<()> {
     println!("Creating/adding profile.");
 
     let profile_path =
-        pack::install_pack_from_version_id("KxUUUFh5".to_string())
+        pack::install_pack_from_version_id("nvrqJg44".to_string())
             .await
             .unwrap();
 
@@ -59,7 +60,7 @@ async fn main() -> theseus::Result<()> {
         profile.hooks = Some(Hooks {
             pre_launch: Some("echo This is before Minecraft runs!".to_string()),
             wrapper: None,
-            post_exit: Some("echo This is after Minecraft runs!".to_string()),
+            post_exit: None,
         });
         async { Ok(()) }
     })
