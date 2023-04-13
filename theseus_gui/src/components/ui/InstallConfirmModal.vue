@@ -19,6 +19,7 @@ defineExpose({
 async function install() {
   let id = await pack_install(version.value)
   await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+  confirmModal.value.hide()
 }
 </script>
 

@@ -50,7 +50,7 @@
                   {{ file.filename }}
                 </span>
                 ({{ formatBytes(file.size) }})
-                <span class="primary-label"> Primary </span>
+                <span v-if="file.primary" class="primary-label"> Primary </span>
               </span>
             </span>
             <Button
