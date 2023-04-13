@@ -22,7 +22,7 @@ export async function create_empty() {
 */
 
 export async function create(name, game_version, modloader, loader_version, icon) {
-  return await invoke('profile_create', { name, game_version, modloader, loader_version, icon})
+  return await invoke('profile_create', { name, game_version, modloader, loader_version, icon })
 }
 
 // Remove a profile
