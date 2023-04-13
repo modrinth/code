@@ -1,5 +1,5 @@
 use crate::api::Result;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use theseus::prelude::*;
 
 // Identical to theseus::settings::Settings except for the custom_java_args field
@@ -43,7 +43,11 @@ pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
     let backend_settings = Settings {
         memory: settings.memory,
         game_resolution: settings.game_resolution,
-        custom_java_args: settings.custom_java_args.split_whitespace().map(|s| s.to_string()).collect(),
+        custom_java_args: settings
+            .custom_java_args
+            .split_whitespace()
+            .map(|s| s.to_string())
+            .collect(),
         custom_env_args: settings.custom_env_args,
         java_globals: settings.java_globals,
         default_user: settings.default_user,

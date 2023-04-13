@@ -79,6 +79,7 @@ pub async fn install_pack_from_version_id(
         Method::GET,
         &format!("{}version/{}", MODRINTH_API_URL, version_id),
         None,
+        None,
         &state.io_semaphore,
     )
     .await?;
@@ -103,6 +104,7 @@ pub async fn install_pack_from_version_id(
     let project: ModrinthProject = fetch_json(
         Method::GET,
         &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
+        None,
         None,
         &state.io_semaphore,
     )
@@ -230,7 +232,7 @@ async fn install_pack(
                 let profile = profile.clone();
 
                 async move {
-                    // TODO: Future update: prompt user for optional files in a modpack
+                    //TODO: Future update: prompt user for optional files in a modpack
                     if let Some(env) = project.env {
                         if env
                             .get(&EnvType::Client)
