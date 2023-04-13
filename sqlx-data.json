@@ -491,44 +491,6 @@
     },
     "query": "\n            INSERT INTO reports (\n                id, report_type_id, mod_id, version_id, user_id,\n                body, reporter, thread_id\n            )\n            VALUES (\n                $1, $2, $3, $4, $5,\n                $6, $7, $8\n            )\n            "
   },
-  "141370c3df1e8746397d71fd8cda5776c82b98af6bbc97f2072b9877d52479b8": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "thread_type",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "members",
-          "ordinal": 2,
-          "type_info": "Int8Array"
-        },
-        {
-          "name": "messages",
-          "ordinal": 3,
-          "type_info": "Jsonb"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        null,
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT t.id, t.thread_type,\n            ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages\n            FROM threads t\n            LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id\n            LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id\n            WHERE t.id = ANY($1)\n            GROUP BY t.id\n            "
-  },
   "15b8ea323c2f6d03c2e385d9c46d7f13460764f2f106fd638226c42ae0217f75": {
     "describe": {
       "columns": [],
@@ -3067,6 +3029,44 @@
       }
     },
     "query": "\n                    UPDATE files\n                    SET is_primary = FALSE\n                    WHERE (version_id = $1)\n                    "
+  },
+  "6df09f8d633b6d6f481c858755ff577d5d8f2ddf26c8235e4e7685364ae91460": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "thread_type",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "members",
+          "ordinal": 2,
+          "type_info": "Int8Array"
+        },
+        {
+          "name": "messages",
+          "ordinal": 3,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        null,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            SELECT t.id, t.thread_type,\n            ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created, 'show_in_mod_inbox', tmsg.show_in_mod_inbox)) filter (where tmsg.id is not null) messages\n            FROM threads t\n            LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id\n            LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id\n            WHERE t.id = ANY($1)\n            GROUP BY t.id\n            "
   },
   "6e07cc68675d0f583182eaa9f50853fa5996b9f83543fe8b6c2a073cf6a9cb5d": {
     "describe": {

@@ -134,7 +134,7 @@ impl Thread {
             "
             SELECT t.id, t.thread_type,
             ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages
+            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created, 'show_in_mod_inbox', tmsg.show_in_mod_inbox)) filter (where tmsg.id is not null) messages
             FROM threads t
             LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id
             LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id
