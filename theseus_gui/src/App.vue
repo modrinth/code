@@ -9,9 +9,9 @@ import {
   ClientIcon,
   PlusIcon,
   SettingsIcon,
-  Avatar,
 } from 'omorphia'
 import { useTheming } from '@/store/state'
+import AccountsCard from '@/components/ui/AccountsCard.vue'
 import { list } from '@/helpers/profile'
 
 const themeStore = useTheming()
@@ -31,7 +31,9 @@ list().then(
   <div class="container">
     <div class="nav-container">
       <div class="nav-section">
-        <Avatar size="sm" src="https://cdn.modrinth.com/data/AANobbMI/icon.png" />
+        <suspense>
+          <AccountsCard ref="accounts" />
+        </suspense>
         <div class="pages-list">
           <RouterLink to="/" class="button-base nav-button"><ClientIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
