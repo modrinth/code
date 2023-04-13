@@ -1,6 +1,6 @@
 //! Theseus settings file
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 use tokio::fs;
 
 use super::JavaGlobals;
@@ -115,10 +115,10 @@ impl Default for WindowSize {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(default)]
 pub struct Hooks {
-    #[serde(skip_serializing_if = "HashSet::is_empty")]
-    pub pre_launch: HashSet<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pre_launch: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wrapper: Option<String>,
-    #[serde(skip_serializing_if = "HashSet::is_empty")]
-    pub post_exit: HashSet<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub post_exit: Option<String>,
 }

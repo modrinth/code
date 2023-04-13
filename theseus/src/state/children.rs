@@ -38,7 +38,7 @@ impl Children {
         _uuid: Uuid,
         profile_path: PathBuf,
         mut mc_command: Command,
-        mut commands: Vec<Command>,
+        mut commands: Vec<Command>, // Commands to run after minecraft. It's plural in case we want to run more than one command in the future
     ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
         let commands = commands.drain(..);

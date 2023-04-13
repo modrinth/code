@@ -154,7 +154,7 @@ pub async fn run_credentials(
     .await?;
     let pre_launch_hooks =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
-    for hook in pre_launch_hooks.iter() {
+    if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {

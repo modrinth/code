@@ -3,8 +3,6 @@
     windows_subsystem = "windows"
 )]
 
-use std::collections::HashSet;
-
 use dunce::canonicalize;
 use theseus::prelude::*;
 use tokio::time::{sleep, Duration};
@@ -58,16 +56,10 @@ async fn main() -> theseus::Result<()> {
     // println!("Editing.");
     profile::edit(&profile_path, |profile| {
         // Add some hooks, for instance!
-        let mut pre = HashSet::new();
-        pre.insert("echo This is before Minecraft runs!".to_string());
-
-        let mut post = HashSet::new();
-        post.insert("echo This is after Minecraft runs!".to_string());
-
         profile.hooks = Some(Hooks {
-            pre_launch: pre,
+            pre_launch: Some("echo This is before Minecraft runs!".to_string()),
             wrapper: None,
-            post_exit: post,
+            post_exit: Some("echo This is after Minecraft runs!".to_string()),
         });
         async { Ok(()) }
     })
