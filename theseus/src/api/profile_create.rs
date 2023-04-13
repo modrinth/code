@@ -159,10 +159,10 @@ pub async fn profile_create(
     let settings = state.settings.read().await;
     let optimal_version_key = jre::get_optimal_jre_key(&profile).await?;
     if settings.java_globals.get(&optimal_version_key).is_some() {
-        profile.set_java_settings(Some(JavaSettings {
+        profile.java = Some(JavaSettings {
             jre_key: Some(optimal_version_key),
             extra_arguments: None,
-        }))?;
+        });
     } else {
         println!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.");
     }

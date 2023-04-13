@@ -5,6 +5,7 @@
 
 use dunce::canonicalize;
 use theseus::prelude::*;
+use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run
@@ -46,14 +47,46 @@ async fn main() -> theseus::Result<()> {
 
     println!("Creating/adding profile.");
 
-    let profile_path =
-        pack::install_pack_from_version_id("KxUUUFh5".to_string())
-            .await
-            .unwrap();
+    let name = "Example".to_string();
+    let game_version = "1.19.2".to_string();
+    let modloader = ModLoader::Fabric;
+    let loader_version = "stable".to_string();
+
+    let profile_path = profile_create(
+        name.clone(),
+        game_version,
+        modloader,
+        Some(loader_version),
+        None,
+        None,
+    )
+    .await?;
+
+    println!("Adding sodium");
+    let sodium_path = profile::add_project_from_version(
+        &profile_path,
+        "rAfhHfow".to_string(),
+    )
+    .await?;
+
+    let mod_menu_path = profile::add_project_from_version(
+        &profile_path,
+        "gSoPJyVn".to_string(),
+    )
+    .await?;
+
+    println!("Disabling sodium");
+    profile::toggle_disable_project(&profile_path, &sodium_path).await?;
+
+    profile::remove_project(&profile_path, &mod_menu_path).await?;
+    // let profile_path =
+    //     pack::install_pack_from_version_id("KxUUUFh5".to_string())
+    //         .await
+    //         .unwrap();
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
-    // println!("Editing.");
+    println!("Editing.");
     profile::edit(&profile_path, |_profile| {
         // Eg: Java- this would let you change the java runtime of the profile instead of using the default
         // use theseus::prelude::jre::JAVA__KEY;
@@ -72,6 +105,7 @@ async fn main() -> theseus::Result<()> {
         authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
     }
 
+    println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
     let proc_lock = profile::run(&canonicalize(&profile_path)?).await?;
 
