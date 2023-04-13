@@ -53,6 +53,7 @@ fn main() {
             api::jre::jre_validate_globals,
             api::jre::jre_get_optimal_jre_key,
             api::jre::jre_get_optimal_jre_key_by_path,
+            api::jre::jre_get_jre,
             api::process::process_get_all_uuids,
             api::process::process_get_all_running_uuids,
             api::process::process_get_uuids_by_profile_path,

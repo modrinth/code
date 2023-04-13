@@ -1,4 +1,6 @@
 //! Authentication flow interface
+use std::path::PathBuf;
+
 use crate::{
     launcher::download,
     prelude::Profile,
@@ -138,4 +140,9 @@ pub async fn validate_globals() -> crate::Result<bool> {
     let state = State::get().await?;
     let settings = state.settings.read().await;
     Ok(settings.java_globals.is_all_valid())
+}
+
+// Validates JRE at a given at a given path
+pub async fn check_jre(path : PathBuf) -> crate::Result<Option<JavaVersion>> {
+    Ok(jre::check_java_at_filepath(&path))
 }
