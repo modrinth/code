@@ -58,14 +58,14 @@
         <div class="table-cell table-text">Supports</div>
         <div class="table-cell table-text">Stats</div>
       </div>
-      <router-link
+      <div
         v-for="version in versions"
         :key="version.id"
-        class="button-base table-row"
-        :to="`/project/${$route.params.id}/version/${version.id}`"
+        class="table-row selectable"
+        @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
       >
         <div class="table-cell table-text">
-          <Button color="primary" icon-only>
+          <Button color="primary" icon-only @click.stop="() => install(version.id)">
             <DownloadIcon />
           </Button>
         </div>
@@ -117,7 +117,7 @@
             <span> Downloads </span>
           </div>
         </div>
-      </router-link>
+      </div>
     </div>
   </Card>
 </template>
@@ -151,6 +151,10 @@ defineProps({
     type: Array,
     required: true,
   },
+  install: {
+    type: Function,
+    required: true,
+  },
 })
 </script>
 
@@ -174,6 +178,19 @@ defineProps({
 .table-row {
   display: grid;
   grid-template-columns: min-content 1fr 1fr 1.5fr;
+  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
+    outline 0.2s ease-in-out;
+
+  &.selectable:focus-visible,
+  &.selectable:hover {
+    cursor: pointer;
+    filter: brightness(0.85);
+  }
+
+  &.selectable:active {
+    filter: brightness(0.8);
+    scale: 0.99;
+  }
 }
 
 .table-head {
