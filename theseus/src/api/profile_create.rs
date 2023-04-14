@@ -135,7 +135,8 @@ pub async fn profile_create(
 
     // Fully canonicalize now that its created for storing purposes
     let path = canonicalize(&path)?;
-    let mut profile = Profile::new(name, game_version, path.clone()).await?;
+    let mut profile =
+        Profile::new(uuid, name, game_version, path.clone()).await?;
     if let Some(ref icon) = icon {
         let bytes = tokio::fs::read(icon).await?;
         profile

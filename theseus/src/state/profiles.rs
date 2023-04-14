@@ -25,7 +25,6 @@ pub const CURRENT_FORMAT_VERSION: u32 = 1;
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
-    #[serde(default = "create_uuid")]
     pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
@@ -52,10 +51,6 @@ pub struct ProfileMetadata {
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
     pub linked_project_id: Option<String>,
-}
-
-pub fn create_uuid() -> Uuid {
-    Uuid::new_v4()
 }
 
 // TODO: Quilt?
@@ -93,6 +88,7 @@ pub struct JavaSettings {
 impl Profile {
     #[tracing::instrument]
     pub async fn new(
+        uuid: Uuid,
         name: String,
         version: String,
         path: PathBuf,
@@ -105,7 +101,7 @@ impl Profile {
         }
 
         Ok(Self {
-            uuid: create_uuid(),
+            uuid,
             path: canonicalize(path)?,
             metadata: ProfileMetadata {
                 name,
