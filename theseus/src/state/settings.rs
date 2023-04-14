@@ -63,7 +63,7 @@ impl Settings {
 
     #[tracing::instrument(skip(self))]
     pub async fn sync(&self, to: &Path) -> crate::Result<()> {
-        fs::write(to, serde_json::to_vec_pretty(self)?)
+        fs::write(to, serde_json::to_vec(self)?)
             .await
             .map_err(|err| {
                 crate::ErrorKind::FSError(format!(

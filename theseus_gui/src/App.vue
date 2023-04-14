@@ -4,14 +4,14 @@ import { RouterView, RouterLink } from 'vue-router'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  HomeIcon,
   SearchIcon,
-  BookIcon,
-  ClientIcon,
+  LibraryIcon,
   PlusIcon,
   SettingsIcon,
-  Avatar,
 } from 'omorphia'
 import { useTheming } from '@/store/state'
+import AccountsCard from '@/components/ui/AccountsCard.vue'
 import { toggleTheme } from '@/helpers/theme'
 import { list } from '@/helpers/profile'
 
@@ -38,11 +38,13 @@ list().then(
   <div class="container">
     <div class="nav-container">
       <div class="nav-section">
-        <Avatar size="sm" src="https://cdn.modrinth.com/data/AANobbMI/icon.png" />
+        <suspense>
+          <AccountsCard ref="accounts" />
+        </suspense>
         <div class="pages-list">
-          <RouterLink to="/" class="button-base nav-button"><ClientIcon /></RouterLink>
+          <RouterLink to="/" class="button-base nav-button"><HomeIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
-          <RouterLink to="/library" class="button-base nav-button"> <BookIcon /></RouterLink>
+          <RouterLink to="/library" class="button-base nav-button"> <LibraryIcon /></RouterLink>
           <button color="primary" class="button-base primary nav-button" icon-only>
             <PlusIcon />
           </button>

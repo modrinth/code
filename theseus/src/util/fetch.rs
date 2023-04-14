@@ -1,53 +1,86 @@
 //! Functions for fetching infromation from the Internet
-use crate::config::REQWEST_CLIENT;
 use bytes::Bytes;
+use lazy_static::lazy_static;
 use reqwest::Method;
 use serde::de::DeserializeOwned;
 use std::ffi::OsStr;
 use std::path::{Path, PathBuf};
+use std::time;
 use tokio::sync::{RwLock, Semaphore};
 use tokio::{
     fs::{self, File},
     io::AsyncWriteExt,
 };
 
+lazy_static! {
+    static ref REQWEST_CLIENT: reqwest::Client = {
+        let mut headers = reqwest::header::HeaderMap::new();
+        let header = reqwest::header::HeaderValue::from_str(&format!(
+            "modrinth/theseus/{} (support@modrinth.com)",
+            env!("CARGO_PKG_VERSION")
+        ))
+        .unwrap();
+        headers.insert(reqwest::header::USER_AGENT, header);
+        reqwest::Client::builder()
+            .tcp_keepalive(Some(time::Duration::from_secs(10)))
+            .default_headers(headers)
+            .build()
+            .expect("Reqwest Client Building Failed")
+    };
+}
 const FETCH_ATTEMPTS: usize = 3;
 
+#[tracing::instrument(skip(semaphore))]
 pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
     semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Bytes> {
-    fetch_advanced(Method::GET, url, sha1, semaphore).await
+    fetch_advanced(Method::GET, url, sha1, None, None, semaphore).await
 }
 
+#[tracing::instrument(skip(json_body, semaphore))]
 pub async fn fetch_json<T>(
     method: Method,
     url: &str,
     sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
     semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
-    let result = fetch_advanced(method, url, sha1, semaphore).await?;
+    let result =
+        fetch_advanced(method, url, sha1, json_body, None, semaphore).await?;
     let value = serde_json::from_slice(&result)?;
     Ok(value)
 }
 
 /// Downloads a file with retry and checksum functionality
-#[tracing::instrument(skip(semaphore))]
+#[tracing::instrument(skip(json_body, semaphore))]
 pub async fn fetch_advanced(
     method: Method,
     url: &str,
     sha1: Option<&str>,
+    json_body: Option<serde_json::Value>,
+    header: Option<(&str, &str)>,
     semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<Bytes> {
     let io_semaphore = semaphore.read().await;
     let _permit = io_semaphore.acquire().await?;
-    for attempt in 1..=(FETCH_ATTEMPTS + 1) {
-        let result = REQWEST_CLIENT.request(method.clone(), url).send().await;
 
+    for attempt in 1..=(FETCH_ATTEMPTS + 1) {
+        let mut req = REQWEST_CLIENT.request(method.clone(), url);
+
+        if let Some(body) = json_body.clone() {
+            req = req.json(&body);
+        }
+
+        if let Some(header) = header {
+            req = req.header(header.0, header.1);
+        }
+
+        let result = req.send().await;
         match result {
             Ok(x) => {
                 let bytes = x.bytes().await;

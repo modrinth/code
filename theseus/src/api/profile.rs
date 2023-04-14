@@ -14,7 +14,7 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use tokio::{process::Command, sync::RwLock};
+use tokio::{fs, process::Command, sync::RwLock};
 
 /// Remove a profile
 #[tracing::instrument]
@@ -87,23 +87,10 @@ pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>
 #[tracing::instrument]
 pub async fn sync(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = get(path).await? {
-        let paths = profile.get_profile_project_paths()?;
-        let projects = crate::state::infer_data_from_files(
-            paths,
-            state.directories.caches_dir(),
-            &state.io_semaphore,
-        )
-        .await?;
-
-        {
-            let mut profiles = state.profiles.write().await;
-            if let Some(profile) = profiles.0.get_mut(path) {
-                profile.projects = projects;
-            }
-        }
-
+    if let Some(profile) = profiles.0.get_mut(path) {
+        profile.sync().await?;
         State::sync().await?;
 
         Ok(())
@@ -115,6 +102,99 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
     }
 }
 
+/// Add a project from a version
+#[tracing::instrument]
+pub async fn add_project_from_version(
+    profile: &Path,
+    version_id: String,
+) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile) {
+        profile.add_project_version(version_id).await
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+/// Add a project from an FS path
+#[tracing::instrument]
+pub async fn add_project_from_path(
+    profile: &Path,
+    path: &Path,
+    project_type: Option<String>,
+) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile) {
+        let file = fs::read(path).await?;
+        let file_name = path
+            .file_name()
+            .unwrap_or_default()
+            .to_string_lossy()
+            .to_string();
+
+        profile
+            .add_project_bytes(
+                &file_name,
+                bytes::Bytes::from(file),
+                project_type.and_then(|x| serde_json::from_str(&x).ok()),
+            )
+            .await
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+/// Toggle whether a project is disabled or not
+#[tracing::instrument]
+pub async fn toggle_disable_project(
+    profile: &Path,
+    project: &Path,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile) {
+        profile.toggle_disable_project(project).await?;
+
+        Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+/// Remove a project from a profile
+#[tracing::instrument]
+pub async fn remove_project(
+    profile: &Path,
+    project: &Path,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile) {
+        profile.remove_project(project).await?;
+
+        Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile.display().to_string(),
+        )
+        .as_error())
+    }
+}
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument(skip_all)]
@@ -124,13 +204,13 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     // Get default account and refresh credentials (preferred way to log in)
     let default_account = state.settings.read().await.default_user;
     let credentials = if let Some(default_account) = default_account {
-        refresh(default_account, false).await?
+        refresh(default_account).await?
     } else {
         // If no default account, try to use a logged in account
         let users = auth::users().await?;
         let last_account = users.iter().next();
         if let Some(last_account) = last_account {
-            refresh(last_account.id, false).await?
+            refresh(last_account.id).await?
         } else {
             return Err(crate::ErrorKind::NoCredentialsError.as_error());
         }
@@ -143,7 +223,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
 #[tracing::instrument(skip_all)]
 pub async fn run_credentials(
     path: &Path,
-    credentials: &crate::auth::Credentials,
+    credentials: &auth::Credentials,
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
     let settings = state.settings.read().await;

@@ -46,7 +46,7 @@ pub async fn authenticate(
         ))
     })?;
 
-    let credentials = flow.extract_credentials().await?;
+    let credentials = flow.extract_credentials(&state.io_semaphore).await?;
     users.insert(&credentials)?;
 
     if state.settings.read().await.default_user.is_none() {
@@ -60,13 +60,11 @@ pub async fn authenticate(
 /// Refresh some credentials using Hydra, if needed
 /// This is the primary desired way to get credentials, as it will also refresh them.
 #[tracing::instrument]
-pub async fn refresh(
-    user: uuid::Uuid,
-    update_name: bool,
-) -> crate::Result<Credentials> {
+pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     let state = State::get().await?;
     let mut users = state.users.write().await;
 
+    let io_sempahore = &state.io_semaphore;
     futures::future::ready(users.get(user)?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to refresh nonexistent user with ID {user}"
@@ -75,10 +73,7 @@ pub async fn refresh(
     }))
     .and_then(|mut credentials| async move {
         if chrono::offset::Utc::now() > credentials.expires {
-            inner::refresh_credentials(&mut credentials).await?;
-            if update_name {
-                inner::refresh_username(&mut credentials).await?;
-            }
+            inner::refresh_credentials(&mut credentials, io_sempahore).await?;
         }
         users.insert(&credentials)?;
         Ok(credentials)

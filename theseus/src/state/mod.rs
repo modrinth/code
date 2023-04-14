@@ -120,7 +120,9 @@ impl State {
 
                     // On launcher initialization, attempt a tag fetch after tags init
                     let mut tags = Tags::init(&database)?;
-                    if let Err(tag_fetch_err) = tags.fetch_update(Some(&loading_bar)).await {
+                    if let Err(tag_fetch_err) =
+                        tags.fetch_update(&io_semaphore).await
+                    {
                         tracing::error!(
                             "Failed to fetch tags on launcher init: {}",
                             tag_fetch_err
