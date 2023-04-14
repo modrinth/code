@@ -151,7 +151,7 @@ impl Tags {
             licenses,
             donation_platforms,
             report_types,
-        ) = loading_join!(0.5, 0.9, "Loading tags from Modrinth...";
+        ) = loading_join!("launcher_init", 0.5, Some("Loading tags from Modrinth...");
             categories,
             loaders,
             game_versions,

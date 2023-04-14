@@ -2,7 +2,7 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::state::projects::Project;
 use crate::util::fetch::write_cached_icon;
 use crate::{data::DirectoryInfo, loading_try_for_each_concurrent};
-use crate::{emit_profile, ProfilePayloadType};
+use crate::{emit_profile, ProfilePayloadType, init_loading};
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
@@ -272,13 +272,14 @@ impl Profiles {
     pub async fn sync(&self) -> crate::Result<&Self> {
         let num_futs = self.0.len();
 
+        init_loading("profile_sync", 100.0, "Syncing profiles...").await;
         loading_try_for_each_concurrent(
             stream::iter(self.0.iter()).map(Ok::<_, crate::Error>),
             None,
-            0.0,
-            1.0,
+            "profile_sync",
+            100.0,
             num_futs,
-            "Synchronizing profiles...",
+            None,
             |(path, profile)| async move {
                 let json = serde_json::to_vec_pretty(&profile)?;
 

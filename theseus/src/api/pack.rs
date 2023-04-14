@@ -4,7 +4,7 @@ use crate::state::{ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
-use crate::{loading_try_for_each_concurrent, State};
+use crate::{loading_try_for_each_concurrent, State, init_loading};
 use async_zip::tokio::read::seek::ZipFileReader;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -222,16 +222,17 @@ async fn install_pack(
         )
         .await?;
 
+        init_loading("pack_download", 100.0, "Downloading modpack...").await;
         let num_files = pack.files.len();
         use futures::StreamExt;
         loading_try_for_each_concurrent(
             futures::stream::iter(pack.files.into_iter())
                 .map(Ok::<PackFile, crate::Error>),
             None,
-            0.0,
-            1.0,
+            "pack_download",
+            100.0,
             num_files,
-            "Downloading pack...",
+            None,
             |project| {
                 let profile = profile.clone();
                 async move {

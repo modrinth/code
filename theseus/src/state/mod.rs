@@ -1,6 +1,7 @@
 //! Theseus state management system
 use crate::config::sled_config;
 use crate::emit_loading;
+use crate::init_loading;
 use crate::jre;
 use crate::loading_join;
 use std::sync::Arc;
@@ -70,6 +71,9 @@ impl State {
         LAUNCHER_STATE
             .get_or_try_init(|| {
                 async {
+
+                    init_loading("launcher_init", 100.0, "Initializing launcher...").await;
+
                     // Directories
                     let directories = DirectoryInfo::init().await?;
 
@@ -79,7 +83,7 @@ impl State {
                         .path(directories.database_file())
                         .open()?;
 
-                    emit_loading(0.1, "Initializing settings...");
+                    emit_loading("launcher_init", 10.0, None).await;
 
                     // Settings
                     let mut settings =
@@ -97,11 +101,11 @@ impl State {
 
                     // Launcher data
                     let (metadata, profiles) = loading_join! {
-                        0.1, 0.4, "Initializing metadata and profiles...";
+                        "launcher_init", 20.0, Some("Initializing metadata and profiles...");
                         metadata_fut, profiles_fut
                     };
 
-                    emit_loading(0.5, "Initializing users...");
+                    emit_loading("launcher_init", 10.0, None).await;
                     let users = Users::init(&database)?;
 
                     let children = Children::new();
@@ -117,7 +121,7 @@ impl State {
                         );
                     };
 
-                    emit_loading(0.9, "Detecting java...");
+                    emit_loading("launcher_init", 10.0, None).await;
 
                     // On launcher initialization, if global java variables are unset, try to find and set them
                     // (they are required for the game to launch)

@@ -3,7 +3,7 @@
 use crate::{
     loading_try_for_each_concurrent,
     state::State,
-    util::{fetch::*, platform::OsExt},
+    util::{fetch::*, platform::OsExt}, init_loading,
 };
 use daedalus::{
     self as d,
@@ -24,6 +24,7 @@ pub async fn download_minecraft(
     log::info!("Downloading Minecraft version {}", version.id);
     let assets_index = download_assets_index(st, version).await?;
 
+    init_loading("minecraft_download", 100.0, "Downloading Minecraft...").await;
     tokio::try_join! {
         download_client(st, version),
         download_assets(st, version.assets == "legacy", &assets_index),
@@ -145,7 +146,12 @@ pub async fn download_assets(
     let assets = stream::iter(index.objects.iter())
         .map(Ok::<(&String, &Asset), crate::Error>);
 
-    loading_try_for_each_concurrent(assets, None, 0.0, 1.0, num_futs, "Loading assets...", 
+    loading_try_for_each_concurrent(assets, 
+        None,
+        "minecraft_download",
+        50.0,
+        num_futs,
+        None,
         |(name, asset)| async move {
             let hash = &asset.hash;
             let resource_path = st.directories.object_dir(hash);
@@ -204,7 +210,7 @@ pub async fn download_libraries(
     let num_files = libraries.len();
     loading_try_for_each_concurrent(
     stream::iter(libraries.iter())
-        .map(Ok::<&Library, crate::Error>), None,0.0,1.0, num_files, "Downloading libraries...",|library| async move {
+        .map(Ok::<&Library, crate::Error>), None, "minecraft_download",50.0,num_files, None,|library| async move {
             if let Some(rules) = &library.rules {
                 if !rules.iter().all(super::parse_rule) {
                     return Ok(());

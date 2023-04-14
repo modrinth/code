@@ -6,7 +6,7 @@ use theseus::{prelude::*, window_scoped};
 
 use super::TheseusSerializableError;
 
-// No futures for many of these, so we do not do window_scoped! (function will either return immediately or error)
+// No futures for many of these, so we do not do window_scoped (function will either return immediately or error)
 
 /// Get all JREs that exist on the system
 #[tauri::command]
