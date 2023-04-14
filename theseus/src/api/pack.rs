@@ -1,10 +1,12 @@
 use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
+use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
+use crate::event::LoadingBarType;
 use crate::state::{ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
-use crate::{init_loading, loading_try_for_each_concurrent, State};
+use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
@@ -222,14 +224,19 @@ async fn install_pack(
         )
         .await?;
 
-        init_loading("pack_download", 100.0, "Downloading modpack...").await;
+        let loading_bar = init_loading(
+            LoadingBarType::PackDownload,
+            100.0,
+            "Downloading modpack...",
+        )
+        .await?;
         let num_files = pack.files.len();
         use futures::StreamExt;
         loading_try_for_each_concurrent(
             futures::stream::iter(pack.files.into_iter())
                 .map(Ok::<PackFile, crate::Error>),
             None,
-            "pack_download",
+            Some(&loading_bar),
             100.0,
             num_files,
             None,

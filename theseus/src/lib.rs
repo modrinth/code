@@ -13,11 +13,11 @@ mod util;
 mod api;
 mod config;
 mod error;
+mod event;
 mod launcher;
 mod state;
 
 pub use api::*;
 pub use error::*;
+pub use event::EventState;
 pub use state::State;
-
-pub use util::events::*;

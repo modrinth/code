@@ -4,7 +4,8 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
 
-use crate::emit_process;
+use crate::event::emit::emit_process;
+use crate::event::ProcessPayloadType;
 
 use super::Profile;
 
@@ -36,7 +37,7 @@ impl Children {
         pid: u32,
         profile_path: PathBuf,
         mut child: tokio::process::Child,
-    ) -> Arc<RwLock<MinecraftChild>> {
+    ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         let uuid = uuid::Uuid::new_v4();
 
         // Create std watcher threads for stdout and stderr
@@ -62,9 +63,9 @@ impl Children {
         emit_process(
             uuid,
             pid,
-            crate::ProcessPayloadType::Launched,
+            ProcessPayloadType::Launched,
             "Launched Minecraft",
-        );
+        )?;
 
         // Create MinecraftChild
         let mchild = MinecraftChild {
@@ -77,7 +78,7 @@ impl Children {
         };
         let mchild = Arc::new(RwLock::new(mchild));
         self.0.insert(pid, mchild.clone());
-        mchild
+        Ok(mchild)
     }
 
     // Returns a ref to the child

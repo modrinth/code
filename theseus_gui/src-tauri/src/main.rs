@@ -3,14 +3,15 @@
     windows_subsystem = "windows"
 )]
 
-use theseus::{prelude::*, window_scoped};
+use theseus::prelude::*;
 
 mod api;
 
 // Should be called in launcher initialization
 #[tauri::command]
-async fn initialize_state(window: tauri::Window) -> api::Result<()> {
-    window_scoped!(window, State::get()).await?;
+async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
+    theseus::EventState::init(app).await?;
+    State::get().await?;
     Ok(())
 }
 

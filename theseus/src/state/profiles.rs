@@ -1,8 +1,11 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
+use super::DirectoryInfo;
+use crate::event::emit::{
+    emit_profile, init_loading, loading_try_for_each_concurrent,
+};
+use crate::event::{LoadingBarType, ProfilePayloadType};
 use crate::state::projects::Project;
 use crate::util::fetch::write_cached_icon;
-use crate::{data::DirectoryInfo, loading_try_for_each_concurrent};
-use crate::{emit_profile, init_loading, ProfilePayloadType};
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
@@ -230,7 +233,7 @@ impl Profiles {
             profile.path.clone(),
             &profile.metadata.name,
             ProfilePayloadType::Added,
-        );
+        )?;
         self.0.insert(
             canonicalize(&profile.path)?
                 .to_str()
@@ -268,11 +271,16 @@ impl Profiles {
     pub async fn sync(&self) -> crate::Result<&Self> {
         let num_futs = self.0.len();
 
-        init_loading("profile_sync", 100.0, "Syncing profiles...").await;
+        let loading_bar = init_loading(
+            LoadingBarType::ProfileSync,
+            100.0,
+            "Syncing profiles...",
+        )
+        .await?;
         loading_try_for_each_concurrent(
             stream::iter(self.0.iter()).map(Ok::<_, crate::Error>),
             None,
-            "profile_sync",
+            Some(&loading_bar),
             100.0,
             num_futs,
             None,

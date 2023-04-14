@@ -1,5 +1,9 @@
 //! Theseus profile management interface
-use crate::{emit_profile, jre, prelude::ModLoader, ProfilePayloadType};
+use crate::{
+    event::{emit::emit_profile, ProfilePayloadType},
+    jre,
+    prelude::ModLoader,
+};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -173,7 +177,7 @@ pub async fn profile_create(
         path.clone(),
         &profile.metadata.name,
         ProfilePayloadType::Created,
-    );
+    )?;
     {
         let mut profiles = state.profiles.write().await;
         profiles.insert(profile)?;

@@ -1,9 +1,12 @@
 //! Theseus state management system
 use crate::config::sled_config;
-use crate::emit_loading;
-use crate::init_loading;
+use crate::event::emit::emit_loading;
+use crate::event::emit::emit_warning;
+use crate::event::emit::init_loading;
+use crate::event::LoadingBarType;
 use crate::jre;
 use crate::loading_join;
+use crate::EventState;
 use std::sync::Arc;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
@@ -71,9 +74,12 @@ impl State {
         LAUNCHER_STATE
             .get_or_try_init(|| {
                 async {
-
-                    init_loading("launcher_init", 100.0, "Initializing launcher...").await;
-
+                    {
+                        if EventState::get().is_err() {
+                            emit_warning("Tauri is active, but EventState is not initialized. Ensure the initialization of the state occurs first.")?;
+                        }
+                    }
+                    let loading_bar = init_loading(LoadingBarType::StateInit, 100.0, "Initializing launcher...").await?;
                     // Directories
                     let directories = DirectoryInfo::init().await?;
 
@@ -83,7 +89,7 @@ impl State {
                         .path(directories.database_file())
                         .open()?;
 
-                    emit_loading("launcher_init", 10.0, None).await;
+                    emit_loading(&loading_bar, 10.0, None).await?;
 
                     // Settings
                     let mut settings =
@@ -101,11 +107,11 @@ impl State {
 
                     // Launcher data
                     let (metadata, profiles) = loading_join! {
-                        "launcher_init", 20.0, Some("Initializing metadata and profiles...");
+                        Some(&loading_bar), 20.0, Some("Initializing metadata and profiles...");
                         metadata_fut, profiles_fut
                     };
 
-                    emit_loading("launcher_init", 10.0, None).await;
+                    emit_loading(&loading_bar, 10.0, None).await?;
                     let users = Users::init(&database)?;
 
                     let children = Children::new();
@@ -114,14 +120,14 @@ impl State {
 
                     // On launcher initialization, attempt a tag fetch after tags init
                     let mut tags = Tags::init(&database)?;
-                    if let Err(tag_fetch_err) = tags.fetch_update().await {
+                    if let Err(tag_fetch_err) = tags.fetch_update(Some(&loading_bar)).await {
                         tracing::error!(
                             "Failed to fetch tags on launcher init: {}",
                             tag_fetch_err
                         );
                     };
 
-                    emit_loading("launcher_init", 10.0, None).await;
+                    emit_loading(&loading_bar, 10.0, None).await?;
 
                     // On launcher initialization, if global java variables are unset, try to find and set them
                     // (they are required for the game to launch)

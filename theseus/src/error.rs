@@ -86,7 +86,7 @@ pub enum ErrorKind {
     ChronoParseError(#[from] chrono::ParseError),
 
     #[error("Event error: {0}")]
-    EventError(#[from] crate::EventError),
+    EventError(#[from] crate::event::EventError),
 
     #[error("Zip error: {0}")]
     ZipError(#[from] async_zip::error::ZipError),

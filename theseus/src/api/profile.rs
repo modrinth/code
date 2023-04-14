@@ -1,10 +1,9 @@
 //! Theseus profile management interface
 use crate::{
     auth::{self, refresh},
-    emit_profile,
+    event::{emit::emit_profile, ProfilePayloadType},
     launcher::download,
     state::MinecraftChild,
-    ProfilePayloadType,
 };
 pub use crate::{
     state::{JavaSettings, Profile},
@@ -29,7 +28,7 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
             profile.path.clone(),
             &profile.metadata.name,
             ProfilePayloadType::Removed,
-        );
+        )?;
     }
 
     profiles.remove(path).await?;
@@ -64,7 +63,7 @@ where
                 profile.path.clone(),
                 &profile.metadata.name,
                 ProfilePayloadType::Edited,
-            );
+            )?;
 
             action(profile).await
         }
@@ -277,7 +276,7 @@ pub async fn run_credentials(
         )
     })?;
     let mchild_arc =
-        state_children.insert_process(pid, path.to_path_buf(), mc_process);
+        state_children.insert_process(pid, path.to_path_buf(), mc_process)?;
 
     Ok(mchild_arc)
 }

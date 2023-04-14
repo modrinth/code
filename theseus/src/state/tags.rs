@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     config::{BINCODE_CONFIG, MODRINTH_API_URL, REQWEST_CLIENT},
+    event::LoadingBarId,
     loading_join,
 };
 
@@ -136,7 +137,10 @@ impl Tags {
 
     // Fetches the tags from the Modrinth API and stores them in the database
     #[tracing::instrument(skip(self))]
-    pub async fn fetch_update(&mut self) -> crate::Result<()> {
+    pub async fn fetch_update(
+        &mut self,
+        loading_bar: Option<&LoadingBarId>,
+    ) -> crate::Result<()> {
         let categories = self.fetch_tag("category");
         let loaders = self.fetch_tag("loader");
         let game_versions = self.fetch_tag("game_version");
@@ -151,7 +155,7 @@ impl Tags {
             licenses,
             donation_platforms,
             report_types,
-        ) = loading_join!("launcher_init", 0.5, Some("Loading tags from Modrinth...");
+        ) = loading_join!(loading_bar, 0.5, Some("Loading tags from Modrinth...");
             categories,
             loaders,
             game_versions,

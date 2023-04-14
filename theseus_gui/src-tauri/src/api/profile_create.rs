@@ -1,13 +1,12 @@
 use crate::api::Result;
 use std::path::PathBuf;
-use theseus::{prelude::*, window_scoped};
+use theseus::prelude::*;
 
 // Generic basic profile creation tool.
 // Creates an essentially empty dummy profile with profile_create
 #[tauri::command]
-pub async fn profile_create_empty(window: tauri::Window) -> Result<PathBuf> {
-    let res =
-        window_scoped!(window, profile_create::profile_create_empty()).await?;
+pub async fn profile_create_empty() -> Result<PathBuf> {
+    let res = profile_create::profile_create_empty().await?;
     Ok(res)
 }
 
@@ -15,23 +14,19 @@ pub async fn profile_create_empty(window: tauri::Window) -> Result<PathBuf> {
 // invoke('profile_add',profile)
 #[tauri::command]
 pub async fn profile_create(
-    window: tauri::Window,
-    name: String, // the name of the profile, and relative path
-    game_version: String, // the game version of the profile
-    modloader: ModLoader, // the modloader to use
+    name: String,           // the name of the profile, and relative path
+    game_version: String,   // the game version of the profile
+    modloader: ModLoader,   // the modloader to use
     loader_version: String, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
     icon: Option<PathBuf>,  // the icon for the profile
 ) -> Result<PathBuf> {
-    let res = window_scoped!(
-        window,
-        profile_create::profile_create(
-            name,
-            game_version,
-            modloader,
-            Some(loader_version),
-            icon,
-            None,
-        )
+    let res = profile_create::profile_create(
+        name,
+        game_version,
+        modloader,
+        Some(loader_version),
+        icon,
+        None,
     )
     .await?;
     Ok(res)

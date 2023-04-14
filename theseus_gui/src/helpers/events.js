@@ -11,29 +11,28 @@
     you can listen for any emitted signal from Rust and do something with it as the state is being initialized
 
     Example:
-    await loading_listener((event) => {
-      // event.event is the event name (useful if you want to use a single callback fn for multiple event types)
-      // event.payload is the payload object
-      console.log(event)
-    })
-
-    
-
+      import { loading_listener } from '@/helpers/events'
+      await loading_listener((event) => {
+        // event.event is the event name (useful if you want to use a single callback fn for multiple event types)
+        // event.payload is the payload object
+        console.log(event)
+      })
+      
     Putting that at the top of the <script setup> block of a page will print any emitted signal from rust
-
-    
 */
-import { appWindow } from '@tauri-apps/api/window'
+import { listen } from '@tauri-apps/api/event'
 
 /// Payload for the 'loading' event
 /*
     LoadingPayload {
+        event_type: "StateInit", "PackDownload", etc
+        loader_uuid: unique identification of the loading bar
         fraction: number, (as a fraction of 1, how much we'vel oaded so far). If null, by convention, loading is finished
         message: message to display to the user
     }
 */
 export async function loading_listener(callback) {
-  return await appWindow.listen('loading', (event) => callback(event.payload))
+  return await listen('loading', (event) => callback(event.payload))
 }
 
 /// Payload for the 'process' event
@@ -46,7 +45,7 @@ export async function loading_listener(callback) {
     }
 */
 export async function process_listener(callback) {
-  return await appWindow.listen('process', (event) => callback(event.payload))
+  return await listen('process', (event) => callback(event.payload))
 }
 
 /// Payload for the 'profile' event
@@ -59,7 +58,7 @@ export async function process_listener(callback) {
     }
 */
 export async function profile_listener(callback) {
-  return await appWindow.listen('profile', (event) => callback(event.payload))
+  return await listen('profile', (event) => callback(event.payload))
 }
 
 /// Payload for the 'warning' event
@@ -69,5 +68,5 @@ export async function profile_listener(callback) {
     }
 */
 export async function warning_listener(callback) {
-  return await appWindow.listen('warning', (event) => callback(event.payload))
+  return await listen('warning', (event) => callback(event.payload))
 }
