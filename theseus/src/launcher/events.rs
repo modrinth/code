@@ -11,7 +11,7 @@ use tauri::async_runtime::RwLock;
 
     To use events, we need to do the following:
     1) Use window_scoped!() to wrap a future in which we want to use events. Calling event functions from outside of this future will fail.
-    2) For emit_loading() specifically, we need to inialize the loading bar with emit_loading_init() first.
+    2) For emit_loading() specifically, we need to inialize the loading bar with emit_loading_init() first. Loading functions are async, so we need to await it.
     - If no Window or LoadingBar is initialized, emit_loading() will fail silently. 
     3) Within this scope, you can call emit_x functions to send events to the frontend.
 
@@ -133,24 +133,27 @@ pub async fn init_loading(
     total: f64,
     default_message: &str,
 ) {
-    // Create a new entry in the local thread Loading progress bar map
-    let loading_bars_clone_ref = match LOADING_PROGRESS_BARS.try_with(|f| f.clone()){
-        Ok(f) => f,
-        Err(e) => {
-            eprintln!("Could not initialize loading '{key}', not inside window scope: {}", e);
-            return;
-        }
-    };
-    let mut loading_bar = loading_bars_clone_ref.write().await;
-    loading_bar.insert(
-        key.to_string(),
-        LoadingBar {
-            message: default_message.to_string(),
-            total,
-            current: 0.0,
-        },
-    );
+    {
+        // Create a new entry in the local thread Loading progress bar map
+        let loading_bars_clone_ref = match LOADING_PROGRESS_BARS.try_with(|f| f.clone()){
+            Ok(f) => f,
+            Err(e) => {
+                eprintln!("Could not initialize loading '{key}', not inside window scope: {}", e);
+                return;
+            }
+        };
 
+        let mut loading_bar = loading_bars_clone_ref.write().await;
+        loading_bar.insert(
+            key.to_string(),
+            LoadingBar {
+                message: default_message.to_string(),
+                total,
+                current: 0.0,
+            },
+        );
+    }
+    
     // attempt an initial loading_emit event to the frontend
     emit_loading(key, 0.0, None).await;
 }
@@ -214,14 +217,13 @@ pub async fn emit_loading(key : &str, increment_frac: f64, message: Option<&str>
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_loading(_key : &str, _increment_frac: f64, _message: Option<&str>) {}
+pub async fn emit_loading(_key : &str, _increment_frac: f64, _message: Option<&str>) {}
 
 // emit_warning(message)
 // Passes the a WarningPayload to the frontend in the window stored by the window_scoped macro
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
 pub fn emit_warning(message: &str) {
-    println!("Warning: {} ", message);
     if let Err(e) = WINDOW.try_with(|f| {
         f.emit(
             "warning",
