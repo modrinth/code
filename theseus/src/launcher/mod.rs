@@ -9,7 +9,6 @@ mod args;
 
 pub mod auth;
 pub mod download;
-pub mod events;
 
 #[tracing::instrument]
 pub fn parse_rule(rule: &d::minecraft::Rule) -> bool {
