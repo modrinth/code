@@ -2,7 +2,7 @@ use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::state::projects::Project;
 use crate::util::fetch::write_cached_icon;
 use crate::{data::DirectoryInfo, loading_try_for_each_concurrent};
-use crate::{emit_profile, ProfilePayloadType, init_loading};
+use crate::{emit_profile, init_loading, ProfilePayloadType};
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;

@@ -6,33 +6,32 @@ use std::sync::Arc;
 use tauri::async_runtime::RwLock;
 
 /*
-    Events are a way we can communciate with the Tauri frontend from the Rust backend.
-    We include a feature flag for Tauri, so that we can compile this code without Tauri.
+   Events are a way we can communciate with the Tauri frontend from the Rust backend.
+   We include a feature flag for Tauri, so that we can compile this code without Tauri.
 
-    To use events, we need to do the following:
-    1) Use window_scoped!() to wrap a future in which we want to use events. Calling event functions from outside of this future will fail.
-    2) For emit_loading() specifically, we need to inialize the loading bar with emit_loading_init() first. Loading functions are async, so we need to await it.
-    - If no Window or LoadingBar is initialized, emit_loading() will fail silently. 
-    3) Within this scope, you can call emit_x functions to send events to the frontend.
+   To use events, we need to do the following:
+   1) Use window_scoped!() to wrap a future in which we want to use events. Calling event functions from outside of this future will fail.
+   2) For emit_loading() specifically, we need to inialize the loading bar with emit_loading_init() first. Loading functions are async, so we need to await it.
+   - If no Window or LoadingBar is initialized, emit_loading() will fail silently.
+   3) Within this scope, you can call emit_x functions to send events to the frontend.
 
-    The window_scoped initializes *task specific* variable, so that it doesn't need to be passed through nested functions and can be separate
-    from that passed to any other futures (in case the Tauri frontend gets complicated).
-    This way it's also disconnected from the state.
+   The window_scoped initializes *task specific* variable, so that it doesn't need to be passed through nested functions and can be separate
+   from that passed to any other futures (in case the Tauri frontend gets complicated).
+   This way it's also disconnected from the state.
 
-    For example:
-    pub async fn do_something_long() {
-        window_scoped!(window, loading_function()).await;
-    }
+   For example:
+   pub async fn do_something_long() {
+       window_scoped!(window, loading_function()).await;
+   }
 
-    pub async fn loading_function() {
-        init_loading("do_func", 100.0, "Loading something long...").await;
-        for i in 0..100 {
-            emit_loading("do_func", 1.0, None).await;
-            tokio::time::sleep(Duration::from_millis(100)).await;
-        }
-    }
- */
-
+   pub async fn loading_function() {
+       init_loading("do_func", 100.0, "Loading something long...").await;
+       for i in 0..100 {
+           emit_loading("do_func", 1.0, None).await;
+           tokio::time::sleep(Duration::from_millis(100)).await;
+       }
+   }
+*/
 
 #[cfg(feature = "tauri")]
 tokio::task_local! {
@@ -107,7 +106,7 @@ macro_rules! window_scoped {
 
                 // Emit closing messages for each existing one that has yet closed.
                 // This is to ensure that the frontend doesn't get stuck on a loading bar that never closes
-                // (ie: accumulated increment provided has been less than the total) 
+                // (ie: accumulated increment provided has been less than the total)
                 if let Ok(loading_bars) = $crate::LOADING_PROGRESS_BARS.try_with(|f| f.clone()) {
                     let loading_bar = loading_bars.read().await;
                     let keys = loading_bars.read().await.keys().cloned().collect::<Vec<String>>();
@@ -132,14 +131,12 @@ macro_rules! window_scoped {
 // default_message is the message to display on the loading bar if no message is passed to emit_loading
 // This function will fail silently if not called from within a window_scoped!() future
 #[cfg(feature = "tauri")]
-pub async fn init_loading(
-    key: &str,
-    total: f64,
-    default_message: &str,
-) {
+pub async fn init_loading(key: &str, total: f64, default_message: &str) {
     {
         // Create a new entry in the local thread Loading progress bar map
-        let loading_bars_clone_ref = match LOADING_PROGRESS_BARS.try_with(|f| f.clone()){
+        let loading_bars_clone_ref = match LOADING_PROGRESS_BARS
+            .try_with(|f| f.clone())
+        {
             Ok(f) => f,
             Err(e) => {
                 eprintln!("Could not initialize loading '{key}', not inside window scope: {}", e);
@@ -157,7 +154,7 @@ pub async fn init_loading(
             },
         );
     }
-    
+
     // attempt an initial loading_emit event to the frontend
     emit_loading(key, 0.0, None).await;
 }
@@ -179,8 +176,14 @@ pub async fn init_loading(
 // By convention, fraction is the fraction of the progress bar that is filled
 // This function cannot fail (as the API should be usable without Tauri), but prints to stderr if it does
 #[cfg(feature = "tauri")]
-pub async fn emit_loading(key : &str, increment_frac: f64, message: Option<&str>) {
-    let loading_bars_clone_ref = match LOADING_PROGRESS_BARS.try_with(|f| f.clone()) {
+pub async fn emit_loading(
+    key: &str,
+    increment_frac: f64,
+    message: Option<&str>,
+) {
+    let loading_bars_clone_ref = match LOADING_PROGRESS_BARS
+        .try_with(|f| f.clone())
+    {
         Ok(f) => f,
         Err(e) => {
             eprintln!("Could not emit loading message '{key}', not inside window scope: {}", e);
@@ -202,7 +205,7 @@ pub async fn emit_loading(key : &str, increment_frac: f64, message: Option<&str>
         let display_frac = loading_bar.current / loading_bar.total;
         let display_frac = if display_frac > 1.0 {
             None // by convention, when its done, we submit None
-            // any further updates will be ignored (also sending None)
+                 // any further updates will be ignored (also sending None)
         } else {
             Some(display_frac)
         };
@@ -216,22 +219,32 @@ pub async fn emit_loading(key : &str, increment_frac: f64, message: Option<&str>
             },
         )
     }) {
-        eprintln!("Could not emit loading '{key}', not inside window scope: {}", e);
-        return;
+        eprintln!(
+            "Could not emit loading '{key}', not inside window scope: {}",
+            e
+        );
     }
 }
 
 #[cfg(not(feature = "tauri"))]
-pub async fn emit_loading(_key : &str, _increment_frac: f64, _message: Option<&str>) {}
+pub async fn emit_loading(
+    _key: &str,
+    _increment_frac: f64,
+    _message: Option<&str>,
+) {
+}
 
 #[cfg(feature = "tauri")]
 pub async fn complete_loading(key: &str) {
     if let Err(e) = WINDOW.try_with(|f| {
-        f.emit("loading", LoadingPayload {
-            key: key.to_string(),
-            fraction: None,
-            message: "Done loading.".to_string(),
-        })
+        f.emit(
+            "loading",
+            LoadingPayload {
+                key: key.to_string(),
+                fraction: None,
+                message: "Done loading.".to_string(),
+            },
+        )
     }) {
         eprintln!("Error emitting loading event to Tauri: {}", e);
     };
@@ -241,7 +254,6 @@ pub async fn complete_loading(key: &str) {
 pub async fn complete_loading(key: &str) -> Result<(), EventError> {
     Ok(())
 }
-
 
 // emit_warning(message)
 // Passes the a WarningPayload to the frontend in the window stored by the window_scoped macro
@@ -432,7 +444,7 @@ where
             let f = f(item);
             async move {
                 f.await?;
-                emit_loading(key, total/(num_futs as f64), message).await;
+                emit_loading(key, total / (num_futs as f64), message).await;
                 Ok(())
             }
         })
@@ -483,5 +495,5 @@ pub enum EventError {
     NoLoadingBar(String),
 
     #[error("Tauri error: {0}")]
-    TauriError(#[from] tauri::Error)
+    TauriError(#[from] tauri::Error),
 }

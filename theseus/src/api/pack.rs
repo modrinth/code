@@ -4,7 +4,7 @@ use crate::state::{ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
-use crate::{loading_try_for_each_concurrent, State, init_loading};
+use crate::{init_loading, loading_try_for_each_concurrent, State};
 use async_zip::tokio::read::seek::ZipFileReader;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
