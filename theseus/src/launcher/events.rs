@@ -31,7 +31,6 @@ use tauri::async_runtime::RwLock;
             tokio::time::sleep(Duration::from_millis(100)).await;
         }
     }
-
  */
 
 
@@ -50,6 +49,7 @@ pub struct LoadingBar {
 
 #[derive(Serialize, Clone)]
 pub struct LoadingPayload {
+    pub key: String,
     pub fraction: Option<f64>, // by convention, if optional, it means the loading is done
     pub message: String,
 }
@@ -104,16 +104,20 @@ macro_rules! window_scoped {
         $crate::WINDOW.scope($window, async move {
             $crate::LOADING_PROGRESS_BARS.scope(Arc::new(RwLock::new(HashMap::new())), async move {
                 let res = $x.await;
-                if let Err(e) = $crate::WINDOW.try_with(|f| {
-                    f.emit(
-                        "loading",
-                        $crate::LoadingPayload {
-                            fraction: None,
-                            message: "Done loading.".to_string(),
-                        },
-                    )
-                }) {
-                    eprintln!("Error emitting loading event to Tauri: {}", e);
+
+                // Emit closing messages for each existing one that has yet closed.
+                // This is to ensure that the frontend doesn't get stuck on a loading bar that never closes
+                // (ie: accumulated increment provided has been less than the total) 
+                if let Ok(loading_bars) = $crate::LOADING_PROGRESS_BARS.try_with(|f| f.clone()) {
+                    let loading_bar = loading_bars.read().await;
+                    let keys = loading_bars.read().await.keys().cloned().collect::<Vec<String>>();
+                    for key in keys {
+                        if let Some(k) = loading_bar.get(&key) {
+                            if k.current < k.total {
+                                $crate::complete_loading(&key).await;
+                            }
+                        }
+                    }
                 }
                res
             }).await
@@ -206,6 +210,7 @@ pub async fn emit_loading(key : &str, increment_frac: f64, message: Option<&str>
         window.emit(
             "loading",
             LoadingPayload {
+                key: key.to_string(),
                 fraction: display_frac,
                 message: message.unwrap_or(&loading_bar.message).to_string(),
             },
@@ -218,6 +223,25 @@ pub async fn emit_loading(key : &str, increment_frac: f64, message: Option<&str>
 
 #[cfg(not(feature = "tauri"))]
 pub async fn emit_loading(_key : &str, _increment_frac: f64, _message: Option<&str>) {}
+
+#[cfg(feature = "tauri")]
+pub async fn complete_loading(key: &str) {
+    if let Err(e) = WINDOW.try_with(|f| {
+        f.emit("loading", LoadingPayload {
+            key: key.to_string(),
+            fraction: None,
+            message: "Done loading.".to_string(),
+        })
+    }) {
+        eprintln!("Error emitting loading event to Tauri: {}", e);
+    };
+}
+
+#[cfg(not(feature = "tauri"))]
+pub async fn complete_loading(key: &str) -> Result<(), EventError> {
+    Ok(())
+}
+
 
 // emit_warning(message)
 // Passes the a WarningPayload to the frontend in the window stored by the window_scoped macro

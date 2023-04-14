@@ -7,13 +7,17 @@
     callback is a function that takes a single argument, which is the payload object (whatever Rust is trying to deliver)
 
     You can call these to await any kind of emitted signal from Rust, and then do something with the payload object
-    
+    An example place to put this is at the start of main.js before the state is initialized- that way
+    you can listen for any emitted signal from Rust and do something with it as the state is being initialized
+
     Example:
     await loading_listener((event) => {
       // event.event is the event name (useful if you want to use a single callback fn for multiple event types)
       // event.payload is the payload object
       console.log(event)
     })
+
+    
 
     Putting that at the top of the <script setup> block of a page will print any emitted signal from rust
 
