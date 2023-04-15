@@ -59,7 +59,7 @@ const handleRightPage = () => {
 }
 </script>
 <template>
-  <div class="row">
+  <div v-if="props.instances.length > 0" class="row">
     <div class="header">
       <p>{{ props.label }}</p>
       <hr aria-hidden="true" />
@@ -71,7 +71,7 @@ const handleRightPage = () => {
     <section v-if="shouldRenderNormalInstances" ref="modsRow" class="instances">
       <Instance
         v-for="instance in props.instances"
-        :key="instance.id"
+        :key="instance?.project_id || instance?.metadata?.linked_project_id"
         display="card"
         :instance="instance"
         class="row-instance"

@@ -1,12 +1,14 @@
 <script setup>
-import { shallowRef } from 'vue'
-import { useRouter, RouterLink } from 'vue-router'
+import { shallowRef, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ofetch } from 'ofetch'
-import { Card, SaveIcon } from 'omorphia'
+import { Card, SaveIcon, XIcon } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
-import { run } from '@/helpers/profile'
+import { run, list } from '@/helpers/profile'
+import { kill_by_pid } from '@/helpers/process'
 
 const props = defineProps({
   instance: {
@@ -17,9 +19,24 @@ const props = defineProps({
   },
 })
 
+const confirmModal = ref(null)
+const stopBtn = ref(null)
+const playBtn = ref(null)
+
+const pid = ref(null)
+
 const router = useRouter()
 
-const install = async () => {
+const seeInstance = async () => {
+  const instancePath = props.instance.metadata
+    ? `/instance/${encodeURIComponent(props.instance.path)}`
+    : `/project/${encodeURIComponent(props.instance.project_id)}`
+
+  await router.push(instancePath)
+}
+
+const install = async (e) => {
+  e.stopPropagation()
   const [data, versions] = await Promise.all([
     ofetch(
       `https://api.modrinth.com/v2/project/${
@@ -38,46 +55,65 @@ const install = async () => {
   ])
 
   if (data.value.project_type === 'modpack') {
-    const id = await pack_install(versions.value[0].id)
-    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+    const packs = Object.values(await list())
+
+    if (
+      packs.length === 0 ||
+      !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
+    ) {
+      await pack_install(versions.value[0].id)
+      router.push('/')
+    } else confirmModal.value.show(versions.value[0].id)
   }
   // TODO: Add condition for installing a mod
 }
 
-const play = () => {
-  run(props.instance.metadata?.linked_project_id)
+const play = async (e) => {
+  e.stopPropagation()
+  pid.value = await run(props.instance.path)
+
+  stopBtn.value.style.opacity = 1
+  stopBtn.value.style.bottom = '4.5rem'
+  stopBtn.value.style.display = 'flex'
+  playBtn.value.style.display = 'none'
+}
+
+const stop = async (e) => {
+  e.stopPropagation()
+  await kill_by_pid(pid.value)
+
+  stopBtn.value.style.opacity = 0
+  stopBtn.value.style.bottom = '0'
+  stopBtn.value.style.display = 'none'
+  playBtn.value.style.display = 'flex'
 }
 </script>
 
 <template>
   <div>
-    <RouterLink
-      :to="
-        props.instance.metadata
-          ? `/instance/${encodeURIComponent(props.instance.path)}`
-          : `/project/${encodeURIComponent(props.instance.project_id)}`
-      "
-    >
-      <Card class="instance-card-item">
-        <img
-          :src="
-            props.instance.metadata
-              ? convertFileSrc(props.instance.metadata?.icon)
-              : props.instance.icon_url
-          "
-          alt="Trending mod card"
-        />
-        <div class="project-info">
-          <p class="title">{{ props.instance.metadata?.name || props.instance.title }}</p>
-          <p class="description">
-            {{ props.instance.metadata?.loader }}
-            {{ props.instance.metadata?.game_version || props.instance.latest_version }}
-          </p>
-        </div>
-        <div v-if="props.instance.metadata" class="cta" @click="play"><PlayIcon /></div>
-        <div v-else class="cta" @click="install"><SaveIcon /></div>
-      </Card>
-    </RouterLink>
+    <Card class="instance-card-item" @click="seeInstance">
+      <img
+        :src="
+          props.instance.metadata
+            ? convertFileSrc(props.instance.metadata?.icon)
+            : props.instance.icon_url
+        "
+        alt="Mod card"
+      />
+      <div class="project-info">
+        <p class="title">{{ props.instance.metadata?.name || props.instance.title }}</p>
+        <p class="description">
+          {{ props.instance.metadata?.loader }}
+          {{ props.instance.metadata?.game_version || props.instance.latest_version }}
+        </p>
+      </div>
+      <div ref="playBtn" v-if="props.instance.metadata" class="install cta" @click="play">
+        <PlayIcon />
+      </div>
+      <div v-else class="install cta" @click="install"><SaveIcon /></div>
+      <div ref="stopBtn" class="stop cta" @click="stop"><XIcon /></div>
+    </Card>
+    <InstallConfirmModal ref="confirmModal" />
   </div>
 </template>
 
@@ -89,22 +125,31 @@ const play = () => {
   justify-content: center;
   cursor: pointer;
   padding: 0.75rem;
-  transition: 0.1s ease-in-out all;
 
   &:hover {
     filter: brightness(0.85);
-    .cta {
+    .install {
       opacity: 1;
       bottom: 4.5rem;
     }
   }
 
+  .install {
+    background: var(--color-brand);
+    z-index: 55;
+    display: flex;
+  }
+
+  .stop {
+    background: var(--color-red);
+    z-index: 77;
+    display: none;
+  }
+
   .cta {
     position: absolute;
-    display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-brand);
     border-radius: var(--radius-lg);
     width: 3rem;
     height: 3rem;
