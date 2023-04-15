@@ -1,10 +1,19 @@
 use crate::event::{
-    EventError, LoadingBar, LoadingBarId, LoadingBarType, LoadingPayload,
-    ProcessPayload, ProcessPayloadType, ProfilePayload, ProfilePayloadType,
-    WarningPayload,
+    EventError, LoadingBar, LoadingBarId, LoadingBarType,
+    ProcessPayloadType, ProfilePayloadType,
 };
 use futures::prelude::*;
 use std::path::PathBuf;
+
+#[cfg(feature = "tauri")]
+use tauri::Manager;
+#[cfg(feature = "tauri")]
+use crate::event::{
+    LoadingPayload,
+    ProcessPayload, ProfilePayload,
+    WarningPayload,
+};
+
 
 /*
    Events are a way we can communciate with the Tauri frontend from the Rust backend.
@@ -34,7 +43,6 @@ use std::path::PathBuf;
 // This will generate a LoadingBarId, which is used to refer to the loading bar uniquely.
 // total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
 // default_message is the message to display on the loading bar if no message is passed to emit_loading
-#[cfg(feature = "tauri")]
 pub async fn init_loading(
     bar_type: LoadingBarType,
     total: f64,
@@ -57,39 +65,17 @@ pub async fn init_loading(
     Ok(key)
 }
 
-#[cfg(not(feature = "tauri"))]
-pub async fn init_loading(
-    bar_type: LoadingBarType,
-    total: f64,
-    default_message: &str,
-) -> crate::Result<LoadingBarId> {
-    let event_state = crate::EventState::get().await?;
-    let key = LoadingBarId::new(bar_type);
-
-    event_state.loading_bars.write().await.insert(
-        key.clone(),
-        LoadingBar {
-            loading_bar_uuid: key.clone(),
-            message: default_message.to_string(),
-            total,
-            current: 0.0,
-        },
-    );
-    Ok(key)
-}
-
 // emit_loading emits a loading event to the frontend
 // key refers to the loading bar to update
 // increment refers to by what relative increment to the loading struct's total to update
 // message is the message to display on the loading bar- if None, use the loading bar's default one
 // By convention, fraction is the fraction of the progress bar that is filled
-#[cfg(feature = "tauri")]
+#[allow(unused_variables)]
 pub async fn emit_loading(
     key: &LoadingBarId,
     increment_frac: f64,
     message: Option<&str>,
 ) -> crate::Result<()> {
-    use tauri::Manager;
 
     let event_state = crate::EventState::get().await?;
 
@@ -111,6 +97,7 @@ pub async fn emit_loading(
         Some(display_frac)
     };
     // Emit event to tauri
+    #[cfg(feature = "tauri")]
     event_state
         .app
         .emit_all(
@@ -126,120 +113,78 @@ pub async fn emit_loading(
     Ok(())
 }
 
-#[cfg(not(feature = "tauri"))]
-pub async fn emit_loading(
-    key: &LoadingBarId,
-    increment_frac: f64,
-    message: Option<&str>,
-) -> crate::Result<()> {
-    let event_state = crate::EventState::get().await?;
-
-    let mut loading_bar = event_state.loading_bars.write().await;
-    let loading_bar = match loading_bar.get_mut(key) {
-        Some(f) => f,
-        None => {
-            return Err(EventError::NoLoadingBar(key.clone()).into());
-        }
-    };
-
-    // Tick up loading bar
-    loading_bar.current += increment_frac;
-    Ok(())
-}
 
 // emit_warning(message)
 #[allow(dead_code)]
-#[cfg(feature = "tauri")]
+#[allow(unused_variables)]
 pub async fn emit_warning(message: &str) -> crate::Result<()> {
-    use tauri::Manager;
-
-    let event_state = crate::EventState::get().await?;
-    event_state
-        .app
-        .emit_all(
-            "warning",
-            WarningPayload {
-                message: message.to_string(),
-            },
-        )
-        .map_err(EventError::from)?;
-    Ok(())
-}
-#[allow(dead_code)]
-#[cfg(not(feature = "tauri"))]
-pub async fn emit_warning(_message: &str) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get().await?;
+        event_state
+            .app
+            .emit_all(
+                "warning",
+                WarningPayload {
+                    message: message.to_string(),
+                },
+            )
+            .map_err(EventError::from)?;
+    }
     Ok(())
 }
 
 // emit_process(pid, event, message)
-#[cfg(feature = "tauri")]
+#[allow(unused_variables)]
 pub async fn emit_process(
     uuid: uuid::Uuid,
     pid: u32,
     event: ProcessPayloadType,
     message: &str,
 ) -> crate::Result<()> {
-    use tauri::Manager;
-
-    let event_state = crate::EventState::get().await?;
-    event_state
-        .app
-        .emit_all(
-            "process",
-            ProcessPayload {
-                uuid,
-                pid,
-                event,
-                message: message.to_string(),
-            },
-        )
-        .map_err(EventError::from)?;
-    Ok(())
-}
-
-#[cfg(not(feature = "tauri"))]
-pub async fn emit_process(
-    _uuid: uuid::Uuid,
-    _pid: u32,
-    _event: ProcessPayloadType,
-    _message: &str,
-) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {   
+        let event_state = crate::EventState::get().await?;
+        event_state
+            .app
+            .emit_all(
+                "process",
+                ProcessPayload {
+                    uuid,
+                    pid,
+                    event,
+                    message: message.to_string(),
+                },
+            )
+            .map_err(EventError::from)?;
+    }
     Ok(())
 }
 
 // emit_profile(path, event)
-#[cfg(feature = "tauri")]
+#[allow(unused_variables)]
 pub async fn emit_profile(
     uuid: uuid::Uuid,
     path: PathBuf,
     name: &str,
     event: ProfilePayloadType,
 ) -> crate::Result<()> {
-    use tauri::Manager;
-
-    let event_state = crate::EventState::get().await?;
-    event_state
-        .app
-        .emit_all(
-            "profile",
-            ProfilePayload {
-                uuid,
-                path,
-                name: name.to_string(),
-                event,
-            },
-        )
-        .map_err(EventError::from)?;
-    Ok(())
-}
-
-#[cfg(not(feature = "tauri"))]
-pub async fn emit_profile(
-    _uuid: uuid::Uuid,
-    _path: PathBuf,
-    _name: &str,
-    _event: ProfilePayloadType,
-) -> crate::Result<()> {
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get().await?;
+        event_state
+            .app
+            .emit_all(
+                "profile",
+                ProfilePayload {
+                    uuid,
+                    path,
+                    name: name.to_string(),
+                    event,
+                },
+            )
+            .map_err(EventError::from)?;
+    }
     Ok(())
 }
 
