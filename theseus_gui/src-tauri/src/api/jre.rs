@@ -6,8 +6,6 @@ use theseus::prelude::*;
 
 use super::TheseusSerializableError;
 
-// No futures for many of these, so we do not do window_scoped (function will either return immediately or error)
-
 /// Get all JREs that exist on the system
 #[tauri::command]
 pub async fn jre_get_all_jre() -> Result<Vec<JavaVersion>> {
