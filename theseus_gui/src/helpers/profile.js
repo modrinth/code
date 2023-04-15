@@ -42,6 +42,28 @@ export async function list() {
   return await invoke('profile_list')
 }
 
+// Add a project to a profile from a version
+// Returns a path to the new project file
+export async function add_project_from_version(path, version_id) {
+  return await invoke('profile_add_project_from_version', { path, version_id })
+}
+
+// Add a project to a profile from a path + project_type
+// Returns a path to the new project file
+export async function add_project_from_path(path, project_path, project_type) {
+  return await invoke('profile_add_project_from_path', { path, project_path, project_type })
+}
+
+// Toggle disabling a project
+export async function toggle_disable_project(path, project_path) {
+  return await invoke('profile_toggle_disable_project', { path, project_path })
+}
+
+// Remove a project
+export async function remove_project(path, project_path) {
+  return await invoke('profile_remove_project', { path, project_path })
+}
+
 // Run Minecraft using a pathed profile
 // Returns PID of child
 export async function run(path) {

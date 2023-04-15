@@ -1,10 +1,13 @@
 //! Authentication flow based on Hydra
+use crate::util::fetch::{fetch_advanced, fetch_json};
 use async_tungstenite as ws;
 use bincode::{Decode, Encode};
 use chrono::{prelude::*, Duration};
 use futures::prelude::*;
 use lazy_static::lazy_static;
+use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use tokio::sync::{RwLock, Semaphore};
 use url::Url;
 
 lazy_static! {
@@ -93,7 +96,10 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
         ))
     }
 
-    pub async fn extract_credentials(&mut self) -> crate::Result<Credentials> {
+    pub async fn extract_credentials(
+        &mut self,
+        semaphore: &RwLock<Semaphore>,
+    ) -> crate::Result<Credentials> {
         // Minecraft bearer token
         let token_resp = self
             .socket
@@ -111,7 +117,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
             Utc::now() + Duration::seconds(token.expires_after.into());
 
         // Get account credentials
-        let info = fetch_info(&token.token).await?;
+        let info = fetch_info(&token.token, semaphore).await?;
 
         // Return structure from response
         Ok(Credentials {
@@ -127,17 +133,16 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
 
 pub async fn refresh_credentials(
     credentials: &mut Credentials,
+    semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<()> {
-    let resp = crate::config::REQWEST_CLIENT
-        .post(HYDRA_URL.join("/refresh")?)
-        .json(
-            &serde_json::json!({ "refresh_token": credentials.refresh_token }),
-        )
-        .send()
-        .await?
-        .error_for_status()?
-        .json::<TokenJSON>()
-        .await?;
+    let resp = fetch_json::<TokenJSON>(
+        Method::POST,
+        HYDRA_URL.join("/refresh")?.as_str(),
+        None,
+        Some(serde_json::json!({ "refresh_token": credentials.refresh_token })),
+        semaphore,
+    )
+    .await?;
 
     credentials.access_token = resp.token;
     credentials.refresh_token = resp.refresh_token;
@@ -147,24 +152,21 @@ pub async fn refresh_credentials(
     Ok(())
 }
 
-pub async fn refresh_username(
-    credentials: &mut Credentials,
-) -> crate::Result<()> {
-    let info = fetch_info(&credentials.access_token).await?;
-    credentials.username = info.name;
-    Ok(())
-}
-
 // Helpers
-async fn fetch_info(token: &str) -> crate::Result<ProfileInfoJSON> {
-    let url =
-        Url::parse("https://api.minecraftservices.com/minecraft/profile")?;
-    Ok(crate::config::REQWEST_CLIENT
-        .get(url)
-        .header(reqwest::header::AUTHORIZATION, format!("Bearer {token}"))
-        .send()
-        .await?
-        .error_for_status()?
-        .json::<ProfileInfoJSON>()
-        .await?)
+async fn fetch_info(
+    token: &str,
+    semaphore: &RwLock<Semaphore>,
+) -> crate::Result<ProfileInfoJSON> {
+    let result = fetch_advanced(
+        Method::GET,
+        "https://api.minecraftservices.com/minecraft/profile",
+        None,
+        None,
+        Some(("Authorization", &format!("Bearer {token}"))),
+        semaphore,
+    )
+    .await?;
+    let value = serde_json::from_slice(&result)?;
+
+    Ok(value)
 }

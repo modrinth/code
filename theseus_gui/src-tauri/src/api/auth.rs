@@ -19,11 +19,8 @@ pub async fn auth_authenticate_await_completion() -> Result<Credentials> {
 /// Refresh some credentials using Hydra, if needed
 // invoke('auth_refresh',user)
 #[tauri::command]
-pub async fn auth_refresh(
-    user: uuid::Uuid,
-    update_name: bool,
-) -> Result<Credentials> {
-    Ok(auth::refresh(user, update_name).await?)
+pub async fn auth_refresh(user: uuid::Uuid) -> Result<Credentials> {
+    Ok(auth::refresh(user).await?)
 }
 
 /// Remove a user account from the database

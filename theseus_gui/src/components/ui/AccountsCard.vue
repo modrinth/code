@@ -3,7 +3,7 @@
     ref="avatar"
     class="button-base"
     size="sm"
-    :src="selectedAccount.profile_picture"
+    :src="selectedAccount?.profile_picture ?? ''"
     @click="toggle()"
   />
   <transition name="fade">
@@ -62,7 +62,7 @@ const appendProfiles = (accounts) => {
   return accounts.map((account) => {
     return {
       ...account,
-      profile_picture: `https://crafthead.net/helm/${account.username}/128`,
+      profile_picture: `https://crafthead.net/helm/${account.id}/128`,
     }
   })
 }
@@ -74,9 +74,7 @@ const displayAccounts = computed(() =>
 )
 
 const selectedAccount = ref(
-  await users().then((accounts) =>
-    accounts.find((account) => account.id === settings.value.default_user)
-  )
+  accounts.value.find((account) => account.id === settings.value.default_user)
 )
 
 const refreshValues = async () => {

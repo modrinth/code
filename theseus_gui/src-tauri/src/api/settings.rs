@@ -1,5 +1,6 @@
 use crate::api::Result;
 use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 use theseus::prelude::*;
 
 use super::TheseusSerializableError;
@@ -75,7 +76,7 @@ pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
             .split_whitespace()
             .map(|s| s.to_string())
             .collect(),
-        custom_env_args,
+        custom_env_args: custom_env_args,
         java_globals: settings.java_globals,
         default_user: settings.default_user,
         hooks: settings.hooks,

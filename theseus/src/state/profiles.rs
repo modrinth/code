@@ -1,11 +1,16 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
+use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
 use crate::state::projects::Project;
-use crate::util::fetch::write_cached_icon;
+use crate::state::{ModrinthVersion, ProjectType};
+use crate::util::fetch::{fetch, fetch_json, write, write_cached_icon};
+use crate::State;
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
+use reqwest::Method;
 use serde::{Deserialize, Serialize};
+use std::io::Cursor;
 use std::{
     collections::HashMap,
     path::{Path, PathBuf},
@@ -129,12 +134,19 @@ impl Profile {
         Ok(self)
     }
 
-    #[tracing::instrument]
-    pub fn set_java_settings(
-        &mut self,
-        java: Option<JavaSettings>,
-    ) -> crate::Result<()> {
-        self.java = java;
+    pub async fn sync(&mut self) -> crate::Result<()> {
+        let state = State::get().await?;
+
+        let paths = self.get_profile_project_paths()?;
+        let projects = crate::state::infer_data_from_files(
+            paths,
+            state.directories.caches_dir(),
+            &state.io_semaphore,
+        )
+        .await?;
+
+        self.projects = projects;
+
         Ok(())
     }
 
@@ -153,12 +165,149 @@ impl Profile {
             Ok::<(), crate::Error>(())
         };
 
-        read_paths("mods")?;
-        read_paths("shaders")?;
-        read_paths("resourcepacks")?;
-        read_paths("datapacks")?;
+        read_paths(ProjectType::Mod.get_folder())?;
+        read_paths(ProjectType::ShaderPack.get_folder())?;
+        read_paths(ProjectType::ResourcePack.get_folder())?;
+        read_paths(ProjectType::DataPack.get_folder())?;
 
         Ok(files)
+    }
+
+    pub async fn add_project_version(
+        &mut self,
+        version_id: String,
+    ) -> crate::Result<PathBuf> {
+        let state = State::get().await?;
+
+        let version = fetch_json::<ModrinthVersion>(
+            Method::GET,
+            &format!("{MODRINTH_API_URL}version/{version_id}"),
+            None,
+            None,
+            &state.io_semaphore,
+        )
+        .await?;
+
+        let file = if let Some(file) = version.files.iter().find(|x| x.primary)
+        {
+            file
+        } else if let Some(file) = version.files.first() {
+            file
+        } else {
+            return Err(crate::ErrorKind::InputError(
+                "No files for input version present!".to_string(),
+            )
+            .into());
+        };
+
+        let bytes = fetch(
+            &file.url,
+            file.hashes.get("sha1").map(|x| &**x),
+            &state.io_semaphore,
+        )
+        .await?;
+
+        let path = self
+            .add_project_bytes(
+                &file.filename,
+                bytes,
+                ProjectType::get_from_loaders(version.loaders),
+            )
+            .await?;
+
+        Ok(path)
+    }
+
+    pub async fn add_project_bytes(
+        &mut self,
+        file_name: &str,
+        bytes: bytes::Bytes,
+        project_type: Option<ProjectType>,
+    ) -> crate::Result<PathBuf> {
+        let project_type = if let Some(project_type) = project_type {
+            project_type
+        } else {
+            let cursor = Cursor::new(&*bytes);
+
+            let mut archive = zip::ZipArchive::new(cursor).map_err(|_| {
+                crate::ErrorKind::InputError(
+                    "Unable to infer project type for input file".to_string(),
+                )
+            })?;
+            if archive.by_name("fabric.mod.json").is_ok()
+                || archive.by_name("quilt.mod.json").is_ok()
+                || archive.by_name("META-INF/mods.toml").is_ok()
+                || archive.by_name("mcmod.info").is_ok()
+            {
+                ProjectType::Mod
+            } else if archive.by_name("pack.mcmeta").is_ok() {
+                if archive.file_names().any(|x| x.starts_with("data/")) {
+                    ProjectType::DataPack
+                } else {
+                    ProjectType::ResourcePack
+                }
+            } else {
+                return Err(crate::ErrorKind::InputError(
+                    "Unable to infer project type for input file".to_string(),
+                )
+                .into());
+            }
+        };
+
+        let state = State::get().await?;
+        let path = self.path.join(project_type.get_folder()).join(file_name);
+        write(&path, &bytes, &state.io_semaphore).await?;
+
+        self.sync().await?;
+
+        Ok(path)
+    }
+
+    pub async fn toggle_disable_project(
+        &mut self,
+        path: &Path,
+    ) -> crate::Result<()> {
+        if let Some(mut project) = self.projects.remove(path) {
+            let path = path.to_path_buf();
+            let mut new_path = path.clone();
+
+            if path.extension().map_or(false, |ext| ext == "disabled") {
+                project.disabled = false;
+            } else {
+                new_path.set_file_name(format!(
+                    "{}.disabled",
+                    path.file_name().unwrap_or_default().to_string_lossy()
+                ));
+                project.disabled = true;
+            }
+
+            fs::rename(path, &new_path).await?;
+
+            self.projects.insert(new_path, project);
+        } else {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Project path does not exist: {:?}",
+                path
+            ))
+            .into());
+        }
+
+        Ok(())
+    }
+
+    pub async fn remove_project(&mut self, path: &Path) -> crate::Result<()> {
+        if self.projects.contains_key(path) {
+            fs::remove_file(path).await?;
+            self.projects.remove(path);
+        } else {
+            return Err(crate::ErrorKind::InputError(format!(
+                "Project path does not exist: {:?}",
+                path
+            ))
+            .into());
+        }
+
+        Ok(())
     }
 }
 
@@ -258,7 +407,7 @@ impl Profiles {
         stream::iter(self.0.iter())
             .map(Ok::<_, crate::Error>)
             .try_for_each_concurrent(None, |(path, profile)| async move {
-                let json = serde_json::to_vec_pretty(&profile)?;
+                let json = serde_json::to_vec(&profile)?;
 
                 let json_path = Path::new(&path.to_string_lossy().to_string())
                     .join(PROFILE_JSON_PATH);
