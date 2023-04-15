@@ -159,23 +159,24 @@ export default defineNuxtPlugin((nuxtApp) => {
   })
   nuxtApp.provide('sortedCategories', sortedCategories)
 })
-export const formatNumber = (number) => {
+export const formatNumber = (number, abbreviate = true) => {
   const x = +number
-  if (x >= 1000000) {
+  if (x >= 1000000 && abbreviate) {
     return (x / 1000000).toFixed(2).toString() + 'M'
-  } else if (x >= 10000) {
-    return (x / 1000).toFixed(1).toString() + 'K'
+  } else if (x >= 10000 && abbreviate) {
+    return (x / 1000).toFixed(1).toString() + 'k'
   } else {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   }
 }
 
-export const formatMoney = (number) => {
+export const formatMoney = (number, abbreviate = false) => {
+  number = Math.floor(number * 100) / 100
   const x = +number
-  if (x >= 1000000) {
+  if (x >= 1000000 && abbreviate) {
     return '$' + (x / 1000000).toFixed(2).toString() + 'M'
-  } else if (x >= 10000) {
-    return '$' + (x / 1000).toFixed(1).toString() + 'K'
+  } else if (x >= 10000 && abbreviate) {
+    return '$' + (x / 1000).toFixed(2).toString() + 'k'
   } else {
     return (
       '$' +
