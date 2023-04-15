@@ -62,6 +62,15 @@
       </div>
     </Modal>
     <div class="version-page__title universal-card">
+      <Breadcrumbs
+        :current-title="version.name"
+        :link-stack="[
+          {
+            href: getPreviousLink(),
+            label: getPreviousLabel(),
+          },
+        ]"
+      />
       <div class="version-header">
         <template v-if="isEditing">
           <input
@@ -151,19 +160,6 @@
           <DownloadIcon aria-hidden="true" />
           Download
         </a>
-        <nuxt-link
-          :to="
-            $router.options.history.state.back &&
-            ($router.options.history.state.back.includes('changelog') ||
-              $router.options.history.state.back.includes('versions'))
-              ? $router.options.history.state.back
-              : `/${project.project_type}/${project.slug ? project.slug : project.id}/versions`
-          "
-          class="iconified-button"
-        >
-          <BackIcon aria-hidden="true" />
-          Back to list
-        </nuxt-link>
         <button
           v-if="$auth.user && !currentMember"
           class="iconified-button"
@@ -533,19 +529,19 @@
             :allow-empty="false"
           />
           <template v-else>
-            <VersionBadge
+            <Badge
               v-if="version.version_type === 'release'"
               class="value"
               type="release"
               color="green"
             />
-            <VersionBadge
+            <Badge
               v-else-if="version.version_type === 'beta'"
               class="value"
               type="beta"
               color="orange"
             />
-            <VersionBadge
+            <Badge
               v-else-if="version.version_type === 'alpha'"
               class="value"
               type="alpha"
@@ -678,8 +674,9 @@ import { inferVersionInfo } from '~/helpers/infer'
 import { createDataPackVersion } from '~/helpers/package'
 import { renderHighlightedString } from '~/helpers/highlight'
 
-import VersionBadge from '~/components/ui/Badge'
 import Avatar from '~/components/ui/Avatar'
+import Badge from '~/components/ui/Badge'
+import Breadcrumbs from '~/components/ui/Breadcrumbs'
 import CopyCode from '~/components/ui/CopyCode'
 import Categories from '~/components/ui/search/Categories'
 import ModalConfirm from '~/components/ui/ModalConfirm'
@@ -704,12 +701,14 @@ import BackIcon from '~/assets/images/utils/left-arrow.svg'
 import BoxIcon from '~/assets/images/utils/box.svg'
 import RightArrowIcon from '~/assets/images/utils/right-arrow.svg'
 import Modal from '~/components/ui/Modal.vue'
+import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
 
 export default defineNuxtComponent({
   components: {
     Modal,
     FileInput,
     Checkbox,
+    ChevronRightIcon,
     Chips,
     Categories,
     DownloadIcon,
@@ -725,8 +724,9 @@ export default defineNuxtComponent({
     TransferIcon,
     UploadIcon,
     BackIcon,
-    VersionBadge,
     Avatar,
+    Badge,
+    Breadcrumbs,
     CopyCode,
     ModalConfirm,
     ModalReport,
@@ -961,6 +961,25 @@ export default defineNuxtComponent({
     },
   },
   methods: {
+    getPreviousLink() {
+      if (this.$router.options.history.state.back) {
+        if (
+          this.$router.options.history.state.back.includes('/changelog') ||
+          this.$router.options.history.state.back.includes('/versions')
+        ) {
+          return this.$router.options.history.state.back
+        }
+      }
+      return `/${this.project.project_type}/${
+        this.project.slug ? this.project.slug : this.project.id
+      }/versions`
+    },
+    getPreviousLabel() {
+      return this.$router.options.history.state.back &&
+        this.$router.options.history.state.back.endsWith('/changelog')
+        ? 'Changelog'
+        : 'Versions'
+    },
     acceptFileFromProjectType,
     renderHighlightedString,
     async addDependency(dependencyAddMode, newDependencyId, newDependencyType, hideErrors) {

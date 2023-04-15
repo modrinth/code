@@ -232,7 +232,7 @@
               <nuxt-link
                 tabindex="-1"
                 :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
-                  project.slug
+                  project.slug ? project.slug : project.id
                 }`"
               >
                 <Avatar
@@ -254,7 +254,7 @@
                 <nuxt-link
                   class="hover-link wrap-as-needed"
                   :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
-                    project.slug
+                    project.slug ? project.slug : project.id
                   }`"
                 >
                   {{ project.title }}
@@ -278,7 +278,7 @@
               <nuxt-link
                 class="square-button"
                 :to="`/${$getProjectTypeForUrl(project.project_type, project.loaders)}/${
-                  project.slug
+                  project.slug ? project.slug : project.id
                 }/settings`"
               >
                 <SettingsIcon />

@@ -605,6 +605,7 @@
     &:focus-visible,
     &:hover {
       color: var(--color-link-hover);
+      text-decoration: underline;
     }
 
     &:active {
@@ -1310,6 +1311,7 @@ textarea.known-error {
 .goto-link:hover,
 .goto-link:focus-visible {
   color: var(--color-link-hover);
+  text-decoration: underline;
 }
 
 .goto-link:active {

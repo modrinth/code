@@ -2,6 +2,17 @@
   <div v-if="$route.name.startsWith('type-id-settings')" class="normal-page">
     <div class="normal-page__sidebar">
       <aside class="universal-card">
+        <Breadcrumbs
+          current-title="Settings"
+          :link-stack="[
+            { href: `/dashboard/projects`, label: 'Projects' },
+            {
+              href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
+              label: project.title,
+              allowTrimming: true,
+            },
+          ]"
+        />
         <div class="settings-header">
           <Avatar
             :src="project.icon_url"
@@ -18,63 +29,66 @@
         </div>
         <h2>Project settings</h2>
         <NavStack>
-          <NavStackItem :link="`/${project.project_type}/${project.slug}/settings`" label="General">
+          <NavStackItem
+            :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+            label="General"
+          >
             <SettingsIcon />
           </NavStackItem>
           <NavStackItem
-            :link="`/${project.project_type}/${project.slug}/settings/tags`"
+            :link="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/settings/tags`"
             label="Tags"
           >
             <CategoriesIcon />
           </NavStackItem>
           <NavStackItem
-            :link="`/${project.project_type}/${project.slug}/settings/description`"
+            :link="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/settings/description`"
             label="Description"
           >
             <DescriptionIcon />
           </NavStackItem>
           <NavStackItem
-            :link="`/${project.project_type}/${project.slug}/settings/license`"
+            :link="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/settings/license`"
             label="License"
           >
             <LicenseIcon />
           </NavStackItem>
           <NavStackItem
-            :link="`/${project.project_type}/${project.slug}/settings/links`"
+            :link="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/settings/links`"
             label="Links"
           >
             <LinksIcon />
           </NavStackItem>
           <NavStackItem
-            :link="`/${project.project_type}/${project.slug}/settings/members`"
+            :link="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/settings/members`"
             label="Members"
           >
             <UsersIcon />
           </NavStackItem>
-          <h3>Relevant pages</h3>
+          <h3>Upload</h3>
           <NavStackItem
-            :link="`/${project.project_type}/${project.slug}`"
-            label="View project"
-            chevron
-          >
-            <EyeIcon />
-          </NavStackItem>
-          <NavStackItem
-            :link="`/${project.project_type}/${project.slug}/gallery`"
+            :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/gallery`"
             label="Gallery"
             chevron
           >
             <GalleryIcon />
           </NavStackItem>
           <NavStackItem
-            :link="`/${project.project_type}/${project.slug}/versions`"
+            :link="`/${project.project_type}/${project.slug ? project.slug : project.id}/versions`"
             label="Versions"
             chevron
           >
             <VersionIcon />
-          </NavStackItem>
-          <NavStackItem link="/dashboard/projects" label="All projects" chevron>
-            <SettingsIcon />
           </NavStackItem>
         </NavStack>
       </aside>
@@ -192,7 +206,17 @@
             <h1 class="title">
               {{ project.title }}
             </h1>
-            <Badge v-if="$auth.user && currentMember" :type="project.status" class="status-badge" />
+            <nuxt-link
+              class="title-link project-type"
+              :to="`/${$getProjectTypeForUrl(project.actualProjectType, project.loaders)}s`"
+            >
+              <BoxIcon />
+              <span>{{
+                $formatProjectType(
+                  $getProjectTypeForDisplay(project.actualProjectType, project.loaders)
+                )
+              }}</span>
+            </nuxt-link>
             <p class="description">
               {{ project.description }}
             </p>
@@ -201,6 +225,11 @@
               :type="project.actualProjectType"
               class="categories"
             >
+              <Badge
+                v-if="$auth.user && currentMember"
+                :type="project.status"
+                class="status-badge"
+              />
               <EnvironmentIndicator
                 :client-side="project.client_side"
                 :server-side="project.server_side"
@@ -442,7 +471,7 @@
           <div class="featured-header">
             <h2 class="card-header">Featured versions</h2>
             <nuxt-link
-              v-if="versions.length > 0 || currentMember"
+              v-if="$route.name !== 'type-id-versions' && (versions.length > 0 || currentMember)"
               :to="`/${project.project_type}/${
                 project.slug ? project.slug : project.id
               }/versions#all-versions`"
@@ -645,7 +674,7 @@
           />
           <div v-if="$auth.user && currentMember" class="input-group">
             <nuxt-link
-              :to="`/${project.project_type}/${project.slug}/settings`"
+              :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
               class="iconified-button"
             >
               <SettingsIcon /> Settings
@@ -685,6 +714,7 @@ import OpenCollectiveIcon from '~/assets/images/external/opencollective.svg'
 import UnknownIcon from '~/assets/images/utils/unknown-donation.svg'
 import ChevronRightIcon from '~/assets/images/utils/chevron-right.svg'
 import EyeIcon from '~/assets/images/utils/eye.svg'
+import BoxIcon from '~/assets/images/utils/box.svg'
 import Promotion from '~/components/ads/Promotion'
 import Badge from '~/components/ui/Badge'
 import Categories from '~/components/ui/search/Categories'
@@ -710,6 +740,7 @@ import CrossIcon from '~/assets/images/utils/x.svg'
 import EditIcon from '~/assets/images/utils/edit.svg'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg'
 import { renderString } from '~/helpers/parse'
+import Breadcrumbs from '~/components/ui/Breadcrumbs.vue'
 
 const data = useNuxtApp()
 const route = useRoute()
@@ -1049,8 +1080,21 @@ const collapsedChecklist = ref(false)
     font-size: var(--font-size-xl);
   }
 
-  .status-badge {
-    margin-top: var(--spacing-card-sm);
+  .project-type {
+    text-decoration: none;
+    font-weight: 500;
+
+    svg {
+      vertical-align: top;
+      margin-right: 0.25em;
+    }
+
+    &:hover,
+    &:focus-visible {
+      span {
+        text-decoration: underline;
+      }
+    }
   }
 
   .description {

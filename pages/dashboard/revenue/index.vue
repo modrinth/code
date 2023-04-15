@@ -26,6 +26,9 @@
             <TransferIcon /> Transfer to
             {{ $formatWallet(auth.user.payout_data.payout_wallet) }}
           </button>
+          <NuxtLink class="iconified-button" to="/dashboard/revenue/transfers">
+            <HistoryIcon /> View transfer history
+          </NuxtLink>
           <NuxtLink class="iconified-button" to="/settings/monetization">
             <SettingsIcon /> Monetization settings
           </NuxtLink>
@@ -90,10 +93,11 @@
 <script>
 import TransferIcon from '~/assets/images/utils/transfer.svg'
 import SettingsIcon from '~/assets/images/utils/settings.svg'
+import HistoryIcon from '~/assets/images/utils/history.svg'
 import ModalTransfer from '~/components/ui/ModalTransfer'
 
 export default defineNuxtComponent({
-  components: { TransferIcon, SettingsIcon, ModalTransfer },
+  components: { TransferIcon, SettingsIcon, HistoryIcon, ModalTransfer },
   async setup() {
     const auth = await useAuth()
 
