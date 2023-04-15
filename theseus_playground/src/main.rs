@@ -55,13 +55,13 @@ async fn main() -> theseus::Result<()> {
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
     // println!("Editing.");
-    profile::edit(&profile_path, |profile| {
+    profile::edit(&profile_path, |_profile| {
         // Add some hooks, for instance!
-        profile.hooks = Some(Hooks {
-            pre_launch: Some("echo This is before Minecraft runs!".to_string()),
-            wrapper: None,
-            post_exit: None,
-        });
+        // profile.hooks = Some(Hooks {
+        //     pre_launch: Some("echo This is before Minecraft runs!".to_string()),
+        //     wrapper: None,
+        //     post_exit: None,
+        // });
         async { Ok(()) }
     })
     .await?;

@@ -235,24 +235,23 @@ pub async fn run_credentials(
     let env_args = &settings.custom_env_args;
 
     // Post post exit hooks
-    let post_exit_hooks =
+    let post_exit_hook =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
 
-    let post_exit_hooks: Vec<Command> = post_exit_hooks
-        .iter()
-        .filter_map(|hook| {
-            let mut cmd = hook.split(' ');
-            if let Some(command) = cmd.next() {
-                let mut command = Command::new(command);
-                command
-                    .args(&cmd.map(|s| s.to_string()).collect::<Vec<String>>())
-                    .current_dir(path);
-                Some(command)
-            } else {
-                None
-            }
-        })
-        .collect();
+    let post_exit_hook=  if let Some(hook) = post_exit_hook {
+        let mut cmd = hook.split(' ');
+        if let Some(command) = cmd.next() {
+            let mut command = Command::new(command);
+            command
+                .args(&cmd.collect::<Vec<&str>>())
+                .current_dir(path);
+            Some(command)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
 
     let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
@@ -265,7 +264,7 @@ pub async fn run_credentials(
         &memory,
         &resolution,
         credentials,
-        post_exit_hooks,
+        post_exit_hook,
     )
     .await?;
 

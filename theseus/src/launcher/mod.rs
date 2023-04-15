@@ -60,7 +60,7 @@ pub async fn launch_minecraft(
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
-    post_exit_hooks: Vec<Command>,
+    post_exit_hook: Option<Command>,
 ) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
     let state = st::State::get().await?;
     let instance_path = &canonicalize(instance_path)?;
@@ -242,6 +242,6 @@ pub async fn launch_minecraft(
         uuid::Uuid::new_v4(),
         instance_path.to_path_buf(),
         command,
-        post_exit_hooks,
+        post_exit_hook,
     )
 }
