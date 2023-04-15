@@ -216,6 +216,7 @@ async fn install_pack(
             .into());
         };
 
+        let pack_name = pack.name.clone();
         let profile = crate::api::profile_create::profile_create(
             pack.name,
             game_version.clone(),
@@ -227,7 +228,7 @@ async fn install_pack(
         .await?;
 
         let loading_bar = init_loading(
-            LoadingBarType::PackDownload,
+            LoadingBarType::PackDownload { pack_name },
             100.0,
             "Downloading modpack...",
         )

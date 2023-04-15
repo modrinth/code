@@ -18,14 +18,20 @@
         console.log(event)
       })
       
-    Putting that at the top of the <script setup> block of a page will print any emitted signal from rust
+    Putting that in a script will print any emitted signal from rust
 */
 import { listen } from '@tauri-apps/api/event'
 
 /// Payload for the 'loading' event
 /*
     LoadingPayload {
-        event_type: "StateInit", "PackDownload", etc
+        event: "StateInit", "PackDownload", etc
+        - Certain states have additional fields:
+        - PackDownload: {
+            pack_name: name of the pack
+        - MinecraftDownload: {
+            profile_name: name of the profile
+            profile_uuid: unique identification of the profile
         loader_uuid: unique identification of the loading bar
         fraction: number, (as a fraction of 1, how much we'vel oaded so far). If null, by convention, loading is finished
         message: message to display to the user

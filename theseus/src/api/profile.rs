@@ -347,6 +347,7 @@ pub async fn run_credentials(
         &memory,
         &resolution,
         credentials,
+        Some(&profile),
     )
     .await?;
 

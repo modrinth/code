@@ -5,6 +5,7 @@ use crate::{
         emit::{emit_loading, init_loading, loading_try_for_each_concurrent},
         LoadingBarId, LoadingBarType,
     },
+    process::Profile,
     state::State,
     util::{fetch::*, platform::OsExt},
 };
@@ -23,12 +24,17 @@ use tokio::{fs, sync::OnceCell};
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
+    profile: Option<&Profile>,
 ) -> crate::Result<()> {
     log::info!("Downloading Minecraft version {}", version.id);
     let assets_index = download_assets_index(st, version).await?;
 
     let loading_bar = init_loading(
-        LoadingBarType::MinecraftDownload,
+        LoadingBarType::MinecraftDownload {
+            // If we are downloading minecraft for a profile, provide its name and uuid
+            profile_name: profile.map(|f| f.metadata.name.clone()),
+            profile_uuid: profile.map(|f| f.uuid),
+        },
         100.0,
         "Downloading Minecraft...",
     )

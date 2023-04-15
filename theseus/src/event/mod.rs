@@ -57,7 +57,7 @@ impl EventState {
 
 #[derive(Debug, Clone)]
 pub struct LoadingBar {
-    pub loading_bar_uuid: LoadingBarId,
+    pub loading_bar_id: LoadingBarId,
     pub message: String,
     pub total: f64,
     pub current: f64,
@@ -65,7 +65,7 @@ pub struct LoadingBar {
 
 // Loading Bar Id lets us uniquely identify loading bars stored in the state
 // the uuid lets us identify loading bars across threads
-#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub struct LoadingBarId {
     pub key: LoadingBarType,
     pub uuid: Uuid,
@@ -86,17 +86,24 @@ impl fmt::Display for LoadingBarId {
     }
 }
 
-#[derive(Serialize, Deserialize, Clone, Debug, Copy, PartialEq, Eq, Hash)]
+#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 pub enum LoadingBarType {
     StateInit,
-    PackDownload,
-    MinecraftDownload,
+    PackDownload {
+        pack_name: String,
+    }, // pack name
+    MinecraftDownload {
+        #[serde(skip_serializing_if = "Option::is_none")]
+        profile_uuid: Option<Uuid>,
+        #[serde(skip_serializing_if = "Option::is_none")]
+        profile_name: Option<String>,
+    },
     ProfileSync,
 }
 
 #[derive(Serialize, Clone)]
 pub struct LoadingPayload {
-    pub event_type: LoadingBarType,
+    pub event: LoadingBarType,
     pub loader_uuid: Uuid,
     pub fraction: Option<f64>, // by convention, if optional, it means the loading is done
     pub message: String,

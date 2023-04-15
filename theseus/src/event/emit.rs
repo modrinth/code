@@ -1,19 +1,16 @@
 use crate::event::{
-    EventError, LoadingBar, LoadingBarId, LoadingBarType,
-    ProcessPayloadType, ProfilePayloadType,
+    EventError, LoadingBar, LoadingBarId, LoadingBarType, ProcessPayloadType,
+    ProfilePayloadType,
 };
 use futures::prelude::*;
 use std::path::PathBuf;
 
 #[cfg(feature = "tauri")]
-use tauri::Manager;
-#[cfg(feature = "tauri")]
 use crate::event::{
-    LoadingPayload,
-    ProcessPayload, ProfilePayload,
-    WarningPayload,
+    LoadingPayload, ProcessPayload, ProfilePayload, WarningPayload,
 };
-
+#[cfg(feature = "tauri")]
+use tauri::Manager;
 
 /*
    Events are a way we can communciate with the Tauri frontend from the Rust backend.
@@ -54,7 +51,7 @@ pub async fn init_loading(
     event_state.loading_bars.write().await.insert(
         key.clone(),
         LoadingBar {
-            loading_bar_uuid: key.clone(),
+            loading_bar_id: key.clone(),
             message: default_message.to_string(),
             total,
             current: 0.0,
@@ -76,7 +73,6 @@ pub async fn emit_loading(
     increment_frac: f64,
     message: Option<&str>,
 ) -> crate::Result<()> {
-
     let event_state = crate::EventState::get().await?;
 
     let mut loading_bar = event_state.loading_bars.write().await;
@@ -105,14 +101,13 @@ pub async fn emit_loading(
             LoadingPayload {
                 fraction: display_frac,
                 message: message.unwrap_or(&loading_bar.message).to_string(),
-                event_type: key.key,
+                event: key.key.clone(),
                 loader_uuid: key.uuid,
             },
         )
         .map_err(EventError::from)?;
     Ok(())
 }
-
 
 // emit_warning(message)
 #[allow(dead_code)]
@@ -143,7 +138,7 @@ pub async fn emit_process(
     message: &str,
 ) -> crate::Result<()> {
     #[cfg(feature = "tauri")]
-    {   
+    {
         let event_state = crate::EventState::get().await?;
         event_state
             .app
