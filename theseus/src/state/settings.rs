@@ -78,6 +78,7 @@ impl Settings {
 
 /// Theseus theme
 #[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum Theme {
     Dark,
     Light,
