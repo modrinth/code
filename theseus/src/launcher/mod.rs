@@ -58,7 +58,7 @@ pub async fn launch_minecraft(
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
-    opt_profile: Option<&Profile>, // optional ref to Profile for event tracking
+    profile: &Profile, // optional ref to Profile for event tracking
 ) -> crate::Result<Child> {
     let state = st::State::get().await?;
     let instance_path = &canonicalize(instance_path)?;
@@ -90,7 +90,7 @@ pub async fn launch_minecraft(
         .version_dir(&version_jar)
         .join(format!("{version_jar}.jar"));
 
-    download::download_minecraft(&state, &version_info, opt_profile).await?;
+    download::download_minecraft(&state, &version_info, profile).await?;
     st::State::sync().await?;
 
     if let Some(processors) = &version_info.processors {

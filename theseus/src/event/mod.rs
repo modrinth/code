@@ -93,10 +93,8 @@ pub enum LoadingBarType {
         pack_name: String,
     }, // pack name
     MinecraftDownload {
-        #[serde(skip_serializing_if = "Option::is_none")]
-        profile_uuid: Option<Uuid>,
-        #[serde(skip_serializing_if = "Option::is_none")]
-        profile_name: Option<String>,
+        profile_uuid: Uuid,
+        profile_name: String,
     },
     ProfileSync,
 }
