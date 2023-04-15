@@ -1,12 +1,12 @@
 //! Theseus state management system
 use crate::config::sled_config;
 use crate::event::emit::emit_loading;
-use crate::event::emit::emit_warning;
+
 use crate::event::emit::init_loading;
 use crate::event::LoadingBarType;
 use crate::jre;
 use crate::loading_join;
-use crate::EventState;
+
 use std::sync::Arc;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
@@ -74,11 +74,6 @@ impl State {
         LAUNCHER_STATE
             .get_or_try_init(|| {
                 async {
-                    {
-                        if EventState::get().is_err() {
-                            emit_warning("Tauri is active, but EventState is not initialized. Ensure the initialization of the state occurs first.")?;
-                        }
-                    }
                     let loading_bar = init_loading(LoadingBarType::StateInit, 100.0, "Initializing launcher...").await?;
                     // Directories
                     let directories = DirectoryInfo::init().await?;
@@ -121,7 +116,7 @@ impl State {
                     // On launcher initialization, attempt a tag fetch after tags init
                     let mut tags = Tags::init(&database)?;
                     if let Err(tag_fetch_err) =
-                        tags.fetch_update(&io_semaphore).await
+                        tags.fetch_update(&io_semaphore,Some(&loading_bar)).await
                     {
                         tracing::error!(
                             "Failed to fetch tags on launcher init: {}",

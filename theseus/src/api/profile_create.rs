@@ -177,10 +177,11 @@ pub async fn profile_create(
         path.clone(),
         &profile.metadata.name,
         ProfilePayloadType::Created,
-    )?;
+    )
+    .await?;
     {
         let mut profiles = state.profiles.write().await;
-        profiles.insert(profile)?;
+        profiles.insert(profile).await?;
     }
 
     State::sync().await?;

@@ -1,8 +1,8 @@
 //! Theseus state management system
 use serde::{Deserialize, Serialize};
 use std::{collections::HashMap, fmt, path::PathBuf, sync::Arc};
-use tauri::async_runtime::RwLock;
 use tokio::sync::OnceCell;
+use tokio::sync::RwLock;
 use uuid::Uuid;
 
 pub mod emit;
@@ -12,12 +12,13 @@ pub mod emit;
 static EVENT_STATE: OnceCell<Arc<EventState>> = OnceCell::const_new();
 pub struct EventState {
     /// Tauri app
+    #[cfg(feature = "tauri")]
     pub app: tauri::AppHandle,
-
     pub loading_bars: RwLock<HashMap<LoadingBarId, LoadingBar>>,
 }
 
 impl EventState {
+    #[cfg(feature = "tauri")]
     pub async fn init(app: tauri::AppHandle) -> crate::Result<Arc<Self>> {
         EVENT_STATE
             .get_or_try_init(|| async {
@@ -30,11 +31,31 @@ impl EventState {
             .map(Arc::clone)
     }
 
-    pub fn get() -> crate::Result<Arc<Self>> {
+    #[cfg(not(feature = "tauri"))]
+    pub async fn init() -> crate::Result<Arc<Self>> {
+        EVENT_STATE
+            .get_or_try_init(|| async {
+                Ok(Arc::new(Self {
+                    loading_bars: RwLock::new(HashMap::new()),
+                }))
+            })
+            .await
+            .map(Arc::clone)
+    }
+
+    #[cfg(feature = "tauri")]
+    pub async fn get() -> crate::Result<Arc<Self>> {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
+    }
+
+    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
+    #[cfg(not(feature = "tauri"))]
+    pub async fn get() -> crate::Result<Arc<Self>> {
+        Self::init().await
     }
 }
 
+#[derive(Debug, Clone)]
 pub struct LoadingBar {
     pub loading_bar_uuid: LoadingBarId,
     pub message: String,
@@ -123,6 +144,7 @@ pub enum EventError {
     #[error("Non-existent loading bar of key: {0}")]
     NoLoadingBar(LoadingBarId),
 
+    #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]
     TauriError(#[from] tauri::Error),
 }

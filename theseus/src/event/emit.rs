@@ -40,7 +40,7 @@ pub async fn init_loading(
     total: f64,
     default_message: &str,
 ) -> crate::Result<LoadingBarId> {
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get().await?;
     let key = LoadingBarId::new(bar_type);
 
     event_state.loading_bars.write().await.insert(
@@ -59,11 +59,23 @@ pub async fn init_loading(
 
 #[cfg(not(feature = "tauri"))]
 pub async fn init_loading(
-    key: LoadingBarId,
+    bar_type: LoadingBarType,
     total: f64,
     default_message: &str,
-) -> Result<(), EventError> {
-    Ok(())
+) -> crate::Result<LoadingBarId> {
+    let event_state = crate::EventState::get().await?;
+    let key = LoadingBarId::new(bar_type);
+
+    event_state.loading_bars.write().await.insert(
+        key.clone(),
+        LoadingBar {
+            loading_bar_uuid: key.clone(),
+            message: default_message.to_string(),
+            total,
+            current: 0.0,
+        },
+    );
+    Ok(key)
 }
 
 // emit_loading emits a loading event to the frontend
@@ -79,7 +91,7 @@ pub async fn emit_loading(
 ) -> crate::Result<()> {
     use tauri::Manager;
 
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get().await?;
 
     let mut loading_bar = event_state.loading_bars.write().await;
     let loading_bar = match loading_bar.get_mut(key) {
@@ -116,19 +128,32 @@ pub async fn emit_loading(
 
 #[cfg(not(feature = "tauri"))]
 pub async fn emit_loading(
-    _key: LoadingBarId,
-    _increment_frac: f64,
-    _message: Option<&str>,
+    key: &LoadingBarId,
+    increment_frac: f64,
+    message: Option<&str>,
 ) -> crate::Result<()> {
+    let event_state = crate::EventState::get().await?;
+
+    let mut loading_bar = event_state.loading_bars.write().await;
+    let loading_bar = match loading_bar.get_mut(key) {
+        Some(f) => f,
+        None => {
+            return Err(EventError::NoLoadingBar(key.clone()).into());
+        }
+    };
+
+    // Tick up loading bar
+    loading_bar.current += increment_frac;
     Ok(())
 }
 
 // emit_warning(message)
+#[allow(dead_code)]
 #[cfg(feature = "tauri")]
-pub fn emit_warning(message: &str) -> crate::Result<()> {
+pub async fn emit_warning(message: &str) -> crate::Result<()> {
     use tauri::Manager;
 
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get().await?;
     event_state
         .app
         .emit_all(
@@ -140,14 +165,15 @@ pub fn emit_warning(message: &str) -> crate::Result<()> {
         .map_err(EventError::from)?;
     Ok(())
 }
+#[allow(dead_code)]
 #[cfg(not(feature = "tauri"))]
-pub fn emit_warning(_message: &str) -> crate::Result<()> {
+pub async fn emit_warning(_message: &str) -> crate::Result<()> {
     Ok(())
 }
 
 // emit_process(pid, event, message)
 #[cfg(feature = "tauri")]
-pub fn emit_process(
+pub async fn emit_process(
     uuid: uuid::Uuid,
     pid: u32,
     event: ProcessPayloadType,
@@ -155,7 +181,7 @@ pub fn emit_process(
 ) -> crate::Result<()> {
     use tauri::Manager;
 
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get().await?;
     event_state
         .app
         .emit_all(
@@ -172,7 +198,7 @@ pub fn emit_process(
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_process(
+pub async fn emit_process(
     _uuid: uuid::Uuid,
     _pid: u32,
     _event: ProcessPayloadType,
@@ -183,7 +209,7 @@ pub fn emit_process(
 
 // emit_profile(path, event)
 #[cfg(feature = "tauri")]
-pub fn emit_profile(
+pub async fn emit_profile(
     uuid: uuid::Uuid,
     path: PathBuf,
     name: &str,
@@ -191,7 +217,7 @@ pub fn emit_profile(
 ) -> crate::Result<()> {
     use tauri::Manager;
 
-    let event_state = crate::EventState::get()?;
+    let event_state = crate::EventState::get().await?;
     event_state
         .app
         .emit_all(
@@ -208,9 +234,10 @@ pub fn emit_profile(
 }
 
 #[cfg(not(feature = "tauri"))]
-pub fn emit_profile(
+pub async fn emit_profile(
     _uuid: uuid::Uuid,
     _path: PathBuf,
+    _name: &str,
     _event: ProfilePayloadType,
 ) -> crate::Result<()> {
     Ok(())
@@ -290,7 +317,7 @@ macro_rules! loading_join {
 #[macro_export]
 macro_rules! loading_join {
     ($start:expr, $end:expr, $message:expr; $($future:expr $(,)?)+) => {{
-        tokio::try_join!($($future),+)
+        tokio::try_join!($($future),+)?
     }};
 }
 
@@ -335,19 +362,17 @@ where
 pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,
-    _loading_frac_start: f64,
-    _loading_frac_end: f64,
+    _key: Option<&LoadingBarId>,
+    _total: f64,
     _num_futs: usize, // num is in here as we allow Iterator to be passed in, which doesn't have a size
-    _message: &str,
+    _message: Option<&str>,
     f: F,
 ) -> crate::Result<()>
 where
-    I: futures::TryStreamExt<Error = crate::Error>
-        + TryStream<Ok = T>
-        + Iterator,
-    F: FnMut(T) -> Fut + Send + 'static,
-    Fut: Future<Output = crate::Result<()>> + Send + 'static,
-    T: Send + 'static,
+    I: futures::TryStreamExt<Error = crate::Error> + TryStream<Ok = T>,
+    F: FnMut(T) -> Fut + Send,
+    Fut: Future<Output = crate::Result<()>> + Send,
+    T: Send,
 {
     let mut f = f;
     stream

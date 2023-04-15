@@ -28,7 +28,8 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
             profile.path.clone(),
             &profile.metadata.name,
             ProfilePayloadType::Removed,
-        )?;
+        )
+        .await?;
     }
 
     profiles.remove(path).await?;
@@ -63,7 +64,8 @@ where
                 profile.path.clone(),
                 &profile.metadata.name,
                 ProfilePayloadType::Edited,
-            )?;
+            )
+            .await?;
 
             action(profile).await
         }
@@ -355,8 +357,9 @@ pub async fn run_credentials(
             "Process failed to stay open.".to_string(),
         )
     })?;
-    let mchild_arc =
-        state_children.insert_process(pid, path.to_path_buf(), mc_process)?;
+    let mchild_arc = state_children
+        .insert_process(pid, path.to_path_buf(), mc_process)
+        .await?;
 
     Ok(mchild_arc)
 }

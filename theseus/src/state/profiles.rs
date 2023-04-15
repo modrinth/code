@@ -1,6 +1,10 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
+use crate::event::emit::{
+    emit_profile, init_loading, loading_try_for_each_concurrent,
+};
+use crate::event::{LoadingBarType, ProfilePayloadType};
 use crate::state::projects::Project;
 use crate::state::{ModrinthVersion, ProjectType};
 use crate::util::fetch::{fetch, fetch_json, write, write_cached_icon};
@@ -372,13 +376,14 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip(self))]
-    pub fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
+    pub async fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         emit_profile(
             profile.uuid,
             profile.path.clone(),
             &profile.metadata.name,
             ProfilePayloadType::Added,
-        )?;
+        )
+        .await?;
         self.0.insert(
             canonicalize(&profile.path)?
                 .to_str()
@@ -397,6 +402,7 @@ impl Profiles {
         path: &'a Path,
     ) -> crate::Result<&Self> {
         self.insert(Self::read_profile_from_dir(&canonicalize(path)?).await?)
+            .await
     }
 
     #[tracing::instrument(skip(self))]
@@ -414,9 +420,21 @@ impl Profiles {
 
     #[tracing::instrument(skip_all)]
     pub async fn sync(&self) -> crate::Result<&Self> {
-        stream::iter(self.0.iter())
-            .map(Ok::<_, crate::Error>)
-            .try_for_each_concurrent(None, |(path, profile)| async move {
+        let loading_bar = init_loading(
+            LoadingBarType::ProfileSync,
+            100.0,
+            "Syncing profiles...",
+        )
+        .await?;
+        let num_futs = self.0.len();
+        loading_try_for_each_concurrent(
+            stream::iter(self.0.iter()).map(Ok::<_, crate::Error>),
+            None,
+            Some(&loading_bar),
+            100.0,
+            num_futs,
+            None,
+            |(path, profile)| async move {
                 let json = serde_json::to_vec(&profile)?;
 
                 let json_path = Path::new(&path.to_string_lossy().to_string())

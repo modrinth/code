@@ -32,7 +32,7 @@ impl Children {
     // Inserts a child process to keep track of, and returns a reference to the container struct MinecraftChild
     // The threads for stdout and stderr are spawned here
     // Unlike a Hashmap's 'insert', this directly returns the reference to the Child rather than any previously stored Child that may exist
-    pub fn insert_process(
+    pub async fn insert_process(
         &mut self,
         pid: u32,
         profile_path: PathBuf,
@@ -65,7 +65,8 @@ impl Children {
             pid,
             ProcessPayloadType::Launched,
             "Launched Minecraft",
-        )?;
+        )
+        .await?;
 
         // Create MinecraftChild
         let mchild = MinecraftChild {
