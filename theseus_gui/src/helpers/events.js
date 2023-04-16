@@ -29,6 +29,8 @@ import { listen } from '@tauri-apps/api/event'
         - Certain states have additional fields:
         - PackDownload: {
             pack_name: name of the pack
+            pack_id, optional, the id of the modpack
+            pack_version, optional, the version of the modpack
         - MinecraftDownload: {
             profile_name: name of the profile
             profile_uuid: unique identification of the profile
