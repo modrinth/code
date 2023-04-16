@@ -4,6 +4,9 @@ use tokio::io::{AsyncBufReadExt, BufReader};
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
 
+use crate::event::emit::emit_process;
+use crate::event::ProcessPayloadType;
+
 use super::Profile;
 
 // Child processes (instances of Minecraft)
@@ -13,6 +16,7 @@ pub struct Children(HashMap<u32, Arc<RwLock<MinecraftChild>>>);
 // Minecraft Child, bundles together the PID, the actual Child, and the easily queryable stdout and stderr streams
 #[derive(Debug)]
 pub struct MinecraftChild {
+    pub uuid: uuid::Uuid,
     pub pid: u32,
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub child: tokio::process::Child,
@@ -28,12 +32,14 @@ impl Children {
     // Inserts a child process to keep track of, and returns a reference to the container struct MinecraftChild
     // The threads for stdout and stderr are spawned here
     // Unlike a Hashmap's 'insert', this directly returns the reference to the Child rather than any previously stored Child that may exist
-    pub fn insert_process(
+    pub async fn insert_process(
         &mut self,
         pid: u32,
         profile_path: PathBuf,
         mut child: tokio::process::Child,
-    ) -> Arc<RwLock<MinecraftChild>> {
+    ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+        let uuid = uuid::Uuid::new_v4();
+
         // Create std watcher threads for stdout and stderr
         let stdout = SharedOutput::new();
         if let Some(child_stdout) = child.stdout.take() {
@@ -54,8 +60,17 @@ impl Children {
             });
         }
 
+        emit_process(
+            uuid,
+            pid,
+            ProcessPayloadType::Launched,
+            "Launched Minecraft",
+        )
+        .await?;
+
         // Create MinecraftChild
         let mchild = MinecraftChild {
+            uuid,
             pid,
             profile_path,
             child,
@@ -64,7 +79,7 @@ impl Children {
         };
         let mchild = Arc::new(RwLock::new(mchild));
         self.0.insert(pid, mchild.clone());
-        mchild
+        Ok(mchild)
     }
 
     // Returns a ref to the child

@@ -118,22 +118,15 @@ async fn main() -> theseus::Result<()> {
     println!("Minecraft PID: {}", pid);
 
     // Wait 5 seconds
-    println!("Waiting 20 seconds to gather logs...");
-    sleep(Duration::from_secs(20)).await;
-    let stdout = process::get_stdout_by_pid(pid).await?;
-    println!("Logs after 5sec <<< {stdout} >>> end stdout");
+    println!("Waiting 5 seconds to gather logs...");
+    sleep(Duration::from_secs(5)).await;
+    let _stdout = process::get_stdout_by_pid(pid).await?;
+    let _stderr = process::get_stderr_by_pid(pid).await?;
+    // println!("Logs after 5sec <<< {stdout} >>> end stdout");
 
-    println!(
-        "All running process PIDs {:?}",
-        process::get_all_running_pids().await?
-    );
     println!(
         "All running process paths {:?}",
         process::get_all_running_profile_paths().await?
-    );
-    println!(
-        "All running process profiles {:?}",
-        process::get_all_running_profiles().await?
     );
 
     // hold the lock to the process until it ends

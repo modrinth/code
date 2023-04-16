@@ -15,7 +15,7 @@ tauri-build = { version = "1.2", features = [] }
 regex = "1.5"
 
 [dependencies]
-theseus = { path = "../../theseus" }
+theseus = { path = "../../theseus", features = ["tauri"] }
 
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }
