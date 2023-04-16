@@ -7,6 +7,8 @@ use serde::Deserialize;
 pub struct ThreadBuilder {
     pub type_: ThreadType,
     pub members: Vec<UserId>,
+    pub project_id: Option<ProjectId>,
+    pub report_id: Option<ReportId>,
 }
 
 #[derive(Clone)]
@@ -15,13 +17,15 @@ pub struct Thread {
     pub type_: ThreadType,
     pub messages: Vec<ThreadMessage>,
     pub members: Vec<UserId>,
+    pub show_in_mod_inbox: bool,
+    pub project_id: Option<ProjectId>,
+    pub report_id: Option<ReportId>,
 }
 
 pub struct ThreadMessageBuilder {
     pub author_id: Option<UserId>,
     pub body: MessageBody,
     pub thread_id: ThreadId,
-    pub show_in_mod_inbox: bool,
 }
 
 #[derive(Deserialize, Clone)]
@@ -31,7 +35,6 @@ pub struct ThreadMessage {
     pub author_id: Option<UserId>,
     pub body: MessageBody,
     pub created: DateTime<Utc>,
-    pub show_in_mod_inbox: bool,
 }
 
 impl ThreadMessageBuilder {
@@ -45,17 +48,16 @@ impl ThreadMessageBuilder {
         sqlx::query!(
             "
             INSERT INTO threads_messages (
-                id, author_id, body, thread_id, show_in_mod_inbox
+                id, author_id, body, thread_id
             )
             VALUES (
-                $1, $2, $3, $4, $5
+                $1, $2, $3, $4
             )
             ",
             thread_message_id as ThreadMessageId,
             self.author_id.map(|x| x.0),
             serde_json::value::to_value(self.body.clone())?,
             self.thread_id as ThreadId,
-            self.show_in_mod_inbox,
         )
         .execute(&mut *transaction)
         .await?;
@@ -133,9 +135,9 @@ impl Thread {
             thread_ids.iter().map(|x| x.0).collect();
         let threads = sqlx::query!(
             "
-            SELECT t.id, t.thread_type,
+            SELECT t.id, t.thread_type, t.show_in_mod_inbox, t.project_id, t.report_id,
             ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,
-            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created, 'show_in_mod_inbox', tmsg.show_in_mod_inbox)) filter (where tmsg.id is not null) messages
+            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages
             FROM threads t
             LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id
             LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id
@@ -159,6 +161,9 @@ impl Thread {
                     messages
                 },
                 members: x.members.unwrap_or_default().into_iter().map(UserId).collect(),
+                show_in_mod_inbox: x.show_in_mod_inbox,
+                project_id: x.project_id.map(ProjectId),
+                report_id: x.report_id.map(ReportId),
             }))
         })
         .try_collect::<Vec<Thread>>()
@@ -229,7 +234,7 @@ impl ThreadMessage {
             message_ids.iter().map(|x| x.0).collect();
         let messages = sqlx::query!(
             "
-            SELECT tm.id, tm.author_id, tm.thread_id, tm.body, tm.created, tm.show_in_mod_inbox
+            SELECT tm.id, tm.author_id, tm.thread_id, tm.body, tm.created
             FROM threads_messages tm
             WHERE tm.id = ANY($1)
             ",
@@ -244,7 +249,6 @@ impl ThreadMessage {
                 body: serde_json::from_value(x.body)
                     .unwrap_or(MessageBody::Deleted),
                 created: x.created,
-                show_in_mod_inbox: x.show_in_mod_inbox,
             }))
         })
         .try_collect::<Vec<ThreadMessage>>()
@@ -259,10 +263,13 @@ impl ThreadMessage {
     ) -> Result<Option<()>, sqlx::error::Error> {
         sqlx::query!(
             "
-            DELETE FROM threads_messages
+            UPDATE threads_messages
+            SET body = $2
             WHERE id = $1
             ",
             id as ThreadMessageId,
+            serde_json::to_value(MessageBody::Deleted)
+                .unwrap_or(serde_json::json!({}))
         )
         .execute(&mut *transaction)
         .await?;

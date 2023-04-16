@@ -759,6 +759,8 @@ async fn project_create_inner(
         let thread_id = ThreadBuilder {
             type_: ThreadType::Project,
             members: vec![],
+            project_id: Some(project_id.into()),
+            report_id: None,
         }
         .insert(&mut *transaction)
         .await?;

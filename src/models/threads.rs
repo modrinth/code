@@ -1,4 +1,5 @@
 use super::ids::Base62Id;
+use crate::models::ids::{ProjectId, ReportId};
 use crate::models::projects::ProjectStatus;
 use crate::models::users::{User, UserId};
 use chrono::{DateTime, Utc};
@@ -21,6 +22,9 @@ pub struct Thread {
     pub type_: ThreadType,
     pub messages: Vec<ThreadMessage>,
     pub members: Vec<User>,
+
+    pub project_id: Option<ProjectId>,
+    pub report_id: Option<ReportId>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -45,6 +49,7 @@ pub enum MessageBody {
         old_status: ProjectStatus,
     },
     ThreadClosure,
+    ThreadReopen,
     Deleted,
 }
 

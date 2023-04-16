@@ -1,8 +1,7 @@
-use crate::database::models::notification_item::{
-    NotificationActionBuilder, NotificationBuilder,
-};
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::TeamMember;
 use crate::models::ids::ProjectId;
+use crate::models::notifications::NotificationBody;
 use crate::models::teams::{Permissions, TeamId};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
@@ -333,9 +332,8 @@ pub async fn add_team_member(
 
     let result = sqlx::query!(
         "
-        SELECT m.title title, m.id id, pt.name project_type
+        SELECT m.id
         FROM mods m
-        INNER JOIN project_types pt ON pt.id = m.project_type
         WHERE m.team_id = $1
         ",
         team_id as crate::database::models::ids::TeamId
@@ -343,32 +341,13 @@ pub async fn add_team_member(
     .fetch_one(&**pool)
     .await?;
 
-    let team: TeamId = team_id.into();
     NotificationBuilder {
-        notification_type: Some("team_invite".to_string()),
-        title: "You have been invited to join a team!".to_string(),
-        text: format!(
-            "Team invite from {} to join the team for project {}",
-            current_user.username, result.title
-        ),
-        link: format!(
-            "/{}/{}",
-            result.project_type,
-            ProjectId(result.id as u64)
-        ),
-        actions: vec![
-            NotificationActionBuilder {
-                title: "Accept".to_string(),
-                action_route: ("POST".to_string(), format!("team/{team}/join")),
-            },
-            NotificationActionBuilder {
-                title: "Deny".to_string(),
-                action_route: (
-                    "DELETE".to_string(),
-                    format!("team/{team}/members/{}", new_member.user_id),
-                ),
-            },
-        ],
+        body: NotificationBody::TeamInvite {
+            project_id: ProjectId(result.id as u64),
+            team_id: team_id.into(),
+            invited_by: current_user.id,
+            role: new_member.role.clone(),
+        },
     }
     .insert(new_member.user_id.into(), &mut transaction)
     .await?;

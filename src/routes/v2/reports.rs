@@ -71,6 +71,8 @@ pub async fn report_create(
     let thread_id = ThreadBuilder {
         type_: ThreadType::Report,
         members: vec![],
+        project_id: None,
+        report_id: Some(id),
     }
     .insert(&mut transaction)
     .await?;
@@ -314,7 +316,7 @@ pub async fn report_edit(
         }
 
         if let Some(edit_closed) = edit_report.closed {
-            if report.closed && !edit_closed && !user.role.is_mod() {
+            if !user.role.is_mod() {
                 return Err(ApiError::InvalidInput(
                     "You cannot reopen a report!".to_string(),
                 ));
@@ -323,9 +325,12 @@ pub async fn report_edit(
             if let Some(thread) = report.thread_id {
                 ThreadMessageBuilder {
                     author_id: Some(user.id.into()),
-                    body: MessageBody::ThreadClosure,
+                    body: if !edit_closed && report.closed {
+                        MessageBody::ThreadReopen
+                    } else {
+                        MessageBody::ThreadClosure
+                    },
                     thread_id: thread,
-                    show_in_mod_inbox: false,
                 }
                 .insert(&mut transaction)
                 .await?;

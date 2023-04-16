@@ -287,56 +287,6 @@
     },
     "query": "\n            INSERT INTO files (id, version_id, url, filename, is_primary, size, file_type)\n            VALUES ($1, $2, $3, $4, $5, $6, $7)\n            "
   },
-  "0eee1b0969f3ee800ccf5105d878c8c417f09bdced6bbbefcdc339534d1baf2a": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "author_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "thread_id",
-          "ordinal": 2,
-          "type_info": "Int8"
-        },
-        {
-          "name": "body",
-          "ordinal": 3,
-          "type_info": "Jsonb"
-        },
-        {
-          "name": "created",
-          "ordinal": 4,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "show_in_mod_inbox",
-          "ordinal": 5,
-          "type_info": "Bool"
-        }
-      ],
-      "nullable": [
-        false,
-        true,
-        false,
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT tm.id, tm.author_id, tm.thread_id, tm.body, tm.created, tm.show_in_mod_inbox\n            FROM threads_messages tm\n            WHERE tm.id = ANY($1)\n            "
-  },
   "0f0244e77f60e69b3ab1320265749656e25da0b021b3df9013a2da470dbc8d46": {
     "describe": {
       "columns": [],
@@ -409,23 +359,6 @@
       }
     },
     "query": "\n        SELECT EXISTS(SELECT 1 FROM mod_follows mf WHERE mf.follower_id = $1 AND mf.mod_id = $2)\n        "
-  },
-  "114df19aa81498b77022bd7347dd4449c7cc48efdab19003bde62c2f2f837d3c": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Varchar",
-          "Varchar",
-          "Varchar",
-          "Varchar"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO notifications (\n                id, user_id, title, text, link, type\n            )\n            VALUES (\n                $1, $2, $3, $4, $5, $6\n            )\n            "
   },
   "1209ffc1ffbea89f7060573275dc7325ac4d7b4885b6c1d1ec92998e6012e455": {
     "describe": {
@@ -694,74 +627,6 @@
       }
     },
     "query": "\n                    UPDATE users\n                    SET email = $1\n                    WHERE (id = $2)\n                    "
-  },
-  "1762798f2b3221292a0152723beda6b4888cf2d15793cca13c3bebc320b2f23e": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "title",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "text",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "link",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "created",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "read",
-          "ordinal": 6,
-          "type_info": "Bool"
-        },
-        {
-          "name": "notification_type",
-          "ordinal": 7,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "actions",
-          "ordinal": 8,
-          "type_info": "Jsonb"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.user_id = $1\n            GROUP BY n.id, n.user_id;\n            "
   },
   "1931ff3846345c0af4e15c3a84dcbfc7c9cbb92c98d2e73634f611a1e5358c7a": {
     "describe": {
@@ -1196,6 +1061,19 @@
       }
     },
     "query": "SELECT EXISTS(SELECT 1 FROM versions WHERE id=$1)"
+  },
+  "2007ac2b16a1d3d8fd053d962ba8548613535255fa197059e86959adf372948d": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Jsonb"
+        ]
+      }
+    },
+    "query": "\n            UPDATE threads_messages\n            SET body = $2\n            WHERE id = $1\n            "
   },
   "20413fce27fe9c1dec71900f9563e787acc11e7789b5294786e0ea6f20d7d958": {
     "describe": {
@@ -1660,6 +1538,50 @@
       }
     },
     "query": "DELETE FROM banned_users WHERE github_id = $1;"
+  },
+  "320d73cd900a6e00f0e74b7a8c34a7658d16034b01a35558cb42fa9c16185eb5": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "author_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "thread_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        },
+        {
+          "name": "body",
+          "ordinal": 3,
+          "type_info": "Jsonb"
+        },
+        {
+          "name": "created",
+          "ordinal": 4,
+          "type_info": "Timestamptz"
+        }
+      ],
+      "nullable": [
+        false,
+        true,
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            SELECT tm.id, tm.author_id, tm.thread_id, tm.body, tm.created\n            FROM threads_messages tm\n            WHERE tm.id = ANY($1)\n            "
   },
   "33a965c7dc615d3b701c05299889357db8dd36d378850625d2602ba471af4885": {
     "describe": {
@@ -2145,6 +2067,62 @@
     },
     "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv\n                    WHERE major = $1 AND type = $2\n                    ORDER BY created DESC\n                    "
   },
+  "447c21dd66f9ac85f9f9d39402d2ceb8440d5951e2c7277d329b65412d330f4e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "thread_type",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "show_in_mod_inbox",
+          "ordinal": 2,
+          "type_info": "Bool"
+        },
+        {
+          "name": "project_id",
+          "ordinal": 3,
+          "type_info": "Int8"
+        },
+        {
+          "name": "report_id",
+          "ordinal": 4,
+          "type_info": "Int8"
+        },
+        {
+          "name": "members",
+          "ordinal": 5,
+          "type_info": "Int8Array"
+        },
+        {
+          "name": "messages",
+          "ordinal": 6,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        true,
+        true,
+        null,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            SELECT t.id, t.thread_type, t.show_in_mod_inbox, t.project_id, t.report_id,\n            ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages\n            FROM threads t\n            LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id\n            LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id\n            WHERE t.id = ANY($1)\n            GROUP BY t.id\n            "
+  },
   "4567790f0dc98ff20b596a33161d1f6ac8af73da67fe8c54192724626c6bf670": {
     "describe": {
       "columns": [],
@@ -2202,6 +2180,19 @@
       }
     },
     "query": "\n            SELECT d.dependency_id, COALESCE(vd.mod_id, 0) mod_id, d.mod_dependency_id\n            FROM versions v\n            INNER JOIN dependencies d ON d.dependent_id = v.id\n            LEFT JOIN versions vd ON d.dependency_id = vd.id\n            WHERE v.mod_id = $1\n            "
+  },
+  "49813a96f007216072d69468aae705d73d5b85dcdd64a22060009b12d947ed5a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Bool",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            UPDATE threads\n            SET show_in_mod_inbox = $1\n            WHERE id = $2\n            "
   },
   "49a5d21a1454afc6383b78e468fd0decc75b9163e7286f34ceab22d563a0d3f7": {
     "describe": {
@@ -2325,18 +2316,6 @@
       }
     },
     "query": "\n            SELECT id FROM mods\n            WHERE id = $1\n            "
-  },
-  "4d093a0f6c87e07f1db3889c05d961c0ead1391fe3e7e9d770de271edee53eb5": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            DELETE FROM threads_messages\n            WHERE id = $1\n            "
   },
   "4d54032b02c860f4facec39eacb4548a0701d4505e7a80b4834650696df69c2b": {
     "describe": {
@@ -2530,53 +2509,25 @@
     },
     "query": "\n                    UPDATE versions\n                    SET version_number = $1\n                    WHERE (id = $2)\n                    "
   },
-  "59859b611ac75b266671daacee0ae3eb0eff1808a046dd0c7b70154f590c28eb": {
+  "599a7966e054d7892c6c48c6f303872bb51f2b5eb387a3967bf8aebb5d33f627": {
     "describe": {
       "columns": [
         {
           "name": "id",
           "ordinal": 0,
           "type_info": "Int8"
-        },
-        {
-          "name": "thread_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "author_id",
-          "ordinal": 2,
-          "type_info": "Int8"
-        },
-        {
-          "name": "body",
-          "ordinal": 3,
-          "type_info": "Jsonb"
-        },
-        {
-          "name": "created",
-          "ordinal": 4,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "project_id",
-          "ordinal": 5,
-          "type_info": "Int8"
         }
       ],
       "nullable": [
-        false,
-        false,
-        true,
-        false,
-        false,
         false
       ],
       "parameters": {
-        "Left": []
+        "Left": [
+          "Int8"
+        ]
       }
     },
-    "query": "\n        SELECT tm.id, tm.thread_id, tm.author_id, tm.body, tm.created, m.id project_id FROM threads_messages tm\n        INNER JOIN mods m ON m.thread_id = tm.thread_id\n        WHERE tm.show_in_mod_inbox = TRUE\n        "
+    "query": "\n        SELECT m.id\n        FROM mods m\n        WHERE m.team_id = $1\n        "
   },
   "599df07263a2705e57fc70a7c4f5dc606e1730c281e3b573d2f2a2030bed04e0": {
     "describe": {
@@ -3051,44 +3002,6 @@
     },
     "query": "\n                    UPDATE files\n                    SET is_primary = FALSE\n                    WHERE (version_id = $1)\n                    "
   },
-  "6df09f8d633b6d6f481c858755ff577d5d8f2ddf26c8235e4e7685364ae91460": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "thread_type",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "members",
-          "ordinal": 2,
-          "type_info": "Int8Array"
-        },
-        {
-          "name": "messages",
-          "ordinal": 3,
-          "type_info": "Jsonb"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        null,
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT t.id, t.thread_type,\n            ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created, 'show_in_mod_inbox', tmsg.show_in_mod_inbox)) filter (where tmsg.id is not null) messages\n            FROM threads t\n            LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id\n            LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id\n            WHERE t.id = ANY($1)\n            GROUP BY t.id\n            "
-  },
   "6e07cc68675d0f583182eaa9f50853fa5996b9f83543fe8b6c2a073cf6a9cb5d": {
     "describe": {
       "columns": [
@@ -3492,18 +3405,6 @@
     },
     "query": "\n        SELECT v.mod_id project_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)\n        INNER JOIN mods m on v.mod_id = m.id\n        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)\n        ORDER BY v.date_published ASC\n        "
   },
-  "7a4b588622729603f4c8d0c6e471baa67d19e9b4c333b2a79c28d2dd84fd869a": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        UPDATE threads_messages\n        SET show_in_mod_inbox = FALSE\n        WHERE id = $1\n        "
-  },
   "7ab21e7613dd88e97cf602e76bff62170c13ceef8104a4ce4cb2d101f8ce4f48": {
     "describe": {
       "columns": [],
@@ -3782,20 +3683,31 @@
     },
     "query": "\n                INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                VALUES ($1, $2, FALSE)\n                "
   },
-  "8129255d25bf0624d83f50558b668ed7b7f9c264e380d276522fc82bc871939b": {
+  "7ee877b149288e53a14b5f0f3417806aee7a8954fa0fc17da80d59bebbe067d2": {
     "describe": {
-      "columns": [],
-      "nullable": [],
+      "columns": [
+        {
+          "name": "status",
+          "ordinal": 0,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "team_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false
+      ],
       "parameters": {
         "Left": [
-          "Int8",
-          "Varchar",
-          "Varchar",
-          "Varchar"
+          "Int8"
         ]
       }
     },
-    "query": "\n            INSERT INTO notifications_actions (\n                notification_id, title, action_route, action_route_method\n            )\n            VALUES (\n                $1, $2, $3, $4\n            )\n            "
+    "query": "SELECT m.status, m.team_id FROM mods m WHERE thread_id = $1"
   },
   "83d428e1c07d16e356ef26bdf1d707940b1683b5f631ded1f6674a081453d67b": {
     "describe": {
@@ -3988,6 +3900,18 @@
     },
     "query": "\n                        UPDATE users\n                        SET payout_wallet = $1, payout_wallet_type = $2, payout_address = $3\n                        WHERE (id = $4)\n                        "
   },
+  "8f5e2a570cf35b2d158182bac37fd40bcec277bbdeddaece5efaa88600048a70": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n        UPDATE threads\n        SET show_in_mod_inbox = FALSE\n        WHERE id = $1\n        "
+  },
   "9284d7f22617e0a7daf91540ff31791d0921ec5d4eb4809846dc67567bec1a81": {
     "describe": {
       "columns": [
@@ -4017,38 +3941,6 @@
     },
     "query": "\n        SELECT h.hash, v.mod_id FROM hashes h\n        INNER JOIN files f ON h.file_id = f.id\n        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)\n        INNER JOIN mods m on v.mod_id = m.id\n        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)\n        "
   },
-  "9348309884811e8b22f33786ae7c0f259f37f3c90e545f00761a641570107160": {
-    "describe": {
-      "columns": [
-        {
-          "name": "title",
-          "ordinal": 0,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "project_type",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        SELECT m.title title, m.id id, pt.name project_type\n        FROM mods m\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.team_id = $1\n        "
-  },
   "9381c483b29d364f14c46d5e73bc14b1ec5d0525e27b9e9b099cb0786934fe78": {
     "describe": {
       "columns": [
@@ -4068,26 +3960,6 @@
       }
     },
     "query": "\n            SELECT id FROM mods\n            WHERE slug = LOWER($1)\n            "
-  },
-  "965a8a34ae559d402f0112ce5f04f1ad18de1eebc92299f4d2ce7250e3fa12d5": {
-    "describe": {
-      "columns": [
-        {
-          "name": "status",
-          "ordinal": 0,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "SELECT m.status FROM mods m WHERE thread_id = $1"
   },
   "96b2f4e0e619e7ed312d191dc90d64113235d72254fbda8f528ce866d1795cb5": {
     "describe": {
@@ -4244,22 +4116,6 @@
       }
     },
     "query": "\n                INSERT INTO team_members (id, team_id, user_id, role, permissions, accepted, payouts_split, ordering)\n                VALUES ($1, $2, $3, $4, $5, $6, $7, $8)\n                "
-  },
-  "9d975d279fa869aad310922653de2fcbe0d2bfb896588067721e5f5560a57593": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Int8",
-          "Jsonb",
-          "Int8",
-          "Bool"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO threads_messages (\n                id, author_id, body, thread_id, show_in_mod_inbox\n            )\n            VALUES (\n                $1, $2, $3, $4, $5\n            )\n            "
   },
   "9dc32a9ef59f57fbad862520b6d3a4795a95d7d0db17e05eb8aedc3a2fe600dc": {
     "describe": {
@@ -4606,32 +4462,6 @@
     },
     "query": "\n                SELECT loader_id id FROM loaders_versions\n                WHERE version_id = $1\n                "
   },
-  "adbe17a5ad3cea333b30b5d6111aff713a8f7dc79ded21f5ba942c4f1108aa8f": {
-    "describe": {
-      "columns": [
-        {
-          "name": "title",
-          "ordinal": 0,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "project_type",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n        SELECT m.title title, pt.name project_type\n        FROM mods m\n        INNER JOIN project_types pt ON pt.id = m.project_type\n        WHERE m.id = $1\n        "
-  },
   "ae1686b8b566dd7ecc57c653c9313a4b324a2ec3a63aa6a44ed1d8ea7999b115": {
     "describe": {
       "columns": [],
@@ -4641,6 +4471,21 @@
       }
     },
     "query": "\n            DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL AND dependency_file_name = NULL\n            "
+  },
+  "b0c29c51bd3ae5b93d487471a98ee9bbb43a4df468ba781852b137dd315b9608": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Jsonb",
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO threads_messages (\n                id, author_id, body, thread_id\n            )\n            VALUES (\n                $1, $2, $3, $4\n            )\n            "
   },
   "b0e3d1c70b87bb54819e3fac04b684a9b857aeedb4dcb7cb400c2af0dbb12922": {
     "describe": {
@@ -5426,6 +5271,80 @@
     },
     "query": "SELECT id FROM versions WHERE mod_id = $1 AND (version_number = $2 OR id = $3) ORDER BY date_published ASC"
   },
+  "c49cda8215982b699d7aee14614763c9b5b997489581293fc2ae3604697867fe": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "title",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "text",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "link",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "read",
+          "ordinal": 6,
+          "type_info": "Bool"
+        },
+        {
+          "name": "notification_type",
+          "ordinal": 7,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "body",
+          "ordinal": 8,
+          "type_info": "Jsonb"
+        },
+        {
+          "name": "actions",
+          "ordinal": 9,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type, n.body,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.user_id = $1\n            GROUP BY n.id, n.user_id;\n            "
+  },
   "c4b167ec7452cc92be0e33f7e4f3908f0c4109291511c94909e9105fc62a432f": {
     "describe": {
       "columns": [],
@@ -5834,6 +5753,20 @@
       }
     },
     "query": "\n            DELETE FROM threads_messages\n            WHERE thread_id = $1\n            "
+  },
+  "d2c046d4bedeb7181ece4e94d7de90c97bd3dd1b0c16070704028923a0c2834a": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Int8",
+          "Jsonb"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO notifications (\n                id, user_id, body\n            )\n            VALUES (\n                $1, $2, $3\n            )\n            "
   },
   "d331ca8f22da418cf654985c822ce4466824beaa00dea64cde90dc651a03024b": {
     "describe": {
@@ -6420,6 +6353,24 @@
     },
     "query": "\n                    UPDATE mods\n                    SET status = $1\n                    WHERE (id = $2)\n                    "
   },
+  "e9d863c1793939d5ae7137d810f23d06460c28a9058b251448e3786c436f80cd": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": []
+      }
+    },
+    "query": "\n        SELECT id\n        FROM threads\n        WHERE show_in_mod_inbox = TRUE\n        "
+  },
   "ea1525cbe7460d0d9e9da8f448c661f7209bc1a7a04e2ea0026fa69c3f550a14": {
     "describe": {
       "columns": [
@@ -6537,74 +6488,6 @@
       }
     },
     "query": "\n            SELECT id FROM reports\n            WHERE closed = FALSE AND reporter = $1\n            ORDER BY created ASC\n            LIMIT $2;\n            "
-  },
-  "f191675ebb8f77548ba7e4385288a2f1899c7c611395249db85bea9a3ce9a54a": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "user_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        },
-        {
-          "name": "title",
-          "ordinal": 2,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "text",
-          "ordinal": 3,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "link",
-          "ordinal": 4,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "created",
-          "ordinal": 5,
-          "type_info": "Timestamptz"
-        },
-        {
-          "name": "read",
-          "ordinal": 6,
-          "type_info": "Bool"
-        },
-        {
-          "name": "notification_type",
-          "ordinal": 7,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "actions",
-          "ordinal": 8,
-          "type_info": "Jsonb"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        false,
-        true,
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.id = ANY($1)\n            GROUP BY n.id, n.user_id\n            ORDER BY n.created DESC;\n            "
   },
   "f22e9aee090f9952cf795a3540c03b0a5036dab0b740847d05e03d4565756283": {
     "describe": {
@@ -6894,6 +6777,80 @@
       }
     },
     "query": "\n                        INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                        VALUES ($1, $2, TRUE)\n                        "
+  },
+  "fce67ce3d0c27c64af85fb7d36661513bc5ea2e96fcf12f3a51c97999b01b83c": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "user_id",
+          "ordinal": 1,
+          "type_info": "Int8"
+        },
+        {
+          "name": "title",
+          "ordinal": 2,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "text",
+          "ordinal": 3,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "link",
+          "ordinal": 4,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "created",
+          "ordinal": 5,
+          "type_info": "Timestamptz"
+        },
+        {
+          "name": "read",
+          "ordinal": 6,
+          "type_info": "Bool"
+        },
+        {
+          "name": "notification_type",
+          "ordinal": 7,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "body",
+          "ordinal": 8,
+          "type_info": "Jsonb"
+        },
+        {
+          "name": "actions",
+          "ordinal": 9,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        true,
+        true,
+        true,
+        false,
+        false,
+        true,
+        true,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            SELECT n.id, n.user_id, n.title, n.text, n.link, n.created, n.read, n.type notification_type, n.body,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', na.id, 'notification_id', na.notification_id, 'title', na.title, 'action_route_method', na.action_route_method, 'action_route', na.action_route)) filter (where na.id is not null) actions\n            FROM notifications n\n            LEFT OUTER JOIN notifications_actions na on n.id = na.notification_id\n            WHERE n.id = ANY($1)\n            GROUP BY n.id, n.user_id\n            ORDER BY n.created DESC;\n            "
   },
   "fdfe36dcb85347a3a8228b5d5fc2d017b9baa307b5ae0ae9deaafab9dcdcb74a": {
     "describe": {

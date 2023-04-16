@@ -1,7 +1,9 @@
 use crate::database;
+use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::models::ids::ThreadMessageId;
-use crate::models::projects::ProjectStatus;
+use crate::models::ids::{ReportId, ThreadMessageId};
+use crate::models::notifications::NotificationBody;
+use crate::models::projects::{ProjectId, ProjectStatus};
 use crate::models::threads::{
     MessageBody, Thread, ThreadId, ThreadMessage, ThreadType,
 };
@@ -11,6 +13,7 @@ use crate::util::auth::{
     check_is_moderator_from_headers, get_user_from_headers,
 };
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
+use futures::TryStreamExt;
 use serde::Deserialize;
 use sqlx::PgPool;
 
@@ -19,7 +22,8 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("thread")
             .service(moderation_inbox)
             .service(thread_get)
-            .service(thread_send_message),
+            .service(thread_send_message)
+            .service(thread_read),
     );
     cfg.service(web::scope("message").service(message_delete));
     cfg.service(threads_get);
@@ -86,8 +90,6 @@ pub async fn filter_authorized_threads(
     }
 
     if !check_threads.is_empty() {
-        use futures::TryStreamExt;
-
         let project_thread_ids = check_threads
             .iter()
             .filter(|x| x.type_ == ThreadType::Project)
@@ -248,6 +250,8 @@ fn convert_thread(
             .into_iter()
             .filter(|x| !x.role.is_mod() || user.role.is_mod())
             .collect(),
+        project_id: data.project_id.map(ProjectId::from),
+        report_id: data.report_id.map(ReportId::from),
     }
 }
 
@@ -384,30 +388,93 @@ pub async fn thread_send_message(
             return Ok(HttpResponse::NotFound().body(""));
         }
 
-        let mod_notif = if thread.type_ == ThreadType::Project {
-            let status = sqlx::query!(
-                "SELECT m.status FROM mods m WHERE thread_id = $1",
+        let report = if let Some(report) = thread.report_id {
+            database::models::report_item::Report::get(report, &**pool).await?
+        } else {
+            None
+        };
+
+        if report.as_ref().map(|x| x.closed).unwrap_or(false)
+            && !user.role.is_mod()
+        {
+            return Err(ApiError::InvalidInput(
+                "You may not reply to a closed report".to_string(),
+            ));
+        }
+
+        let (mod_notif, (user_notif, team_id)) = if thread.type_
+            == ThreadType::Project
+        {
+            let record = sqlx::query!(
+                "SELECT m.status, m.team_id FROM mods m WHERE thread_id = $1",
                 thread.id as database::models::ids::ThreadId,
             )
             .fetch_one(&**pool)
             .await?;
 
-            let status = ProjectStatus::from_str(&status.status);
+            let status = ProjectStatus::from_str(&record.status);
 
-            status == ProjectStatus::Processing && !user.role.is_mod()
+            (
+                status == ProjectStatus::Processing && !user.role.is_mod(),
+                (
+                    status != ProjectStatus::Processing && user.role.is_mod(),
+                    Some(record.team_id),
+                ),
+            )
         } else {
-            false
+            (false, (thread.type_ == ThreadType::Report, None))
         };
 
         let mut transaction = pool.begin().await?;
-        ThreadMessageBuilder {
+        sqlx::query!(
+            "
+            UPDATE threads
+            SET show_in_mod_inbox = $1
+            WHERE id = $2
+            ",
+            mod_notif,
+            thread.id.0,
+        )
+        .execute(&mut *transaction)
+        .await?;
+
+        let id = ThreadMessageBuilder {
             author_id: Some(user.id.into()),
             body: new_message.body.clone(),
             thread_id: thread.id,
-            show_in_mod_inbox: mod_notif,
         }
         .insert(&mut transaction)
         .await?;
+
+        if user_notif {
+            let users_to_notify = if let Some(team_id) = team_id {
+                let members = database::models::TeamMember::get_from_team_full(
+                    database::models::TeamId(team_id),
+                    &**pool,
+                )
+                .await?;
+
+                members.into_iter().map(|x| x.user.id).collect()
+            } else if let Some(report) = report {
+                vec![report.reporter]
+            } else {
+                vec![]
+            };
+
+            if !users_to_notify.is_empty() {
+                NotificationBuilder {
+                    body: NotificationBody::ModeratorMessage {
+                        thread_id: thread.id.into(),
+                        message_id: id.into(),
+                        project_id: thread.project_id.map(ProjectId::from),
+                        report_id: thread.report_id.map(ReportId::from),
+                    },
+                }
+                .insert_many(users_to_notify, &mut transaction)
+                .await?;
+            }
+        }
+
         transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().body(""))
@@ -421,36 +488,33 @@ pub async fn moderation_inbox(
     req: HttpRequest,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    check_is_moderator_from_headers(req.headers(), &**pool).await?;
+    let user = check_is_moderator_from_headers(req.headers(), &**pool).await?;
 
-    let messages = sqlx::query!(
+    let ids = sqlx::query!(
         "
-        SELECT tm.id, tm.thread_id, tm.author_id, tm.body, tm.created, m.id project_id FROM threads_messages tm
-        INNER JOIN mods m ON m.thread_id = tm.thread_id
-        WHERE tm.show_in_mod_inbox = TRUE
+        SELECT id
+        FROM threads
+        WHERE show_in_mod_inbox = TRUE
         "
     )
-        .fetch_all(&**pool)
-        .await?
-        .into_iter()
-        .map(|x| serde_json::json! ({
-            "message": ThreadMessage {
-                id: ThreadMessageId(x.id as u64),
-                author_id: x.author_id.map(|x| crate::models::users::UserId(x as u64)),
-                body: serde_json::from_value(x.body).unwrap_or(MessageBody::Deleted),
-                created: x.created
-            },
-            "project_id": crate::models::projects::ProjectId(x.project_id as u64),
-        }))
-        .collect::<Vec<_>>();
+    .fetch_many(&**pool)
+    .try_filter_map(|e| async {
+        Ok(e.right().map(|m| database::models::ThreadId(m.id)))
+    })
+    .try_collect::<Vec<database::models::ThreadId>>()
+    .await?;
 
-    Ok(HttpResponse::Ok().json(messages))
+    let threads_data =
+        database::models::Thread::get_many(&ids, &**pool).await?;
+    let threads = filter_authorized_threads(threads_data, &user, &pool).await?;
+
+    Ok(HttpResponse::Ok().json(threads))
 }
 
 #[post("{id}/read")]
-pub async fn read_message(
+pub async fn thread_read(
     req: HttpRequest,
-    info: web::Path<(ThreadMessageId,)>,
+    info: web::Path<(ThreadId,)>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     check_is_moderator_from_headers(req.headers(), &**pool).await?;
@@ -460,7 +524,7 @@ pub async fn read_message(
 
     sqlx::query!(
         "
-        UPDATE threads_messages
+        UPDATE threads
         SET show_in_mod_inbox = FALSE
         WHERE id = $1
         ",

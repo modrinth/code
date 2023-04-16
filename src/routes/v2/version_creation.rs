@@ -5,6 +5,7 @@ use crate::database::models::version_item::{
     DependencyBuilder, VersionBuilder, VersionFileBuilder,
 };
 use crate::file_hosting::FileHost;
+use crate::models::notifications::NotificationBody;
 use crate::models::pack::PackFileHash;
 use crate::models::projects::{
     Dependency, DependencyType, FileType, GameVersion, Loader, ProjectId,
@@ -377,18 +378,6 @@ async fn version_create_inner(
         ));
     }
 
-    let result = sqlx::query!(
-        "
-        SELECT m.title title, pt.name project_type
-        FROM mods m
-        INNER JOIN project_types pt ON pt.id = m.project_type
-        WHERE m.id = $1
-        ",
-        builder.project_id as crate::database::models::ids::ProjectId
-    )
-    .fetch_one(&mut *transaction)
-    .await?;
-
     use futures::stream::TryStreamExt;
 
     let users = sqlx::query!(
@@ -409,18 +398,10 @@ async fn version_create_inner(
     let version_id: VersionId = builder.version_id.into();
 
     NotificationBuilder {
-        notification_type: Some("project_update".to_string()),
-        title: format!("**{}** has been updated!", result.title),
-        text: format!(
-            "The project {} has released a new version: {}",
-            result.title,
-            version_data.version_number.clone()
-        ),
-        link: format!(
-            "/{}/{}/version/{}",
-            result.project_type, project_id, version_id
-        ),
-        actions: vec![],
+        body: NotificationBody::ProjectUpdate {
+            project_id,
+            version_id,
+        },
     }
     .insert_many(users, &mut *transaction)
     .await?;

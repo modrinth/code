@@ -4,6 +4,7 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::file_hosting::FileHost;
 use crate::models;
 use crate::models::ids::base62_impl::parse_base62;
+use crate::models::notifications::NotificationBody;
 use crate::models::projects::{
     DonationLink, Project, ProjectId, ProjectStatus, SearchRequest, SideType,
 };
@@ -615,23 +616,11 @@ pub async fn project_edit(
                     .await?;
 
                     NotificationBuilder {
-                        notification_type: Some("status_update".to_string()),
-                        title: format!(
-                            "**{}**'s status has changed!",
-                            project_item.inner.title
-                        ),
-                        text: format!(
-                            "The project {}'s status has changed from {} to {}",
-                            project_item.inner.title,
-                            project_item.inner.status.as_friendly_str(),
-                            status.as_friendly_str()
-                        ),
-                        link: format!(
-                            "/{}/{}",
-                            project_item.project_type,
-                            ProjectId::from(id)
-                        ),
-                        actions: vec![],
+                        body: NotificationBody::StatusChange {
+                            project_id: project_item.inner.id.into(),
+                            old_status: project_item.inner.status,
+                            new_status: *status,
+                        },
                     }
                     .insert_many(notified_members, &mut transaction)
                     .await?;
@@ -645,7 +634,6 @@ pub async fn project_edit(
                             old_status: project_item.inner.status,
                         },
                         thread_id: thread,
-                        show_in_mod_inbox: false,
                     }
                     .insert(&mut transaction)
                     .await?;
