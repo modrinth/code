@@ -627,7 +627,7 @@ export default defineNuxtComponent({
       }
       if (offset > 0) {
         queryItems.push(`o=${offset}`)
-        obj.offset = offset
+        obj.o = offset
       }
       if (facets.value.length > 0) {
         queryItems.push(`f=${encodeURIComponent(facets.value)}`)

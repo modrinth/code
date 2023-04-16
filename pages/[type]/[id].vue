@@ -116,6 +116,7 @@
         :patch-project="patchProject"
         :patch-icon="patchIcon"
         :update-icon="resetProject"
+        :route="route"
       />
     </div>
   </div>
@@ -389,6 +390,95 @@
           </div>
         </div>
       </div>
+      <section class="normal-page__content">
+        <ProjectPublishingChecklist
+          v-if="currentMember"
+          :project="project"
+          :versions="versions"
+          :current-member="currentMember"
+          :is-settings="$route.name.startsWith('type-id-settings')"
+          :route-name="$route.name"
+          :set-processing="setProcessing"
+          :collapsed="collapsedChecklist"
+          :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
+        />
+        <div v-if="project.status === 'withheld'" class="card warning" aria-label="Warning">
+          {{ project.title }} is not viewable in search because it has been found to be in violation
+          of one of <nuxt-link to="/legal/rules"> Modrinth's content rules </nuxt-link>. Modrinth
+          makes no guarantees as to whether {{ project.title }} is safe for use in a multiplayer
+          context.
+        </div>
+        <div v-if="project.status === 'archived'" class="card warning" aria-label="Warning">
+          {{ project.title }} has been archived. {{ project.title }} will not receive any further
+          updates unless the author decides to unarchive the project.
+        </div>
+        <div
+          v-if="project.project_type === 'modpack'"
+          class="card information"
+          aria-label="Information"
+        >
+          To install {{ project.title }}, visit
+          <a href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/" :target="$external()"
+            >our documentation</a
+          >
+          which provides instructions on using
+          <a href="https://atlauncher.com/about" :target="$external()" rel="noopener"> ATLauncher</a
+          >, <a href="https://multimc.org/" :target="$external()" rel="noopener">MultiMC</a>, and
+          <a href="https://prismlauncher.org" :target="$external()" rel="noopener">
+            Prism Launcher</a
+          >.
+        </div>
+        <Promotion v-if="$tag.approvedStatuses.includes(project.status)" />
+        <div class="navigation-card">
+          <NavRow
+            :links="[
+              {
+                label: 'Description',
+                href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
+              },
+              {
+                label: 'Gallery',
+                href: `/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/gallery`,
+                shown: project.gallery.length > 0 || !!currentMember,
+              },
+              {
+                label: 'Changelog',
+                href: `/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/changelog`,
+                shown: versions.length > 0,
+              },
+              {
+                label: 'Versions',
+                href: `/${project.project_type}/${
+                  project.slug ? project.slug : project.id
+                }/versions`,
+                shown: versions.length > 0 || !!currentMember,
+              },
+            ]"
+          />
+          <div v-if="$auth.user && currentMember" class="input-group">
+            <nuxt-link
+              :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
+              class="iconified-button"
+            >
+              <SettingsIcon /> Settings
+            </nuxt-link>
+          </div>
+        </div>
+        <NuxtPage
+          v-model:project="project"
+          v-model:versions="versions"
+          v-model:featured-versions="featuredVersions"
+          v-model:members="members"
+          v-model:all-members="allMembers"
+          v-model:dependencies="dependencies"
+          :current-member="currentMember"
+          :route="route"
+        />
+      </section>
       <div class="card normal-page__info">
         <template
           v-if="
@@ -603,94 +693,6 @@
           </div>
         </div>
       </div>
-      <section class="normal-page__content">
-        <ProjectPublishingChecklist
-          v-if="currentMember"
-          :project="project"
-          :versions="versions"
-          :current-member="currentMember"
-          :is-settings="$route.name.startsWith('type-id-settings')"
-          :route-name="$route.name"
-          :set-processing="setProcessing"
-          :collapsed="collapsedChecklist"
-          :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
-        />
-        <div v-if="project.status === 'withheld'" class="card warning" aria-label="Warning">
-          {{ project.title }} is not viewable in search because it has been found to be in violation
-          of one of <nuxt-link to="/legal/rules"> Modrinth's content rules </nuxt-link>. Modrinth
-          makes no guarantees as to whether {{ project.title }} is safe for use in a multiplayer
-          context.
-        </div>
-        <div v-if="project.status === 'archived'" class="card warning" aria-label="Warning">
-          {{ project.title }} has been archived. {{ project.title }} will not receive any further
-          updates unless the author decides to unarchive the project.
-        </div>
-        <div
-          v-if="project.project_type === 'modpack'"
-          class="card information"
-          aria-label="Information"
-        >
-          To install {{ project.title }}, visit
-          <a href="https://docs.modrinth.com/docs/modpacks/playing_modpacks/" :target="$external()"
-            >our documentation</a
-          >
-          which provides instructions on using
-          <a href="https://atlauncher.com/about" :target="$external()" rel="noopener"> ATLauncher</a
-          >, <a href="https://multimc.org/" :target="$external()" rel="noopener">MultiMC</a>, and
-          <a href="https://prismlauncher.org" :target="$external()" rel="noopener">
-            Prism Launcher</a
-          >.
-        </div>
-        <Promotion v-if="$tag.approvedStatuses.includes(project.status)" />
-        <div class="navigation-card">
-          <NavRow
-            :links="[
-              {
-                label: 'Description',
-                href: `/${project.project_type}/${project.slug ? project.slug : project.id}`,
-              },
-              {
-                label: 'Gallery',
-                href: `/${project.project_type}/${
-                  project.slug ? project.slug : project.id
-                }/gallery`,
-                shown: project.gallery.length > 0 || !!currentMember,
-              },
-              {
-                label: 'Changelog',
-                href: `/${project.project_type}/${
-                  project.slug ? project.slug : project.id
-                }/changelog`,
-                shown: versions.length > 0,
-              },
-              {
-                label: 'Versions',
-                href: `/${project.project_type}/${
-                  project.slug ? project.slug : project.id
-                }/versions`,
-                shown: versions.length > 0 || !!currentMember,
-              },
-            ]"
-          />
-          <div v-if="$auth.user && currentMember" class="input-group">
-            <nuxt-link
-              :to="`/${project.project_type}/${project.slug ? project.slug : project.id}/settings`"
-              class="iconified-button"
-            >
-              <SettingsIcon /> Settings
-            </nuxt-link>
-          </div>
-        </div>
-        <NuxtPage
-          v-model:project="project"
-          v-model:versions="versions"
-          v-model:featured-versions="featuredVersions"
-          v-model:members="members"
-          v-model:all-members="allMembers"
-          v-model:dependencies="dependencies"
-          :current-member="currentMember"
-        />
-      </section>
     </div>
   </div>
 </template>

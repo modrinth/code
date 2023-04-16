@@ -20,7 +20,7 @@
       </aside>
     </div>
     <div class="normal-page__content">
-      <NuxtPage />
+      <NuxtPage :route="route" />
     </div>
   </div>
 </template>
@@ -35,5 +35,7 @@ import ListIcon from '~/assets/images/utils/list.svg'
 definePageMeta({
   middleware: 'auth',
 })
+
+const route = useRoute()
 </script>
 <style lang="scss" scoped></style>

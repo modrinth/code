@@ -20,12 +20,12 @@
       </aside>
     </div>
     <div class="normal-page__content">
-      <NuxtPage class="universal-card" />
+      <NuxtPage class="universal-card" :route="route" />
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
 import NavStack from '~/components/ui/NavStack'
 import NavStackItem from '~/components/ui/NavStackItem'
 
@@ -34,16 +34,7 @@ import PrivacyIcon from '~/assets/images/utils/lock.svg'
 import RulesIcon from '~/assets/images/sidebar/admin.svg'
 import ShieldIcon from '~/assets/images/utils/shield.svg'
 
-export default defineNuxtComponent({
-  components: {
-    NavStack,
-    NavStackItem,
-    TermsIcon,
-    PrivacyIcon,
-    RulesIcon,
-    ShieldIcon,
-  },
-})
+const route = useRoute()
 </script>
 
 <style lang="scss" scoped>
