@@ -107,7 +107,7 @@ const stop = async (e) => {
           {{ props.instance.metadata?.game_version || props.instance.latest_version }}
         </p>
       </div>
-      <div ref="playBtn" v-if="props.instance.metadata" class="install cta" @click="play">
+      <div v-if="props.instance.metadata" ref="playBtn" class="install cta" @click="play">
         <PlayIcon />
       </div>
       <div v-else class="install cta" @click="install"><SaveIcon /></div>
