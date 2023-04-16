@@ -134,19 +134,20 @@ pub async fn install_pack_from_version_id(
         None
     };
 
-    install_pack(file, icon, Some(version.project_id)).await
+    install_pack(file, icon, Some(version.project_id), Some(version.id)).await
 }
 
 pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
     let file = fs::read(path).await?;
 
-    install_pack(bytes::Bytes::from(file), None, None).await
+    install_pack(bytes::Bytes::from(file), None, None, None).await
 }
 
 async fn install_pack(
     file: bytes::Bytes,
     icon: Option<PathBuf>,
     project_id: Option<String>,
+    version_id: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = &State::get().await?;
 
@@ -223,12 +224,16 @@ async fn install_pack(
             mod_loader.unwrap_or(ModLoader::Vanilla),
             loader_version,
             icon,
-            project_id,
+            project_id.clone(),
         )
         .await?;
 
         let loading_bar = init_loading(
-            LoadingBarType::PackDownload { pack_name },
+            LoadingBarType::PackDownload { 
+                pack_name ,
+                pack_id: project_id,
+                pack_version: version_id,
+            },
             100.0,
             "Downloading modpack...",
         )

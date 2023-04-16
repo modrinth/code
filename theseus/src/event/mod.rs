@@ -91,7 +91,9 @@ pub enum LoadingBarType {
     StateInit,
     PackDownload {
         pack_name: String,
-    }, // pack name
+        pack_id: Option<String>,
+        pack_version: Option<String>,
+    }, 
     MinecraftDownload {
         profile_uuid: Uuid,
         profile_name: String,

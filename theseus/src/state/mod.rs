@@ -74,7 +74,8 @@ impl State {
         LAUNCHER_STATE
             .get_or_try_init(|| {
                 async {
-                    let loading_bar = init_loading(LoadingBarType::PackDownload { pack_name: "hello".to_string() }, 100.0, "Initializing launcher...").await?;
+
+                    let loading_bar = init_loading(LoadingBarType::StateInit, 100.0, "Initializing launcher...").await?;
                     // Directories
                     let directories = DirectoryInfo::init().await?;
 
