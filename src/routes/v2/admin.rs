@@ -1,4 +1,5 @@
 use crate::models::ids::ProjectId;
+use crate::models::projects::MonetizationStatus;
 use crate::routes::ApiError;
 use crate::util::guards::admin_key_guard;
 use crate::DownloadQueue;
@@ -166,15 +167,17 @@ pub async fn process_payout(
     let mut projects_map: HashMap<i64, Project> = HashMap::new();
 
     use futures::TryStreamExt;
+
     sqlx::query!(
         "
         SELECT m.id id, tm.user_id user_id, tm.payouts_split payouts_split, pt.name project_type
         FROM mods m
         INNER JOIN team_members tm on m.team_id = tm.team_id AND tm.accepted = TRUE
         INNER JOIN project_types pt ON pt.id = m.project_type
-        WHERE m.id = ANY($1)
+        WHERE m.id = ANY($1) AND m.monetization_status = $2
         ",
-        &multipliers.values.keys().flat_map(|x| x.parse::<i64>().ok()).collect::<Vec<i64>>()
+        &multipliers.values.keys().flat_map(|x| x.parse::<i64>().ok()).collect::<Vec<i64>>(),
+        MonetizationStatus::Monetized.as_str(),
     )
         .fetch_many(&mut *transaction)
         .try_for_each(|e| {

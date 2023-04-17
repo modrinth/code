@@ -102,16 +102,14 @@ pub struct Project {
     /// A string of URLs to visual content featuring the project
     pub gallery: Vec<GalleryItem>,
 
-    /// The project linked from FlameAnvil to sync with
-    pub flame_anvil_project: Option<i32>,
-    /// The user_id of the team member whose token
-    pub flame_anvil_user: Option<UserId>,
-
     /// The color of the project (picked from icon)
     pub color: Option<u32>,
 
     /// The thread of the moderation messages of the project
     pub thread_id: Option<ThreadId>,
+
+    /// The monetization status of this project
+    pub monetization_status: MonetizationStatus,
 }
 
 impl From<QueryProject> for Project {
@@ -197,10 +195,9 @@ impl From<QueryProject> for Project {
                     ordering: x.ordering,
                 })
                 .collect(),
-            flame_anvil_project: m.flame_anvil_project,
-            flame_anvil_user: m.flame_anvil_user.map(|x| x.into()),
             color: m.color,
             thread_id: m.thread_id.map(|x| x.into()),
+            monetization_status: m.monetization_status,
         }
     }
 }
@@ -414,6 +411,39 @@ impl ProjectStatus {
             ProjectStatus::Unknown => false,
             ProjectStatus::Withheld => false,
             ProjectStatus::Scheduled => false,
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Copy, Clone, Debug, Eq, PartialEq)]
+#[serde(rename_all = "kebab-case")]
+pub enum MonetizationStatus {
+    ForceDemonetized,
+    Demonetized,
+    Monetized,
+}
+
+impl std::fmt::Display for MonetizationStatus {
+    fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+        fmt.write_str(self.as_str())
+    }
+}
+
+impl MonetizationStatus {
+    pub fn from_str(string: &str) -> MonetizationStatus {
+        match string {
+            "force-demonetized" => MonetizationStatus::ForceDemonetized,
+            "demonetized" => MonetizationStatus::Demonetized,
+            "monetized" => MonetizationStatus::Monetized,
+            _ => MonetizationStatus::Monetized,
+        }
+    }
+    // These are constant, so this can remove unnecessary allocations (`to_string`)
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            MonetizationStatus::ForceDemonetized => "force-demonetized",
+            MonetizationStatus::Demonetized => "demonetized",
+            MonetizationStatus::Monetized => "monetized",
         }
     }
 }

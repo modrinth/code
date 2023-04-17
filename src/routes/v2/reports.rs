@@ -264,7 +264,7 @@ pub async fn report_get(
         crate::database::models::report_item::Report::get(id, &**pool).await?;
 
     if let Some(report) = report {
-        if !user.role.is_mod() && report.user_id != Some(user.id.into()) {
+        if !user.role.is_mod() && report.reporter != user.id.into() {
             return Ok(HttpResponse::NotFound().body(""));
         }
 

@@ -173,13 +173,6 @@ pub struct EditUser {
     )]
     #[validate]
     pub payout_data: Option<Option<EditPayoutData>>,
-    #[serde(
-        default,
-        skip_serializing_if = "Option::is_none",
-        with = "::serde_with::rust::double_option"
-    )]
-    #[validate(length(min = 1, max = 40), regex = "RE_URL_SAFE")]
-    pub flame_anvil_key: Option<Option<String>>,
 }
 
 #[derive(Serialize, Deserialize, Validate)]
@@ -392,33 +385,6 @@ pub async fn user_edit(
                         .execute(&mut *transaction)
                         .await?;
                 }
-            }
-
-            if let Some(flame_anvil_key) = &new_user.flame_anvil_key {
-                if flame_anvil_key.is_none() {
-                    sqlx::query!(
-                        "
-                        UPDATE mods
-                        SET flame_anvil_user = NULL
-                        WHERE (flame_anvil_user = $1)
-                        ",
-                        id as crate::database::models::ids::UserId,
-                    )
-                    .execute(&mut *transaction)
-                    .await?;
-                }
-
-                sqlx::query!(
-                    "
-                    UPDATE users
-                    SET flame_anvil_key = $1
-                    WHERE (id = $2)
-                    ",
-                    flame_anvil_key.as_deref(),
-                    id as crate::database::models::ids::UserId,
-                )
-                .execute(&mut *transaction)
-                .await?;
             }
 
             transaction.commit().await?;

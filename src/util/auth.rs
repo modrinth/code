@@ -80,7 +80,6 @@ where
                 payout_wallet_type: result.payout_wallet_type,
                 payout_address: result.payout_address,
             }),
-            has_flame_anvil_key: Some(result.flame_anvil_key.is_some()),
         }),
         None => Err(AuthenticationError::InvalidCredentials),
     }

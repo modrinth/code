@@ -33,11 +33,13 @@ impl super::Validator for ModpackValidator {
     ) -> Result<ValidationResult, ValidationError> {
         let pack: PackFormat = {
             let mut file =
-                archive.by_name("modrinth.index.json").map_err(|_| {
-                    ValidationError::InvalidInput(
-                        "Pack manifest is missing.".into(),
-                    )
-                })?;
+                if let Ok(file) = archive.by_name("modrinth.index.json") {
+                    file
+                } else {
+                    return Ok(ValidationResult::Warning(
+                        "Pack manifest is missing.",
+                    ));
+                };
 
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;

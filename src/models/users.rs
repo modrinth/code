@@ -47,7 +47,6 @@ pub struct User {
     pub role: Role,
     pub badges: Badges,
     pub payout_data: Option<UserPayoutData>,
-    pub has_flame_anvil_key: Option<bool>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -141,7 +140,6 @@ impl From<DBUser> for User {
             role: Role::from_string(&data.role),
             badges: data.badges,
             payout_data: None,
-            has_flame_anvil_key: None,
         }
     }
 }

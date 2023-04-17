@@ -854,6 +854,12 @@ pub async fn upload_file(
         ));
     }
 
+    if let ValidationResult::Warning(msg) = validation_result {
+        if primary {
+            return Err(CreateError::InvalidInput(msg.to_string()));
+        }
+    }
+
     version_files.push(VersionFileBuilder {
         filename: file_name.to_string(),
         url: format!("{cdn_url}/{file_path_encode}"),

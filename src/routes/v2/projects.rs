@@ -6,7 +6,8 @@ use crate::models;
 use crate::models::ids::base62_impl::parse_base62;
 use crate::models::notifications::NotificationBody;
 use crate::models::projects::{
-    DonationLink, Project, ProjectId, ProjectStatus, SearchRequest, SideType,
+    DonationLink, MonetizationStatus, Project, ProjectId, ProjectStatus,
+    SearchRequest, SideType,
 };
 use crate::models::teams::Permissions;
 use crate::models::threads::MessageBody;
@@ -416,6 +417,7 @@ pub struct EditProject {
     )]
     #[validate(length(max = 65536))]
     pub moderation_message_body: Option<Option<String>>,
+    pub monetization_status: Option<MonetizationStatus>,
 }
 
 #[patch("{id}")]
@@ -1150,6 +1152,40 @@ pub async fn project_edit(
                     WHERE (id = $2)
                     ",
                     body,
+                    id as database::models::ids::ProjectId,
+                )
+                .execute(&mut *transaction)
+                .await?;
+            }
+
+            if let Some(monetization_status) = &new_project.monetization_status
+            {
+                if !perms.contains(Permissions::EDIT_DETAILS) {
+                    return Err(ApiError::CustomAuthentication(
+                        "You do not have the permissions to edit the monetization status of this project!"
+                            .to_string(),
+                    ));
+                }
+
+                if (*monetization_status
+                    == MonetizationStatus::ForceDemonetized
+                    || project_item.inner.monetization_status
+                        == MonetizationStatus::ForceDemonetized)
+                    && !user.role.is_mod()
+                {
+                    return Err(ApiError::CustomAuthentication(
+                        "You do not have the permissions to edit the monetization status of this project!"
+                            .to_string(),
+                    ));
+                }
+
+                sqlx::query!(
+                    "
+                    UPDATE mods
+                    SET monetization_status = $1
+                    WHERE (id = $2)
+                    ",
+                    monetization_status.as_str(),
                     id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)

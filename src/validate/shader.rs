@@ -28,8 +28,8 @@ impl super::Validator for ShaderValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         if !archive.file_names().any(|x| x.starts_with("shaders/")) {
-            return Err(ValidationError::InvalidInput(
-                "No shaders folder present for OptiFine/Iris shader.".into(),
+            return Ok(ValidationResult::Warning(
+                "No shaders folder present for OptiFine/Iris shader.",
             ));
         }
 
@@ -60,15 +60,15 @@ impl super::Validator for CanvasShaderValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("pack.mcmeta").map_err(|_| {
-            ValidationError::InvalidInput(
-                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!".into(),
-            )
-        })?;
+        if archive.by_name("pack.mcmeta").is_err() {
+            return Ok(ValidationResult::Warning(
+                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!",
+            ));
+        };
 
         if !archive.file_names().any(|x| x.contains("/pipelines/")) {
-            return Err(ValidationError::InvalidInput(
-                "No pipeline shaders folder present for canvas shaders.".into(),
+            return Ok(ValidationResult::Warning(
+                "No pipeline shaders folder present for canvas shaders.",
             ));
         }
 
@@ -99,18 +99,18 @@ impl super::Validator for CoreShaderValidator {
         &self,
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
-        archive.by_name("pack.mcmeta").map_err(|_| {
-            ValidationError::InvalidInput(
-                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!".into(),
-            )
-        })?;
+        if archive.by_name("pack.mcmeta").is_err() {
+            return Ok(ValidationResult::Warning(
+                "No pack.mcmeta present for pack file. Tip: Make sure pack.mcmeta is in the root directory of your pack!",
+            ));
+        };
 
         if !archive
             .file_names()
             .any(|x| x.starts_with("assets/minecraft/shaders/"))
         {
-            return Err(ValidationError::InvalidInput(
-                "No shaders folder present for vanilla shaders.".into(),
+            return Ok(ValidationResult::Warning(
+                "No shaders folder present for vanilla shaders.",
             ));
         }
 

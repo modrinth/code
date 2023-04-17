@@ -4,8 +4,8 @@ use crate::database::models::thread_item::ThreadBuilder;
 use crate::file_hosting::{FileHost, FileHostingError};
 use crate::models::error::ApiError;
 use crate::models::projects::{
-    DonationLink, License, ProjectId, ProjectStatus, SideType, VersionId,
-    VersionStatus,
+    DonationLink, License, MonetizationStatus, ProjectId, ProjectStatus,
+    SideType, VersionId, VersionStatus,
 };
 use crate::models::threads::ThreadType;
 use crate::models::users::UserId;
@@ -802,6 +802,7 @@ async fn project_create_inner(
                 .collect(),
             color: icon_data.and_then(|x| x.1),
             thread_id,
+            monetization_status: MonetizationStatus::Monetized,
         };
 
         let now = Utc::now();
@@ -847,10 +848,9 @@ async fn project_create_inner(
             discord_url: project_builder.discord_url.clone(),
             donation_urls: project_create_data.donation_urls.clone(),
             gallery: gallery_urls,
-            flame_anvil_project: None,
-            flame_anvil_user: None,
             color: project_builder.color,
             thread_id: Some(project_builder.thread_id.into()),
+            monetization_status: project_builder.monetization_status,
         };
 
         let _project_id = project_builder.insert(&mut *transaction).await?;

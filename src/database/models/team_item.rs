@@ -133,7 +133,7 @@ impl TeamMember {
             u.avatar_url avatar_url, u.username username, u.bio bio,
             u.created created, u.role user_role, u.badges badges, u.balance balance,
             u.payout_wallet payout_wallet, u.payout_wallet_type payout_wallet_type,
-            u.payout_address payout_address, u.flame_anvil_key flame_anvil_key
+            u.payout_address payout_address
             FROM team_members tm
             INNER JOIN users u ON u.id = tm.user_id
             WHERE tm.team_id = ANY($1)
@@ -166,7 +166,6 @@ impl TeamMember {
                               payout_wallet: m.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
                               payout_wallet_type: m.payout_wallet_type.map(|x| RecipientType::from_string(&x)),
                               payout_address: m.payout_address,
-                              flame_anvil_key: m.flame_anvil_key,
                           },
                           payouts_split: m.payouts_split,
                           ordering: m.ordering,
@@ -318,18 +317,6 @@ impl TeamMember {
         user_id: UserId,
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<(), super::DatabaseError> {
-        sqlx::query!(
-            "
-            UPDATE mods
-            SET flame_anvil_user = NULL
-            WHERE (team_id = $1 AND flame_anvil_user = $2 )
-            ",
-            id as TeamId,
-            user_id as UserId,
-        )
-        .execute(&mut *transaction)
-        .await?;
-
         sqlx::query!(
             "
             DELETE FROM team_members

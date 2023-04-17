@@ -82,7 +82,9 @@ pub trait Validator: Sync {
     ) -> Result<ValidationResult, ValidationError>;
 }
 
-static VALIDATORS: [&dyn Validator; 16] = [
+static ALWAYS_ALLOWED_EXT: &[&str] = &["zip", "txt"];
+
+static VALIDATORS: &[&dyn Validator] = &[
     &ModpackValidator,
     &FabricValidator,
     &ForgeValidator,
@@ -127,7 +129,7 @@ pub async fn validate_file(
         }
 
         let mut visited = false;
-        for validator in &VALIDATORS {
+        for validator in VALIDATORS {
             if validator.get_project_types().contains(&&*project_type)
                 && loaders
                     .iter()
@@ -147,12 +149,16 @@ pub async fn validate_file(
         }
 
         if visited {
-            Err(ValidationError::InvalidInput(
-                format!(
-                    "File extension {file_extension} is invalid for input file"
-                )
-                .into(),
-            ))
+            if ALWAYS_ALLOWED_EXT.contains(&&*file_extension) {
+                Ok(ValidationResult::Warning("File extension is invalid for input file"))
+            } else {
+                Err(ValidationError::InvalidInput(
+                    format!(
+                        "File extension {file_extension} is invalid for input file"
+                    )
+                        .into(),
+                ))
+            }
         } else {
             Ok(ValidationResult::Pass)
         }

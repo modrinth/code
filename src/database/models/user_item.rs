@@ -18,7 +18,6 @@ pub struct User {
     pub payout_wallet: Option<RecipientWallet>,
     pub payout_wallet_type: Option<RecipientType>,
     pub payout_address: Option<String>,
-    pub flame_anvil_key: Option<String>,
 }
 
 impl User {
@@ -76,7 +75,7 @@ impl User {
                 u.avatar_url, u.username, u.bio,
                 u.created, u.role, u.badges,
                 u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address, u.flame_anvil_key
+                u.payout_address
             FROM users u
             WHERE u.github_id = $1
             ",
@@ -106,7 +105,6 @@ impl User {
                     .payout_wallet_type
                     .map(|x| RecipientType::from_string(&x)),
                 payout_address: row.payout_address,
-                flame_anvil_key: row.flame_anvil_key,
             }))
         } else {
             Ok(None)
@@ -126,7 +124,7 @@ impl User {
                 u.avatar_url, u.username, u.bio,
                 u.created, u.role, u.badges,
                 u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address, u.flame_anvil_key
+                u.payout_address
             FROM users u
             WHERE LOWER(u.username) = LOWER($1)
             ",
@@ -156,7 +154,6 @@ impl User {
                     .payout_wallet_type
                     .map(|x| RecipientType::from_string(&x)),
                 payout_address: row.payout_address,
-                flame_anvil_key: row.flame_anvil_key,
             }))
         } else {
             Ok(None)
@@ -179,7 +176,7 @@ impl User {
                 u.avatar_url, u.username, u.bio,
                 u.created, u.role, u.badges,
                 u.balance, u.payout_wallet, u.payout_wallet_type,
-                u.payout_address, u.flame_anvil_key
+                u.payout_address
             FROM users u
             WHERE u.id = ANY($1)
             ",
@@ -206,7 +203,6 @@ impl User {
                     .payout_wallet_type
                     .map(|x| RecipientType::from_string(&x)),
                 payout_address: u.payout_address,
-                flame_anvil_key: u.flame_anvil_key,
             }))
         })
         .try_collect::<Vec<User>>()

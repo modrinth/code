@@ -278,7 +278,6 @@ pub async fn auth_callback(
                         payout_wallet: None,
                         payout_wallet_type: None,
                         payout_address: None,
-                        flame_anvil_key: None,
                     }
                     .insert(&mut transaction)
                     .await?;
