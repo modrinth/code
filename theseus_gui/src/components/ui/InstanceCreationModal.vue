@@ -2,20 +2,13 @@
   <Modal ref="modal" header="Create Instance">
     <div v-if="showContent" class="modal-body">
       <div class="image-upload">
-        <Avatar
-          :src="display_icon"
-          size="md"
-          :rounded="true"
-        />
+        <Avatar :src="display_icon" size="md" :rounded="true" />
         <div class="image-input">
-          <Button
-            :max-size="262144"
-            @click="upload_icon()"
-          >
+          <Button @click="upload_icon()">
             <UploadIcon />
             Upload Icon
           </Button>
-          <Button class="btn" @click="reset_icon">
+          <Button @click="reset_icon">
             <XIcon />
             Remove Icon
           </Button>
@@ -23,31 +16,31 @@
       </div>
       <div class="input-row">
         <p class="input-label">Game Version</p>
-        <DropdownSelect v-model="game_version" :options="game_versions"/>
+        <DropdownSelect v-model="game_version" :options="game_versions" />
       </div>
       <div class="input-row">
         <p class="input-label">Loader</p>
-        <Chips v-model="loader" :items="loaders"/>
+        <Chips v-model="loader" :items="loaders" />
       </div>
       <div class="input-row">
         <p class="input-label">Loader Version</p>
-        <Chips v-model="loader_version" :items="['latest', 'stable', 'other']"/>
+        <Chips v-model="loader_version" :items="['latest', 'stable', 'other']" />
       </div>
       <div v-if="loader_version === 'other'" class="input-row">
         <p class="input-label">Select Version</p>
-        <DropdownSelect v-model="specified_loader_version" :options="available_loader_versions"/>
+        <DropdownSelect v-model="specified_loader_version" :options="available_loader_versions" />
       </div>
       <div class="input-row">
         <p class="input-label">Name</p>
-        <input v-model="profile_name" class="text-input" type="text"/>
+        <input v-model="profile_name" class="text-input" type="text" />
       </div>
       <div class="button-group">
         <Button>
-          <XIcon/>
+          <XIcon />
           Cancel
         </Button>
         <Button color="primary" :disabled="check_valid !== true" @click="create_instance()">
-          <PlusIcon/>
+          <PlusIcon />
           Create
         </Button>
       </div>
@@ -56,13 +49,13 @@
 </template>
 
 <script setup>
-import {Avatar, Button, Chips, DropdownSelect, Modal, PlusIcon, UploadIcon, XIcon} from 'omorphia'
-import {computed, ref} from 'vue'
-import {get_game_versions, get_loaders} from '@/helpers/tags'
-import {create} from '@/helpers/profile'
-import {open} from '@tauri-apps/api/dialog'
-import {useRouter} from "vue-router";
-import {tauri} from "@tauri-apps/api";
+import { Avatar, Button, Chips, DropdownSelect, Modal, PlusIcon, UploadIcon, XIcon } from 'omorphia'
+import { computed, ref } from 'vue'
+import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { create } from '@/helpers/profile'
+import { open } from '@tauri-apps/api/dialog'
+import { useRouter } from 'vue-router'
+import { tauri } from '@tauri-apps/api'
 
 const router = useRouter()
 
@@ -75,10 +68,9 @@ const showContent = ref(false)
 const icon = ref(null)
 const display_icon = ref(null)
 
-
 defineExpose({
   show: () => {
-    showContent.value = false;
+    showContent.value = false
     modal.value.show()
     game_version.value = ''
     specified_loader_version.value = ''
@@ -113,7 +105,8 @@ const check_valid = computed(() => {
 })
 
 const create_instance = async () => {
-  const loader_version_value = loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
+  const loader_version_value =
+    loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
   const id = await create(
     profile_name.value,
     game_version.value,
@@ -129,10 +122,12 @@ const create_instance = async () => {
 const upload_icon = async () => {
   icon.value = await open({
     multiple: false,
-    filters: [{
-      name: 'Image',
-      extensions: ['png', 'jpeg']
-    }]
+    filters: [
+      {
+        name: 'Image',
+        extensions: ['png', 'jpeg'],
+      },
+    ],
   })
 
   display_icon.value = tauri.convertFileSrc(icon.value)
@@ -142,7 +137,6 @@ const reset_icon = () => {
   icon.value = null
   display_icon.value = null
 }
-
 </script>
 
 <style scoped>
