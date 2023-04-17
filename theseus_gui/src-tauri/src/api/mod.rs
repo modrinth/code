@@ -5,6 +5,7 @@ use thiserror::Error;
 pub mod auth;
 pub mod jre;
 
+pub mod metadata;
 pub mod pack;
 pub mod process;
 pub mod profile;
