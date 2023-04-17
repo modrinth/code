@@ -11,13 +11,13 @@ pub use crate::{
     State,
 };
 
-// Gets whether a child process stored in the state by PID has finished
+// Gets whether a child process stored in the state by UUID has finished
 #[tracing::instrument]
 pub async fn has_finished_by_uuid(uuid: &Uuid) -> crate::Result<bool> {
     Ok(get_exit_status_by_uuid(uuid).await?.is_some())
 }
 
-// Gets the exit status of a child process stored in the state by PID
+// Gets the exit status of a child process stored in the state by UUID
 #[tracing::instrument]
 pub async fn get_exit_status_by_uuid(
     uuid: &Uuid,
@@ -27,7 +27,7 @@ pub async fn get_exit_status_by_uuid(
     Ok(children.exit_status(uuid).await?.and_then(|f| f.code()))
 }
 
-// Gets the PID of each stored process in the state
+// Gets the UUID of each stored process in the state
 #[tracing::instrument]
 pub async fn get_all_uuids() -> crate::Result<Vec<Uuid>> {
     let state = State::get().await?;
@@ -35,7 +35,7 @@ pub async fn get_all_uuids() -> crate::Result<Vec<Uuid>> {
     Ok(children.keys())
 }
 
-// Gets the PID of each *running* stored process in the state
+// Gets the UUID of each *running* stored process in the state
 #[tracing::instrument]
 pub async fn get_all_running_uuids() -> crate::Result<Vec<Uuid>> {
     let state = State::get().await?;
@@ -59,7 +59,7 @@ pub async fn get_all_running_profiles() -> crate::Result<Vec<Profile>> {
     children.running_profiles().await
 }
 
-// Gets the PID of each stored process in the state by profile path
+// Gets the UUID of each stored process in the state by profile path
 #[tracing::instrument]
 pub async fn get_uuids_by_profile_path(
     profile_path: &Path,
@@ -69,7 +69,7 @@ pub async fn get_uuids_by_profile_path(
     children.running_keys_with_profile(profile_path).await
 }
 
-// Gets stdout of a child process stored in the state by PID, as a string
+// Gets stdout of a child process stored in the state by UUID, as a string
 #[tracing::instrument]
 pub async fn get_stdout_by_uuid(uuid: &Uuid) -> crate::Result<String> {
     let state = State::get().await?;
@@ -89,7 +89,7 @@ pub async fn get_stdout_by_uuid(uuid: &Uuid) -> crate::Result<String> {
     }
 }
 
-// Gets stderr of a child process stored in the state by PID, as a string
+// Gets stderr of a child process stored in the state by UUID, as a string
 #[tracing::instrument]
 pub async fn get_stderr_by_uuid(uuid: &Uuid) -> crate::Result<String> {
     let state = State::get().await?;
@@ -109,7 +109,7 @@ pub async fn get_stderr_by_uuid(uuid: &Uuid) -> crate::Result<String> {
     }
 }
 
-// Kill a child process stored in the state by PID, as a string
+// Kill a child process stored in the state by UUID, as a string
 #[tracing::instrument]
 pub async fn kill_by_uuid(uuid: &Uuid) -> crate::Result<()> {
     let state = State::get().await?;
@@ -123,7 +123,7 @@ pub async fn kill_by_uuid(uuid: &Uuid) -> crate::Result<()> {
     }
 }
 
-// Wait for a child process stored in the state by PID
+// Wait for a child process stored in the state by UUID
 #[tracing::instrument]
 pub async fn wait_for_by_uuid(uuid: &Uuid) -> crate::Result<()> {
     let state = State::get().await?;

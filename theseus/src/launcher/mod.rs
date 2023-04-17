@@ -187,9 +187,9 @@ pub async fn launch_minecraft(
     // Done late so a quick double call doesn't launch two instances
     let existing_processes =
         process::get_uuids_by_profile_path(instance_path).await?;
-    if let Some(pid) = existing_processes.first() {
+    if let Some(uuid) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
-            "Profile {} is already running at PID: {pid}",
+            "Profile {} is already running at UUID: {uuid}",
             instance_path.display()
         ))
         .as_error());
@@ -245,5 +245,5 @@ pub async fn launch_minecraft(
         instance_path.to_path_buf(),
         command,
         post_exit_hook,
-    )
+    ).await
 }

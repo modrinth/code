@@ -20,13 +20,18 @@ pub struct Children(HashMap<Uuid, Arc<RwLock<MinecraftChild>>>);
 // Minecraft Child, bundles together the PID, the actual Child, and the easily queryable stdout and stderr streams
 #[derive(Debug)]
 pub struct MinecraftChild {
-    pub uuid: uuid::Uuid,
-    pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub uuid: Uuid,
+    pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<Child>>,
     pub stdout: SharedOutput,
     pub stderr: SharedOutput,
+}
+
+impl MinecraftChild {
+    pub async fn get_pid(& self) -> crate::Result<u32> {
+        self.current_child.read().await.id().ok_or_else(|| crate::ErrorKind::LauncherError("Process immediately failed, could not get PID".to_string()).into())
+    }
 }
 
 impl Children {
@@ -43,11 +48,9 @@ impl Children {
         profile_path: PathBuf,
         mut mc_command: Command,
         post_command: Option<Command>, // Commands to run after minecraft. It's plural in case we want to run more than one command in the future
-    ) -> crate::Result<crate::Result<Arc<RwLock<MinecraftChild>>>> {
+    ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
         let mut child = mc_command.spawn()?;
-
-        let uuid = uuid::Uuid::new_v4();
 
         // Create std watcher threads for stdout and stderr
         let stdout = SharedOutput::new();
@@ -70,9 +73,12 @@ impl Children {
         }
 
         // Slots child into manager
+        let pid = child.id().ok_or_else(|| crate::ErrorKind::LauncherError("Process immediately failed, could not get PID".to_string()))?;
         let current_child = Arc::new(RwLock::new(child));
         let manager = Some(tokio::spawn(Self::sequential_process_manager(
-            vec![post_command].into_iter().flatten().collect(), // left as a vector in case we want to add more commands in the future
+            uuid,
+            post_command, // left as a vector in case we want to add more commands in the future
+            pid,
             current_child.clone(),
         )));
 
@@ -86,7 +92,6 @@ impl Children {
 
         // Create MinecraftChild
         let mchild = MinecraftChild {
-            uuid,
             uuid,
             profile_path,
             current_child,
@@ -104,10 +109,14 @@ impl Children {
     // Also, as the process ends, it spawns the next command in the vector (hooked post-minecraft functions)
     // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
     async fn sequential_process_manager(
-        minecraft_commands: Vec<Command>,
+        uuid : Uuid,
+        post_command: Option<Command>,
+        mut current_pid : u32,
         current_child: Arc<RwLock<Child>>,
     ) -> crate::Result<ExitStatus> {
         let current_child = current_child.clone();
+
+        // Wait on current Minecraft Child
         let mut mc_exit_status;
         loop {
             if let Some(t) = current_child.write().await.try_wait()? {
@@ -118,23 +127,39 @@ impl Children {
         if !mc_exit_status.success() {
             return Ok(mc_exit_status); // Err for a non-zero exit is handled in helper
         }
-        // Now, similarly, spawn and use each subsequent command process to create after minecraft exits
-        for mut m_command in minecraft_commands.into_iter() {
+
+        // If a post-command exist, switch to it and wait on it
+        if let Some(mut m_command) = post_command {
             {
                 let mut current_child = current_child.write().await;
                 let new_child = m_command.spawn()?;
+                current_pid = new_child.id().ok_or_else(|| crate::ErrorKind::LauncherError("Process immediately failed, could not get PID".to_string()))?;
                 *current_child = new_child;
             }
+            emit_process(
+                uuid,
+                current_pid,
+                ProcessPayloadType::Updated,
+                "Completed Minecraft, switching to post-commands",
+            )
+            .await?;
+    
             loop {
                 if let Some(t) = current_child.write().await.try_wait()? {
                     mc_exit_status = t;
                     break;
                 }
             }
-            if !mc_exit_status.success() {
-                return Ok(mc_exit_status); // Err for a non-zero exit is handled in helper
-            }
         }
+
+        emit_process(
+            uuid,
+            current_pid,
+            ProcessPayloadType::Finished,
+            "Exited process",
+        )
+        .await?;
+
         Ok(mc_exit_status)
     }
 
