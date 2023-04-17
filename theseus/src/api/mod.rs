@@ -12,7 +12,7 @@ pub mod tags;
 pub mod data {
     pub use crate::state::{
         DirectoryInfo, Hooks, JavaSettings, MemorySettings, ModLoader,
-        ProfileMetadata, Settings, WindowSize,
+        ProfileMetadata, Settings, Theme, WindowSize,
     };
 }
 

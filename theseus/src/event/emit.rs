@@ -129,7 +129,7 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
     Ok(())
 }
 
-// emit_process(pid, event, message)
+// emit_process(uuid, pid, event, message)
 #[allow(unused_variables)]
 pub async fn emit_process(
     uuid: uuid::Uuid,
