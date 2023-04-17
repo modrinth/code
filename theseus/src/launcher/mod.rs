@@ -5,6 +5,7 @@ use crate::{
 };
 use daedalus as d;
 use dunce::canonicalize;
+use st::Profile;
 use std::{path::Path, process::Stdio, sync::Arc};
 use tokio::process::Command;
 
@@ -61,6 +62,7 @@ pub async fn launch_minecraft(
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
     post_exit_hook: Option<Command>,
+    profile: &Profile, // optional ref to Profile for event tracking
 ) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
     let state = st::State::get().await?;
     let instance_path = &canonicalize(instance_path)?;
@@ -92,7 +94,7 @@ pub async fn launch_minecraft(
         .version_dir(&version_jar)
         .join(format!("{version_jar}.jar"));
 
-    download::download_minecraft(&state, &version_info).await?;
+    download::download_minecraft(&state, &version_info, profile).await?;
     st::State::sync().await?;
 
     if let Some(processors) = &version_info.processors {

@@ -7,6 +7,9 @@ use tokio::process::Child;
 use tokio::process::Command;
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
+
+use crate::event::emit::emit_process;
+use crate::event::ProcessPayloadType;
 use tokio::task::JoinHandle;
 use uuid::Uuid;
 
@@ -17,6 +20,7 @@ pub struct Children(HashMap<Uuid, Arc<RwLock<MinecraftChild>>>);
 // Minecraft Child, bundles together the PID, the actual Child, and the easily queryable stdout and stderr streams
 #[derive(Debug)]
 pub struct MinecraftChild {
+    pub uuid: uuid::Uuid,
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub uuid: Uuid,
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
@@ -33,15 +37,17 @@ impl Children {
     // Runs the command in process, inserts a child process to keep track of, and returns a reference to the container struct MinecraftChild
     // The threads for stdout and stderr are spawned here
     // Unlike a Hashmap's 'insert', this directly returns the reference to the obj rather than any previously stored obj that may exist
-    pub fn insert_process(
+    pub async fn insert_process(
         &mut self,
         uuid: Uuid,
         profile_path: PathBuf,
         mut mc_command: Command,
         post_command: Option<Command>, // Commands to run after minecraft. It's plural in case we want to run more than one command in the future
-    ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+    ) -> crate::Result<crate::Result<Arc<RwLock<MinecraftChild>>>> {
         // Takes the first element of the commands vector and spawns it
         let mut child = mc_command.spawn()?;
+
+        let uuid = uuid::Uuid::new_v4();
 
         // Create std watcher threads for stdout and stderr
         let stdout = SharedOutput::new();
@@ -70,8 +76,17 @@ impl Children {
             current_child.clone(),
         )));
 
+        emit_process(
+            uuid,
+            pid,
+            ProcessPayloadType::Launched,
+            "Launched Minecraft",
+        )
+        .await?;
+
         // Create MinecraftChild
         let mchild = MinecraftChild {
+            uuid,
             uuid,
             profile_path,
             current_child,

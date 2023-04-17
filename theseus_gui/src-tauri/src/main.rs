@@ -9,7 +9,8 @@ mod api;
 
 // Should be called in launcher initialization
 #[tauri::command]
-async fn initialize_state() -> api::Result<()> {
+async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
+    theseus::EventState::init(app).await?;
     State::get().await?;
     Ok(())
 }

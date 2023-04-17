@@ -1,5 +1,9 @@
 //! Theseus profile management interface
-use crate::{jre, prelude::ModLoader};
+use crate::{
+    event::{emit::emit_profile, ProfilePayloadType},
+    jre,
+    prelude::ModLoader,
+};
 pub use crate::{
     state::{JavaSettings, Profile},
     State,
@@ -135,7 +139,8 @@ pub async fn profile_create(
 
     // Fully canonicalize now that its created for storing purposes
     let path = canonicalize(&path)?;
-    let mut profile = Profile::new(name, game_version, path.clone()).await?;
+    let mut profile =
+        Profile::new(uuid, name, game_version, path.clone()).await?;
     if let Some(ref icon) = icon {
         let bytes = tokio::fs::read(icon).await?;
         profile
@@ -167,9 +172,16 @@ pub async fn profile_create(
         println!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.");
     }
 
+    emit_profile(
+        uuid,
+        path.clone(),
+        &profile.metadata.name,
+        ProfilePayloadType::Created,
+    )
+    .await?;
     {
         let mut profiles = state.profiles.write().await;
-        profiles.insert(profile)?;
+        profiles.insert(profile).await?;
     }
 
     State::sync().await?;
