@@ -240,10 +240,12 @@ pub async fn launch_minecraft(
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
     let mut state_children = state.children.write().await;
-    state_children.insert_process(
-        uuid::Uuid::new_v4(),
-        instance_path.to_path_buf(),
-        command,
-        post_exit_hook,
-    ).await
+    state_children
+        .insert_process(
+            uuid::Uuid::new_v4(),
+            instance_path.to_path_buf(),
+            command,
+            post_exit_hook,
+        )
+        .await
 }

@@ -29,8 +29,13 @@ pub struct MinecraftChild {
 }
 
 impl MinecraftChild {
-    pub async fn get_pid(& self) -> crate::Result<u32> {
-        self.current_child.read().await.id().ok_or_else(|| crate::ErrorKind::LauncherError("Process immediately failed, could not get PID".to_string()).into())
+    pub async fn get_pid(&self) -> crate::Result<u32> {
+        self.current_child.read().await.id().ok_or_else(|| {
+            crate::ErrorKind::LauncherError(
+                "Process immediately failed, could not get PID".to_string(),
+            )
+            .into()
+        })
     }
 }
 
@@ -73,7 +78,11 @@ impl Children {
         }
 
         // Slots child into manager
-        let pid = child.id().ok_or_else(|| crate::ErrorKind::LauncherError("Process immediately failed, could not get PID".to_string()))?;
+        let pid = child.id().ok_or_else(|| {
+            crate::ErrorKind::LauncherError(
+                "Process immediately failed, could not get PID".to_string(),
+            )
+        })?;
         let current_child = Arc::new(RwLock::new(child));
         let manager = Some(tokio::spawn(Self::sequential_process_manager(
             uuid,
@@ -109,9 +118,9 @@ impl Children {
     // Also, as the process ends, it spawns the next command in the vector (hooked post-minecraft functions)
     // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
     async fn sequential_process_manager(
-        uuid : Uuid,
+        uuid: Uuid,
         post_command: Option<Command>,
-        mut current_pid : u32,
+        mut current_pid: u32,
         current_child: Arc<RwLock<Child>>,
     ) -> crate::Result<ExitStatus> {
         let current_child = current_child.clone();
@@ -133,7 +142,12 @@ impl Children {
             {
                 let mut current_child = current_child.write().await;
                 let new_child = m_command.spawn()?;
-                current_pid = new_child.id().ok_or_else(|| crate::ErrorKind::LauncherError("Process immediately failed, could not get PID".to_string()))?;
+                current_pid = new_child.id().ok_or_else(|| {
+                    crate::ErrorKind::LauncherError(
+                        "Process immediately failed, could not get PID"
+                            .to_string(),
+                    )
+                })?;
                 *current_child = new_child;
             }
             emit_process(
@@ -143,7 +157,7 @@ impl Children {
                 "Completed Minecraft, switching to post-commands",
             )
             .await?;
-    
+
             loop {
                 if let Some(t) = current_child.write().await.try_wait()? {
                     mc_exit_status = t;

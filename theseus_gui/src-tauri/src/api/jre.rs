@@ -64,6 +64,6 @@ pub async fn jre_validate_globals() -> Result<bool> {
 // Validates JRE at a given path
 // Returns None if the path is not a valid JRE
 #[tauri::command]
-pub async fn jre_get_jre(path : PathBuf) -> Result<Option<JavaVersion>> {
+pub async fn jre_get_jre(path: PathBuf) -> Result<Option<JavaVersion>> {
     jre::check_jre(path).await.map_err(|e| e.into())
 }

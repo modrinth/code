@@ -340,13 +340,11 @@ pub async fn run_credentials(
     let post_exit_hook =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
 
-    let post_exit_hook=  if let Some(hook) = post_exit_hook {
+    let post_exit_hook = if let Some(hook) = post_exit_hook {
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
             let mut command = Command::new(command);
-            command
-                .args(&cmd.collect::<Vec<&str>>())
-                .current_dir(path);
+            command.args(&cmd.collect::<Vec<&str>>()).current_dir(path);
             Some(command)
         } else {
             None

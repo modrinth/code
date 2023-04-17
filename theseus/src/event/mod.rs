@@ -93,7 +93,7 @@ pub enum LoadingBarType {
         pack_name: String,
         pack_id: Option<String>,
         pack_version: Option<String>,
-    }, 
+    },
     MinecraftDownload {
         profile_uuid: Uuid,
         profile_name: String,
@@ -114,7 +114,7 @@ pub struct WarningPayload {
     pub message: String,
 }
 
-#[derive(Serialize, Clone,)]
+#[derive(Serialize, Clone)]
 pub struct ProcessPayload {
     pub uuid: Uuid, // processes in state are going to be identified by UUIDs, as they might change to different processes
     pub pid: u32,
@@ -124,8 +124,8 @@ pub struct ProcessPayload {
 #[derive(Serialize, Clone, Debug)]
 pub enum ProcessPayloadType {
     Launched,
-    Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process 
-    Finished
+    Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process
+    Finished,
 }
 
 #[derive(Serialize, Clone)]

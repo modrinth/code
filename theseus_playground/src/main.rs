@@ -33,7 +33,8 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     let st = State::get().await?;
     st.settings.write().await.max_concurrent_downloads = 5;
-    st.settings.write().await.hooks.post_exit = Some("echo This is after Minecraft runs- global setting!".to_string());
+    st.settings.write().await.hooks.post_exit =
+        Some("echo This is after Minecraft runs- global setting!".to_string());
     // Changed the settings, so need to reset the semaphore
     st.reset_semaphore().await;
 
