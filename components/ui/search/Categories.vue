@@ -46,8 +46,11 @@ export default {
     display: flex;
     align-items: center;
     flex-direction: row;
-    color: var(--color-icon);
     margin-right: var(--spacing-card-md);
+
+    &:not(.version-badge) {
+      color: var(--color-icon);
+    }
 
     svg {
       width: 1rem;

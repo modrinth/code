@@ -118,12 +118,12 @@ export default {
   &.type--creator,
   &.type--approved,
   &.blue {
-    color: var(--color-special-blue);
+    --badge-color: var(--color-special-blue);
   }
 
   &.type--unlisted,
   &.purple {
-    color: var(--color-special-purple);
+    --badge-color: var(--color-special-purple);
   }
 
   &.type--private,
