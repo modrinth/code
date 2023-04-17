@@ -7,7 +7,6 @@ use theseus::prelude::*;
 #[tauri::command]
 pub async fn profile_create_empty() -> Result<PathBuf> {
     let res = profile_create::profile_create_empty().await?;
-    State::sync().await?;
     Ok(res)
 }
 

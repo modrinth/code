@@ -1,21 +1,29 @@
+use super::Profile;
 use std::path::{Path, PathBuf};
+use std::process::ExitStatus;
 use std::{collections::HashMap, sync::Arc};
 use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::process::Child;
+use tokio::process::Command;
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
 
-use super::Profile;
+use crate::event::emit::emit_process;
+use crate::event::ProcessPayloadType;
+use tokio::task::JoinHandle;
+use uuid::Uuid;
 
 // Child processes (instances of Minecraft)
 // A wrapper over a Hashmap connecting PID -> MinecraftChild
-pub struct Children(HashMap<u32, Arc<RwLock<MinecraftChild>>>);
+pub struct Children(HashMap<Uuid, Arc<RwLock<MinecraftChild>>>);
 
 // Minecraft Child, bundles together the PID, the actual Child, and the easily queryable stdout and stderr streams
 #[derive(Debug)]
 pub struct MinecraftChild {
-    pub pid: u32,
+    pub uuid: Uuid,
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
-    pub child: tokio::process::Child,
+    pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
+    pub current_child: Arc<RwLock<Child>>,
     pub stdout: SharedOutput,
     pub stderr: SharedOutput,
 }
@@ -25,15 +33,19 @@ impl Children {
         Children(HashMap::new())
     }
 
-    // Inserts a child process to keep track of, and returns a reference to the container struct MinecraftChild
+    // Runs the command in process, inserts a child process to keep track of, and returns a reference to the container struct MinecraftChild
     // The threads for stdout and stderr are spawned here
-    // Unlike a Hashmap's 'insert', this directly returns the reference to the Child rather than any previously stored Child that may exist
-    pub fn insert_process(
+    // Unlike a Hashmap's 'insert', this directly returns the reference to the MinecraftChild rather than any previously stored MinecraftChild that may exist
+    pub async fn insert_process(
         &mut self,
-        pid: u32,
+        uuid: Uuid,
         profile_path: PathBuf,
-        mut child: tokio::process::Child,
-    ) -> Arc<RwLock<MinecraftChild>> {
+        mut mc_command: Command,
+        post_command: Option<Command>, // Command to run after minecraft.
+    ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
+        // Takes the first element of the commands vector and spawns it
+        let mut child = mc_command.spawn()?;
+
         // Create std watcher threads for stdout and stderr
         let stdout = SharedOutput::new();
         if let Some(child_stdout) = child.stdout.take() {
@@ -49,31 +61,118 @@ impl Children {
             let stderr_clone = stderr.clone();
             tokio::spawn(async move {
                 if let Err(e) = stderr_clone.read_stderr(child_stderr).await {
-                    eprintln!("Stderr thread died with error: {}", e);
+                    eprintln!("Stderr process died with error: {}", e);
                 }
             });
         }
 
+        // Slots child into manager
+        let pid = child.id().ok_or_else(|| {
+            crate::ErrorKind::LauncherError(
+                "Process immediately failed, could not get PID".to_string(),
+            )
+        })?;
+        let current_child = Arc::new(RwLock::new(child));
+        let manager = Some(tokio::spawn(Self::sequential_process_manager(
+            uuid,
+            post_command,
+            pid,
+            current_child.clone(),
+        )));
+
+        emit_process(
+            uuid,
+            pid,
+            ProcessPayloadType::Launched,
+            "Launched Minecraft",
+        )
+        .await?;
+
         // Create MinecraftChild
         let mchild = MinecraftChild {
-            pid,
+            uuid,
             profile_path,
-            child,
+            current_child,
             stdout,
             stderr,
+            manager,
         };
+
         let mchild = Arc::new(RwLock::new(mchild));
-        self.0.insert(pid, mchild.clone());
-        mchild
+        self.0.insert(uuid, mchild.clone());
+        Ok(mchild)
+    }
+
+    // Spawns a new child process and inserts it into the hashmap
+    // Also, as the process ends, it spawns the follow-up process if it exists
+    // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
+    async fn sequential_process_manager(
+        uuid: Uuid,
+        post_command: Option<Command>,
+        mut current_pid: u32,
+        current_child: Arc<RwLock<Child>>,
+    ) -> crate::Result<ExitStatus> {
+        let current_child = current_child.clone();
+
+        // Wait on current Minecraft Child
+        let mut mc_exit_status;
+        loop {
+            if let Some(t) = current_child.write().await.try_wait()? {
+                mc_exit_status = t;
+                break;
+            }
+        }
+        if !mc_exit_status.success() {
+            return Ok(mc_exit_status); // Err for a non-zero exit is handled in helper
+        }
+
+        // If a post-command exist, switch to it and wait on it
+        if let Some(mut m_command) = post_command {
+            {
+                let mut current_child = current_child.write().await;
+                let new_child = m_command.spawn()?;
+                current_pid = new_child.id().ok_or_else(|| {
+                    crate::ErrorKind::LauncherError(
+                        "Process immediately failed, could not get PID"
+                            .to_string(),
+                    )
+                })?;
+                *current_child = new_child;
+            }
+            emit_process(
+                uuid,
+                current_pid,
+                ProcessPayloadType::Updated,
+                "Completed Minecraft, switching to post-commands",
+            )
+            .await?;
+
+            loop {
+                if let Some(t) = current_child.write().await.try_wait()? {
+                    mc_exit_status = t;
+                    break;
+                }
+            }
+        }
+
+        emit_process(
+            uuid,
+            current_pid,
+            ProcessPayloadType::Finished,
+            "Exited process",
+        )
+        .await?;
+
+        Ok(mc_exit_status)
     }
 
     // Returns a ref to the child
-    pub fn get(&self, pid: &u32) -> Option<Arc<RwLock<MinecraftChild>>> {
-        self.0.get(pid).cloned()
+    pub fn get(&self, uuid: &Uuid) -> Option<Arc<RwLock<MinecraftChild>>> {
+        self.0.get(uuid).cloned()
     }
 
     // Gets all PID keys
-    pub fn keys(&self) -> Vec<u32> {
+    pub fn keys(&self) -> Vec<Uuid> {
         self.0.keys().cloned().collect()
     }
 
@@ -81,25 +180,25 @@ impl Children {
     // Returns None if the child is still running
     pub async fn exit_status(
         &self,
-        pid: &u32,
+        uuid: &Uuid,
     ) -> crate::Result<Option<std::process::ExitStatus>> {
-        if let Some(child) = self.get(pid) {
-            let child = child.clone();
-            let mut child = child.write().await;
-            Ok(child.child.try_wait()?)
+        if let Some(child) = self.get(uuid) {
+            let child = child.write().await;
+            let status = child.current_child.write().await.try_wait()?;
+            Ok(status)
         } else {
             Ok(None)
         }
     }
 
     // Gets all PID keys of running children
-    pub async fn running_keys(&self) -> crate::Result<Vec<u32>> {
+    pub async fn running_keys(&self) -> crate::Result<Vec<Uuid>> {
         let mut keys = Vec::new();
         for key in self.keys() {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
-                let mut child = child.write().await;
-                if child.child.try_wait()?.is_none() {
+                let child = child.write().await;
+                if child.current_child.write().await.try_wait()?.is_none() {
                     keys.push(key);
                 }
             }
@@ -111,7 +210,7 @@ impl Children {
     pub async fn running_keys_with_profile(
         &self,
         profile_path: &Path,
-    ) -> crate::Result<Vec<u32>> {
+    ) -> crate::Result<Vec<Uuid>> {
         let running_keys = self.running_keys().await?;
         let mut keys = Vec::new();
         for key in running_keys {
@@ -132,8 +231,8 @@ impl Children {
         for key in self.keys() {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
-                let mut child = child.write().await;
-                if child.child.try_wait()?.is_none() {
+                let child = child.write().await;
+                if child.current_child.write().await.try_wait()?.is_none() {
                     profiles.push(child.profile_path.clone());
                 }
             }
@@ -148,8 +247,8 @@ impl Children {
         for key in self.keys() {
             if let Some(child) = self.get(&key) {
                 let child = child.clone();
-                let mut child = child.write().await;
-                if child.child.try_wait()?.is_none() {
+                let child = child.write().await;
+                if child.current_child.write().await.try_wait()?.is_none() {
                     if let Some(prof) =
                         crate::api::profile::get(&child.profile_path.clone())
                             .await?

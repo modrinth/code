@@ -44,6 +44,12 @@ export async function validate_globals() {
   return await invoke('jre_validate_globals')
 }
 
+// Gets java version from a specific path by trying to run 'java -version' on it.
+// This also validates it, as it returns null if no valid java version is found at the path
+export async function get_jre(path) {
+  return await invoke('jre_get_jre', { path })
+}
+
 // Gets key for the optimal JRE to use, for a given profile path
 // The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
 export async function get_optimal_jre_key_by_path(path) {
@@ -52,7 +58,7 @@ export async function get_optimal_jre_key_by_path(path) {
 
 // Gets key for the optimal JRE to use, for a given profile
 // The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
-export async function get_optimal_jre_ke(path) {
+export async function get_optimal_jre_key(path) {
   return await invoke('jre_get_optimal_jre_key', { path })
 }
 

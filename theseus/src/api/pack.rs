@@ -1,12 +1,13 @@
 use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
+use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
+use crate::event::LoadingBarType;
 use crate::state::{ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
 use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
-use futures::TryStreamExt;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -79,6 +80,7 @@ pub async fn install_pack_from_version_id(
         Method::GET,
         &format!("{}version/{}", MODRINTH_API_URL, version_id),
         None,
+        None,
         &state.io_semaphore,
     )
     .await?;
@@ -103,6 +105,7 @@ pub async fn install_pack_from_version_id(
     let project: ModrinthProject = fetch_json(
         Method::GET,
         &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
+        None,
         None,
         &state.io_semaphore,
     )
@@ -131,19 +134,20 @@ pub async fn install_pack_from_version_id(
         None
     };
 
-    install_pack(file, icon, Some(version.project_id)).await
+    install_pack(file, icon, Some(version.project_id), Some(version.id)).await
 }
 
 pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
     let file = fs::read(path).await?;
 
-    install_pack(bytes::Bytes::from(file), None, None).await
+    install_pack(bytes::Bytes::from(file), None, None, None).await
 }
 
 async fn install_pack(
     file: bytes::Bytes,
     icon: Option<PathBuf>,
     project_id: Option<String>,
+    version_id: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = &State::get().await?;
 
@@ -213,24 +217,41 @@ async fn install_pack(
             .into());
         };
 
+        let pack_name = pack.name.clone();
         let profile = crate::api::profile_create::profile_create(
             pack.name,
             game_version.clone(),
             mod_loader.unwrap_or(ModLoader::Vanilla),
             loader_version,
             icon,
-            project_id,
+            project_id.clone(),
         )
         .await?;
 
+        let loading_bar = init_loading(
+            LoadingBarType::PackDownload {
+                pack_name,
+                pack_id: project_id,
+                pack_version: version_id,
+            },
+            100.0,
+            "Downloading modpack...",
+        )
+        .await?;
+        let num_files = pack.files.len();
         use futures::StreamExt;
-        futures::stream::iter(pack.files.into_iter())
-            .map(Ok::<PackFile, crate::Error>)
-            .try_for_each_concurrent(None, |project| {
+        loading_try_for_each_concurrent(
+            futures::stream::iter(pack.files.into_iter())
+                .map(Ok::<PackFile, crate::Error>),
+            None,
+            Some(&loading_bar),
+            100.0,
+            num_files,
+            None,
+            |project| {
                 let profile = profile.clone();
-
                 async move {
-                    // TODO: Future update: prompt user for optional files in a modpack
+                    //TODO: Future update: prompt user for optional files in a modpack
                     if let Some(env) = project.env {
                         if env
                             .get(&EnvType::Client)
@@ -264,11 +285,11 @@ async fn install_pack(
                             _ => {}
                         };
                     }
-
                     Ok(())
                 }
-            })
-            .await?;
+            },
+        )
+        .await?;
 
         let extract_overrides = |overrides: String| async {
             let reader = Cursor::new(&file);

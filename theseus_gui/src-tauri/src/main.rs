@@ -9,7 +9,8 @@ mod api;
 
 // Should be called in launcher initialization
 #[tauri::command]
-async fn initialize_state() -> api::Result<()> {
+async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
+    theseus::EventState::init(app).await?;
     State::get().await?;
     Ok(())
 }
@@ -23,6 +24,10 @@ fn main() {
             api::profile::profile_remove,
             api::profile::profile_get,
             api::profile::profile_list,
+            api::profile::profile_add_project_from_version,
+            api::profile::profile_add_project_from_path,
+            api::profile::profile_toggle_disable_project,
+            api::profile::profile_remove_project,
             api::profile::profile_run,
             api::profile::profile_run_wait,
             api::profile::profile_run_credentials,
@@ -53,17 +58,21 @@ fn main() {
             api::jre::jre_validate_globals,
             api::jre::jre_get_optimal_jre_key,
             api::jre::jre_get_optimal_jre_key_by_path,
-            api::process::process_get_all_pids,
-            api::process::process_get_all_running_pids,
-            api::process::process_get_pids_by_profile_path,
+            api::jre::jre_get_jre,
+            api::process::process_get_all_uuids,
+            api::process::process_get_all_running_uuids,
+            api::process::process_get_uuids_by_profile_path,
             api::process::process_get_all_running_profile_paths,
             api::process::process_get_all_running_profiles,
-            api::process::process_get_exit_status_by_pid,
-            api::process::process_has_finished_by_pid,
-            api::process::process_get_stderr_by_pid,
-            api::process::process_get_stdout_by_pid,
-            api::process::process_kill_by_pid,
-            api::process::process_wait_for_by_pid,
+            api::process::process_get_exit_status_by_uuid,
+            api::process::process_has_finished_by_uuid,
+            api::process::process_get_stderr_by_uuid,
+            api::process::process_get_stdout_by_uuid,
+            api::process::process_kill_by_uuid,
+            api::process::process_wait_for_by_uuid,
+            api::metadata::metadata_get_game_versions,
+            api::metadata::metadata_get_fabric_versions,
+            api::metadata::metadata_get_forge_versions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

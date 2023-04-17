@@ -2,37 +2,40 @@ use std::path::{Path, PathBuf};
 
 use crate::api::Result;
 use theseus::prelude::*;
+use uuid::Uuid;
 
-// Checks if a process has finished by process PID
+// Checks if a process has finished by process UUID
 #[tauri::command]
-pub async fn process_has_finished_by_pid(pid: u32) -> Result<bool> {
-    Ok(process::has_finished_by_pid(pid).await?)
+pub async fn process_has_finished_by_uuid(uuid: Uuid) -> Result<bool> {
+    Ok(process::has_finished_by_uuid(&uuid).await?)
 }
 
-// Gets process exit status by process PID
+// Gets process exit status by process UUID
 #[tauri::command]
-pub async fn process_get_exit_status_by_pid(pid: u32) -> Result<Option<i32>> {
-    Ok(process::get_exit_status_by_pid(pid).await?)
+pub async fn process_get_exit_status_by_uuid(
+    uuid: Uuid,
+) -> Result<Option<i32>> {
+    Ok(process::get_exit_status_by_uuid(&uuid).await?)
 }
 
-// Gets all process PIDs
+// Gets all process UUIDs
 #[tauri::command]
-pub async fn process_get_all_pids() -> Result<Vec<u32>> {
-    Ok(process::get_all_pids().await?)
+pub async fn process_get_all_uuids() -> Result<Vec<Uuid>> {
+    Ok(process::get_all_uuids().await?)
 }
 
-// Gets all running process PIDs
+// Gets all running process UUIDs
 #[tauri::command]
-pub async fn process_get_all_running_pids() -> Result<Vec<u32>> {
-    Ok(process::get_all_running_pids().await?)
+pub async fn process_get_all_running_uuids() -> Result<Vec<Uuid>> {
+    Ok(process::get_all_running_uuids().await?)
 }
 
-// Gets all process PIDs by profile path
+// Gets all process UUIDs by profile path
 #[tauri::command]
-pub async fn process_get_pids_by_profile_path(
+pub async fn process_get_uuids_by_profile_path(
     profile_path: &Path,
-) -> Result<Vec<u32>> {
-    Ok(process::get_pids_by_profile_path(profile_path).await?)
+) -> Result<Vec<Uuid>> {
+    Ok(process::get_uuids_by_profile_path(profile_path).await?)
 }
 
 // Gets the Profile paths of each *running* stored process in the state
@@ -47,26 +50,26 @@ pub async fn process_get_all_running_profiles() -> Result<Vec<Profile>> {
     Ok(process::get_all_running_profiles().await?)
 }
 
-// Gets process stderr by process PID
+// Gets process stderr by process UUID
 #[tauri::command]
-pub async fn process_get_stderr_by_pid(pid: u32) -> Result<String> {
-    Ok(process::get_stderr_by_pid(pid).await?)
+pub async fn process_get_stderr_by_uuid(uuid: Uuid) -> Result<String> {
+    Ok(process::get_stderr_by_uuid(&uuid).await?)
 }
 
-// Gets process stdout by process PID
+// Gets process stdout by process UUID
 #[tauri::command]
-pub async fn process_get_stdout_by_pid(pid: u32) -> Result<String> {
-    Ok(process::get_stdout_by_pid(pid).await?)
+pub async fn process_get_stdout_by_uuid(uuid: Uuid) -> Result<String> {
+    Ok(process::get_stdout_by_uuid(&uuid).await?)
 }
 
-// Kill a process by process PID
+// Kill a process by process UUID
 #[tauri::command]
-pub async fn process_kill_by_pid(pid: u32) -> Result<()> {
-    Ok(process::kill_by_pid(pid).await?)
+pub async fn process_kill_by_uuid(uuid: Uuid) -> Result<()> {
+    Ok(process::kill_by_uuid(&uuid).await?)
 }
 
-// Wait for a process to finish by process PID
+// Wait for a process to finish by process UUID
 #[tauri::command]
-pub async fn process_wait_for_by_pid(pid: u32) -> Result<()> {
-    Ok(process::wait_for_by_pid(pid).await?)
+pub async fn process_wait_for_by_uuid(uuid: Uuid) -> Result<()> {
+    Ok(process::wait_for_by_uuid(&uuid).await?)
 }

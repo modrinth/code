@@ -4,9 +4,9 @@ import { RouterView, RouterLink } from 'vue-router'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
+  HomeIcon,
   SearchIcon,
-  BookIcon,
-  ClientIcon,
+  LibraryIcon,
   PlusIcon,
   SettingsIcon,
 } from 'omorphia'
@@ -35,9 +35,9 @@ list().then(
           <AccountsCard ref="accounts" />
         </suspense>
         <div class="pages-list">
-          <RouterLink to="/" class="button-base nav-button"><ClientIcon /></RouterLink>
+          <RouterLink to="/" class="button-base nav-button"><HomeIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
-          <RouterLink to="/library" class="button-base nav-button"> <BookIcon /></RouterLink>
+          <RouterLink to="/library" class="button-base nav-button"> <LibraryIcon /></RouterLink>
           <button color="primary" class="button-base primary nav-button" icon-only>
             <PlusIcon />
           </button>

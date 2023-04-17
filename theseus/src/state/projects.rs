@@ -1,9 +1,10 @@
 //! Project management + inference
 
-use crate::config::{MODRINTH_API_URL, REQWEST_CLIENT};
-use crate::util::fetch::write_cached_icon;
+use crate::config::MODRINTH_API_URL;
+use crate::util::fetch::{fetch_json, write_cached_icon};
 use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
+use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use sha2::Digest;
@@ -13,12 +14,51 @@ use tokio::io::AsyncReadExt;
 use tokio::sync::{RwLock, Semaphore};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "lowercase")]
+pub enum ProjectType {
+    Mod,
+    DataPack,
+    ResourcePack,
+    ShaderPack,
+}
+
+impl ProjectType {
+    pub fn get_from_loaders(loaders: Vec<String>) -> Option<Self> {
+        if loaders
+            .iter()
+            .any(|x| ["fabric", "forge", "quilt"].contains(&&**x))
+        {
+            Some(ProjectType::Mod)
+        } else if loaders.iter().any(|x| x == "datapack") {
+            Some(ProjectType::DataPack)
+        } else if loaders.iter().any(|x| ["iris", "optifine"].contains(&&**x)) {
+            Some(ProjectType::ShaderPack)
+        } else if loaders
+            .iter()
+            .any(|x| ["vanilla", "canvas", "minecraft"].contains(&&**x))
+        {
+            Some(ProjectType::ResourcePack)
+        } else {
+            None
+        }
+    }
+
+    pub fn get_folder(&self) -> &'static str {
+        match self {
+            ProjectType::Mod => "mods",
+            ProjectType::DataPack => "datapacks",
+            ProjectType::ResourcePack => "resourcepacks",
+            ProjectType::ShaderPack => "shaderpacks",
+        }
+    }
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Project {
     pub sha512: String,
     pub disabled: bool,
     pub metadata: ProjectMetadata,
     pub file_name: String,
-    pub update_available: bool,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -223,19 +263,20 @@ pub async fn infer_data_from_files(
         file_path_hashes.insert(hash, path.clone());
     }
 
-    let files: HashMap<String, ModrinthVersion> = REQWEST_CLIENT
-        .post(format!("{}version_files", MODRINTH_API_URL))
-        .json(&json!({
+    let files: HashMap<String, ModrinthVersion> = fetch_json(
+        Method::POST,
+        &format!("{}version_files", MODRINTH_API_URL),
+        None,
+        Some(json!({
             "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
             "algorithm": "sha512",
-        }))
-        .send()
-        .await?
-        .json()
-        .await?;
-
-    let projects: Vec<ModrinthProject> = REQWEST_CLIENT
-        .get(format!(
+        })),
+        io_semaphore,
+    )
+    .await?;
+    let projects: Vec<ModrinthProject> = fetch_json(
+        Method::GET,
+        &format!(
             "{}projects?ids={}",
             MODRINTH_API_URL,
             serde_json::to_string(
@@ -244,27 +285,32 @@ pub async fn infer_data_from_files(
                     .map(|x| x.project_id.clone())
                     .collect::<Vec<_>>()
             )?
-        ))
-        .send()
-        .await?
-        .json()
-        .await?;
+        ),
+        None,
+        None,
+        io_semaphore,
+    )
+    .await?;
 
-    let teams: Vec<ModrinthTeamMember> = REQWEST_CLIENT
-        .get(format!(
+    let teams: Vec<ModrinthTeamMember> = fetch_json::<
+        Vec<Vec<ModrinthTeamMember>>,
+    >(
+        Method::GET,
+        &format!(
             "{}teams?ids={}",
             MODRINTH_API_URL,
             serde_json::to_string(
                 &projects.iter().map(|x| x.team.clone()).collect::<Vec<_>>()
             )?
-        ))
-        .send()
-        .await?
-        .json::<Vec<Vec<ModrinthTeamMember>>>()
-        .await?
-        .into_iter()
-        .flatten()
-        .collect();
+        ),
+        None,
+        None,
+        io_semaphore,
+    )
+    .await?
+    .into_iter()
+    .flatten()
+    .collect();
 
     let mut return_projects = HashMap::new();
     let mut further_analyze_projects: Vec<(String, PathBuf)> = Vec::new();
@@ -297,7 +343,6 @@ pub async fn infer_data_from_files(
                             members: team_members,
                         },
                         file_name,
-                        update_available: false,
                     },
                 );
                 continue;
@@ -326,7 +371,6 @@ pub async fn infer_data_from_files(
                     disabled: path.ends_with(".disabled"),
                     metadata: ProjectMetadata::Unknown,
                     file_name,
-                    update_available: false,
                 },
             );
             continue;
@@ -380,7 +424,6 @@ pub async fn infer_data_from_files(
                                 sha512: hash,
                                 disabled: path.ends_with(".disabled"),
                                 file_name,
-                                update_available: false,
                                 metadata: ProjectMetadata::Inferred {
                                     title: Some(
                                         pack.display_name
@@ -447,7 +490,6 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
-                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(if pack.name.is_empty() {
                                     pack.modid
@@ -513,7 +555,6 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
-                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(pack.name.unwrap_or(pack.id)),
                                 description: pack.description,
@@ -579,7 +620,6 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
-                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(
                                     pack.metadata
@@ -615,7 +655,7 @@ pub async fn infer_data_from_files(
             .file()
             .entries()
             .iter()
-            .position(|f| f.entry().filename() == "pack.mcdata");
+            .position(|f| f.entry().filename() == "pack.mcmeta");
         if let Some(index) = zip_index_option {
             let file = zip_file_reader.file().entries().get(index).unwrap();
             #[derive(Deserialize)]
@@ -645,7 +685,6 @@ pub async fn infer_data_from_files(
                             sha512: hash,
                             disabled: path.ends_with(".disabled"),
                             file_name,
-                            update_available: false,
                             metadata: ProjectMetadata::Inferred {
                                 title: None,
                                 description: pack.description,
@@ -666,7 +705,6 @@ pub async fn infer_data_from_files(
                 sha512: hash,
                 disabled: path.ends_with(".disabled"),
                 file_name,
-                update_available: false,
                 metadata: ProjectMetadata::Unknown,
             },
         );
