@@ -256,7 +256,7 @@ pub async fn run_credentials(
     .await?;
     let pre_launch_hooks =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
-    for hook in pre_launch_hooks.iter() {
+    if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
@@ -336,6 +336,23 @@ pub async fn run_credentials(
 
     let env_args = &settings.custom_env_args;
 
+    // Post post exit hooks
+    let post_exit_hook =
+        &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
+
+    let post_exit_hook = if let Some(hook) = post_exit_hook {
+        let mut cmd = hook.split(' ');
+        if let Some(command) = cmd.next() {
+            let mut command = Command::new(command);
+            command.args(&cmd.collect::<Vec<&str>>()).current_dir(path);
+            Some(command)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
     let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
@@ -347,20 +364,10 @@ pub async fn run_credentials(
         &memory,
         &resolution,
         credentials,
+        post_exit_hook,
         &profile,
     )
     .await?;
 
-    // Insert child into state
-    let mut state_children = state.children.write().await;
-    let pid = mc_process.id().ok_or_else(|| {
-        crate::ErrorKind::LauncherError(
-            "Process failed to stay open.".to_string(),
-        )
-    })?;
-    let mchild_arc = state_children
-        .insert_process(pid, path.to_path_buf(), mc_process)
-        .await?;
-
-    Ok(mchild_arc)
+    Ok(mc_process)
 }

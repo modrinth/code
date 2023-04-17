@@ -1,10 +1,13 @@
 //! Logic for launching Minecraft
-use crate::{process, state as st};
+use crate::{
+    process,
+    state::{self as st, MinecraftChild},
+};
 use daedalus as d;
 use dunce::canonicalize;
 use st::Profile;
-use std::{path::Path, process::Stdio};
-use tokio::process::{Child, Command};
+use std::{path::Path, process::Stdio, sync::Arc};
+use tokio::process::Command;
 
 mod args;
 
@@ -58,8 +61,9 @@ pub async fn launch_minecraft(
     memory: &st::MemorySettings,
     resolution: &st::WindowSize,
     credentials: &auth::Credentials,
+    post_exit_hook: Option<Command>,
     profile: &Profile, // optional ref to Profile for event tracking
-) -> crate::Result<Child> {
+) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
     let state = st::State::get().await?;
     let instance_path = &canonicalize(instance_path)?;
 
@@ -182,10 +186,10 @@ pub async fn launch_minecraft(
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
     let existing_processes =
-        process::get_pids_by_profile_path(instance_path).await?;
-    if let Some(pid) = existing_processes.first() {
+        process::get_uuids_by_profile_path(instance_path).await?;
+    if let Some(uuid) = existing_processes.first() {
         return Err(crate::ErrorKind::LauncherError(format!(
-            "Profile {} is already running at PID: {pid}",
+            "Profile {} is already running at UUID: {uuid}",
             instance_path.display()
         ))
         .as_error());
@@ -233,12 +237,15 @@ pub async fn launch_minecraft(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    command.spawn().map_err(|err| {
-        crate::ErrorKind::LauncherError(format!(
-            "Error running Minecraft (minecraft-{} @ {}): {err}",
-            &version.id,
-            instance_path.display()
-        ))
-        .as_error()
-    })
+    // Create Minecraft child by inserting it into the state
+    // This also spawns the process and prepares the subsequent processes
+    let mut state_children = state.children.write().await;
+    state_children
+        .insert_process(
+            uuid::Uuid::new_v4(),
+            instance_path.to_path_buf(),
+            command,
+            post_exit_hook,
+        )
+        .await
 }
