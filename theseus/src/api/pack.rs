@@ -229,8 +229,8 @@ async fn install_pack(
         .await?;
 
         let loading_bar = init_loading(
-            LoadingBarType::PackDownload { 
-                pack_name ,
+            LoadingBarType::PackDownload {
+                pack_name,
                 pack_id: project_id,
                 pack_version: version_id,
             },

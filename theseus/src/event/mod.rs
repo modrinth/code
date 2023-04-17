@@ -93,7 +93,7 @@ pub enum LoadingBarType {
         pack_name: String,
         pack_id: Option<String>,
         pack_version: Option<String>,
-    }, 
+    },
     MinecraftDownload {
         profile_uuid: Uuid,
         profile_name: String,
@@ -121,11 +121,11 @@ pub struct ProcessPayload {
     pub event: ProcessPayloadType,
     pub message: String,
 }
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Debug)]
 pub enum ProcessPayloadType {
     Launched,
-    // Finishing, // TODO: process restructing incoming, currently this is never emitted
-    // Finished, // TODO: process restructing incoming, currently this is never emitted
+    Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process
+    Finished,
 }
 
 #[derive(Serialize, Clone)]

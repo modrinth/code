@@ -33,6 +33,9 @@ pub enum TheseusSerializableError {
 
     #[error("No profile found at {0}")]
     NoProfileFound(String),
+
+    #[error("Improperly formatted environment variables: {0}")]
+    BadEnvVars(String),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -74,4 +77,5 @@ impl_serialize! {
     Theseus,
     IO,
     NoProfileFound,
+    BadEnvVars,
 }

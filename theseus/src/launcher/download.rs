@@ -33,7 +33,7 @@ pub async fn download_minecraft(
         LoadingBarType::MinecraftDownload {
             // If we are downloading minecraft for a profile, provide its name and uuid
             profile_name: profile.metadata.name.clone(),
-            profile_uuid:  profile.uuid,
+            profile_uuid: profile.uuid,
         },
         100.0,
         "Downloading Minecraft...",

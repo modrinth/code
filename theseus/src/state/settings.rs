@@ -1,6 +1,6 @@
 //! Theseus settings file
 use serde::{Deserialize, Serialize};
-use std::{collections::HashSet, path::Path};
+use std::path::Path;
 use tokio::fs;
 
 use super::JavaGlobals;
@@ -13,6 +13,7 @@ const CURRENT_FORMAT_VERSION: u32 = 1;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 #[serde(default)]
 pub struct Settings {
+    pub theme: Theme,
     pub memory: MemorySettings,
     pub game_resolution: WindowSize,
     pub custom_java_args: Vec<String>,
@@ -27,6 +28,7 @@ pub struct Settings {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            theme: Theme::Dark,
             memory: MemorySettings::default(),
             game_resolution: WindowSize::default(),
             custom_java_args: Vec::new(),
@@ -74,6 +76,15 @@ impl Settings {
     }
 }
 
+/// Theseus theme
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Theme {
+    Dark,
+    Light,
+    Oled,
+}
+
 /// Minecraft memory settings
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct MemorySettings {
@@ -105,10 +116,10 @@ impl Default for WindowSize {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 #[serde(default)]
 pub struct Hooks {
-    #[serde(skip_serializing_if = "HashSet::is_empty")]
-    pub pre_launch: HashSet<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub pre_launch: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wrapper: Option<String>,
-    #[serde(skip_serializing_if = "HashSet::is_empty")]
-    pub post_exit: HashSet<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub post_exit: Option<String>,
 }
