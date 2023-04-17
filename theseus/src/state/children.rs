@@ -28,17 +28,6 @@ pub struct MinecraftChild {
     pub stderr: SharedOutput,
 }
 
-impl MinecraftChild {
-    pub async fn get_pid(&self) -> crate::Result<u32> {
-        self.current_child.read().await.id().ok_or_else(|| {
-            crate::ErrorKind::LauncherError(
-                "Process immediately failed, could not get PID".to_string(),
-            )
-            .into()
-        })
-    }
-}
-
 impl Children {
     pub fn new() -> Children {
         Children(HashMap::new())
@@ -46,13 +35,13 @@ impl Children {
 
     // Runs the command in process, inserts a child process to keep track of, and returns a reference to the container struct MinecraftChild
     // The threads for stdout and stderr are spawned here
-    // Unlike a Hashmap's 'insert', this directly returns the reference to the obj rather than any previously stored obj that may exist
+    // Unlike a Hashmap's 'insert', this directly returns the reference to the MinecraftChild rather than any previously stored MinecraftChild that may exist
     pub async fn insert_process(
         &mut self,
         uuid: Uuid,
         profile_path: PathBuf,
         mut mc_command: Command,
-        post_command: Option<Command>, // Commands to run after minecraft. It's plural in case we want to run more than one command in the future
+        post_command: Option<Command>, // Command to run after minecraft.
     ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
         let mut child = mc_command.spawn()?;
@@ -86,7 +75,7 @@ impl Children {
         let current_child = Arc::new(RwLock::new(child));
         let manager = Some(tokio::spawn(Self::sequential_process_manager(
             uuid,
-            post_command, // left as a vector in case we want to add more commands in the future
+            post_command,
             pid,
             current_child.clone(),
         )));
@@ -115,7 +104,7 @@ impl Children {
     }
 
     // Spawns a new child process and inserts it into the hashmap
-    // Also, as the process ends, it spawns the next command in the vector (hooked post-minecraft functions)
+    // Also, as the process ends, it spawns the follow-up process if it exists
     // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
     async fn sequential_process_manager(
         uuid: Uuid,
