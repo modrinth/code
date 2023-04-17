@@ -70,6 +70,9 @@ fn main() {
             api::process::process_get_stdout_by_uuid,
             api::process::process_kill_by_uuid,
             api::process::process_wait_for_by_uuid,
+            api::metadata::metadata_get_game_versions,
+            api::metadata::metadata_get_fabric_versions,
+            api::metadata::metadata_get_forge_versions,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
