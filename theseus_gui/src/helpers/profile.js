@@ -12,8 +12,8 @@ export async function addDefaultInstance() {
 
 /// Creates instance
 /// Returns a path to the profile created
-export async function create(name, game_version, modloader, loader_version, icon) {
-  return await invoke('profile_create', { name, game_version, modloader, loader_version, icon })
+export async function create(name, gameVersion, modloader, loaderVersion, icon) {
+  return await invoke('profile_create', { name, gameVersion, modloader, loaderVersion, icon })
 }
 
 // Remove a profile

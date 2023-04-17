@@ -12,6 +12,7 @@ import {
 } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
+import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { toggleTheme } from '@/helpers/theme'
 import { list } from '@/helpers/profile'
 
@@ -45,9 +46,17 @@ list().then(
           <RouterLink to="/" class="button-base nav-button"><HomeIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
           <RouterLink to="/library" class="button-base nav-button"> <LibraryIcon /></RouterLink>
-          <button color="primary" class="button-base primary nav-button" icon-only>
+          <button
+            color="primary"
+            class="button-base primary nav-button"
+            icon-only
+            @click="() => $refs.installationModal.show()"
+          >
             <PlusIcon />
           </button>
+          <Suspense>
+            <InstanceCreationModal ref="installationModal" />
+          </Suspense>
         </div>
       </div>
       <div class="settings pages-list">
