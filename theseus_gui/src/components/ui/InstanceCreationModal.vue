@@ -3,7 +3,7 @@
     <div v-if="showContent" class="modal-body">
       <div class="image-upload">
         <Avatar
-          :src="icon"
+          :src="display_icon"
           size="md"
           :rounded="true"
         />
@@ -62,6 +62,7 @@ import {get_game_versions, get_loaders} from '@/helpers/tags'
 import {create} from '@/helpers/profile'
 import {open} from '@tauri-apps/api/dialog'
 import {useRouter} from "vue-router";
+import {tauri} from "@tauri-apps/api";
 
 const router = useRouter()
 
@@ -72,6 +73,7 @@ const loader_version = ref('')
 const specified_loader_version = ref('')
 const showContent = ref(false)
 const icon = ref(null)
+const display_icon = ref(null)
 
 
 defineExpose({
@@ -111,21 +113,17 @@ const check_valid = computed(() => {
 })
 
 const create_instance = async () => {
-  try {
-    const loader_version_value = loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
-    const id = await create(
-      profile_name.value,
-      game_version.value,
-      loader.value,
-      loader_version_value,
-      icon.value
-    )
+  const loader_version_value = loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
+  const id = await create(
+    profile_name.value,
+    game_version.value,
+    loader.value,
+    loader_version_value,
+    icon.value
+  )
 
-    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
-    modal.value.hide()
-  } catch (e) {
-    console.error(e)
-  }
+  await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+  modal.value.hide()
 }
 
 const upload_icon = async () => {
@@ -136,10 +134,13 @@ const upload_icon = async () => {
       extensions: ['png', 'jpeg']
     }]
   })
+
+  display_icon.value = tauri.convertFileSrc(icon.value)
 }
 
 const reset_icon = () => {
   icon.value = null
+  display_icon.value = null
 }
 
 </script>
