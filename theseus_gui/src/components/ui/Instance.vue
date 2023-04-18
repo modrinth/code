@@ -17,6 +17,10 @@ const props = defineProps({
       return {}
     },
   },
+  load: {
+    type: Function,
+    default: () => {},
+  },
 })
 
 const confirmModal = ref(null)
@@ -37,6 +41,7 @@ const seeInstance = async () => {
 
 const install = async (e) => {
   e.stopPropagation()
+  props.load()
   const [data, versions] = await Promise.all([
     ofetch(
       `https://api.modrinth.com/v2/project/${
@@ -62,7 +67,7 @@ const install = async (e) => {
       !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
     ) {
       await pack_install(versions.value[0].id)
-      router.push('/')
+      router.go()
     } else confirmModal.value.show(versions.value[0].id)
   }
   // TODO: Add condition for installing a mod

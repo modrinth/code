@@ -22,6 +22,10 @@ const props = defineProps({
     default: '',
   },
   canPaginate: Boolean,
+  load: {
+    type: Function,
+    default: () => {},
+  },
 })
 const allowPagination = ref(false)
 const modsRow = ref(null)
@@ -74,6 +78,7 @@ const handleRightPage = () => {
         :key="instance?.project_id || instance?.metadata?.linked_project_id"
         display="card"
         :instance="instance"
+        :load="props.load"
         class="row-instance"
       />
     </section>

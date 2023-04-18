@@ -27,6 +27,8 @@ const getFeaturedMods = async () => {
   featuredMods.value = response.hits
 }
 
+const load = () => (loading.value = true)
+
 onMounted(async () => {
   loading.value = true
   await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
@@ -37,9 +39,19 @@ onMounted(async () => {
 <template>
   <AnimatedLogo v-if="loading" class="loader" />
   <div v-else class="page-container">
-    <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
-    <RowDisplay label="Popular packs" :instances="featuredModpacks" :can-paginate="true" />
-    <RowDisplay label="Popular mods" :instances="featuredMods" :can-paginate="true" />
+    <RowDisplay
+      label="Jump back in"
+      :instances="recentInstances"
+      :can-paginate="false"
+      :load="load"
+    />
+    <RowDisplay
+      label="Popular packs"
+      :instances="featuredModpacks"
+      :can-paginate="true"
+      :load="load"
+    />
+    <RowDisplay label="Popular mods" :instances="featuredMods" :can-paginate="true" :load="load" />
   </div>
 </template>
 
