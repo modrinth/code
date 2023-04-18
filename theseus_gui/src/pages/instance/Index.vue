@@ -10,9 +10,13 @@
           >
         </div>
         <span class="button-group">
-          <Button color="primary" class="instance-button" @click="run($route.params.id)">
+          <Button ref="playBtn" color="primary" class="instance-button" @click="startInstance">
             <PlayIcon />
             Play
+          </Button>
+          <Button ref="stopBtn" color="danger" class="instance-button" @click="stopInstance">
+            <XIcon />
+            Stop
           </Button>
           <Button class="instance-button" icon-only>
             <OpenFolderIcon />
@@ -41,15 +45,47 @@
   </div>
 </template>
 <script setup>
-import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from 'omorphia'
+import { BoxIcon, SettingsIcon, FileIcon, XIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
-import { get, run } from '@/helpers/profile'
+import { get } from '@/helpers/profile'
+import { get_all_running_uuids, kill_by_uuid } from '@/helpers/process'
 import { useRoute } from 'vue-router'
-import { shallowRef } from 'vue'
+import { shallowRef, ref, onMounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
+const uuid = ref(null)
+const playBtn = ref(null)
+const stopBtn = ref(null)
+
+onMounted(() => {
+  if (!uuid.value) {
+    playBtn.value.$el.style.display = 'flex'
+
+    stopBtn.value.$el.style.display = 'none'
+  } else {
+    playBtn.value.$el.style.display = 'none'
+    stopBtn.value.$el.style.display = 'flex'
+  }
+})
+
+const startInstance = async () => {
+  uuid.value = await run(route.params.id)
+  playBtn.value.innerHtml = `<span>Loading..</span>`
+  const runningUuids = await get_all_running_uuids()
+  if (runningUuids.includes(uuid.value)) {
+    playBtn.value.$el.innerHtml = `<PlayIcon />Play`
+    playBtn.value.$el.style.display = 'none'
+    stopBtn.value.$el.style.display = 'flex'
+  }
+}
+
+const stopInstance = async () => {
+  await kill_by_uuid(uuid.value)
+  stopBtn.value.$el.style.display = 'none'
+  playBtn.value.$el.style.display = 'flex'
+}
 </script>
 
 <style scoped lang="scss">
