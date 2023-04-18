@@ -47,7 +47,7 @@
 <script setup>
 import { BoxIcon, SettingsIcon, FileIcon, XIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
-import { get } from '@/helpers/profile'
+import { get, run } from '@/helpers/profile'
 import { get_all_running_uuids, kill_by_uuid } from '@/helpers/process'
 import { useRoute } from 'vue-router'
 import { shallowRef, ref, onMounted } from 'vue'
