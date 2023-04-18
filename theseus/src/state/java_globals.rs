@@ -37,11 +37,11 @@ impl JavaGlobals {
 
     // Validates that every path here is a valid Java version and that the version matches the version stored here
     // If false, when checked, the user should be prompted to reselect the Java version
-    pub fn is_all_valid(&self) -> bool {
+    pub async fn is_all_valid(&self) -> bool {
         for (_, java) in self.0.iter() {
             let jre = jre::check_java_at_filepath(
                 PathBuf::from(&java.path).as_path(),
-            );
+            ).await;
             if let Some(jre) = jre {
                 if jre.version != java.version {
                     return false;
