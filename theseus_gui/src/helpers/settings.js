@@ -46,6 +46,11 @@ export async function get() {
   return await invoke('settings_get')
 }
 
+// Get theme setting
+export async function getTheme() {
+  return await invoke('theme_get')
+}
+
 // Set full settings object
 export async function set(settings) {
   return await invoke('settings_set', { settings })

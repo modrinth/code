@@ -46,7 +46,11 @@ onBeforeMount(async () => {
 const detectJava17Modal = ref(null)
 const detectJava8Modal = ref(null)
 
-const handleTheme = (e) => themeStore.setThemeState(e.option.toLowerCase())
+const handleTheme = async (e) => {
+  themeStore.setThemeState(e.option.toLowerCase())
+  settings.value.theme = themeStore.selectedTheme
+  await set(settings.value)
+}
 const saveJavaPath = () => {}
 const saveSettings = async () => await set(settings.value)
 
@@ -149,8 +153,8 @@ const setJava8Install = (chosenInstall) => {
         <DropdownSelect
           name="Theme dropdown"
           :options="themeStore.themeOptions"
-          :default-value="themeStore.selectedTheme"
-          :model-value="themeStore.selectedTheme"
+          :default-value="settings.theme"
+          :model-value="settings.theme"
           class="theme-dropdown"
           @change="handleTheme"
         />

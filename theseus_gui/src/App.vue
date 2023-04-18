@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import {
   ChevronLeftIcon,
@@ -13,9 +13,15 @@ import {
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import { list } from '@/helpers/profile'
+import { getTheme } from '@/helpers/settings'
 
 const themeStore = useTheming()
-themeStore.setThemeClass()
+
+onMounted(async () => {
+  const storedTheme = await getTheme()
+  themeStore.setThemeState(storedTheme)
+})
+
 const installedMods = ref(0)
 list().then(
   (profiles) =>
@@ -245,6 +251,10 @@ list().then(
 }
 
 .settings {
+  svg {
+    color: var(--color-base) !important;
+  }
+
   a {
     display: flex;
     flex-direction: column;
