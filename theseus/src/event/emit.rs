@@ -230,7 +230,6 @@ macro_rules! loading_join {
             paste::paste! {
                 tokio::try_join! (
                     $( [ <unique_name $task>] ),+
-                    // $( $task ),+
                 )
             }
         }
