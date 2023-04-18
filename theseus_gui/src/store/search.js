@@ -36,7 +36,6 @@ export const useSearch = defineStore('searchStore', {
       formattedAndFacets = formattedAndFacets.slice(0, formattedAndFacets.length - 1)
       formattedAndFacets += ''
 
-      // TODO: fix me - ask jai
       // If orFacets are present, start building formatted orFacet filter
       let formattedOrFacets = ''
       if (this.orFacets.length > 0) {
