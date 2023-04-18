@@ -1,8 +1,11 @@
 <script setup>
-import { RouterLink } from 'vue-router'
-import { Card } from 'omorphia'
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { Card, XIcon } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { run } from '@/helpers/profile'
+import { kill_by_uuid } from '@/helpers/process'
 
 const props = defineProps({
   instance: {
@@ -12,22 +15,55 @@ const props = defineProps({
     },
   },
 })
+
+const stopBtn = ref(null)
+const playBtn = ref(null)
+
+const uuid = ref(null)
+
+const router = useRouter()
+
+const seeInstance = async () => {
+  const instancePath = `/instance/${encodeURIComponent(props.instance.path)}`
+  await router.push(instancePath)
+}
+
+const play = async (e) => {
+  console.log('playing')
+  e.stopPropagation()
+  uuid.value = await run(props.instance.path)
+  console.log('uuid', uuid.value)
+
+  stopBtn.value.style.opacity = 1
+  stopBtn.value.style.bottom = '4.5rem'
+  stopBtn.value.style.display = 'flex'
+  playBtn.value.style.display = 'none'
+}
+
+const stop = async (e) => {
+  console.log('stopping')
+  e.stopPropagation()
+  await kill_by_uuid(uuid.value)
+  stopBtn.value.style.opacity = 0
+  stopBtn.value.style.bottom = '0'
+  stopBtn.value.style.display = 'none'
+  playBtn.value.style.display = 'flex'
+}
 </script>
 
 <template>
   <div>
-    <RouterLink :to="`/instance/${encodeURIComponent(props.instance.path)}`">
-      <Card class="instance-card-item">
-        <img :src="convertFileSrc(props.instance.metadata.icon)" alt="Trending mod card" />
-        <div class="project-info">
-          <p class="title">{{ props.instance.metadata.name }}</p>
-          <p class="description">
-            {{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}
-          </p>
-        </div>
-        <div class="cta"><PlayIcon /></div>
-      </Card>
-    </RouterLink>
+    <Card class="instance-card-item" @click="seeInstance">
+      <img :src="convertFileSrc(props.instance.metadata.icon)" alt="Trending mod card" />
+      <div class="project-info">
+        <p class="title">{{ props.instance.metadata.name }}</p>
+        <p class="description">
+          {{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}
+        </p>
+      </div>
+      <div ref="playBtn" class="install cta" @click="play"><PlayIcon /></div>
+      <div ref="stopBtn" class="stop cta" @click="stop"><XIcon /></div>
+    </Card>
   </div>
 </template>
 
@@ -43,18 +79,27 @@ const props = defineProps({
 
   &:hover {
     filter: brightness(0.85);
-    .cta {
+    .install {
       opacity: 1;
       bottom: 4.5rem;
     }
   }
 
+  .install {
+    background: var(--color-brand);
+    z-index: 55;
+    display: flex;
+  }
+  .stop {
+    background: var(--color-red);
+    z-index: 77;
+    display: none;
+  }
+
   .cta {
     position: absolute;
-    display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-brand);
     border-radius: var(--radius-lg);
     width: 3rem;
     height: 3rem;
