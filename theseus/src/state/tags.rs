@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 use tokio::sync::{RwLock, Semaphore};
 
 use crate::config::{BINCODE_CONFIG, MODRINTH_API_URL};
+use crate::event::LoadingBarId;
+use crate::loading_join;
 use crate::util::fetch::fetch_json;
 
 const CATEGORIES_DB_TREE: &[u8] = b"categories";
@@ -139,6 +141,7 @@ impl Tags {
     pub async fn fetch_update(
         &mut self,
         semaphore: &RwLock<Semaphore>,
+        loading_bar: Option<&LoadingBarId>,
     ) -> crate::Result<()> {
         let categories = format!("{MODRINTH_API_URL}tag/category");
         let loaders = format!("{MODRINTH_API_URL}tag/loader");
@@ -147,6 +150,50 @@ impl Tags {
         let donation_platforms =
             format!("{MODRINTH_API_URL}tag/donation_platform");
         let report_types = format!("{MODRINTH_API_URL}tag/report_type");
+
+        let categories_fut = fetch_json::<Vec<Category>>(
+            Method::GET,
+            &categories,
+            None,
+            None,
+            semaphore,
+        );
+        let loaders_fut = fetch_json::<Vec<Loader>>(
+            Method::GET,
+            &loaders,
+            None,
+            None,
+            semaphore,
+        );
+        let game_versions_fut = fetch_json::<Vec<GameVersion>>(
+            Method::GET,
+            &game_versions,
+            None,
+            None,
+            semaphore,
+        );
+        let licenses_fut = fetch_json::<Vec<License>>(
+            Method::GET,
+            &licenses,
+            None,
+            None,
+            semaphore,
+        );
+        let donation_platforms_fut = fetch_json::<Vec<DonationPlatform>>(
+            Method::GET,
+            &donation_platforms,
+            None,
+            None,
+            semaphore,
+        );
+        let report_types_fut = fetch_json::<Vec<String>>(
+            Method::GET,
+            &report_types,
+            None,
+            None,
+            semaphore,
+        );
+
         let (
             categories,
             loaders,
@@ -154,50 +201,14 @@ impl Tags {
             licenses,
             donation_platforms,
             report_types,
-        ) = tokio::try_join!(
-            fetch_json::<Vec<Category>>(
-                Method::GET,
-                &categories,
-                None,
-                None,
-                semaphore
-            ),
-            fetch_json::<Vec<Loader>>(
-                Method::GET,
-                &loaders,
-                None,
-                None,
-                semaphore
-            ),
-            fetch_json::<Vec<GameVersion>>(
-                Method::GET,
-                &game_versions,
-                None,
-                None,
-                semaphore
-            ),
-            fetch_json::<Vec<License>>(
-                Method::GET,
-                &licenses,
-                None,
-                None,
-                semaphore
-            ),
-            fetch_json::<Vec<DonationPlatform>>(
-                Method::GET,
-                &donation_platforms,
-                None,
-                None,
-                semaphore
-            ),
-            fetch_json::<Vec<String>>(
-                Method::GET,
-                &report_types,
-                None,
-                None,
-                semaphore
-            ),
-        )?;
+        ) = loading_join!(loading_bar, 0.5, None;
+            categories_fut,
+            loaders_fut,
+            game_versions_fut,
+            licenses_fut,
+            donation_platforms_fut,
+            report_types_fut
+        );
 
         // Store the tags in the database
         self.0.categories.insert(

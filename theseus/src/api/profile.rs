@@ -1,6 +1,7 @@
 //! Theseus profile management interface
 use crate::{
     auth::{self, refresh},
+    event::{emit::emit_profile, ProfilePayloadType},
     launcher::download,
     state::MinecraftChild,
 };
@@ -20,6 +21,17 @@ use tokio::{fs, process::Command, sync::RwLock};
 pub async fn remove(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get(path) {
+        emit_profile(
+            profile.uuid,
+            profile.path.clone(),
+            &profile.metadata.name,
+            ProfilePayloadType::Removed,
+        )
+        .await?;
+    }
+
     profiles.remove(path).await?;
 
     Ok(())
@@ -46,7 +58,17 @@ where
     let mut profiles = state.profiles.write().await;
 
     match profiles.0.get_mut(path) {
-        Some(ref mut profile) => action(profile).await,
+        Some(ref mut profile) => {
+            emit_profile(
+                profile.uuid,
+                profile.path.clone(),
+                &profile.metadata.name,
+                ProfilePayloadType::Edited,
+            )
+            .await?;
+
+            action(profile).await
+        }
         None => Err(crate::ErrorKind::UnmanagedProfileError(
             path.display().to_string(),
         )
@@ -67,19 +89,23 @@ pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>
 #[tracing::instrument]
 pub async fn sync(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
+    let result = {
+        let mut profiles: tokio::sync::RwLockWriteGuard<
+            crate::state::Profiles,
+        > = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(path) {
-        profile.sync().await?;
-        State::sync().await?;
-
-        Ok(())
-    } else {
-        Err(
-            crate::ErrorKind::UnmanagedProfileError(path.display().to_string())
-                .as_error(),
-        )
-    }
+        if let Some(profile) = profiles.0.get_mut(path) {
+            profile.sync().await?;
+            Ok(())
+        } else {
+            Err(crate::ErrorKind::UnmanagedProfileError(
+                path.display().to_string(),
+            )
+            .as_error())
+        }
+    };
+    State::sync().await?;
+    result
 }
 
 /// Add a project from a version
@@ -219,7 +245,7 @@ pub async fn run_credentials(
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == profile.metadata.game_version.as_ref())
+        .find(|it| it.id == profile.metadata.game_version)
         .ok_or_else(|| {
             crate::ErrorKind::LauncherError(format!(
                 "Invalid or unknown Minecraft version: {}",
@@ -234,7 +260,7 @@ pub async fn run_credentials(
     .await?;
     let pre_launch_hooks =
         &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
-    for hook in pre_launch_hooks.iter() {
+    if let Some(hook) = pre_launch_hooks {
         // TODO: hook parameters
         let mut cmd = hook.split(' ');
         if let Some(command) = cmd.next() {
@@ -314,6 +340,23 @@ pub async fn run_credentials(
 
     let env_args = &settings.custom_env_args;
 
+    // Post post exit hooks
+    let post_exit_hook =
+        &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
+
+    let post_exit_hook = if let Some(hook) = post_exit_hook {
+        let mut cmd = hook.split(' ');
+        if let Some(command) = cmd.next() {
+            let mut command = Command::new(command);
+            command.args(&cmd.collect::<Vec<&str>>()).current_dir(path);
+            Some(command)
+        } else {
+            None
+        }
+    } else {
+        None
+    };
+
     let mc_process = crate::launcher::launch_minecraft(
         &profile.metadata.game_version,
         &profile.metadata.loader_version,
@@ -325,18 +368,10 @@ pub async fn run_credentials(
         &memory,
         &resolution,
         credentials,
+        post_exit_hook,
+        &profile,
     )
     .await?;
 
-    // Insert child into state
-    let mut state_children = state.children.write().await;
-    let pid = mc_process.id().ok_or_else(|| {
-        crate::ErrorKind::LauncherError(
-            "Process failed to stay open.".to_string(),
-        )
-    })?;
-    let mchild_arc =
-        state_children.insert_process(pid, path.to_path_buf(), mc_process);
-
-    Ok(mchild_arc)
+    Ok(mc_process)
 }

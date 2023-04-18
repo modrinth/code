@@ -33,6 +33,8 @@ async fn main() -> theseus::Result<()> {
     // Initialize state
     let st = State::get().await?;
     st.settings.write().await.max_concurrent_downloads = 5;
+    st.settings.write().await.hooks.post_exit =
+        Some("echo This is after Minecraft runs- global setting!".to_string());
     // Changed the settings, so need to reset the semaphore
     st.reset_semaphore().await;
 
@@ -88,11 +90,11 @@ async fn main() -> theseus::Result<()> {
     // (ie: changing the java runtime of an added profile)
     println!("Editing.");
     profile::edit(&profile_path, |_profile| {
-        // Eg: Java- this would let you change the java runtime of the profile instead of using the default
-        // use theseus::prelude::jre::JAVA__KEY;
-        // profile.java = Some(JavaSettings {
-        // jre_key: Some(JAVA_17_KEY.to_string()),
-        //     extra_arguments: None,
+        // Add some hooks, for instance!
+        // profile.hooks = Some(Hooks {
+        //     pre_launch: Some("echo This is before Minecraft runs!".to_string()),
+        //     wrapper: None,
+        //     post_exit: None,
         // });
         async { Ok(()) }
     })
@@ -108,32 +110,25 @@ async fn main() -> theseus::Result<()> {
     println!("running");
     // Run a profile, running minecraft and store the RwLock to the process
     let proc_lock = profile::run(&canonicalize(&profile_path)?).await?;
+    let uuid = proc_lock.read().await.uuid;
+    let pid = proc_lock.read().await.current_child.read().await.id();
 
-    let pid = proc_lock
-        .read()
-        .await
-        .child
-        .id()
-        .expect("Could not get PID from process.");
-    println!("Minecraft PID: {}", pid);
+    println!("Minecraft UUID: {}", uuid);
+    println!("Minecraft PID: {:?}", pid);
 
     // Wait 5 seconds
     println!("Waiting 20 seconds to gather logs...");
     sleep(Duration::from_secs(20)).await;
-    let stdout = process::get_stdout_by_pid(pid).await?;
+    let stdout = process::get_stdout_by_uuid(&uuid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");
 
     println!(
-        "All running process PIDs {:?}",
-        process::get_all_running_pids().await?
+        "All running process UUID {:?}",
+        process::get_all_running_uuids().await?
     );
     println!(
         "All running process paths {:?}",
         process::get_all_running_profile_paths().await?
-    );
-    println!(
-        "All running process profiles {:?}",
-        process::get_all_running_profiles().await?
     );
 
     // hold the lock to the process until it ends
