@@ -8,7 +8,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
 import { run, list } from '@/helpers/profile'
-import { kill_by_pid } from '@/helpers/process'
+import { kill_by_uuid } from '@/helpers/process'
 
 const props = defineProps({
   instance: {
@@ -23,7 +23,7 @@ const confirmModal = ref(null)
 const stopBtn = ref(null)
 const playBtn = ref(null)
 
-const pid = ref(null)
+const uuid = ref(null)
 
 const router = useRouter()
 
@@ -70,7 +70,7 @@ const install = async (e) => {
 
 const play = async (e) => {
   e.stopPropagation()
-  pid.value = await run(props.instance.path)
+  uuid.value = await run(props.instance.path)
 
   stopBtn.value.style.opacity = 1
   stopBtn.value.style.bottom = '4.5rem'
@@ -80,7 +80,7 @@ const play = async (e) => {
 
 const stop = async (e) => {
   e.stopPropagation()
-  await kill_by_pid(pid.value)
+  await kill_by_uuid(uuid.value)
 
   stopBtn.value.style.opacity = 0
   stopBtn.value.style.bottom = '0'
