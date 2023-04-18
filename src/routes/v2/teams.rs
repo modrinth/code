@@ -90,7 +90,7 @@ pub async fn team_members_get(
 
     let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    if let Some(user) = current_user {
+    if let Some(user) = &current_user {
         let team_member =
             TeamMember::get_from_user_id(id.into(), user.id.into(), &**pool)
                 .await
@@ -106,9 +106,15 @@ pub async fn team_members_get(
         }
     }
 
+    let user_id = current_user.map(|x| x.id.into());
     let team_members: Vec<_> = members_data
         .into_iter()
-        .filter(|x| x.accepted)
+        .filter(|x| {
+            x.accepted
+                || user_id
+                    .map(|y: crate::database::models::UserId| y == x.user.id)
+                    .unwrap_or(false)
+        })
         .map(|data| crate::models::teams::TeamMember::from(data, true))
         .collect();
 

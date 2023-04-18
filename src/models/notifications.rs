@@ -18,12 +18,12 @@ pub struct NotificationId(pub u64);
 pub struct Notification {
     pub id: NotificationId,
     pub user_id: UserId,
-    #[serde(rename = "type")]
     pub read: bool,
     pub created: DateTime<Utc>,
     pub body: NotificationBody,
 
     // DEPRECATED: use body field instead
+    #[serde(rename = "type")]
     pub type_: Option<String>,
     pub title: String,
     pub text: String,
