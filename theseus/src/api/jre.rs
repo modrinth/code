@@ -144,5 +144,5 @@ pub async fn validate_globals() -> crate::Result<bool> {
 
 // Validates JRE at a given at a given path
 pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
-    Ok(jre::check_java_at_filepath(&path))
+    Ok(jre::check_java_at_filepath(&path).await)
 }

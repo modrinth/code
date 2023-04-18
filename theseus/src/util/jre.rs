@@ -1,13 +1,13 @@
 use dunce::canonicalize;
+use futures::prelude::*;
 use lazy_static::lazy_static;
 use regex::Regex;
 use serde::{Deserialize, Serialize};
-use tokio::task::JoinError;
 use std::env;
 use std::path::PathBuf;
 use std::process::Command;
 use std::{collections::HashSet, path::Path};
-use futures::prelude::*;
+use tokio::task::JoinError;
 
 #[cfg(target_os = "windows")]
 use winreg::{
@@ -52,9 +52,8 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"SOFTWARE\\Eclipse Foundation\\JDK", // Eclipse
         r"SOFTWARE\\Microsoft\\JDK",          // Microsoft
     ];
-    
-    for key in key_paths {
 
+    for key in key_paths {
         if let Ok(jre_key) = RegKey::predef(HKEY_LOCAL_MACHINE)
             .open_subkey_with_flags(key, KEY_READ | KEY_WOW64_32KEY)
         {
@@ -65,15 +64,15 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         {
             jre_paths.extend(get_paths_from_jre_winregkey(jre_key)?);
         }
-
     }
 
     // Get JRE versions from potential paths concurrently
-    let j = check_java_at_filepaths(jre_paths).await?.into_iter().collect();
+    let j = check_java_at_filepaths(jre_paths)
+        .await?
+        .into_iter()
+        .collect();
     Ok(j)
 }
-
-
 
 // Gets paths rather than search directly as RegKeys should not be passed asynchronously (do not impl Send)
 #[cfg(target_os = "windows")]
@@ -105,12 +104,12 @@ pub fn get_paths_from_jre_winregkey(
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations
 #[cfg(target_os = "macos")]
 #[tracing::instrument]
-pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
+pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     // Use HashSet to avoid duplicates
-    let mut jres = HashSet::new();
+    let mut jre_paths = HashSet::new();
 
     // Add JREs directly on PATH
-    jres.extend(get_all_jre_path()?);
+    jre_paths.extend(get_all_jre_path().await?);
 
     // Hard paths for locations for commonly installed .exes
     let java_paths = [
@@ -119,24 +118,22 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands",
     ];
     for path in java_paths {
-        if let Some(j) =
-            check_java_at_filepath(&PathBuf::from(path).join("bin"))
-        {
-            jres.insert(j);
-        }
+        jre_paths.insert(PathBuf::from(path));
     }
     // Iterate over JavaVirtualMachines/(something)/Contents/Home/bin
     let base_path = PathBuf::from("/Library/Java/JavaVirtualMachines/");
     if base_path.is_dir() {
         for entry in std::fs::read_dir(base_path)? {
             let entry = entry?.path().join("Contents/Home/bin");
-            if let Some(j) = check_java_at_filepath(entry.as_path()) {
-                jres.insert(j);
-            }
+            jre_paths.insert(entry);
         }
     }
-
-    Ok(jres.into_iter().collect())
+    // Get JRE versions from potential paths concurrently
+    let j = check_java_at_filepaths(jre_paths)
+        .await?
+        .into_iter()
+        .collect();
+    Ok(j)
 }
 
 // Entrypoint function (Linux)
@@ -193,17 +190,20 @@ const JAVA_BIN: &str = "java";
 // For each example filepath in 'paths', perform check_java_at_filepath, checking each one concurrently
 // and returning a JavaVersion for every valid path that points to a java bin
 #[tracing::instrument]
-pub async fn check_java_at_filepaths(paths : HashSet<PathBuf>) -> Result<HashSet<JavaVersion>, JREError> {
-    let jres = stream::iter(paths.into_iter()).map(|p : PathBuf| {
-        tokio::task::spawn( async move {
-            check_java_at_filepath(&p).await
+pub async fn check_java_at_filepaths(
+    paths: HashSet<PathBuf>,
+) -> Result<HashSet<JavaVersion>, JREError> {
+    let jres = stream::iter(paths.into_iter())
+        .map(|p: PathBuf| {
+            tokio::task::spawn(async move { check_java_at_filepath(&p).await })
         })
-    }).buffer_unordered(64).collect::<Vec<_>>().await;
+        .buffer_unordered(64)
+        .collect::<Vec<_>>()
+        .await;
 
-    let jres : Result<Vec<_>, JoinError> = jres.into_iter().collect();
-    Ok(jres?.into_iter().filter_map(|f|f).collect())
+    let jres: Result<Vec<_>, JoinError> = jres.into_iter().collect();
+    Ok(jres?.into_iter().flatten().collect())
 }
-
 
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
 // If no such path exists, or no such valid java at this path exists, returns None

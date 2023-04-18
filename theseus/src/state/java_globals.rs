@@ -41,7 +41,8 @@ impl JavaGlobals {
         for (_, java) in self.0.iter() {
             let jre = jre::check_java_at_filepath(
                 PathBuf::from(&java.path).as_path(),
-            ).await;
+            )
+            .await;
             if let Some(jre) = jre {
                 if jre.version != java.version {
                     return false;
