@@ -9,6 +9,7 @@ import {
   PlayIcon,
   Modal,
   CheckIcon,
+  XIcon,
   PlusIcon,
   SaveIcon,
   AnimatedLogo,
@@ -16,7 +17,7 @@ import {
 import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
-import { find_jre_8_jres, find_jre_17_jres } from '@/helpers/jre'
+import { find_jre_8_jres, find_jre_17_jres, get_jre } from '@/helpers/jre'
 import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
@@ -25,6 +26,13 @@ const loading = ref(false)
 const settings = ref({})
 const java8InstallOptions = ref([])
 const java17InstallOptions = ref([])
+const chosenInstallOptions = ref([])
+const browsingInstall = ref(0)
+
+const testingJava17 = ref(false)
+const java17Success = ref(null)
+const testingJava8 = ref(false)
+const java8Success = ref(null)
 
 onBeforeMount(async () => {
   loading.value = true
@@ -43,15 +51,24 @@ onBeforeMount(async () => {
 })
 
 // DOM refs
-const detectJava17Modal = ref(null)
-const detectJava8Modal = ref(null)
+const detectJavaModal = ref(null)
+// const detectJava17Modal = ref(null)
+// const detectJava8Modal = ref(null)
 
 const handleTheme = async (e) => {
   themeStore.setThemeState(e.option.toLowerCase())
   settings.value.theme = themeStore.selectedTheme
   await set(settings.value)
 }
-const saveJavaPath = () => {}
+
+const loadJavaModal = (version) => {
+  if (version === 17) chosenInstallOptions.value = [...java17InstallOptions.value]
+  else if (version === 8) chosenInstallOptions.value = [...java8InstallOptions.value]
+
+  browsingInstall.value = version
+  detectJavaModal.value.show()
+}
+
 const saveSettings = async () => await set(settings.value)
 
 const handleJava17FileInput = async () => {
@@ -69,74 +86,79 @@ const handleJava8FileInput = async () => {
   }
 }
 
-const setJava17Install = (chosenInstall) => {
-  settings.value.java_globals.JAVA_17 = chosenInstall
-  detectJava17Modal.value.hide()
+const handleJava17Test = async () => {
+  let result
+  testingJava17.value = true
+  setTimeout(async () => {
+    result = await get_jre(settings.value.java_globals.JAVA_17.path)
+    testingJava17.value = false
+    if (result) java17Success.value = true
+    else java17Success.value = false
+
+    setTimeout(() => {
+      java17Success.value = null
+    }, 2000)
+  }, 1000)
 }
-const setJava8Install = (chosenInstall) => {
-  settings.value.java_globals.JAVA_8 = chosenInstall
-  detectJava8Modal.value.hide()
+
+const handleJava8Test = async () => {
+  let result
+  testingJava8.value = true
+  setTimeout(async () => {
+    result = await get_jre(settings.value.java_globals.JAVA_8.path)
+    testingJava8.value = false
+    if (result) java8Success.value = true
+    else java8Success.value = false
+
+    setTimeout(() => {
+      java8Success.value = null
+    }, 2000)
+  }, 1000)
+}
+
+const setJavaInstall = (javaInstall) => {
+  if (browsingInstall.value === 17) settings.value.java_globals.JAVA_17 = javaInstall
+  else if (browsingInstall.value === 8) settings.value.java_globals.JAVA_8 = javaInstall
+  detectJavaModal.value.hide()
+  chosenInstallOptions.value = []
+  browsingInstall.value = 0
 }
 </script>
 
 <template>
   <AnimatedLogo v-if="loading" class="loading" />
   <div v-else style="margin-bottom: 3.5rem">
-    <Modal ref="detectJava17Modal" header="Auto Detect Java Version" class="auto-detect-modal">
+    <Modal ref="detectJavaModal" header="Auto Detect Java Version" class="auto-detect-modal">
       <div class="table-container">
         <div class="table-row table-head">
           <div class="table-cell table-text">Version</div>
           <div class="table-cell table-text">Path</div>
           <div class="table-cell table-text">Actions</div>
         </div>
-        <div
-          v-for="java17Install in java17InstallOptions"
-          :key="java17Install.path"
-          class="table-row"
-        >
+        <div v-for="javaInstall in chosenInstallOptions" :key="javaInstall.path" class="table-row">
           <div class="table-cell table-text">
-            <span>{{ java17Install.version }}</span>
+            <span>{{ javaInstall.version }}</span>
           </div>
           <div class="table-cell table-text">
-            <span>{{ java17Install.path }}</span>
+            <span>{{ javaInstall.path }}</span>
           </div>
           <div class="table-cell table-text manage">
             <Button
-              :disabled="settings.java_globals.JAVA_17.path === java17Install.path"
-              @click="() => setJava17Install(java17Install)"
+              :disabled="
+                settings.java_globals.JAVA_17.path === javaInstall.path ||
+                settings.java_globals.JAVA_8.path === javaInstall.path
+              "
+              class="select-btn"
+              @click="() => setJavaInstall(javaInstall)"
             >
-              <span v-if="settings.java_globals.JAVA_17.path === java17Install.path"
+              <span
+                v-if="
+                  settings.java_globals.JAVA_17.path === javaInstall.path ||
+                  settings.java_globals.JAVA_8.path === javaInstall.path
+                "
                 ><CheckIcon />Selected</span
               >
 
-              <span v-else><PlusIcon />Select</span>
-            </Button>
-          </div>
-        </div>
-      </div>
-    </Modal>
-    <Modal ref="detectJava8Modal" header="Auto Detect Java Version" class="auto-detect-modal">
-      <div class="table-container">
-        <div class="table-row table-head">
-          <div class="table-cell table-text">Version</div>
-          <div class="table-cell table-text">Path</div>
-          <div class="table-cell table-text">Actions</div>
-        </div>
-        <div v-for="java8Install in java8InstallOptions" :key="java8Install.path" class="table-row">
-          <div class="table-cell table-text">
-            {{ java8Install.version }}
-          </div>
-          <div class="table-cell table-text">
-            {{ java8Install.path }}
-          </div>
-          <div class="table-cell table-text manage">
-            <Button
-              :disabled="settings.java_globals.JAVA_8.path === java8Install.path"
-              @click="() => setJava8Install(java8Install)"
-            >
-              <span v-if="settings.java_globals.JAVA_8.path === java8Install.path"
-                ><CheckIcon />Selected</span
-              >
               <span v-else><PlusIcon />Select</span>
             </Button>
           </div>
@@ -172,7 +194,7 @@ const setJava8Install = (chosenInstall) => {
             placeholder="/path/to/java17"
           />
           <span class="installation-buttons">
-            <Button @click="() => detectJava17Modal.show()">
+            <Button @click="() => loadJavaModal(17)">
               <SearchIcon />
               Auto Detect
             </Button>
@@ -180,10 +202,19 @@ const setJava8Install = (chosenInstall) => {
               <BrowseIcon />
               Browse
             </Button>
-            <Button @click="saveJavaPath">
+            <Button @click="handleJava17Test">
               <PlayIcon />
               Test
             </Button>
+            <AnimatedLogo v-if="testingJava17 === true" class="testing-loader" />
+            <CheckIcon
+              v-else-if="java17Success === true && testingJava17 === false"
+              class="test-success"
+            />
+            <XIcon
+              v-else-if="java17Success === false && testingJava17 === false"
+              class="test-fail"
+            />
           </span>
         </div>
       </div>
@@ -197,7 +228,7 @@ const setJava8Install = (chosenInstall) => {
             placeholder="/path/to/java8"
           />
           <span class="installation-buttons">
-            <Button @click="() => detectJava8Modal.show()">
+            <Button @click="() => loadJavaModal(8)">
               <SearchIcon />
               Auto Detect
             </Button>
@@ -205,10 +236,16 @@ const setJava8Install = (chosenInstall) => {
               <BrowseIcon />
               Browse
             </Button>
-            <Button @click="saveJavaPath">
+            <Button @click="handleJava8Test">
               <PlayIcon />
               Test
             </Button>
+            <AnimatedLogo v-if="testingJava8 === true" class="testing-loader" />
+            <CheckIcon
+              v-else-if="java8Success === true && testingJava8 === false"
+              class="test-success"
+            />
+            <XIcon v-else-if="java8Success === false && testingJava8 === false" class="test-fail" />
           </span>
         </div>
       </div>
@@ -279,15 +316,15 @@ const setJava8Install = (chosenInstall) => {
       <div class="settings-group">
         <div class="toggle-setting">
           Pre Launch
-          <input ref="javaArgs" v-model="settings.hooks.pre_launch" type="text" class="input" />
+          <input v-model="settings.hooks.pre_launch" type="text" class="input" />
         </div>
         <div class="toggle-setting">
           Wrapper
-          <input ref="javaArgs" v-model="settings.hooks.wrapper" type="text" class="input" />
+          <input v-model="settings.hooks.wrapper" type="text" class="input" />
         </div>
         <div class="toggle-setting">
           Post Launch
-          <input ref="javaArgs" v-model="settings.hooks.post_exit" type="text" class="input" />
+          <input v-model="settings.hooks.post_exit" type="text" class="input" />
         </div>
       </div>
     </Card>
@@ -308,14 +345,26 @@ const setJava8Install = (chosenInstall) => {
 .auto-detect-modal {
   .modal-body {
     width: 45rem !important;
+    .header {
+      button {
+        padding: 0;
+        font-family: inherit;
+        background-color: transparent;
+        background-image: none;
+        color: inherit;
+        border: 0;
+        cursor: pointer;
+      }
+    }
+
     .content {
       padding: 1rem;
 
-      button {
-        // width: 100%;
-        // display: flex;
-        // align-items: center;
-        // justify-content: center;
+      .select-btn {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
 
         span {
           display: inherit;
@@ -462,6 +511,24 @@ const setJava8Install = (chosenInstall) => {
 
 .table-row:nth-child(even) .table-cell {
   background-color: var(--color-bg);
+}
+
+.testing-loader {
+  height: 1rem !important;
+  width: 1rem !important;
+
+  svg {
+    height: inherit !important;
+    width: inherit !important;
+  }
+}
+
+.test-success {
+  color: var(--color-green);
+}
+
+.test-fail {
+  color: var(--color-red);
 }
 
 .loading {
