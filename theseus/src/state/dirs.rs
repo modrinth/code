@@ -26,7 +26,6 @@ impl DirectoryInfo {
                 "Could not find valid config dir".to_string(),
             ))?;
 
-        dbg!(&config_dir);
         fs::create_dir_all(&config_dir).await.map_err(|err| {
             crate::ErrorKind::FSError(format!(
                 "Error creating Theseus config directory: {err}"
