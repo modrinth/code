@@ -74,8 +74,6 @@ pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
         })
         .collect::<Result<Vec<(String, String)>>>()?;
 
-    println!("{:?}", settings.theme);
-
     let backend_settings = Settings {
         theme: settings.theme,
         memory: settings.memory,

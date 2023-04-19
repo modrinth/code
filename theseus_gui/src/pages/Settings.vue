@@ -145,7 +145,7 @@ const setJava8Install = (chosenInstall) => {
     </Modal>
     <Card class="theming">
       <h2>Themes</h2>
-      <div class="toggle-setting" style="display: flex">
+      <div class="toggle-setting">
         <div class="description">
           <h3>Color theme</h3>
           <p>Change the global launcher color theme.</p>
@@ -219,7 +219,7 @@ const setJava8Install = (chosenInstall) => {
           v-model="settings.custom_java_args"
           type="text"
           class="input installation-input"
-          placeholder="-Xms10G -Xmx10G -XX:+UseG1GC -XX:+ParallelRefProcEnabled"
+          placeholder="Enter java arguments"
         />
       </div>
       <div class="settings-group">
@@ -228,7 +228,7 @@ const setJava8Install = (chosenInstall) => {
           v-model="settings.custom_env_args"
           type="text"
           class="input installation-input"
-          placeholder="ENV1=TEST ENV2=TEST2"
+          placeholder="Enter environment arguments"
         />
       </div>
       <hr class="card-divider" />
@@ -267,13 +267,10 @@ const setJava8Install = (chosenInstall) => {
       <div class="settings-group">
         <h3>Console</h3>
         <div class="toggle-setting">
-          Maximum Concurrent Downloads
-          <input
-            v-model="settings.max_concurrent_downloads"
-            type="number"
-            name="concurrent-downloads"
-            class="concurrent-downloads"
-          />
+          <span class="concurrent-downloads">
+            Maximum Concurrent Downloads
+            <Slider v-model="settings.max_concurrent_downloads" :min="1" :max="100" :step="1" />
+          </span>
         </div>
       </div>
     </Card>
@@ -305,8 +302,7 @@ const setJava8Install = (chosenInstall) => {
 
 .concurrent-downloads {
   min-height: 40px;
-  max-width: 4.2rem !important;
-  text-align: center;
+  width: 25rem !important;
 }
 
 .auto-detect-modal {
@@ -316,10 +312,10 @@ const setJava8Install = (chosenInstall) => {
       padding: 1rem;
 
       button {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        // width: 100%;
+        // display: flex;
+        // align-items: center;
+        // justify-content: center;
 
         span {
           display: inherit;
@@ -350,6 +346,12 @@ const setJava8Install = (chosenInstall) => {
   margin: 1rem;
   display: flex;
   flex-direction: column;
+}
+
+.theming {
+  .toggle-setting {
+    display: flex;
+  }
 }
 
 .theme-dropdown {

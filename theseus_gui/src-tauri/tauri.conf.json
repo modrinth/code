@@ -12,7 +12,9 @@
   },
   "tauri": {
     "allowlist": {
-      "all": true,
+      "dialog": {
+        "all": true
+      },
       "protocol": {
         "asset": true,
         "assetScope": ["$APPDATA/caches/icons/*"]
