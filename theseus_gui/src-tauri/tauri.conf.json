@@ -15,7 +15,11 @@
       "all": false,
       "protocol": {
         "asset": true,
-        "assetScope": ["$APPDATA/caches/icons/*"]
+        "assetScope": [
+          "$APPDATA/caches/icons/*",
+          "$APPCONFIG/caches/icons/*",
+          "$CONFIG/caches/icons/*"
+        ]
       },
       "window": {
         "create": true,
