@@ -140,12 +140,12 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 // Returns a Vec of unique JavaVersions from the PATH, and common Java locations
 #[cfg(target_os = "linux")]
 #[tracing::instrument]
-pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
+pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     // Use HashSet to avoid duplicates
-    let mut jres = HashSet::new();
+    let mut jre_paths = HashSet::new();
 
     // Add JREs directly on PATH
-    jres.extend(get_all_jre_path()?);
+    jre_paths.extend(get_all_jre_path().await?);
 
     // Hard paths for locations for commonly installed locations
     let java_paths = [
@@ -157,18 +157,15 @@ pub fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"/opt/jdks",
     ];
     for path in java_paths {
-        if let Some(j) =
-            check_java_at_filepath(&PathBuf::from(path).join("jre").join("bin"))
-        {
-            jres.insert(j);
-        }
-        if let Some(j) =
-            check_java_at_filepath(&PathBuf::from(path).join("bin"))
-        {
-            jres.insert(j);
-        }
+        jre_paths.insert(PathBuf::from(path).join("jre").join("bin"));
+        jre_paths.insert(PathBuf::from(path).join("bin"));
     }
-    Ok(jres.into_iter().collect())
+    // Get JRE versions from potential paths concurrently
+    let j = check_java_at_filepaths(jre_paths)
+        .await?
+        .into_iter()
+        .collect();
+    Ok(j)
 }
 
 // Gets all JREs from the PATH env variable
