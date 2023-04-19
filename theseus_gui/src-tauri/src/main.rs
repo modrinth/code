@@ -15,10 +15,24 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
+// cfg only on mac os
+#[cfg(target_os = "macos")]
+#[tauri::command]
+async fn get_css() -> api::Result<String> {
+    let css: &str = include_str!("../../src/assets/stylesheets/macFix.css");
+    Ok(css.to_string())
+}
+#[cfg(not(target_os = "macos"))]
+#[tauri::command]
+async fn get_css() -> api::Result<String> {
+    Ok("".to_string())
+}
+
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             initialize_state,
+            get_css,
             api::profile_create::profile_create_empty,
             api::profile_create::profile_create,
             api::profile::profile_remove,
