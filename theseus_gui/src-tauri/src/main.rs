@@ -19,7 +19,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
 #[cfg(target_os = "macos")]
 #[tauri::command]
-async fn get_css() -> api::Result<String> {
+async fn should_disable_mouseover() -> bool {
     use os_version::OsVersion;
     // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
     if let Ok(OsVersion::MacOS(mac_os)) = os_version::detect() {
@@ -31,24 +31,23 @@ async fn get_css() -> api::Result<String> {
         if let Ok(v) = version {
             if v.len() >= 2 && v[0] >= 12 && v[1] >= 3 {
                 // Mac os version is 12.3 or higher, we allow mouseover
-                return Ok("".to_string());
+                return false;
             }
         }
     }
-    // Mac os version is lower than 12.2 or unrecognizable, we return the css with disabled mouseover
-    Ok(include_str!("../../src/assets/stylesheets/macFix.css").to_string())
+    true
 }
 #[cfg(not(target_os = "macos"))]
 #[tauri::command]
-async fn get_css() -> api::Result<String> {
-    Ok("".to_string())
+async fn should_disable_mouseover() -> bool {
+    false
 }
 
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             initialize_state,
-            get_css,
+            should_disable_mouseover,
             api::profile_create::profile_create_empty,
             api::profile_create::profile_create,
             api::profile::profile_remove,
