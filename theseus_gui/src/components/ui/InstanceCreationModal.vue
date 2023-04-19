@@ -26,9 +26,14 @@
         <p class="input-label">Loader Version</p>
         <Chips v-model="loader_version" :items="['latest', 'stable', 'other']" />
       </div>
-      <div v-if="loader_version === 'other'" class="input-row">
-        <p class="input-label">Select Version</p>
-        <DropdownSelect v-model="specified_loader_version" :options="available_loader_versions" />
+      <div v-if="loader_version === 'other'">
+        <div v-if="game_version" class="input-row">
+          <p class="input-label">Select Version</p>
+          <DropdownSelect v-model="specified_loader_version" :options="selectable_versions" />
+        </div>
+        <div v-else class="input-row">
+          <p class="warning">Select a game version before you select a loader version</p>
+        </div>
       </div>
       <div class="input-row">
         <p class="input-label">Name</p>
@@ -56,6 +61,7 @@ import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
 import { useRouter } from 'vue-router'
 import { tauri } from '@tauri-apps/api'
+import { get_fabric_versions, get_forge_versions } from '@/helpers/metadata'
 
 const router = useRouter()
 
@@ -93,7 +99,6 @@ const loaders = ref(
       .map((item) => item.name)
   )
 )
-const available_loader_versions = ref(['latest', 'stable', 'other'])
 const modal = ref(null)
 
 const check_valid = computed(() => {
@@ -137,6 +142,24 @@ const reset_icon = () => {
   icon.value = null
   display_icon.value = null
 }
+
+const fabric_versions = ref(await get_fabric_versions())
+const forge_versions = ref(await get_forge_versions())
+
+console.log(fabric_versions.value.gameVersions)
+
+const selectable_versions = computed(() => {
+  if (game_version.value) {
+    if (loader.value === 'fabric') {
+      return fabric_versions.value.gameVersions[0].loaders.map((item) => item.id)
+    } else if (loader.value === 'forge') {
+      return forge_versions.value.gameVersions
+        .find((item) => item.id === game_version.value)
+        .loaders.map((item) => item.id)
+    }
+  }
+  return []
+})
 </script>
 
 <style scoped>
@@ -174,5 +197,9 @@ const reset_icon = () => {
   flex-direction: column;
   gap: 0.5rem;
   justify-content: center;
+}
+
+.warning {
+  font-style: italic;
 }
 </style>
