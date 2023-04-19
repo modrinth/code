@@ -16,11 +16,27 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 }
 
 // cfg only on mac os
+// disables mouseover and fixes a random crash error only fixed by recent versions of macos
 #[cfg(target_os = "macos")]
 #[tauri::command]
 async fn get_css() -> api::Result<String> {
-    let css: &str = include_str!("../../src/assets/stylesheets/macFix.css");
-    Ok(css.to_string())
+    use os_version::OsVersion;
+    // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
+    if let Ok(OsVersion::MacOS(mac_os)) = os_version::detect() {
+        let version = mac_os
+            .version
+            .split('.')
+            .map(|f| f.parse::<i32>())
+            .collect::<Result<Vec<i32>, _>>();
+        if let Ok(v) = version {
+            if v.len() >= 2 && v[0] >= 12 && v[1] >= 3 {
+                // Mac os version is 12.3 or higher, we allow mouseover
+                return Ok("".to_string());
+            }
+        }
+    }
+    // Mac os version is lower than 12.2 or unrecognizable, we return the css with disabled mouseover
+    Ok(include_str!("../../src/assets/stylesheets/macFix.css").to_string())
 }
 #[cfg(not(target_os = "macos"))]
 #[tauri::command]

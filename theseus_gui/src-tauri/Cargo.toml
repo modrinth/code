@@ -29,6 +29,8 @@ daedalus = {version = "0.1.15", features = ["bincode"] }
 url = "2.2"
 uuid = { version = "1.1", features = ["serde", "v4"] }
 
+os-version = "0.2.0"
+
 [features]
 # by default Tauri runs in production mode
 # when `tauri dev` runs it is executed with `cargo run --no-default-features` if `devPath` is an URL
