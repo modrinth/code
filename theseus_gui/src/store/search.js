@@ -36,27 +36,30 @@ export const useSearch = defineStore('searchStore', {
       formattedAndFacets = formattedAndFacets.slice(0, formattedAndFacets.length - 1)
       formattedAndFacets += ''
 
-      // TODO: fix me - ask jai
       // If orFacets are present, start building formatted orFacet filter
       let formattedOrFacets = ''
-      if (this.orFacets.length > 0 || this.activeVersions.length > 0) {
+      if (this.orFacets.length > 0) {
         formattedOrFacets += '['
-        // Aggregate normal orFacets
         this.orFacets.forEach((orF) => (formattedOrFacets += `"${orF}",`))
-
-        // Add version list to orFacets
-        if (this.activeVersions.length > 0)
-          this.activeVersions.forEach((ver) => (formattedOrFacets += `"versions:${ver}",`))
-
-        // Add environments to orFacets if enabled
-        if (this.environments.client)
-          formattedOrFacets += '"client_side:optional","client_side:required,"'
-        if (this.environments.server)
-          formattedOrFacets += '"server_side:optional","server_side:required,"'
-
         formattedOrFacets = formattedOrFacets.slice(0, formattedOrFacets.length - 1)
-        formattedOrFacets += ']'
+        formattedOrFacets += '],'
       }
+
+      // Snip normal orFacets and start version orFacets
+      if (this.activeVersions.length > 0) {
+        formattedOrFacets += '['
+        this.activeVersions.forEach((ver) => (formattedOrFacets += `"versions:${ver}",`))
+        formattedOrFacets = formattedOrFacets.slice(0, formattedOrFacets.length - 1)
+        formattedOrFacets += '],'
+      }
+
+      // Add environments to orFacets if enabled
+      if (this.environments.client)
+        formattedOrFacets += '["client_side:optional","client_side:required"]]'
+      if (this.environments.server)
+        formattedOrFacets += '["server_side:optional","server_side:required"]]'
+
+      formattedOrFacets = formattedOrFacets.slice(0, formattedOrFacets.length - 1)
 
       // Aggregate facet query string
       const facets = `&facets=[${formattedAndFacets}${

@@ -89,19 +89,23 @@ pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>
 #[tracing::instrument]
 pub async fn sync(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
+    let result = {
+        let mut profiles: tokio::sync::RwLockWriteGuard<
+            crate::state::Profiles,
+        > = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(path) {
-        profile.sync().await?;
-        State::sync().await?;
-
-        Ok(())
-    } else {
-        Err(
-            crate::ErrorKind::UnmanagedProfileError(path.display().to_string())
-                .as_error(),
-        )
-    }
+        if let Some(profile) = profiles.0.get_mut(path) {
+            profile.sync().await?;
+            Ok(())
+        } else {
+            Err(crate::ErrorKind::UnmanagedProfileError(
+                path.display().to_string(),
+            )
+            .as_error())
+        }
+    };
+    State::sync().await?;
+    result
 }
 
 /// Add a project from a version

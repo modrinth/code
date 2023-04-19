@@ -194,70 +194,53 @@ pub async fn emit_profile(
 // loading_join!(loading_bar, 0.1; task1, task2, task3)
 // This will await on each of the tasks, and as each completes, it will emit a loading event for 0.033, 0.066, 0.099, etc
 // This should function as a drop-in replacement for tokio::try_join_all! in most cases- except the function *itself* calls ? rather than needing it.
+#[macro_export]
+macro_rules! count {
+    () => (0usize);
+    ( $x:tt $($xs:tt)* ) => (1usize + $crate::count!($($xs)*));
+}
 #[cfg(feature = "tauri")]
 #[macro_export]
 macro_rules! loading_join {
-    ($key:expr, $total:expr, $message:expr; $($future:expr $(,)?)+) => {{
-            let mut num_futures = 0;
-            $(
-                {
-                    let _ = &$future; // useless to allow matching to $future
-                    num_futures += 1;
-                }
-            )*
+    ($key:expr, $total:expr, $message:expr; $($task:expr $(,)?)+) => {
+        {
+            let key = $key;
+            let message : Option<&str> = $message;
+
+            let num_futures = $crate::count!($($task)*);
             let increment = $total / num_futures as f64;
 
-            // Create tokio::pinned values
-            $(
-                paste::paste! {
-                    tokio::pin! {
-                        let [<unique_name_ $future>] = $future;
-                    }
-                }
-            )*
-            $(
-                paste::paste! {
-                    let mut [<result_ $future>] = None;
-                }
-            )*
 
-            // Resolve each future and call respective loading as each resolves in any order
-            for _ in 0..num_futures {
-                paste::paste! {
-                    tokio::select! {
-                        $(
-                            v = &mut [<unique_name_ $future>], if ![<result_$future>].is_some() => {
-                                if let Some(key) = $key {
-                                    $crate::event::emit::emit_loading(key, increment, $message).await?;
-                                }
-                                [<result_ $future>] = Some(v);
-                            },
-                        )*
-                        else => break,
+            paste::paste! {
+                $( let [ <unique_name $task>] = {
+                    {
+                        let key = key.clone();
+                        let message = message.clone();
+                        async move {
+                            let res = $task.await;
+                            if let Some(key) = key {
+                                $crate::event::emit::emit_loading(key, increment, message).await?;
+                            }
+                            res
+                        }
                     }
-                }
+                };)+
             }
 
-            // Extract values out of option, then out of error, returning if any errors happened
-            $(
-                paste::paste! {
-                    let [<result_ $future>] = [<result_ $future>].take().unwrap()?; // unwrap here acceptable as numbers of futures and resolved values is guaranteed to be the same
-                }
-            )*
-
-            paste::paste!{
-                ($(
-                    [<result_ $future>], // unwrap here acceptable as numbers of futures and resolved values is guaranteed to be the same
-                )+)
+            paste::paste! {
+                tokio::try_join! (
+                    $( [ <unique_name $task>] ),+
+                )
             }
-    }};
+        }
+    };
+
 }
-
 #[cfg(not(feature = "tauri"))]
 #[macro_export]
 macro_rules! loading_join {
     ($start:expr, $end:expr, $message:expr; $($future:expr $(,)?)+) => {{
-        tokio::try_join!($($future),+)?
+        tokio::try_join!($($future),+)
     }};
 }
 

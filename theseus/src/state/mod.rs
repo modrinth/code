@@ -105,7 +105,7 @@ impl State {
                     let (metadata, profiles) = loading_join! {
                         Some(&loading_bar), 20.0, Some("Initializing metadata and profiles...");
                         metadata_fut, profiles_fut
-                    };
+                    }?;
 
                     emit_loading(&loading_bar, 10.0, None).await?;
                     let users = Users::init(&database)?;
