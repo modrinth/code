@@ -77,7 +77,7 @@ Button {
   flex-direction: column;
   padding: 1rem;
   background: var(--color-raised-bg);
-  min-height: calc(100% - 2rem);
+  min-height: calc(100% - 2.25rem);
   overflow: hidden;
 }
 

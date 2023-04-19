@@ -44,8 +44,8 @@ export async function list() {
 
 // Add a project to a profile from a version
 // Returns a path to the new project file
-export async function add_project_from_version(path, version_id) {
-  return await invoke('profile_add_project_from_version', { path, version_id })
+export async function add_project_from_version(path, versionId) {
+  return await invoke('profile_add_project_from_version', { path, versionId })
 }
 
 // Add a project to a profile from a path + project_type

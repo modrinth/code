@@ -14,15 +14,24 @@ import {
   ClientIcon,
   ServerIcon,
   AnimatedLogo,
+  Avatar,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
+import { get as getProfile } from '@/helpers/profile'
+import { useRoute } from 'vue-router'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
+
+const route = useRoute()
 
 const searchStore = useSearch()
-
+searchStore.projectType = route.query.projectType ?? 'modpack'
+const showVersions = ref(true)
+const showLoaders = ref(true)
 const showSnapshots = ref(false)
 const loading = ref(true)
+const instance = ref(null)
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
   get_categories(),
@@ -41,6 +50,22 @@ const getSearchResults = async (shouldLoad = false) => {
 }
 
 getSearchResults(true)
+
+const handleReset = async () => {
+  searchStore.resetFilters()
+  await getSearchResults()
+}
+
+if (route.query.instance) {
+  instance.value = await getProfile(route.query.instance)
+  console.log(instance.value)
+  searchStore.activeVersions = [instance.value.metadata.game_version]
+  searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
+  showVersions.value = false
+  showLoaders.value = false
+} else {
+  handleReset()
+}
 
 const toggleFacet = async (facet) => {
   const index = searchStore.facets.indexOf(facet)
@@ -66,16 +91,26 @@ const switchPage = async (page) => {
   else searchStore.offset = (searchStore.currentPage - 1) * searchStore.limit
   await getSearchResults()
 }
-
-const handleReset = async () => {
-  searchStore.resetFilters()
-  await getSearchResults()
-}
 </script>
 
 <template>
   <div class="search-container">
     <aside class="filter-panel">
+      <Card
+        v-if="instance"
+        class="instance-card button-base"
+        @click="$router.push(`/instance/${encodeURIComponent(instance.path)}`)"
+      >
+        <Avatar
+          :src="convertFileSrc(instance.metadata.icon)"
+          :alt="instance.metadata.name"
+          size="sm"
+        />
+        <div class="instance-card__info">
+          <span class="title">{{ instance.metadata.name }}</span>
+          {{ instance.metadata.game_version }} {{ instance.metadata.loader }}
+        </div>
+      </Card>
       <Button
         role="button"
         :disabled="
@@ -94,7 +129,9 @@ const handleReset = async () => {
       <div class="categories">
         <h2>Categories</h2>
         <div
-          v-for="category in categories.filter((cat) => cat.project_type === 'modpack')"
+          v-for="category in categories.filter(
+            (cat) => cat.project_type === searchStore.projectType
+          )"
           :key="category.name"
         >
           <SearchFilter
@@ -107,10 +144,12 @@ const handleReset = async () => {
           />
         </div>
       </div>
-      <div class="loaders">
+      <div v-if="showLoaders" class="loaders">
         <h2>Loaders</h2>
         <div
-          v-for="loader in loaders.filter((l) => l.supported_project_types?.includes('modpack'))"
+          v-for="loader in loaders.filter((l) =>
+            l.supported_project_types?.includes(searchStore.projectType)
+          )"
           :key="loader"
         >
           <SearchFilter
@@ -144,7 +183,7 @@ const handleReset = async () => {
           <ServerIcon aria-hidden="true" />
         </SearchFilter>
       </div>
-      <div class="versions">
+      <div v-if="showVersions" class="versions">
         <h2>Minecraft versions</h2>
         <Checkbox v-model="showSnapshots" class="filter-checkbox">Show snapshots</Checkbox>
         <multiselect
@@ -185,7 +224,7 @@ const handleReset = async () => {
             <input
               v-model="searchStore.searchInput"
               type="text"
-              placeholder="Search modpacks..."
+              :placeholder="`Search ${searchStore.projectType}s...`"
               @input="getSearchResults"
             />
           </div>
@@ -224,7 +263,9 @@ const handleReset = async () => {
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
-          :id="`${result?.project_id}/`"
+          :id="`${result?.project_id}/${
+            $route.query.instance ? '?instance=' + encodeURIComponent($route.query.instance) : ''
+          }`"
           :key="result?.project_id"
           class="result-project-item"
           :type="result?.project_type"
@@ -238,12 +279,13 @@ const handleReset = async () => {
           :categories="[
             ...categories.filter(
               (cat) =>
-                result?.display_categories.includes(cat.name) && cat.project_type === 'modpack'
+                result?.display_categories.includes(cat.name) &&
+                cat.project_type === searchStore.projectType
             ),
             ...loaders.filter(
               (loader) =>
                 result?.display_categories.includes(loader.name) &&
-                loader.supported_project_types?.includes('modpack')
+                loader.supported_project_types?.includes(searchStore.projectType)
             ),
           ]"
           :project-type-display="result?.project_type"
@@ -260,6 +302,26 @@ const handleReset = async () => {
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
+.instance-card {
+  background-color: var(--color-bg) !important;
+  padding: 1rem !important;
+  display: flex;
+  flex-direction: row;
+  min-height: min-content !important;
+  gap: 1rem;
+
+  .instance-card__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .title {
+      color: var(--color-contrast);
+      font-weight: bolder;
+    }
+  }
+}
+
 .search-panel-container {
   display: flex;
   flex-direction: column;
@@ -320,7 +382,7 @@ const handleReset = async () => {
     flex-direction: column;
     min-height: 100vh;
     height: fit-content;
-    max-height: 100%;
+    max-height: 100vh;
     overflow-y: auto;
 
     h2 {

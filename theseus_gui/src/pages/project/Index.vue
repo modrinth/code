@@ -29,9 +29,14 @@
         </Categories>
         <hr class="card-divider" />
         <div class="button-group">
-          <Button color="primary" class="instance-button" @click="install(versions[0].id)">
+          <Button
+            color="primary"
+            class="instance-button"
+            :disabled="installed === true"
+            @click="install()"
+          >
             <DownloadIcon />
-            Install
+            {{ installed ? 'Installed' : 'Install' }}
           </Button>
           <a
             :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
@@ -178,6 +183,7 @@
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
+  <InstanceInstallModal ref="modInstallModal" />
 </template>
 
 <script setup>
@@ -210,21 +216,31 @@ import {
   OpenCollectiveIcon,
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
-import { install as pack_install } from '@/helpers/pack'
-import { list } from '@/helpers/profile'
+import { install as packInstall } from '@/helpers/pack'
+import { list, add_project_from_version as installMod, get as getProfile } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
+import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const confirmModal = ref(null)
+const modInstallModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
+const installed = ref(
+  route.query.instance
+    ? Object.values((await getProfile(route.query.instance)).projects).some(
+        (p) => p.metadata?.project?.id === route.params.id
+      )
+    : false
+)
+
 const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
@@ -242,16 +258,37 @@ watch(
 dayjs.extend(relativeTime)
 
 async function install(version) {
+  let queuedVersion
+
+  if (version) {
+    queuedVersion = version
+  } else {
+    if (data.value.project_type === 'modpack' || !route.query.instance) {
+      queuedVersion = versions.value[0].id
+    } else {
+      queuedVersion = versions.value.find((v) =>
+        v.game_versions.includes(data.value.game_versions[0])
+      ).id
+    }
+  }
+
   if (data.value.project_type === 'modpack') {
     const packs = Object.values(await list())
     if (
       packs.length === 0 ||
       !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
     ) {
-      let id = await pack_install(version)
+      let id = await packInstall(queuedVersion)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
-      confirmModal.value.show(version)
+      confirmModal.value.show(queuedVersion)
+    }
+  } else {
+    if (route.query.instance) {
+      await installMod(route.query.instance, queuedVersion)
+      installed.value = true
+    } else {
+      modInstallModal.value.show(queuedVersion)
     }
   }
 }
@@ -265,8 +302,8 @@ async function install(version) {
 }
 
 .project-sidebar {
-  width: 20rem;
-  min-width: 20rem;
+  width: 21rem;
+  min-width: 21rem;
   background: var(--color-raised-bg);
   padding: 1rem;
 }

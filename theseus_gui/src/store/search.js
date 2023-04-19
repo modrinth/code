@@ -9,6 +9,7 @@ export const useSearch = defineStore('searchStore', {
     pageCount: 1,
     offset: 0,
     filter: 'Relevance',
+    projectType: '',
     facets: [],
     orFacets: [],
     environments: {
@@ -21,7 +22,7 @@ export const useSearch = defineStore('searchStore', {
   }),
   actions: {
     getQueryString() {
-      let andFacets = ['project_type:modpack']
+      let andFacets = [`project_type:${this.projectType}`]
 
       // Iterate through possible andFacets
       this.facets.forEach((facet) => {

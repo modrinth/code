@@ -16,7 +16,7 @@
             class="dropdown"
           />
         </span>
-        <Button color="primary">
+        <Button color="primary" @click="searchMod()">
           <PlusIcon />
           Add Mods
         </Button>
@@ -84,6 +84,10 @@ import {
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const props = defineProps({
   instance: {
@@ -139,7 +143,7 @@ const search = computed(() => {
   return updateSort(filtered, sortFilter.value)
 })
 
-function updateSort(projects, sort) {
+const updateSort = (projects, sort) => {
   switch (sort) {
     case 'Version':
       return projects.slice().sort((a, b) => {
@@ -172,6 +176,10 @@ function updateSort(projects, sort) {
         return 0
       })
   }
+}
+
+const searchMod = () => {
+  router.push({ path: '/browse', query: { projectType: 'mod', instance: route.params.id } })
 }
 </script>
 
