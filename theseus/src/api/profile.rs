@@ -256,6 +256,7 @@ pub async fn run_credentials(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
     )
     .await?;
     let pre_launch_hooks =
@@ -369,7 +370,6 @@ pub async fn run_credentials(
         &resolution,
         credentials,
         post_exit_hook,
-        &profile,
     )
     .await?;
 

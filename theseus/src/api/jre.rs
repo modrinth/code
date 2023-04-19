@@ -60,6 +60,7 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
     )
     .await?;
     let optimal_key = match version_info

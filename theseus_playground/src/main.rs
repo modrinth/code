@@ -64,23 +64,23 @@ async fn main() -> theseus::Result<()> {
     )
     .await?;
 
-    println!("Adding sodium");
-    let sodium_path = profile::add_project_from_version(
-        &profile_path,
-        "rAfhHfow".to_string(),
-    )
-    .await?;
-
-    let mod_menu_path = profile::add_project_from_version(
-        &profile_path,
-        "gSoPJyVn".to_string(),
-    )
-    .await?;
-
-    println!("Disabling sodium");
-    profile::toggle_disable_project(&profile_path, &sodium_path).await?;
-
-    profile::remove_project(&profile_path, &mod_menu_path).await?;
+    // println!("Adding sodium");
+    // let sodium_path = profile::add_project_from_version(
+    //     &profile_path,
+    //     "rAfhHfow".to_string(),
+    // )
+    // .await?;
+    //
+    // let mod_menu_path = profile::add_project_from_version(
+    //     &profile_path,
+    //     "gSoPJyVn".to_string(),
+    // )
+    // .await?;
+    //
+    // println!("Disabling sodium");
+    // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
+    //
+    // profile::remove_project(&profile_path, &mod_menu_path).await?;
     // let profile_path =
     //     pack::install_pack_from_version_id("KxUUUFh5".to_string())
     //         .await

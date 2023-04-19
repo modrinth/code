@@ -48,22 +48,12 @@ macro_rules! processor_rules {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
-#[tracing::instrument(skip_all, fields(path = ?instance_path))]
-pub async fn launch_minecraft(
+pub async fn install_minecraft(
     game_version: &str,
     loader_version: &Option<d::modded::LoaderVersion>,
     instance_path: &Path,
-    java_install: &Path,
-    java_args: &[String],
-    env_args: &[(String, String)],
-    wrapper: &Option<String>,
-    memory: &st::MemorySettings,
-    resolution: &st::WindowSize,
-    credentials: &auth::Credentials,
-    post_exit_hook: Option<Command>,
     profile: &Profile, // optional ref to Profile for event tracking
-) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
+) -> crate::Result<()> {
     let state = st::State::get().await?;
     let instance_path = &canonicalize(instance_path)?;
 
@@ -86,16 +76,17 @@ pub async fn launch_minecraft(
         &state,
         version,
         loader_version.as_ref(),
+        None,
     )
     .await?;
+
+    download::download_minecraft(&state, &version_info, profile).await?;
+    st::State::sync().await?;
 
     let client_path = state
         .directories
         .version_dir(&version_jar)
         .join(format!("{version_jar}.jar"));
-
-    download::download_minecraft(&state, &version_info, profile).await?;
-    st::State::sync().await?;
 
     if let Some(processors) = &version_info.processors {
         if let Some(ref mut data) = version_info.data {
@@ -172,6 +163,55 @@ pub async fn launch_minecraft(
             }
         }
     }
+
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+#[tracing::instrument(skip_all, fields(path = ?instance_path))]
+pub async fn launch_minecraft(
+    game_version: &str,
+    loader_version: &Option<d::modded::LoaderVersion>,
+    instance_path: &Path,
+    java_install: &Path,
+    java_args: &[String],
+    env_args: &[(String, String)],
+    wrapper: &Option<String>,
+    memory: &st::MemorySettings,
+    resolution: &st::WindowSize,
+    credentials: &auth::Credentials,
+    post_exit_hook: Option<Command>,
+) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
+    let state = st::State::get().await?;
+    let instance_path = &canonicalize(instance_path)?;
+
+    let version = state
+        .metadata
+        .minecraft
+        .versions
+        .iter()
+        .find(|it| it.id == game_version)
+        .ok_or(crate::ErrorKind::LauncherError(format!(
+            "Invalid game version: {game_version}"
+        )))?;
+
+    let version_jar =
+        loader_version.as_ref().map_or(version.id.clone(), |it| {
+            format!("{}-{}", version.id.clone(), it.id.clone())
+        });
+
+    let version_info = download::download_version_info(
+        &state,
+        version,
+        loader_version.as_ref(),
+        None,
+    )
+    .await?;
+
+    let client_path = state
+        .directories
+        .version_dir(&version_jar)
+        .join(format!("{version_jar}.jar"));
 
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {

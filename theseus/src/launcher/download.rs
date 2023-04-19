@@ -54,6 +54,7 @@ pub async fn download_version_info(
     st: &State,
     version: &GameVersion,
     loader: Option<&LoaderVersion>,
+    force: Option<bool>,
 ) -> crate::Result<GameVersionInfo> {
     let version_id = loader
         .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
@@ -63,7 +64,7 @@ pub async fn download_version_info(
         .version_dir(&version_id)
         .join(format!("{version_id}.json"));
 
-    let res = if path.exists() {
+    let res = if path.exists() && !force.unwrap_or(false) {
         fs::read(path)
             .err_into::<crate::Error>()
             .await
