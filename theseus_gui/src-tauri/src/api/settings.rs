@@ -24,9 +24,6 @@ pub struct FrontendSettings {
 // invoke('settings_get')
 #[tauri::command]
 pub async fn settings_get() -> Result<FrontendSettings> {
-    use std::time::Instant;
-    let now = Instant::now();
-
     let backend_settings = settings::get().await?;
     let frontend_settings = FrontendSettings {
         theme: backend_settings.theme,
@@ -45,9 +42,6 @@ pub async fn settings_get() -> Result<FrontendSettings> {
         max_concurrent_downloads: backend_settings.max_concurrent_downloads,
         version: backend_settings.version,
     };
-    let elapsed = now.elapsed();
-    println!("Elapsed- settings {:.2?}", elapsed);
-
     Ok(frontend_settings)
 }
 
