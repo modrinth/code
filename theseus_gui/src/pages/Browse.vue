@@ -131,13 +131,7 @@ const switchPage = async (page) => {
         <DropdownSelect
           v-model="searchStore.projectType"
           name="Sort dropdown"
-          :options="[
-              'modpack',
-              'mod',
-              'datapack',
-              'shader',
-              'resourcepack',
-            ]"
+          :options="['modpack', 'mod', 'datapack', 'shader', 'resourcepack']"
           class="project-type-dropdown"
           @change="getSearchResults"
         />
