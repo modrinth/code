@@ -459,6 +459,74 @@ a,
   overflow: hidden;
 }
 
+.card-divider {
+  background-color: var(--color-button-bg);
+  border: none;
+  color: var(--color-button-bg);
+  height: 1px;
+  margin: var(--gap-sm) 0;
+}
+
+// TABLE
+.table {
+  .table-container {
+    display: grid;
+    grid-template-rows: repeat(auto-fill, auto);
+    width: 100%;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .table-row {
+    display: grid;
+    grid-template-columns: 1fr 4fr 1.5fr;
+  }
+
+  .table-head {
+    .table-cell {
+      background-color: var(--color-accent-contrast);
+    }
+  }
+
+  .table-cell {
+    padding: 1rem;
+    height: 100%;
+    align-items: center;
+    vertical-align: center;
+    display: flex;
+  }
+
+  .table-text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    display: flex;
+
+    span {
+      display: inline-block;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+  }
+
+  button {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    span {
+      display: inherit;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+}
+
+.table-row:nth-child(even) .table-cell {
+  background-color: var(--color-bg);
+}
+
 // CUSTOM COMPONENTS
 // TODO: MOST OF THESE SHOULD BE MOVED TO AN OMORPHIA COMPONENT
 .textarea-wrapper {
