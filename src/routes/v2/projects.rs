@@ -1641,8 +1641,8 @@ pub async fn project_schedule(
         )
         .await?;
 
-        if user.role.is_mod()
-            || team_member
+        if !user.role.is_mod()
+            && !team_member
                 .map(|x| x.permissions.contains(Permissions::EDIT_DETAILS))
                 .unwrap_or(false)
         {
@@ -2314,6 +2314,10 @@ pub async fn project_follow(
 
     let user_id: database::models::ids::UserId = user.id.into();
     let project_id: database::models::ids::ProjectId = result.id;
+
+    if !is_authorized(&result, &Some(user), &pool).await? {
+        return Ok(HttpResponse::NotFound().body(""));
+    }
 
     let following = sqlx::query!(
         "

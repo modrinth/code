@@ -691,8 +691,8 @@ pub async fn version_schedule(
             )
             .await?;
 
-        if user.role.is_mod()
-            || team_member
+        if !user.role.is_mod()
+            && !team_member
                 .map(|x| x.permissions.contains(Permissions::EDIT_DETAILS))
                 .unwrap_or(false)
         {
