@@ -126,6 +126,22 @@ const switchPage = async (page) => {
         @click="handleReset"
         ><ClearIcon />Clear Filters</Button
       >
+      <div>
+        <h2>Project Type</h2>
+        <DropdownSelect
+          v-model="searchStore.projectType"
+          name="Sort dropdown"
+          :options="[
+              'modpack',
+              'mod',
+              'datapack',
+              'shader',
+              'resourcepack',
+            ]"
+          class="project-type-dropdown"
+          @change="getSearchResults"
+        />
+      </div>
       <div class="categories">
         <h2>Categories</h2>
         <div
@@ -302,6 +318,10 @@ const switchPage = async (page) => {
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
+.project-type-dropdown {
+  width: 100% !important;
+}
+
 .instance-card {
   background-color: var(--color-bg) !important;
   padding: 1rem !important;
@@ -309,6 +329,7 @@ const switchPage = async (page) => {
   flex-direction: row;
   min-height: min-content !important;
   gap: 1rem;
+  align-items: center;
 
   .instance-card__info {
     display: flex;
