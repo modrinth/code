@@ -20,19 +20,12 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 #[cfg(target_os = "macos")]
 #[tauri::command]
 async fn should_disable_mouseover() -> bool {
-    use os_version::OsVersion;
     // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
-    if let Ok(OsVersion::MacOS(mac_os)) = os_version::detect() {
-        let version = mac_os
-            .version
-            .split('.')
-            .map(|f| f.parse::<i32>())
-            .collect::<Result<Vec<i32>, _>>();
-        if let Ok(v) = version {
-            if v.len() >= 2 && v[0] >= 12 && v[1] >= 3 {
-                // Mac os version is 12.3 or higher, we allow mouseover
-                return false;
-            }
+    let os = os_info::get();
+    if let os_info::Version::Semantic(major, minor, _) = os.version() {
+        if *major >= 12 && *minor >= 3 {
+            // Mac os version is 12.3 or higher, we allow mouseover
+            return false;
         }
     }
     true

@@ -18,7 +18,6 @@ export default {
 
           // Append the style element to the document's head
           document.head.appendChild(styleElement)
-        
         }
       } catch (error) {
         console.error('Error checking OS version from Rust backend', error)
