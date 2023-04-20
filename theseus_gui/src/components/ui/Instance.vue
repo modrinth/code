@@ -24,8 +24,7 @@ const props = defineProps({
 })
 
 const confirmModal = ref(null)
-const stopBtn = ref(null)
-const playBtn = ref(null)
+const playing = ref(false)
 
 const uuid = ref(null)
 
@@ -75,22 +74,14 @@ const install = async (e) => {
 
 const play = async (e) => {
   e.stopPropagation()
+  playing.value = true
   uuid.value = await run(props.instance.path)
-
-  stopBtn.value.style.opacity = 1
-  stopBtn.value.style.bottom = '4.5rem'
-  stopBtn.value.style.display = 'flex'
-  playBtn.value.style.display = 'none'
 }
 
 const stop = async (e) => {
   e.stopPropagation()
   await kill_by_uuid(uuid.value)
-
-  stopBtn.value.style.opacity = 0
-  stopBtn.value.style.bottom = '0'
-  stopBtn.value.style.display = 'none'
-  playBtn.value.style.display = 'flex'
+  playing.value = false
 }
 </script>
 
@@ -112,11 +103,11 @@ const stop = async (e) => {
           {{ props.instance.metadata?.game_version || props.instance.latest_version }}
         </p>
       </div>
-      <div v-if="props.instance.metadata" ref="playBtn" class="install cta" @click="play">
+      <div v-if="props.instance.metadata && !playing" class="install cta" @click="play">
         <PlayIcon />
       </div>
+      <div v-else-if="playing" class="stop cta" @click="stop"><XIcon /></div>
       <div v-else class="install cta" @click="install"><SaveIcon /></div>
-      <div ref="stopBtn" class="stop cta" @click="stop"><XIcon /></div>
     </Card>
     <InstallConfirmModal ref="confirmModal" />
   </div>
@@ -133,7 +124,7 @@ const stop = async (e) => {
 
   &:hover {
     filter: brightness(0.85);
-    .install {
+    .cta {
       opacity: 1;
       bottom: 4.5rem;
     }
@@ -148,7 +139,7 @@ const stop = async (e) => {
   .stop {
     background: var(--color-red);
     z-index: 77;
-    display: none;
+    display: flex;
   }
 
   .cta {

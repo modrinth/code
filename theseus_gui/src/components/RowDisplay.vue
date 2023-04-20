@@ -75,7 +75,7 @@ const handleRightPage = () => {
     <section v-if="shouldRenderNormalInstances" ref="modsRow" class="instances">
       <Instance
         v-for="instance in props.instances"
-        :key="instance?.project_id || instance?.metadata?.linked_project_id"
+        :key="instance?.project_id || instance?.id"
         display="card"
         :instance="instance"
         :load="props.load"

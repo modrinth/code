@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { ofetch } from 'ofetch'
 import { AnimatedLogo } from 'omorphia'
 import RowDisplay from '@/components/RowDisplay.vue'
@@ -29,11 +29,9 @@ const getFeaturedMods = async () => {
 
 const load = () => (loading.value = true)
 
-onMounted(async () => {
-  loading.value = true
-  await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
-  loading.value = false
-})
+loading.value = true
+await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+loading.value = false
 </script>
 
 <template>
