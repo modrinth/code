@@ -153,7 +153,7 @@ list().then(
 
 .light-mode {
   .appbar {
-    background: var(--color-raised-bg) !important;
+    background: #e9e9e9 !important;
     box-shadow: var(--shadow-floating), var(--shadow-floating);
   }
 
