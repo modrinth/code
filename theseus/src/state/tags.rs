@@ -208,7 +208,7 @@ impl Tags {
             licenses_fut,
             donation_platforms_fut,
             report_types_fut
-        );
+        )?;
 
         // Store the tags in the database
         self.0.categories.insert(
