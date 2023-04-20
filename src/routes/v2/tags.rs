@@ -1,8 +1,6 @@
 use super::ApiError;
 use crate::database::models;
-use crate::database::models::categories::{
-    DonationPlatform, ProjectType, ReportType, SideType,
-};
+use crate::database::models::categories::{DonationPlatform, ProjectType, ReportType, SideType};
 use actix_web::{get, web, HttpResponse};
 use chrono::{DateTime, Utc};
 use models::categories::{Category, GameVersion, Loader};
@@ -34,9 +32,7 @@ pub struct CategoryData {
 // TODO: searching / filtering? Could be used to implement a live
 // searching category list
 #[get("category")]
-pub async fn category_list(
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
+pub async fn category_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
     let results = Category::list(&**pool)
         .await?
         .into_iter()
@@ -59,9 +55,7 @@ pub struct LoaderData {
 }
 
 #[get("loader")]
-pub async fn loader_list(
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
+pub async fn loader_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
     let mut results = Loader::list(&**pool)
         .await?
         .into_iter()
@@ -97,11 +91,8 @@ pub async fn game_version_list(
     pool: web::Data<PgPool>,
     query: web::Query<GameVersionQuery>,
 ) -> Result<HttpResponse, ApiError> {
-    let results: Vec<GameVersionQueryData> = if query.type_.is_some()
-        || query.major.is_some()
-    {
-        GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool)
-            .await?
+    let results: Vec<GameVersionQueryData> = if query.type_.is_some() || query.major.is_some() {
+        GameVersion::list_filter(query.type_.as_deref(), query.major, &**pool).await?
     } else {
         GameVersion::list(&**pool).await?
     }
@@ -145,9 +136,7 @@ pub struct LicenseText {
 }
 
 #[get("license/{id}")]
-pub async fn license_text(
-    params: web::Path<(String,)>,
-) -> Result<HttpResponse, ApiError> {
+pub async fn license_text(params: web::Path<(String,)>) -> Result<HttpResponse, ApiError> {
     let license_id = params.into_inner().0;
 
     if license_id == *crate::models::projects::DEFAULT_LICENSE_ID {
@@ -176,41 +165,32 @@ pub struct DonationPlatformQueryData {
 }
 
 #[get("donation_platform")]
-pub async fn donation_platform_list(
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
-    let results: Vec<DonationPlatformQueryData> =
-        DonationPlatform::list(&**pool)
-            .await?
-            .into_iter()
-            .map(|x| DonationPlatformQueryData {
-                short: x.short,
-                name: x.name,
-            })
-            .collect();
+pub async fn donation_platform_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
+    let results: Vec<DonationPlatformQueryData> = DonationPlatform::list(&**pool)
+        .await?
+        .into_iter()
+        .map(|x| DonationPlatformQueryData {
+            short: x.short,
+            name: x.name,
+        })
+        .collect();
     Ok(HttpResponse::Ok().json(results))
 }
 
 #[get("report_type")]
-pub async fn report_type_list(
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
+pub async fn report_type_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
     let results = ReportType::list(&**pool).await?;
     Ok(HttpResponse::Ok().json(results))
 }
 
 #[get("project_type")]
-pub async fn project_type_list(
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
+pub async fn project_type_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
     let results = ProjectType::list(&**pool).await?;
     Ok(HttpResponse::Ok().json(results))
 }
 
 #[get("side_type")]
-pub async fn side_type_list(
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
+pub async fn side_type_list(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
     let results = SideType::list(&**pool).await?;
     Ok(HttpResponse::Ok().json(results))
 }

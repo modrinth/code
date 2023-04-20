@@ -68,36 +68,25 @@ impl PayoutsQueue {
             .form(&form)
             .send()
             .await
-            .map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal".to_string(),
-                )
-            })?
+            .map_err(|_| ApiError::Payments("Error while authenticating with PayPal".to_string()))?
             .json()
             .await
             .map_err(|_| {
                 ApiError::Payments(
-                    "Error while authenticating with PayPal (deser error)"
-                        .to_string(),
+                    "Error while authenticating with PayPal (deser error)".to_string(),
                 )
             })?;
 
-        self.credential_expires =
-            Utc::now() + Duration::seconds(credential.expires_in);
+        self.credential_expires = Utc::now() + Duration::seconds(credential.expires_in);
         self.credential = credential;
 
         Ok(())
     }
 
-    pub async fn send_payout(
-        &mut self,
-        mut payout: PayoutItem,
-    ) -> Result<Decimal, ApiError> {
+    pub async fn send_payout(&mut self, mut payout: PayoutItem) -> Result<Decimal, ApiError> {
         if self.credential_expires < Utc::now() {
             self.refresh_token().await.map_err(|_| {
-                ApiError::Payments(
-                    "Error while authenticating with PayPal".to_string(),
-                )
+                ApiError::Payments("Error while authenticating with PayPal".to_string())
             })?;
         }
 
@@ -109,8 +98,7 @@ impl PayoutsQueue {
             std::cmp::min(
                 std::cmp::max(
                     Decimal::ONE / Decimal::from(4),
-                    (Decimal::from(2) / Decimal::ONE_HUNDRED)
-                        * payout.amount.value,
+                    (Decimal::from(2) / Decimal::ONE_HUNDRED) * payout.amount.value,
                 ),
                 Decimal::from(20),
             )
@@ -151,9 +139,7 @@ impl PayoutsQueue {
             }
 
             let body: PayPalError = res.json().await.map_err(|_| {
-                ApiError::Payments(
-                    "Error while registering payment in PayPal!".to_string(),
-                )
+                ApiError::Payments("Error while registering payment in PayPal!".to_string())
             })?;
 
             return Err(ApiError::Payments(format!(
@@ -190,8 +176,7 @@ impl PayoutsQueue {
                             "Authorization",
                             format!(
                                 "{} {}",
-                                self.credential.token_type,
-                                self.credential.access_token
+                                self.credential.token_type, self.credential.access_token
                             ),
                         )
                         .send()
@@ -199,9 +184,7 @@ impl PayoutsQueue {
                     {
                         if let Ok(res) = res.json::<PayoutData>().await {
                             if let Some(data) = res.items.first() {
-                                if (fee - data.payout_item_fee.value)
-                                    > Decimal::ZERO
-                                {
+                                if (fee - data.payout_item_fee.value) > Decimal::ZERO {
                                     return Ok(fee - data.payout_item_fee.value);
                                 }
                             }

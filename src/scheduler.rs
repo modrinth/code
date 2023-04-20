@@ -32,13 +32,9 @@ impl Drop for Scheduler {
 
 use log::{info, warn};
 
-pub fn schedule_versions(
-    scheduler: &mut Scheduler,
-    pool: sqlx::Pool<sqlx::Postgres>,
-) {
-    let version_index_interval = std::time::Duration::from_secs(
-        parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800),
-    );
+pub fn schedule_versions(scheduler: &mut Scheduler, pool: sqlx::Pool<sqlx::Postgres>) {
+    let version_index_interval =
+        std::time::Duration::from_secs(parse_var("VERSION_INDEX_INTERVAL").unwrap_or(1800));
 
     scheduler.run(version_index_interval, move || {
         let pool_ref = pool.clone();
@@ -82,15 +78,11 @@ struct VersionFormat<'a> {
     release_time: DateTime<Utc>,
 }
 
-async fn update_versions(
-    pool: &sqlx::Pool<sqlx::Postgres>,
-) -> Result<(), VersionIndexingError> {
-    let input = reqwest::get(
-        "https://piston-meta.mojang.com/mc/game/version_manifest_v2.json",
-    )
-    .await?
-    .json::<InputFormat>()
-    .await?;
+async fn update_versions(pool: &sqlx::Pool<sqlx::Postgres>) -> Result<(), VersionIndexingError> {
+    let input = reqwest::get("https://piston-meta.mojang.com/mc/game/version_manifest_v2.json")
+        .await?
+        .json::<InputFormat>()
+        .await?;
 
     let mut skipped_versions_count = 0u32;
 
@@ -152,8 +144,7 @@ async fn update_versions(
             .chars()
             .all(|c| c.is_ascii_alphanumeric() || "-_.".contains(c))
         {
-            if let Some((_, alternate)) =
-                HALL_OF_SHAME.iter().find(|(version, _)| name == *version)
+            if let Some((_, alternate)) = HALL_OF_SHAME.iter().find(|(version, _)| name == *version)
             {
                 name = String::from(*alternate);
             } else {

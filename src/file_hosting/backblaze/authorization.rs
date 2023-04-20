@@ -56,13 +56,7 @@ pub async fn get_upload_url(
     bucket_id: &str,
 ) -> Result<UploadUrlData, FileHostingError> {
     let response = reqwest::Client::new()
-        .post(
-            &format!(
-                "{}/b2api/v2/b2_get_upload_url",
-                authorization_data.api_url
-            )
-            .to_string(),
-        )
+        .post(&format!("{}/b2api/v2/b2_get_upload_url", authorization_data.api_url).to_string())
         .header(reqwest::header::CONTENT_TYPE, "application/json")
         .header(
             reqwest::header::AUTHORIZATION,

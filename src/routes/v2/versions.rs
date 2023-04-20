@@ -1,13 +1,10 @@
 use super::ApiError;
 use crate::database;
 use crate::models;
-use crate::models::projects::{
-    Dependency, FileType, VersionStatus, VersionType,
-};
+use crate::models::projects::{Dependency, FileType, VersionStatus, VersionType};
 use crate::models::teams::Permissions;
 use crate::util::auth::{
-    filter_authorized_versions, get_user_from_headers, is_authorized,
-    is_authorized_version,
+    filter_authorized_versions, get_user_from_headers, is_authorized, is_authorized_version,
 };
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
@@ -49,10 +46,7 @@ pub async fn version_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?;
+    let result = database::models::Project::get_from_slug_or_project_id(&string, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -80,9 +74,7 @@ pub async fn version_list(
         )
         .await?;
 
-        let mut versions =
-            database::models::Version::get_many_full(&version_ids, &**pool)
-                .await?;
+        let mut versions = database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
         let mut response = versions
             .iter()
@@ -95,22 +87,13 @@ pub async fn version_list(
             .cloned()
             .collect::<Vec<_>>();
 
-        versions.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
-        });
+        versions.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
 
         // Attempt to populate versions with "auto featured" versions
-        if response.is_empty()
-            && !versions.is_empty()
-            && filters.featured.unwrap_or(false)
-        {
+        if response.is_empty() && !versions.is_empty() && filters.featured.unwrap_or(false) {
             let (loaders, game_versions) = futures::future::try_join(
                 database::models::categories::Loader::list(&**pool),
-                database::models::categories::GameVersion::list_filter(
-                    None,
-                    Some(true),
-                    &**pool,
-                ),
+                database::models::categories::GameVersion::list_filter(None, Some(true), &**pool),
             )
             .await?;
 
@@ -139,13 +122,10 @@ pub async fn version_list(
             }
         }
 
-        response.sort_by(|a, b| {
-            b.inner.date_published.cmp(&a.inner.date_published)
-        });
+        response.sort_by(|a, b| b.inner.date_published.cmp(&a.inner.date_published));
         response.dedup_by(|a, b| a.inner.id == b.inner.id);
 
-        let response =
-            filter_authorized_versions(response, &user_option, &pool).await?;
+        let response = filter_authorized_versions(response, &user_option, &pool).await?;
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -162,16 +142,13 @@ pub async fn version_project_get(
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner();
     let version_data =
-        database::models::Version::get_full_from_id_slug(&id.0, &id.1, &**pool)
-            .await?;
+        database::models::Version::get_full_from_id_slug(&id.0, &id.1, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if let Some(data) = version_data {
         if is_authorized_version(&data.inner, &user_option, &pool).await? {
-            return Ok(
-                HttpResponse::Ok().json(models::projects::Version::from(data))
-            );
+            return Ok(HttpResponse::Ok().json(models::projects::Version::from(data)));
         }
     }
 
@@ -189,18 +166,15 @@ pub async fn versions_get(
     web::Query(ids): web::Query<VersionIds>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    let version_ids =
-        serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
-            .into_iter()
-            .map(|x| x.into())
-            .collect::<Vec<database::models::VersionId>>();
-    let versions_data =
-        database::models::Version::get_many_full(&version_ids, &**pool).await?;
+    let version_ids = serde_json::from_str::<Vec<models::ids::VersionId>>(&ids.ids)?
+        .into_iter()
+        .map(|x| x.into())
+        .collect::<Vec<database::models::VersionId>>();
+    let versions_data = database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let versions =
-        filter_authorized_versions(versions_data, &user_option, &pool).await?;
+    let versions = filter_authorized_versions(versions_data, &user_option, &pool).await?;
 
     Ok(HttpResponse::Ok().json(versions))
 }
@@ -212,16 +186,13 @@ pub async fn version_get(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let id = info.into_inner().0;
-    let version_data =
-        database::models::Version::get_full(id.into(), &**pool).await?;
+    let version_data = database::models::Version::get_full(id.into(), &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
     if let Some(data) = version_data {
         if is_authorized_version(&data.inner, &user_option, &pool).await? {
-            return Ok(
-                HttpResponse::Ok().json(models::projects::Version::from(data))
-            );
+            return Ok(HttpResponse::Ok().json(models::projects::Version::from(data)));
         }
     }
 
@@ -273,9 +244,9 @@ pub async fn version_edit(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    new_version.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    new_version
+        .validate()
+        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
     let version_id = info.into_inner().0;
     let id = version_id.into();
@@ -283,19 +254,15 @@ pub async fn version_edit(
     let result = database::models::Version::get_full(id, &**pool).await?;
 
     if let Some(version_item) = result {
-        let project_item = database::models::Project::get_full(
-            version_item.inner.project_id,
+        let project_item =
+            database::models::Project::get_full(version_item.inner.project_id, &**pool).await?;
+
+        let team_member = database::models::TeamMember::get_from_user_id_version(
+            version_item.inner.id,
+            user.id.into(),
             &**pool,
         )
         .await?;
-
-        let team_member =
-            database::models::TeamMember::get_from_user_id_version(
-                version_item.inner.id,
-                user.id.into(),
-                &**pool,
-            )
-            .await?;
         let permissions;
 
         if user.role.is_admin() {
@@ -303,8 +270,7 @@ pub async fn version_edit(
         } else if let Some(member) = team_member {
             permissions = Some(member.permissions)
         } else if user.role.is_mod() {
-            permissions =
-                Some(Permissions::EDIT_DETAILS | Permissions::EDIT_BODY)
+            permissions = Some(Permissions::EDIT_DETAILS | Permissions::EDIT_BODY)
         } else {
             permissions = None
         }
@@ -312,8 +278,7 @@ pub async fn version_edit(
         if let Some(perms) = permissions {
             if !perms.contains(Permissions::UPLOAD_VERSION) {
                 return Err(ApiError::CustomAuthentication(
-                    "You do not have the permissions to edit this version!"
-                        .to_string(),
+                    "You do not have the permissions to edit this version!".to_string(),
                 ));
             }
 
@@ -403,18 +368,16 @@ pub async fn version_edit(
                 .await?;
 
                 for game_version in game_versions {
-                    let game_version_id =
-                        database::models::categories::GameVersion::get_id(
-                            &game_version.0,
-                            &mut *transaction,
+                    let game_version_id = database::models::categories::GameVersion::get_id(
+                        &game_version.0,
+                        &mut *transaction,
+                    )
+                    .await?
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(
+                            "No database entry for game version provided.".to_string(),
                         )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "No database entry for game version provided."
-                                    .to_string(),
-                            )
-                        })?;
+                    })?;
 
                     sqlx::query!(
                         "
@@ -447,17 +410,13 @@ pub async fn version_edit(
 
                 for loader in loaders {
                     let loader_id =
-                        database::models::categories::Loader::get_id(
-                            &loader.0,
-                            &mut *transaction,
-                        )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(
-                                "No database entry for loader provided."
-                                    .to_string(),
-                            )
-                        })?;
+                        database::models::categories::Loader::get_id(&loader.0, &mut *transaction)
+                            .await?
+                            .ok_or_else(|| {
+                                ApiError::InvalidInput(
+                                    "No database entry for loader provided.".to_string(),
+                                )
+                            })?;
 
                     sqlx::query!(
                         "
@@ -551,8 +510,7 @@ pub async fn version_edit(
             if let Some(downloads) = &new_version.downloads {
                 if !user.role.is_mod() {
                     return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set the downloads of this mod"
-                            .to_string(),
+                        "You don't have permission to set the downloads of this mod".to_string(),
                     ));
                 }
 
@@ -577,8 +535,7 @@ pub async fn version_edit(
                     WHERE (id = $2)
                     ",
                     diff as i32,
-                    version_item.inner.project_id
-                        as database::models::ids::ProjectId,
+                    version_item.inner.project_id as database::models::ids::ProjectId,
                 )
                 .execute(&mut *transaction)
                 .await?;
@@ -667,8 +624,7 @@ pub async fn version_schedule(
 
     if scheduling_data.time < Utc::now() {
         return Err(ApiError::InvalidInput(
-            "You cannot schedule a version to be released in the past!"
-                .to_string(),
+            "You cannot schedule a version to be released in the past!".to_string(),
         ));
     }
 
@@ -679,17 +635,15 @@ pub async fn version_schedule(
     }
 
     let string = info.into_inner().0;
-    let result =
-        database::models::Version::get_full(string.into(), &**pool).await?;
+    let result = database::models::Version::get_full(string.into(), &**pool).await?;
 
     if let Some(version_item) = result {
-        let team_member =
-            database::models::TeamMember::get_from_user_id_version(
-                version_item.inner.id,
-                user.id.into(),
-                &**pool,
-            )
-            .await?;
+        let team_member = database::models::TeamMember::get_from_user_id_version(
+            version_item.inner.id,
+            user.id.into(),
+            &**pool,
+        )
+        .await?;
 
         if !user.role.is_mod()
             && !team_member
@@ -748,17 +702,14 @@ pub async fn version_delete(
             .contains(Permissions::DELETE_VERSION)
         {
             return Err(ApiError::CustomAuthentication(
-                "You do not have permission to delete versions in this team"
-                    .to_string(),
+                "You do not have permission to delete versions in this team".to_string(),
             ));
         }
     }
 
     let mut transaction = pool.begin().await?;
 
-    let result =
-        database::models::Version::remove_full(id.into(), &mut transaction)
-            .await?;
+    let result = database::models::Version::remove_full(id.into(), &mut transaction).await?;
 
     transaction.commit().await?;
 

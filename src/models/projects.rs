@@ -534,16 +534,10 @@ impl From<QueryVersion> for Version {
                     version_id: d.version_id.map(|i| VersionId(i.0 as u64)),
                     project_id: d.project_id.map(|i| ProjectId(i.0 as u64)),
                     file_name: d.file_name,
-                    dependency_type: DependencyType::from_str(
-                        d.dependency_type.as_str(),
-                    ),
+                    dependency_type: DependencyType::from_str(d.dependency_type.as_str()),
                 })
                 .collect(),
-            game_versions: data
-                .game_versions
-                .into_iter()
-                .map(GameVersion)
-                .collect(),
+            game_versions: data.game_versions.into_iter().map(GameVersion).collect(),
             loaders: data.loaders.into_iter().map(Loader).collect(),
         }
     }

@@ -30,9 +30,7 @@ pub struct PackFile {
     pub file_size: u32,
 }
 
-fn validate_download_url(
-    values: &[String],
-) -> Result<(), validator::ValidationError> {
+fn validate_download_url(values: &[String]) -> Result<(), validator::ValidationError> {
     for value in values {
         let url = url::Url::parse(value)
             .ok()
@@ -42,8 +40,7 @@ fn validate_download_url(
             return Err(validator::ValidationError::new("invalid URL"));
         }
 
-        let domains = parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS")
-            .unwrap_or_default();
+        let domains = parse_strings_from_var("WHITELISTED_MODPACK_DOMAINS").unwrap_or_default();
         if !domains.contains(
             &url.domain()
                 .ok_or_else(|| validator::ValidationError::new("invalid URL"))?

@@ -54,17 +54,11 @@ pub async fn init_checkout(
         ])
         .send()
         .await
-        .map_err(|_| {
-            ApiError::Payments(
-                "Error while creating checkout session!".to_string(),
-            )
-        })?
+        .map_err(|_| ApiError::Payments("Error while creating checkout session!".to_string()))?
         .json::<Session>()
         .await
         .map_err(|_| {
-            ApiError::Payments(
-                "Error while deserializing checkout response!".to_string(),
-            )
+            ApiError::Payments("Error while deserializing checkout response!".to_string())
         })?;
 
     Ok(HttpResponse::Ok().json(json!(
@@ -92,11 +86,7 @@ pub async fn init_customer_portal(
     .fetch_optional(&**pool)
     .await?
     .and_then(|x| x.stripe_customer_id)
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "User is not linked to stripe account!".to_string(),
-        )
-    })?;
+    .ok_or_else(|| ApiError::InvalidInput("User is not linked to stripe account!".to_string()))?;
 
     let client = reqwest::Client::new();
 
@@ -117,17 +107,11 @@ pub async fn init_customer_portal(
         ])
         .send()
         .await
-        .map_err(|_| {
-            ApiError::Payments(
-                "Error while creating billing session!".to_string(),
-            )
-        })?
+        .map_err(|_| ApiError::Payments("Error while creating billing session!".to_string()))?
         .json::<Session>()
         .await
         .map_err(|_| {
-            ApiError::Payments(
-                "Error while deserializing billing response!".to_string(),
-            )
+            ApiError::Payments("Error while deserializing billing response!".to_string())
         })?;
 
     Ok(HttpResponse::Ok().json(json!(
@@ -166,27 +150,25 @@ pub async fn handle_stripe_webhook(
             if let Some(signature) = signature {
                 type HmacSha256 = Hmac<sha2::Sha256>;
 
-                let mut key = HmacSha256::new_from_slice(dotenvy::var("STRIPE_WEBHOOK_SECRET")?.as_bytes()).map_err(|_| {
-                    ApiError::Crypto(
-                        "Unable to initialize HMAC instance due to invalid key length!".to_string(),
-                    )
-                })?;
+                let mut key =
+                    HmacSha256::new_from_slice(dotenvy::var("STRIPE_WEBHOOK_SECRET")?.as_bytes())
+                        .map_err(|_| {
+                        ApiError::Crypto(
+                            "Unable to initialize HMAC instance due to invalid key length!"
+                                .to_string(),
+                        )
+                    })?;
 
                 key.update(format!("{timestamp}.{body}").as_bytes());
 
                 key.verify(&signature).map_err(|_| {
-                    ApiError::Crypto(
-                        "Unable to verify webhook signature!".to_string(),
-                    )
+                    ApiError::Crypto("Unable to verify webhook signature!".to_string())
                 })?;
 
                 if timestamp < (Utc::now() - Duration::minutes(5)).timestamp()
-                    || timestamp
-                        > (Utc::now() + Duration::minutes(5)).timestamp()
+                    || timestamp > (Utc::now() + Duration::minutes(5)).timestamp()
                 {
-                    return Err(ApiError::Crypto(
-                        "Webhook signature expired!".to_string(),
-                    ));
+                    return Err(ApiError::Crypto("Webhook signature expired!".to_string()));
                 }
             } else {
                 return Err(ApiError::Crypto("Missing signature!".to_string()));
@@ -256,8 +238,7 @@ pub async fn handle_stripe_webhook(
     // TODO: Currently hardcoded to midas-only. When we add more stuff should include price IDs
     match &*webhook.type_ {
         "checkout.session.completed" => {
-            let session: CheckoutSession =
-                serde_json::from_value(webhook.data.object)?;
+            let session: CheckoutSession = serde_json::from_value(webhook.data.object)?;
 
             sqlx::query!(
                 "
@@ -276,8 +257,7 @@ pub async fn handle_stripe_webhook(
 
             if let Some(item) = invoice.lines.data.first() {
                 let expires: DateTime<Utc> = DateTime::from_utc(
-                    NaiveDateTime::from_timestamp_opt(item.period.end, 0)
-                        .unwrap_or_default(),
+                    NaiveDateTime::from_timestamp_opt(item.period.end, 0).unwrap_or_default(),
                     Utc,
                 ) + Duration::days(1);
 
@@ -323,8 +303,7 @@ pub async fn handle_stripe_webhook(
             }
         }
         "customer.subscription.deleted" => {
-            let session: Subscription =
-                serde_json::from_value(webhook.data.object)?;
+            let session: Subscription = serde_json::from_value(webhook.data.object)?;
 
             sqlx::query!(
                 "
@@ -334,8 +313,8 @@ pub async fn handle_stripe_webhook(
                 ",
                 session.customer,
             )
-                .execute(&mut *transaction)
-                .await?;
+            .execute(&mut *transaction)
+            .await?;
         }
         _ => {}
     };

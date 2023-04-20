@@ -52,10 +52,7 @@ pub struct DonationPlatform {
 }
 
 impl Category {
-    pub async fn get_id<'a, E>(
-        name: &str,
-        exec: E,
-    ) -> Result<Option<CategoryId>, DatabaseError>
+    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<CategoryId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -124,10 +121,7 @@ impl Category {
 }
 
 impl Loader {
-    pub async fn get_id<'a, E>(
-        name: &str,
-        exec: E,
-    ) -> Result<Option<LoaderId>, DatabaseError>
+    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<LoaderId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -315,10 +309,7 @@ impl GameVersion {
 
 impl<'a> GameVersionBuilder<'a> {
     /// The game version.  Spaces must be replaced with '_' for it to be valid
-    pub fn version(
-        self,
-        version: &'a str,
-    ) -> Result<GameVersionBuilder<'a>, DatabaseError> {
+    pub fn version(self, version: &'a str) -> Result<GameVersionBuilder<'a>, DatabaseError> {
         Ok(Self {
             version: Some(version),
             ..self
@@ -342,10 +333,7 @@ impl<'a> GameVersionBuilder<'a> {
         }
     }
 
-    pub async fn insert<'b, E>(
-        self,
-        exec: E,
-    ) -> Result<GameVersionId, DatabaseError>
+    pub async fn insert<'b, E>(self, exec: E) -> Result<GameVersionId, DatabaseError>
     where
         E: sqlx::Executor<'b, Database = sqlx::Postgres>,
     {
@@ -393,9 +381,7 @@ impl DonationPlatform {
         Ok(result.map(|r| DonationPlatformId(r.id)))
     }
 
-    pub async fn list<'a, E>(
-        exec: E,
-    ) -> Result<Vec<DonationPlatform>, DatabaseError>
+    pub async fn list<'a, E>(exec: E) -> Result<Vec<DonationPlatform>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -420,10 +406,7 @@ impl DonationPlatform {
 }
 
 impl ReportType {
-    pub async fn get_id<'a, E>(
-        name: &str,
-        exec: E,
-    ) -> Result<Option<ReportTypeId>, DatabaseError>
+    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<ReportTypeId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -459,10 +442,7 @@ impl ReportType {
 }
 
 impl ProjectType {
-    pub async fn get_id<'a, E>(
-        name: &str,
-        exec: E,
-    ) -> Result<Option<ProjectTypeId>, DatabaseError>
+    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<ProjectTypeId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {
@@ -498,10 +478,7 @@ impl ProjectType {
 }
 
 impl SideType {
-    pub async fn get_id<'a, E>(
-        name: &str,
-        exec: E,
-    ) -> Result<Option<SideTypeId>, DatabaseError>
+    pub async fn get_id<'a, E>(name: &str, exec: E) -> Result<Option<SideTypeId>, DatabaseError>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres>,
     {

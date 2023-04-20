@@ -1,6 +1,4 @@
-use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult,
-};
+use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use std::io::Cursor;
 use zip::ZipArchive;
@@ -37,9 +35,10 @@ impl super::Validator for QuiltValidator {
             ));
         }
 
-        if !archive.file_names().any(|name| {
-            name.ends_with("refmap.json") || name.ends_with(".class")
-        }) {
+        if !archive
+            .file_names()
+            .any(|name| name.ends_with("refmap.json") || name.ends_with(".class"))
+        {
             return Ok(ValidationResult::Warning(
                 "Quilt mod file is a source file!",
             ));

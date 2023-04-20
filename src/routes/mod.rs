@@ -97,30 +97,28 @@ impl actix_web::ResponseError for ApiError {
     }
 
     fn error_response(&self) -> HttpResponse {
-        HttpResponse::build(self.status_code()).json(
-            crate::models::error::ApiError {
-                error: match self {
-                    ApiError::Env(..) => "environment_error",
-                    ApiError::SqlxDatabase(..) => "database_error",
-                    ApiError::Database(..) => "database_error",
-                    ApiError::Authentication(..) => "unauthorized",
-                    ApiError::CustomAuthentication(..) => "unauthorized",
-                    ApiError::Xml(..) => "xml_error",
-                    ApiError::Json(..) => "json_error",
-                    ApiError::Search(..) => "search_error",
-                    ApiError::Indexing(..) => "indexing_error",
-                    ApiError::FileHosting(..) => "file_hosting_error",
-                    ApiError::InvalidInput(..) => "invalid_input",
-                    ApiError::Validation(..) => "invalid_input",
-                    ApiError::Analytics(..) => "analytics_error",
-                    ApiError::Crypto(..) => "crypto_error",
-                    ApiError::Payments(..) => "payments_error",
-                    ApiError::DiscordError(..) => "discord_error",
-                    ApiError::Decoding(..) => "decoding_error",
-                    ApiError::ImageError(..) => "invalid_image",
-                },
-                description: &self.to_string(),
+        HttpResponse::build(self.status_code()).json(crate::models::error::ApiError {
+            error: match self {
+                ApiError::Env(..) => "environment_error",
+                ApiError::SqlxDatabase(..) => "database_error",
+                ApiError::Database(..) => "database_error",
+                ApiError::Authentication(..) => "unauthorized",
+                ApiError::CustomAuthentication(..) => "unauthorized",
+                ApiError::Xml(..) => "xml_error",
+                ApiError::Json(..) => "json_error",
+                ApiError::Search(..) => "search_error",
+                ApiError::Indexing(..) => "indexing_error",
+                ApiError::FileHosting(..) => "file_hosting_error",
+                ApiError::InvalidInput(..) => "invalid_input",
+                ApiError::Validation(..) => "invalid_input",
+                ApiError::Analytics(..) => "analytics_error",
+                ApiError::Crypto(..) => "crypto_error",
+                ApiError::Payments(..) => "payments_error",
+                ApiError::DiscordError(..) => "discord_error",
+                ApiError::Decoding(..) => "decoding_error",
+                ApiError::ImageError(..) => "invalid_image",
             },
-        )
+            description: &self.to_string(),
+        })
     }
 }

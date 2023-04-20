@@ -84,8 +84,7 @@ pub async fn get_version_from_hash(
         .iter()
         .map(|x| database::models::VersionId(x.version_id))
         .collect::<Vec<_>>();
-    let versions_data =
-        database::models::Version::get_many_full(&version_ids, &**pool).await?;
+    let versions_data = database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     if let Some(first) = versions_data.first() {
         if hash_query.multiple {
@@ -96,8 +95,7 @@ pub async fn get_version_from_hash(
                     .collect::<Vec<_>>(),
             ))
         } else {
-            Ok(HttpResponse::Ok()
-                .json(models::projects::Version::from(first.clone())))
+            Ok(HttpResponse::Ok().json(models::projects::Version::from(first.clone())))
         }
     } else {
         Ok(HttpResponse::NotFound().body(""))
@@ -128,10 +126,16 @@ pub async fn download_version(
         WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
         ORDER BY v.date_published ASC
         ",
-        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::VersionStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
         hash.as_bytes(),
         hash_query.algorithm,
-        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
     .fetch_optional(&mut *transaction)
     .await?;
@@ -178,28 +182,25 @@ pub async fn delete_file(
             || Some(x.version_id) == hash_query.version_id.map(|x| x.0 as i64)
     }) {
         if !user.role.is_admin() {
-            let team_member =
-                database::models::TeamMember::get_from_user_id_version(
-                    database::models::ids::VersionId(row.version_id),
-                    user.id.into(),
-                    &**pool,
+            let team_member = database::models::TeamMember::get_from_user_id_version(
+                database::models::ids::VersionId(row.version_id),
+                user.id.into(),
+                &**pool,
+            )
+            .await
+            .map_err(ApiError::Database)?
+            .ok_or_else(|| {
+                ApiError::CustomAuthentication(
+                    "You don't have permission to delete this file!".to_string(),
                 )
-                .await
-                .map_err(ApiError::Database)?
-                .ok_or_else(|| {
-                    ApiError::CustomAuthentication(
-                        "You don't have permission to delete this file!"
-                            .to_string(),
-                    )
-                })?;
+            })?;
 
             if !team_member
                 .permissions
                 .contains(Permissions::DELETE_VERSION)
             {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to delete this file!"
-                        .to_string(),
+                    "You don't have permission to delete this file!".to_string(),
                 ));
             }
         }
@@ -220,8 +221,7 @@ pub async fn delete_file(
 
         if files.len() < 2 {
             return Err(ApiError::InvalidInput(
-                "Versions must have at least one file uploaded to them"
-                    .to_string(),
+                "Versions must have at least one file uploaded to them".to_string(),
             ));
         }
 
@@ -324,9 +324,7 @@ pub async fn get_update_from_hash(
         .await?;
 
         if let Some(version_id) = version_ids.first() {
-            let version_data =
-                database::models::Version::get_full(*version_id, &**pool)
-                    .await?;
+            let version_data = database::models::Version::get_full(*version_id, &**pool).await?;
 
             ok_or_not_found::<QueryVersion, Version>(version_data)
         } else {
@@ -364,10 +362,16 @@ pub async fn get_versions_from_hashes(
         INNER JOIN mods m on v.mod_id = m.id
         WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
         ",
-        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::VersionStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
         hashes_parsed.as_slice(),
         file_data.algorithm,
-        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
     .fetch_all(&**pool)
     .await?;
@@ -376,8 +380,7 @@ pub async fn get_versions_from_hashes(
         .iter()
         .map(|x| database::models::VersionId(x.version_id))
         .collect::<Vec<_>>();
-    let versions_data =
-        database::models::Version::get_many_full(&version_ids, &**pool).await?;
+    let versions_data = database::models::Version::get_many_full(&version_ids, &**pool).await?;
 
     let response: Result<HashMap<String, Version>, ApiError> = result
         .into_iter()
@@ -388,10 +391,7 @@ pub async fn get_versions_from_hashes(
                 .find(|x| x.inner.id.0 == row.version_id)
                 .map(|v| {
                     if let Ok(parsed_hash) = String::from_utf8(row.hash) {
-                        Ok((
-                            parsed_hash,
-                            crate::models::projects::Version::from(v),
-                        ))
+                        Ok((parsed_hash, crate::models::projects::Version::from(v)))
                     } else {
                         Err(ApiError::Database(DatabaseError::Other(format!(
                             "Could not parse hash for version {}",
@@ -423,20 +423,25 @@ pub async fn get_projects_from_hashes(
         INNER JOIN mods m on v.mod_id = m.id
         WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
         ",
-        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::VersionStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
         hashes_parsed.as_slice(),
         file_data.algorithm,
-        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
-        .fetch_all(&**pool)
-        .await?;
+    .fetch_all(&**pool)
+    .await?;
 
     let project_ids = result
         .iter()
         .map(|x| database::models::ProjectId(x.project_id))
         .collect::<Vec<_>>();
-    let versions_data =
-        database::models::Project::get_many_full(&project_ids, &**pool).await?;
+    let versions_data = database::models::Project::get_many_full(&project_ids, &**pool).await?;
 
     let response: Result<HashMap<String, Project>, ApiError> = result
         .into_iter()
@@ -447,10 +452,7 @@ pub async fn get_projects_from_hashes(
                 .find(|x| x.inner.id.0 == row.project_id)
                 .map(|v| {
                     if let Ok(parsed_hash) = String::from_utf8(row.hash) {
-                        Ok((
-                            parsed_hash,
-                            crate::models::projects::Project::from(v),
-                        ))
+                        Ok((parsed_hash, crate::models::projects::Project::from(v)))
                     } else {
                         Err(ApiError::Database(DatabaseError::Other(format!(
                             "Could not parse hash for version {}",
@@ -538,20 +540,26 @@ pub async fn update_files(
         INNER JOIN mods m on v.mod_id = m.id
         WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
         ",
-        &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::VersionStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
         hashes_parsed.as_slice(),
         update_data.algorithm,
-        &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_hidden())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
     )
-        .fetch_many(&mut *transaction)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|m| (m.hash, database::models::ids::ProjectId(m.mod_id))))
-        })
-        .try_collect::<Vec<_>>()
-        .await?;
+    .fetch_many(&mut *transaction)
+    .try_filter_map(|e| async {
+        Ok(e.right()
+            .map(|m| (m.hash, database::models::ids::ProjectId(m.mod_id))))
+    })
+    .try_collect::<Vec<_>>()
+    .await?;
 
-    let mut version_ids: HashMap<database::models::VersionId, Vec<u8>> =
-        HashMap::new();
+    let mut version_ids: HashMap<database::models::VersionId, Vec<u8>> = HashMap::new();
 
     let updated_versions = database::models::Version::get_projects_versions(
         result
@@ -583,17 +591,13 @@ pub async fn update_files(
     .await?;
 
     for (hash, id) in result {
-        if let Some(latest_version) =
-            updated_versions.get(&id).and_then(|x| x.last())
-        {
+        if let Some(latest_version) = updated_versions.get(&id).and_then(|x| x.last()) {
             version_ids.insert(*latest_version, hash);
         }
     }
 
     let query_version_ids = version_ids.keys().copied().collect::<Vec<_>>();
-    let versions =
-        database::models::Version::get_many_full(&query_version_ids, &**pool)
-            .await?;
+    let versions = database::models::Version::get_many_full(&query_version_ids, &**pool).await?;
 
     let mut response = HashMap::new();
 
@@ -602,10 +606,7 @@ pub async fn update_files(
 
         if let Some(hash) = hash {
             if let Ok(parsed_hash) = String::from_utf8(hash.clone()) {
-                response.insert(
-                    parsed_hash,
-                    models::projects::Version::from(version),
-                );
+                response.insert(parsed_hash, models::projects::Version::from(version));
             } else {
                 let version_id: VersionId = version.inner.id.into();
 

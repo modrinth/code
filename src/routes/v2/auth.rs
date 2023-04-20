@@ -58,12 +58,8 @@ impl actix_web::ResponseError for AuthorizationError {
     fn status_code(&self) -> StatusCode {
         match self {
             AuthorizationError::Env(..) => StatusCode::INTERNAL_SERVER_ERROR,
-            AuthorizationError::SqlxDatabase(..) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-            AuthorizationError::Database(..) => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
+            AuthorizationError::SqlxDatabase(..) => StatusCode::INTERNAL_SERVER_ERROR,
+            AuthorizationError::Database(..) => StatusCode::INTERNAL_SERVER_ERROR,
             AuthorizationError::SerDe(..) => StatusCode::BAD_REQUEST,
             AuthorizationError::Github(..) => StatusCode::FAILED_DEPENDENCY,
             AuthorizationError::InvalidCredentials => StatusCode::UNAUTHORIZED,
@@ -84,9 +80,7 @@ impl actix_web::ResponseError for AuthorizationError {
                 AuthorizationError::Github(..) => "github_error",
                 AuthorizationError::InvalidCredentials => "invalid_credentials",
                 AuthorizationError::Decoding(..) => "decoding_error",
-                AuthorizationError::Authentication(..) => {
-                    "authentication_error"
-                }
+                AuthorizationError::Authentication(..) => "authentication_error",
                 AuthorizationError::Url => "url_error",
                 AuthorizationError::Banned => "user_banned",
             },
@@ -119,16 +113,12 @@ pub async fn init(
     Query(info): Query<AuthorizationInit>,
     client: Data<PgPool>,
 ) -> Result<HttpResponse, AuthorizationError> {
-    let url =
-        url::Url::parse(&info.url).map_err(|_| AuthorizationError::Url)?;
+    let url = url::Url::parse(&info.url).map_err(|_| AuthorizationError::Url)?;
 
-    let allowed_callback_urls =
-        parse_strings_from_var("ALLOWED_CALLBACK_URLS").unwrap_or_default();
+    let allowed_callback_urls = parse_strings_from_var("ALLOWED_CALLBACK_URLS").unwrap_or_default();
 
     let domain = url.domain().ok_or(AuthorizationError::Url)?;
-    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x))
-        && domain != "modrinth.com"
-    {
+    if !allowed_callback_urls.iter().any(|x| domain.ends_with(x)) && domain != "modrinth.com" {
         return Err(AuthorizationError::Url);
     }
 
@@ -215,8 +205,7 @@ pub async fn auth_callback(
 
         let user = get_github_user_from_token(&token.access_token).await?;
 
-        let user_result =
-            User::get_from_github_id(user.id, &mut *transaction).await?;
+        let user_result = User::get_from_github_id(user.id, &mut *transaction).await?;
         match user_result {
             Some(_) => {}
             None => {
@@ -231,9 +220,7 @@ pub async fn auth_callback(
                     return Err(AuthorizationError::Banned);
                 }
 
-                let user_id =
-                    crate::database::models::generate_user_id(&mut transaction)
-                        .await?;
+                let user_id = crate::database::models::generate_user_id(&mut transaction).await?;
 
                 let mut username_increment: i32 = 0;
                 let mut username = None;

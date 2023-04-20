@@ -8,9 +8,7 @@ use crate::validate::modpack::ModpackValidator;
 use crate::validate::plugin::*;
 use crate::validate::quilt::QuiltValidator;
 use crate::validate::resourcepack::{PackValidator, TexturePackValidator};
-use crate::validate::shader::{
-    CanvasShaderValidator, CoreShaderValidator, ShaderValidator,
-};
+use crate::validate::shader::{CanvasShaderValidator, CoreShaderValidator, ShaderValidator};
 use chrono::{DateTime, Utc};
 use std::io::Cursor;
 use thiserror::Error;
@@ -119,8 +117,7 @@ pub async fn validate_file(
 
         if let Some(file_type) = file_type {
             match file_type {
-                FileType::RequiredResourcePack
-                | FileType::OptionalResourcePack => {
+                FileType::RequiredResourcePack | FileType::OptionalResourcePack => {
                     project_type = "resourcepack".to_string();
                     loaders = vec![Loader("minecraft".to_string())];
                 }
@@ -150,13 +147,12 @@ pub async fn validate_file(
 
         if visited {
             if ALWAYS_ALLOWED_EXT.contains(&&*file_extension) {
-                Ok(ValidationResult::Warning("File extension is invalid for input file"))
+                Ok(ValidationResult::Warning(
+                    "File extension is invalid for input file",
+                ))
             } else {
                 Err(ValidationError::InvalidInput(
-                    format!(
-                        "File extension {file_extension} is invalid for input file"
-                    )
-                        .into(),
+                    format!("File extension {file_extension} is invalid for input file").into(),
                 ))
             }
         } else {
@@ -173,24 +169,20 @@ fn game_version_supported(
 ) -> bool {
     match supported_game_versions {
         SupportedGameVersions::All => true,
-        SupportedGameVersions::PastDate(date) => {
-            game_versions.iter().any(|x| {
-                all_game_versions
-                    .iter()
-                    .find(|y| y.version == x.0)
-                    .map(|x| x.created > date)
-                    .unwrap_or(false)
-            })
-        }
-        SupportedGameVersions::Range(before, after) => {
-            game_versions.iter().any(|x| {
-                all_game_versions
-                    .iter()
-                    .find(|y| y.version == x.0)
-                    .map(|x| x.created > before && x.created < after)
-                    .unwrap_or(false)
-            })
-        }
+        SupportedGameVersions::PastDate(date) => game_versions.iter().any(|x| {
+            all_game_versions
+                .iter()
+                .find(|y| y.version == x.0)
+                .map(|x| x.created > date)
+                .unwrap_or(false)
+        }),
+        SupportedGameVersions::Range(before, after) => game_versions.iter().any(|x| {
+            all_game_versions
+                .iter()
+                .find(|y| y.version == x.0)
+                .map(|x| x.created > before && x.created < after)
+                .unwrap_or(false)
+        }),
         SupportedGameVersions::Custom(versions) => {
             versions.iter().any(|x| game_versions.contains(x))
         }

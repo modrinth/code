@@ -2,9 +2,7 @@ use crate::database::models::User;
 use crate::file_hosting::FileHost;
 use crate::models::notifications::Notification;
 use crate::models::projects::Project;
-use crate::models::users::{
-    Badges, RecipientType, RecipientWallet, Role, UserId,
-};
+use crate::models::users::{Badges, RecipientType, RecipientWallet, Role, UserId};
 use crate::queue::payouts::{PayoutAmount, PayoutItem, PayoutsQueue};
 use crate::routes::ApiError;
 use crate::util::auth::get_user_from_headers;
@@ -24,6 +22,7 @@ use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
     cfg.service(user_auth_get);
+    cfg.service(user_data_get);
     cfg.service(users_get);
 
     cfg.service(
@@ -45,8 +44,44 @@ pub async fn user_auth_get(
     req: HttpRequest,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    Ok(HttpResponse::Ok()
-        .json(get_user_from_headers(req.headers(), &**pool).await?))
+    Ok(HttpResponse::Ok().json(get_user_from_headers(req.headers(), &**pool).await?))
+}
+
+#[derive(Serialize)]
+pub struct UserData {
+    pub notifs_count: u64,
+    pub followed_projects: Vec<crate::models::ids::ProjectId>,
+}
+
+#[get("user_data")]
+pub async fn user_data_get(
+    req: HttpRequest,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+
+    let data = sqlx::query!(
+        "
+        SELECT COUNT(DISTINCT n.id) notifs_count, ARRAY_AGG(mf.mod_id) followed_projects FROM notifications n
+        LEFT OUTER JOIN mod_follows mf ON mf.follower_id = $1
+        WHERE user_id = $1 AND read = FALSE
+        ",
+        user.id.0 as i64
+    ).fetch_optional(&**pool).await?;
+
+    if let Some(data) = data {
+        Ok(HttpResponse::Ok().json(UserData {
+            notifs_count: data.notifs_count.map(|x| x as u64).unwrap_or(0),
+            followed_projects: data
+                .followed_projects
+                .unwrap_or_default()
+                .into_iter()
+                .map(|x| crate::models::ids::ProjectId(x as u64))
+                .collect(),
+        }))
+    } else {
+        Ok(HttpResponse::NoContent().body(""))
+    }
 }
 
 #[derive(Serialize, Deserialize)]
@@ -66,8 +101,7 @@ pub async fn users_get(
 
     let users_data = User::get_many(&user_ids, &**pool).await?;
 
-    let users: Vec<crate::models::users::User> =
-        users_data.into_iter().map(From::from).collect();
+    let users: Vec<crate::models::users::User> = users_data.into_iter().map(From::from).collect();
 
     Ok(HttpResponse::Ok().json(users))
 }
@@ -78,8 +112,7 @@ pub async fn user_get(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
-    let id_option: Option<UserId> =
-        serde_json::from_str(&format!("\"{string}\"")).ok();
+    let id_option: Option<UserId> = serde_json::from_str(&format!("\"{string}\"")).ok();
 
     let mut user_data;
 
@@ -109,8 +142,7 @@ pub async fn projects_list(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let id_option =
-        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         let user_id: UserId = id.into();
@@ -121,13 +153,12 @@ pub async fn projects_list(
 
         let project_data = User::get_projects(id, &**pool).await?;
 
-        let response: Vec<_> =
-            crate::database::Project::get_many_full(&project_data, &**pool)
-                .await?
-                .into_iter()
-                .filter(|x| can_view_private || x.inner.status.is_searchable())
-                .map(Project::from)
-                .collect();
+        let response: Vec<_> = crate::database::Project::get_many_full(&project_data, &**pool)
+            .await?
+            .into_iter()
+            .filter(|x| can_view_private || x.inner.status.is_searchable())
+            .map(Project::from)
+            .collect();
 
         Ok(HttpResponse::Ok().json(response))
     } else {
@@ -192,12 +223,11 @@ pub async fn user_edit(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    new_user.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    new_user
+        .validate()
+        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
-    let id_option =
-        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         let user_id: UserId = id.into();
@@ -320,23 +350,21 @@ pub async fn user_edit(
 
             if let Some(payout_data) = &new_user.payout_data {
                 if let Some(payout_data) = payout_data {
-                    if payout_data.payout_wallet_type
-                        == RecipientType::UserHandle
+                    if payout_data.payout_wallet_type == RecipientType::UserHandle
                         && payout_data.payout_wallet == RecipientWallet::Paypal
                     {
                         return Err(ApiError::InvalidInput(
-                            "You cannot use a paypal wallet with a user handle!"
-                                .to_string(),
+                            "You cannot use a paypal wallet with a user handle!".to_string(),
                         ));
                     }
 
                     if !match payout_data.payout_wallet_type {
-                        RecipientType::Email => validator::validate_email(
-                            &payout_data.payout_address,
-                        ),
-                        RecipientType::Phone => validator::validate_phone(
-                            &payout_data.payout_address,
-                        ),
+                        RecipientType::Email => {
+                            validator::validate_email(&payout_data.payout_address)
+                        }
+                        RecipientType::Phone => {
+                            validator::validate_phone(&payout_data.payout_address)
+                        }
                         RecipientType::UserHandle => true,
                     } {
                         return Err(ApiError::InvalidInput(
@@ -350,8 +378,8 @@ pub async fn user_edit(
                         ",
                         id as crate::database::models::ids::UserId,
                     )
-                        .fetch_one(&mut *transaction)
-                        .await?;
+                    .fetch_one(&mut *transaction)
+                    .await?;
 
                     if results.exists.unwrap_or(false) {
                         return Err(ApiError::InvalidInput(
@@ -371,8 +399,8 @@ pub async fn user_edit(
                         payout_data.payout_address,
                         id as crate::database::models::ids::UserId,
                     )
-                        .execute(&mut *transaction)
-                        .await?;
+                    .execute(&mut *transaction)
+                    .await?;
                 } else {
                     sqlx::query!(
                         "
@@ -382,8 +410,8 @@ pub async fn user_edit(
                         ",
                         id as crate::database::models::ids::UserId,
                     )
-                        .execute(&mut *transaction)
-                        .await?;
+                    .execute(&mut *transaction)
+                    .await?;
                 }
             }
 
@@ -413,20 +441,15 @@ pub async fn user_icon_edit(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) =
-        crate::util::ext::get_image_content_type(&ext.ext)
-    {
+    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
         let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
-        let id_option =
-            User::get_id_from_username_or_id(&info.into_inner().0, &**pool)
-                .await?;
+        let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
         if let Some(id) = id_option {
             if user.id != id.into() && !user.role.is_mod() {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit this user's icon."
-                        .to_string(),
+                    "You don't have permission to edit this user's icon.".to_string(),
                 ));
             }
 
@@ -452,12 +475,8 @@ pub async fn user_icon_edit(
                 }
             }
 
-            let bytes = read_from_payload(
-                &mut payload,
-                2097152,
-                "Icons must be smaller than 2MiB",
-            )
-            .await?;
+            let bytes =
+                read_from_payload(&mut payload, 2097152, "Icons must be smaller than 2MiB").await?;
 
             let hash = sha1::Sha1::from(&bytes).hexdigest();
             let upload_data = file_host
@@ -509,8 +528,7 @@ pub async fn user_delete(
     removal_type: web::Query<RemovalType>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option =
-        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
@@ -546,11 +564,7 @@ pub async fn user_follows(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &info.into_inner().0,
-        &**pool,
-    )
-    .await?;
+    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
@@ -576,12 +590,11 @@ pub async fn user_follows(
         .try_collect::<Vec<crate::database::models::ProjectId>>()
         .await?;
 
-        let projects: Vec<_> =
-            crate::database::Project::get_many_full(&project_ids, &**pool)
-                .await?
-                .into_iter()
-                .map(Project::from)
-                .collect();
+        let projects: Vec<_> = crate::database::Project::get_many_full(&project_ids, &**pool)
+            .await?
+            .into_iter()
+            .map(Project::from)
+            .collect();
 
         Ok(HttpResponse::Ok().json(projects))
     } else {
@@ -596,11 +609,7 @@ pub async fn user_notifications(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option = crate::database::models::User::get_id_from_username_or_id(
-        &info.into_inner().0,
-        &**pool,
-    )
-    .await?;
+    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
@@ -638,14 +647,12 @@ pub async fn user_payouts(
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option =
-        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
-                "You do not have permission to see the payouts of this user!"
-                    .to_string(),
+                "You do not have permission to see the payouts of this user!".to_string(),
             ));
         }
 
@@ -717,22 +724,18 @@ pub async fn user_payouts_request(
     let mut payouts_queue = payouts_queue.lock().await;
 
     let user = get_user_from_headers(req.headers(), &**pool).await?;
-    let id_option =
-        User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
+    let id_option = User::get_id_from_username_or_id(&info.into_inner().0, &**pool).await?;
 
     if let Some(id) = id_option {
         if !user.role.is_admin() && user.id != id.into() {
             return Err(ApiError::CustomAuthentication(
-                "You do not have permission to request payouts of this user!"
-                    .to_string(),
+                "You do not have permission to request payouts of this user!".to_string(),
             ));
         }
 
         if let Some(payouts_data) = user.payout_data {
             if let Some(payout_address) = payouts_data.payout_address {
-                if let Some(payout_wallet_type) =
-                    payouts_data.payout_wallet_type
-                {
+                if let Some(payout_wallet_type) = payouts_data.payout_wallet_type {
                     if let Some(payout_wallet) = payouts_data.payout_wallet {
                         return if data.amount < payouts_data.balance {
                             let mut transaction = pool.begin().await?;
@@ -744,10 +747,15 @@ pub async fn user_payouts_request(
                                         value: data.amount,
                                     },
                                     receiver: payout_address,
-                                    note: "Payment from Modrinth creator monetization program".to_string(),
+                                    note: "Payment from Modrinth creator monetization program"
+                                        .to_string(),
                                     recipient_type: payout_wallet_type.to_string().to_uppercase(),
                                     recipient_wallet: payout_wallet.as_str_api().to_string(),
-                                    sender_item_id: format!("{}-{}", UserId::from(id), Utc::now().timestamp()),
+                                    sender_item_id: format!(
+                                        "{}-{}",
+                                        UserId::from(id),
+                                        Utc::now().timestamp()
+                                    ),
                                 })
                                 .await?;
 
@@ -760,8 +768,8 @@ pub async fn user_payouts_request(
                                 data.amount,
                                 "success"
                             )
-                                .execute(&mut *transaction)
-                                .await?;
+                            .execute(&mut *transaction)
+                            .await?;
 
                             sqlx::query!(
                                 "
@@ -780,8 +788,7 @@ pub async fn user_payouts_request(
                             Ok(HttpResponse::NoContent().body(""))
                         } else {
                             Err(ApiError::InvalidInput(
-                                "You do not have enough funds to make this payout!"
-                                    .to_string(),
+                                "You do not have enough funds to make this payout!".to_string(),
                             ))
                         };
                     }

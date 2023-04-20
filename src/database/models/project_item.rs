@@ -186,12 +186,11 @@ impl ProjectBuilder {
                 self.project_id as ProjectId,
                 category as CategoryId,
             )
-                .execute(&mut *transaction)
-                .await?;
+            .execute(&mut *transaction)
+            .await?;
         }
 
-        Project::update_game_versions(self.project_id, &mut *transaction)
-            .await?;
+        Project::update_game_versions(self.project_id, &mut *transaction).await?;
         Project::update_loaders(self.project_id, &mut *transaction).await?;
 
         Ok(self.project_id)
@@ -307,8 +306,7 @@ impl Project {
     {
         use futures::stream::TryStreamExt;
 
-        let project_ids_parsed: Vec<i64> =
-            project_ids.iter().map(|x| x.0).collect();
+        let project_ids_parsed: Vec<i64> = project_ids.iter().map(|x| x.0).collect();
         let projects = sqlx::query!(
             "
             SELECT id, project_type, title, description, downloads, follows,
@@ -342,12 +340,8 @@ impl Project {
                 license_url: m.license_url,
                 discord_url: m.discord_url,
                 client_side: SideTypeId(m.client_side),
-                status: ProjectStatus::from_str(
-                    &m.status,
-                ),
-                requested_status: m.requested_status.map(|x| ProjectStatus::from_str(
-                    &x,
-                )),
+                status: ProjectStatus::from_str(&m.status),
+                requested_status: m.requested_status.map(|x| ProjectStatus::from_str(&x)),
                 server_side: SideTypeId(m.server_side),
                 license: m.license,
                 slug: m.slug,
@@ -402,11 +396,7 @@ impl Project {
 
         if let Some(thread_id) = thread_id {
             if let Some(id) = thread_id.thread_id {
-                crate::database::models::Thread::remove_full(
-                    ThreadId(id),
-                    transaction,
-                )
-                .await?;
+                crate::database::models::Thread::remove_full(ThreadId(id), transaction).await?;
             }
         }
 
@@ -595,23 +585,18 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option =
-            crate::models::ids::base62_impl::parse_base62(slug_or_project_id)
-                .ok();
+        let id_option = crate::models::ids::base62_impl::parse_base62(slug_or_project_id).ok();
 
         if let Some(id) = id_option {
-            let mut project =
-                Project::get(ProjectId(id as i64), executor).await?;
+            let mut project = Project::get(ProjectId(id as i64), executor).await?;
 
             if project.is_none() {
-                project = Project::get_from_slug(slug_or_project_id, executor)
-                    .await?;
+                project = Project::get_from_slug(slug_or_project_id, executor).await?;
             }
 
             Ok(project)
         } else {
-            let project =
-                Project::get_from_slug(slug_or_project_id, executor).await?;
+            let project = Project::get_from_slug(slug_or_project_id, executor).await?;
 
             Ok(project)
         }
@@ -624,25 +609,18 @@ impl Project {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option =
-            crate::models::ids::base62_impl::parse_base62(slug_or_project_id)
-                .ok();
+        let id_option = crate::models::ids::base62_impl::parse_base62(slug_or_project_id).ok();
 
         if let Some(id) = id_option {
-            let mut project =
-                Project::get_full(ProjectId(id as i64), executor).await?;
+            let mut project = Project::get_full(ProjectId(id as i64), executor).await?;
 
             if project.is_none() {
-                project =
-                    Project::get_full_from_slug(slug_or_project_id, executor)
-                        .await?;
+                project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
             }
 
             Ok(project)
         } else {
-            let project =
-                Project::get_full_from_slug(slug_or_project_id, executor)
-                    .await?;
+            let project = Project::get_full_from_slug(slug_or_project_id, executor).await?;
             Ok(project)
         }
     }
@@ -668,8 +646,7 @@ impl Project {
     {
         use futures::TryStreamExt;
 
-        let project_ids_parsed: Vec<i64> =
-            project_ids.iter().map(|x| x.0).collect();
+        let project_ids_parsed: Vec<i64> = project_ids.iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT m.id id, m.project_type project_type, m.title title, m.description description, m.downloads downloads, m.follows follows,

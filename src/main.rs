@@ -35,8 +35,7 @@ pub struct Pepper {
 #[actix_rt::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
-    env_logger::Builder::from_env(Env::default().default_filter_or("info"))
-        .init();
+    env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     if check_env_vars() {
         error!("Some environment variables are missing!");
@@ -75,40 +74,37 @@ async fn main() -> std::io::Result<()> {
         .await
         .expect("Database connection failed");
 
-    let storage_backend =
-        dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
+    let storage_backend = dotenvy::var("STORAGE_BACKEND").unwrap_or_else(|_| "local".to_string());
 
-    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> =
-        match storage_backend.as_str() {
-            "backblaze" => Arc::new(
-                file_hosting::BackblazeHost::new(
-                    &dotenvy::var("BACKBLAZE_KEY_ID").unwrap(),
-                    &dotenvy::var("BACKBLAZE_KEY").unwrap(),
-                    &dotenvy::var("BACKBLAZE_BUCKET_ID").unwrap(),
-                )
-                .await,
-            ),
-            "s3" => Arc::new(
-                S3Host::new(
-                    &dotenvy::var("S3_BUCKET_NAME").unwrap(),
-                    &dotenvy::var("S3_REGION").unwrap(),
-                    &dotenvy::var("S3_URL").unwrap(),
-                    &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
-                    &dotenvy::var("S3_SECRET").unwrap(),
-                )
-                .unwrap(),
-            ),
-            "local" => Arc::new(file_hosting::MockHost::new()),
-            _ => panic!("Invalid storage backend specified. Aborting startup!"),
-        };
+    let file_host: Arc<dyn file_hosting::FileHost + Send + Sync> = match storage_backend.as_str() {
+        "backblaze" => Arc::new(
+            file_hosting::BackblazeHost::new(
+                &dotenvy::var("BACKBLAZE_KEY_ID").unwrap(),
+                &dotenvy::var("BACKBLAZE_KEY").unwrap(),
+                &dotenvy::var("BACKBLAZE_BUCKET_ID").unwrap(),
+            )
+            .await,
+        ),
+        "s3" => Arc::new(
+            S3Host::new(
+                &dotenvy::var("S3_BUCKET_NAME").unwrap(),
+                &dotenvy::var("S3_REGION").unwrap(),
+                &dotenvy::var("S3_URL").unwrap(),
+                &dotenvy::var("S3_ACCESS_TOKEN").unwrap(),
+                &dotenvy::var("S3_SECRET").unwrap(),
+            )
+            .unwrap(),
+        ),
+        "local" => Arc::new(file_hosting::MockHost::new()),
+        _ => panic!("Invalid storage backend specified. Aborting startup!"),
+    };
 
     let mut scheduler = scheduler::Scheduler::new();
 
     // The interval in seconds at which the local database is indexed
     // for searching.  Defaults to 1 hour if unset.
-    let local_index_interval = std::time::Duration::from_secs(
-        parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600),
-    );
+    let local_index_interval =
+        std::time::Duration::from_secs(parse_var("LOCAL_INDEX_INTERVAL").unwrap_or(3600));
 
     let pool_ref = pool.clone();
     let search_config_ref = search_config.clone();
@@ -118,8 +114,7 @@ async fn main() -> std::io::Result<()> {
         async move {
             info!("Indexing local database");
             let settings = IndexingSettings { index_local: true };
-            let result =
-                index_projects(pool_ref, settings, &search_config_ref).await;
+            let result = index_projects(pool_ref, settings, &search_config_ref).await;
             if let Err(e) = result {
                 warn!("Local project indexing failed: {:?}", e);
             }
@@ -170,14 +165,11 @@ async fn main() -> std::io::Result<()> {
                 ",
                 crate::models::projects::ProjectStatus::Scheduled.as_str(),
             )
-                .execute(&pool_ref)
-                .await;
+            .execute(&pool_ref)
+            .await;
 
             if let Err(e) = projects_results {
-                warn!(
-                    "Syncing scheduled releases for projects failed: {:?}",
-                    e
-                );
+                warn!("Syncing scheduled releases for projects failed: {:?}", e);
             }
 
             let versions_results = sqlx::query!(
@@ -188,21 +180,18 @@ async fn main() -> std::io::Result<()> {
                 ",
                 crate::models::projects::VersionStatus::Scheduled.as_str(),
             )
-                .execute(&pool_ref)
-                .await;
+            .execute(&pool_ref)
+            .await;
 
             if let Err(e) = versions_results {
-                warn!(
-                    "Syncing scheduled releases for versions failed: {:?}",
-                    e
-                );
+                warn!("Syncing scheduled releases for versions failed: {:?}", e);
             }
 
             info!("Finished releasing scheduled versions/projects");
         }
     });
 
-    // Reminding moderators to review projects which have been in the queue longer than 24hr
+    // Reminding moderators to review projects which have been in the queue longer than 40hr
     let pool_ref = pool.clone();
     let webhook_message_sent = Arc::new(Mutex::new(Vec::<(
         database::models::ProjectId,
@@ -212,7 +201,7 @@ async fn main() -> std::io::Result<()> {
     scheduler.run(std::time::Duration::from_secs(10 * 60), move || {
         let pool_ref = pool_ref.clone();
         let webhook_message_sent_ref = webhook_message_sent.clone();
-        info!("Checking reviewed projects submitted more than 24hrs ago");
+        info!("Checking reviewed projects submitted more than 40hrs ago");
 
         async move {
             let do_steps = async {
@@ -221,7 +210,7 @@ async fn main() -> std::io::Result<()> {
                 let project_ids = sqlx::query!(
                     "
                     SELECT id FROM mods
-                    WHERE status = $1 AND queued < NOW() - INTERVAL '1 day'
+                    WHERE status = $1 AND queued < NOW() - INTERVAL '40 hours'
                     ORDER BY updated ASC
                     ",
                     crate::models::projects::ProjectStatus::Processing.as_str(),
@@ -247,7 +236,7 @@ async fn main() -> std::io::Result<()> {
                             project.into(),
                             &pool_ref,
                             webhook_url,
-                            Some("<@&783155186491195394> This project has been in the queue for over 24 hours!".to_string()),
+                            Some("<@&783155186491195394> This project has been in the queue for over 40 hours!".to_string()),
                         )
                             .await
                             .ok();
@@ -261,12 +250,12 @@ async fn main() -> std::io::Result<()> {
 
             if let Err(e) = do_steps.await {
                 warn!(
-                    "Checking reviewed projects submitted more than 24hrs ago failed: {:?}",
+                    "Checking reviewed projects submitted more than 40hrs ago failed: {:?}",
                     e
                 );
             }
 
-            info!("Finished checking reviewed projects submitted more than 24hrs ago");
+            info!("Finished checking reviewed projects submitted more than 40hrs ago");
         }
     });
 
@@ -291,8 +280,7 @@ async fn main() -> std::io::Result<()> {
     });
 
     let ip_salt = Pepper {
-        pepper: models::ids::Base62Id(models::ids::random_base62(11))
-            .to_string(),
+        pepper: models::ids::Base62Id(models::ids::random_base62(11)).to_string(),
     };
 
     let payouts_queue = Arc::new(Mutex::new(PayoutsQueue::new()));
@@ -317,48 +305,43 @@ async fn main() -> std::io::Result<()> {
                 RateLimiter::new(MemoryStoreActor::from(store.clone()).start())
                     .with_identifier(|req| {
                         let connection_info = req.connection_info();
-                        let ip = String::from(
-                            if parse_var("CLOUDFLARE_INTEGRATION")
-                                .unwrap_or(false)
-                            {
-                                if let Some(header) =
-                                    req.headers().get("CF-Connecting-IP")
-                                {
-                                    header
-                                        .to_str()
-                                        .map_err(|_| ARError::Identification)?
+                        let ip =
+                            String::from(if parse_var("CLOUDFLARE_INTEGRATION").unwrap_or(false) {
+                                if let Some(header) = req.headers().get("CF-Connecting-IP") {
+                                    header.to_str().map_err(|_| ARError::Identification)?
                                 } else {
-                                    connection_info
-                                        .peer_addr()
-                                        .ok_or(ARError::Identification)?
+                                    connection_info.peer_addr().ok_or(ARError::Identification)?
                                 }
                             } else {
-                                connection_info
-                                    .peer_addr()
-                                    .ok_or(ARError::Identification)?
-                            },
-                        );
+                                connection_info.peer_addr().ok_or(ARError::Identification)?
+                            });
 
                         Ok(ip)
                     })
                     .with_interval(std::time::Duration::from_secs(60))
                     .with_max_requests(300)
-                    .with_ignore_key(
-                        dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok(),
-                    ),
+                    .with_ignore_key(dotenvy::var("RATE_LIMIT_IGNORE_KEY").ok()),
             )
-            .app_data(web::FormConfig::default().error_handler(|err, _req| {
-                routes::ApiError::Validation(err.to_string()).into()
-            }))
-            .app_data(web::PathConfig::default().error_handler(|err, _req| {
-                routes::ApiError::Validation(err.to_string()).into()
-            }))
-            .app_data(web::QueryConfig::default().error_handler(|err, _req| {
-                routes::ApiError::Validation(err.to_string()).into()
-            }))
-            .app_data(web::JsonConfig::default().error_handler(|err, _req| {
-                routes::ApiError::Validation(err.to_string()).into()
-            }))
+            .app_data(
+                web::FormConfig::default().error_handler(|err, _req| {
+                    routes::ApiError::Validation(err.to_string()).into()
+                }),
+            )
+            .app_data(
+                web::PathConfig::default().error_handler(|err, _req| {
+                    routes::ApiError::Validation(err.to_string()).into()
+                }),
+            )
+            .app_data(
+                web::QueryConfig::default().error_handler(|err, _req| {
+                    routes::ApiError::Validation(err.to_string()).into()
+                }),
+            )
+            .app_data(
+                web::JsonConfig::default().error_handler(|err, _req| {
+                    routes::ApiError::Validation(err.to_string()).into()
+                }),
+            )
             .app_data(web::Data::new(pool.clone()))
             .app_data(web::Data::new(file_host.clone()))
             .app_data(web::Data::new(search_config.clone()))

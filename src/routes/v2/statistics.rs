@@ -8,9 +8,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
 }
 
 #[get("statistics")]
-pub async fn get_stats(
-    pool: web::Data<PgPool>,
-) -> Result<HttpResponse, ApiError> {
+pub async fn get_stats(pool: web::Data<PgPool>) -> Result<HttpResponse, ApiError> {
     let projects = sqlx::query!(
         "
         SELECT COUNT(id)

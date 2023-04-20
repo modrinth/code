@@ -50,10 +50,7 @@ impl User {
 
         Ok(())
     }
-    pub async fn get<'a, 'b, E>(
-        id: UserId,
-        executor: E,
-    ) -> Result<Option<Self>, sqlx::error::Error>
+    pub async fn get<'a, 'b, E>(id: UserId, executor: E) -> Result<Option<Self>, sqlx::error::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -95,12 +92,9 @@ impl User {
                 bio: row.bio,
                 created: row.created,
                 role: row.role,
-                badges: Badges::from_bits(row.badges as u64)
-                    .unwrap_or_default(),
+                badges: Badges::from_bits(row.badges as u64).unwrap_or_default(),
                 balance: row.balance,
-                payout_wallet: row
-                    .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&x)),
+                payout_wallet: row.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
                 payout_wallet_type: row
                     .payout_wallet_type
                     .map(|x| RecipientType::from_string(&x)),
@@ -144,12 +138,9 @@ impl User {
                 bio: row.bio,
                 created: row.created,
                 role: row.role,
-                badges: Badges::from_bits(row.badges as u64)
-                    .unwrap_or_default(),
+                badges: Badges::from_bits(row.badges as u64).unwrap_or_default(),
                 balance: row.balance,
-                payout_wallet: row
-                    .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&x)),
+                payout_wallet: row.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
                 payout_wallet_type: row
                     .payout_wallet_type
                     .map(|x| RecipientType::from_string(&x)),
@@ -160,10 +151,7 @@ impl User {
         }
     }
 
-    pub async fn get_many<'a, E>(
-        user_ids: &[UserId],
-        exec: E,
-    ) -> Result<Vec<User>, sqlx::Error>
+    pub async fn get_many<'a, E>(user_ids: &[UserId], exec: E) -> Result<Vec<User>, sqlx::Error>
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
@@ -196,12 +184,8 @@ impl User {
                 role: u.role,
                 badges: Badges::from_bits(u.badges as u64).unwrap_or_default(),
                 balance: u.balance,
-                payout_wallet: u
-                    .payout_wallet
-                    .map(|x| RecipientWallet::from_string(&x)),
-                payout_wallet_type: u
-                    .payout_wallet_type
-                    .map(|x| RecipientType::from_string(&x)),
+                payout_wallet: u.payout_wallet.map(|x| RecipientWallet::from_string(&x)),
+                payout_wallet_type: u.payout_wallet_type.map(|x| RecipientType::from_string(&x)),
                 payout_address: u.payout_address,
             }))
         })
@@ -384,11 +368,8 @@ impl User {
         .await?;
 
         for project_id in projects {
-            let _result = super::project_item::Project::remove_full(
-                project_id,
-                transaction,
-            )
-            .await?;
+            let _result =
+                super::project_item::Project::remove_full(project_id, transaction).await?;
         }
 
         let notifications: Vec<i64> = sqlx::query!(
@@ -489,8 +470,7 @@ impl User {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let id_option =
-            crate::models::ids::base62_impl::parse_base62(username_or_id).ok();
+        let id_option = crate::models::ids::base62_impl::parse_base62(username_or_id).ok();
 
         if let Some(id) = id_option {
             let id = UserId(id as i64);

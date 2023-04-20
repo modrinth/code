@@ -1,6 +1,4 @@
-use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult,
-};
+use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use std::io::Cursor;
 use zip::ZipArchive;

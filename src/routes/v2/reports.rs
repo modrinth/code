@@ -1,15 +1,9 @@
-use crate::database::models::thread_item::{
-    ThreadBuilder, ThreadMessageBuilder,
-};
-use crate::models::ids::{
-    base62_impl::parse_base62, ProjectId, UserId, VersionId,
-};
+use crate::database::models::thread_item::{ThreadBuilder, ThreadMessageBuilder};
+use crate::models::ids::{base62_impl::parse_base62, ProjectId, UserId, VersionId};
 use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
 use crate::routes::ApiError;
-use crate::util::auth::{
-    check_is_moderator_from_headers, get_user_from_headers,
-};
+use crate::util::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::StreamExt;
@@ -41,31 +35,24 @@ pub async fn report_create(
 ) -> Result<HttpResponse, ApiError> {
     let mut transaction = pool.begin().await?;
 
-    let current_user =
-        get_user_from_headers(req.headers(), &mut *transaction).await?;
+    let current_user = get_user_from_headers(req.headers(), &mut *transaction).await?;
 
     let mut bytes = web::BytesMut::new();
     while let Some(item) = body.next().await {
         bytes.extend_from_slice(&item.map_err(|_| {
-            ApiError::InvalidInput(
-                "Error while parsing request payload!".to_string(),
-            )
+            ApiError::InvalidInput("Error while parsing request payload!".to_string())
         })?);
     }
     let new_report: CreateReport = serde_json::from_slice(bytes.as_ref())?;
 
-    let id =
-        crate::database::models::generate_report_id(&mut transaction).await?;
+    let id = crate::database::models::generate_report_id(&mut transaction).await?;
     let report_type = crate::database::models::categories::ReportType::get_id(
         &new_report.report_type,
         &mut *transaction,
     )
     .await?
     .ok_or_else(|| {
-        ApiError::InvalidInput(format!(
-            "Invalid report type: {}",
-            new_report.report_type
-        ))
+        ApiError::InvalidInput(format!("Invalid report type: {}", new_report.report_type))
     })?;
 
     let thread_id = ThreadBuilder {
@@ -92,8 +79,7 @@ pub async fn report_create(
 
     match new_report.item_type {
         ItemType::Project => {
-            let project_id =
-                ProjectId(parse_base62(new_report.item_id.as_str())?);
+            let project_id = ProjectId(parse_base62(new_report.item_id.as_str())?);
 
             let result = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM mods WHERE id = $1)",
@@ -112,8 +98,7 @@ pub async fn report_create(
             report.project_id = Some(project_id.into())
         }
         ItemType::Version => {
-            let version_id =
-                VersionId(parse_base62(new_report.item_id.as_str())?);
+            let version_id = VersionId(parse_base62(new_report.item_id.as_str())?);
 
             let result = sqlx::query!(
                 "SELECT EXISTS(SELECT 1 FROM versions WHERE id = $1)",
@@ -236,11 +221,8 @@ pub async fn reports(
         .await?
     };
 
-    let query_reports = crate::database::models::report_item::Report::get_many(
-        &report_ids,
-        &**pool,
-    )
-    .await?;
+    let query_reports =
+        crate::database::models::report_item::Report::get_many(&report_ids, &**pool).await?;
 
     let mut reports = Vec::new();
 
@@ -260,8 +242,7 @@ pub async fn report_get(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id = info.into_inner().0.into();
 
-    let report =
-        crate::database::models::report_item::Report::get(id, &**pool).await?;
+    let report = crate::database::models::report_item::Report::get(id, &**pool).await?;
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.reporter != user.id.into() {
@@ -291,8 +272,7 @@ pub async fn report_edit(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let id = info.into_inner().0.into();
 
-    let report =
-        crate::database::models::report_item::Report::get(id, &**pool).await?;
+    let report = crate::database::models::report_item::Report::get(id, &**pool).await?;
 
     if let Some(report) = report {
         if !user.role.is_mod() && report.user_id != Some(user.id.into()) {
@@ -380,9 +360,7 @@ pub async fn report_delete(
     }
 }
 
-fn to_report(
-    x: crate::database::models::report_item::QueryReport,
-) -> Result<Report, ApiError> {
+fn to_report(x: crate::database::models::report_item::QueryReport) -> Result<Report, ApiError> {
     let mut item_id = "".to_string();
     let mut item_type = ItemType::Unknown;
 

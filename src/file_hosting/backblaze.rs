@@ -16,12 +16,10 @@ pub struct BackblazeHost {
 
 impl BackblazeHost {
     pub async fn new(key_id: &str, key: &str, bucket_id: &str) -> Self {
-        let authorization_data =
-            authorization::authorize_account(key_id, key).await.unwrap();
-        let upload_url_data =
-            authorization::get_upload_url(&authorization_data, bucket_id)
-                .await
-                .unwrap();
+        let authorization_data = authorization::authorize_account(key_id, key).await.unwrap();
+        let upload_url_data = authorization::get_upload_url(&authorization_data, bucket_id)
+            .await
+            .unwrap();
 
         BackblazeHost {
             upload_url_data,
@@ -40,13 +38,8 @@ impl FileHost for BackblazeHost {
     ) -> Result<UploadFileData, FileHostingError> {
         let content_sha512 = format!("{:x}", sha2::Sha512::digest(&file_bytes));
 
-        let upload_data = upload::upload_file(
-            &self.upload_url_data,
-            content_type,
-            file_name,
-            file_bytes,
-        )
-        .await?;
+        let upload_data =
+            upload::upload_file(&self.upload_url_data, content_type, file_name, file_bytes).await?;
         Ok(UploadFileData {
             file_id: upload_data.file_id,
             file_name: upload_data.file_name,
@@ -81,12 +74,8 @@ impl FileHost for BackblazeHost {
         file_id: &str,
         file_name: &str,
     ) -> Result<DeleteFileData, FileHostingError> {
-        let delete_data = delete::delete_file_version(
-            &self.authorization_data,
-            file_id,
-            file_name,
-        )
-        .await?;
+        let delete_data =
+            delete::delete_file_version(&self.authorization_data, file_id, file_name).await?;
         Ok(DeleteFileData {
             file_id: delete_data.file_id,
             file_name: delete_data.file_name,
@@ -94,9 +83,7 @@ impl FileHost for BackblazeHost {
     }
 }
 
-pub async fn process_response<T>(
-    response: Response,
-) -> Result<T, FileHostingError>
+pub async fn process_response<T>(response: Response) -> Result<T, FileHostingError>
 where
     T: for<'de> Deserialize<'de>,
 {

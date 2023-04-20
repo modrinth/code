@@ -6,16 +6,13 @@ use crate::models;
 use crate::models::ids::base62_impl::parse_base62;
 use crate::models::notifications::NotificationBody;
 use crate::models::projects::{
-    DonationLink, MonetizationStatus, Project, ProjectId, ProjectStatus,
-    SearchRequest, SideType,
+    DonationLink, MonetizationStatus, Project, ProjectId, ProjectStatus, SearchRequest, SideType,
 };
 use crate::models::teams::Permissions;
 use crate::models::threads::MessageBody;
 use crate::routes::ApiError;
 use crate::search::{search_for_project, SearchConfig, SearchError};
-use crate::util::auth::{
-    filter_authorized_projects, get_user_from_headers, is_authorized,
-};
+use crate::util::auth::{filter_authorized_projects, get_user_from_headers, is_authorized};
 use crate::util::routes::read_from_payload;
 use crate::util::validate::validation_errors_to_string;
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
@@ -78,30 +75,30 @@ pub async fn random_projects_get(
     web::Query(count): web::Query<RandomProjects>,
     pool: web::Data<PgPool>,
 ) -> Result<HttpResponse, ApiError> {
-    count.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    count
+        .validate()
+        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
     let project_ids = sqlx::query!(
-            "
+        "
             SELECT id FROM mods TABLESAMPLE SYSTEM_ROWS($1) WHERE status = ANY($2)
             ",
-            count.count as i32,
-            &*crate::models::projects::ProjectStatus::iterator().filter(|x| x.is_searchable()).map(|x| x.to_string()).collect::<Vec<String>>(),
-        )
-        .fetch_many(&**pool)
-        .try_filter_map(|e| async {
-            Ok(e.right().map(|m| database::models::ids::ProjectId(m.id)))
-        })
-        .try_collect::<Vec<_>>()
-        .await?;
+        count.count as i32,
+        &*crate::models::projects::ProjectStatus::iterator()
+            .filter(|x| x.is_searchable())
+            .map(|x| x.to_string())
+            .collect::<Vec<String>>(),
+    )
+    .fetch_many(&**pool)
+    .try_filter_map(|e| async { Ok(e.right().map(|m| database::models::ids::ProjectId(m.id))) })
+    .try_collect::<Vec<_>>()
+    .await?;
 
-    let projects_data =
-        database::models::Project::get_many_full(&project_ids, &**pool)
-            .await?
-            .into_iter()
-            .map(Project::from)
-            .collect::<Vec<_>>();
+    let projects_data = database::models::Project::get_many_full(&project_ids, &**pool)
+        .await?
+        .into_iter()
+        .map(Project::from)
+        .collect::<Vec<_>>();
 
     Ok(HttpResponse::Ok().json(projects_data))
 }
@@ -123,13 +120,11 @@ pub async fn projects_get(
             .map(|x| x.into())
             .collect();
 
-    let projects_data =
-        database::models::Project::get_many_full(&project_ids, &**pool).await?;
+    let projects_data = database::models::Project::get_many_full(&project_ids, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
-    let projects =
-        filter_authorized_projects(projects_data, &user_option, &pool).await?;
+    let projects = filter_authorized_projects(projects_data, &user_option, &pool).await?;
 
     Ok(HttpResponse::Ok().json(projects))
 }
@@ -143,10 +138,7 @@ pub async fn project_get(
     let string = info.into_inner().0;
 
     let project_data =
-        database::models::Project::get_full_from_slug_or_project_id(
-            &string, &**pool,
-        )
-        .await?;
+        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -229,10 +221,7 @@ pub async fn dependency_list(
 ) -> Result<HttpResponse, ApiError> {
     let string = info.into_inner().0;
 
-    let result = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?;
+    let result = database::models::Project::get_from_slug_or_project_id(&string, &**pool).await?;
 
     let user_option = get_user_from_headers(req.headers(), &**pool).await.ok();
 
@@ -259,12 +248,13 @@ pub async fn dependency_list(
         .try_filter_map(|e| async {
             Ok(e.right().map(|x| {
                 (
-                    x.dependency_id
-                        .map(database::models::VersionId),
-                    if x.mod_id == Some(0) { None } else { x.mod_id
-                        .map(database::models::ProjectId) },
-                    x.mod_dependency_id
-                        .map(database::models::ProjectId),
+                    x.dependency_id.map(database::models::VersionId),
+                    if x.mod_id == Some(0) {
+                        None
+                    } else {
+                        x.mod_id.map(database::models::ProjectId)
+                    },
+                    x.mod_dependency_id.map(database::models::ProjectId),
                 )
             }))
         })
@@ -430,15 +420,13 @@ pub async fn project_edit(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    new_project.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    new_project
+        .validate()
+        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
     let string = info.into_inner().0;
-    let result = database::models::Project::get_full_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?;
+    let result =
+        database::models::Project::get_full_from_slug_or_project_id(&string, &**pool).await?;
 
     if let Some(project_item) = result {
         let id = project_item.inner.id;
@@ -456,8 +444,7 @@ pub async fn project_edit(
         } else if let Some(ref member) = team_member {
             permissions = Some(member.permissions)
         } else if user.role.is_mod() {
-            permissions =
-                Some(Permissions::EDIT_DETAILS | Permissions::EDIT_BODY)
+            permissions = Some(Permissions::EDIT_DETAILS | Permissions::EDIT_BODY)
         } else {
             permissions = None
         }
@@ -518,12 +505,10 @@ pub async fn project_edit(
                 if !(user.role.is_mod()
                     || !project_item.inner.status.is_approved()
                         && status == &ProjectStatus::Processing
-                    || project_item.inner.status.is_approved()
-                        && status.can_be_requested())
+                    || project_item.inner.status.is_approved() && status.can_be_requested())
                 {
                     return Err(ApiError::CustomAuthentication(
-                        "You don't have permission to set this status!"
-                            .to_string(),
+                        "You don't have permission to set this status!".to_string(),
                     ));
                 }
 
@@ -545,9 +530,7 @@ pub async fn project_edit(
                     .execute(&mut *transaction)
                     .await?;
 
-                    if let Ok(webhook_url) =
-                        dotenvy::var("MODERATION_DISCORD_WEBHOOK")
-                    {
+                    if let Ok(webhook_url) = dotenvy::var("MODERATION_DISCORD_WEBHOOK") {
                         crate::util::webhook::send_discord_webhook(
                             project_item.inner.id.into(),
                             &pool,
@@ -559,9 +542,7 @@ pub async fn project_edit(
                     }
                 }
 
-                if status.is_approved()
-                    && !project_item.inner.status.is_approved()
-                {
+                if status.is_approved() && !project_item.inner.status.is_approved() {
                     sqlx::query!(
                         "
                         UPDATE mods
@@ -575,9 +556,7 @@ pub async fn project_edit(
                 }
 
                 if status.is_searchable() && !project_item.inner.webhook_sent {
-                    if let Ok(webhook_url) =
-                        dotenvy::var("PUBLIC_DISCORD_WEBHOOK")
-                    {
+                    if let Ok(webhook_url) = dotenvy::var("PUBLIC_DISCORD_WEBHOOK") {
                         crate::util::webhook::send_discord_webhook(
                             project_item.inner.id.into(),
                             &pool,
@@ -607,8 +586,7 @@ pub async fn project_edit(
                         FROM team_members tm
                         WHERE tm.team_id = $1 AND tm.accepted
                         ",
-                        project_item.inner.team_id
-                            as database::models::ids::TeamId
+                        project_item.inner.team_id as database::models::ids::TeamId
                     )
                     .fetch_many(&mut *transaction)
                     .try_filter_map(|e| async {
@@ -653,9 +631,7 @@ pub async fn project_edit(
                 .execute(&mut *transaction)
                 .await?;
 
-                if project_item.inner.status.is_searchable()
-                    && !status.is_searchable()
-                {
+                if project_item.inner.status.is_searchable() && !status.is_searchable() {
                     delete_from_index(id.into(), config).await?;
                 }
             }
@@ -726,17 +702,14 @@ pub async fn project_edit(
 
                 for category in categories {
                     let category_id =
-                        database::models::categories::Category::get_id(
-                            category,
-                            &mut *transaction,
-                        )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                                "Category {} does not exist.",
-                                category.clone()
-                            ))
-                        })?;
+                        database::models::categories::Category::get_id(category, &mut *transaction)
+                            .await?
+                            .ok_or_else(|| {
+                                ApiError::InvalidInput(format!(
+                                    "Category {} does not exist.",
+                                    category.clone()
+                                ))
+                            })?;
 
                     sqlx::query!(
                         "
@@ -761,17 +734,14 @@ pub async fn project_edit(
 
                 for category in categories {
                     let category_id =
-                        database::models::categories::Category::get_id(
-                            category,
-                            &mut *transaction,
-                        )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                                "Category {} does not exist.",
-                                category.clone()
-                            ))
-                        })?;
+                        database::models::categories::Category::get_id(category, &mut *transaction)
+                            .await?
+                            .ok_or_else(|| {
+                                ApiError::InvalidInput(format!(
+                                    "Category {} does not exist.",
+                                    category.clone()
+                                ))
+                            })?;
 
                     sqlx::query!(
                         "
@@ -899,8 +869,7 @@ pub async fn project_edit(
                     ));
                 }
 
-                let slug_project_id_option: Option<u64> =
-                    parse_base62(slug).ok();
+                let slug_project_id_option: Option<u64> = parse_base62(slug).ok();
                 if let Some(slug_project_id) = slug_project_id_option {
                     let results = sqlx::query!(
                         "
@@ -913,8 +882,7 @@ pub async fn project_edit(
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "Slug collides with other project's id!"
-                                .to_string(),
+                            "Slug collides with other project's id!".to_string(),
                         ));
                     }
                 }
@@ -933,8 +901,7 @@ pub async fn project_edit(
 
                     if results.exists.unwrap_or(true) {
                         return Err(ApiError::InvalidInput(
-                            "Slug collides with other project's id!"
-                                .to_string(),
+                            "Slug collides with other project's id!".to_string(),
                         ));
                     }
                 }
@@ -960,13 +927,12 @@ pub async fn project_edit(
                     ));
                 }
 
-                let side_type_id =
-                    database::models::categories::SideType::get_id(
-                        new_side.as_str(),
-                        &mut *transaction,
-                    )
-                    .await?
-                    .expect("No database entry found for side type");
+                let side_type_id = database::models::categories::SideType::get_id(
+                    new_side.as_str(),
+                    &mut *transaction,
+                )
+                .await?
+                .expect("No database entry found for side type");
 
                 sqlx::query!(
                     "
@@ -989,13 +955,12 @@ pub async fn project_edit(
                     ));
                 }
 
-                let side_type_id =
-                    database::models::categories::SideType::get_id(
-                        new_side.as_str(),
-                        &mut *transaction,
-                    )
-                    .await?
-                    .expect("No database entry found for side type");
+                let side_type_id = database::models::categories::SideType::get_id(
+                    new_side.as_str(),
+                    &mut *transaction,
+                )
+                .await?
+                .expect("No database entry found for side type");
 
                 sqlx::query!(
                     "
@@ -1025,9 +990,7 @@ pub async fn project_edit(
                 }
 
                 spdx::Expression::parse(&license).map_err(|err| {
-                    ApiError::InvalidInput(format!(
-                        "Invalid SPDX license identifier: {err}"
-                    ))
+                    ApiError::InvalidInput(format!("Invalid SPDX license identifier: {err}"))
                 })?;
 
                 sqlx::query!(
@@ -1062,18 +1025,17 @@ pub async fn project_edit(
                 .await?;
 
                 for donation in donations {
-                    let platform_id =
-                        database::models::categories::DonationPlatform::get_id(
-                            &donation.id,
-                            &mut *transaction,
-                        )
-                        .await?
-                        .ok_or_else(|| {
-                            ApiError::InvalidInput(format!(
-                                "Platform {} does not exist.",
-                                donation.id.clone()
-                            ))
-                        })?;
+                    let platform_id = database::models::categories::DonationPlatform::get_id(
+                        &donation.id,
+                        &mut *transaction,
+                    )
+                    .await?
+                    .ok_or_else(|| {
+                        ApiError::InvalidInput(format!(
+                            "Platform {} does not exist.",
+                            donation.id.clone()
+                        ))
+                    })?;
 
                     sqlx::query!(
                         "
@@ -1090,9 +1052,7 @@ pub async fn project_edit(
             }
 
             if let Some(moderation_message) = &new_project.moderation_message {
-                if !user.role.is_mod()
-                    && project_item.inner.status != ProjectStatus::Approved
-                {
+                if !user.role.is_mod() && project_item.inner.status != ProjectStatus::Approved {
                     return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the moderation message of this project!"
                             .to_string(),
@@ -1112,12 +1072,8 @@ pub async fn project_edit(
                 .await?;
             }
 
-            if let Some(moderation_message_body) =
-                &new_project.moderation_message_body
-            {
-                if !user.role.is_mod()
-                    && project_item.inner.status != ProjectStatus::Approved
-                {
+            if let Some(moderation_message_body) = &new_project.moderation_message_body {
+                if !user.role.is_mod() && project_item.inner.status != ProjectStatus::Approved {
                     return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the moderation message body of this project!"
                             .to_string(),
@@ -1158,8 +1114,7 @@ pub async fn project_edit(
                 .await?;
             }
 
-            if let Some(monetization_status) = &new_project.monetization_status
-            {
+            if let Some(monetization_status) = &new_project.monetization_status {
                 if !perms.contains(Permissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the monetization status of this project!"
@@ -1167,8 +1122,7 @@ pub async fn project_edit(
                     ));
                 }
 
-                if (*monetization_status
-                    == MonetizationStatus::ForceDemonetized
+                if (*monetization_status == MonetizationStatus::ForceDemonetized
                     || project_item.inner.monetization_status
                         == MonetizationStatus::ForceDemonetized)
                     && !user.role.is_mod()
@@ -1276,9 +1230,9 @@ pub async fn projects_edit(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    bulk_edit_project.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    bulk_edit_project
+        .validate()
+        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
     let project_ids: Vec<database::models::ids::ProjectId> =
         serde_json::from_str::<Vec<ProjectId>>(&ids.ids)?
@@ -1286,8 +1240,7 @@ pub async fn projects_edit(
             .map(|x| x.into())
             .collect();
 
-    let projects_data =
-        database::models::Project::get_many_full(&project_ids, &**pool).await?;
+    let projects_data = database::models::Project::get_many_full(&project_ids, &**pool).await?;
 
     if let Some(id) = project_ids
         .iter()
@@ -1303,15 +1256,11 @@ pub async fn projects_edit(
         .iter()
         .map(|x| x.inner.team_id)
         .collect::<Vec<database::models::TeamId>>();
-    let team_members = database::models::TeamMember::get_from_team_full_many(
-        &team_ids, &**pool,
-    )
-    .await?;
+    let team_members =
+        database::models::TeamMember::get_from_team_full_many(&team_ids, &**pool).await?;
 
-    let categories =
-        database::models::categories::Category::list(&**pool).await?;
-    let donation_platforms =
-        database::models::categories::DonationPlatform::list(&**pool).await?;
+    let categories = database::models::categories::Category::list(&**pool).await?;
+    let donation_platforms = database::models::categories::DonationPlatform::list(&**pool).await?;
 
     let mut transaction = pool.begin().await?;
 
@@ -1322,9 +1271,10 @@ pub async fn projects_edit(
                 .find(|x| x.team_id == project.inner.team_id)
             {
                 if !member.permissions.contains(Permissions::EDIT_DETAILS) {
-                    return Err(ApiError::CustomAuthentication(
-                        format!("You do not have the permissions to bulk edit project {}!", project.inner.title),
-                    ));
+                    return Err(ApiError::CustomAuthentication(format!(
+                        "You do not have the permissions to bulk edit project {}!",
+                        project.inner.title
+                    )));
                 }
             } else if project.inner.status.is_hidden() {
                 return Ok(HttpResponse::NotFound().body(""));
@@ -1336,18 +1286,15 @@ pub async fn projects_edit(
             };
         }
 
-        let mut set_categories =
-            if let Some(categories) = bulk_edit_project.categories.clone() {
-                categories
-            } else {
-                project.categories.clone()
-            };
+        let mut set_categories = if let Some(categories) = bulk_edit_project.categories.clone() {
+            categories
+        } else {
+            project.categories.clone()
+        };
 
         if let Some(delete_categories) = &bulk_edit_project.remove_categories {
             for category in delete_categories {
-                if let Some(pos) =
-                    set_categories.iter().position(|x| x == category)
-                {
+                if let Some(pos) = set_categories.iter().position(|x| x == category) {
                     set_categories.remove(pos);
                 }
             }
@@ -1394,34 +1341,27 @@ pub async fn projects_edit(
                     project.inner.id as database::models::ids::ProjectId,
                     category_id as database::models::ids::CategoryId,
                 )
-                    .execute(&mut *transaction)
-                    .await?;
+                .execute(&mut *transaction)
+                .await?;
             }
         }
 
-        let mut set_additional_categories = if let Some(categories) =
-            bulk_edit_project.additional_categories.clone()
-        {
-            categories
-        } else {
-            project.additional_categories.clone()
-        };
+        let mut set_additional_categories =
+            if let Some(categories) = bulk_edit_project.additional_categories.clone() {
+                categories
+            } else {
+                project.additional_categories.clone()
+            };
 
-        if let Some(delete_categories) =
-            &bulk_edit_project.remove_additional_categories
-        {
+        if let Some(delete_categories) = &bulk_edit_project.remove_additional_categories {
             for category in delete_categories {
-                if let Some(pos) =
-                    set_additional_categories.iter().position(|x| x == category)
-                {
+                if let Some(pos) = set_additional_categories.iter().position(|x| x == category) {
                     set_additional_categories.remove(pos);
                 }
             }
         }
 
-        if let Some(add_categories) =
-            &bulk_edit_project.add_additional_categories
-        {
+        if let Some(add_categories) = &bulk_edit_project.add_additional_categories {
             for category in add_categories {
                 if set_additional_categories.len() < 256 {
                     set_additional_categories.push(category.clone());
@@ -1476,16 +1416,14 @@ pub async fn projects_edit(
                 url: d.url,
             })
             .collect();
-        let mut set_donation_links = if let Some(donation_links) =
-            bulk_edit_project.donation_urls.clone()
-        {
-            donation_links
-        } else {
-            project_donations.clone()
-        };
+        let mut set_donation_links =
+            if let Some(donation_links) = bulk_edit_project.donation_urls.clone() {
+                donation_links
+            } else {
+                project_donations.clone()
+            };
 
-        if let Some(delete_donations) = &bulk_edit_project.remove_donation_urls
-        {
+        if let Some(delete_donations) = &bulk_edit_project.remove_donation_urls {
             for donation in delete_donations {
                 if let Some(pos) = set_donation_links
                     .iter()
@@ -1532,8 +1470,8 @@ pub async fn projects_edit(
                     platform_id as database::models::ids::DonationPlatformId,
                     donation.url
                 )
-                    .execute(&mut *transaction)
-                    .await?;
+                .execute(&mut *transaction)
+                .await?;
             }
         }
 
@@ -1616,8 +1554,7 @@ pub async fn project_schedule(
 
     if scheduling_data.time < Utc::now() {
         return Err(ApiError::InvalidInput(
-            "You cannot schedule a project to be released in the past!"
-                .to_string(),
+            "You cannot schedule a project to be released in the past!".to_string(),
         ));
     }
 
@@ -1628,10 +1565,7 @@ pub async fn project_schedule(
     }
 
     let string = info.into_inner().0;
-    let result = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?;
+    let result = database::models::Project::get_from_slug_or_project_id(&string, &**pool).await?;
 
     if let Some(project_item) = result {
         let team_member = database::models::TeamMember::get_from_user_id(
@@ -1684,22 +1618,15 @@ pub async fn project_icon_edit(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) =
-        crate::util::ext::get_image_content_type(&ext.ext)
-    {
+    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
         let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let string = info.into_inner().0;
 
-        let project_item =
-            database::models::Project::get_from_slug_or_project_id(
-                &string, &**pool,
-            )
+        let project_item = database::models::Project::get_from_slug_or_project_id(&string, &**pool)
             .await?
             .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
+                ApiError::InvalidInput("The specified project does not exist!".to_string())
             })?;
 
         if !user.role.is_mod() {
@@ -1711,15 +1638,12 @@ pub async fn project_icon_edit(
             .await
             .map_err(ApiError::Database)?
             .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
+                ApiError::InvalidInput("The specified project does not exist!".to_string())
             })?;
 
             if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit this project's icon."
-                        .to_string(),
+                    "You don't have permission to edit this project's icon.".to_string(),
                 ));
             }
         }
@@ -1732,12 +1656,8 @@ pub async fn project_icon_edit(
             }
         }
 
-        let bytes = read_from_payload(
-            &mut payload,
-            262144,
-            "Icons must be smaller than 256KiB",
-        )
-        .await?;
+        let bytes =
+            read_from_payload(&mut payload, 262144, "Icons must be smaller than 256KiB").await?;
 
         let color = crate::util::img::get_color_from_img(&bytes)?;
 
@@ -1787,15 +1707,11 @@ pub async fn delete_project_icon(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    let project_item = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified project does not exist!".to_string(),
-        )
-    })?;
+    let project_item = database::models::Project::get_from_slug_or_project_id(&string, &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
     if !user.role.is_mod() {
         let team_member = database::models::TeamMember::get_from_user_id(
@@ -1806,15 +1722,12 @@ pub async fn delete_project_icon(
         .await
         .map_err(ApiError::Database)?
         .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
         })?;
 
         if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's icon."
-                    .to_string(),
+                "You don't have permission to edit this project's icon.".to_string(),
             ));
         }
     }
@@ -1866,32 +1779,24 @@ pub async fn add_gallery_item(
     file_host: web::Data<Arc<dyn FileHost + Send + Sync>>,
     mut payload: web::Payload,
 ) -> Result<HttpResponse, ApiError> {
-    if let Some(content_type) =
-        crate::util::ext::get_image_content_type(&ext.ext)
-    {
-        item.validate().map_err(|err| {
-            ApiError::Validation(validation_errors_to_string(err, None))
-        })?;
+    if let Some(content_type) = crate::util::ext::get_image_content_type(&ext.ext) {
+        item.validate()
+            .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
         let cdn_url = dotenvy::var("CDN_URL")?;
         let user = get_user_from_headers(req.headers(), &**pool).await?;
         let string = info.into_inner().0;
 
         let project_item =
-            database::models::Project::get_full_from_slug_or_project_id(
-                &string, &**pool,
-            )
-            .await?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
-            })?;
+            database::models::Project::get_full_from_slug_or_project_id(&string, &**pool)
+                .await?
+                .ok_or_else(|| {
+                    ApiError::InvalidInput("The specified project does not exist!".to_string())
+                })?;
 
         if project_item.gallery_items.len() > 64 {
             return Err(ApiError::CustomAuthentication(
-                "You have reached the maximum of gallery images to upload."
-                    .to_string(),
+                "You have reached the maximum of gallery images to upload.".to_string(),
             ));
         }
 
@@ -1904,15 +1809,12 @@ pub async fn add_gallery_item(
             .await
             .map_err(ApiError::Database)?
             .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
+                ApiError::InvalidInput("The specified project does not exist!".to_string())
             })?;
 
             if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
                 return Err(ApiError::CustomAuthentication(
-                    "You don't have permission to edit this project's gallery."
-                        .to_string(),
+                    "You don't have permission to edit this project's gallery.".to_string(),
                 ));
             }
         }
@@ -2013,19 +1915,14 @@ pub async fn edit_gallery_item(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    item.validate().map_err(|err| {
-        ApiError::Validation(validation_errors_to_string(err, None))
-    })?;
+    item.validate()
+        .map_err(|err| ApiError::Validation(validation_errors_to_string(err, None)))?;
 
-    let project_item = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified project does not exist!".to_string(),
-        )
-    })?;
+    let project_item = database::models::Project::get_from_slug_or_project_id(&string, &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
     if !user.role.is_mod() {
         let team_member = database::models::TeamMember::get_from_user_id(
@@ -2036,15 +1933,12 @@ pub async fn edit_gallery_item(
         .await
         .map_err(ApiError::Database)?
         .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
         })?;
 
         if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's gallery."
-                    .to_string(),
+                "You don't have permission to edit this project's gallery.".to_string(),
             ));
         }
     }
@@ -2157,15 +2051,11 @@ pub async fn delete_gallery_item(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    let project_item = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified project does not exist!".to_string(),
-        )
-    })?;
+    let project_item = database::models::Project::get_from_slug_or_project_id(&string, &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
     if !user.role.is_mod() {
         let team_member = database::models::TeamMember::get_from_user_id(
@@ -2176,15 +2066,12 @@ pub async fn delete_gallery_item(
         .await
         .map_err(ApiError::Database)?
         .ok_or_else(|| {
-            ApiError::InvalidInput(
-                "The specified project does not exist!".to_string(),
-            )
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
         })?;
 
         if !team_member.permissions.contains(Permissions::EDIT_DETAILS) {
             return Err(ApiError::CustomAuthentication(
-                "You don't have permission to edit this project's gallery."
-                    .to_string(),
+                "You don't have permission to edit this project's gallery.".to_string(),
             ));
         }
     }
@@ -2241,30 +2128,23 @@ pub async fn project_delete(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    let project = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified project does not exist!".to_string(),
-        )
-    })?;
+    let project = database::models::Project::get_from_slug_or_project_id(&string, &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
     if !user.role.is_admin() {
-        let team_member =
-            database::models::TeamMember::get_from_user_id_project(
-                project.id,
-                user.id.into(),
-                &**pool,
-            )
-            .await
-            .map_err(ApiError::Database)?
-            .ok_or_else(|| {
-                ApiError::InvalidInput(
-                    "The specified project does not exist!".to_string(),
-                )
-            })?;
+        let team_member = database::models::TeamMember::get_from_user_id_project(
+            project.id,
+            user.id.into(),
+            &**pool,
+        )
+        .await
+        .map_err(ApiError::Database)?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
         if !team_member
             .permissions
@@ -2278,9 +2158,7 @@ pub async fn project_delete(
 
     let mut transaction = pool.begin().await?;
 
-    let result =
-        database::models::Project::remove_full(project.id, &mut transaction)
-            .await?;
+    let result = database::models::Project::remove_full(project.id, &mut transaction).await?;
 
     transaction.commit().await?;
 
@@ -2302,15 +2180,11 @@ pub async fn project_follow(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    let result = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified project does not exist!".to_string(),
-        )
-    })?;
+    let result = database::models::Project::get_from_slug_or_project_id(&string, &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
     let user_id: database::models::ids::UserId = user.id.into();
     let project_id: database::models::ids::ProjectId = result.id;
@@ -2375,15 +2249,11 @@ pub async fn project_unfollow(
     let user = get_user_from_headers(req.headers(), &**pool).await?;
     let string = info.into_inner().0;
 
-    let result = database::models::Project::get_from_slug_or_project_id(
-        &string, &**pool,
-    )
-    .await?
-    .ok_or_else(|| {
-        ApiError::InvalidInput(
-            "The specified project does not exist!".to_string(),
-        )
-    })?;
+    let result = database::models::Project::get_from_slug_or_project_id(&string, &**pool)
+        .await?
+        .ok_or_else(|| {
+            ApiError::InvalidInput("The specified project does not exist!".to_string())
+        })?;
 
     let user_id: database::models::ids::UserId = user.id.into();
     let project_id = result.id;
@@ -2439,8 +2309,7 @@ pub async fn delete_from_index(
     id: ProjectId,
     config: web::Data<SearchConfig>,
 ) -> Result<(), meilisearch_sdk::errors::Error> {
-    let client =
-        meilisearch_sdk::client::Client::new(&*config.address, &*config.key);
+    let client = meilisearch_sdk::client::Client::new(&*config.address, &*config.key);
 
     let indexes: IndexesResults = client.get_indexes().await?;
 

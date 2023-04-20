@@ -2,9 +2,7 @@ use super::ids::Base62Id;
 use super::users::UserId;
 use crate::database::models::notification_item::Notification as DBNotification;
 use crate::database::models::notification_item::NotificationAction as DBNotificationAction;
-use crate::models::ids::{
-    ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId, VersionId,
-};
+use crate::models::ids::{ProjectId, ReportId, TeamId, ThreadId, ThreadMessageId, VersionId};
 use crate::models::projects::ProjectStatus;
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
@@ -91,27 +89,18 @@ impl From<DBNotification> for Notification {
                 } => (
                     Some("team_invite".to_string()),
                     "You have been invited to join a team!".to_string(),
-                    format!(
-                        "An invite has been sent for you to be {} of a team",
-                        role
-                    ),
+                    format!("An invite has been sent for you to be {} of a team", role),
                     format!("/project/{}", project_id),
                     vec![
                         NotificationAction {
                             title: "Accept".to_string(),
-                            action_route: (
-                                "POST".to_string(),
-                                format!("team/{team_id}/join"),
-                            ),
+                            action_route: ("POST".to_string(), format!("team/{team_id}/join")),
                         },
                         NotificationAction {
                             title: "Deny".to_string(),
                             action_route: (
                                 "DELETE".to_string(),
-                                format!(
-                                    "team/{team_id}/members/{}",
-                                    UserId::from(notif.user_id)
-                                ),
+                                format!("team/{team_id}/members/{}", UserId::from(notif.user_id)),
                             ),
                         },
                     ],

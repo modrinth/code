@@ -1,8 +1,6 @@
 use crate::models::pack::{PackFileHash, PackFormat};
 use crate::util::validate::validation_errors_to_string;
-use crate::validate::{
-    SupportedGameVersions, ValidationError, ValidationResult,
-};
+use crate::validate::{SupportedGameVersions, ValidationError, ValidationResult};
 use std::io::{Cursor, Read};
 use std::path::Component;
 use validator::Validate;
@@ -32,14 +30,11 @@ impl super::Validator for ModpackValidator {
         archive: &mut ZipArchive<Cursor<bytes::Bytes>>,
     ) -> Result<ValidationResult, ValidationError> {
         let pack: PackFormat = {
-            let mut file =
-                if let Ok(file) = archive.by_name("modrinth.index.json") {
-                    file
-                } else {
-                    return Ok(ValidationResult::Warning(
-                        "Pack manifest is missing.",
-                    ));
-                };
+            let mut file = if let Ok(file) = archive.by_name("modrinth.index.json") {
+                file
+            } else {
+                return Ok(ValidationResult::Warning("Pack manifest is missing."));
+            };
 
             let mut contents = String::new();
             file.read_to_string(&mut contents)?;
@@ -48,9 +43,7 @@ impl super::Validator for ModpackValidator {
         };
 
         pack.validate().map_err(|err| {
-            ValidationError::InvalidInput(
-                validation_errors_to_string(err, None).into(),
-            )
+            ValidationError::InvalidInput(validation_errors_to_string(err, None).into())
         })?;
 
         if pack.game != "minecraft" {
@@ -75,11 +68,7 @@ impl super::Validator for ModpackValidator {
             let path = std::path::Path::new(&file.path)
                 .components()
                 .next()
-                .ok_or_else(|| {
-                    ValidationError::InvalidInput(
-                        "Invalid pack file path!".into(),
-                    )
-                })?;
+                .ok_or_else(|| ValidationError::InvalidInput("Invalid pack file path!".into()))?;
 
             match path {
                 Component::CurDir | Component::Normal(_) => {}

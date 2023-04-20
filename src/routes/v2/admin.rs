@@ -37,26 +37,22 @@ pub async fn count_download(
     download_body: web::Json<DownloadBody>,
     download_queue: web::Data<Arc<DownloadQueue>>,
 ) -> Result<HttpResponse, ApiError> {
-    let project_id: crate::database::models::ids::ProjectId =
-        download_body.project_id.into();
+    let project_id: crate::database::models::ids::ProjectId = download_body.project_id.into();
 
-    let id_option = crate::models::ids::base62_impl::parse_base62(
-        &download_body.version_name,
-    )
-    .ok()
-    .map(|x| x as i64);
+    let id_option = crate::models::ids::base62_impl::parse_base62(&download_body.version_name)
+        .ok()
+        .map(|x| x as i64);
 
-    let (version_id, project_id, file_type) = if let Some(version) =
-        sqlx::query!(
-            "
+    let (version_id, project_id, file_type) = if let Some(version) = sqlx::query!(
+        "
             SELECT v.id id, v.mod_id mod_id, file_type FROM files f
             INNER JOIN versions v ON v.id = f.version_id
             WHERE f.url = $1
             ",
-            download_body.url,
-        )
-        .fetch_optional(pool.as_ref())
-        .await?
+        download_body.url,
+    )
+    .fetch_optional(pool.as_ref())
+    .await?
     {
         (version.id, version.mod_id, version.file_type)
     } else if let Some(version) = sqlx::query!(
@@ -143,17 +139,11 @@ pub async fn process_payout(
         )])
         .send()
         .await
-        .map_err(|_| {
-            ApiError::Analytics(
-                "Error while fetching payout multipliers!".to_string(),
-            )
-        })?
+        .map_err(|_| ApiError::Analytics("Error while fetching payout multipliers!".to_string()))?
         .json()
         .await
         .map_err(|_| {
-            ApiError::Analytics(
-                "Error while deserializing payout multipliers!".to_string(),
-            )
+            ApiError::Analytics("Error while deserializing payout multipliers!".to_string())
         })?;
 
     struct Project {
@@ -176,26 +166,33 @@ pub async fn process_payout(
         INNER JOIN project_types pt ON pt.id = m.project_type
         WHERE m.id = ANY($1) AND m.monetization_status = $2
         ",
-        &multipliers.values.keys().flat_map(|x| x.parse::<i64>().ok()).collect::<Vec<i64>>(),
+        &multipliers
+            .values
+            .keys()
+            .flat_map(|x| x.parse::<i64>().ok())
+            .collect::<Vec<i64>>(),
         MonetizationStatus::Monetized.as_str(),
     )
-        .fetch_many(&mut *transaction)
-        .try_for_each(|e| {
-            if let Some(row) = e.right() {
-                if let Some(project) = projects_map.get_mut(&row.id) {
-                    project.team_members.push((row.user_id, row.payouts_split));
-                } else {
-                    projects_map.insert(row.id, Project {
+    .fetch_many(&mut *transaction)
+    .try_for_each(|e| {
+        if let Some(row) = e.right() {
+            if let Some(project) = projects_map.get_mut(&row.id) {
+                project.team_members.push((row.user_id, row.payouts_split));
+            } else {
+                projects_map.insert(
+                    row.id,
+                    Project {
                         project_type: row.project_type,
                         team_members: vec![(row.user_id, row.payouts_split)],
-                        split_team_members: Default::default()
-                    });
-                }
+                        split_team_members: Default::default(),
+                    },
+                );
             }
+        }
 
-            futures::future::ready(Ok(()))
-        })
-        .await?;
+        futures::future::ready(Ok(()))
+    })
+    .await?;
 
     // Specific Payout Conditions (ex: modpack payout split)
     let mut projects_split_dependencies = Vec::new();
@@ -208,8 +205,7 @@ pub async fn process_payout(
 
     if !projects_split_dependencies.is_empty() {
         // (dependent_id, (dependency_id, times_depended))
-        let mut project_dependencies: HashMap<i64, Vec<(i64, i64)>> =
-            HashMap::new();
+        let mut project_dependencies: HashMap<i64, Vec<(i64, i64)>> = HashMap::new();
         // dependency_ids to fetch team members from
         let mut fetch_team_members: Vec<i64> = Vec::new();
 
@@ -229,14 +225,11 @@ pub async fn process_payout(
             if let Some(row) = e.right() {
                 fetch_team_members.push(row.id);
 
-                if let Some(project) = project_dependencies.get_mut(&row.mod_id)
-                {
+                if let Some(project) = project_dependencies.get_mut(&row.mod_id) {
                     project.push((row.id, row.times_depended.unwrap_or(0)));
                 } else {
-                    project_dependencies.insert(
-                        row.mod_id,
-                        vec![(row.id, row.times_depended.unwrap_or(0))],
-                    );
+                    project_dependencies
+                        .insert(row.mod_id, vec![(row.id, row.times_depended.unwrap_or(0))]);
                 }
             }
 
@@ -245,8 +238,7 @@ pub async fn process_payout(
         .await?;
 
         // (project_id, (user_id, payouts_split))
-        let mut team_members: HashMap<i64, Vec<(i64, Decimal)>> =
-            HashMap::new();
+        let mut team_members: HashMap<i64, Vec<(i64, Decimal)>> = HashMap::new();
 
         sqlx::query!(
             "
@@ -263,8 +255,7 @@ pub async fn process_payout(
                 if let Some(project) = team_members.get_mut(&row.id) {
                     project.push((row.user_id, row.payouts_split));
                 } else {
-                    team_members
-                        .insert(row.id, vec![(row.user_id, row.payouts_split)]);
+                    team_members.insert(row.id, vec![(row.user_id, row.payouts_split)]);
                 }
             }
 
@@ -281,17 +272,14 @@ pub async fn process_payout(
                 if dep_sum > 0 {
                     for dependency in dependencies {
                         let project_multiplier: Decimal =
-                            Decimal::from(dependency.1)
-                                / Decimal::from(dep_sum);
+                            Decimal::from(dependency.1) / Decimal::from(dep_sum);
 
                         if let Some(members) = team_members.get(&dependency.0) {
-                            let members_sum: Decimal =
-                                members.iter().map(|x| x.1).sum();
+                            let members_sum: Decimal = members.iter().map(|x| x.1).sum();
 
                             if members_sum > Decimal::ZERO {
                                 for member in members {
-                                    let member_multiplier: Decimal =
-                                        member.1 / members_sum;
+                                    let member_multiplier: Decimal = member.1 / members_sum;
                                     project.split_team_members.push((
                                         member.0,
                                         member_multiplier * project_multiplier,
@@ -315,10 +303,8 @@ pub async fn process_payout(
             let split_given = Decimal::ONE / Decimal::from(5);
             let split_retention = Decimal::from(4) / Decimal::from(5);
 
-            let sum_splits: Decimal =
-                project.team_members.iter().map(|x| x.1).sum();
-            let sum_tm_splits: Decimal =
-                project.split_team_members.iter().map(|x| x.1).sum();
+            let sum_splits: Decimal = project.team_members.iter().map(|x| x.1).sum();
+            let sum_tm_splits: Decimal = project.split_team_members.iter().map(|x| x.1).sum();
 
             if sum_splits > Decimal::ZERO {
                 for (user_id, split) in project.team_members {
@@ -342,8 +328,8 @@ pub async fn process_payout(
                             payout,
                             start
                         )
-                            .execute(&mut *transaction)
-                            .await?;
+                        .execute(&mut *transaction)
+                        .await?;
 
                         sqlx::query!(
                             "
@@ -378,8 +364,8 @@ pub async fn process_payout(
                             payout,
                             start
                         )
-                            .execute(&mut *transaction)
-                            .await?;
+                        .execute(&mut *transaction)
+                        .await?;
 
                         sqlx::query!(
                             "

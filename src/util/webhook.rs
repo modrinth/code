@@ -180,8 +180,7 @@ pub async fn send_discord_webhook(
         }
 
         if !versions.is_empty() {
-            let formatted_game_versions: String =
-                get_gv_range(versions, all_game_versions);
+            let formatted_game_versions: String = get_gv_range(versions, all_game_versions);
 
             fields.push(DiscordEmbedField {
                 name: "Versions",
@@ -229,9 +228,7 @@ pub async fn send_discord_webhook(
             thumbnail: DiscordEmbedThumbnail {
                 url: project.icon_url,
             },
-            image: if let Some(first) =
-                project.featured_gallery.unwrap_or_default().first()
-            {
+            image: if let Some(first) = project.featured_gallery.unwrap_or_default().first() {
                 Some(first.clone())
             } else {
                 project.gallery.unwrap_or_default().first().cloned()
@@ -242,9 +239,7 @@ pub async fn send_discord_webhook(
                     "{}{display_project_type} on Modrinth",
                     display_project_type.remove(0).to_uppercase()
                 ),
-                icon_url: Some(
-                    "https://cdn-raw.modrinth.com/modrinth-new.png".to_string(),
-                ),
+                icon_url: Some("https://cdn-raw.modrinth.com/modrinth-new.png".to_string()),
             }),
         };
 
@@ -253,10 +248,7 @@ pub async fn send_discord_webhook(
         client
             .post(&webhook_url)
             .json(&DiscordWebhook {
-                avatar_url: Some(
-                    "https://cdn.modrinth.com/Modrinth_Dark_Logo.png"
-                        .to_string(),
-                ),
+                avatar_url: Some("https://cdn.modrinth.com/Modrinth_Dark_Logo.png".to_string()),
                 username: Some("Modrinth Release".to_string()),
                 embeds: vec![embed],
                 content: message,
@@ -264,9 +256,7 @@ pub async fn send_discord_webhook(
             .send()
             .await
             .map_err(|_| {
-                ApiError::DiscordError(
-                    "Error while sending projects webhook".to_string(),
-                )
+                ApiError::DiscordError("Error while sending projects webhook".to_string())
             })?;
     }
 
@@ -310,21 +300,15 @@ fn get_gv_range(
         } else {
             let interval_base = &intervals[current_interval];
 
-            if ((index as i32)
-                - (interval_base[interval_base.len() - 1][1] as i32)
-                == 1
-                || (release_index as i32)
-                    - (interval_base[interval_base.len() - 1][2] as i32)
-                    == 1)
+            if ((index as i32) - (interval_base[interval_base.len() - 1][1] as i32) == 1
+                || (release_index as i32) - (interval_base[interval_base.len() - 1][2] as i32) == 1)
                 && (all_game_versions[interval_base[0][1]].type_ == "release"
                     || all_game_versions[index].type_ != "release")
             {
                 if intervals[current_interval].get(1).is_some() {
-                    intervals[current_interval][1] =
-                        vec![i, index, release_index];
+                    intervals[current_interval][1] = vec![i, index, release_index];
                 } else {
-                    intervals[current_interval]
-                        .insert(1, vec![i, index, release_index]);
+                    intervals[current_interval].insert(1, vec![i, index, release_index]);
                 }
             } else {
                 current_interval += 1;
@@ -336,10 +320,7 @@ fn get_gv_range(
     let mut new_intervals = Vec::new();
 
     for interval in intervals {
-        if interval.len() == 2
-            && interval[0][2] != MAX_VALUE
-            && interval[1][2] == MAX_VALUE
-        {
+        if interval.len() == 2 && interval[0][2] != MAX_VALUE && interval[1][2] == MAX_VALUE {
             let mut last_snapshot: Option<usize> = None;
 
             for j in ((interval[0][1] + 1)..=interval[1][1]).rev() {
@@ -349,16 +330,12 @@ fn get_gv_range(
                         vec![
                             game_versions
                                 .iter()
-                                .position(|x| {
-                                    x.version == all_game_versions[j].version
-                                })
+                                .position(|x| x.version == all_game_versions[j].version)
                                 .unwrap_or(MAX_VALUE),
                             j,
                             all_releases
                                 .iter()
-                                .position(|x| {
-                                    x.version == all_game_versions[j].version
-                                })
+                                .position(|x| x.version == all_game_versions[j].version)
                                 .unwrap_or(MAX_VALUE),
                         ],
                     ]);
@@ -370,10 +347,7 @@ fn get_gv_range(
                                     game_versions
                                         .iter()
                                         .position(|x| {
-                                            x.version
-                                                == all_game_versions
-                                                    [last_snapshot]
-                                                    .version
+                                            x.version == all_game_versions[last_snapshot].version
                                         })
                                         .unwrap_or(MAX_VALUE),
                                     last_snapshot,
@@ -402,8 +376,7 @@ fn get_gv_range(
         if interval.len() == 2 {
             output.push(format!(
                 "{}—{}",
-                &game_versions[interval[0][0]].version,
-                &game_versions[interval[1][0]].version
+                &game_versions[interval[0][0]].version, &game_versions[interval[1][0]].version
             ))
         } else {
             output.push(game_versions[interval[0][0]].version.clone())

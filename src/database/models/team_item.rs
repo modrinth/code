@@ -36,8 +36,7 @@ impl TeamBuilder {
         .await?;
 
         for member in self.members {
-            let team_member_id =
-                generate_team_member_id(&mut *transaction).await?;
+            let team_member_id = generate_team_member_id(&mut *transaction).await?;
             let team_member = TeamMember {
                 id: team_member_id,
                 team_id,
@@ -224,16 +223,16 @@ impl TeamMember {
         .fetch_many(executor)
         .try_filter_map(|e| async {
             if let Some(m) = e.right() {
-                    Ok(Some(Ok(TeamMember {
-                        id: TeamMemberId(m.id),
-                        team_id: TeamId(m.team_id),
-                        user_id,
-                        role: m.role,
-                        permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
-                        accepted: m.accepted,
-                        payouts_split: m.payouts_split,
-                        ordering: m.ordering,
-                    })))
+                Ok(Some(Ok(TeamMember {
+                    id: TeamMemberId(m.id),
+                    team_id: TeamId(m.team_id),
+                    user_id,
+                    role: m.role,
+                    permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
+                    accepted: m.accepted,
+                    payouts_split: m.payouts_split,
+                    ordering: m.ordering,
+                })))
             } else {
                 Ok(None)
             }
@@ -275,8 +274,7 @@ impl TeamMember {
                 team_id: id,
                 user_id,
                 role: m.role,
-                permissions: Permissions::from_bits(m.permissions as u64)
-                    .unwrap_or_default(),
+                permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
                 ordering: m.ordering,
@@ -448,8 +446,7 @@ impl TeamMember {
                 team_id: TeamId(m.team_id),
                 user_id,
                 role: m.role,
-                permissions: Permissions::from_bits(m.permissions as u64)
-                    .unwrap_or_default(),
+                permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
                 ordering: m.ordering,
@@ -486,8 +483,7 @@ impl TeamMember {
                 team_id: TeamId(m.team_id),
                 user_id,
                 role: m.role,
-                permissions: Permissions::from_bits(m.permissions as u64)
-                    .unwrap_or_default(),
+                permissions: Permissions::from_bits(m.permissions as u64).unwrap_or_default(),
                 accepted: m.accepted,
                 payouts_split: m.payouts_split,
                 ordering: m.ordering,

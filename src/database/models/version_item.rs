@@ -499,8 +499,7 @@ impl Version {
     {
         use futures::stream::TryStreamExt;
 
-        let version_ids_parsed: Vec<i64> =
-            version_ids.iter().map(|x| x.0).collect();
+        let version_ids_parsed: Vec<i64> = version_ids.iter().map(|x| x.0).collect();
         sqlx::query!(
             "
             SELECT v.id id, v.mod_id mod_id, v.author_id author_id, v.name version_name, v.version_number version_number,
@@ -648,8 +647,7 @@ impl Version {
     where
         E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
     {
-        let project_id_opt =
-            parse_base62(project_id_or_slug).ok().map(|x| x as i64);
+        let project_id_opt = parse_base62(project_id_or_slug).ok().map(|x| x as i64);
         let id_opt = parse_base62(slug).ok().map(|x| x as i64);
         let id = sqlx::query!(
             "

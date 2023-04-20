@@ -4,14 +4,10 @@ use crate::database::models::thread_item::ThreadMessageBuilder;
 use crate::models::ids::{ReportId, ThreadMessageId};
 use crate::models::notifications::NotificationBody;
 use crate::models::projects::{ProjectId, ProjectStatus};
-use crate::models::threads::{
-    MessageBody, Thread, ThreadId, ThreadMessage, ThreadType,
-};
+use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadMessage, ThreadType};
 use crate::models::users::User;
 use crate::routes::ApiError;
-use crate::util::auth::{
-    check_is_moderator_from_headers, get_user_from_headers,
-};
+use crate::util::auth::{check_is_moderator_from_headers, get_user_from_headers};
 use actix_web::{delete, get, post, web, HttpRequest, HttpResponse};
 use futures::TryStreamExt;
 use serde::Deserialize;
@@ -42,13 +38,13 @@ pub async fn is_authorized_thread(
     Ok(match thread.type_ {
         ThreadType::Report => {
             let report_exists = sqlx::query!(
-                    "SELECT EXISTS(SELECT 1 FROM reports WHERE thread_id = $1 AND reporter = $2)",
-                    thread.id as database::models::ids::ThreadId,
-                    user_id as database::models::ids::UserId,
-                )
-                    .fetch_one(pool)
-                    .await?
-                    .exists;
+                "SELECT EXISTS(SELECT 1 FROM reports WHERE thread_id = $1 AND reporter = $2)",
+                thread.id as database::models::ids::ThreadId,
+                user_id as database::models::ids::UserId,
+            )
+            .fetch_one(pool)
+            .await?
+            .exists;
 
             report_exists.unwrap_or(false)
         }
@@ -80,8 +76,7 @@ pub async fn filter_authorized_threads(
 
     for thread in threads {
         if user.role.is_mod()
-            || (thread.type_ == ThreadType::DirectMessage
-                && thread.members.contains(&user_id))
+            || (thread.type_ == ThreadType::DirectMessage && thread.members.contains(&user_id))
         {
             return_threads.push(thread);
         } else {
@@ -106,23 +101,23 @@ pub async fn filter_authorized_threads(
                 &*project_thread_ids,
                 user_id as database::models::ids::UserId,
             )
-                .fetch_many(&***pool)
-                .try_for_each(|e| {
-                    if let Some(row) = e.right() {
-                        check_threads.retain(|x| {
-                            let bool = Some(x.id.0) == row.thread_id;
+            .fetch_many(&***pool)
+            .try_for_each(|e| {
+                if let Some(row) = e.right() {
+                    check_threads.retain(|x| {
+                        let bool = Some(x.id.0) == row.thread_id;
 
-                            if bool {
-                                return_threads.push(x.clone());
-                            }
+                        if bool {
+                            return_threads.push(x.clone());
+                        }
 
-                            !bool
-                        });
-                    }
+                        !bool
+                    });
+                }
 
-                    futures::future::ready(Ok(()))
-                })
-                .await?;
+                futures::future::ready(Ok(()))
+            })
+            .await?;
         }
 
         let report_thread_ids = check_threads
@@ -176,12 +171,11 @@ pub async fn filter_authorized_threads(
             .collect::<Vec<database::models::UserId>>(),
     );
 
-    let users: Vec<User> =
-        database::models::User::get_many(&user_ids, &***pool)
-            .await?
-            .into_iter()
-            .map(From::from)
-            .collect();
+    let users: Vec<User> = database::models::User::get_many(&user_ids, &***pool)
+        .await?
+        .into_iter()
+        .map(From::from)
+        .collect();
 
     let mut final_threads = Vec::new();
 
@@ -210,11 +204,7 @@ pub async fn filter_authorized_threads(
     Ok(final_threads)
 }
 
-fn convert_thread(
-    data: database::models::Thread,
-    users: Vec<User>,
-    user: &User,
-) -> Thread {
+fn convert_thread(data: database::models::Thread, users: Vec<User>, user: &User) -> Thread {
     let thread_type = data.type_;
 
     Thread {
@@ -279,16 +269,13 @@ pub async fn thread_get(
                     .collect::<Vec<_>>(),
             );
 
-            let users: Vec<User> =
-                database::models::User::get_many(authors, &**pool)
-                    .await?
-                    .into_iter()
-                    .map(From::from)
-                    .collect();
+            let users: Vec<User> = database::models::User::get_many(authors, &**pool)
+                .await?
+                .into_iter()
+                .map(From::from)
+                .collect();
 
-            return Ok(
-                HttpResponse::Ok().json(convert_thread(data, users, &user))
-            );
+            return Ok(HttpResponse::Ok().json(convert_thread(data, users, &user)));
         }
     }
     Ok(HttpResponse::NotFound().body(""))
@@ -313,8 +300,7 @@ pub async fn threads_get(
             .map(|x| x.into())
             .collect();
 
-    let threads_data =
-        database::models::Thread::get_many(&thread_ids, &**pool).await?;
+    let threads_data = database::models::Thread::get_many(&thread_ids, &**pool).await?;
 
     let threads = filter_authorized_threads(threads_data, &user, &pool).await?;
 
@@ -356,17 +342,13 @@ pub async fn thread_send_message(
         }
 
         if let Some(replying_to) = replying_to {
-            let thread_message = database::models::ThreadMessage::get(
-                (*replying_to).into(),
-                &**pool,
-            )
-            .await?;
+            let thread_message =
+                database::models::ThreadMessage::get((*replying_to).into(), &**pool).await?;
 
             if let Some(thread_message) = thread_message {
                 if thread_message.thread_id != string {
                     return Err(ApiError::InvalidInput(
-                        "Message replied to is from another thread!"
-                            .to_string(),
+                        "Message replied to is from another thread!".to_string(),
                     ));
                 }
             } else {
@@ -394,17 +376,13 @@ pub async fn thread_send_message(
             None
         };
 
-        if report.as_ref().map(|x| x.closed).unwrap_or(false)
-            && !user.role.is_mod()
-        {
+        if report.as_ref().map(|x| x.closed).unwrap_or(false) && !user.role.is_mod() {
             return Err(ApiError::InvalidInput(
                 "You may not reply to a closed report".to_string(),
             ));
         }
 
-        let (mod_notif, (user_notif, team_id)) = if thread.type_
-            == ThreadType::Project
-        {
+        let (mod_notif, (user_notif, team_id)) = if thread.type_ == ThreadType::Project {
             let record = sqlx::query!(
                 "SELECT m.status, m.team_id FROM mods m WHERE thread_id = $1",
                 thread.id as database::models::ids::ThreadId,
@@ -422,7 +400,17 @@ pub async fn thread_send_message(
                 ),
             )
         } else {
-            (false, (thread.type_ == ThreadType::Report, None))
+            (
+                !user.role.is_mod(),
+                (
+                    thread.type_ == ThreadType::Report
+                        && !report
+                            .as_ref()
+                            .map(|x| x.reporter == user.id.into())
+                            .unwrap_or(false),
+                    None,
+                ),
+            )
         };
 
         let mut transaction = pool.begin().await?;
@@ -498,14 +486,11 @@ pub async fn moderation_inbox(
         "
     )
     .fetch_many(&**pool)
-    .try_filter_map(|e| async {
-        Ok(e.right().map(|m| database::models::ThreadId(m.id)))
-    })
+    .try_filter_map(|e| async { Ok(e.right().map(|m| database::models::ThreadId(m.id))) })
     .try_collect::<Vec<database::models::ThreadId>>()
     .await?;
 
-    let threads_data =
-        database::models::Thread::get_many(&ids, &**pool).await?;
+    let threads_data = database::models::Thread::get_many(&ids, &**pool).await?;
     let threads = filter_authorized_threads(threads_data, &user, &pool).await?;
 
     Ok(HttpResponse::Ok().json(threads))
@@ -546,11 +531,7 @@ pub async fn message_delete(
 ) -> Result<HttpResponse, ApiError> {
     let user = get_user_from_headers(req.headers(), &**pool).await?;
 
-    let result = database::models::ThreadMessage::get(
-        info.into_inner().0.into(),
-        &**pool,
-    )
-    .await?;
+    let result = database::models::ThreadMessage::get(info.into_inner().0.into(), &**pool).await?;
 
     if let Some(thread) = result {
         if !user.role.is_mod() && thread.author_id != Some(user.id.into()) {
@@ -560,11 +541,7 @@ pub async fn message_delete(
         }
 
         let mut transaction = pool.begin().await?;
-        database::models::ThreadMessage::remove_full(
-            thread.id,
-            &mut transaction,
-        )
-        .await?;
+        database::models::ThreadMessage::remove_full(thread.id, &mut transaction).await?;
         transaction.commit().await?;
 
         Ok(HttpResponse::NoContent().body(""))

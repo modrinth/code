@@ -35,27 +35,18 @@ impl ResponseError for ARError {
                 reset,
             } => {
                 let mut response = actix_web::HttpResponse::TooManyRequests();
-                response.insert_header((
-                    "x-ratelimit-limit",
-                    max_requests.to_string(),
-                ));
-                response.insert_header((
-                    "x-ratelimit-remaining",
-                    remaining.to_string(),
-                ));
-                response
-                    .insert_header(("x-ratelimit-reset", reset.to_string()));
+                response.insert_header(("x-ratelimit-limit", max_requests.to_string()));
+                response.insert_header(("x-ratelimit-remaining", remaining.to_string()));
+                response.insert_header(("x-ratelimit-reset", reset.to_string()));
                 response.json(ApiError {
                     error: "ratelimit_error",
                     description: &self.to_string(),
                 })
             }
-            _ => actix_web::HttpResponse::build(self.status_code()).json(
-                ApiError {
-                    error: "ratelimit_error",
-                    description: &self.to_string(),
-                },
-            ),
+            _ => actix_web::HttpResponse::build(self.status_code()).json(ApiError {
+                error: "ratelimit_error",
+                description: &self.to_string(),
+            }),
         }
     }
 }

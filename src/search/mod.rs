@@ -99,6 +99,8 @@ pub struct UploadSearchProject {
     pub modified_timestamp: i64,
     pub open_source: bool,
     pub color: Option<u32>,
+    /// format: {project_id}-{dep_type}
+    pub dependencies: Vec<String>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -134,6 +136,8 @@ pub struct ResultSearchProject {
     pub gallery: Vec<String>,
     pub featured_gallery: Option<String>,
     pub color: Option<u32>,
+    /// format: {project_id}-{dep_type}
+    pub dependencies: Vec<String>,
 }
 
 pub async fn search_for_project(
@@ -177,13 +181,12 @@ pub async fn search_for_project(
                 None
             };
 
-            let filters: Cow<_> =
-                match (info.filters.as_deref(), info.version.as_deref()) {
-                    (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
-                    (Some(f), None) => f.into(),
-                    (None, Some(v)) => v.into(),
-                    (None, None) => "".into(),
-                };
+            let filters: Cow<_> = match (info.filters.as_deref(), info.version.as_deref()) {
+                (Some(f), Some(v)) => format!("({f}) AND ({v})").into(),
+                (Some(f), None) => f.into(),
+                (None, Some(v)) => v.into(),
+                (None, None) => "".into(),
+            };
 
             if let Some(facets) = facets {
                 filter_string.push('(');
