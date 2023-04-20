@@ -1168,10 +1168,10 @@ ofetch@^1.0.1:
     node-fetch-native "^1.0.2"
     ufo "^1.1.0"
 
-omorphia@^0.4.6:
-  version "0.4.6"
-  resolved "https://registry.yarnpkg.com/omorphia/-/omorphia-0.4.6.tgz#5ceb8b71cf23bfe2c5480aba9ecf71eb3323ff30"
-  integrity sha512-dIt4T7ADrcoz/+HyW9g/AIfGOY4zTV6bDedMF8giFwwAH7AFPKGmuXmgUkNIXlPMsZbmHA8pqoxteWuUFl9mTw==
+omorphia@^0.4.7:
+  version "0.4.7"
+  resolved "https://registry.yarnpkg.com/omorphia/-/omorphia-0.4.7.tgz#03712c0b4834dff2bad13ac02aa303b8419295ff"
+  integrity sha512-XzDEvDC7CIj10WMem913dVJdbtGkJmJsdRam1btt+QeIjFwV0Em4JV1IB8qg6UewFbHoevvsHsYnXcXor36lYA==
   dependencies:
     dayjs "^1.11.7"
     floating-vue "^2.0.0-beta.20"
@@ -1269,9 +1269,9 @@ postcss-selector-parser@^6.0.9:
     util-deprecate "^1.0.2"
 
 postcss@^8.1.10, postcss@^8.4.21:
-  version "8.4.22"
-  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.22.tgz#c29e6776b60ab3af602d4b513d5bd2ff9aa85dc1"
-  integrity sha512-XseknLAfRHzVWjCEtdviapiBtfLdgyzExD50Rg2ePaucEesyh8Wv4VPdW0nbyDa1ydbrAxV19jvMT4+LFmcNUA==
+  version "8.4.23"
+  resolved "https://registry.yarnpkg.com/postcss/-/postcss-8.4.23.tgz#df0aee9ac7c5e53e1075c24a3613496f9e6552ab"
+  integrity sha512-bQ3qMcpF6A/YjR55xtoTr0jGOlnPOKAIMdOWiv0EIT6HVPEaJiJB4NLljSbiHoC2RX7DN5Uvjtpbg1NPdwv1oA==
   dependencies:
     nanoid "^3.3.6"
     picocolors "^1.0.0"

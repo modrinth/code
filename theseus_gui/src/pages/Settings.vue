@@ -52,8 +52,6 @@ onBeforeMount(async () => {
 
 // DOM refs
 const detectJavaModal = ref(null)
-// const detectJava17Modal = ref(null)
-// const detectJava8Modal = ref(null)
 
 const handleTheme = async (e) => {
   themeStore.setThemeState(e.option.toLowerCase())
@@ -129,38 +127,44 @@ const setJavaInstall = (javaInstall) => {
   <AnimatedLogo v-if="loading" class="loading" />
   <div v-else style="margin-bottom: 3.5rem">
     <Modal ref="detectJavaModal" header="Auto Detect Java Version" class="auto-detect-modal">
-      <div class="table-container">
-        <div class="table-row table-head">
-          <div class="table-cell table-text">Version</div>
-          <div class="table-cell table-text">Path</div>
-          <div class="table-cell table-text">Actions</div>
-        </div>
-        <div v-for="javaInstall in chosenInstallOptions" :key="javaInstall.path" class="table-row">
-          <div class="table-cell table-text">
-            <span>{{ javaInstall.version }}</span>
+      <div class="table">
+        <div class="table-container">
+          <div class="table-row table-head">
+            <div class="table-cell table-text">Version</div>
+            <div class="table-cell table-text">Path</div>
+            <div class="table-cell table-text">Actions</div>
           </div>
-          <div class="table-cell table-text">
-            <span>{{ javaInstall.path }}</span>
-          </div>
-          <div class="table-cell table-text manage">
-            <Button
-              :disabled="
-                settings.java_globals.JAVA_17.path === javaInstall.path ||
-                settings.java_globals.JAVA_8.path === javaInstall.path
-              "
-              class="select-btn"
-              @click="() => setJavaInstall(javaInstall)"
-            >
-              <span
-                v-if="
+          <div
+            v-for="javaInstall in chosenInstallOptions"
+            :key="javaInstall.path"
+            class="table-row"
+          >
+            <div class="table-cell table-text">
+              <span>{{ javaInstall.version }}</span>
+            </div>
+            <div class="table-cell table-text">
+              <span>{{ javaInstall.path }}</span>
+            </div>
+            <div class="table-cell table-text manage">
+              <Button
+                :disabled="
                   settings.java_globals.JAVA_17.path === javaInstall.path ||
                   settings.java_globals.JAVA_8.path === javaInstall.path
                 "
-                ><CheckIcon />Selected</span
+                class="select-btn"
+                @click="() => setJavaInstall(javaInstall)"
               >
+                <span
+                  v-if="
+                    settings.java_globals.JAVA_17.path === javaInstall.path ||
+                    settings.java_globals.JAVA_8.path === javaInstall.path
+                  "
+                  ><CheckIcon />Selected</span
+                >
 
-              <span v-else><PlusIcon />Select</span>
-            </Button>
+                <span v-else><PlusIcon />Select</span>
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -360,17 +364,10 @@ const setJavaInstall = (javaInstall) => {
     .content {
       padding: 1rem;
 
-      .select-btn {
-        width: 100%;
-        display: flex;
+      span {
+        display: inherit;
         align-items: center;
         justify-content: center;
-
-        span {
-          display: inherit;
-          align-items: center;
-          justify-content: center;
-        }
       }
     }
   }
@@ -456,61 +453,9 @@ const setJavaInstall = (javaInstall) => {
   gap: 0.5rem;
 }
 
-.card-divider {
-  background-color: var(--color-button-bg);
-  border: none;
-  color: var(--color-button-bg);
-  height: 1px;
-  margin: var(--gap-sm) 0;
-}
-
-.table-container {
-  display: grid;
-  grid-template-rows: repeat(auto-fill, auto);
-  width: 100%;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.table-row {
-  display: grid;
-  grid-template-columns: 1fr 4fr 1.5fr;
-}
-
-.table-head {
-  .table-cell {
-    background-color: var(--color-accent-contrast);
-  }
-}
-
-.table-cell {
-  padding: 1rem;
-  height: 100%;
-  align-items: center;
-  vertical-align: center;
-  display: flex;
-}
-
-.table-text {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  display: flex;
-
-  span {
-    display: inline-block;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
-}
-
 .manage {
   display: flex;
   gap: 0.5rem;
-}
-
-.table-row:nth-child(even) .table-cell {
-  background-color: var(--color-bg);
 }
 
 .testing-loader {
