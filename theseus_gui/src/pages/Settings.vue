@@ -24,8 +24,6 @@ const themeStore = useTheming()
 
 const loading = ref(false)
 const settings = ref({})
-const java8InstallOptions = ref([])
-const java17InstallOptions = ref([])
 const chosenInstallOptions = ref([])
 const browsingInstall = ref(0)
 
@@ -38,11 +36,11 @@ onBeforeMount(async () => {
   loading.value = true
   settings.value = await get()
 
-  // Finding possible Java 8 and 17 installations
-  java8InstallOptions.value = await find_jre_8_jres()
-  java17InstallOptions.value = await find_jre_17_jres()
-
   // Setting java version defaults. These can come as NULL from Tauri.
+  // It would be ideal for a default object to come from Tauri. This will throw
+  //  undefined errors if we:
+  //  a) remove the loading animation
+  //  b) don't set this default
   if (!settings.value.java_globals?.JAVA_8)
     settings.value.java_globals.JAVA_8 = { path: '', version: '' }
   if (!settings.value.java_globals?.JAVA_17)
@@ -59,9 +57,9 @@ const handleTheme = async (e) => {
   await set(settings.value)
 }
 
-const loadJavaModal = (version) => {
-  if (version === 17) chosenInstallOptions.value = [...java17InstallOptions.value]
-  else if (version === 8) chosenInstallOptions.value = [...java8InstallOptions.value]
+const loadJavaModal = async (version) => {
+  if (version === 17) chosenInstallOptions.value = await find_jre_17_jres()
+  else if (version === 8) chosenInstallOptions.value = await find_jre_8_jres()
 
   browsingInstall.value = version
   detectJavaModal.value.show()

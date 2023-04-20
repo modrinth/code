@@ -45,14 +45,6 @@ pub async fn settings_get() -> Result<FrontendSettings> {
     Ok(frontend_settings)
 }
 
-// Gets just the theme
-// invoke('theme_get')
-#[tauri::command]
-pub async fn theme_get() -> Result<Theme> {
-    let backend_settings = settings::get().await?;
-    Ok(backend_settings.theme)
-}
-
 // Set full settings
 // invoke('settings_set', settings)
 #[tauri::command]

@@ -13,13 +13,13 @@ import {
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import { list } from '@/helpers/profile'
-import { getTheme } from '@/helpers/settings'
+import { get } from '@/helpers/settings'
 
 const themeStore = useTheming()
 
 onMounted(async () => {
-  const storedTheme = await getTheme()
-  themeStore.setThemeState(storedTheme)
+  const { theme } = await get()
+  themeStore.setThemeState(theme)
 })
 
 const installedMods = ref(0)
@@ -99,6 +99,7 @@ list().then(
       background: #40434a;
       text-align: center;
       padding: 0.5rem 1rem;
+      z-index: 108;
 
       .navigation-controls {
         display: inherit;
@@ -139,21 +140,40 @@ list().then(
   }
 }
 
+.dark-mode {
+  .nav-container {
+    background: var(--color-bg) !important;
+  }
+  .pages-list {
+    a.router-link-active {
+      color: #fff;
+    }
+  }
+}
+
+.light-mode {
+  .appbar {
+    background: var(--color-raised-bg) !important;
+    box-shadow: var(--shadow-floating), var(--shadow-floating);
+  }
+
+  .nav-container {
+    box-shadow: var(--shadow-floating), var(--shadow-floating), var(--shadow-floating),
+      var(--shadow-floating) !important;
+  }
+}
+
 .nav-container {
   position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  z-index: 110;
   height: 100%;
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: 1rem;
-}
-
-.dark-mode {
-  .nav-container {
-    background: var(--color-bg);
-  }
+  background: var(--color-raised-bg);
 }
 
 .pages-list {
@@ -175,7 +195,7 @@ list().then(
     color: var(--color-base);
 
     &.router-link-active {
-      color: var(--color-accent-contrast);
+      color: var(--color-contrast);
       background: var(--color-button-bg);
     }
 
@@ -204,14 +224,6 @@ list().then(
   &.primary {
     color: var(--color-accent-contrast);
     background-color: var(--color-brand);
-  }
-}
-
-.dark-mode {
-  .pages-list {
-    a.router-link-active {
-      color: #fff;
-    }
   }
 }
 

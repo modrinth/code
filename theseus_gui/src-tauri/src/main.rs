@@ -71,7 +71,6 @@ fn main() {
             api::tags::tags_get_report_types,
             api::tags::tags_get_tag_bundle,
             api::settings::settings_get,
-            api::settings::theme_get,
             api::settings::settings_set,
             api::jre::jre_get_all_jre,
             api::jre::jre_autodetect_java_globals,
