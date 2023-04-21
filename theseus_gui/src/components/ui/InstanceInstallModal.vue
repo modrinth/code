@@ -1,12 +1,11 @@
 <script setup>
-import { Avatar, Modal, Button, DownloadIcon, PlusIcon, Card, UploadIcon, XIcon, DropdownSelect } from 'omorphia'
+import { Avatar, Modal, Button, DownloadIcon, PlusIcon, Card, UploadIcon, XIcon, RightArrowIcon } from 'omorphia'
 import { computed, ref } from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import {LoginIcon} from "@/assets/icons";
-import {get_game_versions} from "@/helpers/tags";
 import {useRouter} from "vue-router";
 import {create} from "@/helpers/profile";
 const router = useRouter()
@@ -23,9 +22,9 @@ const gameVersion = ref(null)
 const creatingInstance = ref(false)
 
 defineExpose({
-  show: (projectId, id) => {
+  show: (projectId, selectedVersion) => {
     project.value = projectId
-    version.value = id
+    version.value = selectedVersion
     installModal.value.show()
     searchFilter.value = ''
   },
@@ -68,10 +67,6 @@ const toggleCreation = () => {
   loader.value = null
 }
 
-const gameVersions = ref(
-  (await get_game_versions()).filter((item) => item.version_type === 'release').map((item) => item.version)
-)
-
 const upload_icon = async () => {
   icon.value = await open({
     multiple: false,
@@ -92,17 +87,16 @@ const reset_icon = () => {
 }
 
 const createInstance = async () => {
-  const loader_version_value = 'latest'
   creatingInstance.value = true
   const id = await create(
     name.value,
-    gameVersion.value,
-    loader.value,
-    loader_version_value,
+    version.value.game_versions[0],
+    version.value.loaders[0] !== 'forge' || version.value.loaders[0] !== 'fabric' || version.value.loaders[0] !== 'quilt' ? version.value.loaders[0] : 'vanilla',
+    'latest',
     icon.value
   )
 
-  await installMod(id, version.value)
+  await installMod(id, version.value.id)
 
   await router.push({ path: `/instance/${encodeURIComponent(id)}` })
   installModal.value.hide()
@@ -111,9 +105,7 @@ const createInstance = async () => {
 
 const check_valid = computed(() => {
   return (
-    name.value &&
-    gameVersion.value &&
-    loader.value
+    name.value
   )
 })
 </script>
@@ -153,43 +145,31 @@ const check_valid = computed(() => {
             <div class="creation-icon__description">
               <Button @click="upload_icon()">
                 <UploadIcon />
-                Upload Icon
+                <span class="no-wrap">
+                  Upload Icon
+                </span>
               </Button>
               <Button @click="reset_icon()">
                 <XIcon />
-                Remove Icon
+                <span class="no-wrap">
+                  Remove Icon
+                </span>
               </Button>
             </div>
           </div>
           <div class="creation-settings">
             <input v-model="name" type="text" placeholder="Name" class="creation-input"/>
-            <div class="dropdown-options">
-              <DropdownSelect
-                v-model="gameVersion"
-                :options="gameVersions"
-                class="creation-dropdown"
-                placeholder="Version"
-              />
-              <DropdownSelect
-                v-model="loader"
-                :options="['fabric', 'forge', 'quilt']"
-                class="creation-dropdown"
-                placeholder="Loader"
-              />
-            </div>
+            <Button :disabled="creatingInstance === true || !check_valid" @click="createInstance()">
+              <RightArrowIcon />
+              {{ creatingInstance ? 'Creating...' : 'Create'}}
+            </Button>
           </div>
-        </div>
-        <div class="footer">
-          <Button :disabled="creatingInstance === true || !check_valid" @click="createInstance()">
-            <PlusIcon />
-            {{ creatingInstance ? 'Creating...' : 'Create'}}
-          </Button>
         </div>
       </Card>
       <div class="footer">
-        <Button color="primary" @click="toggleCreation()">
+        <Button :color="showCreation ? '' : 'primary'" @click="toggleCreation()">
           <PlusIcon />
-          Create new instance
+          {{ showCreation ? 'Hide New Instance' : 'Create new instance'}}
         </Button>
         <Button @click="installModal.hide()">Cancel</Button>
       </div>
@@ -231,6 +211,10 @@ const check_valid = computed(() => {
   width: 100%;
 }
 
+.no-wrap {
+  white-space: nowrap;
+}
+
 .creation-dropdown {
   width: min-content !important;
   display: flex;
@@ -239,18 +223,12 @@ const check_valid = computed(() => {
 }
 
 .creation-settings {
+  width: 100%;
+  margin-left: 0.5rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   gap: 0.5rem;
-  align-items: center;
-  width: min-content;
-
-  .dropdown-options {
-    display: flex;
-    flex-direction: row;
-    gap: 0.5rem;
-  }
+  justify-content: center;
 }
 
 .modal-body {
@@ -261,7 +239,7 @@ const check_valid = computed(() => {
 }
 
 .profiles {
-  max-height: 18rem;
+  max-height: 14rem;
   overflow-y: auto;
 }
 
