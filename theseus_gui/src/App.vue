@@ -80,17 +80,8 @@ list().then(
   flex-direction: row;
   overflow: hidden;
 
-  .router-view {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    overflow-x: hidden;
-  }
-
   .view {
-    margin-left: 5rem;
-    width: calc(100% - 5rem);
-    height: calc(100%);
+    width: 100%;
 
     .appbar {
       display: flex;
@@ -99,7 +90,7 @@ list().then(
       background: #40434a;
       text-align: center;
       padding: 0.5rem 1rem;
-      z-index: 108;
+      z-index: 11;
 
       .navigation-controls {
         display: inherit;
@@ -137,6 +128,13 @@ list().then(
         justify-content: flex-end;
       }
     }
+
+    .router-view {
+      width: 100%;
+      height: calc(100% - 2rem);
+      overflow: auto;
+      overflow-x: hidden;
+    }
   }
 }
 
@@ -164,12 +162,11 @@ list().then(
 }
 
 .nav-container {
-  position: absolute;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  z-index: 110;
+  z-index: 10;
   height: 100%;
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: 1rem;

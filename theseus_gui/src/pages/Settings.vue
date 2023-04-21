@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount } from 'vue'
+import { ref, watch } from 'vue'
 import {
   Card,
   Slider,
@@ -11,7 +11,6 @@ import {
   CheckIcon,
   XIcon,
   PlusIcon,
-  SaveIcon,
   AnimatedLogo,
 } from 'omorphia'
 import { BrowseIcon } from '@/assets/icons'
@@ -22,8 +21,14 @@ import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
 
-const loading = ref(false)
-const settings = ref({})
+const fetchSettings = await get()
+
+if (!fetchSettings.java_globals?.JAVA_8)
+  fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
+if (!fetchSettings.java_globals?.JAVA_17)
+  fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
+
+const settings = ref(fetchSettings)
 const chosenInstallOptions = ref([])
 const browsingInstall = ref(0)
 
@@ -31,22 +36,6 @@ const testingJava17 = ref(false)
 const java17Success = ref(null)
 const testingJava8 = ref(false)
 const java8Success = ref(null)
-
-onBeforeMount(async () => {
-  loading.value = true
-  settings.value = await get()
-
-  // Setting java version defaults. These can come as NULL from Tauri.
-  // It would be ideal for a default object to come from Tauri. This will throw
-  //  undefined errors if we:
-  //  a) remove the loading animation
-  //  b) don't set this default
-  if (!settings.value.java_globals?.JAVA_8)
-    settings.value.java_globals.JAVA_8 = { path: '', version: '' }
-  if (!settings.value.java_globals?.JAVA_17)
-    settings.value.java_globals.JAVA_17 = { path: '', version: '' }
-  loading.value = false
-})
 
 // DOM refs
 const detectJavaModal = ref(null)
@@ -65,7 +54,9 @@ const loadJavaModal = async (version) => {
   detectJavaModal.value.show()
 }
 
-const saveSettings = async () => await set(settings.value)
+watch(settings.value, async (oldSettings, newSettings) => {
+  await set(newSettings)
+})
 
 const handleJava17FileInput = async () => {
   let filePath = await open()
@@ -103,8 +94,7 @@ const handleJava8Test = async () => {
   setTimeout(async () => {
     result = await get_jre(settings.value.java_globals.JAVA_8.path)
     testingJava8.value = false
-    if (result) java8Success.value = true
-    else java8Success.value = false
+    java8Success.value = !!result
 
     setTimeout(() => {
       java8Success.value = null
@@ -122,11 +112,10 @@ const setJavaInstall = (javaInstall) => {
 </script>
 
 <template>
-  <AnimatedLogo v-if="loading" class="loading" />
-  <div v-else style="margin-bottom: 3.5rem">
-    <Modal ref="detectJavaModal" header="Auto Detect Java Version" class="auto-detect-modal">
-      <div class="table">
-        <div class="table-container">
+  <div>
+    <Modal ref="detectJavaModal" header="Select java version">
+      <div class="auto-detect-modal">
+        <div class="table">
           <div class="table-row table-head">
             <div class="table-cell table-text">Version</div>
             <div class="table-cell table-text">Path</div>
@@ -157,18 +146,21 @@ const setJavaInstall = (javaInstall) => {
                     settings.java_globals.JAVA_17.path === javaInstall.path ||
                     settings.java_globals.JAVA_8.path === javaInstall.path
                   "
-                  ><CheckIcon />Selected</span
                 >
-
+                  <CheckIcon />Selected
+                </span>
                 <span v-else><PlusIcon />Select</span>
               </Button>
             </div>
+          </div>
+          <div v-if="chosenInstallOptions.length === 0" class="table-row entire-row">
+            <div class="table-cell table-text">No JARS Found!</div>
           </div>
         </div>
       </div>
     </Modal>
     <Card class="theming">
-      <h2>Themes</h2>
+      <h2>Display</h2>
       <div class="toggle-setting">
         <div class="description">
           <h3>Color theme</h3>
@@ -258,7 +250,7 @@ const setJavaInstall = (javaInstall) => {
           v-model="settings.custom_java_args"
           type="text"
           class="input installation-input"
-          placeholder="Enter java arguments"
+          placeholder="Enter java arguments..."
         />
       </div>
       <div class="settings-group">
@@ -267,7 +259,7 @@ const setJavaInstall = (javaInstall) => {
           v-model="settings.custom_env_args"
           type="text"
           class="input installation-input"
-          placeholder="Enter environment arguments"
+          placeholder="Enter environment arguments..."
         />
       </div>
       <hr class="card-divider" />
@@ -304,12 +296,16 @@ const setJavaInstall = (javaInstall) => {
     <Card class="settings-card">
       <h2 class="settings-title">Launcher Settings</h2>
       <div class="settings-group">
-        <h3>Console</h3>
+        <h3>Resource Management</h3>
         <div class="toggle-setting">
-          <span class="concurrent-downloads">
-            Maximum Concurrent Downloads
-            <Slider v-model="settings.max_concurrent_downloads" :min="1" :max="100" :step="1" />
-          </span>
+          <span>Maximum Concurrent Downloads</span>
+          <Slider
+            v-model="settings.max_concurrent_downloads"
+            class="concurrent-downloads"
+            :min="1"
+            :max="100"
+            :step="1"
+          />
         </div>
       </div>
     </Card>
@@ -330,49 +326,28 @@ const setJavaInstall = (javaInstall) => {
         </div>
       </div>
     </Card>
-    <Button color="primary" class="save-btn" @click="saveSettings"><SaveIcon />Save changes</Button>
   </div>
 </template>
 
-<style lang="scss">
-.active {
-  background: var(--color-brand-highlight) !important;
-}
-
+<style lang="scss" scoped>
 .concurrent-downloads {
-  min-height: 40px;
-  width: 25rem !important;
+  width: 80% !important;
 }
 
 .auto-detect-modal {
-  .modal-body {
-    width: 45rem !important;
-    .header {
-      button {
-        padding: 0;
-        font-family: inherit;
-        background-color: transparent;
-        background-image: none;
-        color: inherit;
-        border: 0;
-        cursor: pointer;
-      }
+  padding: 1rem;
+
+  .table {
+    .table-row {
+      grid-template-columns: 1fr 4fr 1.5fr;
     }
 
-    .content {
-      padding: 1rem;
-
-      span {
-        display: inherit;
-        align-items: center;
-        justify-content: center;
-      }
+    span {
+      display: inherit;
+      align-items: center;
+      justify-content: center;
     }
   }
-}
-
-.save-btn {
-  margin: 1rem;
 }
 
 .slider-input {
@@ -472,12 +447,5 @@ const setJavaInstall = (javaInstall) => {
 
 .test-fail {
   color: var(--color-red);
-}
-
-.loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100% !important;
 }
 </style>
