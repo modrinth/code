@@ -75,8 +75,8 @@ const play = async (e) => {
 
 const stop = async (e) => {
   e.stopPropagation()
-  await kill_by_uuid(uuid.value)
   playing.value = false
+  await kill_by_uuid(uuid.value)
 }
 </script>
 
@@ -116,6 +116,7 @@ const stop = async (e) => {
   justify-content: center;
   cursor: pointer;
   padding: 0.75rem;
+  z-index: 40;
 
   &:hover {
     filter: brightness(0.85);
@@ -127,13 +128,11 @@ const stop = async (e) => {
 
   .install {
     background: var(--color-brand);
-    z-index: 55;
     display: flex;
   }
 
   .stop {
     background: var(--color-red);
-    z-index: 77;
     display: flex;
   }
 
@@ -142,6 +141,7 @@ const stop = async (e) => {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-lg);
+    z-index: 41;
     width: 3rem;
     height: 3rem;
     right: 1rem;
