@@ -51,7 +51,7 @@
     </div>
   </Card>
   <Card class="mod-card">
-    <div class="table-container">
+    <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text download-cell" />
         <div class="name-cell table-cell table-text">Name</div>
@@ -167,54 +167,8 @@ defineProps({
   gap: 0.5rem;
 }
 
-.table-container {
-  display: grid;
-  grid-template-rows: repeat(auto-fill, auto);
-  width: 100%;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
 .table-row {
-  display: grid;
   grid-template-columns: min-content 1fr 1fr 1.5fr;
-  transition: opacity 0.5s ease-in-out, filter 0.2s ease-in-out, scale 0.05s ease-in-out,
-    outline 0.2s ease-in-out;
-
-  &.selectable:focus-visible,
-  &.selectable:hover {
-    cursor: pointer;
-    filter: brightness(0.85);
-  }
-
-  &.selectable:active {
-    filter: brightness(0.8);
-    scale: 0.99;
-  }
-}
-
-.table-head {
-  .table-cell {
-    background-color: var(--color-accent-contrast);
-  }
-}
-
-.table-cell {
-  padding: 1rem;
-  height: 100%;
-  align-items: center;
-  display: flex;
-  background-color: var(--color-raised-bg);
-}
-
-.name-cell {
-  padding-left: 0;
-}
-
-.table-text {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: fade;
 }
 
 .manage {
@@ -225,17 +179,6 @@ defineProps({
   .multiselect {
     flex-grow: 1;
   }
-}
-
-.mod-text {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: var(--color-contrast);
-}
-
-.table-row:nth-child(even) .table-cell {
-  background-color: var(--color-bg);
 }
 
 .card-row {
