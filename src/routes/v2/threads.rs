@@ -1,9 +1,9 @@
 use crate::database;
 use crate::database::models::notification_item::NotificationBuilder;
 use crate::database::models::thread_item::ThreadMessageBuilder;
-use crate::models::ids::{ReportId, ThreadMessageId};
+use crate::models::ids::ThreadMessageId;
 use crate::models::notifications::NotificationBody;
-use crate::models::projects::{ProjectId, ProjectStatus};
+use crate::models::projects::ProjectStatus;
 use crate::models::threads::{MessageBody, Thread, ThreadId, ThreadMessage, ThreadType};
 use crate::models::users::User;
 use crate::routes::ApiError;
@@ -240,8 +240,6 @@ fn convert_thread(data: database::models::Thread, users: Vec<User>, user: &User)
             .into_iter()
             .filter(|x| !x.role.is_mod() || user.role.is_mod())
             .collect(),
-        project_id: data.project_id.map(ProjectId::from),
-        report_id: data.report_id.map(ReportId::from),
     }
 }
 
@@ -370,21 +368,19 @@ pub async fn thread_send_message(
             return Ok(HttpResponse::NotFound().body(""));
         }
 
-        let report = if let Some(report) = thread.report_id {
-            database::models::report_item::Report::get(report, &**pool).await?
-        } else {
-            None
-        };
+        let mut transaction = pool.begin().await?;
 
-        if report.as_ref().map(|x| x.closed).unwrap_or(false) && !user.role.is_mod() {
-            return Err(ApiError::InvalidInput(
-                "You may not reply to a closed report".to_string(),
-            ));
+        let id = ThreadMessageBuilder {
+            author_id: Some(user.id.into()),
+            body: new_message.body.clone(),
+            thread_id: thread.id,
         }
+        .insert(&mut transaction)
+        .await?;
 
-        let (mod_notif, (user_notif, team_id)) = if thread.type_ == ThreadType::Project {
+        let mod_notif = if thread.type_ == ThreadType::Project {
             let record = sqlx::query!(
-                "SELECT m.status, m.team_id FROM mods m WHERE thread_id = $1",
+                "SELECT m.id, m.status, m.team_id FROM mods m WHERE thread_id = $1",
                 thread.id as database::models::ids::ThreadId,
             )
             .fetch_one(&**pool)
@@ -392,28 +388,69 @@ pub async fn thread_send_message(
 
             let status = ProjectStatus::from_str(&record.status);
 
-            (
-                status == ProjectStatus::Processing && !user.role.is_mod(),
-                (
-                    status != ProjectStatus::Processing && user.role.is_mod(),
-                    Some(record.team_id),
-                ),
+            if status != ProjectStatus::Processing && user.role.is_mod() {
+                let members = database::models::TeamMember::get_from_team_full(
+                    database::models::TeamId(record.team_id),
+                    &**pool,
+                )
+                .await?;
+
+                NotificationBuilder {
+                    body: NotificationBody::ModeratorMessage {
+                        thread_id: thread.id.into(),
+                        message_id: id.into(),
+                        project_id: Some(database::models::ProjectId(record.id).into()),
+                        report_id: None,
+                    },
+                }
+                .insert_many(
+                    members.into_iter().map(|x| x.user.id).collect(),
+                    &mut transaction,
+                )
+                .await?;
+            }
+
+            status == ProjectStatus::Processing && !user.role.is_mod()
+        } else if thread.type_ == ThreadType::Report {
+            let record = sqlx::query!(
+                "SELECT r.id FROM reports r WHERE thread_id = $1",
+                thread.id as database::models::ids::ThreadId,
             )
+            .fetch_one(&**pool)
+            .await?;
+
+            let report = database::models::report_item::Report::get(
+                database::models::ReportId(record.id),
+                &**pool,
+            )
+            .await?;
+
+            if let Some(report) = report {
+                if report.closed && !user.role.is_mod() {
+                    return Err(ApiError::InvalidInput(
+                        "You may not reply to a closed report".to_string(),
+                    ));
+                }
+
+                if user.id != report.reporter.into() {
+                    NotificationBuilder {
+                        body: NotificationBody::ModeratorMessage {
+                            thread_id: thread.id.into(),
+                            message_id: id.into(),
+                            project_id: None,
+                            report_id: Some(report.id.into()),
+                        },
+                    }
+                    .insert(report.reporter, &mut transaction)
+                    .await?;
+                }
+            }
+
+            !user.role.is_mod()
         } else {
-            (
-                !user.role.is_mod(),
-                (
-                    thread.type_ == ThreadType::Report
-                        && !report
-                            .as_ref()
-                            .map(|x| x.reporter == user.id.into())
-                            .unwrap_or(false),
-                    None,
-                ),
-            )
+            false
         };
 
-        let mut transaction = pool.begin().await?;
         sqlx::query!(
             "
             UPDATE threads
@@ -425,43 +462,6 @@ pub async fn thread_send_message(
         )
         .execute(&mut *transaction)
         .await?;
-
-        let id = ThreadMessageBuilder {
-            author_id: Some(user.id.into()),
-            body: new_message.body.clone(),
-            thread_id: thread.id,
-        }
-        .insert(&mut transaction)
-        .await?;
-
-        if user_notif {
-            let users_to_notify = if let Some(team_id) = team_id {
-                let members = database::models::TeamMember::get_from_team_full(
-                    database::models::TeamId(team_id),
-                    &**pool,
-                )
-                .await?;
-
-                members.into_iter().map(|x| x.user.id).collect()
-            } else if let Some(report) = report {
-                vec![report.reporter]
-            } else {
-                vec![]
-            };
-
-            if !users_to_notify.is_empty() {
-                NotificationBuilder {
-                    body: NotificationBody::ModeratorMessage {
-                        thread_id: thread.id.into(),
-                        message_id: id.into(),
-                        project_id: thread.project_id.map(ProjectId::from),
-                        report_id: thread.report_id.map(ReportId::from),
-                    },
-                }
-                .insert_many(users_to_notify, &mut transaction)
-                .await?;
-            }
-        }
 
         transaction.commit().await?;
 

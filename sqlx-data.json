@@ -130,6 +130,50 @@
     },
     "query": "\n                    UPDATE mods\n                    SET source_url = $1\n                    WHERE (id = $2)\n                    "
   },
+  "04a6310fcc8183e6795a63a5017d607174a9a94587ce774e124613b184dfff43": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "thread_type",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "show_in_mod_inbox",
+          "ordinal": 2,
+          "type_info": "Bool"
+        },
+        {
+          "name": "members",
+          "ordinal": 3,
+          "type_info": "Int8Array"
+        },
+        {
+          "name": "messages",
+          "ordinal": 4,
+          "type_info": "Jsonb"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false,
+        null,
+        null
+      ],
+      "parameters": {
+        "Left": [
+          "Int8Array"
+        ]
+      }
+    },
+    "query": "\n            SELECT t.id, t.thread_type, t.show_in_mod_inbox,\n            ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages\n            FROM threads t\n            LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id\n            LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id\n            WHERE t.id = ANY($1)\n            GROUP BY t.id\n            "
+  },
   "04e5ecb14c526000e9098efb65861f6125e6fcc88f39d6ad811ac8504d229de1": {
     "describe": {
       "columns": [],
@@ -774,6 +818,38 @@
       }
     },
     "query": "\n            UPDATE notifications\n            SET read = TRUE\n            WHERE id = ANY($1)\n            "
+  },
+  "13e9d01d815b415eb8505e2362319cbdb7881f100f80671289f47886f3ed084e": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        },
+        {
+          "name": "status",
+          "ordinal": 1,
+          "type_info": "Varchar"
+        },
+        {
+          "name": "team_id",
+          "ordinal": 2,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false,
+        false,
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT m.id, m.status, m.team_id FROM mods m WHERE thread_id = $1"
   },
   "1411c9ae3af067679aa21d7f45937cd94d457e4eb17a108566776a9bd1ee77e2": {
     "describe": {
@@ -2062,6 +2138,19 @@
     },
     "query": "\n            SELECT r.id, rt.name, r.mod_id, r.version_id, r.user_id, r.body, r.reporter, r.created, r.thread_id, r.closed\n            FROM reports r\n            INNER JOIN report_types rt ON rt.id = r.report_type_id\n            WHERE r.id = ANY($1)\n            ORDER BY r.created DESC\n            "
   },
+  "3ae7c4a29dab8bce0e84a9c47a4a4f50a3be4bcb86e5b13d7dd60975d62e9ea3": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Varchar"
+        ]
+      }
+    },
+    "query": "\n            INSERT INTO threads (\n                id, thread_type\n            )\n            VALUES (\n                $1, $2\n            )\n            "
+  },
   "3af747b5543a5a9b10dcce0a1eb9c2a1926dd5a507fe0d8b7f52d8ccc7fcd0af": {
     "describe": {
       "columns": [],
@@ -2283,62 +2372,6 @@
       }
     },
     "query": "\n                    SELECT gv.id id, gv.version version_, gv.type type_, gv.created created, gv.major major FROM game_versions gv\n                    WHERE major = $1 AND type = $2\n                    ORDER BY created DESC\n                    "
-  },
-  "447c21dd66f9ac85f9f9d39402d2ceb8440d5951e2c7277d329b65412d330f4e": {
-    "describe": {
-      "columns": [
-        {
-          "name": "id",
-          "ordinal": 0,
-          "type_info": "Int8"
-        },
-        {
-          "name": "thread_type",
-          "ordinal": 1,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "show_in_mod_inbox",
-          "ordinal": 2,
-          "type_info": "Bool"
-        },
-        {
-          "name": "project_id",
-          "ordinal": 3,
-          "type_info": "Int8"
-        },
-        {
-          "name": "report_id",
-          "ordinal": 4,
-          "type_info": "Int8"
-        },
-        {
-          "name": "members",
-          "ordinal": 5,
-          "type_info": "Int8Array"
-        },
-        {
-          "name": "messages",
-          "ordinal": 6,
-          "type_info": "Jsonb"
-        }
-      ],
-      "nullable": [
-        false,
-        false,
-        false,
-        true,
-        true,
-        null,
-        null
-      ],
-      "parameters": {
-        "Left": [
-          "Int8Array"
-        ]
-      }
-    },
-    "query": "\n            SELECT t.id, t.thread_type, t.show_in_mod_inbox, t.project_id, t.report_id,\n            ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,\n            JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages\n            FROM threads t\n            LEFT OUTER JOIN threads_messages tmsg ON tmsg.thread_id = t.id\n            LEFT OUTER JOIN threads_members tm ON tm.thread_id = t.id\n            WHERE t.id = ANY($1)\n            GROUP BY t.id\n            "
   },
   "4567790f0dc98ff20b596a33161d1f6ac8af73da67fe8c54192724626c6bf670": {
     "describe": {
@@ -3353,6 +3386,26 @@
     },
     "query": "\n                INSERT INTO threads_members (\n                    thread_id, user_id\n                )\n                VALUES (\n                    $1, $2\n                )\n                "
   },
+  "71766ebbecc05c27ae368992f6ec1043661deb57ba62b7f2328016df9c055cba": {
+    "describe": {
+      "columns": [
+        {
+          "name": "id",
+          "ordinal": 0,
+          "type_info": "Int8"
+        }
+      ],
+      "nullable": [
+        false
+      ],
+      "parameters": {
+        "Left": [
+          "Int8"
+        ]
+      }
+    },
+    "query": "SELECT r.id FROM reports r WHERE thread_id = $1"
+  },
   "71abd207410d123f9a50345ddcddee335fea0d0cc6f28762713ee01a36aee8a0": {
     "describe": {
       "columns": [
@@ -3751,32 +3804,6 @@
       }
     },
     "query": "\n                INSERT INTO mods_categories (joining_mod_id, joining_category_id, is_additional)\n                VALUES ($1, $2, FALSE)\n                "
-  },
-  "7ee877b149288e53a14b5f0f3417806aee7a8954fa0fc17da80d59bebbe067d2": {
-    "describe": {
-      "columns": [
-        {
-          "name": "status",
-          "ordinal": 0,
-          "type_info": "Varchar"
-        },
-        {
-          "name": "team_id",
-          "ordinal": 1,
-          "type_info": "Int8"
-        }
-      ],
-      "nullable": [
-        false,
-        false
-      ],
-      "parameters": {
-        "Left": [
-          "Int8"
-        ]
-      }
-    },
-    "query": "SELECT m.status, m.team_id FROM mods m WHERE thread_id = $1"
   },
   "83d428e1c07d16e356ef26bdf1d707940b1683b5f631ded1f6674a081453d67b": {
     "describe": {
@@ -5403,21 +5430,6 @@
       }
     },
     "query": "\n                    SELECT v.id version_id, v.mod_id project_id, h.hash hash FROM hashes h\n                    INNER JOIN files f on h.file_id = f.id\n                    INNER JOIN versions v on f.version_id = v.id\n                    WHERE h.algorithm = 'sha1' AND h.hash = ANY($1)\n                    "
-  },
-  "d0a65443aef9d3781000d0a59d8d81d1a8e51613dfee343d079c233375cebd12": {
-    "describe": {
-      "columns": [],
-      "nullable": [],
-      "parameters": {
-        "Left": [
-          "Int8",
-          "Varchar",
-          "Int8",
-          "Int8"
-        ]
-      }
-    },
-    "query": "\n            INSERT INTO threads (\n                id, thread_type, report_id, project_id\n            )\n            VALUES (\n                $1, $2, $3, $4\n            )\n            "
   },
   "d12bc07adb4dc8147d0ddccd72a4f23ed38cd31d7db3d36ebbe2c9b627130f0b": {
     "describe": {

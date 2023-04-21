@@ -7,8 +7,6 @@ use serde::Deserialize;
 pub struct ThreadBuilder {
     pub type_: ThreadType,
     pub members: Vec<UserId>,
-    pub project_id: Option<ProjectId>,
-    pub report_id: Option<ReportId>,
 }
 
 #[derive(Clone)]
@@ -18,8 +16,6 @@ pub struct Thread {
     pub messages: Vec<ThreadMessage>,
     pub members: Vec<UserId>,
     pub show_in_mod_inbox: bool,
-    pub project_id: Option<ProjectId>,
-    pub report_id: Option<ReportId>,
 }
 
 pub struct ThreadMessageBuilder {
@@ -71,20 +67,17 @@ impl ThreadBuilder {
         transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
     ) -> Result<ThreadId, DatabaseError> {
         let thread_id = generate_thread_id(&mut *transaction).await?;
-
         sqlx::query!(
             "
             INSERT INTO threads (
-                id, thread_type, report_id, project_id
+                id, thread_type
             )
             VALUES (
-                $1, $2, $3, $4
+                $1, $2
             )
             ",
             thread_id as ThreadId,
-            self.type_.as_str(),
-            self.report_id.map(|x| x.0),
-            self.project_id.map(|x| x.0),
+            self.type_.as_str()
         )
         .execute(&mut *transaction)
         .await?;
@@ -132,7 +125,7 @@ impl Thread {
         let thread_ids_parsed: Vec<i64> = thread_ids.iter().map(|x| x.0).collect();
         let threads = sqlx::query!(
             "
-            SELECT t.id, t.thread_type, t.show_in_mod_inbox, t.project_id, t.report_id,
+            SELECT t.id, t.thread_type, t.show_in_mod_inbox,
             ARRAY_AGG(DISTINCT tm.user_id) filter (where tm.user_id is not null) members,
             JSONB_AGG(DISTINCT jsonb_build_object('id', tmsg.id, 'author_id', tmsg.author_id, 'thread_id', tmsg.thread_id, 'body', tmsg.body, 'created', tmsg.created)) filter (where tmsg.id is not null) messages
             FROM threads t
@@ -159,8 +152,6 @@ impl Thread {
                 },
                 members: x.members.unwrap_or_default().into_iter().map(UserId).collect(),
                 show_in_mod_inbox: x.show_in_mod_inbox,
-                project_id: x.project_id.map(ProjectId),
-                report_id: x.report_id.map(ReportId),
             }))
         })
         .try_collect::<Vec<Thread>>()

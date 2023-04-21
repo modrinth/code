@@ -58,8 +58,6 @@ pub async fn report_create(
     let thread_id = ThreadBuilder {
         type_: ThreadType::Report,
         members: vec![],
-        project_id: None,
-        report_id: Some(id),
     }
     .insert(&mut transaction)
     .await?;
