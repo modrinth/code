@@ -120,6 +120,7 @@ const stop = async (e) => {
 
   &:hover {
     filter: brightness(0.85);
+
     .cta {
       opacity: 1;
       bottom: 4.5rem;
@@ -149,25 +150,30 @@ const stop = async (e) => {
     opacity: 0;
     transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
     cursor: pointer;
+
     svg {
       color: var(--color-accent-contrast);
       width: 1.5rem;
       height: 1.5rem;
     }
+
     &:hover {
       filter: brightness(0.75);
       box-shadow: var(--shadow-floating);
     }
   }
+
   img {
     width: 100%;
     border-radius: var(--radius-sm);
     filter: none !important;
     aspect-ratio: 1;
   }
+
   .project-info {
     margin-top: 1rem;
     width: 100%;
+
     .title {
       color: var(--color-contrast);
       //max-width: 10rem;
@@ -181,6 +187,7 @@ const stop = async (e) => {
       line-height: 110%;
       display: inline-block;
     }
+
     .description {
       color: var(--color-base);
       display: -webkit-box;
