@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import {
   ChevronLeftIcon,
@@ -12,15 +12,14 @@ import {
 } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
-import { toggleTheme } from '@/helpers/theme'
 import { list } from '@/helpers/profile'
+import { get } from '@/helpers/settings'
 
 const themeStore = useTheming()
 
-toggleTheme(themeStore.darkTheme)
-
-watch(themeStore, (newState) => {
-  toggleTheme(newState.darkTheme)
+onMounted(async () => {
+  const { theme } = await get()
+  themeStore.setThemeState(theme)
 })
 
 const installedMods = ref(0)
@@ -81,25 +80,17 @@ list().then(
   flex-direction: row;
   overflow: hidden;
 
-  .router-view {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    overflow-x: hidden;
-  }
-
   .view {
-    margin-left: 5rem;
-    width: calc(100% - 5rem);
-    height: calc(100%);
+    width: 100%;
 
     .appbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #40434a;
+      background: var(--color-super-raised-bg);
       text-align: center;
       padding: 0.5rem 1rem;
+      z-index: 11;
 
       .navigation-controls {
         display: inherit;
@@ -137,24 +128,44 @@ list().then(
         justify-content: flex-end;
       }
     }
-  }
-}
 
-.nav-container {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-  padding: 1rem;
+    .router-view {
+      width: 100%;
+      height: calc(100% - 2rem);
+      overflow: auto;
+      overflow-x: hidden;
+    }
+  }
 }
 
 .dark-mode {
   .nav-container {
-    background: var(--color-bg);
+    background: var(--color-bg) !important;
   }
+  .pages-list {
+    a.router-link-active {
+      color: #fff;
+    }
+  }
+}
+
+.light-mode {
+  .nav-container {
+    box-shadow: var(--shadow-floating), var(--shadow-floating), var(--shadow-floating),
+      var(--shadow-floating) !important;
+  }
+}
+
+.nav-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  height: 100%;
+  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+  padding: 1rem;
+  background: var(--color-raised-bg);
 }
 
 .pages-list {
@@ -176,7 +187,7 @@ list().then(
     color: var(--color-base);
 
     &.router-link-active {
-      color: var(--color-accent-contrast);
+      color: var(--color-contrast);
       background: var(--color-button-bg);
     }
 
@@ -205,14 +216,6 @@ list().then(
   &.primary {
     color: var(--color-accent-contrast);
     background-color: var(--color-brand);
-  }
-}
-
-.dark-mode {
-  .pages-list {
-    a.router-link-active {
-      color: #fff;
-    }
   }
 }
 
@@ -252,6 +255,10 @@ list().then(
 }
 
 .settings {
+  svg {
+    color: var(--color-base) !important;
+  }
+
   a {
     display: flex;
     flex-direction: column;
