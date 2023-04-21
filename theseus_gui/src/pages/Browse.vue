@@ -21,7 +21,7 @@ import { useSearch } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { get as getProfile } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
-import Instance from "@/components/ui/Instance.vue";
+import Instance from '@/components/ui/Instance.vue'
 
 const route = useRoute()
 
@@ -60,7 +60,8 @@ if (route.query.instance) {
   instance.value = await getProfile(route.query.instance)
   console.log(instance.value)
   searchStore.activeVersions = [instance.value.metadata.game_version]
-  if(searchStore.projectType === 'mod') searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
+  if (searchStore.projectType === 'mod')
+    searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
   showVersions.value = false
   showLoaders.value = false
 } else {
@@ -95,7 +96,7 @@ const switchPage = async (page) => {
 const setProjectType = (type) => {
   searchStore.projectType = type
   handleReset()
-  if(instance.value && (type === 'modpack' || type === 'mod')) {
+  if (instance.value && (type === 'modpack' || type === 'mod')) {
     searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
   }
   getSearchResults()
@@ -125,7 +126,9 @@ const setProjectType = (type) => {
         <h2>Categories</h2>
         <div
           v-for="category in categories.filter(
-            (cat) => cat.project_type === (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
+            (cat) =>
+              cat.project_type ===
+              (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
           )"
           :key="category.name"
         >
@@ -215,8 +218,12 @@ const setProjectType = (type) => {
       <Card class="project-type-container">
         <Chips
           :model-value="searchStore.projectType"
-          :items="instance ? ['mod', 'datapack', 'shader', 'resourcepack'] : ['modpack', 'mod', 'datapack', 'shader', 'resourcepack']"
-          @update:model-value="newValue => setProjectType(newValue)"
+          :items="
+            instance
+              ? ['mod', 'datapack', 'shader', 'resourcepack']
+              : ['modpack', 'mod', 'datapack', 'shader', 'resourcepack']
+          "
+          @update:model-value="(newValue) => setProjectType(newValue)"
         />
       </Card>
       <Card class="search-panel-container">

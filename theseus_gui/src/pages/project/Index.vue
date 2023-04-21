@@ -298,7 +298,10 @@ async function install(version) {
       await installMod(route.query.instance, queuedVersion)
       installed.value = true
     } else {
-      modInstallModal.value.show(data.value.id, versions.value.find((v) => v.id === queuedVersion))
+      modInstallModal.value.show(
+        data.value.id,
+        versions.value.find((v) => v.id === queuedVersion)
+      )
     }
   }
 

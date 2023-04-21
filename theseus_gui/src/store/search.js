@@ -34,10 +34,9 @@ export const useSearch = defineStore('searchStore', {
       // Create andFacet string
       let formattedAndFacets = ''
       if (this.projectType === 'datapack') {
-        [
-          ...andFacets,
-          `categories:${encodeURIComponent('datapack')}`,
-        ].forEach((f) => (formattedAndFacets += `["${f}"],`))
+        ;[...andFacets, `categories:${encodeURIComponent('datapack')}`].forEach(
+          (f) => (formattedAndFacets += `["${f}"],`)
+        )
       } else {
         andFacets.forEach((f) => (formattedAndFacets += `["${f}"],`))
       }

@@ -1,13 +1,23 @@
 <script setup>
-import { Avatar, Modal, Button, DownloadIcon, PlusIcon, Card, UploadIcon, XIcon, RightArrowIcon } from 'omorphia'
+import {
+  Avatar,
+  Modal,
+  Button,
+  DownloadIcon,
+  PlusIcon,
+  Card,
+  UploadIcon,
+  XIcon,
+  RightArrowIcon,
+} from 'omorphia'
 import { computed, ref } from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import {LoginIcon} from "@/assets/icons";
-import {useRouter} from "vue-router";
-import {create} from "@/helpers/profile";
+import { LoginIcon } from '@/assets/icons'
+import { useRouter } from 'vue-router'
+import { create } from '@/helpers/profile'
 const router = useRouter()
 const version = ref('')
 const project = ref('')
@@ -91,7 +101,11 @@ const createInstance = async () => {
   const id = await create(
     name.value,
     version.value.game_versions[0],
-    version.value.loaders[0] !== 'forge' || version.value.loaders[0] !== 'fabric' || version.value.loaders[0] !== 'quilt' ? version.value.loaders[0] : 'vanilla',
+    version.value.loaders[0] !== 'forge' ||
+      version.value.loaders[0] !== 'fabric' ||
+      version.value.loaders[0] !== 'quilt'
+      ? version.value.loaders[0]
+      : 'vanilla',
     'latest',
     icon.value
   )
@@ -104,9 +118,7 @@ const createInstance = async () => {
 }
 
 const check_valid = computed(() => {
-  return (
-    name.value
-  )
+  return name.value
 })
 </script>
 
@@ -115,17 +127,15 @@ const check_valid = computed(() => {
     <div class="modal-body">
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
       <div class="profiles">
-        <div
-          v-for="profile in filteredVersions"
-          :key="profile.metadata.name"
-          class="option"
-        >
+        <div v-for="profile in filteredVersions" :key="profile.metadata.name" class="option">
           <Avatar :src="convertFileSrc(profile.metadata.icon)" size="xs" />
           <div class="name">{{ profile.metadata.name }}</div>
           <div class="footer">
             <Button :disabled="profile.installed || profile.installing" @click="install(profile)">
-              <DownloadIcon v-if="!profile.installed && !profile.installing"/>
-              {{ profile.installing ? 'Installing...' :profile.installed ? 'Installed' : 'Install'}}
+              <DownloadIcon v-if="!profile.installed && !profile.installing" />
+              {{
+                profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install'
+              }}
             </Button>
             <Button @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)">
               <LoginIcon />
@@ -137,31 +147,23 @@ const check_valid = computed(() => {
       <Card v-if="showCreation" class="creation-card">
         <div class="creation-container">
           <div class="creation-icon">
-            <Avatar
-              size="md"
-              class="icon"
-              :src="display_icon"
-            />
+            <Avatar size="md" class="icon" :src="display_icon" />
             <div class="creation-icon__description">
               <Button @click="upload_icon()">
                 <UploadIcon />
-                <span class="no-wrap">
-                  Upload Icon
-                </span>
+                <span class="no-wrap"> Upload Icon </span>
               </Button>
               <Button @click="reset_icon()">
                 <XIcon />
-                <span class="no-wrap">
-                  Remove Icon
-                </span>
+                <span class="no-wrap"> Remove Icon </span>
               </Button>
             </div>
           </div>
           <div class="creation-settings">
-            <input v-model="name" type="text" placeholder="Name" class="creation-input"/>
+            <input v-model="name" type="text" placeholder="Name" class="creation-input" />
             <Button :disabled="creatingInstance === true || !check_valid" @click="createInstance()">
               <RightArrowIcon />
-              {{ creatingInstance ? 'Creating...' : 'Create'}}
+              {{ creatingInstance ? 'Creating...' : 'Create' }}
             </Button>
           </div>
         </div>
@@ -169,7 +171,7 @@ const check_valid = computed(() => {
       <div class="footer">
         <Button :color="showCreation ? '' : 'primary'" @click="toggleCreation()">
           <PlusIcon />
-          {{ showCreation ? 'Hide New Instance' : 'Create new instance'}}
+          {{ showCreation ? 'Hide New Instance' : 'Create new instance' }}
         </Button>
         <Button @click="installModal.hide()">Cancel</Button>
       </div>

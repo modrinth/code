@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import {Avatar, Card} from 'omorphia'
+import { Avatar, Card } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 
@@ -14,7 +14,7 @@ const props = defineProps({
   small: {
     type: Boolean,
     default: false,
-  }
+  },
 })
 </script>
 
