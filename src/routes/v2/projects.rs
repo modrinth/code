@@ -1052,7 +1052,9 @@ pub async fn project_edit(
             }
 
             if let Some(moderation_message) = &new_project.moderation_message {
-                if !user.role.is_mod() && project_item.inner.status != ProjectStatus::Approved {
+                if !user.role.is_mod()
+                    && (!project_item.inner.status.is_approved() || moderation_message != &None)
+                {
                     return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the moderation message of this project!"
                             .to_string(),
@@ -1073,7 +1075,10 @@ pub async fn project_edit(
             }
 
             if let Some(moderation_message_body) = &new_project.moderation_message_body {
-                if !user.role.is_mod() && project_item.inner.status != ProjectStatus::Approved {
+                if !user.role.is_mod()
+                    && (!project_item.inner.status.is_approved()
+                        || moderation_message_body != &None)
+                {
                     return Err(ApiError::CustomAuthentication(
                         "You do not have the permissions to edit the moderation message body of this project!"
                             .to_string(),
@@ -1268,7 +1273,7 @@ pub async fn projects_edit(
         if !user.role.is_mod() {
             if let Some(member) = team_members
                 .iter()
-                .find(|x| x.team_id == project.inner.team_id)
+                .find(|x| x.team_id == project.inner.team_id && x.user.id == user.id.into())
             {
                 if !member.permissions.contains(Permissions::EDIT_DETAILS) {
                     return Err(ApiError::CustomAuthentication(format!(
