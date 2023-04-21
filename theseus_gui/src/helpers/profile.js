@@ -50,8 +50,8 @@ export async function add_project_from_version(path, version_id) {
 
 // Add a project to a profile from a path + project_type
 // Returns a path to the new project file
-export async function add_project_from_path(path, project_path, project_type) {
-  return await invoke('profile_add_project_from_path', { path, project_path, project_type })
+export async function add_project_from_path(path, projectPath, projectType) {
+  return await invoke('profile_add_project_from_path', { path, projectPath, projectType })
 }
 
 // Toggle disabling a project
