@@ -15,10 +15,10 @@ pub const JAVA_18PLUS_KEY: &str = "JAVA_18PLUS";
 
 // Autodetect JavaSettings default
 // Make a guess for what the default Java global settings should be
-pub fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
-    let mut java_8 = find_java8_jres()?;
-    let mut java_17 = find_java17_jres()?;
-    let mut java_18plus = find_java18plus_jres()?;
+pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
+    let mut java_8 = find_java8_jres().await?;
+    let mut java_17 = find_java17_jres().await?;
+    let mut java_18plus = find_java18plus_jres().await?;
 
     // Simply select last one found for initial guess
     let mut java_globals = JavaGlobals::new();
@@ -76,9 +76,9 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
 }
 
 // Searches for jres on the system that are 1.18 or higher
-pub fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
+pub async fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.18")?;
-    let jres = jre::get_all_jre()?;
+    let jres = jre::get_all_jre().await?;
     // Filter out JREs that are not 1.17 or higher
     Ok(jres
         .into_iter()
@@ -94,9 +94,9 @@ pub fn find_java18plus_jres() -> crate::Result<Vec<JavaVersion>> {
 }
 
 // Searches for jres on the system that are 1.8 exactly
-pub fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
+pub async fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.8")?;
-    let jres = jre::get_all_jre()?;
+    let jres = jre::get_all_jre().await?;
 
     // Filter out JREs that are not 1.8
     Ok(jres
@@ -113,9 +113,9 @@ pub fn find_java8_jres() -> crate::Result<Vec<JavaVersion>> {
 }
 
 // Searches for jres on the system that are 1.17 exactly
-pub fn find_java17_jres() -> crate::Result<Vec<JavaVersion>> {
+pub async fn find_java17_jres() -> crate::Result<Vec<JavaVersion>> {
     let version = extract_java_majorminor_version("1.17")?;
-    let jres = jre::get_all_jre()?;
+    let jres = jre::get_all_jre().await?;
 
     // Filter out JREs that are not 1.8
     Ok(jres
@@ -132,17 +132,17 @@ pub fn find_java17_jres() -> crate::Result<Vec<JavaVersion>> {
 }
 
 // Get all JREs that exist on the system
-pub fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
-    Ok(jre::get_all_jre()?)
+pub async fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
+    Ok(jre::get_all_jre().await?)
 }
 
 pub async fn validate_globals() -> crate::Result<bool> {
     let state = State::get().await?;
     let settings = state.settings.read().await;
-    Ok(settings.java_globals.is_all_valid())
+    Ok(settings.java_globals.is_all_valid().await)
 }
 
 // Validates JRE at a given at a given path
 pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
-    Ok(jre::check_java_at_filepath(&path))
+    Ok(jre::check_java_at_filepath(&path).await)
 }

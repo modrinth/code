@@ -21,5 +21,6 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
     // Replaces the settings struct in the RwLock with the passed argument
     *state.settings.write().await = settings;
     state.reset_semaphore().await; // reset semaphore to new max
+    State::sync().await?;
     Ok(())
 }
