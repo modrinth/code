@@ -75,12 +75,10 @@ const stop = async (e) => {
 
   .install {
     background: var(--color-brand);
-    z-index: 55;
     display: flex;
   }
   .stop {
     background: var(--color-red);
-    z-index: 77;
     display: flex;
   }
 
