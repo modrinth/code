@@ -108,6 +108,39 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
     result
 }
 
+/// Installs/Repairs a profile
+#[tracing::instrument]
+pub async fn install(path: &Path) -> crate::Result<()> {
+    let state = State::get().await?;
+    let result = {
+        let mut profiles: tokio::sync::RwLockWriteGuard<
+            crate::state::Profiles,
+        > = state.profiles.write().await;
+
+        if let Some(profile) = profiles.0.get_mut(path) {
+            crate::launcher::install_minecraft(profile, None).await?;
+
+            profile.sync().await?;
+            Ok(())
+        } else {
+            Err(crate::ErrorKind::UnmanagedProfileError(
+                path.display().to_string(),
+            )
+            .as_error())
+        }
+    };
+    State::sync().await?;
+    result
+}
+
+pub async fn update_all() -> crate::Result<()> {
+    Ok(())
+}
+
+pub async fn update_project() -> crate::Result<()> {
+    Ok(())
+}
+
 /// Add a project from a version
 #[tracing::instrument]
 pub async fn add_project_from_version(
@@ -359,9 +392,6 @@ pub async fn run_credentials(
     };
 
     let mc_process = crate::launcher::launch_minecraft(
-        &profile.metadata.game_version,
-        &profile.metadata.loader_version,
-        &profile.path,
         java_install,
         java_args,
         env_args,
@@ -370,6 +400,7 @@ pub async fn run_credentials(
         &resolution,
         credentials,
         post_exit_hook,
+        &profile,
     )
     .await?;
 

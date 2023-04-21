@@ -4,9 +4,9 @@ use bincode::{Decode, Encode};
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{RwLock, Semaphore};
+use uuid::Uuid;
 
 use crate::config::{BINCODE_CONFIG, MODRINTH_API_URL};
-use crate::event::LoadingBarId;
 use crate::loading_join;
 use crate::util::fetch::fetch_json;
 
@@ -141,7 +141,7 @@ impl Tags {
     pub async fn fetch_update(
         &mut self,
         semaphore: &RwLock<Semaphore>,
-        loading_bar: Option<&LoadingBarId>,
+        loading_bar: Option<&Uuid>,
     ) -> crate::Result<()> {
         let categories = format!("{MODRINTH_API_URL}tag/category");
         let loaders = format!("{MODRINTH_API_URL}tag/loader");

@@ -23,7 +23,7 @@ async_zip = { version = "0.0.13", features = ["full"] }
 chrono = { version = "0.4.19", features = ["serde"] }
 daedalus = { version = "0.1.18", features = ["bincode"] }
 dirs = "4.0"
-# TODO: possibly replace with tracing to have structured logging
+
 log = "0.4.14"
 regex = "1.5"
 sys-info = "0.9.0"

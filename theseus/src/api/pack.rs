@@ -1,6 +1,8 @@
 use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
-use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
+use crate::event::emit::{
+    emit_loading, init_loading, loading_try_for_each_concurrent,
+};
 use crate::event::LoadingBarType;
 use crate::state::{ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
@@ -69,6 +71,10 @@ enum PackDependency {
     FabricLoader,
     QuiltLoader,
     Minecraft,
+}
+
+pub async fn update_pack() -> crate::Result<()> {
+    Ok(())
 }
 
 pub async fn install_pack_from_version_id(
@@ -218,6 +224,7 @@ async fn install_pack(
         };
 
         let pack_name = pack.name.clone();
+
         let profile = crate::api::profile_create::profile_create(
             pack.name,
             game_version.clone(),
@@ -225,6 +232,7 @@ async fn install_pack(
             loader_version,
             icon,
             project_id.clone(),
+            Some(true),
         )
         .await?;
 
@@ -238,6 +246,7 @@ async fn install_pack(
             "Downloading modpack...",
         )
         .await?;
+
         let num_files = pack.files.len();
         use futures::StreamExt;
         loading_try_for_each_concurrent(
@@ -245,7 +254,7 @@ async fn install_pack(
                 .map(Ok::<PackFile, crate::Error>),
             None,
             Some(&loading_bar),
-            100.0,
+            80.0,
             num_files,
             None,
             |project| {
@@ -344,10 +353,21 @@ async fn install_pack(
             .await
         };
 
+        emit_loading(&loading_bar, 0.85, Some("Extracting overrides")).await?;
         extract_overrides("overrides".to_string()).await?;
         extract_overrides("client_overrides".to_string()).await?;
+        emit_loading(&loading_bar, 0.95, Some("Done extacting overrides"))
+            .await?;
 
         super::profile::sync(&profile).await?;
+
+        if let Some(profile) = crate::api::profile::get(&profile).await? {
+            crate::launcher::install_minecraft(&profile, Some(loading_bar))
+                .await?;
+        } else {
+            emit_loading(&loading_bar, 1.0, Some("Done extacting overrides"))
+                .await?;
+        }
 
         Ok(profile)
     } else {

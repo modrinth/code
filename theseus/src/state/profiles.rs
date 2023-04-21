@@ -34,6 +34,8 @@ pub const CURRENT_FORMAT_VERSION: u32 = 1;
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
+    #[serde(default)]
+    pub installed: bool,
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -85,6 +87,17 @@ impl std::fmt::Display for ModLoader {
     }
 }
 
+impl ModLoader {
+    pub(crate) fn as_api_str(&self) -> &'static str {
+        match *self {
+            Self::Vanilla => "vanilla",
+            Self::Forge => "forge",
+            Self::Fabric => "fabric",
+            Self::Quilt => "quilt",
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JavaSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -110,6 +123,7 @@ impl Profile {
 
         Ok(Self {
             uuid,
+            installed: false,
             path: canonicalize(path)?,
             metadata: ProfileMetadata {
                 name,
@@ -147,7 +161,7 @@ impl Profile {
 
         let paths = self.get_profile_project_paths()?;
         let projects = crate::state::infer_data_from_files(
-            paths,
+            &[(self.clone(), paths)],
             state.directories.caches_dir(),
             &state.io_semaphore,
         )
@@ -345,28 +359,33 @@ impl Profiles {
             }
         }
 
-        // project path, parent profile path
-        let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
+        // profile, child paths
+        let mut files: Vec<(Profile, Vec<PathBuf>)> = Vec::new();
         {
-            for (profile_path, profile) in profiles.iter() {
+            for (_profile_path, profile) in profiles.iter() {
                 let paths = profile.get_profile_project_paths()?;
 
-                for path in paths {
-                    files.insert(path, profile_path.clone());
-                }
+                files.push((profile.clone(), paths));
             }
         }
 
         let inferred = super::projects::infer_data_from_files(
-            files.keys().cloned().collect(),
+            &files,
             dirs.caches_dir(),
             io_sempahore,
         )
         .await?;
 
+        let mut wipe_profiles = Vec::new();
         for (key, value) in inferred {
-            if let Some(profile_path) = files.get(&key) {
-                if let Some(profile) = profiles.get_mut(profile_path) {
+            if let Some((profile, _)) =
+                files.iter().find(|(_, files)| files.contains(&key))
+            {
+                if let Some(profile) = profiles.get_mut(&profile.path) {
+                    if !wipe_profiles.contains(&profile.path) {
+                        profile.projects = HashMap::new();
+                        wipe_profiles.push(profile.path.clone());
+                    }
                     profile.projects.insert(key, value);
                 }
             }

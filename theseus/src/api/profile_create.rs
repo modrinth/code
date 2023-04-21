@@ -29,6 +29,7 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
         None, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
         None, // the icon for the profile
         None,
+        None,
     )
     .await
 }
@@ -43,6 +44,7 @@ pub async fn profile_create(
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
     icon: Option<PathBuf>,          // the icon for the profile
     linked_project_id: Option<String>, // the linked project ID (mainly for modpacks)- used for updating
+    skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
@@ -179,9 +181,14 @@ pub async fn profile_create(
         ProfilePayloadType::Created,
     )
     .await?;
+
     {
         let mut profiles = state.profiles.write().await;
-        profiles.insert(profile).await?;
+        profiles.insert(profile.clone()).await?;
+    }
+
+    if !skip_install_profile.unwrap_or(false) {
+        crate::launcher::install_minecraft(&profile, None).await?;
     }
 
     State::sync().await?;
