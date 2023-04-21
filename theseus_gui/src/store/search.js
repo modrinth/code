@@ -22,7 +22,7 @@ export const useSearch = defineStore('searchStore', {
   }),
   actions: {
     getQueryString() {
-      let andFacets = [`project_type:${this.projectType}`]
+      let andFacets = [`project_type:${this.projectType === 'datapack' ? 'mod' : this.projectType}`]
 
       // Iterate through possible andFacets
       this.facets.forEach((facet) => {
@@ -33,7 +33,14 @@ export const useSearch = defineStore('searchStore', {
 
       // Create andFacet string
       let formattedAndFacets = ''
-      andFacets.forEach((f) => (formattedAndFacets += `["${f}"],`))
+      if (this.projectType === 'datapack') {
+        [
+          ...andFacets,
+          `categories:${encodeURIComponent('datapack')}`,
+        ].forEach((f) => (formattedAndFacets += `["${f}"],`))
+      } else {
+        andFacets.forEach((f) => (formattedAndFacets += `["${f}"],`))
+      }
       formattedAndFacets = formattedAndFacets.slice(0, formattedAndFacets.length - 1)
       formattedAndFacets += ''
 

@@ -1,6 +1,7 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
+      <Instance v-if="instance" :instance="instance" small />
       <Card class="sidebar-card">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
@@ -32,11 +33,11 @@
           <Button
             color="primary"
             class="instance-button"
-            :disabled="installed === true"
+            :disabled="installed === true || installing === true"
             @click="install()"
           >
-            <DownloadIcon />
-            {{ installed ? 'Installed' : 'Install' }}
+            <DownloadIcon v-if="!installed && !installing" />
+            {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
           </Button>
           <a
             :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
@@ -45,7 +46,7 @@
             class="btn"
           >
             <ExternalIcon />
-            Website
+            Site
           </a>
         </div>
         <hr class="card-divider" />
@@ -225,6 +226,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import Instance from '@/components/ui/Instance.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -233,9 +235,16 @@ const confirmModal = ref(null)
 const modInstallModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
+const instance = ref(null)
+const installing = ref(false)
+
+if (route.query.instance) {
+  instance.value = await getProfile(route.query.instance)
+}
+
 const installed = ref(
-  route.query.instance
-    ? Object.values((await getProfile(route.query.instance)).projects).some(
+  instance.value
+    ? Object.values(instance.value.projects).some(
         (p) => p.metadata?.project?.id === route.params.id
       )
     : false
@@ -258,6 +267,7 @@ watch(
 dayjs.extend(relativeTime)
 
 async function install(version) {
+  installing.value = true
   let queuedVersion
 
   if (version) {
@@ -288,9 +298,11 @@ async function install(version) {
       await installMod(route.query.instance, queuedVersion)
       installed.value = true
     } else {
-      modInstallModal.value.show(queuedVersion)
+      modInstallModal.value.show(data.value.id, queuedVersion)
     }
   }
+
+  installing.value = false
 }
 </script>
 
@@ -302,8 +314,8 @@ async function install(version) {
 }
 
 .project-sidebar {
-  width: 21rem;
-  min-width: 21rem;
+  width: 19rem;
+  min-width: 19rem;
   background: var(--color-raised-bg);
   padding: 1rem;
 }
@@ -427,6 +439,17 @@ async function install(version) {
       content: '•';
       margin: 0 0.25rem;
     }
+  }
+}
+
+.install-loading {
+  scale: 0.2;
+  height: 1rem;
+  width: 1rem;
+  margin-right: -1rem;
+
+  :deep(svg) {
+    color: var(--color-contrast);
   }
 }
 </style>

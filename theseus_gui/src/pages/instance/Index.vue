@@ -58,7 +58,7 @@ const instance = shallowRef(await get(route.params.id))
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 15rem;
+  width: 17rem;
 }
 
 Button {
@@ -109,7 +109,7 @@ Button {
 }
 
 .content {
-  margin-left: 18rem;
+  margin-left: 20rem;
 }
 
 .instance-info {

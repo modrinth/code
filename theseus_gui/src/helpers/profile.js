@@ -21,8 +21,8 @@ export async function create_empty() {
     - icon is a path to an image file, which will be copied into the profile directory
 */
 
-export async function create(name, game_version, modloader, loader_version, icon) {
-  return await invoke('profile_create', { name, game_version, modloader, loader_version, icon })
+export async function create(name, gameVersion, modloader, loaderVersion, icon) {
+  return await invoke('profile_create', { name, gameVersion, modloader, loaderVersion, icon })
 }
 
 // Remove a profile

@@ -14,14 +14,14 @@ import {
   ClientIcon,
   ServerIcon,
   AnimatedLogo,
-  Avatar,
+  Chips,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { get as getProfile } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
-import { convertFileSrc } from '@tauri-apps/api/tauri'
+import Instance from "@/components/ui/Instance.vue";
 
 const route = useRoute()
 
@@ -60,7 +60,7 @@ if (route.query.instance) {
   instance.value = await getProfile(route.query.instance)
   console.log(instance.value)
   searchStore.activeVersions = [instance.value.metadata.game_version]
-  searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
+  if(searchStore.projectType === 'mod') searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
   showVersions.value = false
   showLoaders.value = false
 } else {
@@ -91,26 +91,21 @@ const switchPage = async (page) => {
   else searchStore.offset = (searchStore.currentPage - 1) * searchStore.limit
   await getSearchResults()
 }
+
+const setProjectType = (type) => {
+  searchStore.projectType = type
+  handleReset()
+  if(instance.value && (type === 'modpack' || type === 'mod')) {
+    searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
+  }
+  getSearchResults()
+}
 </script>
 
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Card
-        v-if="instance"
-        class="instance-card button-base"
-        @click="$router.push(`/instance/${encodeURIComponent(instance.path)}`)"
-      >
-        <Avatar
-          :src="convertFileSrc(instance.metadata.icon)"
-          :alt="instance.metadata.name"
-          size="sm"
-        />
-        <div class="instance-card__info">
-          <span class="title">{{ instance.metadata.name }}</span>
-          {{ instance.metadata.game_version }} {{ instance.metadata.loader }}
-        </div>
-      </Card>
+      <Instance v-if="instance" :instance="instance" small />
       <Button
         role="button"
         :disabled="
@@ -126,21 +121,11 @@ const switchPage = async (page) => {
         @click="handleReset"
         ><ClearIcon />Clear Filters</Button
       >
-      <div>
-        <h2>Project Type</h2>
-        <DropdownSelect
-          v-model="searchStore.projectType"
-          name="Sort dropdown"
-          :options="['modpack', 'mod', 'datapack', 'shader', 'resourcepack']"
-          class="project-type-dropdown"
-          @change="getSearchResults"
-        />
-      </div>
       <div class="categories">
         <h2>Categories</h2>
         <div
           v-for="category in categories.filter(
-            (cat) => cat.project_type === searchStore.projectType
+            (cat) => cat.project_type === (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
           )"
           :key="category.name"
         >
@@ -154,7 +139,7 @@ const switchPage = async (page) => {
           />
         </div>
       </div>
-      <div v-if="showLoaders" class="loaders">
+      <div v-if="showLoaders && searchStore.projectType !== 'datapack'" class="loaders">
         <h2>Loaders</h2>
         <div
           v-for="loader in loaders.filter((l) =>
@@ -172,7 +157,7 @@ const switchPage = async (page) => {
           />
         </div>
       </div>
-      <div class="environment">
+      <div v-if="searchStore.projectType !== 'datapack'" class="environment">
         <h2>Environments</h2>
         <SearchFilter
           v-model="searchStore.environments.client"
@@ -227,6 +212,13 @@ const switchPage = async (page) => {
       </div>
     </aside>
     <div class="search">
+      <Card class="project-type-container">
+        <Chips
+          :model-value="searchStore.projectType"
+          :items="instance ? ['mod', 'datapack', 'shader', 'resourcepack'] : ['modpack', 'mod', 'datapack', 'shader', 'resourcepack']"
+          @update:model-value="newValue => setProjectType(newValue)"
+        />
+      </Card>
       <Card class="search-panel-container">
         <div class="search-panel">
           <div class="iconified-input">
@@ -316,25 +308,12 @@ const switchPage = async (page) => {
   width: 100% !important;
 }
 
-.instance-card {
-  background-color: var(--color-bg) !important;
-  padding: 1rem !important;
+.project-type-container {
   display: flex;
-  flex-direction: row;
-  min-height: min-content !important;
-  gap: 1rem;
-  align-items: center;
-
-  .instance-card__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .title {
-      color: var(--color-contrast);
-      font-weight: bolder;
-    }
-  }
+  flex-direction: column;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.8rem !important;
 }
 
 .search-panel-container {
@@ -390,7 +369,7 @@ const switchPage = async (page) => {
 
   .filter-panel {
     position: fixed;
-    width: 16rem;
+    width: 19rem;
     background: var(--color-raised-bg);
     padding: 1rem 1rem 3rem 1rem;
     display: flex;
@@ -425,8 +404,8 @@ const switchPage = async (page) => {
   }
 
   .search {
-    margin: 0 1rem 0 17rem;
-    width: 100%;
+    margin: 1rem 1rem 0 20rem;
+    width: calc(100% - 21rem);
 
     .loading {
       margin: 2rem;
