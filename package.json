@@ -1,7 +1,7 @@
 {
   "name": "omorphia",
   "type": "module",
-  "version": "0.4.8",
+  "version": "0.4.9",
   "files": [
     "dist"
   ],
@@ -18,7 +18,7 @@
     "build": "vite build",
     "lint:js": "eslint --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
     "lint": "npm run lint:js && prettier --check .",
-    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
+    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write .",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
