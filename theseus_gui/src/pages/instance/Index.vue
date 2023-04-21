@@ -10,14 +10,27 @@
           >
         </div>
         <span class="button-group">
-          <Button ref="playBtn" color="primary" class="instance-button" @click="startInstance">
-            <PlayIcon />
-            Play
-          </Button>
-          <Button ref="stopBtn" color="danger" class="instance-button" @click="stopInstance">
+          <Button
+            v-if="playing === true"
+            color="danger"
+            class="instance-button"
+            @click="stopInstance"
+          >
             <XIcon />
             Stop
           </Button>
+          <Button
+            v-else-if="playing === false && loading === false"
+            color="primary"
+            class="instance-button"
+            @click="startInstance"
+          >
+            <PlayIcon />
+            Play
+          </Button>
+          <Button v-else-if="loading === true && playing === false" disabled class="instance-button"
+            >Loading...</Button
+          >
           <Button class="instance-button" icon-only>
             <OpenFolderIcon />
           </Button>
@@ -48,43 +61,27 @@
 import { BoxIcon, SettingsIcon, FileIcon, XIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
-import { get_all_running_uuids, kill_by_uuid } from '@/helpers/process'
+import { kill_by_uuid } from '@/helpers/process'
 import { useRoute } from 'vue-router'
-import { shallowRef, ref, onMounted } from 'vue'
+import { shallowRef, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
 const uuid = ref(null)
-const playBtn = ref(null)
-const stopBtn = ref(null)
-
-onMounted(() => {
-  if (!uuid.value) {
-    playBtn.value.$el.style.display = 'flex'
-
-    stopBtn.value.$el.style.display = 'none'
-  } else {
-    playBtn.value.$el.style.display = 'none'
-    stopBtn.value.$el.style.display = 'flex'
-  }
-})
+const playing = ref(false)
+const loading = ref(false)
 
 const startInstance = async () => {
+  loading.value = true
   uuid.value = await run(route.params.id)
-  playBtn.value.innerHtml = `<span>Loading..</span>`
-  const runningUuids = await get_all_running_uuids()
-  if (runningUuids.includes(uuid.value)) {
-    playBtn.value.$el.innerHtml = `<PlayIcon />Play`
-    playBtn.value.$el.style.display = 'none'
-    stopBtn.value.$el.style.display = 'flex'
-  }
+  loading.value = false
+  playing.value = true
 }
 
 const stopInstance = async () => {
+  playing.value = false
   await kill_by_uuid(uuid.value)
-  stopBtn.value.$el.style.display = 'none'
-  playBtn.value.$el.style.display = 'flex'
 }
 </script>
 
