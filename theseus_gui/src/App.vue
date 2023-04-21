@@ -81,7 +81,9 @@ list().then(
   overflow: hidden;
 
   .view {
-    width: 100%;
+    margin-left: 5rem;
+    width: calc(100% - 5rem);
+    height: calc(100%);
 
     .appbar {
       display: flex;
@@ -160,6 +162,7 @@ list().then(
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: absolute;
   justify-content: space-between;
   z-index: 10;
   height: 100%;
