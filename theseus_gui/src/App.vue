@@ -87,7 +87,7 @@ list().then(
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #40434a;
+      background: var(--color-super-raised-bg);
       text-align: center;
       padding: 0.5rem 1rem;
       z-index: 11;
@@ -150,11 +150,6 @@ list().then(
 }
 
 .light-mode {
-  .appbar {
-    background: #e9e9e9 !important;
-    box-shadow: var(--shadow-floating), var(--shadow-floating);
-  }
-
   .nav-container {
     box-shadow: var(--shadow-floating), var(--shadow-floating), var(--shadow-floating),
       var(--shadow-floating) !important;
