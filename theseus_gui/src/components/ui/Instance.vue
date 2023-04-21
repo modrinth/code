@@ -17,10 +17,6 @@ const props = defineProps({
       return {}
     },
   },
-  load: {
-    type: Function,
-    default: () => {},
-  },
 })
 
 const confirmModal = ref(null)
@@ -40,7 +36,6 @@ const seeInstance = async () => {
 
 const install = async (e) => {
   e.stopPropagation()
-  props.load()
   const [data, versions] = await Promise.all([
     ofetch(
       `https://api.modrinth.com/v2/project/${
@@ -106,7 +101,7 @@ const stop = async (e) => {
       <div v-if="props.instance.metadata && !playing" class="install cta" @click="play">
         <PlayIcon />
       </div>
-      <div v-else-if="playing" class="stop cta" @click="stop"><XIcon /></div>
+      <div v-else-if="playing === true" class="stop cta" @click="stop"><XIcon /></div>
       <div v-else class="install cta" @click="install"><SaveIcon /></div>
     </Card>
     <InstallConfirmModal ref="confirmModal" />

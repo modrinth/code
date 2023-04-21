@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue'
 import { ofetch } from 'ofetch'
-import { AnimatedLogo } from 'omorphia'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { shallowRef } from 'vue'
 import { list } from '@/helpers/profile.js'
@@ -27,29 +26,16 @@ const getFeaturedMods = async () => {
   featuredMods.value = response.hits
 }
 
-const load = () => (loading.value = true)
-
 loading.value = true
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 loading.value = false
 </script>
 
 <template>
-  <AnimatedLogo v-if="loading" class="loader" />
-  <div v-else class="page-container">
-    <RowDisplay
-      label="Jump back in"
-      :instances="recentInstances"
-      :can-paginate="false"
-      :load="load"
-    />
-    <RowDisplay
-      label="Popular packs"
-      :instances="featuredModpacks"
-      :can-paginate="true"
-      :load="load"
-    />
-    <RowDisplay label="Popular mods" :instances="featuredMods" :can-paginate="true" :load="load" />
+  <div class="page-container">
+    <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
+    <RowDisplay label="Popular packs" :instances="featuredModpacks" :can-paginate="true" />
+    <RowDisplay label="Popular mods" :instances="featuredMods" :can-paginate="true" />
   </div>
 </template>
 
@@ -60,12 +46,5 @@ loading.value = false
   align-items: center;
   justify-content: center;
   width: 100%;
-}
-
-.loader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
 }
 </style>
