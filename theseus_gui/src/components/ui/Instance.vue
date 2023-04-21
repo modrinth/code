@@ -16,38 +16,24 @@ const props = defineProps({
   },
 })
 
-const stopBtn = ref(null)
-const playBtn = ref(null)
-
+const playing = ref(false)
 const uuid = ref(null)
 
 const router = useRouter()
 
-const seeInstance = async () => {
-  const instancePath = `/instance/${encodeURIComponent(props.instance.path)}`
-  await router.push(instancePath)
-}
+const seeInstance = async () =>
+  await router.push(`/instance/${encodeURIComponent(props.instance.path)}`)
 
 const play = async (e) => {
-  console.log('playing')
   e.stopPropagation()
+  playing.value = true
   uuid.value = await run(props.instance.path)
-  console.log('uuid', uuid.value)
-
-  stopBtn.value.style.opacity = 1
-  stopBtn.value.style.bottom = '4.5rem'
-  stopBtn.value.style.display = 'flex'
-  playBtn.value.style.display = 'none'
 }
 
 const stop = async (e) => {
-  console.log('stopping')
   e.stopPropagation()
+  playing.value = false
   await kill_by_uuid(uuid.value)
-  stopBtn.value.style.opacity = 0
-  stopBtn.value.style.bottom = '0'
-  stopBtn.value.style.display = 'none'
-  playBtn.value.style.display = 'flex'
 }
 </script>
 
@@ -61,8 +47,8 @@ const stop = async (e) => {
           {{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}
         </p>
       </div>
-      <div ref="playBtn" class="install cta" @click="play"><PlayIcon /></div>
-      <div ref="stopBtn" class="stop cta" @click="stop"><XIcon /></div>
+      <div v-if="playing === true" class="stop cta" @click="stop"><XIcon /></div>
+      <div v-else class="install cta" @click="play"><PlayIcon /></div>
     </Card>
   </div>
 </template>
@@ -76,10 +62,12 @@ const stop = async (e) => {
   cursor: pointer;
   padding: 0.75rem;
   transition: 0.1s ease-in-out all;
+  z-index: 40;
 
   &:hover {
     filter: brightness(0.85);
-    .install {
+
+    .cta {
       opacity: 1;
       bottom: 4.5rem;
     }
@@ -93,7 +81,7 @@ const stop = async (e) => {
   .stop {
     background: var(--color-red);
     z-index: 77;
-    display: none;
+    display: flex;
   }
 
   .cta {
@@ -101,6 +89,7 @@ const stop = async (e) => {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-lg);
+    z-index: 41;
     width: 3rem;
     height: 3rem;
     right: 1rem;
@@ -108,25 +97,30 @@ const stop = async (e) => {
     opacity: 0;
     transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
     cursor: pointer;
+
     svg {
       color: var(--color-accent-contrast);
       width: 1.5rem;
       height: 1.5rem;
     }
+
     &:hover {
       filter: brightness(0.75);
       box-shadow: var(--shadow-floating);
     }
   }
+
   img {
     width: 100%;
     border-radius: var(--radius-sm);
     filter: none !important;
     aspect-ratio: 1;
   }
+
   .project-info {
     margin-top: 1rem;
     width: 100%;
+
     .title {
       color: var(--color-contrast);
       //max-width: 10rem;
@@ -139,6 +133,7 @@ const stop = async (e) => {
       line-height: 110%;
       display: inline-block;
     }
+
     .description {
       color: var(--color-base);
       display: -webkit-box;
