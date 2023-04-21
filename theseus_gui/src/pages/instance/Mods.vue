@@ -56,14 +56,15 @@
         <div class="table-cell table-text">{{ mod.version }}</div>
         <div class="table-cell table-text">{{ mod.author }}</div>
         <div class="table-cell table-text manage">
-          <Button icon-only>
+          <Button icon-only @click="() => deleteMod(mod)">
             <TrashIcon />
           </Button>
           <input
             id="switch-1"
             type="checkbox"
             class="switch stylized-toggle"
-            :checked="mod.disabled"
+            :checked="!mod.disabled"
+            @change="() => handleDisable(mod)"
           />
         </div>
       </div>
@@ -84,6 +85,7 @@ import {
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { toggle_disable_project, remove_project } from '@/helpers/profile'
 
 const props = defineProps({
   instance: {
@@ -172,6 +174,17 @@ function updateSort(projects, sort) {
         return 0
       })
   }
+}
+
+const handleDisable = async (mod) => {
+  const project = Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
+  await toggle_disable_project(props.instance.path, project)
+}
+
+const deleteMod = async (mod) => {
+  const project = Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
+  await remove_project(props.instance.path, project)
+  projects.value = projects.value.filter((p) => p.slug !== mod.slug)
 }
 </script>
 
