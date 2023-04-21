@@ -14,21 +14,18 @@ export const initUser = async () => {
   const user = {
     notifications: [],
     follows: [],
-    projects: [],
     lastUpdated: 0,
   }
 
   if (auth.user && auth.user.id) {
     try {
-      const [notifications, follows, projects] = await Promise.all([
+      const [notifications, follows] = await Promise.all([
         useBaseFetch(`user/${auth.user.id}/notifications`, auth.headers),
         useBaseFetch(`user/${auth.user.id}/follows`, auth.headers),
-        useBaseFetch(`user/${auth.user.id}/projects`, auth.headers),
       ])
 
       user.notifications = notifications
       user.follows = follows
-      user.projects = projects
       user.lastUpdated = Date.now()
     } catch (err) {
       console.error(err)

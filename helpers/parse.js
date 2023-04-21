@@ -56,6 +56,32 @@ export const configuredXss = new xss.FilterXSS({
       return name + '="' + xss.escapeAttrValue(value) + '"'
     }
   },
+  safeAttrValue(tag, name, value, _cssFilter) {
+    if (tag === 'img' && name === 'src') {
+      try {
+        const url = new URL(value)
+
+        const allowedHostnames = [
+          'imgur.com',
+          'i.imgur.com',
+          'cdn-raw.modrinth.com',
+          'cdn.modrinth.com',
+          'staging-cdn-raw.modrinth.com',
+          'staging-cdn.modrinth.com',
+          'github.com',
+          'raw.githubusercontent.com',
+          'img.shields.io',
+          'i.postimg.cc',
+        ]
+
+        if (!allowedHostnames.includes(url.hostname)) {
+          return `https://wsrv.nl/?url=${encodeURIComponent(value)}`
+        }
+      } catch (err) {}
+    }
+
+    return value
+  },
 })
 
 export const md = (options = {}) => {
@@ -92,45 +118,6 @@ export const md = (options = {}) => {
     tokens[idx].attrSet('rel', 'noopener nofollow ugc')
 
     return defaultLinkOpenRenderer(tokens, idx, options, env, self)
-  }
-
-  const defaultImageRenderer =
-    md.renderer.rules.image ||
-    function (tokens, idx, options, _env, self) {
-      return self.renderToken(tokens, idx, options)
-    }
-
-  md.renderer.rules.image = function (tokens, idx, options, env, self) {
-    const token = tokens[idx]
-    const index = token.attrIndex('src')
-
-    if (index !== -1) {
-      const src = token.attrs[index][1]
-
-      try {
-        const url = new URL(src)
-
-        const allowedHostnames = [
-          'imgur.com',
-          'i.imgur.com',
-          'cdn-raw.modrinth.com',
-          'cdn.modrinth.com',
-          'staging-cdn-raw.modrinth.com',
-          'staging-cdn.modrinth.com',
-          'github.com',
-          'raw.githubusercontent.com',
-          'img.shields.io',
-          'i.postimg.cc',
-        ]
-
-        if (allowedHostnames.includes(url.hostname)) {
-          return defaultImageRenderer(tokens, idx, options, env, self)
-        }
-      } catch (err) {}
-      token.attrs[index][1] = `//wsrv.nl/?url=${encodeURIComponent(src)}`
-    }
-
-    return defaultImageRenderer(tokens, idx, options, env, self)
   }
 
   return md

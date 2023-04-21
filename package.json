@@ -8,7 +8,7 @@
     "postinstall": "nuxi prepare",
     "lint:js": "eslint --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
     "lint": "npm run lint:js && prettier --check .",
-    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue ."
+    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write ."
   },
   "devDependencies": {
     "@nuxtjs/eslint-config-typescript": "^12.0.0",
