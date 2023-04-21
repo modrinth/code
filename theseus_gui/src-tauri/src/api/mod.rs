@@ -26,7 +26,7 @@ pub enum TheseusGuiError {
 // Serializable error intermediary, so TheseusGuiError can be Serializable (eg: so that we can return theseus::Errors in Tauri directly)
 #[derive(Error, Debug)]
 pub enum TheseusSerializableError {
-    #[error("Theseus API error: {0}")]
+    #[error("{0}")]
     Theseus(#[from] theseus::Error),
 
     #[error("IO error: {0}")]
@@ -34,9 +34,6 @@ pub enum TheseusSerializableError {
 
     #[error("No profile found at {0}")]
     NoProfileFound(String),
-
-    #[error("Improperly formatted environment variables: {0}")]
-    BadEnvVars(String),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -78,5 +75,4 @@ impl_serialize! {
     Theseus,
     IO,
     NoProfileFound,
-    BadEnvVars,
 }
