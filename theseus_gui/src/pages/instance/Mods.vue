@@ -182,12 +182,15 @@ function updateSort(projects, sort) {
 }
 
 const unlisten = await listen('tauri://file-drop', async (e) => {
-  // Get the uploaded file from the payload and add it to profile
-  const projPath = e.payload[0]
-  await add_project_from_path(props.instance.path, projPath, 'inferred')
+  // Get the uploaded file(s) from the payload and add it to profile
+  // TODO: Don't do this iteratively when a batch add method is added
+  await e.payload.forEach(async (mod) => {
+    await add_project_from_path(props.instance.path, mod, 'inferred')
+  })
 
   // Get the profile. A get_proj_list_by_profile may be better here when one is made
   const profile = await get(props.instance.path)
+
   // Update the mods table
   formatProjects(Object.values(profile.projects))
 })
