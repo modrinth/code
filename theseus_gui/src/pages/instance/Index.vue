@@ -31,7 +31,7 @@
           <Button v-else-if="loading === true && playing === false" disabled class="instance-button"
             >Loading...</Button
           >
-          <Button class="instance-button" icon-only>
+          <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
             <OpenFolderIcon />
           </Button>
         </span>
@@ -65,6 +65,7 @@ import { kill_by_uuid } from '@/helpers/process'
 import { useRoute } from 'vue-router'
 import { shallowRef, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { open } from '@tauri-apps/api/dialog'
 
 const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
