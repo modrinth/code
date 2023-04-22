@@ -10,16 +10,24 @@ const featuredMods = ref({})
 
 const profiles = await list()
 const recentInstances = shallowRef(Object.values(profiles))
+const excludeIds = shallowRef(recentInstances.value.map((i) => i.metadata.linked_project_id))
+
+let filter = ''
+excludeIds.value.forEach((id, index) => {
+  filter += `NOT"project_id"="${id}"`
+  if (index < excludeIds.value.length - 1) filter += ' AND '
+})
+console.log(filter)
 
 const getFeaturedModpacks = async () => {
   const response = await ofetch(
-    'https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows'
+    `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter}`
   )
   featuredModpacks.value = response.hits
 }
 const getFeaturedMods = async () => {
   const response = await ofetch(
-    'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows'
+    `https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows&filters=${filter}`
   )
   featuredMods.value = response.hits
 }
