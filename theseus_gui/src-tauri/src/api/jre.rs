@@ -9,32 +9,32 @@ use super::TheseusSerializableError;
 /// Get all JREs that exist on the system
 #[tauri::command]
 pub async fn jre_get_all_jre() -> Result<Vec<JavaVersion>> {
-    Ok(jre::get_all_jre()?)
+    Ok(jre::get_all_jre().await?)
 }
 
 // Finds the isntallation of Java 7, if it exists
 #[tauri::command]
 pub async fn jre_find_jre_8_jres() -> Result<Vec<JavaVersion>> {
-    Ok(jre::find_java8_jres()?)
+    Ok(jre::find_java8_jres().await?)
 }
 
 // finds the installation of Java 17, if it exists
 #[tauri::command]
 pub async fn jre_find_jre_17_jres() -> Result<Vec<JavaVersion>> {
-    Ok(jre::find_java17_jres()?)
+    Ok(jre::find_java17_jres().await?)
 }
 
 // Finds the highest version of Java 18+, if it exists
 #[tauri::command]
 pub async fn jre_find_jre_18plus_jres() -> Result<Vec<JavaVersion>> {
-    Ok(jre::find_java18plus_jres()?)
+    Ok(jre::find_java18plus_jres().await?)
 }
 
 // Autodetect Java globals, by searching the users computer.
 // Returns a *NEW* JavaGlobals that can be put into Settings
 #[tauri::command]
 pub async fn jre_autodetect_java_globals() -> Result<JavaGlobals> {
-    Ok(jre::autodetect_java_globals()?)
+    Ok(jre::autodetect_java_globals().await?)
 }
 
 // Gets key for the optimal JRE to use, for a given profile Profile
