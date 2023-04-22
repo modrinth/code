@@ -57,7 +57,7 @@ export const configuredXss = new xss.FilterXSS({
     }
   },
   safeAttrValue(tag, name, value, _cssFilter) {
-    if (tag === 'img' && name === 'src') {
+    if (tag === 'img' && name === 'src' && !value.startsWith('data:')) {
       try {
         const url = new URL(value)
 
@@ -72,6 +72,7 @@ export const configuredXss = new xss.FilterXSS({
           'raw.githubusercontent.com',
           'img.shields.io',
           'i.postimg.cc',
+          'wsrv.nl',
         ]
 
         if (!allowedHostnames.includes(url.hostname)) {
