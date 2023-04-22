@@ -151,3 +151,10 @@ a {
   border-top-left-radius: var(--radius-md) !important;
   border-top-right-radius: var(--radius-md) !important;
 }
+
+.mod-text {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--color-contrast);
+}
