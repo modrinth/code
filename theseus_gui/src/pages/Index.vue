@@ -5,8 +5,6 @@ import RowDisplay from '@/components/RowDisplay.vue'
 import { shallowRef } from 'vue'
 import { list } from '@/helpers/profile.js'
 
-const loading = ref(false)
-
 const featuredModpacks = ref({})
 const featuredMods = ref({})
 
@@ -26,9 +24,7 @@ const getFeaturedMods = async () => {
   featuredMods.value = response.hits
 }
 
-loading.value = true
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
-loading.value = false
 </script>
 
 <template>

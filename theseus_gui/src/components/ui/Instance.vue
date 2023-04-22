@@ -2,7 +2,7 @@
 import { shallowRef, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ofetch } from 'ofetch'
-import { Card, SaveIcon, XIcon } from 'omorphia'
+import { Card, SaveIcon, XIcon, Avatar } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
@@ -83,13 +83,15 @@ const stop = async (e) => {
 <template>
   <div>
     <Card class="instance-card-item" @click="seeInstance">
-      <img
+      <Avatar
+        size="lg"
         :src="
           props.instance.metadata
             ? convertFileSrc(props.instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"
+        class="mod-image"
       />
       <div class="project-info">
         <p class="title">{{ props.instance.metadata?.name || props.instance.title }}</p>
@@ -98,11 +100,11 @@ const stop = async (e) => {
           {{ props.instance.metadata?.game_version || props.instance.latest_version }}
         </p>
       </div>
-      <div v-if="props.instance.metadata && !playing" class="install cta" @click="play">
+      <div v-if="props.instance.metadata && !playing" class="install cta button-base" @click="play">
         <PlayIcon />
       </div>
-      <div v-else-if="playing === true" class="stop cta" @click="stop"><XIcon /></div>
-      <div v-else class="install cta" @click="install"><SaveIcon /></div>
+      <div v-else-if="playing === true" class="stop cta button-base" @click="stop"><XIcon /></div>
+      <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
     </Card>
     <InstallConfirmModal ref="confirmModal" />
   </div>
@@ -116,7 +118,7 @@ const stop = async (e) => {
   justify-content: center;
   cursor: pointer;
   padding: 0.75rem;
-  z-index: 40;
+  transition: 0.1s ease-in-out all;
 
   &:hover {
     filter: brightness(0.85);
@@ -158,16 +160,13 @@ const stop = async (e) => {
     }
 
     &:hover {
-      filter: brightness(0.75);
+      filter: none !important; /* overrides button-base class */
       box-shadow: var(--shadow-floating);
     }
   }
 
-  img {
-    width: 100%;
-    border-radius: var(--radius-sm);
-    filter: none !important;
-    aspect-ratio: 1;
+  .mod-image {
+    border-radius: 1.5rem !important;
   }
 
   .project-info {
@@ -176,7 +175,6 @@ const stop = async (e) => {
 
     .title {
       color: var(--color-contrast);
-      //max-width: 10rem;
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
