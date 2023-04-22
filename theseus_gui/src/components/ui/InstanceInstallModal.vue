@@ -46,8 +46,10 @@ const profiles = ref(await list().then(Object.values))
 async function install(instance) {
   instance.installing = true
   const version = versions.value.find((v) => {
-    return v.game_versions.includes(instance.metadata.game_version)
-    && (v.loaders.includes(instance.metadata.loader) || v.loaders.includes('minecraft'))
+    return (
+      v.game_versions.includes(instance.metadata.game_version) &&
+      (v.loaders.includes(instance.metadata.loader) || v.loaders.includes('minecraft'))
+    )
   })
   await installMod(instance.path, version.id)
   instance.installed = true
@@ -55,12 +57,18 @@ async function install(instance) {
 }
 
 const filteredVersions = computed(() => {
-  const filtered = profiles.value.filter((profile) => {
-    return profile.metadata.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-  }).filter((profile) => {
-    return versions.value.flatMap(v => v.game_versions).includes(profile.metadata.game_version)
-    && versions.value.flatMap(v => v.loaders).some(value => value === profile.metadata.loader || value === 'minecraft')
-  })
+  const filtered = profiles.value
+    .filter((profile) => {
+      return profile.metadata.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+    })
+    .filter((profile) => {
+      return (
+        versions.value.flatMap((v) => v.game_versions).includes(profile.metadata.game_version) &&
+        versions.value
+          .flatMap((v) => v.loaders)
+          .some((value) => value === profile.metadata.loader || value === 'minecraft')
+      )
+    })
 
   filtered.map((profile) => {
     profile.installing = false
@@ -108,8 +116,8 @@ const createInstance = async () => {
     name.value,
     versions.value[0].game_versions[0],
     versions.value[0].loaders[0] !== 'forge' ||
-    versions.value[0].loaders[0] !== 'fabric' ||
-    versions.value[0].loaders[0] !== 'quilt'
+      versions.value[0].loaders[0] !== 'fabric' ||
+      versions.value[0].loaders[0] !== 'quilt'
       ? versions.value[0].loaders[0]
       : 'vanilla',
     'latest',
