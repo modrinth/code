@@ -20,7 +20,7 @@ import { LoginIcon } from '@/assets/icons'
 import { useRouter } from 'vue-router'
 import { create } from '@/helpers/profile'
 const router = useRouter()
-const version = ref('')
+const versions = ref([])
 const project = ref('')
 const installModal = ref(null)
 const searchFilter = ref('')
@@ -35,7 +35,7 @@ const creatingInstance = ref(false)
 defineExpose({
   show: (projectId, selectedVersion) => {
     project.value = projectId
-    version.value = selectedVersion
+    versions.value = selectedVersion
     installModal.value.show()
     searchFilter.value = ''
   },
@@ -45,7 +45,11 @@ const profiles = ref(await list().then(Object.values))
 
 async function install(instance) {
   instance.installing = true
-  await installMod(instance.path, version.value.id)
+  const version = versions.value.find((v) => {
+    return v.game_versions.includes(instance.metadata.game_version)
+    && (v.loaders.includes(instance.metadata.loader) || v.loaders.includes('minecraft'))
+  })
+  await installMod(instance.path, version.id)
   instance.installed = true
   instance.installing = false
 }
@@ -53,6 +57,9 @@ async function install(instance) {
 const filteredVersions = computed(() => {
   const filtered = profiles.value.filter((profile) => {
     return profile.metadata.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+  }).filter((profile) => {
+    return versions.value.flatMap(v => v.game_versions).includes(profile.metadata.game_version)
+    && versions.value.flatMap(v => v.loaders).some(value => value === profile.metadata.loader || value === 'minecraft')
   })
 
   filtered.map((profile) => {
@@ -64,8 +71,6 @@ const filteredVersions = computed(() => {
 })
 
 const checkInstalled = (profile) => {
-  console.log(Object.values(profile.projects))
-  console.log(project.value)
   return Object.values(profile.projects).some((p) => p.metadata?.project?.id === project.value)
 }
 
@@ -101,17 +106,17 @@ const createInstance = async () => {
   creatingInstance.value = true
   const id = await create(
     name.value,
-    version.value.game_versions[0],
-    version.value.loaders[0] !== 'forge' ||
-      version.value.loaders[0] !== 'fabric' ||
-      version.value.loaders[0] !== 'quilt'
-      ? version.value.loaders[0]
+    versions.value[0].game_versions[0],
+    versions.value[0].loaders[0] !== 'forge' ||
+    versions.value[0].loaders[0] !== 'fabric' ||
+    versions.value[0].loaders[0] !== 'quilt'
+      ? versions.value[0].loaders[0]
       : 'vanilla',
     'latest',
     icon.value
   )
 
-  await installMod(id, version.value.id)
+  await installMod(id, versions.value[0].id)
 
   await router.push({ path: `/instance/${encodeURIComponent(id)}` })
   installModal.value.hide()

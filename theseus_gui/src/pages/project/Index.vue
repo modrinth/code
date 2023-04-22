@@ -297,13 +297,34 @@ async function install(version) {
     }
   } else {
     if (route.query.instance) {
-      await installMod(route.query.instance, queuedVersion)
+      if (!version) {
+        const gameVersion = instance.value.metadata.game_version;
+        const loader = instance.value.metadata.loader;
+        console.log(gameVersion, loader)
+        console.log(instance.value)
+        console.log(data.value.project_type)
+        const selectedVersion = versions.value.find((v) =>
+          v.game_versions.includes(gameVersion)
+          && data.value.project_type === 'mod' ? v.loaders.includes(loader) : true
+        )
+        console.log(selectedVersion)
+        await installMod(route.query.instance, selectedVersion.id)
+      } else {
+        await installMod(route.query.instance, queuedVersion)
+      }
       installed.value = true
     } else {
-      modInstallModal.value.show(
-        data.value.id,
-        versions.value.find((v) => v.id === queuedVersion)
-      )
+      if (version) {
+        modInstallModal.value.show(
+          data.value.id,
+          [ versions.value.find((v) => v.id === queuedVersion) ]
+        )
+      } else {
+        modInstallModal.value.show(
+          data.value.id,
+          versions.value
+        )
+      }
     }
   }
 
