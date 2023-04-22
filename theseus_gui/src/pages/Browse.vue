@@ -411,7 +411,7 @@ const setProjectType = (type) => {
   }
 
   .search {
-    margin: 1rem 1rem 0 20rem;
+    margin: 0 1rem 0 20rem;
     width: calc(100% - 21rem);
 
     .loading {

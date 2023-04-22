@@ -304,9 +304,7 @@ async function install(version) {
         console.log(instance.value)
         console.log(data.value.project_type)
         const selectedVersion = versions.value.find((v) =>
-          v.game_versions.includes(gameVersion) && data.value.project_type === 'mod'
-            ? v.loaders.includes(loader)
-            : true
+          v.game_versions.includes(gameVersion) && (v.loaders.includes(loader) || v.loaders.includes('minecraft'))
         )
         console.log(selectedVersion)
         await installMod(route.query.instance, selectedVersion.id)
