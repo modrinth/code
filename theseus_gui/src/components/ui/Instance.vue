@@ -29,7 +29,11 @@ const props = defineProps({
         />
         <div class="instance-small-card__info">
           <span class="title">{{ props.instance.metadata.name }}</span>
-          {{ props.instance.metadata.game_version }} {{ props.instance.metadata.loader }}
+          {{
+            props.instance.metadata.loader.charAt(0).toUpperCase() +
+            props.instance.metadata.loader.slice(1)
+          }}
+          {{ props.instance.metadata.game_version }}
         </div>
       </Card>
       <Card v-else class="instance-card-item">

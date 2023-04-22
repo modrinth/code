@@ -37,6 +37,7 @@
             @click="install()"
           >
             <DownloadIcon v-if="!installed && !installing" />
+            <CheckCircleIcon v-else-if="installed" />
             {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
           </Button>
           <a
@@ -207,6 +208,7 @@ import {
   CodeIcon,
   formatNumber,
   ExternalIcon,
+  CheckCircleIcon,
 } from 'omorphia'
 import {
   BuyMeACoffeeIcon,
@@ -317,8 +319,12 @@ async function install(version) {
 }
 
 .project-sidebar {
-  width: 19rem;
-  min-width: 19rem;
+  position: fixed;
+  width: 20rem;
+  min-height: 100vh;
+  height: fit-content;
+  max-height: 100vh;
+  overflow-y: auto;
   background: var(--color-raised-bg);
   padding: 1rem;
 }
@@ -335,6 +341,7 @@ async function install(version) {
   flex-direction: column;
   width: 100%;
   padding: 1rem;
+  margin-left: 20rem;
 }
 
 .button-group {

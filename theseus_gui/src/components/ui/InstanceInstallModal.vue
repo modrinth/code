@@ -9,6 +9,7 @@ import {
   UploadIcon,
   XIcon,
   RightArrowIcon,
+  CheckCircleIcon,
 } from 'omorphia'
 import { computed, ref } from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile'
@@ -44,7 +45,7 @@ const profiles = ref(await list().then(Object.values))
 
 async function install(instance) {
   instance.installing = true
-  await installMod(instance.path, version.value)
+  await installMod(instance.path, version.value.id)
   instance.installed = true
   instance.installing = false
 }
@@ -133,6 +134,7 @@ const check_valid = computed(() => {
           <div class="footer">
             <Button :disabled="profile.installed || profile.installing" @click="install(profile)">
               <DownloadIcon v-if="!profile.installed && !profile.installing" />
+              <CheckCircleIcon v-else-if="profile.installed" />
               {{
                 profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install'
               }}
