@@ -21,7 +21,11 @@
       <div class="input-row">
         <p class="input-label">Game Version</p>
         <div class="versions">
-          <DropdownSelect v-model="game_version" :options="game_versions" :render-up="!showAdvanced"/>
+          <DropdownSelect
+            v-model="game_version"
+            :options="game_versions"
+            :render-up="!showAdvanced"
+          />
           <Checkbox
             v-if="showAdvanced"
             v-model="showSnapshots"
