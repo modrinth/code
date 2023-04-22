@@ -188,6 +188,7 @@ export default {
     cursor: pointer;
     user-select: none;
     border-radius: var(--radius-md);
+    box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
     &.disabled {
       cursor: not-allowed;

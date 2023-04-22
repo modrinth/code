@@ -1,5 +1,6 @@
 import { resolve } from 'path'
 import svgLoader from 'vite-svg-loader'
+import eslintPlugin from 'vite-plugin-eslint'
 
 export default {
   title: 'Omorphia',
@@ -66,6 +67,7 @@ export default {
           ],
         },
       }),
+      eslintPlugin(),
     ],
     resolve: {
       alias: {

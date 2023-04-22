@@ -315,6 +315,11 @@ a,
       margin: auto;
     }
   }
+
+  &.transparent {
+    background: none;
+    box-shadow: none;
+  }
 }
 
 .btn-group {
