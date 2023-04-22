@@ -19,7 +19,6 @@ export default defineConfig({
         },
       ],
     }),
-    eslint(),
     svgLoader({
       svgoConfig: {
         plugins: [
@@ -34,6 +33,7 @@ export default defineConfig({
         ],
       },
     }),
+    eslint(),
   ],
 
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
