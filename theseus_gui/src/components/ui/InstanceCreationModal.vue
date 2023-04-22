@@ -21,7 +21,7 @@
       <div class="input-row">
         <p class="input-label">Game Version</p>
         <div class="versions">
-          <DropdownSelect v-model="game_version" :options="game_versions" />
+          <DropdownSelect v-model="game_version" :options="game_versions" :render-up="!showAdvanced"/>
           <Checkbox
             v-if="showAdvanced"
             v-model="showSnapshots"
@@ -41,7 +41,11 @@
       <div v-if="showAdvanced && loader_version === 'other'">
         <div v-if="game_version" class="input-row">
           <p class="input-label">Select Version</p>
-          <DropdownSelect v-model="specified_loader_version" :options="selectable_versions" />
+          <DropdownSelect
+            v-model="specified_loader_version"
+            :options="selectable_versions"
+            render-up
+          />
         </div>
         <div v-else class="input-row">
           <p class="warning">Select a game version before you select a loader version</p>
@@ -110,6 +114,10 @@ defineExpose({
     creating.value = false
     showAdvanced.value = false
     showSnapshots.value = false
+    loader.value = ''
+    loader_version.value = 'stable'
+    icon.value = null
+    display_icon.value = null
 
     setTimeout(() => {
       showContent.value = true
@@ -182,8 +190,6 @@ const reset_icon = () => {
 const fabric_versions = ref(await get_fabric_versions())
 const forge_versions = ref(await get_forge_versions())
 
-console.log(fabric_versions.value.gameVersions)
-
 const selectable_versions = computed(() => {
   if (game_version.value) {
     if (loader.value === 'fabric') {
@@ -249,10 +255,7 @@ const toggle_advanced = () => {
   gap: 1rem;
 }
 
-.filter-checkbox {
+:deep(button.checkbox) {
   border: none;
-  button {
-    border: none;
-  }
 }
 </style>
