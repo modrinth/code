@@ -234,7 +234,7 @@ pub async fn launch_minecraft(
         .current_dir(instance_path.clone())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
-    
+
     // Clear cargo-added env varaibles for debugging, and add settings env vars
     clear_cargo_env_vals(&mut command).envs(env_args);
 
@@ -251,9 +251,8 @@ pub async fn launch_minecraft(
         .await
 }
 
-fn clear_cargo_env_vals(command : &mut Command) -> &mut Command {
-    for (key,_) in std::env::vars().into_iter()
-    {
+fn clear_cargo_env_vals(command: &mut Command) -> &mut Command {
+    for (key, _) in std::env::vars() {
         if key.starts_with("CARGO") {
             command.env_remove(key);
         }
