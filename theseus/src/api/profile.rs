@@ -133,28 +133,85 @@ pub async fn install(path: &Path) -> crate::Result<()> {
     result
 }
 
-pub async fn update_all() -> crate::Result<()> {
-    Ok(())
+/// Updates a pack given a new modpack version
+pub async fn update_pack(
+    profile_path: &Path,
+    new_version: &Path,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        if let Some(linked_data) = &profile.metadata.linked_data {}
+
+        Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile_path.display().to_string(),
+        )
+        .as_error())
+    }
 }
 
-pub async fn update_project() -> crate::Result<()> {
-    Ok(())
+pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile_path.display().to_string(),
+        )
+        .as_error())
+    }
 }
 
-/// Add a project from a version
-#[tracing::instrument]
-pub async fn add_project_from_version(
-    profile: &Path,
+/// Replaces a project given a new version ID
+pub async fn replace_project(
+    profile_path: &Path,
+    project: &Path,
     version_id: String,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile) {
-        profile.add_project_version(version_id).await
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        let path = profile.add_project_version(version_id).await?;
+
+        if path != project {
+            profile.remove_project(project).await?;
+        }
+
+        sync(profile_path).await?;
+
+        Ok(path)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
-            profile.display().to_string(),
+            profile_path.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+/// Add a project from a version
+#[tracing::instrument]
+pub async fn add_project_from_version(
+    profile_path: &Path,
+    version_id: String,
+) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        let path = profile.add_project_version(version_id).await?;
+
+        sync(profile_path).await?;
+
+        Ok(path)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile_path.display().to_string(),
         )
         .as_error())
     }
@@ -163,14 +220,14 @@ pub async fn add_project_from_version(
 /// Add a project from an FS path
 #[tracing::instrument]
 pub async fn add_project_from_path(
-    profile: &Path,
+    profile_path: &Path,
     path: &Path,
     project_type: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile) {
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
         let file = fs::read(path).await?;
         let file_name = path
             .file_name()
@@ -178,16 +235,20 @@ pub async fn add_project_from_path(
             .to_string_lossy()
             .to_string();
 
-        profile
+        let path = profile
             .add_project_bytes(
                 &file_name,
                 bytes::Bytes::from(file),
                 project_type.and_then(|x| serde_json::from_str(&x).ok()),
             )
-            .await
+            .await?;
+
+        sync(profile_path).await?;
+
+        Ok(path)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
-            profile.display().to_string(),
+            profile_path.display().to_string(),
         )
         .as_error())
     }

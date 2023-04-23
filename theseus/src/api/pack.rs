@@ -4,7 +4,7 @@ use crate::event::emit::{
     emit_loading, init_loading, loading_try_for_each_concurrent,
 };
 use crate::event::LoadingBarType;
-use crate::state::{ModrinthProject, ModrinthVersion, SideType};
+use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
@@ -71,10 +71,6 @@ enum PackDependency {
     FabricLoader,
     QuiltLoader,
     Minecraft,
-}
-
-pub async fn update_pack() -> crate::Result<()> {
-    Ok(())
 }
 
 pub async fn install_pack_from_version_id(
@@ -231,7 +227,10 @@ async fn install_pack(
             mod_loader.unwrap_or(ModLoader::Vanilla),
             loader_version,
             icon,
-            project_id.clone(),
+            Some(LinkedData {
+                project_id: project_id.clone(),
+                version_id: version_id.clone(),
+            }),
             Some(true),
         )
         .await?;

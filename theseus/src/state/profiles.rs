@@ -60,10 +60,15 @@ pub struct ProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
-    pub linked_project_id: Option<String>,
+    pub linked_data: Option<LinkedData>,
 }
 
-// TODO: Quilt?
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct LinkedData {
+    pub project_id: Option<String>,
+    pub version_id: Option<String>,
+}
+
 #[derive(
     Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Default,
 )]
@@ -132,7 +137,7 @@ impl Profile {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
-                linked_project_id: None,
+                linked_data: None,
             },
             projects: HashMap::new(),
             java: None,
@@ -279,8 +284,6 @@ impl Profile {
         let state = State::get().await?;
         let path = self.path.join(project_type.get_folder()).join(file_name);
         write(&path, &bytes, &state.io_semaphore).await?;
-
-        self.sync().await?;
 
         Ok(path)
     }

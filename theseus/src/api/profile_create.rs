@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::state::LinkedData;
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     jre,
@@ -43,7 +44,7 @@ pub async fn profile_create(
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
     icon: Option<PathBuf>,          // the icon for the profile
-    linked_project_id: Option<String>, // the linked project ID (mainly for modpacks)- used for updating
+    linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
@@ -159,7 +160,7 @@ pub async fn profile_create(
         profile.metadata.loader_version = Some(loader_version);
     }
 
-    profile.metadata.linked_project_id = linked_project_id;
+    profile.metadata.linked_data = linked_data;
 
     // Attempts to find optimal JRE for the profile from the JavaGlobals
     // Finds optimal key, and see if key has been set in JavaGlobals
