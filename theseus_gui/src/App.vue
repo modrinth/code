@@ -14,23 +14,38 @@ import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
+import { loading_listener } from '@/helpers/events'
 
 const themeStore = useTheming()
 
 onMounted(async () => {
   const { theme } = await get()
   themeStore.setThemeState(theme)
+  await getInstalledModsCount()
+
+  // When a modpack is finished installing, get the count of installed mods to update the app bar
+  await loading_listener(async (e) => {
+    installProgress.value = 0
+    if (e.message === 'Downloading modpack...' && e.fraction === 1) {
+      setTimeout(async () => {
+        installProgress.value = 0
+        await getInstalledModsCount()
+      }, 500)
+    } else if (e.message === 'Downloading modpack...' && e.fraction < 1)
+      installProgress.value = e.fraction * 100
+  })
 })
 
 const installedMods = ref(0)
-list().then(
-  (profiles) =>
-    (installedMods.value = Object.values(profiles).reduce(
-      (acc, val) => acc + Object.keys(val.projects).length,
-      0
-    ))
-)
-// TODO: add event when profiles update to update installed mods count
+const installProgress = ref(0)
+
+const getInstalledModsCount = async () => {
+  const profiles = await list()
+  installedMods.value = Object.values(profiles).reduce(
+    (acc, val) => acc + Object.keys(val.projects).length,
+    0
+  )
+}
 </script>
 
 <template>
@@ -61,7 +76,8 @@ list().then(
           <p>{{ $route.name }}</p>
         </section>
         <section class="mod-stats">
-          <p>{{ installedMods }} mods installed</p>
+          <p v-if="installProgress !== 0">Installing: {{ installProgress }}%</p>
+          <p v-else>{{ installedMods }} mods installed</p>
         </section>
       </div>
       <div class="router-view">

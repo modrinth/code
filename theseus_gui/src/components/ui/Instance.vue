@@ -61,7 +61,6 @@ const install = async (e) => {
       !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
     ) {
       await pack_install(versions.value[0].id)
-      router.go()
     } else confirmModal.value.show(versions.value[0].id)
   }
   // TODO: Add condition for installing a mod
