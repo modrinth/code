@@ -232,10 +232,11 @@ pub async fn launch_minecraft(
             .collect::<Vec<_>>(),
         )
         .current_dir(instance_path.clone())
-        .env_clear()
-        .envs(env_args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+    
+    // Clear cargo-added env varaibles for debugging, and add settings env vars
+    clear_cargo_env_vals(&mut command).envs(env_args);
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
@@ -248,4 +249,14 @@ pub async fn launch_minecraft(
             post_exit_hook,
         )
         .await
+}
+
+fn clear_cargo_env_vals(command : &mut Command) -> &mut Command {
+    for (key,_) in std::env::vars().into_iter()
+    {
+        if key.starts_with("CARGO") {
+            command.env_remove(key);
+        }
+    }
+    command
 }
