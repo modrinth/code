@@ -226,6 +226,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
+import { checkInstalled } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
@@ -244,13 +245,7 @@ if (route.query.instance) {
   instance.value = await getProfile(route.query.instance)
 }
 
-const installed = ref(
-  instance.value
-    ? Object.values(instance.value.projects).some(
-        (p) => p.metadata?.project?.id === route.params.id
-      )
-    : false
-)
+const installed = ref(instance.value ? checkInstalled(instance.value, route.params.id) : false)
 
 const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
@@ -270,17 +265,17 @@ dayjs.extend(relativeTime)
 
 async function install(version) {
   installing.value = true
-  let queuedVersion
+  let queuedVersionData
 
   if (version) {
-    queuedVersion = version
+    queuedVersionData = versions.value.find((v) => v.id === version)
   } else {
     if (data.value.project_type === 'modpack' || !route.query.instance) {
-      queuedVersion = versions.value[0].id
+      queuedVersionData = versions.value[0]
     } else {
-      queuedVersion = versions.value.find((v) =>
+      queuedVersionData = versions.value.find((v) =>
         v.game_versions.includes(data.value.game_versions[0])
-      ).id
+      )
     }
   }
 
@@ -290,32 +285,51 @@ async function install(version) {
       packs.length === 0 ||
       !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
     ) {
-      let id = await packInstall(queuedVersion)
+      let id = await packInstall(queuedVersionData.id)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
-      confirmModal.value.show(queuedVersion)
+      confirmModal.value.show(queuedVersionData.id)
     }
   } else {
     if (route.query.instance) {
       if (!version) {
         const gameVersion = instance.value.metadata.game_version
         const loader = instance.value.metadata.loader
-        console.log(gameVersion, loader)
-        console.log(instance.value)
-        console.log(data.value.project_type)
-        const selectedVersion = versions.value.find((v) =>
-          v.game_versions.includes(gameVersion) && (v.loaders.includes(loader) || v.loaders.includes('minecraft'))
+        const selectedVersion = versions.value.find(
+          (v) =>
+            v.game_versions.includes(gameVersion) &&
+            (v.loaders.includes(loader) || v.loaders.includes('minecraft'))
         )
         console.log(selectedVersion)
+        queuedVersionData = selectedVersion
         await installMod(route.query.instance, selectedVersion.id)
       } else {
-        await installMod(route.query.instance, queuedVersion)
+        await installMod(route.query.instance, queuedVersionData.id)
       }
+
+      for (const dep of queuedVersionData.dependencies) {
+        if (dep.version_id) {
+          if (checkInstalled(instance.value, dep.project_id)) continue
+          await installMod(route.query.instance, dep.version_id)
+        } else {
+          if (checkInstalled(instance.value, dep.project_id)) continue
+          const depVersions = await ofetch(
+            `https://api.modrinth.com/v2/project/${dep.project_id}/version`
+          )
+          const latest = depVersions.find(
+            (v) =>
+              v.game_versions.includes(instance.value.metadata.game_version) &&
+              v.loaders.includes(instance.value.metadata.loader)
+          )
+          await installMod(route.query.instance, latest.id)
+        }
+      }
+
       installed.value = true
     } else {
       if (version) {
         modInstallModal.value.show(data.value.id, [
-          versions.value.find((v) => v.id === queuedVersion),
+          versions.value.find((v) => v.id === queuedVersionData.id),
         ])
       } else {
         modInstallModal.value.show(data.value.id, versions.value)

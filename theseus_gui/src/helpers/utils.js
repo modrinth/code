@@ -10,3 +10,7 @@ export const releaseColor = (releaseType) => {
       return ''
   }
 }
+
+export const checkInstalled = (profile, checkProject) => {
+  return Object.values(profile.projects).some((p) => p.metadata?.project?.id === checkProject)
+}
