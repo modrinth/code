@@ -1,7 +1,6 @@
 //! Authentication flow based on Hydra
 use crate::util::fetch::{fetch_advanced, fetch_json};
 use async_tungstenite as ws;
-use bincode::{Decode, Encode};
 use chrono::{prelude::*, Duration};
 use futures::prelude::*;
 use lazy_static::lazy_static;
@@ -50,14 +49,12 @@ struct ProfileInfoJSON {
 }
 
 // Login information
-#[derive(Encode, Decode, Serialize, Deserialize, Clone, Debug)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Credentials {
-    #[bincode(with_serde)]
     pub id: uuid::Uuid,
     pub username: String,
     pub access_token: String,
     pub refresh_token: String,
-    #[bincode(with_serde)]
     pub expires: DateTime<Utc>,
     _ctor_scope: std::marker::PhantomData<()>,
 }

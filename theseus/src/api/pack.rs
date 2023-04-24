@@ -352,10 +352,10 @@ async fn install_pack(
             .await
         };
 
-        emit_loading(&loading_bar, 0.85, Some("Extracting overrides")).await?;
+        emit_loading(&loading_bar, 0.05, Some("Extracting overrides")).await?;
         extract_overrides("overrides".to_string()).await?;
         extract_overrides("client_overrides".to_string()).await?;
-        emit_loading(&loading_bar, 0.95, Some("Done extacting overrides"))
+        emit_loading(&loading_bar, 0.1, Some("Done extacting overrides"))
             .await?;
 
         super::profile::sync(&profile).await?;
@@ -364,7 +364,7 @@ async fn install_pack(
             crate::launcher::install_minecraft(&profile, Some(loading_bar))
                 .await?;
         } else {
-            emit_loading(&loading_bar, 1.0, Some("Done extacting overrides"))
+            emit_loading(&loading_bar, 0.1, Some("Done extacting overrides"))
                 .await?;
         }
 

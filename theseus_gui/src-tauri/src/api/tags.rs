@@ -1,7 +1,5 @@
 use crate::api::Result;
-use theseus::tags::{
-    Category, DonationPlatform, GameVersion, License, Loader, TagBundle,
-};
+use theseus::tags::{Category, DonationPlatform, GameVersion, Loader, Tags};
 
 /// Gets cached category tags from the database
 #[tauri::command]
@@ -27,12 +25,6 @@ pub async fn tags_get_game_versions() -> Result<Vec<GameVersion>> {
     Ok(theseus::tags::get_game_version_tags().await?)
 }
 
-/// Gets cached license tags from the database
-#[tauri::command]
-pub async fn tags_get_licenses() -> Result<Vec<License>> {
-    Ok(theseus::tags::get_license_tags().await?)
-}
-
 /// Gets cached donation platform tags from the database
 #[tauri::command]
 pub async fn tags_get_donation_platforms() -> Result<Vec<DonationPlatform>> {
@@ -41,6 +33,6 @@ pub async fn tags_get_donation_platforms() -> Result<Vec<DonationPlatform>> {
 
 /// Gets cached tag bundle from the database
 #[tauri::command]
-pub async fn tags_get_tag_bundle() -> Result<TagBundle> {
+pub async fn tags_get_tag_bundle() -> Result<Tags> {
     Ok(theseus::tags::get_tag_bundle().await?)
 }

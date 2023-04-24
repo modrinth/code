@@ -12,6 +12,7 @@ mod api;
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
     State::get().await?;
+    State::update();
     Ok(())
 }
 
@@ -67,7 +68,6 @@ fn main() {
             api::tags::tags_get_donation_platforms,
             api::tags::tags_get_game_versions,
             api::tags::tags_get_loaders,
-            api::tags::tags_get_licenses,
             api::tags::tags_get_report_types,
             api::tags::tags_get_tag_bundle,
             api::settings::settings_get,

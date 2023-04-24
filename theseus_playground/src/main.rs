@@ -32,6 +32,8 @@ async fn main() -> theseus::Result<()> {
 
     // Initialize state
     let st = State::get().await?;
+    State::update();
+
     st.settings.write().await.max_concurrent_downloads = 5;
     st.settings.write().await.hooks.post_exit =
         Some("echo This is after Minecraft runs- global setting!".to_string());
@@ -64,6 +66,9 @@ async fn main() -> theseus::Result<()> {
         None,
     )
     .await?;
+
+    // let mut value = list().await?;
+    // let profile_path = value.iter().next().map(|x| x.0).unwrap();
 
     // println!("Adding sodium");
     // let sodium_path = profile::add_project_from_version(
@@ -103,7 +108,7 @@ async fn main() -> theseus::Result<()> {
     State::sync().await?;
 
     // Attempt to run game
-    if auth::users().await?.len() == 0 {
+    if auth::users().await?.is_empty() {
         println!("No users found, authenticating.");
         authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
     }

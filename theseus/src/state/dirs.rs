@@ -134,6 +134,11 @@ impl DirectoryInfo {
         self.config_dir.join("caches")
     }
 
+    #[inline]
+    pub fn caches_meta_dir(&self) -> PathBuf {
+        self.config_dir.join("caches").join("metadata")
+    }
+
     /// Get path from environment variable
     #[inline]
     fn env_path(name: &str) -> Option<PathBuf> {

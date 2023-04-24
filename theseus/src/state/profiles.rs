@@ -362,39 +362,60 @@ impl Profiles {
             }
         }
 
-        // profile, child paths
-        let mut files: Vec<(Profile, Vec<PathBuf>)> = Vec::new();
-        {
-            for (_profile_path, profile) in profiles.iter() {
-                let paths = profile.get_profile_project_paths()?;
+        Ok(Self(profiles))
+    }
 
-                files.push((profile.clone(), paths));
-            }
-        }
+    pub async fn update_projects() {
+        let res = async {
+            let state = State::get().await?;
 
-        let inferred = super::projects::infer_data_from_files(
-            &files,
-            dirs.caches_dir(),
-            io_sempahore,
-        )
-        .await?;
-
-        let mut wipe_profiles = Vec::new();
-        for (key, value) in inferred {
-            if let Some((profile, _)) =
-                files.iter().find(|(_, files)| files.contains(&key))
+            // profile, child paths
+            let mut files: Vec<(Profile, Vec<PathBuf>)> = Vec::new();
             {
-                if let Some(profile) = profiles.get_mut(&profile.path) {
-                    if !wipe_profiles.contains(&profile.path) {
-                        profile.projects = HashMap::new();
-                        wipe_profiles.push(profile.path.clone());
-                    }
-                    profile.projects.insert(key, value);
+                let profiles = state.profiles.read().await;
+                for (_profile_path, profile) in profiles.0.iter() {
+                    let paths = profile.get_profile_project_paths()?;
+
+                    files.push((profile.clone(), paths));
                 }
             }
-        }
 
-        Ok(Self(profiles))
+            if !files.is_empty() {
+                let inferred = super::projects::infer_data_from_files(
+                    &files,
+                    state.directories.caches_dir(),
+                    &state.io_semaphore,
+                )
+                .await?;
+                let mut wipe_profiles = Vec::new();
+                for (key, value) in inferred {
+                    if let Some((profile, _)) =
+                        files.iter().find(|(_, files)| files.contains(&key))
+                    {
+                        let mut new_profiles = state.profiles.write().await;
+                        if let Some(profile) =
+                            new_profiles.0.get_mut(&profile.path)
+                        {
+                            if !wipe_profiles.contains(&profile.path) {
+                                profile.projects = HashMap::new();
+                                wipe_profiles.push(profile.path.clone());
+                            }
+                            profile.projects.insert(key, value);
+                        }
+                    }
+                }
+            }
+
+            Ok::<(), crate::Error>(())
+        }
+        .await;
+
+        match res {
+            Ok(()) => {}
+            Err(err) => {
+                log::warn!("Unable to fetch profile projects: {err}")
+            }
+        };
     }
 
     #[tracing::instrument(skip(self))]
@@ -428,16 +449,19 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
+    pub async fn remove(
+        &mut self,
+        path: &Path,
+    ) -> crate::Result<Option<Profile>> {
         let path =
             PathBuf::from(&canonicalize(path)?.to_string_lossy().to_string());
-        self.0.remove(&path);
+        let profile = self.0.remove(&path);
 
         if path.exists() {
             fs::remove_dir_all(path).await?;
         }
 
-        Ok(self)
+        Ok(profile)
     }
 
     #[tracing::instrument(skip_all)]

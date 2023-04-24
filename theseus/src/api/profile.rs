@@ -22,7 +22,8 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get(path) {
+    println!("{:?}", path);
+    if let Some(profile) = profiles.remove(path).await? {
         emit_profile(
             profile.uuid,
             profile.path.clone(),
@@ -30,9 +31,8 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
             ProfilePayloadType::Removed,
         )
         .await?;
+        println!("hello");
     }
-
-    profiles.remove(path).await?;
 
     Ok(())
 }
@@ -308,7 +308,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     } else {
         // If no default account, try to use a logged in account
         let users = auth::users().await?;
-        let last_account = users.iter().next();
+        let last_account = users.first();
         if let Some(last_account) = last_account {
             refresh(last_account.id).await?
         } else {
@@ -327,6 +327,7 @@ pub async fn run_credentials(
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
     let settings = state.settings.read().await;
+    let metadata = state.metadata.read().await;
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to run a nonexistent or unloaded profile at path {}!",
@@ -334,8 +335,7 @@ pub async fn run_credentials(
         ))
     })?;
 
-    let version = state
-        .metadata
+    let version = metadata
         .minecraft
         .versions
         .iter()

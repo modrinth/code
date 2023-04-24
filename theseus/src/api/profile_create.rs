@@ -48,6 +48,7 @@ pub async fn profile_create(
     skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
+    let metadata = state.metadata.read().await;
 
     let uuid = Uuid::new_v4();
     let path = state.directories.profiles_dir().join(uuid.to_string());
@@ -89,8 +90,8 @@ pub async fn profile_create(
         };
 
         let loader_data = match loader {
-            ModLoader::Forge => &state.metadata.forge,
-            ModLoader::Fabric => &state.metadata.fabric,
+            ModLoader::Forge => &metadata.forge,
+            ModLoader::Fabric => &metadata.fabric,
             _ => {
                 return Err(ProfileCreationError::NoManifest(
                     loader.to_string(),
@@ -191,7 +192,6 @@ pub async fn profile_create(
     if !skip_install_profile.unwrap_or(false) {
         crate::launcher::install_minecraft(&profile, None).await?;
     }
-
     State::sync().await?;
 
     Ok(path)

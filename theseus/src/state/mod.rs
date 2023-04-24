@@ -1,10 +1,8 @@
 //! Theseus state management system
-use crate::config::sled_config;
 use crate::event::emit::emit_loading;
 
 use crate::event::emit::init_loading;
 use crate::event::LoadingBarType;
-use crate::jre;
 use crate::loading_join;
 
 use std::sync::Arc;
@@ -51,8 +49,7 @@ pub struct State {
     /// Stored maximum number of sempahores of current io_semaphore
     pub io_semaphore_max: RwLock<u32>,
     /// Launcher metadata
-    pub metadata: Metadata,
-    // TODO: settings API
+    pub metadata: RwLock<Metadata>,
     /// Launcher configuration
     pub settings: RwLock<Settings>,
     /// Reference to minecraft process children
@@ -68,76 +65,55 @@ pub struct State {
 }
 
 impl State {
-    #[tracing::instrument]
     /// Get the current launcher state, initializing it if needed
     pub async fn get() -> crate::Result<Arc<Self>> {
         LAUNCHER_STATE
             .get_or_try_init(|| {
                 async {
+                    let loading_bar = init_loading(
+                        LoadingBarType::StateInit,
+                        100.0,
+                        "Initializing launcher...",
+                    )
+                    .await?;
 
-                    let loading_bar = init_loading(LoadingBarType::StateInit, 100.0, "Initializing launcher...").await?;
-                    // Directories
                     let directories = DirectoryInfo::init().await?;
-
-                    // Database
-                    // TODO: make database versioned
-                    let database = sled_config()
-                        .path(directories.database_file())
-                        .open()?;
-
                     emit_loading(&loading_bar, 10.0, None).await?;
 
                     // Settings
-                    let mut settings =
+                    let settings =
                         Settings::init(&directories.settings_file()).await?;
+                    let io_semaphore = RwLock::new(Semaphore::new(
+                        settings.max_concurrent_downloads,
+                    ));
+                    emit_loading(&loading_bar, 10.0, None).await?;
 
-                    // Loose initializations
-                    let io_semaphore_max = settings.max_concurrent_downloads;
-
-                    let io_semaphore =
-                        RwLock::new(Semaphore::new(io_semaphore_max));
-
-                    let metadata_fut = Metadata::init(&database);
+                    let metadata_fut =
+                        Metadata::init(&directories, &io_semaphore);
                     let profiles_fut =
                         Profiles::init(&directories, &io_semaphore);
-
+                    let tags_fut = Tags::init(&directories, &io_semaphore);
+                    let users_fut = Users::init(&directories, &io_semaphore);
                     // Launcher data
-                    let (metadata, profiles) = loading_join! {
-                        Some(&loading_bar), 20.0, Some("Initializing metadata and profiles...");
-                        metadata_fut, profiles_fut
+                    let (metadata, profiles, tags, users) = loading_join! {
+                        Some(&loading_bar), 70.0, Some("Initializing...");
+                        metadata_fut,
+                        profiles_fut,
+                        tags_fut,
+                        users_fut,
                     }?;
 
-                    emit_loading(&loading_bar, 10.0, None).await?;
-                    let users = Users::init(&database)?;
-
                     let children = Children::new();
-
                     let auth_flow = AuthTask::new();
-
-                    // On launcher initialization, attempt a tag fetch after tags init
-                    let mut tags = Tags::init(&database)?;
-                    if let Err(tag_fetch_err) =
-                        tags.fetch_update(&io_semaphore,Some(&loading_bar)).await
-                    {
-                        tracing::error!(
-                            "Failed to fetch tags on launcher init: {}",
-                            tag_fetch_err
-                        );
-                    };
-
                     emit_loading(&loading_bar, 10.0, None).await?;
-
-                    // On launcher initialization, if global java variables are unset, try to find and set them
-                    // (they are required for the game to launch)
-                    if settings.java_globals.count() == 0 {
-                        settings.java_globals = jre::autodetect_java_globals().await?;
-                    }
 
                     Ok(Arc::new(Self {
                         directories,
                         io_semaphore,
-                        io_semaphore_max: RwLock::new(io_semaphore_max as u32),
-                        metadata,
+                        io_semaphore_max: RwLock::new(
+                            settings.max_concurrent_downloads as u32,
+                        ),
+                        metadata: RwLock::new(metadata),
                         settings: RwLock::new(settings),
                         profiles: RwLock::new(profiles),
                         users: RwLock::new(users),
@@ -149,6 +125,14 @@ impl State {
             })
             .await
             .map(Arc::clone)
+    }
+
+    /// Updates state with data from the web
+    pub fn update() {
+        tokio::task::spawn(Metadata::update());
+        tokio::task::spawn(Tags::update());
+        tokio::task::spawn(Profiles::update_projects());
+        tokio::task::spawn(Settings::update_java());
     }
 
     #[tracing::instrument]

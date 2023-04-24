@@ -40,7 +40,7 @@ pub async fn auth_has_user(user: uuid::Uuid) -> Result<bool> {
 /// Get a copy of the list of all user credentials
 // invoke('auth_users',user)
 #[tauri::command]
-pub async fn auth_users() -> Result<Box<[Credentials]>> {
+pub async fn auth_users() -> Result<Vec<Credentials>> {
     Ok(auth::users().await?)
 }
 

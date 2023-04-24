@@ -14,4 +14,6 @@ initialize_state()
   .then(() => {
     createApp(App).use(router).use(pinia).use(FloatingVue).mixin(loadCssMixin).mount('#app')
   })
-  .catch((err) => console.error(err))
+  .catch((err) => {
+    console.error(err)
+  })

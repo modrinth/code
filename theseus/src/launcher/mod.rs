@@ -57,9 +57,9 @@ pub async fn install_minecraft(
 ) -> crate::Result<()> {
     let state = st::State::get().await?;
     let instance_path = &canonicalize(&profile.path)?;
+    let metadata = state.metadata.read().await;
 
-    let version = state
-        .metadata
+    let version = metadata
         .minecraft
         .versions
         .iter()
@@ -223,10 +223,10 @@ pub async fn launch_minecraft(
     }
 
     let state = st::State::get().await?;
+    let metadata = state.metadata.read().await;
     let instance_path = &canonicalize(&profile.path)?;
 
-    let version = state
-        .metadata
+    let version = metadata
         .minecraft
         .versions
         .iter()
