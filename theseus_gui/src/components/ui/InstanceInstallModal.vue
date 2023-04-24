@@ -19,8 +19,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { LoginIcon } from '@/assets/icons'
 import { useRouter } from 'vue-router'
 import { create } from '@/helpers/profile'
-import { ofetch } from 'ofetch'
-import { checkInstalled } from '@/helpers/utils'
+import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
 const router = useRouter()
 const versions = ref([])
 const project = ref('')
@@ -53,24 +52,10 @@ async function install(instance) {
       (v.loaders.includes(instance.metadata.loader) || v.loaders.includes('minecraft'))
     )
   })
+
   await installMod(instance.path, version.id)
-  for (const dep of version.dependencies) {
-    if (dep.version_id) {
-      if (checkInstalled(instance, dep.project_id)) continue
-      await installMod(instance.path, dep.version_id)
-    } else {
-      if (checkInstalled(instance, dep.project_id)) continue
-      const depVersions = await ofetch(
-        `https://api.modrinth.com/v2/project/${dep.project_id}/version`
-      )
-      const latest = depVersions.find(
-        (v) =>
-          v.game_versions.includes(instance.metadata.game_version) &&
-          v.loaders.includes(instance.metadata.loader)
-      )
-      await installMod(instance.path, latest.id)
-    }
-  }
+  await installVersionDependencies(instance, version)
+
   instance.installed = true
   instance.installing = false
 }

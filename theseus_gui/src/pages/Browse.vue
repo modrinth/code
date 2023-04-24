@@ -33,6 +33,14 @@ const showSnapshots = ref(false)
 const loading = ref(true)
 const instance = ref(null)
 
+if (route.query.instance) {
+  instance.value = await getProfile(route.query.instance)
+  searchStore.instanceContext = instance.value
+} else {
+  instance.value = null
+  searchStore.instanceContext = null
+}
+
 const [categories, loaders, availableGameVersions] = await Promise.all([
   get_categories(),
   get_loaders(),
@@ -41,6 +49,12 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
 
 const getSearchResults = async (shouldLoad = false) => {
   const queryString = searchStore.getQueryString()
+  if (route.query.instance) {
+    showVersions.value = false
+    showLoaders.value = !(
+      searchStore.projectType === 'mod' || searchStore.projectType === 'resourcepack'
+    )
+  }
   if (shouldLoad === true) {
     loading.value = true
   }
@@ -54,18 +68,6 @@ getSearchResults(true)
 const handleReset = async () => {
   searchStore.resetFilters()
   await getSearchResults()
-}
-
-if (route.query.instance) {
-  instance.value = await getProfile(route.query.instance)
-  console.log(instance.value)
-  searchStore.activeVersions = [instance.value.metadata.game_version]
-  if (searchStore.projectType === 'mod')
-    searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
-  showVersions.value = false
-  showLoaders.value = false
-} else {
-  handleReset()
 }
 
 const toggleFacet = async (facet) => {
@@ -96,10 +98,6 @@ const switchPage = async (page) => {
 const setProjectType = (type) => {
   searchStore.projectType = type
   handleReset()
-  if (instance.value && (type === 'modpack' || type === 'mod')) {
-    searchStore.facets = [`categories:'${encodeURIComponent(instance.value.metadata.loader)}'`]
-  }
-  getSearchResults()
 }
 </script>
 

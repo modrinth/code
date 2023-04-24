@@ -226,7 +226,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
-import { checkInstalled } from '@/helpers/utils'
+import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
@@ -300,30 +300,17 @@ async function install(version) {
             v.game_versions.includes(gameVersion) &&
             (v.loaders.includes(loader) || v.loaders.includes('minecraft'))
         )
-        console.log(selectedVersion)
+        if (!selectedVersion) {
+          installing.value = false
+          return
+        }
         queuedVersionData = selectedVersion
         await installMod(route.query.instance, selectedVersion.id)
       } else {
         await installMod(route.query.instance, queuedVersionData.id)
       }
 
-      for (const dep of queuedVersionData.dependencies) {
-        if (dep.version_id) {
-          if (checkInstalled(instance.value, dep.project_id)) continue
-          await installMod(route.query.instance, dep.version_id)
-        } else {
-          if (checkInstalled(instance.value, dep.project_id)) continue
-          const depVersions = await ofetch(
-            `https://api.modrinth.com/v2/project/${dep.project_id}/version`
-          )
-          const latest = depVersions.find(
-            (v) =>
-              v.game_versions.includes(instance.value.metadata.game_version) &&
-              v.loaders.includes(instance.value.metadata.loader)
-          )
-          await installMod(route.query.instance, latest.id)
-        }
-      }
+      installVersionDependencies(instance.value, queuedVersionData)
 
       installed.value = true
     } else {
