@@ -1,4 +1,7 @@
 //! Theseus profile management interface
+use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
+use crate::event::LoadingBarType;
+use crate::state::ProjectMetadata;
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
@@ -22,7 +25,6 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    println!("{:?}", path);
     if let Some(profile) = profiles.remove(path).await? {
         emit_profile(
             profile.uuid,
@@ -31,7 +33,6 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
             ProfilePayloadType::Removed,
         )
         .await?;
-        println!("hello");
     }
 
     Ok(())
@@ -119,8 +120,6 @@ pub async fn install(path: &Path) -> crate::Result<()> {
 
         if let Some(profile) = profiles.0.get_mut(path) {
             crate::launcher::install_minecraft(profile, None).await?;
-
-            profile.sync().await?;
             Ok(())
         } else {
             Err(crate::ErrorKind::UnmanagedProfileError(
@@ -133,16 +132,35 @@ pub async fn install(path: &Path) -> crate::Result<()> {
     result
 }
 
-/// Updates a pack given a new modpack version
-pub async fn update_pack(
-    profile_path: &Path,
-    new_version: &Path,
-) -> crate::Result<()> {
+pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.0.get_mut(profile_path) {
-        if let Some(linked_data) = &profile.metadata.linked_data {}
+        let loading_bar = init_loading(
+            LoadingBarType::ProfileUpdate {
+                profile_uuid: profile.uuid,
+                profile_name: profile.metadata.name.clone(),
+            },
+            100.0,
+            "Updating profile...",
+        )
+        .await?;
+
+        use futures::StreamExt;
+        loading_try_for_each_concurrent(
+            futures::stream::iter(profile.projects.keys())
+                .map(Ok::<&PathBuf, crate::Error>),
+            None,
+            Some(&loading_bar),
+            100.0,
+            profile.projects.len(),
+            None,
+            |project| update_project(profile_path, project, Some(true)),
+        )
+        .await?;
+
+        profile.sync().await?;
 
         Ok(())
     } else {
@@ -153,11 +171,35 @@ pub async fn update_pack(
     }
 }
 
-pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
+pub async fn update_project(
+    profile_path: &Path,
+    project_path: &Path,
+    should_not_sync: Option<bool>,
+) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.0.get_mut(profile_path) {
+        if let Some(project) = profile.projects.get(project_path) {
+            if let ProjectMetadata::Modrinth {
+                update_version: Some(update_version),
+                ..
+            } = &project.metadata
+            {
+                let path = profile
+                    .add_project_version(update_version.id.clone())
+                    .await?;
+
+                if path != project_path {
+                    profile.remove_project(project_path).await?;
+                }
+
+                if !should_not_sync.unwrap_or(false) {
+                    profile.sync().await?;
+                }
+            }
+        }
+
         Ok(())
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
@@ -183,7 +225,7 @@ pub async fn replace_project(
             profile.remove_project(project).await?;
         }
 
-        sync(profile_path).await?;
+        profile.sync().await?;
 
         Ok(path)
     } else {
@@ -206,7 +248,7 @@ pub async fn add_project_from_version(
     if let Some(profile) = profiles.0.get_mut(profile_path) {
         let path = profile.add_project_version(version_id).await?;
 
-        sync(profile_path).await?;
+        profile.sync().await?;
 
         Ok(path)
     } else {
@@ -243,7 +285,7 @@ pub async fn add_project_from_path(
             )
             .await?;
 
-        sync(profile_path).await?;
+        profile.sync().await?;
 
         Ok(path)
     } else {

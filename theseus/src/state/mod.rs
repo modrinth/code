@@ -5,6 +5,7 @@ use crate::event::emit::init_loading;
 use crate::event::LoadingBarType;
 use crate::loading_join;
 
+use crate::state::users::Users;
 use std::sync::Arc;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
@@ -25,7 +26,6 @@ mod projects;
 pub use self::projects::*;
 
 mod users;
-pub use self::users::*;
 
 mod children;
 pub use self::children::*;

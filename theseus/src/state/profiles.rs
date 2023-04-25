@@ -1,10 +1,8 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
-use crate::event::emit::{
-    emit_profile, init_loading, loading_try_for_each_concurrent,
-};
-use crate::event::{LoadingBarType, ProfilePayloadType};
+use crate::event::emit::emit_profile;
+use crate::event::ProfilePayloadType;
 use crate::state::projects::Project;
 use crate::state::{ModrinthVersion, ProjectType};
 use crate::util::fetch::{fetch, fetch_json, write, write_cached_icon};
@@ -173,6 +171,14 @@ impl Profile {
         .await?;
 
         self.projects = projects;
+
+        emit_profile(
+            self.uuid,
+            self.path.clone(),
+            &self.metadata.name,
+            ProfilePayloadType::Synced,
+        )
+        .await?;
 
         Ok(())
     }
@@ -466,21 +472,9 @@ impl Profiles {
 
     #[tracing::instrument(skip_all)]
     pub async fn sync(&self) -> crate::Result<&Self> {
-        let loading_bar = init_loading(
-            LoadingBarType::ProfileSync,
-            100.0,
-            "Syncing profiles...",
-        )
-        .await?;
-        let num_futs = self.0.len();
-        loading_try_for_each_concurrent(
-            stream::iter(self.0.iter()).map(Ok::<_, crate::Error>),
-            None,
-            Some(&loading_bar),
-            100.0,
-            num_futs,
-            None,
-            |(path, profile)| async move {
+        stream::iter(self.0.iter())
+            .map(Ok::<_, crate::Error>)
+            .try_for_each_concurrent(None, |(path, profile)| async move {
                 let json = serde_json::to_vec(&profile)?;
 
                 let json_path = Path::new(&path.to_string_lossy().to_string())
@@ -488,9 +482,8 @@ impl Profiles {
 
                 fs::write(json_path, json).await?;
                 Ok::<_, crate::Error>(())
-            },
-        )
-        .await?;
+            })
+            .await?;
 
         Ok(self)
     }

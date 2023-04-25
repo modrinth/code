@@ -3,11 +3,9 @@ use std::path::PathBuf;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use tokio::sync::{RwLock, Semaphore};
-use uuid::Uuid;
 
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
-use crate::loading_join;
 use crate::util::fetch::{fetch_json, read_json, write};
 
 // Serializeable struct for all tags to be fetched together by the frontend

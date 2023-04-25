@@ -48,6 +48,13 @@ impl EventState {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
     }
 
+    pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
+    {
+        let value = Self::get().await?;
+        let read = value.loading_bars.read().await;
+        Ok(read.clone())
+    }
+
     // Initialization requires no app handle in non-tauri mode, so we can just use the same function
     #[cfg(not(feature = "tauri"))]
     pub async fn get() -> crate::Result<Arc<Self>> {
@@ -55,7 +62,7 @@ impl EventState {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Debug, Clone)]
 pub struct LoadingBar {
     pub loading_bar_id: Uuid,
     pub message: String,
@@ -76,8 +83,10 @@ pub enum LoadingBarType {
         profile_uuid: Uuid,
         profile_name: String,
     },
-    ProfileSync,
-    LauncherSync,
+    ProfileUpdate {
+        profile_uuid: Uuid,
+        profile_name: String,
+    },
 }
 
 #[derive(Serialize, Clone)]
@@ -118,6 +127,7 @@ pub struct ProfilePayload {
 pub enum ProfilePayloadType {
     Created,
     Added, // also triggered when Created
+    Synced,
     Edited,
     Removed,
 }
