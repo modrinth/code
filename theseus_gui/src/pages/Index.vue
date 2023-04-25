@@ -23,7 +23,6 @@ const getInstances = async () => {
     if (index < excludeIds.length - 1) filter.value += ' AND '
   })
 }
-await getInstances()
 
 const getFeaturedModpacks = async () => {
   const response = await ofetch(
@@ -38,13 +37,20 @@ const getFeaturedMods = async () => {
   featuredMods.value = response.hits
 }
 
+await getInstances()
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 // If a modpack is finished installing, refresh our instances list, the featured modpacks & featured mods
 await loading_listener(async (e) => {
-  console.log(e)
-  if (e.message === 'Downloading modpack...' && e.fraction === 1) await getInstances()
-  await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+  // Null check is a current bug. Events API sometimes send back down a NULL when the task completes
+  if (
+    e.message === 'Downloading modpack...' &&
+    (e.fraction === 1 || e.fraction === null) &&
+    e.event.PackDownload
+  ) {
+    await getInstances()
+    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+  }
 })
 </script>
 

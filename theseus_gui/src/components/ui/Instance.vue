@@ -8,7 +8,11 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
 import { run, list } from '@/helpers/profile'
-import { kill_by_uuid } from '@/helpers/process'
+import {
+  kill_by_uuid,
+  get_all_running_profile_paths,
+  get_uuids_by_profile_path,
+} from '@/helpers/process'
 
 const props = defineProps({
   instance: {
@@ -32,6 +36,18 @@ const seeInstance = async () => {
     : `/project/${encodeURIComponent(props.instance.project_id)}`
 
   await router.push(instancePath)
+}
+
+const checkProcess = async () => {
+  const runningPaths = await get_all_running_profile_paths()
+
+  if (runningPaths.includes(props.instance.path)) {
+    playing.value = true
+    return
+  }
+
+  playing.value = false
+  uuid.value = null
 }
 
 const install = async (e) => {
@@ -74,14 +90,31 @@ const play = async (e) => {
 
 const stop = async (e) => {
   e.stopPropagation()
-  playing.value = false
-  await kill_by_uuid(uuid.value)
+
+  try {
+    // If we lost the uuid for some reason, such as a user navigating
+    // from-then-back to this page, we will get all uuids by the instance path.
+    // For-each uuid, kill the process.
+    if (!uuid.value) {
+      const uuids = await get_uuids_by_profile_path(props.instance.path)
+      console.log(uuids)
+      uuids.forEach(async (u) => await kill_by_uuid(u))
+    } else await kill_by_uuid(uuid.value) // If we still have the uuid, just kill it
+
+    playing.value = false
+    uuid.value = null
+  } catch (err) {
+    // Theseus currently throws:
+    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
+    // For now, we will catch and just warn
+    console.warn(err)
+  }
 }
 </script>
 
 <template>
   <div>
-    <Card class="instance-card-item" @click="seeInstance">
+    <Card class="instance-card-item" @click="seeInstance" @mouseover="checkProcess">
       <Avatar
         size="lg"
         :src="

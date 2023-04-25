@@ -32,7 +32,7 @@ onMounted(async () => {
         await getInstalledModsCount()
       }, 500)
     } else if (e.message === 'Downloading modpack...' && e.fraction < 1)
-      installProgress.value = e.fraction * 100
+      installProgress.value = Math.round(e.fraction * 100)
   })
 })
 

@@ -23,12 +23,14 @@ const props = defineProps({
   },
   canPaginate: Boolean,
 })
+
 const allowPagination = ref(false)
 const modsRow = ref(null)
 const newsRow = ref(null)
-// Remove after state is populated with real data
+
 const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
+
 const handlePaginationDisplay = () => {
   let parentsRow
   if (shouldRenderNormalInstances) parentsRow = modsRow.value
@@ -41,6 +43,7 @@ const handlePaginationDisplay = () => {
     allowPagination.value = true
   else allowPagination.value = false
 }
+
 onMounted(() => {
   if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
   // Check if pagination should be rendered on mount
@@ -49,6 +52,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
 })
+
 const handleLeftPage = () => {
   if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
   else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
