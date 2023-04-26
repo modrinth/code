@@ -218,9 +218,11 @@ import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const route = useRoute()
 const router = useRouter()
+const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)
 const loaders = ref(await get_loaders())
@@ -231,6 +233,8 @@ const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ])
+
+breadcrumbs.setName('Project', data.value.title)
 
 watch(
   () => route.params.id,
