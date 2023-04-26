@@ -93,7 +93,7 @@ async fn main() {
                 &mut uploaded_files,
                 semaphore.clone(),
             )
-                .await
+            .await
             {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),

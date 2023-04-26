@@ -217,7 +217,9 @@ pub async fn retrieve_data(
 
     let mut loader_version_mutex = loader_version_mutex.into_inner();
     if !loader_version_mutex.is_empty() {
-        if let Some(version) = versions.iter_mut().find(|x| x.id == DUMMY_REPLACE_STRING) {
+        if let Some(version) =
+            versions.iter_mut().find(|x| x.id == DUMMY_REPLACE_STRING)
+        {
             version.loaders.append(&mut loader_version_mutex);
         } else {
             versions.push(Version {

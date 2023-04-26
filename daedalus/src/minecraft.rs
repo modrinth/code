@@ -207,7 +207,7 @@ pub enum Os {
     /// Linux ARM 32
     LinuxArm32,
     /// The OS is unknown
-    Unknown
+    Unknown,
 }
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
@@ -321,6 +321,7 @@ pub struct PartialLibrary {
     pub include_in_classpath: Option<bool>,
 }
 
+/// Merges a partial library to make a complete library
 pub fn merge_partial_library(
     partial: PartialLibrary,
     mut merge: Library,

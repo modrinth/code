@@ -1,12 +1,14 @@
 use crate::download_file;
 use crate::{format_url, upload_file_to_bucket, Error};
-use daedalus::minecraft::{Library, merge_partial_library, PartialLibrary, VersionManifest};
+use daedalus::get_hash;
+use daedalus::minecraft::{
+    merge_partial_library, Library, PartialLibrary, VersionManifest,
+};
 use log::info;
+use serde::Deserialize;
 use std::sync::Arc;
 use std::time::Instant;
 use tokio::sync::{Mutex, Semaphore};
-use serde::Deserialize;
-use daedalus::get_hash;
 
 pub async fn retrieve_data(
     uploaded_files: &mut Vec<String>,
@@ -66,14 +68,22 @@ pub async fn retrieve_data(
 
                 let mut new_libraries = Vec::new();
                 for library in version_info.libraries {
-                    if let Some(patch) = patches.iter().find(|x| x.match_.contains(&library.name)) {
-                        if let Some(additional_libraries) = &patch.additional_libraries {
+                    if let Some(patch) = patches
+                        .iter()
+                        .find(|x| x.match_.contains(&library.name))
+                    {
+                        if let Some(additional_libraries) =
+                            &patch.additional_libraries
+                        {
                             new_libraries.push(library);
                             for additional_library in additional_libraries {
                                 new_libraries.push(additional_library.clone());
                             }
                         } else if let Some(override_) = &patch.override_ {
-                            new_libraries.push(merge_partial_library(override_.clone(), library));
+                            new_libraries.push(merge_partial_library(
+                                override_.clone(),
+                                library,
+                            ));
                         } else {
                             new_libraries.push(library);
                         }
@@ -83,7 +93,10 @@ pub async fn retrieve_data(
                 }
                 version_info.libraries = new_libraries;
 
-                let version_info_hash = get_hash(bytes::Bytes::from(serde_json::to_vec(&version_info)?)).await?;
+                let version_info_hash = get_hash(bytes::Bytes::from(
+                    serde_json::to_vec(&version_info)?,
+                ))
+                .await?;
 
                 let version_path = format!(
                     "minecraft/v{}/versions/{}.json",
@@ -227,7 +240,7 @@ struct LibraryPatch {
     pub additional_libraries: Option<Vec<Library>>,
     #[serde(rename = "override")]
     pub override_: Option<PartialLibrary>,
-    pub patch_additional_libraries: Option<bool>,
+    // pub patch_additional_libraries: Option<bool>,
 }
 
 /// Fetches the list of fabric versions
@@ -241,6 +254,6 @@ async fn fetch_library_patches(
             None,
             semaphore,
         )
-            .await?,
+        .await?,
     )?)
 }
