@@ -8,22 +8,20 @@ edition = "2018"
 
 [dependencies]
 bytes = "1"
-bincode = { version = "2.0.0-rc.1", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 toml = "0.7.3"
 sha1 = { version = "0.6.1", features = ["std"]}
 sha2 = "0.9.9"
-sled = { version = "0.34.7", features = ["compression"] }
 url = "2.2"
 uuid = { version = "1.1", features = ["serde", "v4"] }
 zip = "0.5"
 async_zip = { version = "0.0.13", features = ["full"] }
 
 chrono = { version = "0.4.19", features = ["serde"] }
-daedalus = { version = "0.1.18", features = ["bincode"] }
+daedalus = { version = "0.1.18" }
 dirs = "4.0"
-# TODO: possibly replace with tracing to have structured logging
+
 log = "0.4.14"
 regex = "1.5"
 sys-info = "0.9.0"

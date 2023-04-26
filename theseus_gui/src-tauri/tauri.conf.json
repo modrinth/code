@@ -13,7 +13,7 @@
   "tauri": {
     "allowlist": {
       "dialog": {
-        "all": true
+        "open": true
       },
       "protocol": {
         "asset": true,
@@ -62,7 +62,7 @@
       }
     },
     "security": {
-      "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com; style-src https://rsms.me/inter/ 'unsafe-inline'; font-src https://rsms.me/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost"
+      "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost"
     },
     "updater": {
       "active": false

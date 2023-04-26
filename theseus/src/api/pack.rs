@@ -1,8 +1,10 @@
 use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
-use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
+use crate::event::emit::{
+    emit_loading, init_loading, loading_try_for_each_concurrent,
+};
 use crate::event::LoadingBarType;
-use crate::state::{ModrinthProject, ModrinthVersion, SideType};
+use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
     fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
@@ -218,13 +220,18 @@ async fn install_pack(
         };
 
         let pack_name = pack.name.clone();
+
         let profile = crate::api::profile_create::profile_create(
             pack.name,
             game_version.clone(),
             mod_loader.unwrap_or(ModLoader::Vanilla),
             loader_version,
             icon,
-            project_id.clone(),
+            Some(LinkedData {
+                project_id: project_id.clone(),
+                version_id: version_id.clone(),
+            }),
+            Some(true),
         )
         .await?;
 
@@ -238,6 +245,7 @@ async fn install_pack(
             "Downloading modpack...",
         )
         .await?;
+
         let num_files = pack.files.len();
         use futures::StreamExt;
         loading_try_for_each_concurrent(
@@ -245,7 +253,7 @@ async fn install_pack(
                 .map(Ok::<PackFile, crate::Error>),
             None,
             Some(&loading_bar),
-            100.0,
+            80.0,
             num_files,
             None,
             |project| {
@@ -344,10 +352,21 @@ async fn install_pack(
             .await
         };
 
+        emit_loading(&loading_bar, 0.05, Some("Extracting overrides")).await?;
         extract_overrides("overrides".to_string()).await?;
         extract_overrides("client_overrides".to_string()).await?;
+        emit_loading(&loading_bar, 0.1, Some("Done extacting overrides"))
+            .await?;
 
         super::profile::sync(&profile).await?;
+
+        if let Some(profile) = crate::api::profile::get(&profile).await? {
+            crate::launcher::install_minecraft(&profile, Some(loading_bar))
+                .await?;
+        } else {
+            emit_loading(&loading_bar, 0.1, Some("Done extacting overrides"))
+                .await?;
+        }
 
         Ok(profile)
     } else {
