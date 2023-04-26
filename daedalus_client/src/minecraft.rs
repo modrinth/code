@@ -1,7 +1,11 @@
 use crate::download_file;
 use crate::{format_url, upload_file_to_bucket, Error};
-use daedalus::minecraft::VersionManifest;
+use daedalus::get_hash;
+use daedalus::minecraft::{
+    merge_partial_library, Library, PartialLibrary, VersionManifest,
+};
 use log::info;
+use serde::Deserialize;
 use std::sync::Arc;
 use std::time::Instant;
 use tokio::sync::{Mutex, Semaphore};
@@ -22,6 +26,9 @@ pub async fn retrieve_data(
     let mut manifest =
         daedalus::minecraft::fetch_version_manifest(None).await?;
     let cloned_manifest = Arc::new(Mutex::new(manifest.clone()));
+
+    let patches = fetch_library_patches(None, semaphore.clone()).await?;
+    let cloned_patches = Arc::new(&patches);
 
     let visited_assets_mutex = Arc::new(Mutex::new(Vec::new()));
     let uploaded_files_mutex = Arc::new(Mutex::new(Vec::new()));
@@ -48,6 +55,7 @@ pub async fn retrieve_data(
             let cloned_manifest_mutex = Arc::clone(&cloned_manifest);
             let uploaded_files_mutex = Arc::clone(&uploaded_files_mutex);
             let semaphore = Arc::clone(&semaphore);
+            let patches = Arc::clone(&cloned_patches);
 
             let assets_hash =
                 old_version.and_then(|x| x.assets_index_sha1.clone());
@@ -55,8 +63,58 @@ pub async fn retrieve_data(
             async move {
                 let mut upload_futures = Vec::new();
 
-                let version_info =
+                let mut version_info =
                     daedalus::minecraft::fetch_version_info(version).await?;
+
+                fn patch_library(patches: &Vec<LibraryPatch>, mut library: Library) -> Vec<Library> {
+                    let mut val = Vec::new();
+
+                    let actual_patches = patches
+                        .iter()
+                        .filter(|x| x.match_.contains(&library.name))
+                        .collect::<Vec<_>>();
+
+                    if !actual_patches.is_empty()
+                    {
+                        for patch in actual_patches {
+                            if let Some(additional_libraries) =
+                                &patch.additional_libraries
+                            {
+                                for additional_library in additional_libraries {
+                                    if patch.patch_additional_libraries.unwrap_or(false) {
+                                        let mut libs = patch_library(patches, additional_library.clone());
+                                        val.append(&mut libs)
+                                    } else {
+                                        val.push(additional_library.clone());
+                                    }
+                                }
+                            } else if let Some(override_) = &patch.override_ {
+                                library = merge_partial_library(
+                                    override_.clone(),
+                                    library,
+                                );
+                            }
+                        }
+
+                        val.push(library);
+                    } else {
+                        val.push(library);
+                    }
+
+                    val
+                }
+
+                let mut new_libraries = Vec::new();
+                for library in version_info.libraries {
+                    let mut libs = patch_library(&patches, library);
+                    new_libraries.append(&mut libs)
+                }
+                version_info.libraries = new_libraries;
+
+                let version_info_hash = get_hash(bytes::Bytes::from(
+                    serde_json::to_vec(&version_info)?,
+                ))
+                .await?;
 
                 let version_path = format!(
                     "minecraft/v{}/versions/{}.json",
@@ -85,6 +143,7 @@ pub async fn retrieve_data(
                         Some(version_info.asset_index.sha1.clone());
                     cloned_manifest.versions[position].assets_index_url =
                         Some(format_url(&assets_path));
+                    cloned_manifest.versions[position].sha1 = version_info_hash;
                 }
 
                 let mut download_assets = false;
@@ -186,4 +245,33 @@ pub async fn retrieve_data(
     Ok(Arc::try_unwrap(cloned_manifest)
         .map_err(|_| Error::ArcError)?
         .into_inner())
+}
+
+#[derive(Deserialize, Debug)]
+#[serde(rename_all = "camelCase")]
+/// A version of the fabric loader
+struct LibraryPatch {
+    #[serde(rename = "_comment")]
+    pub _comment: String,
+    #[serde(rename = "match")]
+    pub match_: Vec<String>,
+    pub additional_libraries: Option<Vec<Library>>,
+    #[serde(rename = "override")]
+    pub override_: Option<PartialLibrary>,
+    pub patch_additional_libraries: Option<bool>,
+}
+
+/// Fetches the list of fabric versions
+async fn fetch_library_patches(
+    url: Option<&str>,
+    semaphore: Arc<Semaphore>,
+) -> Result<Vec<LibraryPatch>, Error> {
+    Ok(serde_json::from_slice(
+        &download_file(
+            url.unwrap_or(&format_url("library-patches.json")),
+            None,
+            semaphore,
+        )
+        .await?,
+    )?)
 }

@@ -105,9 +105,16 @@ pub async fn retrieve_data(
 
                         async move {
                             /// These forge versions are not worth supporting!
-                            const WHITELIST : [&str; 1] = [
+                            const WHITELIST : &[&str] = &[
                                 // Not supported due to `data` field being `[]` even though the type is a map
                                 "1.12.2-14.23.5.2851",
+                                // Malformed Archives
+                                "1.6.1-8.9.0.749",
+                                "1.6.1-8.9.0.751",
+                                "1.6.4-9.11.1.960",
+                                "1.6.4-9.11.1.961",
+                                "1.6.4-9.11.1.963",
+                                "1.6.4-9.11.1.964",
                             ];
 
                             if WHITELIST.contains(&&*loader_version_full) {
@@ -459,19 +466,20 @@ pub async fn retrieve_data(
                     });
 
                     {
+                        let len = loaders_futures.len();
                         let mut versions = loaders_futures.into_iter().peekable();
                         let mut chunk_index = 0;
                         while versions.peek().is_some() {
                             let now = Instant::now();
 
-                            let chunk: Vec<_> = versions.by_ref().take(10).collect();
+                            let chunk: Vec<_> = versions.by_ref().take(1).collect();
                             let res = futures::future::try_join_all(chunk).await?;
                             loaders_versions.extend(res.into_iter().flatten());
 
                             chunk_index += 1;
 
                             let elapsed = now.elapsed();
-                            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+                            info!("Loader Chunk {}/{len} Elapsed: {:.2?}", chunk_index, elapsed);
                         }
                     }
                     //futures::future::try_join_all(loaders_futures).await?;
@@ -489,6 +497,7 @@ pub async fn retrieve_data(
     }
 
     {
+        let len = version_futures.len();
         let mut versions = version_futures.into_iter().peekable();
         let mut chunk_index = 0;
         while versions.peek().is_some() {
@@ -500,7 +509,7 @@ pub async fn retrieve_data(
             chunk_index += 1;
 
             let elapsed = now.elapsed();
-            info!("Chunk {} Elapsed: {:.2?}", chunk_index, elapsed);
+            info!("Chunk {}/{len} Elapsed: {:.2?}", chunk_index, elapsed);
         }
     }
     //futures::future::try_join_all(version_futures).await?;

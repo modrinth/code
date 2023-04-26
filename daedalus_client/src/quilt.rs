@@ -12,10 +12,10 @@ pub async fn retrieve_data(
     uploaded_files: &mut Vec<String>,
     semaphore: Arc<Semaphore>,
 ) -> Result<(), Error> {
-    let mut list = fetch_fabric_versions(None, semaphore.clone()).await?;
+    let mut list = fetch_quilt_versions(None, semaphore.clone()).await?;
     let old_manifest = daedalus::modded::fetch_manifest(&format_url(&format!(
-        "fabric/v{}/manifest.json",
-        daedalus::modded::CURRENT_FABRIC_FORMAT_VERSION,
+        "quilt/v{}/manifest.json",
+        daedalus::modded::CURRENT_QUILT_FORMAT_VERSION,
     )))
     .await
     .ok();
@@ -32,7 +32,7 @@ pub async fn retrieve_data(
         let mut loaders = loaders_mutex.write().await;
 
         for loader in &list.loader {
-            loaders.push((Box::new(loader.stable), loader.version.clone()))
+            loaders.push((Box::new(false), loader.version.clone()))
         }
 
         list.loader
@@ -56,7 +56,7 @@ pub async fn retrieve_data(
                     }
                 }
 
-                let version = fetch_fabric_version(
+                let version = fetch_quilt_version(
                     DUMMY_GAME_VERSION,
                     &loader,
                     semaphore.clone(),
@@ -107,7 +107,7 @@ pub async fn retrieve_data(
                                     &format!(
                                         "{}{}",
                                         lib_url.unwrap_or_else(|| {
-                                            "https://maven.fabricmc.net/".to_string()
+                                            "https://maven.quiltmc.org/".to_string()
                                         }),
                                         artifact_path
                                     ),
@@ -142,7 +142,7 @@ pub async fn retrieve_data(
                         &format!(
                             "{}{}",
                             lib.url.unwrap_or_else(|| {
-                                "https://maven.fabricmc.net/".to_string()
+                                "https://maven.quiltmc.org/".to_string()
                             }),
                             artifact_path
                         ),
@@ -168,8 +168,8 @@ pub async fn retrieve_data(
             .await?;
 
             let version_path = format!(
-                "fabric/v{}/versions/{}.json",
-                daedalus::modded::CURRENT_FABRIC_FORMAT_VERSION,
+                "quilt/v{}/versions/{}.json",
+                daedalus::modded::CURRENT_QUILT_FORMAT_VERSION,
                 &loader
             );
 
@@ -278,8 +278,8 @@ pub async fn retrieve_data(
 
     upload_file_to_bucket(
         format!(
-            "fabric/v{}/manifest.json",
-            daedalus::modded::CURRENT_FABRIC_FORMAT_VERSION,
+            "quilt/v{}/manifest.json",
+            daedalus::modded::CURRENT_QUILT_FORMAT_VERSION,
         ),
         serde_json::to_vec(&Manifest {
             game_versions: versions,
@@ -297,9 +297,9 @@ pub async fn retrieve_data(
     Ok(())
 }
 
-const FABRIC_META_URL: &str = "https://meta.fabricmc.net/v2";
+const QUILT_META_URL: &str = "https://meta.quiltmc.org/v3";
 
-async fn fetch_fabric_version(
+async fn fetch_quilt_version(
     version_number: &str,
     loader_version: &str,
     semaphore: Arc<Semaphore>,
@@ -308,7 +308,7 @@ async fn fetch_fabric_version(
         &download_file(
             &format!(
                 "{}/versions/loader/{}/{}/profile/json",
-                FABRIC_META_URL, version_number, loader_version
+                QUILT_META_URL, version_number, loader_version
             ),
             None,
             semaphore,
@@ -318,17 +318,17 @@ async fn fetch_fabric_version(
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-/// Versions of fabric components
-struct FabricVersions {
-    /// Versions of Minecraft that fabric supports
-    pub game: Vec<FabricGameVersion>,
-    /// Available versions of the fabric loader
-    pub loader: Vec<FabricLoaderVersion>,
+/// Versions of quilt components
+struct QuiltVersions {
+    /// Versions of Minecraft that quilt supports
+    pub game: Vec<QuiltGameVersion>,
+    /// Available versions of the quilt loader
+    pub loader: Vec<QuiltLoaderVersion>,
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-/// A version of Minecraft that fabric supports
-struct FabricGameVersion {
+/// A version of Minecraft that quilt supports
+struct QuiltGameVersion {
     /// The version number of the game
     pub version: String,
     /// Whether the Minecraft version is stable or not
@@ -336,27 +336,26 @@ struct FabricGameVersion {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-/// A version of the fabric loader
-struct FabricLoaderVersion {
+/// A version of the quilt loader
+struct QuiltLoaderVersion {
     /// The separator to get the build number
     pub separator: String,
     /// The build number
     pub build: u32,
     /// The maven artifact
     pub maven: String,
-    /// The version number of the fabric loader
+    /// The version number of the quilt loader
     pub version: String,
-    /// Whether the loader is stable or not
-    pub stable: bool,
 }
-/// Fetches the list of fabric versions
-async fn fetch_fabric_versions(
+
+/// Fetches the list of quilt versions
+async fn fetch_quilt_versions(
     url: Option<&str>,
     semaphore: Arc<Semaphore>,
-) -> Result<FabricVersions, Error> {
+) -> Result<QuiltVersions, Error> {
     Ok(serde_json::from_slice(
         &download_file(
-            url.unwrap_or(&*format!("{}/versions", FABRIC_META_URL)),
+            url.unwrap_or(&*format!("{}/versions", QUILT_META_URL)),
             None,
             semaphore,
         )

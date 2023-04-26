@@ -14,6 +14,8 @@ use bincode::{Decode, Encode};
 pub const CURRENT_FABRIC_FORMAT_VERSION: usize = 0;
 /// The latest version of the format the fabric model structs deserialize to
 pub const CURRENT_FORGE_FORMAT_VERSION: usize = 0;
+/// The latest version of the format the quilt model structs deserialize to
+pub const CURRENT_QUILT_FORMAT_VERSION: usize = 0;
 
 /// The dummy replace string library names, inheritsFrom, and version names should be replaced with
 pub const DUMMY_REPLACE_STRING: &str = "${modrinth.gameVersion}";
