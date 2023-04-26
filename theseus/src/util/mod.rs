@@ -14,11 +14,3 @@ macro_rules! wrap_ref_builder {
         it
     }};
 }
-
-/// Alias a trait, used to avoid needing nightly features
-macro_rules! alias_trait {
-    ($scope:vis $name:ident : $bound:path $(, $bounds:path)*) => {
-        $scope trait $name: $bound $(+ $bounds)* {}
-        impl<T: $bound $(+ $bounds)*> $name for T {}
-    }
-}

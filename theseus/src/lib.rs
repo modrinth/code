@@ -19,5 +19,5 @@ mod state;
 
 pub use api::*;
 pub use error::*;
-pub use event::EventState;
+pub use event::{EventState, LoadingBar, LoadingBarType};
 pub use state::State;
