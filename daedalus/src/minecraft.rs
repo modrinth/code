@@ -149,11 +149,12 @@ pub struct Download {
 }
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// Download information of a library
 pub struct LibraryDownload {
+    #[serde(skip_serializing_if = "Option::is_none")]
     /// The path that the library should be saved to
-    pub path: String,
+    pub path: Option<String>,
     /// The SHA1 hash of the library
     pub sha1: String,
     /// The size of the library
@@ -163,7 +164,7 @@ pub struct LibraryDownload {
 }
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// A list of files that should be downloaded for libraries
 pub struct LibraryDownloads {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -188,17 +189,25 @@ pub enum RuleAction {
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Hash, Clone)]
-#[serde(rename_all = "snake_case")]
+#[serde(rename_all = "kebab-case")]
 /// An enum representing the different types of operating systems
 pub enum Os {
-    /// MacOS
+    /// MacOS (x86)
     Osx,
-    /// Windows
+    /// M1-Based Macs
+    OsxArm64,
+    /// Windows (x86)
     Windows,
-    /// Linux and its derivatives
+    /// Windows ARM
+    WindowsArm64,
+    /// Linux (x86) and its derivatives
     Linux,
+    /// Linux ARM 64
+    LinuxArm64,
+    /// Linux ARM 32
+    LinuxArm32,
     /// The OS is unknown
-    Unknown,
+    Unknown
 }
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
@@ -243,7 +252,7 @@ pub struct Rule {
 }
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// Information delegating the extraction of the library
 pub struct LibraryExtract {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -263,7 +272,7 @@ pub struct JavaVersion {
 }
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 /// A library which the game relies on to run
 pub struct Library {
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -289,6 +298,59 @@ pub struct Library {
     #[serde(default = "default_include_in_classpath")]
     /// Whether the library should be included in the classpath at the game's launch
     pub include_in_classpath: bool,
+}
+
+#[derive(Deserialize, Debug, Clone)]
+/// A partial library which should be merged with a full library
+pub struct PartialLibrary {
+    /// The files the library has
+    pub downloads: Option<LibraryDownloads>,
+    /// Rules of the extraction of the file
+    pub extract: Option<LibraryExtract>,
+    /// The maven name of the library. The format is `groupId:artifactId:version`
+    pub name: Option<String>,
+    /// The URL to the repository where the library can be downloaded
+    pub url: Option<String>,
+    /// Native files that the library relies on
+    pub natives: Option<HashMap<Os, String>>,
+    /// Rules deciding whether the library should be downloaded or not
+    pub rules: Option<Vec<Rule>>,
+    /// SHA1 Checksums for validating the library's integrity. Only present for forge libraries
+    pub checksums: Option<Vec<String>>,
+    /// Whether the library should be included in the classpath at the game's launch
+    pub include_in_classpath: Option<bool>,
+}
+
+pub fn merge_partial_library(
+    partial: PartialLibrary,
+    mut merge: Library,
+) -> Library {
+    if let Some(downloads) = partial.downloads {
+        merge.downloads = Some(downloads)
+    }
+    if let Some(extract) = partial.extract {
+        merge.extract = Some(extract)
+    }
+    if let Some(name) = partial.name {
+        merge.name = name
+    }
+    if let Some(url) = partial.url {
+        merge.url = Some(url)
+    }
+    if let Some(natives) = partial.natives {
+        merge.natives = Some(natives)
+    }
+    if let Some(rules) = partial.rules {
+        merge.rules = Some(rules)
+    }
+    if let Some(checksums) = partial.checksums {
+        merge.checksums = Some(checksums)
+    }
+    if let Some(include_in_classpath) = partial.include_in_classpath {
+        merge.include_in_classpath = include_in_classpath
+    }
+
+    merge
 }
 
 fn default_include_in_classpath() -> bool {

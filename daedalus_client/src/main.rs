@@ -9,6 +9,7 @@ use tokio::sync::Semaphore;
 mod fabric;
 mod forge;
 mod minecraft;
+mod quilt;
 
 #[derive(thiserror::Error, Debug)]
 pub enum Error {
@@ -45,7 +46,7 @@ async fn main() {
     }
 
     let mut timer = tokio::time::interval(Duration::from_secs(60 * 60));
-    let semaphore = Arc::new(Semaphore::new(50));
+    let semaphore = Arc::new(Semaphore::new(10));
 
     loop {
         timer.tick().await;
@@ -83,6 +84,16 @@ async fn main() {
                 semaphore.clone(),
             )
             .await
+            {
+                Ok(..) => {}
+                Err(err) => error!("{:?}", err),
+            };
+            match quilt::retrieve_data(
+                &manifest,
+                &mut uploaded_files,
+                semaphore.clone(),
+            )
+                .await
             {
                 Ok(..) => {}
                 Err(err) => error!("{:?}", err),
