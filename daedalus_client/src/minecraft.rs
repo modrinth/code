@@ -66,30 +66,48 @@ pub async fn retrieve_data(
                 let mut version_info =
                     daedalus::minecraft::fetch_version_info(version).await?;
 
+                fn patch_library(patches: &Vec<LibraryPatch>, mut library: Library) -> Vec<Library> {
+                    let mut val = Vec::new();
+
+                    let actual_patches = patches
+                        .iter()
+                        .filter(|x| x.match_.contains(&library.name))
+                        .collect::<Vec<_>>();
+
+                    if !actual_patches.is_empty()
+                    {
+                        for patch in actual_patches {
+                            if let Some(additional_libraries) =
+                                &patch.additional_libraries
+                            {
+                                for additional_library in additional_libraries {
+                                    if patch.patch_additional_libraries.unwrap_or(false) {
+                                        let mut libs = patch_library(patches, additional_library.clone());
+                                        val.append(&mut libs)
+                                    } else {
+                                        val.push(additional_library.clone());
+                                    }
+                                }
+                            } else if let Some(override_) = &patch.override_ {
+                                library = merge_partial_library(
+                                    override_.clone(),
+                                    library,
+                                );
+                            }
+                        }
+
+                        val.push(library);
+                    } else {
+                        val.push(library);
+                    }
+
+                    val
+                }
+
                 let mut new_libraries = Vec::new();
                 for library in version_info.libraries {
-                    if let Some(patch) = patches
-                        .iter()
-                        .find(|x| x.match_.contains(&library.name))
-                    {
-                        if let Some(additional_libraries) =
-                            &patch.additional_libraries
-                        {
-                            new_libraries.push(library);
-                            for additional_library in additional_libraries {
-                                new_libraries.push(additional_library.clone());
-                            }
-                        } else if let Some(override_) = &patch.override_ {
-                            new_libraries.push(merge_partial_library(
-                                override_.clone(),
-                                library,
-                            ));
-                        } else {
-                            new_libraries.push(library);
-                        }
-                    } else {
-                        new_libraries.push(library);
-                    }
+                    let mut libs = patch_library(&patches, library);
+                    new_libraries.append(&mut libs)
                 }
                 version_info.libraries = new_libraries;
 
@@ -240,7 +258,7 @@ struct LibraryPatch {
     pub additional_libraries: Option<Vec<Library>>,
     #[serde(rename = "override")]
     pub override_: Option<PartialLibrary>,
-    // pub patch_additional_libraries: Option<bool>,
+    pub patch_additional_libraries: Option<bool>,
 }
 
 /// Fetches the list of fabric versions
