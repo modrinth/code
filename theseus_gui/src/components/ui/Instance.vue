@@ -96,6 +96,8 @@ const play = async (e) => {
 
 const stop = async (e) => {
   e.stopPropagation()
+  playing.value = false
+  uuid.value = null
 
   try {
     // If we lost the uuid for some reason, such as a user navigating
@@ -106,9 +108,6 @@ const stop = async (e) => {
       console.log(uuids)
       uuids.forEach(async (u) => await kill_by_uuid(u))
     } else await kill_by_uuid(uuid.value) // If we still have the uuid, just kill it
-
-    playing.value = false
-    uuid.value = null
   } catch (err) {
     // Theseus currently throws:
     //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
@@ -119,8 +118,8 @@ const stop = async (e) => {
 </script>
 
 <template>
-  <div>
-    <Card class="instance-card-item button-base" @click="seeInstance" @mouseover="checkProcess">
+  <div class="instance">
+    <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
         size="lg"
         :src="
@@ -138,24 +137,89 @@ const stop = async (e) => {
           {{ props.instance.metadata?.game_version || props.instance.latest_version }}
         </p>
       </div>
-      <div
-        v-if="props.instance.metadata && playing === false && modLoading === false"
-        class="install cta button-base"
-        @click="play"
-      >
-        <PlayIcon />
-      </div>
-      <div v-else-if="modLoading === true && playing === false" class="cta loading">
-        <AnimatedLogo class="loading" />
-      </div>
-      <div v-else-if="playing === true" class="stop cta button-base" @click="stop"><XIcon /></div>
-      <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
     </Card>
+    <div
+      v-if="props.instance.metadata && playing === false && modLoading === false"
+      class="install cta button-base"
+      @click="play"
+    >
+      <PlayIcon />
+    </div>
+    <div v-else-if="modLoading === true && playing === false" class="cta loading">
+      <AnimatedLogo class="loading" />
+    </div>
+    <div v-else-if="playing === true" class="stop cta button-base" @click="stop"><XIcon /></div>
+    <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
   </div>
 </template>
 
 <style lang="scss">
+.instance {
+  position: relative;
+
+  &:hover {
+    .cta {
+      opacity: 1;
+      bottom: 4.5rem;
+    }
+  }
+}
+
+.install {
+  background: var(--color-brand);
+  display: flex;
+}
+
+.stop {
+  background: var(--color-red);
+  display: flex;
+}
+
+.cta.loading {
+  background: hsl(220, 11%, 10%) !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .loading {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+
+  svg {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+
+.cta {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  z-index: 41;
+  width: 3rem;
+  height: 3rem;
+  right: 1rem;
+  bottom: 3.5rem;
+  opacity: 0;
+  transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity !important;
+  cursor: pointer;
+
+  svg {
+    color: var(--color-accent-contrast);
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+
+  &:hover {
+    filter: none !important; /* overrides button-base class */
+    box-shadow: var(--shadow-floating);
+  }
+}
+
 .instance-card-item {
   display: flex;
   flex-direction: column;
@@ -169,65 +233,6 @@ const stop = async (e) => {
   &:hover {
     filter: brightness(1) !important;
     background: hsl(220, 11%, 11%) !important;
-
-    .cta {
-      opacity: 1;
-      bottom: 4.5rem;
-    }
-  }
-
-  .install {
-    background: var(--color-brand);
-    display: flex;
-  }
-
-  .stop {
-    background: var(--color-red);
-    display: flex;
-  }
-
-  .cta.loading {
-    background: hsl(220, 11%, 15%) !important;
-    display: inherit;
-    justify-content: inherit;
-    align-items: inherit;
-
-    .loading {
-      width: 2.5rem !important;
-      height: 2.5rem !important;
-    }
-
-    svg {
-      width: 2.5rem !important;
-      height: 2.5rem !important;
-    }
-  }
-
-  .cta {
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: var(--radius-lg);
-    z-index: 41;
-    width: 3rem;
-    height: 3rem;
-    right: 1rem;
-    bottom: 3.5rem;
-    opacity: 0;
-    transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
-    cursor: pointer;
-
-    svg {
-      color: var(--color-accent-contrast);
-      width: 1.5rem !important;
-      height: 1.5rem !important;
-    }
-
-    &:hover {
-      filter: none !important; /* overrides button-base class */
-      box-shadow: var(--shadow-floating);
-    }
   }
 
   .mod-image {
