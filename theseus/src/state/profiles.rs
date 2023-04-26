@@ -164,7 +164,8 @@ impl Profile {
 
         let paths = self.get_profile_project_paths()?;
         let projects = crate::state::infer_data_from_files(
-            &[(self.clone(), paths)],
+            self.clone(),
+            paths,
             state.directories.caches_dir(),
             &state.io_semaphore,
         )
@@ -386,31 +387,28 @@ impl Profiles {
                 }
             }
 
-            if !files.is_empty() {
-                let inferred = super::projects::infer_data_from_files(
-                    &files,
-                    state.directories.caches_dir(),
-                    &state.io_semaphore,
-                )
-                .await?;
-                let mut wipe_profiles = Vec::new();
-                for (key, value) in inferred {
-                    if let Some((profile, _)) =
-                        files.iter().find(|(_, files)| files.contains(&key))
+            future::try_join_all(files.into_iter().map(
+                |(profile, files)| async {
+                    let profile_path = profile.path.clone();
+                    let inferred = super::projects::infer_data_from_files(
+                        profile,
+                        files,
+                        state.directories.caches_dir(),
+                        &state.io_semaphore,
+                    )
+                    .await?;
+
+                    let mut new_profiles = state.profiles.write().await;
+                    if let Some(profile) = new_profiles.0.get_mut(&profile_path)
                     {
-                        let mut new_profiles = state.profiles.write().await;
-                        if let Some(profile) =
-                            new_profiles.0.get_mut(&profile.path)
-                        {
-                            if !wipe_profiles.contains(&profile.path) {
-                                profile.projects = HashMap::new();
-                                wipe_profiles.push(profile.path.clone());
-                            }
-                            profile.projects.insert(key, value);
-                        }
+                        profile.projects = inferred;
                     }
-                }
-            }
+                    drop(new_profiles);
+
+                    Ok::<(), crate::Error>(())
+                },
+            ))
+            .await?;
 
             Ok::<(), crate::Error>(())
         }
