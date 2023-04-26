@@ -61,9 +61,7 @@ list().then(
         <section class="navigation-controls">
           <Breadcrumbs />
         </section>
-
         <section class="mod-stats">
-          <!-- <p>{{ installedMods }} mods installed</p> -->
           <Suspense>
             <RunningAppBar />
           </Suspense>
@@ -95,6 +93,7 @@ list().then(
       background: var(--color-super-raised-bg);
       text-align: center;
       padding: 0 0 0 1rem;
+      height: 3.25rem;
       z-index: 11;
 
       .navigation-controls {
@@ -128,6 +127,7 @@ list().then(
       }
 
       .mod-stats {
+        height: 100%;
         display: inherit;
         align-items: inherit;
         justify-content: flex-end;

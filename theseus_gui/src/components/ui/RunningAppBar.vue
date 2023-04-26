@@ -59,12 +59,13 @@ const goToTerminal = () => {
 
 <style scoped lang="scss">
 .status {
+  height: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 0.5rem;
   background-color: var(--color-raised-bg);
-  padding: 1rem;
+  padding: 0 1rem;
   margin: 0;
 }
 
