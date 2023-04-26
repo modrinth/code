@@ -38,7 +38,7 @@
             color="primary"
             class="instance-button"
             :disabled="installed === true || installing === true"
-            @click="install()"
+            @click="install(null)"
           >
             <DownloadIcon v-if="!installed && !installing" />
             <CheckIcon v-else-if="installed" />
@@ -311,9 +311,9 @@ async function install(version) {
           return
         }
         queuedVersionData = selectedVersion
-        await installMod(route.query.instance, selectedVersion.id)
+        await installMod(instance.value.path, selectedVersion.id)
       } else {
-        await installMod(route.query.instance, queuedVersionData.id)
+        await installMod(instance.value.path, queuedVersionData.id)
       }
 
       installVersionDependencies(instance.value, queuedVersionData)
