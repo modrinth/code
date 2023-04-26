@@ -329,7 +329,7 @@ const setJavaInstall = (javaInstall) => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .concurrent-downloads {
   width: 80% !important;
 }

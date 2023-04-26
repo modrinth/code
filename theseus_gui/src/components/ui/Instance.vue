@@ -2,7 +2,7 @@
 import { shallowRef, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ofetch } from 'ofetch'
-import { Card, SaveIcon, XIcon, Avatar } from 'omorphia'
+import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
@@ -27,6 +27,7 @@ const confirmModal = ref(null)
 const playing = ref(false)
 
 const uuid = ref(null)
+const modLoading = ref(false)
 
 const router = useRouter()
 
@@ -52,6 +53,7 @@ const checkProcess = async () => {
 
 const install = async (e) => {
   e.stopPropagation()
+  modLoading.value = true
   const [data, versions] = await Promise.all([
     ofetch(
       `https://api.modrinth.com/v2/project/${
@@ -79,13 +81,17 @@ const install = async (e) => {
       await pack_install(versions.value[0].id)
     } else confirmModal.value.show(versions.value[0].id)
   }
+
+  modLoading.value = false
   // TODO: Add condition for installing a mod
 }
 
 const play = async (e) => {
   e.stopPropagation()
-  playing.value = true
+  modLoading.value = true
   uuid.value = await run(props.instance.path)
+  modLoading.value = false
+  playing.value = true
 }
 
 const stop = async (e) => {
@@ -114,7 +120,7 @@ const stop = async (e) => {
 
 <template>
   <div>
-    <Card class="instance-card-item" @click="seeInstance" @mouseover="checkProcess">
+    <Card class="instance-card-item button-base" @click="seeInstance" @mouseover="checkProcess">
       <Avatar
         size="lg"
         :src="
@@ -132,8 +138,15 @@ const stop = async (e) => {
           {{ props.instance.metadata?.game_version || props.instance.latest_version }}
         </p>
       </div>
-      <div v-if="props.instance.metadata && !playing" class="install cta button-base" @click="play">
+      <div
+        v-if="props.instance.metadata && playing === false && modLoading === false"
+        class="install cta button-base"
+        @click="play"
+      >
         <PlayIcon />
+      </div>
+      <div v-else-if="modLoading === true && playing === false" class="cta loading">
+        <AnimatedLogo class="loading" />
       </div>
       <div v-else-if="playing === true" class="stop cta button-base" @click="stop"><XIcon /></div>
       <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
@@ -142,7 +155,7 @@ const stop = async (e) => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .instance-card-item {
   display: flex;
   flex-direction: column;
@@ -151,9 +164,11 @@ const stop = async (e) => {
   cursor: pointer;
   padding: 0.75rem;
   transition: 0.1s ease-in-out all;
+  background: hsl(220, 11%, 17%) !important;
 
   &:hover {
-    filter: brightness(0.85);
+    filter: brightness(1) !important;
+    background: hsl(220, 11%, 11%) !important;
 
     .cta {
       opacity: 1;
@@ -171,8 +186,26 @@ const stop = async (e) => {
     display: flex;
   }
 
+  .cta.loading {
+    background: hsl(220, 11%, 15%) !important;
+    display: inherit;
+    justify-content: inherit;
+    align-items: inherit;
+
+    .loading {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+    }
+
+    svg {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+    }
+  }
+
   .cta {
     position: absolute;
+    display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-lg);
@@ -187,8 +220,8 @@ const stop = async (e) => {
 
     svg {
       color: var(--color-accent-contrast);
-      width: 1.5rem;
-      height: 1.5rem;
+      width: 1.5rem !important;
+      height: 1.5rem !important;
     }
 
     &:hover {
