@@ -9,14 +9,13 @@ import {
   UploadIcon,
   XIcon,
   RightArrowIcon,
-  CheckCircleIcon,
+  CheckIcon,
 } from 'omorphia'
 import { computed, ref } from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { LoginIcon } from '@/assets/icons'
 import { useRouter } from 'vue-router'
 import { create } from '@/helpers/profile'
 import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
@@ -142,21 +141,17 @@ const check_valid = computed(() => {
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
       <div class="profiles">
         <div v-for="profile in filteredVersions" :key="profile.metadata.name" class="option">
-          <Avatar :src="convertFileSrc(profile.metadata.icon)" size="xs" />
-          <div class="name">{{ profile.metadata.name }}</div>
-          <div class="footer">
-            <Button :disabled="profile.installed || profile.installing" @click="install(profile)">
-              <DownloadIcon v-if="!profile.installed && !profile.installing" />
-              <CheckCircleIcon v-else-if="profile.installed" />
-              {{
-                profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install'
-              }}
-            </Button>
-            <Button @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)">
-              <LoginIcon />
-              View
-            </Button>
-          </div>
+          <Button color="raised" class="profile-button" @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)">
+            <Avatar :src="convertFileSrc(profile.metadata.icon)" class="profile-image" />
+            {{ profile.metadata.name }}
+          </Button>
+          <Button :disabled="profile.installed || profile.installing" @click="install(profile)">
+            <DownloadIcon v-if="!profile.installed && !profile.installing" />
+            <CheckIcon v-else-if="profile.installed" />
+            {{
+              profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install'
+            }}
+          </Button>
         </div>
       </div>
       <Card v-if="showCreation" class="creation-card">
@@ -199,7 +194,7 @@ const check_valid = computed(() => {
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  margin-top: 1rem;
+  margin: 0;
   padding: 1rem;
   background-color: var(--color-bg);
 }
@@ -256,7 +251,7 @@ const check_valid = computed(() => {
 }
 
 .profiles {
-  max-height: 14rem;
+  max-height: 12rem;
   overflow-y: auto;
 }
 
@@ -267,7 +262,9 @@ const check_valid = computed(() => {
   box-shadow: none;
   display: flex;
   flex-direction: row;
-  padding: 0.5rem;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 0.5rem;
 
   img {
     margin-right: 0.5rem;
@@ -278,6 +275,14 @@ const check_valid = computed(() => {
     flex-direction: column;
     justify-content: center;
   }
+
+  .profile-button {
+    padding: 0.5rem;
+  }
+}
+
+.profile-image {
+  --size: 2rem !important;
 }
 
 .footer {

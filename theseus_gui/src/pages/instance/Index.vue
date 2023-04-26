@@ -47,9 +47,13 @@ import { get, run } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { useSearch} from "@/store/search";
+
+const searchStore = useSearch()
 
 const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
+searchStore.instanceContext = instance.value
 </script>
 
 <style scoped lang="scss">

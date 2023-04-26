@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import {computed, ref, watch} from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
@@ -14,32 +14,26 @@ import {
   ClientIcon,
   ServerIcon,
   AnimatedLogo,
-  Chips,
+  NavRow,
+  formatCategoryHeader
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
-import { get as getProfile } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import Instance from '@/components/ui/Instance.vue'
 
 const route = useRoute()
 
 const searchStore = useSearch()
-searchStore.projectType = route.query.projectType ?? 'modpack'
+searchStore.projectType = route.params.projectType
+if (searchStore.projectType === 'modpack') {
+  searchStore.instanceContext = null
+}
 const showVersions = ref(true)
 const showLoaders = ref(true)
 const showSnapshots = ref(false)
 const loading = ref(true)
-const instance = ref(null)
-
-if (route.query.instance) {
-  instance.value = await getProfile(route.query.instance)
-  searchStore.instanceContext = instance.value
-} else {
-  instance.value = null
-  searchStore.instanceContext = null
-}
 
 const [categories, loaders, availableGameVersions] = await Promise.all([
   get_categories(),
@@ -47,9 +41,26 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
   get_game_versions(),
 ])
 
+console.log(categories)
+
+const sortedCategories = computed( () => {
+  const values = new Map();
+  for (const category of categories.filter(
+    (cat) =>
+      cat.project_type ===
+      (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
+  )) {
+    if (!values.has(category.header)) {
+      values.set(category.header, [])
+    }
+    values.get(category.header).push(category)
+  }
+  return values
+});
+
 const getSearchResults = async (shouldLoad = false) => {
   const queryString = searchStore.getQueryString()
-  if (route.query.instance) {
+  if (searchStore.instanceContext) {
     showVersions.value = false
     showLoaders.value = !(
       searchStore.projectType === 'mod' || searchStore.projectType === 'resourcepack'
@@ -95,16 +106,19 @@ const switchPage = async (page) => {
   await getSearchResults()
 }
 
-const setProjectType = (type) => {
-  searchStore.projectType = type
-  handleReset()
-}
+watch(
+  () => route.params.projectType,
+  (projectType) => {
+    searchStore.projectType = projectType ?? 'modpack'
+    handleReset()
+  }
+)
 </script>
 
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Instance v-if="instance" :instance="instance" small />
+      <Instance v-if="searchStore.instanceContext" :instance="searchStore.instanceContext" small />
       <Button
         role="button"
         :disabled="
@@ -120,14 +134,10 @@ const setProjectType = (type) => {
         @click="handleReset"
         ><ClearIcon />Clear Filters</Button
       >
-      <div class="categories">
-        <h2>Categories</h2>
+      <div v-for="categoryList in Array.from(sortedCategories)" :key="categoryList[0]" class="categories">
+        <h2>{{formatCategoryHeader(categoryList[0])}}</h2>
         <div
-          v-for="category in categories.filter(
-            (cat) =>
-              cat.project_type ===
-              (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
-          )"
+          v-for="category in categoryList[1]"
           :key="category.name"
         >
           <SearchFilter
@@ -214,14 +224,20 @@ const setProjectType = (type) => {
     </aside>
     <div class="search">
       <Card class="project-type-container">
-        <Chips
-          :model-value="searchStore.projectType"
-          :items="
-            instance
-              ? ['mod', 'datapack', 'shader', 'resourcepack']
-              : ['modpack', 'mod', 'datapack', 'shader', 'resourcepack']
-          "
-          @update:model-value="(newValue) => setProjectType(newValue)"
+        <NavRow
+          :links="
+          searchStore.instanceContext ? [
+            { label: 'Mods', href: `/browse/mod` },
+            { label: 'Datapacks', href: `/browse/datapack` },
+            { label: 'Shaders', href: `/browse/shader` },
+            { label: 'Resource Packs', href: `/browse/resourcepack` },
+          ] : [
+            { label: 'Modpacks', href: '/browse/modpack' },
+            { label: 'Mods', href: '/browse/mod' },
+            { label: 'Datapacks', href: '/browse/datapack' },
+            { label: 'Shaders', href: '/browse/shader' },
+            { label: 'Resource Packs', href: '/browse/resourcepack' },
+          ]"
         />
       </Card>
       <Card class="search-panel-container">
@@ -270,9 +286,7 @@ const setProjectType = (type) => {
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
-          :id="`${result?.project_id}/${
-            $route.query.instance ? '?instance=' + encodeURIComponent($route.query.instance) : ''
-          }`"
+          :id="`${result?.project_id}/`"
           :key="result?.project_id"
           class="result-project-item"
           :type="result?.project_type"
@@ -318,7 +332,6 @@ const setProjectType = (type) => {
   flex-direction: column;
   width: 100%;
   margin-top: 1rem;
-  padding: 0.8rem !important;
 }
 
 .search-panel-container {

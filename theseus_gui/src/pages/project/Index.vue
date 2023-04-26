@@ -37,7 +37,7 @@
             @click="install()"
           >
             <DownloadIcon v-if="!installed && !installing" />
-            <CheckCircleIcon v-else-if="installed" />
+            <CheckIcon v-else-if="installed" />
             {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
           </Button>
           <a
@@ -181,6 +181,7 @@
         :members="members"
         :dependencies="dependencies"
         :install="install"
+        :installed="installed"
       />
     </div>
   </div>
@@ -208,7 +209,7 @@ import {
   CodeIcon,
   formatNumber,
   ExternalIcon,
-  CheckCircleIcon,
+  CheckIcon,
 } from 'omorphia'
 import {
   BuyMeACoffeeIcon,
@@ -220,7 +221,7 @@ import {
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
 import { install as packInstall } from '@/helpers/pack'
-import { list, add_project_from_version as installMod, get as getProfile } from '@/helpers/profile'
+import { list, add_project_from_version as installMod } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
@@ -230,6 +231,9 @@ import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
+import { useSearch} from "@/store/search";
+
+const searchStore = useSearch()
 
 const route = useRoute()
 const router = useRouter()
@@ -238,12 +242,8 @@ const confirmModal = ref(null)
 const modInstallModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
-const instance = ref(null)
+const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
-
-if (route.query.instance) {
-  instance.value = await getProfile(route.query.instance)
-}
 
 const installed = ref(instance.value ? checkInstalled(instance.value, route.params.id) : false)
 
@@ -270,7 +270,7 @@ async function install(version) {
   if (version) {
     queuedVersionData = versions.value.find((v) => v.id === version)
   } else {
-    if (data.value.project_type === 'modpack' || !route.query.instance) {
+    if (data.value.project_type === 'modpack' || !instance.value) {
       queuedVersionData = versions.value[0]
     } else {
       queuedVersionData = versions.value.find((v) =>
@@ -291,7 +291,7 @@ async function install(version) {
       confirmModal.value.show(queuedVersionData.id)
     }
   } else {
-    if (route.query.instance) {
+    if (instance.value) {
       if (!version) {
         const gameVersion = instance.value.metadata.game_version
         const loader = instance.value.metadata.loader
