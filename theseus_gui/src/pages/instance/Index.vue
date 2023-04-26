@@ -47,7 +47,7 @@ import { get, run } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { useSearch} from "@/store/search";
+import { useSearch } from '@/store/search'
 
 const searchStore = useSearch()
 

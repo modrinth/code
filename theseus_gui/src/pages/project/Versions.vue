@@ -65,8 +65,13 @@
         @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
       >
         <div class="table-cell table-text">
-          <Button color="primary" icon-only :disabled="installed" @click.stop="() => install(version.id)">
-            <DownloadIcon v-if="!installed"/>
+          <Button
+            color="primary"
+            icon-only
+            :disabled="installed"
+            @click.stop="() => install(version.id)"
+          >
+            <DownloadIcon v-if="!installed" />
             <CheckIcon v-else />
           </Button>
         </div>

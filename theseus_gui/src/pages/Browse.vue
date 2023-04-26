@@ -1,5 +1,5 @@
 <script setup>
-import {computed, ref, watch} from 'vue'
+import { computed, ref, watch } from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
@@ -15,7 +15,7 @@ import {
   ServerIcon,
   AnimatedLogo,
   NavRow,
-  formatCategoryHeader
+  formatCategoryHeader,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
@@ -43,8 +43,8 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
 
 console.log(categories)
 
-const sortedCategories = computed( () => {
-  const values = new Map();
+const sortedCategories = computed(() => {
+  const values = new Map()
   for (const category of categories.filter(
     (cat) =>
       cat.project_type ===
@@ -56,7 +56,7 @@ const sortedCategories = computed( () => {
     values.get(category.header).push(category)
   }
   return values
-});
+})
 
 const getSearchResults = async (shouldLoad = false) => {
   const queryString = searchStore.getQueryString()
@@ -134,12 +134,13 @@ watch(
         @click="handleReset"
         ><ClearIcon />Clear Filters</Button
       >
-      <div v-for="categoryList in Array.from(sortedCategories)" :key="categoryList[0]" class="categories">
-        <h2>{{formatCategoryHeader(categoryList[0])}}</h2>
-        <div
-          v-for="category in categoryList[1]"
-          :key="category.name"
-        >
+      <div
+        v-for="categoryList in Array.from(sortedCategories)"
+        :key="categoryList[0]"
+        class="categories"
+      >
+        <h2>{{ formatCategoryHeader(categoryList[0]) }}</h2>
+        <div v-for="category in categoryList[1]" :key="category.name">
           <SearchFilter
             :active-filters="searchStore.facets"
             :icon="category.icon"
@@ -226,18 +227,21 @@ watch(
       <Card class="project-type-container">
         <NavRow
           :links="
-          searchStore.instanceContext ? [
-            { label: 'Mods', href: `/browse/mod` },
-            { label: 'Datapacks', href: `/browse/datapack` },
-            { label: 'Shaders', href: `/browse/shader` },
-            { label: 'Resource Packs', href: `/browse/resourcepack` },
-          ] : [
-            { label: 'Modpacks', href: '/browse/modpack' },
-            { label: 'Mods', href: '/browse/mod' },
-            { label: 'Datapacks', href: '/browse/datapack' },
-            { label: 'Shaders', href: '/browse/shader' },
-            { label: 'Resource Packs', href: '/browse/resourcepack' },
-          ]"
+            searchStore.instanceContext
+              ? [
+                  { label: 'Mods', href: `/browse/mod` },
+                  { label: 'Datapacks', href: `/browse/datapack` },
+                  { label: 'Shaders', href: `/browse/shader` },
+                  { label: 'Resource Packs', href: `/browse/resourcepack` },
+                ]
+              : [
+                  { label: 'Modpacks', href: '/browse/modpack' },
+                  { label: 'Mods', href: '/browse/mod' },
+                  { label: 'Datapacks', href: '/browse/datapack' },
+                  { label: 'Shaders', href: '/browse/shader' },
+                  { label: 'Resource Packs', href: '/browse/resourcepack' },
+                ]
+          "
         />
       </Card>
       <Card class="search-panel-container">
@@ -286,7 +290,7 @@ watch(
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <ProjectCard
           v-for="result in searchStore.searchResults"
-          :id="`${result?.project_id}/`"
+          :id="`${result?.project_id}/?fromSearch=true`"
           :key="result?.project_id"
           class="result-project-item"
           :type="result?.project_type"

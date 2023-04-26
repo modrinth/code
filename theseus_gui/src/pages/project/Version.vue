@@ -7,7 +7,7 @@
       </div>
       <div class="button-group">
         <Button color="primary" :action="() => install(version.id)" :disabled="installed">
-          <DownloadIcon v-if="!installed"/>
+          <DownloadIcon v-if="!installed" />
           <CheckIcon v-else />
           {{ installed ? 'Installed' : 'Install' }}
         </Button>
@@ -60,7 +60,7 @@
               :action="() => install(version.id)"
               :disabled="installed"
             >
-              <DownloadIcon v-if="!installed"/>
+              <DownloadIcon v-if="!installed" />
               <CheckIcon v-else />
               {{ installed ? 'Installed' : 'Install' }}
             </Button>

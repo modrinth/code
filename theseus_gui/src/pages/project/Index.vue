@@ -1,6 +1,10 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
+      <Button v-if="fromSearch" class="back-button" @click="$router.push('/browse/mod')">
+        <LeftArrowIcon />
+        Back to search
+      </Button>
       <Instance v-if="instance" :instance="instance" small />
       <Card class="sidebar-card">
         <Avatar size="lg" :src="data.icon_url" />
@@ -210,6 +214,7 @@ import {
   formatNumber,
   ExternalIcon,
   CheckIcon,
+  LeftArrowIcon,
 } from 'omorphia'
 import {
   BuyMeACoffeeIcon,
@@ -231,7 +236,7 @@ import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
-import { useSearch} from "@/store/search";
+import { useSearch } from '@/store/search'
 
 const searchStore = useSearch()
 
@@ -243,6 +248,7 @@ const modInstallModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
 const instance = ref(searchStore.instanceContext)
+const fromSearch = ref(route.query.fromSearch === 'true')
 const installing = ref(false)
 
 const installed = ref(instance.value ? checkInstalled(instance.value, route.params.id) : false)
@@ -333,6 +339,14 @@ async function install(version) {
   display: flex;
   flex-direction: row;
   min-height: 100%;
+}
+
+.back-button {
+  margin-bottom: 0.75rem;
+  background-color: var(--color-bg);
+  padding: 1rem;
+  border-radius: var(--radius-lg);
+  width: 100%;
 }
 
 .project-sidebar {

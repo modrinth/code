@@ -43,7 +43,9 @@ list().then(
         </suspense>
         <div class="pages-list">
           <RouterLink to="/" class="button-base nav-button"><HomeIcon /></RouterLink>
-          <RouterLink to="/browse/modpack" class="button-base nav-button"> <SearchIcon /></RouterLink>
+          <RouterLink to="/browse/modpack" class="button-base nav-button">
+            <SearchIcon
+          /></RouterLink>
           <RouterLink to="/library" class="button-base nav-button"> <LibraryIcon /></RouterLink>
           <button
             color="primary"

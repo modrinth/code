@@ -141,16 +141,18 @@ const check_valid = computed(() => {
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
       <div class="profiles">
         <div v-for="profile in filteredVersions" :key="profile.metadata.name" class="option">
-          <Button color="raised" class="profile-button" @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)">
+          <Button
+            color="raised"
+            class="profile-button"
+            @click="$router.push(`/instance/${encodeURIComponent(profile.path)}`)"
+          >
             <Avatar :src="convertFileSrc(profile.metadata.icon)" class="profile-image" />
             {{ profile.metadata.name }}
           </Button>
           <Button :disabled="profile.installed || profile.installing" @click="install(profile)">
             <DownloadIcon v-if="!profile.installed && !profile.installing" />
             <CheckIcon v-else-if="profile.installed" />
-            {{
-              profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install'
-            }}
+            {{ profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install' }}
           </Button>
         </div>
       </div>

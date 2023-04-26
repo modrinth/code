@@ -3,13 +3,11 @@
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
-        <input v-model="searchFilter" type="text" placeholder="Search Mods" class="text-input"/>
+        <input v-model="searchFilter" type="text" placeholder="Search Mods" class="text-input" />
       </div>
       <span class="manage">
         <span class="text-combo">
-          <span class="no-wrap sort">
-            Sort By
-          </span>
+          <span class="no-wrap sort"> Sort By </span>
           <DropdownSelect
             v-model="sortFilter"
             name="sort-by"
@@ -20,9 +18,7 @@
         </span>
         <Button color="primary" @click="searchMod()">
           <PlusIcon />
-          <span class="no-wrap">
-            Add Content
-          </span>
+          <span class="no-wrap"> Add Content </span>
         </Button>
       </span>
     </div>
