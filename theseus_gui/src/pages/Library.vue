@@ -2,6 +2,13 @@
 import { shallowRef } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
+import { useRoute } from 'vue-router'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
+
+const route = useRoute()
+const breadcrumbs = useBreadcrumbs()
+
+breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
 const profiles = await list()
 const instances = shallowRef(

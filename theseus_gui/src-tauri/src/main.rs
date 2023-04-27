@@ -12,6 +12,7 @@ mod api;
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
     State::get().await?;
+    State::update();
     Ok(())
 }
 
@@ -41,11 +42,17 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             should_disable_mouseover,
+            api::progress_bars_list,
             api::profile_create::profile_create_empty,
             api::profile_create::profile_create,
             api::profile::profile_remove,
             api::profile::profile_get,
             api::profile::profile_list,
+            api::profile::profile_sync,
+            api::profile::profile_install,
+            api::profile::profile_update_all,
+            api::profile::profile_update_project,
+            api::profile::profile_replace_project,
             api::profile::profile_add_project_from_version,
             api::profile::profile_add_project_from_path,
             api::profile::profile_toggle_disable_project,
@@ -67,7 +74,6 @@ fn main() {
             api::tags::tags_get_donation_platforms,
             api::tags::tags_get_game_versions,
             api::tags::tags_get_loaders,
-            api::tags::tags_get_licenses,
             api::tags::tags_get_report_types,
             api::tags::tags_get_tag_bundle,
             api::settings::settings_get,

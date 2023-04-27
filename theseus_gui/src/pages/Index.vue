@@ -1,14 +1,20 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
 import { ofetch } from 'ofetch'
+import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
-import { shallowRef } from 'vue'
 import { list } from '@/helpers/profile.js'
 import { loading_listener } from '@/helpers/events'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
 const filter = ref('')
+
+const route = useRoute()
+const breadcrumbs = useBreadcrumbs()
+
+breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
 const recentInstances = shallowRef()
 

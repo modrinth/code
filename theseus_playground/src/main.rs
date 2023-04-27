@@ -4,6 +4,7 @@
 )]
 
 use dunce::canonicalize;
+use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
@@ -32,6 +33,9 @@ async fn main() -> theseus::Result<()> {
 
     // Initialize state
     let st = State::get().await?;
+    //State::update();
+
+    st.settings.write().await.java_globals = autodetect_java_globals().await?;
     st.settings.write().await.max_concurrent_downloads = 5;
     st.settings.write().await.hooks.post_exit =
         Some("echo This is after Minecraft runs- global setting!".to_string());
@@ -51,7 +55,7 @@ async fn main() -> theseus::Result<()> {
 
     let name = "Example".to_string();
     let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Fabric;
+    let modloader = ModLoader::Vanilla;
     let loader_version = "stable".to_string();
 
     let profile_path = profile_create(
@@ -61,28 +65,32 @@ async fn main() -> theseus::Result<()> {
         Some(loader_version),
         None,
         None,
+        None,
     )
     .await?;
 
-    println!("Adding sodium");
-    let sodium_path = profile::add_project_from_version(
-        &profile_path,
-        "rAfhHfow".to_string(),
-    )
-    .await?;
+    // let mut value = list().await?;
+    // let profile_path = value.iter().next().map(|x| x.0).unwrap();
 
-    let mod_menu_path = profile::add_project_from_version(
-        &profile_path,
-        "gSoPJyVn".to_string(),
-    )
-    .await?;
-
-    println!("Disabling sodium");
-    profile::toggle_disable_project(&profile_path, &sodium_path).await?;
-
-    profile::remove_project(&profile_path, &mod_menu_path).await?;
+    // println!("Adding sodium");
+    // let sodium_path = profile::add_project_from_version(
+    //     &profile_path,
+    //     "rAfhHfow".to_string(),
+    // )
+    // .await?;
+    //
+    // let mod_menu_path = profile::add_project_from_version(
+    //     &profile_path,
+    //     "gSoPJyVn".to_string(),
+    // )
+    // .await?;
+    //
+    // println!("Disabling sodium");
+    // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
+    //
+    // profile::remove_project(&profile_path, &mod_menu_path).await?;
     // let profile_path =
-    //     pack::install_pack_from_version_id("KxUUUFh5".to_string())
+    //     pack::install_pack_from_version_id("zroFQG1k".to_string())
     //         .await
     //         .unwrap();
 
@@ -102,7 +110,7 @@ async fn main() -> theseus::Result<()> {
     State::sync().await?;
 
     // Attempt to run game
-    if auth::users().await?.len() == 0 {
+    if auth::users().await?.is_empty() {
         println!("No users found, authenticating.");
         authenticate_run().await?; // could take credentials from here direct, but also deposited in state users
     }
@@ -120,7 +128,9 @@ async fn main() -> theseus::Result<()> {
     println!("Waiting 20 seconds to gather logs...");
     sleep(Duration::from_secs(20)).await;
     let stdout = process::get_stdout_by_uuid(&uuid).await?;
+    let stderr = process::get_stderr_by_uuid(&uuid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");
+    println!("Logs after 5sec <<< {stderr} >>> end stderr");
 
     println!(
         "All running process UUID {:?}",

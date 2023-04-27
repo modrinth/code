@@ -1,5 +1,5 @@
 use crate::event::{
-    EventError, LoadingBar, LoadingBarId, LoadingBarType, ProcessPayloadType,
+    EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
 };
 use futures::prelude::*;
@@ -11,6 +11,7 @@ use crate::event::{
 };
 #[cfg(feature = "tauri")]
 use tauri::Manager;
+use uuid::Uuid;
 
 /*
    Events are a way we can communciate with the Tauri frontend from the Rust backend.
@@ -39,27 +40,62 @@ use tauri::Manager;
 // Initialize a loading bar for use in emit_loading
 // This will generate a LoadingBarId, which is used to refer to the loading bar uniquely.
 // total is the total amount of work to be done- all emissions will be considered a fraction of this value (should be 1 or 100 for simplicity)
-// default_message is the message to display on the loading bar if no message is passed to emit_loading
+// title is the title of the loading bar
 pub async fn init_loading(
     bar_type: LoadingBarType,
     total: f64,
-    default_message: &str,
-) -> crate::Result<LoadingBarId> {
+    title: &str,
+) -> crate::Result<Uuid> {
     let event_state = crate::EventState::get().await?;
-    let key = LoadingBarId::new(bar_type);
+    let key = Uuid::new_v4();
 
     event_state.loading_bars.write().await.insert(
-        key.clone(),
+        key,
         LoadingBar {
-            loading_bar_id: key.clone(),
-            message: default_message.to_string(),
+            loading_bar_id: key,
+            message: title.to_string(),
             total,
             current: 0.0,
+            bar_type,
         },
     );
     // attempt an initial loading_emit event to the frontend
     emit_loading(&key, 0.0, None).await?;
     Ok(key)
+}
+
+pub async fn init_or_edit_loading(
+    id: Option<Uuid>,
+    bar_type: LoadingBarType,
+    total: f64,
+    title: &str,
+) -> crate::Result<Uuid> {
+    if let Some(id) = id {
+        edit_loading(id, bar_type, total, title).await?;
+
+        Ok(id)
+    } else {
+        init_loading(bar_type, total, title).await
+    }
+}
+
+// Edits a loading bar's type
+pub async fn edit_loading(
+    id: Uuid,
+    bar_type: LoadingBarType,
+    total: f64,
+    title: &str,
+) -> crate::Result<()> {
+    let event_state = crate::EventState::get().await?;
+
+    if let Some(bar) = event_state.loading_bars.write().await.get_mut(&id) {
+        bar.bar_type = bar_type;
+        bar.total = total;
+        bar.message = title.to_string();
+    };
+
+    emit_loading(&id, 0.0, None).await?;
+    Ok(())
 }
 
 // emit_loading emits a loading event to the frontend
@@ -69,7 +105,7 @@ pub async fn init_loading(
 // By convention, fraction is the fraction of the progress bar that is filled
 #[allow(unused_variables)]
 pub async fn emit_loading(
-    key: &LoadingBarId,
+    key: &Uuid,
     increment_frac: f64,
     message: Option<&str>,
 ) -> crate::Result<()> {
@@ -79,14 +115,14 @@ pub async fn emit_loading(
     let loading_bar = match loading_bar.get_mut(key) {
         Some(f) => f,
         None => {
-            return Err(EventError::NoLoadingBar(key.clone()).into());
+            return Err(EventError::NoLoadingBar(*key).into());
         }
     };
 
     // Tick up loading bar
     loading_bar.current += increment_frac;
     let display_frac = loading_bar.current / loading_bar.total;
-    let display_frac = if display_frac > 1.0 {
+    let display_frac = if display_frac >= 1.0 {
         None // by convention, when its done, we submit None
              // any further updates will be ignored (also sending None)
     } else {
@@ -101,8 +137,8 @@ pub async fn emit_loading(
             LoadingPayload {
                 fraction: display_frac,
                 message: message.unwrap_or(&loading_bar.message).to_string(),
-                event: key.key.clone(),
-                loader_uuid: key.uuid,
+                event: loading_bar.bar_type.clone(),
+                loader_uuid: loading_bar.loading_bar_id,
             },
         )
         .map_err(EventError::from)?;
@@ -132,7 +168,7 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 // emit_process(uuid, pid, event, message)
 #[allow(unused_variables)]
 pub async fn emit_process(
-    uuid: uuid::Uuid,
+    uuid: Uuid,
     pid: u32,
     event: ProcessPayloadType,
     message: &str,
@@ -159,7 +195,7 @@ pub async fn emit_process(
 // emit_profile(path, event)
 #[allow(unused_variables)]
 pub async fn emit_profile(
-    uuid: uuid::Uuid,
+    uuid: Uuid,
     path: PathBuf,
     name: &str,
     event: ProfilePayloadType,
@@ -253,7 +289,7 @@ macro_rules! loading_join {
 pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,
-    key: Option<&LoadingBarId>,
+    key: Option<&Uuid>,
     total: f64,
     num_futs: usize, // num is in here as we allow Iterator to be passed in, which doesn't have a size
     message: Option<&str>,
@@ -285,7 +321,7 @@ where
 pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,
-    _key: Option<&LoadingBarId>,
+    _key: Option<&Uuid>,
     _total: f64,
     _num_futs: usize, // num is in here as we allow Iterator to be passed in, which doesn't have a size
     _message: Option<&str>,

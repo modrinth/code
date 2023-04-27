@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::state::LinkedData;
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
     jre,
@@ -29,6 +30,7 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
         None, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader
         None, // the icon for the profile
         None,
+        None,
     )
     .await
 }
@@ -42,9 +44,11 @@ pub async fn profile_create(
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
     icon: Option<PathBuf>,          // the icon for the profile
-    linked_project_id: Option<String>, // the linked project ID (mainly for modpacks)- used for updating
+    linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
+    skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
+    let metadata = state.metadata.read().await;
 
     let uuid = Uuid::new_v4();
     let path = state.directories.profiles_dir().join(uuid.to_string());
@@ -86,8 +90,8 @@ pub async fn profile_create(
         };
 
         let loader_data = match loader {
-            ModLoader::Forge => &state.metadata.forge,
-            ModLoader::Fabric => &state.metadata.fabric,
+            ModLoader::Forge => &metadata.forge,
+            ModLoader::Fabric => &metadata.fabric,
             _ => {
                 return Err(ProfileCreationError::NoManifest(
                     loader.to_string(),
@@ -157,7 +161,7 @@ pub async fn profile_create(
         profile.metadata.loader_version = Some(loader_version);
     }
 
-    profile.metadata.linked_project_id = linked_project_id;
+    profile.metadata.linked_data = linked_data;
 
     // Attempts to find optimal JRE for the profile from the JavaGlobals
     // Finds optimal key, and see if key has been set in JavaGlobals
@@ -179,11 +183,15 @@ pub async fn profile_create(
         ProfilePayloadType::Created,
     )
     .await?;
+
     {
         let mut profiles = state.profiles.write().await;
-        profiles.insert(profile).await?;
+        profiles.insert(profile.clone()).await?;
     }
 
+    if !skip_install_profile.unwrap_or(false) {
+        crate::launcher::install_minecraft(&profile, None).await?;
+    }
     State::sync().await?;
 
     Ok(path)

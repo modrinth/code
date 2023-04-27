@@ -64,6 +64,7 @@ impl ProfileInit {
     ) -> Result<()> {
         // TODO: validate inputs from args early
         let state = State::get().await?;
+        let metadata = state.metadata.read().await;
 
         if self.path.exists() {
             ensure!(
@@ -114,7 +115,7 @@ impl ProfileInit {
         let game_version = match &self.game_version {
             Some(version) => version.clone(),
             None => {
-                let default = &state.metadata.minecraft.latest.release;
+                let default = &metadata.minecraft.latest.release;
 
                 prompt_async(
                     String::from("Game version"),
@@ -163,8 +164,8 @@ impl ProfileInit {
             };
 
             let loader_data = match loader {
-                ModLoader::Forge => &state.metadata.forge,
-                ModLoader::Fabric => &state.metadata.fabric,
+                ModLoader::Forge => &metadata.forge,
+                ModLoader::Fabric => &metadata.fabric,
                 _ => eyre::bail!("Could not get manifest for loader {loader}. This is a bug in the CLI!"),
             };
 
@@ -191,6 +192,7 @@ impl ProfileInit {
             game_version,
             loader.clone().map(|x| x.1).unwrap_or(ModLoader::Vanilla),
             loader.map(|x| x.0.id),
+            None,
             None,
             None,
         )
