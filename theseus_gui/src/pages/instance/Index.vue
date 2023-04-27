@@ -68,6 +68,7 @@ import {
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
+import { process_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
 import { shallowRef, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -88,9 +89,8 @@ const startInstance = async () => {
 
 const checkProcess = async () => {
   const runningPaths = await get_all_running_profile_paths()
-  if (runningPaths.includes(instance.path)) {
+  if (runningPaths.includes(instance.value.path)) {
     playing.value = true
-
     return
   }
 
@@ -98,12 +98,14 @@ const checkProcess = async () => {
   uuid.value = null
 }
 
+await checkProcess()
+
 const stopInstance = async () => {
   playing.value = false
 
   try {
     if (!uuid.value) {
-      const uuids = await get_uuids_by_profile_path(instance.path)
+      const uuids = await get_uuids_by_profile_path(instance.value.path)
       uuids.forEach(async (u) => await kill_by_uuid(u))
     } else await kill_by_uuid(uuid.value)
   } catch (err) {
@@ -113,6 +115,10 @@ const stopInstance = async () => {
     console.warn(err)
   }
 }
+
+await process_listener((e) => {
+  if (e.event === 'Finished') playing.value = false
+})
 </script>
 
 <style scoped lang="scss">
