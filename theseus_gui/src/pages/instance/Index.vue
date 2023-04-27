@@ -50,12 +50,12 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
+const route = useRoute()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
 const instance = shallowRef(await get(route.params.id))
 searchStore.instanceContext = instance.value
-const route = useRoute()
 
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
