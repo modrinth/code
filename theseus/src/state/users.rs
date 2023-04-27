@@ -1,79 +1,70 @@
 //! User login info
-use crate::{auth::Credentials, config::BINCODE_CONFIG};
+use crate::auth::Credentials;
+use crate::data::DirectoryInfo;
+use crate::util::fetch::{read_json, write};
+use crate::State;
+use std::collections::HashMap;
+use tokio::sync::{RwLock, Semaphore};
+use uuid::Uuid;
 
-const USER_DB_TREE: &[u8] = b"users";
+const USERS_JSON: &str = "users.json";
 
 /// The set of users stored in the launcher
 #[derive(Clone)]
-pub(crate) struct Users(pub(crate) sled::Tree);
+pub(crate) struct Users(pub(crate) HashMap<Uuid, Credentials>);
 
 impl Users {
-    #[tracing::instrument(skip(db))]
-    pub fn init(db: &sled::Db) -> crate::Result<Self> {
-        Ok(Self(db.open_tree(USER_DB_TREE)?))
+    pub async fn init(
+        dirs: &DirectoryInfo,
+        io_semaphore: &RwLock<Semaphore>,
+    ) -> crate::Result<Self> {
+        let users_path = dirs.caches_meta_dir().join(USERS_JSON);
+        let users = read_json(&users_path, io_semaphore).await.ok();
+
+        if let Some(users) = users {
+            Ok(Self(users))
+        } else {
+            Ok(Self(HashMap::new()))
+        }
+    }
+
+    pub async fn save(&self) -> crate::Result<()> {
+        let state = State::get().await?;
+        let users_path = state.directories.caches_meta_dir().join(USERS_JSON);
+        write(
+            &users_path,
+            &serde_json::to_vec(&self.0)?,
+            &state.io_semaphore,
+        )
+        .await?;
+
+        Ok(())
     }
 
     #[tracing::instrument(skip_all)]
-    pub fn insert(
+    pub async fn insert(
         &mut self,
         credentials: &Credentials,
     ) -> crate::Result<&Self> {
-        let id = credentials.id.as_bytes();
-        self.0.insert(
-            id,
-            bincode::encode_to_vec(credentials, *BINCODE_CONFIG)?,
-        )?;
+        self.0.insert(credentials.id, credentials.clone());
+        self.save().await?;
         Ok(self)
     }
 
     #[tracing::instrument(skip(self))]
-    pub fn contains(&self, id: uuid::Uuid) -> crate::Result<bool> {
-        Ok(self.0.contains_key(id.as_bytes())?)
+    pub fn contains(&self, id: Uuid) -> bool {
+        self.0.contains_key(&id)
     }
 
     #[tracing::instrument(skip(self))]
-    pub fn get(&self, id: uuid::Uuid) -> crate::Result<Option<Credentials>> {
-        self.0.get(id.as_bytes())?.map_or(Ok(None), |prof| {
-            bincode::decode_from_slice(&prof, *BINCODE_CONFIG)
-                .map_err(crate::Error::from)
-                .map(|it| Some(it.0))
-        })
+    pub fn get(&self, id: Uuid) -> Option<Credentials> {
+        self.0.get(&id).cloned()
     }
 
     #[tracing::instrument(skip(self))]
-    pub fn remove(&mut self, id: uuid::Uuid) -> crate::Result<&Self> {
-        self.0.remove(id.as_bytes())?;
+    pub async fn remove(&mut self, id: Uuid) -> crate::Result<&Self> {
+        self.0.remove(&id);
+        self.save().await?;
         Ok(self)
-    }
-
-    pub fn iter(&self) -> UserIter<impl UserInnerIter> {
-        UserIter(self.0.iter().values(), false)
-    }
-}
-
-alias_trait! {
-    pub UserInnerIter: Iterator<Item = sled::Result<sled::IVec>>, Send, Sync
-}
-
-/// An iterator over the set of users
-#[derive(Debug)]
-pub struct UserIter<I: UserInnerIter>(I, bool);
-
-impl<I: UserInnerIter> Iterator for UserIter<I> {
-    type Item = crate::Result<Credentials>;
-
-    #[tracing::instrument(skip(self))]
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.1 {
-            return None;
-        }
-
-        let it = self.0.next()?;
-        let res = it.map_err(crate::Error::from).and_then(|it| {
-            Ok(bincode::decode_from_slice(&it, *BINCODE_CONFIG)?.0)
-        });
-
-        self.1 = res.is_err();
-        Some(res)
     }
 }

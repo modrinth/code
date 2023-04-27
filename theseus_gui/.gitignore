@@ -22,5 +22,3 @@ node_modules
 *.njsproj
 *.sln
 *.sw?
-
-generated.js

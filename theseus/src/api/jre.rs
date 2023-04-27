@@ -40,10 +40,10 @@ pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
 // this can be overwritten by the user a profile-by-profile basis
 pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
     let state = State::get().await?;
+    let metadata = state.metadata.read().await;
 
     // Fetch version info from stored profile game_version
-    let version = state
-        .metadata
+    let version = metadata
         .minecraft
         .versions
         .iter()
@@ -60,6 +60,7 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
     )
     .await?;
     let optimal_key = match version_info

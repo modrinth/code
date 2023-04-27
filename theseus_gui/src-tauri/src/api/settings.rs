@@ -2,8 +2,6 @@ use crate::api::Result;
 use serde::{Deserialize, Serialize};
 use theseus::prelude::*;
 
-use super::TheseusSerializableError;
-
 // Identical to theseus::settings::Settings except for the custom_java_args field
 // This allows us to split the custom_java_args string into a Vec<String> here and join it back into a string in the backend
 #[derive(Serialize, Deserialize, Debug, Clone)]
@@ -53,18 +51,15 @@ pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
         .custom_env_args
         .split_whitespace()
         .map(|s| s.to_string())
-        .map(|f| {
+        .flat_map(|f| {
             let mut split = f.split('=');
             if let (Some(name), Some(value)) = (split.next(), split.next()) {
-                Ok((name.to_string(), value.to_string()))
+                Some((name.to_string(), value.to_string()))
             } else {
-                Err(TheseusSerializableError::BadEnvVars(
-                    "Invalid environment variable: {}".to_string(),
-                )
-                .into())
+                None
             }
         })
-        .collect::<Result<Vec<(String, String)>>>()?;
+        .collect::<Vec<(String, String)>>();
 
     let backend_settings = Settings {
         theme: settings.theme,

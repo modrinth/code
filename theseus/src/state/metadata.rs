@@ -1,21 +1,18 @@
 //! Theseus metadata
-use crate::config::BINCODE_CONFIG;
-use bincode::{Decode, Encode};
+use crate::data::DirectoryInfo;
+use crate::util::fetch::{read_json, write};
 use daedalus::{
     minecraft::{fetch_version_manifest, VersionManifest as MinecraftManifest},
     modded::{
         fetch_manifest as fetch_loader_manifest, Manifest as LoaderManifest,
     },
 };
-use futures::prelude::*;
-use std::collections::LinkedList;
+use serde::{Deserialize, Serialize};
+use tokio::sync::{RwLock, Semaphore};
 
 const METADATA_URL: &str = "https://meta.modrinth.com";
-const METADATA_DB_FIELD: &[u8] = b"metadata";
-const RETRY_ATTEMPTS: i32 = 3;
 
-// TODO: store as subtree in database
-#[derive(Encode, Decode, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Metadata {
     pub minecraft: MinecraftManifest,
     pub forge: LoaderManifest,
@@ -27,7 +24,7 @@ impl Metadata {
         format!("{METADATA_URL}/{name}/v0/manifest.json")
     }
 
-    async fn fetch() -> crate::Result<Self> {
+    pub async fn fetch() -> crate::Result<Self> {
         let (minecraft, forge, fabric) = tokio::try_join! {
             async {
                 let url = Self::get_manifest("minecraft");
@@ -51,41 +48,42 @@ impl Metadata {
     }
 
     // Attempt to fetch metadata and store in sled DB
-    #[tracing::instrument(skip_all)]
-    pub async fn init(db: &sled::Db) -> crate::Result<Self> {
+    pub async fn init(
+        dirs: &DirectoryInfo,
+        io_semaphore: &RwLock<Semaphore>,
+    ) -> crate::Result<Self> {
         let mut metadata = None;
+        let metadata_path = dirs.caches_meta_dir().join("metadata.json");
 
-        if let Some(ref meta_bin) = db.get(METADATA_DB_FIELD)? {
-            match bincode::decode_from_slice::<Self, _>(
-                meta_bin,
-                *BINCODE_CONFIG,
-            ) {
-                Ok((meta, _)) => metadata = Some(meta),
+        if let Ok(metadata_json) =
+            read_json::<Metadata>(&metadata_path, io_semaphore).await
+        {
+            metadata = Some(metadata_json);
+        } else {
+            let res = async {
+                let metadata_fetch = Self::fetch().await?;
+
+                write(
+                    &metadata_path,
+                    &serde_json::to_vec(&metadata_fetch).unwrap_or_default(),
+                    io_semaphore,
+                )
+                .await?;
+
+                metadata = Some(metadata_fetch);
+                Ok::<(), crate::Error>(())
+            }
+            .await;
+
+            match res {
+                Ok(()) => {}
                 Err(err) => {
-                    log::warn!("Could not read launcher metadata: {err}")
+                    log::warn!("Unable to fetch launcher metadata: {err}")
                 }
             }
         }
 
-        let mut fetch_futures = LinkedList::new();
-        for _ in 0..RETRY_ATTEMPTS {
-            fetch_futures.push_back(Self::fetch().boxed());
-        }
-
-        match future::select_ok(fetch_futures).await {
-            Ok(meta) => metadata = Some(meta.0),
-            Err(err) => log::warn!("Unable to fetch launcher metadata: {err}"),
-        }
-
         if let Some(meta) = metadata {
-            db.insert(
-                METADATA_DB_FIELD,
-                sled::IVec::from(bincode::encode_to_vec(
-                    &meta,
-                    *BINCODE_CONFIG,
-                )?),
-            )?;
-            db.flush_async().await?;
             Ok(meta)
         } else {
             Err(
@@ -93,5 +91,36 @@ impl Metadata {
                     .as_error(),
             )
         }
+    }
+
+    pub async fn update() {
+        let res = async {
+            let metadata_fetch = Metadata::fetch().await?;
+            let state = crate::State::get().await?;
+
+            let metadata_path =
+                state.directories.caches_meta_dir().join("metadata.json");
+
+            write(
+                &metadata_path,
+                &serde_json::to_vec(&metadata_fetch)?,
+                &state.io_semaphore,
+            )
+            .await
+            .unwrap();
+
+            let mut old_metadata = state.metadata.write().await;
+            *old_metadata = metadata_fetch;
+
+            Ok::<(), crate::Error>(())
+        }
+        .await;
+
+        match res {
+            Ok(()) => {}
+            Err(err) => {
+                log::warn!("Unable to update launcher metadata: {err}")
+            }
+        };
     }
 }

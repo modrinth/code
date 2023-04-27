@@ -22,7 +22,7 @@
         </Button>
       </span>
     </div>
-    <div class="table-container">
+    <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
           <Button color="success" icon-only>
@@ -189,53 +189,17 @@ const deleteMod = async (mod) => {
 </script>
 
 <style scoped lang="scss">
-.table-container {
-  display: grid;
-  grid-template-rows: repeat(auto-fill, auto);
-  width: 100%;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-}
-
-.table-row {
-  display: grid;
-  grid-template-columns: min-content 2fr 1fr 1fr 8rem;
-}
-
-.table-head {
-  .table-cell {
-    background-color: var(--color-accent-contrast);
-  }
-}
-
-.table-cell {
-  padding: 1rem;
-  height: 100%;
-  align-items: center;
-  vertical-align: center;
-  display: flex;
-}
-
-.table-text {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: fade;
-}
-
 .manage {
   display: flex;
   gap: 0.5rem;
 }
 
-.mod-text {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  color: var(--color-contrast);
+.table-row {
+  grid-template-columns: min-content 2fr 1fr 1fr 8rem;
 }
 
-.table-row:nth-child(even) .table-cell {
-  background-color: var(--color-bg);
+.table-cell {
+  align-items: center;
 }
 
 .card-row {
