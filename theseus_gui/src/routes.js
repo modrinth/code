@@ -52,6 +52,7 @@ export default new createRouter({
           name: 'Description',
           component: Project.Description,
           meta: {
+            useContext: true,
             breadcrumb: [{ name: '?Project' }],
           },
         },
@@ -60,6 +61,7 @@ export default new createRouter({
           name: 'Versions',
           component: Project.Versions,
           meta: {
+            useContext: true,
             breadcrumb: [{ name: '?Project', link: '/project/{id}/' }, { name: 'Versions' }],
           },
         },
@@ -69,6 +71,7 @@ export default new createRouter({
           component: Project.Version,
           props: true,
           meta: {
+            useContext: true,
             breadcrumb: [
               { name: '?Project', link: '/project/{id}/' },
               { name: 'Versions', link: '/project/{id}/versions' },
@@ -81,6 +84,7 @@ export default new createRouter({
           name: 'Gallery',
           component: Project.Gallery,
           meta: {
+            useContext: true,
             breadcrumb: [{ name: '?Project', link: '/project/{id}/' }, { name: 'Gallery' }],
           },
         },
@@ -97,6 +101,7 @@ export default new createRouter({
           name: 'Mods',
           component: Instance.Mods,
           meta: {
+            useRootContext: true,
             breadcrumb: [{ name: '?Instance' }],
           },
         },
@@ -105,6 +110,7 @@ export default new createRouter({
           name: 'Options',
           component: Instance.Options,
           meta: {
+            useRootContext: true,
             breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Options' }],
           },
         },
@@ -113,6 +119,7 @@ export default new createRouter({
           name: 'Logs',
           component: Instance.Logs,
           meta: {
+            useRootContext: true,
             breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Logs' }],
           },
         },

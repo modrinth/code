@@ -54,6 +54,10 @@ const breadcrumbs = useBreadcrumbs()
 const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
 breadcrumbs.setName('Instance', instance.value.metadata.name)
+breadcrumbs.setContext({
+  name: instance.value.metadata.name,
+  link: route.path,
+})
 </script>
 
 <style scoped lang="scss">

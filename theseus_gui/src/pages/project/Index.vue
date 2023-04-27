@@ -250,7 +250,9 @@ async function install(version) {
     const packs = Object.values(await list())
     if (
       packs.length === 0 ||
-      !packs.map((value) => value.metadata).find((pack) => pack.linked_data?.project_id === data.value.id)
+      !packs
+        .map((value) => value.metadata)
+        .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
       let id = await pack_install(version)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
