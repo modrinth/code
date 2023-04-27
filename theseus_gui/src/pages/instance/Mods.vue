@@ -25,7 +25,7 @@
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
-          <Button color="success" icon-only>
+          <Button color="success" icon-only @click="updateAll">
             <UpdatedIcon />
           </Button>
         </div>
@@ -36,7 +36,7 @@
       </div>
       <div v-for="mod in search" :key="mod.file_name" class="table-row">
         <div class="table-cell table-text">
-          <Button v-if="true" icon-only>
+          <Button v-if="allUpdated === false && !mod.updated" icon-only @click="() => update(mod)">
             <UpdatedIcon />
           </Button>
           <Button v-else disabled icon-only>
@@ -85,7 +85,7 @@ import {
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { toggle_disable_project, remove_project } from '@/helpers/profile'
+import { toggle_disable_project, remove_project, update_all } from '@/helpers/profile'
 
 const props = defineProps({
   instance: {
@@ -132,6 +132,7 @@ for (const project of Object.values(props.instance.projects)) {
 
 const searchFilter = ref('')
 const sortFilter = ref('')
+const allUpdated = ref(false)
 
 const search = computed(() => {
   const filtered = projects.value.filter((mod) => {
@@ -176,13 +177,27 @@ function updateSort(projects, sort) {
   }
 }
 
+const getProject = (mod) =>
+  Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
+
+const updateAll = async () => {
+  await update_all(props.instance.path)
+  allUpdated.value = true
+}
+
+const update = async (mod) => {
+  const project = getProject(mod)
+  await update(props.instance.path, project)
+  mod.updated = true
+}
+
 const handleDisable = async (mod) => {
-  const project = Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
+  const project = getProject(mod)
   await toggle_disable_project(props.instance.path, project)
 }
 
 const deleteMod = async (mod) => {
-  const project = Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
+  const project = getProject(mod)
   await remove_project(props.instance.path, project)
   projects.value = projects.value.filter((p) => p.slug !== mod.slug)
 }
