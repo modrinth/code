@@ -13,6 +13,7 @@ import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
 } from '@/helpers/process'
+import { process_listener } from '@/helpers/events'
 
 const props = defineProps({
   instance: {
@@ -115,6 +116,10 @@ const stop = async (e) => {
 
   uuid.value = null
 }
+
+await process_listener((e) => {
+  if (e.event === 'Finished') playing.value = false
+})
 </script>
 
 <template>
@@ -197,6 +202,16 @@ const stop = async (e) => {
   svg {
     width: 2.5rem !important;
     height: 2.5rem !important;
+  }
+}
+
+.light-mode {
+  .instance-card-item {
+    background: hsl(0, 0, 100%) !important;
+
+    &:hover {
+      background: hsl(0, 0, 91%) !important;
+    }
   }
 }
 
