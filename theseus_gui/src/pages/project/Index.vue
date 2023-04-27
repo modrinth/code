@@ -237,11 +237,13 @@ import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { useSearch } from '@/store/search'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const searchStore = useSearch()
 
 const route = useRoute()
 const router = useRouter()
+const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
@@ -259,6 +261,8 @@ const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ])
+
+breadcrumbs.setName('Project', data.value.title)
 
 watch(
   () => route.params.id,
@@ -289,7 +293,9 @@ async function install(version) {
     const packs = Object.values(await list())
     if (
       packs.length === 0 ||
-      !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
+      !packs
+        .map((value) => value.metadata)
+        .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
       let id = await packInstall(queuedVersionData.id)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })

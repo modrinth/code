@@ -187,6 +187,9 @@ import {
 import { releaseColor } from '@/helpers/utils'
 import { ref, defineProps } from 'vue'
 import { useRoute } from 'vue-router'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
+
+const breadcrumbs = useBreadcrumbs()
 
 const route = useRoute()
 
@@ -218,7 +221,10 @@ const props = defineProps({
 })
 
 const version = ref(props.versions.find((version) => version.id === route.params.version))
+breadcrumbs.setName('Version', version.value.name)
+
 const author = ref(props.members.find((member) => member.user.id === version.value.author_id))
+
 const displayDependencies = ref(
   version.value.dependencies.map((dependency) => {
     const version = props.dependencies.versions.find((obj) => obj.id === dependency.version_id)

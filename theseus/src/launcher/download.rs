@@ -1,11 +1,7 @@
 //! Downloader for Minecraft data
 
 use crate::{
-    event::{
-        emit::{emit_loading, init_loading, loading_try_for_each_concurrent},
-        LoadingBarId, LoadingBarType,
-    },
-    process::Profile,
+    event::emit::{emit_loading, loading_try_for_each_concurrent},
     state::State,
     util::{fetch::*, platform::OsExt},
 };
@@ -19,26 +15,17 @@ use daedalus::{
 };
 use futures::prelude::*;
 use tokio::{fs, sync::OnceCell};
+use uuid::Uuid;
 
 #[tracing::instrument(skip_all)]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
-    profile: &Profile,
+    loading_bar: Uuid,
 ) -> crate::Result<()> {
     log::info!("Downloading Minecraft version {}", version.id);
     let assets_index = download_assets_index(st, version).await?;
 
-    let loading_bar = init_loading(
-        LoadingBarType::MinecraftDownload {
-            // If we are downloading minecraft for a profile, provide its name and uuid
-            profile_name: profile.metadata.name.clone(),
-            profile_uuid: profile.uuid,
-        },
-        100.0,
-        "Downloading Minecraft...",
-    )
-    .await?;
     tokio::try_join! {
         download_client(st, version, Some(&loading_bar)),
         download_assets(st, version.assets == "legacy", &assets_index, Some(&loading_bar)),
@@ -54,6 +41,7 @@ pub async fn download_version_info(
     st: &State,
     version: &GameVersion,
     loader: Option<&LoaderVersion>,
+    force: Option<bool>,
 ) -> crate::Result<GameVersionInfo> {
     let version_id = loader
         .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
@@ -63,7 +51,7 @@ pub async fn download_version_info(
         .version_dir(&version_id)
         .join(format!("{version_id}.json"));
 
-    let res = if path.exists() {
+    let res = if path.exists() && !force.unwrap_or(false) {
         fs::read(path)
             .err_into::<crate::Error>()
             .await
@@ -90,7 +78,7 @@ pub async fn download_version_info(
 pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
-    loading_bar: Option<&LoadingBarId>,
+    loading_bar: Option<&Uuid>,
 ) -> crate::Result<()> {
     let version = &version_info.id;
     log::debug!("Locating client for version {version}");
@@ -158,7 +146,7 @@ pub async fn download_assets(
     st: &State,
     with_legacy: bool,
     index: &AssetsIndex,
-    loading_bar: Option<&LoadingBarId>,
+    loading_bar: Option<&Uuid>,
 ) -> crate::Result<()> {
     log::debug!("Loading assets");
     let num_futs = index.objects.len();
@@ -219,7 +207,7 @@ pub async fn download_libraries(
     st: &State,
     libraries: &[Library],
     version: &str,
-    loading_bar: Option<&LoadingBarId>,
+    loading_bar: Option<&Uuid>,
 ) -> crate::Result<()> {
     log::debug!("Loading libraries");
 
@@ -276,7 +264,7 @@ pub async fn download_libraries(
                         library
                             .natives
                             .as_ref()?
-                            .get(&Os::native())?,
+                            .get(&Os::native_arch())?,
                         library
                             .downloads
                             .as_ref()?

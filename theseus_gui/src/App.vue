@@ -1,20 +1,14 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  HomeIcon,
-  SearchIcon,
-  LibraryIcon,
-  PlusIcon,
-  SettingsIcon,
-} from 'omorphia'
+import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
+import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
+import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 
 const themeStore = useTheming()
 
@@ -67,12 +61,12 @@ list().then(
     <div class="view">
       <div class="appbar">
         <section class="navigation-controls">
-          <ChevronLeftIcon @click="$router.back()" />
-          <ChevronRightIcon @click="$router.forward()" />
-          <p>{{ $route.name }}</p>
+          <Breadcrumbs />
         </section>
         <section class="mod-stats">
-          <p>{{ installedMods }} mods installed</p>
+          <Suspense>
+            <RunningAppBar />
+          </Suspense>
         </section>
       </div>
       <div class="router-view">
@@ -92,7 +86,7 @@ list().then(
   overflow: hidden;
 
   .view {
-    width: 100%;
+    width: calc(100% - 5rem);
 
     .appbar {
       display: flex;
@@ -100,7 +94,8 @@ list().then(
       align-items: center;
       background: var(--color-super-raised-bg);
       text-align: center;
-      padding: 0.5rem 1rem;
+      padding: 0 0 0 1rem;
+      height: 3.25rem;
       z-index: 11;
 
       .navigation-controls {
@@ -134,6 +129,7 @@ list().then(
       }
 
       .mod-stats {
+        height: 100%;
         display: inherit;
         align-items: inherit;
         justify-content: flex-end;
@@ -142,7 +138,7 @@ list().then(
 
     .router-view {
       width: 100%;
-      height: calc(100% - 2rem);
+      height: calc(100% - 3.125rem);
       overflow: auto;
       overflow-x: hidden;
     }

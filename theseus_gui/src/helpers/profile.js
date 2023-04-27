@@ -42,6 +42,32 @@ export async function list() {
   return await invoke('profile_list')
 }
 
+// Syncs a profile with the disk
+export async function sync(path) {
+  return await invoke('profile_sync', { path })
+}
+
+// Installs/Repairs a profile
+export async function install(path) {
+  return await invoke('profile_install', { path })
+}
+
+// Updates all of a profile's projects
+export async function update_all(path) {
+  return await invoke('profile_update_all', { path })
+}
+
+// Updates a specified project
+export async function update_project(path, projectPath) {
+  return await invoke('profile_update_project', { path, projectPath })
+}
+
+// Replaces a given project with the specified version ID
+// Returns a path to the new project file
+export async function replace_project(path, projectPath, versionId) {
+  return await invoke('profile_replace_project', { path, projectPath, versionId })
+}
+
 // Add a project to a profile from a version
 // Returns a path to the new project file
 export async function add_project_from_version(path, versionId) {
@@ -50,18 +76,18 @@ export async function add_project_from_version(path, versionId) {
 
 // Add a project to a profile from a path + project_type
 // Returns a path to the new project file
-export async function add_project_from_path(path, project_path, project_type) {
-  return await invoke('profile_add_project_from_path', { path, project_path, project_type })
+export async function add_project_from_path(path, projectPath, projectType) {
+  return await invoke('profile_add_project_from_path', { path, projectPath, projectType })
 }
 
 // Toggle disabling a project
-export async function toggle_disable_project(path, project_path) {
-  return await invoke('profile_toggle_disable_project', { path, project_path })
+export async function toggle_disable_project(path, projectPath) {
+  return await invoke('profile_toggle_disable_project', { path, projectPath })
 }
 
 // Remove a project
-export async function remove_project(path, project_path) {
-  return await invoke('profile_remove_project', { path, project_path })
+export async function remove_project(path, projectPath) {
+  return await invoke('profile_remove_project', { path, projectPath })
 }
 
 // Run Minecraft using a pathed profile

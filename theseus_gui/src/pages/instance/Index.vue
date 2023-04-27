@@ -5,9 +5,9 @@
         <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
         <div class="instance-info">
           <h2 class="name">{{ instance.metadata.name }}</h2>
-          <span class="metadata"
-            >{{ instance.metadata.loader }} {{ instance.metadata.game_version }}</span
-          >
+          <span class="metadata">
+            {{ instance.metadata.loader }} {{ instance.metadata.game_version }}
+          </span>
         </div>
         <span class="button-group">
           <Button color="primary" class="instance-button" @click="run($route.params.id)">
@@ -48,12 +48,20 @@ import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useSearch } from '@/store/search'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const searchStore = useSearch()
+const breadcrumbs = useBreadcrumbs()
 
-const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
 searchStore.instanceContext = instance.value
+const route = useRoute()
+
+breadcrumbs.setName('Instance', instance.value.metadata.name)
+breadcrumbs.setContext({
+  name: instance.value.metadata.name,
+  link: route.path,
+})
 </script>
 
 <style scoped lang="scss">
@@ -81,7 +89,7 @@ Button {
   flex-direction: column;
   padding: 1rem;
   background: var(--color-raised-bg);
-  min-height: calc(100% - 2.25rem);
+  min-height: calc(100% - 3.25rem);
   overflow: hidden;
 }
 

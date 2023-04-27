@@ -10,3 +10,8 @@ import { invoke } from '@tauri-apps/api/tauri'
 export async function initialize_state() {
   return await invoke('initialize_state')
 }
+
+// Gets active progress bars
+export async function progress_bars_list() {
+  return await invoke('progress_bars_list')
+}

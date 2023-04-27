@@ -28,6 +28,53 @@ pub async fn profile_list(
     Ok(res)
 }
 
+/// Syncs a profile's in memory state with the state on the disk
+/// // invoke('profile_sync')
+#[tauri::command]
+pub async fn profile_sync(path: &Path) -> Result<()> {
+    profile::sync(path).await?;
+    Ok(())
+}
+
+/// Installs/Repairs a profile
+/// invoke('profile_install')
+#[tauri::command]
+pub async fn profile_install(path: &Path) -> Result<()> {
+    profile::install(path).await?;
+    Ok(())
+}
+
+/// Updates all of the profile's projects
+/// invoke('profile_update_all')
+#[tauri::command]
+pub async fn profile_update_all(path: &Path) -> Result<()> {
+    profile::update_all(path).await?;
+    Ok(())
+}
+
+/// Updates a specified project
+/// invoke('profile_update_project')
+#[tauri::command]
+pub async fn profile_update_project(
+    path: &Path,
+    project_path: &Path,
+) -> Result<()> {
+    profile::update_project(path, project_path, None).await?;
+    Ok(())
+}
+
+/// Replaces a project with the given version ID
+/// invoke('profile_replace_project')
+#[tauri::command]
+pub async fn profile_replace_project(
+    path: &Path,
+    project: &Path,
+    version_id: String,
+) -> Result<PathBuf> {
+    let res = profile::replace_project(path, project, version_id).await?;
+    Ok(res)
+}
+
 // Adds a project to a profile from a version ID
 // invoke('profile_add_project_from_version')
 #[tauri::command]

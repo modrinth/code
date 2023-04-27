@@ -27,6 +27,7 @@ pub async fn profile_create(
         Some(loader_version),
         icon,
         None,
+        None,
     )
     .await?;
     Ok(res)

@@ -19,6 +19,7 @@ import {
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
 import Instance from '@/components/ui/Instance.vue'
@@ -32,6 +33,10 @@ if (searchStore.projectType === 'modpack') {
 }
 const showVersions = ref(true)
 const showLoaders = ref(true)
+
+const breadcrumbs = useBreadcrumbs()
+breadcrumbs.setContext({ name: 'Browse', link: route.path })
+
 const showSnapshots = ref(false)
 const loading = ref(true)
 

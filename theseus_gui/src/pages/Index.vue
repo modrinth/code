@@ -2,9 +2,16 @@
 import RowDisplay from '@/components/RowDisplay.vue'
 import { shallowRef } from 'vue'
 import { list } from '@/helpers/profile.js'
+import { useRoute } from 'vue-router'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
+
+const route = useRoute()
+const breadcrumbs = useBreadcrumbs()
 
 const profiles = await list()
 const recentInstances = shallowRef(Object.values(profiles))
+
+breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 </script>
 
 <template>
