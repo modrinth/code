@@ -97,7 +97,6 @@ const play = async (e) => {
 const stop = async (e) => {
   e.stopPropagation()
   playing.value = false
-  uuid.value = null
 
   try {
     // If we lost the uuid for some reason, such as a user navigating
@@ -105,7 +104,6 @@ const stop = async (e) => {
     // For-each uuid, kill the process.
     if (!uuid.value) {
       const uuids = await get_uuids_by_profile_path(props.instance.path)
-      console.log(uuids)
       uuids.forEach(async (u) => await kill_by_uuid(u))
     } else await kill_by_uuid(uuid.value) // If we still have the uuid, just kill it
   } catch (err) {
@@ -114,6 +112,8 @@ const stop = async (e) => {
     // For now, we will catch and just warn
     console.warn(err)
   }
+
+  uuid.value = null
 }
 </script>
 
