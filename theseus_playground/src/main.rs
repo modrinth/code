@@ -54,7 +54,7 @@ async fn main() -> theseus::Result<()> {
     println!("Creating/adding profile.");
 
     let name = "Example".to_string();
-    let game_version = "1.18.2".to_string();
+    let game_version = "1.19.2".to_string();
     let modloader = ModLoader::Vanilla;
     let loader_version = "stable".to_string();
 
