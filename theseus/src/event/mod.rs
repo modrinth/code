@@ -1,6 +1,6 @@
 //! Theseus state management system
 use serde::{Deserialize, Serialize};
-use std::{collections::HashMap, fmt, path::PathBuf, sync::Arc};
+use std::{collections::HashMap, path::PathBuf, sync::Arc};
 use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
@@ -14,7 +14,7 @@ pub struct EventState {
     /// Tauri app
     #[cfg(feature = "tauri")]
     pub app: tauri::AppHandle,
-    pub loading_bars: RwLock<HashMap<LoadingBarId, LoadingBar>>,
+    pub loading_bars: RwLock<HashMap<Uuid, LoadingBar>>,
 }
 
 impl EventState {
@@ -48,6 +48,13 @@ impl EventState {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
     }
 
+    pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
+    {
+        let value = Self::get().await?;
+        let read = value.loading_bars.read().await;
+        Ok(read.clone())
+    }
+
     // Initialization requires no app handle in non-tauri mode, so we can just use the same function
     #[cfg(not(feature = "tauri"))]
     pub async fn get() -> crate::Result<Arc<Self>> {
@@ -55,35 +62,13 @@ impl EventState {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Serialize, Debug, Clone)]
 pub struct LoadingBar {
-    pub loading_bar_id: LoadingBarId,
+    pub loading_bar_id: Uuid,
     pub message: String,
     pub total: f64,
     pub current: f64,
-}
-
-// Loading Bar Id lets us uniquely identify loading bars stored in the state
-// the uuid lets us identify loading bars across threads
-#[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
-pub struct LoadingBarId {
-    pub key: LoadingBarType,
-    pub uuid: Uuid,
-}
-
-impl LoadingBarId {
-    pub fn new(key: LoadingBarType) -> Self {
-        Self {
-            key,
-            uuid: Uuid::new_v4(),
-        }
-    }
-}
-
-impl fmt::Display for LoadingBarId {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}-{}", self.key, self.uuid)
-    }
+    pub bar_type: LoadingBarType,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
@@ -98,7 +83,10 @@ pub enum LoadingBarType {
         profile_uuid: Uuid,
         profile_name: String,
     },
-    ProfileSync,
+    ProfileUpdate {
+        profile_uuid: Uuid,
+        profile_name: String,
+    },
 }
 
 #[derive(Serialize, Clone)]
@@ -139,6 +127,7 @@ pub struct ProfilePayload {
 pub enum ProfilePayloadType {
     Created,
     Added, // also triggered when Created
+    Synced,
     Edited,
     Removed,
 }
@@ -149,7 +138,7 @@ pub enum EventError {
     NotInitialized,
 
     #[error("Non-existent loading bar of key: {0}")]
-    NoLoadingBar(LoadingBarId),
+    NoLoadingBar(Uuid),
 
     #[cfg(feature = "tauri")]
     #[error("Tauri error: {0}")]

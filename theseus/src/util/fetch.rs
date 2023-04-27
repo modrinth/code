@@ -144,6 +144,22 @@ pub async fn fetch_mirrors(
     unreachable!()
 }
 
+pub async fn read_json<T>(
+    path: &Path,
+    semaphore: &RwLock<Semaphore>,
+) -> crate::Result<T>
+where
+    T: DeserializeOwned,
+{
+    let io_semaphore = semaphore.read().await;
+    let _permit = io_semaphore.acquire().await?;
+
+    let json = fs::read(path).await?;
+    let json = serde_json::from_slice::<T>(&json)?;
+
+    Ok(json)
+}
+
 #[tracing::instrument(skip(bytes, semaphore))]
 pub async fn write<'a>(
     path: &Path,

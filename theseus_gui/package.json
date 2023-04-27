@@ -10,16 +10,16 @@
     "tauri": "tauri",
     "lint:js": "eslint --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
     "lint": "npm run lint:js && prettier --check .",
-    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue ."
+    "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write ."
   },
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
-    "omorphia": "^0.4.4",
+    "ofetch": "^1.0.1",
+    "omorphia": "^0.4.10",
     "pinia": "^2.0.33",
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.2.45",
     "dayjs": "^1.11.7",
-    "ofetch": "^1.0.1",
     "vue-multiselect": "^3.0.0-alpha.2",
     "vue-router": "4"
   },
