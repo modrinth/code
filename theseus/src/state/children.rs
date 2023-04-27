@@ -2,7 +2,8 @@ use super::Profile;
 use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::{collections::HashMap, sync::Arc};
-use tokio::io::{AsyncBufReadExt, BufReader};
+use tokio::fs::File;
+use tokio::io::{AsyncBufReadExt, BufReader, AsyncWriteExt};
 use tokio::process::Child;
 use tokio::process::Command;
 use tokio::process::{ChildStderr, ChildStdout};
@@ -21,6 +22,7 @@ pub struct Children(HashMap<Uuid, Arc<RwLock<MinecraftChild>>>);
 #[derive(Debug)]
 pub struct MinecraftChild {
     pub uuid: Uuid,
+    pub datetime_string: String, 
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<Child>>,
@@ -46,8 +48,13 @@ impl Children {
         // Takes the first element of the commands vector and spawns it
         let mut child = mc_command.spawn()?;
 
+        // Get current datetime for logs
+        let datetime_string = chrono::Local::now().to_string();
+        let stdout_log_path = profile_path.join("logs").join(&datetime_string).join("stdout.log");
+        let stderr_log_path = profile_path.join("logs").join(&datetime_string).join("stderr.log");
+
         // Create std watcher threads for stdout and stderr
-        let stdout = SharedOutput::new();
+        let stdout = SharedOutput::build(&stdout_log_path).await?;
         if let Some(child_stdout) = child.stdout.take() {
             let stdout_clone = stdout.clone();
             tokio::spawn(async move {
@@ -56,7 +63,7 @@ impl Children {
                 }
             });
         }
-        let stderr = SharedOutput::new();
+        let stderr = SharedOutput::build(&stderr_log_path).await?;
         if let Some(child_stderr) = child.stderr.take() {
             let stderr_clone = stderr.clone();
             tokio::spawn(async move {
@@ -91,6 +98,7 @@ impl Children {
         // Create MinecraftChild
         let mchild = MinecraftChild {
             uuid,
+            datetime_string,
             profile_path,
             current_child,
             stdout,
@@ -270,16 +278,18 @@ impl Default for Children {
 
 // SharedOutput, a wrapper around a String that can be read from and written to concurrently
 // Designed to be used with ChildStdout and ChildStderr in a tokio thread to have a simple String storage for the output of a child process
-#[derive(Clone, Debug)]
+#[derive(Debug, Clone)]
 pub struct SharedOutput {
     output: Arc<RwLock<String>>,
+    log_file : Arc<RwLock<File>>,
 }
 
 impl SharedOutput {
-    fn new() -> Self {
-        SharedOutput {
+    async fn build(log_file_path : &Path) -> crate::Result<Self> {
+        Ok(SharedOutput {
             output: Arc::new(RwLock::new(String::new())),
-        }
+            log_file : Arc::new(RwLock::new(File::create(log_file_path).await?)),
+        })
     }
 
     // Main entry function to a created SharedOutput, returns the log as a String
@@ -299,6 +309,10 @@ impl SharedOutput {
             {
                 let mut output = self.output.write().await;
                 output.push_str(&line);
+            }
+            {
+                let mut log_file = self.log_file.write().await;
+                log_file.write_all(&line.as_bytes());
             }
             line.clear();
         }
