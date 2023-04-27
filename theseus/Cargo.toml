@@ -19,7 +19,7 @@ zip = "0.5"
 async_zip = { version = "0.0.13", features = ["full"] }
 
 chrono = { version = "0.4.19", features = ["serde"] }
-daedalus = { version = "0.1.18" }
+daedalus = { version = "0.1.20" }
 dirs = "4.0"
 
 log = "0.4.14"

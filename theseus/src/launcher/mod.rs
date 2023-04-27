@@ -4,6 +4,7 @@ use crate::event::LoadingBarType;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
+    State,
 };
 use daedalus as d;
 use dunce::canonicalize;
@@ -55,7 +56,7 @@ pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<Uuid>,
 ) -> crate::Result<()> {
-    let state = st::State::get().await?;
+    let state = State::get().await?;
     let instance_path = &canonicalize(&profile.path)?;
     let metadata = state.metadata.read().await;
 
@@ -98,7 +99,6 @@ pub async fn install_minecraft(
     .await?;
 
     download::download_minecraft(&state, &version_info, loading_bar).await?;
-    st::State::sync().await?;
 
     let client_path = state
         .directories
@@ -201,7 +201,7 @@ pub async fn install_minecraft(
         async { Ok(()) }
     })
     .await?;
-    crate::api::profile::sync(&profile.path).await?;
+    State::sync().await?;
 
     Ok(())
 }
@@ -327,7 +327,7 @@ pub async fn launch_minecraft(
     let mut state_children = state.children.write().await;
     state_children
         .insert_process(
-            uuid::Uuid::new_v4(),
+            Uuid::new_v4(),
             instance_path.to_path_buf(),
             command,
             post_exit_hook,
@@ -337,9 +337,11 @@ pub async fn launch_minecraft(
 
 fn clear_cargo_env_vals(command: &mut Command) -> &mut Command {
     for (key, _) in std::env::vars() {
-        if key.starts_with("CARGO") {
-            command.env_remove(key);
-        }
+        command.env_remove(key);
+
+        // if key.starts_with("CARGO") {
+        //     command.env_remove(key);
+        // }
     }
     command
 }

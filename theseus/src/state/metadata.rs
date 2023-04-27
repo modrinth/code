@@ -1,6 +1,7 @@
 //! Theseus metadata
 use crate::data::DirectoryInfo;
 use crate::util::fetch::{read_json, write};
+use crate::State;
 use daedalus::{
     minecraft::{fetch_version_manifest, VersionManifest as MinecraftManifest},
     modded::{
@@ -96,7 +97,7 @@ impl Metadata {
     pub async fn update() {
         let res = async {
             let metadata_fetch = Metadata::fetch().await?;
-            let state = crate::State::get().await?;
+            let state = State::get().await?;
 
             let metadata_path =
                 state.directories.caches_meta_dir().join("metadata.json");
