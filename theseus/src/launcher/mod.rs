@@ -56,7 +56,7 @@ pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<Uuid>,
 ) -> crate::Result<()> {
-    let state = st::State::get().await?;
+    let state = State::get().await?;
     let instance_path = &canonicalize(&profile.path)?;
     let metadata = state.metadata.read().await;
 
@@ -337,9 +337,11 @@ pub async fn launch_minecraft(
 
 fn clear_cargo_env_vals(command: &mut Command) -> &mut Command {
     for (key, _) in std::env::vars() {
-        if key.starts_with("CARGO") {
-            command.env_remove(key);
-        }
+        command.env_remove(key);
+
+        // if key.starts_with("CARGO") {
+        //     command.env_remove(key);
+        // }
     }
     command
 }

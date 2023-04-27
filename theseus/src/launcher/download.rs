@@ -264,7 +264,7 @@ pub async fn download_libraries(
                         library
                             .natives
                             .as_ref()?
-                            .get(&Os::native())?,
+                            .get(&Os::native_arch())?,
                         library
                             .downloads
                             .as_ref()?

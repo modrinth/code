@@ -4,7 +4,9 @@
 )]
 
 use dunce::canonicalize;
+use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
+use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
 
 // A simple Rust implementation of the authentication run
@@ -31,8 +33,9 @@ async fn main() -> theseus::Result<()> {
 
     // Initialize state
     let st = State::get().await?;
-    State::update();
+    //State::update();
 
+    st.settings.write().await.java_globals = autodetect_java_globals().await?;
     st.settings.write().await.max_concurrent_downloads = 5;
     st.settings.write().await.hooks.post_exit =
         Some("echo This is after Minecraft runs- global setting!".to_string());
@@ -50,21 +53,21 @@ async fn main() -> theseus::Result<()> {
 
     println!("Creating/adding profile.");
 
-    // let name = "Example".to_string();
-    // let game_version = "1.19.2".to_string();
-    // let modloader = ModLoader::Fabric;
-    // let loader_version = "stable".to_string();
-    //
-    // let profile_path = profile_create(
-    //     name.clone(),
-    //     game_version,
-    //     modloader,
-    //     Some(loader_version),
-    //     None,
-    //     None,
-    //     None,
-    // )
-    // .await?;
+    let name = "Example".to_string();
+    let game_version = "1.18.2".to_string();
+    let modloader = ModLoader::Vanilla;
+    let loader_version = "stable".to_string();
+
+    let profile_path = profile_create(
+        name.clone(),
+        game_version,
+        modloader,
+        Some(loader_version),
+        None,
+        None,
+        None,
+    )
+    .await?;
 
     // let mut value = list().await?;
     // let profile_path = value.iter().next().map(|x| x.0).unwrap();
@@ -86,10 +89,10 @@ async fn main() -> theseus::Result<()> {
     // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
     //
     // profile::remove_project(&profile_path, &mod_menu_path).await?;
-    let profile_path =
-        pack::install_pack_from_version_id("zroFQG1k".to_string())
-            .await
-            .unwrap();
+    // let profile_path =
+    //     pack::install_pack_from_version_id("zroFQG1k".to_string())
+    //         .await
+    //         .unwrap();
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
@@ -123,9 +126,11 @@ async fn main() -> theseus::Result<()> {
 
     // Wait 5 seconds
     println!("Waiting 20 seconds to gather logs...");
-    sleep(Duration::from_secs(10)).await;
+    sleep(Duration::from_secs(20)).await;
     let stdout = process::get_stdout_by_uuid(&uuid).await?;
+    let stderr = process::get_stderr_by_uuid(&uuid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");
+    println!("Logs after 5sec <<< {stderr} >>> end stderr");
 
     println!(
         "All running process UUID {:?}",
