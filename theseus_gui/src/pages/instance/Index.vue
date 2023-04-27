@@ -15,6 +15,7 @@
             color="danger"
             class="instance-button"
             @click="stopInstance"
+            @mouseover="checkProcess"
           >
             <XIcon />
             Stop
@@ -24,6 +25,7 @@
             color="primary"
             class="instance-button"
             @click="startInstance"
+            @mouseover="checkProcess"
           >
             <PlayIcon />
             Play
@@ -61,7 +63,11 @@
 import { BoxIcon, SettingsIcon, FileIcon, XIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
-import { kill_by_uuid } from '@/helpers/process'
+import {
+  get_all_running_profile_paths,
+  get_uuids_by_profile_path,
+  kill_by_uuid,
+} from '@/helpers/process'
 import { useRoute } from 'vue-router'
 import { shallowRef, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -80,9 +86,32 @@ const startInstance = async () => {
   playing.value = true
 }
 
+const checkProcess = async () => {
+  const runningPaths = await get_all_running_profile_paths()
+  if (runningPaths.includes(instance.path)) {
+    playing.value = true
+
+    return
+  }
+
+  playing.value = false
+  uuid.value = null
+}
+
 const stopInstance = async () => {
   playing.value = false
-  await kill_by_uuid(uuid.value)
+
+  try {
+    if (!uuid.value) {
+      const uuids = await get_uuids_by_profile_path(instance.path)
+      uuids.forEach(async (u) => await kill_by_uuid(u))
+    } else await kill_by_uuid(uuid.value)
+  } catch (err) {
+    // Theseus currently throws:
+    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
+    // For now, we will catch and just warn
+    console.warn(err)
+  }
 }
 </script>
 
