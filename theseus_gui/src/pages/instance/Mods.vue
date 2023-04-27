@@ -36,7 +36,7 @@
       </div>
       <div v-for="mod in search" :key="mod.file_name" class="table-row">
         <div class="table-cell table-text">
-          <Button v-if="allUpdated === false && !mod.updated" icon-only @click="() => update(mod)">
+          <Button v-if="mod.outdated" icon-only @click="() => update(mod)">
             <UpdatedIcon />
           </Button>
           <Button v-else disabled icon-only>
@@ -108,6 +108,7 @@ for (const project of Object.values(props.instance.projects)) {
       file_name: project.file_name,
       icon: project.metadata.project.icon_url,
       disabled: project.disabled,
+      outdated: project.metadata.update_version,
     })
   } else if (project.metadata.type === 'inferred') {
     projects.value.push({
@@ -117,6 +118,7 @@ for (const project of Object.values(props.instance.projects)) {
       file_name: project.file_name,
       icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
       disabled: project.disabled,
+      outdated: false,
     })
   } else {
     projects.value.push({
@@ -126,6 +128,7 @@ for (const project of Object.values(props.instance.projects)) {
       file_name: project.file_name,
       icon: null,
       disabled: project.disabled,
+      outdated: false,
     })
   }
 }

@@ -689,9 +689,9 @@ dependencies = [
 
 [[package]]
 name = "daedalus"
-version = "0.1.18"
+version = "0.1.20"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "83c9c34a2d4904bcaa4cfa5f62b38c915c106fdc92a6a66276ae2bd5ba1b2527"
+checksum = "ab1ff8f873475996ff3d755659e5e0fbe5a2d02d6fc84ff2b625874a8c446973"
 dependencies = [
  "bincode",
  "bytes",

@@ -69,8 +69,8 @@ pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
         .map(|it| it.major_version)
         .unwrap_or(0)
     {
-        0..=16 => JAVA_8_KEY.to_string(),
-        17 => JAVA_17_KEY.to_string(),
+        0..=15 => JAVA_8_KEY.to_string(),
+        16..=17 => JAVA_17_KEY.to_string(),
         _ => JAVA_18PLUS_KEY.to_string(),
     };
     Ok(optimal_key)
