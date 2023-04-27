@@ -148,7 +148,14 @@ const stop = async (e) => {
     <div v-else-if="modLoading === true && playing === false" class="cta loading">
       <AnimatedLogo class="loading" />
     </div>
-    <div v-else-if="playing === true" class="stop cta button-base" @click="stop"><XIcon /></div>
+    <div
+      v-else-if="playing === true"
+      class="stop cta button-base"
+      @click="stop"
+      @mousehover="checkProcess"
+    >
+      <XIcon />
+    </div>
     <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
   </div>
