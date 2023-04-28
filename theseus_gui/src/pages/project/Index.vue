@@ -1,9 +1,9 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
-      <Instance v-if="instance" :instance="instance" small />
+      <Instance v-if="instance" :instance="instance" small/>
       <Card class="sidebar-card">
-        <Avatar size="lg" :src="data.icon_url" />
+        <Avatar size="lg" :src="data.icon_url"/>
         <div class="instance-info">
           <h2 class="name">{{ data.title }}</h2>
           {{ data.description }}
@@ -28,7 +28,7 @@
             :type="data.project_type"
           />
         </Categories>
-        <hr class="card-divider" />
+        <hr class="card-divider"/>
         <div class="button-group">
           <Button
             color="primary"
@@ -36,8 +36,8 @@
             :disabled="installed === true || installing === true"
             @click="install(null)"
           >
-            <DownloadIcon v-if="!installed && !installing" />
-            <CheckIcon v-else-if="installed" />
+            <DownloadIcon v-if="!installed && !installing"/>
+            <CheckIcon v-else-if="installed"/>
             {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
           </Button>
           <a
@@ -46,51 +46,51 @@
             target="_blank"
             class="btn"
           >
-            <ExternalIcon />
+            <ExternalIcon/>
             Site
           </a>
         </div>
-        <hr class="card-divider" />
+        <hr class="card-divider"/>
         <div class="stats">
           <div class="stat">
-            <DownloadIcon aria-hidden="true" />
+            <DownloadIcon aria-hidden="true"/>
             <p>
               <strong>{{ formatNumber(data.downloads) }}</strong>
               <span class="stat-label"> download<span v-if="data.downloads !== '1'">s</span></span>
             </p>
           </div>
           <div class="stat">
-            <HeartIcon aria-hidden="true" />
+            <HeartIcon aria-hidden="true"/>
             <p>
               <strong>{{ formatNumber(data.followers) }}</strong>
               <span class="stat-label"> follower<span v-if="data.followers !== '1'">s</span></span>
             </p>
           </div>
           <div class="stat date">
-            <CalendarIcon aria-hidden="true" />
+            <CalendarIcon aria-hidden="true"/>
             <span
-              ><span class="date-label">Created </span> {{ dayjs(data.published).fromNow() }}</span
+            ><span class="date-label">Created </span> {{ dayjs(data.published).fromNow() }}</span
             >
           </div>
           <div class="stat date">
-            <UpdatedIcon aria-hidden="true" />
+            <UpdatedIcon aria-hidden="true"/>
             <span
-              ><span class="date-label">Updated </span> {{ dayjs(data.updated).fromNow() }}</span
+            ><span class="date-label">Updated </span> {{ dayjs(data.updated).fromNow() }}</span
             >
           </div>
         </div>
-        <hr class="card-divider" />
+        <hr class="card-divider"/>
         <div class="button-group">
           <Button class="instance-button">
-            <ReportIcon />
+            <ReportIcon/>
             Report
           </Button>
           <Button class="instance-button">
-            <HeartIcon />
+            <HeartIcon/>
             Follow
           </Button>
         </div>
-        <hr class="card-divider" />
+        <hr class="card-divider"/>
         <div class="links">
           <a
             v-if="data.issues_url"
@@ -98,7 +98,7 @@
             class="title"
             rel="noopener nofollow ugc"
           >
-            <IssuesIcon aria-hidden="true" />
+            <IssuesIcon aria-hidden="true"/>
             <span>Issues</span>
           </a>
           <a
@@ -107,15 +107,15 @@
             class="title"
             rel="noopener nofollow ugc"
           >
-            <CodeIcon aria-hidden="true" />
+            <CodeIcon aria-hidden="true"/>
             <span>Source</span>
           </a>
           <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
-            <WikiIcon aria-hidden="true" />
+            <WikiIcon aria-hidden="true"/>
             <span>Wiki</span>
           </a>
           <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
-            <DiscordIcon aria-hidden="true" />
+            <DiscordIcon aria-hidden="true"/>
             <span>Discord</span>
           </a>
           <a
@@ -124,13 +124,13 @@
             :href="donation.url"
             rel="noopener nofollow ugc"
           >
-            <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
-            <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />
-            <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true" />
-            <PaypalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
-            <OpenCollectiveIcon v-else-if="donation.id === 'open-collective'" aria-hidden="true" />
-            <HeartIcon v-else-if="donation.id === 'github'" />
-            <CoinsIcon v-else />
+            <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true"/>
+            <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true"/>
+            <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true"/>
+            <PaypalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true"/>
+            <OpenCollectiveIcon v-else-if="donation.id === 'open-collective'" aria-hidden="true"/>
+            <HeartIcon v-else-if="donation.id === 'github'"/>
+            <CoinsIcon v-else/>
             <span v-if="donation.id === 'bmac'">Buy Me a Coffee</span>
             <span v-else-if="donation.id === 'patreon'">Patreon</span>
             <span v-else-if="donation.id === 'paypal'">PayPal</span>
@@ -142,7 +142,7 @@
       </Card>
     </div>
     <div v-if="data" class="content-container">
-      <Promotion />
+      <Promotion/>
       <Card class="tabs">
         <NavRow
           v-if="data.gallery.length > 0"
@@ -185,8 +185,8 @@
       />
     </div>
   </div>
-  <InstallConfirmModal ref="confirmModal" />
-  <InstanceInstallModal ref="modInstallModal" />
+  <InstallConfirmModal ref="confirmModal"/>
+  <InstanceInstallModal ref="modInstallModal"/>
 </template>
 
 <script setup>
@@ -219,20 +219,20 @@ import {
   KoFiIcon,
   OpenCollectiveIcon,
 } from '@/assets/external'
-import { get_categories, get_loaders } from '@/helpers/tags'
-import { install as packInstall } from '@/helpers/pack'
-import { list, add_project_from_version as installMod } from '@/helpers/profile'
+import {get_categories, get_loaders} from '@/helpers/tags'
+import {install as packInstall} from '@/helpers/pack'
+import {list, add_project_from_version as installMod} from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ofetch } from 'ofetch'
-import { useRoute, useRouter } from 'vue-router'
-import { ref, shallowRef, watch } from 'vue'
-import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
+import {ofetch} from 'ofetch'
+import {useRoute, useRouter} from 'vue-router'
+import {ref, shallowRef, watch} from 'vue'
+import {checkInstalled, installVersionDependencies} from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
-import { useSearch } from '@/store/search'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import {useSearch} from '@/store/search'
+import {useBreadcrumbs} from '@/store/breadcrumbs'
 
 const searchStore = useSearch()
 
@@ -292,7 +292,7 @@ async function install(version) {
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
       let id = await packInstall(queuedVersionData.id)
-      await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+      await router.push({path: `/instance/${encodeURIComponent(id)}`})
     } else {
       confirmModal.value.show(queuedVersionData.id)
     }
@@ -301,10 +301,9 @@ async function install(version) {
       if (!version) {
         const gameVersion = instance.value.metadata.game_version
         const loader = instance.value.metadata.loader
+        console.log(gameVersion, loader)
         const selectedVersion = versions.value.find(
-          (v) =>
-            v.game_versions.includes(gameVersion) &&
-            (v.loaders.includes(loader) || v.loaders.includes('minecraft'))
+          (v) => v.game_versions.includes(gameVersion) && (!data.value.project_type === 'mod' || v.loaders.includes(loader) || v.loaders.includes('minecraft'))
         )
         if (!selectedVersion) {
           installing.value = false

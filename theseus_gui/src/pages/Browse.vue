@@ -46,8 +46,6 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
   get_game_versions(),
 ])
 
-console.log(categories)
-
 const sortedCategories = computed(() => {
   const values = new Map()
   for (const category of categories.filter(
@@ -116,6 +114,7 @@ watch(
   (projectType) => {
     searchStore.projectType = projectType ?? 'modpack'
     handleReset()
+    breadcrumbs.setContext({ name: 'Browse', link: route.path })
   }
 )
 </script>
@@ -156,7 +155,7 @@ watch(
           />
         </div>
       </div>
-      <div v-if="showLoaders && searchStore.projectType !== 'datapack'" class="loaders">
+      <div v-if="showLoaders && searchStore.projectType !== 'datapack' && searchStore.projectType !== 'resourcepack' && searchStore.projectType !== 'shader'" class="loaders">
         <h2>Loaders</h2>
         <div
           v-for="loader in loaders.filter((l) =>
@@ -398,12 +397,11 @@ watch(
     position: fixed;
     width: 19rem;
     background: var(--color-raised-bg);
-    padding: 1rem 1rem 3rem 1rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    height: fit-content;
-    max-height: 100vh;
+    height: 100%;
+    max-height: calc(100vh - 3rem);
     overflow-y: auto;
 
     h2 {
