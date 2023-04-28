@@ -22,6 +22,12 @@
   white-space: nowrap;
 }
 
+.no-select {
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 a {
   color: var(--color-link);
   text-decoration: none;
