@@ -333,7 +333,6 @@ impl Profile {
                 project.disabled = true;
             }
 
-            dbg!("Setting from {} to {}", &path, &new_path);
             fs::rename(path, &new_path).await?;
 
             self.projects.insert(new_path.clone(), project);
