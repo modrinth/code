@@ -155,7 +155,15 @@ watch(
           />
         </div>
       </div>
-      <div v-if="showLoaders && searchStore.projectType !== 'datapack' && searchStore.projectType !== 'resourcepack' && searchStore.projectType !== 'shader'" class="loaders">
+      <div
+        v-if="
+          showLoaders &&
+          searchStore.projectType !== 'datapack' &&
+          searchStore.projectType !== 'resourcepack' &&
+          searchStore.projectType !== 'shader'
+        "
+        class="loaders"
+      >
         <h2>Loaders</h2>
         <div
           v-for="loader in loaders.filter((l) =>
