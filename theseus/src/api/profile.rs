@@ -1,4 +1,7 @@
 //! Theseus profile management interface
+use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
+use crate::event::LoadingBarType;
+use crate::state::ProjectMetadata;
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
@@ -22,7 +25,7 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get(path) {
+    if let Some(profile) = profiles.remove(path).await? {
         emit_profile(
             profile.uuid,
             profile.path.clone(),
@@ -31,8 +34,6 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
         )
         .await?;
     }
-
-    profiles.remove(path).await?;
 
     Ok(())
 }
@@ -88,6 +89,34 @@ pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>
 /// Query + sync profile's projects with the UI from the FS
 #[tracing::instrument]
 pub async fn sync(path: &Path) -> crate::Result<()> {
+    Box::pin({
+        async move {
+            let state = State::get().await?;
+            let result = {
+                let mut profiles: tokio::sync::RwLockWriteGuard<
+                    crate::state::Profiles,
+                > = state.profiles.write().await;
+
+                if let Some(profile) = profiles.0.get_mut(path) {
+                    profile.sync().await?;
+                    Ok(())
+                } else {
+                    Err(crate::ErrorKind::UnmanagedProfileError(
+                        path.display().to_string(),
+                    )
+                    .as_error())
+                }
+            };
+            State::sync().await?;
+            result
+        }
+    })
+    .await
+}
+
+/// Installs/Repairs a profile
+#[tracing::instrument]
+pub async fn install(path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
     let result = {
         let mut profiles: tokio::sync::RwLockWriteGuard<
@@ -95,7 +124,7 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
         > = state.profiles.write().await;
 
         if let Some(profile) = profiles.0.get_mut(path) {
-            profile.sync().await?;
+            crate::launcher::install_minecraft(profile, None).await?;
             Ok(())
         } else {
             Err(crate::ErrorKind::UnmanagedProfileError(
@@ -108,20 +137,128 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
     result
 }
 
-/// Add a project from a version
-#[tracing::instrument]
-pub async fn add_project_from_version(
-    profile: &Path,
+pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        let loading_bar = init_loading(
+            LoadingBarType::ProfileUpdate {
+                profile_uuid: profile.uuid,
+                profile_name: profile.metadata.name.clone(),
+            },
+            100.0,
+            "Updating profile...",
+        )
+        .await?;
+
+        use futures::StreamExt;
+        loading_try_for_each_concurrent(
+            futures::stream::iter(profile.projects.keys())
+                .map(Ok::<&PathBuf, crate::Error>),
+            None,
+            Some(&loading_bar),
+            100.0,
+            profile.projects.len(),
+            None,
+            |project| update_project(profile_path, project, Some(true)),
+        )
+        .await?;
+
+        profile.sync().await?;
+
+        Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile_path.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+pub async fn update_project(
+    profile_path: &Path,
+    project_path: &Path,
+    should_not_sync: Option<bool>,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        if let Some(project) = profile.projects.get(project_path) {
+            if let ProjectMetadata::Modrinth {
+                update_version: Some(update_version),
+                ..
+            } = &project.metadata
+            {
+                let path = profile
+                    .add_project_version(update_version.id.clone())
+                    .await?;
+
+                if path != project_path {
+                    profile.remove_project(project_path).await?;
+                }
+
+                if !should_not_sync.unwrap_or(false) {
+                    profile.sync().await?;
+                }
+            }
+        }
+
+        Ok(())
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile_path.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+/// Replaces a project given a new version ID
+pub async fn replace_project(
+    profile_path: &Path,
+    project: &Path,
     version_id: String,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile) {
-        profile.add_project_version(version_id).await
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        let path = profile.add_project_version(version_id).await?;
+
+        if path != project {
+            profile.remove_project(project).await?;
+        }
+
+        profile.sync().await?;
+
+        Ok(path)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
-            profile.display().to_string(),
+            profile_path.display().to_string(),
+        )
+        .as_error())
+    }
+}
+
+/// Add a project from a version
+#[tracing::instrument]
+pub async fn add_project_from_version(
+    profile_path: &Path,
+    version_id: String,
+) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+    let mut profiles = state.profiles.write().await;
+
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
+        let path = profile.add_project_version(version_id).await?;
+
+        profile.sync().await?;
+
+        Ok(path)
+    } else {
+        Err(crate::ErrorKind::UnmanagedProfileError(
+            profile_path.display().to_string(),
         )
         .as_error())
     }
@@ -130,14 +267,14 @@ pub async fn add_project_from_version(
 /// Add a project from an FS path
 #[tracing::instrument]
 pub async fn add_project_from_path(
-    profile: &Path,
+    profile_path: &Path,
     path: &Path,
     project_type: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile) {
+    if let Some(profile) = profiles.0.get_mut(profile_path) {
         let file = fs::read(path).await?;
         let file_name = path
             .file_name()
@@ -145,16 +282,20 @@ pub async fn add_project_from_path(
             .to_string_lossy()
             .to_string();
 
-        profile
+        let path = profile
             .add_project_bytes(
                 &file_name,
                 bytes::Bytes::from(file),
                 project_type.and_then(|x| serde_json::from_str(&x).ok()),
             )
-            .await
+            .await?;
+
+        profile.sync().await?;
+
+        Ok(path)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
-            profile.display().to_string(),
+            profile_path.display().to_string(),
         )
         .as_error())
     }
@@ -214,7 +355,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     } else {
         // If no default account, try to use a logged in account
         let users = auth::users().await?;
-        let last_account = users.iter().next();
+        let last_account = users.first();
         if let Some(last_account) = last_account {
             refresh(last_account.id).await?
         } else {
@@ -233,6 +374,7 @@ pub async fn run_credentials(
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
     let settings = state.settings.read().await;
+    let metadata = state.metadata.read().await;
     let profile = get(path).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to run a nonexistent or unloaded profile at path {}!",
@@ -240,8 +382,7 @@ pub async fn run_credentials(
         ))
     })?;
 
-    let version = state
-        .metadata
+    let version = metadata
         .minecraft
         .versions
         .iter()
@@ -256,6 +397,7 @@ pub async fn run_credentials(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
     )
     .await?;
     let pre_launch_hooks =
@@ -358,9 +500,6 @@ pub async fn run_credentials(
     };
 
     let mc_process = crate::launcher::launch_minecraft(
-        &profile.metadata.game_version,
-        &profile.metadata.loader_version,
-        &profile.path,
         java_install,
         java_args,
         env_args,

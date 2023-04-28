@@ -47,7 +47,7 @@ pub async fn authenticate(
     })?;
 
     let credentials = flow.extract_credentials(&state.io_semaphore).await?;
-    users.insert(&credentials)?;
+    users.insert(&credentials).await?;
 
     if state.settings.read().await.default_user.is_none() {
         let mut settings = state.settings.write().await;
@@ -65,7 +65,7 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     let mut users = state.users.write().await;
 
     let io_sempahore = &state.io_semaphore;
-    futures::future::ready(users.get(user)?.ok_or_else(|| {
+    futures::future::ready(users.get(user).ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to refresh nonexistent user with ID {user}"
         ))
@@ -75,7 +75,7 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
         if chrono::offset::Utc::now() > credentials.expires {
             inner::refresh_credentials(&mut credentials, io_sempahore).await?;
         }
-        users.insert(&credentials)?;
+        users.insert(&credentials).await?;
         Ok(credentials)
     })
     .await
@@ -89,14 +89,10 @@ pub async fn remove_user(user: uuid::Uuid) -> crate::Result<()> {
 
     if state.settings.read().await.default_user == Some(user) {
         let mut settings = state.settings.write().await;
-        settings.default_user = users
-            .0
-            .first()?
-            .map(|it| uuid::Uuid::from_slice(&it.0))
-            .transpose()?;
+        settings.default_user = users.0.values().next().map(|it| it.id);
     }
 
-    users.remove(user)?;
+    users.remove(user).await?;
     Ok(())
 }
 
@@ -106,15 +102,15 @@ pub async fn has_user(user: uuid::Uuid) -> crate::Result<bool> {
     let state = State::get().await?;
     let users = state.users.read().await;
 
-    users.contains(user)
+    Ok(users.contains(user))
 }
 
 /// Get a copy of the list of all user credentials
 #[tracing::instrument]
-pub async fn users() -> crate::Result<Box<[Credentials]>> {
+pub async fn users() -> crate::Result<Vec<Credentials>> {
     let state = State::get().await?;
     let users = state.users.read().await;
-    users.iter().collect()
+    Ok(users.0.values().cloned().collect())
 }
 
 /// Get a specific user by user ID
@@ -123,7 +119,7 @@ pub async fn users() -> crate::Result<Box<[Credentials]>> {
 pub async fn get_user(user: uuid::Uuid) -> crate::Result<Credentials> {
     let state = State::get().await?;
     let users = state.users.read().await;
-    let user = users.get(user)?.ok_or_else(|| {
+    let user = users.get(user).ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to get nonexistent user with ID {user}"
         ))

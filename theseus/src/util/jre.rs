@@ -168,7 +168,6 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
             }
         }
     }
-    dbg!(&jre_paths);
 
     // Get JRE versions from potential paths concurrently
     let j = check_java_at_filepaths(jre_paths)

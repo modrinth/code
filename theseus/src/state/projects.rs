@@ -1,6 +1,7 @@
 //! Project management + inference
 
 use crate::config::MODRINTH_API_URL;
+use crate::state::Profile;
 use crate::util::fetch::{fetch_json, write_cached_icon};
 use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
@@ -185,6 +186,8 @@ pub enum ProjectMetadata {
         project: Box<ModrinthProject>,
         version: Box<ModrinthVersion>,
         members: Vec<ModrinthTeamMember>,
+        update_version: Option<Box<ModrinthVersion>>,
+        incompatible: bool,
     },
     Inferred {
         title: Option<String>,
@@ -246,6 +249,7 @@ async fn read_icon_from_file(
 }
 
 pub async fn infer_data_from_files(
+    profile: Profile,
     paths: Vec<PathBuf>,
     cache_dir: PathBuf,
     io_semaphore: &RwLock<Semaphore>,
@@ -253,7 +257,7 @@ pub async fn infer_data_from_files(
     let mut file_path_hashes = HashMap::new();
 
     // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
-    for path in paths.clone() {
+    for path in paths {
         let mut file = tokio::fs::File::open(path.clone()).await?;
 
         let mut buffer = Vec::new();
@@ -263,17 +267,33 @@ pub async fn infer_data_from_files(
         file_path_hashes.insert(hash, path.clone());
     }
 
-    let files: HashMap<String, ModrinthVersion> = fetch_json(
-        Method::POST,
-        &format!("{}version_files", MODRINTH_API_URL),
-        None,
-        Some(json!({
-            "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
-            "algorithm": "sha512",
-        })),
-        io_semaphore,
-    )
-    .await?;
+    let files_url = format!("{}version_files", MODRINTH_API_URL);
+    let updates_url = format!("{}version_files/update", MODRINTH_API_URL);
+    let (files, update_versions) = tokio::try_join!(
+        fetch_json::<HashMap<String, ModrinthVersion>>(
+            Method::POST,
+            &files_url,
+            None,
+            Some(json!({
+                "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+                "algorithm": "sha512",
+            })),
+            io_semaphore,
+        ),
+        fetch_json::<HashMap<String, ModrinthVersion>>(
+            Method::POST,
+            &updates_url,
+            None,
+            Some(json!({
+                "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+                "algorithm": "sha512",
+                "loaders": [profile.metadata.loader],
+                "game_versions": [profile.metadata.game_version]
+            })),
+            io_semaphore,
+        )
+    )?;
+
     let projects: Vec<ModrinthProject> = fetch_json(
         Method::GET,
         &format!(
@@ -326,22 +346,31 @@ pub async fn infer_data_from_files(
                     .to_string_lossy()
                     .to_string();
 
-                let team_members = teams
-                    .iter()
-                    .filter(|x| x.team_id == project.team)
-                    .cloned()
-                    .collect::<Vec<_>>();
-
                 return_projects.insert(
                     path,
                     Project {
-                        sha512: hash,
                         disabled: false,
                         metadata: ProjectMetadata::Modrinth {
                             project: Box::new(project.clone()),
                             version: Box::new(version.clone()),
-                            members: team_members,
+                            members: teams
+                                .iter()
+                                .filter(|x| x.team_id == project.team)
+                                .cloned()
+                                .collect::<Vec<_>>(),
+                            update_version: update_versions.get(&hash).map(|val| Box::new(val.clone())),
+
+                            incompatible: !version.loaders.contains(
+                                &profile
+                                    .metadata
+                                    .loader
+                                    .as_api_str()
+                                    .to_string(),
+                            ) || version
+                                .game_versions
+                                .contains(&profile.metadata.game_version),
                         },
+                        sha512: hash,
                         file_name,
                     },
                 );

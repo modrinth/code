@@ -1,10 +1,8 @@
 use super::settings::{Hooks, MemorySettings, WindowSize};
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
-use crate::event::emit::{
-    emit_profile, init_loading, loading_try_for_each_concurrent,
-};
-use crate::event::{LoadingBarType, ProfilePayloadType};
+use crate::event::emit::emit_profile;
+use crate::event::ProfilePayloadType;
 use crate::state::projects::Project;
 use crate::state::{ModrinthVersion, ProjectType};
 use crate::util::fetch::{fetch, fetch_json, write, write_cached_icon};
@@ -34,6 +32,8 @@ pub const CURRENT_FORMAT_VERSION: u32 = 1;
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
+    #[serde(default)]
+    pub installed: bool,
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -58,10 +58,15 @@ pub struct ProfileMetadata {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub loader_version: Option<LoaderVersion>,
     pub format_version: u32,
-    pub linked_project_id: Option<String>,
+    pub linked_data: Option<LinkedData>,
 }
 
-// TODO: Quilt?
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct LinkedData {
+    pub project_id: Option<String>,
+    pub version_id: Option<String>,
+}
+
 #[derive(
     Debug, Eq, PartialEq, Clone, Copy, Deserialize, Serialize, Default,
 )]
@@ -82,6 +87,17 @@ impl std::fmt::Display for ModLoader {
             Self::Fabric => "Fabric",
             Self::Quilt => "Quilt",
         })
+    }
+}
+
+impl ModLoader {
+    pub(crate) fn as_api_str(&self) -> &'static str {
+        match *self {
+            Self::Vanilla => "vanilla",
+            Self::Forge => "forge",
+            Self::Fabric => "fabric",
+            Self::Quilt => "quilt",
+        }
     }
 }
 
@@ -110,6 +126,7 @@ impl Profile {
 
         Ok(Self {
             uuid,
+            installed: false,
             path: canonicalize(path)?,
             metadata: ProfileMetadata {
                 name,
@@ -118,7 +135,7 @@ impl Profile {
                 loader: ModLoader::Vanilla,
                 loader_version: None,
                 format_version: CURRENT_FORMAT_VERSION,
-                linked_project_id: None,
+                linked_data: None,
             },
             projects: HashMap::new(),
             java: None,
@@ -147,6 +164,7 @@ impl Profile {
 
         let paths = self.get_profile_project_paths()?;
         let projects = crate::state::infer_data_from_files(
+            self.clone(),
             paths,
             state.directories.caches_dir(),
             &state.io_semaphore,
@@ -154,6 +172,14 @@ impl Profile {
         .await?;
 
         self.projects = projects;
+
+        emit_profile(
+            self.uuid,
+            self.path.clone(),
+            &self.metadata.name,
+            ProfilePayloadType::Synced,
+        )
+        .await?;
 
         Ok(())
     }
@@ -266,8 +292,6 @@ impl Profile {
         let path = self.path.join(project_type.get_folder()).join(file_name);
         write(&path, &bytes, &state.io_semaphore).await?;
 
-        self.sync().await?;
-
         Ok(path)
     }
 
@@ -345,34 +369,57 @@ impl Profiles {
             }
         }
 
-        // project path, parent profile path
-        let mut files: HashMap<PathBuf, PathBuf> = HashMap::new();
-        {
-            for (profile_path, profile) in profiles.iter() {
-                let paths = profile.get_profile_project_paths()?;
-
-                for path in paths {
-                    files.insert(path, profile_path.clone());
-                }
-            }
-        }
-
-        let inferred = super::projects::infer_data_from_files(
-            files.keys().cloned().collect(),
-            dirs.caches_dir(),
-            io_sempahore,
-        )
-        .await?;
-
-        for (key, value) in inferred {
-            if let Some(profile_path) = files.get(&key) {
-                if let Some(profile) = profiles.get_mut(profile_path) {
-                    profile.projects.insert(key, value);
-                }
-            }
-        }
-
         Ok(Self(profiles))
+    }
+
+    pub async fn update_projects() {
+        let res = async {
+            let state = State::get().await?;
+
+            // profile, child paths
+            let mut files: Vec<(Profile, Vec<PathBuf>)> = Vec::new();
+            {
+                let profiles = state.profiles.read().await;
+                for (_profile_path, profile) in profiles.0.iter() {
+                    let paths = profile.get_profile_project_paths()?;
+
+                    files.push((profile.clone(), paths));
+                }
+            }
+
+            future::try_join_all(files.into_iter().map(
+                |(profile, files)| async {
+                    let profile_path = profile.path.clone();
+                    let inferred = super::projects::infer_data_from_files(
+                        profile,
+                        files,
+                        state.directories.caches_dir(),
+                        &state.io_semaphore,
+                    )
+                    .await?;
+
+                    let mut new_profiles = state.profiles.write().await;
+                    if let Some(profile) = new_profiles.0.get_mut(&profile_path)
+                    {
+                        profile.projects = inferred;
+                    }
+                    drop(new_profiles);
+
+                    Ok::<(), crate::Error>(())
+                },
+            ))
+            .await?;
+
+            Ok::<(), crate::Error>(())
+        }
+        .await;
+
+        match res {
+            Ok(()) => {}
+            Err(err) => {
+                log::warn!("Unable to fetch profile projects: {err}")
+            }
+        };
     }
 
     #[tracing::instrument(skip(self))]
@@ -406,35 +453,26 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip(self))]
-    pub async fn remove(&mut self, path: &Path) -> crate::Result<&Self> {
+    pub async fn remove(
+        &mut self,
+        path: &Path,
+    ) -> crate::Result<Option<Profile>> {
         let path =
             PathBuf::from(&canonicalize(path)?.to_string_lossy().to_string());
-        self.0.remove(&path);
+        let profile = self.0.remove(&path);
 
         if path.exists() {
             fs::remove_dir_all(path).await?;
         }
 
-        Ok(self)
+        Ok(profile)
     }
 
     #[tracing::instrument(skip_all)]
     pub async fn sync(&self) -> crate::Result<&Self> {
-        let loading_bar = init_loading(
-            LoadingBarType::ProfileSync,
-            100.0,
-            "Syncing profiles...",
-        )
-        .await?;
-        let num_futs = self.0.len();
-        loading_try_for_each_concurrent(
-            stream::iter(self.0.iter()).map(Ok::<_, crate::Error>),
-            None,
-            Some(&loading_bar),
-            100.0,
-            num_futs,
-            None,
-            |(path, profile)| async move {
+        stream::iter(self.0.iter())
+            .map(Ok::<_, crate::Error>)
+            .try_for_each_concurrent(None, |(path, profile)| async move {
                 let json = serde_json::to_vec(&profile)?;
 
                 let json_path = Path::new(&path.to_string_lossy().to_string())
@@ -442,9 +480,8 @@ impl Profiles {
 
                 fs::write(json_path, json).await?;
                 Ok::<_, crate::Error>(())
-            },
-        )
-        .await?;
+            })
+            .await?;
 
         Ok(self)
     }

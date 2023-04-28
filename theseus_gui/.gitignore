@@ -9,8 +9,6 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-generated.js
-
 node_modules
 *.local
 
@@ -24,5 +22,3 @@ node_modules
 *.njsproj
 *.sln
 *.sw?
-
-generated.js

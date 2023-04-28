@@ -13,31 +13,33 @@ export default new createRouter({
       path: '/',
       name: 'Home',
       component: Pages.Index,
+      meta: {
+        breadcrumb: [{ name: 'Home' }],
+      },
     },
     {
       path: '/browse',
       name: 'Browse',
       component: Pages.Browse,
+      meta: {
+        breadcrumb: [{ name: 'Browse' }],
+      },
     },
     {
       path: '/library',
       name: 'Library',
       component: Pages.Library,
-    },
-    {
-      path: '/add-instance',
-      name: 'Add Instance',
-      component: Pages.AddInstance,
-    },
-    {
-      path: '/project',
-      name: 'Project',
-      component: Pages.Project,
+      meta: {
+        breadcrumb: [{ name: 'Library' }],
+      },
     },
     {
       path: '/settings',
       name: 'Settings',
       component: Pages.Settings,
+      meta: {
+        breadcrumb: [{ name: 'Settings' }],
+      },
     },
     {
       path: '/project/:id',
@@ -49,22 +51,42 @@ export default new createRouter({
           path: '',
           name: 'Description',
           component: Project.Description,
+          meta: {
+            useContext: true,
+            breadcrumb: [{ name: '?Project' }],
+          },
         },
         {
           path: 'versions',
           name: 'Versions',
           component: Project.Versions,
+          meta: {
+            useContext: true,
+            breadcrumb: [{ name: '?Project', link: '/project/{id}/' }, { name: 'Versions' }],
+          },
         },
         {
           path: 'version/:version',
           name: 'Version',
           component: Project.Version,
           props: true,
+          meta: {
+            useContext: true,
+            breadcrumb: [
+              { name: '?Project', link: '/project/{id}/' },
+              { name: 'Versions', link: '/project/{id}/versions' },
+              { name: '?Version' },
+            ],
+          },
         },
         {
           path: 'gallery',
           name: 'Gallery',
           component: Project.Gallery,
+          meta: {
+            useContext: true,
+            breadcrumb: [{ name: '?Project', link: '/project/{id}/' }, { name: 'Gallery' }],
+          },
         },
       ],
     },
@@ -78,16 +100,28 @@ export default new createRouter({
           path: '',
           name: 'Mods',
           component: Instance.Mods,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance' }],
+          },
         },
         {
           path: 'options',
           name: 'Options',
           component: Instance.Options,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Options' }],
+          },
         },
         {
           path: 'logs',
           name: 'Logs',
           component: Instance.Logs,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance', link: '/instance/{id}/' }, { name: 'Logs' }],
+          },
         },
       ],
     },

@@ -25,11 +25,6 @@ export async function get_game_versions() {
   return await invoke('tags_get_game_versions')
 }
 
-// Gets cached licenses tags
-export async function get_licenses() {
-  return await invoke('tags_get_licenses')
-}
-
 // Gets cached donation_platforms tags
 export async function get_donation_platforms() {
   return await invoke('tags_get_donation_platforms')
