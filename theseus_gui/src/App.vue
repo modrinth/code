@@ -13,9 +13,9 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 const themeStore = useTheming()
 
 onMounted(async () => {
-  const { theme } = await get()
-  themeStore.setThemeState(theme)
-  themeStore.collapsedNav = theme.collapsedNav
+  const { settings, collapsed_navigation } = await get()
+  themeStore.setThemeState(settings)
+  themeStore.collapsedNavigation = collapsed_navigation
 })
 
 const installedMods = ref(0)
@@ -31,59 +31,59 @@ list().then(
 
 <template>
   <div class="container">
-    <div class="nav-container" :class="{ expanded: !themeStore.collapsedNav }">
+    <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
-          <AccountsCard ref="accounts" :expanded="!themeStore.collapsedNav" />
+          <AccountsCard ref="accounts" :expanded="!themeStore.collapsedNavigation" />
         </suspense>
         <div class="pages-list">
           <RouterLink
             to="/"
             class="btn"
             :class="{
-              'icon-only': themeStore.collapsedNav,
-              'collapsed-button': themeStore.collapsedNav,
-              'expanded-button': !themeStore.collapsedNav,
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
             }"
           >
             <HomeIcon />
-            <span v-if="!themeStore.collapsedNav">Home</span>
+            <span v-if="!themeStore.collapsedNavigation">Home</span>
           </RouterLink>
           <RouterLink
             to="/browse"
             class="btn"
             :class="{
-              'icon-only': themeStore.collapsedNav,
-              'collapsed-button': themeStore.collapsedNav,
-              'expanded-button': !themeStore.collapsedNav,
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
             }"
           >
             <SearchIcon />
-            <span v-if="!themeStore.collapsedNav">Browse</span>
+            <span v-if="!themeStore.collapsedNavigation">Browse</span>
           </RouterLink>
           <RouterLink
             to="/library"
             class="btn"
             :class="{
-              'icon-only': themeStore.collapsedNav,
-              'collapsed-button': themeStore.collapsedNav,
-              'expanded-button': !themeStore.collapsedNav,
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
             }"
           >
             <LibraryIcon />
-            <span v-if="!themeStore.collapsedNav">Library</span>
+            <span v-if="!themeStore.collapsedNavigation">Library</span>
           </RouterLink>
           <Button
             color="primary"
             :class="{
-              'icon-only': themeStore.collapsedNav,
-              'collapsed-button': themeStore.collapsedNav,
-              'expanded-button': !themeStore.collapsedNav,
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
             }"
             @click="() => $refs.installationModal.show()"
           >
             <PlusIcon />
-            <span v-if="!themeStore.collapsedNav" class="no-wrap">New Instance</span>
+            <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New Instance</span>
           </Button>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
@@ -95,17 +95,17 @@ list().then(
           to="/settings"
           class="btn"
           :class="{
-            'icon-only': themeStore.collapsedNav,
-            'collapsed-button': themeStore.collapsedNav,
-            'expanded-button': !themeStore.collapsedNav,
+            'icon-only': themeStore.collapsedNavigation,
+            'collapsed-button': themeStore.collapsedNavigation,
+            'expanded-button': !themeStore.collapsedNavigation,
           }"
         >
           <SettingsIcon />
-          <span v-if="!themeStore.collapsedNav">Settings</span>
+          <span v-if="!themeStore.collapsedNavigation">Settings</span>
         </RouterLink>
       </div>
     </div>
-    <div class="view" :class="{ expanded: !themeStore.collapsedNav }">
+    <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="appbar">
         <section class="navigation-controls">
           <Breadcrumbs />

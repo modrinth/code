@@ -48,8 +48,8 @@ const handleTheme = async (e) => {
 }
 
 const handleCollapse = async (e) => {
-  themeStore.collapsedNav = e
-  settings.value.collapsedNav = themeStore.collapsedNav
+  themeStore.collapsedNavigation = e
+  settings.value.collapsed_navigation = themeStore.collapsedNavigation
   await set(settings.value)
 }
 
@@ -184,11 +184,12 @@ const setJavaInstall = (javaInstall) => {
       </div>
       <div class="toggle-setting">
         <div class="description">
-          <h3>Collapsed Navigation mode</h3>
+          <h3>Collapsed navigation mode</h3>
           <p>Change the style of the side navigation bar</p>
         </div>
         <Toggle
-          :model-value="themeStore.collapsedNav"
+          :model-value="themeStore.collapsedNavigation"
+          :checked="themeStore.collapsedNavigation"
           @update:model-value="(value) => handleCollapse(value)"
         />
       </div>
