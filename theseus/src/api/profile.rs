@@ -1,6 +1,7 @@
 //! Theseus profile management interface
 use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
 use crate::event::LoadingBarType;
+use crate::prelude::ChangedFilename;
 use crate::state::ProjectMetadata;
 use crate::{
     auth::{self, refresh},
@@ -297,18 +298,19 @@ pub async fn add_project_from_path(
 }
 
 /// Toggle whether a project is disabled or not
+/// Returns new filename (with .disabled added or removed)
 #[tracing::instrument]
 pub async fn toggle_disable_project(
     profile: &Path,
     project: &Path,
-) -> crate::Result<()> {
+) -> crate::Result<ChangedFilename> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.0.get_mut(profile) {
-        profile.toggle_disable_project(project).await?;
-
-        Ok(())
+        let new_path = profile.toggle_disable_project(project).await?;
+        profiles.sync().await?; // sync to disk
+        Ok(new_path)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
@@ -328,6 +330,7 @@ pub async fn remove_project(
 
     if let Some(profile) = profiles.0.get_mut(profile) {
         profile.remove_project(project).await?;
+        profile.sync().await?;
 
         Ok(())
     } else {

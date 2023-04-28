@@ -109,6 +109,13 @@ pub struct JavaSettings {
     pub extra_arguments: Option<Vec<String>>,
 }
 
+// If filepath of a project is changed, a struct to pass that new name change upstream
+#[derive(Serialize)]
+pub struct ChangedFilename {
+    pub file_path: PathBuf, // full new path to proj
+    pub file_name: String,  // new file name
+}
+
 impl Profile {
     #[tracing::instrument]
     pub async fn new(
@@ -295,36 +302,56 @@ impl Profile {
         Ok(path)
     }
 
+    // Returns  String of new project filename
     pub async fn toggle_disable_project(
         &mut self,
         path: &Path,
-    ) -> crate::Result<()> {
+    ) -> crate::Result<ChangedFilename> {
         if let Some(mut project) = self.projects.remove(path) {
             let path = path.to_path_buf();
-            let mut new_path = path.clone();
 
+            let mut new_path = path.clone();
             if path.extension().map_or(false, |ext| ext == "disabled") {
-                project.disabled = false;
+                if let Some(stem) = path.file_stem() {
+                    new_path.set_file_name(stem);
+                    project.file_name = stem.to_string_lossy().to_string();
+                    project.disabled = false;
+                } else {
+                    return Err(crate::ErrorKind::InputError(format!(
+                        "Could not extract file stem from file: {:?}",
+                        path
+                    ))
+                    .into());
+                }
             } else {
-                new_path.set_file_name(format!(
+                let new_filename = format!(
                     "{}.disabled",
                     path.file_name().unwrap_or_default().to_string_lossy()
-                ));
+                );
+                new_path.set_file_name(&new_filename);
+                project.file_name = new_filename;
                 project.disabled = true;
             }
 
+            dbg!("Setting from {} to {}", &path, &new_path);
             fs::rename(path, &new_path).await?;
 
-            self.projects.insert(new_path, project);
+            self.projects.insert(new_path.clone(), project);
+            Ok(ChangedFilename {
+                file_path: new_path.clone(),
+                file_name: new_path
+                    .file_name()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string(),
+            })
         } else {
-            return Err(crate::ErrorKind::InputError(format!(
+            Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
                 path
             ))
-            .into());
+            .into())
         }
-
-        Ok(())
     }
 
     pub async fn remove_project(&mut self, path: &Path) -> crate::Result<()> {

@@ -196,7 +196,13 @@ const update = async (mod) => {
 
 const handleDisable = async (mod) => {
   const project = getProject(mod)
-  await toggle_disable_project(props.instance.path, project)
+  const changed_file = await toggle_disable_project(props.instance.path, project)
+  console.log(changed_file.file_name) // file name
+  console.log(changed_file.file_path) // full file path
+  /*
+    change js stored values to match new actual ones
+    or simply reload all of them (if reloaded from json file, like if you close and reopen, they will match)
+  */
 }
 
 const deleteMod = async (mod) => {
