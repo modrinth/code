@@ -102,9 +102,11 @@ fn main() {
             api::metadata::metadata_get_fabric_versions,
             api::metadata::metadata_get_forge_versions,
             api::logs::logs_get_logs,
-            api::logs::logs_get_log_by_datetime,
+            api::logs::logs_get_logs_by_datetime,
             api::logs::logs_get_stdout_by_datetime,
             api::logs::logs_get_stderr_by_datetime,
+            api::logs::logs_delete_logs,
+            api::logs::logs_delete_logs_by_datetime,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

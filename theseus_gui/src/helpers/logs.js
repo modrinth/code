@@ -22,8 +22,8 @@ export async function get_logs(profileUuid) {
 }
 
 /// Get a profile's log by datetime_string (the folder name, when the log was created)
-export async function get_log_by_datetime(profileUuid, datetimeString) {
-  return await invoke('logs_get_log_by_datetime', { profileUuid, datetimeString })
+export async function get_logs_by_datetime(profileUuid, datetimeString) {
+  return await invoke('logs_get_logs_by_datetime', { profileUuid, datetimeString })
 }
 
 /// Get a profile's stdout only by datetime_string (the folder name, when the log was created)
@@ -34,4 +34,14 @@ export async function get_stdout_by_datetime(profileUuid, datetimeString) {
 /// Get a profile's stderr only by datetime_string (the folder name, when the log was created)
 export async function get_stderr_by_datetime(profileUuid, datetimeString) {
   return await invoke('logs_get_stderr_by_datetime', { profileUuid, datetimeString })
+}
+
+/// Delete a profile's log by datetime_string (the folder name, when the log was created)
+export async function delete_logs_by_datetime(profileUuid, datetimeString) {
+  return await invoke('logs_delete_logs_by_datetime', { profileUuid, datetimeString })
+}
+
+/// Delete all logs for a given profile
+export async function delete_logs(profileUuid) {
+  return await invoke('logs_delete_logs', { profileUuid })
 }
