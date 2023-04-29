@@ -1,5 +1,5 @@
 <script setup>
-import {computed, onMounted, ref, watch} from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
