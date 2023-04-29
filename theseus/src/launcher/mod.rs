@@ -324,14 +324,17 @@ pub async fn launch_minecraft(
     clear_cargo_env_vals(&mut command).envs(env_args);
 
     // Get Modrinth logs directories
-    let datetime_string = chrono::Local::now().format("%Y%m%y_%H%M%S").to_string();
+    let datetime_string =
+        chrono::Local::now().format("%Y%m%y_%H%M%S").to_string();
     let logs_dir = {
         let st = State::get().await?;
-        st.directories.profile_logs_dir(profile.uuid).join(&datetime_string)
+        st.directories
+            .profile_logs_dir(profile.uuid)
+            .join(&datetime_string)
     };
     fs::create_dir_all(&logs_dir)?;
-    
-    let stdout_log_path =  logs_dir.join("stdout.log");
+
+    let stdout_log_path = logs_dir.join("stdout.log");
     let stderr_log_path = logs_dir.join("stderr.log");
 
     // Create Minecraft child by inserting it into the state

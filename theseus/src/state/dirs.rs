@@ -119,7 +119,9 @@ impl DirectoryInfo {
     /// Gets the logs dir for a given profile
     #[inline]
     pub fn profile_logs_dir(&self, profile: uuid::Uuid) -> PathBuf {
-        self.profiles_dir().join(profile.to_string()).join("modrinth_logs")
+        self.profiles_dir()
+            .join(profile.to_string())
+            .join("modrinth_logs")
     }
 
     /// Get the file containing the global database

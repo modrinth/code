@@ -1,19 +1,24 @@
 //! Authentication flow interface
 use crate::State;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use tokio::fs::read_to_string;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Logs {
-    pub datetime_string:  String,
+    pub datetime_string: String,
     pub stdout: String,
     pub stderr: String,
 }
 impl Logs {
-    async fn build(profile_uuid : uuid::Uuid,  datetime_string: String) -> crate::Result<Self> {
+    async fn build(
+        profile_uuid: uuid::Uuid,
+        datetime_string: String,
+    ) -> crate::Result<Self> {
         Ok(Self {
-            stdout: get_stdout_by_datetime(profile_uuid, &datetime_string).await?,
-            stderr: get_stderr_by_datetime(profile_uuid, &datetime_string).await?,
+            stdout: get_stdout_by_datetime(profile_uuid, &datetime_string)
+                .await?,
+            stderr: get_stderr_by_datetime(profile_uuid, &datetime_string)
+                .await?,
             datetime_string,
         })
     }
@@ -29,7 +34,13 @@ pub async fn get_logs(profile_uuid: uuid::Uuid) -> crate::Result<Vec<Logs>> {
         let path = entry.path();
         if path.is_dir() {
             if let Some(datetime_string) = path.file_name() {
-                logs.push(Logs::build(profile_uuid, datetime_string.to_string_lossy().to_string()).await);
+                logs.push(
+                    Logs::build(
+                        profile_uuid,
+                        datetime_string.to_string_lossy().to_string(),
+                    )
+                    .await,
+                );
             }
         }
     }
@@ -39,7 +50,10 @@ pub async fn get_logs(profile_uuid: uuid::Uuid) -> crate::Result<Vec<Logs>> {
 }
 
 #[tracing::instrument]
-pub async fn get_log_by_datetime(profile_uuid : uuid::Uuid, datetime_string : String) -> crate::Result<Logs> {
+pub async fn get_log_by_datetime(
+    profile_uuid: uuid::Uuid,
+    datetime_string: String,
+) -> crate::Result<Logs> {
     Ok(Logs {
         stdout: get_stdout_by_datetime(profile_uuid, &datetime_string).await?,
         stderr: get_stderr_by_datetime(profile_uuid, &datetime_string).await?,
@@ -48,15 +62,27 @@ pub async fn get_log_by_datetime(profile_uuid : uuid::Uuid, datetime_string : St
 }
 
 #[tracing::instrument]
-pub async fn get_stdout_by_datetime(profile_uuid : uuid::Uuid, datetime_string : &str) -> crate::Result<String> {
+pub async fn get_stdout_by_datetime(
+    profile_uuid: uuid::Uuid,
+    datetime_string: &str,
+) -> crate::Result<String> {
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(profile_uuid);
-    Ok(read_to_string(logs_folder.join(datetime_string).join("stdout.log")).await?)
+    Ok(
+        read_to_string(logs_folder.join(datetime_string).join("stdout.log"))
+            .await?,
+    )
 }
 
 #[tracing::instrument]
-pub async fn get_stderr_by_datetime(profile_uuid : uuid::Uuid, datetime_string : &str) -> crate::Result<String> {
+pub async fn get_stderr_by_datetime(
+    profile_uuid: uuid::Uuid,
+    datetime_string: &str,
+) -> crate::Result<String> {
     let state = State::get().await?;
     let logs_folder = state.directories.profile_logs_dir(profile_uuid);
-    Ok(read_to_string(logs_folder.join(datetime_string).join("stderr.log")).await?)
+    Ok(
+        read_to_string(logs_folder.join(datetime_string).join("stderr.log"))
+            .await?,
+    )
 }

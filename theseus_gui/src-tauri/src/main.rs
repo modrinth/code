@@ -105,7 +105,6 @@ fn main() {
             api::logs::logs_get_log_by_datetime,
             api::logs::logs_get_stdout_by_datetime,
             api::logs::logs_get_stderr_by_datetime,
-
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

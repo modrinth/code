@@ -3,7 +3,7 @@ use std::path::{Path, PathBuf};
 use std::process::ExitStatus;
 use std::{collections::HashMap, sync::Arc};
 use tokio::fs::File;
-use tokio::io::{AsyncBufReadExt, BufReader, AsyncWriteExt};
+use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::Child;
 use tokio::process::Command;
 use tokio::process::{ChildStderr, ChildStdout};
@@ -276,14 +276,14 @@ impl Default for Children {
 #[derive(Debug, Clone)]
 pub struct SharedOutput {
     output: Arc<RwLock<String>>,
-    log_file : Arc<RwLock<File>>,
+    log_file: Arc<RwLock<File>>,
 }
 
 impl SharedOutput {
-    async fn build(log_file_path : &Path) -> crate::Result<Self> {
+    async fn build(log_file_path: &Path) -> crate::Result<Self> {
         Ok(SharedOutput {
             output: Arc::new(RwLock::new(String::new())),
-            log_file : Arc::new(RwLock::new(File::create(log_file_path).await?)),
+            log_file: Arc::new(RwLock::new(File::create(log_file_path).await?)),
         })
     }
 
@@ -307,7 +307,7 @@ impl SharedOutput {
             }
             {
                 let mut log_file = self.log_file.write().await;
-                log_file.write_all(&line.as_bytes()).await?;
+                log_file.write_all(line.as_bytes()).await?;
             }
             line.clear();
         }
