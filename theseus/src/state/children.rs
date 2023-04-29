@@ -22,7 +22,6 @@ pub struct Children(HashMap<Uuid, Arc<RwLock<MinecraftChild>>>);
 #[derive(Debug)]
 pub struct MinecraftChild {
     pub uuid: Uuid,
-    pub datetime_string: String, 
     pub profile_path: PathBuf, //todo: make UUID when profiles are recognized by UUID
     pub manager: Option<JoinHandle<crate::Result<ExitStatus>>>, // None when future has completed and been handled
     pub current_child: Arc<RwLock<Child>>,
@@ -42,16 +41,13 @@ impl Children {
         &mut self,
         uuid: Uuid,
         profile_path: PathBuf,
+        stdout_log_path: PathBuf,
+        stderr_log_path: PathBuf,
         mut mc_command: Command,
         post_command: Option<Command>, // Command to run after minecraft.
     ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
         // Takes the first element of the commands vector and spawns it
         let mut child = mc_command.spawn()?;
-
-        // Get current datetime for logs
-        let datetime_string = chrono::Local::now().to_string();
-        let stdout_log_path = profile_path.join("logs").join(&datetime_string).join("stdout.log");
-        let stderr_log_path = profile_path.join("logs").join(&datetime_string).join("stderr.log");
 
         // Create std watcher threads for stdout and stderr
         let stdout = SharedOutput::build(&stdout_log_path).await?;
@@ -98,7 +94,6 @@ impl Children {
         // Create MinecraftChild
         let mchild = MinecraftChild {
             uuid,
-            datetime_string,
             profile_path,
             current_child,
             stdout,
@@ -312,7 +307,7 @@ impl SharedOutput {
             }
             {
                 let mut log_file = self.log_file.write().await;
-                log_file.write_all(&line.as_bytes());
+                log_file.write_all(&line.as_bytes()).await?;
             }
             line.clear();
         }
