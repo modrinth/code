@@ -157,9 +157,18 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         r"/opt/jdks",
     ];
     for path in java_paths {
-        jre_paths.insert(PathBuf::from(path).join("jre").join("bin"));
-        jre_paths.insert(PathBuf::from(path).join("bin"));
+        let path = PathBuf::from(path);
+        jre_paths.insert(PathBuf::from(&path).join("jre").join("bin"));
+        jre_paths.insert(PathBuf::from(&path).join("bin"));
+        if path.is_dir() {
+            for entry in std::fs::read_dir(&path)? {
+                let entry_path = entry?.path();
+                jre_paths.insert(entry_path.join("jre").join("bin"));
+                jre_paths.insert(entry_path.join("bin"));
+            }
+        }
     }
+
     // Get JRE versions from potential paths concurrently
     let j = check_java_at_filepaths(jre_paths)
         .await?

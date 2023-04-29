@@ -1,7 +1,6 @@
 //! Project management + inference
 
 use crate::config::MODRINTH_API_URL;
-use crate::data::ModLoader;
 use crate::state::Profile;
 use crate::util::fetch::{fetch_json, write_cached_icon};
 use async_zip::tokio::read::fs::ZipFileReader;
@@ -250,36 +249,51 @@ async fn read_icon_from_file(
 }
 
 pub async fn infer_data_from_files(
-    paths: &[(Profile, Vec<PathBuf>)],
+    profile: Profile,
+    paths: Vec<PathBuf>,
     cache_dir: PathBuf,
     io_semaphore: &RwLock<Semaphore>,
 ) -> crate::Result<HashMap<PathBuf, Project>> {
     let mut file_path_hashes = HashMap::new();
 
     // TODO: Make this concurrent and use progressive hashing to avoid loading each JAR in memory
-    for set in paths {
-        for path in &set.1 {
-            let mut file = tokio::fs::File::open(path.clone()).await?;
+    for path in paths {
+        let mut file = tokio::fs::File::open(path.clone()).await?;
 
-            let mut buffer = Vec::new();
-            file.read_to_end(&mut buffer).await?;
+        let mut buffer = Vec::new();
+        file.read_to_end(&mut buffer).await?;
 
-            let hash = format!("{:x}", sha2::Sha512::digest(&buffer));
-            file_path_hashes.insert(hash, path.clone());
-        }
+        let hash = format!("{:x}", sha2::Sha512::digest(&buffer));
+        file_path_hashes.insert(hash, path.clone());
     }
 
-    let files: HashMap<String, ModrinthVersion> = fetch_json(
-        Method::POST,
-        &format!("{}version_files", MODRINTH_API_URL),
-        None,
-        Some(json!({
-            "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
-            "algorithm": "sha512",
-        })),
-        io_semaphore,
-    )
-    .await?;
+    let files_url = format!("{}version_files", MODRINTH_API_URL);
+    let updates_url = format!("{}version_files/update", MODRINTH_API_URL);
+    let (files, update_versions) = tokio::try_join!(
+        fetch_json::<HashMap<String, ModrinthVersion>>(
+            Method::POST,
+            &files_url,
+            None,
+            Some(json!({
+                "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+                "algorithm": "sha512",
+            })),
+            io_semaphore,
+        ),
+        fetch_json::<HashMap<String, ModrinthVersion>>(
+            Method::POST,
+            &updates_url,
+            None,
+            Some(json!({
+                "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
+                "algorithm": "sha512",
+                "loaders": [profile.metadata.loader],
+                "game_versions": [profile.metadata.game_version]
+            })),
+            io_semaphore,
+        )
+    )?;
+
     let projects: Vec<ModrinthProject> = fetch_json(
         Method::GET,
         &format!(
@@ -297,6 +311,7 @@ pub async fn infer_data_from_files(
         io_semaphore,
     )
     .await?;
+
     let teams: Vec<ModrinthTeamMember> = fetch_json::<
         Vec<Vec<ModrinthTeamMember>>,
     >(
@@ -317,26 +332,6 @@ pub async fn infer_data_from_files(
     .flatten()
     .collect();
 
-    let mut update_versions: Vec<ModrinthVersion> = fetch_json(
-        Method::GET,
-        &format!(
-            "{}versions?ids={}",
-            MODRINTH_API_URL,
-            serde_json::to_string(
-                &projects
-                    .iter()
-                    .flat_map(|x| x.versions.clone())
-                    .collect::<Vec<String>>()
-            )?
-        ),
-        None,
-        None,
-        io_semaphore,
-    )
-    .await?;
-
-    update_versions.sort_by(|a, b| b.date_published.cmp(&a.date_published));
-
     let mut return_projects = HashMap::new();
     let mut further_analyze_projects: Vec<(String, PathBuf)> = Vec::new();
 
@@ -345,8 +340,6 @@ pub async fn infer_data_from_files(
             if let Some(project) =
                 projects.iter().find(|x| version.project_id == x.id)
             {
-                let profile = paths.iter().find(|x| x.1.contains(&path));
-
                 let file_name = path
                     .file_name()
                     .unwrap_or_default()
@@ -356,7 +349,6 @@ pub async fn infer_data_from_files(
                 return_projects.insert(
                     path,
                     Project {
-                        sha512: hash,
                         disabled: false,
                         metadata: ProjectMetadata::Modrinth {
                             project: Box::new(project.clone()),
@@ -366,48 +358,19 @@ pub async fn infer_data_from_files(
                                 .filter(|x| x.team_id == project.team)
                                 .cloned()
                                 .collect::<Vec<_>>(),
-                            update_version: if let Some((profile, _)) = &profile
-                            {
-                                update_versions
-                                    .iter()
-                                    .find(|x| {
-                                        x.project_id == project.id
-                                            && x.game_versions.contains(
-                                                &profile.metadata.game_version,
-                                            )
-                                            && if profile.metadata.loader
-                                                == ModLoader::Vanilla
-                                            {
-                                                true
-                                            } else {
-                                                x.loaders.contains(
-                                                    &profile
-                                                        .metadata
-                                                        .loader
-                                                        .as_api_str()
-                                                        .to_string(),
-                                                )
-                                            }
-                                    })
-                                    .cloned()
-                                    .map(Box::new)
-                            } else {
-                                None
-                            },
-                            incompatible: if let Some((profile, _)) = &profile {
-                                !version.loaders.contains(
-                                    &profile
-                                        .metadata
-                                        .loader
-                                        .as_api_str()
-                                        .to_string(),
-                                ) || version
-                                    .game_versions
-                                    .contains(&profile.metadata.game_version)
-                            } else {
-                                false
-                            },
+                            update_version: update_versions.get(&hash).map(|val| Box::new(val.clone())),
+
+                            incompatible: !version.loaders.contains(
+                                &profile
+                                    .metadata
+                                    .loader
+                                    .as_api_str()
+                                    .to_string(),
+                            ) || version
+                                .game_versions
+                                .contains(&profile.metadata.game_version),
                         },
+                        sha512: hash,
                         file_name,
                     },
                 );
