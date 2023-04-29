@@ -89,24 +89,29 @@ pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>
 /// Query + sync profile's projects with the UI from the FS
 #[tracing::instrument]
 pub async fn sync(path: &Path) -> crate::Result<()> {
-    let state = State::get().await?;
-    let result = {
-        let mut profiles: tokio::sync::RwLockWriteGuard<
-            crate::state::Profiles,
-        > = state.profiles.write().await;
+    Box::pin({
+        async move {
+            let state = State::get().await?;
+            let result = {
+                let mut profiles: tokio::sync::RwLockWriteGuard<
+                    crate::state::Profiles,
+                > = state.profiles.write().await;
 
-        if let Some(profile) = profiles.0.get_mut(path) {
-            profile.sync().await?;
-            Ok(())
-        } else {
-            Err(crate::ErrorKind::UnmanagedProfileError(
-                path.display().to_string(),
-            )
-            .as_error())
+                if let Some(profile) = profiles.0.get_mut(path) {
+                    profile.sync().await?;
+                    Ok(())
+                } else {
+                    Err(crate::ErrorKind::UnmanagedProfileError(
+                        path.display().to_string(),
+                    )
+                    .as_error())
+                }
+            };
+            State::sync().await?;
+            result
         }
-    };
-    State::sync().await?;
-    result
+    })
+    .await
 }
 
 /// Installs/Repairs a profile
