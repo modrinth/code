@@ -1,5 +1,5 @@
 <script setup>
-import { computed, ref, watch } from 'vue'
+import {computed, onMounted, ref, watch} from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
@@ -28,14 +28,10 @@ const route = useRoute()
 
 const searchStore = useSearch()
 searchStore.projectType = route.params.projectType
-if (searchStore.projectType === 'modpack') {
-  searchStore.instanceContext = null
-}
 const showVersions = ref(true)
 const showLoaders = ref(true)
 
 const breadcrumbs = useBreadcrumbs()
-breadcrumbs.setContext({ name: 'Browse', link: route.path })
 
 const showSnapshots = ref(false)
 const loading = ref(true)
@@ -45,6 +41,16 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
   get_loaders(),
   get_game_versions(),
 ])
+
+onMounted(() => {
+  breadcrumbs.setContext({ name: 'Browse', link: route.path })
+  if (searchStore.projectType === 'modpack') {
+    searchStore.instanceContext = null
+  }
+  searchStore.searchInput = ''
+  handleReset()
+  switchPage(1)
+})
 
 const sortedCategories = computed(() => {
   const values = new Map()
@@ -80,17 +86,21 @@ const getSearchResults = async (shouldLoad = false) => {
 getSearchResults(true)
 
 const handleReset = async () => {
+  searchStore.currentPage = 1
+  searchStore.offset = 0
   searchStore.resetFilters()
   await getSearchResults()
 }
 
 const toggleFacet = async (facet) => {
+  searchStore.currentPage = 1
+  searchStore.offset = 0
   const index = searchStore.facets.indexOf(facet)
 
   if (index !== -1) searchStore.facets.splice(index, 1)
   else searchStore.facets.push(facet)
 
-  await getSearchResults()
+  await switchPage(1)
 }
 
 const toggleOrFacet = async (orFacet) => {
@@ -99,7 +109,7 @@ const toggleOrFacet = async (orFacet) => {
   if (index !== -1) searchStore.orFacets.splice(index, 1)
   else searchStore.orFacets.push(orFacet)
 
-  await getSearchResults()
+  await switchPage(1)
 }
 
 const switchPage = async (page) => {
@@ -111,10 +121,11 @@ const switchPage = async (page) => {
 
 watch(
   () => route.params.projectType,
-  (projectType) => {
+  async (projectType) => {
     searchStore.projectType = projectType ?? 'modpack'
-    handleReset()
     breadcrumbs.setContext({ name: 'Browse', link: route.path })
+    await handleReset()
+    await switchPage(1)
   }
 )
 </script>
