@@ -1,46 +1,20 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
-import { loading_listener } from '@/helpers/events'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 
 const themeStore = useTheming()
 
 onMounted(async () => {
-  const { theme } = await get()
+  const theme = await get()
   themeStore.setThemeState(theme)
-  await getInstalledModsCount()
-
-  // When a modpack is finished installing, get the count of installed mods to update the app bar
-  await loading_listener(async (e) => {
-    installProgress.value = 0
-    if (e.message === 'Downloading modpack...' && e.fraction === 1) {
-      setTimeout(async () => {
-        installProgress.value = 0
-        await getInstalledModsCount()
-      }, 500)
-    } else if (e.message === 'Downloading modpack...' && e.fraction < 1)
-      installProgress.value = Math.round(e.fraction * 100)
-  })
 })
-
-const installedMods = ref(0)
-const installProgress = ref(0)
-
-const getInstalledModsCount = async () => {
-  const profiles = await list()
-  installedMods.value = Object.values(profiles).reduce(
-    (acc, val) => acc + Object.keys(val.projects).length,
-    0
-  )
-}
 </script>
 
 <template>
@@ -77,8 +51,6 @@ const getInstalledModsCount = async () => {
           <Breadcrumbs />
         </section>
         <section class="mod-stats">
-          <p v-if="installProgress !== 0">Installing: {{ installProgress }}%</p>
-          <p v-else>{{ installedMods }} mods installed</p>
           <Suspense>
             <RunningAppBar />
           </Suspense>

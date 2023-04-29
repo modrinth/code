@@ -23,7 +23,7 @@ const getInstances = async () => {
   const profiles = await list()
   recentInstances.value = Object.values(profiles)
 
-  const excludeIds = recentInstances.value.map((i) => i.metadata.linked_project_id)
+  const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
   excludeIds.forEach((id, index) => {
     filter.value += `NOT"project_id"="${id}"`
     if (index < excludeIds.length - 1) filter.value += ' AND '
@@ -48,12 +48,7 @@ await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 // If a modpack is finished installing, refresh our instances list, the featured modpacks & featured mods
 await loading_listener(async (e) => {
-  // Null check is a current bug. Events API sometimes send back down a NULL when the task completes
-  if (
-    e.message === 'Downloading modpack...' &&
-    (e.fraction === 1 || e.fraction === null) &&
-    e.event.PackDownload
-  ) {
+  if (e.message === 'Done extacting overrides' && e.event.PackDownload) {
     await getInstances()
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
   }

@@ -59,14 +59,14 @@ const install = async (e) => {
     ofetch(
       `https://api.modrinth.com/v2/project/${
         props.instance.metadata
-          ? props.instance.metadata?.linked_project_id
+          ? props.instance.metadata?.linked_data?.project_id
           : props.instance.project_id
       }`
     ).then(shallowRef),
     ofetch(
       `https://api.modrinth.com/v2/project/${
         props.instance.metadata
-          ? props.instance.metadata?.linked_project_id
+          ? props.instance.metadata?.linked_dadta?.project_id
           : props.instance.project_id
       }/version`
     ).then(shallowRef),
@@ -77,7 +77,9 @@ const install = async (e) => {
 
     if (
       packs.length === 0 ||
-      !packs.map((value) => value.metadata).find((pack) => pack.linked_project_id === data.value.id)
+      !packs
+        .map((value) => value.metadata)
+        .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
       await pack_install(versions.value[0].id)
     } else confirmModal.value.show(versions.value[0].id)
@@ -207,10 +209,10 @@ await process_listener((e) => {
 
 .light-mode {
   .instance-card-item {
-    background: hsl(0, 0, 100%) !important;
+    background: hsl(0, 0%, 100%) !important;
 
     &:hover {
-      background: hsl(0, 0, 91%) !important;
+      background: hsl(0, 0%, 91%) !important;
     }
   }
 }

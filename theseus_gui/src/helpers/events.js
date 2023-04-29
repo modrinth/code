@@ -35,7 +35,7 @@ import { listen } from '@tauri-apps/api/event'
             profile_name: name of the profile
             profile_uuid: unique identification of the profile
         loader_uuid: unique identification of the loading bar
-        fraction: number, (as a fraction of 1, how much we'vel oaded so far). If null, by convention, loading is finished
+        fraction: number, (as a fraction of 1, how much we've loaded so far). If null, by convention, loading is finished
         message: message to display to the user
     }
 */
