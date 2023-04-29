@@ -174,8 +174,6 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         .await?
         .into_iter()
         .collect();
-    dbg!(&j);
-
     Ok(j)
 }
 
@@ -205,7 +203,7 @@ pub async fn check_java_at_filepaths(
         .map(|p: PathBuf| {
             tokio::task::spawn(async move { check_java_at_filepath(&p).await })
         })
-        .buffer_unordered(500)
+        .buffer_unordered(64)
         .collect::<Vec<_>>()
         .await;
 
