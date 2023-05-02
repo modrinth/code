@@ -106,7 +106,7 @@ pub async fn profile_add_project_from_path(
 pub async fn profile_toggle_disable_project(
     path: &Path,
     project_path: &Path,
-) -> Result<ChangedFilename> {
+) -> Result<()> {
     Ok(profile::toggle_disable_project(path, project_path).await?)
 }
 

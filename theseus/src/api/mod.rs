@@ -11,8 +11,8 @@ pub mod tags;
 
 pub mod data {
     pub use crate::state::{
-        ChangedFilename, DirectoryInfo, Hooks, JavaSettings, MemorySettings,
-        ModLoader, ProfileMetadata, Settings, Theme, WindowSize,
+        DirectoryInfo, Hooks, JavaSettings, MemorySettings, ModLoader,
+        ProfileMetadata, Settings, Theme, WindowSize,
     };
 }
 

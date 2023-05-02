@@ -109,13 +109,6 @@ pub struct JavaSettings {
     pub extra_arguments: Option<Vec<String>>,
 }
 
-// If filepath of a project is changed, a struct to pass that new name change upstream
-#[derive(Serialize)]
-pub struct ChangedFilename {
-    pub file_path: PathBuf, // full new path to proj
-    pub file_name: String,  // new file name
-}
-
 impl Profile {
     #[tracing::instrument]
     pub async fn new(
@@ -306,7 +299,7 @@ impl Profile {
     pub async fn toggle_disable_project(
         &mut self,
         path: &Path,
-    ) -> crate::Result<ChangedFilename> {
+    ) -> crate::Result<()> {
         if let Some(mut project) = self.projects.remove(path) {
             let path = path.to_path_buf();
 
@@ -336,14 +329,7 @@ impl Profile {
             fs::rename(path, &new_path).await?;
 
             self.projects.insert(new_path.clone(), project);
-            Ok(ChangedFilename {
-                file_path: new_path.clone(),
-                file_name: new_path
-                    .file_name()
-                    .unwrap_or_default()
-                    .to_string_lossy()
-                    .to_string(),
-            })
+            Ok(())
         } else {
             Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
