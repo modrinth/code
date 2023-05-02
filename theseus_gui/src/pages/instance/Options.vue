@@ -122,11 +122,50 @@
       </div>
     </div>
   </Card>
+  <Card class="settings-card">
+    <h2 class="settings-title">Profile management</h2>
+    <div class="settings-group">
+      <div class="toggle-setting">
+        Repair profile
+        <Button class="repair-btn" @click="handleRepair"> Repair</Button>
+      </div>
+      <div class="toggle-setting">
+        Delete profile
+        <Button class="delete-btn" @click="handleRemove"><TrashIcon /> Delete</Button>
+      </div>
+    </div>
+  </Card>
 </template>
 
 <script setup>
-import { Card, Button, SearchIcon, Slider } from 'omorphia'
+import { Card, Button, SearchIcon, Slider, TrashIcon } from 'omorphia'
+import { useRouter } from 'vue-router'
 import { BrowseIcon, PlayIcon } from '@/assets/icons'
+import { remove, install } from '@/helpers/profile'
+
+const router = useRouter()
+
+const props = defineProps({
+  instance: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
+})
+
+const handleRepair = async () => {
+  try {
+    await install(props.instance.path)
+  } catch (err) {
+    console.warn('Repair error:', err)
+  }
+}
+
+const handleRemove = async () => {
+  await remove(props.instance.path)
+  router.push('/')
+}
 </script>
 
 <style scoped lang="scss">
@@ -157,6 +196,14 @@ import { BrowseIcon, PlayIcon } from '@/assets/icons'
   align-items: center;
   gap: 0.5rem;
   margin: 0;
+}
+
+.delete-btn {
+  background: var(--color-red) !important;
+}
+
+.repair-btn {
+  background: var(--color-blue) !important;
 }
 
 .sliders {
