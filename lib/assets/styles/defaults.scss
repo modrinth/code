@@ -41,10 +41,6 @@ body {
 a {
   color: var(--color-blue);
   text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-  }
 }
 
 a.uncolored {
