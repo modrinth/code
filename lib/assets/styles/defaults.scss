@@ -56,7 +56,6 @@ input[type='number'],
 textarea {
   border-radius: var(--radius-md);
   box-sizing: border-box;
-  border: 2px solid transparent;
   // safari iOS rounds inputs by default
   // set the appearance to none to prevent this
   appearance: none !important;
@@ -64,10 +63,9 @@ textarea {
   color: var(--color-base);
   padding: 0.5rem 1rem;
   font-weight: var(--font-weight-medium);
-  outline: 2px solid transparent;
-  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
   transition: box-shadow 0.1s ease-in-out;
   min-height: 40px;
+  box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
   &:focus,
   &:focus-visible {
@@ -87,7 +85,7 @@ textarea {
   }
 
   &::placeholder {
-    color: var(--color-contrast);
+    color: var(--color-base);
     opacity: 0.6;
   }
 }
@@ -111,16 +109,19 @@ input[type='number'] {
   }
 
   &:focus-within svg {
-    color: var(--color-base);
     opacity: 1;
+    color: var(--color-contrast);
   }
 
-  :not(input) {
+  svg {
     position: absolute;
     left: 0.75rem;
     height: 1.25rem;
     width: 1.25rem;
     z-index: 1;
+
+    color: var(--color-base);
+    opacity: 0.6;
   }
 }
 

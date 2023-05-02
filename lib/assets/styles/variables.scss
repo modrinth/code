@@ -21,6 +21,7 @@ html {
 .light {
   --color-bg: #e5e7eb;
   --color-raised-bg: #ffffff;
+  --color-super-raised-bg: #e9e9e9;
   --color-button-bg: hsl(220, 13%, 91%);
 
   --color-base: hsl(221, 39%, 11%);
@@ -59,6 +60,7 @@ html {
 .dark {
   --color-bg: #16181c;
   --color-raised-bg: #26292f;
+  --color-super-raised-bg: #40434a;
   --color-button-bg: hsl(222, 13%, 30%);
 
   --color-base: var(--dark-color-base);
