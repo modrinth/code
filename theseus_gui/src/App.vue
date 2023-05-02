@@ -1,35 +1,29 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
+import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, AnimatedLogo } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 
 const themeStore = useTheming()
 
-onMounted(async () => {
-  const { theme } = await get()
-  themeStore.setThemeState(theme)
-})
+const loading = ref(true)
 
-const installedMods = ref(0)
-list().then(
-  (profiles) =>
-    (installedMods.value = Object.values(profiles).reduce(
-      (acc, val) => acc + Object.keys(val.projects).length,
-      0
-    ))
-)
-// TODO: add event when profiles update to update installed mods count
+defineExpose({
+  initialize: async () => {
+    loading.value = false
+    const { theme } = await get()
+    themeStore.setThemeState(theme)
+  },
+})
 </script>
 
 <template>
-  <div class="container">
+  <div v-if="!loading" class="container">
     <div class="nav-container">
       <div class="nav-section">
         <suspense>
@@ -73,6 +67,9 @@ list().then(
         </Suspense>
       </div>
     </div>
+  </div>
+  <div v-else class="loading-page">
+    <AnimatedLogo class="initializing-icon" />
   </div>
 </template>
 
@@ -315,5 +312,24 @@ list().then(
   width: 100%;
   height: 100%;
   gap: 1rem;
+}
+
+.loading-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #16181c;
+  height: 100vh;
+
+  .initializing-icon {
+    width: 12rem;
+    height: 12rem;
+
+    :deep(svg) {
+      width: 12rem;
+      height: 12rem;
+    }
+  }
 }
 </style>

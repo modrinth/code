@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { Card } from 'omorphia'
+import { AnimatedLogo, Card } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 
@@ -25,7 +25,10 @@ const props = defineProps({
             {{ props.instance.metadata.loader }} {{ props.instance.metadata.game_version }}
           </p>
         </div>
-        <div class="cta"><PlayIcon /></div>
+        <div class="cta" :class="{ loading: !instance.installed }">
+          <PlayIcon v-if="instance.installed" />
+          <AnimatedLogo v-else class="loading-icon" />
+        </div>
       </Card>
     </RouterLink>
   </div>
@@ -63,11 +66,27 @@ const props = defineProps({
     opacity: 0;
     transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity;
     cursor: pointer;
+
+    &.loading {
+      background: var(--color-button-bg);
+    }
+
     svg {
       color: var(--color-accent-contrast);
       width: 1.5rem;
       height: 1.5rem;
     }
+
+    .loading-icon {
+      width: 2rem;
+      height: 2rem;
+
+      :deep(svg) {
+        width: 2rem;
+        height: 2rem;
+      }
+    }
+
     &:hover {
       filter: brightness(0.75);
       box-shadow: var(--shadow-floating);

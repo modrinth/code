@@ -10,26 +10,59 @@
     <Button icon-only class="icon-button" @click="goToTerminal()">
       <TerminalIcon />
     </Button>
+    <Button
+      v-if="currentLoadingBars.length > 0"
+      ref="infoButton"
+      icon-only
+      class="icon-button show-card-icon"
+      @click="toggleCard()"
+    >
+      <DownloadIcon />
+    </Button>
   </div>
   <div v-else class="status">
     <span class="circle stopped" />
     <span class="running-text"> No running profiles </span>
+    <Button
+      v-if="currentLoadingBars.length > 0"
+      ref="infoButton"
+      icon-only
+      class="icon-button show-card-icon"
+      @click="toggleCard()"
+    >
+      <DownloadIcon />
+    </Button>
   </div>
+  <Card v-if="showCard === true" ref="card" class="info-card">
+    <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="loading-option">
+      <AnimatedLogo class="loading-icon" />
+      <div class="loading-text">
+        <div class="row">
+          {{ loadingBar.bar_type.PackDownload.pack_name }}
+        </div>
+        <div class="row">{{ Math.round(loadingBar.current) }} % {{ loadingBar.message }}</div>
+      </div>
+    </div>
+  </Card>
 </template>
 
 <script setup>
-import { Button } from 'omorphia'
+import { Button, DownloadIcon, Card, AnimatedLogo } from 'omorphia'
 import { StopIcon, TerminalIcon } from '@/assets/icons'
-import { ref } from 'vue'
+import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   get_all_running_profiles as getRunningProfiles,
   kill_by_uuid as killProfile,
   get_uuids_by_profile_path as getProfileProcesses,
 } from '@/helpers/process'
-import { process_listener } from '@/helpers/events'
+import { loading_listener, process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
+import { progress_bars_list } from '@/helpers/state.js'
 
 const router = useRouter()
+const card = ref(null)
+const infoButton = ref(null)
+const showCard = ref(false)
 
 const currentProcesses = ref(await getRunningProfiles())
 
@@ -55,6 +88,52 @@ const stop = async () => {
 const goToTerminal = () => {
   router.push(`/instance/${encodeURIComponent(currentProcesses.value[0].path)}/logs`)
 }
+
+const currentLoadingBars = ref(
+  Object.values(await progress_bars_list()).filter(
+    (bar) => bar.bar_type !== 'StateInit' && Object.keys(bar.bar_type)[0] === 'PackDownload'
+  )
+)
+
+await loading_listener(async (event) => {
+  console.log('loading listener', event.message, event)
+  await refreshInfo()
+})
+
+const refreshInfo = async () => {
+  currentLoadingBars.value = Object.values(await progress_bars_list()).filter(
+    (bar) => bar.bar_type !== 'StateInit' && Object.keys(bar.bar_type)[0] === 'PackDownload'
+  )
+  if (currentLoadingBars.value.length === 0) {
+    showCard.value = false
+  }
+}
+
+const handleClickOutside = (event) => {
+  console.log('clicked outside from appbar')
+  if (
+    card.value &&
+    infoButton.value.$el !== event.target &&
+    card.value.$el !== event.target &&
+    !document.elementsFromPoint(event.clientX, event.clientY).includes(card.value.$el) &&
+    !document.elementsFromPoint(event.clientX, event.clientY).includes(infoButton.value.$el)
+  ) {
+    showCard.value = false
+  }
+}
+
+const toggleCard = async () => {
+  showCard.value = !showCard.value
+  await refreshInfo()
+}
+
+onMounted(() => {
+  window.addEventListener('click', handleClickOutside)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped lang="scss">
@@ -99,5 +178,69 @@ const goToTerminal = () => {
   &.stop {
     --text-color: var(--color-red) !important;
   }
+}
+
+.info-card {
+  position: absolute;
+  top: 3.25rem;
+  right: 0;
+  z-index: 100;
+  width: 20rem;
+  background-color: var(--color-raised-bg);
+  box-shadow: var(--shadow-raised);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  overflow: auto;
+  transition: all 0.2s ease-in-out;
+  border: 1px solid var(--color-button-bg);
+
+  &.hidden {
+    transform: translateY(-100%);
+  }
+}
+
+.loading-option {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+
+  :hover {
+    background-color: var(--color-raised-bg-hover);
+  }
+}
+
+.loading-text {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+
+  .row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+.loading-icon {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: block;
+
+  :deep(svg) {
+    left: 1rem;
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+.show-card-icon {
+  color: var(--color-brand);
 }
 </style>

@@ -10,9 +10,15 @@
           </span>
         </div>
         <span class="button-group">
-          <Button color="primary" class="instance-button" @click="run($route.params.id)">
-            <PlayIcon />
-            Play
+          <Button
+            :color="instance.installed ? 'primary' : ''"
+            class="instance-button"
+            :disabled="!instance.installed"
+            @click="run($route.params.id)"
+          >
+            <PlayIcon v-if="instance.installed" />
+            <AnimatedLogo v-else class="loading-icon" />
+            {{ instance.installed ? 'Play' : 'Installing' }}
           </Button>
           <Button class="instance-button" icon-only>
             <OpenFolderIcon />
@@ -41,13 +47,23 @@
   </div>
 </template>
 <script setup>
-import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from 'omorphia'
+import {
+  BoxIcon,
+  SettingsIcon,
+  FileIcon,
+  Button,
+  Avatar,
+  Card,
+  Promotion,
+  AnimatedLogo,
+} from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { profile_listener } from '@/helpers/events.js'
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -57,6 +73,12 @@ breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
+})
+
+profile_listener(async (event) => {
+  if (event.profile_path === route.params.id) {
+    instance.value = await get(route.params.id)
+  }
 })
 </script>
 
@@ -273,5 +295,18 @@ Button {
   color: var(--color-button-bg);
   height: 1px;
   margin: var(--gap-xl) 0;
+}
+
+.loading-icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  animation: spin 1s linear infinite;
+
+  :deep(svg) {
+    left: 2rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    fill: var(--color-contrast);
+  }
 }
 </style>
