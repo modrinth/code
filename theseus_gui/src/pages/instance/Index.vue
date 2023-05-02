@@ -33,7 +33,7 @@
           Logs
         </RouterLink>
         <span class="button-group">
-          <Button class="instance-button repair-btn"> Repair </Button>
+          <Button class="instance-button repair-btn"><HammerIcon /> Repair </Button>
           <Button class="instance-button delete-btn" @click="handleRemove"
             ><TrashIcon /> Delete</Button
           >
@@ -57,7 +57,7 @@ import {
   Promotion,
   TrashIcon,
 } from 'omorphia'
-import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
+import { PlayIcon, OpenFolderIcon, HammerIcon } from '@/assets/icons'
 import { get, run, remove } from '@/helpers/profile'
 import { useRoute, useRouter } from 'vue-router'
 import { shallowRef } from 'vue'

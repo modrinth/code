@@ -127,7 +127,7 @@
     <div class="settings-group">
       <div class="toggle-setting">
         Repair profile
-        <Button class="repair-btn" @click="handleRepair"> Repair</Button>
+        <Button class="repair-btn" @click="handleRepair"><HammerIcon /> Repair</Button>
       </div>
       <div class="toggle-setting">
         Delete profile
@@ -140,7 +140,7 @@
 <script setup>
 import { Card, Button, SearchIcon, Slider, TrashIcon } from 'omorphia'
 import { useRouter } from 'vue-router'
-import { BrowseIcon, PlayIcon } from '@/assets/icons'
+import { BrowseIcon, PlayIcon, HammerIcon } from '@/assets/icons'
 import { remove, install } from '@/helpers/profile'
 
 const router = useRouter()
