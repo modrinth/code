@@ -100,14 +100,14 @@ pub async fn profile_add_project_from_path(
 }
 
 // Toggles disabling a project from its path
+// Returns the new filename of the object (added or removed .disabled)
 // invoke('profile_toggle_disable_project')
 #[tauri::command]
 pub async fn profile_toggle_disable_project(
     path: &Path,
     project_path: &Path,
 ) -> Result<()> {
-    profile::toggle_disable_project(path, project_path).await?;
-    Ok(())
+    Ok(profile::toggle_disable_project(path, project_path).await?)
 }
 
 // Removes a project from a profile

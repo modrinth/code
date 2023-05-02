@@ -44,6 +44,7 @@
 import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
+import { profile_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -57,6 +58,11 @@ breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
+})
+
+await profile_listener(async (e) => {
+  if (e.path === instance.value.path && e.event === 'Edited')
+    instance.value = await get(route.params.id)
 })
 </script>
 

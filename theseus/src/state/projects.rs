@@ -358,13 +358,9 @@ pub async fn infer_data_from_files(
                                 .filter(|x| x.team_id == project.team)
                                 .cloned()
                                 .collect::<Vec<_>>(),
-                            update_version: if let Some(val) =
-                                update_versions.get(&hash)
-                            {
-                                Some(Box::new(val.clone()))
-                            } else {
-                                None
-                            },
+                            update_version: update_versions
+                                .get(&hash)
+                                .map(|val| Box::new(val.clone())),
 
                             incompatible: !version.loaders.contains(
                                 &profile

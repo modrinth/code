@@ -81,6 +81,12 @@ export async function add_project_from_path(path, projectPath, projectType) {
 }
 
 // Toggle disabling a project
+// Returns a struct representing the toggled file path and file name
+// (With .disabled added or removed, as appropriate)
+// {
+//    file_path
+//    file_name
+// }
 export async function toggle_disable_project(path, projectPath) {
   return await invoke('profile_toggle_disable_project', { path, projectPath })
 }

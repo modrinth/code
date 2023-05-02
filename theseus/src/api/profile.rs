@@ -297,6 +297,7 @@ pub async fn add_project_from_path(
 }
 
 /// Toggle whether a project is disabled or not
+/// Returns new filename (with .disabled added or removed)
 #[tracing::instrument]
 pub async fn toggle_disable_project(
     profile: &Path,
@@ -307,14 +308,22 @@ pub async fn toggle_disable_project(
 
     if let Some(profile) = profiles.0.get_mut(profile) {
         profile.toggle_disable_project(project).await?;
-
-        Ok(())
+        emit_profile(
+            profile.uuid,
+            profile.path.clone(),
+            &profile.metadata.name,
+            ProfilePayloadType::Edited,
+        )
+        .await?;
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
+        return Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
         )
-        .as_error())
+        .as_error());
     }
+
+    profiles.sync().await?; // sync to disk
+    Ok(())
 }
 
 /// Remove a project from a profile
@@ -328,6 +337,7 @@ pub async fn remove_project(
 
     if let Some(profile) = profiles.0.get_mut(profile) {
         profile.remove_project(project).await?;
+        profile.sync().await?;
 
         Ok(())
     } else {
