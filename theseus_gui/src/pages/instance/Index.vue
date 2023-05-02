@@ -75,7 +75,9 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
+const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
+const instance = shallowRef(await get(route.params.id))
 
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
@@ -83,8 +85,6 @@ breadcrumbs.setContext({
   link: route.path,
 })
 
-const route = useRoute()
-const instance = shallowRef(await get(route.params.id))
 const uuid = ref(null)
 const playing = ref(false)
 const loading = ref(false)
