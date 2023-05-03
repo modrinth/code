@@ -1,10 +1,10 @@
 <script setup>
-import { ref, shallowRef } from 'vue'
+import { ref, shallowRef, onUnmounted } from 'vue'
 import { ofetch } from 'ofetch'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
-import { loading_listener } from '@/helpers/events'
+import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const featuredModpacks = ref({})
@@ -46,13 +46,14 @@ const getFeaturedMods = async () => {
 await getInstances()
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
-// If a modpack is finished installing, refresh our instances list, the featured modpacks & featured mods
-await loading_listener(async (e) => {
-  if (e.message === 'Done extacting overrides' && e.event.PackDownload) {
+const unlisten = await profile_listener(async (e) => {
+  if (e.event === 'Edited') {
     await getInstances()
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
   }
 })
+
+onUnmounted(() => unlisten())
 </script>
 
 <template>
