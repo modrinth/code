@@ -74,7 +74,7 @@ list().then(
             <span v-if="!themeStore.collapsedNavigation">Library</span>
           </RouterLink>
           <Button
-            color="primary"
+            class="new-instance-button"
             :class="{
               'icon-only': themeStore.collapsedNavigation,
               'collapsed-button': themeStore.collapsedNavigation,
@@ -226,16 +226,16 @@ list().then(
   background: var(--color-raised-bg);
 
   &.expanded {
-    width: 12rem;
-    max-width: 12rem;
-    min-width: 12rem;
+    width: 13rem;
+    max-width: 13rem;
+    min-width: 13rem;
   }
 }
 
 .pages-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   width: 100%;
   gap: 0.5rem;
@@ -251,6 +251,7 @@ list().then(
     &.router-link-active {
       color: var(--color-contrast);
       background: var(--color-button-bg);
+      box-shadow: var(--shadow-floating);
     }
 
     &:hover {
@@ -267,6 +268,7 @@ list().then(
   width: 3rem !important;
   padding: 0.75rem;
   border-radius: var(--radius-md);
+  box-shadow: none;
 
   svg {
     width: 1.5rem !important;
@@ -274,16 +276,22 @@ list().then(
     max-width: 1.5rem !important;
     max-height: 1.5rem !important;
   }
-
-  &.primary {
-    color: var(--color-accent-contrast);
-    background-color: var(--color-brand);
-  }
 }
 
 .expanded-button {
-  width: 100% !important;
-  padding: var(--gap-md);
+  width: 100%;
+  padding: var(--gap-md) var(--gap-lg);
+}
+
+.new-instance-button {
+  color: var(--color-brand);
+  background-color: rgba(0, 0, 0, 0);
+  transition: all ease-in-out 0.2s;
+
+  &:hover {
+    color: var(--color-accent-contrast);
+    background-color: var(--color-brand);
+  }
 }
 
 .instance-list {

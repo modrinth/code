@@ -1,6 +1,11 @@
 <template>
-  <div ref="button" class="button-base avatar-button" @click="toggle()">
-    <Avatar size="sm" :src="selectedAccount?.profile_picture ?? ''" />
+  <div
+    ref="button"
+    class="button-base avatar-button"
+    :class="{ expanded: expanded }"
+    @click="toggle()"
+  >
+    <Avatar :size="expanded ? 'xs' : 'sm'" :src="selectedAccount?.profile_picture ?? ''" />
     <div v-show="expanded" class="avatar-text">
       <div class="text no-select">
         {{ selectedAccount.username }}
@@ -187,8 +192,8 @@ onBeforeUnmount(() => {
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 0;
-  left: 5rem;
+  top: 0.5rem;
+  left: 5.5rem;
   z-index: 100;
   gap: 0.5rem;
   padding: 1rem;
@@ -203,7 +208,7 @@ onBeforeUnmount(() => {
   }
 
   &.expanded {
-    left: 12rem;
+    left: 13.5rem;
   }
 }
 
@@ -258,9 +263,15 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 0.5rem;
   color: var(--color-base);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
   box-shadow: none;
   width: 100%;
   text-align: left;
+
+  &.expanded {
+    padding: 1rem;
+  }
 }
 
 .avatar-text {
