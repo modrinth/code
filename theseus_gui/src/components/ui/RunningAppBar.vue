@@ -33,21 +33,21 @@
       <DownloadIcon />
     </Button>
   </div>
-  <Card v-if="showCard === true" ref="card" class="info-card">
-    <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="loading-option">
-      <AnimatedLogo class="loading-icon" />
-      <div class="loading-text">
-        <div class="row">
+  <transition name="download">
+    <Card v-if="showCard === true" ref="card" class="info-card">
+      <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
+        <h3 class="info-title">
           {{ loadingBar.bar_type.PackDownload.pack_name }}
-        </div>
-        <div class="row">{{ Math.round(loadingBar.current) }} % {{ loadingBar.message }}</div>
+        </h3>
+        <ProgressBar :progress="Math.round(loadingBar.current)" />
+        <div class="row">{{ loadingBar.message }}</div>
       </div>
-    </div>
-  </Card>
+    </Card>
+  </transition>
 </template>
 
 <script setup>
-import { Button, DownloadIcon, Card, AnimatedLogo } from 'omorphia'
+import { Button, DownloadIcon, Card } from 'omorphia'
 import { StopIcon, TerminalIcon } from '@/assets/icons'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
@@ -58,6 +58,7 @@ import {
 import { loading_listener, process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
+import ProgressBar from "@/components/ui/ProgressBar.vue";
 
 const router = useRouter()
 const card = ref(null)
@@ -81,7 +82,6 @@ const stop = async () => {
   } catch (e) {
     console.error(e)
   }
-
   await refresh()
 }
 
@@ -101,11 +101,14 @@ await loading_listener(async (event) => {
 })
 
 const refreshInfo = async () => {
+  const currentLoadingBarCount = currentLoadingBars.value.length
   currentLoadingBars.value = Object.values(await progress_bars_list()).filter(
     (bar) => bar.bar_type !== 'StateInit' && Object.keys(bar.bar_type)[0] === 'PackDownload'
   )
   if (currentLoadingBars.value.length === 0) {
     showCard.value = false
+  } else if (currentLoadingBarCount < currentLoadingBars.value.length) {
+    showCard.value = true
   }
 }
 
@@ -182,13 +185,12 @@ onBeforeUnmount(() => {
 
 .info-card {
   position: absolute;
-  top: 3.25rem;
+  top: 3.5rem;
   right: 0;
   z-index: 100;
   width: 20rem;
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-raised);
-  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
@@ -242,5 +244,32 @@ onBeforeUnmount(() => {
 
 .show-card-icon {
   color: var(--color-brand);
+}
+
+.download-enter-active,
+.download-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.download-enter-from,
+.download-leave-to {
+  opacity: 0;
+}
+
+.progress-bar {
+  width: 100%;
+}
+
+.info-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+}
+
+.info-title {
+  margin: 0;
 }
 </style>
