@@ -9,6 +9,7 @@ use crate::{
 use daedalus as d;
 use dunce::canonicalize;
 use st::Profile;
+use std::fs;
 use std::{path::Path, process::Stdio, sync::Arc};
 use tokio::process::Command;
 use uuid::Uuid;
@@ -322,6 +323,20 @@ pub async fn launch_minecraft(
     // Clear cargo-added env varaibles for debugging, and add settings env vars
     clear_cargo_env_vals(&mut command).envs(env_args);
 
+    // Get Modrinth logs directories
+    let datetime_string =
+        chrono::Local::now().format("%Y%m%y_%H%M%S").to_string();
+    let logs_dir = {
+        let st = State::get().await?;
+        st.directories
+            .profile_logs_dir(profile.uuid)
+            .join(&datetime_string)
+    };
+    fs::create_dir_all(&logs_dir)?;
+
+    let stdout_log_path = logs_dir.join("stdout.log");
+    let stderr_log_path = logs_dir.join("stderr.log");
+
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
     let mut state_children = state.children.write().await;
@@ -329,6 +344,8 @@ pub async fn launch_minecraft(
         .insert_process(
             Uuid::new_v4(),
             instance_path.to_path_buf(),
+            stdout_log_path,
+            stderr_log_path,
             command,
             post_exit_hook,
         )
