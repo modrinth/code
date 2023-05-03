@@ -70,7 +70,7 @@ import {
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
-import { shallowRef, ref } from 'vue'
+import { shallowRef, ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
@@ -125,9 +125,11 @@ const stopInstance = async () => {
   }
 }
 
-await process_listener((e) => {
+const unlisten = await process_listener((e) => {
   if (e.event === 'Finished') playing.value = false
 })
+
+onUnmounted(() => unlisten())
 </script>
 
 <style scoped lang="scss">
