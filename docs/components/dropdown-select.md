@@ -23,6 +23,12 @@ const value = ref(null)
     placeholder="Choose Frequency"
     disabled
   />
+  <DropdownSelect
+    v-model="value"
+    :options="['Daily', 'Weekly', 'Monthly', 'Tomorrow', 'Yesterday', 'Today', 'Biweekly', 'Tuesday', 'January']"
+    placeholder="Choose Frequency"
+    :display-name="(name) => name?.toUpperCase()"
+  />
 </DemoContainer>
 
 ```vue

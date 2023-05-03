@@ -51,7 +51,7 @@
               :value="option"
               :name="name"
             />
-            <label :for="`${name}-${index}`">{{ option }}</label>
+            <label :for="`${name}-${index}`">{{ displayName(option) }}</label>
           </div>
         </div>
       </transition>
@@ -59,113 +59,129 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: {
-    options: {
-      type: Array,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    defaultValue: {
-      type: String,
-      default: null,
-    },
-    placeholder: {
-      type: String,
-      default: null,
-    },
-    modelValue: {
-      type: String,
-      default: null,
-    },
-    renderUp: {
-      type: Boolean,
-      default: false,
-    },
-    disabled: {
-      type: Boolean,
-      default: false,
-    },
+<script setup>
+import { computed, ref, watch } from 'vue'
+
+const props = defineProps({
+  options: {
+    type: Array,
+    required: true,
   },
-  emits: ['input', 'change', 'update:modelValue'],
-  data() {
-    return {
-      dropdownVisible: false,
-      selectedValue: this.modelValue || this.defaultValue,
-      focusedOptionIndex: null,
+  name: {
+    type: String,
+    required: true,
+  },
+  defaultValue: {
+    type: String,
+    default: null,
+  },
+  placeholder: {
+    type: String,
+    default: null,
+  },
+  modelValue: {
+    type: String,
+    default: null,
+  },
+  renderUp: {
+    type: Boolean,
+    default: false,
+  },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
+  displayName: {
+    type: Function,
+    default: (option) => option,
+  },
+})
+
+const emit = defineEmits(['input', 'change', 'update:modelValue'])
+
+const dropdownVisible = ref(false)
+const selectedValue = ref(props.modelValue || props.defaultValue)
+const focusedOptionIndex = ref(null)
+const dropdown = ref(null)
+const optionElements = ref(null)
+
+const selectedOption = computed(() => {
+  return props.displayName(selectedValue.value) || props.placeholder || 'Select an option'
+})
+
+const radioValue = computed({
+  get() {
+    return props.modelValue || selectedValue.value
+  },
+  set(newValue) {
+    emit('update:modelValue', newValue)
+    selectedValue.value = newValue
+  },
+})
+
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    selectedValue.value = newValue
+  }
+)
+
+const toggleDropdown = () => {
+  if (!props.disabled) {
+    dropdownVisible.value = !dropdownVisible.value
+    dropdown.value.focus()
+  }
+}
+
+const selectOption = (option, index) => {
+  radioValue.value = option
+  emit('change', { option, index })
+  dropdownVisible.value = false
+}
+
+const onFocus = () => {
+  if (!props.disabled) {
+    focusedOptionIndex.value = props.options.findIndex((option) => option === selectedValue.value)
+    dropdownVisible.value = true
+  }
+}
+
+const onBlur = (event) => {
+  if (!isChildOfDropdown(event.relatedTarget)) {
+    dropdownVisible.value = false
+  }
+}
+
+const focusPreviousOption = () => {
+  if (!props.disabled) {
+    if (!dropdownVisible.value) {
+      toggleDropdown()
     }
-  },
-  computed: {
-    selectedOption() {
-      return this.selectedValue || this.placeholder || 'Select an option'
-    },
-    radioValue: {
-      get() {
-        return this.modelValue || this.selectedValue
-      },
-      set(newValue) {
-        this.$emit('update:modelValue', newValue)
-        this.selectedValue = newValue
-      },
-    },
-  },
-  methods: {
-    toggleDropdown() {
-      if (!this.disabled) {
-        this.dropdownVisible = !this.dropdownVisible
-        this.$refs.dropdown.focus()
-      }
-    },
-    selectOption(option, index) {
-      this.radioValue = option
-      this.$emit('change', { option, index })
-      this.dropdownVisible = false
-    },
-    onFocus() {
-      if (!this.disabled) {
-        this.focusedOptionIndex = this.options.findIndex((option) => option === this.selectedValue)
-        this.dropdownVisible = true
-      }
-    },
-    onBlur(event) {
-      if (!this.isChildOfDropdown(event.relatedTarget)) {
-        this.dropdownVisible = false
-      }
-    },
-    focusPreviousOption() {
-      if (!this.disabled) {
-        if (!this.dropdownVisible) {
-          this.toggleDropdown()
-        }
-        this.focusedOptionIndex =
-          (this.focusedOptionIndex + this.options.length - 1) % this.options.length
-        this.$refs.optionElements[this.focusedOptionIndex].focus()
-      }
-    },
-    focusNextOptionOrOpen() {
-      if (!this.disabled) {
-        if (!this.dropdownVisible) {
-          this.toggleDropdown()
-        }
-        this.focusedOptionIndex = (this.focusedOptionIndex + 1) % this.options.length
-        this.$refs.optionElements[this.focusedOptionIndex].focus()
-      }
-    },
-    isChildOfDropdown(element) {
-      let currentNode = element
-      while (currentNode) {
-        if (currentNode === this.$el) {
-          return true
-        }
-        currentNode = currentNode.parentNode
-      }
-      return false
-    },
-  },
+    focusedOptionIndex.value =
+      (focusedOptionIndex.value + props.options.length - 1) % props.options.length
+    optionElements.value[focusedOptionIndex.value].focus()
+  }
+}
+
+const focusNextOptionOrOpen = () => {
+  if (!props.disabled) {
+    if (!dropdownVisible.value) {
+      toggleDropdown()
+    }
+    focusedOptionIndex.value = (focusedOptionIndex.value + 1) % props.options.length
+    optionElements.value[focusedOptionIndex.value].focus()
+  }
+}
+
+const isChildOfDropdown = (element) => {
+  let currentNode = element
+  while (currentNode) {
+    if (currentNode === this.$el) {
+      return true
+    }
+    currentNode = currentNode.parentNode
+  }
+  return false
 }
 </script>
 
