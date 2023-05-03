@@ -46,7 +46,7 @@ import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
 import { profile_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
-import { shallowRef } from 'vue'
+import { shallowRef, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
@@ -60,10 +60,12 @@ breadcrumbs.setContext({
   link: route.path,
 })
 
-await profile_listener(async (e) => {
+const dropProfileListener = await profile_listener(async (e) => {
   if (e.path === instance.value.path && e.event === 'Edited')
     instance.value = await get(route.params.id)
 })
+
+onUnmounted(() => dropProfileListener())
 </script>
 
 <style scoped lang="scss">
