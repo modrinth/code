@@ -10,10 +10,10 @@ defineProps({
     type: Number,
     required: true,
     validator(value) {
-      return value >= 0 && value <= 100;
+      return value >= 0 && value <= 100
     },
   },
-});
+})
 </script>
 
 <style scoped>

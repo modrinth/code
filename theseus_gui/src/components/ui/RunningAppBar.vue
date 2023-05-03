@@ -58,7 +58,7 @@ import {
 import { loading_listener, process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
-import ProgressBar from "@/components/ui/ProgressBar.vue";
+import ProgressBar from '@/components/ui/ProgressBar.vue'
 
 const router = useRouter()
 const card = ref(null)
