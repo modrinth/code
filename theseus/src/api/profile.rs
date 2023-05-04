@@ -167,13 +167,14 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
 
         profile.sync().await?;
 
-        Ok(())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
+        return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
         .as_error())
     }
+    profiles.sync().await?; // sync to disk
+    Ok(())
 }
 
 pub async fn update_project(
@@ -205,13 +206,16 @@ pub async fn update_project(
             }
         }
 
-        Ok(())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
+        return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
         .as_error())
     }
+    if !should_not_sync.unwrap_or(false) {
+        profiles.sync().await?; // sync to disk
+    }
+    Ok(())
 }
 
 /// Replaces a project given a new version ID
@@ -223,22 +227,22 @@ pub async fn replace_project(
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile_path) {
+    let path = if let Some(profile) = profiles.0.get_mut(profile_path) {
         let path = profile.add_project_version(version_id).await?;
 
         if path != project {
             profile.remove_project(project).await?;
         }
-
         profile.sync().await?;
-
-        Ok(path)
+        path
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
+        return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
         .as_error())
-    }
+    };
+    profiles.sync().await?; // sync to disk
+    Ok(path)
 }
 
 /// Add a project from a version
@@ -250,18 +254,18 @@ pub async fn add_project_from_version(
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile_path) {
+    let path = if let Some(profile) = profiles.0.get_mut(profile_path) {
         let path = profile.add_project_version(version_id).await?;
-
         profile.sync().await?;
-
-        Ok(path)
+        path
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
+        return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
         .as_error())
-    }
+    };
+    profiles.sync().await?; // sync to disk
+    Ok(path)
 }
 
 /// Add a project from an FS path
@@ -274,7 +278,7 @@ pub async fn add_project_from_path(
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile_path) {
+    let path = if let Some(profile) = profiles.0.get_mut(profile_path) {
         let file = fs::read(path).await?;
         let file_name = path
             .file_name()
@@ -291,14 +295,15 @@ pub async fn add_project_from_path(
             .await?;
 
         profile.sync().await?;
-
-        Ok(path)
+        path
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
+        return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
         .as_error())
-    }
+    };
+    profiles.sync().await?; // sync to disk
+    Ok(path)
 }
 
 /// Toggle whether a project is disabled or not
@@ -313,13 +318,7 @@ pub async fn toggle_disable_project(
 
     if let Some(profile) = profiles.0.get_mut(profile) {
         profile.toggle_disable_project(project).await?;
-        emit_profile(
-            profile.uuid,
-            profile.path.clone(),
-            &profile.metadata.name,
-            ProfilePayloadType::Edited,
-        )
-        .await?;
+        profile.sync().await?;
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
@@ -343,14 +342,14 @@ pub async fn remove_project(
     if let Some(profile) = profiles.0.get_mut(profile) {
         profile.remove_project(project).await?;
         profile.sync().await?;
-
-        Ok(())
     } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
+        return Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
         )
         .as_error())
     }
+    profiles.sync().await?;
+    Ok(())
 }
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
