@@ -8,19 +8,21 @@ const stopTimer = (notif) => clearTimeout(notif.timer)
 
 <template>
   <div class="vue-notification-group">
-    <div
-      v-for="item in notificationStore.notifications"
-      :key="item.id"
-      class="vue-notification-wrapper"
-      @click="() => notificationStore.clearNotificationById(item.id)"
-      @mouseenter="stopTimer(item)"
-      @mouseleave="notificationStore.setNotificationTimer(item)"
-    >
-      <div class="vue-notification-template vue-notification" :class="{ [item.type]: true }">
-        <div class="notification-title" v-html="item.title"></div>
-        <div class="notification-content" v-html="item.text"></div>
+    <TransitionGroup name="notifs">
+      <div
+        v-for="item in notificationStore.notifications"
+        :key="item.id"
+        class="vue-notification-wrapper"
+        @click="() => notificationStore.clearNotificationById(item.id)"
+        @mouseenter="stopTimer(item)"
+        @mouseleave="notificationStore.setNotificationTimer(item)"
+      >
+        <div class="vue-notification-template vue-notification" :class="{ [item.type]: true }">
+          <div class="notification-title" v-html="item.title"></div>
+          <div class="notification-content" v-html="item.text"></div>
+        </div>
       </div>
-    </div>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -34,6 +36,8 @@ const stopTimer = (notif) => clearTimeout(notif.timer)
   font-size: 12px;
   padding: 10px;
   margin: 0 5px 5px;
+  cursor: pointer;
+
   &.success {
     background: var(--color-green) !important;
     border-left-color: var(--color-green) !important;
