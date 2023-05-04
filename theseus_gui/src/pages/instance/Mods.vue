@@ -26,7 +26,7 @@
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
-          <Button color="success" icon-only @click="updateAll">
+          <Button color="success" icon-only :disabled="allUpdated" @click="updateAll">
             <UpdatedIcon />
           </Button>
         </div>
@@ -85,7 +85,7 @@ import {
   DropdownSelect,
   AnimatedLogo,
 } from 'omorphia'
-import { computed, ref, shallowRef, onUnmounted } from 'vue'
+import { computed, ref, shallowRef, onUnmounted, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import {
   toggle_disable_project,
@@ -111,7 +111,7 @@ const loading = ref(false)
 const projects = shallowRef([])
 const formatProjects = (projectsToFormat = []) => {
   projects.value = []
-  console.log(Object.keys(props.instance.projects).length)
+
   if (projectsToFormat.length === 0) projectsToFormat = Object.values(props.instance.projects)
 
   for (const project of projectsToFormat) {
@@ -125,7 +125,9 @@ const formatProjects = (projectsToFormat = []) => {
         file_name: project.file_name,
         icon: project.metadata.project.icon_url,
         disabled: project.file_name.includes('.disabled') ? true : false,
-        outdated: project.metadata.update_version,
+        outdated:
+          project.metadata.update_version?.version_number !==
+          project.metadata.version?.version_number,
       })
     } else if (project.metadata.type === 'inferred') {
       projects.value.push({
@@ -162,6 +164,8 @@ const search = computed(() => {
 
   return updateSort(filtered, sortFilter.value)
 })
+
+const allUpdated = computed(() => projects.value.every((p) => p.outdated === false))
 
 function updateSort(projects, sort) {
   switch (sort) {
@@ -215,11 +219,7 @@ const update = async (mod) => await update_project(props.instance.path, getProje
 const handleDisable = async (mod) =>
   await toggle_disable_project(props.instance.path, getProject(mod))
 
-const deleteMod = async (mod) => {
-  const project = getProject(mod)
-  await remove_project(props.instance.path, project)
-  projects.value = projects.value.filter((p) => p.file_name !== mod.file_name)
-}
+const deleteMod = async (mod) => await remove_project(props.instance.path, getProject(mod))
 
 const dropFileListener = await listen('tauri://file-drop', async (e) => {
   // Get the uploaded file(s) from the payload and add it to profile
@@ -232,6 +232,15 @@ const dropFileListener = await listen('tauri://file-drop', async (e) => {
   const profile = await get(props.instance.path)
   formatProjects(Object.values(profile.projects))
 })
+
+watch(
+  () => props.instance,
+  (newProps) => {
+    console.log(props.instance)
+    console.log(newProps)
+    formatProjects()
+  }
+)
 
 onUnmounted(() => {
   dropFileListener()
