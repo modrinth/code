@@ -1,5 +1,6 @@
 <template>
-  <Card class="mod-card">
+  <AnimatedLogo v-if="loading" />
+  <Card v-else class="mod-card">
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
@@ -82,6 +83,7 @@ import {
   SearchIcon,
   UpdatedIcon,
   DropdownSelect,
+  AnimatedLogo,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -95,6 +97,8 @@ const props = defineProps({
     },
   },
 })
+
+const loading = ref(false)
 
 const projects = shallowRef([])
 for (const project of Object.values(props.instance.projects)) {
@@ -136,6 +140,8 @@ for (const project of Object.values(props.instance.projects)) {
 const searchFilter = ref('')
 const sortFilter = ref('')
 const allUpdated = ref(false)
+
+console.log('test mount')
 
 const search = computed(() => {
   const filtered = projects.value.filter((mod) => {
@@ -184,14 +190,25 @@ const getProject = (mod) =>
   Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
 
 const updateAll = async () => {
+  console.log('firing')
+  loading.value = true
   await update_all(props.instance.path)
   allUpdated.value = true
+  loading.value = false
+  props.instance.projects.forEach((p) => (p.outdated = false))
+  console.log('finished')
 }
 
 const update = async (mod) => {
+  if (loading.value === true) return
+
   const project = getProject(mod)
-  await update(props.instance.path, project)
-  mod.updated = true
+  console.log(project)
+  loading.value = true
+  const result = await update(props.instance.path, project)
+  mod.outdated = false
+  loading.value = false
+  console.log(result)
 }
 
 const handleDisable = async (mod) => {
