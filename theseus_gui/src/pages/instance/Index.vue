@@ -147,15 +147,18 @@ Button {
     width: 100%;
     color: var(--color-primary);
     padding: var(--gap-md);
+    box-shadow: none;
 
     &.router-link-exact-active {
+      box-shadow: var(--shadow-inset-lg);
       background: var(--color-button-bg);
+      color: var(--color-contrast);
     }
 
     &:hover {
       background-color: var(--color-button-bg);
       color: var(--color-contrast);
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+      box-shadow: var(--shadow-inset-lg);
       text-decoration: none;
     }
 

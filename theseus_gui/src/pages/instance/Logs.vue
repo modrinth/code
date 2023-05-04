@@ -1,92 +1,77 @@
 <template>
   <Card class="log-card">
     <div class="button-row">
-      <DropdownSelect :options="['logs/latest.log']" />
+      <DropdownSelect v-model="selectedLog" :options="logs" :display-name="name => name?.datetime_string" :disabled="logs.length === 0"/>
       <div class="button-group">
-        <Button>
-          <ClipboardCopyIcon />
-          Copy
+        <Button :disabled="!selectedLog" @click="copyLog()">
+          <ClipboardCopyIcon v-if="!copied"/>
+          <CheckIcon v-else />
+          {{ copied ? 'Copied' : 'Copy'}}
         </Button>
-        <Button color="primary">
+        <Button :disabled="!selectedLog" color="primary" @click="shareLog()">
           <SendIcon />
           Share
         </Button>
-        <Button color="danger">
+        <Button :disabled="!selectedLog || selectedLog === logs[0]" color="danger" @click="deleteLog()">
           <TrashIcon />
           Delete
         </Button>
       </div>
     </div>
     <div class="log-text">
-      <div v-for="(line, index) in fileContents.value.split('\n')" :key="index">{{ line }}</div>
+      <div v-for="line in selectedLog?.stdout.split('\n')" :key="line" class="no-wrap">
+        {{ line }}
+      </div>
     </div>
   </Card>
 </template>
 
 <script setup>
-import { Card, Button, TrashIcon, SendIcon, ClipboardCopyIcon, DropdownSelect } from 'omorphia'
-</script>
-<script>
-export default {
-  data() {
-    return {
-      fileContents: {
-        value:
-          "'ServerLevel[New World]'/minecraft:the_end\n" +
-          '[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n' +
-          '[22:13:02] [Server thread/INFO]: venashial left the game\n' +
-          '[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n' +
-          '[22:13:02] [Server thread/INFO]: Stopping server\n' +
-          '[22:13:02] [Server thread/INFO]: Saving players\n' +
-          '[22:13:02] [Server thread/INFO]: Saving worlds\n' +
-          "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
-          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
-          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n' +
-          '[22:13:06] [Render thread/INFO]: Stopping worker threads\n' +
-          '[22:13:07] [Render thread/INFO]: Stopping!\n' +
-          '[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...\n' +
-          "'ServerLevel[New World]'/minecraft:the_end\n" +
-          '[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n' +
-          '[22:13:02] [Server thread/INFO]: venashial left the game\n' +
-          '[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n' +
-          '[22:13:02] [Server thread/INFO]: Stopping server\n' +
-          '[22:13:02] [Server thread/INFO]: Saving players\n' +
-          '[22:13:02] [Server thread/INFO]: Saving worlds\n' +
-          "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
-          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
-          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n' +
-          '[22:13:06] [Render thread/INFO]: Stopping worker threads\n' +
-          '[22:13:07] [Render thread/INFO]: Stopping!\n' +
-          '[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...\n' +
-          "'ServerLevel[New World]'/minecraft:the_end\n" +
-          '[22:13:02] [Server thread/INFO]: venashial lost connection: Disconnected\n' +
-          '[22:13:02] [Server thread/INFO]: venashial left the game\n' +
-          '[22:13:02] [Server thread/INFO]: Stopping singleplayer server as player logged out\n' +
-          '[22:13:02] [Server thread/INFO]: Stopping server\n' +
-          '[22:13:02] [Server thread/INFO]: Saving players\n' +
-          '[22:13:02] [Server thread/INFO]: Saving worlds\n' +
-          "[22:13:02] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:overworld\n" +
-          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_nether\n" +
-          "[22:13:05] [Server thread/INFO]: Saving chunks for level 'ServerLevel[New World]'/minecraft:the_end\n" +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (New World): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM-1): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage (DIM1): All chunks are saved\n' +
-          '[22:13:05] [Server thread/INFO]: ThreadedAnvilChunkStorage: All dimensions are saved\n' +
-          '[22:13:06] [Render thread/INFO]: Stopping worker threads\n' +
-          '[22:13:07] [Render thread/INFO]: Stopping!\n' +
-          '[22:13:07] [CraftPresence-ShutDown-Handler/INFO]: Shutting down CraftPresence...',
-      },
-    }
+import { Card, Button, TrashIcon, SendIcon, ClipboardCopyIcon, DropdownSelect, CheckIcon } from 'omorphia'
+import {delete_logs_by_datetime, get_logs} from "@/helpers/logs.js";
+import {onMounted, ref, watch} from "vue";
+
+const props = defineProps({
+  instance: {
+    type: Object,
+    required: true,
   },
+})
+
+console.log(props.instance)
+const logs = ref([])
+const selectedLog = ref(null)
+const copied = ref(false)
+
+onMounted(async () => {
+  try {
+    logs.value = await get_logs(props.instance.uuid).then(log => log.reverse())
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+const shareLog = () => {
+  console.log("share")
 }
+
+const copyLog = () => {
+  if (selectedLog.value) {
+    navigator.clipboard.writeText(selectedLog.value.stdout)
+    copied.value = true
+  }
+}
+
+const deleteLog = async () => {
+  if (selectedLog.value && selectedLog.value !== logs.value[0]) {
+    await delete_logs_by_datetime(props.instance.uuid, selectedLog.value.datetime_string)
+    logs.value = await get_logs(props.instance.uuid).then(log => log.reverse())
+  }
+}
+
+watch(selectedLog, () => {
+  copied.value = false
+})
 </script>
 
 <style scoped lang="scss">
@@ -94,7 +79,9 @@ export default {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  height: calc(100vh - 11rem);
 }
+
 .button-row {
   display: flex;
   flex-direction: row;
@@ -109,7 +96,7 @@ export default {
 
 .log-text {
   width: 100%;
-  aspect-ratio: 2/1;
+  height: 100%;
   font-family: var(--mono-font);
   background-color: var(--color-accent-contrast);
   color: var(--color-contrast);
@@ -117,5 +104,6 @@ export default {
   padding: 1.5rem;
   overflow: auto;
   white-space: normal;
+  color-scheme: dark;
 }
 </style>
