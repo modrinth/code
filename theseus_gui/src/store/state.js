@@ -1,4 +1,5 @@
 import { useSearch } from './search'
 import { useTheming } from './theme'
+import { useBreadcrumbs } from './breadcrumbs'
 
-export { useSearch, useTheming }
+export { useSearch, useTheming, useBreadcrumbs }

@@ -136,6 +136,7 @@ pub fn get_jvm_arguments(
             parsed_arguments.push(arg);
         }
     }
+    parsed_arguments.push("-Dorg.lwjgl.util.Debug=true".to_string());
 
     Ok(parsed_arguments)
 }

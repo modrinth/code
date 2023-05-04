@@ -116,6 +116,14 @@ impl DirectoryInfo {
         self.config_dir.join("profiles")
     }
 
+    /// Gets the logs dir for a given profile
+    #[inline]
+    pub fn profile_logs_dir(&self, profile: uuid::Uuid) -> PathBuf {
+        self.profiles_dir()
+            .join(profile.to_string())
+            .join("modrinth_logs")
+    }
+
     /// Get the file containing the global database
     #[inline]
     pub fn database_file(&self) -> PathBuf {
@@ -132,6 +140,11 @@ impl DirectoryInfo {
     #[inline]
     pub fn caches_dir(&self) -> PathBuf {
         self.config_dir.join("caches")
+    }
+
+    #[inline]
+    pub fn caches_meta_dir(&self) -> PathBuf {
+        self.config_dir.join("caches").join("metadata")
     }
 
     /// Get path from environment variable

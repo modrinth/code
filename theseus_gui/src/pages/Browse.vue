@@ -17,9 +17,14 @@ import {
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
+import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
+import { useRoute } from 'vue-router'
 
 const searchStore = useSearch()
+const breadcrumbs = useBreadcrumbs()
+const route = useRoute()
+breadcrumbs.setContext({ name: 'Browse', link: route.path })
 
 const showSnapshots = ref(false)
 const loading = ref(true)

@@ -1,26 +1,20 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-  HomeIcon,
-  SearchIcon,
-  LibraryIcon,
-  PlusIcon,
-  SettingsIcon,
-} from 'omorphia'
+import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
-import { toggleTheme } from '@/helpers/theme'
+import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { list } from '@/helpers/profile'
+import { get } from '@/helpers/settings'
+import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
+import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 
 const themeStore = useTheming()
 
-toggleTheme(themeStore.darkTheme)
-
-watch(themeStore, (newState) => {
-  toggleTheme(newState.darkTheme)
+onMounted(async () => {
+  const { theme } = await get()
+  themeStore.setThemeState(theme)
 })
 
 const installedMods = ref(0)
@@ -45,9 +39,17 @@ list().then(
           <RouterLink to="/" class="button-base nav-button"><HomeIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
           <RouterLink to="/library" class="button-base nav-button"> <LibraryIcon /></RouterLink>
-          <button color="primary" class="button-base primary nav-button" icon-only>
+          <button
+            color="primary"
+            class="button-base primary nav-button"
+            icon-only
+            @click="() => $refs.installationModal.show()"
+          >
             <PlusIcon />
           </button>
+          <Suspense>
+            <InstanceCreationModal ref="installationModal" />
+          </Suspense>
         </div>
       </div>
       <div class="settings pages-list">
@@ -57,12 +59,12 @@ list().then(
     <div class="view">
       <div class="appbar">
         <section class="navigation-controls">
-          <ChevronLeftIcon @click="$router.back()" />
-          <ChevronRightIcon @click="$router.forward()" />
-          <p>{{ $route.name }}</p>
+          <Breadcrumbs />
         </section>
         <section class="mod-stats">
-          <p>{{ installedMods }} mods installed</p>
+          <Suspense>
+            <RunningAppBar />
+          </Suspense>
         </section>
       </div>
       <div class="router-view">
@@ -81,25 +83,18 @@ list().then(
   flex-direction: row;
   overflow: hidden;
 
-  .router-view {
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    overflow-x: hidden;
-  }
-
   .view {
-    margin-left: 5rem;
     width: calc(100% - 5rem);
-    height: calc(100%);
 
     .appbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: #40434a;
+      background: var(--color-super-raised-bg);
       text-align: center;
-      padding: 0.5rem 1rem;
+      padding: 0 0 0 1rem;
+      height: 3.25rem;
+      z-index: 11;
 
       .navigation-controls {
         display: inherit;
@@ -132,29 +127,50 @@ list().then(
       }
 
       .mod-stats {
+        height: 100%;
         display: inherit;
         align-items: inherit;
         justify-content: flex-end;
       }
     }
-  }
-}
 
-.nav-container {
-  position: absolute;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-  padding: 1rem;
+    .router-view {
+      width: 100%;
+      height: calc(100% - 3.125rem);
+      overflow: auto;
+      overflow-x: hidden;
+    }
+  }
 }
 
 .dark-mode {
   .nav-container {
-    background: var(--color-bg);
+    background: var(--color-bg) !important;
   }
+  .pages-list {
+    a.router-link-active {
+      color: #fff;
+    }
+  }
+}
+
+.light-mode {
+  .nav-container {
+    box-shadow: var(--shadow-floating), var(--shadow-floating), var(--shadow-floating),
+      var(--shadow-floating) !important;
+  }
+}
+
+.nav-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 10;
+  height: 100%;
+  box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
+  padding: 1rem;
+  background: var(--color-raised-bg);
 }
 
 .pages-list {
@@ -176,7 +192,7 @@ list().then(
     color: var(--color-base);
 
     &.router-link-active {
-      color: var(--color-accent-contrast);
+      color: var(--color-contrast);
       background: var(--color-button-bg);
     }
 
@@ -205,14 +221,6 @@ list().then(
   &.primary {
     color: var(--color-accent-contrast);
     background-color: var(--color-brand);
-  }
-}
-
-.dark-mode {
-  .pages-list {
-    a.router-link-active {
-      color: #fff;
-    }
   }
 }
 
@@ -252,6 +260,10 @@ list().then(
 }
 
 .settings {
+  svg {
+    color: var(--color-base) !important;
+  }
+
   a {
     display: flex;
     flex-direction: column;

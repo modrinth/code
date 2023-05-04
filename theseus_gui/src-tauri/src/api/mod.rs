@@ -4,7 +4,7 @@ use thiserror::Error;
 
 pub mod auth;
 pub mod jre;
-
+pub mod logs;
 pub mod metadata;
 pub mod pack;
 pub mod process;
@@ -26,7 +26,7 @@ pub enum TheseusGuiError {
 // Serializable error intermediary, so TheseusGuiError can be Serializable (eg: so that we can return theseus::Errors in Tauri directly)
 #[derive(Error, Debug)]
 pub enum TheseusSerializableError {
-    #[error("Theseus API error: {0}")]
+    #[error("{0}")]
     Theseus(#[from] theseus::Error),
 
     #[error("IO error: {0}")]
@@ -34,9 +34,6 @@ pub enum TheseusSerializableError {
 
     #[error("No profile found at {0}")]
     NoProfileFound(String),
-
-    #[error("Improperly formatted environment variables: {0}")]
-    BadEnvVars(String),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -47,6 +44,14 @@ where
     fn from(error: T) -> Self {
         TheseusGuiError::Serializable(TheseusSerializableError::from(error))
     }
+}
+
+// Lists active progress bars
+#[tauri::command]
+pub async fn progress_bars_list(
+) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
+    let res = theseus::EventState::list_progress_bars().await?;
+    Ok(res)
 }
 
 // This is a very simple macro that implements a very basic Serializable for each variant of TheseusSerializableError,
@@ -78,5 +83,4 @@ impl_serialize! {
     Theseus,
     IO,
     NoProfileFound,
-    BadEnvVars,
 }

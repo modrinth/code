@@ -1,13 +1,18 @@
 //! Logic for launching Minecraft
+use crate::event::emit::{emit_loading, init_or_edit_loading};
+use crate::event::LoadingBarType;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
+    State,
 };
 use daedalus as d;
 use dunce::canonicalize;
 use st::Profile;
+use std::fs;
 use std::{path::Path, process::Stdio, sync::Arc};
 use tokio::process::Command;
+use uuid::Uuid;
 
 mod args;
 
@@ -48,54 +53,58 @@ macro_rules! processor_rules {
     }
 }
 
-#[allow(clippy::too_many_arguments)]
-#[tracing::instrument(skip_all, fields(path = ?instance_path))]
-pub async fn launch_minecraft(
-    game_version: &str,
-    loader_version: &Option<d::modded::LoaderVersion>,
-    instance_path: &Path,
-    java_install: &Path,
-    java_args: &[String],
-    env_args: &[(String, String)],
-    wrapper: &Option<String>,
-    memory: &st::MemorySettings,
-    resolution: &st::WindowSize,
-    credentials: &auth::Credentials,
-    post_exit_hook: Option<Command>,
-    profile: &Profile, // optional ref to Profile for event tracking
-) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
-    let state = st::State::get().await?;
-    let instance_path = &canonicalize(instance_path)?;
+pub async fn install_minecraft(
+    profile: &Profile,
+    existing_loading_bar: Option<Uuid>,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let instance_path = &canonicalize(&profile.path)?;
+    let metadata = state.metadata.read().await;
 
-    let version = state
-        .metadata
+    let version = metadata
         .minecraft
         .versions
         .iter()
-        .find(|it| it.id == game_version)
+        .find(|it| it.id == profile.metadata.game_version)
         .ok_or(crate::ErrorKind::LauncherError(format!(
-            "Invalid game version: {game_version}"
+            "Invalid game version: {}",
+            profile.metadata.game_version
         )))?;
 
-    let version_jar =
-        loader_version.as_ref().map_or(version.id.clone(), |it| {
+    let version_jar = profile
+        .metadata
+        .loader_version
+        .as_ref()
+        .map_or(version.id.clone(), |it| {
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 
     let mut version_info = download::download_version_info(
         &state,
         version,
-        loader_version.as_ref(),
+        profile.metadata.loader_version.as_ref(),
+        None,
     )
     .await?;
+
+    let loading_bar = init_or_edit_loading(
+        existing_loading_bar,
+        LoadingBarType::MinecraftDownload {
+            // If we are downloading minecraft for a profile, provide its name and uuid
+            profile_name: profile.metadata.name.clone(),
+            profile_uuid: profile.uuid,
+        },
+        100.0,
+        "Downloading Minecraft...",
+    )
+    .await?;
+
+    download::download_minecraft(&state, &version_info, loading_bar).await?;
 
     let client_path = state
         .directories
         .version_dir(&version_jar)
         .join(format!("{version_jar}.jar"));
-
-    download::download_minecraft(&state, &version_info, profile).await?;
-    st::State::sync().await?;
 
     if let Some(processors) = &version_info.processors {
         if let Some(ref mut data) = version_info.data {
@@ -108,7 +117,7 @@ pub async fn launch_minecraft(
                     client => client_path.to_string_lossy(),
                     server => "";
                 "MINECRAFT_VERSION":
-                    client => game_version,
+                    client => profile.metadata.game_version.clone(),
                     server => "";
                 "ROOT":
                     client => instance_path.to_string_lossy(),
@@ -118,7 +127,21 @@ pub async fn launch_minecraft(
                     server => "";
             }
 
-            for processor in processors {
+            emit_loading(&loading_bar, 0.0, Some("Running forge processors"))
+                .await?;
+            let total_length = processors.len();
+
+            for (index, processor) in processors.iter().enumerate() {
+                emit_loading(
+                    &loading_bar,
+                    index as f64 / total_length as f64,
+                    Some(&format!(
+                        "Running forge processor {}/{}",
+                        index, total_length
+                    )),
+                )
+                .await?;
+
                 if let Some(sides) = &processor.sides {
                     if !sides.contains(&String::from("client")) {
                         continue;
@@ -172,6 +195,68 @@ pub async fn launch_minecraft(
             }
         }
     }
+
+    crate::api::profile::edit(&profile.path, |prof| {
+        prof.installed = true;
+
+        async { Ok(()) }
+    })
+    .await?;
+    State::sync().await?;
+
+    Ok(())
+}
+
+#[allow(clippy::too_many_arguments)]
+pub async fn launch_minecraft(
+    java_install: &Path,
+    java_args: &[String],
+    env_args: &[(String, String)],
+    wrapper: &Option<String>,
+    memory: &st::MemorySettings,
+    resolution: &st::WindowSize,
+    credentials: &auth::Credentials,
+    post_exit_hook: Option<Command>,
+    profile: &Profile,
+) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
+    if !profile.installed {
+        install_minecraft(profile, None).await?;
+    }
+
+    let state = st::State::get().await?;
+    let metadata = state.metadata.read().await;
+    let instance_path = &canonicalize(&profile.path)?;
+
+    let version = metadata
+        .minecraft
+        .versions
+        .iter()
+        .find(|it| it.id == profile.metadata.game_version)
+        .ok_or(crate::ErrorKind::LauncherError(format!(
+            "Invalid game version: {}",
+            profile.metadata.game_version
+        )))?;
+
+    let version_jar = profile
+        .metadata
+        .loader_version
+        .as_ref()
+        .map_or(version.id.clone(), |it| {
+            format!("{}-{}", version.id.clone(), it.id.clone())
+        });
+
+    let version_info = download::download_version_info(
+        &state,
+        version,
+        profile.metadata.loader_version.as_ref(),
+        None,
+    )
+    .await?;
+
+    let client_path = state
+        .directories
+        .version_dir(&version_jar)
+        .join(format!("{version_jar}.jar"));
 
     let args = version_info.arguments.clone().unwrap_or_default();
     let mut command = match wrapper {
@@ -232,20 +317,48 @@ pub async fn launch_minecraft(
             .collect::<Vec<_>>(),
         )
         .current_dir(instance_path.clone())
-        .env_clear()
-        .envs(env_args)
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+
+    // Clear cargo-added env varaibles for debugging, and add settings env vars
+    clear_cargo_env_vals(&mut command).envs(env_args);
+
+    // Get Modrinth logs directories
+    let datetime_string =
+        chrono::Local::now().format("%Y%m%y_%H%M%S").to_string();
+    let logs_dir = {
+        let st = State::get().await?;
+        st.directories
+            .profile_logs_dir(profile.uuid)
+            .join(&datetime_string)
+    };
+    fs::create_dir_all(&logs_dir)?;
+
+    let stdout_log_path = logs_dir.join("stdout.log");
+    let stderr_log_path = logs_dir.join("stderr.log");
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes
     let mut state_children = state.children.write().await;
     state_children
         .insert_process(
-            uuid::Uuid::new_v4(),
+            Uuid::new_v4(),
             instance_path.to_path_buf(),
+            stdout_log_path,
+            stderr_log_path,
             command,
             post_exit_hook,
         )
         .await
+}
+
+fn clear_cargo_env_vals(command: &mut Command) -> &mut Command {
+    for (key, _) in std::env::vars() {
+        command.env_remove(key);
+
+        // if key.starts_with("CARGO") {
+        //     command.env_remove(key);
+        // }
+    }
+    command
 }
