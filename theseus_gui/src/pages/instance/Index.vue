@@ -61,9 +61,10 @@ breadcrumbs.setContext({
 })
 
 const dropProfileListener = await profile_listener(async (e) => {
-  console.log(e)
-  if (e.path === instance.value.path && e.event === 'Edited')
+  if (e.path === instance.value.path && (e.event === 'Edited' || e.event === 'Synced')) {
+    console.log('refreshing instance data')
     instance.value = await get(route.params.id)
+  }
 })
 
 onUnmounted(() => dropProfileListener())

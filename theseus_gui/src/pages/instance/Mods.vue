@@ -87,7 +87,12 @@ import {
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { toggle_disable_project, remove_project, update_all } from '@/helpers/profile'
+import {
+  toggle_disable_project,
+  remove_project,
+  update_all,
+  update_project,
+} from '@/helpers/profile'
 
 const props = defineProps({
   instance: {
@@ -140,8 +145,6 @@ for (const project of Object.values(props.instance.projects)) {
 const searchFilter = ref('')
 const sortFilter = ref('')
 const allUpdated = ref(false)
-
-console.log('test mount')
 
 const search = computed(() => {
   const filtered = projects.value.filter((mod) => {
@@ -200,21 +203,12 @@ const updateAll = async () => {
 }
 
 const update = async (mod) => {
-  if (loading.value === true) return
-
-  const project = getProject(mod)
-  console.log(project)
-  loading.value = true
-  const result = await update(props.instance.path, project)
+  await update_project(props.instance.path, getProject(mod))
   mod.outdated = false
-  loading.value = false
-  console.log(result)
 }
 
-const handleDisable = async (mod) => {
-  const project = getProject(mod)
-  await toggle_disable_project(props.instance.path, project)
-}
+const handleDisable = async (mod) =>
+  await toggle_disable_project(props.instance.path, getProject(mod))
 
 const deleteMod = async (mod) => {
   const project = getProject(mod)
