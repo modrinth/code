@@ -138,42 +138,51 @@ pub async fn install(path: &Path) -> crate::Result<()> {
 }
 
 pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
+    let keys: Vec<PathBuf>;
+    let loading_bar;
+    let num_futs;
     let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
-
-    if let Some(profile) = profiles.0.get_mut(profile_path) {
-        let loading_bar = init_loading(
-            LoadingBarType::ProfileUpdate {
-                profile_uuid: profile.uuid,
-                profile_name: profile.metadata.name.clone(),
-            },
-            100.0,
-            "Updating profile...",
-        )
-        .await?;
-
-        use futures::StreamExt;
-        loading_try_for_each_concurrent(
-            futures::stream::iter(profile.projects.keys())
-                .map(Ok::<&PathBuf, crate::Error>),
-            None,
-            Some(&loading_bar),
-            100.0,
-            profile.projects.len(),
-            None,
-            |project| update_project(profile_path, project, Some(true)),
-        )
-        .await?;
-
-        profile.sync().await?;
-
-    } else {
-        return Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
-        )
-        .as_error())
+    {
+        let mut profiles: tokio::sync::RwLockWriteGuard<
+            crate::state::Profiles,
+        > = state.profiles.write().await;
+        if let Some(profile) = profiles.0.get_mut(profile_path) {
+            loading_bar = init_loading(
+                LoadingBarType::ProfileUpdate {
+                    profile_uuid: profile.uuid.clone(),
+                    profile_name: profile.metadata.name.clone(),
+                },
+                100.0,
+                "Updating profile...",
+            )
+            .await?;
+            keys = profile.projects.keys().cloned().collect();
+            num_futs = profile.projects.len();
+        } else {
+            return Err(crate::ErrorKind::UnmanagedProfileError(
+                profile_path.display().to_string().clone(),
+            )
+            .as_error());
+        }
     }
-    profiles.sync().await?; // sync to disk
+
+    use futures::StreamExt;
+    loading_try_for_each_concurrent(
+        futures::stream::iter(keys.iter()).map(Ok::<&PathBuf, crate::Error>),
+        None,
+        Some(&loading_bar),
+        100.0,
+        num_futs,
+        None,
+        |project| update_project(profile_path, project, Some(true)),
+    )
+    .await?;
+
+    {
+        let profiles: tokio::sync::RwLockWriteGuard<crate::state::Profiles> =
+            state.profiles.write().await;
+        profiles.sync().await?; // sync to disk
+    }
     Ok(())
 }
 
@@ -184,7 +193,6 @@ pub async fn update_project(
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
-
     if let Some(profile) = profiles.0.get_mut(profile_path) {
         if let Some(project) = profile.projects.get(project_path) {
             if let ProjectMetadata::Modrinth {
@@ -199,19 +207,18 @@ pub async fn update_project(
                 if path != project_path {
                     profile.remove_project(project_path).await?;
                 }
-
                 if !should_not_sync.unwrap_or(false) {
                     profile.sync().await?;
                 }
             }
         }
-
     } else {
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
-        .as_error())
+        .as_error());
     }
+
     if !should_not_sync.unwrap_or(false) {
         profiles.sync().await?; // sync to disk
     }
@@ -239,7 +246,7 @@ pub async fn replace_project(
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
-        .as_error())
+        .as_error());
     };
     profiles.sync().await?; // sync to disk
     Ok(path)
@@ -262,7 +269,7 @@ pub async fn add_project_from_version(
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
-        .as_error())
+        .as_error());
     };
     profiles.sync().await?; // sync to disk
     Ok(path)
@@ -300,7 +307,7 @@ pub async fn add_project_from_path(
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
         )
-        .as_error())
+        .as_error());
     };
     profiles.sync().await?; // sync to disk
     Ok(path)
@@ -346,7 +353,7 @@ pub async fn remove_project(
         return Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
         )
-        .as_error())
+        .as_error());
     }
     profiles.sync().await?;
     Ok(())
