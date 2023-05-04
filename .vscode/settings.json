@@ -53,4 +53,7 @@
   "svelte.ask-to-enable-ts-plugin": false,
   "svelte.plugin.css.diagnostics.enable": false,
   "svelte.plugin.svelte.diagnostics.enable": false,
+  "rust-analyzer.linkedProjects": [
+    "./theseus/Cargo.toml"
+  ],
 }
