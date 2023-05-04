@@ -1,6 +1,5 @@
 <template>
-  <AnimatedLogo v-if="loading" />
-  <Card v-else class="mod-card">
+  <Card class="mod-card">
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
@@ -83,7 +82,6 @@ import {
   SearchIcon,
   UpdatedIcon,
   DropdownSelect,
-  AnimatedLogo,
 } from 'omorphia'
 import { computed, ref, shallowRef, onUnmounted, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -105,8 +103,6 @@ const props = defineProps({
     },
   },
 })
-
-const loading = ref(false)
 
 const projects = shallowRef([])
 const formatProjects = (projectsToFormat = []) => {
@@ -205,14 +201,7 @@ function updateSort(projects, sort) {
 const getProject = (mod) =>
   Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
 
-const updateAll = async () => {
-  console.log('firing')
-  loading.value = true
-  await update_all(props.instance.path)
-  loading.value = false
-  props.instance.projects.forEach((p) => (p.outdated = false))
-  console.log('finished')
-}
+const updateAll = async () => await update_all(props.instance.path)
 
 const update = async (mod) => await update_project(props.instance.path, getProject(mod))
 
@@ -233,13 +222,10 @@ const dropFileListener = await listen('tauri://file-drop', async (e) => {
   formatProjects(Object.values(profile.projects))
 })
 
+// When the instance is updated, reformat the projects.
 watch(
   () => props.instance,
-  (newProps) => {
-    console.log(props.instance)
-    console.log(newProps)
-    formatProjects()
-  }
+  () => formatProjects()
 )
 
 onUnmounted(() => {

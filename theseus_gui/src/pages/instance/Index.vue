@@ -61,6 +61,7 @@ breadcrumbs.setContext({
 })
 
 const dropProfileListener = await profile_listener(async (e) => {
+  console.log(e)
   if (e.path === instance.value.path && ['Edited', 'Synced'].includes(e.event))
     instance.value = await get(route.params.id)
 })
