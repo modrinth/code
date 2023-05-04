@@ -32,12 +32,6 @@
           <FileIcon />
           Logs
         </RouterLink>
-        <span class="button-group">
-          <Button class="instance-button repair-btn"><HammerIcon /> Repair </Button>
-          <Button class="instance-button delete-btn" @click="handleRemove"
-            ><TrashIcon /> Delete</Button
-          >
-        </span>
       </div>
     </div>
     <div class="content">
@@ -47,26 +41,15 @@
   </div>
 </template>
 <script setup>
-import {
-  BoxIcon,
-  SettingsIcon,
-  FileIcon,
-  Button,
-  Avatar,
-  Card,
-  Promotion,
-  TrashIcon,
-} from 'omorphia'
-import { PlayIcon, OpenFolderIcon, HammerIcon } from '@/assets/icons'
-import { get, run, remove } from '@/helpers/profile'
-import { useRoute, useRouter } from 'vue-router'
+import { BoxIcon, SettingsIcon, FileIcon, Button, Avatar, Card, Promotion } from 'omorphia'
+import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
+import { get, run } from '@/helpers/profile'
+import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
 const breadcrumbs = useBreadcrumbs()
-
-const router = useRouter()
 
 const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
@@ -75,11 +58,6 @@ breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
 })
-
-const handleRemove = async () => {
-  await remove(instance.value.path)
-  router.go('/')
-}
 </script>
 
 <style scoped lang="scss">
@@ -160,14 +138,6 @@ Button {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-
-  .delete-btn {
-    background: var(--color-red) !important;
-  }
-
-  .repair-btn {
-    background: var(--color-blue) !important;
-  }
 
   a {
     font-size: 100%;

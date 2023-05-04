@@ -127,11 +127,11 @@
     <div class="settings-group">
       <div class="toggle-setting">
         Repair profile
-        <Button class="repair-btn" @click="handleRepair"><HammerIcon /> Repair</Button>
+        <Button color="highlight" @click="handleRepair"><HammerIcon /> Repair</Button>
       </div>
       <div class="toggle-setting">
         Delete profile
-        <Button class="delete-btn" @click="handleRemove"><TrashIcon /> Delete</Button>
+        <Button color="danger" @click="handleRemove"><TrashIcon /> Delete</Button>
       </div>
     </div>
   </Card>
@@ -196,14 +196,6 @@ const handleRemove = async () => {
   align-items: center;
   gap: 0.5rem;
   margin: 0;
-}
-
-.delete-btn {
-  background: var(--color-red) !important;
-}
-
-.repair-btn {
-  background: var(--color-blue) !important;
 }
 
 .sliders {
