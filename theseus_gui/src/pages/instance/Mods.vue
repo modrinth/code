@@ -85,14 +85,17 @@ import {
   DropdownSelect,
   AnimatedLogo,
 } from 'omorphia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref, shallowRef, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import {
   toggle_disable_project,
   remove_project,
   update_all,
   update_project,
+  add_project_from_path,
+  get,
 } from '@/helpers/profile'
+import { listen } from '@tauri-apps/api/event'
 
 const props = defineProps({
   instance: {
@@ -106,41 +109,43 @@ const props = defineProps({
 const loading = ref(false)
 
 const projects = shallowRef([])
-for (const project of Object.values(props.instance.projects)) {
-  if (project.metadata.type === 'modrinth') {
-    let owner = project.metadata.members.find((x) => x.role === 'Owner')
-    projects.value.push({
-      name: project.metadata.project.title,
-      slug: project.metadata.project.slug,
-      author: owner ? owner.user.username : null,
-      version: project.metadata.version.version_number,
-      file_name: project.file_name,
-      icon: project.metadata.project.icon_url,
-      disabled: project.disabled,
-      outdated: project.metadata.update_version,
-    })
-  } else if (project.metadata.type === 'inferred') {
-    projects.value.push({
-      name: project.metadata.title ?? project.file_name,
-      author: project.metadata.authors[0],
-      version: project.metadata.version,
-      file_name: project.file_name,
-      icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
-      disabled: project.disabled,
-      outdated: false,
-    })
-  } else {
-    projects.value.push({
-      name: project.file_name,
-      author: '',
-      version: null,
-      file_name: project.file_name,
-      icon: null,
-      disabled: project.disabled,
-      outdated: false,
-    })
+const formatProjects = (projectsToFormat = []) => {
+  if (projectsToFormat.length === 0) projectsToFormat = Object.values(props.instance.projects)
+
+  for (const project of projectsToFormat) {
+    if (project.metadata.type === 'modrinth') {
+      let owner = project.metadata.members.find((x) => x.role === 'Owner')
+      projects.value.push({
+        name: project.metadata.project.title,
+        slug: project.metadata.project.slug,
+        author: owner ? owner.user.username : null,
+        version: project.metadata.version.version_number,
+        file_name: project.file_name,
+        icon: project.metadata.project.icon_url,
+        disabled: project.disabled,
+      })
+    } else if (project.metadata.type === 'inferred') {
+      projects.value.push({
+        name: project.metadata.title ?? project.file_name,
+        author: project.metadata.authors[0],
+        version: project.metadata.version,
+        file_name: project.file_name,
+        icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
+        disabled: project.disabled,
+      })
+    } else {
+      projects.value.push({
+        name: project.file_name,
+        author: '',
+        version: null,
+        file_name: project.file_name,
+        icon: null,
+        disabled: project.disabled,
+      })
+    }
   }
 }
+formatProjects()
 
 const searchFilter = ref('')
 const sortFilter = ref('')
@@ -215,6 +220,22 @@ const deleteMod = async (mod) => {
   await remove_project(props.instance.path, project)
   projects.value = projects.value.filter((p) => p.slug !== mod.slug)
 }
+
+const unlisten = await listen('tauri://file-drop', async (e) => {
+  // Get the uploaded file(s) from the payload and add it to profile
+  // TODO: Don't do this iteratively when a batch add method is added
+  await e.payload.forEach(async (mod) => {
+    await add_project_from_path(props.instance.path, mod, 'inferred')
+  })
+
+  // Get the profile. A get_proj_list_by_profile may be better here when one is made
+  const profile = await get(props.instance.path)
+
+  // Update the mods table
+  formatProjects(Object.values(profile.projects))
+})
+
+onUnmounted(() => unlisten())
 </script>
 
 <style scoped lang="scss">
