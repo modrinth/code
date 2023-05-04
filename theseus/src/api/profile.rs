@@ -174,7 +174,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
         100.0,
         num_futs,
         None,
-        |project| update_project(profile_path, project, Some(true)),
+        |project| update_project(profile_path, project, None),
     )
     .await?;
 
