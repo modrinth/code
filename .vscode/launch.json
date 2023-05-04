@@ -133,6 +133,28 @@
             },
             "args": [],
             "cwd": "${workspaceFolder}"
-        }
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Tauri Development Debug",
+            "cargo": {
+              "args": [
+                "build",
+                "--manifest-path=./theseus_gui/src-tauri/Cargo.toml",
+                "--no-default-features"
+              ]
+            },
+            "preLaunchTask": "ui:dev"
+          },
+          {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Tauri Production Debug",
+            "cargo": {
+              "args": ["build", "--release", "--manifest-path=.theseus_gui/src-tauri/Cargo.toml"]
+            },
+            "preLaunchTask": "ui:build"
+          }      
     ]
 }
