@@ -110,6 +110,8 @@ const loading = ref(false)
 
 const projects = shallowRef([])
 const formatProjects = (projectsToFormat = []) => {
+  projects.value = []
+  console.log(Object.keys(props.instance.projects).length)
   if (projectsToFormat.length === 0) projectsToFormat = Object.values(props.instance.projects)
 
   for (const project of projectsToFormat) {
@@ -122,7 +124,8 @@ const formatProjects = (projectsToFormat = []) => {
         version: project.metadata.version.version_number,
         file_name: project.file_name,
         icon: project.metadata.project.icon_url,
-        disabled: project.disabled,
+        disabled: project.file_name.includes('.disabled') ? true : false,
+        outdated: project.metadata.update_version,
       })
     } else if (project.metadata.type === 'inferred') {
       projects.value.push({
@@ -131,7 +134,8 @@ const formatProjects = (projectsToFormat = []) => {
         version: project.metadata.version,
         file_name: project.file_name,
         icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
-        disabled: project.disabled,
+        disabled: project.file_name.includes('.disabled') ? true : false,
+        outdated: false,
       })
     } else {
       projects.value.push({
@@ -140,7 +144,8 @@ const formatProjects = (projectsToFormat = []) => {
         version: null,
         file_name: project.file_name,
         icon: null,
-        disabled: project.disabled,
+        disabled: project.file_name.includes('.disabled') ? true : false,
+        outdated: false,
       })
     }
   }
@@ -149,7 +154,6 @@ formatProjects()
 
 const searchFilter = ref('')
 const sortFilter = ref('')
-const allUpdated = ref(false)
 
 const search = computed(() => {
   const filtered = projects.value.filter((mod) => {
@@ -201,7 +205,6 @@ const updateAll = async () => {
   console.log('firing')
   loading.value = true
   await update_all(props.instance.path)
-  allUpdated.value = true
   loading.value = false
   props.instance.projects.forEach((p) => (p.outdated = false))
   console.log('finished')
@@ -209,7 +212,6 @@ const updateAll = async () => {
 
 const update = async (mod) => {
   await update_project(props.instance.path, getProject(mod))
-  mod.outdated = false
 }
 
 const handleDisable = async (mod) =>
@@ -218,24 +220,24 @@ const handleDisable = async (mod) =>
 const deleteMod = async (mod) => {
   const project = getProject(mod)
   await remove_project(props.instance.path, project)
-  projects.value = projects.value.filter((p) => p.slug !== mod.slug)
+  projects.value = projects.value.filter((p) => p.file_name !== mod.file_name)
 }
 
-const unlisten = await listen('tauri://file-drop', async (e) => {
+const dropFileListener = await listen('tauri://file-drop', async (e) => {
   // Get the uploaded file(s) from the payload and add it to profile
   // TODO: Don't do this iteratively when a batch add method is added
   await e.payload.forEach(async (mod) => {
     await add_project_from_path(props.instance.path, mod, 'inferred')
   })
 
-  // Get the profile. A get_proj_list_by_profile may be better here when one is made
+  // Get the profile. A get_proj_list_by_profile may be better here when one is made.
   const profile = await get(props.instance.path)
-
-  // Update the mods table
   formatProjects(Object.values(profile.projects))
 })
 
-onUnmounted(() => unlisten())
+onUnmounted(() => {
+  dropFileListener()
+})
 </script>
 
 <style scoped lang="scss">
