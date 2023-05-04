@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
-import { useTheming } from '@/store/state'
+import { useTheming, useNotifications } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import Notifications from '@/components/ui/Notifications.vue'
@@ -13,6 +13,7 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import { warning_listener } from './helpers/events'
 
 const themeStore = useTheming()
+const notificationStore = useNotifications()
 let dropWarningListener = () => {}
 
 onMounted(async () => {
@@ -21,11 +22,13 @@ onMounted(async () => {
 
   // Setting up the listener here since we can't use top-level await outside of Suspense.
   //  App.vue isn't wrapped.
-  dropWarningListener = await warning_listener((e) => {
-    console.log(e)
-
-    // TODO: Map warning events to notifications by type.
-  })
+  dropWarningListener = await warning_listener((e) =>
+    notificationStore.addNotification({
+      title: 'Warning',
+      text: e.message,
+      type: 'warn',
+    })
+  )
 })
 
 const installedMods = ref(0)
