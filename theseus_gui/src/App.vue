@@ -1,20 +1,31 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
+import Notifications from '@/components/ui/Notifications.vue'
 import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import { warning_listener } from './helpers/events'
 
 const themeStore = useTheming()
+let dropWarningListener = () => {}
 
 onMounted(async () => {
   const { theme } = await get()
   themeStore.setThemeState(theme)
+
+  // Setting up the listener here since we can't use top-level await outside of Suspense.
+  //  App.vue isn't wrapped.
+  dropWarningListener = await warning_listener((e) => {
+    console.log(e)
+
+    // TODO: Map warning events to notifications by type.
+  })
 })
 
 const installedMods = ref(0)
@@ -25,16 +36,17 @@ list().then(
       0
     ))
 )
-// TODO: add event when profiles update to update installed mods count
+
+onUnmounted(() => dropWarningListener())
 </script>
 
 <template>
   <div class="container">
     <div class="nav-container">
       <div class="nav-section">
-        <suspense>
+        <Suspense>
           <AccountsCard ref="accounts" />
-        </suspense>
+        </Suspense>
         <div class="pages-list">
           <RouterLink to="/" class="button-base nav-button"><HomeIcon /></RouterLink>
           <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
@@ -73,6 +85,7 @@ list().then(
         </Suspense>
       </div>
     </div>
+    <Notifications />
   </div>
 </template>
 

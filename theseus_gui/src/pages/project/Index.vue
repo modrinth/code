@@ -218,7 +218,9 @@ import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumbs, useNotifications } from '@/store/state'
+
+const notificationStore = useNotifications()
 
 const route = useRoute()
 const router = useRouter()
@@ -228,10 +230,42 @@ const confirmModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
 const [data, versions, members, dependencies] = await Promise.all([
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`)
+    .then(shallowRef)
+    .catch(() =>
+      notificationStore.addNotification({
+        title: 'Error',
+        text: 'Something went wrong fetching the project data.',
+        type: 'error',
+      })
+    ),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`)
+    .then(shallowRef)
+    .catch(() =>
+      notificationStore.addNotification({
+        title: 'Error',
+        text: 'Something went wrong getting the versions for the project.',
+        type: 'error',
+      })
+    ),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`)
+    .then(shallowRef)
+    .catch(() =>
+      notificationStore.addNotification({
+        title: 'Error',
+        text: 'Something went wrong getting the members for th eproject.',
+        type: 'error',
+      })
+    ),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`)
+    .then(shallowRef)
+    .catch(() =>
+      notificationStore.addNotification({
+        title: 'Error',
+        text: 'Failure while fetching project dependencies.',
+        type: 'error',
+      })
+    ),
 ])
 
 breadcrumbs.setName('Project', data.value.title)

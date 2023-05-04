@@ -16,11 +16,11 @@ import {
   AnimatedLogo,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
-import { useSearch } from '@/store/state'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useSearch, useBreadcrumbs, useNotifications } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
 
+const notificationStore = useNotifications()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 const route = useRoute()
@@ -40,9 +40,17 @@ const getSearchResults = async (shouldLoad = false) => {
   if (shouldLoad === true) {
     loading.value = true
   }
-  const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
-  loading.value = false
-  searchStore.setSearchResults(response)
+  try {
+    const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
+    loading.value = false
+    searchStore.setSearchResults(response)
+  } catch (err) {
+    notificationStore.addNotification({
+      title: 'Search Error',
+      text: 'A failure occurred during the search.',
+      type: 'error',
+    })
+  }
 }
 
 getSearchResults(true)
