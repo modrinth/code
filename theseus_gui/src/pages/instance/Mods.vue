@@ -210,9 +210,7 @@ const updateAll = async () => {
   console.log('finished')
 }
 
-const update = async (mod) => {
-  await update_project(props.instance.path, getProject(mod))
-}
+const update = async (mod) => await update_project(props.instance.path, getProject(mod))
 
 const handleDisable = async (mod) =>
   await toggle_disable_project(props.instance.path, getProject(mod))
