@@ -22,9 +22,9 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
 import Instance from '@/components/ui/Instance.vue'
-import SearchCard from "@/components/ui/SearchCard.vue";
-import InstallConfirmModal from "@/components/ui/InstallConfirmModal.vue";
-import InstanceInstallModal from "@/components/ui/InstanceInstallModal.vue";
+import SearchCard from '@/components/ui/SearchCard.vue'
+import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
+import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 
 const route = useRoute()
 
