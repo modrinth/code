@@ -33,9 +33,9 @@ const gameVersion = ref(null)
 const creatingInstance = ref(false)
 
 defineExpose({
-  show: (projectId, selectedVersion) => {
+  show: (projectId, selectedVersions) => {
     project.value = projectId
-    versions.value = selectedVersion
+    versions.value = selectedVersions
     installModal.value.show()
     searchFilter.value = ''
   },

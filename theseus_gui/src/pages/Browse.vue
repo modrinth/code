@@ -3,7 +3,6 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
-  ProjectCard,
   Checkbox,
   Button,
   ClearIcon,
@@ -23,6 +22,9 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
 import Instance from '@/components/ui/Instance.vue'
+import SearchCard from "@/components/ui/SearchCard.vue";
+import InstallConfirmModal from "@/components/ui/InstallConfirmModal.vue";
+import InstanceInstallModal from "@/components/ui/InstanceInstallModal.vue";
 
 const route = useRoute()
 
@@ -30,6 +32,8 @@ const searchStore = useSearch()
 searchStore.projectType = route.params.projectType
 const showVersions = ref(true)
 const showLoaders = ref(true)
+const confirmModal = ref(null)
+const modInstallModal = ref(null)
 
 const breadcrumbs = useBreadcrumbs()
 
@@ -215,7 +219,7 @@ watch(
       </div>
       <div v-if="showVersions" class="versions">
         <h2>Minecraft versions</h2>
-        <Checkbox v-model="showSnapshots" class="filter-checkbox">Show snapshots</Checkbox>
+        <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
         <multiselect
           v-model="searchStore.activeVersions"
           :options="
@@ -240,10 +244,9 @@ watch(
         <Checkbox
           v-model="searchStore.openSource"
           class="filter-checkbox"
+          label="Open source"
           @click="getSearchResults"
-        >
-          Open source
-        </Checkbox>
+        />
       </div>
     </aside>
     <div class="search">
@@ -311,19 +314,11 @@ watch(
       />
       <AnimatedLogo v-if="loading" class="loading" />
       <section v-else class="project-list display-mode--list instance-results" role="list">
-        <ProjectCard
+        <SearchCard
           v-for="result in searchStore.searchResults"
-          :id="`${result?.project_id}/`"
           :key="result?.project_id"
-          class="result-project-item"
-          :type="result?.project_type"
-          :name="result?.title"
-          :description="result?.description"
-          :icon-url="result?.icon_url"
-          :downloads="result?.downloads?.toString()"
-          :follows="result?.follows?.toString()"
-          :created-at="result?.date_created"
-          :updated-at="result?.date_modified"
+          :project="result"
+          :instance="searchStore.instanceContext"
           :categories="[
             ...categories.filter(
               (cat) =>
@@ -336,16 +331,14 @@ watch(
                 loader.supported_project_types?.includes(searchStore.projectType)
             ),
           ]"
-          :project-type-display="result?.project_type"
-          project-type-url="project"
-          :server-side="result?.server_side"
-          :client-side="result?.client_side"
-          :show-updated-date="false"
-          :color="result?.color"
+          :confirm-modal="confirmModal"
+          :mod-install-modal="modInstallModal"
         />
       </section>
     </div>
   </div>
+  <InstallConfirmModal ref="confirmModal" />
+  <InstanceInstallModal ref="modInstallModal" />
 </template>
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
