@@ -25,18 +25,14 @@ jobs:
           path: ../target/**
           key: ${{ runner.os }}-theseus
       - name: Install toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          override: true
           components: rustfmt, clippy
-      - uses: actions-rs/cargo@v1
-        name: Build program
-        with:
-          command: build
-          args: --bin theseus_cli
+      - name: Build program
+        run: cargo build --bin theseus_cli
       - name: Run Lint
-        uses: actions-rs/clippy-check@v1
+        uses: actions-rs-plus/clippy-check@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --bin theseus_cli
