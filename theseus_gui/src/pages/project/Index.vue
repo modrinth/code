@@ -289,6 +289,11 @@ async function install(version) {
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
       let id = await pack_install(version)
+      notificationStore.addNotification({
+        title: 'Success',
+        text: `${data.value.title} installed`,
+        type: 'success',
+      })
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
       confirmModal.value.show(version)
