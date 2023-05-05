@@ -74,7 +74,7 @@ list().then(
             <span v-if="!themeStore.collapsedNavigation">Library</span>
           </RouterLink>
           <Button
-            class="new-instance-button"
+            color="primary"
             :class="{
               'icon-only': themeStore.collapsedNavigation,
               'collapsed-button': themeStore.collapsedNavigation,
@@ -261,6 +261,11 @@ list().then(
       text-decoration: none;
     }
   }
+
+  &.primary {
+    color: var(--color-accent-contrast);
+    background-color: var(--color-brand);
+  }
 }
 
 .collapsed-button {
@@ -281,17 +286,6 @@ list().then(
 .expanded-button {
   width: 100%;
   padding: var(--gap-md) var(--gap-lg);
-}
-
-.new-instance-button {
-  color: var(--color-brand);
-  background-color: rgba(0, 0, 0, 0);
-  transition: all ease-in-out 0.2s;
-
-  &:hover {
-    color: var(--color-accent-contrast);
-    background-color: var(--color-brand);
-  }
 }
 
 .instance-list {
