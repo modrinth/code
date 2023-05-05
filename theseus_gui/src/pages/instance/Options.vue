@@ -11,10 +11,12 @@ import {
   XIcon,
   Modal,
   TrashIcon,
+  DropdownSelect,
 } from 'omorphia'
 import { BrowseIcon, PlayIcon, HammerIcon } from '@/assets/icons'
 import { get_jre, get_all_jre } from '@/helpers/jre'
 import { remove, install } from '@/helpers/profile'
+import { get_game_versions } from '@/helpers/tags'
 import { open } from '@tauri-apps/api/dialog'
 
 const props = defineProps({
@@ -35,6 +37,8 @@ const settings = ref({
   javaArgs: props.instance.java.extra_arguments ?? '',
   jreKey: props.instance.java.jre_key ?? '',
   javaPath: '',
+  loader: props.instance.metadata.loader,
+  gameVersion: props.instance.metadata.game_version,
 })
 
 watch(settings.value, (_, newSettings) => {
@@ -46,6 +50,11 @@ watch(settings.value, (_, newSettings) => {
     memory: { ...settings.value.memory },
     hooks: { ...settings.value.hooks },
     java: { jre_key: settings.value.jreKey, extra_arguments: settings.value.javaArgs },
+    metadata: {
+      ...props.instance.metadata,
+      loader: settings.value.loader,
+      game_version: settings.value.gameVersion,
+    },
   }
 
   // TODO: Save new data to the instance once able.
@@ -53,6 +62,8 @@ watch(settings.value, (_, newSettings) => {
   console.log('old', props.instance)
   console.log('new', newInstance)
 })
+
+const gameVersions = await get_game_versions()
 
 // TODO: Remove or wire up depending on whether we add these as instance settings.
 const fullscreen = ref(false)
@@ -279,6 +290,26 @@ const handleRemove = async () => {
       <h2 class="settings-title">Profile management</h2>
       <div class="settings-group">
         <div class="toggle-setting">
+          Profile loader
+          <DropdownSelect
+            v-model="settings.loader"
+            :options="['forge', 'fabric', 'vanilla']"
+            class="loader-dropdown"
+          />
+        </div>
+      </div>
+      <div class="settings-group">
+        <div class="toggle-setting">
+          Game version
+          <DropdownSelect
+            v-model="settings.gameVersion"
+            :options="gameVersions.map((v) => v.version)"
+          />
+        </div>
+      </div>
+      <hr class="card-divider" />
+      <div class="settings-group">
+        <div class="toggle-setting">
           Repair profile
           <Button color="highlight" @click="handleRepair"><HammerIcon /> Repair</Button>
         </div>
@@ -319,6 +350,10 @@ const handleRemove = async () => {
   align-items: center;
   gap: 0.5rem;
   margin: 0;
+}
+
+.loader-dropdown {
+  text-transform: capitalize;
 }
 
 .sliders {
