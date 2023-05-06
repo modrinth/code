@@ -147,6 +147,13 @@ function switchPage(page) {
   position: relative;
   padding-left: 1.8rem;
 
+  &:last-child {
+    .changelog-bar.duplicate {
+      height: 100%;
+      background: transparent;
+    }
+  }
+
   .changelog-bar {
     --color: var(--color-special-green);
 
