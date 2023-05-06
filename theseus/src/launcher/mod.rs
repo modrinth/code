@@ -266,7 +266,7 @@ pub async fn launch_minecraft(
         None => Command::new(String::from(java_install.to_string_lossy())),
     };
 
-    let _env_args = Vec::from(env_args);
+    let env_args = Vec::from(env_args);
 
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
@@ -319,6 +319,15 @@ pub async fn launch_minecraft(
         .current_dir(instance_path.clone())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
+
+    // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
+    #[cfg(target_os = "macos")]
+    if let Some(c) = std::env::var("CARGO") {
+        if c == "run" || c == "test" {
+            command.env_remove("DYLD_LIBRARY_PATH");
+        }
+    }
+    command.envs(env_args);
 
     // Get Modrinth logs directories
     let datetime_string =
