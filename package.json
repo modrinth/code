@@ -1,7 +1,7 @@
 {
   "name": "omorphia",
   "type": "module",
-  "version": "0.4.13",
+  "version": "0.4.14",
   "files": [
     "dist"
   ],
@@ -38,6 +38,7 @@
     "eslint": "^8.33.0",
     "eslint-config-prettier": "^8.6.0",
     "eslint-plugin-vue": "^9.9.0",
+    "eslint-plugin-prettier": "^4.2.1",
     "postcss": "^8.4.21",
     "postcss-prefix-selector": "^1.16.0",
     "prettier": "^2.7.1",

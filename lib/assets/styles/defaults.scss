@@ -38,17 +38,13 @@ body {
   --font-weight-title: var(--font-weight-extrabold);
 }
 
-a {
-  color: var(--color-blue);
-  text-decoration: none;
-}
-
 a.uncolored {
   color: inherit;
 }
 
 input[type='text'],
 input[type='number'],
+input[type='password'],
 textarea {
   border-radius: var(--radius-md);
   box-sizing: border-box;
@@ -62,6 +58,8 @@ textarea {
   transition: box-shadow 0.1s ease-in-out;
   min-height: 40px;
   box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
+  border: none;
+  outline: none;
 
   &:focus,
   &:focus-visible {

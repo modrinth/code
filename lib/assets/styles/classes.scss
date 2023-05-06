@@ -841,3 +841,12 @@ select {
   color: #000000;
   border: 1px solid #000000;
 }
+
+.text-link {
+  color: var(--color-blue);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
