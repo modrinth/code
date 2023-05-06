@@ -295,7 +295,7 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
+import { Multiselect } from 'vue-multiselect'
 
 import Badge from '~/components/ui/Badge.vue'
 import Checkbox from '~/components/ui/Checkbox.vue'

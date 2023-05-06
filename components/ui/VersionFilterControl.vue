@@ -84,7 +84,7 @@
 </template>
 
 <script setup>
-import Multiselect from 'vue-multiselect'
+import { Multiselect } from 'vue-multiselect'
 import Checkbox from '~/components/ui/Checkbox'
 import ClearIcon from '~/assets/images/utils/clear.svg'
 

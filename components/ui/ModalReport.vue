@@ -20,7 +20,7 @@
           <strong>Reason</strong>
         </span>
       </label>
-      <multiselect
+      <Multiselect
         id="report-type"
         v-model="reportType"
         :options="$tag.reportTypes"
@@ -57,7 +57,7 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
+import { Multiselect } from 'vue-multiselect'
 import CrossIcon from '~/assets/images/utils/x.svg'
 import CheckIcon from '~/assets/images/utils/check.svg'
 import Modal from '~/components/ui/Modal'

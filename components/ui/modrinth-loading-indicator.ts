@@ -42,7 +42,7 @@ export default defineComponent({
 
     const loading = useLoading()
 
-    watch(loading, (newValue, _oldValue) => {
+    watch(loading, (newValue) => {
       if (newValue) {
         indicator.start()
       } else {

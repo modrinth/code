@@ -342,7 +342,7 @@
   </div>
 </template>
 <script>
-import Multiselect from 'vue-multiselect'
+import { Multiselect } from 'vue-multiselect'
 import ProjectCard from '~/components/ui/ProjectCard'
 import Pagination from '~/components/ui/Pagination'
 import SearchFilter from '~/components/ui/search/SearchFilter'

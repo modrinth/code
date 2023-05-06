@@ -1,12 +1,43 @@
 import { promises as fs } from 'fs'
 import svgLoader from 'vite-svg-loader'
-import eslintPlugin from 'vite-plugin-eslint'
 import { resolve } from 'pathe'
 import { defineNuxtConfig } from 'nuxt/config'
 import { $fetch } from 'ofetch'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
 const STAGING_ARIADNE_URL = 'https://staging-ariadne.modrinth.com/v1/'
+
+const preloadedFonts = [
+  'inter/Inter-Regular.woff2',
+  'inter/Inter-Medium.woff2',
+  'inter/Inter-SemiBold.woff2',
+  'inter/Inter-Bold.woff2',
+]
+
+const favicons = {
+  '(prefers-color-scheme:no-preference)': '/favicon-light.ico',
+  '(prefers-color-scheme:light)': '/favicon-light.ico',
+  '(prefers-color-scheme:dark)': '/favicon.ico',
+}
+
+const meta = {
+  description:
+    'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
+  publisher: 'Rinth, Inc.',
+  'apple-mobile-web-app-title': 'Modrinth',
+  'theme-color': '#1bd96a',
+  'color-scheme': 'dark light',
+  // OpenGraph
+  'og:title': 'Modrinth',
+  'og:site_name': 'Modrinth',
+  'og:description': 'An open source modding platform',
+  'og:type': 'website',
+  'og:url': 'https://modrinth.com',
+  'og:image': 'https://cdn.modrinth.com/modrinth-new.png?',
+  // Twitter
+  'twitter:card': 'summary',
+  'twitter:site': '@modrinth',
+}
 
 export default defineNuxtConfig({
   app: {
@@ -15,108 +46,23 @@ export default defineNuxtConfig({
         lang: 'en',
       },
       title: 'Modrinth',
-      meta: [
-        {
-          name: 'description',
-          content:
-            'Download Minecraft mods, plugins, datapacks, shaders, resourcepacks, and modpacks on Modrinth. Discover and publish projects on Modrinth with a modern, easy to use interface and API.',
-        },
-        {
-          name: 'publisher',
-          content: 'Rinth, Inc.',
-        },
-        {
-          name: 'og:title',
-          content: 'Modrinth',
-        },
-        {
-          name: 'apple-mobile-web-app-title',
-          content: 'Modrinth',
-        },
-        {
-          name: 'theme-color',
-          content: '#1bd96a',
-        },
-        {
-          name: 'color-scheme',
-          content: 'dark light',
-        },
-        {
-          name: 'og:site_name',
-          content: 'Modrinth',
-        },
-        {
-          name: 'og:description',
-          content: 'An open source modding platform',
-        },
-        {
-          name: 'og:type',
-          content: 'website',
-        },
-        {
-          name: 'og:url',
-          content: 'https://modrinth.com',
-        },
-        {
-          name: 'og:image',
-          content: 'https://cdn.modrinth.com/modrinth-new.png?',
-        },
-        {
-          name: 'twitter:card',
-          content: 'summary',
-        },
-        {
-          name: 'twitter:site',
-          content: '@modrinth',
-        },
-      ],
+      meta: Object.entries(meta).map(([name, content]): object => {
+        return { name, content }
+      }),
       link: [
-        {
-          rel: 'preload',
-          href: 'https://cdn-raw.modrinth.com/fonts/inter/Inter-Regular.woff2?v=3.19',
-          as: 'font',
-          type: 'font/woff2',
-          crossorigin: true,
-        },
-        {
-          rel: 'preload',
-          href: 'https://cdn-raw.modrinth.com/fonts/inter/Inter-Medium.woff2?v=3.19',
-          as: 'font',
-          type: 'font/woff2',
-          crossorigin: true,
-        },
-        {
-          rel: 'preload',
-          href: 'https://cdn-raw.modrinth.com/fonts/inter/Inter-SemiBold.woff2?v=3.19',
-          as: 'font',
-          type: 'font/woff2',
-          crossorigin: true,
-        },
-        {
-          rel: 'preload',
-          href: 'https://cdn-raw.modrinth.com/fonts/inter/Inter-Bold.woff2?v=3.19',
-          as: 'font',
-          type: 'font/woff2',
-          crossorigin: true,
-        },
-        {
-          rel: 'icon',
-          type: 'image/x-icon',
-          href: '/favicon-light.ico',
-          media: '(prefers-color-scheme:no-preference)',
-        },
-        {
-          rel: 'icon',
-          type: 'image/x-icon',
-          href: '/favicon.ico',
-          media: '(prefers-color-scheme:dark)',
-        },
-        {
-          rel: 'icon',
-          type: 'image/x-icon',
-          href: '/favicon-light.ico',
-          media: '(prefers-color-scheme:light)',
-        },
+        // The type is necessary because the linter can't always compare this very nested/complex type on itself
+        ...preloadedFonts.map((font): object => {
+          return {
+            rel: 'preload',
+            href: `https://cdn-raw.modrinth.com/fonts/${font}?v=3.19`,
+            as: 'font',
+            type: 'font/woff2',
+            crossorigin: 'anonymous',
+          }
+        }),
+        ...Object.entries(favicons).map(([media, href]): object => {
+          return { rel: 'icon', type: 'image/x-icon', href, media }
+        }),
         {
           rel: 'search',
           type: 'application/opensearchdescription+xml',
@@ -128,7 +74,6 @@ export default defineNuxtConfig({
   },
   vite: {
     plugins: [
-      eslintPlugin(),
       svgLoader({
         svgoConfig: {
           plugins: [
@@ -145,17 +90,20 @@ export default defineNuxtConfig({
       }),
     ],
   },
-  dayjs: {
-    locales: ['en'],
-    defaultLocale: 'en',
-    plugins: ['relativeTime'],
-  },
   hooks: {
     async 'build:before'() {
       // 30 minutes
       const TTL = 30 * 60 * 1000
 
-      let state = {}
+      let state: {
+        lastGenerated?: string
+        apiUrl?: string
+        categories?: any[]
+        loaders?: any[]
+        gameVersions?: any[]
+        donationPlatforms?: any[]
+        reportTypes?: any[]
+      } = {}
       try {
         state = JSON.parse(await fs.readFile('./generated/state.json', 'utf8'))
       } catch {
@@ -170,7 +118,6 @@ export default defineNuxtConfig({
         state.lastGenerated &&
         new Date(state.lastGenerated).getTime() + TTL > new Date().getTime() &&
         // ...but only if the API URL is the same
-        state.apiUrl &&
         state.apiUrl === API_URL
       ) {
         return
@@ -212,42 +159,16 @@ export default defineNuxtConfig({
         1
       )
 
-      routes.push({
-        name: 'search-mods',
-        path: '/mods',
-        file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
-        children: [],
-      })
-      routes.push({
-        name: 'search-modpacks',
-        path: '/modpacks',
-        file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
-        children: [],
-      })
-      routes.push({
-        name: 'search-plugins',
-        path: '/plugins',
-        file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
-        children: [],
-      })
-      routes.push({
-        name: 'search-resourcepacks',
-        path: '/resourcepacks',
-        file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
-        children: [],
-      })
-      routes.push({
-        name: 'search-shaders',
-        path: '/shaders',
-        file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
-        children: [],
-      })
-      routes.push({
-        name: 'search-datapacks',
-        path: '/datapacks',
-        file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
-        children: [],
-      })
+      const types = ['mods', 'modpacks', 'plugins', 'resourcepacks', 'shaders', 'datapacks']
+
+      types.forEach((type) =>
+        routes.push({
+          name: `search-${type}`,
+          path: `/${type}`,
+          file: resolve(__dirname, 'pages/search/[searchProjectType].vue'),
+          children: [],
+        })
+      )
     },
   },
   runtimeConfig: {
@@ -265,6 +186,11 @@ export default defineNuxtConfig({
       branch: process.env.VERCEL_GIT_COMMIT_REF || 'master',
       hash: process.env.VERCEL_GIT_COMMIT_SHA || 'unknown',
     },
+  },
+  typescript: {
+    shim: false,
+    strict: true,
+    typeCheck: true,
   },
 })
 

@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
+import { Multiselect } from 'vue-multiselect'
 import Chips from '~/components/ui/Chips'
 import SaveIcon from '~/assets/images/utils/save.svg'
 import TrashIcon from '~/assets/images/utils/trash.svg'

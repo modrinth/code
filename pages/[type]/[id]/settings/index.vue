@@ -203,7 +203,7 @@
 </template>
 
 <script>
-import Multiselect from 'vue-multiselect'
+import { Multiselect } from 'vue-multiselect'
 import Avatar from '~/components/ui/Avatar'
 import ModalConfirm from '~/components/ui/ModalConfirm'
 import FileInput from '~/components/ui/FileInput'
