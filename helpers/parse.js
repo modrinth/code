@@ -75,6 +75,7 @@ export const configuredXss = new xss.FilterXSS({
           'img.shields.io',
           'i.postimg.cc',
           'wsrv.nl',
+          'cf.way2muchnoise.eu',
           'bstats.org',
         ]
 
