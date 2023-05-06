@@ -236,8 +236,8 @@ const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ]).catch((err) =>
   notificationStore.addNotification({
-    title: 'Error',
-    text: err,
+    title: err.name,
+    text: err.message,
     type: 'error',
   })
 )

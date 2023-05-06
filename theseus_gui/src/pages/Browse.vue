@@ -41,13 +41,13 @@ const getSearchResults = async (shouldLoad = false) => {
     loading.value = true
   }
   try {
-    const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
+    const response = await ofetch(`https://api.modsdrinth.com/v2/search${queryString}`)
     loading.value = false
     searchStore.setSearchResults(response)
   } catch (err) {
     notificationStore.addNotification({
-      title: 'Search Error',
-      text: err,
+      title: err.name,
+      text: err.message,
       type: 'error',
     })
   }

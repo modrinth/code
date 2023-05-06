@@ -3,11 +3,8 @@ import { Button, Modal, XIcon, DownloadIcon } from 'omorphia'
 import { useRouter } from 'vue-router'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
-import { useNotifications } from '@/store/state'
 
 const router = useRouter()
-
-const notificationStore = useNotifications()
 
 const version = ref('')
 const confirmModal = ref(null)
@@ -21,11 +18,6 @@ defineExpose({
 
 async function install() {
   let id = await pack_install(version.value)
-  notificationStore.addNotification({
-    title: 'Success',
-    text: 'Pack installed',
-    type: 'success',
-  })
   await router.push({ path: `/instance/${encodeURIComponent(id)}` })
   confirmModal.value.hide()
 }
