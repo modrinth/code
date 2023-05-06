@@ -77,6 +77,9 @@ pub struct LoadingBar {
     pub total: f64,
     pub current: f64,
     pub bar_type: LoadingBarType,
+    #[cfg(feature = "cli")]
+    #[serde(skip)]
+    pub cli_progress_bar: indicatif::ProgressBar,
 }
 
 #[derive(Serialize, Debug)]
@@ -106,23 +109,32 @@ impl Drop for LoadingBar {
         let loader_uuid = self.loading_bar_uuid;
         let event = self.bar_type.clone();
         let fraction = self.current / self.total;
+        let cli_progress_bar = self.cli_progress_bar.clone();
 
-        use tauri::Manager;
         tokio::spawn(async move {
-            if let Ok(event_state) = crate::EventState::get().await {
-                let _ = event_state.app.emit_all(
-                    "loading",
-                    LoadingPayload {
-                        fraction: None,
-                        message: "Completed".to_string(),
-                        event,
-                        loader_uuid,
-                    },
-                );
-                tracing::debug!(
-                    "Exited at {fraction} for loading bar: {:?}",
-                    loader_uuid
-                );
+            #[cfg(feature = "tauri")]
+            {
+                use tauri::Manager;
+                if let Ok(event_state) = crate::EventState::get().await {
+                    let _ = event_state.app.emit_all(
+                        "loading",
+                        LoadingPayload {
+                            fraction: None,
+                            message: "Completed".to_string(),
+                            event,
+                            loader_uuid,
+                        },
+                    );
+                    tracing::debug!(
+                        "Exited at {fraction} for loading bar: {:?}",
+                        loader_uuid
+                    );
+                }
+            }
+            // Emit event to indicatif progress bar arc
+            #[cfg(feature = "cli")]
+            {
+                cli_progress_bar.finish_and_clear();
             }
         });
     }

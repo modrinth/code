@@ -107,7 +107,7 @@ pub async fn download_client(
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
-        tracing::info!("Fetched client version {version}");
+        tracing::trace!("Fetched client version {version}");
     }
     if let Some(loading_bar) = loading_bar {
         emit_loading(loading_bar, 10.0, None).await?;
@@ -178,7 +178,7 @@ pub async fn download_assets(
                             .get_or_try_init(|| fetch(&url, Some(hash), &st.io_semaphore))
                             .await?;
                         write(&resource_path, resource, &st.io_semaphore).await?;
-                        tracing::info!("Fetched asset with hash {hash}");
+                        tracing::trace!("Fetched asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
                 },
@@ -191,13 +191,13 @@ pub async fn download_assets(
                             name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
                         );
                         write(&resource_path, resource, &st.io_semaphore).await?;
-                        tracing::info!("Fetched legacy asset with hash {hash}");
+                        tracing::trace!("Fetched legacy asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
                 },
             }?;
 
-            tracing::debug!("Loaded asset with hash {hash}");
+            tracing::trace!("Loaded asset with hash {hash}");
             Ok(())
         }).await?;
 
@@ -241,7 +241,7 @@ pub async fn download_libraries(
                             let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.io_semaphore)
                                 .await?;
                             write(&path, &bytes, &st.io_semaphore).await?;
-                            tracing::info!("Fetched library {}", &library.name);
+                            tracing::trace!("Fetched library {}", &library.name);
                             Ok::<_, crate::Error>(())
                         }
                         None => {
@@ -255,7 +255,7 @@ pub async fn download_libraries(
 
                             let bytes = fetch(&url, None, &st.io_semaphore).await?;
                             write(&path, &bytes, &st.io_semaphore).await?;
-                            tracing::info!("Fetched library {}", &library.name);
+                            tracing::trace!("Fetched library {}", &library.name);
                             Ok::<_, crate::Error>(())
                         }
                         _ => Ok(())

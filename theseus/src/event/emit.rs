@@ -1,3 +1,4 @@
+use super::LoadingBarId;
 use crate::event::{
     EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
     ProfilePayloadType,
@@ -14,7 +15,8 @@ use crate::event::{
 use tauri::Manager;
 use uuid::Uuid;
 
-use super::LoadingBarId;
+#[cfg(feature = "cli")]
+const CLI_PROGRESS_BAR_TOTAL: u64 = 10000;
 
 /*
    Events are a way we can communciate with the Tauri frontend from the Rust backend.
@@ -60,6 +62,10 @@ pub async fn init_loading(
             total,
             current: 0.0,
             bar_type,
+            #[cfg(feature = "cli")]
+            cli_progress_bar: indicatif::ProgressBar::new(
+                CLI_PROGRESS_BAR_TOTAL * total.round() as u64,
+            ),
         },
     );
     // attempt an initial loading_emit event to the frontend
@@ -97,6 +103,10 @@ pub async fn edit_loading(
         bar.total = total;
         bar.message = title.to_string();
         bar.current = 0.0;
+        #[cfg(feature = "cli")]
+        {
+            bar.cli_progress_bar.reset(); // indicatif::ProgressBar::new(CLI_PROGRESS_BAR_TOTAL as u64);
+        }
     };
 
     emit_loading(id, 0.0, None).await?;
@@ -134,6 +144,19 @@ pub async fn emit_loading(
     } else {
         Some(display_frac)
     };
+
+    // Emit event to indicatif progress bar
+    #[cfg(feature = "cli")]
+    {
+        if let Some(message) = message {
+            loading_bar
+                .cli_progress_bar
+                .set_message(message.to_string());
+        }
+        loading_bar.cli_progress_bar.inc(
+            (increment_frac * CLI_PROGRESS_BAR_TOTAL as f64).round() as u64,
+        );
+    }
 
     // Emit event to tauri
     #[cfg(feature = "tauri")]
@@ -329,7 +352,7 @@ where
 pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,
-    _key: Option<&Uuid>,
+    _key: Option<&LoadingBarId>,
     _total: f64,
     _num_futs: usize, // num is in here as we allow Iterator to be passed in, which doesn't have a size
     _message: Option<&str>,

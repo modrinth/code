@@ -260,7 +260,7 @@ async fn install_pack(
                     .map(Ok::<PackFile, crate::Error>),
                 None,
                 Some(&loading_bar),
-                80.0,
+                90.0,
                 num_files,
                 None,
                 |project| {
@@ -365,11 +365,11 @@ async fn install_pack(
                 .await
             };
 
-            emit_loading(&loading_bar, 0.05, Some("Extracting overrides"))
+            emit_loading(&loading_bar, 5.0, Some("Extracting overrides"))
                 .await?;
             extract_overrides("overrides".to_string()).await?;
             extract_overrides("client_overrides".to_string()).await?;
-            emit_loading(&loading_bar, 0.1, Some("Done extacting overrides"))
+            emit_loading(&loading_bar, 5.0, Some("Done extacting overrides"))
                 .await?;
 
             if let Some(profile) = crate::api::profile::get(&profile).await? {
@@ -383,7 +383,7 @@ async fn install_pack(
             } else {
                 emit_loading(
                     &loading_bar,
-                    0.1,
+                    10.0,
                     Some("Done extacting overrides"),
                 )
                 .await?;
