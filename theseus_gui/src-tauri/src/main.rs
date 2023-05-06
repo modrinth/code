@@ -4,8 +4,12 @@
 )]
 
 use theseus::prelude::*;
+use tracing::{info, warn};
+use tracing_error::{ErrorLayer, SpanTrace};
+use tracing_subscriber::{EnvFilter};
 
 mod api;
+mod error;
 
 // Should be called in launcher initialization
 #[tauri::command]
@@ -37,7 +41,20 @@ async fn should_disable_mouseover() -> bool {
     false
 }
 
+use tracing_subscriber::prelude::*;
+
 fn main() {
+    let filter = EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| EnvFilter::new("theseus=trace"));
+
+    let subscriber = tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .with(filter)
+        .with(ErrorLayer::default());
+
+    tracing::subscriber::set_global_default(subscriber)
+        .expect("setting default subscriber failed");
+
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             initialize_state,
