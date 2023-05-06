@@ -108,7 +108,12 @@
         </section>
       </section>
       <section class="mobile-navigation">
-        <div class="nav-menu nav-menu-browse" :class="{ expanded: isBrowseMenuOpen }">
+        <div
+          class="nav-menu nav-menu-browse"
+          :class="{ expanded: isBrowseMenuOpen }"
+          @focusin="isBrowseMenuOpen = true"
+          @focusout="isBrowseMenuOpen = false"
+        >
           <div class="links cascade-links">
             <NuxtLink
               v-for="navRoute in navRoutes"
@@ -120,7 +125,12 @@
             </NuxtLink>
           </div>
         </div>
-        <div class="nav-menu nav-menu-mobile" :class="{ expanded: isMobileMenuOpen }">
+        <div
+          class="nav-menu nav-menu-mobile"
+          :class="{ expanded: isMobileMenuOpen }"
+          @focusin="isMobileMenuOpen = true"
+          @focusout="isMobileMenuOpen = false"
+        >
           <div class="account-container">
             <NuxtLink
               v-if="auth.user"
@@ -284,9 +294,9 @@
       </div>
       <div class="links links-1" role="region" aria-label="Legal">
         <h4 aria-hidden="true">Company</h4>
-        <nuxt-link to="/legal/terms"> Terms </nuxt-link>
-        <nuxt-link to="/legal/privacy"> Privacy </nuxt-link>
-        <nuxt-link to="/legal/rules"> Rules </nuxt-link>
+        <nuxt-link to="/legal/terms"> Terms</nuxt-link>
+        <nuxt-link to="/legal/privacy"> Privacy</nuxt-link>
+        <nuxt-link to="/legal/rules"> Rules</nuxt-link>
         <a :target="$external()" href="https://careers.modrinth.com"> Careers </a>
       </div>
       <div class="links links-2" role="region" aria-label="Resources">
@@ -765,6 +775,7 @@ export default defineNuxtComponent({
 
     .mobile-navigation {
       display: none;
+
       .nav-menu {
         width: 100%;
         position: fixed;
@@ -777,6 +788,7 @@ export default defineNuxtComponent({
         transition: transform 0.4s cubic-bezier(0.54, 0.84, 0.42, 1);
         border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
         box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0);
+
         .links,
         .account-container {
           display: grid;
@@ -795,6 +807,7 @@ export default defineNuxtComponent({
             margin: 0 auto;
           }
         }
+
         .cascade-links {
           @media screen and (min-width: 354px) {
             grid-template-columns: repeat(2, 1fr);
@@ -803,36 +816,43 @@ export default defineNuxtComponent({
             grid-template-columns: repeat(3, 1fr);
           }
         }
+
         &-browse {
           &.expanded {
             transform: translateY(0);
             box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
           }
         }
+
         &-mobile {
           .account-container {
             padding-bottom: 0;
+
             .account-button {
               padding: var(--spacing-card-md);
               display: flex;
               align-items: center;
               justify-content: center;
               gap: 0.5rem;
+
               .user-icon {
                 width: 2.25rem;
                 height: 2.25rem;
               }
+
               .account-text {
                 flex-grow: 0;
               }
             }
           }
+
           &.expanded {
             transform: translateY(0);
             box-shadow: 0 0 20px 2px rgba(0, 0, 0, 0.3);
           }
         }
       }
+
       .mobile-navbar {
         display: flex;
         height: var(--size-mobile-navbar-height);
@@ -850,10 +870,12 @@ export default defineNuxtComponent({
         transition: border-radius 0.3s ease-out;
         border-top: 2px solid rgba(0, 0, 0, 0);
         box-sizing: border-box;
+
         &.expanded {
           box-shadow: none;
           border-radius: 0;
         }
+
         .tab {
           position: relative;
           background: none;
@@ -868,10 +890,12 @@ export default defineNuxtComponent({
           transition: color ease-in-out 0.15s;
           color: var(--color-text-inactive);
           text-align: center;
+
           &.browse {
             svg {
               transform: rotate(180deg);
               transition: transform ease-in-out 0.3s;
+
               &.closed {
                 transform: rotate(0deg);
               }
@@ -907,28 +931,35 @@ export default defineNuxtComponent({
             transition: border ease-in-out 0.15s;
             border: 0 solid var(--color-brand);
             box-sizing: border-box;
+
             &.expanded {
               border: 2px solid var(--color-brand);
             }
           }
+
           &:hover,
           &:focus {
             color: var(--color-text);
           }
+
           &:first-child {
             margin-left: 2rem;
           }
+
           &:last-child {
             margin-right: 2rem;
           }
+
           &.router-link-exact-active:not(&.no-active) {
             svg {
               color: var(--color-brand);
             }
+
             color: var(--color-brand);
           }
         }
       }
+
       @media screen and (max-width: 1095px) {
         display: flex;
       }
