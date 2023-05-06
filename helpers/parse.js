@@ -75,6 +75,7 @@ export const configuredXss = new xss.FilterXSS({
           'img.shields.io',
           'i.postimg.cc',
           'wsrv.nl',
+          'bstats.org',
         ]
 
         if (!allowedHostnames.includes(url.hostname)) {
