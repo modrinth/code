@@ -1,7 +1,10 @@
 //! Downloader for Minecraft data
 
 use crate::{
-    event::emit::{emit_loading, loading_try_for_each_concurrent},
+    event::{
+        emit::{emit_loading, loading_try_for_each_concurrent},
+        LoadingBarId,
+    },
     state::State,
     util::{fetch::*, platform::OsExt},
 };
@@ -15,21 +18,21 @@ use daedalus::{
 };
 use futures::prelude::*;
 use tokio::{fs, sync::OnceCell};
-use uuid::Uuid;
 
 #[tracing::instrument(skip_all)]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
-    loading_bar: Uuid,
+    loading_bar: &LoadingBarId,
 ) -> crate::Result<()> {
     tracing::info!("Downloading Minecraft version {}", version.id);
     let assets_index = download_assets_index(st, version).await?;
 
     tokio::try_join! {
-        download_client(st, version, Some(&loading_bar)),
-        download_assets(st, version.assets == "legacy", &assets_index, Some(&loading_bar)),
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(&loading_bar))
+        // Total loading sums to 90
+        download_client(st, version, Some(loading_bar)), // 10
+        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar)), // 40
+        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar)) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -78,7 +81,7 @@ pub async fn download_version_info(
 pub async fn download_client(
     st: &State,
     version_info: &GameVersionInfo,
-    loading_bar: Option<&Uuid>,
+    loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<()> {
     let version = &version_info.id;
     tracing::debug!("Locating client for version {version}");
@@ -107,7 +110,7 @@ pub async fn download_client(
         tracing::info!("Fetched client version {version}");
     }
     if let Some(loading_bar) = loading_bar {
-        emit_loading(loading_bar, 20.0, None).await?;
+        emit_loading(loading_bar, 10.0, None).await?;
     }
 
     tracing::debug!("Client loaded for version {version}!");
@@ -146,7 +149,7 @@ pub async fn download_assets(
     st: &State,
     with_legacy: bool,
     index: &AssetsIndex,
-    loading_bar: Option<&Uuid>,
+    loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<()> {
     tracing::debug!("Loading assets");
     let num_futs = index.objects.len();
@@ -156,7 +159,7 @@ pub async fn download_assets(
     loading_try_for_each_concurrent(assets,
         None,
         loading_bar,
-        50.0,
+        40.0,
         num_futs,
         None,
         |(name, asset)| async move {
@@ -207,7 +210,7 @@ pub async fn download_libraries(
     st: &State,
     libraries: &[Library],
     version: &str,
-    loading_bar: Option<&Uuid>,
+    loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<()> {
     tracing::debug!("Loading libraries");
 
@@ -218,7 +221,7 @@ pub async fn download_libraries(
     let num_files = libraries.len();
     loading_try_for_each_concurrent(
     stream::iter(libraries.iter())
-        .map(Ok::<&Library, crate::Error>), None, loading_bar,50.0,num_files, None,|library| async move {
+        .map(Ok::<&Library, crate::Error>), None, loading_bar,40.0,num_files, None,|library| async move {
             if let Some(rules) = &library.rules {
                 if !rules.iter().all(super::parse_rule) {
                     return Ok(());

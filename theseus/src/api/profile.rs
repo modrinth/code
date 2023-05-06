@@ -159,7 +159,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
             None,
             Some(&loading_bar),
             100.0,
-            profile.projects.len(),
+            profile.projects.keys().len(),
             None,
             |project| update_project(profile_path, project, Some(true)),
         )

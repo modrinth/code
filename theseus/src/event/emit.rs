@@ -14,6 +14,8 @@ use crate::event::{
 use tauri::Manager;
 use uuid::Uuid;
 
+use super::LoadingBarId;
+
 /*
    Events are a way we can communciate with the Tauri frontend from the Rust backend.
    We include a feature flag for Tauri, so that we can compile this code without Tauri.
@@ -46,14 +48,14 @@ pub async fn init_loading(
     bar_type: LoadingBarType,
     total: f64,
     title: &str,
-) -> crate::Result<Uuid> {
+) -> crate::Result<LoadingBarId> {
     let event_state = crate::EventState::get().await?;
-    let key = Uuid::new_v4();
+    let key = LoadingBarId(Uuid::new_v4());
 
     event_state.loading_bars.write().await.insert(
-        key,
+        key.0,
         LoadingBar {
-            loading_bar_id: key,
+            loading_bar_uuid: key.0,
             message: title.to_string(),
             total,
             current: 0.0,
@@ -66,13 +68,13 @@ pub async fn init_loading(
 }
 
 pub async fn init_or_edit_loading(
-    id: Option<Uuid>,
+    id: Option<LoadingBarId>,
     bar_type: LoadingBarType,
     total: f64,
     title: &str,
-) -> crate::Result<Uuid> {
+) -> crate::Result<LoadingBarId> {
     if let Some(id) = id {
-        edit_loading(id, bar_type, total, title).await?;
+        edit_loading(&id, bar_type, total, title).await?;
 
         Ok(id)
     } else {
@@ -81,21 +83,23 @@ pub async fn init_or_edit_loading(
 }
 
 // Edits a loading bar's type
+// This also resets the bar's current progress to 0
 pub async fn edit_loading(
-    id: Uuid,
+    id: &LoadingBarId,
     bar_type: LoadingBarType,
     total: f64,
     title: &str,
 ) -> crate::Result<()> {
     let event_state = crate::EventState::get().await?;
 
-    if let Some(bar) = event_state.loading_bars.write().await.get_mut(&id) {
+    if let Some(bar) = event_state.loading_bars.write().await.get_mut(&id.0) {
         bar.bar_type = bar_type;
         bar.total = total;
         bar.message = title.to_string();
+        bar.current = 0.0;
     };
 
-    emit_loading(&id, 0.0, None).await?;
+    emit_loading(id, 0.0, None).await?;
     Ok(())
 }
 
@@ -105,18 +109,19 @@ pub async fn edit_loading(
 // message is the message to display on the loading bar- if None, use the loading bar's default one
 // By convention, fraction is the fraction of the progress bar that is filled
 #[allow(unused_variables)]
+#[tracing::instrument(level = "debug")]
 pub async fn emit_loading(
-    key: &Uuid,
+    key: &LoadingBarId,
     increment_frac: f64,
     message: Option<&str>,
 ) -> crate::Result<()> {
     let event_state = crate::EventState::get().await?;
 
     let mut loading_bar = event_state.loading_bars.write().await;
-    let loading_bar = match loading_bar.get_mut(key) {
+    let loading_bar = match loading_bar.get_mut(&key.0) {
         Some(f) => f,
         None => {
-            return Err(EventError::NoLoadingBar(*key).into());
+            return Err(EventError::NoLoadingBar(key.0).into());
         }
     };
 
@@ -129,6 +134,7 @@ pub async fn emit_loading(
     } else {
         Some(display_frac)
     };
+
     // Emit event to tauri
     #[cfg(feature = "tauri")]
     event_state
@@ -139,7 +145,7 @@ pub async fn emit_loading(
                 fraction: display_frac,
                 message: message.unwrap_or(&loading_bar.message).to_string(),
                 event: loading_bar.bar_type.clone(),
-                loader_uuid: loading_bar.loading_bar_id,
+                loader_uuid: loading_bar.loading_bar_uuid,
             },
         )
         .map_err(EventError::from)?;
@@ -291,7 +297,7 @@ macro_rules! loading_join {
 pub async fn loading_try_for_each_concurrent<I, F, Fut, T>(
     stream: I,
     limit: Option<usize>,
-    key: Option<&Uuid>,
+    key: Option<&LoadingBarId>,
     total: f64,
     num_futs: usize, // num is in here as we allow Iterator to be passed in, which doesn't have a size
     message: Option<&str>,

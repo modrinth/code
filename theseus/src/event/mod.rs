@@ -48,11 +48,18 @@ impl EventState {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
     }
 
+    // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
     pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
     {
         let value = Self::get().await?;
         let read = value.loading_bars.read().await;
-        Ok(read.clone())
+
+        let mut display_list: HashMap<Uuid, LoadingBar> = HashMap::new();
+        for (uuid, loading_bar) in read.iter() {
+            display_list.insert(*uuid, loading_bar.clone());
+        }
+
+        Ok(display_list)
     }
 
     // Initialization requires no app handle in non-tauri mode, so we can just use the same function
@@ -64,11 +71,61 @@ impl EventState {
 
 #[derive(Serialize, Debug, Clone)]
 pub struct LoadingBar {
-    pub loading_bar_id: Uuid,
+    // loading_bar_uuid not be used directly by external functions as it may not reflect the current state of the loading bar/hashmap
+    pub loading_bar_uuid: Uuid,
     pub message: String,
     pub total: f64,
     pub current: f64,
     pub bar_type: LoadingBarType,
+}
+
+#[derive(Serialize, Debug)]
+pub struct LoadingBarId(Uuid);
+
+// When Loading bar id is dropped, we should remove it from the hashmap
+impl Drop for LoadingBarId {
+    fn drop(&mut self) {
+        let loader_uuid = self.0;
+        let _event = LoadingBarType::StateInit;
+        let _message = "finished".to_string();
+        tokio::spawn(async move {
+            if let Ok(event_state) = crate::EventState::get().await {
+                {
+                    let mut bars = event_state.loading_bars.write().await;
+                    bars.remove(&loader_uuid);
+                }
+            }
+        });
+    }
+}
+
+// When Loading bar is dropped, should attempt to throw out one last event to indicate that the loading bar is done
+#[cfg(feature = "tauri")]
+impl Drop for LoadingBar {
+    fn drop(&mut self) {
+        let loader_uuid = self.loading_bar_uuid;
+        let event = self.bar_type.clone();
+        let fraction = self.current / self.total;
+
+        use tauri::Manager;
+        tokio::spawn(async move {
+            if let Ok(event_state) = crate::EventState::get().await {
+                let _ = event_state.app.emit_all(
+                    "loading",
+                    LoadingPayload {
+                        fraction: None,
+                        message: "Completed".to_string(),
+                        event,
+                        loader_uuid,
+                    },
+                );
+                tracing::debug!(
+                    "Exited at {fraction} for loading bar: {:?}",
+                    loader_uuid
+                );
+            }
+        });
+    }
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]

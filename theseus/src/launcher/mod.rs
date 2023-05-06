@@ -1,6 +1,6 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
-use crate::event::LoadingBarType;
+use crate::event::{LoadingBarId, LoadingBarType};
 use crate::{
     process,
     state::{self as st, MinecraftChild},
@@ -53,9 +53,10 @@ macro_rules! processor_rules {
     }
 }
 
+#[tracing::instrument(skip(profile))]
 pub async fn install_minecraft(
     profile: &Profile,
-    existing_loading_bar: Option<Uuid>,
+    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let instance_path = &canonicalize(&profile.path)?;
@@ -87,6 +88,11 @@ pub async fn install_minecraft(
     )
     .await?;
 
+    let minecraft_download_total = if version_info.processors.is_none() {
+        90.0 // No processors at all will be used, so shrink total to avoid jump at end
+    } else {
+        100.0 // Processors will be used, so keep total at 100
+    };
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
         LoadingBarType::MinecraftDownload {
@@ -94,12 +100,13 @@ pub async fn install_minecraft(
             profile_name: profile.metadata.name.clone(),
             profile_uuid: profile.uuid,
         },
-        100.0,
+        minecraft_download_total,
         "Downloading Minecraft...",
     )
     .await?;
 
-    download::download_minecraft(&state, &version_info, loading_bar).await?;
+    // Download minecraft (0-90)
+    download::download_minecraft(&state, &version_info, &loading_bar).await?;
 
     let client_path = state
         .directories
@@ -131,10 +138,11 @@ pub async fn install_minecraft(
                 .await?;
             let total_length = processors.len();
 
+            // Forge processors (90-100)
             for (index, processor) in processors.iter().enumerate() {
                 emit_loading(
                     &loading_bar,
-                    index as f64 / total_length as f64,
+                    10.0 / total_length as f64,
                     Some(&format!(
                         "Running forge processor {}/{}",
                         index, total_length
