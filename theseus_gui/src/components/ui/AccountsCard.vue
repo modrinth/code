@@ -1,13 +1,23 @@
 <template>
-  <Avatar
-    ref="avatar"
-    class="button-base"
-    size="sm"
-    :src="selectedAccount?.profile_picture ?? ''"
+  <div
+    ref="button"
+    class="button-base avatar-button"
+    :class="{ expanded: expanded }"
     @click="toggle()"
-  />
+  >
+    <Avatar :size="expanded ? 'xs' : 'sm'" :src="selectedAccount?.profile_picture ?? ''" />
+    <div v-show="expanded" class="avatar-text">
+      <div class="text no-select">
+        {{ selectedAccount.username }}
+      </div>
+      <p class="no-select">
+        <UsersIcon />
+        Accounts
+      </p>
+    </div>
+  </div>
   <transition name="fade">
-    <Card v-if="showCard" ref="card" class="account-card">
+    <Card v-if="showCard" ref="card" class="account-card" :class="{ expanded: expanded }">
       <div v-if="selectedAccount" class="selected account">
         <Avatar size="xs" :src="selectedAccount.profile_picture" />
         <div>
@@ -15,7 +25,7 @@
           <p>Selected</p>
         </div>
         <Button icon-only color="raised" @click="logout(selectedAccount.id)">
-          <LogOutIcon />
+          <XIcon />
         </Button>
       </div>
       <div v-else class="logged-out account">
@@ -31,7 +41,7 @@
             <p>{{ account.username }}</p>
           </Button>
           <Button icon-only @click="logout(account.id)">
-            <LogOutIcon />
+            <XIcon />
           </Button>
         </div>
       </div>
@@ -44,9 +54,9 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, LogOutIcon } from 'omorphia'
-import { LoginIcon } from '@/assets/icons'
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { Avatar, Button, Card, PlusIcon, XIcon } from 'omorphia'
+import { LoginIcon, UsersIcon } from '@/assets/icons'
+import { ref, defineProps, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
   remove_user,
@@ -55,6 +65,13 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
+
+defineProps({
+  expanded: {
+    type: Boolean,
+    required: true,
+  },
+})
 
 const settings = ref(await get())
 
@@ -86,7 +103,7 @@ const refreshValues = async () => {
 
 let showCard = ref(false)
 let card = ref(null)
-let avatar = ref(null)
+let button = ref(null)
 
 const setAccount = async (account) => {
   settings.value.default_user = account.id
@@ -95,9 +112,7 @@ const setAccount = async (account) => {
 }
 
 const login = async () => {
-  console.log('login process')
   const url = await authenticate_begin_flow()
-  console.log(url)
 
   const window = new WebviewWindow('loginWindow', {
     url: url,
@@ -128,15 +143,15 @@ const logout = async (id) => {
 
 const toggle = () => {
   showCard.value = !showCard.value
-  console.log('toggled')
 }
 
 const handleClickOutside = (event) => {
+  const elements = document.elementsFromPoint(event.clientX, event.clientY)
   if (
     card.value &&
-    avatar.value.$el !== event.target &&
     card.value.$el !== event.target &&
-    !document.elementsFromPoint(event.clientX, event.clientY).includes(card.value.$el)
+    !elements.includes(card.value.$el) &&
+    !button.value.contains(event.target)
   ) {
     showCard.value = false
   }
@@ -177,8 +192,8 @@ onBeforeUnmount(() => {
   position: absolute;
   display: flex;
   flex-direction: column;
-  top: 0;
-  left: 5rem;
+  top: 0.5rem;
+  left: 5.5rem;
   z-index: 100;
   gap: 0.5rem;
   padding: 1rem;
@@ -190,6 +205,10 @@ onBeforeUnmount(() => {
 
   &.hidden {
     display: none;
+  }
+
+  &.expanded {
+    left: 13.5rem;
   }
 }
 
@@ -237,5 +256,34 @@ onBeforeUnmount(() => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+
+.avatar-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-base);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  width: 100%;
+  text-align: left;
+
+  &.expanded {
+    padding: 1rem;
+  }
+}
+
+.avatar-text {
+  margin: auto 0 auto 0.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.text {
+  width: 6rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>

@@ -24,6 +24,7 @@ pub struct Settings {
     pub hooks: Hooks,
     pub max_concurrent_downloads: usize,
     pub version: u32,
+    pub collapsed_navigation: bool,
 }
 
 impl Default for Settings {
@@ -39,6 +40,7 @@ impl Default for Settings {
             hooks: Hooks::default(),
             max_concurrent_downloads: 64,
             version: CURRENT_FORMAT_VERSION,
+            collapsed_navigation: false,
         }
     }
 }
