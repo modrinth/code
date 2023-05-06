@@ -361,7 +361,6 @@ pub async fn infer_data_from_files(
                             update_version: update_versions
                                 .get(&hash)
                                 .map(|val| Box::new(val.clone())),
-
                             incompatible: !version.loaders.contains(
                                 &profile
                                     .metadata

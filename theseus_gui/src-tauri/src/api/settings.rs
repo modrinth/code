@@ -16,6 +16,7 @@ pub struct FrontendSettings {
     pub hooks: Hooks,
     pub max_concurrent_downloads: usize,
     pub version: u32,
+    pub collapsed_navigation: bool,
 }
 
 // Get full settings
@@ -39,6 +40,7 @@ pub async fn settings_get() -> Result<FrontendSettings> {
         hooks: backend_settings.hooks,
         max_concurrent_downloads: backend_settings.max_concurrent_downloads,
         version: backend_settings.version,
+        collapsed_navigation: backend_settings.collapsed_navigation,
     };
     Ok(frontend_settings)
 }
@@ -76,6 +78,7 @@ pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
         hooks: settings.hooks,
         max_concurrent_downloads: settings.max_concurrent_downloads,
         version: settings.version,
+        collapsed_navigation: settings.collapsed_navigation,
     };
     settings::set(backend_settings).await?;
     Ok(())
