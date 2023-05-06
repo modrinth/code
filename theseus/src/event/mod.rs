@@ -72,6 +72,7 @@ pub struct LoadingBar {
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
+#[serde(tag = "type")]
 pub enum LoadingBarType {
     StateInit,
     PackDownload {

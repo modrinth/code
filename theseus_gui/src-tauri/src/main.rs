@@ -5,7 +5,7 @@
 
 use theseus::prelude::*;
 
-use tracing_error::{ErrorLayer};
+use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
 mod api;
