@@ -42,25 +42,22 @@ export const configuredXss = new xss.FilterXSS({
       for (const source of allowedSources) {
         if (source.regex.test(value)) {
           for (const remove of source.remove) {
-            let index = value.indexOf(remove)
+            let index = value.indexOf(remove);
             do {
               if (index - 1 > 0 && value.charAt(index - 1) === '?') {
                 // need to watch out for two things
                 // case where its ?stand=alone
                 // case where its ?followed=by&another=queryParam
-                if (
-                  index + remove.length < value.length &&
-                  value.charAt(index + remove.length) === '&'
-                ) {
-                  value = value.replace(`${remove}&`, '')
+                if (index + remove.length < value.length && value.charAt(index + remove.length) === '&') {
+                  value = value.replace(`${remove}&`, '');
                 } else if (index + remove.length >= value.length) {
-                  value = value.replace(`?${remove}`, '')
+                  value = value.replace(`?${remove}`, '');
                 }
               } else {
-                value = value.replaceAll(`&${remove}`, '') // can safely be removed
+                value = value.replaceAll(`&${remove}`, ''); // can safely be removed
               }
-              index = value.indexOf(remove)
-            } while (index !== -1)
+              index = value.indexOf(remove);
+            } while (index !== -1);
           }
           return name + '="' + xss.escapeAttrValue(value) + '"'
         }
