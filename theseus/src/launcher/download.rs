@@ -23,7 +23,7 @@ pub async fn download_minecraft(
     version: &GameVersionInfo,
     loading_bar: Uuid,
 ) -> crate::Result<()> {
-    log::info!("Downloading Minecraft version {}", version.id);
+    tracing::info!("Downloading Minecraft version {}", version.id);
     let assets_index = download_assets_index(st, version).await?;
 
     tokio::try_join! {
@@ -32,7 +32,7 @@ pub async fn download_minecraft(
         download_libraries(st, version.libraries.as_slice(), &version.id, Some(&loading_bar))
     }?;
 
-    log::info!("Done downloading Minecraft!");
+    tracing::info!("Done downloading Minecraft!");
     Ok(())
 }
 
@@ -45,7 +45,7 @@ pub async fn download_version_info(
 ) -> crate::Result<GameVersionInfo> {
     let version_id = loader
         .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
-    log::debug!("Loading version info for Minecraft {version_id}");
+    tracing::debug!("Loading version info for Minecraft {version_id}");
     let path = st
         .directories
         .version_dir(&version_id)
@@ -57,7 +57,7 @@ pub async fn download_version_info(
             .await
             .and_then(|ref it| Ok(serde_json::from_slice(it)?))
     } else {
-        log::info!("Downloading version info for version {}", &version.id);
+        tracing::info!("Downloading version info for version {}", &version.id);
         let mut info = d::minecraft::fetch_version_info(version).await?;
 
         if let Some(loader) = loader {
@@ -70,7 +70,7 @@ pub async fn download_version_info(
         Ok(info)
     }?;
 
-    log::debug!("Loaded version info for Minecraft {version_id}");
+    tracing::debug!("Loaded version info for Minecraft {version_id}");
     Ok(res)
 }
 
@@ -81,7 +81,7 @@ pub async fn download_client(
     loading_bar: Option<&Uuid>,
 ) -> crate::Result<()> {
     let version = &version_info.id;
-    log::debug!("Locating client for version {version}");
+    tracing::debug!("Locating client for version {version}");
     let client_download = version_info
         .downloads
         .get(&d::minecraft::DownloadType::Client)
@@ -104,13 +104,13 @@ pub async fn download_client(
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
-        log::info!("Fetched client version {version}");
+        tracing::info!("Fetched client version {version}");
     }
     if let Some(loading_bar) = loading_bar {
         emit_loading(loading_bar, 20.0, None).await?;
     }
 
-    log::debug!("Client loaded for version {version}!");
+    tracing::debug!("Client loaded for version {version}!");
     Ok(())
 }
 
@@ -119,7 +119,7 @@ pub async fn download_assets_index(
     st: &State,
     version: &GameVersionInfo,
 ) -> crate::Result<AssetsIndex> {
-    log::debug!("Loading assets index");
+    tracing::debug!("Loading assets index");
     let path = st
         .directories
         .assets_index_dir()
@@ -133,11 +133,11 @@ pub async fn download_assets_index(
     } else {
         let index = d::minecraft::fetch_assets_index(version).await?;
         write(&path, &serde_json::to_vec(&index)?, &st.io_semaphore).await?;
-        log::info!("Fetched assets index");
+        tracing::info!("Fetched assets index");
         Ok(index)
     }?;
 
-    log::debug!("Assets index successfully loaded!");
+    tracing::debug!("Assets index successfully loaded!");
     Ok(res)
 }
 
@@ -148,7 +148,7 @@ pub async fn download_assets(
     index: &AssetsIndex,
     loading_bar: Option<&Uuid>,
 ) -> crate::Result<()> {
-    log::debug!("Loading assets");
+    tracing::debug!("Loading assets");
     let num_futs = index.objects.len();
     let assets = stream::iter(index.objects.iter())
         .map(Ok::<(&String, &Asset), crate::Error>);
@@ -175,7 +175,7 @@ pub async fn download_assets(
                             .get_or_try_init(|| fetch(&url, Some(hash), &st.io_semaphore))
                             .await?;
                         write(&resource_path, resource, &st.io_semaphore).await?;
-                        log::info!("Fetched asset with hash {hash}");
+                        tracing::info!("Fetched asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
                 },
@@ -188,17 +188,17 @@ pub async fn download_assets(
                             name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
                         );
                         write(&resource_path, resource, &st.io_semaphore).await?;
-                        log::info!("Fetched legacy asset with hash {hash}");
+                        tracing::info!("Fetched legacy asset with hash {hash}");
                     }
                     Ok::<_, crate::Error>(())
                 },
             }?;
 
-            log::debug!("Loaded asset with hash {hash}");
+            tracing::debug!("Loaded asset with hash {hash}");
             Ok(())
         }).await?;
 
-    log::debug!("Done loading assets!");
+    tracing::debug!("Done loading assets!");
     Ok(())
 }
 
@@ -209,7 +209,7 @@ pub async fn download_libraries(
     version: &str,
     loading_bar: Option<&Uuid>,
 ) -> crate::Result<()> {
-    log::debug!("Loading libraries");
+    tracing::debug!("Loading libraries");
 
     tokio::try_join! {
         fs::create_dir_all(st.directories.libraries_dir()),
@@ -238,7 +238,7 @@ pub async fn download_libraries(
                             let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.io_semaphore)
                                 .await?;
                             write(&path, &bytes, &st.io_semaphore).await?;
-                            log::info!("Fetched library {}", &library.name);
+                            tracing::info!("Fetched library {}", &library.name);
                             Ok::<_, crate::Error>(())
                         }
                         None => {
@@ -252,7 +252,7 @@ pub async fn download_libraries(
 
                             let bytes = fetch(&url, None, &st.io_semaphore).await?;
                             write(&path, &bytes, &st.io_semaphore).await?;
-                            log::info!("Fetched library {}", &library.name);
+                            tracing::info!("Fetched library {}", &library.name);
                             Ok::<_, crate::Error>(())
                         }
                         _ => Ok(())
@@ -281,11 +281,11 @@ pub async fn download_libraries(
                             let reader = std::io::Cursor::new(&data);
                             if let Ok(mut archive) = zip::ZipArchive::new(reader) {
                                 match archive.extract(&st.directories.version_natives_dir(version)) {
-                                    Ok(_) => log::info!("Fetched native {}", &library.name),
-                                    Err(err) => log::error!("Failed extracting native {}. err: {}", &library.name, err)
+                                    Ok(_) => tracing::info!("Fetched native {}", &library.name),
+                                    Err(err) => tracing::error!("Failed extracting native {}. err: {}", &library.name, err)
                                 }
                             } else {
-                                log::error!("Failed extracting native {}", &library.name)
+                                tracing::error!("Failed extracting native {}", &library.name)
                             }
                         }
                     }
@@ -294,11 +294,11 @@ pub async fn download_libraries(
                 }
             }?;
 
-            log::debug!("Loaded library {}", library.name);
+            tracing::debug!("Loaded library {}", library.name);
             Ok(())
         }
     ).await?;
 
-    log::debug!("Done loading libraries!");
+    tracing::debug!("Done loading libraries!");
     Ok(())
 }

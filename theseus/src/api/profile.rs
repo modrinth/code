@@ -344,7 +344,7 @@ pub async fn remove_project(
 }
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
-#[tracing::instrument(skip_all)]
+#[tracing::instrument]
 pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
 
@@ -367,7 +367,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
 
 /// Run Minecraft using a profile, and credentials for authentication
 /// Returns Arc pointer to RwLock to Child
-#[tracing::instrument(skip_all)]
+#[tracing::instrument]
 pub async fn run_credentials(
     path: &Path,
     credentials: &auth::Credentials,

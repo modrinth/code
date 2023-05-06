@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::event::emit::emit_warning;
 use crate::state::LinkedData;
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
@@ -15,6 +16,7 @@ use futures::prelude::*;
 use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
+use tracing::{info, trace};
 use uuid::Uuid;
 
 const DEFAULT_NAME: &str = "Untitled Instance";
@@ -47,6 +49,7 @@ pub async fn profile_create(
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
+    trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     let metadata = state.metadata.read().await;
 
@@ -74,7 +77,7 @@ pub async fn profile_create(
         fs::create_dir_all(&path).await?;
     }
 
-    println!(
+    info!(
         "Creating profile at path {}",
         &canonicalize(&path)?.display()
     );
@@ -173,7 +176,7 @@ pub async fn profile_create(
             extra_arguments: None,
         });
     } else {
-        println!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.");
+        emit_warning(&format!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.")).await?;
     }
 
     emit_profile(

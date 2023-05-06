@@ -79,7 +79,7 @@ impl Metadata {
             match res {
                 Ok(()) => {}
                 Err(err) => {
-                    log::warn!("Unable to fetch launcher metadata: {err}")
+                    tracing::warn!("Unable to fetch launcher metadata: {err}")
                 }
             }
         }
@@ -120,7 +120,7 @@ impl Metadata {
         match res {
             Ok(()) => {}
             Err(err) => {
-                log::warn!("Unable to update launcher metadata: {err}")
+                tracing::warn!("Unable to update launcher metadata: {err}")
             }
         };
     }

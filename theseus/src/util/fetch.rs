@@ -101,7 +101,7 @@ pub async fn fetch_advanced(
                         }
                     }
 
-                    log::debug!("Done downloading URL {url}");
+                    tracing::debug!("Done downloading URL {url}");
                     return Ok(bytes);
                 } else if attempt <= 3 {
                     continue;
@@ -175,7 +175,7 @@ pub async fn write<'a>(
 
     let mut file = File::create(path).await?;
     file.write_all(bytes).await?;
-    log::debug!("Done writing file {}", path.display());
+    tracing::debug!("Done writing file {}", path.display());
     Ok(())
 }
 

@@ -358,7 +358,9 @@ impl Profiles {
                 let prof = match Self::read_profile_from_dir(&path).await {
                     Ok(prof) => Some(prof),
                     Err(err) => {
-                        log::warn!("Error loading profile: {err}. Skipping...");
+                        tracing::warn!(
+                            "Error loading profile: {err}. Skipping..."
+                        );
                         None
                     }
                 };
@@ -417,7 +419,7 @@ impl Profiles {
         match res {
             Ok(()) => {}
             Err(err) => {
-                log::warn!("Unable to fetch profile projects: {err}")
+                tracing::warn!("Unable to fetch profile projects: {err}")
             }
         };
     }

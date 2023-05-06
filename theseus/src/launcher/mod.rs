@@ -266,7 +266,7 @@ pub async fn launch_minecraft(
         None => Command::new(String::from(java_install.to_string_lossy())),
     };
 
-    let env_args = Vec::from(env_args);
+    let _env_args = Vec::from(env_args);
 
     // Check if profile has a running profile, and reject running the command if it does
     // Done late so a quick double call doesn't launch two instances
@@ -320,9 +320,6 @@ pub async fn launch_minecraft(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    // Clear cargo-added env varaibles for debugging, and add settings env vars
-    clear_cargo_env_vals(&mut command).envs(env_args);
-
     // Get Modrinth logs directories
     let datetime_string =
         chrono::Local::now().format("%Y%m%y_%H%M%S").to_string();
@@ -350,15 +347,4 @@ pub async fn launch_minecraft(
             post_exit_hook,
         )
         .await
-}
-
-fn clear_cargo_env_vals(command: &mut Command) -> &mut Command {
-    for (key, _) in std::env::vars() {
-        command.env_remove(key);
-
-        // if key.starts_with("CARGO") {
-        //     command.env_remove(key);
-        // }
-    }
-    command
 }

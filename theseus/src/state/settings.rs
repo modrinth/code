@@ -82,7 +82,7 @@ impl Settings {
         match res {
             Ok(()) => {}
             Err(err) => {
-                log::warn!("Unable to update launcher java: {err}")
+                tracing::warn!("Unable to update launcher java: {err}")
             }
         };
     }

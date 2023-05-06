@@ -33,7 +33,7 @@ impl Tags {
             match Self::fetch(io_semaphore).await {
                 Ok(tags_fetch) => tags = Some(tags_fetch),
                 Err(err) => {
-                    log::warn!("Unable to fetch launcher tags: {err}")
+                    tracing::warn!("Unable to fetch launcher tags: {err}")
                 }
             }
         }
@@ -74,7 +74,7 @@ impl Tags {
         match res {
             Ok(()) => {}
             Err(err) => {
-                log::warn!("Unable to update launcher tags: {err}")
+                tracing::warn!("Unable to update launcher tags: {err}")
             }
         };
     }

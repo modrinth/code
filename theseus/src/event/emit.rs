@@ -4,6 +4,7 @@ use crate::event::{
 };
 use futures::prelude::*;
 use std::path::PathBuf;
+use tracing::warn;
 
 #[cfg(feature = "tauri")]
 use crate::event::{
@@ -162,6 +163,7 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
             )
             .map_err(EventError::from)?;
     }
+    warn!("{}", message);
     Ok(())
 }
 

@@ -4,9 +4,9 @@
 )]
 
 use theseus::prelude::*;
-use tracing::{info, warn};
-use tracing_error::{ErrorLayer, SpanTrace};
-use tracing_subscriber::{EnvFilter};
+
+use tracing_error::{ErrorLayer};
+use tracing_subscriber::EnvFilter;
 
 mod api;
 mod error;
@@ -44,8 +44,22 @@ async fn should_disable_mouseover() -> bool {
 use tracing_subscriber::prelude::*;
 
 fn main() {
+    /*
+       tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
+           ERROR > WARN > INFO > DEBUG > TRACE
+       eg. RUST_LOG=info will show info, warn, and error logs
+           RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
+           RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
+
+       Error messages returned to Tauri will display as traced error logs if they return an error.
+       This will also include an attached span trace if the error is from a tracing error, and the level is set to info, debug, or trace
+
+       on unix:
+           RUST_LOG="theseus=trace" {run command}
+
+    */
     let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("theseus=trace"));
+        .unwrap_or_else(|_| EnvFilter::new("theseus=info"));
 
     let subscriber = tracing_subscriber::registry()
         .with(tracing_subscriber::fmt::layer())
