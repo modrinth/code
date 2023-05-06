@@ -30,8 +30,8 @@ export const configuredXss = new xss.FilterXSS({
       const allowedSources = [
         {
           regex:
-            /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}((&|\?)\w+=\w+)*$/,
-          remove: ['autoplay=1'], // Prevents autoplay
+            /^https?:\/\/(www\.)?youtube(-nocookie)?\.com\/embed\/[a-zA-Z0-9_-]{11}(\?&autoplay=[0-1]{1})?$/,
+          remove: ['&autoplay=1'], // Prevents autoplay
         },
         {
           regex: /^https?:\/\/(www\.)?discord\.com\/widget\?id=\d{18,19}(&theme=\w+)?$/,
@@ -42,22 +42,7 @@ export const configuredXss = new xss.FilterXSS({
       for (const source of allowedSources) {
         if (source.regex.test(value)) {
           for (const remove of source.remove) {
-            let index = value.indexOf(remove);
-            do {
-              if (index - 1 > 0 && value.charAt(index - 1) === '?') {
-                // need to watch out for two things
-                // case where its ?stand=alone
-                // case where its ?followed=by&another=queryParam
-                if (index + remove.length < value.length && value.charAt(index + remove.length) === '&') {
-                  value = value.replace(`${remove}&`, '');
-                } else if (index + remove.length >= value.length) {
-                  value = value.replace(`?${remove}`, '');
-                }
-              } else {
-                value = value.replaceAll(`&${remove}`, ''); // can safely be removed
-              }
-              index = value.indexOf(remove);
-            } while (index !== -1);
+            value = value.replace(remove, '')
           }
           return name + '="' + xss.escapeAttrValue(value) + '"'
         }
