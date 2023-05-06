@@ -14,7 +14,9 @@ export const configuredXss = new xss.FilterXSS({
     kbd: ['id'],
     input: ['checked', 'disabled', 'type'],
     iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
-    img: [...xss.whiteList.img, 'style'],
+    img: [...xss.whiteList.img, 'style', 'usemap'],
+    map: ['name'],
+    area: [...xss.whiteList.a, 'coords'],
     a: [...xss.whiteList.a, 'rel'],
   },
   css: {
