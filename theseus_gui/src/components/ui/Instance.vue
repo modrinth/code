@@ -177,6 +177,18 @@ await process_listener((e) => {
       opacity: 1;
       bottom: 4.5rem;
     }
+
+    .instance-card-item {
+      background: hsl(220, 11%, 11%) !important;
+    }
+  }
+}
+
+.light-mode {
+  .instance:hover {
+    .instance-card-item {
+      background: hsl(0, 0%, 91%) !important;
+    }
   }
 }
 
@@ -250,8 +262,8 @@ await process_listener((e) => {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  padding: 0.75rem;
-  transition: 0.1s ease-in-out all;
+  padding: 0.75rem !important; /* overrides card class */
+  transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
   background: hsl(220, 11%, 17%) !important;
 
   &:hover {
