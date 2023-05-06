@@ -230,43 +230,17 @@ const confirmModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
 const [data, versions, members, dependencies] = await Promise.all([
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`)
-    .then(shallowRef)
-    .catch(() =>
-      notificationStore.addNotification({
-        title: 'Error',
-        text: 'Something went wrong fetching the project data.',
-        type: 'error',
-      })
-    ),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`)
-    .then(shallowRef)
-    .catch(() =>
-      notificationStore.addNotification({
-        title: 'Error',
-        text: 'Something went wrong getting the versions for the project.',
-        type: 'error',
-      })
-    ),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`)
-    .then(shallowRef)
-    .catch(() =>
-      notificationStore.addNotification({
-        title: 'Error',
-        text: 'Something went wrong getting the members for th eproject.',
-        type: 'error',
-      })
-    ),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`)
-    .then(shallowRef)
-    .catch(() =>
-      notificationStore.addNotification({
-        title: 'Error',
-        text: 'Failure while fetching project dependencies.',
-        type: 'error',
-      })
-    ),
-])
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
+  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
+]).catch((err) =>
+  notificationStore.addNotification({
+    title: 'Error',
+    text: err,
+    type: 'error',
+  })
+)
 
 breadcrumbs.setName('Project', data.value.title)
 
@@ -289,11 +263,6 @@ async function install(version) {
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
       let id = await pack_install(version)
-      notificationStore.addNotification({
-        title: 'Success',
-        text: `${data.value.title} installed`,
-        type: 'success',
-      })
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
       confirmModal.value.show(version)

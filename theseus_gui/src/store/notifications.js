@@ -15,7 +15,6 @@ export const useNotifications = defineStore('notificationStore', {
       }, 30000)
     },
     addNotification(newNotif) {
-      console.log('firing')
       const existingNotif = this.notifications.find(
         (n) =>
           n.text === newNotif.text &&

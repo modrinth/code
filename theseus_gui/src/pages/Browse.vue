@@ -47,7 +47,7 @@ const getSearchResults = async (shouldLoad = false) => {
   } catch (err) {
     notificationStore.addNotification({
       title: 'Search Error',
-      text: 'A failure occurred during the search.',
+      text: err,
       type: 'error',
     })
   }
