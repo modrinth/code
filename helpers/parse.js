@@ -35,7 +35,7 @@ export const configuredXss = new xss.FilterXSS({
         },
         {
           regex: /^https?:\/\/(www\.)?discord\.com\/widget\?id=\d{18,19}(&theme=\w+)?$/,
-          remove: [/&theme=\w+/],
+          remove: [/theme=\w+/],
         },
       ]
 
