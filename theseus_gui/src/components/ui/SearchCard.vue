@@ -1,6 +1,5 @@
 <template>
-  <Card class="card button-base" @click="$router.push(`/project/${project.project_id}/`)">
-    <div class="card-content">
+  <Card class="card card-content button-base" @click="$router.push(`/project/${project.project_id}/`)">
       <div class="content">
         <Avatar :src="project.icon_url" size="md" />
       </div>
@@ -52,7 +51,6 @@
           </div>
         </div>
       </div>
-    </div>
   </Card>
 </template>
 
@@ -162,22 +160,17 @@ const install = async () => {
 
 <style scoped lang="scss">
 .card {
-  padding: 0;
-  z-index: 0;
   margin-bottom: 0;
-
-  &:active:not(&:disabled) {
-    scale: 0.98 !important;
-  }
-}
-
-.card-content {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   gap: 1rem;
-  padding: var(--gap-xl);
   height: 100%;
+  padding: var(--gap-lg);
+
+  &:active:not(&:disabled) {
+    scale: 0.98 !important;
+  }
 }
 
 .content {
