@@ -36,12 +36,19 @@ const handlePaginationDisplay = () => {
   if (shouldRenderNormalInstances) parentsRow = modsRow.value
   if (shouldRenderNews) parentsRow = newsRow.value
   if (!parentsRow) return
-  const children = parentsRow.children
-  const lastChild = children[children.length - 1]
-  const childBox = lastChild?.getBoundingClientRect()
-  if (childBox?.x + childBox?.width > window.innerWidth && props.canPaginate)
-    allowPagination.value = true
-  else allowPagination.value = false
+
+  // This is wrapped in a setTimeout because the HtmlCollection seems to struggle
+  // with getting populated sometimes. It's a flaky error, but providing a bit of
+  // wait-time for the below expressions has not failed thus-far.
+  setTimeout(() => {
+    const children = parentsRow.children
+    const lastChild = children[children.length - 1]
+    const childBox = lastChild?.getBoundingClientRect()
+
+    if (childBox?.x + childBox?.width > window.innerWidth && props.canPaginate)
+      allowPagination.value = true
+    else allowPagination.value = false
+  }, 300)
 }
 
 onMounted(() => {

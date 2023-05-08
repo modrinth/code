@@ -128,6 +128,7 @@ onMounted(async () => {
 
     &.expanded {
       width: calc(100% - 12rem);
+      margin-left: 12rem;
     }
 
     .appbar {
