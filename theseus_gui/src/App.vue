@@ -1,5 +1,5 @@
 <script setup>
-import {onMounted, ref} from 'vue'
+import { onMounted, ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, AnimatedLogo } from 'omorphia'
 import { useTheming } from '@/store/state'
