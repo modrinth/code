@@ -50,7 +50,7 @@ list().then(
             <span v-if="!themeStore.collapsedNavigation">Home</span>
           </RouterLink>
           <RouterLink
-            to="/browse"
+            to="/browse/modpack"
             class="btn"
             :class="{
               'icon-only': themeStore.collapsedNavigation,
