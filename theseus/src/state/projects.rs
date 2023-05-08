@@ -2,7 +2,9 @@
 
 use crate::config::MODRINTH_API_URL;
 use crate::state::Profile;
-use crate::util::fetch::{fetch_json, write_cached_icon};
+use crate::util::fetch::{
+    fetch_json, write_cached_icon, FetchSemaphore, IoSemaphore,
+};
 use async_zip::tokio::read::fs::ZipFileReader;
 use chrono::{DateTime, Utc};
 use reqwest::Method;
@@ -12,7 +14,6 @@ use sha2::Digest;
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use tokio::io::AsyncReadExt;
-use tokio::sync::{RwLock, Semaphore};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 #[serde(rename_all = "lowercase")]
@@ -203,7 +204,7 @@ async fn read_icon_from_file(
     icon_path: Option<String>,
     cache_dir: &Path,
     path: &PathBuf,
-    io_semaphore: &RwLock<Semaphore>,
+    io_semaphore: &IoSemaphore,
 ) -> crate::Result<Option<PathBuf>> {
     if let Some(icon_path) = icon_path {
         // we have to repoen the zip twice here :(
@@ -252,7 +253,8 @@ pub async fn infer_data_from_files(
     profile: Profile,
     paths: Vec<PathBuf>,
     cache_dir: PathBuf,
-    io_semaphore: &RwLock<Semaphore>,
+    io_semaphore: &IoSemaphore,
+    fetch_semaphore: &FetchSemaphore,
 ) -> crate::Result<HashMap<PathBuf, Project>> {
     let mut file_path_hashes = HashMap::new();
 
@@ -278,7 +280,7 @@ pub async fn infer_data_from_files(
                 "hashes": file_path_hashes.keys().collect::<Vec<_>>(),
                 "algorithm": "sha512",
             })),
-            io_semaphore,
+            fetch_semaphore,
         ),
         fetch_json::<HashMap<String, ModrinthVersion>>(
             Method::POST,
@@ -290,7 +292,7 @@ pub async fn infer_data_from_files(
                 "loaders": [profile.metadata.loader],
                 "game_versions": [profile.metadata.game_version]
             })),
-            io_semaphore,
+            fetch_semaphore,
         )
     )?;
 
@@ -308,7 +310,7 @@ pub async fn infer_data_from_files(
         ),
         None,
         None,
-        io_semaphore,
+        fetch_semaphore,
     )
     .await?;
 
@@ -325,7 +327,7 @@ pub async fn infer_data_from_files(
         ),
         None,
         None,
-        io_semaphore,
+        fetch_semaphore,
     )
     .await?
     .into_iter()

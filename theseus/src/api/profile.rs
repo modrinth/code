@@ -148,7 +148,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
                 profile_name: profile.metadata.name.clone(),
             },
             100.0,
-            "Updating profile...",
+            "Updating profile",
         )
         .await?;
 
@@ -397,6 +397,7 @@ pub async fn run_credentials(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
         None,
     )
     .await?;

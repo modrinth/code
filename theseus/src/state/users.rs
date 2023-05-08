@@ -1,10 +1,9 @@
 //! User login info
 use crate::auth::Credentials;
 use crate::data::DirectoryInfo;
-use crate::util::fetch::{read_json, write};
+use crate::util::fetch::{read_json, write, IoSemaphore};
 use crate::State;
 use std::collections::HashMap;
-use tokio::sync::{RwLock, Semaphore};
 use uuid::Uuid;
 
 const USERS_JSON: &str = "users.json";
@@ -16,7 +15,7 @@ pub(crate) struct Users(pub(crate) HashMap<Uuid, Credentials>);
 impl Users {
     pub async fn init(
         dirs: &DirectoryInfo,
-        io_semaphore: &RwLock<Semaphore>,
+        io_semaphore: &IoSemaphore,
     ) -> crate::Result<Self> {
         let users_path = dirs.caches_meta_dir().join(USERS_JSON);
         let users = read_json(&users_path, io_semaphore).await.ok();

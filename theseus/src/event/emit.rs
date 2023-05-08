@@ -16,7 +16,7 @@ use tauri::Manager;
 use uuid::Uuid;
 
 #[cfg(feature = "cli")]
-const CLI_PROGRESS_BAR_TOTAL: u64 = 10000;
+const CLI_PROGRESS_BAR_TOTAL: u64 = 1000;
 
 /*
    Events are a way we can communciate with the Tauri frontend from the Rust backend.
@@ -63,9 +63,21 @@ pub async fn init_loading(
             current: 0.0,
             bar_type,
             #[cfg(feature = "cli")]
-            cli_progress_bar: indicatif::ProgressBar::new(
-                CLI_PROGRESS_BAR_TOTAL * total.round() as u64,
-            ),
+            cli_progress_bar: {
+                let pb = indicatif::ProgressBar::new(CLI_PROGRESS_BAR_TOTAL);
+
+                pb.set_position(0);
+                pb.set_style(
+                    indicatif::ProgressStyle::default_bar()
+                        .template(
+                            "{spinner:.green} [{elapsed_precise}] [{bar:.lime/green}] {pos}/{len} {msg}",
+                        ).unwrap()
+                        .progress_chars("#>-"),
+                );
+                //pb.set_message(title);
+
+                pb
+            },
         },
     );
     // attempt an initial loading_emit event to the frontend
@@ -148,13 +160,15 @@ pub async fn emit_loading(
     // Emit event to indicatif progress bar
     #[cfg(feature = "cli")]
     {
-        if let Some(message) = message {
-            loading_bar
-                .cli_progress_bar
-                .set_message(message.to_string());
-        }
-        loading_bar.cli_progress_bar.inc(
-            (increment_frac * CLI_PROGRESS_BAR_TOTAL as f64).round() as u64,
+        loading_bar.cli_progress_bar.set_message(
+            message
+                .map(|x| x.to_string())
+                .unwrap_or(loading_bar.message.clone()),
+        );
+        loading_bar.cli_progress_bar.set_position(
+            ((loading_bar.current / loading_bar.total)
+                * CLI_PROGRESS_BAR_TOTAL as f64)
+                .round() as u64,
         );
     }
 

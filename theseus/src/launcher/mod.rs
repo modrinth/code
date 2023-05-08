@@ -80,19 +80,6 @@ pub async fn install_minecraft(
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 
-    let mut version_info = download::download_version_info(
-        &state,
-        version,
-        profile.metadata.loader_version.as_ref(),
-        None,
-    )
-    .await?;
-
-    let minecraft_download_total = if version_info.processors.is_none() {
-        90.0 // No processors at all will be used, so shrink total to avoid jump at end
-    } else {
-        100.0 // Processors will be used, so keep total at 100
-    };
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
         LoadingBarType::MinecraftDownload {
@@ -100,12 +87,22 @@ pub async fn install_minecraft(
             profile_name: profile.metadata.name.clone(),
             profile_uuid: profile.uuid,
         },
-        minecraft_download_total,
-        "Downloading Minecraft...",
+        100.0,
+        "Downloading Minecraft",
     )
     .await?;
 
-    // Download minecraft (0-90)
+    // Download version info
+    let mut version_info = download::download_version_info(
+        &state,
+        version,
+        profile.metadata.loader_version.as_ref(),
+        None,
+        Some(&loading_bar),
+    )
+    .await?;
+
+    // Download minecraft (5-90)
     download::download_minecraft(&state, &version_info, &loading_bar).await?;
 
     let client_path = state
@@ -231,7 +228,7 @@ pub async fn launch_minecraft(
         install_minecraft(profile, None).await?;
     }
 
-    let state = st::State::get().await?;
+    let state = State::get().await?;
     let metadata = state.metadata.read().await;
     let instance_path = &canonicalize(&profile.path)?;
 
@@ -257,6 +254,7 @@ pub async fn launch_minecraft(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
         None,
     )
     .await?;

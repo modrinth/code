@@ -23,6 +23,7 @@ pub struct Settings {
     pub default_user: Option<uuid::Uuid>,
     pub hooks: Hooks,
     pub max_concurrent_downloads: usize,
+    pub max_concurrent_writes: usize,
     pub version: u32,
 }
 
@@ -38,6 +39,7 @@ impl Default for Settings {
             default_user: None,
             hooks: Hooks::default(),
             max_concurrent_downloads: 64,
+            max_concurrent_writes: 100,
             version: CURRENT_FORMAT_VERSION,
         }
     }

@@ -1,4 +1,6 @@
 //! Functions for fetching infromation from the Internet
+use crate::event::emit::emit_loading;
+use crate::event::LoadingBarId;
 use bytes::Bytes;
 use lazy_static::lazy_static;
 use reqwest::Method;
@@ -11,6 +13,11 @@ use tokio::{
     fs::{self, File},
     io::AsyncWriteExt,
 };
+
+#[derive(Debug)]
+pub struct IoSemaphore(pub RwLock<Semaphore>);
+#[derive(Debug)]
+pub struct FetchSemaphore(pub RwLock<Semaphore>);
 
 lazy_static! {
     static ref REQWEST_CLIENT: reqwest::Client = {
@@ -34,9 +41,9 @@ const FETCH_ATTEMPTS: usize = 3;
 pub async fn fetch(
     url: &str,
     sha1: Option<&str>,
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &FetchSemaphore,
 ) -> crate::Result<Bytes> {
-    fetch_advanced(Method::GET, url, sha1, None, None, semaphore).await
+    fetch_advanced(Method::GET, url, sha1, None, None, None, semaphore).await
 }
 
 #[tracing::instrument(skip(json_body, semaphore))]
@@ -45,13 +52,14 @@ pub async fn fetch_json<T>(
     url: &str,
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &FetchSemaphore,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
     let result =
-        fetch_advanced(method, url, sha1, json_body, None, semaphore).await?;
+        fetch_advanced(method, url, sha1, json_body, None, None, semaphore)
+            .await?;
     let value = serde_json::from_slice(&result)?;
     Ok(value)
 }
@@ -64,9 +72,10 @@ pub async fn fetch_advanced(
     sha1: Option<&str>,
     json_body: Option<serde_json::Value>,
     header: Option<(&str, &str)>,
-    semaphore: &RwLock<Semaphore>,
+    loading_bar: Option<(&LoadingBarId, f64)>,
+    semaphore: &FetchSemaphore,
 ) -> crate::Result<Bytes> {
-    let io_semaphore = semaphore.read().await;
+    let io_semaphore = semaphore.0.read().await;
     let _permit = io_semaphore.acquire().await?;
 
     for attempt in 1..=(FETCH_ATTEMPTS + 1) {
@@ -83,7 +92,35 @@ pub async fn fetch_advanced(
         let result = req.send().await;
         match result {
             Ok(x) => {
-                let bytes = x.bytes().await;
+                let bytes = if let Some((bar, total)) = &loading_bar {
+                    let length = x.content_length();
+                    if let Some(total_size) = length {
+                        use futures::StreamExt;
+                        let mut stream = x.bytes_stream();
+                        let mut bytes = Vec::new();
+                        while let Some(item) = stream.next().await {
+                            let chunk = item.or(Err(
+                                crate::error::ErrorKind::NoValueFor(
+                                    "fetch bytes".to_string(),
+                                ),
+                            ))?;
+                            bytes.append(&mut chunk.to_vec());
+                            emit_loading(
+                                bar,
+                                (chunk.len() as f64 / total_size as f64)
+                                    * total,
+                                None,
+                            )
+                            .await?;
+                        }
+
+                        Ok(bytes::Bytes::from(bytes))
+                    } else {
+                        x.bytes().await
+                    }
+                } else {
+                    x.bytes().await
+                };
 
                 if let Ok(bytes) = bytes {
                     if let Some(sha1) = sha1 {
@@ -124,7 +161,7 @@ pub async fn fetch_advanced(
 pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &FetchSemaphore,
 ) -> crate::Result<Bytes> {
     if mirrors.is_empty() {
         return Err(crate::ErrorKind::InputError(
@@ -146,12 +183,12 @@ pub async fn fetch_mirrors(
 
 pub async fn read_json<T>(
     path: &Path,
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &IoSemaphore,
 ) -> crate::Result<T>
 where
     T: DeserializeOwned,
 {
-    let io_semaphore = semaphore.read().await;
+    let io_semaphore = semaphore.0.read().await;
     let _permit = io_semaphore.acquire().await?;
 
     let json = fs::read(path).await?;
@@ -164,9 +201,9 @@ where
 pub async fn write<'a>(
     path: &Path,
     bytes: &[u8],
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &IoSemaphore,
 ) -> crate::Result<()> {
-    let io_semaphore = semaphore.read().await;
+    let io_semaphore = semaphore.0.read().await;
     let _permit = io_semaphore.acquire().await?;
 
     if let Some(parent) = path.parent() {
@@ -184,7 +221,7 @@ pub async fn write_cached_icon(
     icon_path: &str,
     cache_dir: &Path,
     bytes: Bytes,
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &IoSemaphore,
 ) -> crate::Result<PathBuf> {
     let extension = Path::new(&icon_path).extension().and_then(OsStr::to_str);
     let hash = sha1_async(bytes.clone()).await?;

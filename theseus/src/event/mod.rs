@@ -134,7 +134,7 @@ impl Drop for LoadingBar {
             // Emit event to indicatif progress bar arc
             #[cfg(feature = "cli")]
             {
-                cli_progress_bar.finish_and_clear();
+                cli_progress_bar.finish();
             }
         });
     }
@@ -142,8 +142,13 @@ impl Drop for LoadingBar {
 
 #[derive(Serialize, Deserialize, Clone, Debug, Hash, PartialEq, Eq)]
 #[serde(tag = "type")]
+#[serde(rename_all = "snake_case")]
 pub enum LoadingBarType {
     StateInit,
+    PackFileDownload {
+        pack_name: Option<String>,
+        pack_version: String,
+    },
     PackDownload {
         pack_name: String,
         pack_id: Option<String>,
@@ -194,6 +199,7 @@ pub struct ProfilePayload {
     pub event: ProfilePayloadType,
 }
 #[derive(Serialize, Clone)]
+#[serde(rename_all = "snake_case")]
 pub enum ProfilePayloadType {
     Created,
     Added, // also triggered when Created

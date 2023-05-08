@@ -1,12 +1,13 @@
 use crate::config::MODRINTH_API_URL;
 use crate::data::ModLoader;
 use crate::event::emit::{
-    emit_loading, init_loading, loading_try_for_each_concurrent,
+    emit_loading, init_loading, init_or_edit_loading,
+    loading_try_for_each_concurrent,
 };
-use crate::event::LoadingBarType;
+use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType};
 use crate::util::fetch::{
-    fetch, fetch_json, fetch_mirrors, write, write_cached_icon,
+    fetch, fetch_advanced, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
 use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
@@ -75,17 +76,30 @@ enum PackDependency {
 
 pub async fn install_pack_from_version_id(
     version_id: String,
+    title: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
 
+    let loading_bar = init_loading(
+        LoadingBarType::PackFileDownload {
+            pack_name: title,
+            pack_version: version_id.clone(),
+        },
+        100.0,
+        "Downloading pack file",
+    )
+    .await?;
+
+    emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
     let version: ModrinthVersion = fetch_json(
         Method::GET,
         &format!("{}version/{}", MODRINTH_API_URL, version_id),
         None,
         None,
-        &state.io_semaphore,
+        &state.fetch_semaphore,
     )
     .await?;
+    emit_loading(&loading_bar, 10.0, None).await?;
 
     let (url, hash) =
         if let Some(file) = version.files.iter().find(|x| x.primary) {
@@ -102,20 +116,31 @@ pub async fn install_pack_from_version_id(
             )
         })?;
 
-    let file = fetch(&url, hash.map(|x| &**x), &state.io_semaphore).await?;
+    let file = fetch_advanced(
+        Method::GET,
+        &url,
+        hash.map(|x| &**x),
+        None,
+        None,
+        Some((&loading_bar, 70.0)),
+        &state.fetch_semaphore,
+    )
+    .await?;
+    emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
 
     let project: ModrinthProject = fetch_json(
         Method::GET,
         &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
         None,
         None,
-        &state.io_semaphore,
+        &state.fetch_semaphore,
     )
     .await?;
 
+    emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
     let icon = if let Some(icon_url) = project.icon_url {
         let state = State::get().await?;
-        let icon_bytes = fetch(&icon_url, None, &state.io_semaphore).await?;
+        let icon_bytes = fetch(&icon_url, None, &state.fetch_semaphore).await?;
 
         let filename = icon_url.rsplit('/').next();
 
@@ -135,6 +160,7 @@ pub async fn install_pack_from_version_id(
     } else {
         None
     };
+    emit_loading(&loading_bar, 10.0, None).await?;
 
     install_pack(
         file,
@@ -142,6 +168,7 @@ pub async fn install_pack_from_version_id(
         Some(project.title),
         Some(version.project_id),
         Some(version.id),
+        Some(loading_bar),
     )
     .await
 }
@@ -149,7 +176,7 @@ pub async fn install_pack_from_version_id(
 pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
     let file = fs::read(path).await?;
 
-    install_pack(bytes::Bytes::from(file), None, None, None, None).await
+    install_pack(bytes::Bytes::from(file), None, None, None, None, None).await
 }
 
 async fn install_pack(
@@ -158,6 +185,7 @@ async fn install_pack(
     override_title: Option<String>,
     project_id: Option<String>,
     version_id: Option<String>,
+    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<PathBuf> {
     let state = &State::get().await?;
 
@@ -242,14 +270,15 @@ async fn install_pack(
         .await?;
         let profile = profile_raw.clone();
         let result = async {
-            let loading_bar = init_loading(
+            let loading_bar = init_or_edit_loading(
+                existing_loading_bar,
                 LoadingBarType::PackDownload {
                     pack_name: pack.name.clone(),
                     pack_id: project_id,
                     pack_version: version_id,
                 },
                 100.0,
-                "Downloading modpack...",
+                "Downloading modpack",
             )
             .await?;
 
@@ -260,7 +289,7 @@ async fn install_pack(
                     .map(Ok::<PackFile, crate::Error>),
                 None,
                 Some(&loading_bar),
-                90.0,
+                70.0,
                 num_files,
                 None,
                 |project| {
@@ -287,7 +316,7 @@ async fn install_pack(
                                 .hashes
                                 .get(&PackFileHash::Sha1)
                                 .map(|x| &**x),
-                            &state.io_semaphore,
+                            &state.fetch_semaphore,
                         )
                         .await?;
 
@@ -365,11 +394,11 @@ async fn install_pack(
                 .await
             };
 
-            emit_loading(&loading_bar, 5.0, Some("Extracting overrides"))
+            emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))
                 .await?;
             extract_overrides("overrides".to_string()).await?;
             extract_overrides("client_overrides".to_string()).await?;
-            emit_loading(&loading_bar, 5.0, Some("Done extacting overrides"))
+            emit_loading(&loading_bar, 29.9, Some("Done extacting overrides"))
                 .await?;
 
             if let Some(profile) = crate::api::profile::get(&profile).await? {
@@ -380,13 +409,6 @@ async fn install_pack(
                         Some(loading_bar)
                     ),
                 )?;
-            } else {
-                emit_loading(
-                    &loading_bar,
-                    10.0,
-                    Some("Done extacting overrides"),
-                )
-                .await?;
             }
 
             Ok::<PathBuf, crate::Error>(profile)

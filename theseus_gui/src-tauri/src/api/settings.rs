@@ -15,6 +15,7 @@ pub struct FrontendSettings {
     pub default_user: Option<uuid::Uuid>,
     pub hooks: Hooks,
     pub max_concurrent_downloads: usize,
+    pub max_concurrent_writes: usize,
     pub version: u32,
 }
 
@@ -38,6 +39,7 @@ pub async fn settings_get() -> Result<FrontendSettings> {
         default_user: backend_settings.default_user,
         hooks: backend_settings.hooks,
         max_concurrent_downloads: backend_settings.max_concurrent_downloads,
+        max_concurrent_writes: backend_settings.max_concurrent_writes,
         version: backend_settings.version,
     };
     Ok(frontend_settings)
@@ -75,6 +77,7 @@ pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
         default_user: settings.default_user,
         hooks: settings.hooks,
         max_concurrent_downloads: settings.max_concurrent_downloads,
+        max_concurrent_writes: settings.max_concurrent_writes,
         version: settings.version,
     };
     settings::set(backend_settings).await?;

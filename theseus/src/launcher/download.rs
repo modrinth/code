@@ -26,13 +26,15 @@ pub async fn download_minecraft(
     loading_bar: &LoadingBarId,
 ) -> crate::Result<()> {
     tracing::info!("Downloading Minecraft version {}", version.id);
-    let assets_index = download_assets_index(st, version).await?;
+    // 5
+    let assets_index =
+        download_assets_index(st, version, Some(loading_bar)).await?;
 
     tokio::try_join! {
-        // Total loading sums to 90
+        // Total loading sums to 80
         download_client(st, version, Some(loading_bar)), // 10
-        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar)), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar)) // 40
+        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar)), // 35
+        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar)) // 35
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -45,6 +47,7 @@ pub async fn download_version_info(
     version: &GameVersion,
     loader: Option<&LoaderVersion>,
     force: Option<bool>,
+    loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<GameVersionInfo> {
     let version_id = loader
         .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
@@ -72,6 +75,24 @@ pub async fn download_version_info(
         write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
         Ok(info)
     }?;
+
+    if let Some(loading_bar) = loading_bar {
+        emit_loading(
+            loading_bar,
+            if res
+                .processors
+                .as_ref()
+                .map(|x| !x.is_empty())
+                .unwrap_or(false)
+            {
+                5.0
+            } else {
+                15.0
+            },
+            None,
+        )
+        .await?;
+    }
 
     tracing::debug!("Loaded version info for Minecraft {version_id}");
     Ok(res)
@@ -103,7 +124,7 @@ pub async fn download_client(
         let bytes = fetch(
             &client_download.url,
             Some(&client_download.sha1),
-            &st.io_semaphore,
+            &st.fetch_semaphore,
         )
         .await?;
         write(&path, &bytes, &st.io_semaphore).await?;
@@ -121,6 +142,7 @@ pub async fn download_client(
 pub async fn download_assets_index(
     st: &State,
     version: &GameVersionInfo,
+    loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<AssetsIndex> {
     tracing::debug!("Loading assets index");
     let path = st
@@ -140,6 +162,9 @@ pub async fn download_assets_index(
         Ok(index)
     }?;
 
+    if let Some(loading_bar) = loading_bar {
+        emit_loading(loading_bar, 5.0, None).await?;
+    }
     tracing::debug!("Assets index successfully loaded!");
     Ok(res)
 }
@@ -159,7 +184,7 @@ pub async fn download_assets(
     loading_try_for_each_concurrent(assets,
         None,
         loading_bar,
-        40.0,
+        35.0,
         num_futs,
         None,
         |(name, asset)| async move {
@@ -175,7 +200,7 @@ pub async fn download_assets(
                 async {
                     if !resource_path.exists() {
                         let resource = fetch_cell
-                            .get_or_try_init(|| fetch(&url, Some(hash), &st.io_semaphore))
+                            .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore))
                             .await?;
                         write(&resource_path, resource, &st.io_semaphore).await?;
                         tracing::trace!("Fetched asset with hash {hash}");
@@ -185,7 +210,7 @@ pub async fn download_assets(
                 async {
                     if with_legacy {
                         let resource = fetch_cell
-                            .get_or_try_init(|| fetch(&url, Some(hash), &st.io_semaphore))
+                            .get_or_try_init(|| fetch(&url, Some(hash), &st.fetch_semaphore))
                             .await?;
                         let resource_path = st.directories.legacy_assets_dir().join(
                             name.replace('/', &String::from(std::path::MAIN_SEPARATOR))
@@ -221,7 +246,7 @@ pub async fn download_libraries(
     let num_files = libraries.len();
     loading_try_for_each_concurrent(
     stream::iter(libraries.iter())
-        .map(Ok::<&Library, crate::Error>), None, loading_bar,40.0,num_files, None,|library| async move {
+        .map(Ok::<&Library, crate::Error>), None, loading_bar,35.0,num_files, None,|library| async move {
             if let Some(rules) = &library.rules {
                 if !rules.iter().all(super::parse_rule) {
                     return Ok(());
@@ -238,7 +263,7 @@ pub async fn download_libraries(
                             artifact: Some(ref artifact),
                             ..
                         }) => {
-                            let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.io_semaphore)
+                            let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore)
                                 .await?;
                             write(&path, &bytes, &st.io_semaphore).await?;
                             tracing::trace!("Fetched library {}", &library.name);
@@ -253,7 +278,7 @@ pub async fn download_libraries(
                                 &artifact_path
                             ].concat();
 
-                            let bytes = fetch(&url, None, &st.io_semaphore).await?;
+                            let bytes = fetch(&url, None, &st.fetch_semaphore).await?;
                             write(&path, &bytes, &st.io_semaphore).await?;
                             tracing::trace!("Fetched library {}", &library.name);
                             Ok::<_, crate::Error>(())
@@ -280,7 +305,7 @@ pub async fn download_libraries(
                         );
 
                         if let Some(native) = classifiers.get(&parsed_key) {
-                            let data = fetch(&native.url, Some(&native.sha1), &st.io_semaphore).await?;
+                            let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore).await?;
                             let reader = std::io::Cursor::new(&data);
                             if let Ok(mut archive) = zip::ZipArchive::new(reader) {
                                 match archive.extract(&st.directories.version_natives_dir(version)) {
