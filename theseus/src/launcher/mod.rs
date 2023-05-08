@@ -1,6 +1,6 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
-use crate::event::LoadingBarType;
+use crate::event::{LoadingBarId, LoadingBarType};
 use crate::{
     process,
     state::{self as st, MinecraftChild},
@@ -53,9 +53,10 @@ macro_rules! processor_rules {
     }
 }
 
+#[tracing::instrument(skip(profile))]
 pub async fn install_minecraft(
     profile: &Profile,
-    existing_loading_bar: Option<Uuid>,
+    existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let instance_path = &canonicalize(&profile.path)?;
@@ -79,14 +80,6 @@ pub async fn install_minecraft(
             format!("{}-{}", version.id.clone(), it.id.clone())
         });
 
-    let mut version_info = download::download_version_info(
-        &state,
-        version,
-        profile.metadata.loader_version.as_ref(),
-        None,
-    )
-    .await?;
-
     let loading_bar = init_or_edit_loading(
         existing_loading_bar,
         LoadingBarType::MinecraftDownload {
@@ -95,11 +88,22 @@ pub async fn install_minecraft(
             profile_uuid: profile.uuid,
         },
         100.0,
-        "Downloading Minecraft...",
+        "Downloading Minecraft",
     )
     .await?;
 
-    download::download_minecraft(&state, &version_info, loading_bar).await?;
+    // Download version info
+    let mut version_info = download::download_version_info(
+        &state,
+        version,
+        profile.metadata.loader_version.as_ref(),
+        None,
+        Some(&loading_bar),
+    )
+    .await?;
+
+    // Download minecraft (5-90)
+    download::download_minecraft(&state, &version_info, &loading_bar).await?;
 
     let client_path = state
         .directories
@@ -131,10 +135,11 @@ pub async fn install_minecraft(
                 .await?;
             let total_length = processors.len();
 
+            // Forge processors (90-100)
             for (index, processor) in processors.iter().enumerate() {
                 emit_loading(
                     &loading_bar,
-                    index as f64 / total_length as f64,
+                    10.0 / total_length as f64,
                     Some(&format!(
                         "Running forge processor {}/{}",
                         index, total_length
@@ -223,7 +228,7 @@ pub async fn launch_minecraft(
         install_minecraft(profile, None).await?;
     }
 
-    let state = st::State::get().await?;
+    let state = State::get().await?;
     let metadata = state.metadata.read().await;
     let instance_path = &canonicalize(&profile.path)?;
 
@@ -249,6 +254,7 @@ pub async fn launch_minecraft(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
         None,
     )
     .await?;
@@ -320,8 +326,12 @@ pub async fn launch_minecraft(
         .stdout(Stdio::piped())
         .stderr(Stdio::piped());
 
-    // Clear cargo-added env varaibles for debugging, and add settings env vars
-    clear_cargo_env_vals(&mut command).envs(env_args);
+    // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
+    #[cfg(target_os = "macos")]
+    if std::env::var("CARGO").is_ok() {
+        command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
+    }
+    command.envs(env_args);
 
     // Get Modrinth logs directories
     let datetime_string =
@@ -350,15 +360,4 @@ pub async fn launch_minecraft(
             post_exit_hook,
         )
         .await
-}
-
-fn clear_cargo_env_vals(command: &mut Command) -> &mut Command {
-    for (key, _) in std::env::vars() {
-        command.env_remove(key);
-
-        // if key.starts_with("CARGO") {
-        //     command.env_remove(key);
-        // }
-    }
-    command
 }

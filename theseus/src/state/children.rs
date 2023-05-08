@@ -8,6 +8,7 @@ use tokio::process::Child;
 use tokio::process::Command;
 use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
+use tracing::error;
 
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
@@ -55,7 +56,7 @@ impl Children {
             let stdout_clone = stdout.clone();
             tokio::spawn(async move {
                 if let Err(e) = stdout_clone.read_stdout(child_stdout).await {
-                    eprintln!("Stdout process died with error: {}", e);
+                    error!("Stdout process died with error: {}", e);
                 }
             });
         }
@@ -64,7 +65,7 @@ impl Children {
             let stderr_clone = stderr.clone();
             tokio::spawn(async move {
                 if let Err(e) = stderr_clone.read_stderr(child_stderr).await {
-                    eprintln!("Stderr process died with error: {}", e);
+                    error!("Stderr process died with error: {}", e);
                 }
             });
         }
