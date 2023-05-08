@@ -6,6 +6,7 @@
 use dunce::canonicalize;
 use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
+use theseus::profile::install;
 use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
 use tracing_error::ErrorLayer;
@@ -67,48 +68,50 @@ async fn main() -> theseus::Result<()> {
 
     println!("Creating/adding profile.");
 
-    // let name = "Example".to_string();
-    // let game_version = "1.19.2".to_string();
-    // let modloader = ModLoader::Vanilla;
-    // let loader_version = "stable".to_string();
-    //
-    // let profile_path = profile_create(
-    //     name.clone(),
-    //     game_version,
-    //     modloader,
-    //     Some(loader_version),
-    //     None,
-    //     None,
-    //     None,
-    // )
-    // .await?;
+    let name = "Example".to_string();
+    let game_version = "1.19.2".to_string();
+    let modloader = ModLoader::Vanilla;
+    let loader_version = "stable".to_string();
+
+    let profile_path = profile_create(
+        name.clone(),
+        game_version,
+        modloader,
+        Some(loader_version),
+        None,
+        None,
+        None,
+    )
+    .await?;
+
+    install(&profile_path).await.unwrap();
 
     // let mut value = list().await?;
     // let profile_path = value.iter().next().map(|x| x.0).unwrap();
 
-    // println!("Adding sodium");
-    // let sodium_path = profile::add_project_from_version(
-    //     &profile_path,
-    //     "rAfhHfow".to_string(),
-    // )
-    // .await?;
-    //
-    // let mod_menu_path = profile::add_project_from_version(
-    //     &profile_path,
-    //     "gSoPJyVn".to_string(),
-    // )
-    // .await?;
-    //
-    // println!("Disabling sodium");
-    // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
-    //
-    // profile::remove_project(&profile_path, &mod_menu_path).await?;
-    let profile_path = pack::install_pack_from_version_id(
-        "zroFQG1k".to_string(),
-        Some("Technical Electrical".to_string()),
+    println!("Adding sodium");
+    let sodium_path = profile::add_project_from_version(
+        &profile_path,
+        "rAfhHfow".to_string(),
     )
-    .await
-    .unwrap();
+    .await?;
+
+    let mod_menu_path = profile::add_project_from_version(
+        &profile_path,
+        "gSoPJyVn".to_string(),
+    )
+    .await?;
+
+    println!("Disabling sodium");
+    profile::toggle_disable_project(&profile_path, &sodium_path).await?;
+
+    // profile::remove_project(&profile_path, &mod_menu_path).await?;
+    // let profile_path = pack::install_pack_from_version_id(
+    //     "zroFQG1k".to_string(),
+    //     Some("Technical Electrical".to_string()),
+    // )
+    // .await
+    // .unwrap();
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)

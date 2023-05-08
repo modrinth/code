@@ -1,4 +1,5 @@
 use crate::api::Result;
+use daedalus::modded::LoaderVersion;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use uuid::Uuid;
@@ -164,4 +165,54 @@ pub async fn profile_run_wait_credentials(
     let proc_lock = profile::run_credentials(path, &credentials).await?;
     let mut proc = proc_lock.write().await;
     Ok(process::wait_for(&mut proc).await?)
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EditProfile {
+    pub metadata: Option<EditProfileMetadata>,
+    pub java: Option<JavaSettings>,
+    pub memory: Option<MemorySettings>,
+    pub resolution: Option<WindowSize>,
+    pub hooks: Option<Hooks>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct EditProfileMetadata {
+    pub name: Option<String>,
+    pub game_version: Option<String>,
+    pub loader: Option<ModLoader>,
+    pub loader_version: Option<LoaderVersion>,
+}
+
+// Edits a profile
+// invoke('profile_edit', {path, editProfile})
+#[tauri::command]
+pub async fn profile_edit(
+    path: &Path,
+    edit_profile: EditProfile,
+) -> Result<()> {
+    profile::edit(&path, |prof| {
+        if let Some(metadata) = edit_profile.metadata {
+            if let Some(name) = metadata.name {
+                prof.metadata.name = name
+            }
+            if let Some(game_version) = metadata.game_version {
+                prof.metadata.game_version = game_version
+            }
+            if let Some(loader) = metadata.loader {
+                prof.metadata.loader = loader
+            }
+            prof.metadata.loader_version = name
+        }
+
+        prof.java = edit_profile.java;
+        prof.memory = edit_profile.memory;
+        prof.resolution = edit_profile.resolution;
+        prof.hooks = edit_profile.hooks;
+
+        async { Ok(()) }
+    })
+    .await?;
+
+    Ok(())
 }

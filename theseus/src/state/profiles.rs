@@ -4,11 +4,12 @@ use crate::data::DirectoryInfo;
 use crate::event::emit::emit_profile;
 use crate::event::ProfilePayloadType;
 use crate::state::projects::Project;
-use crate::state::{ModrinthVersion, ProjectType};
+use crate::state::{ModrinthVersion, ProjectMetadata, ProjectType};
 use crate::util::fetch::{
     fetch, fetch_json, write, write_cached_icon, IoSemaphore,
 };
 use crate::State;
+use daedalus::get_hash;
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
@@ -29,12 +30,28 @@ pub(crate) struct Profiles(pub HashMap<PathBuf, Profile>);
 // TODO: possibly add defaults to some of these values
 pub const CURRENT_FORMAT_VERSION: u32 = 1;
 
+#[derive(
+    Serialize, Deserialize, Clone, Copy, Debug, Default, Eq, PartialEq,
+)]
+#[serde(rename_all = "snake_case")]
+pub enum ProfileInstallStage {
+    /// Profile is installed
+    Installed,
+    /// Profile's minecraft game is still installing
+    Installing,
+    /// Profile created for pack, but the pack hasn't been fully installed yet
+    PackInstalling,
+    /// Profile is not installed
+    #[default]
+    NotInstalled,
+}
+
 // Represent a Minecraft instance.
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Profile {
     pub uuid: Uuid, // todo: will be used in restructure to refer to profiles
     #[serde(default)]
-    pub installed: bool,
+    pub install_stage: ProfileInstallStage,
     pub path: PathBuf,
     pub metadata: ProfileMetadata,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -127,7 +144,7 @@ impl Profile {
 
         Ok(Self {
             uuid,
-            installed: false,
+            install_stage: ProfileInstallStage::NotInstalled,
             path: canonicalize(path)?,
             metadata: ProfileMetadata {
                 name,
@@ -160,7 +177,7 @@ impl Profile {
         Ok(self)
     }
 
-    pub async fn sync(&mut self) -> crate::Result<()> {
+    pub async fn sync_projects(&mut self) -> crate::Result<()> {
         let state = State::get().await?;
 
         let paths = self.get_profile_project_paths()?;
@@ -184,6 +201,45 @@ impl Profile {
         .await?;
 
         Ok(())
+    }
+
+    pub fn sync_projects_task(path: PathBuf) {
+        tokio::task::spawn(async move {
+            let res = async {
+                let state = State::get().await?;
+                let profile = crate::api::profile::get(&path).await?;
+
+                if let Some(profile) = profile {
+                    let paths = profile.get_profile_project_paths()?;
+
+                    let projects = crate::state::infer_data_from_files(
+                        profile,
+                        paths,
+                        state.directories.caches_dir(),
+                        &state.io_semaphore,
+                        &state.fetch_semaphore,
+                    )
+                    .await?;
+
+                    let mut new_profiles = state.profiles.write().await;
+                    if let Some(profile) = new_profiles.0.get_mut(&path) {
+                        profile.projects = projects;
+                    }
+                }
+
+                Ok::<(), crate::Error>(())
+            }
+            .await;
+
+            match res {
+                Ok(()) => {}
+                Err(err) => {
+                    tracing::warn!(
+                        "Unable to fetch single profile projects: {err}"
+                    )
+                }
+            };
+        });
     }
 
     pub fn get_profile_project_paths(&self) -> crate::Result<Vec<PathBuf>> {
@@ -212,7 +268,7 @@ impl Profile {
     pub async fn add_project_version(
         &mut self,
         version_id: String,
-    ) -> crate::Result<PathBuf> {
+    ) -> crate::Result<(PathBuf, ModrinthVersion)> {
         let state = State::get().await?;
 
         let version = fetch_json::<ModrinthVersion>(
@@ -247,11 +303,11 @@ impl Profile {
             .add_project_bytes(
                 &file.filename,
                 bytes,
-                ProjectType::get_from_loaders(version.loaders),
+                ProjectType::get_from_loaders(version.loaders.clone()),
             )
             .await?;
 
-        Ok(path)
+        Ok((path, version))
     }
 
     pub async fn add_project_bytes(
@@ -294,6 +350,25 @@ impl Profile {
         let path = self.path.join(project_type.get_folder()).join(file_name);
         write(&path, &bytes, &state.io_semaphore).await?;
 
+        let hash = get_hash(bytes).await?;
+
+        self.projects.insert(
+            path.clone(),
+            Project {
+                sha512: hash,
+                disabled: false,
+                metadata: ProjectMetadata::Unknown,
+                file_name: file_name.to_string(),
+            },
+        );
+        emit_profile(
+            self.uuid,
+            self.path.clone(),
+            &self.metadata.name,
+            ProfilePayloadType::Synced,
+        )
+        .await?;
+
         Ok(path)
     }
 
@@ -329,10 +404,16 @@ impl Profile {
         Ok(())
     }
 
-    pub async fn remove_project(&mut self, path: &Path) -> crate::Result<()> {
+    pub async fn remove_project(
+        &mut self,
+        path: &Path,
+        dont_remove_arr: Option<bool>,
+    ) -> crate::Result<()> {
         if self.projects.contains_key(path) {
             fs::remove_file(path).await?;
-            self.projects.remove(path);
+            if !dont_remove_arr.unwrap_or(false) {
+                self.projects.remove(path);
+            }
         } else {
             return Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",

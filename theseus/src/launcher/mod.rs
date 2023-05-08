@@ -1,6 +1,7 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
+use crate::state::ProfileInstallStage;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
@@ -58,6 +59,14 @@ pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
+    crate::api::profile::edit(&profile.path, |prof| {
+        prof.install_stage = ProfileInstallStage::Installing;
+
+        async { Ok(()) }
+    })
+    .await?;
+    State::sync().await?;
+
     let state = State::get().await?;
     let instance_path = &canonicalize(&profile.path)?;
     let metadata = state.metadata.read().await;
@@ -202,7 +211,7 @@ pub async fn install_minecraft(
     }
 
     crate::api::profile::edit(&profile.path, |prof| {
-        prof.installed = true;
+        prof.install_stage = ProfileInstallStage::Installed;
 
         async { Ok(()) }
     })
@@ -224,7 +233,16 @@ pub async fn launch_minecraft(
     post_exit_hook: Option<Command>,
     profile: &Profile,
 ) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
-    if !profile.installed {
+    if profile.install_stage == ProfileInstallStage::PackInstalling
+        || profile.install_stage == ProfileInstallStage::Installing
+    {
+        return Err(crate::ErrorKind::LauncherError(format!(
+            "Profile is still installing"
+        ))
+        .into());
+    }
+
+    if profile.install_stage != ProfileInstallStage::Installed {
         install_minecraft(profile, None).await?;
     }
 

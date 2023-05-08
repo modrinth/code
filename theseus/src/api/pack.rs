@@ -5,7 +5,9 @@ use crate::event::emit::{
     loading_try_for_each_concurrent,
 };
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType};
+use crate::state::{
+    LinkedData, ModrinthProject, ModrinthVersion, ProfileInstallStage, SideType,
+};
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
@@ -268,6 +270,14 @@ async fn install_pack(
             Some(true),
         )
         .await?;
+        crate::api::profile::edit(&profile_raw, |prof| {
+            prof.install_stage = ProfileInstallStage::PackInstalling;
+
+            async { Ok(()) }
+        })
+        .await?;
+        State::sync().await?;
+
         let profile = profile_raw.clone();
         let result = async {
             let loading_bar = init_or_edit_loading(
@@ -398,7 +408,7 @@ async fn install_pack(
                 .await?;
             extract_overrides("overrides".to_string()).await?;
             extract_overrides("client_overrides".to_string()).await?;
-            emit_loading(&loading_bar, 29.9, Some("Done extacting overrides"))
+            emit_loading(&loading_bar, 29.9, Some("Done extracting overrides"))
                 .await?;
 
             if let Some(profile) = crate::api::profile::get(&profile).await? {

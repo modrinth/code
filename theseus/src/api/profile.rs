@@ -98,7 +98,7 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
                 > = state.profiles.write().await;
 
                 if let Some(profile) = profiles.0.get_mut(path) {
-                    profile.sync().await?;
+                    profile.sync_projects().await?;
                     Ok(())
                 } else {
                     Err(crate::ErrorKind::UnmanagedProfileError(
@@ -117,24 +117,18 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
 /// Installs/Repairs a profile
 #[tracing::instrument]
 pub async fn install(path: &Path) -> crate::Result<()> {
-    let state = State::get().await?;
-    let result = {
-        let mut profiles: tokio::sync::RwLockWriteGuard<
-            crate::state::Profiles,
-        > = state.profiles.write().await;
+    let profile = get(path).await?;
 
-        if let Some(profile) = profiles.0.get_mut(path) {
-            crate::launcher::install_minecraft(profile, None).await?;
-            Ok(())
-        } else {
-            Err(crate::ErrorKind::UnmanagedProfileError(
-                path.display().to_string(),
-            )
-            .as_error())
-        }
-    };
+    if let Some(profile) = profile {
+        crate::launcher::install_minecraft(&profile, None).await?;
+    } else {
+        return Err(crate::ErrorKind::UnmanagedProfileError(
+            path.display().to_string(),
+        )
+        .as_error());
+    }
     State::sync().await?;
-    result
+    Ok(())
 }
 
 pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
@@ -161,11 +155,13 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
             100.0,
             profile.projects.keys().len(),
             None,
-            |project| update_project(profile_path, project, Some(true)),
+            |project| async move {
+                let _ = update_project(profile_path, project).await?;
+
+                Ok(())
+            },
         )
         .await?;
-
-        profile.sync().await?;
 
         Ok(())
     } else {
@@ -179,8 +175,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
 pub async fn update_project(
     profile_path: &Path,
     project_path: &Path,
-    should_not_sync: Option<bool>,
-) -> crate::Result<()> {
+) -> crate::Result<PathBuf> {
     let state = State::get().await?;
     let mut profiles = state.profiles.write().await;
 
@@ -191,21 +186,33 @@ pub async fn update_project(
                 ..
             } = &project.metadata
             {
-                let path = profile
+                let (path, new_version) = profile
                     .add_project_version(update_version.id.clone())
                     .await?;
 
                 if path != project_path {
-                    profile.remove_project(project_path).await?;
+                    profile.remove_project(project_path, Some(true)).await?;
                 }
 
-                if !should_not_sync.unwrap_or(false) {
-                    profile.sync().await?;
+                let value = profile.projects.remove(project_path);
+                if let Some(mut project) = value {
+                    if let ProjectMetadata::Modrinth {
+                        ref mut version, ..
+                    } = project.metadata
+                    {
+                        *version = Box::new(new_version);
+                    }
+                    profile.projects.insert(path.clone(), project);
                 }
+
+                return Ok(path);
             }
         }
 
-        Ok(())
+        Err(crate::ErrorKind::InputError(
+            "This project cannot be updated!".to_string(),
+        )
+        .as_error())
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
@@ -224,13 +231,23 @@ pub async fn replace_project(
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.0.get_mut(profile_path) {
-        let path = profile.add_project_version(version_id).await?;
+        let (path, new_version) =
+            profile.add_project_version(version_id).await?;
 
         if path != project {
-            profile.remove_project(project).await?;
+            profile.remove_project(project, Some(true)).await?;
         }
 
-        profile.sync().await?;
+        let value = profile.projects.remove(&*project);
+        if let Some(mut project) = value {
+            if let ProjectMetadata::Modrinth {
+                ref mut version, ..
+            } = project.metadata
+            {
+                *version = Box::new(new_version);
+            }
+            profile.projects.insert(path.clone(), project);
+        }
 
         Ok(path)
     } else {
@@ -251,9 +268,9 @@ pub async fn add_project_from_version(
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.0.get_mut(profile_path) {
-        let path = profile.add_project_version(version_id).await?;
+        let (path, _) = profile.add_project_version(version_id).await?;
 
-        profile.sync().await?;
+        Profile::sync_projects_task(profile.path.clone());
 
         Ok(path)
     } else {
@@ -290,7 +307,7 @@ pub async fn add_project_from_path(
             )
             .await?;
 
-        profile.sync().await?;
+        Profile::sync_projects_task(profile.path.clone());
 
         Ok(path)
     } else {
@@ -332,7 +349,7 @@ pub async fn remove_project(
     let mut profiles = state.profiles.write().await;
 
     if let Some(profile) = profiles.0.get_mut(profile) {
-        profile.remove_project(project).await?;
+        profile.remove_project(project, None).await?;
 
         Ok(())
     } else {
