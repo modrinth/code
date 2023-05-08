@@ -89,7 +89,7 @@ pub async fn install_pack_from_version_id(
             "Downloading pack file",
         )
         .await?;
-    
+
         emit_loading(&loading_bar, 0.0, Some("Fetching version")).await?;
         let version: ModrinthVersion = fetch_json(
             Method::GET,
@@ -100,7 +100,7 @@ pub async fn install_pack_from_version_id(
         )
         .await?;
         emit_loading(&loading_bar, 10.0, None).await?;
-    
+
         let (url, hash) =
             if let Some(file) = version.files.iter().find(|x| x.primary) {
                 Some((file.url.clone(), file.hashes.get("sha1")))
@@ -115,7 +115,7 @@ pub async fn install_pack_from_version_id(
                     "Specified version has no files".to_string(),
                 )
             })?;
-    
+
         let file = fetch_advanced(
             Method::GET,
             &url,
@@ -126,8 +126,9 @@ pub async fn install_pack_from_version_id(
             &state.fetch_semaphore,
         )
         .await?;
-        emit_loading(&loading_bar, 0.0, Some("Fetching project metadata")).await?;
-    
+        emit_loading(&loading_bar, 0.0, Some("Fetching project metadata"))
+            .await?;
+
         let project: ModrinthProject = fetch_json(
             Method::GET,
             &format!("{}project/{}", MODRINTH_API_URL, version.project_id),
@@ -136,14 +137,15 @@ pub async fn install_pack_from_version_id(
             &state.fetch_semaphore,
         )
         .await?;
-    
+
         emit_loading(&loading_bar, 10.0, Some("Retrieving icon")).await?;
         let icon = if let Some(icon_url) = project.icon_url {
             let state = State::get().await?;
-            let icon_bytes = fetch(&icon_url, None, &state.fetch_semaphore).await?;
-    
+            let icon_bytes =
+                fetch(&icon_url, None, &state.fetch_semaphore).await?;
+
             let filename = icon_url.rsplit('/').next();
-    
+
             if let Some(filename) = filename {
                 Some(
                     write_cached_icon(
@@ -161,7 +163,7 @@ pub async fn install_pack_from_version_id(
             None
         };
         emit_loading(&loading_bar, 10.0, None).await?;
-    
+
         install_pack(
             file,
             icon,
@@ -171,8 +173,8 @@ pub async fn install_pack_from_version_id(
             Some(loading_bar),
         )
         .await
-    
-    }).await
+    })
+    .await
 }
 
 pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
@@ -195,12 +197,13 @@ async fn install_pack(
         let reader: Cursor<&bytes::Bytes> = Cursor::new(&file);
 
         // Create zip reader around file
-        let mut zip_reader = ZipFileReader::new(reader).await.map_err(|_| {
-            crate::Error::from(crate::ErrorKind::InputError(
-                "Failed to read input modpack zip".to_string(),
-            ))
-        })?;
-    
+        let mut zip_reader =
+            ZipFileReader::new(reader).await.map_err(|_| {
+                crate::Error::from(crate::ErrorKind::InputError(
+                    "Failed to read input modpack zip".to_string(),
+                ))
+            })?;
+
         // Extract index of modrinth.index.json
         let zip_index_option = zip_reader
             .file()
@@ -218,16 +221,16 @@ async fn install_pack(
                 .clone();
             let mut reader = zip_reader.entry(zip_index).await?;
             reader.read_to_string_checked(&mut manifest, &entry).await?;
-    
+
             let pack: PackFormat = serde_json::from_str(&manifest)?;
-    
+
             if &*pack.game != "minecraft" {
                 return Err(crate::ErrorKind::InputError(
                     "Pack does not support Minecraft".to_string(),
                 )
                 .into());
             }
-    
+
             let mut game_version = None;
             let mut mod_loader = None;
             let mut loader_version = None;
@@ -248,7 +251,7 @@ async fn install_pack(
                     PackDependency::Minecraft => game_version = Some(value),
                 }
             }
-    
+
             let game_version = if let Some(game_version) = game_version {
                 game_version
             } else {
@@ -257,7 +260,7 @@ async fn install_pack(
                 )
                 .into());
             };
-    
+
             let profile_raw = crate::api::profile_create::profile_create(
                 override_title.unwrap_or_else(|| pack.name.clone()),
                 game_version.clone(),
@@ -284,7 +287,7 @@ async fn install_pack(
                     "Downloading modpack",
                 )
                 .await?;
-    
+
                 let num_files = pack.files.len();
                 use futures::StreamExt;
                 loading_try_for_each_concurrent(
@@ -308,7 +311,7 @@ async fn install_pack(
                                     return Ok(());
                                 }
                             }
-    
+
                             let file = fetch_mirrors(
                                 &project
                                     .downloads
@@ -322,16 +325,21 @@ async fn install_pack(
                                 &state.fetch_semaphore,
                             )
                             .await?;
-    
+
                             let path = std::path::Path::new(&project.path)
                                 .components()
                                 .next();
                             if let Some(path) = path {
                                 match path {
-                                    Component::CurDir | Component::Normal(_) => {
+                                    Component::CurDir
+                                    | Component::Normal(_) => {
                                         let path = profile.join(project.path);
-                                        write(&path, &file, &state.io_semaphore)
-                                            .await?;
+                                        write(
+                                            &path,
+                                            &file,
+                                            &state.io_semaphore,
+                                        )
+                                        .await?;
                                     }
                                     _ => {}
                                 };
@@ -341,17 +349,17 @@ async fn install_pack(
                     },
                 )
                 .await?;
-    
+
                 let extract_overrides = |overrides: String| async {
                     let reader = Cursor::new(&file);
-    
+
                     let mut overrides_zip =
                         ZipFileReader::new(reader).await.map_err(|_| {
                             crate::Error::from(crate::ErrorKind::InputError(
                                 "Failed extract overrides Zip".to_string(),
                             ))
                         })?;
-    
+
                     let profile = profile.clone();
                     async move {
                         for index in 0..overrides_zip.file().entries().len() {
@@ -362,25 +370,26 @@ async fn install_pack(
                                 .unwrap()
                                 .entry()
                                 .clone();
-    
+
                             let file_path = PathBuf::from(file.filename());
                             if file.filename().starts_with(&overrides)
                                 && !file.filename().ends_with('/')
                             {
                                 // Reads the file into the 'content' variable
                                 let mut content = Vec::new();
-                                let mut reader = overrides_zip.entry(index).await?;
+                                let mut reader =
+                                    overrides_zip.entry(index).await?;
                                 reader
                                     .read_to_end_checked(&mut content, &file)
                                     .await?;
-    
+
                                 let mut new_path = PathBuf::new();
                                 let components = file_path.components().skip(1);
-    
+
                                 for component in components {
                                     new_path.push(component);
                                 }
-    
+
                                 if new_path.file_name().is_some() {
                                     write(
                                         &profile.join(new_path),
@@ -391,20 +400,26 @@ async fn install_pack(
                                 }
                             }
                         }
-    
+
                         Ok::<(), crate::Error>(())
                     }
                     .await
                 };
-    
+
                 emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))
                     .await?;
                 extract_overrides("overrides".to_string()).await?;
                 extract_overrides("client_overrides".to_string()).await?;
-                emit_loading(&loading_bar, 29.9, Some("Done extacting overrides"))
-                    .await?;
-    
-                if let Some(profile) = crate::api::profile::get(&profile).await? {
+                emit_loading(
+                    &loading_bar,
+                    29.9,
+                    Some("Done extacting overrides"),
+                )
+                .await?;
+
+                if let Some(profile) =
+                    crate::api::profile::get(&profile).await?
+                {
                     tokio::try_join!(
                         super::profile::sync(&profile.path),
                         crate::launcher::install_minecraft(
@@ -413,16 +428,16 @@ async fn install_pack(
                         ),
                     )?;
                 }
-    
+
                 Ok::<PathBuf, crate::Error>(profile)
             }
             .await;
-    
+
             match result {
                 Ok(profile) => Ok(profile),
                 Err(err) => {
                     let _ = crate::api::profile::remove(&profile_raw).await;
-    
+
                     Err(err)
                 }
             }
@@ -430,6 +445,7 @@ async fn install_pack(
             Err(crate::Error::from(crate::ErrorKind::InputError(
                 "No pack manifest found in mrpack".to_string(),
             )))
-        }    
-    }).await
+        }
+    })
+    .await
 }

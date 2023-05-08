@@ -152,7 +152,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
                 "Updating profile",
             )
             .await?;
-    
+
             use futures::StreamExt;
             loading_try_for_each_concurrent(
                 futures::stream::iter(profile.projects.keys())
@@ -165,17 +165,18 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
                 |project| update_project(profile_path, project, Some(true)),
             )
             .await?;
-    
+
             profile.sync().await?;
-    
+
             Ok(())
         } else {
             Err(crate::ErrorKind::UnmanagedProfileError(
                 profile_path.display().to_string(),
             )
             .as_error())
-        }    
-    }).await
+        }
+    })
+    .await
 }
 
 pub async fn update_project(
@@ -374,7 +375,6 @@ pub async fn run_credentials(
     path: &Path,
     credentials: &auth::Credentials,
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
-
     Box::pin(async move {
         let state = State::get().await?;
         let settings = state.settings.read().await;
@@ -385,7 +385,7 @@ pub async fn run_credentials(
                 path.display()
             ))
         })?;
-    
+
         let version = metadata
             .minecraft
             .versions
@@ -417,7 +417,7 @@ pub async fn run_credentials(
                     .spawn()?
                     .wait()
                     .await?;
-    
+
                 if !result.success() {
                     return Err(crate::ErrorKind::LauncherError(format!(
                         "Non-zero exit code for pre-launch hook: {}",
@@ -427,7 +427,7 @@ pub async fn run_credentials(
                 }
             }
         }
-    
+
         let java_version = match profile.java {
             // Load profile-specific Java implementation choice
             // (This defaults to Daedalus-decided key on init, but can be changed by the user)
@@ -461,7 +461,7 @@ pub async fn run_credentials(
                 version_info.java_version.map_or(8, |it| it.major_version),
             ))
         })?;
-    
+
         // Get the path to the Java executable from the chosen Java implementation key
         let java_install: &Path = &PathBuf::from(&java_version.path);
         if !java_install.exists() {
@@ -476,21 +476,21 @@ pub async fn run_credentials(
             .as_ref()
             .and_then(|it| it.extra_arguments.as_ref())
             .unwrap_or(&settings.custom_java_args);
-    
+
         let wrapper = profile
             .hooks
             .as_ref()
             .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
-    
+
         let memory = profile.memory.unwrap_or(settings.memory);
         let resolution = profile.resolution.unwrap_or(settings.game_resolution);
-    
+
         let env_args = &settings.custom_env_args;
-    
+
         // Post post exit hooks
         let post_exit_hook =
             &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
-    
+
         let post_exit_hook = if let Some(hook) = post_exit_hook {
             let mut cmd = hook.split(' ');
             if let Some(command) = cmd.next() {
@@ -503,7 +503,7 @@ pub async fn run_credentials(
         } else {
             None
         };
-    
+
         let mc_process = crate::launcher::launch_minecraft(
             java_install,
             java_args,
@@ -516,7 +516,7 @@ pub async fn run_credentials(
             &profile,
         )
         .await?;
-    Ok(mc_process)
-    }).await
-
+        Ok(mc_process)
+    })
+    .await
 }

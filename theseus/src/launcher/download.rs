@@ -50,55 +50,60 @@ pub async fn download_version_info(
     loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<GameVersionInfo> {
     Box::pin(async move {
-        let version_id = loader
-        .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
-    tracing::debug!("Loading version info for Minecraft {version_id}");
-    let path = st
-        .directories
-        .version_dir(&version_id)
-        .join(format!("{version_id}.json"));
+        let version_id = loader.map_or(version.id.clone(), |it| {
+            format!("{}-{}", version.id, it.id)
+        });
+        tracing::debug!("Loading version info for Minecraft {version_id}");
+        let path = st
+            .directories
+            .version_dir(&version_id)
+            .join(format!("{version_id}.json"));
 
-    let res = if path.exists() && !force.unwrap_or(false) {
-        fs::read(path)
-            .err_into::<crate::Error>()
-            .await
-            .and_then(|ref it| Ok(serde_json::from_slice(it)?))
-    } else {
-        tracing::info!("Downloading version info for version {}", &version.id);
-        let mut info = d::minecraft::fetch_version_info(version).await?;
+        let res = if path.exists() && !force.unwrap_or(false) {
+            fs::read(path)
+                .err_into::<crate::Error>()
+                .await
+                .and_then(|ref it| Ok(serde_json::from_slice(it)?))
+        } else {
+            tracing::info!(
+                "Downloading version info for version {}",
+                &version.id
+            );
+            let mut info = d::minecraft::fetch_version_info(version).await?;
 
-        if let Some(loader) = loader {
-            let partial = d::modded::fetch_partial_version(&loader.url).await?;
-            info = d::modded::merge_partial_version(partial, info);
+            if let Some(loader) = loader {
+                let partial =
+                    d::modded::fetch_partial_version(&loader.url).await?;
+                info = d::modded::merge_partial_version(partial, info);
+            }
+            info.id = version_id.clone();
+
+            write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
+            Ok(info)
+        }?;
+
+        if let Some(loading_bar) = loading_bar {
+            emit_loading(
+                loading_bar,
+                if res
+                    .processors
+                    .as_ref()
+                    .map(|x| !x.is_empty())
+                    .unwrap_or(false)
+                {
+                    5.0
+                } else {
+                    15.0
+                },
+                None,
+            )
+            .await?;
         }
-        info.id = version_id.clone();
 
-        write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
-        Ok(info)
-    }?;
-
-    if let Some(loading_bar) = loading_bar {
-        emit_loading(
-            loading_bar,
-            if res
-                .processors
-                .as_ref()
-                .map(|x| !x.is_empty())
-                .unwrap_or(false)
-            {
-                5.0
-            } else {
-                15.0
-            },
-            None,
-        )
-        .await?;
-    }
-
-    tracing::debug!("Loaded version info for Minecraft {version_id}");
-    Ok(res)
-        
-    }).await
+        tracing::debug!("Loaded version info for Minecraft {version_id}");
+        Ok(res)
+    })
+    .await
 }
 
 #[tracing::instrument(skip_all)]
@@ -123,7 +128,7 @@ pub async fn download_client(
             .directories
             .version_dir(version)
             .join(format!("{version}.jar"));
-    
+
         if !path.exists() {
             let bytes = fetch(
                 &client_download.url,
@@ -137,11 +142,11 @@ pub async fn download_client(
         if let Some(loading_bar) = loading_bar {
             emit_loading(loading_bar, 10.0, None).await?;
         }
-    
+
         tracing::debug!("Client loaded for version {version}!");
         Ok(())
-    
-    }).await
+    })
+    .await
 }
 
 #[tracing::instrument(skip_all)]

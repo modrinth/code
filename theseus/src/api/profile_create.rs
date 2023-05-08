@@ -49,7 +49,6 @@ pub async fn profile_create(
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
-
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     Box::pin(async move {
