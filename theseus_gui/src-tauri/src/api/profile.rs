@@ -1,5 +1,6 @@
 use crate::api::Result;
 use daedalus::modded::LoaderVersion;
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use uuid::Uuid;
@@ -60,7 +61,7 @@ pub async fn profile_update_project(
     path: &Path,
     project_path: &Path,
 ) -> Result<()> {
-    profile::update_project(path, project_path, None).await?;
+    profile::update_project(path, project_path).await?;
     Ok(())
 }
 
@@ -192,7 +193,7 @@ pub async fn profile_edit(
     edit_profile: EditProfile,
 ) -> Result<()> {
     profile::edit(&path, |prof| {
-        if let Some(metadata) = edit_profile.metadata {
+        if let Some(metadata) = edit_profile.metadata.clone() {
             if let Some(name) = metadata.name {
                 prof.metadata.name = name
             }
@@ -202,13 +203,13 @@ pub async fn profile_edit(
             if let Some(loader) = metadata.loader {
                 prof.metadata.loader = loader
             }
-            prof.metadata.loader_version = name
+            prof.metadata.loader_version = metadata.loader_version
         }
 
-        prof.java = edit_profile.java;
+        prof.java = edit_profile.java.clone();
         prof.memory = edit_profile.memory;
         prof.resolution = edit_profile.resolution;
-        prof.hooks = edit_profile.hooks;
+        prof.hooks = edit_profile.hooks.clone();
 
         async { Ok(()) }
     })

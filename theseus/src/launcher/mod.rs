@@ -236,9 +236,9 @@ pub async fn launch_minecraft(
     if profile.install_stage == ProfileInstallStage::PackInstalling
         || profile.install_stage == ProfileInstallStage::Installing
     {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "Profile is still installing"
-        ))
+        return Err(crate::ErrorKind::LauncherError(
+            "Profile is still installing".to_string(),
+        )
         .into());
     }
 

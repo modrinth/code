@@ -238,7 +238,7 @@ pub async fn replace_project(
             profile.remove_project(project, Some(true)).await?;
         }
 
-        let value = profile.projects.remove(&*project);
+        let value = profile.projects.remove(project);
         if let Some(mut project) = value {
             if let ProjectMetadata::Modrinth {
                 ref mut version, ..
