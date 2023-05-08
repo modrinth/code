@@ -1,6 +1,6 @@
 //! Theseus metadata
 use crate::data::DirectoryInfo;
-use crate::util::fetch::{read_json, write};
+use crate::util::fetch::{read_json, write, IoSemaphore};
 use crate::State;
 use daedalus::{
     minecraft::{fetch_version_manifest, VersionManifest as MinecraftManifest},
@@ -9,7 +9,6 @@ use daedalus::{
     },
 };
 use serde::{Deserialize, Serialize};
-use tokio::sync::{RwLock, Semaphore};
 
 const METADATA_URL: &str = "https://meta.modrinth.com";
 
@@ -51,7 +50,7 @@ impl Metadata {
     // Attempt to fetch metadata and store in sled DB
     pub async fn init(
         dirs: &DirectoryInfo,
-        io_semaphore: &RwLock<Semaphore>,
+        io_semaphore: &IoSemaphore,
     ) -> crate::Result<Self> {
         let mut metadata = None;
         let metadata_path = dirs.caches_meta_dir().join("metadata.json");
@@ -79,7 +78,7 @@ impl Metadata {
             match res {
                 Ok(()) => {}
                 Err(err) => {
-                    log::warn!("Unable to fetch launcher metadata: {err}")
+                    tracing::warn!("Unable to fetch launcher metadata: {err}")
                 }
             }
         }
@@ -120,7 +119,7 @@ impl Metadata {
         match res {
             Ok(()) => {}
             Err(err) => {
-                log::warn!("Unable to update launcher metadata: {err}")
+                tracing::warn!("Unable to update launcher metadata: {err}")
             }
         };
     }

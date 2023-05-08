@@ -2,11 +2,12 @@ use std::path::PathBuf;
 
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
-use tokio::sync::{RwLock, Semaphore};
 
 use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
-use crate::util::fetch::{fetch_json, read_json, write};
+use crate::util::fetch::{
+    fetch_json, read_json, write, FetchSemaphore, IoSemaphore,
+};
 
 // Serializeable struct for all tags to be fetched together by the frontend
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -21,7 +22,8 @@ pub struct Tags {
 impl Tags {
     pub async fn init(
         dirs: &DirectoryInfo,
-        io_semaphore: &RwLock<Semaphore>,
+        io_semaphore: &IoSemaphore,
+        fetch_sempahore: &FetchSemaphore,
     ) -> crate::Result<Self> {
         let mut tags = None;
         let tags_path = dirs.caches_meta_dir().join("tags.json");
@@ -30,10 +32,10 @@ impl Tags {
         {
             tags = Some(tags_json);
         } else {
-            match Self::fetch(io_semaphore).await {
+            match Self::fetch(fetch_sempahore).await {
                 Ok(tags_fetch) => tags = Some(tags_fetch),
                 Err(err) => {
-                    log::warn!("Unable to fetch launcher tags: {err}")
+                    tracing::warn!("Unable to fetch launcher tags: {err}")
                 }
             }
         }
@@ -51,7 +53,7 @@ impl Tags {
     pub async fn update() {
         let res = async {
             let state = crate::State::get().await?;
-            let tags_fetch = Tags::fetch(&state.io_semaphore).await?;
+            let tags_fetch = Tags::fetch(&state.fetch_semaphore).await?;
 
             let tags_path =
                 state.directories.caches_meta_dir().join("tags.json");
@@ -74,7 +76,7 @@ impl Tags {
         match res {
             Ok(()) => {}
             Err(err) => {
-                log::warn!("Unable to update launcher tags: {err}")
+                tracing::warn!("Unable to update launcher tags: {err}")
             }
         };
     }
@@ -116,7 +118,7 @@ impl Tags {
     }
 
     // Fetches the tags from the Modrinth API and stores them in the database
-    pub async fn fetch(semaphore: &RwLock<Semaphore>) -> crate::Result<Self> {
+    pub async fn fetch(semaphore: &FetchSemaphore) -> crate::Result<Self> {
         let categories = format!("{MODRINTH_API_URL}tag/category");
         let loaders = format!("{MODRINTH_API_URL}tag/loader");
         let game_versions = format!("{MODRINTH_API_URL}tag/game_version");
