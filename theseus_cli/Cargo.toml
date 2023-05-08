@@ -7,7 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-theseus = { path = "../theseus" }
+theseus = { path = "../theseus", features = ["cli"] }
 daedalus = {version = "0.1.15", features = ["bincode"]}
 tokio = { version = "1", features = ["full"] }
 tokio-stream = { version = "0.1", features = ["fs"] }

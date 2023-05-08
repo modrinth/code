@@ -5,7 +5,9 @@ use crate::event::emit::emit_profile;
 use crate::event::ProfilePayloadType;
 use crate::state::projects::Project;
 use crate::state::{ModrinthVersion, ProjectType};
-use crate::util::fetch::{fetch, fetch_json, write, write_cached_icon};
+use crate::util::fetch::{
+    fetch, fetch_json, write, write_cached_icon, IoSemaphore,
+};
 use crate::State;
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
@@ -17,8 +19,7 @@ use std::{
     collections::HashMap,
     path::{Path, PathBuf},
 };
-use tokio::sync::Semaphore;
-use tokio::{fs, sync::RwLock};
+use tokio::fs;
 use uuid::Uuid;
 
 const PROFILE_JSON_PATH: &str = "profile.json";
@@ -149,7 +150,7 @@ impl Profile {
     pub async fn set_icon<'a>(
         &'a mut self,
         cache_dir: &Path,
-        semaphore: &RwLock<Semaphore>,
+        semaphore: &IoSemaphore,
         icon: bytes::Bytes,
         file_name: &str,
     ) -> crate::Result<&'a mut Self> {
@@ -168,6 +169,7 @@ impl Profile {
             paths,
             state.directories.caches_dir(),
             &state.io_semaphore,
+            &state.fetch_semaphore,
         )
         .await?;
 
@@ -218,7 +220,7 @@ impl Profile {
             &format!("{MODRINTH_API_URL}version/{version_id}"),
             None,
             None,
-            &state.io_semaphore,
+            &state.fetch_semaphore,
         )
         .await?;
 
@@ -237,7 +239,7 @@ impl Profile {
         let bytes = fetch(
             &file.url,
             file.hashes.get("sha1").map(|x| &**x),
-            &state.io_semaphore,
+            &state.fetch_semaphore,
         )
         .await?;
 
@@ -345,10 +347,7 @@ impl Profile {
 
 impl Profiles {
     #[tracing::instrument]
-    pub async fn init(
-        dirs: &DirectoryInfo,
-        io_sempahore: &RwLock<Semaphore>,
-    ) -> crate::Result<Self> {
+    pub async fn init(dirs: &DirectoryInfo) -> crate::Result<Self> {
         let mut profiles = HashMap::new();
         fs::create_dir_all(dirs.profiles_dir()).await?;
         let mut entries = fs::read_dir(dirs.profiles_dir()).await?;
@@ -358,7 +357,9 @@ impl Profiles {
                 let prof = match Self::read_profile_from_dir(&path).await {
                     Ok(prof) => Some(prof),
                     Err(err) => {
-                        log::warn!("Error loading profile: {err}. Skipping...");
+                        tracing::warn!(
+                            "Error loading profile: {err}. Skipping..."
+                        );
                         None
                     }
                 };
@@ -395,6 +396,7 @@ impl Profiles {
                         files,
                         state.directories.caches_dir(),
                         &state.io_semaphore,
+                        &state.fetch_semaphore,
                     )
                     .await?;
 
@@ -417,7 +419,7 @@ impl Profiles {
         match res {
             Ok(()) => {}
             Err(err) => {
-                log::warn!("Unable to fetch profile projects: {err}")
+                tracing::warn!("Unable to fetch profile projects: {err}")
             }
         };
     }
