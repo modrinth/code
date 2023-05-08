@@ -17,6 +17,7 @@ import { BrowseIcon, PlayIcon, HammerIcon } from '@/assets/icons'
 import { get_jre, get_all_jre } from '@/helpers/jre'
 import { remove, install } from '@/helpers/profile'
 import { get_game_versions } from '@/helpers/tags'
+import { get } from '@/helpers/settings'
 import { open } from '@tauri-apps/api/dialog'
 
 const props = defineProps({
@@ -29,6 +30,17 @@ const props = defineProps({
 })
 
 const router = useRouter()
+
+const fetchSettings = await get()
+
+if (!fetchSettings.java_globals?.JAVA_8)
+  fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
+if (!fetchSettings.java_globals?.JAVA_17)
+  fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
+
+fetchSettings.custom_java_args = fetchSettings.custom_java_args ?? ''
+
+const globalSettings = ref(fetchSettings)
 
 const settings = ref({
   resolution: props.instance.resolution ?? [400, 800],
@@ -72,7 +84,11 @@ const consoleSetting = ref(false)
 const testingJava = ref(false)
 const javaTestSuccess = ref(null)
 const possibleJavaOptions = ref([])
+const isDeleteModal = ref(false)
+const overriding = ref(false)
+
 const detectJavaModal = ref(null)
+const confirmationModal = ref(null)
 
 const handleJavaFileInput = async () => {
   let filePath = await open()
@@ -103,6 +119,11 @@ const setJavaInstall = (javaInstall) => {
   settings.value.javaPath = javaInstall.path
   detectJavaModal.value.hide()
   possibleJavaOptions.value = []
+}
+
+const openModal = (isDelete) => {
+  isDeleteModal.value = isDelete
+  confirmationModal.value.show()
 }
 
 const handleRepair = async () => {
@@ -153,6 +174,24 @@ const handleRemove = async () => {
         </div>
       </div>
     </Modal>
+    <Modal ref="confirmationModal" header="Confirm">
+      <div class="confirmation-modal">
+        <p>You are about to {{ isDeleteModal ? 'delete' : 'repair' }} the profile.</p>
+        <p v-if="isDeleteModal === false">
+          Repairing the instance will effectively re-install the profile, ensuring all mods and data
+          is present.
+        </p>
+        <br />
+        <p>Are you sure you want to do this?</p>
+        <section class="modal-btn-group">
+          <Button v-if="isDeleteModal === true" color="danger" @click="handleRemove">Delete</Button>
+          <Button v-else color="highlight" @click="handleRepair">Repair</Button>
+          <Button @click="() => confirmationModal.hide()">Cancel</Button>
+        </section>
+      </div>
+    </Modal>
+    Override global settings?
+    <input v-model="overriding" type="checkbox" />
     <Card class="settings-card">
       <h2 class="settings-title">Java</h2>
       <div class="settings-group">
@@ -161,18 +200,19 @@ const handleRemove = async () => {
           v-model="settings.javaPath"
           type="text"
           class="input installation-input"
+          :disabled="overriding === false"
           placeholder="/Library/Java/JavaVirtualMachines/zulu-17.jdk/Contents/Home"
         />
         <span class="installation-buttons">
-          <Button @click="loadJavaModal">
+          <Button :disabled="overriding === false" @click="loadJavaModal">
             <SearchIcon />
             Auto Detect
           </Button>
-          <Button @click="handleJavaFileInput">
+          <Button :disabled="overriding === false" @click="handleJavaFileInput">
             <BrowseIcon />
             Browse
           </Button>
-          <Button @click="handleJavaTest">
+          <Button :disabled="overriding === false" @click="handleJavaTest">
             <PlayIcon />
             Test
           </Button>
@@ -192,6 +232,8 @@ const handleRemove = async () => {
           v-model="settings.javaArgs"
           type="text"
           class="input installation-input"
+          :placeholder="globalSettings.custom_java_args"
+          :disabled="overriding === false"
         />
       </div>
       <hr class="card-divider" />
@@ -199,11 +241,23 @@ const handleRemove = async () => {
         <div class="sliders">
           <span class="slider">
             Minimum Memory
-            <Slider v-model="settings.memory.minimum" :min="1000" :max="8200" :step="10" />
+            <Slider
+              v-model="settings.memory.minimum"
+              :min="1000"
+              :max="8200"
+              :step="10"
+              :disabled="overriding === false"
+            />
           </span>
           <span class="slider">
             Maximum Memory
-            <Slider v-model="settings.memory.maximum" :min="1000" :max="8200" :step="10" />
+            <Slider
+              v-model="settings.memory.maximum"
+              :min="1000"
+              :max="8200"
+              :step="10"
+              :disabled="overriding === false"
+            />
           </span>
         </div>
       </div>
@@ -215,11 +269,23 @@ const handleRemove = async () => {
           <div class="sliders">
             <span class="slider">
               Width
-              <Slider v-model="settings.resolution[0]" :min="400" :max="2562" :step="2" />
+              <Slider
+                v-model="settings.resolution[0]"
+                :min="400"
+                :max="2562"
+                :step="2"
+                :disabled="overriding === false"
+              />
             </span>
             <span class="slider">
               Height
-              <Slider v-model="settings.resolution[1]" :min="400" :max="2562" :step="2" />
+              <Slider
+                v-model="settings.resolution[1]"
+                :min="400"
+                :max="2562"
+                :step="2"
+                :disabled="overriding === false"
+              />
             </span>
           </div>
           <div class="toggle-setting">
@@ -274,15 +340,33 @@ const handleRemove = async () => {
       <div class="settings-group">
         <div class="toggle-setting">
           Pre Launch
-          <input v-model="settings.hooks.pre_launch" type="text" class="input" />
+          <input
+            v-model="settings.hooks.pre_launch"
+            type="text"
+            class="input"
+            :placeholder="globalSettings.hooks.pre_launch"
+            :disabled="overriding === false"
+          />
         </div>
         <div class="toggle-setting">
           Wrapper
-          <input v-model="settings.hooks.wrapper" type="text" class="input" />
+          <input
+            v-model="settings.hooks.wrapper"
+            type="text"
+            class="input"
+            :placeholder="globalSettings.hooks.wrapper"
+            :disabled="overriding === false"
+          />
         </div>
         <div class="toggle-setting">
           Post Launch
-          <input v-model="settings.hooks.post_exit" type="text" class="input" />
+          <input
+            v-model="settings.hooks.post_exit"
+            type="text"
+            class="input"
+            :placeholder="globalSettings.hooks.post_exit"
+            :disabled="overriding === false"
+          />
         </div>
       </div>
     </Card>
@@ -311,11 +395,11 @@ const handleRemove = async () => {
       <div class="settings-group">
         <div class="toggle-setting">
           Repair profile
-          <Button color="highlight" @click="handleRepair"><HammerIcon /> Repair</Button>
+          <Button color="highlight" @click="() => openModal(false)"><HammerIcon /> Repair</Button>
         </div>
         <div class="toggle-setting">
           Delete profile
-          <Button color="danger" @click="handleRemove"><TrashIcon /> Delete</Button>
+          <Button color="danger" @click="() => openModal(true)"><TrashIcon /> Delete</Button>
         </div>
       </div>
     </Card>
@@ -331,6 +415,23 @@ const handleRemove = async () => {
 
 .settings-title {
   color: var(--color-contrast);
+}
+
+.confirmation-modal {
+  padding: 1rem;
+  line-height: 1.5;
+
+  .modal-btn-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    button.btn {
+      flex-grow: 1;
+      justify-content: center;
+      margin: 0.4rem;
+    }
+  }
 }
 
 .settings-group {
