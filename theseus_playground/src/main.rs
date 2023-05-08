@@ -8,6 +8,9 @@ use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
+use tracing_error::ErrorLayer;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::EnvFilter;
 
 // A simple Rust implementation of the authentication run
 // 1) call the authenticate_begin_flow() function to get the URL to open (like you would in the frontend)
@@ -31,16 +34,27 @@ pub async fn authenticate_run() -> theseus::Result<Credentials> {
 async fn main() -> theseus::Result<()> {
     println!("Starting.");
 
+    let filter = EnvFilter::try_from_default_env()
+        .unwrap_or_else(|_| EnvFilter::new("theseus=info"));
+
+    let subscriber = tracing_subscriber::registry()
+        .with(tracing_subscriber::fmt::layer())
+        .with(filter)
+        .with(ErrorLayer::default());
+
+    tracing::subscriber::set_global_default(subscriber)
+        .expect("setting default subscriber failed");
+
     // Initialize state
     let st = State::get().await?;
     //State::update();
 
     st.settings.write().await.java_globals = autodetect_java_globals().await?;
-    st.settings.write().await.max_concurrent_downloads = 5;
+    st.settings.write().await.max_concurrent_downloads = 50;
     st.settings.write().await.hooks.post_exit =
         Some("echo This is after Minecraft runs- global setting!".to_string());
     // Changed the settings, so need to reset the semaphore
-    st.reset_semaphore().await;
+    st.reset_fetch_semaphore().await;
 
     // Clear profiles
     println!("Clearing profiles.");
@@ -53,21 +67,21 @@ async fn main() -> theseus::Result<()> {
 
     println!("Creating/adding profile.");
 
-    let name = "Example".to_string();
-    let game_version = "1.19.2".to_string();
-    let modloader = ModLoader::Vanilla;
-    let loader_version = "stable".to_string();
-
-    let profile_path = profile_create(
-        name.clone(),
-        game_version,
-        modloader,
-        Some(loader_version),
-        None,
-        None,
-        None,
-    )
-    .await?;
+    // let name = "Example".to_string();
+    // let game_version = "1.19.2".to_string();
+    // let modloader = ModLoader::Vanilla;
+    // let loader_version = "stable".to_string();
+    //
+    // let profile_path = profile_create(
+    //     name.clone(),
+    //     game_version,
+    //     modloader,
+    //     Some(loader_version),
+    //     None,
+    //     None,
+    //     None,
+    // )
+    // .await?;
 
     // let mut value = list().await?;
     // let profile_path = value.iter().next().map(|x| x.0).unwrap();
@@ -89,10 +103,12 @@ async fn main() -> theseus::Result<()> {
     // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
     //
     // profile::remove_project(&profile_path, &mod_menu_path).await?;
-    // let profile_path =
-    //     pack::install_pack_from_version_id("zroFQG1k".to_string())
-    //         .await
-    //         .unwrap();
+    let profile_path = pack::install_pack_from_version_id(
+        "zroFQG1k".to_string(),
+        Some("Technical Electrical".to_string()),
+    )
+    .await
+    .unwrap();
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)

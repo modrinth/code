@@ -6,6 +6,7 @@ use crate::event::LoadingBarType;
 use crate::loading_join;
 
 use crate::state::users::Users;
+use crate::util::fetch::{FetchSemaphore, IoSemaphore};
 use std::sync::Arc;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
@@ -44,10 +45,16 @@ static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
     /// Information on the location of files used in the launcher
     pub directories: DirectoryInfo,
+
+    /// Semaphore used to limit concurrent network requests and avoid errors
+    pub fetch_semaphore: FetchSemaphore,
+    /// Stored maximum number of sempahores of current fetch_semaphore
+    pub fetch_semaphore_max: RwLock<u32>,
     /// Semaphore used to limit concurrent I/O and avoid errors
-    pub io_semaphore: RwLock<Semaphore>,
+    pub io_semaphore: IoSemaphore,
     /// Stored maximum number of sempahores of current io_semaphore
     pub io_semaphore_max: RwLock<u32>,
+
     /// Launcher metadata
     pub metadata: RwLock<Metadata>,
     /// Launcher configuration
@@ -73,7 +80,7 @@ impl State {
                     let loading_bar = init_loading(
                         LoadingBarType::StateInit,
                         100.0,
-                        "Initializing launcher...",
+                        "Initializing launcher",
                     )
                     .await?;
 
@@ -83,20 +90,26 @@ impl State {
                     // Settings
                     let settings =
                         Settings::init(&directories.settings_file()).await?;
-                    let io_semaphore = RwLock::new(Semaphore::new(
-                        settings.max_concurrent_downloads,
+                    let fetch_semaphore = FetchSemaphore(RwLock::new(
+                        Semaphore::new(settings.max_concurrent_downloads),
+                    ));
+                    let io_semaphore = IoSemaphore(RwLock::new(
+                        Semaphore::new(settings.max_concurrent_writes),
                     ));
                     emit_loading(&loading_bar, 10.0, None).await?;
 
                     let metadata_fut =
                         Metadata::init(&directories, &io_semaphore);
-                    let profiles_fut =
-                        Profiles::init(&directories, &io_semaphore);
-                    let tags_fut = Tags::init(&directories, &io_semaphore);
+                    let profiles_fut = Profiles::init(&directories);
+                    let tags_fut = Tags::init(
+                        &directories,
+                        &io_semaphore,
+                        &fetch_semaphore,
+                    );
                     let users_fut = Users::init(&directories, &io_semaphore);
                     // Launcher data
                     let (metadata, profiles, tags, users) = loading_join! {
-                        Some(&loading_bar), 70.0, Some("Initializing...");
+                        Some(&loading_bar), 70.0, Some("Loading metadata");
                         metadata_fut,
                         profiles_fut,
                         tags_fut,
@@ -109,9 +122,13 @@ impl State {
 
                     Ok(Arc::new(Self {
                         directories,
+                        fetch_semaphore,
+                        fetch_semaphore_max: RwLock::new(
+                            settings.max_concurrent_downloads as u32,
+                        ),
                         io_semaphore,
                         io_semaphore_max: RwLock::new(
-                            settings.max_concurrent_downloads as u32,
+                            settings.max_concurrent_writes as u32,
                         ),
                         metadata: RwLock::new(metadata),
                         settings: RwLock::new(settings),
@@ -169,13 +186,30 @@ impl State {
         .await
     }
 
-    /// Reset semaphores to default values
+    /// Reset IO semaphore to default values
     /// This will block until all uses of the semaphore are complete, so it should only be called
     /// when we are not in the middle of downloading something (ie: changing the settings!)
-    pub async fn reset_semaphore(&self) {
+    pub async fn reset_io_semaphore(&self) {
         let settings = self.settings.read().await;
-        let mut io_semaphore = self.io_semaphore.write().await;
+        let mut io_semaphore = self.io_semaphore.0.write().await;
         let mut total_permits = self.io_semaphore_max.write().await;
+
+        // Wait to get all permits back
+        let _ = io_semaphore.acquire_many(*total_permits).await;
+
+        // Reset the semaphore
+        io_semaphore.close();
+        *total_permits = settings.max_concurrent_writes as u32;
+        *io_semaphore = Semaphore::new(settings.max_concurrent_writes);
+    }
+
+    /// Reset IO semaphore to default values
+    /// This will block until all uses of the semaphore are complete, so it should only be called
+    /// when we are not in the middle of downloading something (ie: changing the settings!)
+    pub async fn reset_fetch_semaphore(&self) {
+        let settings = self.settings.read().await;
+        let mut io_semaphore = self.fetch_semaphore.0.write().await;
+        let mut total_permits = self.fetch_semaphore_max.write().await;
 
         // Wait to get all permits back
         let _ = io_semaphore.acquire_many(*total_permits).await;

@@ -46,7 +46,7 @@ pub async fn authenticate(
         ))
     })?;
 
-    let credentials = flow.extract_credentials(&state.io_semaphore).await?;
+    let credentials = flow.extract_credentials(&state.fetch_semaphore).await?;
     users.insert(&credentials).await?;
 
     if state.settings.read().await.default_user.is_none() {
@@ -64,7 +64,7 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     let state = State::get().await?;
     let mut users = state.users.write().await;
 
-    let io_sempahore = &state.io_semaphore;
+    let fetch_semaphore = &state.fetch_semaphore;
     futures::future::ready(users.get(user).ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to refresh nonexistent user with ID {user}"
@@ -73,7 +73,8 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     }))
     .and_then(|mut credentials| async move {
         if chrono::offset::Utc::now() > credentials.expires {
-            inner::refresh_credentials(&mut credentials, io_sempahore).await?;
+            inner::refresh_credentials(&mut credentials, fetch_semaphore)
+                .await?;
         }
         users.insert(&credentials).await?;
         Ok(credentials)

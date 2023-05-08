@@ -47,6 +47,8 @@ where
 }
 
 // Lists active progress bars
+// Create a new HashMap with the same keys
+// Values provided should not be used directly, as they are not guaranteed to be up-to-date
 #[tauri::command]
 pub async fn progress_bars_list(
 ) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
@@ -64,6 +66,16 @@ macro_rules! impl_serialize {
                 S: Serializer,
             {
                 match self {
+                    // For the Theseus variant, we add a special display for the error,
+                    // to view the spans if subscribed to them (which is information that is lost when serializing)
+                    TheseusSerializableError::Theseus(theseus_error) => {
+                        $crate::error::display_tracing_error(theseus_error);
+
+                        let mut state = serializer.serialize_struct("Theseus", 2)?;
+                        state.serialize_field("field_name", "Theseus")?;
+                        state.serialize_field("message", &theseus_error.to_string())?;
+                        state.end()
+                    }
                     $(
                         TheseusSerializableError::$variant(message) => {
                             let mut state = serializer.serialize_struct(stringify!($variant), 2)?;
@@ -80,7 +92,6 @@ macro_rules! impl_serialize {
 
 // Use the macro to implement Serialize for TheseusSerializableError
 impl_serialize! {
-    Theseus,
     IO,
     NoProfileFound,
 }
