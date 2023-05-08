@@ -47,7 +47,7 @@ await getInstances()
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 const unlisten = await profile_listener(async (e) => {
-  if (e.event === 'Edited') {
+  if (e.event === 'edited') {
     await getInstances()
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
   }
