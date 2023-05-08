@@ -148,7 +148,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
                 profile_name: profile.metadata.name.clone(),
             },
             100.0,
-            "Updating profile...",
+            "Updating profile",
         )
         .await?;
 
@@ -159,7 +159,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
             None,
             Some(&loading_bar),
             100.0,
-            profile.projects.len(),
+            profile.projects.keys().len(),
             None,
             |project| update_project(profile_path, project, Some(true)),
         )
@@ -344,7 +344,7 @@ pub async fn remove_project(
 }
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
-#[tracing::instrument(skip_all)]
+#[tracing::instrument]
 pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
     let state = State::get().await?;
 
@@ -367,7 +367,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
 
 /// Run Minecraft using a profile, and credentials for authentication
 /// Returns Arc pointer to RwLock to Child
-#[tracing::instrument(skip_all)]
+#[tracing::instrument]
 pub async fn run_credentials(
     path: &Path,
     credentials: &auth::Credentials,
@@ -397,6 +397,7 @@ pub async fn run_credentials(
         &state,
         version,
         profile.metadata.loader_version.as_ref(),
+        None,
         None,
     )
     .await?;
