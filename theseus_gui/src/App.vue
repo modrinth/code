@@ -1,11 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
@@ -17,16 +16,6 @@ onMounted(async () => {
   themeStore.setThemeState(settings)
   themeStore.collapsedNavigation = collapsed_navigation
 })
-
-const installedMods = ref(0)
-list().then(
-  (profiles) =>
-    (installedMods.value = Object.values(profiles).reduce(
-      (acc, val) => acc + Object.keys(val.projects).length,
-      0
-    ))
-)
-// TODO: add event when profiles update to update installed mods count
 </script>
 
 <template>
@@ -117,9 +106,13 @@ list().then(
         </section>
       </div>
       <div class="router-view">
-        <Suspense>
-          <RouterView />
-        </Suspense>
+        <RouterView v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense>
+              <component :is="Component"></component>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
   </div>
@@ -133,10 +126,10 @@ list().then(
   overflow: hidden;
 
   .view {
-    width: calc(100% - 5rem);
+    width: var(--view-width);
 
     &.expanded {
-      width: calc(100% - 12rem);
+      width: var(--expanded-view-width);
     }
 
     .appbar {
