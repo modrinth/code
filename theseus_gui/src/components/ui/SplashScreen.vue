@@ -10,7 +10,6 @@ import { AnimatedLogo } from 'omorphia'
 defineProps({
   appLoading: Boolean,
 })
-
 </script>
 
 <style scoped lang="scss">
