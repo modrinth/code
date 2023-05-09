@@ -122,8 +122,14 @@ onMounted(async () => {
   overflow: hidden;
 
   .view {
-    width: 100%;
-    height: 100%;
+    margin-left: 5rem;
+    width: calc(100% - 5rem);
+    height: calc(100%);
+
+    &.expanded {
+      width: calc(100% - 13rem);
+      margin-left: 13rem;
+    }
 
     .appbar {
       display: flex;
@@ -204,6 +210,7 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
+  position: absolute;
   justify-content: space-between;
   z-index: 10;
   height: 100%;
