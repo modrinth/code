@@ -22,6 +22,10 @@ const props = defineProps({
       return {}
     },
   },
+  small: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 const confirmModal = ref(null)
@@ -126,7 +130,27 @@ await process_listener((e) => {
 
 <template>
   <div class="instance">
-    <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
+    <Card v-if="props.small" class="instance-small-card button-base">
+      <Avatar
+        :src="convertFileSrc(props.instance.metadata.icon)"
+        :alt="props.instance.metadata.name"
+        size="sm"
+      />
+      <div class="instance-small-card__info">
+        <span class="title">{{ props.instance.metadata.name }}</span>
+        {{
+          props.instance.metadata.loader.charAt(0).toUpperCase() +
+          props.instance.metadata.loader.slice(1)
+        }}
+        {{ props.instance.metadata.game_version }}
+      </div>
+    </Card>
+    <Card
+      v-else
+      class="instance-card-item button-base"
+      @click="seeInstance"
+      @mouseenter="checkProcess"
+    >
       <Avatar
         size="lg"
         :src="
@@ -169,6 +193,27 @@ await process_listener((e) => {
 </template>
 
 <style lang="scss">
+.instance-small-card {
+  background-color: var(--color-bg) !important;
+  padding: 1rem !important;
+  display: flex;
+  flex-direction: row;
+  min-height: min-content !important;
+  gap: 1rem;
+  align-items: center;
+
+  .instance-small-card__info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    .title {
+      color: var(--color-contrast);
+      font-weight: bolder;
+    }
+  }
+}
+
 .instance {
   position: relative;
 

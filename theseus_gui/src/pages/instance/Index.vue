@@ -47,12 +47,16 @@ import { get, run } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
+const route = useRoute()
+const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
-const route = useRoute()
 const instance = shallowRef(await get(route.params.id))
+searchStore.instanceContext = instance.value
+
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
@@ -66,7 +70,7 @@ breadcrumbs.setContext({
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 15rem;
+  width: 17rem;
 }
 
 Button {
@@ -117,7 +121,7 @@ Button {
 }
 
 .content {
-  margin-left: 18rem;
+  margin-left: 20rem;
 }
 
 .instance-info {
