@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
+import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
