@@ -14,15 +14,10 @@ export const configuredXss = new xss.FilterXSS({
     kbd: ['id'],
     input: ['checked', 'disabled', 'type'],
     iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
-    img: [...xss.whiteList.img, 'style', 'usemap'],
+    img: [...xss.whiteList.img, 'usemap'],
     map: ['name'],
     area: [...xss.whiteList.a, 'coords'],
     a: [...xss.whiteList.a, 'rel'],
-  },
-  css: {
-    whiteList: {
-      'image-rendering': /^pixelated$/,
-    },
   },
   onIgnoreTagAttr: (tag, name, value) => {
     // Allow iframes from acceptable sources
@@ -80,7 +75,7 @@ export const configuredXss = new xss.FilterXSS({
         ]
 
         if (!allowedHostnames.includes(url.hostname)) {
-          return `https://wsrv.nl/?url=${encodeURIComponent(value)}`
+          return `https://wsrv.nl/?url=${encodeURIComponent(value)}&n=-1`
         }
       } catch (err) {}
     }
