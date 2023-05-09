@@ -25,15 +25,16 @@ import { listen } from '@tauri-apps/api/event'
 /// Payload for the 'loading' event
 /*
     LoadingPayload {
-        event: "StateInit", "PackDownload", etc
-        - Certain states have additional fields:
-        - PackDownload: {
-            pack_name: name of the pack
-            pack_id, optional, the id of the modpack
-            pack_version, optional, the version of the modpack
-        - MinecraftDownload: {
-            profile_name: name of the profile
-            profile_uuid: unique identification of the profile
+        event: {
+          type: string, one of  "StateInit", "PackDownload", etc
+          (Optional fields depending on event type)
+          pack_name: name of the pack
+          pack_id, optional, the id of the modpack
+          pack_version, optional, the version of the modpack
+          profile_name: name of the profile
+          profile_uuid: unique identification of the profile
+
+        }
         loader_uuid: unique identification of the loading bar
         fraction: number, (as a fraction of 1, how much we'vel oaded so far). If null, by convention, loading is finished
         message: message to display to the user

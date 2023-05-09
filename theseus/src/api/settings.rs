@@ -19,8 +19,22 @@ pub async fn get() -> crate::Result<Settings> {
 pub async fn set(settings: Settings) -> crate::Result<()> {
     let state = State::get().await?;
     // Replaces the settings struct in the RwLock with the passed argument
+    let (reset_io, reset_fetch) = async {
+        let read = state.settings.read().await;
+        (
+            settings.max_concurrent_writes != read.max_concurrent_writes,
+            settings.max_concurrent_downloads != read.max_concurrent_downloads,
+        )
+    }
+    .await;
+
     *state.settings.write().await = settings;
-    state.reset_semaphore().await; // reset semaphore to new max
+    if reset_io {
+        state.reset_io_semaphore().await;
+    }
+    if reset_fetch {
+        state.reset_fetch_semaphore().await;
+    }
     State::sync().await?;
     Ok(())
 }

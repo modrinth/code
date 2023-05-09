@@ -1,7 +1,7 @@
 <script setup>
 import GridDisplay from '@/components/GridDisplay.vue'
 import { shallowRef } from 'vue'
-import { list } from '@/helpers/profile.js'
+import { list } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
