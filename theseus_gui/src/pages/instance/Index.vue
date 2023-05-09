@@ -73,11 +73,14 @@ import { useRoute } from 'vue-router'
 import { shallowRef, ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumbs, useSearch } from '@/store/state'
 
 const route = useRoute()
+const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
+
 const instance = shallowRef(await get(route.params.id))
+searchStore.instanceContext = instance.value
 
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
@@ -138,7 +141,7 @@ onUnmounted(() => unlisten())
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 15rem;
+  width: 17rem;
 }
 
 Button {
@@ -189,7 +192,7 @@ Button {
 }
 
 .content {
-  margin-left: 18rem;
+  margin-left: 20rem;
 }
 
 .instance-info {
