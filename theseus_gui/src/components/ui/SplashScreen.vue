@@ -26,14 +26,6 @@ defineProps({
     background-color: #16181c;
     height: 100vh;
   }
-
-  .splash-text {
-    margin-top: 2rem;
-    font-size: 1rem;
-    font-weight: 500;
-    text-align: center;
-    width: 15rem;
-  }
 }
 
 .initializing-icon {
