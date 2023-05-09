@@ -111,6 +111,7 @@ const stop = async (e) => {
     // For-each uuid, kill the process.
     if (!uuid.value) {
       const uuids = await get_uuids_by_profile_path(props.instance.path)
+      uuid.value = uuids[0]
       uuids.forEach(async (u) => await kill_by_uuid(u))
     } else await kill_by_uuid(uuid.value) // If we still have the uuid, just kill it
   } catch (err) {
@@ -124,7 +125,7 @@ const stop = async (e) => {
 }
 
 await process_listener((e) => {
-  if (e.event === 'Finished') playing.value = false
+  if (e.event === 'Finished' && e.uuid == uuid.value) playing.value = false
 })
 </script>
 
