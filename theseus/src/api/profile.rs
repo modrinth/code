@@ -139,41 +139,44 @@ pub async fn install(path: &Path) -> crate::Result<()> {
 
 pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
     let state = State::get().await?;
-    let mut profiles = state.profiles.write().await;
+    Box::pin(async move {
+        let mut profiles = state.profiles.write().await;
 
-    if let Some(profile) = profiles.0.get_mut(profile_path) {
-        let loading_bar = init_loading(
-            LoadingBarType::ProfileUpdate {
-                profile_uuid: profile.uuid,
-                profile_name: profile.metadata.name.clone(),
-            },
-            100.0,
-            "Updating profile",
-        )
-        .await?;
+        if let Some(profile) = profiles.0.get_mut(profile_path) {
+            let loading_bar = init_loading(
+                LoadingBarType::ProfileUpdate {
+                    profile_uuid: profile.uuid,
+                    profile_name: profile.metadata.name.clone(),
+                },
+                100.0,
+                "Updating profile",
+            )
+            .await?;
 
-        use futures::StreamExt;
-        loading_try_for_each_concurrent(
-            futures::stream::iter(profile.projects.keys())
-                .map(Ok::<&PathBuf, crate::Error>),
-            None,
-            Some(&loading_bar),
-            100.0,
-            profile.projects.keys().len(),
-            None,
-            |project| update_project(profile_path, project, Some(true)),
-        )
-        .await?;
+            use futures::StreamExt;
+            loading_try_for_each_concurrent(
+                futures::stream::iter(profile.projects.keys())
+                    .map(Ok::<&PathBuf, crate::Error>),
+                None,
+                Some(&loading_bar),
+                100.0,
+                profile.projects.keys().len(),
+                None,
+                |project| update_project(profile_path, project, Some(true)),
+            )
+            .await?;
 
-        profile.sync().await?;
+            profile.sync().await?;
 
-        Ok(())
-    } else {
-        Err(crate::ErrorKind::UnmanagedProfileError(
-            profile_path.display().to_string(),
-        )
-        .as_error())
-    }
+            Ok(())
+        } else {
+            Err(crate::ErrorKind::UnmanagedProfileError(
+                profile_path.display().to_string(),
+            )
+            .as_error())
+        }
+    })
+    .await
 }
 
 pub async fn update_project(
@@ -372,146 +375,148 @@ pub async fn run_credentials(
     path: &Path,
     credentials: &auth::Credentials,
 ) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
-    let state = State::get().await?;
-    let settings = state.settings.read().await;
-    let metadata = state.metadata.read().await;
-    let profile = get(path).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to run a nonexistent or unloaded profile at path {}!",
-            path.display()
-        ))
-    })?;
-
-    let version = metadata
-        .minecraft
-        .versions
-        .iter()
-        .find(|it| it.id == profile.metadata.game_version)
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Invalid or unknown Minecraft version: {}",
-                profile.metadata.game_version
+    Box::pin(async move {
+        let state = State::get().await?;
+        let settings = state.settings.read().await;
+        let metadata = state.metadata.read().await;
+        let profile = get(path).await?.ok_or_else(|| {
+            crate::ErrorKind::OtherError(format!(
+                "Tried to run a nonexistent or unloaded profile at path {}!",
+                path.display()
             ))
         })?;
-    let version_info = download::download_version_info(
-        &state,
-        version,
-        profile.metadata.loader_version.as_ref(),
-        None,
-        None,
-    )
-    .await?;
-    let pre_launch_hooks =
-        &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
-    if let Some(hook) = pre_launch_hooks {
-        // TODO: hook parameters
-        let mut cmd = hook.split(' ');
-        if let Some(command) = cmd.next() {
-            let result = Command::new(command)
-                .args(&cmd.collect::<Vec<&str>>())
-                .current_dir(path)
-                .spawn()?
-                .wait()
-                .await?;
 
-            if !result.success() {
-                return Err(crate::ErrorKind::LauncherError(format!(
-                    "Non-zero exit code for pre-launch hook: {}",
-                    result.code().unwrap_or(-1)
+        let version = metadata
+            .minecraft
+            .versions
+            .iter()
+            .find(|it| it.id == profile.metadata.game_version)
+            .ok_or_else(|| {
+                crate::ErrorKind::LauncherError(format!(
+                    "Invalid or unknown Minecraft version: {}",
+                    profile.metadata.game_version
                 ))
-                .as_error());
+            })?;
+        let version_info = download::download_version_info(
+            &state,
+            version,
+            profile.metadata.loader_version.as_ref(),
+            None,
+            None,
+        )
+        .await?;
+        let pre_launch_hooks =
+            &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
+        if let Some(hook) = pre_launch_hooks {
+            // TODO: hook parameters
+            let mut cmd = hook.split(' ');
+            if let Some(command) = cmd.next() {
+                let result = Command::new(command)
+                    .args(&cmd.collect::<Vec<&str>>())
+                    .current_dir(path)
+                    .spawn()?
+                    .wait()
+                    .await?;
+
+                if !result.success() {
+                    return Err(crate::ErrorKind::LauncherError(format!(
+                        "Non-zero exit code for pre-launch hook: {}",
+                        result.code().unwrap_or(-1)
+                    ))
+                    .as_error());
+                }
             }
         }
-    }
 
-    let java_version = match profile.java {
-        // Load profile-specific Java implementation choice
-        // (This defaults to Daedalus-decided key on init, but can be changed by the user)
-        Some(JavaSettings {
-            jre_key: Some(ref jre_key),
-            ..
-        }) => settings.java_globals.get(jre_key),
-        // Fall back to Daedalus-decided key if no profile-specific key is set
-        _ => {
-            match version_info
-                .java_version
-                .as_ref()
-                .map(|it| it.major_version)
-                .unwrap_or(0)
-            {
-                0..=16 => settings
-                    .java_globals
-                    .get(&crate::jre::JAVA_8_KEY.to_string()),
-                17 => settings
-                    .java_globals
-                    .get(&crate::jre::JAVA_17_KEY.to_string()),
-                _ => settings
-                    .java_globals
-                    .get(&crate::jre::JAVA_18PLUS_KEY.to_string()),
+        let java_version = match profile.java {
+            // Load profile-specific Java implementation choice
+            // (This defaults to Daedalus-decided key on init, but can be changed by the user)
+            Some(JavaSettings {
+                jre_key: Some(ref jre_key),
+                ..
+            }) => settings.java_globals.get(jre_key),
+            // Fall back to Daedalus-decided key if no profile-specific key is set
+            _ => {
+                match version_info
+                    .java_version
+                    .as_ref()
+                    .map(|it| it.major_version)
+                    .unwrap_or(0)
+                {
+                    0..=16 => settings
+                        .java_globals
+                        .get(&crate::jre::JAVA_8_KEY.to_string()),
+                    17 => settings
+                        .java_globals
+                        .get(&crate::jre::JAVA_17_KEY.to_string()),
+                    _ => settings
+                        .java_globals
+                        .get(&crate::jre::JAVA_18PLUS_KEY.to_string()),
+                }
             }
+        };
+        let java_version = java_version.as_ref().ok_or_else(|| {
+            crate::ErrorKind::LauncherError(format!(
+                "No Java stored for version {}",
+                version_info.java_version.map_or(8, |it| it.major_version),
+            ))
+        })?;
+
+        // Get the path to the Java executable from the chosen Java implementation key
+        let java_install: &Path = &PathBuf::from(&java_version.path);
+        if !java_install.exists() {
+            return Err(crate::ErrorKind::LauncherError(format!(
+                "Could not find Java install: {}",
+                java_install.display()
+            ))
+            .as_error());
         }
-    };
-    let java_version = java_version.as_ref().ok_or_else(|| {
-        crate::ErrorKind::LauncherError(format!(
-            "No Java stored for version {}",
-            version_info.java_version.map_or(8, |it| it.major_version),
-        ))
-    })?;
+        let java_args = profile
+            .java
+            .as_ref()
+            .and_then(|it| it.extra_arguments.as_ref())
+            .unwrap_or(&settings.custom_java_args);
 
-    // Get the path to the Java executable from the chosen Java implementation key
-    let java_install: &Path = &PathBuf::from(&java_version.path);
-    if !java_install.exists() {
-        return Err(crate::ErrorKind::LauncherError(format!(
-            "Could not find Java install: {}",
-            java_install.display()
-        ))
-        .as_error());
-    }
-    let java_args = profile
-        .java
-        .as_ref()
-        .and_then(|it| it.extra_arguments.as_ref())
-        .unwrap_or(&settings.custom_java_args);
+        let wrapper = profile
+            .hooks
+            .as_ref()
+            .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
 
-    let wrapper = profile
-        .hooks
-        .as_ref()
-        .map_or(&settings.hooks.wrapper, |it| &it.wrapper);
+        let memory = profile.memory.unwrap_or(settings.memory);
+        let resolution = profile.resolution.unwrap_or(settings.game_resolution);
 
-    let memory = profile.memory.unwrap_or(settings.memory);
-    let resolution = profile.resolution.unwrap_or(settings.game_resolution);
+        let env_args = &settings.custom_env_args;
 
-    let env_args = &settings.custom_env_args;
+        // Post post exit hooks
+        let post_exit_hook =
+            &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
 
-    // Post post exit hooks
-    let post_exit_hook =
-        &profile.hooks.as_ref().unwrap_or(&settings.hooks).post_exit;
-
-    let post_exit_hook = if let Some(hook) = post_exit_hook {
-        let mut cmd = hook.split(' ');
-        if let Some(command) = cmd.next() {
-            let mut command = Command::new(command);
-            command.args(&cmd.collect::<Vec<&str>>()).current_dir(path);
-            Some(command)
+        let post_exit_hook = if let Some(hook) = post_exit_hook {
+            let mut cmd = hook.split(' ');
+            if let Some(command) = cmd.next() {
+                let mut command = Command::new(command);
+                command.args(&cmd.collect::<Vec<&str>>()).current_dir(path);
+                Some(command)
+            } else {
+                None
+            }
         } else {
             None
-        }
-    } else {
-        None
-    };
+        };
 
-    let mc_process = crate::launcher::launch_minecraft(
-        java_install,
-        java_args,
-        env_args,
-        wrapper,
-        &memory,
-        &resolution,
-        credentials,
-        post_exit_hook,
-        &profile,
-    )
-    .await?;
-
-    Ok(mc_process)
+        let mc_process = crate::launcher::launch_minecraft(
+            java_install,
+            java_args,
+            env_args,
+            wrapper,
+            &memory,
+            &resolution,
+            credentials,
+            post_exit_hook,
+            &profile,
+        )
+        .await?;
+        Ok(mc_process)
+    })
+    .await
 }
