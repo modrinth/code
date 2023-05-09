@@ -13,7 +13,6 @@ import {
   Card,
   ClientIcon,
   ServerIcon,
-  AnimatedLogo,
   NavRow,
   formatCategoryHeader,
 } from 'omorphia'
@@ -23,6 +22,7 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
 import Instance from '@/components/ui/Instance.vue'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const route = useRoute()
 
@@ -36,25 +36,28 @@ const breadcrumbs = useBreadcrumbs()
 const showSnapshots = ref(false)
 const loading = ref(true)
 
-const [categories, loaders, availableGameVersions] = await Promise.all([
-  get_categories(),
-  get_loaders(),
-  get_game_versions(),
-])
+const categories = ref([])
+const loaders = ref([])
+const availableGameVersions = ref([])
 
-onMounted(() => {
+onMounted(async () => {
+  ;[categories.value, loaders.value, availableGameVersions.value] = await Promise.all([
+    get_categories(),
+    get_loaders(),
+    get_game_versions(),
+  ])
   breadcrumbs.setContext({ name: 'Browse', link: route.path })
   if (searchStore.projectType === 'modpack') {
     searchStore.instanceContext = null
   }
   searchStore.searchInput = ''
-  handleReset()
-  switchPage(1)
+  await handleReset(true)
+  loading.value = false
 })
 
 const sortedCategories = computed(() => {
   const values = new Map()
-  for (const category of categories.filter(
+  for (const category of categories.value.filter(
     (cat) =>
       cat.project_type ===
       (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
@@ -67,7 +70,7 @@ const sortedCategories = computed(() => {
   return values
 })
 
-const getSearchResults = async (shouldLoad = false) => {
+const getSearchResults = async () => {
   const queryString = searchStore.getQueryString()
   if (searchStore.instanceContext) {
     showVersions.value = false
@@ -75,15 +78,9 @@ const getSearchResults = async (shouldLoad = false) => {
       searchStore.projectType === 'mod' || searchStore.projectType === 'resourcepack'
     )
   }
-  if (shouldLoad === true) {
-    loading.value = true
-  }
   const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
-  loading.value = false
   searchStore.setSearchResults(response)
 }
-
-getSearchResults(true)
 
 const handleReset = async () => {
   searchStore.currentPage = 1
@@ -131,221 +128,227 @@ watch(
 </script>
 
 <template>
-  <div class="search-container">
-    <aside class="filter-panel">
-      <Instance v-if="searchStore.instanceContext" :instance="searchStore.instanceContext" small />
-      <Button
-        role="button"
-        :disabled="
-          !(
-            searchStore.facets.length > 0 ||
-            searchStore.orFacets.length > 0 ||
-            searchStore.environments.server === true ||
-            searchStore.environments.client === true ||
-            searchStore.openSource === true ||
-            searchStore.activeVersions.length > 0
-          )
-        "
-        @click="handleReset"
-        ><ClearIcon />Clear Filters</Button
-      >
-      <div
-        v-for="categoryList in Array.from(sortedCategories)"
-        :key="categoryList[0]"
-        class="categories"
-      >
-        <h2>{{ formatCategoryHeader(categoryList[0]) }}</h2>
-        <div v-for="category in categoryList[1]" :key="category.name">
-          <SearchFilter
-            :active-filters="searchStore.facets"
-            :icon="category.icon"
-            :display-name="category.name"
-            :facet-name="`categories:${encodeURIComponent(category.name)}`"
-            class="filter-checkbox"
-            @toggle="toggleFacet"
-          />
-        </div>
-      </div>
-      <div
-        v-if="
-          showLoaders &&
-          searchStore.projectType !== 'datapack' &&
-          searchStore.projectType !== 'resourcepack' &&
-          searchStore.projectType !== 'shader'
-        "
-        class="loaders"
-      >
-        <h2>Loaders</h2>
+  <transition name="fade">
+    <SplashScreen v-if="loading" />
+    <div v-else class="search-container">
+      <aside class="filter-panel">
+        <Instance
+          v-if="searchStore.instanceContext"
+          :instance="searchStore.instanceContext"
+          small
+        />
+        <Button
+          role="button"
+          :disabled="
+            !(
+              searchStore.facets.length > 0 ||
+              searchStore.orFacets.length > 0 ||
+              searchStore.environments.server === true ||
+              searchStore.environments.client === true ||
+              searchStore.openSource === true ||
+              searchStore.activeVersions.length > 0
+            )
+          "
+          @click="handleReset"
+          ><ClearIcon />Clear Filters</Button
+        >
         <div
-          v-for="loader in loaders.filter((l) =>
-            l.supported_project_types?.includes(searchStore.projectType)
-          )"
-          :key="loader"
+          v-for="categoryList in Array.from(sortedCategories)"
+          :key="categoryList[0]"
+          class="categories"
         >
-          <SearchFilter
-            :active-filters="searchStore.orFacets"
-            :icon="loader.icon"
-            :display-name="loader.name"
-            :facet-name="`categories:${encodeURIComponent(loader.name)}`"
-            class="filter-checkbox"
-            @toggle="toggleOrFacet"
-          />
-        </div>
-      </div>
-      <div v-if="searchStore.projectType !== 'datapack'" class="environment">
-        <h2>Environments</h2>
-        <SearchFilter
-          v-model="searchStore.environments.client"
-          display-name="Client"
-          facet-name="client"
-          class="filter-checkbox"
-          @click="getSearchResults"
-        >
-          <ClientIcon aria-hidden="true" />
-        </SearchFilter>
-        <SearchFilter
-          v-model="searchStore.environments.server"
-          display-name="Server"
-          facet-name="server"
-          class="filter-checkbox"
-          @click="getSearchResults"
-        >
-          <ServerIcon aria-hidden="true" />
-        </SearchFilter>
-      </div>
-      <div v-if="showVersions" class="versions">
-        <h2>Minecraft versions</h2>
-        <Checkbox v-model="showSnapshots" class="filter-checkbox">Show snapshots</Checkbox>
-        <multiselect
-          v-model="searchStore.activeVersions"
-          :options="
-            showSnapshots
-              ? availableGameVersions.map((x) => x.version)
-              : availableGameVersions
-                  .filter((it) => it.version_type === 'release')
-                  .map((x) => x.version)
-          "
-          :multiple="true"
-          :searchable="true"
-          :show-no-results="false"
-          :close-on-select="false"
-          :clear-search-on-select="false"
-          :show-labels="false"
-          placeholder="Choose versions..."
-          @update:model-value="getSearchResults"
-        />
-      </div>
-      <div class="open-source">
-        <h2>Open source</h2>
-        <Checkbox
-          v-model="searchStore.openSource"
-          class="filter-checkbox"
-          @click="getSearchResults"
-        >
-          Open source
-        </Checkbox>
-      </div>
-    </aside>
-    <div class="search">
-      <Card class="project-type-container">
-        <NavRow
-          :links="
-            searchStore.instanceContext
-              ? [
-                  { label: 'Mods', href: `/browse/mod` },
-                  { label: 'Datapacks', href: `/browse/datapack` },
-                  { label: 'Shaders', href: `/browse/shader` },
-                  { label: 'Resource Packs', href: `/browse/resourcepack` },
-                ]
-              : [
-                  { label: 'Modpacks', href: '/browse/modpack' },
-                  { label: 'Mods', href: '/browse/mod' },
-                  { label: 'Datapacks', href: '/browse/datapack' },
-                  { label: 'Shaders', href: '/browse/shader' },
-                  { label: 'Resource Packs', href: '/browse/resourcepack' },
-                ]
-          "
-        />
-      </Card>
-      <Card class="search-panel-container">
-        <div class="search-panel">
-          <div class="iconified-input">
-            <SearchIcon aria-hidden="true" />
-            <input
-              v-model="searchStore.searchInput"
-              type="text"
-              :placeholder="`Search ${searchStore.projectType}s...`"
-              @input="getSearchResults"
+          <h2>{{ formatCategoryHeader(categoryList[0]) }}</h2>
+          <div v-for="category in categoryList[1]" :key="category.name">
+            <SearchFilter
+              :active-filters="searchStore.facets"
+              :icon="category.icon"
+              :display-name="category.name"
+              :facet-name="`categories:${encodeURIComponent(category.name)}`"
+              class="filter-checkbox"
+              @toggle="toggleFacet"
             />
           </div>
-          <span>Sort by</span>
-          <DropdownSelect
-            v-model="searchStore.filter"
-            name="Sort dropdown"
-            :options="[
-              'Relevance',
-              'Download count',
-              'Follow count',
-              'Recently published',
-              'Recently updated',
-            ]"
-            class="sort-dropdown"
-            @change="getSearchResults"
-          />
-          <span>Show per page</span>
-          <DropdownSelect
-            v-model="searchStore.limit"
-            name="Limit dropdown"
-            :options="[5, 10, 15, 20, 50, 100]"
-            :default-value="searchStore.limit.toString()"
-            :model-value="searchStore.limit.toString()"
-            class="limit-dropdown"
-            @change="getSearchResults"
+        </div>
+        <div
+          v-if="
+            showLoaders &&
+            searchStore.projectType !== 'datapack' &&
+            searchStore.projectType !== 'resourcepack' &&
+            searchStore.projectType !== 'shader'
+          "
+          class="loaders"
+        >
+          <h2>Loaders</h2>
+          <div
+            v-for="loader in loaders.filter((l) =>
+              l.supported_project_types?.includes(searchStore.projectType)
+            )"
+            :key="loader"
+          >
+            <SearchFilter
+              :active-filters="searchStore.orFacets"
+              :icon="loader.icon"
+              :display-name="loader.name"
+              :facet-name="`categories:${encodeURIComponent(loader.name)}`"
+              class="filter-checkbox"
+              @toggle="toggleOrFacet"
+            />
+          </div>
+        </div>
+        <div v-if="searchStore.projectType !== 'datapack'" class="environment">
+          <h2>Environments</h2>
+          <SearchFilter
+            v-model="searchStore.environments.client"
+            display-name="Client"
+            facet-name="client"
+            class="filter-checkbox"
+            @click="getSearchResults"
+          >
+            <ClientIcon aria-hidden="true" />
+          </SearchFilter>
+          <SearchFilter
+            v-model="searchStore.environments.server"
+            display-name="Server"
+            facet-name="server"
+            class="filter-checkbox"
+            @click="getSearchResults"
+          >
+            <ServerIcon aria-hidden="true" />
+          </SearchFilter>
+        </div>
+        <div v-if="showVersions" class="versions">
+          <h2>Minecraft versions</h2>
+          <Checkbox v-model="showSnapshots" class="filter-checkbox">Show snapshots</Checkbox>
+          <multiselect
+            v-model="searchStore.activeVersions"
+            :options="
+              showSnapshots
+                ? availableGameVersions.map((x) => x.version)
+                : availableGameVersions
+                    .filter((it) => it.version_type === 'release')
+                    .map((x) => x.version)
+            "
+            :multiple="true"
+            :searchable="true"
+            :show-no-results="false"
+            :close-on-select="false"
+            :clear-search-on-select="false"
+            :show-labels="false"
+            placeholder="Choose versions..."
+            @update:model-value="getSearchResults"
           />
         </div>
-      </Card>
-      <Pagination
-        :page="searchStore.currentPage"
-        :count="searchStore.pageCount"
-        @switch-page="switchPage"
-      />
-      <AnimatedLogo v-if="loading" class="loading" />
-      <section v-else class="project-list display-mode--list instance-results" role="list">
-        <ProjectCard
-          v-for="result in searchStore.searchResults"
-          :id="`${result?.project_id}/`"
-          :key="result?.project_id"
-          class="result-project-item"
-          :type="result?.project_type"
-          :name="result?.title"
-          :description="result?.description"
-          :icon-url="result?.icon_url"
-          :downloads="result?.downloads?.toString()"
-          :follows="result?.follows?.toString()"
-          :created-at="result?.date_created"
-          :updated-at="result?.date_modified"
-          :categories="[
-            ...categories.filter(
-              (cat) =>
-                result?.display_categories.includes(cat.name) &&
-                cat.project_type === searchStore.projectType
-            ),
-            ...loaders.filter(
-              (loader) =>
-                result?.display_categories.includes(loader.name) &&
-                loader.supported_project_types?.includes(searchStore.projectType)
-            ),
-          ]"
-          :project-type-display="result?.project_type"
-          project-type-url="project"
-          :server-side="result?.server_side"
-          :client-side="result?.client_side"
-          :show-updated-date="false"
-          :color="result?.color"
+        <div class="open-source">
+          <h2>Open source</h2>
+          <Checkbox
+            v-model="searchStore.openSource"
+            class="filter-checkbox"
+            @click="getSearchResults"
+          >
+            Open source
+          </Checkbox>
+        </div>
+      </aside>
+      <div class="search">
+        <Card class="project-type-container">
+          <NavRow
+            :links="
+              searchStore.instanceContext
+                ? [
+                    { label: 'Mods', href: `/browse/mod` },
+                    { label: 'Datapacks', href: `/browse/datapack` },
+                    { label: 'Shaders', href: `/browse/shader` },
+                    { label: 'Resource Packs', href: `/browse/resourcepack` },
+                  ]
+                : [
+                    { label: 'Modpacks', href: '/browse/modpack' },
+                    { label: 'Mods', href: '/browse/mod' },
+                    { label: 'Datapacks', href: '/browse/datapack' },
+                    { label: 'Shaders', href: '/browse/shader' },
+                    { label: 'Resource Packs', href: '/browse/resourcepack' },
+                  ]
+            "
+          />
+        </Card>
+        <Card class="search-panel-container">
+          <div class="search-panel">
+            <div class="iconified-input">
+              <SearchIcon aria-hidden="true" />
+              <input
+                v-model="searchStore.searchInput"
+                type="text"
+                :placeholder="`Search ${searchStore.projectType}s...`"
+                @input="getSearchResults"
+              />
+            </div>
+            <span>Sort by</span>
+            <DropdownSelect
+              v-model="searchStore.filter"
+              name="Sort dropdown"
+              :options="[
+                'Relevance',
+                'Download count',
+                'Follow count',
+                'Recently published',
+                'Recently updated',
+              ]"
+              class="sort-dropdown"
+              @change="getSearchResults"
+            />
+            <span>Show per page</span>
+            <DropdownSelect
+              v-model="searchStore.limit"
+              name="Limit dropdown"
+              :options="[5, 10, 15, 20, 50, 100]"
+              :default-value="searchStore.limit.toString()"
+              :model-value="searchStore.limit.toString()"
+              class="limit-dropdown"
+              @change="getSearchResults"
+            />
+          </div>
+        </Card>
+        <Pagination
+          :page="searchStore.currentPage"
+          :count="searchStore.pageCount"
+          @switch-page="switchPage"
         />
-      </section>
+        <section class="project-list display-mode--list instance-results" role="list">
+          <ProjectCard
+            v-for="result in searchStore.searchResults"
+            :id="`${result?.project_id}/`"
+            :key="result?.project_id"
+            class="result-project-item"
+            :type="result?.project_type"
+            :name="result?.title"
+            :description="result?.description"
+            :icon-url="result?.icon_url"
+            :downloads="result?.downloads?.toString()"
+            :follows="result?.follows?.toString()"
+            :created-at="result?.date_created"
+            :updated-at="result?.date_modified"
+            :categories="[
+              ...categories.filter(
+                (cat) =>
+                  result?.display_categories.includes(cat.name) &&
+                  cat.project_type === searchStore.projectType
+              ),
+              ...loaders.filter(
+                (loader) =>
+                  result?.display_categories.includes(loader.name) &&
+                  loader.supported_project_types?.includes(searchStore.projectType)
+              ),
+            ]"
+            :project-type-display="result?.project_type"
+            project-type-url="project"
+            :server-side="result?.server_side"
+            :client-side="result?.client_side"
+            :show-updated-date="false"
+            :color="result?.color"
+          />
+        </section>
+      </div>
     </div>
-  </div>
+  </transition>
 </template>
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
@@ -456,5 +459,15 @@ watch(
       text-align: center;
     }
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

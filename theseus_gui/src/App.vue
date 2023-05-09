@@ -1,13 +1,14 @@
 <script setup>
 import { onMounted, ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, AnimatedLogo } from 'omorphia'
+import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const themeStore = useTheming()
 
@@ -28,7 +29,8 @@ defineExpose({
 </script>
 
 <template>
-  <div v-if="!loading" class="container">
+  <SplashScreen v-if="loading" app-loading />
+  <div v-else class="container">
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
@@ -120,9 +122,6 @@ defineExpose({
         </Suspense>
       </div>
     </div>
-  </div>
-  <div v-else class="loading-page">
-    <AnimatedLogo class="initializing-icon" />
   </div>
 </template>
 
@@ -346,24 +345,5 @@ defineExpose({
   width: 100%;
   height: 100%;
   gap: 1rem;
-}
-
-.loading-page {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-color: #16181c;
-  height: 100vh;
-
-  .initializing-icon {
-    width: 12rem;
-    height: 12rem;
-
-    :deep(svg) {
-      width: 12rem;
-      height: 12rem;
-    }
-  }
 }
 </style>

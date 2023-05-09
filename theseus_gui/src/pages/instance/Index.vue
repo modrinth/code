@@ -1,50 +1,53 @@
 <template>
-  <div class="instance-container">
-    <div class="side-cards">
-      <Card class="instance-card">
-        <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
-        <div class="instance-info">
-          <h2 class="name">{{ instance.metadata.name }}</h2>
-          <span class="metadata">
-            {{ instance.metadata.loader }} {{ instance.metadata.game_version }}
+  <transition name="fade">
+    <SplashScreen v-if="loading" />
+    <div v-else class="instance-container">
+      <div class="side-cards">
+        <Card class="instance-card">
+          <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
+          <div class="instance-info">
+            <h2 class="name">{{ instance.metadata.name }}</h2>
+            <span class="metadata">
+              {{ instance.metadata.loader }} {{ instance.metadata.game_version }}
+            </span>
+          </div>
+          <span class="button-group">
+            <Button
+              :color="instance.installed ? 'primary' : ''"
+              class="instance-button"
+              :disabled="!instance.installed"
+              @click="run($route.params.id)"
+            >
+              <PlayIcon v-if="instance.installed" />
+              <AnimatedLogo v-else class="loading-icon" />
+              {{ instance.installed ? 'Play' : 'Installing' }}
+            </Button>
+            <Button class="instance-button" icon-only>
+              <OpenFolderIcon />
+            </Button>
           </span>
+        </Card>
+        <div class="pages-list">
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
+            <BoxIcon />
+            Mods
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
+            <SettingsIcon />
+            Options
+          </RouterLink>
+          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
+            <FileIcon />
+            Logs
+          </RouterLink>
         </div>
-        <span class="button-group">
-          <Button
-            :color="instance.installed ? 'primary' : ''"
-            class="instance-button"
-            :disabled="!instance.installed"
-            @click="run($route.params.id)"
-          >
-            <PlayIcon v-if="instance.installed" />
-            <AnimatedLogo v-else class="loading-icon" />
-            {{ instance.installed ? 'Play' : 'Installing' }}
-          </Button>
-          <Button class="instance-button" icon-only>
-            <OpenFolderIcon />
-          </Button>
-        </span>
-      </Card>
-      <div class="pages-list">
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
-          <BoxIcon />
-          Mods
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
-          <SettingsIcon />
-          Options
-        </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
-          <FileIcon />
-          Logs
-        </RouterLink>
+      </div>
+      <div class="content">
+        <Promotion />
+        <router-view :instance="instance" />
       </div>
     </div>
-    <div class="content">
-      <Promotion />
-      <router-view :instance="instance" />
-    </div>
-  </div>
+  </transition>
 </template>
 <script setup>
 import {
@@ -60,23 +63,29 @@ import {
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
-import { shallowRef } from 'vue'
+import { onMounted, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { profile_listener } from '@/helpers/events.js'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const route = useRoute()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
-const instance = shallowRef(await get(route.params.id))
-searchStore.instanceContext = instance.value
+const instance = ref(null)
+const loading = ref(true)
 
-breadcrumbs.setName('Instance', instance.value.metadata.name)
-breadcrumbs.setContext({
-  name: instance.value.metadata.name,
-  link: route.path,
+onMounted(async () => {
+  instance.value = await get(route.params.id)
+  searchStore.instanceContext = instance.value
+  breadcrumbs.setName('Instance', instance.value.metadata.name)
+  breadcrumbs.setContext({
+    name: instance.value.metadata.name,
+    link: route.path,
+  })
+  loading.value = false
 })
 
 profile_listener(async (event) => {
@@ -318,5 +327,15 @@ Button {
   :deep(path) {
     fill: var(--color-base) !important;
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

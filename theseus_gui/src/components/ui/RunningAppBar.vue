@@ -37,10 +37,10 @@
     <Card v-if="showCard === true" ref="card" class="info-card">
       <div v-for="loadingBar in currentLoadingBars" :key="loadingBar.id" class="info-text">
         <h3 class="info-title">
-          {{ loadingBar.bar_type.PackDownload.pack_name }}
+          {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
         </h3>
         <ProgressBar :progress="Math.round(loadingBar.current)" />
-        <div class="row">{{ loadingBar.message }}</div>
+        <div class="row">{{ Math.floor(loadingBar.current) }}% {{ loadingBar.message }}</div>
       </div>
     </Card>
   </transition>
@@ -67,7 +67,8 @@ const showCard = ref(false)
 
 const currentProcesses = ref(await getRunningProfiles())
 
-await process_listener(async () => {
+await process_listener(async (event) => {
+  console.log(event)
   await refresh()
 })
 
@@ -89,11 +90,7 @@ const goToTerminal = () => {
   router.push(`/instance/${encodeURIComponent(currentProcesses.value[0].path)}/logs`)
 }
 
-const currentLoadingBars = ref(
-  Object.values(await progress_bars_list()).filter(
-    (bar) => bar.bar_type !== 'StateInit' && Object.keys(bar.bar_type)[0] === 'PackDownload'
-  )
-)
+const currentLoadingBars = ref(Object.values(await progress_bars_list()))
 
 await loading_listener(async (event) => {
   console.log('loading listener', event.message, event)
@@ -102,9 +99,7 @@ await loading_listener(async (event) => {
 
 const refreshInfo = async () => {
   const currentLoadingBarCount = currentLoadingBars.value.length
-  currentLoadingBars.value = Object.values(await progress_bars_list()).filter(
-    (bar) => bar.bar_type !== 'StateInit' && Object.keys(bar.bar_type)[0] === 'PackDownload'
-  )
+  currentLoadingBars.value = Object.values(await progress_bars_list())
   if (currentLoadingBars.value.length === 0) {
     showCard.value = false
   } else if (currentLoadingBarCount < currentLoadingBars.value.length) {

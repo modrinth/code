@@ -1,190 +1,201 @@
 <template>
-  <div class="root-container">
-    <div v-if="data" class="project-sidebar">
-      <Instance v-if="instance" :instance="instance" small />
-      <Card class="sidebar-card">
-        <Avatar size="lg" :src="data.icon_url" />
-        <div class="instance-info">
-          <h2 class="name">{{ data.title }}</h2>
-          {{ data.description }}
-        </div>
-        <Categories
-          class="tags"
-          type=""
-          :categories="[
-            ...categories.filter(
-              (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
-            ),
-            ...loaders.filter(
-              (loader) =>
-                data.categories.includes(loader.name) &&
-                loader.supported_project_types?.includes('modpack')
-            ),
-          ]"
-        >
-          <EnvironmentIndicator
-            :client-side="data.client_side"
-            :server-side="data.server_side"
-            :type="data.project_type"
+  <transition name="fade">
+    <SplashScreen v-if="loading" />
+    <div v-else class="root-container">
+      <div v-if="data" class="project-sidebar">
+        <Instance v-if="instance" :instance="instance" small />
+        <Card class="sidebar-card">
+          <Avatar size="lg" :src="data.icon_url" />
+          <div class="instance-info">
+            <h2 class="name">{{ data.title }}</h2>
+            {{ data.description }}
+          </div>
+          <Categories
+            class="tags"
+            type=""
+            :categories="[
+              ...categories.filter(
+                (cat) => data.categories.includes(cat.name) && cat.project_type === 'mod'
+              ),
+              ...loaders.filter(
+                (loader) =>
+                  data.categories.includes(loader.name) &&
+                  loader.supported_project_types?.includes('modpack')
+              ),
+            ]"
+          >
+            <EnvironmentIndicator
+              :client-side="data.client_side"
+              :server-side="data.server_side"
+              :type="data.project_type"
+            />
+          </Categories>
+          <hr class="card-divider" />
+          <div class="button-group">
+            <Button
+              color="primary"
+              class="instance-button"
+              :disabled="installed === true || installing === true"
+              @click="install(null)"
+            >
+              <DownloadIcon v-if="!installed && !installing" />
+              <CheckIcon v-else-if="installed" />
+              {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
+            </Button>
+            <a
+              :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
+              rel="external"
+              target="_blank"
+              class="btn"
+            >
+              <ExternalIcon />
+              Site
+            </a>
+          </div>
+          <hr class="card-divider" />
+          <div class="stats">
+            <div class="stat">
+              <DownloadIcon aria-hidden="true" />
+              <p>
+                <strong>{{ formatNumber(data.downloads) }}</strong>
+                <span class="stat-label">
+                  download<span v-if="data.downloads !== '1'">s</span></span
+                >
+              </p>
+            </div>
+            <div class="stat">
+              <HeartIcon aria-hidden="true" />
+              <p>
+                <strong>{{ formatNumber(data.followers) }}</strong>
+                <span class="stat-label">
+                  follower<span v-if="data.followers !== '1'">s</span></span
+                >
+              </p>
+            </div>
+            <div class="stat date">
+              <CalendarIcon aria-hidden="true" />
+              <span
+                ><span class="date-label">Created </span>
+                {{ dayjs(data.published).fromNow() }}</span
+              >
+            </div>
+            <div class="stat date">
+              <UpdatedIcon aria-hidden="true" />
+              <span
+                ><span class="date-label">Updated </span> {{ dayjs(data.updated).fromNow() }}</span
+              >
+            </div>
+          </div>
+          <hr class="card-divider" />
+          <div class="button-group">
+            <Button class="instance-button">
+              <ReportIcon />
+              Report
+            </Button>
+            <Button class="instance-button">
+              <HeartIcon />
+              Follow
+            </Button>
+          </div>
+          <hr class="card-divider" />
+          <div class="links">
+            <a
+              v-if="data.issues_url"
+              :href="data.issues_url"
+              class="title"
+              rel="noopener nofollow ugc"
+            >
+              <IssuesIcon aria-hidden="true" />
+              <span>Issues</span>
+            </a>
+            <a
+              v-if="data.source_url"
+              :href="data.source_url"
+              class="title"
+              rel="noopener nofollow ugc"
+            >
+              <CodeIcon aria-hidden="true" />
+              <span>Source</span>
+            </a>
+            <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
+              <WikiIcon aria-hidden="true" />
+              <span>Wiki</span>
+            </a>
+            <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
+              <DiscordIcon aria-hidden="true" />
+              <span>Discord</span>
+            </a>
+            <a
+              v-for="(donation, index) in data.donation_urls"
+              :key="index"
+              :href="donation.url"
+              rel="noopener nofollow ugc"
+            >
+              <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
+              <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />
+              <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true" />
+              <PaypalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
+              <OpenCollectiveIcon
+                v-else-if="donation.id === 'open-collective'"
+                aria-hidden="true"
+              />
+              <HeartIcon v-else-if="donation.id === 'github'" />
+              <CoinsIcon v-else />
+              <span v-if="donation.id === 'bmac'">Buy Me a Coffee</span>
+              <span v-else-if="donation.id === 'patreon'">Patreon</span>
+              <span v-else-if="donation.id === 'paypal'">PayPal</span>
+              <span v-else-if="donation.id === 'ko-fi'">Ko-fi</span>
+              <span v-else-if="donation.id === 'github'">GitHub Sponsors</span>
+              <span v-else>Donate</span>
+            </a>
+          </div>
+        </Card>
+      </div>
+      <div v-if="data" class="content-container">
+        <Promotion />
+        <Card class="tabs">
+          <NavRow
+            v-if="data.gallery.length > 0"
+            :links="[
+              {
+                label: 'Description',
+                href: `/project/${$route.params.id}/`,
+              },
+              {
+                label: 'Versions',
+                href: `/project/${$route.params.id}/versions`,
+              },
+              {
+                label: 'Gallery',
+                href: `/project/${$route.params.id}/gallery`,
+              },
+            ]"
           />
-        </Categories>
-        <hr class="card-divider" />
-        <div class="button-group">
-          <Button
-            color="primary"
-            class="instance-button"
-            :disabled="installed === true || installing === true"
-            @click="install(null)"
-          >
-            <DownloadIcon v-if="!installed && !installing" />
-            <CheckIcon v-else-if="installed" />
-            {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
-          </Button>
-          <a
-            :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
-            rel="external"
-            target="_blank"
-            class="btn"
-          >
-            <ExternalIcon />
-            Site
-          </a>
-        </div>
-        <hr class="card-divider" />
-        <div class="stats">
-          <div class="stat">
-            <DownloadIcon aria-hidden="true" />
-            <p>
-              <strong>{{ formatNumber(data.downloads) }}</strong>
-              <span class="stat-label"> download<span v-if="data.downloads !== '1'">s</span></span>
-            </p>
-          </div>
-          <div class="stat">
-            <HeartIcon aria-hidden="true" />
-            <p>
-              <strong>{{ formatNumber(data.followers) }}</strong>
-              <span class="stat-label"> follower<span v-if="data.followers !== '1'">s</span></span>
-            </p>
-          </div>
-          <div class="stat date">
-            <CalendarIcon aria-hidden="true" />
-            <span
-              ><span class="date-label">Created </span> {{ dayjs(data.published).fromNow() }}</span
-            >
-          </div>
-          <div class="stat date">
-            <UpdatedIcon aria-hidden="true" />
-            <span
-              ><span class="date-label">Updated </span> {{ dayjs(data.updated).fromNow() }}</span
-            >
-          </div>
-        </div>
-        <hr class="card-divider" />
-        <div class="button-group">
-          <Button class="instance-button">
-            <ReportIcon />
-            Report
-          </Button>
-          <Button class="instance-button">
-            <HeartIcon />
-            Follow
-          </Button>
-        </div>
-        <hr class="card-divider" />
-        <div class="links">
-          <a
-            v-if="data.issues_url"
-            :href="data.issues_url"
-            class="title"
-            rel="noopener nofollow ugc"
-          >
-            <IssuesIcon aria-hidden="true" />
-            <span>Issues</span>
-          </a>
-          <a
-            v-if="data.source_url"
-            :href="data.source_url"
-            class="title"
-            rel="noopener nofollow ugc"
-          >
-            <CodeIcon aria-hidden="true" />
-            <span>Source</span>
-          </a>
-          <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
-            <WikiIcon aria-hidden="true" />
-            <span>Wiki</span>
-          </a>
-          <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
-            <DiscordIcon aria-hidden="true" />
-            <span>Discord</span>
-          </a>
-          <a
-            v-for="(donation, index) in data.donation_urls"
-            :key="index"
-            :href="donation.url"
-            rel="noopener nofollow ugc"
-          >
-            <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
-            <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />
-            <KoFiIcon v-else-if="donation.id === 'ko-fi'" aria-hidden="true" />
-            <PaypalIcon v-else-if="donation.id === 'paypal'" aria-hidden="true" />
-            <OpenCollectiveIcon v-else-if="donation.id === 'open-collective'" aria-hidden="true" />
-            <HeartIcon v-else-if="donation.id === 'github'" />
-            <CoinsIcon v-else />
-            <span v-if="donation.id === 'bmac'">Buy Me a Coffee</span>
-            <span v-else-if="donation.id === 'patreon'">Patreon</span>
-            <span v-else-if="donation.id === 'paypal'">PayPal</span>
-            <span v-else-if="donation.id === 'ko-fi'">Ko-fi</span>
-            <span v-else-if="donation.id === 'github'">GitHub Sponsors</span>
-            <span v-else>Donate</span>
-          </a>
-        </div>
-      </Card>
-    </div>
-    <div v-if="data" class="content-container">
-      <Promotion />
-      <Card class="tabs">
-        <NavRow
-          v-if="data.gallery.length > 0"
-          :links="[
-            {
-              label: 'Description',
-              href: `/project/${$route.params.id}/`,
-            },
-            {
-              label: 'Versions',
-              href: `/project/${$route.params.id}/versions`,
-            },
-            {
-              label: 'Gallery',
-              href: `/project/${$route.params.id}/gallery`,
-            },
-          ]"
+          <NavRow
+            v-else
+            :links="[
+              {
+                label: 'Description',
+                href: `/project/${$route.params.id}/`,
+              },
+              {
+                label: 'Versions',
+                href: `/project/${$route.params.id}/versions`,
+              },
+            ]"
+          />
+        </Card>
+        <RouterView
+          :project="data"
+          :versions="versions"
+          :members="members"
+          :dependencies="dependencies"
+          :install="install"
+          :installed="installed"
         />
-        <NavRow
-          v-else
-          :links="[
-            {
-              label: 'Description',
-              href: `/project/${$route.params.id}/`,
-            },
-            {
-              label: 'Versions',
-              href: `/project/${$route.params.id}/versions`,
-            },
-          ]"
-        />
-      </Card>
-      <RouterView
-        :project="data"
-        :versions="versions"
-        :members="members"
-        :dependencies="dependencies"
-        :install="install"
-        :installed="installed"
-      />
+      </div>
     </div>
-  </div>
+  </transition>
   <InstallConfirmModal ref="confirmModal" />
   <InstanceInstallModal ref="modInstallModal" />
 </template>
@@ -226,37 +237,51 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
-import { ref, shallowRef, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const searchStore = useSearch()
 
 const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
+const loading = ref(true)
 
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
-const loaders = ref(await get_loaders())
-const categories = ref(await get_categories())
+const loaders = ref(null)
+const categories = ref(null)
 const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
 
-const [data, versions, members, dependencies] = await Promise.all([
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
-])
+const data = ref(null)
+const versions = ref(null)
+const members = ref(null)
+const dependencies = ref(null)
+const installed = ref(false)
 
-const installed = ref(instance.value && checkInstalled(instance.value, data.value.id))
+onMounted(async () => {
+  ;[data.value, versions.value, members.value, dependencies.value] = await Promise.all([
+    ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`),
+    ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`),
+    ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`),
+    ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`),
+  ])
 
-breadcrumbs.setName('Project', data.value.title)
+  loaders.value = await get_loaders()
+  categories.value = await get_categories()
+
+  loading.value = false
+
+  installed.value = instance.value && checkInstalled(instance.value, data.value.id)
+  breadcrumbs.setName('Project', data.value.title)
+})
 
 watch(
   () => route.params.id,
@@ -291,7 +316,7 @@ async function install(version) {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
-      let id = await packInstall(queuedVersionData.id)
+      let id = await packInstall(queuedVersionData.id, data.value.title)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
       confirmModal.value.show(queuedVersionData.id)
@@ -486,5 +511,15 @@ async function install(version) {
   :deep(svg) {
     color: var(--color-contrast);
   }
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
