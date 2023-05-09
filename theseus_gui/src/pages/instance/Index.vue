@@ -118,6 +118,7 @@ const stopInstance = async () => {
   try {
     if (!uuid.value) {
       const uuids = await get_uuids_by_profile_path(instance.value.path)
+      uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
       uuids.forEach(async (u) => await kill_by_uuid(u))
     } else await kill_by_uuid(uuid.value)
   } catch (err) {
@@ -129,7 +130,7 @@ const stopInstance = async () => {
 }
 
 const unlisten = await process_listener((e) => {
-  if (e.event === 'Finished') playing.value = false
+  if (e.event === 'Finished' && uuid.value === e.uuid) playing.value = false
 })
 
 onUnmounted(() => unlisten())
