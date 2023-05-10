@@ -6,9 +6,10 @@
         <span v-if="version.featured">Auto-Featured</span>
       </div>
       <div class="button-group">
-        <Button color="primary" :action="() => install(version.id)">
-          <DownloadIcon />
-          Install
+        <Button color="primary" :action="() => install(version.id)" :disabled="installed">
+          <DownloadIcon v-if="!installed" />
+          <CheckIcon v-else />
+          {{ installed ? 'Installed' : 'Install' }}
         </Button>
         <Button :link="`/project/${route.params.id}/versions`">
           <LeftArrowIcon />
@@ -57,9 +58,11 @@
               v-if="project.project_type !== 'modpack' || file.primary"
               class="download"
               :action="() => install(version.id)"
+              :disabled="installed"
             >
-              <DownloadIcon />
-              Install
+              <DownloadIcon v-if="!installed" />
+              <CheckIcon v-else />
+              {{ installed ? 'Installed' : 'Install' }}
             </Button>
           </Card>
         </Card>
@@ -177,6 +180,7 @@ import {
   Badge,
   ExternalIcon,
   CopyCode,
+  CheckIcon,
   formatBytes,
   renderString,
 } from 'omorphia'
@@ -208,6 +212,10 @@ const props = defineProps({
   },
   install: {
     type: Function,
+    required: true,
+  },
+  installed: {
+    type: Boolean,
     required: true,
   },
 })

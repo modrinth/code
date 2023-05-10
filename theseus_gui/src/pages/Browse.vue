@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { ofetch } from 'ofetch'
 import {
   Pagination,
@@ -14,17 +14,24 @@ import {
   ClientIcon,
   ServerIcon,
   AnimatedLogo,
+  NavRow,
+  formatCategoryHeader,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
+import Instance from '@/components/ui/Instance.vue'
+
+const route = useRoute()
 
 const searchStore = useSearch()
+searchStore.projectType = route.params.projectType
+const showVersions = ref(true)
+const showLoaders = ref(true)
+
 const breadcrumbs = useBreadcrumbs()
-const route = useRoute()
-breadcrumbs.setContext({ name: 'Browse', link: route.path })
 
 const showSnapshots = ref(false)
 const loading = ref(true)
@@ -35,8 +42,39 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
   get_game_versions(),
 ])
 
+onMounted(() => {
+  breadcrumbs.setContext({ name: 'Browse', link: route.path })
+  if (searchStore.projectType === 'modpack') {
+    searchStore.instanceContext = null
+  }
+  searchStore.searchInput = ''
+  handleReset()
+  switchPage(1)
+})
+
+const sortedCategories = computed(() => {
+  const values = new Map()
+  for (const category of categories.filter(
+    (cat) =>
+      cat.project_type ===
+      (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
+  )) {
+    if (!values.has(category.header)) {
+      values.set(category.header, [])
+    }
+    values.get(category.header).push(category)
+  }
+  return values
+})
+
 const getSearchResults = async (shouldLoad = false) => {
   const queryString = searchStore.getQueryString()
+  if (searchStore.instanceContext) {
+    showVersions.value = false
+    showLoaders.value = !(
+      searchStore.projectType === 'mod' || searchStore.projectType === 'resourcepack'
+    )
+  }
   if (shouldLoad === true) {
     loading.value = true
   }
@@ -47,13 +85,22 @@ const getSearchResults = async (shouldLoad = false) => {
 
 getSearchResults(true)
 
+const handleReset = async () => {
+  searchStore.currentPage = 1
+  searchStore.offset = 0
+  searchStore.resetFilters()
+  await getSearchResults()
+}
+
 const toggleFacet = async (facet) => {
+  searchStore.currentPage = 1
+  searchStore.offset = 0
   const index = searchStore.facets.indexOf(facet)
 
   if (index !== -1) searchStore.facets.splice(index, 1)
   else searchStore.facets.push(facet)
 
-  await getSearchResults()
+  await switchPage(1)
 }
 
 const toggleOrFacet = async (orFacet) => {
@@ -62,7 +109,7 @@ const toggleOrFacet = async (orFacet) => {
   if (index !== -1) searchStore.orFacets.splice(index, 1)
   else searchStore.orFacets.push(orFacet)
 
-  await getSearchResults()
+  await switchPage(1)
 }
 
 const switchPage = async (page) => {
@@ -72,15 +119,21 @@ const switchPage = async (page) => {
   await getSearchResults()
 }
 
-const handleReset = async () => {
-  searchStore.resetFilters()
-  await getSearchResults()
-}
+watch(
+  () => route.params.projectType,
+  async (projectType) => {
+    searchStore.projectType = projectType ?? 'modpack'
+    breadcrumbs.setContext({ name: 'Browse', link: route.path })
+    await handleReset()
+    await switchPage(1)
+  }
+)
 </script>
 
 <template>
   <div class="search-container">
     <aside class="filter-panel">
+      <Instance v-if="searchStore.instanceContext" :instance="searchStore.instanceContext" small />
       <Button
         role="button"
         :disabled="
@@ -96,12 +149,13 @@ const handleReset = async () => {
         @click="handleReset"
         ><ClearIcon />Clear Filters</Button
       >
-      <div class="categories">
-        <h2>Categories</h2>
-        <div
-          v-for="category in categories.filter((cat) => cat.project_type === 'modpack')"
-          :key="category.name"
-        >
+      <div
+        v-for="categoryList in Array.from(sortedCategories)"
+        :key="categoryList[0]"
+        class="categories"
+      >
+        <h2>{{ formatCategoryHeader(categoryList[0]) }}</h2>
+        <div v-for="category in categoryList[1]" :key="category.name">
           <SearchFilter
             :active-filters="searchStore.facets"
             :icon="category.icon"
@@ -112,10 +166,20 @@ const handleReset = async () => {
           />
         </div>
       </div>
-      <div class="loaders">
+      <div
+        v-if="
+          showLoaders &&
+          searchStore.projectType !== 'datapack' &&
+          searchStore.projectType !== 'resourcepack' &&
+          searchStore.projectType !== 'shader'
+        "
+        class="loaders"
+      >
         <h2>Loaders</h2>
         <div
-          v-for="loader in loaders.filter((l) => l.supported_project_types?.includes('modpack'))"
+          v-for="loader in loaders.filter((l) =>
+            l.supported_project_types?.includes(searchStore.projectType)
+          )"
           :key="loader"
         >
           <SearchFilter
@@ -128,7 +192,7 @@ const handleReset = async () => {
           />
         </div>
       </div>
-      <div class="environment">
+      <div v-if="searchStore.projectType !== 'datapack'" class="environment">
         <h2>Environments</h2>
         <SearchFilter
           v-model="searchStore.environments.client"
@@ -149,7 +213,7 @@ const handleReset = async () => {
           <ServerIcon aria-hidden="true" />
         </SearchFilter>
       </div>
-      <div class="versions">
+      <div v-if="showVersions" class="versions">
         <h2>Minecraft versions</h2>
         <Checkbox v-model="showSnapshots" class="filter-checkbox">Show snapshots</Checkbox>
         <multiselect
@@ -183,6 +247,26 @@ const handleReset = async () => {
       </div>
     </aside>
     <div class="search">
+      <Card class="project-type-container">
+        <NavRow
+          :links="
+            searchStore.instanceContext
+              ? [
+                  { label: 'Mods', href: `/browse/mod` },
+                  { label: 'Datapacks', href: `/browse/datapack` },
+                  { label: 'Shaders', href: `/browse/shader` },
+                  { label: 'Resource Packs', href: `/browse/resourcepack` },
+                ]
+              : [
+                  { label: 'Modpacks', href: '/browse/modpack' },
+                  { label: 'Mods', href: '/browse/mod' },
+                  { label: 'Datapacks', href: '/browse/datapack' },
+                  { label: 'Shaders', href: '/browse/shader' },
+                  { label: 'Resource Packs', href: '/browse/resourcepack' },
+                ]
+          "
+        />
+      </Card>
       <Card class="search-panel-container">
         <div class="search-panel">
           <div class="iconified-input">
@@ -190,7 +274,7 @@ const handleReset = async () => {
             <input
               v-model="searchStore.searchInput"
               type="text"
-              placeholder="Search modpacks..."
+              :placeholder="`Search ${searchStore.projectType}s...`"
               @input="getSearchResults"
             />
           </div>
@@ -243,12 +327,13 @@ const handleReset = async () => {
           :categories="[
             ...categories.filter(
               (cat) =>
-                result?.display_categories.includes(cat.name) && cat.project_type === 'modpack'
+                result?.display_categories.includes(cat.name) &&
+                cat.project_type === searchStore.projectType
             ),
             ...loaders.filter(
               (loader) =>
                 result?.display_categories.includes(loader.name) &&
-                loader.supported_project_types?.includes('modpack')
+                loader.supported_project_types?.includes(searchStore.projectType)
             ),
           ]"
           :project-type-display="result?.project_type"
@@ -265,6 +350,17 @@ const handleReset = async () => {
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
+.project-type-dropdown {
+  width: 100% !important;
+}
+
+.project-type-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-top: 1rem;
+}
+
 .search-panel-container {
   display: flex;
   flex-direction: column;
@@ -318,14 +414,13 @@ const handleReset = async () => {
 
   .filter-panel {
     position: fixed;
-    width: 16rem;
+    width: 19rem;
     background: var(--color-raised-bg);
-    padding: 1rem 1rem 3rem 1rem;
+    padding: 1rem;
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    height: fit-content;
-    max-height: 100%;
+    height: 100%;
+    max-height: calc(100vh - 3rem);
     overflow-y: auto;
 
     h2 {
@@ -353,8 +448,8 @@ const handleReset = async () => {
   }
 
   .search {
-    margin: 0 1rem 0 17rem;
-    width: 100%;
+    margin: 0 1rem 0 20rem;
+    width: calc(100% - 21rem);
 
     .loading {
       margin: 2rem;

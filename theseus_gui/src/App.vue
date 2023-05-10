@@ -1,11 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon } from 'omorphia'
+import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
@@ -13,50 +12,89 @@ import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 const themeStore = useTheming()
 
 onMounted(async () => {
-  const { theme } = await get()
-  themeStore.setThemeState(theme)
+  const { settings, collapsed_navigation } = await get()
+  themeStore.setThemeState(settings)
+  themeStore.collapsedNavigation = collapsed_navigation
 })
-
-const installedMods = ref(0)
-list().then(
-  (profiles) =>
-    (installedMods.value = Object.values(profiles).reduce(
-      (acc, val) => acc + Object.keys(val.projects).length,
-      0
-    ))
-)
-// TODO: add event when profiles update to update installed mods count
 </script>
 
 <template>
   <div class="container">
-    <div class="nav-container">
+    <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
-          <AccountsCard ref="accounts" />
+          <AccountsCard ref="accounts" :expanded="!themeStore.collapsedNavigation" />
         </suspense>
         <div class="pages-list">
-          <RouterLink to="/" class="button-base nav-button"><HomeIcon /></RouterLink>
-          <RouterLink to="/browse" class="button-base nav-button"> <SearchIcon /></RouterLink>
-          <RouterLink to="/library" class="button-base nav-button"> <LibraryIcon /></RouterLink>
-          <button
+          <RouterLink
+            to="/"
+            class="btn"
+            :class="{
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
+            }"
+          >
+            <HomeIcon />
+            <span v-if="!themeStore.collapsedNavigation">Home</span>
+          </RouterLink>
+          <RouterLink
+            to="/browse/modpack"
+            class="btn"
+            :class="{
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
+            }"
+          >
+            <SearchIcon />
+            <span v-if="!themeStore.collapsedNavigation">Browse</span>
+          </RouterLink>
+          <RouterLink
+            to="/library"
+            class="btn"
+            :class="{
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
+            }"
+          >
+            <LibraryIcon />
+            <span v-if="!themeStore.collapsedNavigation">Library</span>
+          </RouterLink>
+          <Button
             color="primary"
-            class="button-base primary nav-button"
-            icon-only
+            :class="{
+              'icon-only': themeStore.collapsedNavigation,
+              'collapsed-button': themeStore.collapsedNavigation,
+              'expanded-button': !themeStore.collapsedNavigation,
+            }"
             @click="() => $refs.installationModal.show()"
           >
             <PlusIcon />
-          </button>
+            <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New Instance</span>
+          </Button>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
           </Suspense>
         </div>
       </div>
       <div class="settings pages-list">
-        <RouterLink to="/settings" class="button-base nav-button"><SettingsIcon /></RouterLink>
+        <RouterLink
+          to="/settings"
+          class="btn"
+          :class="{
+            'icon-only': themeStore.collapsedNavigation,
+            'collapsed-button': themeStore.collapsedNavigation,
+            'expanded-button': !themeStore.collapsedNavigation,
+          }"
+        >
+          <SettingsIcon />
+          <span v-if="!themeStore.collapsedNavigation">Settings</span>
+        </RouterLink>
       </div>
     </div>
-    <div class="view">
+    <div class="view" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="appbar">
         <section class="navigation-controls">
           <Breadcrumbs />
@@ -68,9 +106,13 @@ list().then(
         </section>
       </div>
       <div class="router-view">
-        <Suspense>
-          <RouterView />
-        </Suspense>
+        <RouterView v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense>
+              <component :is="Component"></component>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
   </div>
@@ -84,7 +126,11 @@ list().then(
   overflow: hidden;
 
   .view {
-    width: calc(100% - 5rem);
+    width: var(--view-width);
+
+    &.expanded {
+      width: var(--expanded-view-width);
+    }
 
     .appbar {
       display: flex;
@@ -171,12 +217,18 @@ list().then(
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: 1rem;
   background: var(--color-raised-bg);
+
+  &.expanded {
+    width: 13rem;
+    max-width: 13rem;
+    min-width: 13rem;
+  }
 }
 
 .pages-list {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-start;
   width: 100%;
   gap: 0.5rem;
@@ -184,8 +236,6 @@ list().then(
   a {
     display: flex;
     align-items: center;
-    font-size: 0.9rem;
-    font-weight: 400;
     word-spacing: 3px;
     background: inherit;
     transition: all ease-in-out 0.1s;
@@ -194,6 +244,7 @@ list().then(
     &.router-link-active {
       color: var(--color-contrast);
       background: var(--color-button-bg);
+      box-shadow: var(--shadow-floating);
     }
 
     &:hover {
@@ -203,25 +254,31 @@ list().then(
       text-decoration: none;
     }
   }
-}
-
-.nav-button {
-  height: 3rem;
-  width: 3rem;
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
-
-  svg {
-    width: 1.5rem;
-    height: 1.5rem;
-    max-width: 1.5rem;
-    max-height: 1.5rem;
-  }
 
   &.primary {
     color: var(--color-accent-contrast);
     background-color: var(--color-brand);
   }
+}
+
+.collapsed-button {
+  height: 3rem !important;
+  width: 3rem !important;
+  padding: 0.75rem;
+  border-radius: var(--radius-md);
+  box-shadow: none;
+
+  svg {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+    max-width: 1.5rem !important;
+    max-height: 1.5rem !important;
+  }
+}
+
+.expanded-button {
+  width: 100%;
+  padding: var(--gap-md) var(--gap-lg);
 }
 
 .instance-list {
@@ -245,38 +302,6 @@ list().then(
   }
 }
 
-.add-instance-btn {
-  background-color: var(--color-bg);
-  font-size: 0.9rem;
-  margin-right: 0.6rem;
-
-  svg {
-    background-color: var(--color-green);
-    width: 1.5rem;
-    height: 1.5rem;
-    color: var(--color-accent-contrast);
-    border-radius: var(--radius-xs);
-  }
-}
-
-.settings {
-  svg {
-    color: var(--color-base) !important;
-  }
-
-  a {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    gap: 1rem;
-
-    &:hover {
-      text-decoration: none;
-    }
-  }
-}
-
 .user-section {
   display: flex;
   justify-content: flex-start;
@@ -294,14 +319,12 @@ list().then(
 
   .username {
     margin-bottom: 0.3rem;
-    font-size: 1.1rem;
     font-weight: 400;
     line-height: 1.25rem;
     color: var(--color-contrast);
   }
 
   a {
-    font-size: 0.75rem;
     font-weight: 400;
     color: var(--color-secondary);
   }

@@ -3,11 +3,11 @@
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
-        <input v-model="searchFilter" type="text" placeholder="Search Mods" />
+        <input v-model="searchFilter" type="text" placeholder="Search Mods" class="text-input" />
       </div>
       <span class="manage">
         <span class="text-combo">
-          Sort By
+          <span class="no-wrap sort"> Sort By </span>
           <DropdownSelect
             v-model="sortFilter"
             name="sort-by"
@@ -16,9 +16,9 @@
             class="dropdown"
           />
         </span>
-        <Button color="primary">
+        <Button color="primary" @click="searchMod()">
           <PlusIcon />
-          Add Mods
+          <span class="no-wrap"> Add Content </span>
         </Button>
       </span>
     </div>
@@ -40,7 +40,7 @@
             <UpdatedIcon />
           </Button>
           <Button v-else disabled icon-only>
-            <CheckCircleIcon />
+            <CheckIcon />
           </Button>
         </div>
         <div class="table-cell table-text name-cell">
@@ -78,7 +78,7 @@ import {
   TrashIcon,
   PlusIcon,
   Card,
-  CheckCircleIcon,
+  CheckIcon,
   SearchIcon,
   UpdatedIcon,
   DropdownSelect,
@@ -94,6 +94,10 @@ import {
   get,
 } from '@/helpers/profile'
 import { listen } from '@tauri-apps/api/event'
+import { useRouter, useRoute } from 'vue-router'
+
+const router = useRouter()
+const route = useRoute()
 
 const props = defineProps({
   instance: {
@@ -163,7 +167,7 @@ const search = computed(() => {
 
 const allUpdated = computed(() => projects.value.every((p) => p.outdated === false))
 
-function updateSort(projects, sort) {
+const updateSort = (projects, sort) => {
   switch (sort) {
     case 'Version':
       return projects.slice().sort((a, b) => {
@@ -198,6 +202,9 @@ function updateSort(projects, sort) {
   }
 }
 
+const searchMod = () => {
+  router.push({ path: '/browse/mod', query: { instance: route.params.id } })
+}
 const getProject = (mod) =>
   Object.keys(props.instance.projects).find((p) => p.includes(mod.file_name))
 
@@ -234,6 +241,10 @@ onUnmounted(() => {
 </script>
 
 <style scoped lang="scss">
+.text-input {
+  width: 100%;
+}
+
 .manage {
   display: flex;
   gap: 0.5rem;
@@ -273,5 +284,15 @@ onUnmounted(() => {
 
 .dropdown {
   width: 7rem !important;
+}
+
+.no-wrap {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &.sort {
+    padding-left: 0.5rem;
+  }
 }
 </style>

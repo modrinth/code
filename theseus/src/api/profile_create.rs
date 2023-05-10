@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::event::emit::emit_warning;
 use crate::state::LinkedData;
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
@@ -15,6 +16,7 @@ use futures::prelude::*;
 use std::path::PathBuf;
 use tokio::fs;
 use tokio_stream::wrappers::ReadDirStream;
+use tracing::{info, trace};
 use uuid::Uuid;
 
 const DEFAULT_NAME: &str = "Untitled Instance";
@@ -47,154 +49,158 @@ pub async fn profile_create(
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
+    trace!("Creating new profile. {}", name);
     let state = State::get().await?;
-    let metadata = state.metadata.read().await;
+    Box::pin(async move {
+        let metadata = state.metadata.read().await;
 
-    let uuid = Uuid::new_v4();
-    let path = state.directories.profiles_dir().join(uuid.to_string());
-    if path.exists() {
-        if !path.is_dir() {
-            return Err(ProfileCreationError::NotFolder.into());
-        }
-        if path.join("profile.json").exists() {
-            return Err(ProfileCreationError::ProfileExistsError(
-                path.join("profile.json"),
-            )
-            .into());
-        }
-
-        if ReadDirStream::new(fs::read_dir(&path).await?)
-            .next()
-            .await
-            .is_some()
-        {
-            return Err(ProfileCreationError::NotEmptyFolder.into());
-        }
-    } else {
-        fs::create_dir_all(&path).await?;
-    }
-
-    println!(
-        "Creating profile at path {}",
-        &canonicalize(&path)?.display()
-    );
-
-    let loader = modloader;
-    let loader = if loader != ModLoader::Vanilla {
-        let version = loader_version.unwrap_or_else(|| "latest".to_string());
-
-        let filter = |it: &LoaderVersion| match version.as_str() {
-            "latest" => true,
-            "stable" => it.stable,
-            id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
-        };
-
-        let loader_data = match loader {
-            ModLoader::Forge => &metadata.forge,
-            ModLoader::Fabric => &metadata.fabric,
-            _ => {
-                return Err(ProfileCreationError::NoManifest(
-                    loader.to_string(),
-                )
-                .into())
+        let uuid = Uuid::new_v4();
+        let path = state.directories.profiles_dir().join(uuid.to_string());
+        if path.exists() {
+            if !path.is_dir() {
+                return Err(ProfileCreationError::NotFolder.into());
             }
+            if path.join("profile.json").exists() {
+                return Err(ProfileCreationError::ProfileExistsError(
+                    path.join("profile.json"),
+                )
+                .into());
+            }
+    
+            if ReadDirStream::new(fs::read_dir(&path).await?)
+                .next()
+                .await
+                .is_some()
+            {
+                return Err(ProfileCreationError::NotEmptyFolder.into());
+            }
+        } else {
+            fs::create_dir_all(&path).await?;
+        }
+    
+        info!(
+            "Creating profile at path {}",
+            &canonicalize(&path)?.display()
+        );
+    
+        let loader = modloader;
+        let loader = if loader != ModLoader::Vanilla {
+            let version = loader_version.unwrap_or_else(|| "latest".to_string());
+    
+            let filter = |it: &LoaderVersion| match version.as_str() {
+                "latest" => true,
+                "stable" => it.stable,
+                id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
+            };
+    
+            let loader_data = match loader {
+                ModLoader::Forge => &metadata.forge,
+                ModLoader::Fabric => &metadata.fabric,
+                _ => {
+                    return Err(ProfileCreationError::NoManifest(
+                        loader.to_string(),
+                    )
+                    .into())
+                }
+            };
+    
+            let loaders = &loader_data
+                .game_versions
+                .iter()
+                .find(|it| {
+                    it.id.replace(
+                        daedalus::modded::DUMMY_REPLACE_STRING,
+                        &game_version,
+                    ) == game_version
+                })
+                .ok_or_else(|| {
+                    ProfileCreationError::ModloaderUnsupported(
+                        loader.to_string(),
+                        game_version.clone(),
+                    )
+                })?
+                .loaders;
+    
+            let loader_version = loaders
+                .iter()
+                .cloned()
+                .find(filter)
+                .or(
+                    // If stable was searched for but not found, return latest by default
+                    if version == "stable" {
+                        loaders.iter().next().cloned()
+                    } else {
+                        None
+                    },
+                )
+                .ok_or_else(|| {
+                    ProfileCreationError::InvalidVersionModloader(
+                        version,
+                        loader.to_string(),
+                    )
+                })?;
+    
+            Some((loader_version, loader))
+        } else {
+            None
         };
-
-        let loaders = &loader_data
-            .game_versions
-            .iter()
-            .find(|it| {
-                it.id.replace(
-                    daedalus::modded::DUMMY_REPLACE_STRING,
-                    &game_version,
-                ) == game_version
-            })
-            .ok_or_else(|| {
-                ProfileCreationError::ModloaderUnsupported(
-                    loader.to_string(),
-                    game_version.clone(),
+    
+        // Fully canonicalize now that its created for storing purposes
+        let path = canonicalize(&path)?;
+        let mut profile =
+            Profile::new(uuid, name, game_version, path.clone()).await?;
+        if let Some(ref icon) = icon {
+            let bytes = tokio::fs::read(icon).await?;
+            profile
+                .set_icon(
+                    &state.directories.caches_dir(),
+                    &state.io_semaphore,
+                    bytes::Bytes::from(bytes),
+                    &icon.to_string_lossy(),
                 )
-            })?
-            .loaders;
-
-        let loader_version = loaders
-            .iter()
-            .cloned()
-            .find(filter)
-            .or(
-                // If stable was searched for but not found, return latest by default
-                if version == "stable" {
-                    loaders.iter().next().cloned()
-                } else {
-                    None
-                },
-            )
-            .ok_or_else(|| {
-                ProfileCreationError::InvalidVersionModloader(
-                    version,
-                    loader.to_string(),
-                )
-            })?;
-
-        Some((loader_version, loader))
-    } else {
-        None
-    };
-
-    // Fully canonicalize now that its created for storing purposes
-    let path = canonicalize(&path)?;
-    let mut profile =
-        Profile::new(uuid, name, game_version, path.clone()).await?;
-    if let Some(ref icon) = icon {
-        let bytes = tokio::fs::read(icon).await?;
-        profile
-            .set_icon(
-                &state.directories.caches_dir(),
-                &state.io_semaphore,
-                bytes::Bytes::from(bytes),
-                &icon.to_string_lossy(),
-            )
-            .await?;
-    }
-    if let Some((loader_version, loader)) = loader {
-        profile.metadata.loader = loader;
-        profile.metadata.loader_version = Some(loader_version);
-    }
-
-    profile.metadata.linked_data = linked_data;
-
-    // Attempts to find optimal JRE for the profile from the JavaGlobals
-    // Finds optimal key, and see if key has been set in JavaGlobals
-    let settings = state.settings.read().await;
-    let optimal_version_key = jre::get_optimal_jre_key(&profile).await?;
-    if settings.java_globals.get(&optimal_version_key).is_some() {
-        profile.java = Some(JavaSettings {
-            jre_key: Some(optimal_version_key),
-            extra_arguments: None,
-        });
-    } else {
-        println!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.");
-    }
-
-    emit_profile(
-        uuid,
-        path.clone(),
-        &profile.metadata.name,
-        ProfilePayloadType::Created,
-    )
-    .await?;
-
-    {
-        let mut profiles = state.profiles.write().await;
-        profiles.insert(profile.clone()).await?;
-    }
-
-    if !skip_install_profile.unwrap_or(false) {
-        crate::launcher::install_minecraft(&profile, None).await?;
-    }
-    State::sync().await?;
-
-    Ok(path)
+                .await?;
+        }
+        if let Some((loader_version, loader)) = loader {
+            profile.metadata.loader = loader;
+            profile.metadata.loader_version = Some(loader_version);
+        }
+    
+        profile.metadata.linked_data = linked_data;
+    
+        // Attempts to find optimal JRE for the profile from the JavaGlobals
+        // Finds optimal key, and see if key has been set in JavaGlobals
+        let settings = state.settings.read().await;
+        let optimal_version_key = jre::get_optimal_jre_key(&profile).await?;
+        if settings.java_globals.get(&optimal_version_key).is_some() {
+            profile.java = Some(JavaSettings {
+                jre_key: Some(optimal_version_key),
+                extra_arguments: None,
+            });
+        } else {
+            emit_warning(&format!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.")).await?;
+        }
+    
+        emit_profile(
+            uuid,
+            path.clone(),
+            &profile.metadata.name,
+            ProfilePayloadType::Created,
+        )
+        .await?;
+    
+        {
+            let mut profiles = state.profiles.write().await;
+            profiles.insert(profile.clone()).await?;
+        }
+    
+        if !skip_install_profile.unwrap_or(false) {
+            crate::launcher::install_minecraft(&profile, None).await?;
+        }
+        State::sync().await?;
+    
+        Ok(path)
+    
+    }).await
 }
 
 #[derive(thiserror::Error, Debug)]
