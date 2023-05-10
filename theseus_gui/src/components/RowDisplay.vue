@@ -193,7 +193,7 @@ const handleRightPage = () => {
 }
 
 .row-instance {
-  min-width: 12rem;
-  max-width: 12rem;
+  min-width: 10.5rem;
+  max-width: 10.5rem;
 }
 </style>

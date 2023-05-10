@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useLoading, useTheming } from '@/store/state'
@@ -8,21 +8,31 @@ import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 
 const themeStore = useTheming()
 
+const isLoading = ref(true)
 onMounted(async () => {
   const { settings, collapsed_navigation } = await get()
   themeStore.setThemeState(settings)
   themeStore.collapsedNavigation = collapsed_navigation
 })
 
+defineExpose({
+  initialize: async () => {
+    isLoading.value = false
+    const { theme } = await get()
+    themeStore.setThemeState(theme)
+  },
+})
 const loading = useLoading()
 </script>
 
 <template>
-  <div class="container">
+  <SplashScreen v-if="isLoading" app-loading />
+  <div v-else class="container">
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
@@ -150,7 +160,6 @@ const loading = useLoading()
       text-align: center;
       padding: 0 0 0 1rem;
       height: 3.25rem;
-      z-index: 11;
 
       .navigation-controls {
         display: inherit;
@@ -222,7 +231,6 @@ const loading = useLoading()
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  z-index: 10;
   height: 100%;
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: 1rem;

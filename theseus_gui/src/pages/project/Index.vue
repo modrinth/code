@@ -291,7 +291,7 @@ async function install(version) {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
-      let id = await packInstall(queuedVersionData.id)
+      let id = await packInstall(queuedVersionData.id, data.value.title)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
       confirmModal.value.show(queuedVersionData.id)

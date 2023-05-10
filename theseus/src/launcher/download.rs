@@ -30,11 +30,22 @@ pub async fn download_minecraft(
     let assets_index =
         download_assets_index(st, version, Some(loading_bar)).await?;
 
+    let amount = if version
+        .processors
+        .as_ref()
+        .map(|x| !x.is_empty())
+        .unwrap_or(false)
+    {
+        25.0
+    } else {
+        40.0
+    };
+
     tokio::try_join! {
-        // Total loading sums to 80
+        // Total loading sums to 90/60
         download_client(st, version, Some(loading_bar)), // 10
-        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar)), // 35
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar)) // 35
+        download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount), // 40
+        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -83,21 +94,7 @@ pub async fn download_version_info(
         }?;
 
         if let Some(loading_bar) = loading_bar {
-            emit_loading(
-                loading_bar,
-                if res
-                    .processors
-                    .as_ref()
-                    .map(|x| !x.is_empty())
-                    .unwrap_or(false)
-                {
-                    5.0
-                } else {
-                    15.0
-                },
-                None,
-            )
-            .await?;
+            emit_loading(loading_bar, 5.0, None).await?;
         }
 
         tracing::debug!("Loaded version info for Minecraft {version_id}");
@@ -140,7 +137,7 @@ pub async fn download_client(
             tracing::trace!("Fetched client version {version}");
         }
         if let Some(loading_bar) = loading_bar {
-            emit_loading(loading_bar, 10.0, None).await?;
+            emit_loading(loading_bar, 9.0, None).await?;
         }
 
         tracing::debug!("Client loaded for version {version}!");
@@ -186,17 +183,18 @@ pub async fn download_assets(
     with_legacy: bool,
     index: &AssetsIndex,
     loading_bar: Option<&LoadingBarId>,
+    loading_amount: f64,
 ) -> crate::Result<()> {
     Box::pin(async move {
         tracing::debug!("Loading assets");
         let num_futs = index.objects.len();
         let assets = stream::iter(index.objects.iter())
             .map(Ok::<(&String, &Asset), crate::Error>);
-    
+
         loading_try_for_each_concurrent(assets,
             None,
             loading_bar,
-            35.0,
+            loading_amount,
             num_futs,
             None,
             |(name, asset)| async move {
@@ -206,7 +204,7 @@ pub async fn download_assets(
                     "https://resources.download.minecraft.net/{sub_hash}/{hash}",
                     sub_hash = &hash[..2]
                 );
-    
+
                 let fetch_cell = OnceCell::<bytes::Bytes>::new();
                 tokio::try_join! {
                     async {
@@ -233,14 +231,12 @@ pub async fn download_assets(
                         Ok::<_, crate::Error>(())
                     },
                 }?;
-    
+
                 tracing::trace!("Loaded asset with hash {hash}");
                 Ok(())
             }).await?;
-    
         tracing::debug!("Done loading assets!");
         Ok(())
-    
     }).await
 }
 
@@ -250,6 +246,7 @@ pub async fn download_libraries(
     libraries: &[Library],
     version: &str,
     loading_bar: Option<&LoadingBarId>,
+    loading_amount: f64,
 ) -> crate::Result<()> {
     Box::pin(async move {
         tracing::debug!("Loading libraries");
@@ -261,7 +258,7 @@ pub async fn download_libraries(
         let num_files = libraries.len();
         loading_try_for_each_concurrent(
         stream::iter(libraries.iter())
-            .map(Ok::<&Library, crate::Error>), None, loading_bar,35.0,num_files, None,|library| async move {
+            .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
                     if !rules.iter().all(super::parse_rule) {
                         return Ok(());
@@ -271,7 +268,7 @@ pub async fn download_libraries(
                     async {
                         let artifact_path = d::get_path_from_artifact(&library.name)?;
                         let path = st.directories.libraries_dir().join(&artifact_path);
-    
+
                         match library.downloads {
                             _ if path.exists() => Ok(()),
                             Some(d::minecraft::LibraryDownloads {
@@ -292,7 +289,7 @@ pub async fn download_libraries(
                                         .unwrap_or("https://libraries.minecraft.net"),
                                     &artifact_path
                                 ].concat();
-    
+
                                 let bytes = fetch(&url, None, &st.fetch_semaphore).await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
                                 tracing::trace!("Fetched library {}", &library.name);
@@ -318,7 +315,7 @@ pub async fn download_libraries(
                                 "${arch}",
                                 crate::util::platform::ARCH_WIDTH,
                             );
-    
+
                             if let Some(native) = classifiers.get(&parsed_key) {
                                 let data = fetch(&native.url, Some(&native.sha1), &st.fetch_semaphore).await?;
                                 let reader = std::io::Cursor::new(&data);
@@ -332,18 +329,18 @@ pub async fn download_libraries(
                                 }
                             }
                         }
-    
+
                         Ok(())
                     }
                 }?;
-    
+
                 tracing::debug!("Loaded library {}", library.name);
                 Ok(())
             }
         ).await?;
-    
+
         tracing::debug!("Done loading libraries!");
         Ok(())
-    
+
     }).await
 }

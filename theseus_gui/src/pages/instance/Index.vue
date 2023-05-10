@@ -68,9 +68,9 @@ import {
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
-import { process_listener } from '@/helpers/events'
+import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
-import { shallowRef, ref, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { useBreadcrumbs, useSearch } from '@/store/state'
@@ -79,13 +79,19 @@ const route = useRoute()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
-const instance = shallowRef(await get(route.params.id))
-searchStore.instanceContext = instance.value
+const instance = ref(await get(route.params.id))
 
+searchStore.instanceContext = instance.value
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
+})
+
+profile_listener(async (event) => {
+  if (event.profile_path === route.params.id) {
+    instance.value = await get(route.params.id)
+  }
 })
 
 const uuid = ref(null)
