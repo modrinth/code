@@ -2,7 +2,7 @@
 import { onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
-import {useLoading, useTheming} from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -109,7 +109,10 @@ const loading = useLoading()
         </section>
       </div>
       <div class="router-view">
-        <ModrinthLoadingIndicator offset-height="var(--appbar-height)" offset-width="var(--sidebar-width)" />
+        <ModrinthLoadingIndicator
+          offset-height="var(--appbar-height)"
+          offset-width="var(--sidebar-width)"
+        />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
