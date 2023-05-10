@@ -2,6 +2,9 @@
 
 :root {
   font-family: var(--font-standard);
+  color-scheme: dark;
+  --view-width: calc(100% - 5rem);
+  --expanded-view-width: calc(100% - 13rem);
 }
 
 * {
