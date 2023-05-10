@@ -193,7 +193,7 @@ await process_listener((e) => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .instance-small-card {
   background-color: var(--color-bg) !important;
   padding: 1rem !important;
@@ -275,20 +275,8 @@ await process_listener((e) => {
   }
 }
 
-.cta {
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-lg);
-  z-index: 41;
-  width: 3rem;
-  height: 3rem;
-  right: 1rem;
-  bottom: 3.5rem;
-  opacity: 0;
-  transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity !important;
-  cursor: pointer;
+.mod-image {
+  border-radius: 1.5rem !important;
 
   svg {
     color: var(--color-accent-contrast);
