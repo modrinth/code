@@ -8,7 +8,7 @@
     <Avatar :size="expanded ? 'xs' : 'sm'" :src="selectedAccount?.profile_picture ?? ''" />
     <div v-show="expanded" class="avatar-text">
       <div class="text no-select">
-        {{ selectedAccount.username }}
+        {{ selectedAccount ? selectedAccount.username : 'Offline' }}
       </div>
       <p class="no-select">
         <UsersIcon />

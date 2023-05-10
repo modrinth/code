@@ -1,6 +1,7 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
+      <Instance v-if="instance" :instance="instance" small />
       <Card class="sidebar-card">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
@@ -29,9 +30,15 @@
         </Categories>
         <hr class="card-divider" />
         <div class="button-group">
-          <Button color="primary" class="instance-button" @click="install(versions[0].id)">
-            <DownloadIcon />
-            Install
+          <Button
+            color="primary"
+            class="instance-button"
+            :disabled="installed === true || installing === true"
+            @click="install(null)"
+          >
+            <DownloadIcon v-if="!installed && !installing" />
+            <CheckIcon v-else-if="installed" />
+            {{ installing ? 'Installing...' : installed ? 'Installed' : 'Install' }}
           </Button>
           <a
             :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
@@ -40,7 +47,7 @@
             class="btn"
           >
             <ExternalIcon />
-            Website
+            Site
           </a>
         </div>
         <hr class="card-divider" />
@@ -174,10 +181,12 @@
         :members="members"
         :dependencies="dependencies"
         :install="install"
+        :installed="installed"
       />
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
+  <InstanceInstallModal ref="modInstallModal" />
 </template>
 
 <script setup>
@@ -200,6 +209,7 @@ import {
   CodeIcon,
   formatNumber,
   ExternalIcon,
+  CheckIcon,
 } from 'omorphia'
 import {
   BuyMeACoffeeIcon,
@@ -210,25 +220,32 @@ import {
   OpenCollectiveIcon,
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
-import { install as pack_install } from '@/helpers/pack'
-import { list } from '@/helpers/profile'
+import { install as packInstall } from '@/helpers/pack'
+import { list, add_project_from_version as installMod } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
+import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import { useBreadcrumbs, useNotifications } from '@/store/state'
+import Instance from '@/components/ui/Instance.vue'
+import { useBreadcrumbs, useSearch, useNotifications } from '@/store/state'
 
 const notificationStore = useNotifications()
+const searchStore = useSearch()
 
 const route = useRoute()
 const router = useRouter()
 const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)
+const modInstallModal = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
+const instance = ref(searchStore.instanceContext)
+const installing = ref(false)
+
 const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
@@ -242,6 +259,8 @@ const [data, versions, members, dependencies] = await Promise.all([
   })
 )
 
+const installed = ref(instance.value && checkInstalled(instance.value, data.value.id))
+
 breadcrumbs.setName('Project', data.value.title)
 
 watch(
@@ -254,6 +273,21 @@ watch(
 dayjs.extend(relativeTime)
 
 async function install(version) {
+  installing.value = true
+  let queuedVersionData
+
+  if (version) {
+    queuedVersionData = versions.value.find((v) => v.id === version)
+  } else {
+    if (data.value.project_type === 'modpack' || !instance.value) {
+      queuedVersionData = versions.value[0]
+    } else {
+      queuedVersionData = versions.value.find((v) =>
+        v.game_versions.includes(data.value.game_versions[0])
+      )
+    }
+  }
+
   if (data.value.project_type === 'modpack') {
     const packs = Object.values(await list())
     if (
@@ -262,12 +296,48 @@ async function install(version) {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
-      let id = await pack_install(version)
+      let id = await packInstall(queuedVersionData.id)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
-      confirmModal.value.show(version)
+      confirmModal.value.show(queuedVersionData.id)
+    }
+  } else {
+    if (instance.value) {
+      if (!version) {
+        const gameVersion = instance.value.metadata.game_version
+        const loader = instance.value.metadata.loader
+        const selectedVersion = versions.value.find(
+          (v) =>
+            v.game_versions.includes(gameVersion) &&
+            (data.value.project_type === 'mod'
+              ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
+              : true)
+        )
+        if (!selectedVersion) {
+          installing.value = false
+          return
+        }
+        queuedVersionData = selectedVersion
+        await installMod(instance.value.path, selectedVersion.id)
+      } else {
+        await installMod(instance.value.path, queuedVersionData.id)
+      }
+
+      installVersionDependencies(instance.value, queuedVersionData)
+
+      installed.value = true
+    } else {
+      if (version) {
+        modInstallModal.value.show(data.value.id, [
+          versions.value.find((v) => v.id === queuedVersionData.id),
+        ])
+      } else {
+        modInstallModal.value.show(data.value.id, versions.value)
+      }
     }
   }
+
+  installing.value = false
 }
 </script>
 
@@ -279,8 +349,12 @@ async function install(version) {
 }
 
 .project-sidebar {
+  position: fixed;
   width: 20rem;
-  min-width: 20rem;
+  min-height: 100vh;
+  height: fit-content;
+  max-height: 100vh;
+  overflow-y: auto;
   background: var(--color-raised-bg);
   padding: 1rem;
 }
@@ -297,6 +371,7 @@ async function install(version) {
   flex-direction: column;
   width: 100%;
   padding: 1rem;
+  margin-left: 20rem;
 }
 
 .button-group {
@@ -404,6 +479,17 @@ async function install(version) {
       content: '•';
       margin: 0 0.25rem;
     }
+  }
+}
+
+.install-loading {
+  scale: 0.2;
+  height: 1rem;
+  width: 1rem;
+  margin-right: -1rem;
+
+  :deep(svg) {
+    color: var(--color-contrast);
   }
 }
 </style>

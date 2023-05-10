@@ -3,11 +3,9 @@ import { ref, onMounted, onUnmounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useTheming, useNotifications } from '@/store/state'
-
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import Notifications from '@/components/ui/Notifications.vue'
-import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
@@ -33,16 +31,8 @@ onMounted(async () => {
   )
 })
 
-const installedMods = ref(0)
-list().then(
-  (profiles) =>
-    (installedMods.value = Object.values(profiles).reduce(
-      (acc, val) => acc + Object.keys(val.projects).length,
-      0
-    ))
-)
-
 onUnmounted(() => dropWarningListener())
+master
 </script>
 
 <template>
@@ -66,7 +56,7 @@ onUnmounted(() => dropWarningListener())
             <span v-if="!themeStore.collapsedNavigation">Home</span>
           </RouterLink>
           <RouterLink
-            to="/browse"
+            to="/browse/modpack"
             class="btn"
             :class="{
               'icon-only': themeStore.collapsedNavigation,
@@ -133,9 +123,13 @@ onUnmounted(() => dropWarningListener())
         </section>
       </div>
       <div class="router-view">
-        <Suspense>
-          <RouterView />
-        </Suspense>
+        <RouterView v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense>
+              <component :is="Component"></component>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
     <Notifications />
@@ -150,10 +144,10 @@ onUnmounted(() => dropWarningListener())
   overflow: hidden;
 
   .view {
-    width: calc(100% - 5rem);
+    width: var(--view-width);
 
     &.expanded {
-      width: calc(100% - 12rem);
+      width: var(--expanded-view-width);
     }
 
     .appbar {

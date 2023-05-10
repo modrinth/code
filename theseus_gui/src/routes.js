@@ -18,7 +18,7 @@ export default new createRouter({
       },
     },
     {
-      path: '/browse',
+      path: '/browse/:projectType',
       name: 'Browse',
       component: Pages.Browse,
       meta: {
