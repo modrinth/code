@@ -1,5 +1,5 @@
 import { add_project_from_version as installMod } from '@/helpers/profile'
-import { ofetch } from 'ofetch'
+import useFetch from '@/helpers/fetch'
 
 export const releaseColor = (releaseType) => {
   switch (releaseType) {
@@ -25,7 +25,7 @@ export const installVersionDependencies = async (profile, version) => {
       await installMod(profile.path, dep.version_id)
     } else {
       if (checkInstalled(profile, dep.project_id)) continue
-      const depVersions = await ofetch(
+      const depVersions = await useFetch(
         `https://api.modrinth.com/v2/project/${dep.project_id}/version`
       )
       const latest = depVersions.find(

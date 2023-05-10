@@ -1,6 +1,5 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { ofetch } from 'ofetch'
 import {
   Pagination,
   ProjectCard,
@@ -22,6 +21,7 @@ import { useSearch, useBreadcrumbs, useNotifications } from '@/store/state'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
 import Instance from '@/components/ui/Instance.vue'
+import useFetch from '@/helpers/fetch'
 
 const route = useRoute()
 
@@ -78,8 +78,9 @@ const getSearchResults = async (shouldLoad = false) => {
   if (shouldLoad === true) {
     loading.value = true
   }
+
   try {
-    const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
+    const response = await useFetch(`https://api.modrinth.com/v2/search${queryString}`)
     loading.value = false
     searchStore.setSearchResults(response)
   } catch (err) {

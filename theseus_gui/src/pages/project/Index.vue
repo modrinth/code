@@ -224,7 +224,7 @@ import { install as packInstall } from '@/helpers/pack'
 import { list, add_project_from_version as installMod } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ofetch } from 'ofetch'
+import useFetch from '@/helpers/fetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
@@ -247,10 +247,10 @@ const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
 
 const [data, versions, members, dependencies] = await Promise.all([
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ]).catch((err) => notificationStore.addApiErrorNotif(err))
 
 const installed = ref(instance.value && checkInstalled(instance.value, data.value.id))

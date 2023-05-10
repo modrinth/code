@@ -1,6 +1,6 @@
 <script setup>
 import { ref, shallowRef, onUnmounted } from 'vue'
-import { ofetch } from 'ofetch'
+import useFetch from '@/helpers/fetch'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
@@ -37,13 +37,13 @@ const getInstances = async () => {
 }
 
 const getFeaturedModpacks = async () => {
-  const response = await ofetch(
+  const response = await useFetch(
     `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`
   )
   featuredModpacks.value = response.hits
 }
 const getFeaturedMods = async () => {
-  const response = await ofetch(
+  const response = await useFetch(
     `https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows&filters=${filter.value}`
   )
   featuredMods.value = response.hits

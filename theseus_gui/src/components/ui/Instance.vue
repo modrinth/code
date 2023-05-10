@@ -1,7 +1,7 @@
 <script setup>
 import { shallowRef, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { ofetch } from 'ofetch'
+import useFetch from '@/helpers/fetch'
 import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo } from 'omorphia'
 import { PlayIcon } from '@/assets/icons'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -67,14 +67,14 @@ const install = async (e) => {
   e.stopPropagation()
   modLoading.value = true
   const [data, versions] = await Promise.all([
-    ofetch(
+    useFetch(
       `https://api.modrinth.com/v2/project/${
         props.instance.metadata
           ? props.instance.metadata?.linked_data?.project_id
           : props.instance.project_id
       }`
     ).then(shallowRef),
-    ofetch(
+    useFetch(
       `https://api.modrinth.com/v2/project/${
         props.instance.metadata
           ? props.instance.metadata?.linked_dadta?.project_id
