@@ -1,9 +1,9 @@
 <script setup>
-import { list } from '@/helpers/profile.js'
 import { ref, onUnmounted, shallowRef } from 'vue'
 import { ofetch } from 'ofetch'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
+import { list } from '@/helpers/profile.js'
 import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 
@@ -14,9 +14,9 @@ const filter = ref('')
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 
-const recentInstances = shallowRef(Object.values(await list()))
-
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
+
+const recentInstances = shallowRef(Object.values(await list()))
 
 const getInstances = async () => {
   filter.value = ''
