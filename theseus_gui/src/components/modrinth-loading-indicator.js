@@ -2,7 +2,6 @@ import { computed, defineComponent, h, onBeforeUnmount, ref, watch } from 'vue'
 import { useLoading } from '@/store/state.js'
 
 export default defineComponent({
-  name: 'ModrinthLoadingIndicator',
   props: {
     throttle: {
       type: Number,
@@ -52,7 +51,6 @@ export default defineComponent({
       h(
         'div',
         {
-          class: 'nuxt-loading-indicator',
           style: {
             position: 'fixed',
             top: props.offsetHeight,
