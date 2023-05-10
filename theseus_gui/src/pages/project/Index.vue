@@ -247,12 +247,14 @@ const categories = ref(await get_categories())
 const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
 
+console.log('fetched before')
 const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ])
+console.log('fetched after')
 
 const installed = ref(instance.value && checkInstalled(instance.value, data.value.id))
 
