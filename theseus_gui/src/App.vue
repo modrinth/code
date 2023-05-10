@@ -2,17 +2,18 @@
 import { onMounted, ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
-import { useTheming } from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
+import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 
 const themeStore = useTheming()
 
-const loading = ref(true)
+const isLoading = ref(true)
 onMounted(async () => {
   const { settings, collapsed_navigation } = await get()
   themeStore.setThemeState(settings)
@@ -21,15 +22,16 @@ onMounted(async () => {
 
 defineExpose({
   initialize: async () => {
-    loading.value = false
+    isLoading.value = false
     const { theme } = await get()
     themeStore.setThemeState(theme)
   },
 })
+const loading = useLoading()
 </script>
 
 <template>
-  <SplashScreen v-if="loading" app-loading />
+  <SplashScreen v-if="isLoading" app-loading />
   <div v-else class="container">
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
@@ -117,9 +119,13 @@ defineExpose({
         </section>
       </div>
       <div class="router-view">
+        <ModrinthLoadingIndicator
+          offset-height="var(--appbar-height)"
+          offset-width="var(--sidebar-width)"
+        />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
-            <Suspense>
+            <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
               <component :is="Component"></component>
             </Suspense>
           </template>
@@ -131,17 +137,20 @@ defineExpose({
 
 <style lang="scss" scoped>
 .container {
+  --appbar-height: 3.25rem;
+  --sidebar-width: 5rem;
+
   height: 100vh;
   display: flex;
   flex-direction: row;
   overflow: hidden;
 
   .view {
-    width: var(--view-width);
-
     &.expanded {
-      width: var(--expanded-view-width);
+      --sidebar-width: 13rem;
     }
+
+    width: calc(100% - var(--sidebar-width));
 
     .appbar {
       display: flex;
@@ -228,9 +237,11 @@ defineExpose({
   background: var(--color-raised-bg);
 
   &.expanded {
-    width: 13rem;
-    max-width: 13rem;
-    min-width: 13rem;
+    --sidebar-width: 13rem;
+
+    width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
   }
 }
 
