@@ -76,6 +76,8 @@ pub struct LoadingBar {
     pub message: String,
     pub total: f64,
     pub current: f64,
+    #[serde(skip)]
+    pub last_sent: f64,
     pub bar_type: LoadingBarType,
     #[cfg(feature = "cli")]
     #[serde(skip)]

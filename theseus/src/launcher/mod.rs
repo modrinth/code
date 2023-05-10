@@ -100,9 +100,9 @@ pub async fn install_minecraft(
             100.0,
             "Downloading Minecraft",
         )
-            .await?;
+        .await?;
 
-        // Download version info
+        // Download version info (5)
         let mut version_info = download::download_version_info(
             &state,
             version,
@@ -110,36 +110,36 @@ pub async fn install_minecraft(
             None,
             Some(&loading_bar),
         )
-            .await?;
+        .await?;
 
         // Download minecraft (5-90)
         download::download_minecraft(&state, &version_info, &loading_bar).await?;
 
-        let client_path = state
-            .directories
-            .version_dir(&version_jar)
-            .join(format!("{version_jar}.jar"));
-
         if let Some(processors) = &version_info.processors {
+            let client_path = state
+                .directories
+                .version_dir(&version_jar)
+                .join(format!("{version_jar}.jar"));
+
             if let Some(ref mut data) = version_info.data {
                 processor_rules! {
-                data;
-                "SIDE":
-                    client => "client",
-                    server => "";
-                "MINECRAFT_JAR" :
-                    client => client_path.to_string_lossy(),
-                    server => "";
-                "MINECRAFT_VERSION":
-                    client => profile.metadata.game_version.clone(),
-                    server => "";
-                "ROOT":
-                    client => instance_path.to_string_lossy(),
-                    server => "";
-                "LIBRARY_DIR":
-                    client => state.directories.libraries_dir().to_string_lossy(),
-                    server => "";
-            }
+                    data;
+                    "SIDE":
+                        client => "client",
+                        server => "";
+                    "MINECRAFT_JAR" :
+                        client => client_path.to_string_lossy(),
+                        server => "";
+                    "MINECRAFT_VERSION":
+                        client => profile.metadata.game_version.clone(),
+                        server => "";
+                    "ROOT":
+                        client => instance_path.to_string_lossy(),
+                        server => "";
+                    "LIBRARY_DIR":
+                        client => state.directories.libraries_dir().to_string_lossy(),
+                        server => "";
+                }
 
                 emit_loading(&loading_bar, 0.0, Some("Running forge processors"))
                     .await?;
@@ -147,26 +147,16 @@ pub async fn install_minecraft(
 
                 // Forge processors (90-100)
                 for (index, processor) in processors.iter().enumerate() {
-                    emit_loading(
-                        &loading_bar,
-                        10.0 / total_length as f64,
-                        Some(&format!(
-                            "Running forge processor {}/{}",
-                            index, total_length
-                        )),
-                    )
-                        .await?;
-
                     if let Some(sides) = &processor.sides {
                         if !sides.contains(&String::from("client")) {
                             continue;
                         }
                     }
-    
+
                     let cp = wrap_ref_builder!(cp = processor.classpath.clone() => {
                         cp.push(processor.jar.clone())
                     });
-    
+
                     let child = Command::new("java")
                         .arg("-cp")
                         .arg(args::get_class_paths_jar(
@@ -199,7 +189,7 @@ pub async fn install_minecraft(
                                 "Error running processor: {err}",
                             ))
                         })?;
-    
+
                     if !child.status.success() {
                         return Err(crate::ErrorKind::LauncherError(format!(
                             "Processor error: {}",
@@ -207,6 +197,16 @@ pub async fn install_minecraft(
                         ))
                         .as_error());
                     }
+
+                    emit_loading(
+                        &loading_bar,
+                        30.0 / total_length as f64,
+                        Some(&format!(
+                            "Running forge processor {}/{}",
+                            index, total_length
+                        )),
+                    )
+                        .await?;
                 }
             }
         }
@@ -218,6 +218,12 @@ pub async fn install_minecraft(
         })
             .await?;
         State::sync().await?;
+        emit_loading(
+            &loading_bar,
+            1.0,
+            Some("Finished installing"),
+        )
+            .await?;
 
         Ok(())
     }).await
@@ -278,7 +284,7 @@ pub async fn launch_minecraft(
             None,
             None,
         )
-            .await?;
+        .await?;
 
         let client_path = state
             .directories
@@ -292,9 +298,9 @@ pub async fn launch_minecraft(
             }
             None => Command::new(String::from(java_install.to_string_lossy())),
         };
-    
+
         let env_args = Vec::from(env_args);
-    
+
         // Check if profile has a running profile, and reject running the command if it does
         // Done late so a quick double call doesn't launch two instances
         let existing_processes =
@@ -306,7 +312,7 @@ pub async fn launch_minecraft(
             ))
             .as_error());
         }
-    
+
         command
             .args(
                 args::get_jvm_arguments(
@@ -346,14 +352,14 @@ pub async fn launch_minecraft(
             .current_dir(instance_path.clone())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
-    
+
         // CARGO-set DYLD_LIBRARY_PATH breaks Minecraft on macOS during testing on playground
         #[cfg(target_os = "macos")]
         if std::env::var("CARGO").is_ok() {
             command.env_remove("DYLD_FALLBACK_LIBRARY_PATH");
         }
         command.envs(env_args);
-    
+
         // Get Modrinth logs directories
         let datetime_string =
             chrono::Local::now().format("%Y%m%y_%H%M%S").to_string();
@@ -364,10 +370,10 @@ pub async fn launch_minecraft(
                 .join(&datetime_string)
         };
         fs::create_dir_all(&logs_dir)?;
-    
+
         let stdout_log_path = logs_dir.join("stdout.log");
         let stderr_log_path = logs_dir.join("stderr.log");
-    
+
         // Create Minecraft child by inserting it into the state
         // This also spawns the process and prepares the subsequent processes
         let mut state_children = state.children.write().await;
@@ -381,6 +387,5 @@ pub async fn launch_minecraft(
                 post_exit_hook,
             )
             .await
-            
     }).await
 }

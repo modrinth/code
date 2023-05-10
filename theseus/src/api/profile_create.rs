@@ -66,7 +66,7 @@ pub async fn profile_create(
                 )
                 .into());
             }
-    
+
             if ReadDirStream::new(fs::read_dir(&path).await?)
                 .next()
                 .await
@@ -77,7 +77,7 @@ pub async fn profile_create(
         } else {
             fs::create_dir_all(&path).await?;
         }
-    
+
         info!(
             "Creating profile at path {}",
             &canonicalize(&path)?.display()
@@ -88,7 +88,7 @@ pub async fn profile_create(
         } else {
             None
         };
-    
+
         // Fully canonicalize now that its created for storing purposes
         let path = canonicalize(&path)?;
         let mut profile =
@@ -109,9 +109,9 @@ pub async fn profile_create(
             profile.metadata.loader = modloader;
             profile.metadata.loader_version = Some(loader_version);
         }
-    
+
         profile.metadata.linked_data = linked_data;
-    
+
         // Attempts to find optimal JRE for the profile from the JavaGlobals
         // Finds optimal key, and see if key has been set in JavaGlobals
         let settings = state.settings.read().await;
@@ -124,7 +124,7 @@ pub async fn profile_create(
         } else {
             emit_warning(&format!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.")).await?;
         }
-    
+
         emit_profile(
             uuid,
             path.clone(),
@@ -132,19 +132,18 @@ pub async fn profile_create(
             ProfilePayloadType::Created,
         )
         .await?;
-    
+
         {
             let mut profiles = state.profiles.write().await;
             profiles.insert(profile.clone()).await?;
         }
-    
+
         if !skip_install_profile.unwrap_or(false) {
             crate::launcher::install_minecraft(&profile, None).await?;
         }
         State::sync().await?;
-    
+
         Ok(path)
-    
     }).await
 }
 
@@ -167,6 +166,7 @@ pub(crate) async fn get_loader_version_from_loader(
     let loader_data = match loader {
         ModLoader::Forge => &metadata.forge,
         ModLoader::Fabric => &metadata.fabric,
+        ModLoader::Quilt => &metadata.quilt,
         _ => {
             return Err(
                 ProfileCreationError::NoManifest(loader.to_string()).into()
