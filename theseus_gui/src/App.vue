@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
 import { useTheming, useNotifications } from '@/store/state'
@@ -16,9 +16,13 @@ const notificationStore = useNotifications()
 let dropWarningListener = () => {}
 
 onMounted(async () => {
-  const { settings, collapsed_navigation } = await get()
-  themeStore.setThemeState(settings)
-  themeStore.collapsedNavigation = collapsed_navigation
+  try {
+    const { settings, collapsed_navigation } = await get()
+    themeStore.setThemeState(settings)
+    themeStore.collapsedNavigation = collapsed_navigation
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  }
 
   // Setting up the listener here since we can't use top-level await outside of Suspense.
   //  App.vue isn't wrapped.
@@ -32,7 +36,6 @@ onMounted(async () => {
 })
 
 onUnmounted(() => dropWarningListener())
-master
 </script>
 
 <template>

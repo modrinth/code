@@ -251,13 +251,7 @@ const [data, versions, members, dependencies] = await Promise.all([
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
   ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
-]).catch((err) =>
-  notificationStore.addNotification({
-    title: err.name,
-    text: err.message,
-    type: 'error',
-  })
-)
+]).catch((err) => notificationStore.addApiErrorNotif(err))
 
 const installed = ref(instance.value && checkInstalled(instance.value, data.value.id))
 
@@ -273,71 +267,75 @@ watch(
 dayjs.extend(relativeTime)
 
 async function install(version) {
-  installing.value = true
-  let queuedVersionData
+  try {
+    installing.value = true
+    let queuedVersionData
 
-  if (version) {
-    queuedVersionData = versions.value.find((v) => v.id === version)
-  } else {
-    if (data.value.project_type === 'modpack' || !instance.value) {
-      queuedVersionData = versions.value[0]
+    if (version) {
+      queuedVersionData = versions.value.find((v) => v.id === version)
     } else {
-      queuedVersionData = versions.value.find((v) =>
-        v.game_versions.includes(data.value.game_versions[0])
-      )
-    }
-  }
-
-  if (data.value.project_type === 'modpack') {
-    const packs = Object.values(await list())
-    if (
-      packs.length === 0 ||
-      !packs
-        .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === data.value.id)
-    ) {
-      let id = await packInstall(queuedVersionData.id)
-      await router.push({ path: `/instance/${encodeURIComponent(id)}` })
-    } else {
-      confirmModal.value.show(queuedVersionData.id)
-    }
-  } else {
-    if (instance.value) {
-      if (!version) {
-        const gameVersion = instance.value.metadata.game_version
-        const loader = instance.value.metadata.loader
-        const selectedVersion = versions.value.find(
-          (v) =>
-            v.game_versions.includes(gameVersion) &&
-            (data.value.project_type === 'mod'
-              ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
-              : true)
+      if (data.value.project_type === 'modpack' || !instance.value) {
+        queuedVersionData = versions.value[0]
+      } else {
+        queuedVersionData = versions.value.find((v) =>
+          v.game_versions.includes(data.value.game_versions[0])
         )
-        if (!selectedVersion) {
-          installing.value = false
-          return
-        }
-        queuedVersionData = selectedVersion
-        await installMod(instance.value.path, selectedVersion.id)
-      } else {
-        await installMod(instance.value.path, queuedVersionData.id)
-      }
-
-      installVersionDependencies(instance.value, queuedVersionData)
-
-      installed.value = true
-    } else {
-      if (version) {
-        modInstallModal.value.show(data.value.id, [
-          versions.value.find((v) => v.id === queuedVersionData.id),
-        ])
-      } else {
-        modInstallModal.value.show(data.value.id, versions.value)
       }
     }
-  }
 
-  installing.value = false
+    if (data.value.project_type === 'modpack') {
+      const packs = Object.values(await list())
+      if (
+        packs.length === 0 ||
+        !packs
+          .map((value) => value.metadata)
+          .find((pack) => pack.linked_data?.project_id === data.value.id)
+      ) {
+        let id = await packInstall(queuedVersionData.id)
+        await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+      } else {
+        confirmModal.value.show(queuedVersionData.id)
+      }
+    } else {
+      if (instance.value) {
+        if (!version) {
+          const gameVersion = instance.value.metadata.game_version
+          const loader = instance.value.metadata.loader
+          const selectedVersion = versions.value.find(
+            (v) =>
+              v.game_versions.includes(gameVersion) &&
+              (data.value.project_type === 'mod'
+                ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
+                : true)
+          )
+          if (!selectedVersion) {
+            installing.value = false
+            return
+          }
+          queuedVersionData = selectedVersion
+          await installMod(instance.value.path, selectedVersion.id)
+        } else {
+          await installMod(instance.value.path, queuedVersionData.id)
+        }
+
+        installVersionDependencies(instance.value, queuedVersionData)
+
+        installed.value = true
+      } else {
+        if (version) {
+          modInstallModal.value.show(data.value.id, [
+            versions.value.find((v) => v.id === queuedVersionData.id),
+          ])
+        } else {
+          modInstallModal.value.show(data.value.id, versions.value)
+        }
+      }
+    }
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  } finally {
+    installing.value = false
+  }
 }
 </script>
 

@@ -15,14 +15,15 @@ import {
   Toggle,
 } from 'omorphia'
 import { BrowseIcon } from '@/assets/icons'
-import { useTheming } from '@/store/state'
+import { useTheming, useNotifications } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { find_jre_8_jres, find_jre_17_jres, get_jre } from '@/helpers/jre'
 import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
+const notificationStore = useNotifications()
 
-const fetchSettings = await get()
+const fetchSettings = await get().catch((err) => notificationStore.addTauriErrorNotif(err))
 
 if (!fetchSettings.java_globals?.JAVA_8)
   fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
@@ -44,25 +45,29 @@ const detectJavaModal = ref(null)
 const handleTheme = async (e) => {
   themeStore.setThemeState(e.option.toLowerCase())
   settings.value.theme = themeStore.selectedTheme
-  await set(settings.value)
+  await set(settings.value).catch((err) => notificationStore.addTauriErrorNotif(err))
 }
 
 const handleCollapse = async (e) => {
   themeStore.collapsedNavigation = e
   settings.value.collapsed_navigation = themeStore.collapsedNavigation
-  await set(settings.value)
+  await set(settings.value).catch((err) => notificationStore.addTauriErrorNotif(err))
 }
 
 const loadJavaModal = async (version) => {
-  if (version === 17) chosenInstallOptions.value = await find_jre_17_jres()
-  else if (version === 8) chosenInstallOptions.value = await find_jre_8_jres()
+  try {
+    if (version === 17) chosenInstallOptions.value = await find_jre_17_jres()
+    else if (version === 8) chosenInstallOptions.value = await find_jre_8_jres()
 
-  browsingInstall.value = version
-  detectJavaModal.value.show()
+    browsingInstall.value = version
+    detectJavaModal.value.show()
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  }
 }
 
-watch(settings.value, async (oldSettings, newSettings) => {
-  await set(newSettings)
+watch(settings.value, async (_, newSettings) => {
+  await set(newSettings).catch((err) => notificationStore.addTauriErrorNotif(err))
 })
 
 const handleJava17FileInput = async () => {
@@ -81,32 +86,40 @@ const handleJava8FileInput = async () => {
 }
 
 const handleJava17Test = async () => {
-  let result
-  testingJava17.value = true
-  setTimeout(async () => {
-    result = await get_jre(settings.value.java_globals.JAVA_17.path)
-    testingJava17.value = false
-    if (result) java17Success.value = true
-    else java17Success.value = false
+  try {
+    let result
+    testingJava17.value = true
+    setTimeout(async () => {
+      result = await get_jre(settings.value.java_globals.JAVA_17.path)
+      testingJava17.value = false
+      if (result) java17Success.value = true
+      else java17Success.value = false
 
-    setTimeout(() => {
-      java17Success.value = null
-    }, 2000)
-  }, 1000)
+      setTimeout(() => {
+        java17Success.value = null
+      }, 2000)
+    }, 1000)
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  }
 }
 
 const handleJava8Test = async () => {
-  let result
-  testingJava8.value = true
-  setTimeout(async () => {
-    result = await get_jre(settings.value.java_globals.JAVA_8.path)
-    testingJava8.value = false
-    java8Success.value = !!result
+  try {
+    let result
+    testingJava8.value = true
+    setTimeout(async () => {
+      result = await get_jre(settings.value.java_globals.JAVA_8.path)
+      testingJava8.value = false
+      java8Success.value = !!result
 
-    setTimeout(() => {
-      java8Success.value = null
-    }, 2000)
-  }, 1000)
+      setTimeout(() => {
+        java8Success.value = null
+      }, 2000)
+    }, 1000)
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  }
 }
 
 const setJavaInstall = (javaInstall) => {

@@ -72,7 +72,7 @@ const stopTimer = (notif) => clearTimeout(notif.timer)
       }
       .notification-content {
         margin-right: auto;
-        font-size: var(--font-size-md);
+        font-size: var(--font-size-xs);
       }
     }
     &:last-child {

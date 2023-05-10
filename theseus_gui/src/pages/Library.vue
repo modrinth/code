@@ -3,14 +3,15 @@ import { shallowRef } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumbs, useNotifications } from '@/store/state'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
+const notificationStore = useNotifications()
 
 breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
-const profiles = await list()
+const profiles = await list().catch((err) => notificationStore.addTauriErrorNotif(err))
 const instances = shallowRef(
   Object.values(profiles).filter((prof) => !prof.metadata.linked_project_id)
 )

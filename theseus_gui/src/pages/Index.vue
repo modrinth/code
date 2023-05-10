@@ -5,7 +5,7 @@ import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { profile_listener } from '@/helpers/events'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useBreadcrumbs, useNotifications } from '@/store/state'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -13,6 +13,7 @@ const filter = ref('')
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
+const notificationStore = useNotifications()
 
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
@@ -20,14 +21,19 @@ const recentInstances = shallowRef()
 
 const getInstances = async () => {
   filter.value = ''
-  const profiles = await list()
-  recentInstances.value = Object.values(profiles)
 
-  const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
-  excludeIds.forEach((id, index) => {
-    filter.value += `NOT"project_id"="${id}"`
-    if (index < excludeIds.length - 1) filter.value += ' AND '
-  })
+  try {
+    const profiles = await list()
+    recentInstances.value = Object.values(profiles)
+
+    const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
+    excludeIds.forEach((id, index) => {
+      filter.value += `NOT"project_id"="${id}"`
+      if (index < excludeIds.length - 1) filter.value += ' AND '
+    })
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  }
 }
 
 const getFeaturedModpacks = async () => {
@@ -44,12 +50,17 @@ const getFeaturedMods = async () => {
 }
 
 await getInstances()
-await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+
+await Promise.all([getFeaturedModpacks(), getFeaturedMods()]).catch((err) =>
+  notificationStore.addApiErrorNotif(err)
+)
 
 const unlisten = await profile_listener(async (e) => {
   if (e.event === 'edited') {
     await getInstances()
-    await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
+    await Promise.all([getFeaturedModpacks(), getFeaturedMods()]).catch((err) =>
+      notificationStore.addApiErrorNotif(err)
+    )
   }
 })
 

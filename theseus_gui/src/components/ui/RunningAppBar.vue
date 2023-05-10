@@ -28,25 +28,31 @@ import {
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
+import { useNotifications } from '@/store/state'
 
+const notificationStore = useNotifications()
 const router = useRouter()
 
-const currentProcesses = ref(await getRunningProfiles())
+const currentProcesses = ref(
+  await getRunningProfiles().catch((err) => notificationStore.addTauriErrorNotif(err))
+)
 
 await process_listener(async () => {
   await refresh()
 })
 
 const refresh = async () => {
-  currentProcesses.value = await getRunningProfiles()
+  currentProcesses.value = await getRunningProfiles().catch((err) =>
+    notificationStore.addTauriErrorNotif(err)
+  )
 }
 
 const stop = async () => {
   try {
     const processes = await getProfileProcesses(currentProcesses.value[0].path)
     await killProfile(processes[0])
-  } catch (e) {
-    console.error(e)
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
   }
 
   await refresh()

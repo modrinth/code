@@ -19,6 +19,9 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import { create } from '@/helpers/profile'
 import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
+import { useNotifications } from '@/store/state'
+
+const notificationStore = useNotifications()
 const router = useRouter()
 const versions = ref([])
 const project = ref('')
@@ -41,7 +44,11 @@ defineExpose({
   },
 })
 
-const profiles = ref(await list().then(Object.values))
+const profiles = ref(
+  await list()
+    .then(Object.values)
+    .catch((err) => notificationStore.addTauriErrorNotif(err))
+)
 
 async function install(instance) {
   instance.installing = true
@@ -52,11 +59,16 @@ async function install(instance) {
     )
   })
 
-  await installMod(instance.path, version.id)
-  await installVersionDependencies(instance, version)
+  try {
+    await installMod(instance.path, version.id)
+    await installVersionDependencies(instance, version)
 
-  instance.installed = true
-  instance.installing = false
+    instance.installed = true
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  } finally {
+    instance.installing = false
+  }
 }
 
 const filteredVersions = computed(() => {
@@ -123,11 +135,16 @@ const createInstance = async () => {
     icon.value
   )
 
-  await installMod(id, versions.value[0].id)
+  try {
+    await installMod(id, versions.value[0].id)
 
-  await router.push({ path: `/instance/${encodeURIComponent(id)}` })
-  installModal.value.hide()
-  creatingInstance.value = false
+    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+    installModal.value.hide()
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  } finally {
+    creatingInstance.value = false
+  }
 }
 
 const check_valid = computed(() => {

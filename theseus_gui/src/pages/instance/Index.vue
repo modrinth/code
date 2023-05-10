@@ -73,13 +73,16 @@ import { useRoute } from 'vue-router'
 import { shallowRef, ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import { useBreadcrumbs, useSearch } from '@/store/state'
+import { useBreadcrumbs, useSearch, useNotifications } from '@/store/state'
 
 const route = useRoute()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
+const notificationStore = useNotifications()
 
-const instance = shallowRef(await get(route.params.id))
+const instance = shallowRef(
+  await get(route.params.id).catch((err) => notificationStore.addTauriErrorNotif(err))
+)
 searchStore.instanceContext = instance.value
 
 breadcrumbs.setName('Instance', instance.value.metadata.name)
@@ -93,14 +96,22 @@ const playing = ref(false)
 const loading = ref(false)
 
 const startInstance = async () => {
-  loading.value = true
-  uuid.value = await run(route.params.id)
-  loading.value = false
-  playing.value = true
+  try {
+    loading.value = true
+    uuid.value = await run(route.params.id)
+    loading.value = false
+    playing.value = true
+  } catch {
+    notificationStore.addTauriErrorNotif(err)
+  } finally {
+    loading.value = false
+  }
 }
 
 const checkProcess = async () => {
-  const runningPaths = await get_all_running_profile_paths()
+  const runningPaths = await get_all_running_profile_paths().catch((err) =>
+    notificationStore.addTauriErrorNotif(err)
+  )
   if (runningPaths.includes(instance.value.path)) {
     playing.value = true
     return
@@ -122,10 +133,7 @@ const stopInstance = async () => {
       uuids.forEach(async (u) => await kill_by_uuid(u))
     } else await kill_by_uuid(uuid.value)
   } catch (err) {
-    // Theseus currently throws:
-    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
-    // For now, we will catch and just warn
-    console.warn(err)
+    notificationStore.addTauriErrorNotif(err)
   }
 }
 

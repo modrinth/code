@@ -40,7 +40,7 @@ const [categories, loaders, availableGameVersions] = await Promise.all([
   get_categories(),
   get_loaders(),
   get_game_versions(),
-])
+]).catch((err) => notificationStore.addTauriErrorNotif(err))
 
 onMounted(() => {
   breadcrumbs.setContext({ name: 'Browse', link: route.path })
@@ -79,15 +79,11 @@ const getSearchResults = async (shouldLoad = false) => {
     loading.value = true
   }
   try {
-    const response = await ofetch(`https://api.modsdrinth.com/v2/search${queryString}`)
+    const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
     loading.value = false
     searchStore.setSearchResults(response)
   } catch (err) {
-    notificationStore.addNotification({
-      title: err.name,
-      text: err.message,
-      type: 'error',
-    })
+    notificationStore.addApiErrorNotif(err)
   }
 }
 

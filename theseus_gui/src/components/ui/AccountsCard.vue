@@ -65,6 +65,7 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
+import { useNotifications } from '@/store/state'
 
 defineProps({
   expanded: {
@@ -73,7 +74,9 @@ defineProps({
   },
 })
 
-const settings = ref(await get())
+const notificationStore = useNotifications()
+
+const settings = ref(await get().catch((err) => notificationStore.addTauriErrorNotif(err)))
 
 const appendProfiles = (accounts) => {
   return accounts.map((account) => {
@@ -84,7 +87,11 @@ const appendProfiles = (accounts) => {
   })
 }
 
-const accounts = ref(await users().then(appendProfiles))
+const accounts = ref(
+  await users()
+    .then(appendProfiles)
+    .catch((err) => notificationStore.addTauriErrorNotif(err))
+)
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => settings.value.default_user !== account.id)
@@ -95,7 +102,9 @@ const selectedAccount = ref(
 )
 
 const refreshValues = async () => {
-  accounts.value = await users().then(appendProfiles)
+  accounts.value = await users()
+    .then(appendProfiles)
+    .catch((err) => notificationStore.addTauriErrorNotif(err))
   selectedAccount.value = accounts.value.find(
     (account) => account.id === settings.value.default_user
   )
@@ -108,36 +117,45 @@ let button = ref(null)
 const setAccount = async (account) => {
   settings.value.default_user = account.id
   selectedAccount.value = account
-  await set(settings.value)
+
+  await set(settings.value).catch((err) => notificationStore.addTauriErrorNotif(err))
 }
 
 const login = async () => {
-  const url = await authenticate_begin_flow()
+  try {
+    const url = await authenticate_begin_flow()
 
-  const window = new WebviewWindow('loginWindow', {
-    url: url,
-  })
+    const window = new WebviewWindow('loginWindow', {
+      url: url,
+    })
 
-  window.once('tauri://created', function () {
-    console.log('webview created')
-  })
+    window.once('tauri://created', function () {
+      console.log('webview created')
+    })
 
-  window.once('tauri://error', function (e) {
-    console.log('webview error', e)
-  })
+    window.once('tauri://error', function (e) {
+      console.log('webview error', e)
+    })
 
-  const loggedIn = await authenticate_await_completion()
-  await setAccount(loggedIn)
-  await refreshValues()
-  await window.close()
+    const loggedIn = await authenticate_await_completion()
+    await setAccount(loggedIn)
+    await refreshValues()
+    await window.close()
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  }
 }
 
 const logout = async (id) => {
-  await remove_user(id)
-  await refreshValues()
-  if (!selectedAccount.value && accounts.value.length > 0) {
-    await setAccount(accounts.value[0])
+  try {
+    await remove_user(id)
     await refreshValues()
+    if (!selectedAccount.value && accounts.value.length > 0) {
+      await setAccount(accounts.value[0])
+      await refreshValues()
+    }
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
   }
 }
 

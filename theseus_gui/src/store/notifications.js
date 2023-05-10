@@ -14,6 +14,20 @@ export const useNotifications = defineStore('notificationStore', {
         this.clearNotificationByIndex(this.notifications.indexOf(notif))
       }, 30000)
     },
+    addApiErrorNotif(err) {
+      this.addNotification({
+        title: err.name,
+        text: err.message,
+        type: 'error',
+      })
+    },
+    addTauriErrorNotif(err) {
+      this.addNotification({
+        title: err.Serializable?.field_name,
+        text: err.Serializable?.message,
+        type: 'error',
+      })
+    },
     addNotification(newNotif) {
       const existingNotif = this.notifications.find(
         (n) =>

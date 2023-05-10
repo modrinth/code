@@ -93,7 +93,9 @@ import { open } from '@tauri-apps/api/dialog'
 import { useRouter } from 'vue-router'
 import { tauri } from '@tauri-apps/api'
 import { get_fabric_versions, get_forge_versions } from '@/helpers/metadata'
+import { useNotifications } from '@/store/state'
 
+const notificationStore = useNotifications()
 const router = useRouter()
 
 const profile_name = ref('')
@@ -129,7 +131,11 @@ defineExpose({
   },
 })
 
-const all_game_versions = ref(await get_game_versions())
+const all_game_versions = ref(
+  await get_game_versions().catch((err) =>
+    notificationStore.addTauriErrorNotif(err)
+  )
+)
 
 const game_versions = computed(() => {
   return all_game_versions.value
@@ -137,11 +143,14 @@ const game_versions = computed(() => {
     .map((item) => item.version)
 })
 const loaders = ref(
-  await get_loaders().then((value) =>
-    value
-      .filter((item) => item.supported_project_types.includes('modpack'))
-      .map((item) => item.name.toLowerCase())
-  )
+  await get_loaders()
+    .then((value) =>
+      value
+        .filter((item) => item.supported_project_types.includes('modpack'))
+        .map((item) => item.name.toLowerCase())
+    )
+    .catch((err) =>
+      notificationStore.addTauriErrorNotif(err)
 )
 const modal = ref(null)
 
@@ -167,7 +176,8 @@ const create_instance = async () => {
     modal.value.hide()
     creating.value = false
   } catch (e) {
-    console.error(e)
+    notificationStore.addTauriErrorNotif(err)
+
     creating.value = false
   }
 }
@@ -191,8 +201,17 @@ const reset_icon = () => {
   display_icon.value = null
 }
 
-const fabric_versions = ref(await get_fabric_versions())
-const forge_versions = ref(await get_forge_versions())
+const fabric_versions = ref(
+  await get_fabric_versions().catch((err) =>
+    notificationStore.addTauriErrorNotif(err)
+  )
+)
+
+const forge_versions = ref(
+  await get_forge_versions().catch((err) =>
+    notificationStore.addTauriErrorNotif(err)
+  )
+)
 
 const selectable_versions = computed(() => {
   if (game_version.value) {

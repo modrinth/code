@@ -8,6 +8,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
 import { run, list } from '@/helpers/profile'
+import { useNotifications } from '@/store/state'
 import {
   kill_by_uuid,
   get_all_running_profile_paths,
@@ -28,6 +29,8 @@ const props = defineProps({
   },
 })
 
+const notificationStore = useNotifications()
+
 const confirmModal = ref(null)
 const playing = ref(false)
 
@@ -45,15 +48,19 @@ const seeInstance = async () => {
 }
 
 const checkProcess = async () => {
-  const runningPaths = await get_all_running_profile_paths()
+  try {
+    const runningPaths = await get_all_running_profile_paths()
 
-  if (runningPaths.includes(props.instance.path)) {
-    playing.value = true
-    return
+    if (runningPaths.includes(props.instance.path)) {
+      playing.value = true
+      return
+    }
+
+    playing.value = false
+    uuid.value = null
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
   }
-
-  playing.value = false
-  uuid.value = null
 }
 
 const install = async (e) => {
@@ -74,31 +81,42 @@ const install = async (e) => {
           : props.instance.project_id
       }/version`
     ).then(shallowRef),
-  ])
+  ]).catch((err) => notificationStore.addApiErrorNotif(err))
 
-  if (data.value.project_type === 'modpack') {
-    const packs = Object.values(await list())
+  try {
+    if (data.value.project_type === 'modpack') {
+      const packs = Object.values(await list())
 
-    if (
-      packs.length === 0 ||
-      !packs
-        .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === data.value.id)
-    ) {
-      await pack_install(versions.value[0].id)
-    } else confirmModal.value.show(versions.value[0].id)
+      if (
+        packs.length === 0 ||
+        !packs
+          .map((value) => value.metadata)
+          .find((pack) => pack.linked_data?.project_id === data.value.id)
+      ) {
+        await pack_install(versions.value[0].id)
+      } else confirmModal.value.show(versions.value[0].id)
+    }
+
+    modLoading.value = false
+    // TODO: Add condition for installing a mod
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
   }
-
-  modLoading.value = false
-  // TODO: Add condition for installing a mod
 }
 
 const play = async (e) => {
   e.stopPropagation()
   modLoading.value = true
-  uuid.value = await run(props.instance.path)
-  modLoading.value = false
-  playing.value = true
+
+  try {
+    uuid.value = await run(props.instance.path)
+    playing.value = true
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+    playing.value = false
+  } finally {
+    modLoading.value = false
+  }
 }
 
 const stop = async (e) => {
@@ -115,10 +133,7 @@ const stop = async (e) => {
       uuids.forEach(async (u) => await kill_by_uuid(u))
     } else await kill_by_uuid(uuid.value) // If we still have the uuid, just kill it
   } catch (err) {
-    // Theseus currently throws:
-    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
-    // For now, we will catch and just warn
-    console.warn(err)
+    notificationStore.addTauriErrorNotif(err)
   }
 
   uuid.value = null
