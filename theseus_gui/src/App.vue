@@ -2,12 +2,13 @@
 import { onMounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
-import { useTheming } from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 
 const themeStore = useTheming()
 
@@ -16,6 +17,8 @@ onMounted(async () => {
   themeStore.setThemeState(settings)
   themeStore.collapsedNavigation = collapsed_navigation
 })
+
+const loading = useLoading()
 </script>
 
 <template>
@@ -106,9 +109,13 @@ onMounted(async () => {
         </section>
       </div>
       <div class="router-view">
+        <ModrinthLoadingIndicator
+          offset-height="var(--appbar-height)"
+          offset-width="var(--sidebar-width)"
+        />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
-            <Suspense>
+            <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
               <component :is="Component"></component>
             </Suspense>
           </template>
@@ -120,17 +127,20 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .container {
+  --appbar-height: 3.25rem;
+  --sidebar-width: 5rem;
+
   height: 100vh;
   display: flex;
   flex-direction: row;
   overflow: hidden;
 
   .view {
-    width: var(--view-width);
-
     &.expanded {
-      width: var(--expanded-view-width);
+      --sidebar-width: 13rem;
     }
+
+    width: calc(100% - var(--sidebar-width));
 
     .appbar {
       display: flex;
@@ -219,9 +229,11 @@ onMounted(async () => {
   background: var(--color-raised-bg);
 
   &.expanded {
-    width: 13rem;
-    max-width: 13rem;
-    min-width: 13rem;
+    --sidebar-width: 13rem;
+
+    width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
   }
 }
 
