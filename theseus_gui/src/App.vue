@@ -2,18 +2,17 @@
 import { onMounted, ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
-import { useLoading, useTheming } from '@/store/state'
+import { useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 
 const themeStore = useTheming()
 
-const isLoading = ref(true)
+const loading = ref(true)
 onMounted(async () => {
   const { settings, collapsed_navigation } = await get()
   themeStore.setThemeState(settings)
@@ -22,16 +21,15 @@ onMounted(async () => {
 
 defineExpose({
   initialize: async () => {
-    isLoading.value = false
+    loading.value = false
     const { theme } = await get()
     themeStore.setThemeState(theme)
   },
 })
-const loading = useLoading()
 </script>
 
 <template>
-  <SplashScreen v-if="isLoading" app-loading />
+  <SplashScreen v-if="loading" app-loading />
   <div v-else class="container">
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
@@ -119,13 +117,9 @@ const loading = useLoading()
         </section>
       </div>
       <div class="router-view">
-        <ModrinthLoadingIndicator
-          offset-height="var(--appbar-height)"
-          offset-width="var(--sidebar-width)"
-        />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
-            <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
+            <Suspense>
               <component :is="Component"></component>
             </Suspense>
           </template>
@@ -137,20 +131,17 @@ const loading = useLoading()
 
 <style lang="scss" scoped>
 .container {
-  --appbar-height: 3.25rem;
-  --sidebar-width: 5rem;
-
   height: 100vh;
   display: flex;
   flex-direction: row;
   overflow: hidden;
 
   .view {
-    &.expanded {
-      --sidebar-width: 13rem;
-    }
+    width: var(--view-width);
 
-    width: calc(100% - var(--sidebar-width));
+    &.expanded {
+      width: var(--expanded-view-width);
+    }
 
     .appbar {
       display: flex;
@@ -239,11 +230,9 @@ const loading = useLoading()
   background: var(--color-raised-bg);
 
   &.expanded {
-    --sidebar-width: 13rem;
-
-    width: var(--sidebar-width);
-    max-width: var(--sidebar-width);
-    min-width: var(--sidebar-width);
+    width: 13rem;
+    max-width: 13rem;
+    min-width: 13rem;
   }
 }
 
