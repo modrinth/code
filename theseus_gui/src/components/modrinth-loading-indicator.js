@@ -61,9 +61,9 @@ export default defineComponent({
             height: `${props.height}px`,
             opacity: indicator.isLoading.value ? 1 : 0,
             background: props.color || undefined,
-            //backgroundSize: `${(100 / indicator.progress.value) * 100}% auto`,
+            backgroundSize: `${(100 / indicator.progress.value) * 100}% auto`,
             transition: 'width 0.1s, height 0.4s, opacity 0.4s',
-            zIndex: 999999,
+            zIndex: 99,
           },
         },
         slots
