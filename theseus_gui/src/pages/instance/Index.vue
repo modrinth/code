@@ -99,9 +99,8 @@ const startInstance = async () => {
   try {
     loading.value = true
     uuid.value = await run(route.params.id)
-    loading.value = false
     playing.value = true
-  } catch {
+  } catch (err) {
     notificationStore.addTauriErrorNotif(err)
   } finally {
     loading.value = false

@@ -132,9 +132,7 @@ defineExpose({
 })
 
 const all_game_versions = ref(
-  await get_game_versions().catch((err) =>
-    notificationStore.addTauriErrorNotif(err)
-  )
+  await get_game_versions().catch((err) => notificationStore.addTauriErrorNotif(err))
 )
 
 const game_versions = computed(() => {
@@ -142,6 +140,7 @@ const game_versions = computed(() => {
     .filter((item) => item.version_type === 'release' || showSnapshots.value)
     .map((item) => item.version)
 })
+
 const loaders = ref(
   await get_loaders()
     .then((value) =>
@@ -149,8 +148,7 @@ const loaders = ref(
         .filter((item) => item.supported_project_types.includes('modpack'))
         .map((item) => item.name.toLowerCase())
     )
-    .catch((err) =>
-      notificationStore.addTauriErrorNotif(err)
+    .catch((err) => notificationStore.addTauriErrorNotif(err))
 )
 const modal = ref(null)
 
@@ -174,10 +172,9 @@ const create_instance = async () => {
 
     await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     modal.value.hide()
-    creating.value = false
-  } catch (e) {
+  } catch (err) {
     notificationStore.addTauriErrorNotif(err)
-
+  } finally {
     creating.value = false
   }
 }
@@ -202,15 +199,11 @@ const reset_icon = () => {
 }
 
 const fabric_versions = ref(
-  await get_fabric_versions().catch((err) =>
-    notificationStore.addTauriErrorNotif(err)
-  )
+  await get_fabric_versions().catch((err) => notificationStore.addTauriErrorNotif(err))
 )
 
 const forge_versions = ref(
-  await get_forge_versions().catch((err) =>
-    notificationStore.addTauriErrorNotif(err)
-  )
+  await get_forge_versions().catch((err) => notificationStore.addTauriErrorNotif(err))
 )
 
 const selectable_versions = computed(() => {
