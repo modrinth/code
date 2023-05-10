@@ -138,9 +138,6 @@ pub async fn install(path: &Path) -> crate::Result<()> {
 }
 
 pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
-    let keys: Vec<PathBuf>;
-    let loading_bar;
-    let num_futs;
     let state = State::get().await?;
     Box::pin(async move {
         let mut profiles = state.profiles.write().await;

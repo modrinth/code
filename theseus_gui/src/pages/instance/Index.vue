@@ -134,7 +134,7 @@ const dropProcessListener = await process_listener((e) => {
 })
 const dropProfileListener = await profile_listener(async (e) => {
   console.log(e)
-  if (e.path === instance.value.path && ['Edited', 'Synced'].includes(e.event))
+  if (e.path === instance.value.path && ['edited', 'synced'].includes(e.event))
     instance.value = await get(route.params.id)
 })
 
