@@ -151,7 +151,6 @@ defineExpose({
       text-align: center;
       padding: 0 0 0 1rem;
       height: 3.25rem;
-      z-index: 11;
 
       .navigation-controls {
         display: inherit;
@@ -223,7 +222,6 @@ defineExpose({
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  z-index: 10;
   height: 100%;
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: 1rem;

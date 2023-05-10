@@ -66,7 +66,7 @@ pub async fn profile_create(
                 )
                 .into());
             }
-    
+
             if ReadDirStream::new(fs::read_dir(&path).await?)
                 .next()
                 .await
@@ -77,25 +77,26 @@ pub async fn profile_create(
         } else {
             fs::create_dir_all(&path).await?;
         }
-    
+
         info!(
             "Creating profile at path {}",
             &canonicalize(&path)?.display()
         );
-    
+
         let loader = modloader;
         let loader = if loader != ModLoader::Vanilla {
             let version = loader_version.unwrap_or_else(|| "latest".to_string());
-    
+
             let filter = |it: &LoaderVersion| match version.as_str() {
                 "latest" => true,
                 "stable" => it.stable,
                 id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
             };
-    
+
             let loader_data = match loader {
                 ModLoader::Forge => &metadata.forge,
                 ModLoader::Fabric => &metadata.fabric,
+                ModLoader::Quilt => &metadata.quilt,
                 _ => {
                     return Err(ProfileCreationError::NoManifest(
                         loader.to_string(),
@@ -103,7 +104,7 @@ pub async fn profile_create(
                     .into())
                 }
             };
-    
+
             let loaders = &loader_data
                 .game_versions
                 .iter()
@@ -120,7 +121,7 @@ pub async fn profile_create(
                     )
                 })?
                 .loaders;
-    
+
             let loader_version = loaders
                 .iter()
                 .cloned()
@@ -139,12 +140,12 @@ pub async fn profile_create(
                         loader.to_string(),
                     )
                 })?;
-    
+
             Some((loader_version, loader))
         } else {
             None
         };
-    
+
         // Fully canonicalize now that its created for storing purposes
         let path = canonicalize(&path)?;
         let mut profile =
@@ -164,9 +165,9 @@ pub async fn profile_create(
             profile.metadata.loader = loader;
             profile.metadata.loader_version = Some(loader_version);
         }
-    
+
         profile.metadata.linked_data = linked_data;
-    
+
         // Attempts to find optimal JRE for the profile from the JavaGlobals
         // Finds optimal key, and see if key has been set in JavaGlobals
         let settings = state.settings.read().await;
@@ -179,7 +180,7 @@ pub async fn profile_create(
         } else {
             emit_warning(&format!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.")).await?;
         }
-    
+
         emit_profile(
             uuid,
             path.clone(),
@@ -187,19 +188,18 @@ pub async fn profile_create(
             ProfilePayloadType::Created,
         )
         .await?;
-    
+
         {
             let mut profiles = state.profiles.write().await;
             profiles.insert(profile.clone()).await?;
         }
-    
+
         if !skip_install_profile.unwrap_or(false) {
             crate::launcher::install_minecraft(&profile, None).await?;
         }
         State::sync().await?;
-    
+
         Ok(path)
-    
     }).await
 }
 

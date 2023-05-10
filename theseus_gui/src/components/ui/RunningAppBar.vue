@@ -39,7 +39,7 @@
         <h3 class="info-title">
           {{ loadingBar.bar_type.pack_name ?? 'Installing Modpack' }}
         </h3>
-        <ProgressBar :progress="Math.round(loadingBar.current)" />
+        <ProgressBar :progress="Math.floor(loadingBar.current)" />
         <div class="row">{{ Math.floor(loadingBar.current) }}% {{ loadingBar.message }}</div>
       </div>
     </Card>
@@ -92,8 +92,7 @@ const goToTerminal = () => {
 
 const currentLoadingBars = ref(Object.values(await progress_bars_list()))
 
-await loading_listener(async (event) => {
-  console.log('loading listener', event.message, event)
+await loading_listener(async () => {
   await refreshInfo()
 })
 
@@ -181,8 +180,8 @@ onBeforeUnmount(() => {
 .info-card {
   position: absolute;
   top: 3.5rem;
-  right: 0;
-  z-index: 100;
+  right: 0.5rem;
+  z-index: 9;
   width: 20rem;
   background-color: var(--color-raised-bg);
   box-shadow: var(--shadow-raised);
