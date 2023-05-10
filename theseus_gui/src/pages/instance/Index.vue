@@ -1,7 +1,5 @@
 <template>
-  <transition name="fade">
-    <SplashScreen v-if="loading" />
-    <div v-else class="instance-container">
+    <div class="instance-container">
       <div class="side-cards">
         <Card class="instance-card">
           <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
@@ -12,20 +10,33 @@
             </span>
           </div>
           <span class="button-group">
-            <Button
-              :color="instance.installed ? 'primary' : ''"
-              class="instance-button"
-              :disabled="!instance.installed"
-              @click="run($route.params.id)"
-            >
-              <PlayIcon v-if="instance.installed" />
-              <AnimatedLogo v-else class="loading-icon" />
-              {{ instance.installed ? 'Play' : 'Installing' }}
-            </Button>
-            <Button class="instance-button" icon-only>
-              <OpenFolderIcon />
-            </Button>
-          </span>
+          <Button
+            v-if="playing === true"
+            color="danger"
+            class="instance-button"
+            @click="stopInstance"
+            @mouseover="checkProcess"
+          >
+            <XIcon />
+            Stop
+          </Button>
+          <Button
+            v-else-if="playing === false && loading === false"
+            color="primary"
+            class="instance-button"
+            @click="startInstance"
+            @mouseover="checkProcess"
+          >
+            <PlayIcon />
+            Play
+          </Button>
+          <Button v-else-if="loading === true && playing === false" disabled class="instance-button"
+          >Loading...</Button
+          >
+          <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
+            <OpenFolderIcon />
+          </Button>
+        </span>
         </Card>
         <div class="pages-list">
           <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
@@ -45,47 +56,36 @@
       <div class="content">
         <Promotion />
         <router-view :instance="instance" />
-      </div>
     </div>
-  </transition>
+    </div>
 </template>
 <script setup>
-import {
-  BoxIcon,
-  SettingsIcon,
-  FileIcon,
-  Button,
-  Avatar,
-  Card,
-  Promotion,
-  AnimatedLogo,
-} from 'omorphia'
+import { BoxIcon, SettingsIcon, FileIcon, XIcon, Button, Avatar, Card, Promotion } from 'omorphia'
 import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
 import { get, run } from '@/helpers/profile'
+import {
+  get_all_running_profile_paths,
+  get_uuids_by_profile_path,
+  kill_by_uuid,
+} from '@/helpers/process'
+import {process_listener, profile_listener} from '@/helpers/events'
 import { useRoute } from 'vue-router'
-import { onMounted, ref } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { useSearch } from '@/store/search'
-import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { profile_listener } from '@/helpers/events.js'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
+import { open } from '@tauri-apps/api/dialog'
+import { useBreadcrumbs, useSearch } from '@/store/state'
 
 const route = useRoute()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
-const instance = ref(null)
-const loading = ref(true)
+const instance = ref(await get(route.params.id))
 
-onMounted(async () => {
-  instance.value = await get(route.params.id)
-  searchStore.instanceContext = instance.value
-  breadcrumbs.setName('Instance', instance.value.metadata.name)
-  breadcrumbs.setContext({
-    name: instance.value.metadata.name,
-    link: route.path,
-  })
-  loading.value = false
+searchStore.instanceContext = instance.value
+breadcrumbs.setName('Instance', instance.value.metadata.name)
+breadcrumbs.setContext({
+  name: instance.value.metadata.name,
+  link: route.path,
 })
 
 profile_listener(async (event) => {
@@ -93,6 +93,53 @@ profile_listener(async (event) => {
     instance.value = await get(route.params.id)
   }
 })
+
+const uuid = ref(null)
+const playing = ref(false)
+const loading = ref(false)
+
+const startInstance = async () => {
+  loading.value = true
+  uuid.value = await run(route.params.id)
+  loading.value = false
+  playing.value = true
+}
+
+const checkProcess = async () => {
+  const runningPaths = await get_all_running_profile_paths()
+  if (runningPaths.includes(instance.value.path)) {
+    playing.value = true
+    return
+  }
+
+  playing.value = false
+  uuid.value = null
+}
+
+await checkProcess()
+
+const stopInstance = async () => {
+  playing.value = false
+
+  try {
+    if (!uuid.value) {
+      const uuids = await get_uuids_by_profile_path(instance.value.path)
+      uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
+      uuids.forEach(async (u) => await kill_by_uuid(u))
+    } else await kill_by_uuid(uuid.value)
+  } catch (err) {
+    // Theseus currently throws:
+    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
+    // For now, we will catch and just warn
+    console.warn(err)
+  }
+}
+
+const unlisten = await process_listener((e) => {
+  if (e.event === 'Finished' && uuid.value === e.uuid) playing.value = false
+})
+
+onUnmounted(() => unlisten())
 </script>
 
 <style scoped lang="scss">

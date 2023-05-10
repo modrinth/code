@@ -117,9 +117,13 @@ defineExpose({
         </section>
       </div>
       <div class="router-view">
-        <Suspense>
-          <RouterView />
-        </Suspense>
+        <RouterView v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense>
+              <component :is="Component"></component>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
   </div>
@@ -133,10 +137,10 @@ defineExpose({
   overflow: hidden;
 
   .view {
-    width: calc(100% - 5rem);
+    width: var(--view-width);
 
     &.expanded {
-      width: calc(100% - 12rem);
+      width: var(--expanded-view-width);
     }
 
     .appbar {

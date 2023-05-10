@@ -360,7 +360,7 @@ const setJavaInstall = (javaInstall) => {
   </transition>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .concurrent-downloads {
   width: 80% !important;
 }
