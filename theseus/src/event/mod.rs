@@ -146,20 +146,24 @@ impl Drop for LoadingBar {
 pub enum LoadingBarType {
     StateInit,
     PackFileDownload {
-        pack_name: Option<String>,
+        profile_path: PathBuf,
+        pack_name: String,
+        icon: Option<String>,
         pack_version: String,
     },
     PackDownload {
+        profile_path: PathBuf,
         pack_name: String,
+        icon: Option<PathBuf>,
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
     MinecraftDownload {
-        profile_uuid: Uuid,
+        profile_path: PathBuf,
         profile_name: String,
     },
     ProfileUpdate {
-        profile_uuid: Uuid,
+        profile_path: PathBuf,
         profile_name: String,
     },
 }

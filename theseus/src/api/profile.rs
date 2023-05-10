@@ -139,7 +139,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
         if let Some(profile) = profiles.0.get_mut(profile_path) {
             let loading_bar = init_loading(
                 LoadingBarType::ProfileUpdate {
-                    profile_uuid: profile.uuid,
+                    profile_path: profile.path.clone(),
                     profile_name: profile.metadata.name.clone(),
                 },
                 100.0,
@@ -164,7 +164,7 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
             )
             .await?;
 
-            profile.sync().await?;
+            profile.sync_projects().await?;
 
             Ok(())
         } else {

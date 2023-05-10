@@ -70,6 +70,8 @@ pub struct ProfileMetadata {
     pub name: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub icon: Option<PathBuf>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub icon_url: Option<String>,
     pub game_version: String,
     #[serde(default)]
     pub loader: ModLoader,
@@ -149,6 +151,7 @@ impl Profile {
             metadata: ProfileMetadata {
                 name,
                 icon: None,
+                icon_url: None,
                 game_version: version,
                 loader: ModLoader::Vanilla,
                 loader_version: None,

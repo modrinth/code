@@ -78,13 +78,28 @@ enum PackDependency {
 
 pub async fn install_pack_from_version_id(
     version_id: String,
-    title: Option<String>,
+    title: String,
+    icon_url: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
     Box::pin(async move {
+        let profile = crate::api::profile_create::profile_create(
+            title.clone(),
+            "1.19.4".to_string(),
+            ModLoader::Vanilla,
+            None,
+            None,
+            icon_url.clone(),
+            None,
+            Some(true),
+        )
+        .await?;
+
         let loading_bar = init_loading(
             LoadingBarType::PackFileDownload {
+                profile_path: profile.clone(),
                 pack_name: title,
+                icon: icon_url,
                 pack_version: version_id.clone(),
             },
             100.0,
@@ -173,6 +188,7 @@ pub async fn install_pack_from_version_id(
             Some(version.project_id),
             Some(version.id),
             Some(loading_bar),
+            profile,
         )
         .await
     })
@@ -180,9 +196,36 @@ pub async fn install_pack_from_version_id(
 }
 
 pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
-    let file = fs::read(path).await?;
+    let file = fs::read(&path).await?;
 
-    install_pack(bytes::Bytes::from(file), None, None, None, None, None).await
+    let file_name = path
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+
+    let profile = crate::api::profile_create::profile_create(
+        file_name,
+        "1.19.4".to_string(),
+        ModLoader::Vanilla,
+        None,
+        None,
+        None,
+        None,
+        Some(true),
+    )
+    .await?;
+
+    install_pack(
+        bytes::Bytes::from(file),
+        None,
+        None,
+        None,
+        None,
+        None,
+        profile,
+    )
+    .await
 }
 
 async fn install_pack(
@@ -192,6 +235,7 @@ async fn install_pack(
     project_id: Option<String>,
     version_id: Option<String>,
     existing_loading_bar: Option<LoadingBarId>,
+    profile: PathBuf,
 ) -> crate::Result<PathBuf> {
     let state = &State::get().await?;
 
@@ -263,33 +307,38 @@ async fn install_pack(
                 .into());
             };
 
-            let profile_raw = crate::api::profile_create::profile_create(
-                override_title.unwrap_or_else(|| pack.name.clone()),
-                game_version.clone(),
-                mod_loader.unwrap_or(ModLoader::Vanilla),
-                loader_version.cloned(),
-                icon,
-                Some(LinkedData {
+            let loader_version =
+                crate::profile_create::get_loader_version_from_loader(
+                    game_version.clone(),
+                    mod_loader.unwrap_or(ModLoader::Vanilla),
+                    loader_version.cloned(),
+                )
+                .await?;
+            crate::api::profile::edit(&profile, |prof| {
+                prof.metadata.name =
+                    override_title.clone().unwrap_or_else(|| pack.name.clone());
+                prof.install_stage = ProfileInstallStage::PackInstalling;
+                prof.metadata.linked_data = Some(LinkedData {
                     project_id: project_id.clone(),
                     version_id: version_id.clone(),
-                }),
-                Some(true),
-            )
-            .await?;
-            crate::api::profile::edit(&profile_raw, |prof| {
-                prof.install_stage = ProfileInstallStage::PackInstalling;
+                });
+                prof.metadata.icon = icon.clone();
+                prof.metadata.game_version = game_version.clone();
+                prof.metadata.loader_version = loader_version.clone();
 
                 async { Ok(()) }
             })
             .await?;
             State::sync().await?;
 
-            let profile = profile_raw.clone();
+            let profile = profile.clone();
             let result = async {
                 let loading_bar = init_or_edit_loading(
                     existing_loading_bar,
                     LoadingBarType::PackDownload {
+                        profile_path: profile.clone(),
                         pack_name: pack.name.clone(),
+                        icon,
                         pack_id: project_id,
                         pack_version: version_id,
                     },
@@ -439,19 +488,21 @@ async fn install_pack(
                     )?;
                 }
 
-                Ok::<PathBuf, crate::Error>(profile)
+                Ok::<PathBuf, crate::Error>(profile.clone())
             }
             .await;
 
             match result {
                 Ok(profile) => Ok(profile),
                 Err(err) => {
-                    let _ = crate::api::profile::remove(&profile_raw).await;
+                    let _ = crate::api::profile::remove(&profile).await;
 
                     Err(err)
                 }
             }
         } else {
+            let _ = crate::api::profile::remove(&profile).await;
+
             Err(crate::Error::from(crate::ErrorKind::InputError(
                 "No pack manifest found in mrpack".to_string(),
             )))
