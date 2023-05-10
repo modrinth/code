@@ -1,12 +1,11 @@
 //! Authentication flow based on Hydra
-use crate::util::fetch::{fetch_advanced, fetch_json};
+use crate::util::fetch::{fetch_advanced, fetch_json, FetchSemaphore};
 use async_tungstenite as ws;
 use chrono::{prelude::*, Duration};
 use futures::prelude::*;
 use lazy_static::lazy_static;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
-use tokio::sync::{RwLock, Semaphore};
 use url::Url;
 
 lazy_static! {
@@ -95,7 +94,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
 
     pub async fn extract_credentials(
         &mut self,
-        semaphore: &RwLock<Semaphore>,
+        semaphore: &FetchSemaphore,
     ) -> crate::Result<Credentials> {
         // Minecraft bearer token
         let token_resp = self
@@ -130,7 +129,7 @@ impl HydraAuthFlow<ws::tokio::ConnectStream> {
 
 pub async fn refresh_credentials(
     credentials: &mut Credentials,
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &FetchSemaphore,
 ) -> crate::Result<()> {
     let resp = fetch_json::<TokenJSON>(
         Method::POST,
@@ -152,7 +151,7 @@ pub async fn refresh_credentials(
 // Helpers
 async fn fetch_info(
     token: &str,
-    semaphore: &RwLock<Semaphore>,
+    semaphore: &FetchSemaphore,
 ) -> crate::Result<ProfileInfoJSON> {
     let result = fetch_advanced(
         Method::GET,
@@ -160,6 +159,7 @@ async fn fetch_info(
         None,
         None,
         Some(("Authorization", &format!("Bearer {token}"))),
+        None,
         semaphore,
     )
     .await?;

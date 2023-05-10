@@ -18,6 +18,7 @@ Settings {
     "hooks": Hooks,
     "max_concurrent_downloads": uint,
     "version": u32,
+    "collapsed_navigation": bool,
 }
 
 Memorysettings {

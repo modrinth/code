@@ -1,7 +1,11 @@
 import { defineStore } from 'pinia'
 
 export const useTheming = defineStore('themeStore', {
-  state: () => ({ themeOptions: ['light', 'dark'], selectedTheme: 'dark' }),
+  state: () => ({
+    themeOptions: ['light', 'dark'],
+    collapsedNavigation: false,
+    selectedTheme: 'dark',
+  }),
   actions: {
     setThemeState(newTheme) {
       if (this.themeOptions.includes(newTheme)) this.selectedTheme = newTheme

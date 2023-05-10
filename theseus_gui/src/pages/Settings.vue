@@ -12,6 +12,7 @@ import {
   XIcon,
   PlusIcon,
   AnimatedLogo,
+  Toggle,
 } from 'omorphia'
 import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
@@ -43,6 +44,12 @@ const detectJavaModal = ref(null)
 const handleTheme = async (e) => {
   themeStore.setThemeState(e.option.toLowerCase())
   settings.value.theme = themeStore.selectedTheme
+  await set(settings.value)
+}
+
+const handleCollapse = async (e) => {
+  themeStore.collapsedNavigation = e
+  settings.value.collapsed_navigation = themeStore.collapsedNavigation
   await set(settings.value)
 }
 
@@ -173,6 +180,17 @@ const setJavaInstall = (javaInstall) => {
           :model-value="settings.theme"
           class="theme-dropdown"
           @change="handleTheme"
+        />
+      </div>
+      <div class="toggle-setting">
+        <div class="description">
+          <h3>Collapsed navigation mode</h3>
+          <p>Change the style of the side navigation bar</p>
+        </div>
+        <Toggle
+          :model-value="themeStore.collapsedNavigation"
+          :checked="themeStore.collapsedNavigation"
+          @update:model-value="(value) => handleCollapse(value)"
         />
       </div>
     </Card>
@@ -329,7 +347,7 @@ const setJavaInstall = (javaInstall) => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .concurrent-downloads {
   width: 80% !important;
 }
@@ -365,6 +383,7 @@ const setJavaInstall = (javaInstall) => {
   margin: 1rem;
   display: flex;
   flex-direction: column;
+  gap: 1rem;
 }
 
 .theming {

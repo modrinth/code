@@ -9,6 +9,7 @@ export const useSearch = defineStore('searchStore', {
     pageCount: 1,
     offset: 0,
     filter: 'Relevance',
+    projectType: '',
     facets: [],
     orFacets: [],
     environments: {
@@ -18,10 +19,15 @@ export const useSearch = defineStore('searchStore', {
     activeVersions: [],
     openSource: false,
     limit: 20,
+    instanceContext: null,
   }),
   actions: {
     getQueryString() {
-      let andFacets = ['project_type:modpack']
+      let andFacets = [`project_type:${this.projectType === 'datapack' ? 'mod' : this.projectType}`]
+
+      if (this.instanceContext) {
+        this.activeVersions = [this.instanceContext.metadata.game_version]
+      }
 
       // Iterate through possible andFacets
       this.facets.forEach((facet) => {
@@ -32,7 +38,18 @@ export const useSearch = defineStore('searchStore', {
 
       // Create andFacet string
       let formattedAndFacets = ''
-      andFacets.forEach((f) => (formattedAndFacets += `["${f}"],`))
+      if (this.projectType === 'datapack') {
+        ;[...andFacets, `categories:${encodeURIComponent('datapack')}`].forEach(
+          (f) => (formattedAndFacets += `["${f}"],`)
+        )
+      } else if (this.instanceContext && this.projectType === 'mod') {
+        ;[
+          ...andFacets,
+          `categories:${encodeURIComponent(this.instanceContext.metadata.loader)}`,
+        ].forEach((f) => (formattedAndFacets += `["${f}"],`))
+      } else {
+        andFacets.forEach((f) => (formattedAndFacets += `["${f}"],`))
+      }
       formattedAndFacets = formattedAndFacets.slice(0, formattedAndFacets.length - 1)
       formattedAndFacets += ''
 

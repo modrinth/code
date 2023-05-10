@@ -45,7 +45,7 @@
         :disabled="!filterLoader && !filterVersions && !filterCompatible"
         :action="clearFilters"
       >
-        <CheckCircleIcon />
+        <ClearIcon />
         Clear Filters
       </Button>
     </div>
@@ -65,8 +65,14 @@
         @click="$router.push(`/project/${$route.params.id}/version/${version.id}`)"
       >
         <div class="table-cell table-text">
-          <Button color="primary" icon-only @click.stop="() => install(version.id)">
-            <DownloadIcon />
+          <Button
+            color="primary"
+            icon-only
+            :disabled="installed"
+            @click.stop="() => install(version.id)"
+          >
+            <DownloadIcon v-if="!installed" />
+            <CheckIcon v-else />
           </Button>
         </div>
         <div class="name-cell table-cell table-text">
@@ -126,7 +132,8 @@
 import {
   Card,
   Button,
-  CheckCircleIcon,
+  CheckIcon,
+  ClearIcon,
   Badge,
   DownloadIcon,
   Checkbox,
@@ -153,6 +160,10 @@ defineProps({
   },
   install: {
     type: Function,
+    required: true,
+  },
+  installed: {
+    type: Boolean,
     required: true,
   },
 })
