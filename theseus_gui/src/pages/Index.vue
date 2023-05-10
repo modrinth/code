@@ -1,6 +1,6 @@
 <script setup>
 import { list } from '@/helpers/profile.js'
-import {ref, onUnmounted, shallowRef} from 'vue'
+import { ref, onUnmounted, shallowRef } from 'vue'
 import { ofetch } from 'ofetch'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'

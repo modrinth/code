@@ -31,7 +31,7 @@
             Play
           </Button>
           <Button v-else-if="loading === true && playing === false" disabled class="instance-button"
-          >Loading...</Button
+            >Loading...</Button
           >
           <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
             <OpenFolderIcon />
@@ -68,7 +68,7 @@ import {
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
-import {process_listener, profile_listener} from '@/helpers/events'
+import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'

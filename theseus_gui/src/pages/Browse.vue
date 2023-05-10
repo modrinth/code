@@ -144,7 +144,7 @@ watch(
           )
         "
         @click="handleReset"
-      ><ClearIcon />Clear Filters</Button
+        ><ClearIcon />Clear Filters</Button
       >
       <div
         v-for="categoryList in Array.from(sortedCategories)"
@@ -454,5 +454,4 @@ watch(
     }
   }
 }
-
 </style>

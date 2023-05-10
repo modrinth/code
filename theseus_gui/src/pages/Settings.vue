@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue'
+import { ref, watch } from 'vue'
 import {
   Card,
   Slider,
@@ -22,20 +22,15 @@ import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
 
-const settings = ref(null)
-const loading = ref(true)
+const fetchSettings = await get()
 
-onMounted(async () => {
-  const fetchSettings = await get()
+if (!fetchSettings.java_globals?.JAVA_8)
+  fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
+if (!fetchSettings.java_globals?.JAVA_17)
+  fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
 
-  if (!fetchSettings.java_globals?.JAVA_8)
-    fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
-  if (!fetchSettings.java_globals?.JAVA_17)
-    fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
+const settings = ref(fetchSettings)
 
-  settings.value = fetchSettings
-  loading.value = false
-})
 const chosenInstallOptions = ref([])
 const browsingInstall = ref(0)
 
@@ -352,7 +347,6 @@ const setJavaInstall = (javaInstall) => {
     </Card>
   </div>
 </template>
-
 
 <style lang="scss">
 .concurrent-downloads {

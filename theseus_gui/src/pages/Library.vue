@@ -23,12 +23,8 @@ loading_listener(async (profile) => {
   console.log(profile)
   if (profile.event === 'loaded') {
     const profiles = await list()
-    instances.value = Object.values(profiles).filter(
-      (prof) => !prof.metadata.linked_project_id
-    )
-    modpacks.value = Object.values(profiles).filter(
-      (prof) => prof.metadata.linked_project_id
-    )
+    instances.value = Object.values(profiles).filter((prof) => !prof.metadata.linked_project_id)
+    modpacks.value = Object.values(profiles).filter((prof) => prof.metadata.linked_project_id)
   }
 })
 </script>
