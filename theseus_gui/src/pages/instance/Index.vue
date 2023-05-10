@@ -1,15 +1,15 @@
 <template>
-    <div class="instance-container">
-      <div class="side-cards">
-        <Card class="instance-card">
-          <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
-          <div class="instance-info">
-            <h2 class="name">{{ instance.metadata.name }}</h2>
-            <span class="metadata">
-              {{ instance.metadata.loader }} {{ instance.metadata.game_version }}
-            </span>
-          </div>
-          <span class="button-group">
+  <div class="instance-container">
+    <div class="side-cards">
+      <Card class="instance-card">
+        <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
+        <div class="instance-info">
+          <h2 class="name">{{ instance.metadata.name }}</h2>
+          <span class="metadata">
+            {{ instance.metadata.loader }} {{ instance.metadata.game_version }}
+          </span>
+        </div>
+        <span class="button-group">
           <Button
             v-if="playing === true"
             color="danger"
@@ -37,27 +37,27 @@
             <OpenFolderIcon />
           </Button>
         </span>
-        </Card>
-        <div class="pages-list">
-          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
-            <BoxIcon />
-            Mods
-          </RouterLink>
-          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
-            <SettingsIcon />
-            Options
-          </RouterLink>
-          <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
-            <FileIcon />
-            Logs
-          </RouterLink>
-        </div>
+      </Card>
+      <div class="pages-list">
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/`" class="btn">
+          <BoxIcon />
+          Mods
+        </RouterLink>
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
+          <SettingsIcon />
+          Options
+        </RouterLink>
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
+          <FileIcon />
+          Logs
+        </RouterLink>
       </div>
-      <div class="content">
-        <Promotion />
-        <router-view :instance="instance" />
     </div>
+    <div class="content">
+      <Promotion />
+      <router-view :instance="instance" />
     </div>
+  </div>
 </template>
 <script setup>
 import { BoxIcon, SettingsIcon, FileIcon, XIcon, Button, Avatar, Card, Promotion } from 'omorphia'
