@@ -60,9 +60,7 @@ const install = async (e) => {
   e.stopPropagation()
   modLoading.value = true
   const versions = await ofetch(
-    `https://api.modrinth.com/v2/project/${
-      props.instance.project_id
-    }/version`
+    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`
   )
 
   if (props.instance.project_type === 'modpack') {

@@ -31,7 +31,7 @@ loading_listener(async (profile) => {
 
 <template>
   <div>
-    <GridDisplay v-if="instances.length > 0 " label="Instances" :instances="instances" />
+    <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
     <GridDisplay v-if="modpacks.length > 0" label="Modpacks" :instances="modpacks" />
   </div>
 </template>
