@@ -129,8 +129,7 @@ watch(
 
 <template>
   <transition name="fade">
-    <SplashScreen v-if="loading" />
-    <div v-else class="search-container">
+    <div class="search-container">
       <aside class="filter-panel">
         <Instance
           v-if="searchStore.instanceContext"
@@ -312,7 +311,8 @@ watch(
           :count="searchStore.pageCount"
           @switch-page="switchPage"
         />
-        <section class="project-list display-mode--list instance-results" role="list">
+        <SplashScreen v-if="loading"/>
+        <section v-else class="project-list display-mode--list instance-results" role="list">
           <ProjectCard
             v-for="result in searchStore.searchResults"
             :id="`${result?.project_id}/`"
@@ -461,13 +461,4 @@ watch(
   }
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
 </style>

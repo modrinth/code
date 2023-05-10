@@ -19,7 +19,6 @@ import { useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { find_jre_8_jres, find_jre_17_jres, get_jre } from '@/helpers/jre'
 import { open } from '@tauri-apps/api/dialog'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const themeStore = useTheming()
 
@@ -126,9 +125,7 @@ const setJavaInstall = (javaInstall) => {
 </script>
 
 <template>
-  <transition name="fade">
-    <SplashScreen v-if="loading" />
-    <div v-else>
+    <div>
       <Modal ref="detectJavaModal" header="Select java version">
         <div class="auto-detect-modal">
           <div class="table">
@@ -357,7 +354,6 @@ const setJavaInstall = (javaInstall) => {
         </div>
       </Card>
     </div>
-  </transition>
 </template>
 
 <style lang="scss">
@@ -479,15 +475,5 @@ const setJavaInstall = (javaInstall) => {
 
 .test-fail {
   color: var(--color-red);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

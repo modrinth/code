@@ -1,7 +1,5 @@
 <template>
-  <transition name="fade">
-    <SplashScreen v-if="loading" />
-    <div v-else class="root-container">
+    <div class="root-container">
       <div v-if="data" class="project-sidebar">
         <Instance v-if="instance" :instance="instance" small />
         <Card class="sidebar-card">
@@ -195,7 +193,6 @@
         />
       </div>
     </div>
-  </transition>
   <InstallConfirmModal ref="confirmModal" />
   <InstanceInstallModal ref="modInstallModal" />
 </template>
@@ -244,7 +241,6 @@ import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const searchStore = useSearch()
 
@@ -511,15 +507,5 @@ async function install(version) {
   :deep(svg) {
     color: var(--color-contrast);
   }
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
 }
 </style>

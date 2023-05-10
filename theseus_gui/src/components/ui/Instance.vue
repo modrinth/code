@@ -85,7 +85,7 @@ const install = async (e) => {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
-      await pack_install(versions.value[0].id)
+      await pack_install(versions.value[0].id, data.value.title)
     } else confirmModal.value.show(versions.value[0].id)
   }
 
@@ -357,11 +357,13 @@ await process_listener((e) => {
       box-shadow: var(--shadow-floating);
     }
   }
+
   img {
     width: 100%;
     border-radius: var(--radius-sm);
     filter: none !important;
     aspect-ratio: 1;
+  }
 
   .project-info {
     margin-top: 1rem;
