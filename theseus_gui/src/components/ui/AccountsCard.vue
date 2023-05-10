@@ -248,7 +248,7 @@ onBeforeUnmount(() => {
   padding-right: 1rem;
 }
 
-.initializing-icon-active,
+.fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
 }

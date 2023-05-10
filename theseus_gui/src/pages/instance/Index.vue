@@ -356,23 +356,4 @@ Button {
   height: 1px;
   margin: var(--gap-xl) 0;
 }
-
-.loading-icon {
-  width: 1.5rem;
-  height: 1.5rem;
-  animation: spin 1s linear infinite;
-  color: var(--color-base);
-
-  :deep(svg) {
-    color: var(--color-base);
-    fill: var(--color-base);
-    left: 2rem;
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-
-  :deep(path) {
-    fill: var(--color-base) !important;
-  }
-}
 </style>
