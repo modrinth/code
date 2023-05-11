@@ -84,10 +84,10 @@ const loading = useLoading()
         <Button
           class="sleek-primary"
           :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
-            }"
+            'icon-only': themeStore.collapsedNavigation,
+            'collapsed-button': themeStore.collapsedNavigation,
+            'expanded-button': !themeStore.collapsedNavigation,
+          }"
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />

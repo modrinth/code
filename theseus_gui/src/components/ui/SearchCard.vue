@@ -65,7 +65,7 @@ import {
   HeartIcon,
   CalendarIcon,
   CheckIcon,
-  StarIcon
+  StarIcon,
 } from 'omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -162,7 +162,6 @@ const install = async () => {
 </script>
 
 <style scoped lang="scss">
-
 #icon {
   grid-column: 1;
   grid-row: 1 / 3;

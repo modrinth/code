@@ -140,7 +140,7 @@ const check_valid = computed(() => {
   <Modal ref="installModal" header="Install mod to instance">
     <div class="modal-body">
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
-      <div class="profiles" :class="{'hide-creation': !showCreation}">
+      <div class="profiles" :class="{ 'hide-creation': !showCreation }">
         <div v-for="profile in filteredVersions" :key="profile.metadata.name" class="option">
           <Button
             color="raised"
