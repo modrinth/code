@@ -101,3 +101,8 @@ export async function run(path) {
 export async function run_wait(path) {
   return await invoke('profile_run_wait', { path })
 }
+
+// Edits a profile
+export async function edit(path, editProfile) {
+  return await invoke('profile_edit', { path, editProfile })
+}

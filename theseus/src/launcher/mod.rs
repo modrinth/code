@@ -1,6 +1,7 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
+use crate::state::ProfileInstallStage;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
@@ -59,9 +60,18 @@ pub async fn install_minecraft(
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     Box::pin(async move {
+        crate::api::profile::edit(&profile.path, |prof| {
+            prof.install_stage = ProfileInstallStage::Installing;
+
+            async { Ok(()) }
+        })
+            .await?;
+        State::sync().await?;
+
         let state = State::get().await?;
         let instance_path = &canonicalize(&profile.path)?;
         let metadata = state.metadata.read().await;
+
         let version = metadata
             .minecraft
             .versions
@@ -85,7 +95,7 @@ pub async fn install_minecraft(
             LoadingBarType::MinecraftDownload {
                 // If we are downloading minecraft for a profile, provide its name and uuid
                 profile_name: profile.metadata.name.clone(),
-                profile_uuid: profile.uuid,
+                profile_path: profile.path.clone(),
             },
             100.0,
             "Downloading Minecraft",
@@ -202,11 +212,11 @@ pub async fn install_minecraft(
         }
 
         crate::api::profile::edit(&profile.path, |prof| {
-            prof.installed = true;
+            prof.install_stage = ProfileInstallStage::Installed;
 
             async { Ok(()) }
         })
-        .await?;
+            .await?;
         State::sync().await?;
         emit_loading(
             &loading_bar,
@@ -232,7 +242,16 @@ pub async fn launch_minecraft(
     profile: &Profile,
 ) -> crate::Result<Arc<tokio::sync::RwLock<MinecraftChild>>> {
     Box::pin(async move {
-        if !profile.installed {
+        if profile.install_stage == ProfileInstallStage::PackInstalling
+            || profile.install_stage == ProfileInstallStage::Installing
+        {
+            return Err(crate::ErrorKind::LauncherError(
+                "Profile is still installing".to_string(),
+            )
+                .into());
+        }
+
+        if profile.install_stage != ProfileInstallStage::Installed {
             install_minecraft(profile, None).await?;
         }
 
