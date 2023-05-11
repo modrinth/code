@@ -13,7 +13,8 @@ pub mod tags;
 pub mod data {
     pub use crate::state::{
         DirectoryInfo, Hooks, JavaSettings, MemorySettings, ModLoader,
-        ProfileMetadata, Settings, Theme, WindowSize,
+        ModrinthProject, ModrinthTeamMember, ModrinthUser, ModrinthVersion,
+        ProfileMetadata, ProjectMetadata, Settings, Theme, WindowSize,
     };
 }
 

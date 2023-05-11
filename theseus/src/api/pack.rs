@@ -477,7 +477,7 @@ async fn install_pack(
                 .await?;
 
                 if let Some(profile) =
-                    crate::api::profile::get(&profile).await?
+                    crate::api::profile::get(&profile, None).await?
                 {
                     tokio::try_join!(
                         super::profile::sync(&profile.path),

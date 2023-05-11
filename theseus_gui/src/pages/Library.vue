@@ -11,12 +11,12 @@ const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
-const profiles = await list()
+const profiles = await list(true)
 const instances = shallowRef(Object.values(profiles))
 
 loading_listener(async (profile) => {
   if (profile.event === 'loaded') {
-    const profiles = await list()
+    const profiles = await list(true)
     instances.value = Object.values(profiles)
   }
 })

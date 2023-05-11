@@ -64,7 +64,7 @@ const install = async (e) => {
   )
 
   if (props.instance.project_type === 'modpack') {
-    const packs = Object.values(await list())
+    const packs = Object.values(await list(true))
 
     if (
       packs.length === 0 ||

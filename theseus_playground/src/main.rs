@@ -61,7 +61,7 @@ async fn main() -> theseus::Result<()> {
     // Clear profiles
     println!("Clearing profiles.");
     {
-        let h = profile::list().await?;
+        let h = profile::list(None).await?;
         for (path, _) in h.into_iter() {
             profile::remove(&path).await?;
         }

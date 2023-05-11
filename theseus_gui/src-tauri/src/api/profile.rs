@@ -16,8 +16,11 @@ pub async fn profile_remove(path: &Path) -> Result<()> {
 // Get a profile by path
 // invoke('profile_add_path',path)
 #[tauri::command]
-pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
-    let res = profile::get(path).await?;
+pub async fn profile_get(
+    path: &Path,
+    clear_projects: Option<bool>,
+) -> Result<Option<Profile>> {
+    let res = profile::get(path, clear_projects).await?;
     Ok(res)
 }
 
@@ -25,9 +28,30 @@ pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
 // invoke('profile_list')
 #[tauri::command]
 pub async fn profile_list(
+    clear_projects: Option<bool>,
 ) -> Result<std::collections::HashMap<PathBuf, Profile>> {
-    let res = profile::list().await?;
+    let res = profile::list(clear_projects).await?;
     Ok(res)
+}
+
+#[tauri::command]
+pub async fn profile_check_installed(
+    path: &Path,
+    project_id: String,
+) -> Result<bool> {
+    let profile = profile_get(path, None).await?;
+    if let Some(profile) = profile {
+        Ok(profile.projects.into_iter().any(|(_, project)| {
+            if let ProjectMetadata::Modrinth { project, .. } = &project.metadata
+            {
+                project.id == project_id
+            } else {
+                false
+            }
+        }))
+    } else {
+        Ok(false)
+    }
 }
 
 /// Syncs a profile's in memory state with the state on the disk
