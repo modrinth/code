@@ -134,6 +134,7 @@ fn main() {
             api::metadata::metadata_get_game_versions,
             api::metadata::metadata_get_fabric_versions,
             api::metadata::metadata_get_forge_versions,
+            api::metadata::metadata_get_quilt_versions,
             api::logs::logs_get_logs,
             api::logs::logs_get_logs_by_datetime,
             api::logs::logs_get_stdout_by_datetime,
