@@ -55,7 +55,7 @@ async function install(instance) {
   await installMod(instance.path, version.id)
   await installVersionDependencies(instance, version)
 
-  instance.installed = true
+  instance.installedMod = true
   instance.installing = false
 }
 
@@ -75,7 +75,7 @@ const filteredVersions = computed(() => {
 
   filtered.map((profile) => {
     profile.installing = false
-    profile.installed = checkInstalled(profile, project.value)
+    profile.installedMod = checkInstalled(profile, project.value)
   })
 
   return filtered
@@ -149,10 +149,12 @@ const check_valid = computed(() => {
             <Avatar :src="convertFileSrc(profile.metadata.icon)" class="profile-image" />
             {{ profile.metadata.name }}
           </Button>
-          <Button :disabled="profile.installed || profile.installing" @click="install(profile)">
-            <DownloadIcon v-if="!profile.installed && !profile.installing" />
-            <CheckIcon v-else-if="profile.installed" />
-            {{ profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install' }}
+          <Button :disabled="profile.installedMod || profile.installing" @click="install(profile)">
+            <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
+            <CheckIcon v-else-if="profile.installedMod" />
+            {{
+              profile.installing ? 'Installing...' : profile.installedMod ? 'Installed' : 'Install'
+            }}
           </Button>
         </div>
       </div>

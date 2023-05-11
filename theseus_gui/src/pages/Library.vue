@@ -12,28 +12,28 @@ const breadcrumbs = useBreadcrumbs()
 breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
 const profiles = await list()
-const instances = shallowRef(
-  Object.values(profiles).filter((prof) => !prof.metadata.linked_project_id)
-)
-const modpacks = shallowRef(
-  Object.values(profiles).filter((prof) => prof.metadata.linked_project_id)
-)
+const instances = shallowRef(Object.values(profiles))
 
 loading_listener(async (profile) => {
-  console.log(profile)
   if (profile.event === 'loaded') {
     const profiles = await list()
-    instances.value = Object.values(profiles).filter((prof) => !prof.metadata.linked_project_id)
-    modpacks.value = Object.values(profiles).filter((prof) => prof.metadata.linked_project_id)
+    instances.value = Object.values(profiles)
   }
 })
 </script>
 
 <template>
-  <div>
-    <GridDisplay v-if="instances.length > 0" label="Instances" :instances="instances" />
-    <GridDisplay v-if="modpacks.length > 0" label="Modpacks" :instances="modpacks" />
-  </div>
+  <GridDisplay
+    v-if="instances.length > 0"
+    label="Instances"
+    :instances="instances"
+    class="display"
+  />
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.display {
+  background-color: rgb(30, 31, 34);
+  min-height: 100%;
+}
+</style>

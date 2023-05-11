@@ -41,6 +41,7 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
 // Creates a profile at  the given filepath and adds it to the in-memory state
 // Returns filepath at which it can be accessed in the State
 #[tracing::instrument]
+#[allow(clippy::too_many_arguments)]
 pub async fn profile_create(
     name: String,         // the name of the profile, and relative path
     game_version: String, // the game version of the profile
@@ -82,7 +83,6 @@ pub async fn profile_create(
             "Creating profile at path {}",
             &canonicalize(&path)?.display()
         );
-    
         let loader = if modloader != ModLoader::Vanilla {
             get_loader_version_from_loader(game_version.clone(), modloader, loader_version).await?
         } else {

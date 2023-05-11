@@ -28,6 +28,7 @@ pub async fn profile_create(
         icon,
         None,
         None,
+        None,
     )
     .await?;
     Ok(res)
