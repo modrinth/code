@@ -101,6 +101,7 @@ const upload_icon = async () => {
     ],
   })
 
+  if (!icon.value) return
   display_icon.value = tauri.convertFileSrc(icon.value)
 }
 
@@ -139,7 +140,7 @@ const check_valid = computed(() => {
   <Modal ref="installModal" header="Install mod to instance">
     <div class="modal-body">
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
-      <div class="profiles">
+      <div class="profiles" :class="{'hide-creation': !showCreation}">
         <div v-for="profile in filteredVersions" :key="profile.metadata.name" class="option">
           <Button
             color="raised"
@@ -255,6 +256,10 @@ const check_valid = computed(() => {
 .profiles {
   max-height: 12rem;
   overflow-y: auto;
+
+  &.hide-creation {
+    max-height: 21rem;
+  }
 }
 
 .option {
@@ -267,6 +272,7 @@ const check_valid = computed(() => {
   justify-content: space-between;
   align-items: center;
   padding: 0 0.5rem;
+  gap: 0.5rem;
 
   img {
     margin-right: 0.5rem;
@@ -279,7 +285,9 @@ const check_valid = computed(() => {
   }
 
   .profile-button {
+    align-content: start;
     padding: 0.5rem;
+    text-align: left;
   }
 }
 

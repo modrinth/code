@@ -183,6 +183,7 @@ const upload_icon = async () => {
     ],
   })
 
+  if (!icon.value) return
   display_icon.value = tauri.convertFileSrc(icon.value)
 }
 

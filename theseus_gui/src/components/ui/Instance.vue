@@ -38,8 +38,8 @@ const router = useRouter()
 
 const seeInstance = async () => {
   const instancePath = props.instance.metadata
-    ? `/instance/${encodeURIComponent(props.instance.path)}`
-    : `/project/${encodeURIComponent(props.instance.project_id)}`
+    ? `/instance/${encodeURIComponent(props.instance.path)}/`
+    : `/project/${encodeURIComponent(props.instance.project_id)}/`
 
   await router.push(instancePath)
 }
@@ -125,7 +125,7 @@ await process_listener((e) => {
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card button-base">
+    <Card v-if="props.small" class="instance-small-card button-base" @click="seeInstance">
       <Avatar
         :src="convertFileSrc(props.instance.metadata.icon)"
         :alt="props.instance.metadata.name"
@@ -165,13 +165,13 @@ await process_listener((e) => {
       </div>
     </Card>
     <div
-      v-if="props.instance.metadata && playing === false && modLoading === false"
+      v-if="!props.small && props.instance.metadata && playing === false && modLoading === false"
       class="install cta button-base"
       @click="play"
     >
       <PlayIcon />
     </div>
-    <div v-else-if="modLoading === true && playing === false" class="cta loading">
+    <div v-else-if="!props.small && modLoading === true && playing === false" class="cta loading">
       <AnimatedLogo class="loading" />
     </div>
     <div
@@ -182,7 +182,7 @@ await process_listener((e) => {
     >
       <XIcon />
     </div>
-    <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+    <div v-else-if="!props.small" class="install cta buttonbase" @click="install"><SaveIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
   </div>
 </template>

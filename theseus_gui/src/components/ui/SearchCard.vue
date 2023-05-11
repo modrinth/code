@@ -1,56 +1,54 @@
 <template>
-  <Card class="card card-content button-base" @click="$router.push(`/project/${project.project_id}/`)">
-      <div class="content">
-        <Avatar :src="project.icon_url" size="md" />
+  <Card class="card button-base" @click="$router.push(`/project/${project.project_id}/`)">
+    <div id="icon">
+      <Avatar :src="project.icon_url" size="md" class="search-icon" />
+    </div>
+    <div id="title" class="no-wrap joined-text">
+      <h2>{{ project.title }}</h2>
+      <span>by {{ project.author }}</span>
+    </div>
+    <div id="description">
+      {{ project.description }}
+      <Categories :categories="categories" :type="project.project_type" class="tags">
+        <EnvironmentIndicator
+          :type-only="project.moderation"
+          :client-side="project.client_side"
+          :server-side="project.server_side"
+          :type="project.project_type"
+          :search="true"
+        />
+      </Categories>
+    </div>
+    <div id="stats" class="button-group">
+      <div v-if="featured" class="badge">
+        <StarIcon />
+        Featured
       </div>
-      <div class="content description">
-        <div class="content">
-          <div class="no-wrap joined-text">
-            <h2>{{ project.title }}</h2>
-            <span>by {{ project.author }}</span>
-          </div>
-          <p>
-            {{ project.description }}
-          </p>
-        </div>
-        <Categories :categories="categories" :type="project.project_type" class="tags">
-          <EnvironmentIndicator
-            :type-only="project.moderation"
-            :client-side="project.client_side"
-            :server-side="project.server_side"
-            :type="project.project_type"
-            :search="true"
-          />
-        </Categories>
+      <div class="badge">
+        <DownloadIcon />
+        {{ formatNumber(project.downloads) }}
       </div>
-      <div class="content badges">
-        <Button
-          :to="`/browse/${project.slug}`"
-          color="primary"
-          :disabled="installed || installing"
-          @click.stop="install()"
-        >
-          <DownloadIcon v-if="!installed" />
-          <CheckIcon v-else />
-          {{ installing ? 'Installing' : installed ? 'Installed' : 'Install' }}
-        </Button>
-        <div class="content">
-          <div class="button-group">
-            <div class="badge">
-              <HeartIcon />
-              {{ formatNumber(project.follows) }}
-            </div>
-            <div class="badge">
-              <DownloadIcon />
-              {{ formatNumber(project.downloads) }}
-            </div>
-            <div class="badge">
-              <CalendarIcon />
-              {{ formatCategory(dayjs(project.date_modified).fromNow()) }}
-            </div>
-          </div>
-        </div>
+      <div class="badge">
+        <HeartIcon />
+        {{ formatNumber(project.follows) }}
       </div>
+      <div class="badge">
+        <CalendarIcon />
+        {{ formatCategory(dayjs(project.date_modified).fromNow()) }}
+      </div>
+    </div>
+    <div id="install">
+      <Button
+        :to="`/browse/${project.slug}`"
+        color="primary"
+        :disabled="installed || installing"
+        @click.stop="install()"
+      >
+        <DownloadIcon v-if="!installed" />
+        <CheckIcon v-else />
+        {{ installing ? 'Installing' : installed ? 'Installed' : 'Install' }}
+      </Button>
+    </div>
   </Card>
 </template>
 
@@ -67,6 +65,7 @@ import {
   HeartIcon,
   CalendarIcon,
   CheckIcon,
+  StarIcon
 } from 'omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
@@ -104,6 +103,10 @@ const props = defineProps({
   modInstallModal: {
     type: Object,
     default: null,
+  },
+  featured: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -159,30 +162,55 @@ const install = async () => {
 </script>
 
 <style scoped lang="scss">
+
+#icon {
+  grid-column: 1;
+  grid-row: 1 / 3;
+  align-self: center;
+}
+
+#title {
+  grid-column: 2 / 4;
+  grid-row: 1;
+  align-self: start;
+}
+
+#description {
+  grid-column: 2 / 4;
+  grid-row: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-self: stretch;
+  justify-self: start;
+}
+
+#stats {
+  grid-column: 1 / 3;
+  grid-row: 3;
+  justify-self: stretch;
+  align-self: start;
+}
+
+#install {
+  grid-column: 3 / 4;
+  grid-row: 3;
+  justify-self: end;
+  align-self: start;
+}
+
 .card {
   margin-bottom: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 1rem;
-  height: 100%;
-  padding: var(--gap-lg);
+  display: grid;
+  grid-template-columns: 6rem auto 7rem;
+  grid-template-rows: min-content auto auto;
+  gap: 0.5rem;
+  padding: 1rem;
 
   &:active:not(&:disabled) {
     scale: 0.98 !important;
   }
-}
-
-.content {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.description {
-  flex-grow: 1;
-  justify-content: space-between;
 }
 
 .background {
@@ -226,31 +254,32 @@ const install = async () => {
 
 .badge {
   display: flex;
-  width: fit-content;
-  height: fit-content;
   border-radius: var(--radius-md);
   white-space: nowrap;
   font-weight: 500;
   align-items: center;
+  background-color: var(--color-bg);
+  padding-block: var(--gap-sm);
+  padding-inline: var(--gap-lg);
 
   svg {
     width: 1.1rem;
     height: 1.1rem;
     margin-right: 0.5rem;
   }
-}
 
-.badges {
-  align-items: flex-end;
-  justify-content: space-between;
+  &.featured {
+    background-color: var(--color-brand-highlight);
+    color: var(--color-contrast);
+  }
 }
 
 .button-group {
   display: inline-flex;
-  flex-wrap: wrap;
   flex-direction: row;
   gap: 0.5rem;
-  align-items: center;
-  justify-content: flex-end;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  justify-content: flex-start;
 }
 </style>
