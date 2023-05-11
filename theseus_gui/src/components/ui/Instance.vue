@@ -74,13 +74,13 @@ const install = async (e) => {
     ) {
       try {
         modLoading.value = true
-        await pack_install(versions[0].id, props.instance.title)
+        await pack_install(versions[0].id, props.instance.title, props.instance.icon_url)
         modLoading.value = false
       } catch (err) {
         console.error(err)
         modLoading.value = false
       }
-    } else confirmModal.value.show(versions[0].id)
+    } else confirmModal.value.show(versions[0].id, props.instance.title, props.instance.icon_url)
   }
 
   modLoading.value = false
@@ -119,7 +119,7 @@ const stop = async (e) => {
 }
 
 await process_listener((e) => {
-  if (e.event === 'Finished' && e.uuid === uuid.value) playing.value = false
+  if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
 })
 </script>
 
@@ -147,10 +147,12 @@ await process_listener((e) => {
       @mouseenter="checkProcess"
     >
       <Avatar
-        size="lg"
+        size="none"
         :src="
           props.instance.metadata
-            ? convertFileSrc(props.instance.metadata?.icon)
+            ? props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http')
+              ? props.instance.metadata.icon
+              : convertFileSrc(props.instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"
@@ -315,8 +317,14 @@ await process_listener((e) => {
     background: hsl(220, 11%, 11%) !important;
   }
 
-  .mod-image {
-    border-radius: 1.5rem !important;
+  > .avatar {
+    --size: 100%;
+
+    width: 100% !important;
+    height: auto !important;
+    max-width: unset !important;
+    max-height: unset !important;
+    aspect-ratio: 1 / 1 !important;
   }
 
   .project-info {

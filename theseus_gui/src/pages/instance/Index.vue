@@ -2,7 +2,14 @@
   <div class="instance-container">
     <div class="side-cards">
       <Card class="instance-card">
-        <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
+        <Avatar
+          size="lg"
+          :src="
+            instance.metadata.icon && instance.metadata.icon.startsWith('http')
+              ? instance.metadata.icon
+              : convertFileSrc(instance.metadata?.icon)
+          "
+        />
         <div class="instance-info">
           <h2 class="name">{{ instance.metadata.name }}</h2>
           <span class="metadata">
@@ -136,7 +143,7 @@ const stopInstance = async () => {
 }
 
 const unlisten = await process_listener((e) => {
-  if (e.event === 'Finished' && uuid.value === e.uuid) playing.value = false
+  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
 })
 
 onUnmounted(() => unlisten())
