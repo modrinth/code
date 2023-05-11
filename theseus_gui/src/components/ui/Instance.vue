@@ -119,7 +119,7 @@ const stop = async (e) => {
 }
 
 await process_listener((e) => {
-  if (e.event === 'Finished' && e.uuid === uuid.value) playing.value = false
+  if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
 })
 </script>
 

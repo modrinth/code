@@ -143,7 +143,7 @@ const stopInstance = async () => {
 }
 
 const unlisten = await process_listener((e) => {
-  if (e.event === 'Finished' && uuid.value === e.uuid) playing.value = false
+  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
 })
 
 onUnmounted(() => unlisten())
