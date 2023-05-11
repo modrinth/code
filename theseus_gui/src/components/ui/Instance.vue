@@ -125,7 +125,7 @@ await process_listener((e) => {
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card button-base">
+    <Card v-if="props.small" class="instance-small-card button-base" @click="seeInstance">
       <Avatar
         :src="
           !props.instance.metadata.icon ||
@@ -172,25 +172,27 @@ await process_listener((e) => {
         </p>
       </div>
     </Card>
-    <div
-      v-if="props.instance.metadata && playing === false && modLoading === false"
-      class="install cta button-base"
-      @click="play"
-    >
-      <PlayIcon />
-    </div>
-    <div v-else-if="modLoading === true && playing === false" class="cta loading">
-      <AnimatedLogo class="loading" />
-    </div>
-    <div
-      v-else-if="playing === true"
-      class="stop cta button-base"
-      @click="stop"
-      @mousehover="checkProcess"
-    >
-      <XIcon />
-    </div>
-    <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+    <template v-if="!props.small">
+      <div
+        v-if="props.instance.metadata && playing === false && modLoading === false"
+        class="install cta button-base"
+        @click="play"
+      >
+        <PlayIcon />
+      </div>
+      <div v-else-if="modLoading === true && playing === false" class="cta loading">
+        <AnimatedLogo class="loading" />
+      </div>
+      <div
+        v-else-if="playing === true"
+        class="stop cta button-base"
+        @click="stop"
+        @mousehover="checkProcess"
+      >
+        <XIcon />
+      </div>
+      <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+    </template>
     <InstallConfirmModal ref="confirmModal" />
   </div>
 </template>
@@ -214,10 +216,6 @@ await process_listener((e) => {
       color: var(--color-contrast);
       font-weight: bolder;
     }
-  }
-
-  .cta {
-    display: none;
   }
 }
 

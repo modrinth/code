@@ -111,7 +111,6 @@ impl Drop for LoadingBar {
         let loader_uuid = self.loading_bar_uuid;
         let event = self.bar_type.clone();
         let fraction = self.current / self.total;
-        let cli_progress_bar = self.cli_progress_bar.clone();
 
         tokio::spawn(async move {
             #[cfg(feature = "tauri")]
@@ -136,6 +135,7 @@ impl Drop for LoadingBar {
             // Emit event to indicatif progress bar arc
             #[cfg(feature = "cli")]
             {
+                let cli_progress_bar = self.cli_progress_bar.clone();
                 cli_progress_bar.finish();
             }
         });
