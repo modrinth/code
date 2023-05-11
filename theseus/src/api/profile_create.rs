@@ -33,6 +33,7 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
         None, // the icon for the profile
         None,
         None,
+        None,
     )
     .await
 }
@@ -40,20 +41,20 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
 // Creates a profile at  the given filepath and adds it to the in-memory state
 // Returns filepath at which it can be accessed in the State
 #[tracing::instrument]
+#[allow(clippy::too_many_arguments)]
 pub async fn profile_create(
     name: String,         // the name of the profile, and relative path
     game_version: String, // the game version of the profile
     modloader: ModLoader, // the modloader to use
     loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
     icon: Option<PathBuf>,          // the icon for the profile
+    icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
 ) -> crate::Result<PathBuf> {
     trace!("Creating new profile. {}", name);
     let state = State::get().await?;
     Box::pin(async move {
-        let metadata = state.metadata.read().await;
-
         let uuid = Uuid::new_v4();
         let path = state.directories.profiles_dir().join(uuid.to_string());
         if path.exists() {
@@ -82,66 +83,8 @@ pub async fn profile_create(
             "Creating profile at path {}",
             &canonicalize(&path)?.display()
         );
-
-        let loader = modloader;
-        let loader = if loader != ModLoader::Vanilla {
-            let version = loader_version.unwrap_or_else(|| "latest".to_string());
-
-            let filter = |it: &LoaderVersion| match version.as_str() {
-                "latest" => true,
-                "stable" => it.stable,
-                id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
-            };
-
-            let loader_data = match loader {
-                ModLoader::Forge => &metadata.forge,
-                ModLoader::Fabric => &metadata.fabric,
-                ModLoader::Quilt => &metadata.quilt,
-                _ => {
-                    return Err(ProfileCreationError::NoManifest(
-                        loader.to_string(),
-                    )
-                    .into())
-                }
-            };
-
-            let loaders = &loader_data
-                .game_versions
-                .iter()
-                .find(|it| {
-                    it.id.replace(
-                        daedalus::modded::DUMMY_REPLACE_STRING,
-                        &game_version,
-                    ) == game_version
-                })
-                .ok_or_else(|| {
-                    ProfileCreationError::ModloaderUnsupported(
-                        loader.to_string(),
-                        game_version.clone(),
-                    )
-                })?
-                .loaders;
-
-            let loader_version = loaders
-                .iter()
-                .cloned()
-                .find(filter)
-                .or(
-                    // If stable was searched for but not found, return latest by default
-                    if version == "stable" {
-                        loaders.iter().next().cloned()
-                    } else {
-                        None
-                    },
-                )
-                .ok_or_else(|| {
-                    ProfileCreationError::InvalidVersionModloader(
-                        version,
-                        loader.to_string(),
-                    )
-                })?;
-
-            Some((loader_version, loader))
+        let loader = if modloader != ModLoader::Vanilla {
+            get_loader_version_from_loader(game_version.clone(), modloader, loader_version).await?
         } else {
             None
         };
@@ -161,8 +104,9 @@ pub async fn profile_create(
                 )
                 .await?;
         }
-        if let Some((loader_version, loader)) = loader {
-            profile.metadata.loader = loader;
+        profile.metadata.icon_url = icon_url;
+        if let Some(loader_version) = loader {
+            profile.metadata.loader = modloader;
             profile.metadata.loader_version = Some(loader_version);
         }
 
@@ -201,6 +145,71 @@ pub async fn profile_create(
 
         Ok(path)
     }).await
+}
+
+pub(crate) async fn get_loader_version_from_loader(
+    game_version: String,
+    loader: ModLoader,
+    loader_version: Option<String>,
+) -> crate::Result<Option<LoaderVersion>> {
+    let state = State::get().await?;
+    let metadata = state.metadata.read().await;
+
+    let version = loader_version.unwrap_or_else(|| "latest".to_string());
+
+    let filter = |it: &LoaderVersion| match version.as_str() {
+        "latest" => true,
+        "stable" => it.stable,
+        id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
+    };
+
+    let loader_data = match loader {
+        ModLoader::Forge => &metadata.forge,
+        ModLoader::Fabric => &metadata.fabric,
+        ModLoader::Quilt => &metadata.quilt,
+        _ => {
+            return Err(
+                ProfileCreationError::NoManifest(loader.to_string()).into()
+            )
+        }
+    };
+
+    let loaders = &loader_data
+        .game_versions
+        .iter()
+        .find(|it| {
+            it.id
+                .replace(daedalus::modded::DUMMY_REPLACE_STRING, &game_version)
+                == game_version
+        })
+        .ok_or_else(|| {
+            ProfileCreationError::ModloaderUnsupported(
+                loader.to_string(),
+                game_version.clone(),
+            )
+        })?
+        .loaders;
+
+    let loader_version = loaders
+        .iter()
+        .cloned()
+        .find(filter)
+        .or(
+            // If stable was searched for but not found, return latest by default
+            if version == "stable" {
+                loaders.iter().next().cloned()
+            } else {
+                None
+            },
+        )
+        .ok_or_else(|| {
+            ProfileCreationError::InvalidVersionModloader(
+                version,
+                loader.to_string(),
+            )
+        })?;
+
+    Ok(Some(loader_version))
 }
 
 #[derive(thiserror::Error, Debug)]
