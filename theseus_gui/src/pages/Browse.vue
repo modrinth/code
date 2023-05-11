@@ -360,6 +360,11 @@ const handleInstanceSwitch = async (value) => {
           ]"
         />
       </section>
+      <Pagination
+        :page="searchStore.currentPage"
+        :count="searchStore.pageCount"
+        @switch-page="switchPage"
+      />
     </div>
   </div>
   <InstallConfirmModal ref="confirmModal" />
@@ -432,7 +437,6 @@ const handleInstanceSwitch = async (value) => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  margin-top: 1rem;
   padding: 0.8rem !important;
 
   .search-panel {
