@@ -187,10 +187,9 @@ await process_listener((e) => {
   </div>
 </template>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .instance-small-card {
   background-color: var(--color-bg) !important;
-  padding: 1rem !important;
   display: flex;
   flex-direction: row;
   min-height: min-content !important;

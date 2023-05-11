@@ -69,7 +69,7 @@ import {
 } from 'omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ref } from 'vue'
+import {onMounted, ref} from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
@@ -110,13 +110,15 @@ const props = defineProps({
   },
 })
 
-const installed = ref(
-  props.instance &&
-    Object.values(props.instance.projects).some(
-      (project) => project?.metadata?.project?.id === props.project.project_id
-    )
-)
+const installed = ref(false)
 const installing = ref(false)
+
+onMounted(() => {
+  installed.value = props.instance &&
+  Object.values(props.instance.projects).some(
+    (project) => project?.metadata?.project?.id === props.project.project_id
+  )
+})
 
 const install = async () => {
   installing.value = true
@@ -204,7 +206,7 @@ const install = async () => {
   display: grid;
   grid-template-columns: 6rem auto 7rem;
   grid-template-rows: min-content auto auto;
-  gap: 0.5rem;
+  gap: 1rem;
   padding: 1rem;
 
   &:active:not(&:disabled) {

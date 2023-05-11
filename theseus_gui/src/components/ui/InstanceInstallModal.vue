@@ -11,7 +11,7 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from 'omorphia'
-import { computed, ref } from 'vue'
+import {computed, onMounted, ref} from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
@@ -41,7 +41,11 @@ defineExpose({
   },
 })
 
-const profiles = ref(await list().then(Object.values))
+const profiles = ref([])
+
+onMounted(async () => {
+  profiles.value = await list().then(Object.values)
+})
 
 async function install(instance) {
   instance.installing = true

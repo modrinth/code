@@ -346,9 +346,9 @@ async function install(version) {
 .project-sidebar {
   position: fixed;
   width: 20rem;
-  min-height: 100vh;
+  min-height: calc(100vh - 3.25rem);
   height: fit-content;
-  max-height: 100vh;
+  max-height: calc(100vh - 3.25rem);
   overflow-y: auto;
   background: var(--color-raised-bg);
   padding: 1rem;
