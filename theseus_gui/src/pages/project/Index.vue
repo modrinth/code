@@ -221,7 +221,7 @@ import {
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
 import { install as packInstall } from '@/helpers/pack'
-import {list, add_project_from_version as installMod, check_installed} from '@/helpers/profile'
+import { list, add_project_from_version as installMod, check_installed } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ofetch } from 'ofetch'

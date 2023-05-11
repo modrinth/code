@@ -11,8 +11,8 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from 'omorphia'
-import {computed, ref, shallowRef} from 'vue'
-import {add_project_from_version as installMod, check_installed, list} from '@/helpers/profile'
+import { computed, ref, shallowRef } from 'vue'
+import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -74,7 +74,10 @@ async function getData() {
         versions.value.flatMap((v) => v.game_versions).includes(profile.metadata.game_version) &&
         versions.value
           .flatMap((v) => v.loaders)
-          .some((value) => value === profile.metadata.loader || ['minecraft', 'iris', 'optifine'].includes(value))
+          .some(
+            (value) =>
+              value === profile.metadata.loader || ['minecraft', 'iris', 'optifine'].includes(value)
+          )
       )
     })
 

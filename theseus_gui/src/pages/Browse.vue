@@ -173,9 +173,11 @@ watch(
       >
         <h2>Loaders</h2>
         <div
-          v-for="loader in loaders.filter((l) =>
-            (searchStore.projectType !== 'mod' && l.supported_project_types?.includes(searchStore.projectType)) ||
-            (searchStore.projectType === 'mod' && ['fabric', 'forge', 'quilt'].includes(l.name))
+          v-for="loader in loaders.filter(
+            (l) =>
+              (searchStore.projectType !== 'mod' &&
+                l.supported_project_types?.includes(searchStore.projectType)) ||
+              (searchStore.projectType === 'mod' && ['fabric', 'forge', 'quilt'].includes(l.name))
           )"
           :key="loader"
         >
