@@ -191,6 +191,7 @@ pub struct ProcessPayload {
     pub message: String,
 }
 #[derive(Serialize, Clone, Debug)]
+#[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
     Launched,
     Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process
