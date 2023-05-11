@@ -127,7 +127,12 @@ await process_listener((e) => {
   <div class="instance">
     <Card v-if="props.small" class="instance-small-card button-base">
       <Avatar
-        :src="convertFileSrc(props.instance.metadata.icon)"
+        :src="
+          !props.instance.metadata.icon ||
+          (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
+            ? props.instance.metadata.icon
+            : convertFileSrc(instance.metadata?.icon)
+        "
         :alt="props.instance.metadata.name"
         size="sm"
       />
@@ -150,9 +155,10 @@ await process_listener((e) => {
         size="none"
         :src="
           props.instance.metadata
-            ? props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http')
+            ? !props.instance.metadata.icon ||
+              (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
               ? props.instance.metadata.icon
-              : convertFileSrc(props.instance.metadata?.icon)
+              : convertFileSrc(instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"

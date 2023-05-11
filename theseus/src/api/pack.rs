@@ -325,6 +325,7 @@ async fn install_pack(
                 prof.metadata.icon = icon.clone();
                 prof.metadata.game_version = game_version.clone();
                 prof.metadata.loader_version = loader_version.clone();
+                prof.metadata.loader = mod_loader.unwrap_or(ModLoader::Vanilla);
 
                 async { Ok(()) }
             })

@@ -9,11 +9,7 @@ export async function get_game_versions() {
 // Gets the fabric versions from daedalus
 // Returns Manifest
 export async function get_fabric_versions() {
-  const startTime = performance.now()
-  let res = await invoke('metadata_get_fabric_versions')
-  const endTime = performance.now()
-  console.log(`Call to doSomething took ${endTime - startTime} milliseconds`)
-  return res
+  return await invoke('metadata_get_fabric_versions')
 }
 
 // Gets the forge versions from daedalus
