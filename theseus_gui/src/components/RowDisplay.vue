@@ -23,23 +23,34 @@ const props = defineProps({
   },
   canPaginate: Boolean,
 })
+
 const allowPagination = ref(false)
 const modsRow = ref(null)
 const newsRow = ref(null)
-// Remove after state is populated with real data
+
 const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
 const shouldRenderNews = props.news && props.news?.length !== 0
+
 const handlePaginationDisplay = () => {
   let parentsRow
   if (shouldRenderNormalInstances) parentsRow = modsRow.value
   if (shouldRenderNews) parentsRow = newsRow.value
   if (!parentsRow) return
-  const children = parentsRow.children
-  const lastChild = children[children.length - 1]
-  const childBox = lastChild.getBoundingClientRect()
-  if (childBox.x + childBox.width > window.innerWidth) allowPagination.value = true
-  else allowPagination.value = false
+
+  // This is wrapped in a setTimeout because the HtmlCollection seems to struggle
+  // with getting populated sometimes. It's a flaky error, but providing a bit of
+  // wait-time for the below expressions has not failed thus-far.
+  setTimeout(() => {
+    const children = parentsRow.children
+    const lastChild = children[children.length - 1]
+    const childBox = lastChild?.getBoundingClientRect()
+
+    if (childBox?.x + childBox?.width > window.innerWidth && props.canPaginate)
+      allowPagination.value = true
+    else allowPagination.value = false
+  }, 300)
 }
+
 onMounted(() => {
   if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
   // Check if pagination should be rendered on mount
@@ -48,6 +59,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
 })
+
 const handleLeftPage = () => {
   if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
   else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
@@ -58,7 +70,7 @@ const handleRightPage = () => {
 }
 </script>
 <template>
-  <div class="row">
+  <div v-if="props.instances.length > 0" class="row">
     <div class="header">
       <p>{{ props.label }}</p>
       <hr aria-hidden="true" />
@@ -70,7 +82,7 @@ const handleRightPage = () => {
     <section v-if="shouldRenderNormalInstances" ref="modsRow" class="instances">
       <Instance
         v-for="instance in props.instances"
-        :key="instance.id"
+        :key="instance?.project_id || instance?.id"
         display="card"
         :instance="instance"
         class="row-instance"
@@ -181,7 +193,7 @@ const handleRightPage = () => {
 }
 
 .row-instance {
-  min-width: 12rem;
-  max-width: 12rem;
+  min-width: 10.5rem;
+  max-width: 10.5rem;
 }
 </style>

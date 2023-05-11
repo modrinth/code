@@ -1,36 +1,38 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
-import { useTheming } from '@/store/state'
+import { useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { list } from '@/helpers/profile'
 import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
+import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 
 const themeStore = useTheming()
 
+const isLoading = ref(true)
 onMounted(async () => {
   const { settings, collapsed_navigation } = await get()
   themeStore.setThemeState(settings)
   themeStore.collapsedNavigation = collapsed_navigation
 })
 
-const installedMods = ref(0)
-list().then(
-  (profiles) =>
-    (installedMods.value = Object.values(profiles).reduce(
-      (acc, val) => acc + Object.keys(val.projects).length,
-      0
-    ))
-)
-// TODO: add event when profiles update to update installed mods count
+defineExpose({
+  initialize: async () => {
+    isLoading.value = false
+    const { theme } = await get()
+    themeStore.setThemeState(theme)
+  },
+})
+const loading = useLoading()
 </script>
 
 <template>
-  <div class="container">
+  <SplashScreen v-if="isLoading" app-loading />
+  <div v-else class="container">
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
@@ -117,9 +119,17 @@ list().then(
         </section>
       </div>
       <div class="router-view">
-        <Suspense>
-          <RouterView />
-        </Suspense>
+        <ModrinthLoadingIndicator
+          offset-height="var(--appbar-height)"
+          offset-width="var(--sidebar-width)"
+        />
+        <RouterView v-slot="{ Component }">
+          <template v-if="Component">
+            <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
+              <component :is="Component"></component>
+            </Suspense>
+          </template>
+        </RouterView>
       </div>
     </div>
   </div>
@@ -127,17 +137,20 @@ list().then(
 
 <style lang="scss" scoped>
 .container {
+  --appbar-height: 3.25rem;
+  --sidebar-width: 5rem;
+
   height: 100vh;
   display: flex;
   flex-direction: row;
   overflow: hidden;
 
   .view {
-    width: calc(100% - 5rem);
-
     &.expanded {
-      width: calc(100% - 12rem);
+      --sidebar-width: 13rem;
     }
+
+    width: calc(100% - var(--sidebar-width));
 
     .appbar {
       display: flex;
@@ -147,7 +160,6 @@ list().then(
       text-align: center;
       padding: 0 0 0 1rem;
       height: 3.25rem;
-      z-index: 11;
 
       .navigation-controls {
         display: inherit;
@@ -219,16 +231,17 @@ list().then(
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  z-index: 10;
   height: 100%;
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: 1rem;
   background: var(--color-raised-bg);
 
   &.expanded {
-    width: 13rem;
-    max-width: 13rem;
-    min-width: 13rem;
+    --sidebar-width: 13rem;
+
+    width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
   }
 }
 
