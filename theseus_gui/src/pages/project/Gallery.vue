@@ -164,7 +164,7 @@ const expandImage = (item, index) => {
 
 .expanded-image-modal {
   position: fixed;
-  z-index: 20;
+  z-index: 10;
   overflow: auto;
   top: 0;
   left: 0;

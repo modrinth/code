@@ -194,7 +194,7 @@ onBeforeUnmount(() => {
   flex-direction: column;
   top: 0.5rem;
   left: 5.5rem;
-  z-index: 100;
+  z-index: 9;
   gap: 0.5rem;
   padding: 1rem;
   border: 1px solid var(--color-button-bg);

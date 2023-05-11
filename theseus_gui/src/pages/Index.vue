@@ -1,5 +1,5 @@
 <script setup>
-import { ref, shallowRef, onUnmounted } from 'vue'
+import { ref, onUnmounted, shallowRef } from 'vue'
 import { ofetch } from 'ofetch'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
@@ -16,7 +16,7 @@ const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
-const recentInstances = shallowRef()
+const recentInstances = shallowRef(Object.values(await list()))
 
 const getInstances = async () => {
   filter.value = ''
@@ -47,7 +47,7 @@ await getInstances()
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 const unlisten = await profile_listener(async (e) => {
-  if (e.event === 'edited') {
+  if (e.event === 'created' || e.event === 'removed') {
     await getInstances()
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
   }

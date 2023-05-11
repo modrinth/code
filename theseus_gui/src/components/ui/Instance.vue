@@ -1,5 +1,5 @@
 <script setup>
-import { shallowRef, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ofetch } from 'ofetch'
 import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo } from 'omorphia'
@@ -59,34 +59,28 @@ const checkProcess = async () => {
 const install = async (e) => {
   e.stopPropagation()
   modLoading.value = true
-  const [data, versions] = await Promise.all([
-    ofetch(
-      `https://api.modrinth.com/v2/project/${
-        props.instance.metadata
-          ? props.instance.metadata?.linked_data?.project_id
-          : props.instance.project_id
-      }`
-    ).then(shallowRef),
-    ofetch(
-      `https://api.modrinth.com/v2/project/${
-        props.instance.metadata
-          ? props.instance.metadata?.linked_dadta?.project_id
-          : props.instance.project_id
-      }/version`
-    ).then(shallowRef),
-  ])
+  const versions = await ofetch(
+    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`
+  )
 
-  if (data.value.project_type === 'modpack') {
+  if (props.instance.project_type === 'modpack') {
     const packs = Object.values(await list())
 
     if (
       packs.length === 0 ||
       !packs
         .map((value) => value.metadata)
-        .find((pack) => pack.linked_data?.project_id === data.value.id)
+        .find((pack) => pack.linked_data?.project_id === props.instance.project_id)
     ) {
-      await pack_install(versions.value[0].id)
-    } else confirmModal.value.show(versions.value[0].id)
+      try {
+        modLoading.value = true
+        await pack_install(versions[0].id, props.instance.title)
+        modLoading.value = false
+      } catch (err) {
+        console.error(err)
+        modLoading.value = false
+      }
+    } else confirmModal.value.show(versions[0].id)
   }
 
   modLoading.value = false
@@ -125,7 +119,7 @@ const stop = async (e) => {
 }
 
 await process_listener((e) => {
-  if (e.event === 'Finished' && e.uuid == uuid.value) playing.value = false
+  if (e.event === 'Finished' && e.uuid === uuid.value) playing.value = false
 })
 </script>
 
@@ -213,6 +207,10 @@ await process_listener((e) => {
       font-weight: bolder;
     }
   }
+
+  .cta {
+    display: none;
+  }
 }
 
 .instance {
@@ -281,7 +279,7 @@ await process_listener((e) => {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-lg);
-  z-index: 41;
+  z-index: 1;
   width: 3rem;
   height: 3rem;
   right: 1rem;

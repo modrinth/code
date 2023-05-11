@@ -28,8 +28,8 @@ if (!fetchSettings.java_globals?.JAVA_8)
   fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
 if (!fetchSettings.java_globals?.JAVA_17)
   fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
-
 const settings = ref(fetchSettings)
+
 const chosenInstallOptions = ref([])
 const browsingInstall = ref(0)
 

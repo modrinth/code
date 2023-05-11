@@ -12,7 +12,6 @@ import {
   Card,
   ClientIcon,
   ServerIcon,
-  AnimatedLogo,
   NavRow,
   formatCategoryHeader,
 } from 'omorphia'
@@ -25,6 +24,7 @@ import Instance from '@/components/ui/Instance.vue'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
 
 const route = useRoute()
 
@@ -40,25 +40,28 @@ const breadcrumbs = useBreadcrumbs()
 const showSnapshots = ref(false)
 const loading = ref(true)
 
-const [categories, loaders, availableGameVersions] = await Promise.all([
-  get_categories(),
-  get_loaders(),
-  get_game_versions(),
-])
+const categories = ref([])
+const loaders = ref([])
+const availableGameVersions = ref([])
 
-onMounted(() => {
+onMounted(async () => {
+  ;[categories.value, loaders.value, availableGameVersions.value] = await Promise.all([
+    get_categories(),
+    get_loaders(),
+    get_game_versions(),
+  ])
   breadcrumbs.setContext({ name: 'Browse', link: route.path })
   if (searchStore.projectType === 'modpack') {
     searchStore.instanceContext = null
   }
   searchStore.searchInput = ''
-  handleReset()
-  switchPage(1)
+  await handleReset()
+  loading.value = false
 })
 
 const sortedCategories = computed(() => {
   const values = new Map()
-  for (const category of categories.filter(
+  for (const category of categories.value.filter(
     (cat) =>
       cat.project_type ===
       (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
@@ -71,7 +74,7 @@ const sortedCategories = computed(() => {
   return values
 })
 
-const getSearchResults = async (shouldLoad = false) => {
+const getSearchResults = async () => {
   const queryString = searchStore.getQueryString()
   if (searchStore.instanceContext) {
     showVersions.value = false
@@ -79,15 +82,9 @@ const getSearchResults = async (shouldLoad = false) => {
       searchStore.projectType === 'mod' || searchStore.projectType === 'resourcepack'
     )
   }
-  if (shouldLoad === true) {
-    loading.value = true
-  }
   const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
-  loading.value = false
   searchStore.setSearchResults(response)
 }
-
-getSearchResults(true)
 
 const handleReset = async () => {
   searchStore.currentPage = 1
@@ -312,7 +309,7 @@ watch(
         :count="searchStore.pageCount"
         @switch-page="switchPage"
       />
-      <AnimatedLogo v-if="loading" class="loading" />
+      <SplashScreen v-if="loading" />
       <section v-else class="project-list display-mode--list instance-results" role="list">
         <SearchCard
           v-for="result in searchStore.searchResults"
