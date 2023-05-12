@@ -216,7 +216,7 @@ pub async fn profile_edit(
     path: &Path,
     edit_profile: EditProfile,
 ) -> Result<()> {
-    profile::edit(&path, |prof| {
+    profile::edit(path, |prof| {
         if let Some(metadata) = edit_profile.metadata.clone() {
             if let Some(name) = metadata.name {
                 prof.metadata.name = name
