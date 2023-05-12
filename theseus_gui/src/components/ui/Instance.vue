@@ -1,5 +1,5 @@
 <script setup>
-import { shallowRef, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import useFetch from '@/helpers/fetch'
 import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo } from 'omorphia'
@@ -66,42 +66,34 @@ const checkProcess = async () => {
 const install = async (e) => {
   e.stopPropagation()
   modLoading.value = true
-  const [data, versions] = await Promise.all([
-    useFetch(
-      `https://api.modrinth.com/v2/project/${
-        props.instance.metadata
-          ? props.instance.metadata?.linked_data?.project_id
-          : props.instance.project_id
-      }`
-    ).then(shallowRef),
-    useFetch(
-      `https://api.modrinth.com/v2/project/${
-        props.instance.metadata
-          ? props.instance.metadata?.linked_dadta?.project_id
-          : props.instance.project_id
-      }/version`
-    ).then(shallowRef),
-  ]).catch((err) => notificationStore.addApiErrorNotif(err))
+  const versions = await useFetch(
+    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`
+  ).catch((err) => notificationStore.addApiErrorNotif(err))
 
-  try {
-    if (data.value.project_type === 'modpack') {
-      const packs = Object.values(await list())
+  if (props.instance.project_type === 'modpack') {
+    const packs = Object.values(
+      await list(true).catch((err) => notificationStore.addTauriErrorNotif(err))
+    )
 
-      if (
-        packs.length === 0 ||
-        !packs
-          .map((value) => value.metadata)
-          .find((pack) => pack.linked_data?.project_id === data.value.id)
-      ) {
-        await pack_install(versions.value[0].id)
-      } else confirmModal.value.show(versions.value[0].id)
-    }
-
-    modLoading.value = false
-    // TODO: Add condition for installing a mod
-  } catch (err) {
-    notificationStore.addTauriErrorNotif(err)
+    if (
+      packs.length === 0 ||
+      !packs
+        .map((value) => value.metadata)
+        .find((pack) => pack.linked_data?.project_id === props.instance.project_id)
+    ) {
+      try {
+        modLoading.value = true
+        await pack_install(versions[0].id, props.instance.title, props.instance.icon_url)
+      } catch (err) {
+        notificationStore.addTauriErrorNotif(err)
+      } finally {
+        modLoading.value = false
+      }
+    } else confirmModal.value.show(versions[0].id, props.instance.title, props.instance.icon_url)
   }
+
+  modLoading.value = false
+  // TODO: Add condition for installing a mod
 }
 
 const play = async (e) => {
@@ -140,15 +132,20 @@ const stop = async (e) => {
 }
 
 await process_listener((e) => {
-  if (e.event === 'Finished' && e.uuid == uuid.value) playing.value = false
+  if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
 })
 </script>
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card button-base">
+    <Card v-if="props.small" class="instance-small-card button-base" @click="seeInstance">
       <Avatar
-        :src="convertFileSrc(props.instance.metadata.icon)"
+        :src="
+          !props.instance.metadata.icon ||
+          (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
+            ? props.instance.metadata.icon
+            : convertFileSrc(instance.metadata?.icon)
+        "
         :alt="props.instance.metadata.name"
         size="sm"
       />
@@ -168,10 +165,13 @@ await process_listener((e) => {
       @mouseenter="checkProcess"
     >
       <Avatar
-        size="lg"
+        size="none"
         :src="
           props.instance.metadata
-            ? convertFileSrc(props.instance.metadata?.icon)
+            ? !props.instance.metadata.icon ||
+              (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
+              ? props.instance.metadata.icon
+              : convertFileSrc(instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"
@@ -185,25 +185,27 @@ await process_listener((e) => {
         </p>
       </div>
     </Card>
-    <div
-      v-if="props.instance.metadata && playing === false && modLoading === false"
-      class="install cta button-base"
-      @click="play"
-    >
-      <PlayIcon />
-    </div>
-    <div v-else-if="modLoading === true && playing === false" class="cta loading">
-      <AnimatedLogo class="loading" />
-    </div>
-    <div
-      v-else-if="playing === true"
-      class="stop cta button-base"
-      @click="stop"
-      @mousehover="checkProcess"
-    >
-      <XIcon />
-    </div>
-    <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+    <template v-if="!props.small">
+      <div
+        v-if="props.instance.metadata && playing === false && modLoading === false"
+        class="install cta button-base"
+        @click="play"
+      >
+        <PlayIcon />
+      </div>
+      <div v-else-if="modLoading === true && playing === false" class="cta loading">
+        <AnimatedLogo class="loading" />
+      </div>
+      <div
+        v-else-if="playing === true"
+        class="stop cta button-base"
+        @click="stop"
+        @mousehover="checkProcess"
+      >
+        <XIcon />
+      </div>
+      <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+    </template>
     <InstallConfirmModal ref="confirmModal" />
   </div>
 </template>
@@ -296,7 +298,7 @@ await process_listener((e) => {
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-lg);
-  z-index: 41;
+  z-index: 1;
   width: 3rem;
   height: 3rem;
   right: 1rem;
@@ -332,8 +334,14 @@ await process_listener((e) => {
     background: hsl(220, 11%, 11%) !important;
   }
 
-  .mod-image {
-    border-radius: 1.5rem !important;
+  > .avatar {
+    --size: 100%;
+
+    width: 100% !important;
+    height: auto !important;
+    max-width: unset !important;
+    max-height: unset !important;
+    aspect-ratio: 1 / 1 !important;
   }
 
   .project-info {

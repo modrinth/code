@@ -6,6 +6,8 @@
 use dunce::canonicalize;
 use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
+use theseus::profile::install;
+use theseus::profile_create::profile_create;
 
 use tokio::time::{sleep, Duration};
 use tracing_error::ErrorLayer;
@@ -59,7 +61,7 @@ async fn main() -> theseus::Result<()> {
     // Clear profiles
     println!("Clearing profiles.");
     {
-        let h = profile::list().await?;
+        let h = profile::list(None).await?;
         for (path, _) in h.into_iter() {
             profile::remove(&path).await?;
         }
@@ -80,8 +82,11 @@ async fn main() -> theseus::Result<()> {
     //     None,
     //     None,
     //     None,
+    //     None,
     // )
     // .await?;
+    //
+    // install(&profile_path).await.unwrap();
 
     // let mut value = list().await?;
     // let profile_path = value.iter().next().map(|x| x.0).unwrap();
@@ -101,11 +106,12 @@ async fn main() -> theseus::Result<()> {
     //
     // println!("Disabling sodium");
     // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
-    //
+
     // profile::remove_project(&profile_path, &mod_menu_path).await?;
     let profile_path = pack::install_pack_from_version_id(
-        "zroFQG1k".to_string(),
-        Some("Technical Electrical".to_string()),
+        "CeeCkHke".to_string(),
+        "Technical Electrical".to_string(),
+        None,
     )
     .await
     .unwrap();

@@ -32,14 +32,18 @@ export async function remove(path) {
 
 // Get a profile by path
 // Returns a Profile
-export async function get(path) {
-  return await invoke('profile_get', { path })
+export async function get(path, clearProjects) {
+  return await invoke('profile_get', { path, clearProjects })
 }
 
 // Get a copy of the profile set
 // Returns hashmap of path -> Profile
-export async function list() {
-  return await invoke('profile_list')
+export async function list(clearProjects) {
+  return await invoke('profile_list', { clearProjects })
+}
+
+export async function check_installed(path, projectId) {
+  return await invoke('profile_check_installed', { path, projectId })
 }
 
 // Syncs a profile with the disk
@@ -100,4 +104,9 @@ export async function run(path) {
 // Waits for end
 export async function run_wait(path) {
   return await invoke('profile_run_wait', { path })
+}
+
+// Edits a profile
+export async function edit(path, editProfile) {
+  return await invoke('profile_edit', { path, editProfile })
 }

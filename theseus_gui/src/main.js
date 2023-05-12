@@ -16,8 +16,10 @@ app.use(pinia)
 app.use(FloatingVue)
 app.mixin(loadCssMixin)
 
+const mountedApp = app.mount('#app')
+
 initialize_state()
-  .then(() => app.mount('#app'))
+  .then(() => mountedApp.initialize())
   .catch((err) => {
     console.error(err)
   })

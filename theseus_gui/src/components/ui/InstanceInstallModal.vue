@@ -11,17 +11,16 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from 'omorphia'
-import { computed, ref } from 'vue'
-import { add_project_from_version as installMod, list } from '@/helpers/profile'
+import { computed, ref, shallowRef } from 'vue'
+import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import { create } from '@/helpers/profile'
-import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
+import { installVersionDependencies } from '@/helpers/utils'
 import { useNotifications } from '@/store/state'
 
-const notificationStore = useNotifications()
 const router = useRouter()
 const versions = ref([])
 const project = ref('')
@@ -36,19 +35,17 @@ const gameVersion = ref(null)
 const creatingInstance = ref(false)
 
 defineExpose({
-  show: (projectId, selectedVersion) => {
+  show: async (projectId, selectedVersion) => {
     project.value = projectId
     versions.value = selectedVersion
     installModal.value.show()
     searchFilter.value = ''
+
+    profiles.value = await getData()
   },
 })
 
-const profiles = ref(
-  await list()
-    .then(Object.values)
-    .catch((err) => notificationStore.addTauriErrorNotif(err))
-)
+const profiles = shallowRef(await getData())
 
 async function install(instance) {
   instance.installing = true
@@ -71,27 +68,37 @@ async function install(instance) {
   }
 }
 
-const filteredVersions = computed(() => {
-  const filtered = profiles.value
-    .filter((profile) => {
-      return profile.metadata.name.toLowerCase().includes(searchFilter.value.toLowerCase())
-    })
-    .filter((profile) => {
-      return (
-        versions.value.flatMap((v) => v.game_versions).includes(profile.metadata.game_version) &&
-        versions.value
-          .flatMap((v) => v.loaders)
-          .some((value) => value === profile.metadata.loader || value === 'minecraft')
-      )
-    })
+async function getData() {
+  try {
+    const projects = await list(true).then(Object.values)
 
-  filtered.map((profile) => {
-    profile.installing = false
-    profile.installed = checkInstalled(profile, project.value)
-  })
+    const filtered = projects
+      .filter((profile) => {
+        return profile.metadata.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+      })
+      .filter((profile) => {
+        return (
+          versions.value.flatMap((v) => v.game_versions).includes(profile.metadata.game_version) &&
+          versions.value
+            .flatMap((v) => v.loaders)
+            .some(
+              (value) =>
+                value === profile.metadata.loader ||
+                ['minecraft', 'iris', 'optifine'].includes(value)
+            )
+        )
+      })
 
-  return filtered
-})
+    for (let profile of filtered) {
+      profile.installing = false
+      profile.installedMod = await check_installed(profile.path, project.value)
+    }
+
+    return filtered
+  } catch (err) {
+    notificationStore.addTauriErrorNotif(err)
+  }
+}
 
 const toggleCreation = () => {
   showCreation.value = !showCreation.value
@@ -157,7 +164,7 @@ const check_valid = computed(() => {
     <div class="modal-body">
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
       <div class="profiles">
-        <div v-for="profile in filteredVersions" :key="profile.metadata.name" class="option">
+        <div v-for="profile in profiles" :key="profile.metadata.name" class="option">
           <Button
             color="raised"
             class="profile-button"
@@ -166,10 +173,12 @@ const check_valid = computed(() => {
             <Avatar :src="convertFileSrc(profile.metadata.icon)" class="profile-image" />
             {{ profile.metadata.name }}
           </Button>
-          <Button :disabled="profile.installed || profile.installing" @click="install(profile)">
-            <DownloadIcon v-if="!profile.installed && !profile.installing" />
-            <CheckIcon v-else-if="profile.installed" />
-            {{ profile.installing ? 'Installing...' : profile.installed ? 'Installed' : 'Install' }}
+          <Button :disabled="profile.installedMod || profile.installing" @click="install(profile)">
+            <DownloadIcon v-if="!profile.installedMod && !profile.installing" />
+            <CheckIcon v-else-if="profile.installedMod" />
+            {{
+              profile.installing ? 'Installing...' : profile.installedMod ? 'Installed' : 'Install'
+            }}
           </Button>
         </div>
       </div>

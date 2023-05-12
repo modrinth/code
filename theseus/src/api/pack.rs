@@ -5,7 +5,10 @@ use crate::event::emit::{
     loading_try_for_each_concurrent,
 };
 use crate::event::{LoadingBarId, LoadingBarType};
-use crate::state::{LinkedData, ModrinthProject, ModrinthVersion, SideType};
+use crate::state::{
+    LinkedData, ModrinthProject, ModrinthVersion, Profile, ProfileInstallStage,
+    SideType,
+};
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, fetch_mirrors, write, write_cached_icon,
 };
@@ -76,13 +79,28 @@ enum PackDependency {
 
 pub async fn install_pack_from_version_id(
     version_id: String,
-    title: Option<String>,
+    title: String,
+    icon_url: Option<String>,
 ) -> crate::Result<PathBuf> {
     let state = State::get().await?;
     Box::pin(async move {
+        let profile = crate::api::profile_create::profile_create(
+            title.clone(),
+            "1.19.4".to_string(),
+            ModLoader::Vanilla,
+            None,
+            None,
+            icon_url.clone(),
+            None,
+            Some(true),
+        )
+        .await?;
+
         let loading_bar = init_loading(
             LoadingBarType::PackFileDownload {
+                profile_path: profile.clone(),
                 pack_name: title,
+                icon: icon_url,
                 pack_version: version_id.clone(),
             },
             100.0,
@@ -171,6 +189,7 @@ pub async fn install_pack_from_version_id(
             Some(version.project_id),
             Some(version.id),
             Some(loading_bar),
+            profile,
         )
         .await
     })
@@ -178,9 +197,36 @@ pub async fn install_pack_from_version_id(
 }
 
 pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
-    let file = fs::read(path).await?;
+    let file = fs::read(&path).await?;
 
-    install_pack(bytes::Bytes::from(file), None, None, None, None, None).await
+    let file_name = path
+        .file_name()
+        .unwrap_or_default()
+        .to_string_lossy()
+        .to_string();
+
+    let profile = crate::api::profile_create::profile_create(
+        file_name,
+        "1.19.4".to_string(),
+        ModLoader::Vanilla,
+        None,
+        None,
+        None,
+        None,
+        Some(true),
+    )
+    .await?;
+
+    install_pack(
+        bytes::Bytes::from(file),
+        None,
+        None,
+        None,
+        None,
+        None,
+        profile,
+    )
+    .await
 }
 
 async fn install_pack(
@@ -190,6 +236,7 @@ async fn install_pack(
     project_id: Option<String>,
     version_id: Option<String>,
     existing_loading_bar: Option<LoadingBarId>,
+    profile: PathBuf,
 ) -> crate::Result<PathBuf> {
     let state = &State::get().await?;
 
@@ -261,25 +308,39 @@ async fn install_pack(
                 .into());
             };
 
-            let profile_raw = crate::api::profile_create::profile_create(
-                override_title.unwrap_or_else(|| pack.name.clone()),
-                game_version.clone(),
-                mod_loader.unwrap_or(ModLoader::Vanilla),
-                loader_version.cloned(),
-                icon,
-                Some(LinkedData {
+            let loader_version =
+                crate::profile_create::get_loader_version_from_loader(
+                    game_version.clone(),
+                    mod_loader.unwrap_or(ModLoader::Vanilla),
+                    loader_version.cloned(),
+                )
+                .await?;
+            crate::api::profile::edit(&profile, |prof| {
+                prof.metadata.name =
+                    override_title.clone().unwrap_or_else(|| pack.name.clone());
+                prof.install_stage = ProfileInstallStage::PackInstalling;
+                prof.metadata.linked_data = Some(LinkedData {
                     project_id: project_id.clone(),
                     version_id: version_id.clone(),
-                }),
-                Some(true),
-            )
+                });
+                prof.metadata.icon = icon.clone();
+                prof.metadata.game_version = game_version.clone();
+                prof.metadata.loader_version = loader_version.clone();
+                prof.metadata.loader = mod_loader.unwrap_or(ModLoader::Vanilla);
+
+                async { Ok(()) }
+            })
             .await?;
-            let profile = profile_raw.clone();
+            State::sync().await?;
+
+            let profile = profile.clone();
             let result = async {
                 let loading_bar = init_or_edit_loading(
                     existing_loading_bar,
                     LoadingBarType::PackDownload {
+                        profile_path: profile.clone(),
                         pack_name: pack.name.clone(),
+                        icon,
                         pack_id: project_id,
                         pack_version: version_id,
                     },
@@ -350,98 +411,96 @@ async fn install_pack(
                 )
                 .await?;
 
-                let extract_overrides = |overrides: String| async {
-                    let reader = Cursor::new(&file);
-
-                    let mut overrides_zip =
-                        ZipFileReader::new(reader).await.map_err(|_| {
-                            crate::Error::from(crate::ErrorKind::InputError(
-                                "Failed extract overrides Zip".to_string(),
-                            ))
-                        })?;
-
-                    let profile = profile.clone();
-                    async move {
-                        for index in 0..overrides_zip.file().entries().len() {
-                            let file = overrides_zip
-                                .file()
-                                .entries()
-                                .get(index)
-                                .unwrap()
-                                .entry()
-                                .clone();
-
-                            let file_path = PathBuf::from(file.filename());
-                            if file.filename().starts_with(&overrides)
-                                && !file.filename().ends_with('/')
-                            {
-                                // Reads the file into the 'content' variable
-                                let mut content = Vec::new();
-                                let mut reader =
-                                    overrides_zip.entry(index).await?;
-                                reader
-                                    .read_to_end_checked(&mut content, &file)
-                                    .await?;
-
-                                let mut new_path = PathBuf::new();
-                                let components = file_path.components().skip(1);
-
-                                for component in components {
-                                    new_path.push(component);
-                                }
-
-                                if new_path.file_name().is_some() {
-                                    write(
-                                        &profile.join(new_path),
-                                        &content,
-                                        &state.io_semaphore,
-                                    )
-                                    .await?;
-                                }
-                            }
-                        }
-
-                        Ok::<(), crate::Error>(())
-                    }
-                    .await
-                };
-
                 emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))
                     .await?;
-                extract_overrides("overrides".to_string()).await?;
-                extract_overrides("client_overrides".to_string()).await?;
-                emit_loading(
-                    &loading_bar,
-                    29.9,
-                    Some("Done extacting overrides"),
-                )
-                .await?;
 
-                if let Some(profile) =
-                    crate::api::profile::get(&profile).await?
-                {
-                    tokio::try_join!(
-                        super::profile::sync(&profile.path),
-                        crate::launcher::install_minecraft(
-                            &profile,
-                            Some(loading_bar)
-                        ),
-                    )?;
+                let mut total_len = 0;
+
+                for index in 0..zip_reader.file().entries().len() {
+                    let file =
+                        zip_reader.file().entries().get(index).unwrap().entry();
+
+                    if (file.filename().starts_with("overrides")
+                        || file.filename().starts_with("client_overrides"))
+                        && !file.filename().ends_with('/')
+                    {
+                        total_len += 1;
+                    }
                 }
 
-                Ok::<PathBuf, crate::Error>(profile)
+                for index in 0..zip_reader.file().entries().len() {
+                    let file = zip_reader
+                        .file()
+                        .entries()
+                        .get(index)
+                        .unwrap()
+                        .entry()
+                        .clone();
+
+                    let file_path = PathBuf::from(file.filename());
+                    if (file.filename().starts_with("overrides")
+                        || file.filename().starts_with("client_overrides"))
+                        && !file.filename().ends_with('/')
+                    {
+                        // Reads the file into the 'content' variable
+                        let mut content = Vec::new();
+                        let mut reader = zip_reader.entry(index).await?;
+                        reader.read_to_end_checked(&mut content, &file).await?;
+
+                        let mut new_path = PathBuf::new();
+                        let components = file_path.components().skip(1);
+
+                        for component in components {
+                            new_path.push(component);
+                        }
+
+                        if new_path.file_name().is_some() {
+                            write(
+                                &profile.join(new_path),
+                                &content,
+                                &state.io_semaphore,
+                            )
+                            .await?;
+                        }
+
+                        emit_loading(
+                            &loading_bar,
+                            30.0 / total_len as f64,
+                            Some(&format!(
+                                "Extracting override {}/{}",
+                                index, total_len
+                            )),
+                        )
+                        .await?;
+                    }
+                }
+
+                if let Some(profile_val) =
+                    crate::api::profile::get(&profile, None).await?
+                {
+                    Profile::sync_projects_task(profile.clone());
+                    crate::launcher::install_minecraft(
+                        &profile_val,
+                        Some(loading_bar),
+                    )
+                    .await?;
+                }
+
+                Ok::<PathBuf, crate::Error>(profile.clone())
             }
             .await;
 
             match result {
                 Ok(profile) => Ok(profile),
                 Err(err) => {
-                    let _ = crate::api::profile::remove(&profile_raw).await;
+                    let _ = crate::api::profile::remove(&profile).await;
 
                     Err(err)
                 }
             }
         } else {
+            let _ = crate::api::profile::remove(&profile).await;
+
             Err(crate::Error::from(crate::ErrorKind::InputError(
                 "No pack manifest found in mrpack".to_string(),
             )))

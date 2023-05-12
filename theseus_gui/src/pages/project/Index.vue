@@ -221,13 +221,13 @@ import {
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
 import { install as packInstall } from '@/helpers/pack'
-import { list, add_project_from_version as installMod } from '@/helpers/profile'
+import { list, add_project_from_version as installMod, check_installed } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import useFetch from '@/helpers/fetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
-import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
+import { installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { useBreadcrumbs, useSearch, useNotifications } from '@/store/state'
@@ -241,8 +241,6 @@ const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
-const loaders = ref(await get_loaders())
-const categories = ref(await get_categories())
 const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
 
@@ -253,7 +251,17 @@ const [data, versions, members, dependencies] = await Promise.all([
   useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
 ]).catch((err) => notificationStore.addApiErrorNotif(err))
 
-const installed = ref(instance.value && checkInstalled(instance.value, data.value.id))
+const [categories, loaders] = await Promise.all([
+  get_loaders().then(ref),
+  get_categories().then(ref),
+]).catch((err) => notificationStore.addTauriErrorNotif(err))
+
+const installed = ref(
+  instance.value &&
+    (await check_installed(instance.value.path, data.value.id).catch((err) =>
+      notificationStore.addTauriErrorNotif(err)
+    ))
+)
 
 breadcrumbs.setName('Project', data.value.title)
 
@@ -267,75 +275,89 @@ watch(
 dayjs.extend(relativeTime)
 
 async function install(version) {
-  try {
-    installing.value = true
-    let queuedVersionData
+  installing.value = true
+  let queuedVersionData
 
-    if (version) {
-      queuedVersionData = versions.value.find((v) => v.id === version)
+  if (version) {
+    queuedVersionData = versions.value.find((v) => v.id === version)
+  } else {
+    if (data.value.project_type === 'modpack' || !instance.value) {
+      queuedVersionData = versions.value[0]
     } else {
-      if (data.value.project_type === 'modpack' || !instance.value) {
-        queuedVersionData = versions.value[0]
-      } else {
-        queuedVersionData = versions.value.find((v) =>
-          v.game_versions.includes(data.value.game_versions[0])
-        )
-      }
+      queuedVersionData = versions.value.find((v) =>
+        v.game_versions.includes(data.value.game_versions[0])
+      )
     }
+  }
 
-    if (data.value.project_type === 'modpack') {
-      const packs = Object.values(await list())
+  if (data.value.project_type === 'modpack') {
+    try {
+      const packs = Object.values(await list(true))
       if (
         packs.length === 0 ||
         !packs
           .map((value) => value.metadata)
           .find((pack) => pack.linked_data?.project_id === data.value.id)
       ) {
-        let id = await packInstall(queuedVersionData.id)
-        await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+        await packInstall(queuedVersionData.id, data.value.title, data.value.icon_url)
       } else {
-        confirmModal.value.show(queuedVersionData.id)
+        confirmModal.value.show(queuedVersionData.id, data.value.title, data.value.icon_url)
+      }
+    } catch (err) {
+      notificationStore.addTauriErrorNotif(err)
+    } finally {
+      installing.value = false
+    }
+  } else {
+    if (instance.value) {
+      if (!version) {
+        const gameVersion = instance.value.metadata.game_version
+        const loader = instance.value.metadata.loader
+        const selectedVersion = versions.value.find(
+          (v) =>
+            v.game_versions.includes(gameVersion) &&
+            (data.value.project_type === 'mod'
+              ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
+              : true)
+        )
+        if (!selectedVersion) {
+          installing.value = false
+          return
+        }
+        queuedVersionData = selectedVersion
+        await installMod(instance.value.path, selectedVersion.id).catch((err) => {
+          notificationStore.addTauriErrorNotif(err)
+          installing.value = false
+          return
+        })
+      } else {
+        await installMod(instance.value.path, queuedVersionData.id).catch((err) => {
+          notificationStore.addTauriErrorNotif(err)
+          installing.value = false
+          return
+        })
+      }
+
+      try {
+        await installVersionDependencies(instance.value, queuedVersionData)
+        installed.value = true
+      } catch (err) {
+        notificationStore.addApiErrorNotif(err)
+      } finally {
+        installing.value = false
       }
     } else {
-      if (instance.value) {
-        if (!version) {
-          const gameVersion = instance.value.metadata.game_version
-          const loader = instance.value.metadata.loader
-          const selectedVersion = versions.value.find(
-            (v) =>
-              v.game_versions.includes(gameVersion) &&
-              (data.value.project_type === 'mod'
-                ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
-                : true)
-          )
-          if (!selectedVersion) {
-            installing.value = false
-            return
-          }
-          queuedVersionData = selectedVersion
-          await installMod(instance.value.path, selectedVersion.id)
-        } else {
-          await installMod(instance.value.path, queuedVersionData.id)
-        }
-
-        installVersionDependencies(instance.value, queuedVersionData)
-
-        installed.value = true
+      if (version) {
+        modInstallModal.value.show(data.value.id, [
+          versions.value.find((v) => v.id === queuedVersionData.id),
+        ])
       } else {
-        if (version) {
-          modInstallModal.value.show(data.value.id, [
-            versions.value.find((v) => v.id === queuedVersionData.id),
-          ])
-        } else {
-          modInstallModal.value.show(data.value.id, versions.value)
-        }
+        modInstallModal.value.show(data.value.id, versions.value)
       }
     }
-  } catch (err) {
-    notificationStore.addTauriErrorNotif(err)
-  } finally {
-    installing.value = false
   }
+
+  installing.value = false
 }
 </script>
 

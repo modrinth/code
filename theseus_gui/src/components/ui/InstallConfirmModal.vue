@@ -1,31 +1,30 @@
 <script setup>
 import { Button, Modal, XIcon, DownloadIcon } from 'omorphia'
-import { useRouter } from 'vue-router'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
 import { useNotifications } from '@/store/state'
 
 const notificationStore = useNotifications()
-const router = useRouter()
 
 const version = ref('')
+const title = ref('')
+const icon = ref('')
 const confirmModal = ref(null)
 
 defineExpose({
-  show: (id) => {
+  show: (id, projectTitle, projectIcon) => {
     version.value = id
+    title.value = projectTitle
+    icon.value = projectIcon
     confirmModal.value.show()
   },
 })
 
 async function install() {
-  try {
-    let id = await pack_install(version.value)
-    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
-    confirmModal.value.hide()
-  } catch (err) {
+  confirmModal.value.hide()
+  await pack_install(version.value, title.value, icon.value ? icon.value : null).catch((err) =>
     notificationStore.addTauriErrorNotif(err)
-  }
+  )
 }
 </script>
 

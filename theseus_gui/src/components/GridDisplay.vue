@@ -97,19 +97,13 @@ const modsRow = ref(null)
 
   .instances {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
     width: 100%;
     gap: 1rem;
     margin-right: auto;
     margin-top: 0.8rem;
     scroll-behavior: smooth;
-    overflow-x: scroll;
-    overflow-y: hidden;
-
-    &::-webkit-scrollbar {
-      width: 0px;
-      background: transparent;
-    }
+    overflow-y: auto;
   }
 }
 

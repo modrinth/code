@@ -61,6 +61,7 @@ pub async fn init_loading(
             message: title.to_string(),
             total,
             current: 0.0,
+            last_sent: 0.0,
             bar_type,
             #[cfg(feature = "cli")]
             cli_progress_bar: {
@@ -115,6 +116,7 @@ pub async fn edit_loading(
         bar.total = total;
         bar.message = title.to_string();
         bar.current = 0.0;
+        bar.last_sent = 0.0;
         #[cfg(feature = "cli")]
         {
             bar.cli_progress_bar.reset(); // indicatif::ProgressBar::new(CLI_PROGRESS_BAR_TOTAL as u64);
@@ -150,42 +152,47 @@ pub async fn emit_loading(
     // Tick up loading bar
     loading_bar.current += increment_frac;
     let display_frac = loading_bar.current / loading_bar.total;
-    let display_frac = if display_frac >= 1.0 {
+    let opt_display_frac = if display_frac >= 1.0 {
         None // by convention, when its done, we submit None
              // any further updates will be ignored (also sending None)
     } else {
         Some(display_frac)
     };
 
-    // Emit event to indicatif progress bar
-    #[cfg(feature = "cli")]
-    {
-        loading_bar.cli_progress_bar.set_message(
-            message
-                .map(|x| x.to_string())
-                .unwrap_or(loading_bar.message.clone()),
-        );
-        loading_bar.cli_progress_bar.set_position(
-            ((loading_bar.current / loading_bar.total)
-                * CLI_PROGRESS_BAR_TOTAL as f64)
-                .round() as u64,
-        );
+    if f64::abs(display_frac - loading_bar.last_sent) > 0.005 {
+        // Emit event to indicatif progress bar
+        #[cfg(feature = "cli")]
+        {
+            loading_bar.cli_progress_bar.set_message(
+                message
+                    .map(|x| x.to_string())
+                    .unwrap_or(loading_bar.message.clone()),
+            );
+            loading_bar.cli_progress_bar.set_position(
+                (display_frac * CLI_PROGRESS_BAR_TOTAL as f64).round() as u64,
+            );
+        }
+
+        // Emit event to tauri
+        #[cfg(feature = "tauri")]
+        event_state
+            .app
+            .emit_all(
+                "loading",
+                LoadingPayload {
+                    fraction: opt_display_frac,
+                    message: message
+                        .unwrap_or(&loading_bar.message)
+                        .to_string(),
+                    event: loading_bar.bar_type.clone(),
+                    loader_uuid: loading_bar.loading_bar_uuid,
+                },
+            )
+            .map_err(EventError::from)?;
+
+        loading_bar.last_sent = display_frac;
     }
 
-    // Emit event to tauri
-    #[cfg(feature = "tauri")]
-    event_state
-        .app
-        .emit_all(
-            "loading",
-            LoadingPayload {
-                fraction: display_frac,
-                message: message.unwrap_or(&loading_bar.message).to_string(),
-                event: loading_bar.bar_type.clone(),
-                loader_uuid: loading_bar.loading_bar_uuid,
-            },
-        )
-        .map_err(EventError::from)?;
     Ok(())
 }
 

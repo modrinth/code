@@ -1,4 +1,6 @@
 use crate::api::Result;
+use daedalus::modded::LoaderVersion;
+use serde::{Deserialize, Serialize};
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use uuid::Uuid;
@@ -14,8 +16,11 @@ pub async fn profile_remove(path: &Path) -> Result<()> {
 // Get a profile by path
 // invoke('profile_add_path',path)
 #[tauri::command]
-pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
-    let res = profile::get(path).await?;
+pub async fn profile_get(
+    path: &Path,
+    clear_projects: Option<bool>,
+) -> Result<Option<Profile>> {
+    let res = profile::get(path, clear_projects).await?;
     Ok(res)
 }
 
@@ -23,9 +28,30 @@ pub async fn profile_get(path: &Path) -> Result<Option<Profile>> {
 // invoke('profile_list')
 #[tauri::command]
 pub async fn profile_list(
+    clear_projects: Option<bool>,
 ) -> Result<std::collections::HashMap<PathBuf, Profile>> {
-    let res = profile::list().await?;
+    let res = profile::list(clear_projects).await?;
     Ok(res)
+}
+
+#[tauri::command]
+pub async fn profile_check_installed(
+    path: &Path,
+    project_id: String,
+) -> Result<bool> {
+    let profile = profile_get(path, None).await?;
+    if let Some(profile) = profile {
+        Ok(profile.projects.into_iter().any(|(_, project)| {
+            if let ProjectMetadata::Modrinth { project, .. } = &project.metadata
+            {
+                project.id == project_id
+            } else {
+                false
+            }
+        }))
+    } else {
+        Ok(false)
+    }
 }
 
 /// Syncs a profile's in memory state with the state on the disk
@@ -59,7 +85,7 @@ pub async fn profile_update_project(
     path: &Path,
     project_path: &Path,
 ) -> Result<()> {
-    profile::update_project(path, project_path, None).await?;
+    profile::update_project(path, project_path).await?;
     Ok(())
 }
 
@@ -164,4 +190,54 @@ pub async fn profile_run_wait_credentials(
     let proc_lock = profile::run_credentials(path, &credentials).await?;
     let mut proc = proc_lock.write().await;
     Ok(process::wait_for(&mut proc).await?)
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct EditProfile {
+    pub metadata: Option<EditProfileMetadata>,
+    pub java: Option<JavaSettings>,
+    pub memory: Option<MemorySettings>,
+    pub resolution: Option<WindowSize>,
+    pub hooks: Option<Hooks>,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct EditProfileMetadata {
+    pub name: Option<String>,
+    pub game_version: Option<String>,
+    pub loader: Option<ModLoader>,
+    pub loader_version: Option<LoaderVersion>,
+}
+
+// Edits a profile
+// invoke('profile_edit', {path, editProfile})
+#[tauri::command]
+pub async fn profile_edit(
+    path: &Path,
+    edit_profile: EditProfile,
+) -> Result<()> {
+    profile::edit(&path, |prof| {
+        if let Some(metadata) = edit_profile.metadata.clone() {
+            if let Some(name) = metadata.name {
+                prof.metadata.name = name
+            }
+            if let Some(game_version) = metadata.game_version {
+                prof.metadata.game_version = game_version
+            }
+            if let Some(loader) = metadata.loader {
+                prof.metadata.loader = loader
+            }
+            prof.metadata.loader_version = metadata.loader_version
+        }
+
+        prof.java = edit_profile.java.clone();
+        prof.memory = edit_profile.memory;
+        prof.resolution = edit_profile.resolution;
+        prof.hooks = edit_profile.hooks.clone();
+
+        async { Ok(()) }
+    })
+    .await?;
+
+    Ok(())
 }

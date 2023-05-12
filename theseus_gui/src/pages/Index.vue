@@ -1,5 +1,5 @@
 <script setup>
-import { ref, shallowRef, onUnmounted } from 'vue'
+import { ref, onUnmounted, shallowRef } from 'vue'
 import useFetch from '@/helpers/fetch'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
@@ -17,13 +17,13 @@ const notificationStore = useNotifications()
 
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
-const recentInstances = shallowRef()
+const recentInstances = shallowRef([])
 
 const getInstances = async () => {
   filter.value = ''
 
   try {
-    const profiles = await list()
+    const profiles = await list(true)
     recentInstances.value = Object.values(profiles)
 
     const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
@@ -56,8 +56,8 @@ await Promise.all([getFeaturedModpacks(), getFeaturedMods()]).catch((err) =>
 )
 
 const unlisten = await profile_listener(async (e) => {
-  if (e.event === 'edited') {
-    await getInstances()
+  await getInstances()
+  if (['created', 'removed'].includes(e.event)) {
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()]).catch((err) =>
       notificationStore.addApiErrorNotif(err)
     )

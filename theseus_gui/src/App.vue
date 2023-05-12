@@ -1,8 +1,8 @@
 <script setup>
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, ref, onUnmounted } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
-import { useTheming, useNotifications } from '@/store/state'
+import { useLoading, useTheming, useNotifications } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import Notifications from '@/components/ui/Notifications.vue'
@@ -10,11 +10,14 @@ import { get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import { warning_listener } from './helpers/events'
+import SplashScreen from '@/components/ui/SplashScreen.vue'
+import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 
 const themeStore = useTheming()
 const notificationStore = useNotifications()
 let dropWarningListener = () => {}
 
+const isLoading = ref(true)
 onMounted(async () => {
   try {
     const { settings, collapsed_navigation } = await get()
@@ -35,11 +38,21 @@ onMounted(async () => {
   )
 })
 
+defineExpose({
+  initialize: async () => {
+    isLoading.value = false
+    const { theme } = await get()
+    themeStore.setThemeState(theme)
+  },
+})
+const loading = useLoading()
+
 onUnmounted(() => dropWarningListener())
 </script>
 
 <template>
-  <div class="container">
+  <SplashScreen v-if="isLoading" app-loading />
+  <div v-else class="container">
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <Suspense>
@@ -126,9 +139,13 @@ onUnmounted(() => dropWarningListener())
         </section>
       </div>
       <div class="router-view">
+        <ModrinthLoadingIndicator
+          offset-height="var(--appbar-height)"
+          offset-width="var(--sidebar-width)"
+        />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
-            <Suspense>
+            <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">
               <component :is="Component"></component>
             </Suspense>
           </template>
@@ -141,17 +158,20 @@ onUnmounted(() => dropWarningListener())
 
 <style lang="scss" scoped>
 .container {
+  --appbar-height: 3.25rem;
+  --sidebar-width: 5rem;
+
   height: 100vh;
   display: flex;
   flex-direction: row;
   overflow: hidden;
 
   .view {
-    width: var(--view-width);
-
     &.expanded {
-      width: var(--expanded-view-width);
+      --sidebar-width: 13rem;
     }
+
+    width: calc(100% - var(--sidebar-width));
 
     .appbar {
       display: flex;
@@ -161,7 +181,6 @@ onUnmounted(() => dropWarningListener())
       text-align: center;
       padding: 0 0 0 1rem;
       height: 3.25rem;
-      z-index: 11;
 
       .navigation-controls {
         display: inherit;
@@ -233,16 +252,17 @@ onUnmounted(() => dropWarningListener())
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  z-index: 10;
   height: 100%;
   box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
   padding: 1rem;
   background: var(--color-raised-bg);
 
   &.expanded {
-    width: 13rem;
-    max-width: 13rem;
-    min-width: 13rem;
+    --sidebar-width: 13rem;
+
+    width: var(--sidebar-width);
+    max-width: var(--sidebar-width);
+    min-width: var(--sidebar-width);
   }
 }
 

@@ -2,7 +2,15 @@
   <div class="instance-container">
     <div class="side-cards">
       <Card class="instance-card">
-        <Avatar size="lg" :src="convertFileSrc(instance.metadata.icon)" />
+        <Avatar
+          size="lg"
+          :src="
+            !instance.metadata.icon ||
+            (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
+              ? instance.metadata.icon
+              : convertFileSrc(instance.metadata?.icon)
+          "
+        />
         <div class="instance-info">
           <h2 class="name">{{ instance.metadata.name }}</h2>
           <span class="metadata">
@@ -68,9 +76,9 @@ import {
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
-import { process_listener } from '@/helpers/events'
+import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
-import { shallowRef, ref, onUnmounted } from 'vue'
+import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { useBreadcrumbs, useSearch, useNotifications } from '@/store/state'
@@ -80,15 +88,21 @@ const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 const notificationStore = useNotifications()
 
-const instance = shallowRef(
+const instance = ref(
   await get(route.params.id).catch((err) => notificationStore.addTauriErrorNotif(err))
 )
-searchStore.instanceContext = instance.value
 
+searchStore.instanceContext = instance.value
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
+})
+
+profile_listener(async (event) => {
+  if (event.profile_path === route.params.id) {
+    instance.value = await get(route.params.id)
+  }
 })
 
 const uuid = ref(null)
@@ -137,7 +151,7 @@ const stopInstance = async () => {
 }
 
 const unlisten = await process_listener((e) => {
-  if (e.event === 'Finished' && uuid.value === e.uuid) playing.value = false
+  if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
 })
 
 onUnmounted(() => unlisten())

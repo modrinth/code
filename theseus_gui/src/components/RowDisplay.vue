@@ -1,17 +1,10 @@
 <script setup>
 import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
-import News from '@/components/ui/News.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps({
   instances: {
-    type: Array,
-    default() {
-      return []
-    },
-  },
-  news: {
     type: Array,
     default() {
       return []
@@ -26,16 +19,9 @@ const props = defineProps({
 
 const allowPagination = ref(false)
 const modsRow = ref(null)
-const newsRow = ref(null)
-
-const shouldRenderNormalInstances = props.instances && props.instances?.length !== 0
-const shouldRenderNews = props.news && props.news?.length !== 0
 
 const handlePaginationDisplay = () => {
-  let parentsRow
-  if (shouldRenderNormalInstances) parentsRow = modsRow.value
-  if (shouldRenderNews) parentsRow = newsRow.value
-  if (!parentsRow) return
+  let parentsRow = modsRow.value
 
   // This is wrapped in a setTimeout because the HtmlCollection seems to struggle
   // with getting populated sometimes. It's a flaky error, but providing a bit of
@@ -53,7 +39,7 @@ const handlePaginationDisplay = () => {
 
 onMounted(() => {
   if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
-  // Check if pagination should be rendered on mount
+
   handlePaginationDisplay()
 })
 onUnmounted(() => {
@@ -61,12 +47,10 @@ onUnmounted(() => {
 })
 
 const handleLeftPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft -= 170
-  else if (shouldRenderNews) newsRow.value.scrollLeft -= 170
+  modsRow.value.scrollLeft -= 170
 }
 const handleRightPage = () => {
-  if (shouldRenderNormalInstances) modsRow.value.scrollLeft += 170
-  else if (shouldRenderNews) newsRow.value.scrollLeft += 170
+  modsRow.value.scrollLeft += 170
 }
 </script>
 <template>
@@ -79,7 +63,7 @@ const handleRightPage = () => {
         <ChevronRightIcon role="button" @click="handleRightPage" />
       </div>
     </div>
-    <section v-if="shouldRenderNormalInstances" ref="modsRow" class="instances">
+    <section ref="modsRow" class="instances">
       <Instance
         v-for="instance in props.instances"
         :key="instance?.project_id || instance?.id"
@@ -87,9 +71,6 @@ const handleRightPage = () => {
         :instance="instance"
         class="row-instance"
       />
-    </section>
-    <section v-else-if="shouldRenderNews" ref="newsRow" class="news">
-      <News v-for="actualNews in props.news" :key="actualNews.id" :news="actualNews" />
     </section>
   </div>
 </template>
@@ -153,19 +134,6 @@ const handleRightPage = () => {
     gap: 1rem;
   }
 
-  .news {
-    margin: auto;
-    width: 100%;
-    scroll-behavior: smooth;
-    overflow-x: scroll;
-    overflow-y: hidden;
-
-    &::-webkit-scrollbar {
-      width: 0px;
-      background: transparent;
-    }
-  }
-
   .instances {
     display: flex;
     flex-direction: row;
@@ -193,7 +161,7 @@ const handleRightPage = () => {
 }
 
 .row-instance {
-  min-width: 12rem;
-  max-width: 12rem;
+  min-width: 10.5rem;
+  max-width: 10.5rem;
 }
 </style>

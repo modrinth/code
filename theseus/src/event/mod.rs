@@ -76,6 +76,8 @@ pub struct LoadingBar {
     pub message: String,
     pub total: f64,
     pub current: f64,
+    #[serde(skip)]
+    pub last_sent: f64,
     pub bar_type: LoadingBarType,
     #[cfg(feature = "cli")]
     #[serde(skip)]
@@ -109,6 +111,8 @@ impl Drop for LoadingBar {
         let loader_uuid = self.loading_bar_uuid;
         let event = self.bar_type.clone();
         let fraction = self.current / self.total;
+
+        #[cfg(feature = "cli")]
         let cli_progress_bar = self.cli_progress_bar.clone();
 
         tokio::spawn(async move {
@@ -146,20 +150,24 @@ impl Drop for LoadingBar {
 pub enum LoadingBarType {
     StateInit,
     PackFileDownload {
-        pack_name: Option<String>,
+        profile_path: PathBuf,
+        pack_name: String,
+        icon: Option<String>,
         pack_version: String,
     },
     PackDownload {
+        profile_path: PathBuf,
         pack_name: String,
+        icon: Option<PathBuf>,
         pack_id: Option<String>,
         pack_version: Option<String>,
     },
     MinecraftDownload {
-        profile_uuid: Uuid,
+        profile_path: PathBuf,
         profile_name: String,
     },
     ProfileUpdate {
-        profile_uuid: Uuid,
+        profile_path: PathBuf,
         profile_name: String,
     },
 }
@@ -185,6 +193,7 @@ pub struct ProcessPayload {
     pub message: String,
 }
 #[derive(Serialize, Clone, Debug)]
+#[serde(rename_all = "snake_case")]
 pub enum ProcessPayloadType {
     Launched,
     Updated, // eg: if the MinecraftChild changes to its post-command process instead of the Minecraft process

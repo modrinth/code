@@ -25,3 +25,11 @@ pub async fn get_forge_versions() -> crate::Result<Manifest> {
 
     Ok(tags)
 }
+
+#[tracing::instrument]
+pub async fn get_quilt_versions() -> crate::Result<Manifest> {
+    let state = State::get().await?;
+    let tags = state.metadata.read().await.quilt.clone();
+
+    Ok(tags)
+}
