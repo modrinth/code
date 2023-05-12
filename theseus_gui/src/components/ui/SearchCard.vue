@@ -69,10 +69,10 @@ import {
 } from 'omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import {onMounted, ref} from 'vue'
+import { onMounted, ref } from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
-import { installVersionDependencies } from '@/helpers/utils.js'
+import { checkInstalled, installVersionDependencies } from '@/helpers/utils.js'
 import { ofetch } from 'ofetch'
 import { useRouter } from 'vue-router'
 dayjs.extend(relativeTime)
@@ -104,6 +104,10 @@ const props = defineProps({
     type: Object,
     default: null,
   },
+  incompatibilityWarningModal: {
+    type: Object,
+    default: null,
+  },
   featured: {
     type: Boolean,
     default: false,
@@ -114,11 +118,12 @@ const installed = ref(false)
 const installing = ref(false)
 
 onMounted(() => {
-  installed.value = props.instance &&
-  Object.values(props.instance.projects).some(
-    (project) => project?.metadata?.project?.id === props.project.project_id
-  )
+  installed.value = props.instance && checkInstalled(props.instance, props.project.project_id)
 })
+
+const markInstalled = () => {
+  installed.value = true
+}
 
 const install = async () => {
   installing.value = true
@@ -127,14 +132,18 @@ const install = async () => {
   )
   let queuedVersionData
 
+  installed.value = props.instance && checkInstalled(props.instance, props.project.project_id)
+  if (installed.value) return
+
   if (!props.instance) {
     queuedVersionData = versions[0]
   } else {
-    queuedVersionData = versions.find((v) => v.game_versions.includes(props.instance.game_version))
+    queuedVersionData = versions.find(
+      (v) =>
+        v.game_versions.includes(props.instance.metadata.game_version) &&
+        v.loaders.includes(props.instance.metadata.loader)
+    )
   }
-
-  console.log(versions)
-  console.log(queuedVersionData)
 
   if (props.project.project_type === 'modpack') {
     const packs = Object.values(await list())
@@ -151,10 +160,23 @@ const install = async () => {
     }
   } else {
     if (props.instance) {
-      await installMod(props.instance.path, queuedVersionData.id)
-      installVersionDependencies(props.instance, queuedVersionData)
+      if (!queuedVersionData) {
+        props.incompatibilityWarningModal.show(
+          props.instance,
+          props.project.title,
+          versions,
+          markInstalled
+        )
+        installing.value = false
+        return
+      } else {
+        await installMod(props.instance.path, queuedVersionData.id)
+        installVersionDependencies(props.instance, queuedVersionData)
+      }
     } else {
       props.modInstallModal.show(props.project.project_id, versions)
+      installing.value = false
+      return
     }
     if (props.instance) installed.value = true
   }

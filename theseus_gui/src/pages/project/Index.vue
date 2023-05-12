@@ -187,6 +187,7 @@
   </div>
   <InstallConfirmModal ref="confirmModal" />
   <InstanceInstallModal ref="modInstallModal" />
+  <IncompatibilityWarningModal ref="incompatibilityWarning" />
 </template>
 
 <script setup>
@@ -233,6 +234,7 @@ import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 
 const searchStore = useSearch()
 
@@ -242,6 +244,7 @@ const breadcrumbs = useBreadcrumbs()
 
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
+const incompatibilityWarning = ref(null)
 const loaders = ref(await get_loaders())
 const categories = ref(await get_categories())
 const instance = ref(searchStore.instanceContext)
@@ -266,6 +269,10 @@ watch(
 )
 
 dayjs.extend(relativeTime)
+
+const markInstalled = () => {
+  installed.value = true
+}
 
 async function install(version) {
   installing.value = true
@@ -308,16 +315,43 @@ async function install(version) {
               : true)
         )
         if (!selectedVersion) {
+          incompatibilityWarning.value.show(
+            instance.value,
+            data.value.title,
+            versions.value,
+            markInstalled
+          )
+          installing.value = false
+          return
+        } else {
+          queuedVersionData = selectedVersion
+          await installMod(instance.value.path, selectedVersion.id)
+          installVersionDependencies(instance.value, queuedVersionData)
+        }
+      } else {
+        const gameVersion = instance.value.metadata.game_version
+        const loader = instance.value.metadata.loader
+        const compatible = versions.value.some(
+          (v) =>
+            v.game_versions.includes(gameVersion) &&
+            (data.value.project_type === 'mod'
+              ? v.loaders.includes(loader) || v.loaders.includes('minecraft')
+              : true)
+        )
+        if (compatible) {
+          await installMod(instance.value.path, queuedVersionData.id)
+          installVersionDependencies(instance.value, queuedVersionData)
+        } else {
+          incompatibilityWarning.value.show(
+            instance.value,
+            data.value.title,
+            [queuedVersionData],
+            markInstalled
+          )
           installing.value = false
           return
         }
-        queuedVersionData = selectedVersion
-        await installMod(instance.value.path, selectedVersion.id)
-      } else {
-        await installMod(instance.value.path, queuedVersionData.id)
       }
-
-      installVersionDependencies(instance.value, queuedVersionData)
 
       installed.value = true
     } else {

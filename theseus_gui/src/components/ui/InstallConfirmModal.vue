@@ -2,7 +2,7 @@
 import { Button, Modal, XIcon, DownloadIcon } from 'omorphia'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
-import {useRouter} from "vue-router";
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
 

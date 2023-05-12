@@ -13,7 +13,8 @@ import {
   ClientIcon,
   ServerIcon,
   NavRow,
-  formatCategoryHeader, Avatar, formatCategory,
+  formatCategoryHeader,
+  formatCategory,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
@@ -24,36 +25,45 @@ import SearchCard from '@/components/ui/SearchCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import {convertFileSrc} from "@tauri-apps/api/tauri";
+import Instance from '@/components/ui/Instance.vue'
+import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 
 const route = useRoute()
 
 const searchStore = useSearch()
 searchStore.projectType = route.params.projectType
-const showVersions = ref(true)
-const showLoaders = ref(true)
+const showVersions = computed(
+  () => searchStore.instanceContext === null || searchStore.ignoreInstance
+)
+const showLoaders = computed(
+  () =>
+    searchStore.projectType !== 'datapack' &&
+    searchStore.projectType !== 'resourcepack' &&
+    searchStore.projectType !== 'shader' &&
+    (searchStore.instanceContext === null || searchStore.ignoreInstance)
+)
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
+const incompatibilityWarningModal = ref(null)
 
 const breadcrumbs = useBreadcrumbs()
 
 const showSnapshots = ref(false)
 const loading = ref(true)
 
-const categories = ref([])
-const loaders = ref([])
-const availableGameVersions = ref([])
+const [categories, loaders, availableGameVersions] = await Promise.all([
+  get_categories(),
+  get_loaders(),
+  get_game_versions(),
+])
+
+breadcrumbs.setContext({ name: 'Browse', link: route.path })
+
+if (searchStore.projectType === 'modpack') {
+  searchStore.instanceContext = null
+}
 
 onMounted(async () => {
-  [categories.value, loaders.value, availableGameVersions.value] = await Promise.all([
-    get_categories(),
-    get_loaders(),
-    get_game_versions(),
-  ])
-  breadcrumbs.setContext({ name: 'Browse', link: route.path })
-  if (searchStore.projectType === 'modpack') {
-    searchStore.instanceContext = null
-  }
   searchStore.searchInput = ''
   await handleReset()
   loading.value = false
@@ -61,7 +71,7 @@ onMounted(async () => {
 
 const sortedCategories = computed(() => {
   const values = new Map()
-  for (const category of categories.value.filter(
+  for (const category of categories.filter(
     (cat) =>
       cat.project_type ===
       (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
@@ -76,12 +86,6 @@ const sortedCategories = computed(() => {
 
 const getSearchResults = async () => {
   const queryString = searchStore.getQueryString()
-  if (searchStore.instanceContext) {
-    showVersions.value = false
-    showLoaders.value = !(
-      searchStore.projectType === 'mod' || searchStore.projectType === 'resourcepack'
-    )
-  }
   const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
   searchStore.setSearchResults(response)
 }
@@ -123,8 +127,9 @@ const switchPage = async (page) => {
 watch(
   () => route.params.projectType,
   async (projectType) => {
-    searchStore.projectType = projectType ?? 'modpack'
-    breadcrumbs.setContext({ name: 'Browse', link: route.path })
+    if (!projectType) return
+    searchStore.projectType = projectType
+    breadcrumbs.setContext({ name: 'Browse', link: `/browse/${searchStore.projectType}` })
     await handleReset()
     await switchPage(1)
   }
@@ -139,30 +144,17 @@ const handleInstanceSwitch = async (value) => {
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Card v-if="searchStore.instanceContext" class="instance-small-card button-base" @click="seeInstance">
-        <div class="instance-small-card__description">
-          <Avatar
-            :src="convertFileSrc(searchStore.instanceContext.metadata.icon)"
-            :alt="searchStore.instanceContext.metadata.name"
-            size="sm"
+      <Instance v-if="searchStore.instanceContext" :instance="searchStore.instanceContext" small>
+        <template #content>
+          <Checkbox
+            :model-value="searchStore.ignoreInstance"
+            :checked="searchStore.ignoreInstance"
+            label="Unfilter loader & version"
+            class="filter-checkbox"
+            @update:model-value="(value) => handleInstanceSwitch(value)"
           />
-          <div class="instance-small-card__info">
-            <span class="title">{{ searchStore.instanceContext.metadata.name }}</span>
-            {{
-              searchStore.instanceContext.metadata.loader.charAt(0).toUpperCase() +
-              searchStore.instanceContext.metadata.loader.slice(1)
-            }}
-            {{ searchStore.instanceContext.metadata.game_version }}
-          </div>
-        </div>
-        <Checkbox
-          :model-value="searchStore.ignoreInstance"
-          :checked="searchStore.ignoreInstance"
-          label="Ignore Instance"
-          class="filter-checkbox"
-          @update:model-value="(value) => handleInstanceSwitch(value)"
-        />
-      </Card>
+        </template>
+      </Instance>
       <Card class="search-panel-card">
         <Button
           role="button"
@@ -196,15 +188,7 @@ const handleInstanceSwitch = async (value) => {
             />
           </div>
         </div>
-        <div
-          v-if="
-            showLoaders &&
-            searchStore.projectType !== 'datapack' &&
-            searchStore.projectType !== 'resourcepack' &&
-            searchStore.projectType !== 'shader'
-          "
-          class="loaders"
-        >
+        <div v-if="showLoaders" class="loaders">
           <h2>Loaders</h2>
           <div
             v-for="loader in loaders.filter((l) =>
@@ -298,16 +282,16 @@ const handleInstanceSwitch = async (value) => {
         />
       </Card>
       <Card class="search-panel-container">
-        <div class="search-panel">
-          <div class="iconified-input">
-            <SearchIcon aria-hidden="true" />
-            <input
-              v-model="searchStore.searchInput"
-              type="text"
-              :placeholder="`Search ${searchStore.projectType}s...`"
-              @input="getSearchResults"
-            />
-          </div>
+        <div class="iconified-input">
+          <SearchIcon aria-hidden="true" />
+          <input
+            v-model="searchStore.searchInput"
+            type="text"
+            :placeholder="`Search ${searchStore.projectType}s...`"
+            @input="getSearchResults"
+          />
+        </div>
+        <div class="inline-option">
           <span>Sort by</span>
           <DropdownSelect
             v-model="searchStore.filter"
@@ -322,6 +306,8 @@ const handleInstanceSwitch = async (value) => {
             class="sort-dropdown"
             @change="getSearchResults"
           />
+        </div>
+        <div class="inline-option">
           <span>Show per page</span>
           <DropdownSelect
             v-model="searchStore.limit"
@@ -358,6 +344,9 @@ const handleInstanceSwitch = async (value) => {
                 loader.supported_project_types?.includes(searchStore.projectType)
             ),
           ]"
+          :mod-install-modal="modInstallModal"
+          :confirm-modal="confirmModal"
+          :incompatibility-warning-modal="incompatibilityWarningModal"
         />
       </section>
       <Pagination
@@ -369,43 +358,11 @@ const handleInstanceSwitch = async (value) => {
   </div>
   <InstallConfirmModal ref="confirmModal" />
   <InstanceInstallModal ref="modInstallModal" />
+  <IncompatibilityWarningModal ref="incompatibilityWarningModal" />
 </template>
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
-.instance-small-card {
-  background-color: var(--color-bg) !important;
-  display: flex;
-  flex-direction: column;
-  min-height: min-content !important;
-  gap: 0.5rem;
-  align-items: flex-start;
-
-  .instance-small-card__description {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 1rem;
-    flex-grow: 1;
-  }
-
-  .instance-small-card__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .title {
-      color: var(--color-contrast);
-      font-weight: bolder;
-    }
-  }
-
-  .cta {
-    display: none;
-  }
-}
-
-
 .project-type-dropdown {
   width: 100% !important;
 }
@@ -432,37 +389,32 @@ const handleInstanceSwitch = async (value) => {
 }
 
 .search-panel-container {
-  display: flex;
-  flex-direction: column;
+  display: inline-flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: center;
+  flex-wrap: wrap;
   width: 100%;
-  padding: 0.8rem !important;
+  padding: 1rem !important;
+  white-space: nowrap;
+  gap: 1rem;
 
-  .search-panel {
+  .inline-option {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-evenly;
-    width: 100%;
-    gap: 1rem;
-    margin: 1rem auto;
-    white-space: nowrap;
+    gap: 0.5rem;
 
     .sort-dropdown {
-      min-width: 12.18rem;
+      max-width: 12.25rem;
     }
 
     .limit-dropdown {
       width: 5rem;
     }
+  }
 
-    .iconified-input {
-      width: 75%;
-
-      input {
-        flex-basis: initial;
-      }
-    }
+  .iconified-input {
+    flex-grow: 1;
   }
 
   .filter-panel {
@@ -483,7 +435,7 @@ const handleInstanceSwitch = async (value) => {
 
   .filter-panel {
     position: fixed;
-    width: 19rem;
+    width: 20rem;
     background: var(--color-raised-bg);
     padding: 1rem;
     display: flex;
@@ -517,8 +469,8 @@ const handleInstanceSwitch = async (value) => {
   }
 
   .search {
-    margin: 0 1rem 0 20rem;
-    width: calc(100% - 21rem);
+    margin: 0 1rem 0 21rem;
+    width: calc(100% - 22rem);
 
     .loading {
       margin: 2rem;

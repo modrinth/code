@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, useSlots } from 'vue'
 import { useRouter } from 'vue-router'
 import { ofetch } from 'ofetch'
 import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo } from 'omorphia'
@@ -33,6 +33,7 @@ const playing = ref(false)
 
 const uuid = ref(null)
 const modLoading = ref(false)
+const slots = useSlots()
 
 const router = useRouter()
 
@@ -125,19 +126,28 @@ await process_listener((e) => {
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card button-base" @click="seeInstance">
-      <Avatar
-        :src="convertFileSrc(props.instance.metadata.icon)"
-        :alt="props.instance.metadata.name"
-        size="sm"
-      />
-      <div class="instance-small-card__info">
-        <span class="title">{{ props.instance.metadata.name }}</span>
-        {{
-          props.instance.metadata.loader.charAt(0).toUpperCase() +
-          props.instance.metadata.loader.slice(1)
-        }}
-        {{ props.instance.metadata.game_version }}
+    <Card v-if="props.small" class="instance-small-card" :class="{ 'button-base': !slots.content }">
+      <div
+        class="instance-small-card__description"
+        :class="{ 'button-base': slots.content }"
+        @click="seeInstance"
+      >
+        <Avatar
+          :src="convertFileSrc(props.instance.metadata.icon)"
+          :alt="props.instance.metadata.name"
+          size="sm"
+        />
+        <div class="instance-small-card__info">
+          <span class="title">{{ props.instance.metadata.name }}</span>
+          {{
+            props.instance.metadata.loader.charAt(0).toUpperCase() +
+            props.instance.metadata.loader.slice(1)
+          }}
+          {{ props.instance.metadata.game_version }}
+        </div>
+      </div>
+      <div v-if="slots.content" class="instance-small-card__content">
+        <slot name="content" />
       </div>
     </Card>
     <Card
@@ -193,10 +203,26 @@ await process_listener((e) => {
 .instance-small-card {
   background-color: var(--color-bg) !important;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
   min-height: min-content !important;
-  gap: 1rem;
-  align-items: center;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0;
+
+  .instance-small-card__description {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 1rem;
+    flex-grow: 1;
+    padding: var(--gap-xl);
+    padding-bottom: 0;
+    width: 100%;
+
+    &:not(.button-base) {
+      padding-bottom: var(--gap-xl);
+    }
+  }
 
   .instance-small-card__info {
     display: flex;
@@ -207,6 +233,11 @@ await process_listener((e) => {
       color: var(--color-contrast);
       font-weight: bolder;
     }
+  }
+
+  .instance-small-card__content {
+    padding: var(--gap-xl);
+    padding-top: 0;
   }
 
   .cta {

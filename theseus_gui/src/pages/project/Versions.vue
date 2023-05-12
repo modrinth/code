@@ -35,14 +35,9 @@
           placeholder="Filter versions..."
         />
       </div>
-      <Checkbox
-        v-model="filterCompatible"
-        label="Only show compatible versions"
-        class="filter-checkbox"
-      />
       <Button
         class="no-wrap clear-filters"
-        :disabled="!filterLoader && !filterVersions && !filterCompatible"
+        :disabled="!filterLoader && !filterVersions"
         :action="clearFilters"
       >
         <ClearIcon />
@@ -129,28 +124,17 @@
 </template>
 
 <script setup>
-import {
-  Card,
-  Button,
-  CheckIcon,
-  ClearIcon,
-  Badge,
-  DownloadIcon,
-  Checkbox,
-  formatNumber,
-} from 'omorphia'
+import { Card, Button, CheckIcon, ClearIcon, Badge, DownloadIcon, formatNumber } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
 import { ref } from 'vue'
 
 let filterVersions = ref(null)
 let filterLoader = ref(null)
-let filterCompatible = ref(false)
 
 const clearFilters = () => {
   filterVersions.value = null
   filterLoader.value = null
-  filterCompatible.value = false
 }
 
 defineProps({

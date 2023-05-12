@@ -96,7 +96,7 @@ breadcrumbs.setContext({
 })
 
 profile_listener(async (event) => {
-  if (event.profile_path === route.params.id) {
+  if (event.path === route.params.id) {
     instance.value = await get(route.params.id)
   }
 })
