@@ -172,6 +172,32 @@ const handleInstanceSwitch = async (value) => {
           ><ClearIcon />Clear Filters</Button
         >
         <div
+          v-if="
+            showLoaders
+          "
+          class="loaders"
+        >
+          <h2>Loaders</h2>
+          <div
+            v-for="loader in loaders.filter(
+              (l) =>
+                (searchStore.projectType !== 'mod' &&
+                  l.supported_project_types?.includes(searchStore.projectType)) ||
+                (searchStore.projectType === 'mod' && ['fabric', 'forge', 'quilt'].includes(l.name))
+            )"
+            :key="loader"
+          >
+            <SearchFilter
+              :active-filters="searchStore.orFacets"
+              :icon="loader.icon"
+              :display-name="formatCategory(loader.name)"
+              :facet-name="`categories:${encodeURIComponent(loader.name)}`"
+              class="filter-checkbox"
+              @toggle="toggleOrFacet"
+            />
+          </div>
+        </div>
+        <div
           v-for="categoryList in Array.from(sortedCategories)"
           :key="categoryList[0]"
           class="categories"
@@ -185,24 +211,6 @@ const handleInstanceSwitch = async (value) => {
               :facet-name="`categories:${encodeURIComponent(category.name)}`"
               class="filter-checkbox"
               @toggle="toggleFacet"
-            />
-          </div>
-        </div>
-        <div v-if="showLoaders" class="loaders">
-          <h2>Loaders</h2>
-          <div
-            v-for="loader in loaders.filter((l) =>
-              l.supported_project_types?.includes(searchStore.projectType)
-            )"
-            :key="loader"
-          >
-            <SearchFilter
-              :active-filters="searchStore.orFacets"
-              :icon="loader.icon"
-              :display-name="formatCategory(loader.name)"
-              :facet-name="`categories:${encodeURIComponent(loader.name)}`"
-              class="filter-checkbox"
-              @toggle="toggleOrFacet"
             />
           </div>
         </div>

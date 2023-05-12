@@ -6,7 +6,8 @@ use crate::event::emit::{
 };
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
-    LinkedData, ModrinthProject, ModrinthVersion, ProfileInstallStage, SideType,
+    LinkedData, ModrinthProject, ModrinthVersion, Profile, ProfileInstallStage,
+    SideType,
 };
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, fetch_mirrors, write, write_cached_icon,
@@ -325,6 +326,7 @@ async fn install_pack(
                 prof.metadata.icon = icon.clone();
                 prof.metadata.game_version = game_version.clone();
                 prof.metadata.loader_version = loader_version.clone();
+                prof.metadata.loader = mod_loader.unwrap_or(ModLoader::Vanilla);
 
                 async { Ok(()) }
             })
@@ -409,83 +411,79 @@ async fn install_pack(
                 )
                 .await?;
 
-                let extract_overrides = |overrides: String| async {
-                    let reader = Cursor::new(&file);
-
-                    let mut overrides_zip =
-                        ZipFileReader::new(reader).await.map_err(|_| {
-                            crate::Error::from(crate::ErrorKind::InputError(
-                                "Failed extract overrides Zip".to_string(),
-                            ))
-                        })?;
-
-                    let profile = profile.clone();
-                    async move {
-                        for index in 0..overrides_zip.file().entries().len() {
-                            let file = overrides_zip
-                                .file()
-                                .entries()
-                                .get(index)
-                                .unwrap()
-                                .entry()
-                                .clone();
-
-                            let file_path = PathBuf::from(file.filename());
-                            if file.filename().starts_with(&overrides)
-                                && !file.filename().ends_with('/')
-                            {
-                                // Reads the file into the 'content' variable
-                                let mut content = Vec::new();
-                                let mut reader =
-                                    overrides_zip.entry(index).await?;
-                                reader
-                                    .read_to_end_checked(&mut content, &file)
-                                    .await?;
-
-                                let mut new_path = PathBuf::new();
-                                let components = file_path.components().skip(1);
-
-                                for component in components {
-                                    new_path.push(component);
-                                }
-
-                                if new_path.file_name().is_some() {
-                                    write(
-                                        &profile.join(new_path),
-                                        &content,
-                                        &state.io_semaphore,
-                                    )
-                                    .await?;
-                                }
-                            }
-                        }
-
-                        Ok::<(), crate::Error>(())
-                    }
-                    .await
-                };
-
                 emit_loading(&loading_bar, 0.0, Some("Extracting overrides"))
                     .await?;
-                extract_overrides("overrides".to_string()).await?;
-                extract_overrides("client_overrides".to_string()).await?;
-                emit_loading(
-                    &loading_bar,
-                    29.9,
-                    Some("Done extracting overrides"),
-                )
-                .await?;
 
-                if let Some(profile) =
-                    crate::api::profile::get(&profile).await?
+                let mut total_len = 0;
+
+                for index in 0..zip_reader.file().entries().len() {
+                    let file =
+                        zip_reader.file().entries().get(index).unwrap().entry();
+
+                    if (file.filename().starts_with("overrides")
+                        || file.filename().starts_with("client_overrides"))
+                        && !file.filename().ends_with('/')
+                    {
+                        total_len += 1;
+                    }
+                }
+
+                for index in 0..zip_reader.file().entries().len() {
+                    let file = zip_reader
+                        .file()
+                        .entries()
+                        .get(index)
+                        .unwrap()
+                        .entry()
+                        .clone();
+
+                    let file_path = PathBuf::from(file.filename());
+                    if (file.filename().starts_with("overrides")
+                        || file.filename().starts_with("client_overrides"))
+                        && !file.filename().ends_with('/')
+                    {
+                        // Reads the file into the 'content' variable
+                        let mut content = Vec::new();
+                        let mut reader = zip_reader.entry(index).await?;
+                        reader.read_to_end_checked(&mut content, &file).await?;
+
+                        let mut new_path = PathBuf::new();
+                        let components = file_path.components().skip(1);
+
+                        for component in components {
+                            new_path.push(component);
+                        }
+
+                        if new_path.file_name().is_some() {
+                            write(
+                                &profile.join(new_path),
+                                &content,
+                                &state.io_semaphore,
+                            )
+                            .await?;
+                        }
+
+                        emit_loading(
+                            &loading_bar,
+                            30.0 / total_len as f64,
+                            Some(&format!(
+                                "Extracting override {}/{}",
+                                index, total_len
+                            )),
+                        )
+                        .await?;
+                    }
+                }
+
+                if let Some(profile_val) =
+                    crate::api::profile::get(&profile, None).await?
                 {
-                    tokio::try_join!(
-                        super::profile::sync(&profile.path),
-                        crate::launcher::install_minecraft(
-                            &profile,
-                            Some(loading_bar)
-                        ),
-                    )?;
+                    Profile::sync_projects_task(profile.clone());
+                    crate::launcher::install_minecraft(
+                        &profile_val,
+                        Some(loading_bar),
+                    )
+                    .await?;
                 }
 
                 Ok::<PathBuf, crate::Error>(profile.clone())

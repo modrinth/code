@@ -257,7 +257,7 @@ impl ProfileList {
         _args: &crate::Args,
         _largs: &ProfileCommand,
     ) -> Result<()> {
-        let profiles = profile::list().await?;
+        let profiles = profile::list(None).await?;
         let rows = profiles.values().map(ProfileRow::from);
 
         let table = table(rows).with(

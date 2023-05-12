@@ -4,21 +4,19 @@ import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { loading_listener } from '@/helpers/events.js'
+import { profile_listener } from '@/helpers/events.js'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 
-const profiles = await list()
+const profiles = await list(true)
 const instances = shallowRef(Object.values(profiles))
 
-loading_listener(async (profile) => {
-  if (profile.event === 'loaded') {
-    const profiles = await list()
-    instances.value = Object.values(profiles)
-  }
+profile_listener(async () => {
+  const profiles = await list(true)
+  instances.value = Object.values(profiles)
 })
 </script>
 

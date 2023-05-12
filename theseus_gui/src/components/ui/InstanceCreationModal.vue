@@ -86,13 +86,13 @@ import {
   CodeIcon,
   Checkbox,
 } from 'omorphia'
-import { computed, ref } from 'vue'
+import { computed, ref, shallowRef } from 'vue'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
 import { useRouter } from 'vue-router'
 import { tauri } from '@tauri-apps/api'
-import { get_fabric_versions, get_forge_versions } from '@/helpers/metadata'
+import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata'
 
 const router = useRouter()
 
@@ -129,20 +129,27 @@ defineExpose({
   },
 })
 
-const all_game_versions = ref(await get_game_versions())
+const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
+  await Promise.all([
+    get_fabric_versions().then(shallowRef),
+    get_forge_versions().then(shallowRef),
+    get_quilt_versions().then(shallowRef),
+    get_game_versions().then(shallowRef),
+    get_loaders()
+      .then((value) =>
+        value
+          .filter((item) => item.supported_project_types.includes('modpack'))
+          .map((item) => item.name.toLowerCase())
+      )
+      .then(ref),
+  ])
 
 const game_versions = computed(() => {
   return all_game_versions.value
     .filter((item) => item.version_type === 'release' || showSnapshots.value)
     .map((item) => item.version)
 })
-const loaders = ref(
-  await get_loaders().then((value) =>
-    value
-      .filter((item) => item.supported_project_types.includes('modpack'))
-      .map((item) => item.name.toLowerCase())
-  )
-)
+
 const modal = ref(null)
 
 const check_valid = computed(() => {
@@ -192,9 +199,6 @@ const reset_icon = () => {
   display_icon.value = null
 }
 
-const fabric_versions = ref(await get_fabric_versions())
-const forge_versions = ref(await get_forge_versions())
-
 const selectable_versions = computed(() => {
   if (game_version.value) {
     if (loader.value === 'fabric') {
@@ -203,6 +207,8 @@ const selectable_versions = computed(() => {
       return forge_versions.value.gameVersions
         .find((item) => item.id === game_version.value)
         .loaders.map((item) => item.id)
+    } else if (loader.value === 'quilt') {
+      return quilt_versions.value.gameVersions[0].loaders.map((item) => item.id)
     }
   }
   return []

@@ -210,7 +210,7 @@ impl Profile {
         tokio::task::spawn(async move {
             let res = async {
                 let state = State::get().await?;
-                let profile = crate::api::profile::get(&path).await?;
+                let profile = crate::api::profile::get(&path, None).await?;
 
                 if let Some(profile) = profile {
                     let paths = profile.get_profile_project_paths()?;

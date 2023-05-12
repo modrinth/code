@@ -103,7 +103,7 @@ const modsRow = ref(null)
     margin-right: auto;
     margin-top: 0.8rem;
     scroll-behavior: smooth;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
 }
 

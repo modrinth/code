@@ -12,6 +12,7 @@ pub use crate::{
     state::{JavaSettings, Profile},
     State,
 };
+use std::collections::HashMap;
 use std::{
     future::Future,
     path::{Path, PathBuf},
@@ -40,11 +41,21 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
 
 /// Get a profile by path,
 #[tracing::instrument]
-pub async fn get(path: &Path) -> crate::Result<Option<Profile>> {
+pub async fn get(
+    path: &Path,
+    clear_projects: Option<bool>,
+) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
+    let mut profile = profiles.0.get(path).cloned();
 
-    Ok(profiles.0.get(path).cloned())
+    if clear_projects.unwrap_or(false) {
+        if let Some(profile) = &mut profile {
+            profile.projects = HashMap::new();
+        }
+    }
+
+    Ok(profile)
 }
 
 /// Edit a profile using a given asynchronous closure
@@ -79,11 +90,23 @@ where
 
 /// Get a copy of the profile set
 #[tracing::instrument]
-pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>>
-{
+pub async fn list(
+    clear_projects: Option<bool>,
+) -> crate::Result<HashMap<PathBuf, Profile>> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
-    Ok(profiles.0.clone())
+    Ok(profiles
+        .0
+        .clone()
+        .into_iter()
+        .map(|mut x| {
+            if clear_projects.unwrap_or(false) {
+                x.1.projects = HashMap::new();
+            }
+
+            x
+        })
+        .collect())
 }
 
 /// Query + sync profile's projects with the UI from the FS
@@ -117,7 +140,7 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
 /// Installs/Repairs a profile
 #[tracing::instrument]
 pub async fn install(path: &Path) -> crate::Result<()> {
-    let profile = get(path).await?;
+    let profile = get(path, None).await?;
 
     if let Some(profile) = profile {
         crate::launcher::install_minecraft(&profile, None).await?;
@@ -368,23 +391,26 @@ pub async fn remove_project(
 /// failing with an error if no credentials are available
 #[tracing::instrument]
 pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
-    let state = State::get().await?;
+    Box::pin(async move {
+        let state = State::get().await?;
 
-    // Get default account and refresh credentials (preferred way to log in)
-    let default_account = state.settings.read().await.default_user;
-    let credentials = if let Some(default_account) = default_account {
-        refresh(default_account).await?
-    } else {
-        // If no default account, try to use a logged in account
-        let users = auth::users().await?;
-        let last_account = users.first();
-        if let Some(last_account) = last_account {
-            refresh(last_account.id).await?
+        // Get default account and refresh credentials (preferred way to log in)
+        let default_account = state.settings.read().await.default_user;
+        let credentials = if let Some(default_account) = default_account {
+            refresh(default_account).await?
         } else {
-            return Err(crate::ErrorKind::NoCredentialsError.as_error());
-        }
-    };
-    run_credentials(path, &credentials).await
+            // If no default account, try to use a logged in account
+            let users = auth::users().await?;
+            let last_account = users.first();
+            if let Some(last_account) = last_account {
+                refresh(last_account.id).await?
+            } else {
+                return Err(crate::ErrorKind::NoCredentialsError.as_error());
+            }
+        };
+        run_credentials(path, &credentials).await
+    })
+    .await
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
@@ -398,7 +424,7 @@ pub async fn run_credentials(
         let state = State::get().await?;
         let settings = state.settings.read().await;
         let metadata = state.metadata.read().await;
-        let profile = get(path).await?.ok_or_else(|| {
+        let profile = get(path, None).await?.ok_or_else(|| {
             crate::ErrorKind::OtherError(format!(
                 "Tried to run a nonexistent or unloaded profile at path {}!",
                 path.display()

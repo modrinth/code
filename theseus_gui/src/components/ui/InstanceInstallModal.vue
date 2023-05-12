@@ -11,14 +11,15 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from 'omorphia'
-import { computed, onMounted, ref } from 'vue'
-import { add_project_from_version as installMod, list } from '@/helpers/profile'
+import { computed, ref, shallowRef } from 'vue'
+import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import { create } from '@/helpers/profile'
-import { checkInstalled, installVersionDependencies } from '@/helpers/utils'
+import { installVersionDependencies } from '@/helpers/utils'
+
 const router = useRouter()
 const versions = ref([])
 const project = ref('')
@@ -33,19 +34,17 @@ const gameVersion = ref(null)
 const creatingInstance = ref(false)
 
 defineExpose({
-  show: (projectId, selectedVersions) => {
+  show: async (projectId, selectedVersions) => {
     project.value = projectId
     versions.value = selectedVersions
     installModal.value.show()
     searchFilter.value = ''
+
+    profiles.value = await getData()
   },
 })
 
-const profiles = ref([])
-
-onMounted(async () => {
-  profiles.value = await list().then(Object.values)
-})
+const profiles = shallowRef(await getData())
 
 async function install(instance) {
   instance.installing = true
@@ -63,8 +62,10 @@ async function install(instance) {
   instance.installing = false
 }
 
-const filteredVersions = computed(() => {
-  const filtered = profiles.value
+async function getData() {
+  const projects = await list(true).then(Object.values)
+
+  const filtered = projects
     .filter((profile) => {
       return profile.metadata.name.toLowerCase().includes(searchFilter.value.toLowerCase())
     })
@@ -73,17 +74,20 @@ const filteredVersions = computed(() => {
         versions.value.flatMap((v) => v.game_versions).includes(profile.metadata.game_version) &&
         versions.value
           .flatMap((v) => v.loaders)
-          .some((value) => value === profile.metadata.loader || value === 'minecraft')
+          .some(
+            (value) =>
+              value === profile.metadata.loader || ['minecraft', 'iris', 'optifine'].includes(value)
+          )
       )
     })
 
-  filtered.map((profile) => {
+  for (let profile of filtered) {
     profile.installing = false
-    profile.installedMod = checkInstalled(profile, project.value)
-  })
+    profile.installedMod = await check_installed(profile.path, project.value)
+  }
 
   return filtered
-})
+}
 
 const toggleCreation = () => {
   showCreation.value = !showCreation.value
@@ -145,7 +149,7 @@ const check_valid = computed(() => {
     <div class="modal-body">
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
       <div class="profiles" :class="{ 'hide-creation': !showCreation }">
-        <div v-for="profile in filteredVersions" :key="profile.metadata.name" class="option">
+        <div v-for="profile in profiles" :key="profile.metadata.name" class="option">
           <Button
             color="raised"
             class="profile-button"

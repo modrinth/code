@@ -253,9 +253,11 @@ impl Children {
                 let child = child.clone();
                 let child = child.write().await;
                 if child.current_child.write().await.try_wait()?.is_none() {
-                    if let Some(prof) =
-                        crate::api::profile::get(&child.profile_path.clone())
-                            .await?
+                    if let Some(prof) = crate::api::profile::get(
+                        &child.profile_path.clone(),
+                        None,
+                    )
+                    .await?
                     {
                         profiles.push(prof);
                     }
