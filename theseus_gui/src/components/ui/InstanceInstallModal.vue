@@ -11,7 +11,7 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from 'omorphia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
@@ -44,7 +44,7 @@ defineExpose({
   },
 })
 
-const profiles = shallowRef(await getData())
+const profiles = ref([])
 
 async function install(instance) {
   instance.installing = true

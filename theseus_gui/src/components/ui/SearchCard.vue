@@ -114,8 +114,8 @@ const props = defineProps({
   },
 })
 
-const installed = ref(false)
-const installing = ref(props.instance && await check_installed(props.instance.path, props.project.project_id))
+const installing = ref(false)
+const installed = ref(props.instance && await check_installed(props.instance.path, props.project.project_id))
 
 const markInstalled = () => {
   installed.value = true

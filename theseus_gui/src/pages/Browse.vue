@@ -51,11 +51,9 @@ const breadcrumbs = useBreadcrumbs()
 const showSnapshots = ref(false)
 const loading = ref(true)
 
-const [categories, loaders, availableGameVersions] = await Promise.all([
-  get_categories(),
-  get_loaders(),
-  get_game_versions(),
-])
+const categories = ref([])
+const loaders = ref([])
+const availableGameVersions = ref([])
 
 breadcrumbs.setContext({ name: 'Browse', link: route.path })
 
@@ -64,14 +62,24 @@ if (searchStore.projectType === 'modpack') {
 }
 
 onMounted(async () => {
+  [categories.value, loaders.value, availableGameVersions.value] = await Promise.all([
+    get_categories(),
+    get_loaders(),
+    get_game_versions(),
+  ])
+  breadcrumbs.setContext({ name: 'Browse', link: route.path })
+  if (searchStore.projectType === 'modpack') {
+    searchStore.instanceContext = null
+  }
   searchStore.searchInput = ''
   await handleReset()
   loading.value = false
 })
 
+
 const sortedCategories = computed(() => {
   const values = new Map()
-  for (const category of categories.filter(
+  for (const category of categories.value.filter(
     (cat) =>
       cat.project_type ===
       (searchStore.projectType === 'datapack' ? 'mod' : searchStore.projectType)
@@ -352,8 +360,8 @@ const handleInstanceSwitch = async (value) => {
                 loader.supported_project_types?.includes(searchStore.projectType)
             ),
           ]"
-          :mod-install-modal="modInstallModal"
           :confirm-modal="confirmModal"
+          :mod-install-modal="modInstallModal"
           :incompatibility-warning-modal="incompatibilityWarningModal"
         />
       </section>
