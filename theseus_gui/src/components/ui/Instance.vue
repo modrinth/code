@@ -64,7 +64,7 @@ const install = async (e) => {
   )
 
   if (props.instance.project_type === 'modpack') {
-    const packs = Object.values(await list())
+    const packs = Object.values(await list(true))
 
     if (
       packs.length === 0 ||
@@ -125,9 +125,14 @@ await process_listener((e) => {
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card button-base">
+    <Card v-if="props.small" class="instance-small-card button-base" @click="seeInstance">
       <Avatar
-        :src="convertFileSrc(props.instance.metadata.icon)"
+        :src="
+          !props.instance.metadata.icon ||
+          (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
+            ? props.instance.metadata.icon
+            : convertFileSrc(instance.metadata?.icon)
+        "
         :alt="props.instance.metadata.name"
         size="sm"
       />
@@ -150,9 +155,10 @@ await process_listener((e) => {
         size="none"
         :src="
           props.instance.metadata
-            ? props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http')
+            ? !props.instance.metadata.icon ||
+              (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
               ? props.instance.metadata.icon
-              : convertFileSrc(props.instance.metadata?.icon)
+              : convertFileSrc(instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"
@@ -166,25 +172,27 @@ await process_listener((e) => {
         </p>
       </div>
     </Card>
-    <div
-      v-if="props.instance.metadata && playing === false && modLoading === false"
-      class="install cta button-base"
-      @click="play"
-    >
-      <PlayIcon />
-    </div>
-    <div v-else-if="modLoading === true && playing === false" class="cta loading">
-      <AnimatedLogo class="loading" />
-    </div>
-    <div
-      v-else-if="playing === true"
-      class="stop cta button-base"
-      @click="stop"
-      @mousehover="checkProcess"
-    >
-      <XIcon />
-    </div>
-    <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+    <template v-if="!props.small">
+      <div
+        v-if="props.instance.metadata && playing === false && modLoading === false"
+        class="install cta button-base"
+        @click="play"
+      >
+        <PlayIcon />
+      </div>
+      <div v-else-if="modLoading === true && playing === false" class="cta loading">
+        <AnimatedLogo class="loading" />
+      </div>
+      <div
+        v-else-if="playing === true"
+        class="stop cta button-base"
+        @click="stop"
+        @mousehover="checkProcess"
+      >
+        <XIcon />
+      </div>
+      <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+    </template>
     <InstallConfirmModal ref="confirmModal" />
   </div>
 </template>
@@ -208,10 +216,6 @@ await process_listener((e) => {
       color: var(--color-contrast);
       font-weight: bolder;
     }
-  }
-
-  .cta {
-    display: none;
   }
 }
 

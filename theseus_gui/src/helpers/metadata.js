@@ -17,3 +17,9 @@ export async function get_fabric_versions() {
 export async function get_forge_versions() {
   return await invoke('metadata_get_forge_versions')
 }
+
+// Gets the quilt versions from daedalus
+// Returns Manifest
+export async function get_quilt_versions() {
+  return await invoke('metadata_get_quilt_versions')
+}

@@ -12,6 +12,7 @@ pub use crate::{
     state::{JavaSettings, Profile},
     State,
 };
+use std::collections::HashMap;
 use std::{
     future::Future,
     path::{Path, PathBuf},
@@ -40,11 +41,21 @@ pub async fn remove(path: &Path) -> crate::Result<()> {
 
 /// Get a profile by path,
 #[tracing::instrument]
-pub async fn get(path: &Path) -> crate::Result<Option<Profile>> {
+pub async fn get(
+    path: &Path,
+    clear_projects: Option<bool>,
+) -> crate::Result<Option<Profile>> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
+    let mut profile = profiles.0.get(path).cloned();
 
-    Ok(profiles.0.get(path).cloned())
+    if clear_projects.unwrap_or(false) {
+        if let Some(profile) = &mut profile {
+            profile.projects = HashMap::new();
+        }
+    }
+
+    Ok(profile)
 }
 
 /// Edit a profile using a given asynchronous closure
@@ -79,11 +90,23 @@ where
 
 /// Get a copy of the profile set
 #[tracing::instrument]
-pub async fn list() -> crate::Result<std::collections::HashMap<PathBuf, Profile>>
-{
+pub async fn list(
+    clear_projects: Option<bool>,
+) -> crate::Result<HashMap<PathBuf, Profile>> {
     let state = State::get().await?;
     let profiles = state.profiles.read().await;
-    Ok(profiles.0.clone())
+    Ok(profiles
+        .0
+        .clone()
+        .into_iter()
+        .map(|mut x| {
+            if clear_projects.unwrap_or(false) {
+                x.1.projects = HashMap::new();
+            }
+
+            x
+        })
+        .collect())
 }
 
 /// Query + sync profile's projects with the UI from the FS
@@ -117,7 +140,7 @@ pub async fn sync(path: &Path) -> crate::Result<()> {
 /// Installs/Repairs a profile
 #[tracing::instrument]
 pub async fn install(path: &Path) -> crate::Result<()> {
-    let profile = get(path).await?;
+    let profile = get(path, None).await?;
 
     if let Some(profile) = profile {
         crate::launcher::install_minecraft(&profile, None).await?;
@@ -398,7 +421,7 @@ pub async fn run_credentials(
         let state = State::get().await?;
         let settings = state.settings.read().await;
         let metadata = state.metadata.read().await;
-        let profile = get(path).await?.ok_or_else(|| {
+        let profile = get(path, None).await?.ok_or_else(|| {
             crate::ErrorKind::OtherError(format!(
                 "Tried to run a nonexistent or unloaded profile at path {}!",
                 path.display()

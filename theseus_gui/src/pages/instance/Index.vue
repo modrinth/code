@@ -5,7 +5,8 @@
         <Avatar
           size="lg"
           :src="
-            instance.metadata.icon && instance.metadata.icon.startsWith('http')
+            !instance.metadata.icon ||
+            (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
               ? instance.metadata.icon
               : convertFileSrc(instance.metadata?.icon)
           "

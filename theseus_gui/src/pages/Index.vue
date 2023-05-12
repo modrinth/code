@@ -16,11 +16,11 @@ const breadcrumbs = useBreadcrumbs()
 
 breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 
-const recentInstances = shallowRef(Object.values(await list()))
+const recentInstances = shallowRef([])
 
 const getInstances = async () => {
   filter.value = ''
-  const profiles = await list()
+  const profiles = await list(true)
   recentInstances.value = Object.values(profiles)
 
   const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
@@ -47,8 +47,8 @@ await getInstances()
 await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
 
 const unlisten = await profile_listener(async (e) => {
+  await getInstances()
   if (e.event === 'created' || e.event === 'removed') {
-    await getInstances()
     await Promise.all([getFeaturedModpacks(), getFeaturedMods()])
   }
 })
