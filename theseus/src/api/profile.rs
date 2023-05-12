@@ -391,23 +391,26 @@ pub async fn remove_project(
 /// failing with an error if no credentials are available
 #[tracing::instrument]
 pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
-    let state = State::get().await?;
+    Box::pin(async move {
+        let state = State::get().await?;
 
-    // Get default account and refresh credentials (preferred way to log in)
-    let default_account = state.settings.read().await.default_user;
-    let credentials = if let Some(default_account) = default_account {
-        refresh(default_account).await?
-    } else {
-        // If no default account, try to use a logged in account
-        let users = auth::users().await?;
-        let last_account = users.first();
-        if let Some(last_account) = last_account {
-            refresh(last_account.id).await?
+        // Get default account and refresh credentials (preferred way to log in)
+        let default_account = state.settings.read().await.default_user;
+        let credentials = if let Some(default_account) = default_account {
+            refresh(default_account).await?
         } else {
-            return Err(crate::ErrorKind::NoCredentialsError.as_error());
-        }
-    };
-    run_credentials(path, &credentials).await
+            // If no default account, try to use a logged in account
+            let users = auth::users().await?;
+            let last_account = users.first();
+            if let Some(last_account) = last_account {
+                refresh(last_account.id).await?
+            } else {
+                return Err(crate::ErrorKind::NoCredentialsError.as_error());
+            }
+        };
+        run_credentials(path, &credentials).await
+    })
+    .await
 }
 
 /// Run Minecraft using a profile, and credentials for authentication
