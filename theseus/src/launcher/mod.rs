@@ -60,6 +60,18 @@ pub async fn install_minecraft(
     existing_loading_bar: Option<LoadingBarId>,
 ) -> crate::Result<()> {
     Box::pin(async move {
+        let loading_bar = init_or_edit_loading(
+            existing_loading_bar,
+            LoadingBarType::MinecraftDownload {
+                // If we are downloading minecraft for a profile, provide its name and uuid
+                profile_name: profile.metadata.name.clone(),
+                profile_path: profile.path.clone(),
+            },
+            100.0,
+            "Downloading Minecraft",
+        )
+            .await?;
+
         crate::api::profile::edit(&profile.path, |prof| {
             prof.install_stage = ProfileInstallStage::Installing;
 
@@ -89,18 +101,6 @@ pub async fn install_minecraft(
             .map_or(version.id.clone(), |it| {
                 format!("{}-{}", version.id.clone(), it.id.clone())
             });
-
-        let loading_bar = init_or_edit_loading(
-            existing_loading_bar,
-            LoadingBarType::MinecraftDownload {
-                // If we are downloading minecraft for a profile, provide its name and uuid
-                profile_name: profile.metadata.name.clone(),
-                profile_path: profile.path.clone(),
-            },
-            100.0,
-            "Downloading Minecraft",
-        )
-        .await?;
 
         // Download version info (5)
         let mut version_info = download::download_version_info(

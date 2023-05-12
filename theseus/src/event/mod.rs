@@ -111,6 +111,8 @@ impl Drop for LoadingBar {
         let loader_uuid = self.loading_bar_uuid;
         let event = self.bar_type.clone();
         let fraction = self.current / self.total;
+
+        #[cfg(feature = "cli")]
         let cli_progress_bar = self.cli_progress_bar.clone();
 
         tokio::spawn(async move {

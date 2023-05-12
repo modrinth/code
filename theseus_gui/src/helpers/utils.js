@@ -1,4 +1,4 @@
-import { add_project_from_version as installMod } from '@/helpers/profile'
+import { add_project_from_version as installMod, check_installed } from '@/helpers/profile'
 import { ofetch } from 'ofetch'
 
 export const releaseColor = (releaseType) => {
@@ -14,17 +14,13 @@ export const releaseColor = (releaseType) => {
   }
 }
 
-export const checkInstalled = (profile, projectId) => {
-  return Object.values(profile.projects).some((p) => p.metadata?.project?.id === projectId)
-}
-
 export const installVersionDependencies = async (profile, version) => {
   for (const dep of version.dependencies) {
     if (dep.version_id) {
-      if (checkInstalled(profile, dep.project_id)) continue
+      if (await check_installed(profile.path, dep.project_id)) continue
       await installMod(profile.path, dep.version_id)
     } else {
-      if (checkInstalled(profile, dep.project_id)) continue
+      if (await check_installed(profile.path, dep.project_id)) continue
       const depVersions = await ofetch(
         `https://api.modrinth.com/v2/project/${dep.project_id}/version`
       )

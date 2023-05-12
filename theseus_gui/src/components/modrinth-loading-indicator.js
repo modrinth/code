@@ -63,7 +63,7 @@ export default defineComponent({
             background: props.color || undefined,
             backgroundSize: `${(100 / indicator.progress.value) * 100}% auto`,
             transition: 'width 0.1s, height 0.4s, opacity 0.4s',
-            zIndex: 99,
+            zIndex: 6,
           },
         },
         slots
