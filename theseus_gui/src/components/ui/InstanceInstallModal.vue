@@ -21,6 +21,8 @@ import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
 import { useNotifications } from '@/store/state'
 
+const notificationStore = useNotifications()
+
 const router = useRouter()
 const versions = ref([])
 const project = ref('')
