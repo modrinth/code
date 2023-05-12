@@ -69,10 +69,10 @@ import {
 } from 'omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { onMounted, ref } from 'vue'
-import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
+import { ref } from 'vue'
+import {add_project_from_version as installMod, check_installed, list} from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
-import { checkInstalled, installVersionDependencies } from '@/helpers/utils.js'
+import { installVersionDependencies } from '@/helpers/utils.js'
 import { ofetch } from 'ofetch'
 import { useRouter } from 'vue-router'
 dayjs.extend(relativeTime)
@@ -115,11 +115,7 @@ const props = defineProps({
 })
 
 const installed = ref(false)
-const installing = ref(false)
-
-onMounted(() => {
-  installed.value = props.instance && checkInstalled(props.instance, props.project.project_id)
-})
+const installing = ref(props.instance && await check_installed(props.instance.path, props.project.project_id))
 
 const markInstalled = () => {
   installed.value = true
@@ -131,9 +127,6 @@ const install = async () => {
     `https://api.modrinth.com/v2/project/${props.project.project_id}/version`
   )
   let queuedVersionData
-
-  installed.value = props.instance && checkInstalled(props.instance, props.project.project_id)
-  if (installed.value) return
 
   if (!props.instance) {
     queuedVersionData = versions[0]
