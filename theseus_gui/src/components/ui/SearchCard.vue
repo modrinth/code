@@ -69,8 +69,8 @@ import {
 } from 'omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import {onMounted, ref} from 'vue'
-import {add_project_from_version as installMod, check_installed, list} from '@/helpers/profile.js'
+import { onMounted, ref } from 'vue'
+import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
 import { ofetch } from 'ofetch'
@@ -118,7 +118,8 @@ const installing = ref(false)
 const installed = ref(false)
 
 onMounted(async () => {
-  installed.value = props.instance && await check_installed(props.instance.path, props.project.project_id)
+  installed.value =
+    props.instance && (await check_installed(props.instance.path, props.project.project_id))
 })
 
 const markInstalled = () => {

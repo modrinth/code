@@ -62,7 +62,7 @@ if (searchStore.projectType === 'modpack') {
 }
 
 onMounted(async () => {
-  [categories.value, loaders.value, availableGameVersions.value] = await Promise.all([
+  ;[categories.value, loaders.value, availableGameVersions.value] = await Promise.all([
     get_categories(),
     get_loaders(),
     get_game_versions(),
@@ -75,7 +75,6 @@ onMounted(async () => {
   await handleReset()
   loading.value = false
 })
-
 
 const sortedCategories = computed(() => {
   const values = new Map()
@@ -179,12 +178,7 @@ const handleInstanceSwitch = async (value) => {
           @click="handleReset"
           ><ClearIcon />Clear Filters</Button
         >
-        <div
-          v-if="
-            showLoaders
-          "
-          class="loaders"
-        >
+        <div v-if="showLoaders" class="loaders">
           <h2>Loaders</h2>
           <div
             v-for="loader in loaders.filter(
