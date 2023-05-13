@@ -327,7 +327,22 @@ pub fn merge_partial_library(
     mut merge: Library,
 ) -> Library {
     if let Some(downloads) = partial.downloads {
-        merge.downloads = Some(downloads)
+        if let Some(merge_downloads) = &mut merge.downloads {
+            if let Some(artifact) = downloads.artifact {
+                merge_downloads.artifact = Some(artifact);
+            }
+            if let Some(classifiers) = downloads.classifiers {
+                if let Some(merge_classifiers) = &mut merge_downloads.classifiers {
+                    for classifier in classifiers {
+                        merge_classifiers.insert(classifier.0, classifier.1);
+                    }
+                } else {
+                    merge_downloads.classifiers = Some(classifiers);
+                }
+            }
+        } else {
+            merge.downloads = Some(downloads)
+        }
     }
     if let Some(extract) = partial.extract {
         merge.extract = Some(extract)
@@ -339,10 +354,22 @@ pub fn merge_partial_library(
         merge.url = Some(url)
     }
     if let Some(natives) = partial.natives {
-        merge.natives = Some(natives)
+        if let Some(merge_natives) = &mut merge.natives {
+            for native in natives {
+                merge_natives.insert(native.0, native.1);
+            }
+        } else {
+            merge.natives = Some(natives);
+        }
     }
     if let Some(rules) = partial.rules {
-        merge.rules = Some(rules)
+        if let Some(merge_rules) = &mut merge.rules {
+            for rule in rules {
+                merge_rules.push(rule);
+            }
+        } else {
+            merge.rules = Some(rules)
+        }
     }
     if let Some(checksums) = partial.checksums {
         merge.checksums = Some(checksums)

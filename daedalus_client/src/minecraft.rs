@@ -1,9 +1,7 @@
 use crate::download_file;
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::get_hash;
-use daedalus::minecraft::{
-    merge_partial_library, Library, PartialLibrary, VersionManifest,
-};
+use daedalus::minecraft::{merge_partial_library, Library, PartialLibrary, VersionManifest, VersionInfo};
 use log::info;
 use serde::Deserialize;
 use std::sync::Arc;
@@ -66,7 +64,7 @@ pub async fn retrieve_data(
                 let mut version_info =
                     daedalus::minecraft::fetch_version_info(version).await?;
 
-                fn patch_library(patches: &Vec<LibraryPatch>, mut library: Library) -> Vec<Library> {
+                fn patch_library(patches: &Vec<LibraryPatch>, mut library: Library, version_info: &VersionInfo) -> Vec<Library> {
                     let mut val = Vec::new();
 
                     let actual_patches = patches
@@ -77,22 +75,26 @@ pub async fn retrieve_data(
                     if !actual_patches.is_empty()
                     {
                         for patch in actual_patches {
+                            println!("{} {}", version_info.id, patch._comment);
+
+                            if let Some(override_) = &patch.override_ {
+                                library = merge_partial_library(
+                                    override_.clone(),
+                                    library,
+                                );
+                            }
+
                             if let Some(additional_libraries) =
                                 &patch.additional_libraries
                             {
                                 for additional_library in additional_libraries {
                                     if patch.patch_additional_libraries.unwrap_or(false) {
-                                        let mut libs = patch_library(patches, additional_library.clone());
+                                        let mut libs = patch_library(patches, additional_library.clone(), &version_info);
                                         val.append(&mut libs)
                                     } else {
                                         val.push(additional_library.clone());
                                     }
                                 }
-                            } else if let Some(override_) = &patch.override_ {
-                                library = merge_partial_library(
-                                    override_.clone(),
-                                    library,
-                                );
                             }
                         }
 
@@ -105,8 +107,8 @@ pub async fn retrieve_data(
                 }
 
                 let mut new_libraries = Vec::new();
-                for library in version_info.libraries {
-                    let mut libs = patch_library(&patches, library);
+                for library in version_info.libraries.clone() {
+                    let mut libs = patch_library(&patches, library, &version_info);
                     new_libraries.append(&mut libs)
                 }
                 version_info.libraries = new_libraries;
@@ -266,12 +268,6 @@ async fn fetch_library_patches(
     url: Option<&str>,
     semaphore: Arc<Semaphore>,
 ) -> Result<Vec<LibraryPatch>, Error> {
-    Ok(serde_json::from_slice(
-        &download_file(
-            url.unwrap_or(&format_url("library-patches.json")),
-            None,
-            semaphore,
-        )
-        .await?,
-    )?)
+    let patches = include_bytes!("../library-patches.json");
+    Ok(serde_json::from_slice(patches)?)
 }
