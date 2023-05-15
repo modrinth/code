@@ -3,6 +3,7 @@ use crate::config::MODRINTH_API_URL;
 use crate::data::DirectoryInfo;
 use crate::event::emit::emit_profile;
 use crate::event::ProfilePayloadType;
+use crate::prelude::JavaVersion;
 use crate::state::projects::Project;
 use crate::state::{ModrinthVersion, ProjectMetadata, ProjectType};
 use crate::util::fetch::{
@@ -124,7 +125,7 @@ impl ModLoader {
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct JavaSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub jre_key: Option<String>,
+    pub override_version: Option<JavaVersion>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra_arguments: Option<Vec<String>>,
 }

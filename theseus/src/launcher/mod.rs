@@ -1,6 +1,8 @@
 //! Logic for launching Minecraft
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
+use crate::jre::{JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
+use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
 use crate::{
     process,
@@ -8,10 +10,11 @@ use crate::{
     State,
 };
 use daedalus as d;
+use daedalus::minecraft::VersionInfo;
 use dunce::canonicalize;
 use st::Profile;
 use std::fs;
-use std::{path::Path, process::Stdio, sync::Arc};
+use std::{process::Stdio, sync::Arc};
 use tokio::process::Command;
 use uuid::Uuid;
 
@@ -21,18 +24,18 @@ pub mod auth;
 pub mod download;
 
 #[tracing::instrument]
-pub fn parse_rule(rule: &d::minecraft::Rule) -> bool {
+pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
     use d::minecraft::{Rule, RuleAction};
 
     let res = match rule {
         Rule {
             os: Some(ref os), ..
-        } => crate::util::platform::os_rule(os),
+        } => crate::util::platform::os_rule(os, java_version),
         Rule {
             features: Some(ref features),
             ..
         } => features.has_demo_resolution.unwrap_or(false),
-        _ => true,
+        _ => false,
     };
 
     match rule.action {
@@ -51,6 +54,40 @@ macro_rules! processor_rules {
                 server: String::from($server),
             },
         );)+
+    }
+}
+
+async fn get_java_version_from_profile(
+    profile: &Profile,
+    version_info: &VersionInfo,
+) -> crate::Result<JavaVersion> {
+    if let Some(java) = profile.java.clone().and_then(|x| x.override_version) {
+        Ok(java)
+    } else {
+        let optimal_keys = match version_info
+            .java_version
+            .as_ref()
+            .map(|it| it.major_version)
+            .unwrap_or(8)
+        {
+            0..=15 => vec![JAVA_8_KEY, JAVA_17_KEY, JAVA_18PLUS_KEY],
+            16..=17 => vec![JAVA_17_KEY, JAVA_18PLUS_KEY],
+            _ => vec![JAVA_18PLUS_KEY],
+        };
+
+        let state = State::get().await?;
+        let settings = state.settings.read().await;
+
+        for key in optimal_keys {
+            if let Some(java) = settings.java_globals.get(&key.to_string()) {
+                return Ok(java.clone());
+            }
+        }
+
+        Err(crate::ErrorKind::LauncherError(
+            "No available java installation".to_string(),
+        )
+        .into())
     }
 }
 
@@ -112,8 +149,10 @@ pub async fn install_minecraft(
         )
         .await?;
 
+        let java_version = get_java_version_from_profile(profile, &version_info).await?;
+
         // Download minecraft (5-90)
-        download::download_minecraft(&state, &version_info, &loading_bar).await?;
+        download::download_minecraft(&state, &version_info, &loading_bar, &java_version.architecture).await?;
 
         if let Some(processors) = &version_info.processors {
             let client_path = state
@@ -157,11 +196,12 @@ pub async fn install_minecraft(
                         cp.push(processor.jar.clone())
                     });
 
-                    let child = Command::new("java")
+                    let child = Command::new(&java_version.path)
                         .arg("-cp")
                         .arg(args::get_class_paths_jar(
                             &state.directories.libraries_dir(),
                             &cp,
+                            &java_version.architecture
                         )?)
                         .arg(
                             args::get_processor_main_class(args::get_lib_path(
@@ -231,7 +271,6 @@ pub async fn install_minecraft(
 
 #[allow(clippy::too_many_arguments)]
 pub async fn launch_minecraft(
-    java_install: &Path,
     java_args: &[String],
     env_args: &[(String, String)],
     wrapper: &Option<String>,
@@ -286,6 +325,8 @@ pub async fn launch_minecraft(
         )
         .await?;
 
+        let java_version = get_java_version_from_profile(profile, &version_info).await?;
+
         let client_path = state
             .directories
             .version_dir(&version_jar)
@@ -294,9 +335,9 @@ pub async fn launch_minecraft(
         let args = version_info.arguments.clone().unwrap_or_default();
         let mut command = match wrapper {
             Some(hook) => {
-                wrap_ref_builder!(it = Command::new(hook) => {it.arg(java_install)})
+                wrap_ref_builder!(it = Command::new(hook) => {it.arg(&java_version.path)})
             }
-            None => Command::new(String::from(java_install.to_string_lossy())),
+            None => Command::new(&java_version.path),
         };
 
         let env_args = Vec::from(env_args);
@@ -324,10 +365,12 @@ pub async fn launch_minecraft(
                         &state.directories.libraries_dir(),
                         version_info.libraries.as_slice(),
                         &client_path,
+                        &java_version.architecture
                     )?,
                     &version_jar,
                     *memory,
                     Vec::from(java_args),
+                    &java_version.architecture
                 )?
                 .into_iter()
                 .collect::<Vec<_>>(),
@@ -345,6 +388,7 @@ pub async fn launch_minecraft(
                     &state.directories.assets_dir(),
                     &version.type_,
                     *resolution,
+                    &java_version.architecture
                 )?
                 .into_iter()
                 .collect::<Vec<_>>(),
@@ -362,7 +406,7 @@ pub async fn launch_minecraft(
 
         // Get Modrinth logs directories
         let datetime_string =
-            chrono::Local::now().format("%Y%m%y_%H%M%S").to_string();
+            chrono::Local::now().format("%Y%m%d_%H%M%S").to_string();
         let logs_dir = {
             let st = State::get().await?;
             st.directories

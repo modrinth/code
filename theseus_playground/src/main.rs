@@ -4,11 +4,12 @@
 )]
 
 use dunce::canonicalize;
-use theseus::jre::autodetect_java_globals;
+use theseus::jre::{
+    autodetect_java_globals, check_jre, get_max_memory, JAVA_8_KEY,
+};
 use theseus::prelude::*;
 
-
-
+use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
 use tracing_error::ErrorLayer;
 use tracing_subscriber::layer::SubscriberExt;
@@ -51,6 +52,7 @@ async fn main() -> theseus::Result<()> {
     let st = State::get().await?;
     //State::update();
 
+    println!("max memory: {}", get_max_memory().await?);
     st.settings.write().await.java_globals = autodetect_java_globals().await?;
     st.settings.write().await.max_concurrent_downloads = 50;
     st.settings.write().await.hooks.post_exit =
@@ -58,6 +60,13 @@ async fn main() -> theseus::Result<()> {
     // Changed the settings, so need to reset the semaphore
     st.reset_fetch_semaphore().await;
 
+    // let path = jre::auto_install_java(8).await.unwrap();
+    //
+    // st.settings
+    //     .write()
+    //     .await
+    //     .java_globals
+    //     .insert(JAVA_8_KEY.to_string(), check_jre(path).await?.unwrap());
     // Clear profiles
     println!("Clearing profiles.");
     {
@@ -69,22 +78,22 @@ async fn main() -> theseus::Result<()> {
 
     println!("Creating/adding profile.");
 
-    // let name = "Example".to_string();
-    // let game_version = "1.19.2".to_string();
-    // let modloader = ModLoader::Vanilla;
-    // let loader_version = "stable".to_string();
-    //
-    // let profile_path = profile_create(
-    //     name.clone(),
-    //     game_version,
-    //     modloader,
-    //     Some(loader_version),
-    //     None,
-    //     None,
-    //     None,
-    //     None,
-    // )
-    // .await?;
+    let name = "Example".to_string();
+    let game_version = "rd-132211".to_string();
+    let modloader = ModLoader::Vanilla;
+    let loader_version = "stable".to_string();
+
+    let profile_path = profile_create(
+        name.clone(),
+        game_version,
+        modloader,
+        Some(loader_version),
+        None,
+        None,
+        None,
+        None,
+    )
+    .await?;
     //
     // install(&profile_path).await.unwrap();
 
@@ -108,13 +117,13 @@ async fn main() -> theseus::Result<()> {
     // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
 
     // profile::remove_project(&profile_path, &mod_menu_path).await?;
-    let profile_path = pack::install_pack_from_version_id(
-        "CeeCkHke".to_string(),
-        "Technical Electrical".to_string(),
-        None,
-    )
-    .await
-    .unwrap();
+    // let profile_path = pack::install_pack_from_version_id(
+    //     "CeeCkHke".to_string(),
+    //     "Technical Electrical".to_string(),
+    //     None,
+    // )
+    // .await
+    // .unwrap();
 
     //  async closure for testing any desired edits
     // (ie: changing the java runtime of an added profile)
@@ -147,8 +156,8 @@ async fn main() -> theseus::Result<()> {
     println!("Minecraft PID: {:?}", pid);
 
     // Wait 5 seconds
-    println!("Waiting 20 seconds to gather logs...");
-    sleep(Duration::from_secs(20)).await;
+    println!("Waiting 5 seconds to gather logs...");
+    sleep(Duration::from_secs(5)).await;
     let stdout = process::get_stdout_by_uuid(&uuid).await?;
     let stderr = process::get_stderr_by_uuid(&uuid).await?;
     println!("Logs after 5sec <<< {stdout} >>> end stdout");

@@ -5,7 +5,6 @@ use crate::state::ProjectMetadata;
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
-    launcher::download,
     state::MinecraftChild,
 };
 pub use crate::{
@@ -423,7 +422,6 @@ pub async fn run_credentials(
     Box::pin(async move {
         let state = State::get().await?;
         let settings = state.settings.read().await;
-        let metadata = state.metadata.read().await;
         let profile = get(path, None).await?.ok_or_else(|| {
             crate::ErrorKind::OtherError(format!(
                 "Tried to run a nonexistent or unloaded profile at path {}!",
@@ -431,25 +429,6 @@ pub async fn run_credentials(
             ))
         })?;
 
-        let version = metadata
-            .minecraft
-            .versions
-            .iter()
-            .find(|it| it.id == profile.metadata.game_version)
-            .ok_or_else(|| {
-                crate::ErrorKind::LauncherError(format!(
-                    "Invalid or unknown Minecraft version: {}",
-                    profile.metadata.game_version
-                ))
-            })?;
-        let version_info = download::download_version_info(
-            &state,
-            version,
-            profile.metadata.loader_version.as_ref(),
-            None,
-            None,
-        )
-        .await?;
         let pre_launch_hooks =
             &profile.hooks.as_ref().unwrap_or(&settings.hooks).pre_launch;
         if let Some(hook) = pre_launch_hooks {
@@ -473,49 +452,6 @@ pub async fn run_credentials(
             }
         }
 
-        let java_version = match profile.java {
-            // Load profile-specific Java implementation choice
-            // (This defaults to Daedalus-decided key on init, but can be changed by the user)
-            Some(JavaSettings {
-                jre_key: Some(ref jre_key),
-                ..
-            }) => settings.java_globals.get(jre_key),
-            // Fall back to Daedalus-decided key if no profile-specific key is set
-            _ => {
-                match version_info
-                    .java_version
-                    .as_ref()
-                    .map(|it| it.major_version)
-                    .unwrap_or(0)
-                {
-                    0..=16 => settings
-                        .java_globals
-                        .get(&crate::jre::JAVA_8_KEY.to_string()),
-                    17 => settings
-                        .java_globals
-                        .get(&crate::jre::JAVA_17_KEY.to_string()),
-                    _ => settings
-                        .java_globals
-                        .get(&crate::jre::JAVA_18PLUS_KEY.to_string()),
-                }
-            }
-        };
-        let java_version = java_version.as_ref().ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "No Java stored for version {}",
-                version_info.java_version.map_or(8, |it| it.major_version),
-            ))
-        })?;
-
-        // Get the path to the Java executable from the chosen Java implementation key
-        let java_install: &Path = &PathBuf::from(&java_version.path);
-        if !java_install.exists() {
-            return Err(crate::ErrorKind::LauncherError(format!(
-                "Could not find Java install: {}",
-                java_install.display()
-            ))
-            .as_error());
-        }
         let java_args = profile
             .java
             .as_ref()
@@ -550,7 +486,6 @@ pub async fn run_credentials(
         };
 
         let mc_process = crate::launcher::launch_minecraft(
-            java_install,
             java_args,
             env_args,
             wrapper,

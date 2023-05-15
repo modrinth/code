@@ -1,12 +1,12 @@
 use dunce::canonicalize;
 use futures::prelude::*;
-use lazy_static::lazy_static;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::env;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 use std::{collections::HashSet, path::Path};
+use tempfile::NamedTempFile;
 use tokio::task::JoinError;
 
 #[cfg(target_os = "windows")]
@@ -19,6 +19,7 @@ use winreg::{
 pub struct JavaVersion {
     pub path: String,
     pub version: String,
+    pub architecture: String,
 }
 
 // Entrypoint function (Windows)
@@ -231,26 +232,49 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
         return None;
     };
 
-    // Run 'java -version' using found java binary
-    let output = Command::new(&java).arg("-version").output().ok()?;
-    let stderr = String::from_utf8_lossy(&output.stderr);
+    let mut file = NamedTempFile::new().ok()?;
+    file.write_all(include_bytes!("../../library/JavaInfo.class"))
+        .ok()?;
 
-    // Match: version "1.8.0_361"
-    // Extracting version numbers
-    lazy_static! {
-        static ref JAVA_VERSION_CAPTURE: Regex =
-            Regex::new(r#"version "([\d\._]+)""#)
-                .expect("Error creating java version capture regex");
+    let original_path = file.path().to_path_buf();
+    let mut new_path = original_path.clone();
+    new_path.set_file_name("JavaInfo");
+    new_path.set_extension("class");
+    tokio::fs::rename(&original_path, &new_path).await.ok()?;
+
+    // Run java checker on java binary
+    let output = Command::new(&java)
+        .arg("-cp")
+        .arg(file.path().parent().unwrap())
+        .arg("JavaInfo")
+        .output()
+        .ok()?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    let mut java_version = None;
+    let mut java_arch = None;
+
+    for line in stdout.lines() {
+        let mut parts = line.split('=');
+        let key = parts.next().unwrap_or_default();
+        let value = parts.next().unwrap_or_default();
+
+        if key == "os.arch" {
+            java_arch = Some(value);
+        } else if key == "java.version" {
+            java_version = Some(value);
+        }
     }
 
     // Extract version info from it
-    if let Some(captures) = JAVA_VERSION_CAPTURE.captures(&stderr) {
-        if let Some(version) = captures.get(1) {
-            let Some(path) = java.to_str() else { return None };
-            let path = path.to_string();
+    if let Some(arch) = java_arch {
+        if let Some(version) = java_version {
+            let path = java.to_string_lossy().to_string();
             return Some(JavaVersion {
                 path,
-                version: version.as_str().to_string(),
+                version: version.to_string(),
+                architecture: arch.to_string(),
             });
         }
     }

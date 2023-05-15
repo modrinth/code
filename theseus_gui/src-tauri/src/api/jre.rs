@@ -1,10 +1,8 @@
-use std::path::{Path, PathBuf};
+use std::path::PathBuf;
 
 use crate::api::Result;
 use theseus::prelude::JavaVersion;
 use theseus::prelude::*;
-
-use super::TheseusSerializableError;
 
 /// Get all JREs that exist on the system
 #[tauri::command]
@@ -37,23 +35,6 @@ pub async fn jre_autodetect_java_globals() -> Result<JavaGlobals> {
     Ok(jre::autodetect_java_globals().await?)
 }
 
-// Gets key for the optimal JRE to use, for a given profile Profile
-// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
-#[tauri::command]
-pub async fn jre_get_optimal_jre_key(profile: Profile) -> Result<String> {
-    Ok(jre::get_optimal_jre_key(&profile).await?)
-}
-
-// Gets key for the optimal JRE to use, for a given profile path
-// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
-#[tauri::command]
-pub async fn jre_get_optimal_jre_key_by_path(path: &Path) -> Result<String> {
-    let profile = profile::get(path, Some(true)).await?.ok_or_else(|| {
-        TheseusSerializableError::NoProfileFound(path.display().to_string())
-    })?;
-    Ok(jre::get_optimal_jre_key(&profile).await?)
-}
-
 // Validates java globals, by checking if the paths exist
 // If false, recommend to direct them to reassign, or to re-guess
 #[tauri::command]
@@ -66,4 +47,16 @@ pub async fn jre_validate_globals() -> Result<bool> {
 #[tauri::command]
 pub async fn jre_get_jre(path: PathBuf) -> Result<Option<JavaVersion>> {
     jre::check_jre(path).await.map_err(|e| e.into())
+}
+
+// Auto installs java for the given java version
+#[tauri::command]
+pub async fn jre_auto_install_java(java_version: u32) -> Result<PathBuf> {
+    Ok(jre::auto_install_java(java_version).await?)
+}
+
+// Gets the maximum memory a system has available.
+#[tauri::command]
+pub async fn jre_get_max_memory() -> Result<u64> {
+    Ok(jre::get_max_memory().await?)
 }

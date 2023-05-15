@@ -1,12 +1,16 @@
 //! Authentication flow interface
+use reqwest::Method;
+use serde::Deserialize;
 use std::path::PathBuf;
 
+use crate::event::emit::{emit_loading, init_loading};
+use crate::util::fetch::{fetch_advanced, fetch_json};
 use crate::{
     launcher::download,
     prelude::Profile,
     state::JavaGlobals,
     util::jre::{self, extract_java_majorminor_version, JavaVersion},
-    State,
+    LoadingBarType, State,
 };
 
 pub const JAVA_8_KEY: &str = "JAVA_8";
@@ -133,6 +137,90 @@ pub async fn find_java17_jres() -> crate::Result<Vec<JavaVersion>> {
         .collect())
 }
 
+pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
+    let state = State::get().await?;
+
+    let loading_bar = init_loading(
+        LoadingBarType::JavaDownload {
+            version: java_version,
+        },
+        100.0,
+        "Downloading java versionœ",
+    )
+    .await?;
+
+    #[derive(Deserialize)]
+    struct Package {
+        pub download_url: String,
+        pub name: PathBuf,
+    }
+
+    emit_loading(&loading_bar, 0.0, Some("Fetching java version")).await?;
+    let packages = fetch_json::<Vec<Package>>(
+        Method::GET,
+        &format!(
+            "https://api.azul.com/metadata/v1/zulu/packages?arch={}&java_version={}&os={}&archive_type=zip&javafx_bundled=false&java_package_type=jre&page_size=1",
+            std::env::consts::ARCH, java_version, std::env::consts::OS
+        ),
+        None,
+        None,
+        &state.fetch_semaphore,
+    ).await?;
+    emit_loading(&loading_bar, 10.0, Some("Downloading java version")).await?;
+
+    if let Some(download) = packages.first() {
+        let file = fetch_advanced(
+            Method::GET,
+            &download.download_url,
+            None,
+            None,
+            None,
+            Some((&loading_bar, 80.0)),
+            &state.fetch_semaphore,
+        )
+        .await?;
+
+        let path = state
+            .directories
+            .java_versions_dir()
+            .join(java_version.to_string());
+
+        if path.exists() {
+            tokio::fs::remove_dir_all(&path).await?;
+        }
+
+        let mut archive = zip::ZipArchive::new(std::io::Cursor::new(file))
+            .map_err(|_| {
+                crate::Error::from(crate::ErrorKind::InputError(
+                    "Failed to read java zip".to_string(),
+                ))
+            })?;
+
+        emit_loading(&loading_bar, 0.0, Some("Extracting java")).await?;
+        archive.extract(&path).map_err(|_| {
+            crate::Error::from(crate::ErrorKind::InputError(
+                "Failed to extract java zip".to_string(),
+            ))
+        })?;
+        emit_loading(&loading_bar, 100.0, Some("Done extracting java")).await?;
+        Ok(path
+            .join(
+                download
+                    .name
+                    .file_stem()
+                    .unwrap_or_default()
+                    .to_string_lossy()
+                    .to_string(),
+            )
+            .join(format!("zulu-{}.jre/Contents/Home/bin/java", java_version)))
+    } else {
+        Err(crate::ErrorKind::LauncherError(format!(
+            "No Java Version found for Java version {}, OS {}, and Architecture {}",
+            java_version, std::env::consts::OS, std::env::consts::ARCH,
+        )).into())
+    }
+}
+
 // Get all JREs that exist on the system
 pub async fn get_all_jre() -> crate::Result<Vec<JavaVersion>> {
     Ok(jre::get_all_jre().await?)
@@ -147,4 +235,15 @@ pub async fn validate_globals() -> crate::Result<bool> {
 // Validates JRE at a given at a given path
 pub async fn check_jre(path: PathBuf) -> crate::Result<Option<JavaVersion>> {
     Ok(jre::check_java_at_filepath(&path).await)
+}
+
+// Gets maximum memory in KiB.
+pub async fn get_max_memory() -> crate::Result<u64> {
+    Ok(sys_info::mem_info()
+        .map_err(|_| {
+            crate::Error::from(crate::ErrorKind::LauncherError(
+                "Unable to get computer memory".to_string(),
+            ))
+        })?
+        .total)
 }
