@@ -333,10 +333,7 @@ export default defineNuxtComponent({
   },
   async setup() {
     const user = await useUser()
-    if (process.client) {
-      await initUserProjects()
-    }
-
+    await initUserProjects()
     return { user: ref(user) }
   },
   data() {
