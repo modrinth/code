@@ -52,7 +52,6 @@ async fn main() -> theseus::Result<()> {
     let st = State::get().await?;
     //State::update();
 
-    println!("max memory: {}", get_max_memory().await?);
     st.settings.write().await.java_globals = autodetect_java_globals().await?;
     st.settings.write().await.max_concurrent_downloads = 50;
     st.settings.write().await.hooks.post_exit =
@@ -79,7 +78,7 @@ async fn main() -> theseus::Result<()> {
     println!("Creating/adding profile.");
 
     let name = "Example".to_string();
-    let game_version = "rd-132211".to_string();
+    let game_version = "1.19.2".to_string();
     let modloader = ModLoader::Vanilla;
     let loader_version = "stable".to_string();
 
@@ -100,23 +99,24 @@ async fn main() -> theseus::Result<()> {
     // let mut value = list().await?;
     // let profile_path = value.iter().next().map(|x| x.0).unwrap();
 
-    // println!("Adding sodium");
-    // let sodium_path = profile::add_project_from_version(
-    //     &profile_path,
-    //     "rAfhHfow".to_string(),
-    // )
-    // .await?;
-    //
-    // let mod_menu_path = profile::add_project_from_version(
-    //     &profile_path,
-    //     "gSoPJyVn".to_string(),
-    // )
-    // .await?;
-    //
-    // println!("Disabling sodium");
-    // profile::toggle_disable_project(&profile_path, &sodium_path).await?;
+    println!("Adding sodium");
+    let sodium_path = profile::add_project_from_version(
+        &profile_path,
+        "rAfhHfow".to_string(),
+    )
+    .await?;
 
-    // profile::remove_project(&profile_path, &mod_menu_path).await?;
+    let mod_menu_path = profile::add_project_from_version(
+        &profile_path,
+        "gSoPJyVn".to_string(),
+    )
+    .await?;
+
+    println!("Disabling sodium");
+    profile::toggle_disable_project(&profile_path, &sodium_path).await?;
+
+    profile::remove_project(&profile_path, &mod_menu_path).await?;
+
     // let profile_path = pack::install_pack_from_version_id(
     //     "CeeCkHke".to_string(),
     //     "Technical Electrical".to_string(),

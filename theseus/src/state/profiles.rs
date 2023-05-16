@@ -14,6 +14,8 @@ use daedalus::get_hash;
 use daedalus::modded::LoaderVersion;
 use dunce::canonicalize;
 use futures::prelude::*;
+use notify::{RecommendedWatcher, RecursiveMode};
+use notify_debouncer_mini::Debouncer;
 use reqwest::Method;
 use serde::{Deserialize, Serialize};
 use std::io::Cursor;
@@ -174,36 +176,10 @@ impl Profile {
         semaphore: &IoSemaphore,
         icon: bytes::Bytes,
         file_name: &str,
-    ) -> crate::Result<&'a mut Self> {
+    ) -> crate::Result<()> {
         let file =
             write_cached_icon(file_name, cache_dir, icon, semaphore).await?;
         self.metadata.icon = Some(file);
-        Ok(self)
-    }
-
-    pub async fn sync_projects(&mut self) -> crate::Result<()> {
-        let state = State::get().await?;
-
-        let paths = self.get_profile_project_paths()?;
-        let projects = crate::state::infer_data_from_files(
-            self.clone(),
-            paths,
-            state.directories.caches_dir(),
-            &state.io_semaphore,
-            &state.fetch_semaphore,
-        )
-        .await?;
-
-        self.projects = projects;
-
-        emit_profile(
-            self.uuid,
-            self.path.clone(),
-            &self.metadata.name,
-            ProfilePayloadType::Synced,
-        )
-        .await?;
-
         Ok(())
     }
 
@@ -229,6 +205,16 @@ impl Profile {
                     if let Some(profile) = new_profiles.0.get_mut(&path) {
                         profile.projects = projects;
                     }
+                    println!(
+                        "Fetched {path:?}"
+                    );
+                } else {
+                    println!(
+                        "Unable to fetch single profile projects: path {path:?} invalid"
+                    );
+                    tracing::warn!(
+                        "Unable to fetch single profile projects: path {path:?} invalid",
+                    );
                 }
 
                 Ok::<(), crate::Error>(())
@@ -269,8 +255,44 @@ impl Profile {
         Ok(files)
     }
 
+    pub async fn watch_fs(
+        profile_path: &Path,
+        watcher: &mut Debouncer<RecommendedWatcher>,
+    ) -> crate::Result<()> {
+        async fn watch_path(
+            profile_path: &Path,
+            watcher: &mut Debouncer<RecommendedWatcher>,
+            path: &str,
+        ) -> crate::Result<()> {
+            let path = profile_path.join(path);
+
+            fs::create_dir_all(&path).await?;
+
+            watcher
+                .watcher()
+                .watch(&*profile_path.join(path), RecursiveMode::Recursive)?;
+
+            Ok(())
+        }
+
+        watch_path(profile_path, watcher, ProjectType::Mod.get_folder())
+            .await?;
+        watch_path(profile_path, watcher, ProjectType::ShaderPack.get_folder())
+            .await?;
+        watch_path(
+            profile_path,
+            watcher,
+            ProjectType::ResourcePack.get_folder(),
+        )
+        .await?;
+        watch_path(profile_path, watcher, ProjectType::DataPack.get_folder())
+            .await?;
+
+        Ok(())
+    }
+
     pub async fn add_project_version(
-        &mut self,
+        &self,
         version_id: String,
     ) -> crate::Result<(PathBuf, ModrinthVersion)> {
         let state = State::get().await?;
@@ -315,7 +337,7 @@ impl Profile {
     }
 
     pub async fn add_project_bytes(
-        &mut self,
+        &self,
         file_name: &str,
         bytes: bytes::Bytes,
         project_type: Option<ProjectType>,
@@ -355,16 +377,22 @@ impl Profile {
         write(&path, &bytes, &state.io_semaphore).await?;
 
         let hash = get_hash(bytes).await?;
+        {
+            let mut profiles = state.profiles.write().await;
 
-        self.projects.insert(
-            path.clone(),
-            Project {
-                sha512: hash,
-                disabled: false,
-                metadata: ProjectMetadata::Unknown,
-                file_name: file_name.to_string(),
-            },
-        );
+            if let Some(profile) = profiles.0.get_mut(&self.path) {
+                profile.projects.insert(
+                    path.clone(),
+                    Project {
+                        sha512: hash,
+                        disabled: false,
+                        metadata: ProjectMetadata::Unknown,
+                        file_name: file_name.to_string(),
+                    },
+                );
+            }
+        }
+
         emit_profile(
             self.uuid,
             self.path.clone(),
@@ -377,10 +405,19 @@ impl Profile {
     }
 
     pub async fn toggle_disable_project(
-        &mut self,
+        &self,
         path: &Path,
     ) -> crate::Result<()> {
-        if let Some(mut project) = self.projects.remove(path) {
+        let state = State::get().await?;
+        if let Some(mut project) = {
+            let mut profiles = state.profiles.write().await;
+
+            if let Some(profile) = profiles.0.get_mut(&self.path) {
+                profile.projects.remove(path)
+            } else {
+                None
+            }
+        } {
             let path = path.to_path_buf();
             let mut new_path = path.clone();
 
@@ -396,7 +433,10 @@ impl Profile {
 
             fs::rename(path, &new_path).await?;
 
-            self.projects.insert(new_path, project);
+            let mut profiles = state.profiles.write().await;
+            if let Some(profile) = profiles.0.get_mut(&self.path) {
+                profile.projects.insert(new_path, project);
+            }
         } else {
             return Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
@@ -409,14 +449,19 @@ impl Profile {
     }
 
     pub async fn remove_project(
-        &mut self,
+        &self,
         path: &Path,
         dont_remove_arr: Option<bool>,
     ) -> crate::Result<()> {
+        let state = State::get().await?;
         if self.projects.contains_key(path) {
             fs::remove_file(path).await?;
             if !dont_remove_arr.unwrap_or(false) {
-                self.projects.remove(path);
+                let mut profiles = state.profiles.write().await;
+
+                if let Some(profile) = profiles.0.get_mut(&self.path) {
+                    profile.projects.remove(path);
+                }
             }
         } else {
             return Err(crate::ErrorKind::InputError(format!(
@@ -431,8 +476,11 @@ impl Profile {
 }
 
 impl Profiles {
-    #[tracing::instrument]
-    pub async fn init(dirs: &DirectoryInfo) -> crate::Result<Self> {
+    #[tracing::instrument(skip(file_watcher))]
+    pub async fn init(
+        dirs: &DirectoryInfo,
+        file_watcher: &mut Debouncer<RecommendedWatcher>,
+    ) -> crate::Result<Self> {
         let mut profiles = HashMap::new();
         fs::create_dir_all(dirs.profiles_dir()).await?;
         let mut entries = fs::read_dir(dirs.profiles_dir()).await?;
@@ -450,6 +498,7 @@ impl Profiles {
                 };
                 if let Some(profile) = prof {
                     let path = canonicalize(path)?;
+                    Profile::watch_fs(&path, file_watcher).await?;
                     profiles.insert(path, profile);
                 }
             }
@@ -518,6 +567,11 @@ impl Profiles {
             ProfilePayloadType::Added,
         )
         .await?;
+
+        let state = State::get().await?;
+        let mut file_watcher = state.file_watcher.write().await;
+        Profile::watch_fs(&profile.path, &mut *file_watcher).await?;
+
         self.0.insert(
             canonicalize(&profile.path)?
                 .to_str()
@@ -528,15 +582,6 @@ impl Profiles {
             profile,
         );
         Ok(self)
-    }
-
-    #[tracing::instrument(skip(self))]
-    pub async fn insert_from<'a>(
-        &'a mut self,
-        path: &'a Path,
-    ) -> crate::Result<&Self> {
-        self.insert(Self::read_profile_from_dir(&canonicalize(path)?).await?)
-            .await
     }
 
     #[tracing::instrument(skip(self))]

@@ -79,7 +79,6 @@ fn main() {
             api::profile::profile_remove,
             api::profile::profile_get,
             api::profile::profile_list,
-            api::profile::profile_sync,
             api::profile::profile_install,
             api::profile::profile_update_all,
             api::profile::profile_update_project,

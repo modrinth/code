@@ -35,11 +35,14 @@ paste = { version = "1.0"}
 tauri = { version = "1.2", optional = true}
 indicatif = { version = "0.17.3", optional = true }
 
-async-tungstenite = { version = "0.20.0", features = ["tokio-runtime", "tokio-native-tls"] }
+async-tungstenite = { version = "0.22.1", features = ["tokio-runtime", "tokio-native-tls"] }
 futures = "0.3"
 reqwest = { version = "0.11", features = ["json", "stream"] }
 tokio = { version = "1", features = ["full"] }
 tokio-stream = { version = "0.1", features = ["fs"] }
+
+notify = { version = "5.1.0", default-features = false }
+notify-debouncer-mini = { version = "0.2.1", default-features = false }
 
 lazy_static = "1.4.0"
 dunce = "1.0.3"

@@ -6,8 +6,7 @@ use crate::event::emit::{
 };
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::state::{
-    LinkedData, ModrinthProject, ModrinthVersion, Profile, ProfileInstallStage,
-    SideType,
+    LinkedData, ModrinthProject, ModrinthVersion, ProfileInstallStage, SideType,
 };
 use crate::util::fetch::{
     fetch, fetch_advanced, fetch_json, fetch_mirrors, write, write_cached_icon,
@@ -478,7 +477,6 @@ async fn install_pack(
                 if let Some(profile_val) =
                     crate::api::profile::get(&profile, None).await?
                 {
-                    Profile::sync_projects_task(profile.clone());
                     crate::launcher::install_minecraft(
                         &profile_val,
                         Some(loading_bar),
