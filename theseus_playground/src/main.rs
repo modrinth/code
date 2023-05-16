@@ -4,9 +4,7 @@
 )]
 
 use dunce::canonicalize;
-use theseus::jre::{
-    autodetect_java_globals, check_jre, get_max_memory, JAVA_8_KEY,
-};
+use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
 use theseus::profile_create::profile_create;
@@ -52,6 +50,8 @@ async fn main() -> theseus::Result<()> {
     let st = State::get().await?;
     //State::update();
 
+    // let path = jre::auto_install_java(8).await.unwrap();
+
     st.settings.write().await.java_globals = autodetect_java_globals().await?;
     st.settings.write().await.max_concurrent_downloads = 50;
     st.settings.write().await.hooks.post_exit =
@@ -59,7 +59,6 @@ async fn main() -> theseus::Result<()> {
     // Changed the settings, so need to reset the semaphore
     st.reset_fetch_semaphore().await;
 
-    // let path = jre::auto_install_java(8).await.unwrap();
     //
     // st.settings
     //     .write()

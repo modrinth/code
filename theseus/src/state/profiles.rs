@@ -205,13 +205,7 @@ impl Profile {
                     if let Some(profile) = new_profiles.0.get_mut(&path) {
                         profile.projects = projects;
                     }
-                    println!(
-                        "Fetched {path:?}"
-                    );
                 } else {
-                    println!(
-                        "Unable to fetch single profile projects: path {path:?} invalid"
-                    );
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {path:?} invalid",
                     );
@@ -270,7 +264,7 @@ impl Profile {
 
             watcher
                 .watcher()
-                .watch(&*profile_path.join(path), RecursiveMode::Recursive)?;
+                .watch(&profile_path.join(path), RecursiveMode::Recursive)?;
 
             Ok(())
         }
@@ -570,7 +564,7 @@ impl Profiles {
 
         let state = State::get().await?;
         let mut file_watcher = state.file_watcher.write().await;
-        Profile::watch_fs(&profile.path, &mut *file_watcher).await?;
+        Profile::watch_fs(&profile.path, &mut file_watcher).await?;
 
         self.0.insert(
             canonicalize(&profile.path)?

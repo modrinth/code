@@ -145,7 +145,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
             version: java_version,
         },
         100.0,
-        "Downloading java versionœ",
+        "Downloading java version",
     )
     .await?;
 
@@ -180,10 +180,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
         )
         .await?;
 
-        let path = state
-            .directories
-            .java_versions_dir()
-            .join(java_version.to_string());
+        let path = state.directories.java_versions_dir();
 
         if path.exists() {
             tokio::fs::remove_dir_all(&path).await?;

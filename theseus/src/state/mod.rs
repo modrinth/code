@@ -14,10 +14,7 @@ use std::sync::Arc;
 use std::time::Duration;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
 
-use futures::{
-    channel::mpsc::{channel, Receiver},
-    SinkExt, StreamExt,
-};
+use futures::{channel::mpsc::channel, SinkExt, StreamExt};
 
 // Submodules
 mod dirs;
