@@ -82,7 +82,6 @@ fn main() {
             api::profile::profile_install,
             api::profile::profile_update_all,
             api::profile::profile_update_project,
-            api::profile::profile_replace_project,
             api::profile::profile_add_project_from_version,
             api::profile::profile_add_project_from_path,
             api::profile::profile_toggle_disable_project,

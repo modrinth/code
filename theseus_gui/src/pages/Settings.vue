@@ -17,7 +17,7 @@ import {
 import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
-import {find_jre_8_jres, find_jre_17_jres, get_jre, get_max_memory} from '@/helpers/jre'
+import { find_jre_8_jres, find_jre_17_jres, get_jre, get_max_memory } from '@/helpers/jre'
 import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
