@@ -190,7 +190,7 @@ await process_listener((e) => {
       >
         <PlayIcon />
       </div>
-      <div v-else-if="modLoading === true && playing === false" class="cta loading">
+      <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
         <AnimatedLogo class="loading" />
       </div>
       <div
@@ -207,7 +207,7 @@ await process_listener((e) => {
   </div>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .instance-small-card {
   background-color: var(--color-bg) !important;
   display: flex;
@@ -276,33 +276,6 @@ await process_listener((e) => {
   }
 }
 
-.install {
-  background: var(--color-brand);
-  display: flex;
-}
-
-.stop {
-  background: var(--color-red);
-  display: flex;
-}
-
-.cta.loading {
-  background: hsl(220, 11%, 10%) !important;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  .loading {
-    width: 2.5rem !important;
-    height: 2.5rem !important;
-  }
-
-  svg {
-    width: 2.5rem !important;
-    height: 2.5rem !important;
-  }
-}
-
 .light-mode {
   .instance-card-item {
     background: hsl(0, 0%, 100%) !important;
@@ -337,6 +310,33 @@ await process_listener((e) => {
   &:hover {
     filter: none !important; /* overrides button-base class */
     box-shadow: var(--shadow-floating);
+  }
+
+  &.install {
+    background: var(--color-brand);
+    display: flex;
+  }
+
+  &.stop {
+    background: var(--color-red);
+    display: flex;
+  }
+
+  &.loading-cta {
+    background: hsl(220, 11%, 10%) !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .loading {
+      width: 2.5rem !important;
+      height: 2.5rem !important;
+
+      svg {
+        width: 2.5rem !important;
+        height: 2.5rem !important;
+      }
+    }
   }
 }
 

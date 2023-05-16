@@ -1,25 +1,29 @@
 <template>
   <Card class="card button-base" @click="$router.push(`/project/${project.project_id}/`)">
-    <div id="icon">
+    <div class="icon">
       <Avatar :src="project.icon_url" size="md" class="search-icon" />
     </div>
-    <div id="title" class="no-wrap joined-text">
-      <h2>{{ project.title }}</h2>
-      <span>by {{ project.author }}</span>
+    <div class="content-wrapper">
+      <div class="title joined-text">
+        <h2>{{ project.title }}</h2>
+        <span>by {{ project.author }}</span>
+      </div>
+      <div class="description">
+        {{ project.description }}
+      </div>
+      <div class="tags">
+        <Categories :categories="categories" :type="project.project_type">
+          <EnvironmentIndicator
+            :type-only="project.moderation"
+            :client-side="project.client_side"
+            :server-side="project.server_side"
+            :type="project.project_type"
+            :search="true"
+          />
+        </Categories>
+      </div>
     </div>
-    <div id="description">
-      {{ project.description }}
-      <Categories :categories="categories" :type="project.project_type" class="tags">
-        <EnvironmentIndicator
-          :type-only="project.moderation"
-          :client-side="project.client_side"
-          :server-side="project.server_side"
-          :type="project.project_type"
-          :search="true"
-        />
-      </Categories>
-    </div>
-    <div id="stats" class="button-group">
+    <div class="stats button-group">
       <div v-if="featured" class="badge">
         <StarIcon />
         Featured
@@ -37,7 +41,7 @@
         {{ formatCategory(dayjs(project.date_modified).fromNow()) }}
       </div>
     </div>
-    <div id="install">
+    <div class="install">
       <Button
         :to="`/browse/${project.slug}`"
         color="primary"
@@ -69,8 +73,8 @@ import {
 } from 'omorphia'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { onMounted, ref } from 'vue'
-import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile.js'
+import { ref } from 'vue'
+import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
 import { ofetch } from 'ofetch'
@@ -115,18 +119,10 @@ const props = defineProps({
 })
 
 const installing = ref(false)
-const installed = ref(false)
 
-onMounted(async () => {
-  installed.value =
-    props.instance && (await check_installed(props.instance.path, props.project.project_id))
-})
+const installed = ref(props.instance ? Object.values(props.instance.projects).some((p) => p.metadata?.project?.id === props.project.project_id) : false)
 
-const markInstalled = () => {
-  installed.value = true
-}
-
-const install = async () => {
+async function install() {
   installing.value = true
   const versions = await ofetch(
     `https://api.modrinth.com/v2/project/${props.project.project_id}/version`
@@ -151,7 +147,7 @@ const install = async () => {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === props.project.project_id)
     ) {
-      let id = await packInstall(queuedVersionData.id)
+      let id = await packInstall(queuedVersionData.id, props.project.title, props.project.icon_url)
       await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     } else {
       props.confirmModal.show(queuedVersionData.id)
@@ -163,7 +159,7 @@ const install = async () => {
           props.instance,
           props.project.title,
           versions,
-          markInstalled
+          () => installed.value = true
         )
         installing.value = false
         return
@@ -184,39 +180,37 @@ const install = async () => {
 </script>
 
 <style scoped lang="scss">
-#icon {
+.icon {
   grid-column: 1;
-  grid-row: 1 / 3;
-  align-self: center;
-}
-
-#title {
-  grid-column: 2 / 4;
   grid-row: 1;
-  align-self: start;
+  align-self: center;
+  height: 6rem;
 }
 
-#description {
-  grid-column: 2 / 4;
-  grid-row: 2;
+.content-wrapper {
   display: flex;
-  flex-direction: column;
   justify-content: space-between;
-  gap: 0.5rem;
-  align-self: stretch;
-  justify-self: start;
+  grid-column: 2 / 4;
+  flex-direction: column;
+  grid-row: 1;
+  gap: .5rem;
+
+  .description {
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+  }
 }
 
-#stats {
+.stats {
   grid-column: 1 / 3;
-  grid-row: 3;
+  grid-row: 2;
   justify-self: stretch;
   align-self: start;
 }
 
-#install {
+.install {
   grid-column: 3 / 4;
-  grid-row: 3;
+  grid-row: 2;
   justify-self: end;
   align-self: start;
 }
@@ -225,37 +219,12 @@ const install = async () => {
   margin-bottom: 0;
   display: grid;
   grid-template-columns: 6rem auto 7rem;
-  grid-template-rows: min-content auto auto;
-  gap: 1rem;
+  gap: .75rem;
   padding: 1rem;
 
   &:active:not(&:disabled) {
     scale: 0.98 !important;
   }
-}
-
-.background {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.15;
-  z-index: -1;
-  background-image: linear-gradient(to right, rgba(0, 0, 0, 0), var(--color-raised-bg));
-}
-
-.background-img {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: var(--radius-lg);
-  object-fit: cover;
 }
 
 .joined-text {
@@ -266,10 +235,11 @@ const install = async () => {
   align-items: baseline;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 
   h2 {
     margin-bottom: 0 !important;
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
   }
 }
 
