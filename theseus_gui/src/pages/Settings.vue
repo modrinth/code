@@ -17,7 +17,7 @@ import {
 import { BrowseIcon } from '@/assets/icons'
 import { useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
-import { find_jre_8_jres, find_jre_17_jres, get_jre } from '@/helpers/jre'
+import { find_jre_8_jres, find_jre_17_jres, get_jre, get_max_memory } from '@/helpers/jre'
 import { open } from '@tauri-apps/api/dialog'
 
 const themeStore = useTheming()
@@ -29,6 +29,7 @@ if (!fetchSettings.java_globals?.JAVA_8)
 if (!fetchSettings.java_globals?.JAVA_17)
   fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
 const settings = ref(fetchSettings)
+const maxMemory = ref((await get_max_memory()) / 1024)
 
 const chosenInstallOptions = ref([])
 const browsingInstall = ref(0)
@@ -285,11 +286,11 @@ const setJavaInstall = (javaInstall) => {
         <div class="sliders">
           <span class="slider">
             Minimum Memory
-            <Slider v-model="settings.memory.minimum" :min="1000" :max="8200" :step="10" />
+            <Slider v-model="settings.memory.minimum" :min="256" :max="maxMemory" :step="10" />
           </span>
           <span class="slider">
             Maximum Memory
-            <Slider v-model="settings.memory.maximum" :min="1000" :max="8200" :step="10" />
+            <Slider v-model="settings.memory.maximum" :min="256" :max="maxMemory" :step="10" />
           </span>
         </div>
       </div>

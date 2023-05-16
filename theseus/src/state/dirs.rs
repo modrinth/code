@@ -44,6 +44,12 @@ impl DirectoryInfo {
         self.config_dir.join("meta")
     }
 
+    /// Get the Minecraft java versions metadata directory
+    #[inline]
+    pub fn java_versions_dir(&self) -> PathBuf {
+        self.metadata_dir().join("java_versions")
+    }
+
     /// Get the Minecraft versions metadata directory
     #[inline]
     pub fn versions_dir(&self) -> PathBuf {
