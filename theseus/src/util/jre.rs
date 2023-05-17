@@ -1,14 +1,15 @@
 use dunce::canonicalize;
 use futures::prelude::*;
-use lazy_static::lazy_static;
-use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::env;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 use std::{collections::HashSet, path::Path};
+use tempfile::NamedTempFile;
 use tokio::task::JoinError;
 
+use crate::State;
 #[cfg(target_os = "windows")]
 use winreg::{
     enums::{HKEY_LOCAL_MACHINE, KEY_READ, KEY_WOW64_32KEY, KEY_WOW64_64KEY},
@@ -19,6 +20,7 @@ use winreg::{
 pub struct JavaVersion {
     pub path: String,
     pub version: String,
+    pub architecture: String,
 }
 
 // Entrypoint function (Windows)
@@ -30,6 +32,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
     // Add JRES directly on PATH
     jre_paths.extend(get_all_jre_path().await?);
+    jre_paths.extend(get_all_autoinstalled_jre_path().await?);
 
     // Hard paths for locations for commonly installed .exes
     let java_paths = [r"C:/Program Files/Java", r"C:/Program Files (x86)/Java"];
@@ -110,6 +113,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
     // Add JREs directly on PATH
     jre_paths.extend(get_all_jre_path().await?);
+    jre_paths.extend(get_all_autoinstalled_jre_path().await?);
 
     // Hard paths for locations for commonly installed .exes
     let java_paths = [
@@ -128,6 +132,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
             jre_paths.insert(entry);
         }
     }
+
     // Get JRE versions from potential paths concurrently
     let j = check_java_at_filepaths(jre_paths)
         .await?
@@ -146,6 +151,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
     // Add JREs directly on PATH
     jre_paths.extend(get_all_jre_path().await?);
+    jre_paths.extend(get_all_autoinstalled_jre_path().await?);
 
     // Hard paths for locations for commonly installed locations
     let java_paths = [
@@ -175,6 +181,30 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
         .into_iter()
         .collect();
     Ok(j)
+}
+
+// Gets all JREs from the PATH env variable
+#[tracing::instrument]
+async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
+{
+    let state = State::get().await.map_err(|_| JREError::StateError)?;
+
+    let mut jre_paths = HashSet::new();
+    let base_path = state.directories.java_versions_dir();
+
+    if base_path.is_dir() {
+        for entry in std::fs::read_dir(base_path)? {
+            let entry = entry?;
+            let file_path = entry.path().join("bin");
+            let contents = std::fs::read_to_string(file_path)?;
+
+            let entry = entry.path().join(contents);
+            println!("{:?}", entry);
+            jre_paths.insert(entry);
+        }
+    }
+
+    Ok(jre_paths)
 }
 
 // Gets all JREs from the PATH env variable
@@ -231,26 +261,49 @@ pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
         return None;
     };
 
-    // Run 'java -version' using found java binary
-    let output = Command::new(&java).arg("-version").output().ok()?;
-    let stderr = String::from_utf8_lossy(&output.stderr);
+    let mut file = NamedTempFile::new().ok()?;
+    file.write_all(include_bytes!("../../library/JavaInfo.class"))
+        .ok()?;
 
-    // Match: version "1.8.0_361"
-    // Extracting version numbers
-    lazy_static! {
-        static ref JAVA_VERSION_CAPTURE: Regex =
-            Regex::new(r#"version "([\d\._]+)""#)
-                .expect("Error creating java version capture regex");
+    let original_path = file.path().to_path_buf();
+    let mut new_path = original_path.clone();
+    new_path.set_file_name("JavaInfo");
+    new_path.set_extension("class");
+    tokio::fs::rename(&original_path, &new_path).await.ok()?;
+
+    // Run java checker on java binary
+    let output = Command::new(&java)
+        .arg("-cp")
+        .arg(file.path().parent().unwrap())
+        .arg("JavaInfo")
+        .output()
+        .ok()?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    let mut java_version = None;
+    let mut java_arch = None;
+
+    for line in stdout.lines() {
+        let mut parts = line.split('=');
+        let key = parts.next().unwrap_or_default();
+        let value = parts.next().unwrap_or_default();
+
+        if key == "os.arch" {
+            java_arch = Some(value);
+        } else if key == "java.version" {
+            java_version = Some(value);
+        }
     }
 
     // Extract version info from it
-    if let Some(captures) = JAVA_VERSION_CAPTURE.captures(&stderr) {
-        if let Some(version) = captures.get(1) {
-            let Some(path) = java.to_str() else { return None };
-            let path = path.to_string();
+    if let Some(arch) = java_arch {
+        if let Some(version) = java_version {
+            let path = java.to_string_lossy().to_string();
             return Some(JavaVersion {
                 path,
-                version: version.as_str().to_string(),
+                version: version.to_string(),
+                architecture: arch.to_string(),
             });
         }
     }
@@ -311,6 +364,9 @@ pub enum JREError {
 
     #[error("No stored tag for Minecraft Version {0}")]
     NoMinecraftVersionFound(String),
+
+    #[error("Error getting launcher sttae")]
+    StateError,
 }
 
 #[cfg(test)]

@@ -1,9 +1,7 @@
 //! Theseus profile management interface
-use crate::event::emit::emit_warning;
 use crate::state::LinkedData;
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
-    jre,
     prelude::ModLoader,
 };
 pub use crate::{
@@ -84,7 +82,12 @@ pub async fn profile_create(
             &canonicalize(&path)?.display()
         );
         let loader = if modloader != ModLoader::Vanilla {
-            get_loader_version_from_loader(game_version.clone(), modloader, loader_version).await?
+            get_loader_version_from_loader(
+                game_version.clone(),
+                modloader,
+                loader_version,
+            )
+            .await?
         } else {
             None
         };
@@ -112,19 +115,6 @@ pub async fn profile_create(
 
         profile.metadata.linked_data = linked_data;
 
-        // Attempts to find optimal JRE for the profile from the JavaGlobals
-        // Finds optimal key, and see if key has been set in JavaGlobals
-        let settings = state.settings.read().await;
-        let optimal_version_key = jre::get_optimal_jre_key(&profile).await?;
-        if settings.java_globals.get(&optimal_version_key).is_some() {
-            profile.java = Some(JavaSettings {
-                jre_key: Some(optimal_version_key),
-                extra_arguments: None,
-            });
-        } else {
-            emit_warning(&format!("Could not detect optimal JRE: {optimal_version_key}, falling back to system default.")).await?;
-        }
-
         emit_profile(
             uuid,
             path.clone(),
@@ -144,7 +134,8 @@ pub async fn profile_create(
         State::sync().await?;
 
         Ok(path)
-    }).await
+    })
+    .await
 }
 
 pub(crate) async fn get_loader_version_from_loader(

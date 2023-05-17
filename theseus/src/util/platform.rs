@@ -8,27 +8,27 @@ pub trait OsExt {
     fn native() -> Self;
 
     /// Gets the OS + Arch of the current system
-    fn native_arch() -> Self;
+    fn native_arch(java_arch: &str) -> Self;
 }
 
 impl OsExt for Os {
-    fn native_arch() -> Self {
+    fn native_arch(java_arch: &str) -> Self {
         if std::env::consts::OS == "windows" {
-            if std::env::consts::ARCH == "aarch64" {
+            if java_arch == "aarch64" {
                 Os::WindowsArm64
             } else {
                 Os::Windows
             }
         } else if std::env::consts::OS == "linux" {
-            if std::env::consts::ARCH == "aarch64" {
+            if java_arch == "aarch64" {
                 Os::LinuxArm64
-            } else if std::env::consts::ARCH == "arm" {
+            } else if java_arch == "arm" {
                 Os::LinuxArm32
             } else {
                 Os::Linux
             }
         } else if std::env::consts::OS == "macos" {
-            if std::env::consts::ARCH == "aarch64" {
+            if java_arch == "aarch64" {
                 Os::OsxArm64
             } else {
                 Os::Osx
@@ -39,30 +39,6 @@ impl OsExt for Os {
     }
 
     fn native() -> Self {
-        if std::env::consts::OS == "windows" {
-            if std::env::consts::ARCH == "aarch64" {
-                Os::WindowsArm64
-            } else {
-                Os::Windows
-            }
-        } else if std::env::consts::OS == "linux" {
-            if std::env::consts::ARCH == "aarch64" {
-                Os::LinuxArm64
-            } else if std::env::consts::ARCH == "arm" {
-                Os::LinuxArm32
-            } else {
-                Os::Linux
-            }
-        } else if std::env::consts::OS == "macos" {
-            if std::env::consts::ARCH == "aarch64" {
-                Os::OsxArm64
-            } else {
-                Os::Osx
-            }
-        } else {
-            Os::Unknown
-        };
-
         match std::env::consts::OS {
             "windows" => Self::Windows,
             "macos" => Self::Osx,
@@ -80,7 +56,7 @@ pub const ARCH_WIDTH: &str = "64";
 pub const ARCH_WIDTH: &str = "32";
 
 // Platform rule handling
-pub fn os_rule(rule: &OsRule) -> bool {
+pub fn os_rule(rule: &OsRule, java_arch: &str) -> bool {
     let mut rule_match = true;
 
     if let Some(ref arch) = rule.arch {
@@ -88,7 +64,8 @@ pub fn os_rule(rule: &OsRule) -> bool {
     }
 
     if let Some(name) = &rule.name {
-        rule_match &= &Os::native() == name || &Os::native_arch() == name;
+        rule_match &=
+            &Os::native() == name || &Os::native_arch(java_arch) == name;
     }
 
     if let Some(version) = &rule.version {
@@ -101,8 +78,8 @@ pub fn os_rule(rule: &OsRule) -> bool {
     rule_match
 }
 
-pub fn classpath_separator() -> &'static str {
-    match Os::native_arch() {
+pub fn classpath_separator(java_arch: &str) -> &'static str {
+    match Os::native_arch(java_arch) {
         Os::Osx
         | Os::OsxArm64
         | Os::Linux

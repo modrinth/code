@@ -54,14 +54,6 @@ pub async fn profile_check_installed(
     }
 }
 
-/// Syncs a profile's in memory state with the state on the disk
-/// // invoke('profile_sync')
-#[tauri::command]
-pub async fn profile_sync(path: &Path) -> Result<()> {
-    profile::sync(path).await?;
-    Ok(())
-}
-
 /// Installs/Repairs a profile
 /// invoke('profile_install')
 #[tauri::command]
@@ -87,18 +79,6 @@ pub async fn profile_update_project(
 ) -> Result<()> {
     profile::update_project(path, project_path).await?;
     Ok(())
-}
-
-/// Replaces a project with the given version ID
-/// invoke('profile_replace_project')
-#[tauri::command]
-pub async fn profile_replace_project(
-    path: &Path,
-    project: &Path,
-    version_id: String,
-) -> Result<PathBuf> {
-    let res = profile::replace_project(path, project, version_id).await?;
-    Ok(res)
 }
 
 // Adds a project to a profile from a version ID

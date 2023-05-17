@@ -84,6 +84,9 @@ pub enum ErrorKind {
 
     #[error("Error: {0}")]
     OtherError(String),
+
+    #[error("File watching error: {0}")]
+    NotifyError(#[from] notify::Error),
 }
 
 #[derive(Debug)]
