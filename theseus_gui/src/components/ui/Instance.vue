@@ -1,5 +1,5 @@
 <script setup>
-import { ref, useSlots } from 'vue'
+import { onUnmounted, ref, useSlots } from 'vue'
 import { useRouter } from 'vue-router'
 import { ofetch } from 'ofetch'
 import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo } from 'omorphia'
@@ -119,9 +119,11 @@ const stop = async (e) => {
   uuid.value = null
 }
 
-await process_listener((e) => {
+const unlisten = await process_listener((e) => {
   if (e.event === 'finished' && e.uuid === uuid.value) playing.value = false
 })
+
+onUnmounted(() => unlisten())
 </script>
 
 <template>

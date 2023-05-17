@@ -120,7 +120,13 @@ const props = defineProps({
 
 const installing = ref(false)
 
-const installed = ref(props.instance ? Object.values(props.instance.projects).some((p) => p.metadata?.project?.id === props.project.project_id) : false)
+const installed = ref(
+  props.instance
+    ? Object.values(props.instance.projects).some(
+        (p) => p.metadata?.project?.id === props.project.project_id
+      )
+    : false
+)
 
 async function install() {
   installing.value = true
@@ -159,7 +165,7 @@ async function install() {
           props.instance,
           props.project.title,
           versions,
-          () => installed.value = true
+          () => (installed.value = true)
         )
         installing.value = false
         return
@@ -193,7 +199,7 @@ async function install() {
   grid-column: 2 / 4;
   flex-direction: column;
   grid-row: 1;
-  gap: .5rem;
+  gap: 0.5rem;
 
   .description {
     word-wrap: break-word;
@@ -219,7 +225,7 @@ async function install() {
   margin-bottom: 0;
   display: grid;
   grid-template-columns: 6rem auto 7rem;
-  gap: .75rem;
+  gap: 0.75rem;
   padding: 1rem;
 
   &:active:not(&:disabled) {
