@@ -5,6 +5,7 @@ use theseus::prelude::*;
 // Generic basic profile creation tool.
 // Creates an essentially empty dummy profile with profile_create
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_create_empty() -> Result<PathBuf> {
     let res = profile_create::profile_create_empty().await?;
     Ok(res)
@@ -13,6 +14,7 @@ pub async fn profile_create_empty() -> Result<PathBuf> {
 // Creates a profile at  the given filepath and adds it to the in-memory state
 // invoke('profile_add',profile)
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_create(
     name: String,           // the name of the profile, and relative path
     game_version: String,   // the game version of the profile
