@@ -63,7 +63,13 @@
     </div>
     <div class="content">
       <Promotion />
-      <router-view :instance="instance" />
+      <RouterView v-slot="{ Component }">
+        <template v-if="Component">
+          <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
+            <component :is="Component" :instance="instance"></component>
+          </Suspense>
+        </template>
+      </RouterView>
     </div>
   </div>
 </template>
@@ -81,7 +87,7 @@ import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import { useBreadcrumbs, useSearch } from '@/store/state'
+import {useBreadcrumbs, useLoading, useSearch} from '@/store/state'
 
 const route = useRoute()
 const searchStore = useSearch()
@@ -101,6 +107,8 @@ profile_listener(async (event) => {
     instance.value = await get(route.params.id)
   }
 })
+
+const loadingBar = useLoading()
 
 const uuid = ref(null)
 const playing = ref(false)

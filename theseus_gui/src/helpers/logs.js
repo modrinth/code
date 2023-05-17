@@ -17,8 +17,8 @@ pub struct Logs {
 
 /// Get all logs that exist for a given profile
 /// This is returned as an array of Log objects, sorted by datetime_string (the folder name, when the log was created)
-export async function get_logs(profileUuid) {
-  return await invoke('logs_get_logs', { profileUuid })
+export async function get_logs(profileUuid, clearContents) {
+  return await invoke('logs_get_logs', { profileUuid, clearContents })
 }
 
 /// Get a profile's log by datetime_string (the folder name, when the log was created)

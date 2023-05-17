@@ -2,6 +2,7 @@
   <Card class="log-card">
     <div class="button-row">
       <DropdownSelect
+        name="Log date"
         :model-value="logs[selectedLogIndex]"
         :options="logs"
         :display-name="(option) => option?.name"
@@ -47,11 +48,11 @@ import {
   SendIcon,
   TrashIcon,
 } from 'omorphia'
-import { delete_logs_by_datetime, get_logs } from '@/helpers/logs.js'
-import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import {delete_logs_by_datetime, get_logs, get_stdout_by_datetime} from '@/helpers/logs.js'
+import {onUnmounted, ref, watch} from 'vue'
 import dayjs from 'dayjs'
-import { get_stdout_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
-import { useRoute } from 'vue-router'
+import {get_stdout_by_uuid, get_uuids_by_profile_path} from '@/helpers/process.js'
+import {useRoute} from 'vue-router'
 
 const route = useRoute()
 
@@ -70,26 +71,26 @@ async function getLiveLog() {
   } else {
     returnValue = await get_stdout_by_uuid(uuids[0])
   }
+
   return { name: 'Live Log', stdout: returnValue, live: true }
 }
 
 async function getLogs() {
-  return (await get_logs(props.instance.uuid)).reverse().map((log) => {
+  return (await get_logs(props.instance.uuid, true)).reverse().map((log) => {
+    // TODO: fix display
     log.name = dayjs(log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9))
+    log.stdout = 'Loading...'
     return log
   })
 }
 
-const logs = ref([])
-
-try {
-  console.log('initializing logs', logs.value)
-  logs.value = [await getLiveLog(), ...(await getLogs())]
-
-  console.log('finalizing logs', logs.value)
-} catch (e) {
-  logs.value = [await getLiveLog()]
+async function setLogs() {
+  const [liveLog, allLogs] = await Promise.all([getLiveLog(), getLogs()])
+  logs.value = [liveLog, ...(allLogs)]
 }
+
+const logs = ref([])
+await setLogs()
 
 const selectedLogIndex = ref(0)
 const copied = ref(false)
@@ -101,8 +102,13 @@ const copyLog = () => {
   }
 }
 
-watch(selectedLogIndex, () => {
+watch(selectedLogIndex, async (newIndex) => {
   copied.value = false
+
+  if (newIndex !== 0) {
+    logs.value[newIndex].stdout = 'Loading...'
+    logs.value[newIndex].stdout = await get_stdout_by_datetime(props.instance.uuid, logs.value[newIndex].datetime_string)
+  }
 })
 
 const deleteLog = async () => {
@@ -110,25 +116,23 @@ const deleteLog = async () => {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_datetime(props.instance.uuid, logs.value[deleteIndex].datetime_string)
-    logs.value = [await getLiveLog(), ...(await getLogs())]
+    await setLogs()
   }
 }
 
 const logContainer = ref(null)
 const interval = ref(null)
 
-onMounted(() => {
-  interval.value = setInterval(async () => {
-    if (logs.value.length > 0) {
-      logs.value[0] = await getLiveLog()
+interval.value = setInterval(async () => {
+  if (logs.value.length > 0) {
+    logs.value[0] = await getLiveLog()
 
-      if (selectedLogIndex.value === 0) {
-        await nextTick()
-        logContainer.value.scrollTop = logContainer.value.scrollHeight
-      }
+    // TODO fix scroll thing
+    if (selectedLogIndex.value === 0) {
+      logContainer.value.scrollTop = logContainer.value.scrollHeight
     }
-  }, 250)
-})
+  }
+}, 250)
 
 onUnmounted(() => {
   clearInterval(interval.value)
