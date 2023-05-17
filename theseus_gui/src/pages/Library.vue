@@ -1,5 +1,5 @@
 <script setup>
-import { shallowRef } from 'vue'
+import { onUnmounted, shallowRef } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { useRoute } from 'vue-router'
@@ -14,10 +14,11 @@ breadcrumbs.setRootContext({ name: 'Library', link: route.path })
 const profiles = await list(true)
 const instances = shallowRef(Object.values(profiles))
 
-profile_listener(async () => {
+const unlisten = await profile_listener(async () => {
   const profiles = await list(true)
   instances.value = Object.values(profiles)
 })
+onUnmounted(() => unlisten())
 </script>
 
 <template>

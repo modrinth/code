@@ -1,6 +1,6 @@
 <template>
   <Card>
-    <div class="markdown-body" v-html="renderHighlightedString(project.body)" />
+    <div class="markdown-body" v-html="renderHighlightedString(project?.body ?? '')" />
   </Card>
 </template>
 

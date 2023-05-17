@@ -43,6 +43,8 @@ a {
 .multiselect {
   color: var(--color-base) !important;
   outline: 2px solid transparent;
+  max-width: 15rem;
+  width: 100% !important;
 
   .multiselect__input:focus-visible {
     outline: none !important;
@@ -166,4 +168,8 @@ a {
   align-items: center;
   gap: 1rem;
   color: var(--color-contrast);
+}
+
+input {
+  border: none !important;
 }

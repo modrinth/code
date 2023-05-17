@@ -127,6 +127,14 @@ impl Children {
             }
         }
         if !mc_exit_status.success() {
+            emit_process(
+                uuid,
+                current_pid,
+                ProcessPayloadType::Finished,
+                "Exited process",
+            )
+            .await?;
+
             return Ok(mc_exit_status); // Err for a non-zero exit is handled in helper
         }
 

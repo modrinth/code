@@ -84,10 +84,9 @@ import {
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter } from 'vue-router'
 
 const router = useRouter()
-const route = useRoute()
 
 const props = defineProps({
   instance: {
@@ -182,7 +181,7 @@ const updateSort = (projects, sort) => {
 }
 
 const searchMod = () => {
-  router.push({ path: '/browse/mod', query: { instance: route.params.id } })
+  router.push({ path: '/browse/mod' })
 }
 </script>
 
