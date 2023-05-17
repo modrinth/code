@@ -168,37 +168,35 @@ impl State {
     }
 
     #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     /// Synchronize in-memory state with persistent state
     pub async fn sync() -> crate::Result<()> {
-        Box::pin(async move {
-            let state = Self::get().await?;
-            let sync_settings = async {
-                let state = Arc::clone(&state);
+        let state = Self::get().await?;
+        let sync_settings = async {
+            let state = Arc::clone(&state);
 
-                tokio::spawn(async move {
-                    let reader = state.settings.read().await;
-                    reader.sync(&state.directories.settings_file()).await?;
-                    Ok::<_, crate::Error>(())
-                })
-                .await?
-            };
+            tokio::spawn(async move {
+                let reader = state.settings.read().await;
+                reader.sync(&state.directories.settings_file()).await?;
+                Ok::<_, crate::Error>(())
+            })
+            .await?
+        };
 
-            let sync_profiles = async {
-                let state = Arc::clone(&state);
+        let sync_profiles = async {
+            let state = Arc::clone(&state);
 
-                tokio::spawn(async move {
-                    let profiles = state.profiles.read().await;
+            tokio::spawn(async move {
+                let profiles = state.profiles.read().await;
 
-                    profiles.sync().await?;
-                    Ok::<_, crate::Error>(())
-                })
-                .await?
-            };
+                profiles.sync().await?;
+                Ok::<_, crate::Error>(())
+            })
+            .await?
+        };
 
-            tokio::try_join!(sync_settings, sync_profiles)?;
-            Ok(())
-        })
-        .await
+        tokio::try_join!(sync_settings, sync_profiles)?;
+        Ok(())
     }
 
     /// Reset IO semaphore to default values

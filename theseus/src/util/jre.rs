@@ -185,6 +185,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
 // Gets all JREs from the PATH env variable
 #[tracing::instrument]
+#[theseus_macros::debug_pin]
 async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
 {
     Box::pin(async move {

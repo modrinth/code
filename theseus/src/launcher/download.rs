@@ -62,47 +62,39 @@ pub async fn download_version_info(
     force: Option<bool>,
     loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<GameVersionInfo> {
-    Box::pin(async move {
-        let version_id = loader.map_or(version.id.clone(), |it| {
-            format!("{}-{}", version.id, it.id)
-        });
-        tracing::debug!("Loading version info for Minecraft {version_id}");
-        let path = st
-            .directories
-            .version_dir(&version_id)
-            .join(format!("{version_id}.json"));
+    let version_id = loader
+        .map_or(version.id.clone(), |it| format!("{}-{}", version.id, it.id));
+    tracing::debug!("Loading version info for Minecraft {version_id}");
+    let path = st
+        .directories
+        .version_dir(&version_id)
+        .join(format!("{version_id}.json"));
 
-        let res = if path.exists() && !force.unwrap_or(false) {
-            fs::read(path)
-                .err_into::<crate::Error>()
-                .await
-                .and_then(|ref it| Ok(serde_json::from_slice(it)?))
-        } else {
-            tracing::info!(
-                "Downloading version info for version {}",
-                &version.id
-            );
-            let mut info = d::minecraft::fetch_version_info(version).await?;
+    let res = if path.exists() && !force.unwrap_or(false) {
+        fs::read(path)
+            .err_into::<crate::Error>()
+            .await
+            .and_then(|ref it| Ok(serde_json::from_slice(it)?))
+    } else {
+        tracing::info!("Downloading version info for version {}", &version.id);
+        let mut info = d::minecraft::fetch_version_info(version).await?;
 
-            if let Some(loader) = loader {
-                let partial =
-                    d::modded::fetch_partial_version(&loader.url).await?;
-                info = d::modded::merge_partial_version(partial, info);
-            }
-            info.id = version_id.clone();
-
-            write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
-            Ok(info)
-        }?;
-
-        if let Some(loading_bar) = loading_bar {
-            emit_loading(loading_bar, 5.0, None).await?;
+        if let Some(loader) = loader {
+            let partial = d::modded::fetch_partial_version(&loader.url).await?;
+            info = d::modded::merge_partial_version(partial, info);
         }
+        info.id = version_id.clone();
 
-        tracing::debug!("Loaded version info for Minecraft {version_id}");
-        Ok(res)
-    })
-    .await
+        write(&path, &serde_json::to_vec(&info)?, &st.io_semaphore).await?;
+        Ok(info)
+    }?;
+
+    if let Some(loading_bar) = loading_bar {
+        emit_loading(loading_bar, 5.0, None).await?;
+    }
+
+    tracing::debug!("Loaded version info for Minecraft {version_id}");
+    Ok(res)
 }
 
 #[tracing::instrument(skip_all)]
@@ -112,41 +104,38 @@ pub async fn download_client(
     version_info: &GameVersionInfo,
     loading_bar: Option<&LoadingBarId>,
 ) -> crate::Result<()> {
-    Box::pin(async move {
-        let version = &version_info.id;
-        tracing::debug!("Locating client for version {version}");
-        let client_download = version_info
-            .downloads
-            .get(&d::minecraft::DownloadType::Client)
-            .ok_or(
-                crate::ErrorKind::LauncherError(format!(
-                    "No client downloads exist for version {version}"
-                ))
-                .as_error(),
-            )?;
-        let path = st
-            .directories
-            .version_dir(version)
-            .join(format!("{version}.jar"));
+    let version = &version_info.id;
+    tracing::debug!("Locating client for version {version}");
+    let client_download = version_info
+        .downloads
+        .get(&d::minecraft::DownloadType::Client)
+        .ok_or(
+            crate::ErrorKind::LauncherError(format!(
+                "No client downloads exist for version {version}"
+            ))
+            .as_error(),
+        )?;
+    let path = st
+        .directories
+        .version_dir(version)
+        .join(format!("{version}.jar"));
 
-        if !path.exists() {
-            let bytes = fetch(
-                &client_download.url,
-                Some(&client_download.sha1),
-                &st.fetch_semaphore,
-            )
-            .await?;
-            write(&path, &bytes, &st.io_semaphore).await?;
-            tracing::trace!("Fetched client version {version}");
-        }
-        if let Some(loading_bar) = loading_bar {
-            emit_loading(loading_bar, 9.0, None).await?;
-        }
+    if !path.exists() {
+        let bytes = fetch(
+            &client_download.url,
+            Some(&client_download.sha1),
+            &st.fetch_semaphore,
+        )
+        .await?;
+        write(&path, &bytes, &st.io_semaphore).await?;
+        tracing::trace!("Fetched client version {version}");
+    }
+    if let Some(loading_bar) = loading_bar {
+        emit_loading(loading_bar, 9.0, None).await?;
+    }
 
-        tracing::debug!("Client loaded for version {version}!");
-        Ok(())
-    })
-    .await
+    tracing::debug!("Client loaded for version {version}!");
+    Ok(())
 }
 
 #[tracing::instrument(skip_all)]
@@ -190,13 +179,12 @@ pub async fn download_assets(
     loading_bar: Option<&LoadingBarId>,
     loading_amount: f64,
 ) -> crate::Result<()> {
-    Box::pin(async move {
-        tracing::debug!("Loading assets");
-        let num_futs = index.objects.len();
-        let assets = stream::iter(index.objects.iter())
-            .map(Ok::<(&String, &Asset), crate::Error>);
+    tracing::debug!("Loading assets");
+    let num_futs = index.objects.len();
+    let assets = stream::iter(index.objects.iter())
+        .map(Ok::<(&String, &Asset), crate::Error>);
 
-        loading_try_for_each_concurrent(assets,
+    loading_try_for_each_concurrent(assets,
             None,
             loading_bar,
             loading_amount,
@@ -240,9 +228,8 @@ pub async fn download_assets(
                 tracing::trace!("Loaded asset with hash {hash}");
                 Ok(())
             }).await?;
-        tracing::debug!("Done loading assets!");
-        Ok(())
-    }).await
+    tracing::debug!("Done loading assets!");
+    Ok(())
 }
 
 #[tracing::instrument(skip(st, libraries))]
@@ -255,15 +242,14 @@ pub async fn download_libraries(
     loading_amount: f64,
     java_arch: &str,
 ) -> crate::Result<()> {
-    Box::pin(async move {
-        tracing::debug!("Loading libraries");
+    tracing::debug!("Loading libraries");
 
-        tokio::try_join! {
-            fs::create_dir_all(st.directories.libraries_dir()),
-            fs::create_dir_all(st.directories.version_natives_dir(version))
-        }?;
-        let num_files = libraries.len();
-        loading_try_for_each_concurrent(
+    tokio::try_join! {
+        fs::create_dir_all(st.directories.libraries_dir()),
+        fs::create_dir_all(st.directories.version_natives_dir(version))
+    }?;
+    let num_files = libraries.len();
+    loading_try_for_each_concurrent(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
@@ -347,8 +333,6 @@ pub async fn download_libraries(
             }
         ).await?;
 
-        tracing::debug!("Done loading libraries!");
-        Ok(())
-
-    }).await
+    tracing::debug!("Done loading libraries!");
+    Ok(())
 }
