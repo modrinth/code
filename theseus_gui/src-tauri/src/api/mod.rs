@@ -31,9 +31,6 @@ pub enum TheseusSerializableError {
 
     #[error("IO error: {0}")]
     IO(#[from] std::io::Error),
-
-    #[error("No profile found at {0}")]
-    NoProfileFound(String),
 }
 
 // Generic implementation of From<T> for ErrorTypeA
@@ -92,6 +89,5 @@ macro_rules! impl_serialize {
 
 // Use the macro to implement Serialize for TheseusSerializableError
 impl_serialize! {
-    IO,
-    NoProfileFound,
+    IO
 }

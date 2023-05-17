@@ -67,8 +67,7 @@ const showCard = ref(false)
 
 const currentProcesses = ref(await getRunningProfiles())
 
-await process_listener(async (event) => {
-  console.log(event)
+await process_listener(async () => {
   await refresh()
 })
 

@@ -1,5 +1,6 @@
 //! Theseus state management system
 use crate::event::emit::emit_loading;
+use std::path::PathBuf;
 
 use crate::event::emit::init_loading;
 use crate::event::LoadingBarType;
@@ -7,8 +8,13 @@ use crate::loading_join;
 
 use crate::state::users::Users;
 use crate::util::fetch::{FetchSemaphore, IoSemaphore};
+use notify::RecommendedWatcher;
+use notify_debouncer_mini::{new_debouncer, DebounceEventResult, Debouncer};
 use std::sync::Arc;
+use std::time::Duration;
 use tokio::sync::{OnceCell, RwLock, Semaphore};
+
+use futures::{channel::mpsc::channel, SinkExt, StreamExt};
 
 // Submodules
 mod dirs;
@@ -69,6 +75,9 @@ pub struct State {
     pub(crate) users: RwLock<Users>,
     /// Launcher tags
     pub(crate) tags: RwLock<Tags>,
+
+    /// File watcher debouncer
+    pub(crate) file_watcher: RwLock<Debouncer<RecommendedWatcher>>,
 }
 
 impl State {
@@ -83,6 +92,8 @@ impl State {
                         "Initializing launcher",
                     )
                     .await?;
+
+                    let mut file_watcher = init_watcher().await?;
 
                     let directories = DirectoryInfo::init().await?;
                     emit_loading(&loading_bar, 10.0, None).await?;
@@ -100,7 +111,8 @@ impl State {
 
                     let metadata_fut =
                         Metadata::init(&directories, &io_semaphore);
-                    let profiles_fut = Profiles::init(&directories);
+                    let profiles_fut =
+                        Profiles::init(&directories, &mut file_watcher);
                     let tags_fut = Tags::init(
                         &directories,
                         &io_semaphore,
@@ -137,6 +149,7 @@ impl State {
                         children: RwLock::new(children),
                         auth_flow: RwLock::new(auth_flow),
                         tags: RwLock::new(tags),
+                        file_watcher: RwLock::new(file_watcher),
                     }))
                 }
             })
@@ -219,4 +232,52 @@ impl State {
         *total_permits = settings.max_concurrent_downloads as u32;
         *io_semaphore = Semaphore::new(settings.max_concurrent_downloads);
     }
+}
+
+async fn init_watcher() -> crate::Result<Debouncer<RecommendedWatcher>> {
+    let (mut tx, mut rx) = channel(1);
+
+    let file_watcher = new_debouncer(
+        Duration::from_secs(2),
+        None,
+        move |res: DebounceEventResult| {
+            futures::executor::block_on(async {
+                tx.send(res).await.unwrap();
+            })
+        },
+    )?;
+
+    tokio::task::spawn(async move {
+        while let Some(res) = rx.next().await {
+            match res {
+                Ok(events) => {
+                    let mut visited_paths = Vec::new();
+                    events.iter().for_each(|e| {
+                        let mut new_path = PathBuf::new();
+                        let mut found = false;
+
+                        for component in e.path.components() {
+                            new_path.push(component);
+                            if found {
+                                break;
+                            }
+                            if component.as_os_str() == "profiles" {
+                                found = true;
+                            }
+                        }
+
+                        if !visited_paths.contains(&new_path) {
+                            Profile::sync_projects_task(new_path.clone());
+                            visited_paths.push(new_path);
+                        }
+                    });
+                }
+                Err(errors) => errors.iter().for_each(|err| {
+                    tracing::warn!("Unable to watch file: {err}")
+                }),
+            }
+        }
+    });
+
+    Ok(file_watcher)
 }

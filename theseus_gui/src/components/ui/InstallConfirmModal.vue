@@ -2,11 +2,15 @@
 import { Button, Modal, XIcon, DownloadIcon } from 'omorphia'
 import { install as pack_install } from '@/helpers/pack'
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 const version = ref('')
 const title = ref('')
 const icon = ref('')
 const confirmModal = ref(null)
+const installing = ref(false)
 
 defineExpose({
   show: (id, projectTitle, projectIcon) => {
@@ -18,8 +22,11 @@ defineExpose({
 })
 
 async function install() {
-  confirmModal.value.hide()
+  installing.value = true
+  let id = await pack_install(version.value)
   await pack_install(version.value, title.value, icon.value ? icon.value : null)
+  await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+  confirmModal.value.hide()
 }
 </script>
 
@@ -31,7 +38,9 @@ async function install() {
       </p>
       <div class="button-group">
         <Button @click="() => $refs.confirmModal.hide()"><XIcon />Cancel</Button>
-        <Button color="primary" @click="install()"><DownloadIcon /> Install</Button>
+        <Button color="primary" :disabled="installing" @click="install()"
+          ><DownloadIcon /> {{ installing ? 'Installing' : 'Install' }}</Button
+        >
       </div>
     </div>
   </Modal>

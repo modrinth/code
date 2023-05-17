@@ -11,7 +11,7 @@ import {
   RightArrowIcon,
   CheckIcon,
 } from 'omorphia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 import { add_project_from_version as installMod, check_installed, list } from '@/helpers/profile'
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
@@ -34,9 +34,9 @@ const gameVersion = ref(null)
 const creatingInstance = ref(false)
 
 defineExpose({
-  show: async (projectId, selectedVersion) => {
+  show: async (projectId, selectedVersions) => {
     project.value = projectId
-    versions.value = selectedVersion
+    versions.value = selectedVersions
     installModal.value.show()
     searchFilter.value = ''
 
@@ -44,7 +44,7 @@ defineExpose({
   },
 })
 
-const profiles = shallowRef(await getData())
+const profiles = ref([])
 
 async function install(instance) {
   instance.installing = true
@@ -109,6 +109,7 @@ const upload_icon = async () => {
     ],
   })
 
+  if (!icon.value) return
   display_icon.value = tauri.convertFileSrc(icon.value)
 }
 
@@ -147,7 +148,7 @@ const check_valid = computed(() => {
   <Modal ref="installModal" header="Install mod to instance">
     <div class="modal-body">
       <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
-      <div class="profiles">
+      <div class="profiles" :class="{ 'hide-creation': !showCreation }">
         <div v-for="profile in profiles" :key="profile.metadata.name" class="option">
           <Button
             color="raised"
@@ -265,6 +266,10 @@ const check_valid = computed(() => {
 .profiles {
   max-height: 12rem;
   overflow-y: auto;
+
+  &.hide-creation {
+    max-height: 21rem;
+  }
 }
 
 .option {
@@ -277,6 +282,7 @@ const check_valid = computed(() => {
   justify-content: space-between;
   align-items: center;
   padding: 0 0.5rem;
+  gap: 0.5rem;
 
   img {
     margin-right: 0.5rem;
@@ -289,7 +295,9 @@ const check_valid = computed(() => {
   }
 
   .profile-button {
+    align-content: start;
     padding: 0.5rem;
+    text-align: left;
   }
 }
 

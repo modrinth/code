@@ -149,6 +149,9 @@ impl Drop for LoadingBar {
 #[serde(rename_all = "snake_case")]
 pub enum LoadingBarType {
     StateInit,
+    JavaDownload {
+        version: u32,
+    },
     PackFileDownload {
         profile_path: PathBuf,
         pack_name: String,

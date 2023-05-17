@@ -11,7 +11,7 @@ JavaVersion {
     path: Path
     version: String
 }
- 
+
 */
 
 /// Get all JREs that exist on the system
@@ -50,20 +50,18 @@ export async function get_jre(path) {
   return await invoke('jre_get_jre', { path })
 }
 
-// Gets key for the optimal JRE to use, for a given profile path
-// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
-export async function get_optimal_jre_key_by_path(path) {
-  return await invoke('jre_get_optimal_jre_key_by_path', { path })
-}
-
-// Gets key for the optimal JRE to use, for a given profile
-// The key can be used in the hashmap contained by JavaGlobals in Settings (if it exists)
-export async function get_optimal_jre_key(path) {
-  return await invoke('jre_get_optimal_jre_key', { path })
-}
-
 // Autodetect Java globals, by searching the users computer.
 // Returns a *NEW* JavaGlobals that can be put into Settings
 export async function autodetect_java_globals(path) {
   return await invoke('jre_autodetect_java_globals', { path })
+}
+
+// Automatically installs specified java version
+export async function jre_auto_install_java(javaVersion) {
+  return await invoke('jre_auto_install_java', { javaVersion })
+}
+
+// Get max memory in KiB
+export async function get_max_memory() {
+  return await invoke('jre_get_max_memory')
 }

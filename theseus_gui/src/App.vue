@@ -75,24 +75,24 @@ const loading = useLoading()
             <LibraryIcon />
             <span v-if="!themeStore.collapsedNavigation">Library</span>
           </RouterLink>
-          <Button
-            color="primary"
-            :class="{
-              'icon-only': themeStore.collapsedNavigation,
-              'collapsed-button': themeStore.collapsedNavigation,
-              'expanded-button': !themeStore.collapsedNavigation,
-            }"
-            @click="() => $refs.installationModal.show()"
-          >
-            <PlusIcon />
-            <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New Instance</span>
-          </Button>
           <Suspense>
             <InstanceCreationModal ref="installationModal" />
           </Suspense>
         </div>
       </div>
       <div class="settings pages-list">
+        <Button
+          class="sleek-primary"
+          :class="{
+            'icon-only': themeStore.collapsedNavigation,
+            'collapsed-button': themeStore.collapsedNavigation,
+            'expanded-button': !themeStore.collapsedNavigation,
+          }"
+          @click="() => $refs.installationModal.show()"
+        >
+          <PlusIcon />
+          <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New Instance</span>
+        </Button>
         <RouterLink
           to="/settings"
           class="btn"
@@ -136,6 +136,10 @@ const loading = useLoading()
 </template>
 
 <style lang="scss" scoped>
+.sleek-primary {
+  background-color: var(--color-brand-highlight);
+  transition: all ease-in-out 0.1s;
+}
 .container {
   --appbar-height: 3.25rem;
   --sidebar-width: 5rem;

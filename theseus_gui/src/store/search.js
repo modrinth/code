@@ -20,12 +20,13 @@ export const useSearch = defineStore('searchStore', {
     openSource: false,
     limit: 20,
     instanceContext: null,
+    ignoreInstance: false,
   }),
   actions: {
     getQueryString() {
       let andFacets = [`project_type:${this.projectType === 'datapack' ? 'mod' : this.projectType}`]
 
-      if (this.instanceContext) {
+      if (this.instanceContext && !this.ignoreInstance) {
         this.activeVersions = [this.instanceContext.metadata.game_version]
       }
 
@@ -42,7 +43,7 @@ export const useSearch = defineStore('searchStore', {
         ;[...andFacets, `categories:${encodeURIComponent('datapack')}`].forEach(
           (f) => (formattedAndFacets += `["${f}"],`)
         )
-      } else if (this.instanceContext && this.projectType === 'mod') {
+      } else if (this.instanceContext && !this.ignoreInstance && this.projectType === 'mod') {
         ;[
           ...andFacets,
           `categories:${encodeURIComponent(this.instanceContext.metadata.loader)}`,

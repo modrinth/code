@@ -22,12 +22,13 @@ pub fn get_class_paths(
     libraries_path: &Path,
     libraries: &[Library],
     client_path: &Path,
+    java_arch: &str,
 ) -> crate::Result<String> {
     let mut cps = libraries
         .iter()
         .filter_map(|library| {
             if let Some(rules) = &library.rules {
-                if !rules.iter().all(parse_rule) {
+                if !rules.iter().any(|x| parse_rule(x, java_arch)) {
                     return None;
                 }
             }
@@ -53,19 +54,20 @@ pub fn get_class_paths(
             .to_string(),
     );
 
-    Ok(cps.join(classpath_separator()))
+    Ok(cps.join(classpath_separator(java_arch)))
 }
 
 pub fn get_class_paths_jar<T: AsRef<str>>(
     libraries_path: &Path,
     libraries: &[T],
+    java_arch: &str,
 ) -> crate::Result<String> {
     let cps = libraries
         .iter()
         .map(|library| get_lib_path(libraries_path, library.as_ref(), false))
         .collect::<Result<Vec<_>, _>>()?;
 
-    Ok(cps.join(classpath_separator()))
+    Ok(cps.join(classpath_separator(java_arch)))
 }
 
 pub fn get_lib_path(
@@ -91,6 +93,8 @@ pub fn get_lib_path(
 
     Ok(path.to_string_lossy().to_string())
 }
+
+#[allow(clippy::too_many_arguments)]
 pub fn get_jvm_arguments(
     arguments: Option<&[Argument]>,
     natives_path: &Path,
@@ -99,19 +103,26 @@ pub fn get_jvm_arguments(
     version_name: &str,
     memory: MemorySettings,
     custom_args: Vec<String>,
+    java_arch: &str,
 ) -> crate::Result<Vec<String>> {
     let mut parsed_arguments = Vec::new();
 
     if let Some(args) = arguments {
-        parse_arguments(args, &mut parsed_arguments, |arg| {
-            parse_jvm_argument(
-                arg.to_string(),
-                natives_path,
-                libraries_path,
-                class_paths,
-                version_name,
-            )
-        })?;
+        parse_arguments(
+            args,
+            &mut parsed_arguments,
+            |arg| {
+                parse_jvm_argument(
+                    arg.to_string(),
+                    natives_path,
+                    libraries_path,
+                    class_paths,
+                    version_name,
+                    java_arch,
+                )
+            },
+            java_arch,
+        )?;
     } else {
         parsed_arguments.push(format!(
             "-Djava.library.path={}",
@@ -147,6 +158,7 @@ fn parse_jvm_argument(
     libraries_path: &Path,
     class_paths: &str,
     version_name: &str,
+    java_arch: &str,
 ) -> crate::Result<String> {
     argument.retain(|c| !c.is_whitespace());
     Ok(argument
@@ -174,7 +186,7 @@ fn parse_jvm_argument(
                 })?
                 .to_string_lossy(),
         )
-        .replace("${classpath_separator}", classpath_separator())
+        .replace("${classpath_separator}", classpath_separator(java_arch))
         .replace("${launcher_name}", "theseus")
         .replace("${launcher_version}", env!("CARGO_PKG_VERSION"))
         .replace("${version_name}", version_name)
@@ -192,13 +204,37 @@ pub fn get_minecraft_arguments(
     assets_directory: &Path,
     version_type: &VersionType,
     resolution: WindowSize,
+    java_arch: &str,
 ) -> crate::Result<Vec<String>> {
     if let Some(arguments) = arguments {
         let mut parsed_arguments = Vec::new();
 
-        parse_arguments(arguments, &mut parsed_arguments, |arg| {
-            parse_minecraft_argument(
-                arg,
+        parse_arguments(
+            arguments,
+            &mut parsed_arguments,
+            |arg| {
+                parse_minecraft_argument(
+                    arg,
+                    &credentials.access_token,
+                    &credentials.username,
+                    &credentials.id,
+                    version,
+                    asset_index_name,
+                    game_directory,
+                    assets_directory,
+                    version_type,
+                    resolution,
+                )
+            },
+            java_arch,
+        )?;
+
+        Ok(parsed_arguments)
+    } else if let Some(legacy_arguments) = legacy_arguments {
+        let mut parsed_arguments = Vec::new();
+        for x in legacy_arguments.split(' ') {
+            parsed_arguments.push(parse_minecraft_argument(
+                &x.replace(' ', TEMPORARY_REPLACE_CHAR),
                 &credentials.access_token,
                 &credentials.username,
                 &credentials.id,
@@ -208,26 +244,9 @@ pub fn get_minecraft_arguments(
                 assets_directory,
                 version_type,
                 resolution,
-            )
-        })?;
-
+            )?);
+        }
         Ok(parsed_arguments)
-    } else if let Some(legacy_arguments) = legacy_arguments {
-        Ok(parse_minecraft_argument(
-            &legacy_arguments.replace(' ', TEMPORARY_REPLACE_CHAR),
-            &credentials.access_token,
-            &credentials.username,
-            &credentials.id,
-            version,
-            asset_index_name,
-            game_directory,
-            assets_directory,
-            version_type,
-            resolution,
-        )?
-        .split(' ')
-        .map(|x| x.to_string())
-        .collect())
     } else {
         Ok(Vec::new())
     }
@@ -300,6 +319,7 @@ fn parse_arguments<F>(
     arguments: &[Argument],
     parsed_arguments: &mut Vec<String>,
     parse_function: F,
+    java_arch: &str,
 ) -> crate::Result<()>
 where
     F: Fn(&str) -> crate::Result<String>,
@@ -314,7 +334,7 @@ where
                 }
             }
             Argument::Ruled { rules, value } => {
-                if rules.iter().all(parse_rule) {
+                if rules.iter().any(|x| parse_rule(x, java_arch)) {
                     match value {
                         ArgumentValue::Single(arg) => {
                             parsed_arguments.push(parse_function(

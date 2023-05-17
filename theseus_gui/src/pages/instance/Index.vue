@@ -102,12 +102,6 @@ breadcrumbs.setContext({
   link: route.path,
 })
 
-profile_listener(async (event) => {
-  if (event.profile_path === route.params.id) {
-    instance.value = await get(route.params.id)
-  }
-})
-
 const loadingBar = useLoading()
 
 const uuid = ref(null)
@@ -151,11 +145,20 @@ const stopInstance = async () => {
   }
 }
 
-const unlisten = await process_listener((e) => {
+const unlistenProfiles = await profile_listener(async (event) => {
+  if (event.path === route.params.id) {
+    instance.value = await get(route.params.id)
+  }
+})
+
+const unlistenProcesses = await process_listener((e) => {
   if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
 })
 
-onUnmounted(() => unlisten())
+onUnmounted(() => {
+  unlistenProcesses()
+  unlistenProfiles()
+})
 </script>
 
 <style scoped lang="scss">

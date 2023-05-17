@@ -46,11 +46,6 @@ export async function check_installed(path, projectId) {
   return await invoke('profile_check_installed', { path, projectId })
 }
 
-// Syncs a profile with the disk
-export async function sync(path) {
-  return await invoke('profile_sync', { path })
-}
-
 // Installs/Repairs a profile
 export async function install(path) {
   return await invoke('profile_install', { path })
@@ -64,12 +59,6 @@ export async function update_all(path) {
 // Updates a specified project
 export async function update_project(path, projectPath) {
   return await invoke('profile_update_project', { path, projectPath })
-}
-
-// Replaces a given project with the specified version ID
-// Returns a path to the new project file
-export async function replace_project(path, projectPath, versionId) {
-  return await invoke('profile_replace_project', { path, projectPath, versionId })
 }
 
 // Add a project to a profile from a version

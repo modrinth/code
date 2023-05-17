@@ -24,6 +24,7 @@ pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,
     loading_bar: &LoadingBarId,
+    java_arch: &str,
 ) -> crate::Result<()> {
     tracing::info!("Downloading Minecraft version {}", version.id);
     // 5
@@ -45,7 +46,7 @@ pub async fn download_minecraft(
         // Total loading sums to 90/60
         download_client(st, version, Some(loading_bar)), // 10
         download_assets(st, version.assets == "legacy", &assets_index, Some(loading_bar), amount), // 40
-        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount) // 40
+        download_libraries(st, version.libraries.as_slice(), &version.id, Some(loading_bar), amount, java_arch) // 40
     }?;
 
     tracing::info!("Done downloading Minecraft!");
@@ -247,6 +248,7 @@ pub async fn download_libraries(
     version: &str,
     loading_bar: Option<&LoadingBarId>,
     loading_amount: f64,
+    java_arch: &str,
 ) -> crate::Result<()> {
     Box::pin(async move {
         tracing::debug!("Loading libraries");
@@ -260,10 +262,12 @@ pub async fn download_libraries(
         stream::iter(libraries.iter())
             .map(Ok::<&Library, crate::Error>), None, loading_bar,loading_amount,num_files, None,|library| async move {
                 if let Some(rules) = &library.rules {
-                    if !rules.iter().all(super::parse_rule) {
+                    if !rules.iter().any(|x| super::parse_rule(x, java_arch)) {
+                        tracing::trace!("Skipped library {}", &library.name);
                         return Ok(());
                     }
                 }
+
                 tokio::try_join! {
                     async {
                         let artifact_path = d::get_path_from_artifact(&library.name)?;
@@ -278,24 +282,23 @@ pub async fn download_libraries(
                                 let bytes = fetch(&artifact.url, Some(&artifact.sha1), &st.fetch_semaphore)
                                     .await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
-                                tracing::trace!("Fetched library {}", &library.name);
+                                tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
                                 Ok::<_, crate::Error>(())
                             }
-                            None => {
+                            _ => {
                                 let url = [
                                     library
                                         .url
                                         .as_deref()
-                                        .unwrap_or("https://libraries.minecraft.net"),
+                                        .unwrap_or("https://libraries.minecraft.net/"),
                                     &artifact_path
                                 ].concat();
 
                                 let bytes = fetch(&url, None, &st.fetch_semaphore).await?;
                                 write(&path, &bytes, &st.io_semaphore).await?;
-                                tracing::trace!("Fetched library {}", &library.name);
+                                tracing::trace!("Fetched library {} to path {:?}", &library.name, &path);
                                 Ok::<_, crate::Error>(())
                             }
-                            _ => Ok(())
                         }
                     },
                     async {
@@ -304,7 +307,7 @@ pub async fn download_libraries(
                             library
                                 .natives
                                 .as_ref()?
-                                .get(&Os::native_arch())?,
+                                .get(&Os::native_arch(java_arch))?,
                             library
                                 .downloads
                                 .as_ref()?
