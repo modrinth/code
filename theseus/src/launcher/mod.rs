@@ -92,6 +92,7 @@ async fn get_java_version_from_profile(
 }
 
 #[tracing::instrument(skip(profile))]
+#[theseus_macros::debug_pin]
 pub async fn install_minecraft(
     profile: &Profile,
     existing_loading_bar: Option<LoadingBarId>,
@@ -269,6 +270,8 @@ pub async fn install_minecraft(
     Ok(())
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn launch_minecraft(
     java_args: &[String],

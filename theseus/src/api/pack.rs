@@ -76,6 +76,8 @@ enum PackDependency {
     Minecraft,
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn install_pack_from_version_id(
     version_id: String,
     title: String,
@@ -190,6 +192,8 @@ pub async fn install_pack_from_version_id(
     .await
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
     let file = fs::read(&path).await?;
 
@@ -223,6 +227,8 @@ pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
     .await
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 async fn install_pack(
     file: bytes::Bytes,
     icon: Option<PathBuf>,

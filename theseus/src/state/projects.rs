@@ -200,6 +200,8 @@ pub enum ProjectMetadata {
     Unknown,
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 async fn read_icon_from_file(
     icon_path: Option<String>,
     cache_dir: &Path,
@@ -249,6 +251,8 @@ async fn read_icon_from_file(
     Ok(None)
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn infer_data_from_files(
     profile: Profile,
     paths: Vec<PathBuf>,

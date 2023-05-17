@@ -39,6 +39,7 @@ pub async fn profile_create_empty() -> crate::Result<PathBuf> {
 // Creates a profile at  the given filepath and adds it to the in-memory state
 // Returns filepath at which it can be accessed in the State
 #[tracing::instrument]
+#[theseus_macros::debug_pin]
 #[allow(clippy::too_many_arguments)]
 pub async fn profile_create(
     name: String,         // the name of the profile, and relative path
@@ -138,6 +139,8 @@ pub async fn profile_create(
     .await
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub(crate) async fn get_loader_version_from_loader(
     game_version: String,
     loader: ModLoader,

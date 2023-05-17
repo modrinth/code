@@ -82,6 +82,8 @@ pub struct State {
 
 impl State {
     /// Get the current launcher state, initializing it if needed
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     pub async fn get() -> crate::Result<Arc<Self>> {
         LAUNCHER_STATE
             .get_or_try_init(|| {

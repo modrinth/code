@@ -66,6 +66,7 @@ where
 
 /// Downloads a file with retry and checksum functionality
 #[tracing::instrument(skip(json_body, semaphore))]
+#[theseus_macros::debug_pin]
 pub async fn fetch_advanced(
     method: Method,
     url: &str,
@@ -158,6 +159,7 @@ pub async fn fetch_advanced(
 
 /// Downloads a file from specified mirrors
 #[tracing::instrument(skip(semaphore))]
+#[theseus_macros::debug_pin]
 pub async fn fetch_mirrors(
     mirrors: &[&str],
     sha1: Option<&str>,

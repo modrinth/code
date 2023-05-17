@@ -3764,6 +3764,7 @@ dependencies = [
  "sys-info",
  "tauri",
  "tempfile",
+ "theseus_macros",
  "thiserror",
  "tokio",
  "tokio-stream",

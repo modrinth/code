@@ -9,6 +9,7 @@ pub fn debug_pin(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // Parse the input tokens into a syntax tree
     let input = parse_macro_input!(item as ItemFn);
 
+    let attrs = &input.attrs;
     let vis = &input.vis; // visibility modifier
     let sig = &input.sig; // function signature
     let body = &input.block;
@@ -16,6 +17,7 @@ pub fn debug_pin(_attr: TokenStream, item: TokenStream) -> TokenStream {
     // Use cfg attribute for conditional compilation
     let result = quote! {
         #[cfg(debug_assertions)]
+        #(#attrs) *
         #vis #sig {
             Box::pin(async move {
                 #body
@@ -23,6 +25,7 @@ pub fn debug_pin(_attr: TokenStream, item: TokenStream) -> TokenStream {
         }
 
         #[cfg(not(debug_assertions))]
+        #(#attrs) *
         #vis #sig {
             #body
         }

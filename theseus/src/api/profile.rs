@@ -123,6 +123,8 @@ pub async fn install(path: &Path) -> crate::Result<()> {
     Ok(())
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
     if let Some(profile) = get(profile_path, None).await? {
         let loading_bar = init_loading(
@@ -161,6 +163,8 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
     }
 }
 
+#[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn update_project(
     profile_path: &Path,
     project_path: &Path,
@@ -323,6 +327,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
 /// Run Minecraft using a profile, and credentials for authentication
 /// Returns Arc pointer to RwLock to Child
 #[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn run_credentials(
     path: &Path,
     credentials: &auth::Credentials,
