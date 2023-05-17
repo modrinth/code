@@ -49,10 +49,14 @@ import {
   TrashIcon,
 } from 'omorphia'
 import {delete_logs_by_datetime, get_logs, get_stdout_by_datetime} from '@/helpers/logs.js'
-import {onUnmounted, ref, watch} from 'vue'
+import {nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from 'vue'
 import dayjs from 'dayjs'
+import calendar from 'dayjs/plugin/calendar'
 import {get_stdout_by_uuid, get_uuids_by_profile_path} from '@/helpers/process.js'
 import {useRoute} from 'vue-router'
+import {process_listener} from "@/helpers/events.js";
+
+dayjs.extend(calendar)
 
 const route = useRoute()
 
@@ -77,8 +81,7 @@ async function getLiveLog() {
 
 async function getLogs() {
   return (await get_logs(props.instance.uuid, true)).reverse().map((log) => {
-    // TODO: fix display
-    log.name = dayjs(log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9))
+    log.name = dayjs(log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)).calendar()
     log.stdout = 'Loading...'
     return log
   })
@@ -104,6 +107,7 @@ const copyLog = () => {
 
 watch(selectedLogIndex, async (newIndex) => {
   copied.value = false
+  userScrolled.value = false
 
   if (newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
@@ -122,20 +126,45 @@ const deleteLog = async () => {
 
 const logContainer = ref(null)
 const interval = ref(null)
+const userScrolled = ref(false)
+const isAutoScrolling = ref(false)
+
+function handleUserScroll() {
+  if (!isAutoScrolling.value) {
+    userScrolled.value = true
+  }
+}
 
 interval.value = setInterval(async () => {
   if (logs.value.length > 0) {
     logs.value[0] = await getLiveLog()
 
-    // TODO fix scroll thing
-    if (selectedLogIndex.value === 0) {
-      logContainer.value.scrollTop = logContainer.value.scrollHeight
+    if (selectedLogIndex.value === 0 && !userScrolled.value) {
+      await nextTick()
+      isAutoScrolling.value = true
+      logContainer.value.scrollTop = logContainer.value.scrollHeight - logContainer.value.offsetHeight
+      setTimeout(() => isAutoScrolling.value = false, 50)
     }
   }
 }, 250)
 
+const unlistenProcesses = await process_listener(async (e) => {
+  if (e.event === 'finished') {
+    userScrolled.value = false
+    await setLogs()
+  }
+})
+
+onMounted(() => {
+  logContainer.value.addEventListener('scroll', handleUserScroll);
+})
+
+onBeforeUnmount(() => {
+  logContainer.value.removeEventListener('scroll', handleUserScroll)
+})
 onUnmounted(() => {
   clearInterval(interval.value)
+  unlistenProcesses()
 })
 </script>
 
@@ -171,6 +200,5 @@ onUnmounted(() => {
   overflow: auto;
   white-space: normal;
   color-scheme: dark;
-  // scroll-behavior: smooth;
 }
 </style>

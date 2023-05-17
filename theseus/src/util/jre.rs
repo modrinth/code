@@ -187,24 +187,27 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 #[tracing::instrument]
 async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
 {
-    let state = State::get().await.map_err(|_| JREError::StateError)?;
+    Box::pin(async move {
+        let state = State::get().await.map_err(|_| JREError::StateError)?;
 
-    let mut jre_paths = HashSet::new();
-    let base_path = state.directories.java_versions_dir();
+        let mut jre_paths = HashSet::new();
+        let base_path = state.directories.java_versions_dir();
 
-    if base_path.is_dir() {
-        for entry in std::fs::read_dir(base_path)? {
-            let entry = entry?;
-            let file_path = entry.path().join("bin");
-            let contents = std::fs::read_to_string(file_path)?;
+        if base_path.is_dir() {
+            for entry in std::fs::read_dir(base_path)? {
+                let entry = entry?;
+                let file_path = entry.path().join("bin");
+                let contents = std::fs::read_to_string(file_path)?;
 
-            let entry = entry.path().join(contents);
-            println!("{:?}", entry);
-            jre_paths.insert(entry);
+                let entry = entry.path().join(contents);
+                println!("{:?}", entry);
+                jre_paths.insert(entry);
+            }
         }
-    }
 
-    Ok(jre_paths)
+        Ok(jre_paths)
+    })
+    .await
 }
 
 // Gets all JREs from the PATH env variable
