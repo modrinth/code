@@ -7,7 +7,6 @@ use dunce::canonicalize;
 use theseus::jre::autodetect_java_globals;
 use theseus::prelude::*;
 
-
 use theseus::profile_create::profile_create;
 use tokio::time::{sleep, Duration};
 use tracing_error::ErrorLayer;

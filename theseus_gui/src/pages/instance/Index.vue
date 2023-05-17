@@ -87,7 +87,7 @@ import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import {useBreadcrumbs, useLoading, useSearch} from '@/store/state'
+import { useBreadcrumbs, useLoading, useSearch } from '@/store/state'
 
 const route = useRoute()
 const searchStore = useSearch()

@@ -48,13 +48,13 @@ import {
   SendIcon,
   TrashIcon,
 } from 'omorphia'
-import {delete_logs_by_datetime, get_logs, get_stdout_by_datetime} from '@/helpers/logs.js'
-import {nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch} from 'vue'
+import { delete_logs_by_datetime, get_logs, get_stdout_by_datetime } from '@/helpers/logs.js'
+import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import calendar from 'dayjs/plugin/calendar'
-import {get_stdout_by_uuid, get_uuids_by_profile_path} from '@/helpers/process.js'
-import {useRoute} from 'vue-router'
-import {process_listener} from "@/helpers/events.js";
+import { get_stdout_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
+import { useRoute } from 'vue-router'
+import { process_listener } from '@/helpers/events.js'
 
 dayjs.extend(calendar)
 
@@ -81,7 +81,9 @@ async function getLiveLog() {
 
 async function getLogs() {
   return (await get_logs(props.instance.uuid, true)).reverse().map((log) => {
-    log.name = dayjs(log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)).calendar()
+    log.name = dayjs(
+      log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)
+    ).calendar()
     log.stdout = 'Loading...'
     return log
   })
@@ -89,7 +91,7 @@ async function getLogs() {
 
 async function setLogs() {
   const [liveLog, allLogs] = await Promise.all([getLiveLog(), getLogs()])
-  logs.value = [liveLog, ...(allLogs)]
+  logs.value = [liveLog, ...allLogs]
 }
 
 const logs = ref([])
@@ -111,7 +113,10 @@ watch(selectedLogIndex, async (newIndex) => {
 
   if (newIndex !== 0) {
     logs.value[newIndex].stdout = 'Loading...'
-    logs.value[newIndex].stdout = await get_stdout_by_datetime(props.instance.uuid, logs.value[newIndex].datetime_string)
+    logs.value[newIndex].stdout = await get_stdout_by_datetime(
+      props.instance.uuid,
+      logs.value[newIndex].datetime_string
+    )
   }
 })
 
@@ -142,8 +147,9 @@ interval.value = setInterval(async () => {
     if (selectedLogIndex.value === 0 && !userScrolled.value) {
       await nextTick()
       isAutoScrolling.value = true
-      logContainer.value.scrollTop = logContainer.value.scrollHeight - logContainer.value.offsetHeight
-      setTimeout(() => isAutoScrolling.value = false, 50)
+      logContainer.value.scrollTop =
+        logContainer.value.scrollHeight - logContainer.value.offsetHeight
+      setTimeout(() => (isAutoScrolling.value = false), 50)
     }
   }
 }, 250)
@@ -156,7 +162,7 @@ const unlistenProcesses = await process_listener(async (e) => {
 })
 
 onMounted(() => {
-  logContainer.value.addEventListener('scroll', handleUserScroll);
+  logContainer.value.addEventListener('scroll', handleUserScroll)
 })
 
 onBeforeUnmount(() => {
