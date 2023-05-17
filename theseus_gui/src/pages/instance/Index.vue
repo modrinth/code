@@ -63,7 +63,13 @@
     </div>
     <div class="content">
       <Promotion />
-      <router-view :instance="instance" />
+      <RouterView v-slot="{ Component }">
+        <template v-if="Component">
+          <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
+            <component :is="Component" :instance="instance"></component>
+          </Suspense>
+        </template>
+      </RouterView>
     </div>
   </div>
 </template>
@@ -81,7 +87,7 @@ import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import { useBreadcrumbs, useSearch } from '@/store/state'
+import { useBreadcrumbs, useLoading, useSearch } from '@/store/state'
 
 const route = useRoute()
 const searchStore = useSearch()
@@ -95,6 +101,8 @@ breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
 })
+
+const loadingBar = useLoading()
 
 const uuid = ref(null)
 const playing = ref(false)
@@ -240,15 +248,18 @@ Button {
     width: 100%;
     color: var(--color-primary);
     padding: var(--gap-md);
+    box-shadow: none;
 
     &.router-link-exact-active {
+      box-shadow: var(--shadow-inset-lg);
       background: var(--color-button-bg);
+      color: var(--color-contrast);
     }
 
     &:hover {
       background-color: var(--color-button-bg);
       color: var(--color-contrast);
-      box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+      box-shadow: var(--shadow-inset-lg);
       text-decoration: none;
     }
 

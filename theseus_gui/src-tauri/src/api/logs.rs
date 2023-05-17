@@ -14,8 +14,17 @@ pub struct Logs {
 
 /// Get all Logs for a profile, sorted by datetime
 #[tauri::command]
-pub async fn logs_get_logs(profile_uuid: Uuid) -> Result<Vec<Logs>> {
-    Ok(logs::get_logs(profile_uuid).await?)
+pub async fn logs_get_logs(
+    profile_uuid: Uuid,
+    clear_contents: Option<bool>,
+) -> Result<Vec<Logs>> {
+    use std::time::Instant;
+    let now = Instant::now();
+    let val = logs::get_logs(profile_uuid, clear_contents).await?;
+    let elapsed = now.elapsed();
+    println!("Elapsed: {:.2?}", elapsed);
+
+    Ok(val)
 }
 
 /// Get a Log struct for a profile by profile id and datetime string

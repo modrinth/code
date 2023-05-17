@@ -40,6 +40,10 @@ a {
   }
 }
 
+input {
+  border: none;
+}
+
 .multiselect {
   color: var(--color-base) !important;
   outline: 2px solid transparent;
