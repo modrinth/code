@@ -2,23 +2,24 @@
   <Card class="log-card">
     <div class="button-row">
       <DropdownSelect
-        v-model="selectedLog"
+        :model-value="logs[selectedLogIndex]"
         :options="logs"
         :display-name="(option) => option?.name"
         :disabled="logs.length === 0"
+        @change="(value) => (selectedLogIndex = value.index)"
       />
       <div class="button-group">
-        <Button :disabled="!selectedLog" @click="copyLog()">
+        <Button :disabled="!logs[selectedLogIndex]" @click="copyLog()">
           <ClipboardCopyIcon v-if="!copied" />
           <CheckIcon v-else />
           {{ copied ? 'Copied' : 'Copy' }}
         </Button>
-        <Button disabled color="primary" @click="shareLog()">
+        <Button disabled color="primary">
           <SendIcon />
           Share
         </Button>
         <Button
-          :disabled="!selectedLog || selectedLog.live === true"
+          :disabled="!logs[selectedLogIndex] || logs[selectedLogIndex].live === true"
           color="danger"
           @click="deleteLog()"
         >
@@ -27,9 +28,9 @@
         </Button>
       </div>
     </div>
-    <div class="log-text">
-      {{ logs[1] }}
-      <div v-for="line in selectedLog?.stdout.split('\n')" :key="line" class="no-wrap">
+    <div ref="logContainer" class="log-text">
+      <!--      {{ logs[1] }}-->
+      <div v-for="line in logs[selectedLogIndex]?.stdout.split('\n')" :key="line" class="no-wrap">
         {{ line }}
       </div>
     </div>
@@ -47,7 +48,7 @@ import {
   TrashIcon,
 } from 'omorphia'
 import { delete_logs_by_datetime, get_logs } from '@/helpers/logs.js'
-import { onMounted, ref, watch } from 'vue'
+import { nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import { get_stdout_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
@@ -61,7 +62,7 @@ const props = defineProps({
   },
 })
 
-const getLiveLog = async () => {
+async function getLiveLog() {
   const uuids = await get_uuids_by_profile_path(route.params.id)
   let returnValue
   if (uuids.length === 0) {
@@ -72,7 +73,7 @@ const getLiveLog = async () => {
   return { name: 'Live Log', stdout: returnValue, live: true }
 }
 
-const getLogs = async () => {
+async function getLogs() {
   return (await get_logs(props.instance.uuid)).reverse().map((log) => {
     log.name = dayjs(log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9))
     return log
@@ -90,37 +91,47 @@ try {
   logs.value = [await getLiveLog()]
 }
 
-const selectedLog = ref(logs.value[0])
+const selectedLogIndex = ref(0)
 const copied = ref(false)
 
-const shareLog = () => {
-  console.log('share')
-}
-
 const copyLog = () => {
-  if (selectedLog.value) {
-    navigator.clipboard.writeText(selectedLog.value.stdout)
+  if (logs.value[selectedLogIndex.value]) {
+    navigator.clipboard.writeText(logs.value[selectedLogIndex.value].stdout)
     copied.value = true
   }
 }
 
+watch(selectedLogIndex, () => {
+  copied.value = false
+})
+
 const deleteLog = async () => {
-  if (selectedLog.value && selectedLog.value !== logs.value[0]) {
-    await delete_logs_by_datetime(props.instance.uuid, selectedLog.value.datetime_string)
+  if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
+    let deleteIndex = selectedLogIndex.value
+    selectedLogIndex.value = deleteIndex - 1
+    await delete_logs_by_datetime(props.instance.uuid, logs.value[deleteIndex].datetime_string)
     logs.value = [await getLiveLog(), ...(await getLogs())]
   }
 }
 
-watch(selectedLog, () => {
-  copied.value = false
-})
+const logContainer = ref(null)
+const interval = ref(null)
 
 onMounted(() => {
-  setInterval(async () => {
+  interval.value = setInterval(async () => {
     if (logs.value.length > 0) {
       logs.value[0] = await getLiveLog()
+
+      if (selectedLogIndex.value === 0) {
+        await nextTick()
+        logContainer.value.scrollTop = logContainer.value.scrollHeight
+      }
     }
-  }, 1000)
+  }, 250)
+})
+
+onUnmounted(() => {
+  clearInterval(interval.value)
 })
 </script>
 
@@ -156,5 +167,6 @@ onMounted(() => {
   overflow: auto;
   white-space: normal;
   color-scheme: dark;
+  // scroll-behavior: smooth;
 }
 </style>
