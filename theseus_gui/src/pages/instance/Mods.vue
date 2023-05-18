@@ -202,9 +202,8 @@ async function updateAll() {
 
   const paths = await update_all(props.instance.path)
 
-  console.log(paths)
   for (const [oldVal, newVal] of Object.entries(paths)) {
-    const index = projects.value.findIndex((x) => (x.path = oldVal))
+    const index = projects.value.findIndex((x) => (x.path === oldVal))
     projects.value[index].path = newVal
     projects.value[index].outdated = false
 
