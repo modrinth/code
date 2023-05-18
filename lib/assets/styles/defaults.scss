@@ -65,6 +65,7 @@ textarea {
   &:focus-visible {
     box-shadow: inset 0 0 0 transparent, 0 0 0 0.25rem var(--color-brand-shadow);
     color: var(--color-contrast);
+    outline: none;
   }
 
   &:disabled,
