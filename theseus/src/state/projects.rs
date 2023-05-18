@@ -351,7 +351,7 @@ pub async fn infer_data_from_files(
                 return_projects.insert(
                     path,
                     Project {
-                        disabled: false,
+                        disabled: file_name.ends_with(".disabled"),
                         metadata: ProjectMetadata::Modrinth {
                             project: Box::new(project.clone()),
                             version: Box::new(version.clone()),
@@ -360,9 +360,17 @@ pub async fn infer_data_from_files(
                                 .filter(|x| x.team_id == project.team)
                                 .cloned()
                                 .collect::<Vec<_>>(),
-                            update_version: update_versions
-                                .get(&hash)
-                                .map(|val| Box::new(val.clone())),
+                            update_version: if let Some(value) =
+                                update_versions.get(&hash)
+                            {
+                                if value.id != version.id {
+                                    Some(Box::new(value.clone()))
+                                } else {
+                                    None
+                                }
+                            } else {
+                                None
+                            },
                             incompatible: !version.loaders.contains(
                                 &profile
                                     .metadata
@@ -400,7 +408,7 @@ pub async fn infer_data_from_files(
                 path.clone(),
                 Project {
                     sha512: hash,
-                    disabled: path.ends_with(".disabled"),
+                    disabled: file_name.ends_with(".disabled"),
                     metadata: ProjectMetadata::Unknown,
                     file_name,
                 },
@@ -454,7 +462,7 @@ pub async fn infer_data_from_files(
                             path.clone(),
                             Project {
                                 sha512: hash,
-                                disabled: path.ends_with(".disabled"),
+                                disabled: file_name.ends_with(".disabled"),
                                 file_name,
                                 metadata: ProjectMetadata::Inferred {
                                     title: Some(
@@ -520,7 +528,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: path.ends_with(".disabled"),
+                            disabled: file_name.ends_with(".disabled"),
                             file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(if pack.name.is_empty() {
@@ -585,7 +593,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: path.ends_with(".disabled"),
+                            disabled: file_name.ends_with(".disabled"),
                             file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(pack.name.unwrap_or(pack.id)),
@@ -650,7 +658,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: path.ends_with(".disabled"),
+                            disabled: file_name.ends_with(".disabled"),
                             file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: Some(
@@ -715,7 +723,7 @@ pub async fn infer_data_from_files(
                         path.clone(),
                         Project {
                             sha512: hash,
-                            disabled: path.ends_with(".disabled"),
+                            disabled: file_name.ends_with(".disabled"),
                             file_name,
                             metadata: ProjectMetadata::Inferred {
                                 title: None,
@@ -735,7 +743,7 @@ pub async fn infer_data_from_files(
             path.clone(),
             Project {
                 sha512: hash,
-                disabled: path.ends_with(".disabled"),
+                disabled: file_name.ends_with(".disabled"),
                 file_name,
                 metadata: ProjectMetadata::Unknown,
             },

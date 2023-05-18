@@ -81,17 +81,17 @@ import {
   SearchIcon,
   UpdatedIcon,
   DropdownSelect,
-  AnimatedLogo
+  AnimatedLogo,
 } from 'omorphia'
-import {computed, ref} from 'vue'
+import { computed, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import {
   remove_project,
   toggle_disable_project,
   update_all,
-  update_project
-} from "@/helpers/profile.js";
+  update_project,
+} from '@/helpers/profile.js'
 
 const router = useRouter()
 
@@ -118,7 +118,7 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       icon: project.metadata.project.icon_url,
       disabled: project.disabled,
       updateVersion: project.metadata.update_version,
-      outdated: !!project.metadata.update_version
+      outdated: !!project.metadata.update_version,
     })
   } else if (project.metadata.type === 'inferred') {
     projects.value.push({
@@ -204,7 +204,7 @@ async function updateAll() {
 
   console.log(paths)
   for (const [oldVal, newVal] of Object.entries(paths)) {
-    const index = projects.value.findIndex((x) => x.path = oldVal)
+    const index = projects.value.findIndex((x) => (x.path = oldVal))
     projects.value[index].path = newVal
     projects.value[index].outdated = false
 
@@ -293,7 +293,6 @@ async function removeMod(mod) {
     padding-left: 0.5rem;
   }
 }
-
 </style>
 <style lang="scss">
 .updating-indicator {
