@@ -54,6 +54,8 @@ impl Metadata {
     }
 
     // Attempt to fetch metadata and store in sled DB
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     pub async fn init(
         dirs: &DirectoryInfo,
         io_semaphore: &IoSemaphore,

@@ -13,6 +13,7 @@ mod error;
 
 // Should be called in launcher initialization
 #[tauri::command]
+#[theseus_macros::debug_pin]
 async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     theseus::EventState::init(app).await?;
     State::get().await?;
@@ -24,6 +25,7 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
 #[cfg(target_os = "macos")]
 #[tauri::command]
+#[theseus_macros::debug_pin]
 async fn should_disable_mouseover() -> bool {
     // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
     let os = os_info::get();
@@ -37,6 +39,7 @@ async fn should_disable_mouseover() -> bool {
 }
 #[cfg(not(target_os = "macos"))]
 #[tauri::command]
+#[theseus_macros::debug_pin]
 async fn should_disable_mouseover() -> bool {
     false
 }

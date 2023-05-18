@@ -249,6 +249,8 @@ impl Profile {
         Ok(files)
     }
 
+    #[tracing::instrument(skip(watcher))]
+    #[theseus_macros::debug_pin]
     pub async fn watch_fs(
         profile_path: &Path,
         watcher: &mut Debouncer<RecommendedWatcher>,
@@ -285,6 +287,8 @@ impl Profile {
         Ok(())
     }
 
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     pub async fn add_project_version(
         &self,
         version_id: String,
@@ -330,6 +334,8 @@ impl Profile {
         Ok((path, version))
     }
 
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     pub async fn add_project_bytes(
         &self,
         file_name: &str,
@@ -398,6 +404,8 @@ impl Profile {
         Ok(path)
     }
 
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     pub async fn toggle_disable_project(
         &self,
         path: &Path,
@@ -471,6 +479,7 @@ impl Profile {
 
 impl Profiles {
     #[tracing::instrument(skip(file_watcher))]
+    #[theseus_macros::debug_pin]
     pub async fn init(
         dirs: &DirectoryInfo,
         file_watcher: &mut Debouncer<RecommendedWatcher>,
@@ -501,6 +510,8 @@ impl Profiles {
         Ok(Self(profiles))
     }
 
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     pub async fn update_projects() {
         let res = async {
             let state = State::get().await?;
@@ -553,6 +564,7 @@ impl Profiles {
     }
 
     #[tracing::instrument(skip(self))]
+    #[theseus_macros::debug_pin]
     pub async fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         emit_profile(
             profile.uuid,

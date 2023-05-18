@@ -16,6 +16,7 @@ regex = "1.5"
 
 [dependencies]
 theseus = { path = "../../theseus", features = ["tauri"] }
+theseus_macros = { path = "../../theseus_macros" }
 
 serde_json = "1.0"
 serde = { version = "1.0", features = ["derive"] }

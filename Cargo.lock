@@ -3764,6 +3764,7 @@ dependencies = [
  "sys-info",
  "tauri",
  "tempfile",
+ "theseus_macros",
  "thiserror",
  "tokio",
  "tokio-stream",
@@ -3817,6 +3818,7 @@ dependencies = [
  "tauri",
  "tauri-build",
  "theseus",
+ "theseus_macros",
  "thiserror",
  "tokio",
  "tokio-stream",
@@ -3825,6 +3827,14 @@ dependencies = [
  "tracing-subscriber 0.2.25",
  "url",
  "uuid 1.3.0",
+]
+
+[[package]]
+name = "theseus_macros"
+version = "0.1.0"
+dependencies = [
+ "quote",
+ "syn 1.0.109",
 ]
 
 [[package]]
