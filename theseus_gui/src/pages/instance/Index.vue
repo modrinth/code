@@ -41,6 +41,7 @@
           <Button v-else-if="loading === true && playing === false" disabled class="instance-button"
             >Loading...</Button
           >
+          <!--TODO: https://github.com/tauri-apps/tauri/issues/4062 -->
           <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
             <OpenFolderIcon />
           </Button>

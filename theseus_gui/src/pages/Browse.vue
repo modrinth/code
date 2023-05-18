@@ -373,6 +373,22 @@ const handleInstanceSwitch = async (value) => {
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
+.filter-checkbox {
+  margin-bottom: 0.3rem;
+  font-size: 1rem;
+
+  svg {
+    display: flex;
+    align-self: center;
+    justify-self: center;
+  }
+
+  button.checkbox {
+    border: none;
+  }
+}
+</style>
+<style lang="scss" scoped>
 .project-type-dropdown {
   width: 100% !important;
 }
@@ -394,7 +410,8 @@ const handleInstanceSwitch = async (value) => {
 
 .iconified-input {
   input {
-    max-width: 20rem !important;
+    max-width: none !important;
+    flex-basis: auto;
   }
 }
 
@@ -460,21 +477,6 @@ const handleInstanceSwitch = async (value) => {
       margin-top: 1rem;
       margin-bottom: 0.5rem;
       font-size: 1.16rem;
-    }
-
-    .filter-checkbox {
-      margin-bottom: 0.3rem;
-      font-size: 1rem;
-
-      svg {
-        display: flex;
-        align-self: center;
-        justify-self: center;
-      }
-
-      button.checkbox {
-        border: none;
-      }
     }
   }
 

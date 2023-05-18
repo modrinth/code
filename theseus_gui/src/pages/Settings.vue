@@ -349,6 +349,17 @@ const setJavaInstall = (javaInstall) => {
 </template>
 
 <style lang="scss">
+.testing-loader {
+  height: 1rem !important;
+  width: 1rem !important;
+
+  svg {
+    height: inherit !important;
+    width: inherit !important;
+  }
+}
+</style>
+<style lang="scss" scoped>
 .concurrent-downloads {
   width: 80% !important;
 }
@@ -449,16 +460,6 @@ const setJavaInstall = (javaInstall) => {
 .manage {
   display: flex;
   gap: 0.5rem;
-}
-
-.testing-loader {
-  height: 1rem !important;
-  width: 1rem !important;
-
-  svg {
-    height: inherit !important;
-    width: inherit !important;
-  }
 }
 
 .test-success {
