@@ -9,6 +9,7 @@ use uuid::Uuid;
 // Remove a profile
 // invoke('profile_add_path',path)
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_remove(path: &Path) -> Result<()> {
     profile::remove(path).await?;
     Ok(())
@@ -17,6 +18,7 @@ pub async fn profile_remove(path: &Path) -> Result<()> {
 // Get a profile by path
 // invoke('profile_add_path',path)
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_get(
     path: &Path,
     clear_projects: Option<bool>,
@@ -28,6 +30,7 @@ pub async fn profile_get(
 // Get a copy of the profile set
 // invoke('profile_list')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_list(
     clear_projects: Option<bool>,
 ) -> Result<HashMap<PathBuf, Profile>> {
@@ -36,6 +39,7 @@ pub async fn profile_list(
 }
 
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_check_installed(
     path: &Path,
     project_id: String,
@@ -58,6 +62,7 @@ pub async fn profile_check_installed(
 /// Installs/Repairs a profile
 /// invoke('profile_install')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_install(path: &Path) -> Result<()> {
     profile::install(path).await?;
     Ok(())
@@ -66,6 +71,7 @@ pub async fn profile_install(path: &Path) -> Result<()> {
 /// Updates all of the profile's projects
 /// invoke('profile_update_all')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_update_all(
     path: &Path,
 ) -> Result<HashMap<PathBuf, PathBuf>> {
@@ -75,6 +81,7 @@ pub async fn profile_update_all(
 /// Updates a specified project
 /// invoke('profile_update_project')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_update_project(
     path: &Path,
     project_path: &Path,
@@ -85,6 +92,7 @@ pub async fn profile_update_project(
 // Adds a project to a profile from a version ID
 // invoke('profile_add_project_from_version')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_add_project_from_version(
     path: &Path,
     version_id: String,
@@ -95,6 +103,7 @@ pub async fn profile_add_project_from_version(
 // Adds a project to a profile from a path
 // invoke('profile_add_project_from_path')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_add_project_from_path(
     path: &Path,
     project_path: &Path,
@@ -108,6 +117,7 @@ pub async fn profile_add_project_from_path(
 // Toggles disabling a project from its path
 // invoke('profile_toggle_disable_project')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_toggle_disable_project(
     path: &Path,
     project_path: &Path,
@@ -118,6 +128,7 @@ pub async fn profile_toggle_disable_project(
 // Removes a project from a profile
 // invoke('profile_remove_project')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_remove_project(
     path: &Path,
     project_path: &Path,
@@ -130,6 +141,7 @@ pub async fn profile_remove_project(
 // for the actual Child in the state.
 // invoke('profile_run', path)
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_run(path: &Path) -> Result<Uuid> {
     let minecraft_child = profile::run(path).await?;
     let uuid = minecraft_child.read().await.uuid;
@@ -139,6 +151,7 @@ pub async fn profile_run(path: &Path) -> Result<Uuid> {
 // Run Minecraft using a profile using the default credentials, and wait for the result
 // invoke('profile_run_wait', path)
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_run_wait(path: &Path) -> Result<()> {
     let proc_lock = profile::run(path).await?;
     let mut proc = proc_lock.write().await;
@@ -150,6 +163,7 @@ pub async fn profile_run_wait(path: &Path) -> Result<()> {
 // for the actual Child in the state.
 // invoke('profile_run_credentials', {path, credentials})')
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_run_credentials(
     path: &Path,
     credentials: Credentials,
@@ -162,6 +176,7 @@ pub async fn profile_run_credentials(
 // Run Minecraft using a profile using the chosen credentials, and wait for the result
 // invoke('profile_run_wait', {path, credentials)
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_run_wait_credentials(
     path: &Path,
     credentials: Credentials,
@@ -191,6 +206,7 @@ pub struct EditProfileMetadata {
 // Edits a profile
 // invoke('profile_edit', {path, editProfile})
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn profile_edit(
     path: &Path,
     edit_profile: EditProfile,

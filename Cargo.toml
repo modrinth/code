@@ -4,7 +4,8 @@ members = [
     "theseus",
     "theseus_cli",
     "theseus_playground",
-    "theseus_gui/src-tauri"
+    "theseus_gui/src-tauri",
+    "theseus_macros"
 ]
 
 # Optimize for speed and reduce size on release builds

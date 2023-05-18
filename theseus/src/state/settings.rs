@@ -68,6 +68,8 @@ impl Settings {
         }
     }
 
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     pub async fn update_java() {
         let res = async {
             let state = State::get().await?;

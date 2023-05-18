@@ -14,6 +14,7 @@ pub struct Logs {
 
 /// Get all Logs for a profile, sorted by datetime
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn logs_get_logs(
     profile_uuid: Uuid,
     clear_contents: Option<bool>,
@@ -29,6 +30,7 @@ pub async fn logs_get_logs(
 
 /// Get a Log struct for a profile by profile id and datetime string
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn logs_get_logs_by_datetime(
     profile_uuid: Uuid,
     datetime_string: String,
@@ -38,6 +40,7 @@ pub async fn logs_get_logs_by_datetime(
 
 /// Get the stdout for a profile by profile id and datetime string
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn logs_get_stdout_by_datetime(
     profile_uuid: Uuid,
     datetime_string: String,
@@ -47,6 +50,7 @@ pub async fn logs_get_stdout_by_datetime(
 
 /// Get the stderr for a profile by profile id and datetime string
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn logs_get_stderr_by_datetime(
     profile_uuid: Uuid,
     datetime_string: String,
@@ -56,12 +60,14 @@ pub async fn logs_get_stderr_by_datetime(
 
 /// Delete all logs for a profile by profile id
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn logs_delete_logs(profile_uuid: Uuid) -> Result<()> {
     Ok(logs::delete_logs(profile_uuid).await?)
 }
 
 /// Delete a log for a profile by profile id and datetime string
 #[tauri::command]
+#[theseus_macros::debug_pin]
 pub async fn logs_delete_logs_by_datetime(
     profile_uuid: Uuid,
     datetime_string: String,

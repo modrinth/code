@@ -32,6 +32,7 @@ pub async fn authenticate_await_complete_flow() -> crate::Result<Credentials> {
 /// open a browser to the given URL and finally wait on the spawned future
 /// with the ability to cancel in case the browser is closed before finishing
 #[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn authenticate(
     browser_url: oneshot::Sender<url::Url>,
 ) -> crate::Result<Credentials> {
@@ -60,6 +61,7 @@ pub async fn authenticate(
 /// Refresh some credentials using Hydra, if needed
 /// This is the primary desired way to get credentials, as it will also refresh them.
 #[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     let state = State::get().await?;
     let mut users = state.users.write().await;

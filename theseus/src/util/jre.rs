@@ -185,6 +185,7 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
 
 // Gets all JREs from the PATH env variable
 #[tracing::instrument]
+#[theseus_macros::debug_pin]
 async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
 {
     Box::pin(async move {
@@ -247,6 +248,7 @@ pub async fn check_java_at_filepaths(
 // For example filepath 'path', attempt to resolve it and get a Java version at this path
 // If no such path exists, or no such valid java at this path exists, returns None
 #[tracing::instrument]
+#[theseus_macros::debug_pin]
 pub async fn check_java_at_filepath(path: &Path) -> Option<JavaVersion> {
     // Attempt to canonicalize the potential java filepath
     // If it fails, this path does not exist and None is returned (no Java here)

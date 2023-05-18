@@ -38,6 +38,9 @@ impl Children {
     // Runs the command in process, inserts a child process to keep track of, and returns a reference to the container struct MinecraftChild
     // The threads for stdout and stderr are spawned here
     // Unlike a Hashmap's 'insert', this directly returns the reference to the MinecraftChild rather than any previously stored MinecraftChild that may exist
+
+    #[tracing::instrument(skip(self))]
+    #[theseus_macros::debug_pin]
     pub async fn insert_process(
         &mut self,
         uuid: Uuid,
@@ -110,6 +113,8 @@ impl Children {
     // Spawns a new child process and inserts it into the hashmap
     // Also, as the process ends, it spawns the follow-up process if it exists
     // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
+    #[tracing::instrument]
+    #[theseus_macros::debug_pin]
     async fn sequential_process_manager(
         uuid: Uuid,
         post_command: Option<Command>,
