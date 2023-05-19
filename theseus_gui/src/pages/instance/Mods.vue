@@ -16,7 +16,7 @@
             class="dropdown"
           />
         </span>
-        <Button color="primary" @click="searchMod()">
+        <Button color="primary" @click="router.push({ path: '/browse/mod' })">
           <PlusIcon />
           <span class="no-wrap"> Add Content </span>
         </Button>
@@ -25,7 +25,7 @@
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
-          <Button color="success" icon-only>
+          <Button icon-only :disabled="!projects.some((x) => x.outdated)" @click="updateAll">
             <UpdatedIcon />
           </Button>
         </div>
@@ -36,11 +36,10 @@
       </div>
       <div v-for="mod in search" :key="mod.file_name" class="table-row">
         <div class="table-cell table-text">
-          <Button v-if="mod.outdated" icon-only>
-            <UpdatedIcon />
-          </Button>
-          <Button v-else disabled icon-only>
-            <CheckIcon />
+          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
+          <Button v-else :disabled="!mod.outdated" icon-only @click="updateProject(mod)">
+            <UpdatedIcon v-if="mod.outdated" />
+            <CheckIcon v-else />
           </Button>
         </div>
         <div class="table-cell table-text name-cell">
@@ -56,14 +55,15 @@
         <div class="table-cell table-text">{{ mod.version }}</div>
         <div class="table-cell table-text">{{ mod.author }}</div>
         <div class="table-cell table-text manage">
-          <Button icon-only>
+          <Button icon-only @click="removeMod(mod)">
             <TrashIcon />
           </Button>
           <input
             id="switch-1"
             type="checkbox"
             class="switch stylized-toggle"
-            :checked="mod.disabled"
+            :checked="!mod.disabled"
+            @change="toggleDisableMod(mod)"
           />
         </div>
       </div>
@@ -81,10 +81,17 @@ import {
   SearchIcon,
   UpdatedIcon,
   DropdownSelect,
+  AnimatedLogo,
 } from 'omorphia'
-import { computed, ref, shallowRef } from 'vue'
+import { computed, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
+import {
+  remove_project,
+  toggle_disable_project,
+  update_all,
+  update_project,
+} from '@/helpers/profile.js'
 
 const router = useRouter()
 
@@ -97,11 +104,12 @@ const props = defineProps({
   },
 })
 
-const projects = shallowRef([])
-for (const project of Object.values(props.instance.projects)) {
+const projects = ref([])
+for (const [path, project] of Object.entries(props.instance.projects)) {
   if (project.metadata.type === 'modrinth') {
     let owner = project.metadata.members.find((x) => x.role === 'Owner')
     projects.value.push({
+      path,
       name: project.metadata.project.title,
       slug: project.metadata.project.slug,
       author: owner ? owner.user.username : null,
@@ -109,10 +117,12 @@ for (const project of Object.values(props.instance.projects)) {
       file_name: project.file_name,
       icon: project.metadata.project.icon_url,
       disabled: project.disabled,
-      outdated: project.metadata.update_version,
+      updateVersion: project.metadata.update_version,
+      outdated: !!project.metadata.update_version,
     })
   } else if (project.metadata.type === 'inferred') {
     projects.value.push({
+      path,
       name: project.metadata.title ?? project.file_name,
       author: project.metadata.authors[0],
       version: project.metadata.version,
@@ -123,6 +133,7 @@ for (const project of Object.values(props.instance.projects)) {
     })
   } else {
     projects.value.push({
+      path,
       name: project.file_name,
       author: '',
       version: null,
@@ -145,7 +156,7 @@ const search = computed(() => {
   return updateSort(filtered, sortFilter.value)
 })
 
-const updateSort = (projects, sort) => {
+function updateSort(projects, sort) {
   switch (sort) {
     case 'Version':
       return projects.slice().sort((a, b) => {
@@ -180,8 +191,49 @@ const updateSort = (projects, sort) => {
   }
 }
 
-const searchMod = () => {
-  router.push({ path: '/browse/mod' })
+async function updateAll() {
+  const setProjects = []
+  for (const [i, project] of projects.value.entries()) {
+    if (project.outdated) {
+      project.updating = true
+      setProjects.push(i)
+    }
+  }
+
+  const paths = await update_all(props.instance.path)
+
+  for (const [oldVal, newVal] of Object.entries(paths)) {
+    const index = projects.value.findIndex((x) => x.path === oldVal)
+    projects.value[index].path = newVal
+    projects.value[index].outdated = false
+
+    if (projects.value[index].updateVersion) {
+      projects.value[index].version = projects.value[index].updateVersion.version_number
+      projects.value[index].updateVersion = null
+    }
+  }
+  for (const project of setProjects) {
+    projects.value[project].updating = false
+  }
+}
+
+async function updateProject(mod) {
+  mod.updating = true
+  mod.path = await update_project(props.instance.path, mod.path)
+  mod.updating = false
+
+  mod.outdated = false
+  mod.version = mod.updateVersion.version_number
+  mod.updateVersion = null
+}
+
+async function toggleDisableMod(mod) {
+  mod.path = await toggle_disable_project(props.instance.path, mod.path)
+}
+
+async function removeMod(mod) {
+  await remove_project(props.instance.path, mod.path)
+  projects.value = projects.value.filter((x) => mod.path !== x.path)
 }
 </script>
 
@@ -238,6 +290,13 @@ const searchMod = () => {
 
   &.sort {
     padding-left: 0.5rem;
+  }
+}
+</style>
+<style lang="scss">
+.updating-indicator {
+  svg {
+    margin-left: 0.5rem !important;
   }
 }
 </style>

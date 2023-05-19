@@ -1,6 +1,7 @@
 use crate::api::Result;
 use daedalus::modded::LoaderVersion;
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 use std::path::{Path, PathBuf};
 use theseus::prelude::*;
 use uuid::Uuid;
@@ -32,7 +33,7 @@ pub async fn profile_get(
 #[theseus_macros::debug_pin]
 pub async fn profile_list(
     clear_projects: Option<bool>,
-) -> Result<std::collections::HashMap<PathBuf, Profile>> {
+) -> Result<HashMap<PathBuf, Profile>> {
     let res = profile::list(clear_projects).await?;
     Ok(res)
 }
@@ -71,9 +72,10 @@ pub async fn profile_install(path: &Path) -> Result<()> {
 /// invoke('profile_update_all')
 #[tauri::command]
 #[theseus_macros::debug_pin]
-pub async fn profile_update_all(path: &Path) -> Result<()> {
-    profile::update_all(path).await?;
-    Ok(())
+pub async fn profile_update_all(
+    path: &Path,
+) -> Result<HashMap<PathBuf, PathBuf>> {
+    Ok(profile::update_all(path).await?)
 }
 
 /// Updates a specified project
@@ -83,9 +85,8 @@ pub async fn profile_update_all(path: &Path) -> Result<()> {
 pub async fn profile_update_project(
     path: &Path,
     project_path: &Path,
-) -> Result<()> {
-    profile::update_project(path, project_path).await?;
-    Ok(())
+) -> Result<PathBuf> {
+    Ok(profile::update_project(path, project_path).await?)
 }
 
 // Adds a project to a profile from a version ID
@@ -96,8 +97,7 @@ pub async fn profile_add_project_from_version(
     path: &Path,
     version_id: String,
 ) -> Result<PathBuf> {
-    let res = profile::add_project_from_version(path, version_id).await?;
-    Ok(res)
+    Ok(profile::add_project_from_version(path, version_id).await?)
 }
 
 // Adds a project to a profile from a path
@@ -121,9 +121,8 @@ pub async fn profile_add_project_from_path(
 pub async fn profile_toggle_disable_project(
     path: &Path,
     project_path: &Path,
-) -> Result<()> {
-    profile::toggle_disable_project(path, project_path).await?;
-    Ok(())
+) -> Result<PathBuf> {
+    Ok(profile::toggle_disable_project(path, project_path).await?)
 }
 
 // Removes a project from a profile

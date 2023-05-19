@@ -193,7 +193,7 @@ impl Profile {
                     let paths = profile.get_profile_project_paths()?;
 
                     let projects = crate::state::infer_data_from_files(
-                        profile,
+                        profile.clone(),
                         paths,
                         state.directories.caches_dir(),
                         &state.io_semaphore,
@@ -205,6 +205,14 @@ impl Profile {
                     if let Some(profile) = new_profiles.0.get_mut(&path) {
                         profile.projects = projects;
                     }
+
+                    emit_profile(
+                        profile.uuid,
+                        profile.path,
+                        &profile.metadata.name,
+                        ProfilePayloadType::Synced,
+                    )
+                        .await?;
                 } else {
                     tracing::warn!(
                         "Unable to fetch single profile projects: path {path:?} invalid",
@@ -409,7 +417,7 @@ impl Profile {
     pub async fn toggle_disable_project(
         &self,
         path: &Path,
-    ) -> crate::Result<()> {
+    ) -> crate::Result<PathBuf> {
         let state = State::get().await?;
         if let Some(mut project) = {
             let mut profiles = state.profiles.write().await;
@@ -425,6 +433,12 @@ impl Profile {
 
             if path.extension().map_or(false, |ext| ext == "disabled") {
                 project.disabled = false;
+                new_path.set_file_name(
+                    path.file_name()
+                        .unwrap_or_default()
+                        .to_string_lossy()
+                        .replace(".disabled", ""),
+                );
             } else {
                 new_path.set_file_name(format!(
                     "{}.disabled",
@@ -437,17 +451,17 @@ impl Profile {
 
             let mut profiles = state.profiles.write().await;
             if let Some(profile) = profiles.0.get_mut(&self.path) {
-                profile.projects.insert(new_path, project);
+                profile.projects.insert(new_path.clone(), project);
             }
+
+            Ok(new_path)
         } else {
-            return Err(crate::ErrorKind::InputError(format!(
+            Err(crate::ErrorKind::InputError(format!(
                 "Project path does not exist: {:?}",
                 path
             ))
-            .into());
+            .into())
         }
-
-        Ok(())
     }
 
     pub async fn remove_project(

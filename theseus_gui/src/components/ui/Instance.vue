@@ -193,7 +193,7 @@ onUnmounted(() => unlisten())
         <PlayIcon />
       </div>
       <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
-        <AnimatedLogo class="loading" />
+        <AnimatedLogo class="loading-indicator" />
       </div>
       <div
         v-else-if="playing === true"
@@ -210,6 +210,18 @@ onUnmounted(() => unlisten())
 </template>
 
 <style lang="scss">
+.loading-indicator {
+  width: 2.5rem !important;
+  height: 2.5rem !important;
+
+  svg {
+    width: 2.5rem !important;
+    height: 2.5rem !important;
+  }
+}
+</style>
+
+<style lang="scss" scoped>
 .instance-small-card {
   background-color: var(--color-bg) !important;
   display: flex;
@@ -329,16 +341,6 @@ onUnmounted(() => unlisten())
     display: flex;
     justify-content: center;
     align-items: center;
-
-    .loading {
-      width: 2.5rem !important;
-      height: 2.5rem !important;
-
-      svg {
-        width: 2.5rem !important;
-        height: 2.5rem !important;
-      }
-    }
   }
 }
 

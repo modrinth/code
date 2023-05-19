@@ -125,7 +125,9 @@ pub async fn install(path: &Path) -> crate::Result<()> {
 
 #[tracing::instrument]
 #[theseus_macros::debug_pin]
-pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
+pub async fn update_all(
+    profile_path: &Path,
+) -> crate::Result<HashMap<PathBuf, PathBuf>> {
     if let Some(profile) = get(profile_path, None).await? {
         let loading_bar = init_loading(
             LoadingBarType::ProfileUpdate {
@@ -137,24 +139,49 @@ pub async fn update_all(profile_path: &Path) -> crate::Result<()> {
         )
         .await?;
 
+        let keys = profile
+            .projects
+            .into_iter()
+            .filter(|(_, project)| {
+                matches!(
+                    &project.metadata,
+                    ProjectMetadata::Modrinth {
+                        update_version: Some(_),
+                        ..
+                    }
+                )
+            })
+            .map(|x| x.0)
+            .collect::<Vec<_>>();
+        let len = keys.len();
+
+        let map = Arc::new(RwLock::new(HashMap::new()));
+
         use futures::StreamExt;
         loading_try_for_each_concurrent(
-            futures::stream::iter(profile.projects.keys())
-                .map(Ok::<&PathBuf, crate::Error>),
+            futures::stream::iter(keys).map(Ok::<PathBuf, crate::Error>),
             None,
             Some(&loading_bar),
             100.0,
-            profile.projects.keys().len(),
+            len,
             None,
-            |project| async move {
-                let _ = update_project(profile_path, project).await?;
+            |project| async {
+                let map = map.clone();
 
-                Ok(())
+                async move {
+                    let new_path =
+                        update_project(profile_path, &project).await?;
+
+                    map.write().await.insert(project, new_path);
+
+                    Ok(())
+                }
+                .await
             },
         )
         .await?;
 
-        Ok(())
+        Ok(Arc::try_unwrap(map).unwrap().into_inner())
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
             profile_path.display().to_string(),
@@ -271,11 +298,9 @@ pub async fn add_project_from_path(
 pub async fn toggle_disable_project(
     profile: &Path,
     project: &Path,
-) -> crate::Result<()> {
+) -> crate::Result<PathBuf> {
     if let Some(profile) = get(profile, None).await? {
-        profile.toggle_disable_project(project).await?;
-
-        Ok(())
+        Ok(profile.toggle_disable_project(project).await?)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
