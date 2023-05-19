@@ -18,8 +18,11 @@
           </span>
         </div>
         <span class="button-group">
+          <Button v-if="instance.install_stage !== 'installed'" disabled class="instance-button">
+            Installing...
+          </Button>
           <Button
-            v-if="playing === true"
+            v-else-if="playing === true"
             color="danger"
             class="instance-button"
             @click="stopInstance"
@@ -38,9 +41,13 @@
             <PlayIcon />
             Play
           </Button>
-          <Button v-else-if="loading === true && playing === false" disabled class="instance-button"
-            >Loading...</Button
+          <Button
+            v-else-if="loading === true && playing === false"
+            disabled
+            class="instance-button"
           >
+            Loading...
+          </Button>
           <!--TODO: https://github.com/tauri-apps/tauri/issues/4062 -->
           <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
             <OpenFolderIcon />

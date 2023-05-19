@@ -1,55 +1,82 @@
 <template>
+  <section class="card">
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Profile</span>
+      </h3>
+    </div>
+    <label for="instance-icon">
+      <span class="label__title">Icon</span>
+    </label>
+    <div class="input-group">
+      <Avatar
+        :src="
+          !instance.metadata.icon ||
+          (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
+            ? instance.metadata.icon
+            : convertFileSrc(instance.metadata?.icon)
+        "
+        size="md"
+        class="project__icon"
+      />
+      <div class="input-stack">
+        <Button id="instance-icon" class="btn">
+          <UploadIcon />
+          Upload icon
+        </Button>
+        <button class="btn">
+          <TrashIcon />
+          Remove icon
+        </button>
+      </div>
+    </div>
+
+    <label for="project-name">
+      <span class="label__title">Name</span>
+    </label>
+    <input id="profile-name" v-model="title" maxlength="80" type="text" />
+
+    <div class="adjacent-input">
+      <label for="edit-versions">
+        <span class="label__title">Edit mod loader/game versions</span>
+        <span class="label__description">
+          Allows you to change the mod loader, loader version, or game version of the profile.
+        </span>
+      </label>
+      <button id="edit-versions" class="btn">
+        <EditIcon />
+        Edit versions
+      </button>
+    </div>
+  </section>
   <Card class="settings-card">
     <h2 class="settings-title">Java</h2>
     <div class="settings-group">
       <h3>Installation</h3>
       <Checkbox v-model="overrideJavaInstall" label="Override global java installations" />
-      <input
-        ref="javaPath"
-        v-model="javaPath"
-        :disabled="!overrideJavaInstall"
-        type="text"
-        class="input installation-input"
-        :placeholder="optimalJava ? optimalJava.path : 'Enter java path...'"
-      />
-      <span class="installation-buttons">
-        <Button :disabled="!overrideJavaInstall" @click="saveJavaPath">
-          <SearchIcon />
-          Auto Detect
-        </Button>
-        <Button :disabled="!overrideJavaInstall" @click="saveJavaPath">
-          <BrowseIcon />
-          Browse
-        </Button>
-        <Button :disabled="!overrideJavaInstall" @click="saveJavaPath">
-          <PlayIcon />
-          Test
-        </Button>
-      </span>
+      <JavaSelector v-model="javaInstall" :disabled="!overrideJavaInstall" />
     </div>
     <hr class="card-divider" />
     <div class="settings-group">
-      <h3>Java Arguments</h3>
+      <h3>Java arguments</h3>
       <Checkbox v-model="overrideJavaArgs" label="Override global java arguments" />
       <input
-        ref="javaArgs"
         v-model="javaArgs"
         :disabled="!overrideJavaArgs"
         type="text"
         class="input installation-input"
-        :placeholder="globalSettings.custom_java_args ?? 'Enter java arguments...'"
+        placeholder="Enter java arguments..."
       />
     </div>
     <div class="settings-group">
-      <h3>Environment Variables</h3>
-      <Checkbox v-model="overrideEnvVars" label="Override environment variables" />
+      <h3>Environment variables</h3>
+      <Checkbox v-model="overrideEnvVars" label="Override global environment variables" />
       <input
-        ref="javaArgs"
-        v-model="javaArgs"
+        v-model="envVars"
         :disabled="!overrideEnvVars"
         type="text"
         class="input installation-input"
-        :placeholder="globalSettings.custom_env_args ?? 'Enter environment arguments...'"
+        placeholder="Enter environment variables..."
       />
     </div>
     <hr class="card-divider" />
@@ -57,9 +84,9 @@
       <Checkbox v-model="overrideMemorySettings" label="Override global memory settings" />
       <div class="sliders">
         <span class="slider">
-          Minimum Memory
+          Minimum memory
           <Slider
-            v-model="globalSettings.memory.minimum"
+            v-model="memory.minimum"
             :disabled="!overrideMemorySettings"
             :min="256"
             :max="maxMemory"
@@ -67,9 +94,9 @@
           />
         </span>
         <span class="slider">
-          Maximum Memory
+          Maximum memory
           <Slider
-            v-model="globalSettings.memory.maximum"
+            v-model="memory.maximum"
             :disabled="!overrideMemorySettings"
             :min="256"
             :max="maxMemory"
@@ -86,19 +113,19 @@
       <div class="toggle-setting">
         Width
         <input
+          v-model="resolution[0]"
           :disabled="!overrideWindowSettings"
           type="number"
           class="input"
-          :placeholder="globalSettings.game_resolution[0]"
         />
       </div>
       <div class="toggle-setting">
         Height
         <input
+          v-model="resolution[1]"
           :disabled="!overrideWindowSettings"
           type="number"
           class="input"
-          :placeholder="globalSettings.game_resolution[1]"
         />
       </div>
     </div>
@@ -108,39 +135,21 @@
     <Checkbox v-model="overrideHooks" label="Override global hooks" />
     <div class="settings-group">
       <div class="toggle-setting">
-        Pre Launch
-        <input
-          v-model="javaArgs"
-          :disabled="!overrideHooks"
-          type="text"
-          class="input"
-          :placeholder="globalSettings.hooks.pre_launch"
-        />
+        Pre launch
+        <input v-model="hooks.pre_launch" :disabled="!overrideHooks" type="text" class="input" />
       </div>
       <div class="toggle-setting">
         Wrapper
-        <input
-          v-model="javaArgs"
-          :disabled="!overrideHooks"
-          type="text"
-          class="input"
-          :placeholder="globalSettings.hooks.wrapper"
-        />
+        <input v-model="hooks.wrapper" :disabled="!overrideHooks" type="text" class="input" />
       </div>
       <div class="toggle-setting">
-        Post Exit
-        <input
-          v-model="javaArgs"
-          :disabled="!overrideHooks"
-          type="text"
-          class="input"
-          :placeholder="globalSettings.hooks.post_exit"
-        />
+        Post exit
+        <input v-model="hooks.post_exit" :disabled="!overrideHooks" type="text" class="input" />
       </div>
     </div>
   </Card>
   <Card class="settings-card">
-    <h2 class="settings-title">Profile Management</h2>
+    <h2 class="settings-title">Profile management</h2>
     <div class="settings-group">
       <div class="toggle-setting">
         Repair profile
@@ -159,14 +168,15 @@
 </template>
 
 <script setup>
-import { Card, Button, SearchIcon, Slider, TrashIcon, Checkbox } from 'omorphia'
-import { BrowseIcon, PlayIcon } from '@/assets/icons'
+import { Card, Slider, TrashIcon, Checkbox, UploadIcon, Avatar, EditIcon } from 'omorphia'
 import { HammerIcon } from '@/assets/icons'
 import { useRouter } from 'vue-router'
 import { get_optimal_jre_key, install, remove } from '@/helpers/profile.js'
-import { ref } from 'vue'
+import { readonly, ref } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
+import JavaSelector from '@/components/ui/JavaSelector.vue'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const router = useRouter()
 
@@ -177,18 +187,56 @@ const props = defineProps({
   },
 })
 
-const globalSettings = await get()
-const optimalJava = await get_optimal_jre_key(props.instance.path)
-const maxMemory = ref((await get_max_memory()) / 1024)
+const title = ref(props.instance.metadata.name)
+// const icon = ref(props.instance.metadata.icon)
 
-const overrideJavaInstall = ref(false)
-const overrideJavaArgs = ref(false)
-const overrideEnvVars = ref(false)
-const overrideMemorySettings = ref(false)
-const overrideWindowSettings = ref(false)
-const overrideHooks = ref(false)
+const globalSettings = await get()
+
+const overrideJavaInstall = ref(!!props.instance.java?.override_version)
+const optimalJava = readonly(await get_optimal_jre_key(props.instance.path))
+const javaInstall = ref(
+  optimalJava ?? props.instance.profile.java?.override_version ?? { path: '', version: '' }
+)
+
+const overrideJavaArgs = ref(!!props.instance.java?.extra_arguments)
+const javaArgs = ref(props.instance.java?.extra_arguments ?? globalSettings.custom_java_args)
+
+const overrideEnvVars = ref(!!props.instance.java?.custom_env_args)
+const envVars = ref(props.instance.java?.custom_env_args ?? globalSettings.custom_env_args)
+
+const overrideMemorySettings = ref(!!props.instance.memory)
+const memory = ref(props.instance.memory ?? globalSettings.memory)
+const maxMemory = readonly((await get_max_memory()) / 1024)
+
+const overrideWindowSettings = ref(!!props.instance.resolution)
+const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
+
+const overrideHooks = ref(!!props.instance.hooks)
+const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 
 const repairing = ref(false)
+
+// async function updateProfile() {
+//   const editProfile = {
+//     title: title.value
+//   }
+//
+//   if (overrideJavaInstall.value) {
+//     if (javaInstall.value.path !== '') {
+//       editProfile.java = {
+//         override_version: javaInstall.value,
+//         ...editProfile.java
+//       }
+//     }
+//   }
+//
+//   if (overrideJavaArgs.value) {
+//     if (javaArgs.value !== )
+//   }
+//
+//   await edit(props.instance.path, editProfile)
+// }
+
 async function repairProfile() {
   repairing.value = true
   await install(props.instance.path)
@@ -209,7 +257,18 @@ async function removeProfile() {
 .settings-card {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 0.5rem;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .settings-title {
@@ -224,15 +283,6 @@ async function removeProfile() {
 
 .installation-input {
   width: 100%;
-}
-
-.installation-buttons {
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0;
 }
 
 .sliders {
