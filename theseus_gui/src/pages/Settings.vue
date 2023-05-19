@@ -196,6 +196,32 @@ const setJavaInstall = (javaInstall) => {
       </div>
     </Card>
     <Card class="settings-card">
+      <h2 class="settings-title">Launcher Settings</h2>
+      <div class="settings-group">
+        <h3>Resource Management</h3>
+        <div class="toggle-setting">
+          <span>Maximum Concurrent Downloads</span>
+          <Slider
+            v-model="settings.max_concurrent_downloads"
+            class="concurrent-downloads"
+            :min="1"
+            :max="100"
+            :step="1"
+          />
+        </div>
+        <div class="toggle-setting">
+          <span>Maximum Concurrent Writes</span>
+          <Slider
+            v-model="settings.max_concurrent_writes"
+            class="concurrent-downloads"
+            :min="1"
+            :max="100"
+            :step="1"
+          />
+        </div>
+      </div>
+    </Card>
+    <Card class="settings-card">
       <h2 class="settings-title">Java</h2>
       <div class="settings-group">
         <h3>Java 17 Location</h3>
@@ -273,12 +299,12 @@ const setJavaInstall = (javaInstall) => {
         />
       </div>
       <div class="settings-group">
-        <h3>Environment Arguments</h3>
+        <h3>Environment Variables</h3>
         <input
           v-model="settings.custom_env_args"
           type="text"
           class="input installation-input"
-          placeholder="Enter environment arguments..."
+          placeholder="Enter environment variables..."
         />
       </div>
       <hr class="card-divider" />
@@ -296,40 +322,7 @@ const setJavaInstall = (javaInstall) => {
       </div>
     </Card>
     <Card class="settings-card">
-      <h2 class="settings-title">Window Size</h2>
-      <div class="settings-group">
-        <div class="settings-group">
-          <div class="sliders">
-            <span class="slider">
-              Width
-              <Slider v-model="settings.game_resolution[0]" :min="400" :max="2562" :step="2" />
-            </span>
-            <span class="slider">
-              Height
-              <Slider v-model="settings.game_resolution[1]" :min="400" :max="2562" :step="2" />
-            </span>
-          </div>
-        </div>
-      </div>
-    </Card>
-    <Card class="settings-card">
-      <h2 class="settings-title">Launcher Settings</h2>
-      <div class="settings-group">
-        <h3>Resource Management</h3>
-        <div class="toggle-setting">
-          <span>Maximum Concurrent Downloads</span>
-          <Slider
-            v-model="settings.max_concurrent_downloads"
-            class="concurrent-downloads"
-            :min="1"
-            :max="100"
-            :step="1"
-          />
-        </div>
-      </div>
-    </Card>
-    <Card class="settings-card">
-      <h2 class="settings-title">Commands</h2>
+      <h2 class="settings-title">Hooks</h2>
       <div class="settings-group">
         <div class="toggle-setting">
           Pre Launch
@@ -340,8 +333,21 @@ const setJavaInstall = (javaInstall) => {
           <input v-model="settings.hooks.wrapper" type="text" class="input" />
         </div>
         <div class="toggle-setting">
-          Post Launch
+          Post Exit
           <input v-model="settings.hooks.post_exit" type="text" class="input" />
+        </div>
+      </div>
+    </Card>
+    <Card class="settings-card">
+      <h2 class="settings-title">Window Size</h2>
+      <div class="settings-group">
+        <div class="toggle-setting">
+          Width
+          <input v-model="settings.game_resolution[0]" type="number" class="input" />
+        </div>
+        <div class="toggle-setting">
+          Height
+          <input v-model="settings.game_resolution[1]" type="number" class="input" />
         </div>
       </div>
     </Card>

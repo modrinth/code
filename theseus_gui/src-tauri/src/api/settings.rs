@@ -23,7 +23,6 @@ pub struct FrontendSettings {
 // Get full settings
 // invoke('settings_get')
 #[tauri::command]
-#[theseus_macros::debug_pin]
 pub async fn settings_get() -> Result<FrontendSettings> {
     let backend_settings = settings::get().await?;
     let frontend_settings = FrontendSettings {
@@ -51,7 +50,6 @@ pub async fn settings_get() -> Result<FrontendSettings> {
 // Set full settings
 // invoke('settings_set', settings)
 #[tauri::command]
-#[theseus_macros::debug_pin]
 pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
     let custom_env_args: Vec<(String, String)> = settings
         .custom_env_args

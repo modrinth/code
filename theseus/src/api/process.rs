@@ -139,14 +139,14 @@ pub async fn wait_for_by_uuid(uuid: &Uuid) -> crate::Result<()> {
 }
 
 // Kill a running child process directly, and wait for it to be killed
-#[tracing::instrument]
+#[tracing::instrument(skip(running))]
 pub async fn kill(running: &mut MinecraftChild) -> crate::Result<()> {
     running.current_child.write().await.kill().await?;
     wait_for(running).await
 }
 
 // Await on the completion of a child process directly
-#[tracing::instrument]
+#[tracing::instrument(skip(running))]
 pub async fn wait_for(running: &mut MinecraftChild) -> crate::Result<()> {
     // We do not wait on the Child directly, but wait on the thread manager.
     // This way we can still run all cleanup hook functions that happen after.

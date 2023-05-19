@@ -200,7 +200,7 @@ pub enum ProjectMetadata {
     Unknown,
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip(io_semaphore))]
 #[theseus_macros::debug_pin]
 async fn read_icon_from_file(
     icon_path: Option<String>,
@@ -251,7 +251,7 @@ async fn read_icon_from_file(
     Ok(None)
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip(profile, io_semaphore, fetch_semaphore))]
 #[theseus_macros::debug_pin]
 pub async fn infer_data_from_files(
     profile: Profile,

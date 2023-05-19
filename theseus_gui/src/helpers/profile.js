@@ -36,6 +36,12 @@ export async function get(path, clearProjects) {
   return await invoke('profile_get', { path, clearProjects })
 }
 
+// Get optimal java version from profile
+// Returns a java version
+export async function get_optimal_jre_key(path) {
+  return await invoke('profile_get_optimal_jre_key', { path })
+}
+
 // Get a copy of the profile set
 // Returns hashmap of path -> Profile
 export async function list(clearProjects) {

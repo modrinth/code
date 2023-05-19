@@ -23,6 +23,9 @@
           "$CONFIG/caches/icons/*"
         ]
       },
+      "shell": {
+        "open": true
+      },
       "window": {
         "create": true,
         "close": true

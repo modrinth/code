@@ -6,8 +6,6 @@ use std::path::PathBuf;
 use crate::event::emit::{emit_loading, init_loading};
 use crate::util::fetch::{fetch_advanced, fetch_json};
 use crate::{
-    launcher::download,
-    prelude::Profile,
     state::JavaGlobals,
     util::jre::{self, extract_java_majorminor_version, JavaVersion},
     LoadingBarType, State,
@@ -37,48 +35,6 @@ pub async fn autodetect_java_globals() -> crate::Result<JavaGlobals> {
     }
 
     Ok(java_globals)
-}
-
-// Gets the optimal JRE key for the given profile, using Daedalus
-// Generally this would be used for profile_create, to get the optimal JRE key
-// this can be overwritten by the user a profile-by-profile basis
-pub async fn get_optimal_jre_key(profile: &Profile) -> crate::Result<String> {
-    let state = State::get().await?;
-    let metadata = state.metadata.read().await;
-
-    // Fetch version info from stored profile game_version
-    let version = metadata
-        .minecraft
-        .versions
-        .iter()
-        .find(|it| it.id == profile.metadata.game_version)
-        .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(format!(
-                "Invalid or unknown Minecraft version: {}",
-                profile.metadata.game_version
-            ))
-        })?;
-
-    // Get detailed manifest info from Daedalus
-    let version_info = download::download_version_info(
-        &state,
-        version,
-        profile.metadata.loader_version.as_ref(),
-        None,
-        None,
-    )
-    .await?;
-    let optimal_key = match version_info
-        .java_version
-        .as_ref()
-        .map(|it| it.major_version)
-        .unwrap_or(0)
-    {
-        0..=15 => JAVA_8_KEY.to_string(),
-        16..=17 => JAVA_17_KEY.to_string(),
-        _ => JAVA_18PLUS_KEY.to_string(),
-    };
-    Ok(optimal_key)
 }
 
 // Searches for jres on the system that are 1.18 or higher

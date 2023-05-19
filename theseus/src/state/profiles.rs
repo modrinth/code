@@ -130,6 +130,8 @@ pub struct JavaSettings {
     pub override_version: Option<JavaVersion>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra_arguments: Option<Vec<String>>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub custom_env_args: Option<Vec<(String, String)>>,
 }
 
 impl Profile {
@@ -169,7 +171,7 @@ impl Profile {
         })
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self, semaphore, icon))]
     pub async fn set_icon<'a>(
         &'a mut self,
         cache_dir: &Path,
@@ -295,7 +297,7 @@ impl Profile {
         Ok(())
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn add_project_version(
         &self,
@@ -342,7 +344,7 @@ impl Profile {
         Ok((path, version))
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self, bytes))]
     #[theseus_macros::debug_pin]
     pub async fn add_project_bytes(
         &self,
@@ -412,7 +414,7 @@ impl Profile {
         Ok(path)
     }
 
-    #[tracing::instrument]
+    #[tracing::instrument(skip(self))]
     #[theseus_macros::debug_pin]
     pub async fn toggle_disable_project(
         &self,
@@ -577,7 +579,7 @@ impl Profiles {
         };
     }
 
-    #[tracing::instrument(skip(self))]
+    #[tracing::instrument(skip(self, profile))]
     #[theseus_macros::debug_pin]
     pub async fn insert(&mut self, profile: Profile) -> crate::Result<&Self> {
         emit_profile(

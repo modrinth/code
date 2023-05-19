@@ -47,7 +47,6 @@ where
 // Create a new HashMap with the same keys
 // Values provided should not be used directly, as they are not guaranteed to be up-to-date
 #[tauri::command]
-#[theseus_macros::debug_pin]
 pub async fn progress_bars_list(
 ) -> Result<std::collections::HashMap<uuid::Uuid, theseus::LoadingBar>> {
     let res = theseus::EventState::list_progress_bars().await?;

@@ -81,11 +81,11 @@
         </div>
         <hr class="card-divider" />
         <div class="button-group">
-          <Button class="instance-button">
+          <Button class="instance-button" disabled>
             <ReportIcon />
             Report
           </Button>
-          <Button class="instance-button">
+          <Button class="instance-button" disabled>
             <HeartIcon />
             Follow
           </Button>
@@ -96,7 +96,8 @@
             v-if="data.issues_url"
             :href="data.issues_url"
             class="title"
-            rel="noopener nofollow ugc"
+            rel="noopener nofollow ugc external"
+            target="_blank"
           >
             <IssuesIcon aria-hidden="true" />
             <span>Issues</span>
@@ -105,16 +106,29 @@
             v-if="data.source_url"
             :href="data.source_url"
             class="title"
-            rel="noopener nofollow ugc"
+            target="_blank"
+            rel="noopener nofollow ugc external"
           >
             <CodeIcon aria-hidden="true" />
             <span>Source</span>
           </a>
-          <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
+          <a
+            v-if="data.wiki_url"
+            :href="data.wiki_url"
+            class="title"
+            rel="noopener nofollow ugc external"
+            target="_blank"
+          >
             <WikiIcon aria-hidden="true" />
             <span>Wiki</span>
           </a>
-          <a v-if="data.wiki_url" :href="data.wiki_url" class="title" rel="noopener nofollow ugc">
+          <a
+            v-if="data.wiki_url"
+            :href="data.wiki_url"
+            class="title"
+            rel="noopener nofollow ugc external"
+            target="_blank"
+          >
             <DiscordIcon aria-hidden="true" />
             <span>Discord</span>
           </a>
@@ -122,7 +136,8 @@
             v-for="(donation, index) in data.donation_urls"
             :key="index"
             :href="donation.url"
-            rel="noopener nofollow ugc"
+            target="_blank"
+            rel="noopener nofollow ugc external"
           >
             <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
             <PatreonIcon v-else-if="donation.id === 'patreon'" aria-hidden="true" />

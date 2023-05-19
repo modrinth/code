@@ -113,7 +113,7 @@ impl Children {
     // Spawns a new child process and inserts it into the hashmap
     // Also, as the process ends, it spawns the follow-up process if it exists
     // By convention, ExitStatus is last command's exit status, and we exit on the first non-zero exit status
-    #[tracing::instrument]
+    #[tracing::instrument(skip(current_child))]
     #[theseus_macros::debug_pin]
     async fn sequential_process_manager(
         uuid: Uuid,
