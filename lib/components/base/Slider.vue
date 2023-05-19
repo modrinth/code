@@ -10,6 +10,10 @@
           :max="max"
           :step="step"
           class="slider"
+          :class="{
+            disabled: disabled,
+          }"
+          :disabled="disabled"
           :style="{
             '--current-value': currentValue,
             '--min-value': min,
@@ -32,6 +36,7 @@
       :value="currentValue"
       type="text"
       class="slider-input"
+      :disabled="disabled"
       @change="onInput($refs.value.value)"
     />
   </div>
@@ -63,12 +68,17 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
 })
 
 let currentValue = ref(Math.max(props.min, props.modelValue).toString())
 
 const inputValueValid = (newValue) => {
   const parsedValue = parseInt(newValue)
+
   if (parsedValue < props.min) {
     currentValue.value = props.min.toString()
   } else if (parsedValue > props.max) {
@@ -142,13 +152,13 @@ const onInput = (value) => {
   transition: 0.2s;
 }
 
-.slider-component .slide-container .slider:hover::-webkit-slider-thumb {
+.slider-component .slide-container .slider:hover::-webkit-slider-thumb:not(.disabled) {
   width: 1rem;
   height: 1rem;
   transition: 0.2s;
 }
 
-.slider-component .slide-container .slider:hover::-moz-range-thumb {
+.slider-component .slide-container .slider:hover::-moz-range-thumb:not(.disabled) {
   width: 1rem;
   height: 1rem;
   transition: 0.2s;
@@ -165,5 +175,9 @@ const onInput = (value) => {
   justify-content: space-between;
   font-size: 0.75rem;
   margin: 0;
+}
+
+.disabled {
+  filter: brightness(0.8);
 }
 </style>

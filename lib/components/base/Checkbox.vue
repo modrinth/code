@@ -86,6 +86,7 @@ export default defineComponent({
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  outline: none;
 
   min-width: 1rem;
   min-height: 1rem;
