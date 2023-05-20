@@ -330,7 +330,8 @@ watch(
       if (envVars.value !== '') {
         editProfile.java.custom_env_args = envVars.value
           .trim()
-          .split(/\s+/).filter(Boolean)
+          .split(/\s+/)
+          .filter(Boolean)
           .map((x) => x.split('=').filter(Boolean))
       }
     }
@@ -420,7 +421,9 @@ const selectableLoaderVersions = computed(() => {
   return []
 })
 const loaderVersionIndex = ref(
-  selectableLoaderVersions.value.findIndex((x) => x.id === props.instance.metadata.loader_version?.id)
+  selectableLoaderVersions.value.findIndex(
+    (x) => x.id === props.instance.metadata.loader_version?.id
+  )
 )
 
 const isValid = computed(() => {
@@ -430,7 +433,7 @@ const isValid = computed(() => {
   )
 })
 
-watch(loader, () => loaderVersionIndex.value = 0)
+watch(loader, () => (loaderVersionIndex.value = 0))
 
 const editing = ref(false)
 async function saveGvLoaderEdits() {
