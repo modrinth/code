@@ -19,13 +19,13 @@
         <input v-model="profile_name" class="text-input" type="text" />
       </div>
       <div class="input-row">
+        <p class="input-label">Loader</p>
+        <Chips v-model="loader" :items="loaders" />
+      </div>
+      <div class="input-row">
         <p class="input-label">Game Version</p>
         <div class="versions">
-          <DropdownSelect
-            v-model="game_version"
-            :options="game_versions"
-            :render-up="!showAdvanced"
-          />
+          <DropdownSelect v-model="game_version" :options="game_versions" render-up />
           <Checkbox
             v-if="showAdvanced"
             v-model="showSnapshots"
@@ -34,15 +34,11 @@
           />
         </div>
       </div>
-      <div class="input-row">
-        <p class="input-label">Loader</p>
-        <Chips v-model="loader" :items="loaders" />
-      </div>
-      <div v-if="showAdvanced" class="input-row">
+      <div v-if="showAdvanced && loader !== 'vanilla'" class="input-row">
         <p class="input-label">Loader Version</p>
         <Chips v-model="loader_version" :items="['stable', 'latest', 'other']" />
       </div>
-      <div v-if="showAdvanced && loader_version === 'other'">
+      <div v-if="showAdvanced && loader_version === 'other' && loader !== 'vanilla'">
         <div v-if="game_version" class="input-row">
           <p class="input-label">Select Version</p>
           <DropdownSelect
@@ -98,7 +94,7 @@ const router = useRouter()
 
 const profile_name = ref('')
 const game_version = ref('')
-const loader = ref('')
+const loader = ref('vanilla')
 const loader_version = ref('stable')
 const specified_loader_version = ref('')
 const showContent = ref(false)
@@ -143,17 +139,31 @@ const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loade
       )
       .then(ref),
   ])
+loaders.value.push('vanilla')
 
 const game_versions = computed(() => {
   return all_game_versions.value
-    .filter((item) => item.version_type === 'release' || showSnapshots.value)
+    .filter((item) => {
+      let defaultVal = item.version_type === 'release' || showSnapshots.value
+      if (loader.value === 'fabric') {
+        defaultVal &= fabric_versions.value.gameVersions.some((x) => item.version === x.id)
+      } else if (loader.value === 'forge') {
+        defaultVal &= forge_versions.value.gameVersions.some((x) => item.version === x.id)
+      } else if (loader.value === 'quilt') {
+        defaultVal &= quilt_versions.value.gameVersions.some((x) => item.version === x.id)
+      }
+
+      return defaultVal
+    })
     .map((item) => item.version)
 })
 
 const modal = ref(null)
 
 const check_valid = computed(() => {
-  return profile_name.value && game_version.value
+  return (
+    profile_name.value && game_version.value && game_versions.value.includes(game_version.value)
+  )
 })
 
 const create_instance = async () => {
@@ -166,7 +176,7 @@ const create_instance = async () => {
       profile_name.value,
       game_version.value,
       loader.value,
-      loader_version_value ?? 'stable',
+      loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
       icon.value
     )
 
@@ -185,7 +195,7 @@ const upload_icon = async () => {
     filters: [
       {
         name: 'Image',
-        extensions: ['png', 'jpeg'],
+        extensions: ['png', 'jpeg', 'svg', 'webp', 'gif', 'jpg'],
       },
     ],
   })

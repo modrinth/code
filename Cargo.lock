@@ -3818,7 +3818,6 @@ dependencies = [
  "tauri",
  "tauri-build",
  "theseus",
- "theseus_macros",
  "thiserror",
  "tokio",
  "tokio-stream",

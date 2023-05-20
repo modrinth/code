@@ -19,7 +19,7 @@ use daedalus::{
 use futures::prelude::*;
 use tokio::{fs, sync::OnceCell};
 
-#[tracing::instrument(skip_all)]
+#[tracing::instrument(skip(st, version))]
 pub async fn download_minecraft(
     st: &State,
     version: &GameVersionInfo,

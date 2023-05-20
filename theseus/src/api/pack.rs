@@ -227,7 +227,7 @@ pub async fn install_pack_from_file(path: PathBuf) -> crate::Result<PathBuf> {
     .await
 }
 
-#[tracing::instrument]
+#[tracing::instrument(skip(file))]
 #[theseus_macros::debug_pin]
 async fn install_pack(
     file: bytes::Bytes,

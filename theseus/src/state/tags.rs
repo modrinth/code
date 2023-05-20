@@ -20,12 +20,12 @@ pub struct Tags {
 }
 
 impl Tags {
-    #[tracing::instrument]
+    #[tracing::instrument(skip(io_semaphore, fetch_semaphore))]
     #[theseus_macros::debug_pin]
     pub async fn init(
         dirs: &DirectoryInfo,
         io_semaphore: &IoSemaphore,
-        fetch_sempahore: &FetchSemaphore,
+        fetch_semaphore: &FetchSemaphore,
     ) -> crate::Result<Self> {
         let mut tags = None;
         let tags_path = dirs.caches_meta_dir().join("tags.json");
@@ -34,7 +34,7 @@ impl Tags {
         {
             tags = Some(tags_json);
         } else {
-            match Self::fetch(fetch_sempahore).await {
+            match Self::fetch(fetch_semaphore).await {
                 Ok(tags_fetch) => tags = Some(tags_fetch),
                 Err(err) => {
                     tracing::warn!("Unable to fetch launcher tags: {err}")

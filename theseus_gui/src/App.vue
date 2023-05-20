@@ -91,7 +91,7 @@ const loading = useLoading()
           @click="() => $refs.installationModal.show()"
         >
           <PlusIcon />
-          <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New Instance</span>
+          <span v-if="!themeStore.collapsedNavigation" class="no-wrap">New instance</span>
         </Button>
         <RouterLink
           to="/settings"

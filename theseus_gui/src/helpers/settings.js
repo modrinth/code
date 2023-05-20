@@ -28,20 +28,6 @@ Memorysettings {
 
 */
 
-// An example test function for getting/setting settings
-export async function test() {
-  // First, print settings and store them to an object
-  let settings = await get()
-  console.log(JSON.stringify(settings))
-
-  // Then set some random settings in that object
-  settings.java_8_path = '/example/path'
-
-  // Set the new settings object
-  await set(settings)
-  console.log(JSON.stringify(await get()))
-}
-
 // Get full settings object
 export async function get() {
   return await invoke('settings_get')

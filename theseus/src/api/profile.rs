@@ -1,10 +1,12 @@
 //! Theseus profile management interface
 use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
 use crate::event::LoadingBarType;
+use crate::prelude::JavaVersion;
 use crate::state::ProjectMetadata;
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
+    profile,
     state::MinecraftChild,
 };
 pub use crate::{
@@ -84,6 +86,100 @@ where
             path.display().to_string(),
         )
         .as_error()),
+    }
+}
+
+/// Edits a profile's icon
+pub async fn edit_icon(
+    path: &Path,
+    icon_path: Option<&Path>,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+
+    if let Some(icon) = icon_path {
+        let bytes = tokio::fs::read(icon).await?;
+
+        let mut profiles = state.profiles.write().await;
+
+        match profiles.0.get_mut(path) {
+            Some(ref mut profile) => {
+                emit_profile(
+                    profile.uuid,
+                    profile.path.clone(),
+                    &profile.metadata.name,
+                    ProfilePayloadType::Edited,
+                )
+                .await?;
+
+                profile
+                    .set_icon(
+                        &state.directories.caches_dir(),
+                        &state.io_semaphore,
+                        bytes::Bytes::from(bytes),
+                        &icon.to_string_lossy(),
+                    )
+                    .await
+            }
+            None => Err(crate::ErrorKind::UnmanagedProfileError(
+                path.display().to_string(),
+            )
+            .as_error()),
+        }
+    } else {
+        edit(path, |profile| {
+            profile.metadata.icon = None;
+            async { Ok(()) }
+        })
+        .await
+    }
+}
+
+// Gets the optimal JRE key for the given profile, using Daedalus
+// Generally this would be used for profile_create, to get the optimal JRE key
+// this can be overwritten by the user a profile-by-profile basis
+pub async fn get_optimal_jre_key(
+    path: &Path,
+) -> crate::Result<Option<JavaVersion>> {
+    let state = State::get().await?;
+
+    if let Some(profile) = get(path, None).await? {
+        let metadata = state.metadata.read().await;
+
+        // Fetch version info from stored profile game_version
+        let version = metadata
+            .minecraft
+            .versions
+            .iter()
+            .find(|it| it.id == profile.metadata.game_version)
+            .ok_or_else(|| {
+                crate::ErrorKind::LauncherError(format!(
+                    "Invalid or unknown Minecraft version: {}",
+                    profile.metadata.game_version
+                ))
+            })?;
+
+        // Get detailed manifest info from Daedalus
+        let version_info = crate::launcher::download::download_version_info(
+            &state,
+            version,
+            profile.metadata.loader_version.as_ref(),
+            None,
+            None,
+        )
+        .await?;
+
+        let version = crate::launcher::get_java_version_from_profile(
+            &profile,
+            &version_info,
+        )
+        .await?;
+
+        Ok(version)
+    } else {
+        Err(
+            crate::ErrorKind::UnmanagedProfileError(path.display().to_string())
+                .as_error(),
+        )
     }
 }
 
@@ -326,6 +422,7 @@ pub async fn remove_project(
         .as_error())
     }
 }
+
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]
@@ -351,7 +448,7 @@ pub async fn run(path: &Path) -> crate::Result<Arc<RwLock<MinecraftChild>>> {
 
 /// Run Minecraft using a profile, and credentials for authentication
 /// Returns Arc pointer to RwLock to Child
-#[tracing::instrument]
+#[tracing::instrument(skip(credentials))]
 #[theseus_macros::debug_pin]
 pub async fn run_credentials(
     path: &Path,
@@ -403,7 +500,11 @@ pub async fn run_credentials(
     let memory = profile.memory.unwrap_or(settings.memory);
     let resolution = profile.resolution.unwrap_or(settings.game_resolution);
 
-    let env_args = &settings.custom_env_args;
+    let env_args = profile
+        .java
+        .as_ref()
+        .and_then(|x| x.custom_env_args.as_ref())
+        .unwrap_or(&settings.custom_env_args);
 
     // Post post exit hooks
     let post_exit_hook =

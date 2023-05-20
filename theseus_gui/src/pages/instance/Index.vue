@@ -18,8 +18,11 @@
           </span>
         </div>
         <span class="button-group">
+          <Button v-if="instance.install_stage !== 'installed'" disabled class="instance-button">
+            Installing...
+          </Button>
           <Button
-            v-if="playing === true"
+            v-else-if="playing === true"
             color="danger"
             class="instance-button"
             @click="stopInstance"
@@ -38,9 +41,13 @@
             <PlayIcon />
             Play
           </Button>
-          <Button v-else-if="loading === true && playing === false" disabled class="instance-button"
-            >Loading...</Button
+          <Button
+            v-else-if="loading === true && playing === false"
+            disabled
+            class="instance-button"
           >
+            Loading...
+          </Button>
           <!--TODO: https://github.com/tauri-apps/tauri/issues/4062 -->
           <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
             <OpenFolderIcon />
@@ -52,13 +59,13 @@
           <BoxIcon />
           Mods
         </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
-          <SettingsIcon />
-          Options
-        </RouterLink>
         <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
           <FileIcon />
           Logs
+        </RouterLink>
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
+          <SettingsIcon />
+          Options
         </RouterLink>
       </div>
     </div>
@@ -370,13 +377,5 @@ Button {
       display: none;
     }
   }
-}
-
-.card-divider {
-  background-color: var(--color-button-bg);
-  border: none;
-  color: var(--color-button-bg);
-  height: 1px;
-  margin: var(--gap-xl) 0;
 }
 </style>

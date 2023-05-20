@@ -57,12 +57,12 @@ macro_rules! processor_rules {
     }
 }
 
-async fn get_java_version_from_profile(
+pub async fn get_java_version_from_profile(
     profile: &Profile,
     version_info: &VersionInfo,
-) -> crate::Result<JavaVersion> {
+) -> crate::Result<Option<JavaVersion>> {
     if let Some(java) = profile.java.clone().and_then(|x| x.override_version) {
-        Ok(java)
+        Ok(Some(java))
     } else {
         let optimal_keys = match version_info
             .java_version
@@ -80,14 +80,11 @@ async fn get_java_version_from_profile(
 
         for key in optimal_keys {
             if let Some(java) = settings.java_globals.get(&key.to_string()) {
-                return Ok(java.clone());
+                return Ok(Some(java.clone()));
             }
         }
 
-        Err(crate::ErrorKind::LauncherError(
-            "No available java installation".to_string(),
-        )
-        .into())
+        Ok(None)
     }
 }
 
@@ -149,8 +146,13 @@ pub async fn install_minecraft(
     )
     .await?;
 
-    let java_version =
-        get_java_version_from_profile(profile, &version_info).await?;
+    let java_version = get_java_version_from_profile(profile, &version_info)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(
+                "No available java installation".to_string(),
+            )
+        })?;
 
     // Download minecraft (5-90)
     download::download_minecraft(
@@ -327,8 +329,13 @@ pub async fn launch_minecraft(
     )
     .await?;
 
-    let java_version =
-        get_java_version_from_profile(profile, &version_info).await?;
+    let java_version = get_java_version_from_profile(profile, &version_info)
+        .await?
+        .ok_or_else(|| {
+            crate::ErrorKind::LauncherError(
+                "No available java installation".to_string(),
+            )
+        })?;
 
     let client_path = state
         .directories

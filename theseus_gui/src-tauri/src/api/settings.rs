@@ -23,68 +23,15 @@ pub struct FrontendSettings {
 // Get full settings
 // invoke('settings_get')
 #[tauri::command]
-#[theseus_macros::debug_pin]
-pub async fn settings_get() -> Result<FrontendSettings> {
-    let backend_settings = settings::get().await?;
-    let frontend_settings = FrontendSettings {
-        theme: backend_settings.theme,
-        memory: backend_settings.memory,
-        game_resolution: backend_settings.game_resolution,
-        custom_java_args: backend_settings.custom_java_args.join(" "),
-        custom_env_args: backend_settings
-            .custom_env_args
-            .into_iter()
-            .map(|(s1, s2)| format!("{s1}={s2}"))
-            .collect::<Vec<String>>()
-            .join(" "),
-        java_globals: backend_settings.java_globals,
-        default_user: backend_settings.default_user,
-        hooks: backend_settings.hooks,
-        max_concurrent_downloads: backend_settings.max_concurrent_downloads,
-        max_concurrent_writes: backend_settings.max_concurrent_writes,
-        version: backend_settings.version,
-        collapsed_navigation: backend_settings.collapsed_navigation,
-    };
-    Ok(frontend_settings)
+pub async fn settings_get() -> Result<Settings> {
+    let res = settings::get().await?;
+    Ok(res)
 }
 
 // Set full settings
 // invoke('settings_set', settings)
 #[tauri::command]
-#[theseus_macros::debug_pin]
-pub async fn settings_set(settings: FrontendSettings) -> Result<()> {
-    let custom_env_args: Vec<(String, String)> = settings
-        .custom_env_args
-        .split_whitespace()
-        .map(|s| s.to_string())
-        .flat_map(|f| {
-            let mut split = f.split('=');
-            if let (Some(name), Some(value)) = (split.next(), split.next()) {
-                Some((name.to_string(), value.to_string()))
-            } else {
-                None
-            }
-        })
-        .collect::<Vec<(String, String)>>();
-
-    let backend_settings = Settings {
-        theme: settings.theme,
-        memory: settings.memory,
-        game_resolution: settings.game_resolution,
-        custom_java_args: settings
-            .custom_java_args
-            .split_whitespace()
-            .map(|s| s.to_string())
-            .collect(),
-        custom_env_args,
-        java_globals: settings.java_globals,
-        default_user: settings.default_user,
-        hooks: settings.hooks,
-        max_concurrent_downloads: settings.max_concurrent_downloads,
-        max_concurrent_writes: settings.max_concurrent_writes,
-        version: settings.version,
-        collapsed_navigation: settings.collapsed_navigation,
-    };
-    settings::set(backend_settings).await?;
+pub async fn settings_set(settings: Settings) -> Result<()> {
+    settings::set(settings).await?;
     Ok(())
 }

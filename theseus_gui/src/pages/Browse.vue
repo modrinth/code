@@ -15,6 +15,7 @@ import {
   NavRow,
   formatCategoryHeader,
   formatCategory,
+  Promotion,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { useSearch } from '@/store/state'
@@ -271,6 +272,7 @@ const handleInstanceSwitch = async (value) => {
       </Card>
     </aside>
     <div class="search">
+      <Promotion class="promotion" />
       <Card class="project-type-container">
         <NavRow
           :links="
@@ -393,11 +395,14 @@ const handleInstanceSwitch = async (value) => {
   width: 100% !important;
 }
 
+.promotion {
+  margin-top: 1rem;
+}
+
 .project-type-container {
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-top: 1rem;
 }
 
 .search-panel-card {
