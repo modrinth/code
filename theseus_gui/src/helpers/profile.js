@@ -105,3 +105,8 @@ export async function run_wait(path) {
 export async function edit(path, editProfile) {
   return await invoke('profile_edit', { path, editProfile })
 }
+
+// Edits a profile's icon
+export async function edit_icon(path, iconPath) {
+  return await invoke('profile_edit_icon', { path, iconPath })
+}

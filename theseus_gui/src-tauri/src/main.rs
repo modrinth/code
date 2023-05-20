@@ -92,6 +92,7 @@ fn main() {
             api::profile::profile_run_credentials,
             api::profile::profile_run_wait_credentials,
             api::profile::profile_edit,
+            api::profile::profile_edit_icon,
             api::profile::profile_check_installed,
             api::pack::pack_install_version_id,
             api::pack::pack_install_file,

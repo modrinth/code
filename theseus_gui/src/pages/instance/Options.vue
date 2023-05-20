@@ -1,4 +1,42 @@
 <template>
+  <Modal ref="changeVersionsModal" header="Change instance versions">
+    <div class="change-versions-modal universal-body">
+      <div class="input-row">
+        <p class="input-label">Loader</p>
+        <Chips v-model="loader" :items="loaders" />
+      </div>
+      <div class="input-row">
+        <p class="input-label">Game Version</p>
+        <div class="versions">
+          <DropdownSelect v-model="gameVersion" :options="selectableGameVersions" render-up />
+          <Checkbox v-model="showSnapshots" class="filter-checkbox" label="Include snapshots" />
+        </div>
+      </div>
+      <div v-if="loader !== 'vanilla'" class="input-row">
+        <p class="input-label">Loader Version</p>
+        <DropdownSelect
+          v-model="loaderVersion"
+          :options="selectableLoaderVersions"
+          :display-name="(option) => option?.id"
+          render-up
+        />
+      </div>
+      <div class="button-group">
+        <button class="btn" @click="$refs.changeVersionsModal.hide()">
+          <XIcon />
+          Cancel
+        </button>
+        <button
+          class="btn btn-primary"
+          :disabled="!isValid || editing"
+          @click="saveGvLoaderEdits()"
+        >
+          <SaveIcon />
+          {{ editing ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+    </div>
+  </Modal>
   <section class="card">
     <div class="label">
       <h3>
@@ -10,21 +48,16 @@
     </label>
     <div class="input-group">
       <Avatar
-        :src="
-          !instance.metadata.icon ||
-          (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
-            ? instance.metadata.icon
-            : convertFileSrc(instance.metadata?.icon)
-        "
+        :src="!icon || (icon && icon.startsWith('http')) ? icon : convertFileSrc(icon)"
         size="md"
         class="project__icon"
       />
       <div class="input-stack">
-        <Button id="instance-icon" class="btn">
+        <button id="instance-icon" class="btn" @click="setIcon">
           <UploadIcon />
           Upload icon
-        </Button>
-        <button class="btn">
+        </button>
+        <button class="btn" @click="resetIcon">
           <TrashIcon />
           Remove icon
         </button>
@@ -43,7 +76,7 @@
           Allows you to change the mod loader, loader version, or game version of the profile.
         </span>
       </label>
-      <button id="edit-versions" class="btn">
+      <button id="edit-versions" class="btn" @click="$refs.changeVersionsModal.show()">
         <EditIcon />
         Edit versions
       </button>
@@ -117,6 +150,7 @@
           :disabled="!overrideWindowSettings"
           type="number"
           class="input"
+          @change="updateProfile"
         />
       </div>
       <div class="toggle-setting">
@@ -126,6 +160,7 @@
           :disabled="!overrideWindowSettings"
           type="number"
           class="input"
+          @change="updateProfile"
         />
       </div>
     </div>
@@ -136,15 +171,15 @@
     <div class="settings-group">
       <div class="toggle-setting">
         Pre launch
-        <input v-model="hooks.pre_launch" :disabled="!overrideHooks" type="text" class="input" />
+        <input v-model="hooks.pre_launch" :disabled="!overrideHooks" type="text" />
       </div>
       <div class="toggle-setting">
         Wrapper
-        <input v-model="hooks.wrapper" :disabled="!overrideHooks" type="text" class="input" />
+        <input v-model="hooks.wrapper" :disabled="!overrideHooks" type="text" />
       </div>
       <div class="toggle-setting">
         Post exit
-        <input v-model="hooks.post_exit" :disabled="!overrideHooks" type="text" class="input" />
+        <input v-model="hooks.post_exit" :disabled="!overrideHooks" type="text" />
       </div>
     </div>
   </Card>
@@ -168,15 +203,31 @@
 </template>
 
 <script setup>
-import { Card, Slider, TrashIcon, Checkbox, UploadIcon, Avatar, EditIcon } from 'omorphia'
+import {
+  Card,
+  Slider,
+  TrashIcon,
+  Checkbox,
+  UploadIcon,
+  Avatar,
+  EditIcon,
+  Modal,
+  Chips,
+  DropdownSelect,
+  XIcon,
+  SaveIcon,
+} from 'omorphia'
 import { HammerIcon } from '@/assets/icons'
 import { useRouter } from 'vue-router'
-import { get_optimal_jre_key, install, remove } from '@/helpers/profile.js'
-import { readonly, ref } from 'vue'
+import { edit, edit_icon, get_optimal_jre_key, install, remove } from '@/helpers/profile.js'
+import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
+import { open } from '@tauri-apps/api/dialog'
+import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata.js'
+import { get_game_versions, get_loaders } from '@/helpers/tags.js'
 
 const router = useRouter()
 
@@ -188,25 +239,49 @@ const props = defineProps({
 })
 
 const title = ref(props.instance.metadata.name)
-// const icon = ref(props.instance.metadata.icon)
+const icon = ref(props.instance.metadata.icon)
+
+async function resetIcon() {
+  icon.value = null
+  await edit_icon(props.instance.path, null)
+}
+
+async function setIcon() {
+  const value = await open({
+    multiple: false,
+    filters: [
+      {
+        name: 'Image',
+        extensions: ['png', 'jpeg', 'svg', 'webp', 'gif', 'jpg'],
+      },
+    ],
+  })
+
+  if (!value) return
+
+  icon.value = value
+  await edit_icon(props.instance.path, icon.value)
+}
 
 const globalSettings = await get()
 
-const overrideJavaInstall = ref(!!props.instance.java?.override_version)
+const javaSettings = props.instance.java ?? {}
+
+const overrideJavaInstall = ref(!!javaSettings.override_version)
 const optimalJava = readonly(await get_optimal_jre_key(props.instance.path))
-const javaInstall = ref(
-  optimalJava ?? props.instance.profile.java?.override_version ?? { path: '', version: '' }
+const javaInstall = ref(optimalJava ?? javaSettings.override_version ?? { path: '', version: '' })
+
+const overrideJavaArgs = ref(!!javaSettings.extra_arguments)
+const javaArgs = ref((javaSettings.extra_arguments ?? globalSettings.custom_java_args).join(' '))
+
+const overrideEnvVars = ref(!!javaSettings.custom_env_args)
+const envVars = ref(
+  (javaSettings.custom_env_args ?? globalSettings.custom_env_args).map((x) => x.join('=')).join(' ')
 )
-
-const overrideJavaArgs = ref(!!props.instance.java?.extra_arguments)
-const javaArgs = ref(props.instance.java?.extra_arguments ?? globalSettings.custom_java_args)
-
-const overrideEnvVars = ref(!!props.instance.java?.custom_env_args)
-const envVars = ref(props.instance.java?.custom_env_args ?? globalSettings.custom_env_args)
 
 const overrideMemorySettings = ref(!!props.instance.memory)
 const memory = ref(props.instance.memory ?? globalSettings.memory)
-const maxMemory = readonly((await get_max_memory()) / 1024)
+const maxMemory = (await get_max_memory()) / 1024
 
 const overrideWindowSettings = ref(!!props.instance.resolution)
 const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
@@ -214,28 +289,68 @@ const resolution = ref(props.instance.resolution ?? globalSettings.game_resoluti
 const overrideHooks = ref(!!props.instance.hooks)
 const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 
-const repairing = ref(false)
+watch(
+  [
+    title,
+    overrideJavaInstall,
+    javaInstall,
+    overrideJavaArgs,
+    javaArgs,
+    overrideEnvVars,
+    envVars,
+    overrideMemorySettings,
+    memory.value,
+    overrideWindowSettings,
+    resolution.value,
+    overrideHooks,
+    hooks.value,
+  ],
+  async () => {
+    const editProfile = {
+      metadata: {
+        name: title.value,
+      },
+      java: {},
+    }
 
-// async function updateProfile() {
-//   const editProfile = {
-//     title: title.value
-//   }
-//
-//   if (overrideJavaInstall.value) {
-//     if (javaInstall.value.path !== '') {
-//       editProfile.java = {
-//         override_version: javaInstall.value,
-//         ...editProfile.java
-//       }
-//     }
-//   }
-//
-//   if (overrideJavaArgs.value) {
-//     if (javaArgs.value !== )
-//   }
-//
-//   await edit(props.instance.path, editProfile)
-// }
+    if (overrideJavaInstall.value) {
+      if (javaInstall.value.path !== '') {
+        editProfile.java.override_version = javaInstall.value
+      }
+    }
+
+    if (overrideJavaArgs.value) {
+      if (javaArgs.value !== '') {
+        editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/)
+      }
+    }
+
+    if (overrideEnvVars.value) {
+      if (envVars.value !== '') {
+        editProfile.java.custom_env_args = envVars.value
+          .trim()
+          .split(/\s+/)
+          .map((x) => x.split('='))
+      }
+    }
+
+    if (overrideMemorySettings.value) {
+      editProfile.memory = memory.value
+    }
+
+    if (overrideWindowSettings.value) {
+      editProfile.resolution = resolution.value
+    }
+
+    if (overrideHooks.value) {
+      editProfile.hooks = hooks.value
+    }
+
+    await edit(props.instance.path, editProfile)
+  }
+)
+
+const repairing = ref(false)
 
 async function repairProfile() {
   repairing.value = true
@@ -251,9 +366,118 @@ async function removeProfile() {
 
   await router.push({ path: '/' })
 }
+
+const changeVersionsModal = ref(null)
+const showSnapshots = ref(false)
+
+const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
+  await Promise.all([
+    get_fabric_versions().then(shallowRef),
+    get_forge_versions().then(shallowRef),
+    get_quilt_versions().then(shallowRef),
+    get_game_versions().then(shallowRef),
+    get_loaders()
+      .then((value) =>
+        value
+          .filter((item) => item.supported_project_types.includes('modpack'))
+          .map((item) => item.name.toLowerCase())
+      )
+      .then(ref),
+  ])
+loaders.value.push('vanilla')
+
+const loader = ref(props.instance.metadata.loader)
+
+const gameVersion = ref(props.instance.metadata.game_version)
+const selectableGameVersions = computed(() => {
+  return all_game_versions.value
+    .filter((item) => {
+      let defaultVal = item.version_type === 'release' || showSnapshots.value
+      if (loader.value === 'fabric') {
+        defaultVal &= fabric_versions.value.gameVersions.some((x) => item.version === x.id)
+      } else if (loader.value === 'forge') {
+        defaultVal &= forge_versions.value.gameVersions.some((x) => item.version === x.id)
+      } else if (loader.value === 'quilt') {
+        defaultVal &= quilt_versions.value.gameVersions.some((x) => item.version === x.id)
+      }
+
+      return defaultVal
+    })
+    .map((item) => item.version)
+})
+
+const selectableLoaderVersions = computed(() => {
+  if (gameVersion.value) {
+    if (loader.value === 'fabric') {
+      return fabric_versions.value.gameVersions[0].loaders
+    } else if (loader.value === 'forge') {
+      return forge_versions.value.gameVersions.find((item) => item.id === gameVersion.value).loaders
+    } else if (loader.value === 'quilt') {
+      return quilt_versions.value.gameVersions[0].loaders
+    }
+  }
+  return []
+})
+const loaderVersion = ref(
+  selectableLoaderVersions.value.find((x) => x.id === props.instance.metadata.loader_version?.id)
+)
+
+const isValid = computed(() => {
+  return (
+    selectableGameVersions.value.includes(gameVersion.value) &&
+    (selectableLoaderVersions.value.includes(loaderVersion.value) || loader.value === 'vanilla')
+  )
+})
+
+const editing = ref(false)
+async function saveGvLoaderEdits() {
+  editing.value = true
+
+  const editProfile = {
+    metadata: {
+      game_version: gameVersion.value,
+      loader: loader.value,
+    },
+  }
+
+  if (loader.value !== 'vanilla') {
+    editProfile.metadata.loader_version = loaderVersion.value
+  }
+  await edit(props.instance.path, editProfile)
+  await repairProfile()
+
+  editing.value = false
+  changeVersionsModal.value.hide()
+}
 </script>
 
 <style scoped lang="scss">
+.change-versions-modal {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 1rem;
+
+  .input-label {
+    font-size: 1rem;
+    font-weight: bolder;
+    color: var(--color-contrast);
+    margin-bottom: 0.5rem;
+  }
+
+  .versions {
+    display: flex;
+    flex-direction: row;
+    gap: 1rem;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+}
+
 .settings-card {
   display: flex;
   flex-direction: column;

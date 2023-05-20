@@ -59,13 +59,13 @@
           <BoxIcon />
           Mods
         </RouterLink>
-        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
-          <SettingsIcon />
-          Options
-        </RouterLink>
         <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/logs`" class="btn">
           <FileIcon />
           Logs
+        </RouterLink>
+        <RouterLink :to="`/instance/${encodeURIComponent($route.params.id)}/options`" class="btn">
+          <SettingsIcon />
+          Options
         </RouterLink>
       </div>
     </div>
@@ -377,13 +377,5 @@ Button {
       display: none;
     }
   }
-}
-
-.card-divider {
-  background-color: var(--color-button-bg);
-  border: none;
-  color: var(--color-button-bg);
-  height: 1px;
-  margin: var(--gap-xl) 0;
 }
 </style>

@@ -6,6 +6,7 @@ use crate::state::ProjectMetadata;
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
+    profile,
     state::MinecraftChild,
 };
 pub use crate::{
@@ -85,6 +86,51 @@ where
             path.display().to_string(),
         )
         .as_error()),
+    }
+}
+
+/// Edits a profile's icon
+pub async fn edit_icon(
+    path: &Path,
+    icon_path: Option<&Path>,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+
+    if let Some(icon) = icon_path {
+        let bytes = tokio::fs::read(icon).await?;
+
+        let mut profiles = state.profiles.write().await;
+
+        match profiles.0.get_mut(path) {
+            Some(ref mut profile) => {
+                emit_profile(
+                    profile.uuid,
+                    profile.path.clone(),
+                    &profile.metadata.name,
+                    ProfilePayloadType::Edited,
+                )
+                .await?;
+
+                profile
+                    .set_icon(
+                        &state.directories.caches_dir(),
+                        &state.io_semaphore,
+                        bytes::Bytes::from(bytes),
+                        &icon.to_string_lossy(),
+                    )
+                    .await
+            }
+            None => Err(crate::ErrorKind::UnmanagedProfileError(
+                path.display().to_string(),
+            )
+            .as_error()),
+        }
+    } else {
+        edit(path, |profile| {
+            profile.metadata.icon = None;
+            async { Ok(()) }
+        })
+        .await
     }
 }
 
