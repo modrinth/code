@@ -322,7 +322,7 @@ watch(
 
     if (overrideJavaArgs.value) {
       if (javaArgs.value !== '') {
-        editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/)
+        editProfile.java.extra_arguments = javaArgs.value.trim().split(/\s+/).filter(Boolean)
       }
     }
 
@@ -330,8 +330,8 @@ watch(
       if (envVars.value !== '') {
         editProfile.java.custom_env_args = envVars.value
           .trim()
-          .split(/\s+/)
-          .map((x) => x.split('='))
+          .split(/\s+/).filter(Boolean)
+          .map((x) => x.split('=').filter(Boolean))
       }
     }
 

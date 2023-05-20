@@ -29,11 +29,22 @@ watch(settings.value, async (oldSettings, newSettings) => {
     newSettings.java_globals.JAVA_17 = undefined
   }
 
-  newSettings.custom_java_args = newSettings.javaArgs.trim().split(/\s+/)
+  newSettings.custom_java_args = newSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
   newSettings.custom_env_args = newSettings.envArgs
     .trim()
     .split(/\s+/)
-    .map((x) => x.split('='))
+    .filter(Boolean)
+    .map((x) => x.split('=').filter(Boolean))
+
+  if (!newSettings.hooks.pre_launch) {
+    newSettings.hooks.pre_launch = null
+  }
+  if (!newSettings.hooks.wrapper) {
+    newSettings.hooks.wrapper = null
+  }
+  if (!newSettings.hooks.post_exit) {
+    newSettings.hooks.post_exit = null
+  }
 
   await set(newSettings)
 })
