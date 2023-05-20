@@ -15,10 +15,11 @@
       <div v-if="loader !== 'vanilla'" class="input-row">
         <p class="input-label">Loader Version</p>
         <DropdownSelect
-          v-model="loaderVersion"
+          :model-value="selectableLoaderVersions[loaderVersionIndex]"
           :options="selectableLoaderVersions"
           :display-name="(option) => option?.id"
           render-up
+          @change="(value) => (loaderVersionIndex = value.index)"
         />
       </div>
       <div class="button-group">
@@ -418,16 +419,18 @@ const selectableLoaderVersions = computed(() => {
   }
   return []
 })
-const loaderVersion = ref(
-  selectableLoaderVersions.value.find((x) => x.id === props.instance.metadata.loader_version?.id)
+const loaderVersionIndex = ref(
+  selectableLoaderVersions.value.findIndex((x) => x.id === props.instance.metadata.loader_version?.id)
 )
 
 const isValid = computed(() => {
   return (
     selectableGameVersions.value.includes(gameVersion.value) &&
-    (selectableLoaderVersions.value.includes(loaderVersion.value) || loader.value === 'vanilla')
+    (loaderVersionIndex.value >= 0 || loader.value === 'vanilla')
   )
 })
+
+watch(loader, () => loaderVersionIndex.value = 0)
 
 const editing = ref(false)
 async function saveGvLoaderEdits() {
@@ -441,7 +444,7 @@ async function saveGvLoaderEdits() {
   }
 
   if (loader.value !== 'vanilla') {
-    editProfile.metadata.loader_version = loaderVersion.value
+    editProfile.metadata.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value]
   }
   await edit(props.instance.path, editProfile)
   await repairProfile()
