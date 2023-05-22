@@ -42,12 +42,13 @@ export default {
           { text: 'Promotion', link: '/components/promotion' },
           { text: 'Markdown', link: '/components/markdown' },
           { text: 'Copy Code', link: '/components/copy-code' },
+          { text: 'Notifications', link: '/components/notifications' },
         ],
       },
     ],
     footer: {
       message:
-        'Released under the <a href="https://github.com/modrinth/omoprhia/blob/main/LICENSE">GPLv3 License</a>.',
+        'Released under the <a href="https://github.com/modrinth/omoprhia/blob/main/LICENSE">AGPLv3 License</a>.',
       copyright: 'Copyright © 2023-present <a href="https://modrinth.com">Rinth, Inc.</a>',
     },
   },
