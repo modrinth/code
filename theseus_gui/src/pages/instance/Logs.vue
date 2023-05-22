@@ -55,6 +55,7 @@ import calendar from 'dayjs/plugin/calendar'
 import { get_stdout_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
 import { useRoute } from 'vue-router'
 import { process_listener } from '@/helpers/events.js'
+import { handleError } from '@/store/notifications.js'
 
 dayjs.extend(calendar)
 
@@ -68,19 +69,19 @@ const props = defineProps({
 })
 
 async function getLiveLog() {
-  const uuids = await get_uuids_by_profile_path(route.params.id)
+  const uuids = await get_uuids_by_profile_path(route.params.id).catch(handleError)
   let returnValue
   if (uuids.length === 0) {
     returnValue = 'No live game detected. \nStart your game to proceed'
   } else {
-    returnValue = await get_stdout_by_uuid(uuids[0])
+    returnValue = await get_stdout_by_uuid(uuids[0]).catch(handleError)
   }
 
   return { name: 'Live Log', stdout: returnValue, live: true }
 }
 
 async function getLogs() {
-  return (await get_logs(props.instance.uuid, true)).reverse().map((log) => {
+  return (await get_logs(props.instance.uuid, true).catch(handleError)).reverse().map((log) => {
     log.name = dayjs(
       log.datetime_string.slice(0, 8) + 'T' + log.datetime_string.slice(9)
     ).calendar()
@@ -116,7 +117,7 @@ watch(selectedLogIndex, async (newIndex) => {
     logs.value[newIndex].stdout = await get_stdout_by_datetime(
       props.instance.uuid,
       logs.value[newIndex].datetime_string
-    )
+    ).catch(handleError)
   }
 })
 
@@ -124,7 +125,10 @@ const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
     let deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
-    await delete_logs_by_datetime(props.instance.uuid, logs.value[deleteIndex].datetime_string)
+    await delete_logs_by_datetime(
+      props.instance.uuid,
+      logs.value[deleteIndex].datetime_string
+    ).catch(handleError)
     await setLogs()
   }
 }

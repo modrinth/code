@@ -1,14 +1,14 @@
 <script setup>
 import { ref, watch } from 'vue'
 import { Card, Slider, DropdownSelect, Toggle } from 'omorphia'
-import { useTheming } from '@/store/state'
+import { handleError, useTheming } from '@/store/state'
 import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 
 const themeStore = useTheming()
 
-const fetchSettings = await get()
+const fetchSettings = await get().catch(handleError)
 
 if (!fetchSettings.java_globals?.JAVA_8)
   fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
@@ -19,7 +19,7 @@ fetchSettings.javaArgs = fetchSettings.custom_java_args.join(' ')
 fetchSettings.envArgs = fetchSettings.custom_env_args.map((x) => x.join('=')).join(' ')
 
 const settings = ref(fetchSettings)
-const maxMemory = ref((await get_max_memory()) / 1024)
+const maxMemory = ref((await get_max_memory().catch(handleError)) / 1024)
 
 watch(settings.value, async (oldSettings, newSettings) => {
   if (newSettings.java_globals?.JAVA_8?.path === '') {

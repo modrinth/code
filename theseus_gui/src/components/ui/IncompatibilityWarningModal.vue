@@ -54,6 +54,7 @@
 import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } from 'omorphia'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { defineExpose, ref } from 'vue'
+import { handleError } from '@/store/state.js'
 
 const instance = ref(null)
 const projectTitle = ref(null)
@@ -77,7 +78,7 @@ defineExpose({
 
 const install = async () => {
   installing.value = true
-  await installMod(instance.value.path, selectedVersion.value.id)
+  await installMod(instance.value.path, selectedVersion.value.id).catch(handleError)
   installing.value = false
   markInstalled()
   incompatibleModal.value.hide()

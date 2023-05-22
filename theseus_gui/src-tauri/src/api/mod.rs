@@ -13,15 +13,15 @@ pub mod profile_create;
 pub mod settings;
 pub mod tags;
 
-pub type Result<T> = std::result::Result<T, TheseusGuiError>;
+pub type Result<T> = std::result::Result<T, TheseusSerializableError>;
 
-// Main returnable Theseus GUI error
-// Needs to be Serializable to be returned to the JavaScript side
-#[derive(Error, Debug, Serialize)]
-pub enum TheseusGuiError {
-    #[error(transparent)]
-    Serializable(TheseusSerializableError),
-}
+// // Main returnable Theseus GUI error
+// // Needs to be Serializable to be returned to the JavaScript side
+// #[derive(Error, Debug, Serialize)]
+// pub enum TheseusGuiError {
+//     #[error(transparent)]
+//     Serializable(),
+// }
 
 // Serializable error intermediary, so TheseusGuiError can be Serializable (eg: so that we can return theseus::Errors in Tauri directly)
 #[derive(Error, Debug)]
@@ -34,14 +34,14 @@ pub enum TheseusSerializableError {
 }
 
 // Generic implementation of From<T> for ErrorTypeA
-impl<T> From<T> for TheseusGuiError
-where
-    TheseusSerializableError: From<T>,
-{
-    fn from(error: T) -> Self {
-        TheseusGuiError::Serializable(TheseusSerializableError::from(error))
-    }
-}
+// impl<T> From<T> for TheseusGuiError
+// where
+//     TheseusSerializableError: From<T>,
+// {
+//     fn from(error: T) -> Self {
+//         TheseusGuiError::Serializable(TheseusSerializableError::from(error))
+//     }
+// }
 
 // Lists active progress bars
 // Create a new HashMap with the same keys

@@ -3,7 +3,7 @@
   <div class="toggle-setting">
     <input
       :disabled="props.disabled"
-      :value="props.modelValue.path"
+      :value="props.modelValue ? props.modelValue.path : ''"
       type="text"
       class="installation-input"
       :placeholder="placeholder ?? '/path/to/java'"
@@ -25,7 +25,7 @@
         Auto Detect
       </Button>
       <Button :disabled="props.disabled" @click="handleJavaFileInput()">
-        <BrowseIcon />
+        <FolderSearchIcon />
         Browse
       </Button>
       <Button :disabled="props.disabled" @click="testJava">
@@ -43,8 +43,15 @@
 </template>
 
 <script setup>
-import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, AnimatedLogo } from 'omorphia'
-import { BrowseIcon } from '@/assets/icons'
+import {
+  Button,
+  SearchIcon,
+  PlayIcon,
+  CheckIcon,
+  XIcon,
+  AnimatedLogo,
+  FolderSearchIcon,
+} from 'omorphia'
 import { get_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
@@ -78,7 +85,7 @@ const testingJava = ref(false)
 const testingJavaSuccess = ref(null)
 async function testJava() {
   testingJava.value = true
-  let result = await get_jre(props.modelValue.path)
+  let result = await get_jre(props.modelValue ? props.modelValue.path : '')
   testingJava.value = false
   testingJavaSuccess.value = !!result
 

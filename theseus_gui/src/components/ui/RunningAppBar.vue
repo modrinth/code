@@ -5,10 +5,10 @@
       {{ currentProcesses[0].metadata.name }}
     </span>
     <Button icon-only class="icon-button stop" @click="stop()">
-      <StopIcon />
+      <StopCircleIcon />
     </Button>
     <Button icon-only class="icon-button" @click="goToTerminal()">
-      <TerminalIcon />
+      <TerminalSquareIcon />
     </Button>
     <Button
       v-if="currentLoadingBars.length > 0"
@@ -47,8 +47,7 @@
 </template>
 
 <script setup>
-import { Button, DownloadIcon, Card } from 'omorphia'
-import { StopIcon, TerminalIcon } from '@/assets/icons'
+import { Button, DownloadIcon, Card, StopCircleIcon, TerminalSquareIcon } from 'omorphia'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   get_all_running_profiles as getRunningProfiles,
@@ -59,20 +58,21 @@ import { loading_listener, process_listener } from '@/helpers/events'
 import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
+import { handleError } from '@/store/notifications.js'
 
 const router = useRouter()
 const card = ref(null)
 const infoButton = ref(null)
 const showCard = ref(false)
 
-const currentProcesses = ref(await getRunningProfiles())
+const currentProcesses = ref(await getRunningProfiles().catch(handleError))
 
 await process_listener(async () => {
   await refresh()
 })
 
 const refresh = async () => {
-  currentProcesses.value = await getRunningProfiles()
+  currentProcesses.value = await getRunningProfiles().catch(handleError)
 }
 
 const stop = async () => {
@@ -89,7 +89,7 @@ const goToTerminal = () => {
   router.push(`/instance/${encodeURIComponent(currentProcesses.value[0].path)}/logs`)
 }
 
-const currentLoadingBars = ref(Object.values(await progress_bars_list()))
+const currentLoadingBars = ref(Object.values(await progress_bars_list().catch(handleError)))
 
 await loading_listener(async () => {
   await refreshInfo()
@@ -97,7 +97,7 @@ await loading_listener(async () => {
 
 const refreshInfo = async () => {
   const currentLoadingBarCount = currentLoadingBars.value.length
-  currentLoadingBars.value = Object.values(await progress_bars_list())
+  currentLoadingBars.value = Object.values(await progress_bars_list().catch(handleError))
   if (currentLoadingBars.value.length === 0) {
     showCard.value = false
   } else if (currentLoadingBarCount < currentLoadingBars.value.length) {
@@ -106,7 +106,6 @@ const refreshInfo = async () => {
 }
 
 const handleClickOutside = (event) => {
-  console.log('clicked outside from appbar')
   if (
     card.value &&
     infoButton.value.$el !== event.target &&

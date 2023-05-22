@@ -1,6 +1,5 @@
 <script setup>
 import { computed, onMounted, ref, watch } from 'vue'
-import { ofetch } from 'ofetch'
 import {
   Pagination,
   Checkbox,
@@ -18,7 +17,7 @@ import {
   Promotion,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
-import { useSearch } from '@/store/state'
+import { handleError, useSearch } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute } from 'vue-router'
@@ -28,6 +27,7 @@ import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import Instance from '@/components/ui/Instance.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
+import { useFetch } from '@/helpers/fetch.js'
 
 const route = useRoute()
 
@@ -64,9 +64,9 @@ if (searchStore.projectType === 'modpack') {
 
 onMounted(async () => {
   ;[categories.value, loaders.value, availableGameVersions.value] = await Promise.all([
-    get_categories(),
-    get_loaders(),
-    get_game_versions(),
+    get_categories().catch(handleError),
+    get_loaders().catch(handleError),
+    get_game_versions().catch(handleError),
   ])
   breadcrumbs.setContext({ name: 'Browse', link: route.path })
   if (searchStore.projectType === 'modpack') {
@@ -94,7 +94,10 @@ const sortedCategories = computed(() => {
 
 const getSearchResults = async () => {
   const queryString = searchStore.getQueryString()
-  const response = await ofetch(`https://api.modrinth.com/v2/search${queryString}`)
+  const response = await useFetch(
+    `https://api.modrinth.com/v2/search${queryString}`,
+    'search results'
+  )
   searchStore.setSearchResults(response)
 }
 

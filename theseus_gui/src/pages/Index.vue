@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onUnmounted, shallowRef } from 'vue'
-import { ofetch } from 'ofetch'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
 import { list } from '@/helpers/profile.js'
 import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
+import { useFetch } from '@/helpers/fetch.js'
+import { handleError } from '@/store/notifications.js'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -20,7 +21,7 @@ const recentInstances = shallowRef([])
 
 const getInstances = async () => {
   filter.value = ''
-  const profiles = await list(true)
+  const profiles = await list(true).catch(handleError)
   recentInstances.value = Object.values(profiles)
 
   const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
@@ -31,14 +32,16 @@ const getInstances = async () => {
 }
 
 const getFeaturedModpacks = async () => {
-  const response = await ofetch(
-    `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`
+  const response = await useFetch(
+    `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
+    'featured modpacks'
   )
   featuredModpacks.value = response.hits
 }
 const getFeaturedMods = async () => {
-  const response = await ofetch(
-    `https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows&filters=${filter.value}`
+  const response = await useFetch(
+    `https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows&filters=${filter.value}`,
+    'featured mods'
   )
   featuredMods.value = response.hits
 }

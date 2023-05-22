@@ -50,7 +50,7 @@
           </Button>
           <!--TODO: https://github.com/tauri-apps/tauri/issues/4062 -->
           <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
-            <OpenFolderIcon />
+            <FolderOpenIcon />
           </Button>
         </span>
       </Card>
@@ -82,8 +82,18 @@
   </div>
 </template>
 <script setup>
-import { BoxIcon, SettingsIcon, FileIcon, XIcon, Button, Avatar, Card, Promotion } from 'omorphia'
-import { PlayIcon, OpenFolderIcon } from '@/assets/icons'
+import {
+  BoxIcon,
+  SettingsIcon,
+  FileIcon,
+  XIcon,
+  Button,
+  Avatar,
+  Card,
+  Promotion,
+  PlayIcon,
+  FolderOpenIcon,
+} from 'omorphia'
 import { get, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
@@ -95,13 +105,13 @@ import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import { useBreadcrumbs, useLoading, useSearch } from '@/store/state'
+import { handleError, useBreadcrumbs, useLoading, useSearch } from '@/store/state'
 
 const route = useRoute()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
-const instance = ref(await get(route.params.id))
+const instance = ref(await get(route.params.id).catch(handleError))
 
 searchStore.instanceContext = instance.value
 breadcrumbs.setName('Instance', instance.value.metadata.name)
@@ -118,13 +128,13 @@ const loading = ref(false)
 
 const startInstance = async () => {
   loading.value = true
-  uuid.value = await run(route.params.id)
+  uuid.value = await run(route.params.id).catch(handleError)
   loading.value = false
   playing.value = true
 }
 
 const checkProcess = async () => {
-  const runningPaths = await get_all_running_profile_paths()
+  const runningPaths = await get_all_running_profile_paths().catch(handleError)
   if (runningPaths.includes(instance.value.path)) {
     playing.value = true
     return
@@ -141,10 +151,10 @@ const stopInstance = async () => {
 
   try {
     if (!uuid.value) {
-      const uuids = await get_uuids_by_profile_path(instance.value.path)
+      const uuids = await get_uuids_by_profile_path(instance.value.path).catch(handleError)
       uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
-      uuids.forEach(async (u) => await kill_by_uuid(u))
-    } else await kill_by_uuid(uuid.value)
+      uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
+    } else await kill_by_uuid(uuid.value).catch(handleError)
   } catch (err) {
     // Theseus currently throws:
     //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
@@ -155,7 +165,7 @@ const stopInstance = async () => {
 
 const unlistenProfiles = await profile_listener(async (event) => {
   if (event.path === route.params.id) {
-    instance.value = await get(route.params.id)
+    instance.value = await get(route.params.id).catch(handleError)
   }
 })
 

@@ -16,11 +16,10 @@ import { add_project_from_version as installMod, check_installed, list } from '@
 import { tauri } from '@tauri-apps/api'
 import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { useRouter } from 'vue-router'
 import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
+import { handleError } from '@/store/notifications.js'
 
-const router = useRouter()
 const versions = ref([])
 const project = ref('')
 const installModal = ref(null)
@@ -55,7 +54,7 @@ async function install(instance) {
     )
   })
 
-  await installMod(instance.path, version.id)
+  await installMod(instance.path, version.id).catch(handleError)
   await installVersionDependencies(instance, version)
 
   instance.installedMod = true
@@ -63,7 +62,7 @@ async function install(instance) {
 }
 
 async function getData() {
-  const projects = await list(true).then(Object.values)
+  const projects = await list(true).then(Object.values).catch(handleError)
 
   const filtered = projects
     .filter((profile) => {
@@ -83,7 +82,7 @@ async function getData() {
 
   for (let profile of filtered) {
     profile.installing = false
-    profile.installedMod = await check_installed(profile.path, project.value)
+    profile.installedMod = await check_installed(profile.path, project.value).catch(handleError)
   }
 
   return filtered
@@ -130,11 +129,10 @@ const createInstance = async () => {
       : 'vanilla',
     'latest',
     icon.value
-  )
+  ).catch(handleError)
 
-  await installMod(id, versions.value[0].id)
+  await installMod(id, versions.value[0].id).catch(handleError)
 
-  await router.push({ path: `/instance/${encodeURIComponent(id)}` })
   installModal.value.hide()
   creatingInstance.value = false
 }

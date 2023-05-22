@@ -1,8 +1,16 @@
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
-import { HomeIcon, SearchIcon, LibraryIcon, PlusIcon, SettingsIcon, Button } from 'omorphia'
-import { useLoading, useTheming } from '@/store/state'
+import {
+  HomeIcon,
+  SearchIcon,
+  LibraryIcon,
+  PlusIcon,
+  SettingsIcon,
+  Button,
+  Notifications,
+} from 'omorphia'
+import { handleError, useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
 import { get } from '@/helpers/settings'
@@ -10,14 +18,24 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
+import { useNotifications } from '@/store/notifications.js'
+import { warning_listener } from '@/helpers/events.js'
 
 const themeStore = useTheming()
 
 const isLoading = ref(true)
 onMounted(async () => {
-  const { settings, collapsed_navigation } = await get()
+  const { settings, collapsed_navigation } = await get().catch(handleError)
   themeStore.setThemeState(settings)
   themeStore.collapsedNavigation = collapsed_navigation
+
+  await warning_listener((e) =>
+    notificationsWrapper.value.addNotification({
+      title: 'Warning',
+      text: e.message,
+      type: 'warn',
+    })
+  )
 })
 
 defineExpose({
@@ -28,6 +46,13 @@ defineExpose({
   },
 })
 const loading = useLoading()
+
+const notifications = useNotifications()
+const notificationsWrapper = ref(null)
+
+watch(notificationsWrapper, () => {
+  notifications.setNotifs(notificationsWrapper.value)
+})
 </script>
 
 <template>
@@ -123,6 +148,7 @@ const loading = useLoading()
           offset-height="var(--appbar-height)"
           offset-width="var(--sidebar-width)"
         />
+        <Notifications ref="notificationsWrapper" />
         <RouterView v-slot="{ Component }">
           <template v-if="Component">
             <Suspense @pending="loading.startLoading()" @resolve="loading.stopLoading()">

@@ -1,9 +1,7 @@
 <script setup>
 import { onUnmounted, ref, useSlots } from 'vue'
 import { useRouter } from 'vue-router'
-import { ofetch } from 'ofetch'
-import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo } from 'omorphia'
-import { PlayIcon } from '@/assets/icons'
+import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
@@ -14,6 +12,8 @@ import {
   get_uuids_by_profile_path,
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
+import { useFetch } from '@/helpers/fetch.js'
+import { handleError } from '@/store/state.js'
 
 const props = defineProps({
   instance: {
@@ -46,7 +46,7 @@ const seeInstance = async () => {
 }
 
 const checkProcess = async () => {
-  const runningPaths = await get_all_running_profile_paths()
+  const runningPaths = await get_all_running_profile_paths().catch(handleError)
 
   if (runningPaths.includes(props.instance.path)) {
     playing.value = true
@@ -60,12 +60,13 @@ const checkProcess = async () => {
 const install = async (e) => {
   e.stopPropagation()
   modLoading.value = true
-  const versions = await ofetch(
-    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`
+  const versions = await useFetch(
+    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
+    'project versions'
   )
 
   if (props.instance.project_type === 'modpack') {
-    const packs = Object.values(await list(true))
+    const packs = Object.values(await list(true).catch(handleError))
 
     if (
       packs.length === 0 ||
@@ -75,7 +76,9 @@ const install = async (e) => {
     ) {
       try {
         modLoading.value = true
-        await pack_install(versions[0].id, props.instance.title, props.instance.icon_url)
+        await pack_install(versions[0].id, props.instance.title, props.instance.icon_url).catch(
+          handleError
+        )
         modLoading.value = false
       } catch (err) {
         console.error(err)
@@ -91,7 +94,7 @@ const install = async (e) => {
 const play = async (e) => {
   e.stopPropagation()
   modLoading.value = true
-  uuid.value = await run(props.instance.path)
+  uuid.value = await run(props.instance.path).catch(handleError)
   modLoading.value = false
   playing.value = true
 }
@@ -105,10 +108,10 @@ const stop = async (e) => {
     // from-then-back to this page, we will get all uuids by the instance path.
     // For-each uuid, kill the process.
     if (!uuid.value) {
-      const uuids = await get_uuids_by_profile_path(props.instance.path)
+      const uuids = await get_uuids_by_profile_path(props.instance.path).catch(handleError)
       uuid.value = uuids[0]
-      uuids.forEach(async (u) => await kill_by_uuid(u))
-    } else await kill_by_uuid(uuid.value) // If we still have the uuid, just kill it
+      uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
+    } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
   } catch (err) {
     // Theseus currently throws:
     //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
