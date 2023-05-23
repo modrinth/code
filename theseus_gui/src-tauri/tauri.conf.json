@@ -7,8 +7,8 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "theseus",
-    "version": "0.0.0"
+    "productName": "Modrinth App",
+    "version": "0.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -33,7 +33,7 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Entertainment",
       "copyright": "",
       "deb": {
         "depends": []
@@ -75,7 +75,7 @@
         "fullscreen": false,
         "height": 650,
         "resizable": true,
-        "title": "Modrinth Launcher",
+        "title": "Modrinth App",
         "width": 1140,
         "minHeight": 630,
         "minWidth": 1100
