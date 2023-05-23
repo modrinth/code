@@ -52,7 +52,9 @@ jobs:
       - name: install frontend dependencies
         run: yarn install --immutable --immutable-cache --check-cache
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: build app (macos)
+        uses: tauri-apps/tauri-action@v0
+        id: build_os
         if: startsWith(matrix.platform, 'macos')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -65,7 +67,9 @@ jobs:
         with:
           args: --target universal-apple-darwin
 
-      - uses: tauri-apps/tauri-action@v0
+      - name: build app
+        uses: tauri-apps/tauri-action@v0
+        id: build_os
         if: "!startsWith(matrix.platform, 'macos')"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
