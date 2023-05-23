@@ -54,7 +54,7 @@ jobs:
 
       - name: build app (macos)
         uses: tauri-apps/tauri-action@v0
-        id: build_os
+        id: build_os_mac
         if: startsWith(matrix.platform, 'macos')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,6 +76,14 @@ jobs:
 
       - name: upload ${{ matrix.platform }}
         uses: actions/upload-artifact@v3
+        if: startsWith(matrix.platform, 'macos')
+        with:
+          name: ${{ matrix.platform }}
+          path: "${{ join(fromJSON(steps.build_os_mac.outputs.artifactPaths), '\n') }}"
+
+      - name: upload ${{ matrix.platform }}
+        uses: actions/upload-artifact@v3
+        if: "!startsWith(matrix.platform, 'macos')"
         with:
           name: ${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
