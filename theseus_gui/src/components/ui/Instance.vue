@@ -1,7 +1,7 @@
 <script setup>
 import { onUnmounted, ref, useSlots } from 'vue'
 import { useRouter } from 'vue-router'
-import { Card, SaveIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
+import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
@@ -206,7 +206,7 @@ onUnmounted(() => unlisten())
       >
         <XIcon />
       </div>
-      <div v-else class="install cta buttonbase" @click="install"><SaveIcon /></div>
+      <div v-else class="install cta buttonbase" @click="install"><DownloadIcon /></div>
     </template>
     <InstallConfirmModal ref="confirmModal" />
   </div>

@@ -47,7 +47,7 @@
       </div>
       <Button v-if="accounts.length > 0" @click="login()">
         <PlusIcon />
-        Add Account
+        Add account
       </Button>
     </Card>
   </transition>
@@ -115,6 +115,7 @@ const login = async () => {
   const url = await authenticate_begin_flow().catch(handleError)
 
   const window = new WebviewWindow('loginWindow', {
+    title: 'Modrinth App',
     url: url,
   })
 

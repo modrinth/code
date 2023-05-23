@@ -41,7 +41,7 @@
         :action="clearFilters"
       >
         <ClearIcon />
-        Clear Filters
+        Clear filters
       </Button>
     </div>
   </Card>

@@ -10,9 +10,9 @@ const themeStore = useTheming()
 
 const fetchSettings = await get().catch(handleError)
 
-if (!fetchSettings.java_globals?.JAVA_8)
+if (!fetchSettings.java_globals.JAVA_8)
   fetchSettings.java_globals.JAVA_8 = { path: '', version: '' }
-if (!fetchSettings.java_globals?.JAVA_17)
+if (!fetchSettings.java_globals.JAVA_17)
   fetchSettings.java_globals.JAVA_17 = { path: '', version: '' }
 
 fetchSettings.javaArgs = fetchSettings.custom_java_args.join(' ')
@@ -22,31 +22,33 @@ const settings = ref(fetchSettings)
 const maxMemory = ref((await get_max_memory().catch(handleError)) / 1024)
 
 watch(settings.value, async (oldSettings, newSettings) => {
-  if (newSettings.java_globals?.JAVA_8?.path === '') {
-    newSettings.java_globals.JAVA_8 = undefined
+  const setSettings = JSON.parse(JSON.stringify(newSettings))
+
+  if (setSettings.java_globals.JAVA_8?.path === '') {
+    setSettings.java_globals.JAVA_8 = undefined
   }
-  if (newSettings.java_globals?.JAVA_17?.path === '') {
-    newSettings.java_globals.JAVA_17 = undefined
+  if (setSettings.java_globals.JAVA_17?.path === '') {
+    setSettings.java_globals.JAVA_17 = undefined
   }
 
-  newSettings.custom_java_args = newSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
-  newSettings.custom_env_args = newSettings.envArgs
+  setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
+  setSettings.custom_env_args = setSettings.envArgs
     .trim()
     .split(/\s+/)
     .filter(Boolean)
     .map((x) => x.split('=').filter(Boolean))
 
-  if (!newSettings.hooks.pre_launch) {
-    newSettings.hooks.pre_launch = null
+  if (!setSettings.hooks.pre_launch) {
+    setSettings.hooks.pre_launch = null
   }
-  if (!newSettings.hooks.wrapper) {
-    newSettings.hooks.wrapper = null
+  if (!setSettings.hooks.wrapper) {
+    setSettings.hooks.wrapper = null
   }
-  if (!newSettings.hooks.post_exit) {
-    newSettings.hooks.post_exit = null
+  if (!setSettings.hooks.post_exit) {
+    setSettings.hooks.post_exit = null
   }
 
-  await set(newSettings)
+  await set(setSettings)
 })
 </script>
 

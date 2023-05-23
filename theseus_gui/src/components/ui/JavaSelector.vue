@@ -22,7 +22,7 @@
         @click="$refs.detectJavaModal.show(props.version, props.modelValue)"
       >
         <SearchIcon />
-        Auto Detect
+        Auto detect
       </Button>
       <Button :disabled="props.disabled" @click="handleJavaFileInput()">
         <FolderSearchIcon />

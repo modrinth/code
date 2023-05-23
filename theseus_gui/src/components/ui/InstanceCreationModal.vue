@@ -1,16 +1,16 @@
 <template>
-  <Modal ref="modal" header="Create Instance">
+  <Modal ref="modal" header="Create instance">
     <div v-if="showContent" class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
         <div class="image-input">
           <Button @click="upload_icon()">
             <UploadIcon />
-            Upload Icon
+            Select icon
           </Button>
           <Button @click="reset_icon">
             <XIcon />
-            Remove Icon
+            Remove icon
           </Button>
         </div>
       </div>
@@ -23,7 +23,7 @@
         <Chips v-model="loader" :items="loaders" />
       </div>
       <div class="input-row">
-        <p class="input-label">Game Version</p>
+        <p class="input-label">Game version</p>
         <div class="versions">
           <DropdownSelect v-model="game_version" :options="game_versions" render-up />
           <Checkbox
@@ -35,12 +35,12 @@
         </div>
       </div>
       <div v-if="showAdvanced && loader !== 'vanilla'" class="input-row">
-        <p class="input-label">Loader Version</p>
+        <p class="input-label">Loader version</p>
         <Chips v-model="loader_version" :items="['stable', 'latest', 'other']" />
       </div>
       <div v-if="showAdvanced && loader_version === 'other' && loader !== 'vanilla'">
         <div v-if="game_version" class="input-row">
-          <p class="input-label">Select Version</p>
+          <p class="input-label">Select version</p>
           <DropdownSelect
             v-model="specified_loader_version"
             :options="selectable_versions"
@@ -54,7 +54,7 @@
       <div class="button-group">
         <Button @click="toggle_advanced">
           <CodeIcon />
-          {{ showAdvanced ? 'Hide Advanced' : 'Show Advanced' }}
+          {{ showAdvanced ? 'Hide advanced' : 'Show advanced' }}
         </Button>
         <Button @click="$refs.modal.hide()">
           <XIcon />

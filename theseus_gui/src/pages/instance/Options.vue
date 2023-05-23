@@ -56,7 +56,7 @@
       <div class="input-stack">
         <button id="instance-icon" class="btn" @click="setIcon">
           <UploadIcon />
-          Upload icon
+          Select icon
         </button>
         <button class="btn" @click="resetIcon">
           <TrashIcon />
