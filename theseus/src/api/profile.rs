@@ -6,7 +6,6 @@ use crate::state::ProjectMetadata;
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
-    profile,
     state::MinecraftChild,
 };
 pub use crate::{

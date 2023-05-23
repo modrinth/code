@@ -7,8 +7,8 @@
     "withGlobalTauri": false
   },
   "package": {
-    "productName": "theseus",
-    "version": "0.0.0"
+    "productName": "Modrinth App",
+    "version": "0.0.1"
   },
   "tauri": {
     "allowlist": {
@@ -33,7 +33,7 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Entertainment",
       "copyright": "",
       "deb": {
         "depends": []
@@ -68,14 +68,17 @@
       "csp": "default-src 'self'; connect-src https://modrinth.com https://*.modrinth.com; font-src https://cdn-raw.modrinth.com/fonts/inter/; img-src tauri: https: data: blob: 'unsafe-inline' asset: https://asset.localhost"
     },
     "updater": {
-      "active": false
+      "active": true,
+      "endpoints": ["https://launcher-files.modrinth.com/updates.json"],
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIwMzM5QkE0M0FCOERBMzkKUldRNTJyZzZwSnN6SUdPRGdZREtUUGxMblZqeG9OVHYxRUlRTzJBc2U3MUNJaDMvZDQ1UytZZmYK"
     },
     "windows": [
       {
         "fullscreen": false,
         "height": 650,
         "resizable": true,
-        "title": "Modrinth Launcher",
+        "title": "Modrinth App",
         "width": 1140,
         "minHeight": 630,
         "minWidth": 1100

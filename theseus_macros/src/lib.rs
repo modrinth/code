@@ -13,22 +13,19 @@ pub fn debug_pin(_attr: TokenStream, item: TokenStream) -> TokenStream {
     let sig = &input.sig;
     let body = &input.block;
 
-    // Generate tokens for the common part
-    let common_tokens = quote! {
-        #(#attrs)*
-        #vis #sig
-    };
-
+    #[cfg(debug_assertions)]
     let result = quote! {
-        #[cfg(debug_assertions)]
-        #common_tokens {
+        #(#attrs)*
+        #vis #sig {
             Box::pin(async move {
                 #body
             }).await
         }
-
-        #[cfg(not(debug_assertions))]
-        #common_tokens {
+    };
+    #[cfg(not(debug_assertions))]
+    let result = quote! {
+        #(#attrs)*
+        #vis #sig {
             #body
         }
     };
