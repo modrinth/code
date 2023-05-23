@@ -41,6 +41,7 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
+          cache-dependency-path: "theseus_gui"
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
