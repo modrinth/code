@@ -22,9 +22,8 @@ jobs:
         if: startsWith(matrix.platform, 'macos')
         uses: dtolnay/rust-toolchain@stable
         with:
+          targets: 'aarch64-apple-darwin'
           components: rustfmt, clippy
-          targets: "aarch64-apple-darwin"
-
       - name: Rust setup
         if: !startsWith(matrix.platform, 'macos')
         uses: dtolnay/rust-toolchain@stable
