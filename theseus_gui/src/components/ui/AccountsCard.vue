@@ -31,7 +31,7 @@
       <div v-else class="logged-out account">
         <h4>Not signed in</h4>
         <Button icon-only color="primary" @click="login()">
-          <LoginIcon />
+          <LogInIcon />
         </Button>
       </div>
       <div v-if="displayAccounts.length > 0" class="account-group">
@@ -54,8 +54,7 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, XIcon } from 'omorphia'
-import { LoginIcon, UsersIcon } from '@/assets/icons'
+import { Avatar, Button, Card, PlusIcon, XIcon, UsersIcon, LogInIcon } from 'omorphia'
 import { ref, defineProps, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
@@ -65,6 +64,7 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
+import { handleError } from '@/store/state.js'
 
 defineProps({
   expanded: {
@@ -73,7 +73,7 @@ defineProps({
   },
 })
 
-const settings = ref(await get())
+const settings = ref(await get().catch(handleError))
 
 const appendProfiles = (accounts) => {
   return accounts.map((account) => {
@@ -84,7 +84,7 @@ const appendProfiles = (accounts) => {
   })
 }
 
-const accounts = ref(await users().then(appendProfiles))
+const accounts = ref(await users().then(appendProfiles).catch(handleError))
 
 const displayAccounts = computed(() =>
   accounts.value.filter((account) => settings.value.default_user !== account.id)
@@ -95,7 +95,7 @@ const selectedAccount = ref(
 )
 
 const refreshValues = async () => {
-  accounts.value = await users().then(appendProfiles)
+  accounts.value = await users().then(appendProfiles).catch(handleError)
   selectedAccount.value = accounts.value.find(
     (account) => account.id === settings.value.default_user
   )
@@ -108,11 +108,11 @@ let button = ref(null)
 const setAccount = async (account) => {
   settings.value.default_user = account.id
   selectedAccount.value = account
-  await set(settings.value)
+  await set(settings.value).catch(handleError)
 }
 
 const login = async () => {
-  const url = await authenticate_begin_flow()
+  const url = await authenticate_begin_flow().catch(handleError)
 
   const window = new WebviewWindow('loginWindow', {
     url: url,
@@ -126,14 +126,14 @@ const login = async () => {
     console.log('webview error', e)
   })
 
-  const loggedIn = await authenticate_await_completion()
+  const loggedIn = await authenticate_await_completion().catch(handleError)
   await setAccount(loggedIn)
   await refreshValues()
   await window.close()
 }
 
 const logout = async (id) => {
-  await remove_user(id)
+  await remove_user(id).catch(handleError)
   await refreshValues()
   if (!selectedAccount.value && accounts.value.length > 0) {
     await setAccount(accounts.value[0])

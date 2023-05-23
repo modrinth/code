@@ -77,11 +77,9 @@ import { ref } from 'vue'
 import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
 import { install as packInstall } from '@/helpers/pack.js'
 import { installVersionDependencies } from '@/helpers/utils.js'
-import { ofetch } from 'ofetch'
-import { useRouter } from 'vue-router'
+import { useFetch } from '@/helpers/fetch.js'
+import { handleError } from '@/store/notifications.js'
 dayjs.extend(relativeTime)
-
-const router = useRouter()
 
 const props = defineProps({
   backgroundImage: {
@@ -130,8 +128,9 @@ const installed = ref(
 
 async function install() {
   installing.value = true
-  const versions = await ofetch(
-    `https://api.modrinth.com/v2/project/${props.project.project_id}/version`
+  const versions = await useFetch(
+    `https://api.modrinth.com/v2/project/${props.project.project_id}/version`,
+    'project versions'
   )
   let queuedVersionData
 
@@ -146,15 +145,16 @@ async function install() {
   }
 
   if (props.project.project_type === 'modpack') {
-    const packs = Object.values(await list())
+    const packs = Object.values(await list().catch(handleError))
     if (
       packs.length === 0 ||
       !packs
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === props.project.project_id)
     ) {
-      let id = await packInstall(queuedVersionData.id, props.project.title, props.project.icon_url)
-      await router.push({ path: `/instance/${encodeURIComponent(id)}` })
+      await packInstall(queuedVersionData.id, props.project.title, props.project.icon_url).catch(
+        handleError
+      )
     } else {
       props.confirmModal.show(queuedVersionData.id)
     }
@@ -170,7 +170,7 @@ async function install() {
         installing.value = false
         return
       } else {
-        await installMod(props.instance.path, queuedVersionData.id)
+        await installMod(props.instance.path, queuedVersionData.id).catch(handleError)
         installVersionDependencies(props.instance, queuedVersionData)
       }
     } else {

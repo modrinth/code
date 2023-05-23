@@ -240,7 +240,6 @@ import { install as packInstall } from '@/helpers/pack'
 import { list, add_project_from_version as installMod, check_installed } from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { ofetch } from 'ofetch'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies } from '@/helpers/utils'
@@ -250,6 +249,8 @@ import Instance from '@/components/ui/Instance.vue'
 import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
+import { useFetch } from '@/helpers/fetch.js'
+import { handleError } from '@/store/notifications.js'
 
 const searchStore = useSearch()
 
@@ -264,15 +265,23 @@ const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
 
 const [data, versions, members, dependencies, categories, loaders] = await Promise.all([
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`).then(shallowRef),
-  ofetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`).then(shallowRef),
-  get_loaders().then(ref),
-  get_categories().then(ref),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project').then(shallowRef),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project').then(
+    shallowRef
+  ),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project').then(
+    shallowRef
+  ),
+  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project').then(
+    shallowRef
+  ),
+  get_loaders().then(ref).catch(handleError),
+  get_categories().then(ref).catch(handleError),
 ])
 
-const installed = ref(instance.value && (await check_installed(instance.value.path, data.value.id)))
+const installed = ref(
+  instance.value && (await check_installed(instance.value.path, data.value.id).catch(handleError))
+)
 
 breadcrumbs.setName('Project', data.value.title)
 
@@ -306,14 +315,16 @@ async function install(version) {
   }
 
   if (data.value.project_type === 'modpack') {
-    const packs = Object.values(await list(true))
+    const packs = Object.values(await list(true).catch(handleError))
     if (
       packs.length === 0 ||
       !packs
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
-      await packInstall(queuedVersionData.id, data.value.title, data.value.icon_url)
+      await packInstall(queuedVersionData.id, data.value.title, data.value.icon_url).catch(
+        handleError
+      )
     } else {
       confirmModal.value.show(queuedVersionData.id, data.value.title, data.value.icon_url)
     }
@@ -340,7 +351,7 @@ async function install(version) {
           return
         } else {
           queuedVersionData = selectedVersion
-          await installMod(instance.value.path, selectedVersion.id)
+          await installMod(instance.value.path, selectedVersion.id).catch(handleError)
           installVersionDependencies(instance.value, queuedVersionData)
         }
       } else {
@@ -354,7 +365,7 @@ async function install(version) {
               : true)
         )
         if (compatible) {
-          await installMod(instance.value.path, queuedVersionData.id)
+          await installMod(instance.value.path, queuedVersionData.id).catch(handleError)
           await installVersionDependencies(instance.value, queuedVersionData)
         } else {
           incompatibilityWarning.value.show(

@@ -92,6 +92,7 @@ import {
   update_all,
   update_project,
 } from '@/helpers/profile.js'
+import { handleError } from '@/store/notifications.js'
 
 const router = useRouter()
 
@@ -200,7 +201,7 @@ async function updateAll() {
     }
   }
 
-  const paths = await update_all(props.instance.path)
+  const paths = await update_all(props.instance.path).catch(handleError)
 
   for (const [oldVal, newVal] of Object.entries(paths)) {
     const index = projects.value.findIndex((x) => x.path === oldVal)
@@ -219,7 +220,7 @@ async function updateAll() {
 
 async function updateProject(mod) {
   mod.updating = true
-  mod.path = await update_project(props.instance.path, mod.path)
+  mod.path = await update_project(props.instance.path, mod.path).catch(handleError)
   mod.updating = false
 
   mod.outdated = false
@@ -228,11 +229,11 @@ async function updateProject(mod) {
 }
 
 async function toggleDisableMod(mod) {
-  mod.path = await toggle_disable_project(props.instance.path, mod.path)
+  mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
 }
 
 async function removeMod(mod) {
-  await remove_project(props.instance.path, mod.path)
+  await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 }
 </script>

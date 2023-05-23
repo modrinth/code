@@ -1,8 +1,0 @@
-export { default as PlayIcon } from './play.svg'
-export { default as OpenFolderIcon } from './folder-open.svg'
-export { default as BrowseIcon } from './folder-search.svg'
-export { default as LoginIcon } from './log-in.svg'
-export { default as StopIcon } from './stop-circle.svg'
-export { default as TerminalIcon } from './terminal-square.svg'
-export { default as UsersIcon } from './users.svg'
-export { default as HammerIcon } from './hammer.svg'

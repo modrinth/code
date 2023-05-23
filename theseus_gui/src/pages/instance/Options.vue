@@ -217,8 +217,8 @@ import {
   DropdownSelect,
   XIcon,
   SaveIcon,
+  HammerIcon,
 } from 'omorphia'
-import { HammerIcon } from '@/assets/icons'
 import { useRouter } from 'vue-router'
 import { edit, edit_icon, get_optimal_jre_key, install, remove } from '@/helpers/profile.js'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
@@ -229,6 +229,7 @@ import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
 import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata.js'
 import { get_game_versions, get_loaders } from '@/helpers/tags.js'
+import { handleError } from '@/store/notifications.js'
 
 const router = useRouter()
 
@@ -244,7 +245,7 @@ const icon = ref(props.instance.metadata.icon)
 
 async function resetIcon() {
   icon.value = null
-  await edit_icon(props.instance.path, null)
+  await edit_icon(props.instance.path, null).catch(handleError)
 }
 
 async function setIcon() {
@@ -261,15 +262,15 @@ async function setIcon() {
   if (!value) return
 
   icon.value = value
-  await edit_icon(props.instance.path, icon.value)
+  await edit_icon(props.instance.path, icon.value).catch(handleError)
 }
 
-const globalSettings = await get()
+const globalSettings = await get().catch(handleError)
 
 const javaSettings = props.instance.java ?? {}
 
 const overrideJavaInstall = ref(!!javaSettings.override_version)
-const optimalJava = readonly(await get_optimal_jre_key(props.instance.path))
+const optimalJava = readonly(await get_optimal_jre_key(props.instance.path).catch(handleError))
 const javaInstall = ref(optimalJava ?? javaSettings.override_version ?? { path: '', version: '' })
 
 const overrideJavaArgs = ref(!!javaSettings.extra_arguments)
@@ -282,7 +283,7 @@ const envVars = ref(
 
 const overrideMemorySettings = ref(!!props.instance.memory)
 const memory = ref(props.instance.memory ?? globalSettings.memory)
-const maxMemory = (await get_max_memory()) / 1024
+const maxMemory = (await get_max_memory().catch(handleError)) / 1024
 
 const overrideWindowSettings = ref(!!props.instance.resolution)
 const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
@@ -356,14 +357,14 @@ const repairing = ref(false)
 
 async function repairProfile() {
   repairing.value = true
-  await install(props.instance.path)
+  await install(props.instance.path).catch(handleError)
   repairing.value = false
 }
 
 const removing = ref(false)
 async function removeProfile() {
   removing.value = true
-  await remove(props.instance.path)
+  await remove(props.instance.path).catch(handleError)
   removing.value = false
 
   await router.push({ path: '/' })
@@ -374,17 +375,18 @@ const showSnapshots = ref(false)
 
 const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
   await Promise.all([
-    get_fabric_versions().then(shallowRef),
-    get_forge_versions().then(shallowRef),
-    get_quilt_versions().then(shallowRef),
-    get_game_versions().then(shallowRef),
+    get_fabric_versions().then(shallowRef).catch(handleError),
+    get_forge_versions().then(shallowRef).catch(handleError),
+    get_quilt_versions().then(shallowRef).catch(handleError),
+    get_game_versions().then(shallowRef).catch(handleError),
     get_loaders()
       .then((value) =>
         value
           .filter((item) => item.supported_project_types.includes('modpack'))
           .map((item) => item.name.toLowerCase())
       )
-      .then(ref),
+      .then(ref)
+      .catch(handleError),
   ])
 loaders.value.push('vanilla')
 
@@ -449,7 +451,7 @@ async function saveGvLoaderEdits() {
   if (loader.value !== 'vanilla') {
     editProfile.metadata.loader_version = selectableLoaderVersions.value[loaderVersionIndex.value]
   }
-  await edit(props.instance.path, editProfile)
+  await edit(props.instance.path, editProfile).catch(handleError)
   await repairProfile()
 
   editing.value = false

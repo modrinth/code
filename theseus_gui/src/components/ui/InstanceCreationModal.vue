@@ -86,11 +86,9 @@ import { computed, ref, shallowRef } from 'vue'
 import { get_game_versions, get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
-import { useRouter } from 'vue-router'
 import { tauri } from '@tauri-apps/api'
 import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata'
-
-const router = useRouter()
+import { handleError } from '@/store/notifications.js'
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -127,17 +125,18 @@ defineExpose({
 
 const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loaders] =
   await Promise.all([
-    get_fabric_versions().then(shallowRef),
-    get_forge_versions().then(shallowRef),
-    get_quilt_versions().then(shallowRef),
-    get_game_versions().then(shallowRef),
+    get_fabric_versions().then(shallowRef).catch(handleError),
+    get_forge_versions().then(shallowRef).catch(handleError),
+    get_quilt_versions().then(shallowRef).catch(handleError),
+    get_game_versions().then(shallowRef).catch(handleError),
     get_loaders()
       .then((value) =>
         value
           .filter((item) => item.supported_project_types.includes('modpack'))
           .map((item) => item.name.toLowerCase())
       )
-      .then(ref),
+      .then(ref)
+      .catch(handleError),
   ])
 loaders.value.push('vanilla')
 
@@ -172,15 +171,14 @@ const create_instance = async () => {
     const loader_version_value =
       loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
 
-    const id = await create(
+    await create(
       profile_name.value,
       game_version.value,
       loader.value,
       loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
       icon.value
-    )
+    ).catch(handleError)
 
-    await router.push({ path: `/instance/${encodeURIComponent(id)}` })
     modal.value.hide()
     creating.value = false
   } catch (e) {

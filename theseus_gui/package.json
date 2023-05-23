@@ -15,7 +15,7 @@
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
     "ofetch": "^1.0.1",
-    "omorphia": "^0.4.16",
+    "omorphia": "^0.4.17",
     "pinia": "^2.0.33",
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.2.45",
