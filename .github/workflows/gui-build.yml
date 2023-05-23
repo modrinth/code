@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: 16
           cache: 'yarn'
+          cache-dependency-path: "theseus_gui"
 
       - name: Install dependencies
         run: yarn install --immutable --immutable-cache --check-cache
