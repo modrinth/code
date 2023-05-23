@@ -39,8 +39,8 @@ impl Default for Settings {
             java_globals: JavaGlobals::new(),
             default_user: None,
             hooks: Hooks::default(),
-            max_concurrent_downloads: 64,
-            max_concurrent_writes: 100,
+            max_concurrent_downloads: 10,
+            max_concurrent_writes: 10,
             version: CURRENT_FORMAT_VERSION,
             collapsed_navigation: false,
         }

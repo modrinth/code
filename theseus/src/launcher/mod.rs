@@ -149,7 +149,7 @@ pub async fn install_minecraft(
     let java_version = get_java_version_from_profile(profile, &version_info)
         .await?
         .ok_or_else(|| {
-            crate::ErrorKind::LauncherError(
+            crate::ErrorKind::OtherError(
                 "No available java installation".to_string(),
             )
         })?;

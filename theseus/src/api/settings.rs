@@ -18,7 +18,6 @@ pub async fn get() -> crate::Result<Settings> {
 #[tracing::instrument]
 pub async fn set(settings: Settings) -> crate::Result<()> {
     let state = State::get().await?;
-    // Replaces the settings struct in the RwLock with the passed argument
     let (reset_io, reset_fetch) = async {
         let read = state.settings.read().await;
         (
@@ -28,13 +27,17 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
     }
     .await;
 
-    *state.settings.write().await = settings;
+    {
+        *state.settings.write().await = settings;
+    }
+
     if reset_io {
         state.reset_io_semaphore().await;
     }
     if reset_fetch {
         state.reset_fetch_semaphore().await;
     }
+
     State::sync().await?;
     Ok(())
 }

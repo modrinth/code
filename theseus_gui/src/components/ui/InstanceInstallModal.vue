@@ -172,11 +172,11 @@ const check_valid = computed(() => {
             <div class="creation-icon__description">
               <Button @click="upload_icon()">
                 <UploadIcon />
-                <span class="no-wrap"> Upload Icon </span>
+                <span class="no-wrap"> Select icon </span>
               </Button>
               <Button @click="reset_icon()">
                 <XIcon />
-                <span class="no-wrap"> Remove Icon </span>
+                <span class="no-wrap"> Remove icon </span>
               </Button>
             </div>
           </div>

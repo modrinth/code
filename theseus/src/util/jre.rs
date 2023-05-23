@@ -221,7 +221,7 @@ async fn get_all_jre_path() -> Result<HashSet<PathBuf>, JREError> {
 
 #[cfg(target_os = "windows")]
 #[allow(dead_code)]
-const JAVA_BIN: &str = "java.exe";
+const JAVA_BIN: &str = "javaw.exe";
 
 #[cfg(not(target_os = "windows"))]
 #[allow(dead_code)]
