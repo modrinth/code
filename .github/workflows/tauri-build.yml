@@ -22,10 +22,11 @@ jobs:
         if: startsWith(matrix.platform, 'macos')
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: 'aarch64-apple-darwin'
           components: rustfmt, clippy
+          targets: aarch64-apple-darwin
+
       - name: Rust setup
-        if: !startsWith(matrix.platform, 'macos')
+        if: "!startsWith(matrix.platform, 'macos')"
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
@@ -64,7 +65,7 @@ jobs:
           args: --target universal-apple-darwin
 
       - uses: tauri-apps/tauri-action@v0
-        if: !startsWith(matrix.platform, 'macos')
+        if: "!startsWith(matrix.platform, 'macos')"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
