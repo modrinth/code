@@ -15,7 +15,6 @@
   "dependencies": {
     "@tauri-apps/api": "^1.2.0",
     "dayjs": "^1.11.7",
-    "debounce": "^1.2.1",
     "ofetch": "^1.0.1",
     "omorphia": "^0.4.17",
     "pinia": "^2.0.33",
