@@ -39,7 +39,7 @@ jobs:
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*'
+          node-version: 16
           cache: 'yarn'
 
       - name: install dependencies (ubuntu only)

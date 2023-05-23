@@ -11,10 +11,13 @@ jobs:
       run:
         working-directory: ./theseus_gui
     steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
       - name: Sync node version and setup cache
         uses: actions/setup-node@v3
         with:
-          node-version: 'lts/*'
+          node-version: 16
           cache: 'yarn'
 
       - name: Install dependencies
