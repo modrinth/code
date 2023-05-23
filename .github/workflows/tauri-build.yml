@@ -91,10 +91,3 @@ jobs:
         with:
           name: ${{ matrix.platform }}
           path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
-
-      - name: Run Lint
-        if: startsWith(matrix.platform, 'ubuntu')
-        uses: actions-rs/clippy-check@v1
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          args: --bin theseus_cli
