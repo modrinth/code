@@ -70,6 +70,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: upload ${{ matrix.platform }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.platform }}
+          path: "${{ join(fromJSON(steps.build_os.outputs.artifactPaths), '\n') }}"
+
       - name: Run Lint
         if: startsWith(matrix.platform, 'ubuntu')
         uses: actions-rs/clippy-check@v1
