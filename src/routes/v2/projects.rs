@@ -1282,7 +1282,10 @@ pub async fn projects_edit(
                     )));
                 }
             } else if project.inner.status.is_hidden() {
-                return Ok(HttpResponse::NotFound().body(""));
+                return Err(ApiError::InvalidInput(format!(
+                    "Project {} not found",
+                    ProjectId(project.inner.id.0 as u64)
+                )));
             } else {
                 return Err(ApiError::CustomAuthentication(format!(
                     "You are not a member of project {}!",
