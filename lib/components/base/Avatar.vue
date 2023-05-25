@@ -44,7 +44,7 @@ export default {
       type: String,
       default: 'sm',
       validator(value) {
-        return ['xs', 'sm', 'md', 'lg'].includes(value)
+        return ['xs', 'sm', 'md', 'lg', 'none'].includes(value)
       },
     },
     circle: {
@@ -109,6 +109,10 @@ export default {
   &.size-lg {
     --size: 9rem;
     border-radius: var(--radius-lg);
+  }
+
+  &.size-none {
+    --size: unset;
   }
 
   &.circle {
