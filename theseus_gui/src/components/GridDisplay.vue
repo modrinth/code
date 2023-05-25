@@ -1,12 +1,7 @@
 <script setup>
 import Instance from '@/components/ui/Instance.vue'
-import {computed, ref} from 'vue'
-import {
-  SearchIcon,
-  DropdownSelect,
-  Card,
-  formatCategoryHeader,
-} from "omorphia";
+import { computed, ref } from 'vue'
+import { SearchIcon, DropdownSelect, Card, formatCategoryHeader } from 'omorphia'
 
 const props = defineProps({
   instances: {
@@ -34,7 +29,7 @@ const filters = ref('All profiles')
 const sortBy = ref('Name')
 
 const filteredResults = computed(() => {
-  let instances =  props.instances.filter((instance) => {
+  let instances = props.instances.filter((instance) => {
     return instance.metadata.name.toLowerCase().includes(search.value.toLowerCase())
   })
 
@@ -111,31 +106,19 @@ const filteredResults = computed(() => {
 
   return instanceMap
 })
-
 </script>
 <template>
   <Card class="header">
     <div class="iconified-input">
-      <SearchIcon/>
-      <input
-        v-model="search"
-        type="text"
-        placeholder="Search"
-        class="search-input"
-      />
+      <SearchIcon />
+      <input v-model="search" type="text" placeholder="Search" class="search-input" />
     </div>
     <div class="labeled_button">
       <span>Sort by</span>
       <DropdownSelect
         v-model="sortBy"
         class="sort-dropdown"
-        :options="[
-          'Name',
-          'Last played',
-          'Date created',
-          'Date modified',
-          'Game version',
-        ]"
+        :options="['Name', 'Last played', 'Date created', 'Date modified', 'Game version']"
         placeholder="Select..."
       />
     </div>
@@ -144,11 +127,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="filters"
         class="filter-dropdown"
-        :options="[
-          'All profiles',
-          'Custom instances',
-          'Downloaded modpacks'
-        ]"
+        :options="['All profiles', 'Custom instances', 'Downloaded modpacks']"
         placeholder="Select..."
       />
     </div>
@@ -157,17 +136,16 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="group"
         class="group-dropdown"
-        :options="[
-          'None',
-          'Loader',
-          'Game version',
-          'Category'
-        ]"
+        :options="['None', 'Loader', 'Game version', 'Category']"
         placeholder="Select..."
       />
     </div>
   </Card>
-  <div v-for="instanceSection in Array.from(filteredResults, ([key, value]) => ({ key, value }))" :key="instanceSection.key" class="row">
+  <div
+    v-for="instanceSection in Array.from(filteredResults, ([key, value]) => ({ key, value }))"
+    :key="instanceSection.key"
+    class="row"
+  >
     <div v-if="instanceSection.key !== 'None'" class="divider">
       <p>{{ instanceSection.key }}</p>
       <hr aria-hidden="true" />

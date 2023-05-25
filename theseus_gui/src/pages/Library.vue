@@ -20,7 +20,6 @@ const unlisten = await profile_listener(async () => {
   instances.value = Object.values(profiles)
 })
 onUnmounted(() => unlisten())
-
 </script>
 
 <template>
