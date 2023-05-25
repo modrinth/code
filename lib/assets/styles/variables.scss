@@ -54,6 +54,9 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, hsla(0, 0%, 0%, 0.1) 0px 2px 4px -1px;
 
   --shadow-card: rgba(50, 50, 100, 0.1) 0px 2px 4px 0px;
+
+  --color-tooltip-text: var(--color-accent-contrast);
+  --color-tooltip-bg: var(--color-base);
 }
 
 .dark-mode,
@@ -91,6 +94,9 @@ html {
     hsla(0, 0%, 0%, 0.1) 0px 4px 6px -1px, rgba(0, 0, 0, 0.06) 0px 2px 4px -1px;
 
   --shadow-card: rgba(0, 0, 0, 0.25) 0px 2px 4px 0px;
+
+  --color-tooltip-text: var(--color-base);
+  --color-tooltip-bg: var(--color-button-bg);
 }
 
 .oled-mode {
