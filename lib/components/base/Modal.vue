@@ -11,7 +11,7 @@
     <div class="modal-body" :class="{ shown: shown }">
       <div v-if="header" class="header">
         <h1>{{ header }}</h1>
-        <button class="iconified-button icon-only transparent" @click="hide">
+        <button class="btn icon-only transparent" @click="hide">
           <XIcon />
         </button>
       </div>

@@ -56,7 +56,7 @@
     margin-block-start: var(--gap-md);
   }
 
-  :where(button, .button, .iconified-button) {
+  :where(button, .button, .btn) {
     width: fit-content;
   }
 
@@ -86,7 +86,7 @@
     gap: var(--gap-sm);
     margin-bottom: calc(var(--gap-sm) + var(--gap-md));
 
-    .iconified-button,
+    .btn,
     .input-group {
       flex-shrink: 0;
     }

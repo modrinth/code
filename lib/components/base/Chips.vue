@@ -3,7 +3,7 @@
     <Button
       v-for="item in items"
       :key="item"
-      class="iconified-button"
+      class="btn"
       :class="{ selected: selected === item }"
       @click="toggleItem(item)"
     >
@@ -71,7 +71,7 @@ export default defineComponent({
   grid-gap: 0.5rem;
   flex-wrap: wrap;
 
-  .iconified-button {
+  .btn {
     text-transform: capitalize;
 
     svg {
