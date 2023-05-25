@@ -196,6 +196,7 @@ const filteredResults = computed(() => {
     align-items: center;
     width: 100%;
     gap: 1rem;
+    margin-bottom: 1rem;
 
     p {
       font-size: 1rem;
@@ -254,7 +255,6 @@ const filteredResults = computed(() => {
   width: 100%;
   gap: 1rem;
   margin-right: auto;
-  margin-top: 0.8rem;
   scroll-behavior: smooth;
   overflow-y: auto;
 }
