@@ -5,7 +5,7 @@ use crate::models::notifications::NotificationBody;
 use crate::models::teams::{Permissions, TeamId};
 use crate::models::users::UserId;
 use crate::routes::ApiError;
-use crate::util::auth::get_user_from_headers;
+use crate::util::auth::{get_user_from_headers, is_authorized};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
@@ -36,9 +36,13 @@ pub async fn team_members_get_project(
         crate::database::models::Project::get_from_slug_or_project_id(&string, &**pool).await?;
 
     if let Some(project) = project_data {
-        let members_data = TeamMember::get_from_team_full(project.team_id, &**pool).await?;
-
         let current_user = get_user_from_headers(req.headers(), &**pool).await.ok();
+
+        if !is_authorized(&project, &current_user, &pool).await? {
+            return Ok(HttpResponse::NotFound().body(""));
+        }
+
+        let members_data = TeamMember::get_from_team_full(project.team_id, &**pool).await?;
 
         if let Some(user) = &current_user {
             let team_member =

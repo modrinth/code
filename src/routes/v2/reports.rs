@@ -12,6 +12,7 @@ use sqlx::PgPool;
 use validator::Validate;
 
 pub fn config(cfg: &mut web::ServiceConfig) {
+    cfg.service(reports_get);
     cfg.service(reports);
     cfg.service(report_create);
     cfg.service(report_edit);
@@ -225,10 +226,41 @@ pub async fn reports(
     let mut reports = Vec::new();
 
     for x in query_reports {
-        reports.push(to_report(x)?);
+        reports.push(to_report(x));
     }
 
     Ok(HttpResponse::Ok().json(reports))
+}
+
+#[derive(Deserialize)]
+pub struct ReportIds {
+    pub ids: String,
+}
+
+#[get("reports")]
+pub async fn reports_get(
+    req: HttpRequest,
+    web::Query(ids): web::Query<ReportIds>,
+    pool: web::Data<PgPool>,
+) -> Result<HttpResponse, ApiError> {
+    let report_ids: Vec<crate::database::models::ids::ReportId> =
+        serde_json::from_str::<Vec<crate::models::ids::ReportId>>(&ids.ids)?
+            .into_iter()
+            .map(|x| x.into())
+            .collect();
+
+    let reports_data =
+        crate::database::models::report_item::Report::get_many(&report_ids, &**pool).await?;
+
+    let user = get_user_from_headers(req.headers(), &**pool).await?;
+
+    let all_reports = reports_data
+        .into_iter()
+        .filter(|x| user.role.is_mod() || x.reporter == user.id.into())
+        .map(to_report)
+        .collect::<Vec<Report>>();
+
+    Ok(HttpResponse::Ok().json(all_reports))
 }
 
 #[get("report/{id}")]
@@ -247,7 +279,7 @@ pub async fn report_get(
             return Ok(HttpResponse::NotFound().body(""));
         }
 
-        Ok(HttpResponse::Ok().json(to_report(report)?))
+        Ok(HttpResponse::Ok().json(to_report(report)))
     } else {
         Ok(HttpResponse::NotFound().body(""))
     }
@@ -358,22 +390,22 @@ pub async fn report_delete(
     }
 }
 
-fn to_report(x: crate::database::models::report_item::QueryReport) -> Result<Report, ApiError> {
+fn to_report(x: crate::database::models::report_item::QueryReport) -> Report {
     let mut item_id = "".to_string();
     let mut item_type = ItemType::Unknown;
 
     if let Some(project_id) = x.project_id {
-        item_id = serde_json::to_string::<ProjectId>(&project_id.into())?;
+        item_id = ProjectId::from(project_id).to_string();
         item_type = ItemType::Project;
     } else if let Some(version_id) = x.version_id {
-        item_id = serde_json::to_string::<VersionId>(&version_id.into())?;
+        item_id = VersionId::from(version_id).to_string();
         item_type = ItemType::Version;
     } else if let Some(user_id) = x.user_id {
-        item_id = serde_json::to_string::<UserId>(&user_id.into())?;
+        item_id = UserId::from(user_id).to_string();
         item_type = ItemType::User;
     }
 
-    Ok(Report {
+    Report {
         id: x.id.into(),
         report_type: x.report_type,
         item_id,
@@ -383,5 +415,5 @@ fn to_report(x: crate::database::models::report_item::QueryReport) -> Result<Rep
         created: x.created,
         closed: x.closed,
         thread_id: x.thread_id.map(|x| x.into()),
-    })
+    }
 }
