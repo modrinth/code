@@ -17,21 +17,23 @@ export const releaseColor = (releaseType) => {
 
 export const installVersionDependencies = async (profile, version) => {
   for (const dep of version.dependencies) {
-    if (dep.version_id) {
-      if (await check_installed(profile.path, dep.project_id).catch(handleError)) continue
-      await installMod(profile.path, dep.version_id)
-    } else {
-      if (await check_installed(profile.path, dep.project_id).catch(handleError)) continue
-      const depVersions = await useFetch(
-        `https://api.modrinth.com/v2/project/${dep.project_id}/version`,
-        'dependency versions'
-      )
-      const latest = depVersions.find(
-        (v) =>
-          v.game_versions.includes(profile.metadata.game_version) &&
-          v.loaders.includes(profile.metadata.loader)
-      )
-      await installMod(profile.path, latest.id).catch(handleError)
+    if (dep.dependency_type === 'required') {
+      if (dep.version_id) {
+        if (await check_installed(profile.path, dep.project_id).catch(handleError)) continue
+        await installMod(profile.path, dep.version_id)
+      } else {
+        if (await check_installed(profile.path, dep.project_id).catch(handleError)) continue
+        const depVersions = await useFetch(
+          `https://api.modrinth.com/v2/project/${dep.project_id}/version`,
+          'dependency versions'
+        )
+        const latest = depVersions.find(
+          (v) =>
+            v.game_versions.includes(profile.metadata.game_version) &&
+            v.loaders.includes(profile.metadata.loader)
+        )
+        await installMod(profile.path, latest.id).catch(handleError)
+      }
     }
   }
 }
