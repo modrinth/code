@@ -1,9 +1,8 @@
 <script setup>
-import { onUnmounted, ref, useSlots } from 'vue'
+import { onUnmounted, ref, useSlots, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
 import { run, list } from '@/helpers/profile'
 import {
@@ -14,6 +13,8 @@ import {
 import { process_listener } from '@/helpers/events'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/state.js'
+import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
+import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 
 const props = defineProps({
   instance: {
@@ -29,10 +30,20 @@ const props = defineProps({
 })
 
 const confirmModal = ref(null)
+const modInstallModal = ref(null)
 const playing = ref(false)
 
 const uuid = ref(null)
-const modLoading = ref(false)
+const modLoading = ref(
+  props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
+)
+
+watch(props.instance, () => {
+  modLoading.value = props.instance.install_stage
+    ? props.instance.install_stage !== 'installed'
+    : false
+})
+
 const slots = useSlots()
 
 const router = useRouter()
@@ -74,21 +85,26 @@ const install = async (e) => {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === props.instance.project_id)
     ) {
-      try {
-        modLoading.value = true
-        await pack_install(versions[0].id, props.instance.title, props.instance.icon_url).catch(
-          handleError
-        )
-        modLoading.value = false
-      } catch (err) {
-        console.error(err)
-        modLoading.value = false
-      }
-    } else confirmModal.value.show(versions[0].id, props.instance.title, props.instance.icon_url)
+      modLoading.value = true
+      await pack_install(
+        props.instance.project_id,
+        versions[0].id,
+        props.instance.title,
+        props.instance.icon_url
+      ).catch(handleError)
+      modLoading.value = false
+    } else
+      confirmModal.value.show(
+        props.instance.project_id,
+        versions[0].id,
+        props.instance.title,
+        props.instance.icon_url
+      )
+  } else {
+    modInstallModal.value.show(props.instance.project_id, versions)
   }
 
   modLoading.value = false
-  // TODO: Add condition for installing a mod
 }
 
 const play = async (e) => {
@@ -103,21 +119,14 @@ const stop = async (e) => {
   e.stopPropagation()
   playing.value = false
 
-  try {
-    // If we lost the uuid for some reason, such as a user navigating
-    // from-then-back to this page, we will get all uuids by the instance path.
-    // For-each uuid, kill the process.
-    if (!uuid.value) {
-      const uuids = await get_uuids_by_profile_path(props.instance.path).catch(handleError)
-      uuid.value = uuids[0]
-      uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
-    } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
-  } catch (err) {
-    // Theseus currently throws:
-    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
-    // For now, we will catch and just warn
-    console.warn(err)
-  }
+  // If we lost the uuid for some reason, such as a user navigating
+  // from-then-back to this page, we will get all uuids by the instance path.
+  // For-each uuid, kill the process.
+  if (!uuid.value) {
+    const uuids = await get_uuids_by_profile_path(props.instance.path).catch(handleError)
+    uuid.value = uuids[0]
+    uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
+  } else await kill_by_uuid(uuid.value).catch(handleError) // If we still have the uuid, just kill it
 
   uuid.value = null
 }
@@ -206,9 +215,10 @@ onUnmounted(() => unlisten())
       >
         <XIcon />
       </div>
-      <div v-else class="install cta buttonbase" @click="install"><DownloadIcon /></div>
+      <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     </template>
     <InstallConfirmModal ref="confirmModal" />
+    <InstanceInstallModal ref="modInstallModal" />
   </div>
 </template>
 
@@ -276,7 +286,7 @@ onUnmounted(() => unlisten())
   &:hover {
     .cta {
       opacity: 1;
-      bottom: 4.5rem;
+      bottom: 5.5rem;
     }
 
     .instance-card-item {
@@ -312,21 +322,17 @@ onUnmounted(() => unlisten())
   z-index: 1;
   width: 3rem;
   height: 3rem;
-  right: 1rem;
-  bottom: 3.5rem;
+  right: 1.25rem;
+  bottom: 5rem;
   opacity: 0;
-  transition: 0.3s ease-in-out bottom, 0.1s ease-in-out opacity !important;
+  transition: 0.2s ease-in-out bottom, 0.1s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;
+  box-shadow: var(--shadow-floating);
 
   svg {
     color: var(--color-accent-contrast);
     width: 1.5rem !important;
     height: 1.5rem !important;
-  }
-
-  &:hover {
-    filter: none !important; /* overrides button-base class */
-    box-shadow: var(--shadow-floating);
   }
 
   &.install {

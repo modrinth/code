@@ -11,7 +11,7 @@
           <div class="table-cell table-text">
             <span>{{ javaInstall.version }}</span>
           </div>
-          <div class="table-cell table-text">
+          <div v-tooltip="javaInstall.path" class="table-cell table-text">
             <span>{{ javaInstall.path }}</span>
           </div>
           <div class="table-cell table-text manage">

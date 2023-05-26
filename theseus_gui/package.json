@@ -16,7 +16,7 @@
     "@tauri-apps/api": "^1.2.0",
     "dayjs": "^1.11.7",
     "ofetch": "^1.0.1",
-    "omorphia": "^0.4.17",
+    "omorphia": "^0.4.21",
     "pinia": "^2.0.33",
     "vite-svg-loader": "^4.0.0",
     "vue": "^3.2.45",

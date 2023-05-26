@@ -1,6 +1,11 @@
 import { add_project_from_version as installMod, check_installed } from '@/helpers/profile'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import { invoke } from '@tauri-apps/api/tauri'
+
+export async function showInFolder(path) {
+  return await invoke('show_in_folder', { path })
+}
 
 export const releaseColor = (releaseType) => {
   switch (releaseType) {

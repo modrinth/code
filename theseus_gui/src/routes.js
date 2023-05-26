@@ -128,4 +128,8 @@ export default new createRouter({
   ],
   linkActiveClass: 'router-link-active',
   linkExactActiveClass: 'router-link-exact-active',
+  scrollBehavior() {
+    // always scroll to top
+    return { top: 0 }
+  },
 })

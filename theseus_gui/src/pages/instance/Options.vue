@@ -22,7 +22,7 @@
           @change="(value) => (loaderVersionIndex = value.index)"
         />
       </div>
-      <div class="button-group">
+      <div class="push-right input-group">
         <button class="btn" @click="$refs.changeVersionsModal.hide()">
           <XIcon />
           Cancel
@@ -83,8 +83,12 @@
       </button>
     </div>
   </section>
-  <Card class="settings-card">
-    <h2 class="settings-title">Java</h2>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Java</span>
+      </h3>
+    </div>
     <div class="settings-group">
       <h3>Installation</h3>
       <Checkbox v-model="overrideJavaInstall" label="Override global java installations" />
@@ -95,10 +99,11 @@
       <h3>Java arguments</h3>
       <Checkbox v-model="overrideJavaArgs" label="Override global java arguments" />
       <input
+        id="java-args"
         v-model="javaArgs"
         :disabled="!overrideJavaArgs"
         type="text"
-        class="input installation-input"
+        class="installation-input"
         placeholder="Enter java arguments..."
       />
     </div>
@@ -109,7 +114,7 @@
         v-model="envVars"
         :disabled="!overrideEnvVars"
         type="text"
-        class="input installation-input"
+        class="installation-input"
         placeholder="Enter environment variables..."
       />
     </div>
@@ -140,65 +145,131 @@
       </div>
     </div>
   </Card>
-  <Card class="settings-card">
-    <h2 class="settings-title">Window</h2>
-    <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
-    <div class="settings-group">
-      <div class="toggle-setting">
-        Width
-        <input
-          v-model="resolution[0]"
-          :disabled="!overrideWindowSettings"
-          type="number"
-          class="input"
-          @change="updateProfile"
-        />
-      </div>
-      <div class="toggle-setting">
-        Height
-        <input
-          v-model="resolution[1]"
-          :disabled="!overrideWindowSettings"
-          type="number"
-          class="input"
-          @change="updateProfile"
-        />
-      </div>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Window</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
+    </div>
+    <div class="adjacent-input">
+      <label for="width">
+        <span class="label__title">Width</span>
+        <span class="label__description"> The width of the game window when launched. </span>
+      </label>
+      <input
+        id="width"
+        v-model="resolution[0]"
+        :disabled="!overrideWindowSettings"
+        type="number"
+        placeholder="Enter width..."
+      />
+    </div>
+    <div class="adjacent-input">
+      <label for="height">
+        <span class="label__title">Height</span>
+        <span class="label__description"> The height of the game window when launched. </span>
+      </label>
+      <input
+        id="height"
+        v-model="resolution[1]"
+        :disabled="!overrideWindowSettings"
+        type="number"
+        class="input"
+        placeholder="Enter height..."
+      />
     </div>
   </Card>
-  <Card class="settings-card">
-    <h2 class="settings-title">Hooks</h2>
-    <Checkbox v-model="overrideHooks" label="Override global hooks" />
-    <div class="settings-group">
-      <div class="toggle-setting">
-        Pre launch
-        <input v-model="hooks.pre_launch" :disabled="!overrideHooks" type="text" />
-      </div>
-      <div class="toggle-setting">
-        Wrapper
-        <input v-model="hooks.wrapper" :disabled="!overrideHooks" type="text" />
-      </div>
-      <div class="toggle-setting">
-        Post exit
-        <input v-model="hooks.post_exit" :disabled="!overrideHooks" type="text" />
-      </div>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Hooks</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <Checkbox v-model="overrideHooks" label="Override global hooks" />
+    </div>
+    <div class="adjacent-input">
+      <label for="pre-launch">
+        <span class="label__title">Pre launch</span>
+        <span class="label__description"> Ran before the instance is launched. </span>
+      </label>
+      <input
+        id="pre-launch"
+        v-model="hooks.pre_launch"
+        :disabled="!overrideHooks"
+        type="text"
+        placeholder="Enter pre-launch command..."
+      />
+    </div>
+    <div class="adjacent-input">
+      <label for="wrapper">
+        <span class="label__title">Wrapper</span>
+        <span class="label__description"> Wrapper command for launching Minecraft. </span>
+      </label>
+      <input
+        id="wrapper"
+        v-model="hooks.wrapper"
+        :disabled="!overrideHooks"
+        type="text"
+        placeholder="Enter wrapper command..."
+      />
+    </div>
+    <div class="adjacent-input">
+      <label for="post-exit">
+        <span class="label__title">Post exit</span>
+        <span class="label__description"> Ran after the game closes. </span>
+      </label>
+      <input
+        id="post-exit"
+        v-model="hooks.post_exit"
+        :disabled="!overrideHooks"
+        type="text"
+        placeholder="Enter post-exit command..."
+      />
     </div>
   </Card>
-  <Card class="settings-card">
-    <h2 class="settings-title">Profile management</h2>
-    <div class="settings-group">
-      <div class="toggle-setting">
-        Repair profile
-        <button class="btn btn-highlight" :disabled="repairing" @click="repairProfile">
-          <HammerIcon /> Repair
-        </button>
-      </div>
-      <div class="toggle-setting">
-        Delete profile
-        <button class="btn btn-danger" :disabled="removing" @click="removeProfile">
-          <TrashIcon /> Delete
-        </button>
-      </div>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Profile management</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Repair profile</span>
+        <span class="label__description">
+          Reinstalls the profile and checks for corruption. Use this if your game is not launching
+          due to launcher-related errors.
+        </span>
+      </label>
+      <button
+        id="repair-profile"
+        class="btn btn-highlight"
+        :disabled="repairing"
+        @click="repairProfile"
+      >
+        <HammerIcon /> Repair
+      </button>
+    </div>
+    <div class="adjacent-input">
+      <label for="delete-profile">
+        <span class="label__title">Delete profile</span>
+        <span class="label__description">
+          Fully removes a profile from the disk. Be careful, as once you delete a profile there is
+          no way to recover it.
+        </span>
+      </label>
+      <button
+        id="delete-profile"
+        class="btn btn-danger"
+        :disabled="removing"
+        @click="removeProfile"
+      >
+        <TrashIcon /> Delete
+      </button>
     </div>
   </Card>
 </template>
@@ -479,38 +550,20 @@ async function saveGvLoaderEdits() {
     gap: 1rem;
   }
 
-  .button-group {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
+  .push-right {
+    margin-left: auto;
   }
-}
-
-.settings-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.input-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.settings-title {
-  color: var(--color-contrast);
 }
 
 .settings-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin: 1rem 0;
+
+  h3 {
+    margin: 0;
+  }
 }
 
 .installation-input {
@@ -527,22 +580,6 @@ async function saveGvLoaderEdits() {
   .slider {
     flex-grow: 1;
   }
-}
-
-.toggle-setting {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.card-divider {
-  background-color: var(--color-button-bg);
-  border: none;
-  color: var(--color-button-bg);
-  height: 1px;
-  margin: var(--gap-sm) 0;
 }
 
 :deep(button.checkbox) {

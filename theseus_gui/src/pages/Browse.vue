@@ -160,7 +160,7 @@ const handleInstanceSwitch = async (value) => {
           <Checkbox
             :model-value="searchStore.ignoreInstance"
             :checked="searchStore.ignoreInstance"
-            label="Unfilter loader & version"
+            label="Show unsupported content"
             class="filter-checkbox"
             @update:model-value="(value) => handleInstanceSwitch(value)"
           />
@@ -282,14 +282,14 @@ const handleInstanceSwitch = async (value) => {
             searchStore.instanceContext
               ? [
                   { label: 'Mods', href: `/browse/mod` },
-                  { label: 'Datapacks', href: `/browse/datapack` },
+                  { label: 'Data Packs', href: `/browse/datapack` },
                   { label: 'Shaders', href: `/browse/shader` },
                   { label: 'Resource Packs', href: `/browse/resourcepack` },
                 ]
               : [
                   { label: 'Modpacks', href: '/browse/modpack' },
                   { label: 'Mods', href: '/browse/mod' },
-                  { label: 'Datapacks', href: '/browse/datapack' },
+                  { label: 'Data Packs', href: '/browse/datapack' },
                   { label: 'Shaders', href: '/browse/shader' },
                   { label: 'Resource Packs', href: '/browse/resourcepack' },
                 ]

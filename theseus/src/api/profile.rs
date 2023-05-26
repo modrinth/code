@@ -71,6 +71,8 @@ where
 
     match profiles.0.get_mut(path) {
         Some(ref mut profile) => {
+            action(profile).await?;
+
             emit_profile(
                 profile.uuid,
                 profile.path.clone(),
@@ -79,7 +81,7 @@ where
             )
             .await?;
 
-            action(profile).await
+            Ok(())
         }
         None => Err(crate::ErrorKind::UnmanagedProfileError(
             path.display().to_string(),

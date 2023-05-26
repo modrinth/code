@@ -42,16 +42,10 @@ onMounted(() => {
 
   handlePaginationDisplay()
 })
+
 onUnmounted(() => {
   if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
 })
-
-const handleLeftPage = () => {
-  modsRow.value.scrollLeft -= 170
-}
-const handleRightPage = () => {
-  modsRow.value.scrollLeft += 170
-}
 </script>
 <template>
   <div v-if="props.instances.length > 0" class="row">
@@ -59,8 +53,8 @@ const handleRightPage = () => {
       <p>{{ props.label }}</p>
       <hr aria-hidden="true" />
       <div v-if="allowPagination" class="pagination">
-        <ChevronLeftIcon role="button" @click="handleLeftPage" />
-        <ChevronRightIcon role="button" @click="handleRightPage" />
+        <ChevronLeftIcon role="button" @click="modsRow.value.scrollLeft -= 170" />
+        <ChevronRightIcon role="button" @click="modsRow.value.scrollLeft += 170" />
       </div>
     </div>
     <section ref="modsRow" class="instances">
@@ -95,6 +89,7 @@ const handleRightPage = () => {
     gap: 1rem;
 
     p {
+      margin: 0;
       font-size: 1rem;
       white-space: nowrap;
       color: var(--color-contrast);

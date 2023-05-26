@@ -3,11 +3,11 @@
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
-        <input v-model="searchFilter" type="text" placeholder="Search Mods" class="text-input" />
+        <input v-model="searchFilter" type="text" placeholder="Search mods" class="text-input" />
       </div>
       <span class="manage">
         <span class="text-combo">
-          <span class="no-wrap sort"> Sort By </span>
+          <span class="sort"> Sort by </span>
           <DropdownSelect
             v-model="sortFilter"
             name="sort-by"
@@ -18,14 +18,19 @@
         </span>
         <Button color="primary" @click="router.push({ path: '/browse/mod' })">
           <PlusIcon />
-          <span class="no-wrap"> Add Content </span>
+          <span> Add content </span>
         </Button>
       </span>
     </div>
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
-          <Button icon-only :disabled="!projects.some((x) => x.outdated)" @click="updateAll">
+          <Button
+            v-tooltip="'Update all projects'"
+            icon-only
+            :disabled="!projects.some((x) => x.outdated)"
+            @click="updateAll"
+          >
             <UpdatedIcon />
           </Button>
         </div>
@@ -37,7 +42,13 @@
       <div v-for="mod in search" :key="mod.file_name" class="table-row">
         <div class="table-cell table-text">
           <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <Button v-else :disabled="!mod.outdated" icon-only @click="updateProject(mod)">
+          <Button
+            v-else
+            v-tooltip="'Update project'"
+            :disabled="!mod.outdated"
+            icon-only
+            @click="updateProject(mod)"
+          >
             <UpdatedIcon v-if="mod.outdated" />
             <CheckIcon v-else />
           </Button>
@@ -55,7 +66,7 @@
         <div class="table-cell table-text">{{ mod.version }}</div>
         <div class="table-cell table-text">{{ mod.author }}</div>
         <div class="table-cell table-text manage">
-          <Button icon-only @click="removeMod(mod)">
+          <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
             <TrashIcon />
           </Button>
           <input
@@ -284,14 +295,8 @@ async function removeMod(mod) {
   width: 7rem !important;
 }
 
-.no-wrap {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  &.sort {
-    padding-left: 0.5rem;
-  }
+.sort {
+  padding-left: 0.5rem;
 }
 </style>
 <style lang="scss">
@@ -299,5 +304,9 @@ async function removeMod(mod) {
   svg {
     margin-left: 0.5rem !important;
   }
+}
+
+.v-popper--theme-tooltip .v-popper__inner {
+  background: #fff !important;
 }
 </style>

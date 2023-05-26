@@ -4,10 +4,10 @@
     <span class="running-text">
       {{ currentProcesses[0].metadata.name }}
     </span>
-    <Button icon-only class="icon-button stop" @click="stop()">
+    <Button v-tooltip="'Stop instance'" icon-only class="icon-button stop" @click="stop()">
       <StopCircleIcon />
     </Button>
-    <Button icon-only class="icon-button" @click="goToTerminal()">
+    <Button v-tooltip="'View logs'" icon-only class="icon-button" @click="goToTerminal()">
       <TerminalSquareIcon />
     </Button>
     <Button

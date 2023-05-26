@@ -322,11 +322,19 @@ async function install(version) {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
-      await packInstall(queuedVersionData.id, data.value.title, data.value.icon_url).catch(
-        handleError
-      )
+      await packInstall(
+        data.value.id,
+        queuedVersionData.id,
+        data.value.title,
+        data.value.icon_url
+      ).catch(handleError)
     } else {
-      confirmModal.value.show(queuedVersionData.id, data.value.title, data.value.icon_url)
+      confirmModal.value.show(
+        data.value.id,
+        queuedVersionData.id,
+        data.value.title,
+        data.value.icon_url
+      )
     }
   } else {
     if (instance.value) {
