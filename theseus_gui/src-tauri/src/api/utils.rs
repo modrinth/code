@@ -18,7 +18,7 @@ pub async fn should_disable_mouseover() -> bool {
 }
 #[cfg(not(target_os = "macos"))]
 #[tauri::command]
-async fn should_disable_mouseover() -> bool {
+pub async fn should_disable_mouseover() -> bool {
     false
 }
 
