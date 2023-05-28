@@ -36,12 +36,27 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
 
-      - name: Sync node version and setup cache
+      - name: Use Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
-          cache: 'yarn'
-          cache-dependency-path: "theseus_gui"
+          node-version: 18.x
+      - name: Install pnpm via corepack
+        shell: bash
+        run: |
+          corepack enable
+          corepack prepare --activate
+      - name: Get pnpm store directory
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path)" >> $GITHUB_OUTPUT
+      - name: Setup pnpm cache
+        uses: actions/cache@v3
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
 
       - name: install dependencies (ubuntu only)
         if: startsWith(matrix.platform, 'ubuntu')
@@ -49,8 +64,8 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev libappindicator3-dev librsvg2-dev patchelf
 
-      - name: install frontend dependencies
-        run: yarn install --immutable --immutable-cache --check-cache
+      - name: Install frontend dependencies
+        run: pnpm install
 
       - name: build app (macos)
         uses: tauri-apps/tauri-action@v0

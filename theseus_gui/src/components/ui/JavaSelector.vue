@@ -2,6 +2,7 @@
   <JavaDetectionModal ref="detectJavaModal" @submit="(val) => emit('update:modelValue', val)" />
   <div class="toggle-setting">
     <input
+      autocomplete="off"
       :disabled="props.disabled"
       :value="props.modelValue ? props.modelValue.path : ''"
       type="text"

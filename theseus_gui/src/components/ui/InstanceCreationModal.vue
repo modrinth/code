@@ -16,7 +16,7 @@
       </div>
       <div class="input-row">
         <p class="input-label">Name</p>
-        <input v-model="profile_name" class="text-input" type="text" />
+        <input v-model="profile_name" autocomplete="off" class="text-input" type="text" />
       </div>
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -64,7 +64,7 @@
           <p class="warning">Select a game version before you select a loader version</p>
         </div>
       </div>
-      <div class="button-group">
+      <div class="input-group push-right">
         <Button @click="toggle_advanced">
           <CodeIcon />
           {{ showAdvanced ? 'Hide advanced' : 'Show advanced' }}
@@ -95,11 +95,16 @@ import {
   Checkbox,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
-import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
 import { tauri } from '@tauri-apps/api'
-import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata'
+import {
+  get_game_versions,
+  get_fabric_versions,
+  get_forge_versions,
+  get_quilt_versions,
+} from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
 
@@ -145,30 +150,32 @@ const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loade
       .then(ref)
       .catch(handleError),
   ])
-loaders.value.push('vanilla')
+loaders.value.unshift('vanilla')
 
 const game_versions = computed(() => {
-  return all_game_versions.value
+  return all_game_versions.value.versions
     .filter((item) => {
-      let defaultVal = item.version_type === 'release' || showSnapshots.value
+      let defaultVal = item.type === 'release' || showSnapshots.value
       if (loader.value === 'fabric') {
-        defaultVal &= fabric_versions.value.gameVersions.some((x) => item.version === x.id)
+        defaultVal &= fabric_versions.value.gameVersions.some((x) => item.id === x.id)
       } else if (loader.value === 'forge') {
-        defaultVal &= forge_versions.value.gameVersions.some((x) => item.version === x.id)
+        defaultVal &= forge_versions.value.gameVersions.some((x) => item.id === x.id)
       } else if (loader.value === 'quilt') {
-        defaultVal &= quilt_versions.value.gameVersions.some((x) => item.version === x.id)
+        defaultVal &= quilt_versions.value.gameVersions.some((x) => item.id === x.id)
       }
 
       return defaultVal
     })
-    .map((item) => item.version)
+    .map((item) => item.id)
 })
 
 const modal = ref(null)
 
 const check_valid = computed(() => {
   return (
-    profile_name.value && game_version.value && game_versions.value.includes(game_version.value)
+    profile_name.value.trim() &&
+    game_version.value &&
+    game_versions.value.includes(game_version.value)
   )
 })
 
@@ -246,12 +253,6 @@ const toggle_advanced = () => {
 
 .text-input {
   width: 20rem;
-}
-
-.button-group {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 
 .image-upload {

@@ -31,9 +31,10 @@
     </div>
     <div ref="logContainer" class="log-text">
       <!--      {{ logs[1] }}-->
-      <div v-for="line in logs[selectedLogIndex]?.stdout.split('\n')" :key="line" class="no-wrap">
-        {{ line }}
-      </div>
+
+      <span v-for="line in logs[selectedLogIndex]?.stdout.split('\n')" :key="line" class="no-wrap">
+        {{ line }} <br />
+      </span>
     </div>
   </Card>
 </template>
@@ -210,5 +211,9 @@ onUnmounted(() => {
   overflow: auto;
   white-space: normal;
   color-scheme: dark;
+
+  .no-wrap {
+    white-space: pre;
+  }
 }
 </style>

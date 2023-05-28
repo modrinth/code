@@ -3,7 +3,13 @@
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
-        <input v-model="searchFilter" type="text" placeholder="Search mods" class="text-input" />
+        <input
+          v-model="searchFilter"
+          type="text"
+          placeholder="Search mods"
+          class="text-input"
+          autocomplete="off"
+        />
       </div>
       <span class="manage">
         <span class="text-combo">
@@ -16,7 +22,14 @@
             class="dropdown"
           />
         </span>
-        <Button color="primary" @click="router.push({ path: '/browse/mod' })">
+        <Button
+          color="primary"
+          @click="
+            router.push({
+              path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+            })
+          "
+        >
           <PlusIcon />
           <span> Add content </span>
         </Button>
@@ -71,6 +84,7 @@
           </Button>
           <input
             id="switch-1"
+            autocomplete="off"
             type="checkbox"
             class="switch stylized-toggle"
             :checked="!mod.disabled"

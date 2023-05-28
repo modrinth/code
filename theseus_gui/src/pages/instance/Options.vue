@@ -41,7 +41,7 @@
   <section class="card">
     <div class="label">
       <h3>
-        <span class="label__title size-card-header">Profile</span>
+        <span class="label__title size-card-header">Instance</span>
       </h3>
     </div>
     <label for="instance-icon">
@@ -68,13 +68,13 @@
     <label for="project-name">
       <span class="label__title">Name</span>
     </label>
-    <input id="profile-name" v-model="title" maxlength="80" type="text" />
+    <input id="profile-name" v-model="title" autocomplete="off" maxlength="80" type="text" />
 
     <div class="adjacent-input">
       <label for="edit-versions">
         <span class="label__title">Edit mod loader/game versions</span>
         <span class="label__description">
-          Allows you to change the mod loader, loader version, or game version of the profile.
+          Allows you to change the mod loader, loader version, or game version of the instance.
         </span>
       </label>
       <button id="edit-versions" class="btn" @click="$refs.changeVersionsModal.show()">
@@ -101,6 +101,7 @@
       <input
         id="java-args"
         v-model="javaArgs"
+        autocomplete="off"
         :disabled="!overrideJavaArgs"
         type="text"
         class="installation-input"
@@ -112,6 +113,7 @@
       <Checkbox v-model="overrideEnvVars" label="Override global environment variables" />
       <input
         v-model="envVars"
+        autocomplete="off"
         :disabled="!overrideEnvVars"
         type="text"
         class="installation-input"
@@ -129,7 +131,7 @@
             :disabled="!overrideMemorySettings"
             :min="256"
             :max="maxMemory"
-            :step="10"
+            :step="1"
           />
         </span>
         <span class="slider">
@@ -139,7 +141,7 @@
             :disabled="!overrideMemorySettings"
             :min="256"
             :max="maxMemory"
-            :step="10"
+            :step="1"
           />
         </span>
       </div>
@@ -162,6 +164,7 @@
       <input
         id="width"
         v-model="resolution[0]"
+        autocomplete="off"
         :disabled="!overrideWindowSettings"
         type="number"
         placeholder="Enter width..."
@@ -175,6 +178,7 @@
       <input
         id="height"
         v-model="resolution[1]"
+        autocomplete="off"
         :disabled="!overrideWindowSettings"
         type="number"
         class="input"
@@ -199,6 +203,7 @@
       <input
         id="pre-launch"
         v-model="hooks.pre_launch"
+        autocomplete="off"
         :disabled="!overrideHooks"
         type="text"
         placeholder="Enter pre-launch command..."
@@ -212,6 +217,7 @@
       <input
         id="wrapper"
         v-model="hooks.wrapper"
+        autocomplete="off"
         :disabled="!overrideHooks"
         type="text"
         placeholder="Enter wrapper command..."
@@ -225,6 +231,7 @@
       <input
         id="post-exit"
         v-model="hooks.post_exit"
+        autocomplete="off"
         :disabled="!overrideHooks"
         type="text"
         placeholder="Enter post-exit command..."
@@ -234,14 +241,14 @@
   <Card>
     <div class="label">
       <h3>
-        <span class="label__title size-card-header">Profile management</span>
+        <span class="label__title size-card-header">Instance management</span>
       </h3>
     </div>
     <div class="adjacent-input">
       <label for="repair-profile">
-        <span class="label__title">Repair profile</span>
+        <span class="label__title">Repair instance</span>
         <span class="label__description">
-          Reinstalls the profile and checks for corruption. Use this if your game is not launching
+          Reinstalls the instance and checks for corruption. Use this if your game is not launching
           due to launcher-related errors.
         </span>
       </label>
@@ -256,9 +263,9 @@
     </div>
     <div class="adjacent-input">
       <label for="delete-profile">
-        <span class="label__title">Delete profile</span>
+        <span class="label__title">Delete instance</span>
         <span class="label__description">
-          Fully removes a profile from the disk. Be careful, as once you delete a profile there is
+          Fully removes a instance from the disk. Be careful, as once you delete a instance there is
           no way to recover it.
         </span>
       </label>

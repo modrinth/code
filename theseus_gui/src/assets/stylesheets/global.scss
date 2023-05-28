@@ -1,10 +1,15 @@
-@import 'inter.scss';
-
 :root {
   font-family: var(--font-standard);
   color-scheme: dark;
   --view-width: calc(100% - 5rem);
   --expanded-view-width: calc(100% - 13rem);
+}
+
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
 * {
@@ -39,7 +44,7 @@ a {
 }
 
 input {
-  border: none;
+  border: none !important;
 }
 
 .mod-text {
@@ -47,8 +52,4 @@ input {
   align-items: center;
   gap: 1rem;
   color: var(--color-contrast);
-}
-
-input {
-  border: none !important;
 }

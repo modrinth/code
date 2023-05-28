@@ -162,6 +162,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
       <input
         id="java-args"
         v-model="settings.javaArgs"
+        autocomplete="off"
         type="text"
         class="installation-input"
         placeholder="Enter java arguments..."
@@ -172,6 +173,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
       <input
         id="env-vars"
         v-model="settings.envArgs"
+        autocomplete="off"
         type="text"
         class="installation-input"
         placeholder="Enter environmental variables..."
@@ -180,11 +182,11 @@ watch(settings.value, async (oldSettings, newSettings) => {
       <div class="sliders">
         <span class="slider">
           Minimum memory
-          <Slider v-model="settings.memory.minimum" :min="256" :max="maxMemory" :step="10" />
+          <Slider v-model="settings.memory.minimum" :min="256" :max="maxMemory" :step="1" />
         </span>
         <span class="slider">
           Maximum memory
-          <Slider v-model="settings.memory.maximum" :min="256" :max="maxMemory" :step="10" />
+          <Slider v-model="settings.memory.maximum" :min="256" :max="maxMemory" :step="1" />
         </span>
       </div>
     </Card>
@@ -202,6 +204,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
         <input
           id="pre-launch"
           v-model="settings.hooks.pre_launch"
+          autocomplete="off"
           type="text"
           placeholder="Enter pre-launch command..."
         />
@@ -214,6 +217,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
         <input
           id="wrapper"
           v-model="settings.hooks.wrapper"
+          autocomplete="off"
           type="text"
           placeholder="Enter wrapper command..."
         />
@@ -226,6 +230,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
         <input
           id="post-exit"
           v-model="settings.hooks.post_exit"
+          autocomplete="off"
           type="text"
           placeholder="Enter post-exit command..."
         />
@@ -245,6 +250,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
         <input
           id="width"
           v-model="settings.game_resolution[0]"
+          autocomplete="off"
           type="number"
           placeholder="Enter width..."
         />
@@ -257,6 +263,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
         <input
           id="height"
           v-model="settings.game_resolution[1]"
+          autocomplete="off"
           type="number"
           class="input"
           placeholder="Enter height..."

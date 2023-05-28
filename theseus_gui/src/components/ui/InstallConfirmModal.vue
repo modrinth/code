@@ -31,7 +31,7 @@ async function install() {
   <Modal ref="confirmModal" header="Are you sure?">
     <div class="modal-body">
       <p>You already have this modpack installed. Are you sure you want to install it again?</p>
-      <div class="button-group">
+      <div class="input-group push-right">
         <Button @click="() => $refs.confirmModal.hide()"><XIcon />Cancel</Button>
         <Button color="primary" :disabled="installing" @click="install()"
           ><DownloadIcon /> {{ installing ? 'Installing' : 'Install' }}</Button
@@ -47,12 +47,5 @@ async function install() {
   flex-direction: column;
   gap: 1rem;
   padding: 1rem;
-}
-
-.button-group {
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 </style>

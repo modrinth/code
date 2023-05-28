@@ -406,6 +406,8 @@ onUnmounted(() => unlisten())
       line-height: 125%;
       margin: 0.25rem 0 0;
       text-transform: capitalize;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 }

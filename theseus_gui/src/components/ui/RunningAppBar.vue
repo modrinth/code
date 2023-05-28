@@ -22,7 +22,7 @@
   </div>
   <div v-else class="status">
     <span class="circle stopped" />
-    <span class="running-text"> No running profiles </span>
+    <span class="running-text"> No running instances </span>
     <Button
       v-if="currentLoadingBars.length > 0"
       ref="infoButton"
