@@ -3,7 +3,8 @@
   "type": "module",
   "version": "0.4.21",
   "files": [
-    "dist"
+    "dist",
+    "lib"
   ],
   "main": "./dist/omorphia.umd.cjs",
   "module": "./dist/omorphia.js",
@@ -17,7 +18,7 @@
   "scripts": {
     "build": "vite build",
     "lint:js": "eslint --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue .",
-    "lint": "npm run lint:js && prettier --check .",
+    "lint": "pnpm run lint:js && prettier --check .",
     "fix": "eslint --fix --ext .js,.vue,.ts,.jsx,.tsx,.html,.vue . && prettier --write .",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
@@ -26,27 +27,28 @@
   "dependencies": {
     "dayjs": "^1.11.7",
     "floating-vue": "^2.0.0-beta.20",
-    "highlight.js": "^11.7.0",
+    "highlight.js": "^11.8.0",
     "markdown-it": "^13.0.1",
-    "vue": "^3.2.45",
-    "vue-router": "^4.1.6",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.1",
     "vue-select": "^4.0.0-beta.6",
     "xss": "^1.0.14"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^4.0.0",
-    "eslint": "^8.33.0",
-    "eslint-config-prettier": "^8.6.0",
-    "eslint-plugin-vue": "^9.9.0",
+    "@vitejs/plugin-vue": "^4.2.3",
+    "eslint": "^8.41.0",
+    "eslint-config-prettier": "^8.8.0",
     "eslint-plugin-prettier": "^4.2.1",
-    "postcss": "^8.4.21",
+    "eslint-plugin-vue": "^9.14.1",
+    "postcss": "^8.4.24",
     "postcss-prefix-selector": "^1.16.0",
-    "prettier": "^2.7.1",
-    "sass": "^1.57.1",
-    "sass-loader": "^13.2.0",
-    "vite": "^4.0.0",
+    "prettier": "^2.8.8",
+    "sass": "^1.62.1",
+    "sass-loader": "^13.3.1",
+    "vite": "^4.3.9",
     "vite-plugin-eslint": "^1.8.1",
     "vite-svg-loader": "^4.0.0",
-    "vitepress": "^1.0.0-alpha.46"
-  }
+    "vitepress": "^1.0.0-beta.1"
+  },
+  "packageManager": "pnpm@8.5.1"
 }

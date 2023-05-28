@@ -160,6 +160,14 @@
       margin-bottom: var(--gap-md);
     }
   }
+
+  ul,
+  ol {
+    ul,
+    ol {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .input-group {
@@ -965,9 +973,10 @@ select {
     .multiselect__placeholder {
       color: var(--color-base);
       margin-left: 0.5rem;
+      margin-bottom: 8px;
       opacity: 0.6;
       font-size: 1rem;
-      line-height: 1.25rem;
+      line-height: 16px;
     }
   }
 
@@ -1015,4 +1024,39 @@ select {
   border-top: none !important;
   border-top-left-radius: var(--radius-md) !important;
   border-top-right-radius: var(--radius-md) !important;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: row;
+  grid-gap: var(--gap-sm);
+  flex-wrap: wrap;
+  max-width: 100%;
+  align-items: center;
+
+  .multiselect {
+    width: 15rem;
+  }
+
+  input {
+    flex-shrink: 2;
+  }
+
+  &.shrink-first {
+    :first-child {
+      flex-shrink: 2;
+      flex-grow: 1;
+      flex-basis: min-content;
+    }
+
+    :not(:first-child) {
+      flex-shrink: 1;
+    }
+  }
+}
+
+.push-right:not(.input-group),
+.push-right.input-group > :first-child {
+  margin-left: auto;
+  margin-right: 0;
 }

@@ -1,5 +1,5 @@
 <template>
-  <Modal ref="modal" :header="`Report ${itemType}`">
+  <Modal ref="modal" :header="`Report ${props.itemType}`">
     <div class="modal-report">
       <div class="markdown-body">
         <p>
@@ -10,7 +10,7 @@
           <router-link to="/legal/rules">Rules</router-link>
           . Rest assured, we’ll keep your identifying information private.
         </p>
-        <p v-if="itemType === 'project' || itemType === 'version'">
+        <p v-if="props.itemType === 'project' || props.itemType === 'version'">
           Please <strong>do not</strong> use this to report bugs with the project itself. This form
           is only for submitting a report to Modrinth staff. If the project has an Issues link or a
           Discord invite, consider reporting it there.
@@ -25,7 +25,7 @@
         <DropdownSelect
           id="report-type"
           v-model="reportType"
-          :options="reportTypes"
+          :options="props.reportTypes"
           default-value="Choose report type"
           class="multiselect"
         />
@@ -41,7 +41,7 @@
         </div>
         <div v-else class="preview" v-html="renderString(body)"></div>
       </div>
-      <div class="button-group">
+      <div class="input-group push-right">
         <Button @click="cancel">
           <XIcon />
           Cancel
@@ -59,52 +59,46 @@ import { Modal, Chips, XIcon, CheckIcon, DropdownSelect } from '@/components'
 import { renderString } from '@/helpers/parse.js'
 import { ref } from 'vue'
 
-const modal = ref('modal')
-defineExpose({
-  modal: modal,
+const props = defineProps({
+  itemType: {
+    type: String,
+    default: '',
+  },
+  itemId: {
+    type: String,
+    default: '',
+  },
+  reportTypes: {
+    type: Array,
+    default: () => [],
+  },
+  submitReport: {
+    type: Function,
+    default: () => {},
+  },
 })
-</script>
-<script>
-export default {
-  props: {
-    itemType: {
-      type: String,
-      default: '',
-    },
-    itemId: {
-      type: String,
-      default: '',
-    },
-    reportTypes: {
-      type: Array,
-      default: () => [],
-    },
-    submitReport: {
-      type: Function,
-      default: () => {},
-    },
-  },
-  data() {
-    return {
-      reportType: '',
-      body: '',
-      bodyViewType: 'source',
-    }
-  },
-  methods: {
-    renderString,
-    cancel() {
-      this.reportType = ''
-      this.body = ''
-      this.bodyViewType = 'source'
 
-      this.$refs.modal.hide()
-    },
-    show() {
-      this.$refs.modal.show()
-    },
-  },
+const reportType = ref('')
+const body = ref('')
+const bodyViewType = ref('source')
+
+const modal = ref(null)
+
+function cancel() {
+  reportType.value = ''
+  body.value = ''
+  bodyViewType.value = 'source'
+
+  modal.value.hide()
 }
+
+function show() {
+  modal.value.show()
+}
+
+defineExpose({
+  show,
+})
 </script>
 
 <style scoped lang="scss">
@@ -124,13 +118,6 @@ export default {
   flex-direction: column;
   align-items: flex-start;
   margin-bottom: 0.5rem;
-}
-
-.button-group {
-  margin-left: auto;
-  display: flex;
-  grid-gap: 0.5rem;
-  flex-wrap: wrap;
 }
 
 .text-input {

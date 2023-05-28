@@ -2,10 +2,13 @@
   <img
     v-if="src"
     ref="img"
-    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''}`"
+    :class="`avatar size-${size} ${circle ? 'circle' : ''} ${noShadow ? 'no-shadow' : ''} ${
+      pixelated ? 'pixelated' : ''
+    }`"
     :src="src"
     :alt="alt"
     :loading="loading"
+    @load="updatePixelated"
   />
   <svg
     v-else
@@ -60,20 +63,19 @@ export default {
       default: 'eager',
     },
   },
-  mounted() {
-    if (this.$refs.img && this.$refs.img.naturalWidth) {
-      const isPixelated = () => {
-        if (this.$refs.img.naturalWidth < 96 && this.$refs.img.naturalWidth > 0) {
-          this.$refs.img.style.imageRendering = 'pixelated'
-        }
-      }
-
-      if (this.$refs.img.naturalWidth) {
-        isPixelated()
-      } else {
-        this.$refs.img.onload = isPixelated
-      }
+  data() {
+    return {
+      pixelated: false,
     }
+  },
+  methods: {
+    updatePixelated() {
+      if (this.$refs.img && this.$refs.img.naturalWidth && this.$refs.img.naturalWidth <= 96) {
+        this.pixelated = true
+      } else {
+        this.pixelated = false
+      }
+    },
   },
 }
 </script>
@@ -121,6 +123,10 @@ export default {
 
   &.no-shadow {
     box-shadow: none;
+  }
+
+  &.pixelated {
+    image-rendering: pixelated;
   }
 }
 </style>

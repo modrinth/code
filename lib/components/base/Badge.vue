@@ -91,6 +91,7 @@ defineProps({
 
   &.type--accepted,
   &.type--admin,
+  &.type--success,
   &.green {
     --badge-color: var(--color-green);
   }
@@ -98,12 +99,12 @@ defineProps({
   &.type--creator,
   &.type--approved,
   &.blue {
-    color: var(--color-blue);
+    --badge-color: var(--color-blue);
   }
 
   &.type--unlisted,
   &.purple {
-    color: var(--color-purple);
+    --badge-color: var(--color-purple);
   }
 
   &.type--private,

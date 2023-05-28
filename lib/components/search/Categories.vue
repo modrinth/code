@@ -42,8 +42,11 @@ export default {
   :deep(span) {
     display: flex;
     flex-direction: row;
-    color: var(--color-icon);
     align-items: center;
+
+    &:not(.version-badge) {
+      color: var(--color-gray);
+    }
 
     svg {
       width: 1rem;

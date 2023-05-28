@@ -1,57 +1,65 @@
 <template>
-  <div>
+  <div v-if="shown">
     <div
       :class="{
-        shown: shown,
-        noblur: noblur,
+        shown: actuallyShown,
+        noblur: props.noblur,
       }"
       class="modal-overlay"
       @click="hide"
     />
-    <div class="modal-body" :class="{ shown: shown }">
-      <div v-if="header" class="header">
-        <h1>{{ header }}</h1>
-        <button class="btn icon-only transparent" @click="hide">
-          <XIcon />
-        </button>
-      </div>
-      <div class="content">
-        <slot />
+    <div class="modal-container" :class="{ shown: actuallyShown }">
+      <div class="modal-body">
+        <div v-if="props.header" class="header">
+          <h1>{{ props.header }}</h1>
+          <button class="btn icon-only transparent" @click="hide">
+            <XIcon />
+          </button>
+        </div>
+        <div class="content">
+          <slot />
+        </div>
       </div>
     </div>
   </div>
+  <div v-else></div>
 </template>
 
 <script setup>
 import { XIcon } from '@/components'
-</script>
-<script>
-import { defineComponent } from 'vue'
+import { ref } from 'vue'
 
-export default defineComponent({
-  props: {
-    header: {
-      type: String,
-      default: null,
-    },
-    noblur: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  header: {
+    type: String,
+    default: null,
   },
-  data() {
-    return {
-      shown: false,
-    }
+  noblur: {
+    type: Boolean,
+    default: false,
   },
-  methods: {
-    show() {
-      this.shown = true
-    },
-    hide() {
-      this.shown = false
-    },
-  },
+})
+
+const shown = ref(false)
+const actuallyShown = ref(false)
+
+function show() {
+  shown.value = true
+  setTimeout(() => {
+    actuallyShown.value = true
+  }, 50)
+}
+
+function hide() {
+  actuallyShown.value = false
+  setTimeout(() => {
+    shown.value = false
+  }, 300)
+}
+
+defineExpose({
+  show,
+  hide,
 })
 </script>
 
@@ -64,7 +72,6 @@ export default defineComponent({
   width: 100%;
   height: 100%;
   z-index: 20;
-
   transition: all 0.3s ease-in-out;
 
   &.shown {
@@ -79,48 +86,62 @@ export default defineComponent({
   }
 }
 
-.modal-body {
+.modal-container {
   position: fixed;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 21;
-  box-shadow: var(--shadow-raised), var(--shadow-inset);
-  border-radius: var(--radius-lg);
-  max-height: calc(100% - 2 * var(--gap-lg));
-  overflow-y: auto;
-  width: 600px;
+  visibility: hidden;
+  pointer-events: none;
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: var(--color-bg);
-    padding: var(--gap-md) var(--gap-lg);
-
-    h1 {
-      font-size: 1.25rem;
-      color: var(--color-contrast);
-      font-weight: bolder;
+  &.shown {
+    visibility: visible;
+    .modal-body {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
     }
   }
 
-  .content {
-    background-color: var(--color-raised-bg);
-  }
+  .modal-body {
+    position: fixed;
+    box-shadow: var(--shadow-raised), var(--shadow-inset);
+    border-radius: var(--radius-lg);
+    max-height: calc(100% - 2 * var(--gap-lg));
+    overflow-y: auto;
+    width: 600px;
+    pointer-events: auto;
 
-  top: calc(100% + 400px);
-  visibility: hidden;
-  opacity: 0;
-  transition: all 0.25s ease-in-out;
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background-color: var(--color-bg);
+      padding: var(--gap-md) var(--gap-lg);
 
-  &.shown {
-    opacity: 1;
-    visibility: visible;
-    top: 50%;
-  }
+      h1 {
+        font-weight: bold;
+        font-size: 1.25rem;
+      }
+    }
 
-  @media screen and (max-width: 650px) {
-    width: calc(100% - 2 * var(--gap-lg));
+    .content {
+      background-color: var(--color-raised-bg);
+    }
+
+    transform: translateY(50vh);
+    visibility: hidden;
+    opacity: 0;
+    transition: all 0.25s ease-in-out;
+
+    @media screen and (max-width: 650px) {
+      width: calc(100% - 2 * var(--gap-lg));
+    }
   }
 }
 </style>
