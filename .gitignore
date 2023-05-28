@@ -81,7 +81,3 @@ sw.*
 
 # Vim swap files
 *.swp
-
-# pnpm files
-pnpm-lock.yaml
-/.npmrc
