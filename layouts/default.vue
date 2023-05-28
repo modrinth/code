@@ -297,7 +297,9 @@
         <nuxt-link to="/legal/terms"> Terms</nuxt-link>
         <nuxt-link to="/legal/privacy"> Privacy</nuxt-link>
         <nuxt-link to="/legal/rules"> Rules</nuxt-link>
-        <a :target="$external()" href="https://careers.modrinth.com"> Careers </a>
+        <a :target="$external()" href="https://careers.modrinth.com"
+          >Careers <span class="count-bubble">1</span></a
+        >
       </div>
       <div class="links links-2" role="region" aria-label="Resources">
         <h4 aria-hidden="true">Resources</h4>
@@ -1041,7 +1043,7 @@ export default defineNuxtComponent({
         border-radius: 5rem;
         background: var(--color-brand);
         color: var(--color-text-inverted);
-        padding: 0 0.25rem;
+        padding: 0 0.35rem;
         margin-left: 0.25rem;
       }
     }

@@ -173,8 +173,6 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     apiBaseUrl: process.env.BASE_URL ?? getApiUrl(),
-    ariadneBaseUrl: process.env.ARIADNE_URL ?? getAriadneUrl(),
-    ariadneAdminKey: process.env.ARIADNE_ADMIN_KEY,
     rateLimitKey: process.env.RATE_LIMIT_IGNORE_KEY,
     public: {
       apiBaseUrl: getApiUrl(),

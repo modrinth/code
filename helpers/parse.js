@@ -19,6 +19,11 @@ export const configuredXss = new xss.FilterXSS({
     area: [...xss.whiteList.a, 'coords'],
     a: [...xss.whiteList.a, 'rel'],
   },
+  css: {
+    whiteList: {
+      'image-rendering': /^pixelated$/,
+    },
+  },
   onIgnoreTagAttr: (tag, name, value) => {
     // Allow iframes from acceptable sources
     if (tag === 'iframe' && name === 'src') {
@@ -53,7 +58,7 @@ export const configuredXss = new xss.FilterXSS({
       return name + '="' + xss.escapeAttrValue(value) + '"'
     }
   },
-  safeAttrValue(tag, name, value, _cssFilter) {
+  safeAttrValue(tag, name, value, cssFilter) {
     if (tag === 'img' && name === 'src' && !value.startsWith('data:')) {
       try {
         const url = new URL(value)
@@ -75,12 +80,17 @@ export const configuredXss = new xss.FilterXSS({
         ]
 
         if (!allowedHostnames.includes(url.hostname)) {
-          return `https://wsrv.nl/?url=${encodeURIComponent(value)}&n=-1`
+          return xss.safeAttrValue(
+            tag,
+            name,
+            `https://wsrv.nl/?url=${encodeURIComponent(value)}&n=-1`,
+            cssFilter
+          )
         }
       } catch (err) {}
     }
 
-    return value
+    return xss.safeAttrValue(tag, name, value, cssFilter)
   },
 })
 
