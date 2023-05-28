@@ -38,7 +38,9 @@ jobs:
         run: pnpm install
       - name: Build
         run: pnpm build
-      - name: Publish package
-        run: pnpm publish --no-git-checks
+      - name: Set publishing config
+        run: pnpm config set '//registry.npmjs.org/:_authToken' "${NODE_AUTH_TOKEN}"
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+      - name: Publish package
+        run: pnpm publish --no-git-checks --access=public --tag latest
