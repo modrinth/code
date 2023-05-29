@@ -106,6 +106,15 @@ export default new createRouter({
           },
         },
         {
+          path: 'projects/:type',
+          name: 'ModsFilter',
+          component: Instance.Mods,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance' }],
+          },
+        },
+        {
           path: 'options',
           name: 'Options',
           component: Instance.Options,

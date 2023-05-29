@@ -6,7 +6,10 @@
         <input
           v-model="searchFilter"
           type="text"
-          placeholder="Search mods"
+          :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
+            ? 'projects'
+            : selectedProjectType.toLowerCase()
+          ).slice(0, search.length === 1 ? -1 : 64)}...`"
           class="text-input"
           autocomplete="off"
         />
@@ -35,6 +38,11 @@
         </Button>
       </span>
     </div>
+    <Chips
+      v-if="Object.keys(selectableProjectTypes).length > 1"
+      v-model="selectedProjectType"
+      :items="Object.keys(selectableProjectTypes)"
+    />
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
@@ -107,6 +115,8 @@ import {
   UpdatedIcon,
   DropdownSelect,
   AnimatedLogo,
+  Chips,
+  formatProjectType,
 } from 'omorphia'
 import { computed, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -145,6 +155,7 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       disabled: project.disabled,
       updateVersion: project.metadata.update_version,
       outdated: !!project.metadata.update_version,
+      project_type: project.metadata.project.project_type,
     })
   } else if (project.metadata.type === 'inferred') {
     projects.value.push({
@@ -156,6 +167,7 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
       disabled: project.disabled,
       outdated: false,
+      project_type: project.metadata.project_type,
     })
   } else {
     projects.value.push({
@@ -167,16 +179,33 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       icon: null,
       disabled: project.disabled,
       outdated: false,
+      project_type: null,
     })
   }
 }
 
 const searchFilter = ref('')
 const sortFilter = ref('')
+const selectedProjectType = ref('All')
+
+const selectableProjectTypes = computed(() => {
+  const obj = { All: 'all' }
+
+  for (const project of projects.value) {
+    obj[project.project_type ? formatProjectType(project.project_type) + 's' : 'Other'] =
+      project.project_type
+  }
+
+  return obj
+})
 
 const search = computed(() => {
+  const projectType = selectableProjectTypes.value[selectedProjectType.value]
   const filtered = projects.value.filter((mod) => {
-    return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+    return (
+      mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
+      (projectType === 'all' || mod.project_type === projectType)
+    )
   })
 
   return updateSort(filtered, sortFilter.value)
@@ -283,6 +312,10 @@ async function removeMod(mod) {
 .manage {
   display: flex;
   gap: 0.5rem;
+}
+
+.table {
+  margin-block-start: 0;
 }
 
 .table-row {

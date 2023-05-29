@@ -5,6 +5,7 @@
 
 use theseus::prelude::*;
 
+use tauri::Manager;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
@@ -21,6 +22,12 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
 }
 
 use tracing_subscriber::prelude::*;
+
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    args: Vec<String>,
+    cwd: String,
+}
 
 fn main() {
     /*
@@ -49,6 +56,11 @@ fn main() {
         .expect("setting default subscriber failed");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+            app.emit_all("single-instance", Payload { args: argv, cwd })
+                .unwrap();
+        }))
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             api::progress_bars_list,

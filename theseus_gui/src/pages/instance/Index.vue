@@ -162,6 +162,7 @@ const stopInstance = async () => {
 const unlistenProfiles = await profile_listener(async (event) => {
   if (event.path === route.params.id) {
     instance.value = await get(route.params.id).catch(handleError)
+    searchStore.instanceContext = instance.value
   }
 })
 

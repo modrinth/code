@@ -143,7 +143,7 @@ const check_valid = computed(() => {
 </script>
 
 <template>
-  <Modal ref="installModal" header="Install mod to instance">
+  <Modal ref="installModal" header="Install project to instance">
     <div class="modal-body">
       <input
         v-model="searchFilter"
