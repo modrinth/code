@@ -179,15 +179,20 @@ watch(settings.value, async (oldSettings, newSettings) => {
         placeholder="Enter environmental variables..."
       />
       <hr class="card-divider" />
-      <div class="sliders">
-        <span class="slider">
-          Minimum memory
-          <Slider v-model="settings.memory.minimum" :min="256" :max="maxMemory" :step="1" />
-        </span>
-        <span class="slider">
-          Maximum memory
-          <Slider v-model="settings.memory.maximum" :min="256" :max="maxMemory" :step="1" />
-        </span>
+      <div class="adjacent-input">
+        <label for="max-memory">
+          <span class="label__title">Java memory</span>
+          <span class="label__description">
+            The memory allocated to each instance when it is ran.
+          </span>
+        </label>
+        <Slider
+          id="max-memory"
+          v-model="settings.memory.maximum"
+          :min="256"
+          :max="maxMemory"
+          :step="1"
+        />
       </div>
     </Card>
     <Card>
@@ -278,11 +283,6 @@ watch(settings.value, async (oldSettings, newSettings) => {
   margin: 1rem 1rem 1rem 0;
 }
 
-.slider-input {
-  width: 5rem !important;
-  flex-basis: 5rem !important;
-}
-
 .installation-input {
   width: 100% !important;
   flex-grow: 1;
@@ -290,18 +290,6 @@ watch(settings.value, async (oldSettings, newSettings) => {
 
 .theme-dropdown {
   text-transform: capitalize;
-}
-
-.sliders {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 1rem;
-  width: 100%;
-
-  .slider {
-    flex-grow: 1;
-  }
 }
 
 .card-divider {

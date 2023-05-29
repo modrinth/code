@@ -3,7 +3,7 @@
     <div class="change-versions-modal universal-body">
       <div class="input-row">
         <p class="input-label">Loader</p>
-        <Chips v-model="loader" :items="loaders" />
+        <Chips v-model="loader" :items="loaders" :never-empty="false" />
       </div>
       <div class="input-row">
         <p class="input-label">Game Version</p>
@@ -122,29 +122,15 @@
     </div>
     <hr class="card-divider" />
     <div class="settings-group">
+      <h3>Java memory</h3>
       <Checkbox v-model="overrideMemorySettings" label="Override global memory settings" />
-      <div class="sliders">
-        <span class="slider">
-          Minimum memory
-          <Slider
-            v-model="memory.minimum"
-            :disabled="!overrideMemorySettings"
-            :min="256"
-            :max="maxMemory"
-            :step="1"
-          />
-        </span>
-        <span class="slider">
-          Maximum memory
-          <Slider
-            v-model="memory.maximum"
-            :disabled="!overrideMemorySettings"
-            :min="256"
-            :max="maxMemory"
-            :step="1"
-          />
-        </span>
-      </div>
+      <Slider
+        v-model="memory.maximum"
+        :disabled="!overrideMemorySettings"
+        :min="256"
+        :max="maxMemory"
+        :step="1"
+      />
     </div>
   </Card>
   <Card>
@@ -299,7 +285,7 @@ import {
 } from 'omorphia'
 import { useRouter } from 'vue-router'
 import { edit, edit_icon, get_optimal_jre_key, install, remove } from '@/helpers/profile.js'
-import { computed, readonly, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
@@ -466,10 +452,9 @@ const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loade
       .then(ref)
       .catch(handleError),
   ])
-loaders.value.push('vanilla')
+loaders.value.unshift('vanilla')
 
 const loader = ref(props.instance.metadata.loader)
-
 const gameVersion = ref(props.instance.metadata.game_version)
 const selectableGameVersions = computed(() => {
   return all_game_versions.value
@@ -535,6 +520,8 @@ async function saveGvLoaderEdits() {
   editing.value = false
   changeVersionsModal.value.hide()
 }
+
+onMounted(() => console.log(loader.value))
 </script>
 
 <style scoped lang="scss">
@@ -556,10 +543,6 @@ async function saveGvLoaderEdits() {
     flex-direction: row;
     gap: 1rem;
   }
-
-  .push-right {
-    margin-left: auto;
-  }
 }
 
 .settings-group {
@@ -575,18 +558,6 @@ async function saveGvLoaderEdits() {
 
 .installation-input {
   width: 100%;
-}
-
-.sliders {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 1rem;
-  width: 100%;
-
-  .slider {
-    flex-grow: 1;
-  }
 }
 
 :deep(button.checkbox) {

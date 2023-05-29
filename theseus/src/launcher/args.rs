@@ -137,10 +137,6 @@ pub fn get_jvm_arguments(
         parsed_arguments.push("-cp".to_string());
         parsed_arguments.push(class_paths.to_string());
     }
-
-    if let Some(minimum) = memory.minimum {
-        parsed_arguments.push(format!("-Xms{minimum}M"));
-    }
     parsed_arguments.push(format!("-Xmx{}M", memory.maximum));
     for arg in custom_args {
         if !arg.is_empty() {
