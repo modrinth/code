@@ -22,11 +22,20 @@ export const releaseColor = (releaseType) => {
 
 export const installVersionDependencies = async (profile, version) => {
   for (const dep of version.dependencies) {
+    if (dep.dependency_type !== 'required') continue
     if (dep.version_id) {
-      if (await check_installed(profile.path, dep.project_id).catch(handleError)) continue
+      if (
+        dep.project_id &&
+        (await check_installed(profile.path, dep.project_id).catch(handleError))
+      )
+        continue
       await installMod(profile.path, dep.version_id)
     } else {
-      if (await check_installed(profile.path, dep.project_id).catch(handleError)) continue
+      if (
+        dep.project_id &&
+        (await check_installed(profile.path, dep.project_id).catch(handleError))
+      )
+        continue
       const depVersions = await useFetch(
         `https://api.modrinth.com/v2/project/${dep.project_id}/version`,
         'dependency versions'

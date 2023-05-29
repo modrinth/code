@@ -29,30 +29,25 @@
         <FolderSearchIcon />
         Browse
       </Button>
-      <Button :disabled="props.disabled" @click="testJava">
+      <Button v-if="testingJava" disabled> Testing... </Button>
+      <Button v-else-if="testingJavaSuccess === true">
+        <CheckIcon class="test-success" />
+        Success
+      </Button>
+      <Button v-else-if="testingJavaSuccess === false">
+        <XIcon class="test-fail" />
+        Failed
+      </Button>
+      <Button v-else :disabled="props.disabled" @click="testJava">
         <PlayIcon />
         Test
       </Button>
-      <AnimatedLogo v-if="testingJava === true" class="testing-loader" />
-      <CheckIcon
-        v-else-if="testingJavaSuccess === true && testingJava === false"
-        class="test-success"
-      />
-      <XIcon v-else-if="testingJavaSuccess === false && testingJava === false" class="test-fail" />
     </span>
   </div>
 </template>
 
 <script setup>
-import {
-  Button,
-  SearchIcon,
-  PlayIcon,
-  CheckIcon,
-  XIcon,
-  AnimatedLogo,
-  FolderSearchIcon,
-} from 'omorphia'
+import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, FolderSearchIcon } from 'omorphia'
 import { get_jre } from '@/helpers/jre.js'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
@@ -142,16 +137,5 @@ async function handleJavaFileInput() {
 
 .test-fail {
   color: var(--color-red);
-}
-</style>
-<style lang="scss">
-.testing-loader {
-  height: 1rem !important;
-  width: 1rem !important;
-
-  svg {
-    height: inherit !important;
-    width: inherit !important;
-  }
 }
 </style>

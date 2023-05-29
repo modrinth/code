@@ -79,7 +79,7 @@ const appendProfiles = (accounts) => {
   return accounts.map((account) => {
     return {
       ...account,
-      profile_picture: `https://crafthead.net/helm/${account.id.replace(/-/g, '')}/128`,
+      profile_picture: `https://mc-heads.net/avatar/${account.id}/128`,
     }
   })
 }

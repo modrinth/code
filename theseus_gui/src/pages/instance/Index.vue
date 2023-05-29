@@ -51,10 +51,10 @@
           <Button
             v-tooltip="'Open instance folder'"
             class="instance-button"
-            icon-only
             @click="showInFolder(instance.path)"
           >
             <FolderOpenIcon />
+            Folder
           </Button>
         </span>
       </Card>

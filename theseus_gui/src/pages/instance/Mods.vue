@@ -17,7 +17,7 @@
           <DropdownSelect
             v-model="sortFilter"
             name="sort-by"
-            :options="['Name', 'Version', 'Author']"
+            :options="['Name', 'Version', 'Author', 'Enabled']"
             default-value="Name"
             class="dropdown"
           />
@@ -204,6 +204,16 @@ function updateSort(projects, sort) {
         }
         return 0
       })
+    case 'Enabled':
+      return projects.slice().sort((a, b) => {
+        if (a.disabled && !b.disabled) {
+          return 1
+        }
+        if (!a.disabled && b.disabled) {
+          return -1
+        }
+        return 0
+      })
     default:
       return projects.slice().sort((a, b) => {
         if (a.name < b.name) {
@@ -255,6 +265,8 @@ async function updateProject(mod) {
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
+  console.log(mod.disabled)
+  mod.disabled = !mod.disabled
 }
 
 async function removeMod(mod) {

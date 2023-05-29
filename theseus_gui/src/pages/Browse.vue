@@ -163,6 +163,7 @@ const selectableProjectTypes = computed(() => {
       values.unshift({ label: 'Mods', href: '/browse/mod' })
     }
   } else {
+    values.unshift({ label: 'Mods', href: '/browse/mod' })
     values.unshift({ label: 'Modpacks', href: '/browse/modpack' })
   }
 

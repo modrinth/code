@@ -34,7 +34,11 @@ pub fn parse_rule(rule: &d::minecraft::Rule, java_version: &str) -> bool {
         Rule {
             features: Some(ref features),
             ..
-        } => features.has_demo_resolution.unwrap_or(false),
+        } => {
+            features.has_demo_resolution.unwrap_or(false)
+                || (features.has_demo_resolution.is_none()
+                    && features.is_demo_user.is_none())
+        }
         _ => false,
     };
 
