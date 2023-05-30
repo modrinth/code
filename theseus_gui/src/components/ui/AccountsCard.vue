@@ -1,12 +1,13 @@
 <template>
   <div
+    v-if="mode !== 'isolated'"
     ref="button"
     class="button-base avatar-button"
-    :class="{ expanded: expanded }"
+    :class="{ expanded: mode === 'expanded' }"
     @click="toggle()"
   >
-    <Avatar :size="expanded ? 'xs' : 'sm'" :src="selectedAccount?.profile_picture ?? ''" />
-    <div v-show="expanded" class="avatar-text">
+    <Avatar :size="mode === 'expanded' ? 'xs' : 'sm'" :src="selectedAccount?.profile_picture ?? ''" />
+    <div v-show="mode === 'expanded'" class="avatar-text">
       <div class="text no-select">
         {{ selectedAccount ? selectedAccount.username : 'Offline' }}
       </div>
@@ -17,7 +18,7 @@
     </div>
   </div>
   <transition name="fade">
-    <Card v-if="showCard" ref="card" class="account-card" :class="{ expanded: expanded }">
+    <Card v-if="showCard || mode === 'isolated'" ref="card" class="account-card" :class="{ expanded: mode === 'expanded', 'isolated': mode === 'isolated' }">
       <div v-if="selectedAccount" class="selected account">
         <Avatar size="xs" :src="selectedAccount.profile_picture" />
         <div>
@@ -67,9 +68,10 @@ import { WebviewWindow } from '@tauri-apps/api/window'
 import { handleError } from '@/store/state.js'
 
 defineProps({
-  expanded: {
-    type: Boolean,
+  mode: {
+    type: String,
     required: true,
+    default: 'normal',
   },
 })
 
@@ -210,6 +212,12 @@ onBeforeUnmount(() => {
 
   &.expanded {
     left: 13.5rem;
+  }
+
+  &.isolated {
+    position: relative;
+    left: 0;
+    top: 0;
   }
 }
 

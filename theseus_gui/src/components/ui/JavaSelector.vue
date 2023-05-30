@@ -19,18 +19,19 @@
     <span class="installation-buttons">
       <Button
         :disabled="props.disabled"
+        :icon-only="compact"
         @click="$refs.detectJavaModal.show(props.version, props.modelValue)"
       >
         <SearchIcon />
-        Auto detect
+        {{ compact ? '' : 'Auto detect' }}
       </Button>
-      <Button :disabled="props.disabled" @click="handleJavaFileInput()">
+      <Button :disabled="props.disabled" :icon-only="compact" @click="handleJavaFileInput()">
         <FolderSearchIcon />
-        Browse
+        {{ compact ? '' : 'Browse' }}
       </Button>
-      <Button :disabled="props.disabled" @click="testJava">
+      <Button :disabled="props.disabled" :icon-only="compact" @click="testJava">
         <PlayIcon />
-        Test
+        {{ compact ? '' : 'Test' }}
       </Button>
       <AnimatedLogo v-if="testingJava === true" class="testing-loader" />
       <CheckIcon
@@ -76,6 +77,11 @@ const props = defineProps({
     type: String,
     required: false,
     default: null,
+  },
+  compact: {
+    type: Boolean,
+    required: false,
+    default: false,
   },
 })
 
@@ -129,7 +135,6 @@ async function handleJavaFileInput() {
 .installation-buttons {
   display: flex;
   flex-direction: row;
-  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
   margin: 0;

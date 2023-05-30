@@ -32,6 +32,9 @@
     >
       <DownloadIcon />
     </Button>
+    <Button icon-only class="icon-button" @click="modal.show()">
+      <DashboardIcon />
+    </Button>
   </div>
   <transition name="download">
     <Card v-if="showCard === true" ref="card" class="info-card">
@@ -44,10 +47,18 @@
       </div>
     </Card>
   </transition>
+  <OnboardingModal ref="modal" />
 </template>
 
 <script setup>
-import { Button, DownloadIcon, Card, StopCircleIcon, TerminalSquareIcon } from 'omorphia'
+import {
+  Button,
+  DownloadIcon,
+  Card,
+  StopCircleIcon,
+  TerminalSquareIcon,
+  DashboardIcon,
+} from 'omorphia'
 import { onBeforeUnmount, onMounted, ref } from 'vue'
 import {
   get_all_running_profiles as getRunningProfiles,
@@ -59,11 +70,13 @@ import { useRouter } from 'vue-router'
 import { progress_bars_list } from '@/helpers/state.js'
 import ProgressBar from '@/components/ui/ProgressBar.vue'
 import { handleError } from '@/store/notifications.js'
+import OnboardingModal from '@/components/OnboardingModal.vue'
 
 const router = useRouter()
 const card = ref(null)
 const infoButton = ref(null)
 const showCard = ref(false)
+const modal = ref(null)
 
 const currentProcesses = ref(await getRunningProfiles().catch(handleError))
 
