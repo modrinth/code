@@ -36,7 +36,9 @@
           <span class="circle" :class="{'active': page === 2}"/>
           <span class="circle" :class="{'active': page === 3}"/>
         </div>
-        <Button v-if="page !== 1" @click="page++"> Next </Button>
+        <Button v-if="page !== 1" :color="page === 3 ? 'primary' : ''" @click="pageTurn()">
+          {{ page === 3 ? 'Finish' : 'Next'}}
+        </Button>
       </div>
     </div>
   </Modal>
@@ -80,6 +82,14 @@ watch(settings.value, async (oldSettings, newSettings) => {
 
   await set(setSettings)
 })
+
+const pageTurn = () => {
+  if (page.value === 3) {
+    onboardingModal.value.hide()
+    return
+  }
+  page.value++
+}
 </script>
 
 <style scoped lang="scss">
