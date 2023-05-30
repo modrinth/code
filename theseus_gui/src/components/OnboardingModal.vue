@@ -1,3 +1,4 @@
+<template>
   <Modal ref="onboardingModal" header="Getting started">
     <div class="modal-body">
       <transition name="page">
