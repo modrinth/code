@@ -1,31 +1,29 @@
 <template>
   <Modal ref="onboardingModal" header="Getting started">
     <div class="modal-body">
-      <transition name="page">
-        <div class="swapped-page">
-          <div v-if="page === 1" class="banner-content">
-            <TextLogo class="text-logo" />
-            <h2>Getting started</h2>
-            <p>
-              The Modrinth App is a desktop application that allows you to easily install and manage
-              Minecraft modpacks.
-            </p>
-            <Button color="primary" @click="page = 2"> Continue </Button>
+      <transition name="slide" mode="out-in">
+        <div v-if="page === 1" key="1" class="banner-content swapped-page">
+          <TextLogo class="text-logo" />
+          <h2>Getting started</h2>
+          <p>
+            The Modrinth App is a desktop application that allows you to easily install and manage
+            Minecraft modpacks.
+          </p>
+          <Button color="primary" @click="page = 2"> Continue </Button>
+        </div>
+        <div v-else-if="page === 2" key="2" class="content swapped-page">
+          <h2>Sign into Minecraft</h2>
+          <AccountsCard mode="isolated"/>
+        </div>
+        <div v-else-if="page === 3" key="3" class="content swapped-page">
+          <h2>Setting up Java</h2>
+          <div class="settings-group">
+            <h3>Java 17 location</h3>
+            <JavaSelector v-model="settings.java_globals.JAVA_17" :version="17" compact/>
           </div>
-          <div v-else-if="page === 2" class="content">
-            <h2>Sign into Minecraft</h2>
-            <AccountsCard mode="isolated"/>
-          </div>
-          <div v-else-if="page === 3" class="content">
-            <h2>Setting up Java</h2>
-            <div class="settings-group">
-              <h3>Java 17 location</h3>
-              <JavaSelector v-model="settings.java_globals.JAVA_17" :version="17" compact/>
-            </div>
-            <div class="settings-group">
-              <h3>Java 8 location</h3>
-              <JavaSelector v-model="settings.java_globals.JAVA_8" :version="8" compact/>
-            </div>
+          <div class="settings-group">
+            <h3>Java 8 location</h3>
+            <JavaSelector v-model="settings.java_globals.JAVA_8" :version="8" compact/>
           </div>
         </div>
       </transition>
@@ -187,5 +185,13 @@ const pageTurn = () => {
     align-items: center;
     justify-content: center;
   }
+}
+
+.slide-enter-active, .slide-leave-active {
+  transition: transform .5s;
+}
+
+.slide-enter, .slide-leave-to {
+  transform: translateX(100%);
 }
 </style>
