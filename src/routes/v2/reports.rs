@@ -3,7 +3,9 @@ use crate::models::ids::{base62_impl::parse_base62, ProjectId, UserId, VersionId
 use crate::models::reports::{ItemType, Report};
 use crate::models::threads::{MessageBody, ThreadType};
 use crate::routes::ApiError;
-use crate::util::auth::{check_is_moderator_from_headers, get_user_from_headers};
+use crate::util::auth::{
+    check_is_moderator_from_headers, get_user_from_headers, get_user_from_headers_transaction,
+};
 use actix_web::{delete, get, patch, post, web, HttpRequest, HttpResponse};
 use chrono::Utc;
 use futures::StreamExt;
@@ -36,7 +38,7 @@ pub async fn report_create(
 ) -> Result<HttpResponse, ApiError> {
     let mut transaction = pool.begin().await?;
 
-    let current_user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+    let current_user = get_user_from_headers_transaction(req.headers(), &mut transaction).await?;
 
     let mut bytes = web::BytesMut::new();
     while let Some(item) = body.next().await {

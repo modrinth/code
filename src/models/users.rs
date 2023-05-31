@@ -37,7 +37,7 @@ impl Default for Badges {
 #[derive(Serialize, Deserialize, Clone)]
 pub struct User {
     pub id: UserId,
-    pub github_id: Option<u64>,
+    pub kratos_id: Option<String>, // None if legacy user unconnected to Minos/Kratos
     pub username: String,
     pub name: Option<String>,
     pub email: Option<String>,
@@ -47,6 +47,12 @@ pub struct User {
     pub role: Role,
     pub badges: Badges,
     pub payout_data: Option<UserPayoutData>,
+    pub github_id: Option<u64>,
+    pub discord_id: Option<u64>,
+    pub google_id: Option<u128>,
+    pub microsoft_id: Option<u64>,
+    pub apple_id: Option<u64>,
+    pub gitlab_id: Option<u64>,
 }
 
 #[derive(Serialize, Deserialize, Clone)]
@@ -130,7 +136,7 @@ impl From<DBUser> for User {
     fn from(data: DBUser) -> Self {
         Self {
             id: data.id.into(),
-            github_id: data.github_id.map(|i| i as u64),
+            kratos_id: data.kratos_id,
             username: data.username,
             name: data.name,
             email: None,
@@ -140,6 +146,12 @@ impl From<DBUser> for User {
             role: Role::from_string(&data.role),
             badges: data.badges,
             payout_data: None,
+            github_id: None,
+            discord_id: None,
+            google_id: None,
+            microsoft_id: None,
+            apple_id: None,
+            gitlab_id: None,
         }
     }
 }

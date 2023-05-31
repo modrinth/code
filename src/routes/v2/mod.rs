@@ -3,6 +3,7 @@ mod auth;
 mod midas;
 mod moderation;
 mod notifications;
+mod pats;
 pub(crate) mod project_creation;
 mod projects;
 mod reports;
@@ -25,6 +26,7 @@ pub fn config(cfg: &mut actix_web::web::ServiceConfig) {
             .configure(midas::config)
             .configure(moderation::config)
             .configure(notifications::config)
+            .configure(pats::config)
             .configure(project_creation::config)
             .configure(projects::config)
             .configure(reports::config)

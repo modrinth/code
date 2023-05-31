@@ -1,14 +1,23 @@
 use crate::database;
 use crate::database::models::project_item::QueryProject;
+use crate::database::models::user_item;
 use crate::database::models::version_item::QueryVersion;
 use crate::database::{models, Project, Version};
-use crate::models::users::{Role, User, UserId, UserPayoutData};
+use crate::models::users::{Badges, Role, User, UserId, UserPayoutData};
 use crate::routes::ApiError;
+use crate::Utc;
 use actix_web::http::header::HeaderMap;
+use actix_web::http::header::COOKIE;
 use actix_web::web;
+use reqwest::header::{HeaderValue, AUTHORIZATION};
+use rust_decimal::Decimal;
 use serde::{Deserialize, Serialize};
+use serde_with::serde_as;
+use serde_with::DisplayFromStr;
 use sqlx::PgPool;
 use thiserror::Error;
+
+use super::pat::get_user_from_pat;
 
 #[derive(Error, Debug)]
 pub enum AuthenticationError {
@@ -18,85 +27,323 @@ pub enum AuthenticationError {
     Database(#[from] models::DatabaseError),
     #[error("Error while parsing JSON: {0}")]
     SerDe(#[from] serde_json::Error),
-    #[error("Error while communicating to GitHub OAuth2: {0}")]
-    Github(#[from] reqwest::Error),
+    #[error("Error while communicating over the internet: {0}")]
+    Reqwest(#[from] reqwest::Error),
+    #[error("Error while decoding PAT: {0}")]
+    Decoding(#[from] crate::models::ids::DecodingError),
     #[error("Invalid Authentication Credentials")]
     InvalidCredentials,
+    #[error("Authentication method was not valid")]
+    InvalidAuthMethod,
 }
 
+// A user as stored in the Minos database
 #[derive(Serialize, Deserialize, Debug)]
-pub struct GitHubUser {
-    pub login: String,
-    pub id: u64,
-    pub avatar_url: String,
-    pub name: Option<String>,
-    pub email: Option<String>,
-    pub bio: Option<String>,
+pub struct MinosUser {
+    pub id: String,       // This is the unique generated Ory name
+    pub username: String, // unique username
+    pub email: String,
+    pub name: Option<String>, // real name
+    pub github_id: Option<u64>,
+    pub discord_id: Option<u64>,
+    pub google_id: Option<u128>,
+    pub gitlab_id: Option<u64>,
+    pub microsoft_id: Option<u64>,
+    pub apple_id: Option<u64>,
 }
 
-pub async fn get_github_user_from_token(
-    access_token: &str,
-) -> Result<GitHubUser, AuthenticationError> {
-    Ok(reqwest::Client::new()
-        .get("https://api.github.com/user")
-        .header(reqwest::header::USER_AGENT, "Modrinth")
+// A payload marking a new user in Minos, with data to be inserted into Labrinth
+#[serde_as]
+#[derive(Deserialize, Debug)]
+pub struct MinosNewUser {
+    pub id: String,       // This is the unique generated Ory name
+    pub username: String, // unique username
+    pub email: String,
+
+    pub name: Option<String>,            // real name
+    pub default_picture: Option<String>, // uri of default avatar
+    #[serde_as(as = "Option<DisplayFromStr>")]
+    pub github_id: Option<i64>, // we allow Github to be submitted to connect to an existing account
+}
+
+// Attempt to append a Minos user to an existing user, if one exists
+// (combining the the legacy user with the Minos user)
+pub async fn link_or_insert_new_user(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    minos_new_user: MinosNewUser,
+) -> Result<(), AuthenticationError> {
+    // If the user with this Github ID already exists, we can just merge the two accounts
+    if let Some(github_id) = minos_new_user.github_id {
+        if let Some(existing_user) =
+            user_item::User::get_from_github_id(github_id as u64, &mut *transaction).await?
+        {
+            existing_user
+                .merge_minos_user(&minos_new_user.id, &mut *transaction)
+                .await?;
+            return Ok(());
+        }
+    }
+    // No user exists, so we need to create a new user
+    insert_new_user(transaction, minos_new_user).await?;
+
+    Ok(())
+}
+
+// Insert a new user into the database from a MinosUser
+pub async fn insert_new_user(
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+    minos_new_user: MinosNewUser,
+) -> Result<(), AuthenticationError> {
+    let user_id = crate::database::models::generate_user_id(transaction).await?;
+
+    database::models::User {
+        id: user_id,
+        kratos_id: Some(minos_new_user.id),
+        username: minos_new_user.username,
+        name: minos_new_user.name,
+        email: Some(minos_new_user.email),
+        avatar_url: minos_new_user.default_picture,
+        bio: None,
+        github_id: minos_new_user.github_id,
+        created: Utc::now(),
+        role: Role::Developer.to_string(),
+        badges: Badges::default(),
+        balance: Decimal::ZERO,
+        payout_wallet: None,
+        payout_wallet_type: None,
+        payout_address: None,
+    }
+    .insert(transaction)
+    .await?;
+
+    Ok(())
+}
+
+// Gets MinosUser from Kratos ID
+// This uses an administrative bearer token to access the Minos API
+// Should NOT be directly accessible to users
+pub async fn get_minos_user(kratos_id: &str) -> Result<MinosUser, AuthenticationError> {
+    let ory_auth_bearer = dotenvy::var("ORY_AUTH_BEARER").unwrap();
+    let req = reqwest::Client::new()
+        .get(format!(
+            "{}/admin/user/{kratos_id}",
+            dotenvy::var("MINOS_URL").unwrap()
+        ))
+        .header(reqwest::header::USER_AGENT, "Labrinth")
         .header(
             reqwest::header::AUTHORIZATION,
-            format!("token {access_token}"),
-        )
-        .send()
-        .await?
-        .json()
-        .await?)
+            format!("Bearer {ory_auth_bearer}"),
+        );
+    let res = req.send().await?.error_for_status()?;
+    let res = res.json().await?;
+    Ok(res)
 }
 
-pub async fn get_user_from_token<'a, 'b, E>(
-    access_token: &str,
-    executor: E,
-) -> Result<User, AuthenticationError>
-where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
-{
-    let github_user = get_github_user_from_token(access_token).await?;
+// pass the cookies to Minos to get the user.
+pub async fn get_minos_user_from_cookies(cookies: &str) -> Result<MinosUser, AuthenticationError> {
+    let req = reqwest::Client::new()
+        .get(dotenvy::var("MINOS_URL").unwrap() + "/user")
+        .header(reqwest::header::USER_AGENT, "Modrinth")
+        .header(reqwest::header::COOKIE, cookies);
+    let res = req.send().await?;
 
-    let res = models::User::get_from_github_id(github_user.id, executor).await?;
-
-    match res {
-        Some(result) => Ok(User {
-            id: UserId::from(result.id),
-            github_id: result.github_id.map(|i| i as u64),
-            username: result.username,
-            name: result.name,
-            email: result.email,
-            avatar_url: result.avatar_url,
-            bio: result.bio,
-            created: result.created,
-            role: Role::from_string(&result.role),
-            badges: result.badges,
-            payout_data: Some(UserPayoutData {
-                balance: result.balance,
-                payout_wallet: result.payout_wallet,
-                payout_wallet_type: result.payout_wallet_type,
-                payout_address: result.payout_address,
-            }),
-        }),
-        None => Err(AuthenticationError::InvalidCredentials),
-    }
+    let res = match res.status() {
+        reqwest::StatusCode::OK => res,
+        reqwest::StatusCode::UNAUTHORIZED => return Err(AuthenticationError::InvalidCredentials),
+        _ => res.error_for_status()?,
+    };
+    Ok(res.json().await?)
 }
-pub async fn get_user_from_headers<'a, 'b, E>(
+
+pub async fn get_user_from_headers<'a, E>(
     headers: &HeaderMap,
     executor: E,
 ) -> Result<User, AuthenticationError>
 where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
+{
+    let token: Option<&reqwest::header::HeaderValue> = headers.get(AUTHORIZATION);
+    let cookies_unparsed: Option<&reqwest::header::HeaderValue> = headers.get(COOKIE);
+
+    // Fetch DB user record and minos user from headers
+    let (db_user, minos_user) = match (token, cookies_unparsed) {
+        // If both, favour the bearer token first- redirect to cookie on failure
+        (Some(token), Some(cookies)) => {
+            match get_db_and_minos_user_from_bearer_token(token, executor).await {
+                Ok((db, minos)) => (db, minos),
+                Err(_) => get_db_and_minos_user_from_cookies(cookies, executor).await?,
+            }
+        }
+        (Some(token), _) => get_db_and_minos_user_from_bearer_token(token, executor).await?,
+        (_, Some(cookies)) => get_db_and_minos_user_from_cookies(cookies, executor).await?,
+        _ => return Err(AuthenticationError::InvalidAuthMethod), // No credentials passed
+    };
+
+    let user = User {
+        id: UserId::from(db_user.id),
+        kratos_id: db_user.kratos_id,
+        github_id: minos_user.github_id,
+        discord_id: minos_user.discord_id,
+        google_id: minos_user.google_id,
+        microsoft_id: minos_user.microsoft_id,
+        apple_id: minos_user.apple_id,
+        gitlab_id: minos_user.gitlab_id,
+        username: db_user.username,
+        name: db_user.name,
+        email: db_user.email,
+        avatar_url: db_user.avatar_url,
+        bio: db_user.bio,
+        created: db_user.created,
+        role: Role::from_string(&db_user.role),
+        badges: db_user.badges,
+        payout_data: Some(UserPayoutData {
+            balance: db_user.balance,
+            payout_wallet: db_user.payout_wallet,
+            payout_wallet_type: db_user.payout_wallet_type,
+            payout_address: db_user.payout_address,
+        }),
+    };
+    Ok(user)
+}
+
+pub async fn get_user_from_headers_transaction(
+    headers: &HeaderMap,
+    transaction: &mut sqlx::Transaction<'_, sqlx::Postgres>,
+) -> Result<User, AuthenticationError> {
+    let token: Option<&reqwest::header::HeaderValue> = headers.get(AUTHORIZATION);
+    let cookies_unparsed: Option<&reqwest::header::HeaderValue> = headers.get(COOKIE);
+
+    // Fetch DB user record and minos user from headers
+    let (db_user, minos_user) = match (token, cookies_unparsed) {
+        // If both, favour the bearer token first- redirect to cookie on failure
+        (Some(token), Some(cookies)) => {
+            match get_db_and_minos_user_from_bearer_token(token, &mut *transaction).await {
+                Ok((db, minos)) => (db, minos),
+                Err(_) => get_db_and_minos_user_from_cookies(cookies, &mut *transaction).await?,
+            }
+        }
+        (Some(token), _) => {
+            get_db_and_minos_user_from_bearer_token(token, &mut *transaction).await?
+        }
+        (_, Some(cookies)) => {
+            get_db_and_minos_user_from_cookies(cookies, &mut *transaction).await?
+        }
+        _ => return Err(AuthenticationError::InvalidAuthMethod), // No credentials passed
+    };
+
+    let user = User {
+        id: UserId::from(db_user.id),
+        kratos_id: db_user.kratos_id,
+        github_id: minos_user.github_id,
+        discord_id: minos_user.discord_id,
+        google_id: minos_user.google_id,
+        microsoft_id: minos_user.microsoft_id,
+        apple_id: minos_user.apple_id,
+        gitlab_id: minos_user.gitlab_id,
+        username: db_user.username,
+        name: db_user.name,
+        email: db_user.email,
+        avatar_url: db_user.avatar_url,
+        bio: db_user.bio,
+        created: db_user.created,
+        role: Role::from_string(&db_user.role),
+        badges: db_user.badges,
+        payout_data: Some(UserPayoutData {
+            balance: db_user.balance,
+            payout_wallet: db_user.payout_wallet,
+            payout_wallet_type: db_user.payout_wallet_type,
+            payout_address: db_user.payout_address,
+        }),
+    };
+    Ok(user)
+}
+
+pub async fn get_db_and_minos_user_from_bearer_token<'a, E>(
+    token: &HeaderValue,
+    executor: E,
+) -> Result<(user_item::User, MinosUser), AuthenticationError>
+where
     E: sqlx::Executor<'a, Database = sqlx::Postgres>,
 {
-    let token = headers
-        .get("Authorization")
-        .ok_or(AuthenticationError::InvalidCredentials)?
-        .to_str()
-        .map_err(|_| AuthenticationError::InvalidCredentials)?;
+    let db_user = get_user_record_from_bearer_token(
+        token
+            .to_str()
+            .map_err(|_| AuthenticationError::InvalidCredentials)?,
+        executor,
+    )
+    .await?
+    .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+    let minos_user = get_minos_user(
+        &db_user
+            .kratos_id
+            .clone()
+            .ok_or_else(|| AuthenticationError::InvalidCredentials)?,
+    )
+    .await?;
+    Ok((db_user, minos_user))
+}
 
-    get_user_from_token(token, executor).await
+pub async fn get_db_and_minos_user_from_cookies<'a, E>(
+    cookies: &HeaderValue,
+    executor: E,
+) -> Result<(user_item::User, MinosUser), AuthenticationError>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+{
+    let minos_user = get_minos_user_from_cookies(
+        cookies
+            .to_str()
+            .map_err(|_| AuthenticationError::InvalidCredentials)?,
+    )
+    .await?;
+    let db_user = models::User::get_from_minos_kratos_id(minos_user.id.clone(), executor)
+        .await?
+        .ok_or_else(|| AuthenticationError::InvalidCredentials)?;
+    Ok((db_user, minos_user))
+}
+
+pub async fn get_user_record_from_bearer_token<'a, 'b, E>(
+    token: &str,
+    executor: E,
+) -> Result<Option<user_item::User>, AuthenticationError>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+{
+    if token.starts_with("Bearer ") {
+        let token: &str = token.trim_start_matches("Bearer ");
+
+        // Tokens beginning with Ory are considered to be Kratos tokens (in reality, extracted cookies) and can be forwarded to Minos
+        let possible_user = match token.split_at(4) {
+            ("mod_", _) => get_user_from_pat(token, executor).await?,
+            ("ory_", _) => get_user_from_minos_session_token(token, executor).await?,
+            _ => return Err(AuthenticationError::InvalidAuthMethod),
+        };
+        Ok(possible_user)
+    } else {
+        Err(AuthenticationError::InvalidAuthMethod)
+    }
+}
+
+pub async fn get_user_from_minos_session_token<'a, 'b, E>(
+    token: &str,
+    executor: E,
+) -> Result<Option<user_item::User>, AuthenticationError>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+{
+    let ory_auth_bearer = dotenvy::var("ORY_AUTH_BEARER").unwrap();
+    let req = reqwest::Client::new()
+        .get(dotenvy::var("MINOS_URL").unwrap() + "/admin/user/token?token=" + token)
+        .header(reqwest::header::USER_AGENT, "Labrinth")
+        .header(
+            reqwest::header::AUTHORIZATION,
+            format!("Bearer {ory_auth_bearer}"),
+        );
+    let res = req.send().await?.error_for_status()?;
+    let minos_user: MinosUser = res.json().await?;
+
+    let db_user = models::User::get_from_minos_kratos_id(minos_user.id.clone(), executor).await?;
+    Ok(db_user)
 }
 
 pub async fn check_is_moderator_from_headers<'a, 'b, E>(
@@ -104,7 +351,7 @@ pub async fn check_is_moderator_from_headers<'a, 'b, E>(
     executor: E,
 ) -> Result<User, AuthenticationError>
 where
-    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+    E: sqlx::Executor<'a, Database = sqlx::Postgres> + Copy,
 {
     let user = get_user_from_headers(headers, executor).await?;
 

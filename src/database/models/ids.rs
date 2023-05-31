@@ -84,6 +84,14 @@ generate_ids!(
     StateId
 );
 generate_ids!(
+    pub generate_pat_id,
+    PatId,
+    8,
+    "SELECT EXISTS(SELECT 1 FROM pats WHERE id=$1)",
+    PatId
+);
+
+generate_ids!(
     pub generate_user_id,
     UserId,
     8,
@@ -176,6 +184,10 @@ pub struct FileId(pub i64);
 #[derive(Copy, Clone, Debug, Type)]
 #[sqlx(transparent)]
 pub struct StateId(pub i64);
+
+#[derive(Copy, Clone, Debug, Type)]
+#[sqlx(transparent)]
+pub struct PatId(pub i64);
 
 #[derive(Copy, Clone, Debug, Type, Deserialize)]
 #[sqlx(transparent)]

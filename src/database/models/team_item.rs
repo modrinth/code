@@ -128,7 +128,7 @@ impl TeamMember {
         let teams = sqlx::query!(
             "
             SELECT tm.id id, tm.team_id team_id, tm.role member_role, tm.permissions permissions, tm.accepted accepted, tm.payouts_split payouts_split, tm.ordering,
-            u.id user_id, u.github_id github_id, u.name user_name, u.email email,
+            u.id user_id, u.name user_name, u.email email, u.kratos_id kratos_id, u.github_id github_id,
             u.avatar_url avatar_url, u.username username, u.bio bio,
             u.created created, u.role user_role, u.badges badges, u.balance balance,
             u.payout_wallet payout_wallet, u.payout_wallet_type payout_wallet_type,
@@ -153,6 +153,7 @@ impl TeamMember {
                           user: User {
                               id: UserId(m.user_id),
                               github_id: m.github_id,
+                              kratos_id: m.kratos_id,
                               name: m.user_name,
                               email: m.email,
                               avatar_url: m.avatar_url,

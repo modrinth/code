@@ -10,7 +10,7 @@ use crate::models::projects::{
 use crate::models::threads::ThreadType;
 use crate::models::users::UserId;
 use crate::search::indexing::IndexingError;
-use crate::util::auth::{get_user_from_headers, AuthenticationError};
+use crate::util::auth::{get_user_from_headers_transaction, AuthenticationError};
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use actix_multipart::{Field, Multipart};
@@ -341,7 +341,7 @@ async fn project_create_inner(
     let cdn_url = dotenvy::var("CDN_URL")?;
 
     // The currently logged in user
-    let current_user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+    let current_user = get_user_from_headers_transaction(req.headers(), &mut *transaction).await?;
 
     let project_id: ProjectId = models::generate_project_id(transaction).await?.into();
 

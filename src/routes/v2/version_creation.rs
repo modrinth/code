@@ -12,7 +12,7 @@ use crate::models::projects::{
     VersionId, VersionStatus, VersionType,
 };
 use crate::models::teams::Permissions;
-use crate::util::auth::get_user_from_headers;
+use crate::util::auth::get_user_from_headers_transaction;
 use crate::util::routes::read_from_field;
 use crate::util::validate::validation_errors_to_string;
 use crate::validate::{validate_file, ValidationResult};
@@ -127,7 +127,7 @@ async fn version_create_inner(
     let all_game_versions = models::categories::GameVersion::list(&mut *transaction).await?;
     let all_loaders = models::categories::Loader::list(&mut *transaction).await?;
 
-    let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+    let user = get_user_from_headers_transaction(req.headers(), &mut *transaction).await?;
 
     let mut error = None;
     while let Some(item) = payload.next().await {
@@ -479,7 +479,7 @@ async fn upload_file_to_version_inner(
     let mut initial_file_data: Option<InitialFileData> = None;
     let mut file_builders: Vec<VersionFileBuilder> = Vec::new();
 
-    let user = get_user_from_headers(req.headers(), &mut *transaction).await?;
+    let user = get_user_from_headers_transaction(req.headers(), &mut *transaction).await?;
 
     let result = models::Version::get_full(version_id, &**client).await?;
 
