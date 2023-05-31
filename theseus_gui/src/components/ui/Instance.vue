@@ -167,7 +167,7 @@ onUnmounted(() => unlisten())
       @mouseenter="checkProcess"
     >
       <Avatar
-        size="none"
+        size="sm"
         :src="
           props.instance.metadata
             ? !props.instance.metadata.icon ||

@@ -53,6 +53,8 @@ const notificationsWrapper = ref(null)
 watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
 })
+
+// document.addEventListener('contextmenu', event => event.preventDefault());
 </script>
 
 <template>

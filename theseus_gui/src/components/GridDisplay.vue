@@ -1,6 +1,14 @@
 <script setup>
 import Instance from '@/components/ui/Instance.vue'
 import { ref } from 'vue'
+import {
+  ClipboardCopyIcon,
+  EditIcon,
+  FolderOpenIcon,
+  PlayIcon, PlusIcon,
+  TrashIcon
+} from "omorphia";
+import ContextMenu from "@/components/ui/ContextMenu.vue";
 
 const props = defineProps({
   instances: {
@@ -21,7 +29,18 @@ const props = defineProps({
   },
   canPaginate: Boolean,
 })
+
 const modsRow = ref(null)
+const instanceOptions = ref(null)
+
+const handleRightClick = (event, e) => {
+  console.log(event, e)
+  instanceOptions.value.showMenu(event, e)
+}
+
+const handleOptionsClick = (args) => {
+  console.log(args)
+}
 </script>
 <template>
   <div class="row">
@@ -33,11 +52,45 @@ const modsRow = ref(null)
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
-        display="card"
         :instance="instance"
+        @contextmenu.prevent.stop="event => handleRightClick(event, instance)"
       />
     </section>
   </div>
+  <ContextMenu
+    ref="instanceOptions"
+    :element-id="`instance-options`"
+    :options="[
+        'play',
+        'install',
+        'divider',
+        'edit',
+        'open',
+        'copy',
+        'divider',
+        'delete',
+      ]"
+    @option-clicked="handleOptionsClick"
+  >
+    <template #play>
+      <PlayIcon /> Play
+    </template>
+    <template #install>
+      <PlusIcon /> Add content
+    </template>
+    <template #edit>
+      <EditIcon /> Edit
+    </template>
+    <template #delete>
+      <TrashIcon /> Delete
+    </template>
+    <template #open>
+      <FolderOpenIcon /> Open folder
+    </template>
+    <template #copy>
+      <ClipboardCopyIcon /> Copy path
+    </template>
+  </ContextMenu>
 </template>
 <style lang="scss" scoped>
 .row {
@@ -104,12 +157,13 @@ const modsRow = ref(null)
     margin-top: 0.8rem;
     scroll-behavior: smooth;
     overflow-y: auto;
+    transition: all ease-in-out 0.3s;
   }
 }
 
 .dark-mode {
   .row {
-    &:nth-child(odd) {
+    &:nth-child(even) {
       background-color: rgb(30, 31, 34);
     }
   }

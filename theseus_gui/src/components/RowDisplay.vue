@@ -1,7 +1,17 @@
 <script setup>
-import { ChevronLeftIcon, ChevronRightIcon } from 'omorphia'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  ClipboardCopyIcon, EditIcon,
+  FolderOpenIcon, PlayIcon,
+  PlusIcon,
+  TrashIcon,
+  DownloadIcon,
+  GlobeIcon
+} from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
+import ContextMenu from "@/components/ui/ContextMenu.vue";
 
 const props = defineProps({
   instances: {
@@ -17,24 +27,29 @@ const props = defineProps({
   canPaginate: Boolean,
 })
 
-const allowPagination = ref(false)
+const allowPagination = ref(Array.apply(false, Array(props.instances.length)))
 const modsRow = ref(null)
+const instanceOptions = ref(null)
+const projectOptions = ref(null)
 
 const handlePaginationDisplay = () => {
-  let parentsRow = modsRow.value
 
-  // This is wrapped in a setTimeout because the HtmlCollection seems to struggle
-  // with getting populated sometimes. It's a flaky error, but providing a bit of
-  // wait-time for the below expressions has not failed thus-far.
-  setTimeout(() => {
-    const children = parentsRow.children
-    const lastChild = children[children.length - 1]
-    const childBox = lastChild?.getBoundingClientRect()
+  for (let i = 0; i < props.instances.length; i++) {
+    let parentsRow = modsRow.value[i]
 
-    if (childBox?.x + childBox?.width > window.innerWidth && props.canPaginate)
-      allowPagination.value = true
-    else allowPagination.value = false
-  }, 300)
+    // This is wrapped in a setTimeout because the HtmlCollection seems to struggle
+    // with getting populated sometimes. It's a flaky error, but providing a bit of
+    // wait-time for the below expressions has not failed thus-far.
+    setTimeout(() => {
+      const children = parentsRow.children
+      const lastChild = children[children.length - 1]
+      const childBox = lastChild?.getBoundingClientRect()
+
+      if (childBox?.x + childBox?.width > window.innerWidth && props.canPaginate)
+        allowPagination.value[i] = true
+      else allowPagination.value[i] = false
+    }, 300)
+  }
 }
 
 onMounted(() => {
@@ -46,35 +61,118 @@ onUnmounted(() => {
   if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
 })
 
-const handleLeftPage = () => {
-  modsRow.value.scrollLeft -= 170
+const handleLeftPage = (index) => {
+  modsRow.value[index].scrollLeft -= 170
 }
-const handleRightPage = () => {
-  modsRow.value.scrollLeft += 170
+const handleRightPage = (index) => {
+  modsRow.value[index].scrollLeft += 170
+}
+
+const handleInstanceRightClick = (event, e) => {
+  console.log(event, e)
+  instanceOptions.value.showMenu(event, e)
+}
+
+const handleProjectRightClick = (event, e) => {
+  console.log(event, e)
+  projectOptions.value.showMenu(event, e)
+}
+
+const handleOptionsClick = (args) => {
+  console.log(args)
 }
 </script>
+
 <template>
-  <div v-if="props.instances.length > 0" class="row">
-    <div class="header">
-      <p>{{ props.label }}</p>
-      <hr aria-hidden="true" />
-      <div v-if="allowPagination" class="pagination">
-        <ChevronLeftIcon role="button" @click="handleLeftPage" />
-        <ChevronRightIcon role="button" @click="handleRightPage" />
+  <div class="content">
+    <div v-for="(row, index) in instances" :key="row.label" class="row">
+      <div class="header">
+        <p>{{ row.label }}</p>
+        <hr aria-hidden="true" />
+        <div v-if="allowPagination[index]" class="pagination">
+          <ChevronLeftIcon role="button" @click="handleLeftPage(index)" />
+          <ChevronRightIcon role="button" @click="handleRightPage(index)" />
+        </div>
       </div>
+      <section ref="modsRow" class="instances">
+        <Instance
+          v-for="instance in row.instances"
+          :key="instance?.project_id || instance?.id"
+          :instance="instance"
+          @contextmenu.prevent.stop="event => row.downloaded ? handleInstanceRightClick(event, instance) : handleProjectRightClick(event, instance)"
+        />
+      </section>
     </div>
-    <section ref="modsRow" class="instances">
-      <Instance
-        v-for="instance in props.instances"
-        :key="instance?.project_id || instance?.id"
-        display="card"
-        :instance="instance"
-        class="row-instance"
-      />
-    </section>
   </div>
+  <ContextMenu
+    ref="instanceOptions"
+    :element-id="`instance-options`"
+    :options="[
+        'play',
+        'install',
+        'divider',
+        'edit',
+        'open',
+        'copy',
+        'divider',
+        'delete',
+      ]"
+    @option-clicked="handleOptionsClick"
+  >
+    <template #play>
+      <PlayIcon /> Play
+    </template>
+    <template #install>
+      <PlusIcon /> Add content
+    </template>
+    <template #edit>
+      <EditIcon /> Edit
+    </template>
+    <template #delete>
+      <TrashIcon /> Delete
+    </template>
+    <template #open>
+      <FolderOpenIcon /> Open folder
+    </template>
+    <template #copy>
+      <ClipboardCopyIcon /> Copy path
+    </template>
+  </ContextMenu>
+  <ContextMenu
+    ref="projectOptions"
+    :element-id="`project-options`"
+    :options="[
+        'install',
+        'add',
+        'divider',
+        'open',
+        'copy',
+      ]"
+    @option-clicked="handleOptionsClick"
+  >
+    <template #install>
+      <DownloadIcon /> Install
+    </template>
+    <template #add>
+      <PlusIcon /> Add to Instance
+    </template>
+    <template #open>
+      <GlobeIcon /> Open in Modrinth
+    </template>
+    <template #copy>
+      <ClipboardCopyIcon /> Copy link
+    </template>
+  </ContextMenu>
 </template>
 <style lang="scss" scoped>
+.content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .row {
   display: flex;
   flex-direction: column;
@@ -149,6 +247,11 @@ const handleRightPage = () => {
       width: 0px;
       background: transparent;
     }
+
+    :deep(.instance) {
+      min-width: 10.5rem;
+      max-width: 10.5rem;
+    }
   }
 }
 
@@ -158,10 +261,5 @@ const handleRightPage = () => {
       background-color: rgb(30, 31, 34);
     }
   }
-}
-
-.row-instance {
-  min-width: 10.5rem;
-  max-width: 10.5rem;
 }
 </style>

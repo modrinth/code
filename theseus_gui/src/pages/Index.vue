@@ -61,9 +61,26 @@ onUnmounted(() => unlisten())
 
 <template>
   <div class="page-container">
-    <RowDisplay label="Jump back in" :instances="recentInstances" :can-paginate="false" />
-    <RowDisplay label="Popular packs" :instances="featuredModpacks" :can-paginate="true" />
-    <RowDisplay label="Popular mods" :instances="featuredMods" :can-paginate="true" />
+    <RowDisplay
+      :instances="[
+        {
+          label: 'Jump back in',
+          instances: recentInstances,
+          downloaded: true
+        },
+        {
+          label: 'Popular packs',
+          instances: featuredModpacks,
+          downloaded: false
+        },
+        {
+          label: 'Popular mods',
+          instances: featuredMods,
+          downloaded: false
+        }
+      ]"
+      :can-paginate="true"
+    />
   </div>
 </template>
 
