@@ -135,12 +135,6 @@ impl Report {
         .fetch_optional(&mut *transaction)
         .await?;
 
-        if let Some(thread_id) = thread_id {
-            if let Some(id) = thread_id.thread_id {
-                crate::database::models::Thread::remove_full(ThreadId(id), transaction).await?;
-            }
-        }
-
         sqlx::query!(
             "
             DELETE FROM reports WHERE id = $1
@@ -149,6 +143,12 @@ impl Report {
         )
         .execute(&mut *transaction)
         .await?;
+
+        if let Some(thread_id) = thread_id {
+            if let Some(id) = thread_id.thread_id {
+                crate::database::models::Thread::remove_full(ThreadId(id), transaction).await?;
+            }
+        }
 
         Ok(Some(()))
     }
