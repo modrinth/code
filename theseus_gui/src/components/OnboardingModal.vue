@@ -13,29 +13,29 @@
         </div>
         <div v-else-if="page === 2" key="2" class="content swapped-page">
           <h2>Sign into Minecraft</h2>
-          <AccountsCard mode="isolated"/>
+          <AccountsCard mode="isolated" />
         </div>
         <div v-else-if="page === 3" key="3" class="content swapped-page">
           <h2>Setting up Java</h2>
           <div class="settings-group">
             <h3>Java 17 location</h3>
-            <JavaSelector v-model="settings.java_globals.JAVA_17" :version="17" compact/>
+            <JavaSelector v-model="settings.java_globals.JAVA_17" :version="17" compact />
           </div>
           <div class="settings-group">
             <h3>Java 8 location</h3>
-            <JavaSelector v-model="settings.java_globals.JAVA_8" :version="8" compact/>
+            <JavaSelector v-model="settings.java_globals.JAVA_8" :version="8" compact />
           </div>
         </div>
       </transition>
       <div class="button-row">
         <Button v-if="page !== 1" @click="page--"> Back </Button>
         <div class="page-indicator">
-          <span class="circle" :class="{'active': page === 1}"/>
-          <span class="circle" :class="{'active': page === 2}"/>
-          <span class="circle" :class="{'active': page === 3}"/>
+          <span class="circle" :class="{ active: page === 1 }" />
+          <span class="circle" :class="{ active: page === 2 }" />
+          <span class="circle" :class="{ active: page === 3 }" />
         </div>
         <Button v-if="page !== 1" :color="page === 3 ? 'primary' : ''" @click="pageTurn()">
-          {{ page === 3 ? 'Finish' : 'Next'}}
+          {{ page === 3 ? 'Finish' : 'Next' }}
         </Button>
       </div>
     </div>
@@ -43,12 +43,12 @@
 </template>
 
 <script setup>
-import {Modal, TextLogo, Button} from 'omorphia'
-import {ref, watch} from 'vue'
+import { Modal, TextLogo, Button } from 'omorphia'
+import { ref, watch } from 'vue'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
-import JavaSelector from "@/components/ui/JavaSelector.vue";
-import {handleError} from "@/store/notifications.js";
-import {get, set} from "@/helpers/settings.js";
+import JavaSelector from '@/components/ui/JavaSelector.vue'
+import { handleError } from '@/store/notifications.js'
+import { get, set } from '@/helpers/settings.js'
 
 const onboardingModal = ref(null)
 const page = ref(1)
@@ -187,11 +187,13 @@ const pageTurn = () => {
   }
 }
 
-.slide-enter-active, .slide-leave-active {
-  transition: transform .5s;
+.slide-enter-active,
+.slide-leave-active {
+  transition: transform 0.5s;
 }
 
-.slide-enter, .slide-leave-to {
+.slide-enter,
+.slide-leave-to {
   transform: translateX(100%);
 }
 </style>

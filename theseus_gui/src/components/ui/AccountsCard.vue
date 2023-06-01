@@ -6,7 +6,10 @@
     :class="{ expanded: mode === 'expanded' }"
     @click="toggle()"
   >
-    <Avatar :size="mode === 'expanded' ? 'xs' : 'sm'" :src="selectedAccount?.profile_picture ?? ''" />
+    <Avatar
+      :size="mode === 'expanded' ? 'xs' : 'sm'"
+      :src="selectedAccount?.profile_picture ?? ''"
+    />
     <div v-show="mode === 'expanded'" class="avatar-text">
       <div class="text no-select">
         {{ selectedAccount ? selectedAccount.username : 'Offline' }}
@@ -18,7 +21,12 @@
     </div>
   </div>
   <transition name="fade">
-    <Card v-if="showCard || mode === 'isolated'" ref="card" class="account-card" :class="{ expanded: mode === 'expanded', 'isolated': mode === 'isolated' }">
+    <Card
+      v-if="showCard || mode === 'isolated'"
+      ref="card"
+      class="account-card"
+      :class="{ expanded: mode === 'expanded', isolated: mode === 'isolated' }"
+    >
       <div v-if="selectedAccount" class="selected account">
         <Avatar size="xs" :src="selectedAccount.profile_picture" />
         <div>

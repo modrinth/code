@@ -61,7 +61,10 @@ watch(notificationsWrapper, () => {
     <div class="nav-container" :class="{ expanded: !themeStore.collapsedNavigation }">
       <div class="nav-section">
         <suspense>
-          <AccountsCard ref="accounts" :mode="themeStore.collapsedNavigation ? 'small' : 'expanded'" />
+          <AccountsCard
+            ref="accounts"
+            :mode="themeStore.collapsedNavigation ? 'small' : 'expanded'"
+          />
         </suspense>
         <div class="pages-list">
           <RouterLink
