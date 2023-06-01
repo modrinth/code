@@ -1,4 +1,9 @@
 <template>
+  <div class="external-buttons">
+    <Button icon-only class="icon-button" @click="modal.show()">
+      <DashboardIcon />
+    </Button>
+  </div>
   <div v-if="currentProcesses[0]" class="status">
     <span class="circle running" />
     <span class="running-text">
@@ -31,9 +36,6 @@
       @click="toggleCard()"
     >
       <DownloadIcon />
-    </Button>
-    <Button icon-only class="icon-button" @click="modal.show()">
-      <DashboardIcon />
     </Button>
   </div>
   <transition name="download">
@@ -77,6 +79,10 @@ const card = ref(null)
 const infoButton = ref(null)
 const showCard = ref(false)
 const modal = ref(null)
+
+defineExpose({
+  modal,
+})
 
 const currentProcesses = ref(await getRunningProfiles().catch(handleError))
 
@@ -146,6 +152,15 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.external-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  height: 100%;
+  padding: 0 1rem;
+}
+
 .status {
   height: 100%;
   display: flex;
