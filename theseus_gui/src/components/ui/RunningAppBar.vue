@@ -137,6 +137,7 @@ const toggleCard = async () => {
 
 onMounted(() => {
   window.addEventListener('click', handleClickOutside)
+  modal.value.show()
 })
 
 onBeforeUnmount(() => {
