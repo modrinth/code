@@ -9,6 +9,7 @@ use crate::{
     state::{self as st, MinecraftChild},
     State,
 };
+use chrono::Utc;
 use daedalus as d;
 use daedalus::minecraft::VersionInfo;
 use dunce::canonicalize;
@@ -431,6 +432,13 @@ pub async fn launch_minecraft(
 
     let stdout_log_path = logs_dir.join("stdout.log");
     let stderr_log_path = logs_dir.join("stderr.log");
+
+    crate::api::profile::edit(&profile.path, |prof| {
+        prof.metadata.last_played = Some(Utc::now());
+
+        async { Ok(()) }
+    })
+    .await?;
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes

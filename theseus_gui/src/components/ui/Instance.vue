@@ -362,6 +362,7 @@ onUnmounted(() => unlisten())
   padding: 0.75rem !important; /* overrides card class */
   transition: 0.1s ease-in-out all !important; /* overrides Omorphia defaults */
   background: hsl(220, 11%, 17%) !important;
+  margin-bottom: 0;
 
   &:hover {
     filter: brightness(1) !important;
