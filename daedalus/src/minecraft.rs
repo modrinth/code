@@ -332,7 +332,9 @@ pub fn merge_partial_library(
                 merge_downloads.artifact = Some(artifact);
             }
             if let Some(classifiers) = downloads.classifiers {
-                if let Some(merge_classifiers) = &mut merge_downloads.classifiers {
+                if let Some(merge_classifiers) =
+                    &mut merge_downloads.classifiers
+                {
                     for classifier in classifiers {
                         merge_classifiers.insert(classifier.0, classifier.1);
                     }

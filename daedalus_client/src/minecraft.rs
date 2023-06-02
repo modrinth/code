@@ -1,7 +1,10 @@
 use crate::download_file;
 use crate::{format_url, upload_file_to_bucket, Error};
 use daedalus::get_hash;
-use daedalus::minecraft::{merge_partial_library, Library, PartialLibrary, VersionManifest, VersionInfo};
+use daedalus::minecraft::{
+    merge_partial_library, Library, PartialLibrary,
+    VersionManifest,
+};
 use log::info;
 use serde::Deserialize;
 use std::sync::Arc;
@@ -25,7 +28,7 @@ pub async fn retrieve_data(
         daedalus::minecraft::fetch_version_manifest(None).await?;
     let cloned_manifest = Arc::new(Mutex::new(manifest.clone()));
 
-    let patches = fetch_library_patches(None, semaphore.clone()).await?;
+    let patches = fetch_library_patches()?;
     let cloned_patches = Arc::new(&patches);
 
     let visited_assets_mutex = Arc::new(Mutex::new(Vec::new()));
@@ -43,10 +46,8 @@ pub async fn retrieve_data(
                 None
             };
 
-            if let Some(old_version) = old_version {
-                if old_version.sha1 == version.sha1 {
-                    return Ok(());
-                }
+            if old_version.is_some() {
+                return Ok(());
             }
 
             let visited_assets_mutex = Arc::clone(&visited_assets_mutex);
@@ -64,7 +65,10 @@ pub async fn retrieve_data(
                 let mut version_info =
                     daedalus::minecraft::fetch_version_info(version).await?;
 
-                fn patch_library(patches: &Vec<LibraryPatch>, mut library: Library, version_info: &VersionInfo) -> Vec<Library> {
+                fn patch_library(
+                    patches: &Vec<LibraryPatch>,
+                    mut library: Library,
+                ) -> Vec<Library> {
                     let mut val = Vec::new();
 
                     let actual_patches = patches
@@ -72,11 +76,8 @@ pub async fn retrieve_data(
                         .filter(|x| x.match_.contains(&library.name))
                         .collect::<Vec<_>>();
 
-                    if !actual_patches.is_empty()
-                    {
+                    if !actual_patches.is_empty() {
                         for patch in actual_patches {
-                            println!("{} {}", version_info.id, patch._comment);
-
                             if let Some(override_) = &patch.override_ {
                                 library = merge_partial_library(
                                     override_.clone(),
@@ -88,8 +89,14 @@ pub async fn retrieve_data(
                                 &patch.additional_libraries
                             {
                                 for additional_library in additional_libraries {
-                                    if patch.patch_additional_libraries.unwrap_or(false) {
-                                        let mut libs = patch_library(patches, additional_library.clone(), &version_info);
+                                    if patch
+                                        .patch_additional_libraries
+                                        .unwrap_or(false)
+                                    {
+                                        let mut libs = patch_library(
+                                            patches,
+                                            additional_library.clone(),
+                                        );
                                         val.append(&mut libs)
                                     } else {
                                         val.push(additional_library.clone());
@@ -108,7 +115,8 @@ pub async fn retrieve_data(
 
                 let mut new_libraries = Vec::new();
                 for library in version_info.libraries.clone() {
-                    let mut libs = patch_library(&patches, library, &version_info);
+                    let mut libs =
+                        patch_library(&patches, library);
                     new_libraries.append(&mut libs)
                 }
                 version_info.libraries = new_libraries;
@@ -264,10 +272,7 @@ struct LibraryPatch {
 }
 
 /// Fetches the list of fabric versions
-async fn fetch_library_patches(
-    url: Option<&str>,
-    semaphore: Arc<Semaphore>,
-) -> Result<Vec<LibraryPatch>, Error> {
+fn fetch_library_patches() -> Result<Vec<LibraryPatch>, Error> {
     let patches = include_bytes!("../library-patches.json");
     Ok(serde_json::from_slice(patches)?)
 }
