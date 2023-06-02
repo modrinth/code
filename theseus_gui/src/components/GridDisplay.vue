@@ -2,6 +2,7 @@
 import Instance from '@/components/ui/Instance.vue'
 import { computed, ref } from 'vue'
 import { SearchIcon, DropdownSelect, Card, formatCategoryHeader } from 'omorphia'
+import dayjs from 'dayjs'
 
 const props = defineProps({
   instances: {
@@ -17,7 +18,7 @@ const props = defineProps({
 })
 
 const search = ref('')
-const group = ref('None')
+const group = ref('Category')
 const filters = ref('All profiles')
 const sortBy = ref('Name')
 
@@ -40,19 +41,19 @@ const filteredResults = computed(() => {
 
   if (sortBy.value === 'Last played') {
     instances.sort((a, b) => {
-      return b.metadata.last_played - a.metadata.last_played
+      return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
     })
   }
 
   if (sortBy.value === 'Date created') {
     instances.sort((a, b) => {
-      return b.metadata.date_created - a.metadata.date_created
+      return dayjs(b.metadata.date_created).diff(dayjs(a.metadata.date_created))
     })
   }
 
   if (sortBy.value === 'Date modified') {
     instances.sort((a, b) => {
-      return b.metadata.date_modified - a.metadata.date_modified
+      return dayjs(b.metadata.date_modified).diff(dayjs(a.metadata.date_modified))
     })
   }
 
@@ -87,11 +88,17 @@ const filteredResults = computed(() => {
     })
   } else if (group.value === 'Category') {
     instances.forEach((instance) => {
-      if (!instanceMap.has(instance.metadata.category)) {
-        instanceMap.set(instance.metadata.category, [])
+      if (instance.metadata.groups.length === 0) {
+        instance.metadata.groups.push('None')
       }
 
-      instanceMap.get(instance.metadata.category).push(instance)
+      for (const category of instance.metadata.groups) {
+        if (!instanceMap.has(category)) {
+          instanceMap.set(category, [])
+        }
+
+        instanceMap.get(category).push(instance)
+      }
     })
   } else {
     return instanceMap.set('None', instances)
@@ -129,7 +136,7 @@ const filteredResults = computed(() => {
       <DropdownSelect
         v-model="group"
         class="group-dropdown"
-        :options="['None', 'Loader', 'Game version', 'Category']"
+        :options="['Category', 'Loader', 'Game version', 'None']"
         placeholder="Select..."
       />
     </div>
@@ -229,13 +236,5 @@ const filteredResults = computed(() => {
   margin-right: auto;
   scroll-behavior: smooth;
   overflow-y: auto;
-}
-
-.dark-mode {
-  .row {
-    &:nth-child(odd) {
-      background-color: rgb(30, 31, 34);
-    }
-  }
 }
 </style>

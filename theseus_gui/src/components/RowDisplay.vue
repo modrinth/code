@@ -152,9 +152,7 @@ onUnmounted(() => {
 
 .dark-mode {
   .row {
-    &:nth-child(odd) {
-      background-color: rgb(30, 31, 34);
-    }
+    background-color: rgb(30, 31, 34);
   }
 }
 
