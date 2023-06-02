@@ -11,7 +11,7 @@
           <div class="table-cell table-text">
             <span>{{ javaInstall.version }}</span>
           </div>
-          <div class="table-cell table-text">
+          <div v-tooltip="javaInstall.path" class="table-cell table-text">
             <span>{{ javaInstall.path }}</span>
           </div>
           <div class="table-cell table-text manage">
@@ -22,10 +22,10 @@
           </div>
         </div>
         <div v-if="chosenInstallOptions.length === 0" class="table-row entire-row">
-          <div class="table-cell table-text">No JARS Found!</div>
+          <div class="table-cell table-text">No java installations found!</div>
         </div>
       </div>
-      <div class="button-group">
+      <div class="input-group push-right">
         <Button @click="$refs.detectJavaModal.hide()">
           <XIcon />
           Cancel
@@ -94,13 +94,6 @@ function setJavaInstall(javaInstall) {
       justify-content: center;
     }
   }
-}
-
-.button-group {
-  margin-top: 1rem;
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
 }
 
 .manage {

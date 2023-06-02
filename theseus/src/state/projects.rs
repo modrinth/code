@@ -196,6 +196,7 @@ pub enum ProjectMetadata {
         authors: Vec<String>,
         version: Option<String>,
         icon: Option<PathBuf>,
+        project_type: Option<String>,
     },
     Unknown,
 }
@@ -484,6 +485,7 @@ pub async fn infer_data_from_files(
                                         .unwrap_or_default(),
                                     version: pack.version.clone(),
                                     icon,
+                                    project_type: Some("mod".to_string()),
                                 },
                             },
                         );
@@ -544,6 +546,7 @@ pub async fn infer_data_from_files(
                                 authors: pack.author_list.unwrap_or_default(),
                                 version: pack.version,
                                 icon,
+                                project_type: Some("mod".to_string()),
                             },
                         },
                     );
@@ -612,6 +615,7 @@ pub async fn infer_data_from_files(
                                     .collect(),
                                 version: Some(pack.version),
                                 icon,
+                                project_type: Some("mod".to_string()),
                             },
                         },
                     );
@@ -687,6 +691,7 @@ pub async fn infer_data_from_files(
                                     .unwrap_or_default(),
                                 version: Some(pack.version),
                                 icon,
+                                project_type: Some("mod".to_string()),
                             },
                         },
                     );
@@ -735,6 +740,7 @@ pub async fn infer_data_from_files(
                                 authors: Vec::new(),
                                 version: None,
                                 icon,
+                                project_type: None,
                             },
                         },
                     );

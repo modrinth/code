@@ -106,6 +106,15 @@ export default new createRouter({
           },
         },
         {
+          path: 'projects/:type',
+          name: 'ModsFilter',
+          component: Instance.Mods,
+          meta: {
+            useRootContext: true,
+            breadcrumb: [{ name: '?Instance' }],
+          },
+        },
+        {
           path: 'options',
           name: 'Options',
           component: Instance.Options,
@@ -128,4 +137,8 @@ export default new createRouter({
   ],
   linkActiveClass: 'router-link-active',
   linkExactActiveClass: 'router-link-exact-active',
+  scrollBehavior() {
+    // always scroll to top
+    return { top: 0 }
+  },
 })

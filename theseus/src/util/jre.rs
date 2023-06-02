@@ -33,9 +33,17 @@ pub async fn get_all_jre() -> Result<Vec<JavaVersion>, JREError> {
     // Add JRES directly on PATH
     jre_paths.extend(get_all_jre_path().await?);
     jre_paths.extend(get_all_autoinstalled_jre_path().await?);
+    if let Ok(java_home) = env::var("JAVA_HOME") {
+        jre_paths.insert(PathBuf::from(java_home));
+    }
 
     // Hard paths for locations for commonly installed .exes
-    let java_paths = [r"C:/Program Files/Java", r"C:/Program Files (x86)/Java"];
+    let java_paths = [
+        r"C:/Program Files/Java",
+        r"C:/Program Files (x86)/Java",
+        r"C:\Program Files\Eclipse Adoptium",
+        r"C:\Program Files (x86)\Eclipse Adoptium",
+    ];
     for java_path in java_paths {
         let Ok(java_subpaths) = std::fs::read_dir(java_path) else {continue };
         for java_subpath in java_subpaths {
@@ -201,7 +209,6 @@ async fn get_all_autoinstalled_jre_path() -> Result<HashSet<PathBuf>, JREError>
                 let contents = std::fs::read_to_string(file_path)?;
 
                 let entry = entry.path().join(contents);
-                println!("{:?}", entry);
                 jre_paths.insert(entry);
             }
         }

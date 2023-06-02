@@ -10,17 +10,10 @@ const props = defineProps({
       return []
     },
   },
-  news: {
-    type: Array,
-    default() {
-      return []
-    },
-  },
   label: {
     type: String,
     default: '',
   },
-  canPaginate: Boolean,
 })
 
 const search = ref('')
@@ -177,6 +170,7 @@ const filteredResults = computed(() => {
     margin-bottom: 1rem;
 
     p {
+      margin: 0;
       font-size: 1rem;
       white-space: nowrap;
       color: var(--color-contrast);

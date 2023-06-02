@@ -6,5 +6,6 @@ export const useFetch = async (url, item) => {
     return await ofetch(url)
   } catch (err) {
     handleError({ message: `Error fetching ${item}` })
+    console.error(err)
   }
 }

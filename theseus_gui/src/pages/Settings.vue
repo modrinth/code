@@ -53,15 +53,20 @@ watch(settings.value, async (oldSettings, newSettings) => {
 </script>
 
 <template>
-  <div>
-    <Card class="theming">
-      <h2>Display</h2>
-      <div class="toggle-setting">
-        <div class="description">
-          <h3>Color theme</h3>
-          <p>Change the global launcher color theme.</p>
-        </div>
+  <div class="settings-page">
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Display</span>
+        </h3>
+      </div>
+      <div class="adjacent-input">
+        <label for="theme">
+          <span class="label__title">Color theme</span>
+          <span class="label__description">Change the global launcher color theme.</span>
+        </label>
         <DropdownSelect
+          id="theme"
           name="Theme dropdown"
           :options="themeStore.themeOptions"
           :default-value="settings.theme"
@@ -75,12 +80,15 @@ watch(settings.value, async (oldSettings, newSettings) => {
           "
         />
       </div>
-      <div class="toggle-setting">
-        <div class="description">
-          <h3>Collapsed navigation mode</h3>
-          <p>Change the style of the side navigation bar</p>
-        </div>
+      <div class="adjacent-input">
+        <label for="collapsed-nav">
+          <span class="label__title">Collapsed navigation mode</span>
+          <span class="label__description"
+            >Change the style of the side navigation bar to a compact version.</span
+          >
+        </label>
         <Toggle
+          id="collapsed-nav"
           :model-value="themeStore.collapsedNavigation"
           :checked="themeStore.collapsedNavigation"
           @update:model-value="
@@ -92,116 +100,187 @@ watch(settings.value, async (oldSettings, newSettings) => {
         />
       </div>
     </Card>
-    <Card class="settings-card">
-      <h2 class="settings-title">Launcher settings</h2>
-      <div class="settings-group">
-        <h3>Resource management</h3>
-        <div class="toggle-setting">
-          <span>Maximum concurrent downloads</span>
-          <Slider
-            v-model="settings.max_concurrent_downloads"
-            class="concurrent-downloads"
-            :min="1"
-            :max="100"
-            :step="1"
-          />
-        </div>
-        <div class="toggle-setting">
-          <span>Maximum concurrent writes</span>
-          <Slider
-            v-model="settings.max_concurrent_writes"
-            class="concurrent-downloads"
-            :min="1"
-            :max="100"
-            :step="1"
-          />
-        </div>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Resource management</span>
+        </h3>
       </div>
-    </Card>
-    <Card class="settings-card">
-      <h2 class="settings-title">Java</h2>
-      <div class="settings-group">
-        <h3>Java 17 location</h3>
-        <JavaSelector v-model="settings.java_globals.JAVA_17" :version="17" />
-      </div>
-      <div class="settings-group">
-        <h3>Java 8 location</h3>
-        <JavaSelector v-model="settings.java_globals.JAVA_8" :version="8" />
-      </div>
-      <hr class="card-divider" />
-      <div class="settings-group">
-        <h3>Java arguments</h3>
-        <input
-          v-model="settings.javaArgs"
-          type="text"
-          class="input installation-input"
-          placeholder="Enter java arguments..."
+
+      <div class="adjacent-input">
+        <label for="max-downloads">
+          <span class="label__title">Maximum concurrent downloads</span>
+          <span class="label__description"
+            >The maximum amount of files the launcher can download at the same time. Set this to a
+            lower value if you have a poor internet connection.</span
+          >
+        </label>
+        <Slider
+          id="max-downloads"
+          v-model="settings.max_concurrent_downloads"
+          :min="1"
+          :max="100"
+          :step="1"
         />
       </div>
-      <div class="settings-group">
-        <h3>Environment variables</h3>
-        <input
-          v-model="settings.envArgs"
-          type="text"
-          class="input installation-input"
-          placeholder="Enter environment variables..."
+
+      <div class="adjacent-input">
+        <label for="max-writes">
+          <span class="label__title">Maximum concurrent writes</span>
+          <span class="label__description"
+            >The maximum amount of files the launcher can write to the disk at once. Set this to a
+            lower value if you are frequently getting I/O errors.</span
+          >
+        </label>
+        <Slider
+          id="max-writes"
+          v-model="settings.max_concurrent_writes"
+          :min="1"
+          :max="100"
+          :step="1"
         />
       </div>
+    </Card>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Java settings</span>
+        </h3>
+      </div>
+      <label for="java-17">
+        <span class="label__title">Java 17 location</span>
+      </label>
+      <JavaSelector id="java-17" v-model="settings.java_globals.JAVA_17" :version="17" />
+      <label for="java-8">
+        <span class="label__title">Java 8 location</span>
+      </label>
+      <JavaSelector id="java-8" v-model="settings.java_globals.JAVA_8" :version="8" />
       <hr class="card-divider" />
-      <div class="settings-group">
-        <div class="sliders">
-          <span class="slider">
-            Minimum memory
-            <Slider v-model="settings.memory.minimum" :min="256" :max="maxMemory" :step="10" />
+      <label for="java-args">
+        <span class="label__title">Java arguments</span>
+      </label>
+      <input
+        id="java-args"
+        v-model="settings.javaArgs"
+        autocomplete="off"
+        type="text"
+        class="installation-input"
+        placeholder="Enter java arguments..."
+      />
+      <label for="env-vars">
+        <span class="label__title">Environmental variables</span>
+      </label>
+      <input
+        id="env-vars"
+        v-model="settings.envArgs"
+        autocomplete="off"
+        type="text"
+        class="installation-input"
+        placeholder="Enter environmental variables..."
+      />
+      <hr class="card-divider" />
+      <div class="adjacent-input">
+        <label for="max-memory">
+          <span class="label__title">Java memory</span>
+          <span class="label__description">
+            The memory allocated to each instance when it is ran.
           </span>
-          <span class="slider">
-            Maximum memory
-            <Slider v-model="settings.memory.maximum" :min="256" :max="maxMemory" :step="10" />
-          </span>
-        </div>
+        </label>
+        <Slider
+          id="max-memory"
+          v-model="settings.memory.maximum"
+          :min="256"
+          :max="maxMemory"
+          :step="1"
+        />
       </div>
     </Card>
-    <Card class="settings-card">
-      <h2 class="settings-title">Hooks</h2>
-      <div class="settings-group">
-        <div class="toggle-setting">
-          Pre launch
-          <input v-model="settings.hooks.pre_launch" type="text" class="input" />
-        </div>
-        <div class="toggle-setting">
-          Wrapper
-          <input v-model="settings.hooks.wrapper" type="text" class="input" />
-        </div>
-        <div class="toggle-setting">
-          Post exit
-          <input v-model="settings.hooks.post_exit" type="text" class="input" />
-        </div>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Hooks</span>
+        </h3>
+      </div>
+      <div class="adjacent-input">
+        <label for="pre-launch">
+          <span class="label__title">Pre launch</span>
+          <span class="label__description"> Ran before the instance is launched. </span>
+        </label>
+        <input
+          id="pre-launch"
+          v-model="settings.hooks.pre_launch"
+          autocomplete="off"
+          type="text"
+          placeholder="Enter pre-launch command..."
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="wrapper">
+          <span class="label__title">Wrapper</span>
+          <span class="label__description"> Wrapper command for launching Minecraft. </span>
+        </label>
+        <input
+          id="wrapper"
+          v-model="settings.hooks.wrapper"
+          autocomplete="off"
+          type="text"
+          placeholder="Enter wrapper command..."
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="post-exit">
+          <span class="label__title">Post exit</span>
+          <span class="label__description"> Ran after the game closes. </span>
+        </label>
+        <input
+          id="post-exit"
+          v-model="settings.hooks.post_exit"
+          autocomplete="off"
+          type="text"
+          placeholder="Enter post-exit command..."
+        />
       </div>
     </Card>
-    <Card class="settings-card">
-      <h2 class="settings-title">Window Size</h2>
-      <div class="settings-group">
-        <div class="toggle-setting">
-          Width
-          <input v-model="settings.game_resolution[0]" type="number" class="input" />
-        </div>
-        <div class="toggle-setting">
-          Height
-          <input v-model="settings.game_resolution[1]" type="number" class="input" />
-        </div>
+    <Card>
+      <div class="label">
+        <h3>
+          <span class="label__title size-card-header">Window size</span>
+        </h3>
+      </div>
+      <div class="adjacent-input">
+        <label for="width">
+          <span class="label__title">Width</span>
+          <span class="label__description"> The width of the game window when launched. </span>
+        </label>
+        <input
+          id="width"
+          v-model="settings.game_resolution[0]"
+          autocomplete="off"
+          type="number"
+          placeholder="Enter width..."
+        />
+      </div>
+      <div class="adjacent-input">
+        <label for="height">
+          <span class="label__title">Height</span>
+          <span class="label__description"> The height of the game window when launched. </span>
+        </label>
+        <input
+          id="height"
+          v-model="settings.game_resolution[1]"
+          autocomplete="off"
+          type="number"
+          class="input"
+          placeholder="Enter height..."
+        />
       </div>
     </Card>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.concurrent-downloads {
-  width: 80% !important;
-}
-
-.slider-input {
-  width: 5rem !important;
-  flex-basis: 5rem !important;
+.settings-page {
+  margin: 1rem 1rem 1rem 0;
 }
 
 .installation-input {
@@ -209,54 +288,11 @@ watch(settings.value, async (oldSettings, newSettings) => {
   flex-grow: 1;
 }
 
-.theming,
-.settings-card {
-  margin: 1rem;
-}
-
-.theming {
-  .toggle-setting {
-    display: flex;
-  }
-}
-
 .theme-dropdown {
   text-transform: capitalize;
 }
 
-.settings-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.settings-title {
-  color: var(--color-contrast);
-}
-
-.settings-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.toggle-setting {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.sliders {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 1rem;
-  width: 100%;
-
-  .slider {
-    flex-grow: 1;
-  }
+.card-divider {
+  margin: 1rem 0;
 }
 </style>
