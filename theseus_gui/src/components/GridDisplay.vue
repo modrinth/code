@@ -1,15 +1,8 @@
 <script setup>
 import Instance from '@/components/ui/Instance.vue'
-import { ref } from 'vue'
 
 const props = defineProps({
   instances: {
-    type: Array,
-    default() {
-      return []
-    },
-  },
-  news: {
     type: Array,
     default() {
       return []
@@ -19,9 +12,7 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  canPaginate: Boolean,
 })
-const modsRow = ref(null)
 </script>
 <template>
   <div class="row">
@@ -29,7 +20,7 @@ const modsRow = ref(null)
       <p>{{ props.label }}</p>
       <hr />
     </div>
-    <section ref="modsRow" class="instances">
+    <section class="instances">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
@@ -56,6 +47,7 @@ const modsRow = ref(null)
     gap: 1rem;
 
     p {
+      margin: 0;
       font-size: 1rem;
       white-space: nowrap;
       color: var(--color-contrast);
@@ -101,7 +93,6 @@ const modsRow = ref(null)
     width: 100%;
     gap: 1rem;
     margin-right: auto;
-    margin-top: 0.8rem;
     scroll-behavior: smooth;
     overflow-y: auto;
   }

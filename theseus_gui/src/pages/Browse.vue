@@ -150,6 +150,25 @@ const handleInstanceSwitch = async (value) => {
   searchStore.ignoreInstance = value
   await switchPage(1)
 }
+
+const selectableProjectTypes = computed(() => {
+  const values = [
+    { label: 'Data Packs', href: `/browse/datapack` },
+    { label: 'Shaders', href: `/browse/shader` },
+    { label: 'Resource Packs', href: `/browse/resourcepack` },
+  ]
+
+  if (searchStore.instanceContext) {
+    if (searchStore.instanceContext.metadata.loader !== 'vanilla') {
+      values.unshift({ label: 'Mods', href: '/browse/mod' })
+    }
+  } else {
+    values.unshift({ label: 'Mods', href: '/browse/mod' })
+    values.unshift({ label: 'Modpacks', href: '/browse/modpack' })
+  }
+
+  return values
+})
 </script>
 
 <template>
@@ -160,7 +179,7 @@ const handleInstanceSwitch = async (value) => {
           <Checkbox
             :model-value="searchStore.ignoreInstance"
             :checked="searchStore.ignoreInstance"
-            label="Unfilter loader & version"
+            label="Show unsupported content"
             class="filter-checkbox"
             @update:model-value="(value) => handleInstanceSwitch(value)"
           />
@@ -277,30 +296,14 @@ const handleInstanceSwitch = async (value) => {
     <div class="search">
       <Promotion class="promotion" />
       <Card class="project-type-container">
-        <NavRow
-          :links="
-            searchStore.instanceContext
-              ? [
-                  { label: 'Mods', href: `/browse/mod` },
-                  { label: 'Datapacks', href: `/browse/datapack` },
-                  { label: 'Shaders', href: `/browse/shader` },
-                  { label: 'Resource Packs', href: `/browse/resourcepack` },
-                ]
-              : [
-                  { label: 'Modpacks', href: '/browse/modpack' },
-                  { label: 'Mods', href: '/browse/mod' },
-                  { label: 'Datapacks', href: '/browse/datapack' },
-                  { label: 'Shaders', href: '/browse/shader' },
-                  { label: 'Resource Packs', href: '/browse/resourcepack' },
-                ]
-          "
-        />
+        <NavRow :links="selectableProjectTypes" />
       </Card>
       <Card class="search-panel-container">
         <div class="iconified-input">
           <SearchIcon aria-hidden="true" />
           <input
             v-model="searchStore.searchInput"
+            autocomplete="off"
             type="text"
             :placeholder="`Search ${searchStore.projectType}s...`"
             @input="getSearchResults"

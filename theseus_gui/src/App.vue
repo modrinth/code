@@ -53,6 +53,33 @@ const notificationsWrapper = ref(null)
 watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
 })
+
+// Link handler
+document.querySelector('body').addEventListener('click', function (e) {
+  let target = e.target
+  while (target != null) {
+    if (target.matches('a')) {
+      if (
+        target.href &&
+        ['http://', 'https://', 'mailto:', 'tel:'].some((v) => target.href.startsWith(v)) &&
+        !target.classList.contains('router-link-active') &&
+        !target.href.startsWith('http://localhost') &&
+        !target.href.startsWith('https://tauri.localhost')
+      ) {
+        window.__TAURI_INVOKE__('tauri', {
+          __tauriModule: 'Shell',
+          message: {
+            cmd: 'open',
+            path: target.href,
+          },
+        })
+        e.preventDefault()
+      }
+      break
+    }
+    target = target.parentElement
+  }
+})
 </script>
 
 <template>

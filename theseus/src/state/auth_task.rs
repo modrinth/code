@@ -13,7 +13,9 @@ impl AuthTask {
         AuthTask(None)
     }
 
-    pub async fn begin_auth(&mut self) -> crate::Result<url::Url> {
+    pub async fn begin_auth() -> crate::Result<url::Url> {
+        let state = crate::State::get().await?;
+
         // Creates a channel to receive the URL
         let (tx, rx) = tokio::sync::oneshot::channel::<url::Url>();
         let task = tokio::spawn(crate::auth::authenticate(tx));
@@ -29,16 +31,20 @@ impl AuthTask {
         };
 
         // Flow is going, store in state and return
-        self.0 = Some(task);
+        let mut write = state.auth_flow.write().await;
+        write.0 = Some(task);
 
         Ok(url)
     }
 
-    pub async fn await_auth_completion(
-        &mut self,
-    ) -> crate::Result<Credentials> {
+    pub async fn await_auth_completion() -> crate::Result<Credentials> {
         // Gets the task handle from the state, replacing with None
-        let task = mem::replace(&mut self.0, None);
+        let task = {
+            let state = crate::State::get().await?;
+            let mut write = state.auth_flow.write().await;
+
+            mem::replace(&mut write.0, None)
+        };
 
         // Waits for the task to complete, and returns the credentials
         let credentials = task
@@ -49,13 +55,20 @@ impl AuthTask {
         Ok(credentials)
     }
 
-    pub async fn cancel(&mut self) {
+    pub async fn cancel() -> crate::Result<()> {
         // Gets the task handle from the state, replacing with None
-        let task = mem::replace(&mut self.0, None);
+        let task = {
+            let state = crate::State::get().await?;
+            let mut write = state.auth_flow.write().await;
+
+            mem::replace(&mut write.0, None)
+        };
         if let Some(task) = task {
             // Cancels the task
             task.abort();
         }
+
+        Ok(())
     }
 }
 

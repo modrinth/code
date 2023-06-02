@@ -140,7 +140,7 @@ async function install() {
     queuedVersionData = versions.find(
       (v) =>
         v.game_versions.includes(props.instance.metadata.game_version) &&
-        v.loaders.includes(props.instance.metadata.loader)
+        (props.project.project_type !== 'mod' || v.loaders.includes(props.instance.metadata.loader))
     )
   }
 
@@ -152,11 +152,19 @@ async function install() {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === props.project.project_id)
     ) {
-      await packInstall(queuedVersionData.id, props.project.title, props.project.icon_url).catch(
-        handleError
-      )
+      await packInstall(
+        props.project.project_id,
+        queuedVersionData.id,
+        props.project.title,
+        props.project.icon_url
+      ).catch(handleError)
     } else {
-      props.confirmModal.show(queuedVersionData.id)
+      props.confirmModal.show(
+        props.project.project_id,
+        queuedVersionData.id,
+        props.project.title,
+        props.project.icon_url
+      )
     }
   } else {
     if (props.instance) {

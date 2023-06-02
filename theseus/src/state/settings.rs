@@ -118,17 +118,12 @@ pub enum Theme {
 /// Minecraft memory settings
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub struct MemorySettings {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub minimum: Option<u32>,
     pub maximum: u32,
 }
 
 impl Default for MemorySettings {
     fn default() -> Self {
-        Self {
-            minimum: None,
-            maximum: 2048,
-        }
+        Self { maximum: 2048 }
     }
 }
 

@@ -3,7 +3,7 @@
     <div class="change-versions-modal universal-body">
       <div class="input-row">
         <p class="input-label">Loader</p>
-        <Chips v-model="loader" :items="loaders" />
+        <Chips v-model="loader" :items="loaders" :never-empty="false" />
       </div>
       <div class="input-row">
         <p class="input-label">Game Version</p>
@@ -22,7 +22,7 @@
           @change="(value) => (loaderVersionIndex = value.index)"
         />
       </div>
-      <div class="button-group">
+      <div class="push-right input-group">
         <button class="btn" @click="$refs.changeVersionsModal.hide()">
           <XIcon />
           Cancel
@@ -41,7 +41,7 @@
   <section class="card">
     <div class="label">
       <h3>
-        <span class="label__title size-card-header">Profile</span>
+        <span class="label__title size-card-header">Instance</span>
       </h3>
     </div>
     <label for="instance-icon">
@@ -68,13 +68,13 @@
     <label for="project-name">
       <span class="label__title">Name</span>
     </label>
-    <input id="profile-name" v-model="title" maxlength="80" type="text" />
+    <input id="profile-name" v-model="title" autocomplete="off" maxlength="80" type="text" />
 
     <div class="adjacent-input">
       <label for="edit-versions">
         <span class="label__title">Edit mod loader/game versions</span>
         <span class="label__description">
-          Allows you to change the mod loader, loader version, or game version of the profile.
+          Allows you to change the mod loader, loader version, or game version of the instance.
         </span>
       </label>
       <button id="edit-versions" class="btn" @click="$refs.changeVersionsModal.show()">
@@ -83,8 +83,12 @@
       </button>
     </div>
   </section>
-  <Card class="settings-card">
-    <h2 class="settings-title">Java</h2>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Java</span>
+      </h3>
+    </div>
     <div class="settings-group">
       <h3>Installation</h3>
       <Checkbox v-model="overrideJavaInstall" label="Override global java installations" />
@@ -95,10 +99,12 @@
       <h3>Java arguments</h3>
       <Checkbox v-model="overrideJavaArgs" label="Override global java arguments" />
       <input
+        id="java-args"
         v-model="javaArgs"
+        autocomplete="off"
         :disabled="!overrideJavaArgs"
         type="text"
-        class="input installation-input"
+        class="installation-input"
         placeholder="Enter java arguments..."
       />
     </div>
@@ -107,98 +113,156 @@
       <Checkbox v-model="overrideEnvVars" label="Override global environment variables" />
       <input
         v-model="envVars"
+        autocomplete="off"
         :disabled="!overrideEnvVars"
         type="text"
-        class="input installation-input"
+        class="installation-input"
         placeholder="Enter environment variables..."
       />
     </div>
     <hr class="card-divider" />
     <div class="settings-group">
+      <h3>Java memory</h3>
       <Checkbox v-model="overrideMemorySettings" label="Override global memory settings" />
-      <div class="sliders">
-        <span class="slider">
-          Minimum memory
-          <Slider
-            v-model="memory.minimum"
-            :disabled="!overrideMemorySettings"
-            :min="256"
-            :max="maxMemory"
-            :step="10"
-          />
+      <Slider
+        v-model="memory.maximum"
+        :disabled="!overrideMemorySettings"
+        :min="256"
+        :max="maxMemory"
+        :step="1"
+      />
+    </div>
+  </Card>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Window</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
+    </div>
+    <div class="adjacent-input">
+      <label for="width">
+        <span class="label__title">Width</span>
+        <span class="label__description"> The width of the game window when launched. </span>
+      </label>
+      <input
+        id="width"
+        v-model="resolution[0]"
+        autocomplete="off"
+        :disabled="!overrideWindowSettings"
+        type="number"
+        placeholder="Enter width..."
+      />
+    </div>
+    <div class="adjacent-input">
+      <label for="height">
+        <span class="label__title">Height</span>
+        <span class="label__description"> The height of the game window when launched. </span>
+      </label>
+      <input
+        id="height"
+        v-model="resolution[1]"
+        autocomplete="off"
+        :disabled="!overrideWindowSettings"
+        type="number"
+        class="input"
+        placeholder="Enter height..."
+      />
+    </div>
+  </Card>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Hooks</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <Checkbox v-model="overrideHooks" label="Override global hooks" />
+    </div>
+    <div class="adjacent-input">
+      <label for="pre-launch">
+        <span class="label__title">Pre launch</span>
+        <span class="label__description"> Ran before the instance is launched. </span>
+      </label>
+      <input
+        id="pre-launch"
+        v-model="hooks.pre_launch"
+        autocomplete="off"
+        :disabled="!overrideHooks"
+        type="text"
+        placeholder="Enter pre-launch command..."
+      />
+    </div>
+    <div class="adjacent-input">
+      <label for="wrapper">
+        <span class="label__title">Wrapper</span>
+        <span class="label__description"> Wrapper command for launching Minecraft. </span>
+      </label>
+      <input
+        id="wrapper"
+        v-model="hooks.wrapper"
+        autocomplete="off"
+        :disabled="!overrideHooks"
+        type="text"
+        placeholder="Enter wrapper command..."
+      />
+    </div>
+    <div class="adjacent-input">
+      <label for="post-exit">
+        <span class="label__title">Post exit</span>
+        <span class="label__description"> Ran after the game closes. </span>
+      </label>
+      <input
+        id="post-exit"
+        v-model="hooks.post_exit"
+        autocomplete="off"
+        :disabled="!overrideHooks"
+        type="text"
+        placeholder="Enter post-exit command..."
+      />
+    </div>
+  </Card>
+  <Card>
+    <div class="label">
+      <h3>
+        <span class="label__title size-card-header">Instance management</span>
+      </h3>
+    </div>
+    <div class="adjacent-input">
+      <label for="repair-profile">
+        <span class="label__title">Repair instance</span>
+        <span class="label__description">
+          Reinstalls the instance and checks for corruption. Use this if your game is not launching
+          due to launcher-related errors.
         </span>
-        <span class="slider">
-          Maximum memory
-          <Slider
-            v-model="memory.maximum"
-            :disabled="!overrideMemorySettings"
-            :min="256"
-            :max="maxMemory"
-            :step="10"
-          />
+      </label>
+      <button
+        id="repair-profile"
+        class="btn btn-highlight"
+        :disabled="repairing"
+        @click="repairProfile"
+      >
+        <HammerIcon /> Repair
+      </button>
+    </div>
+    <div class="adjacent-input">
+      <label for="delete-profile">
+        <span class="label__title">Delete instance</span>
+        <span class="label__description">
+          Fully removes a instance from the disk. Be careful, as once you delete a instance there is
+          no way to recover it.
         </span>
-      </div>
-    </div>
-  </Card>
-  <Card class="settings-card">
-    <h2 class="settings-title">Window</h2>
-    <Checkbox v-model="overrideWindowSettings" label="Override global window settings" />
-    <div class="settings-group">
-      <div class="toggle-setting">
-        Width
-        <input
-          v-model="resolution[0]"
-          :disabled="!overrideWindowSettings"
-          type="number"
-          class="input"
-          @change="updateProfile"
-        />
-      </div>
-      <div class="toggle-setting">
-        Height
-        <input
-          v-model="resolution[1]"
-          :disabled="!overrideWindowSettings"
-          type="number"
-          class="input"
-          @change="updateProfile"
-        />
-      </div>
-    </div>
-  </Card>
-  <Card class="settings-card">
-    <h2 class="settings-title">Hooks</h2>
-    <Checkbox v-model="overrideHooks" label="Override global hooks" />
-    <div class="settings-group">
-      <div class="toggle-setting">
-        Pre launch
-        <input v-model="hooks.pre_launch" :disabled="!overrideHooks" type="text" />
-      </div>
-      <div class="toggle-setting">
-        Wrapper
-        <input v-model="hooks.wrapper" :disabled="!overrideHooks" type="text" />
-      </div>
-      <div class="toggle-setting">
-        Post exit
-        <input v-model="hooks.post_exit" :disabled="!overrideHooks" type="text" />
-      </div>
-    </div>
-  </Card>
-  <Card class="settings-card">
-    <h2 class="settings-title">Profile management</h2>
-    <div class="settings-group">
-      <div class="toggle-setting">
-        Repair profile
-        <button class="btn btn-highlight" :disabled="repairing" @click="repairProfile">
-          <HammerIcon /> Repair
-        </button>
-      </div>
-      <div class="toggle-setting">
-        Delete profile
-        <button class="btn btn-danger" :disabled="removing" @click="removeProfile">
-          <TrashIcon /> Delete
-        </button>
-      </div>
+      </label>
+      <button
+        id="delete-profile"
+        class="btn btn-danger"
+        :disabled="removing"
+        @click="removeProfile"
+      >
+        <TrashIcon /> Delete
+      </button>
     </div>
   </Card>
 </template>
@@ -221,7 +285,7 @@ import {
 } from 'omorphia'
 import { useRouter } from 'vue-router'
 import { edit, edit_icon, get_optimal_jre_key, install, remove } from '@/helpers/profile.js'
-import { computed, readonly, ref, shallowRef, watch } from 'vue'
+import { computed, onMounted, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
@@ -388,10 +452,9 @@ const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loade
       .then(ref)
       .catch(handleError),
   ])
-loaders.value.push('vanilla')
+loaders.value.unshift('vanilla')
 
 const loader = ref(props.instance.metadata.loader)
-
 const gameVersion = ref(props.instance.metadata.game_version)
 const selectableGameVersions = computed(() => {
   return all_game_versions.value
@@ -457,6 +520,8 @@ async function saveGvLoaderEdits() {
   editing.value = false
   changeVersionsModal.value.hide()
 }
+
+onMounted(() => console.log(loader.value))
 </script>
 
 <style scoped lang="scss">
@@ -478,71 +543,21 @@ async function saveGvLoaderEdits() {
     flex-direction: row;
     gap: 1rem;
   }
-
-  .button-group {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-  }
-}
-
-.settings-card {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.input-group {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.input-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.settings-title {
-  color: var(--color-contrast);
 }
 
 .settings-group {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  margin: 1rem 0;
+
+  h3 {
+    margin: 0;
+  }
 }
 
 .installation-input {
   width: 100%;
-}
-
-.sliders {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  gap: 1rem;
-  width: 100%;
-
-  .slider {
-    flex-grow: 1;
-  }
-}
-
-.toggle-setting {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.card-divider {
-  background-color: var(--color-button-bg);
-  border: none;
-  color: var(--color-button-bg);
-  height: 1px;
-  margin: var(--gap-sm) 0;
 }
 
 :deep(button.checkbox) {

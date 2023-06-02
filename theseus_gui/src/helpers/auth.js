@@ -28,6 +28,10 @@ export async function authenticate_await_completion() {
   return await invoke('auth_authenticate_await_completion')
 }
 
+export async function cancel_flow() {
+  return await invoke('auth_cancel_flow')
+}
+
 /// Refresh some credentials using Hydra, if needed
 /// user is UUID
 /// update_name is bool

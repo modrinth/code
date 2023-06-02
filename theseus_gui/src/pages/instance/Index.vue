@@ -48,9 +48,13 @@
           >
             Loading...
           </Button>
-          <!--TODO: https://github.com/tauri-apps/tauri/issues/4062 -->
-          <Button class="instance-button" icon-only @click="open({ defaultPath: instance.path })">
+          <Button
+            v-tooltip="'Open instance folder'"
+            class="instance-button"
+            @click="showInFolder(instance.path)"
+          >
             <FolderOpenIcon />
+            Folder
           </Button>
         </span>
       </Card>
@@ -104,8 +108,8 @@ import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { open } from '@tauri-apps/api/dialog'
 import { handleError, useBreadcrumbs, useLoading, useSearch } from '@/store/state'
+import { showInFolder } from '@/helpers/utils.js'
 
 const route = useRoute()
 const searchStore = useSearch()
@@ -148,24 +152,17 @@ await checkProcess()
 
 const stopInstance = async () => {
   playing.value = false
-
-  try {
-    if (!uuid.value) {
-      const uuids = await get_uuids_by_profile_path(instance.value.path).catch(handleError)
-      uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
-      uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
-    } else await kill_by_uuid(uuid.value).catch(handleError)
-  } catch (err) {
-    // Theseus currently throws:
-    //  "Error launching Minecraft: Minecraft exited with non-zero code 1" error
-    // For now, we will catch and just warn
-    console.warn(err)
-  }
+  if (!uuid.value) {
+    const uuids = await get_uuids_by_profile_path(instance.value.path).catch(handleError)
+    uuid.value = uuids[0] // populate Uuid to listen for in the process_listener
+    uuids.forEach(async (u) => await kill_by_uuid(u).catch(handleError))
+  } else await kill_by_uuid(uuid.value).catch(handleError)
 }
 
 const unlistenProfiles = await profile_listener(async (event) => {
   if (event.path === route.params.id) {
     instance.value = await get(route.params.id).catch(handleError)
+    searchStore.instanceContext = instance.value
   }
 })
 

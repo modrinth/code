@@ -1,6 +1,6 @@
 <template>
   <Modal ref="modal" header="Create instance">
-    <div v-if="showContent" class="modal-body">
+    <div class="modal-body">
       <div class="image-upload">
         <Avatar :src="display_icon" size="md" :rounded="true" />
         <div class="image-input">
@@ -16,7 +16,7 @@
       </div>
       <div class="input-row">
         <p class="input-label">Name</p>
-        <input v-model="profile_name" class="text-input" type="text" />
+        <input v-model="profile_name" autocomplete="off" class="text-input" type="text" />
       </div>
       <div class="input-row">
         <p class="input-label">Loader</p>
@@ -25,7 +25,16 @@
       <div class="input-row">
         <p class="input-label">Game version</p>
         <div class="versions">
-          <DropdownSelect v-model="game_version" :options="game_versions" render-up />
+          <multiselect
+            v-model="game_version"
+            class="selector"
+            :options="game_versions"
+            :multiple="false"
+            :searchable="true"
+            placeholder="Select game version"
+            open-direction="top"
+            :show-labels="false"
+          />
           <Checkbox
             v-if="showAdvanced"
             v-model="showSnapshots"
@@ -41,17 +50,21 @@
       <div v-if="showAdvanced && loader_version === 'other' && loader !== 'vanilla'">
         <div v-if="game_version" class="input-row">
           <p class="input-label">Select version</p>
-          <DropdownSelect
+          <multiselect
             v-model="specified_loader_version"
+            class="selector"
             :options="selectable_versions"
-            render-up
+            :searchable="true"
+            placeholder="Select loader version"
+            open-direction="top"
+            :show-labels="false"
           />
         </div>
         <div v-else class="input-row">
           <p class="warning">Select a game version before you select a loader version</p>
         </div>
       </div>
-      <div class="button-group">
+      <div class="input-group push-right">
         <Button @click="toggle_advanced">
           <CodeIcon />
           {{ showAdvanced ? 'Hide advanced' : 'Show advanced' }}
@@ -74,7 +87,6 @@ import {
   Avatar,
   Button,
   Chips,
-  DropdownSelect,
   Modal,
   PlusIcon,
   UploadIcon,
@@ -83,19 +95,24 @@ import {
   Checkbox,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
-import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { get_loaders } from '@/helpers/tags'
 import { create } from '@/helpers/profile'
 import { open } from '@tauri-apps/api/dialog'
 import { tauri } from '@tauri-apps/api'
-import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata'
+import {
+  get_game_versions,
+  get_fabric_versions,
+  get_forge_versions,
+  get_quilt_versions,
+} from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
+import Multiselect from 'vue-multiselect'
 
 const profile_name = ref('')
 const game_version = ref('')
 const loader = ref('vanilla')
 const loader_version = ref('stable')
 const specified_loader_version = ref('')
-const showContent = ref(false)
 const icon = ref(null)
 const display_icon = ref(null)
 const showAdvanced = ref(false)
@@ -104,22 +121,17 @@ const showSnapshots = ref(false)
 
 defineExpose({
   show: () => {
-    showContent.value = false
-    modal.value.show()
     game_version.value = ''
     specified_loader_version.value = ''
     profile_name.value = ''
     creating.value = false
     showAdvanced.value = false
     showSnapshots.value = false
-    loader.value = ''
+    loader.value = 'vanilla'
     loader_version.value = 'stable'
     icon.value = null
     display_icon.value = null
-
-    setTimeout(() => {
-      showContent.value = true
-    }, 100)
+    modal.value.show()
   },
 })
 
@@ -138,53 +150,50 @@ const [fabric_versions, forge_versions, quilt_versions, all_game_versions, loade
       .then(ref)
       .catch(handleError),
   ])
-loaders.value.push('vanilla')
+loaders.value.unshift('vanilla')
 
 const game_versions = computed(() => {
-  return all_game_versions.value
+  return all_game_versions.value.versions
     .filter((item) => {
-      let defaultVal = item.version_type === 'release' || showSnapshots.value
+      let defaultVal = item.type === 'release' || showSnapshots.value
       if (loader.value === 'fabric') {
-        defaultVal &= fabric_versions.value.gameVersions.some((x) => item.version === x.id)
+        defaultVal &= fabric_versions.value.gameVersions.some((x) => item.id === x.id)
       } else if (loader.value === 'forge') {
-        defaultVal &= forge_versions.value.gameVersions.some((x) => item.version === x.id)
+        defaultVal &= forge_versions.value.gameVersions.some((x) => item.id === x.id)
       } else if (loader.value === 'quilt') {
-        defaultVal &= quilt_versions.value.gameVersions.some((x) => item.version === x.id)
+        defaultVal &= quilt_versions.value.gameVersions.some((x) => item.id === x.id)
       }
 
       return defaultVal
     })
-    .map((item) => item.version)
+    .map((item) => item.id)
 })
 
 const modal = ref(null)
 
 const check_valid = computed(() => {
   return (
-    profile_name.value && game_version.value && game_versions.value.includes(game_version.value)
+    profile_name.value.trim() &&
+    game_version.value &&
+    game_versions.value.includes(game_version.value)
   )
 })
 
 const create_instance = async () => {
-  try {
-    creating.value = true
-    const loader_version_value =
-      loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
+  creating.value = true
+  const loader_version_value =
+    loader_version.value === 'other' ? specified_loader_version.value : loader_version.value
 
-    await create(
-      profile_name.value,
-      game_version.value,
-      loader.value,
-      loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
-      icon.value
-    ).catch(handleError)
+  create(
+    profile_name.value,
+    game_version.value,
+    loader.value,
+    loader.value === 'vanilla' ? null : loader_version_value ?? 'stable',
+    icon.value
+  ).catch(handleError)
 
-    modal.value.hide()
-    creating.value = false
-  } catch (e) {
-    console.error(e)
-    creating.value = false
-  }
+  modal.value.hide()
+  creating.value = false
 }
 
 const upload_icon = async () => {
@@ -246,12 +255,6 @@ const toggle_advanced = () => {
   width: 20rem;
 }
 
-.button-group {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-}
-
 .image-upload {
   display: flex;
   gap: 1rem;
@@ -276,5 +279,9 @@ const toggle_advanced = () => {
 
 :deep(button.checkbox) {
   border: none;
+}
+
+.selector {
+  max-width: 20rem;
 }
 </style>
