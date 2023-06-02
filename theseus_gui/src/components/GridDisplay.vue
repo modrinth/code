@@ -93,7 +93,6 @@ const props = defineProps({
     width: 100%;
     gap: 1rem;
     margin-right: auto;
-    margin-top: 0.8rem;
     scroll-behavior: smooth;
     overflow-y: auto;
   }
