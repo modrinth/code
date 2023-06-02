@@ -5,10 +5,13 @@
         v-for="(option, index) in options"
         :key="index"
         class="vue-simple-context-menu__item"
-        :class="[option === 'divider' ? 'vue-simple-context-menu__divider' : '']"
-        @click.stop="optionClicked(option)"
+        :class="[
+          option.name === 'divider' ? 'vue-simple-context-menu__divider' : '',
+          option.color ?? 'base',
+        ]"
+        @click.stop="optionClicked(option.name)"
       >
-        <slot v-if="option !== 'divider'" :name="option" />
+        <slot v-if="option.name !== 'divider'" :name="option.name" />
       </li>
     </ul>
   </transition>
@@ -22,10 +25,6 @@ const props = defineProps({
     type: String,
     required: true,
   },
-  options: {
-    type: Array,
-    required: true,
-  },
 })
 
 const emit = defineEmits(['menu-closed', 'option-clicked'])
@@ -34,12 +33,12 @@ const item = ref(null)
 const menuHeight = ref(null)
 const menuWidth = ref(null)
 const contextMenu = ref(null)
+const options = ref([])
 
 defineExpose({
-  showMenu: (event, passedItem) => {
-  console.log('showMenu', passedItem)
+  showMenu: (event, passedItem, passedOptions) => {
   item.value = passedItem;
-  console.log('showMenu', item.value)
+  options.value = passedOptions;
 
   var menu = document.getElementById(props.elementId);
   if (!menu) {
@@ -150,8 +149,20 @@ onBeforeUnmount(() => {
     border-radius: var(--radius-sm);
 
     &:hover {
-      background-color: var(--color-brand);
-      color: var(--color-accent-contrast);
+      &.base {
+        background-color: var(--color-button-bg);
+        color: var(--color-contrast);
+      }
+
+      &.primary {
+        background-color: var(--color-brand);
+        color: var(--color-accent-contrast);
+      }
+
+      &.danger {
+        background-color: var(--color-red);
+        color: var(--color-accent-contrast);
+      }
     }
   }
 

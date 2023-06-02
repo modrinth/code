@@ -7,7 +7,7 @@ import {
   PlusIcon,
   TrashIcon,
   DownloadIcon,
-  GlobeIcon
+  GlobeIcon, StopCircleIcon
 } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
@@ -30,7 +30,46 @@ const props = defineProps({
 const allowPagination = ref(Array.apply(false, Array(props.instances.length)))
 const modsRow = ref(null)
 const instanceOptions = ref(null)
-const projectOptions = ref(null)
+const instanceComponents = ref(null)
+
+const baseOptions = [
+  { name: 'add_content' },
+  { name: 'divider' },
+  { name: 'edit' },
+  { name: 'open_folder' },
+  { name: 'copy_path' },
+  { name: 'divider' },
+  {
+    name: 'delete',
+    color: 'danger',
+  },
+]
+
+const playingOptions = ref([
+  {
+    name: 'play',
+    color: 'primary',
+  },
+  ... baseOptions
+])
+
+const stoppingOptions = ref([
+  {
+    name: 'stop',
+    color: 'danger',
+  },
+  ... baseOptions
+])
+
+const projectOptions = ref([
+  {
+    name: 'install',
+    color: 'primary',
+  },
+  { name: 'divider' },
+  { name: 'open_link'},
+  { name: 'copy_link'}
+])
 
 const handlePaginationDisplay = () => {
 
@@ -64,33 +103,74 @@ onUnmounted(() => {
 const handleInstanceRightClick = (event, e) => {
   console.log(event, e)
   instanceOptions.value.showMenu(event, e)
+
+const handleInstanceRightClick = (event, e, passedOptions) => {
+  instanceOptions.value.showMenu(event, e, passedOptions)
 }
 
-const handleProjectRightClick = (event, e) => {
-  console.log(event, e)
-  projectOptions.value.showMenu(event, e)
+const handleOptionsClick = async (args) => {
+  switch (args.option) {
+    case 'play':
+      await args.item.play()
+      break
+    case 'stop':
+      await args.item.stop()
+      break
+    case 'add_content':
+      await args.item.addContent()
+      break
+    case 'edit':
+      await args.item.seeInstance()
+      break
+    case 'delete':
+      await args.item.deleteInstance()
+      break
+    case 'open_folder':
+      await args.item.openFolder()
+      break
+    case 'copy_path':
+      await navigator.clipboard.writeText(args.item.instance.path)
+      break
+    case 'install':
+      args.item.install()
+      break
+    case 'open_link':
+      window.open(args.item.instance.project_url, '_blank')
+      break
+    case 'copy_link':
+      await navigator.clipboard.writeText(args.item.instance.project_url)
+      break
+  }
 }
 
-const handleOptionsClick = (args) => {
-  console.log(args)
+const getInstanceIndex = (rowIndex, index) => {
+  let instanceIndex = 0
+  for (let i = 0; i < rowIndex; i++) {
+    instanceIndex += props.instances[i].instances.length
+  }
+  instanceIndex += index
+  return instanceIndex
 }
 </script>
 
 <template>
-  <div v-if="props.instances.length > 0" class="row">
-    <div class="header">
-      <p>{{ props.label }}</p>
-      <hr aria-hidden="true" />
-      <div v-if="allowPagination" class="pagination">
-        <ChevronLeftIcon role="button" @click="modsRow.value.scrollLeft -= 170" />
-        <ChevronRightIcon role="button" @click="modsRow.value.scrollLeft += 170" />
+  <div class="content">
+    <div v-for="(row, rowIndex) in instances" :key="row.label" class="row">
+      <div class="header">
+        <p>{{ row.label }}</p>
+        <hr aria-hidden="true" />
+        <div v-if="allowPagination[rowIndex]" class="pagination">
+          <ChevronLeftIcon role="button" @click="modsRow.value.scrollLeft -= 170" />
+          <ChevronRightIcon role="button" @click="modsRow.value.scrollLeft += 170" />
+        </div>
       </div>
       <section ref="modsRow" class="instances">
         <Instance
-          v-for="instance in row.instances"
+          v-for="(instance, instanceIndex) in row.instances"
+          ref="instanceComponents"
           :key="instance?.project_id || instance?.id"
           :instance="instance"
-          @contextmenu.prevent.stop="event => row.downloaded ? handleInstanceRightClick(event, instance) : handleProjectRightClick(event, instance)"
+          @contextmenu.prevent.stop="event => handleInstanceRightClick(event, instanceComponents[getInstanceIndex(rowIndex, instanceIndex)], !row.downloaded ? projectOptions : instanceComponents[getInstanceIndex(rowIndex, instanceIndex)].playing ? stoppingOptions : playingOptions)"
         />
       </section>
     </div>
@@ -98,22 +178,15 @@ const handleOptionsClick = (args) => {
   <ContextMenu
     ref="instanceOptions"
     :element-id="`instance-options`"
-    :options="[
-        'play',
-        'install',
-        'divider',
-        'edit',
-        'open',
-        'copy',
-        'divider',
-        'delete',
-      ]"
     @option-clicked="handleOptionsClick"
   >
     <template #play>
       <PlayIcon /> Play
     </template>
-    <template #install>
+    <template #stop>
+      <StopCircleIcon /> Stop
+    </template>
+    <template #add_content>
       <PlusIcon /> Add content
     </template>
     <template #edit>
@@ -122,35 +195,19 @@ const handleOptionsClick = (args) => {
     <template #delete>
       <TrashIcon /> Delete
     </template>
-    <template #open>
+    <template #open_folder>
       <FolderOpenIcon /> Open folder
     </template>
-    <template #copy>
+    <template #copy_path>
       <ClipboardCopyIcon /> Copy path
     </template>
-  </ContextMenu>
-  <ContextMenu
-    ref="projectOptions"
-    :element-id="`project-options`"
-    :options="[
-        'install',
-        'add',
-        'divider',
-        'open',
-        'copy',
-      ]"
-    @option-clicked="handleOptionsClick"
-  >
     <template #install>
       <DownloadIcon /> Install
     </template>
-    <template #add>
-      <PlusIcon /> Add to Instance
-    </template>
-    <template #open>
+    <template #open_link>
       <GlobeIcon /> Open in Modrinth
     </template>
-    <template #copy>
+    <template #copy_link>
       <ClipboardCopyIcon /> Copy link
     </template>
   </ContextMenu>

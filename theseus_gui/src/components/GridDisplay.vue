@@ -6,7 +6,8 @@ import {
   EditIcon,
   FolderOpenIcon,
   PlayIcon, PlusIcon,
-  TrashIcon
+  TrashIcon,
+  StopCircleIcon
 } from "omorphia";
 import ContextMenu from "@/components/ui/ContextMenu.vue";
 
@@ -23,14 +24,63 @@ const props = defineProps({
   },
 })
 const instanceOptions = ref(null)
+const instanceComponents = ref(null)
+const baseOptions = [
+  { name: 'add_content' },
+  { name: 'divider' },
+  { name: 'edit' },
+  { name: 'open' },
+  { name: 'copy' },
+  { name: 'divider' },
+  {
+    name: 'delete',
+    color: 'danger',
+  },
+]
 
-const handleRightClick = (event, e) => {
+const playingOptions = ref([
+  {
+    name: 'play',
+    color: 'primary',
+  },
+  ... baseOptions
+])
+
+const stoppingOptions = ref([
+  {
+    name: 'stop',
+    color: 'danger',
+  },
+  ... baseOptions
+])
+
+const handleRightClick = (event, e, passedOptions) => {
   console.log(event, e)
-  instanceOptions.value.showMenu(event, e)
+  instanceOptions.value.showMenu(event, e, passedOptions)
 }
 
 const handleOptionsClick = (args) => {
   console.log(args)
+  switch (args.option) {
+    case 'play':
+      args.item.play()
+      break
+    case 'stop':
+      args.item.stop()
+      break
+    case 'edit':
+      args.item.seeInstance()
+      break
+    case 'delete':
+      args.item.deleteInstance()
+      break
+    case 'open':
+      args.item.openFolder()
+      break
+    case 'copy':
+      navigator.clipboard.writeText(args.item.instance.path)
+      break
+  }
 }
 </script>
 <template>
@@ -41,32 +91,26 @@ const handleOptionsClick = (args) => {
     </div>
     <section class="instances">
       <Instance
-        v-for="instance in props.instances"
+        v-for="(instance, index) in props.instances"
+        ref="instanceComponents"
         :key="instance.id"
         :instance="instance"
-        @contextmenu.prevent.stop="event => handleRightClick(event, instance)"
+        @contextmenu.prevent.stop="event => handleRightClick(event, instanceComponents[index], !instanceComponents[index].playing ? playingOptions : stoppingOptions)"
       />
     </section>
   </div>
   <ContextMenu
     ref="instanceOptions"
     :element-id="`instance-options`"
-    :options="[
-        'play',
-        'install',
-        'divider',
-        'edit',
-        'open',
-        'copy',
-        'divider',
-        'delete',
-      ]"
     @option-clicked="handleOptionsClick"
   >
     <template #play>
       <PlayIcon /> Play
     </template>
-    <template #install>
+    <template #stop>
+      <StopCircleIcon /> Stop
+    </template>
+    <template #add_content>
       <PlusIcon /> Add content
     </template>
     <template #edit>
