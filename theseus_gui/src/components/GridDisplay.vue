@@ -17,20 +17,11 @@ const props = defineProps({
       return []
     },
   },
-  news: {
-    type: Array,
-    default() {
-      return []
-    },
-  },
   label: {
     type: String,
     default: '',
   },
-  canPaginate: Boolean,
 })
-
-const modsRow = ref(null)
 const instanceOptions = ref(null)
 
 const handleRightClick = (event, e) => {
@@ -48,7 +39,7 @@ const handleOptionsClick = (args) => {
       <p>{{ props.label }}</p>
       <hr />
     </div>
-    <section ref="modsRow" class="instances">
+    <section class="instances">
       <Instance
         v-for="instance in props.instances"
         :key="instance.id"
@@ -109,6 +100,7 @@ const handleOptionsClick = (args) => {
     gap: 1rem;
 
     p {
+      margin: 0;
       font-size: 1rem;
       white-space: nowrap;
       color: var(--color-contrast);
@@ -154,7 +146,6 @@ const handleOptionsClick = (args) => {
     width: 100%;
     gap: 1rem;
     margin-right: auto;
-    margin-top: 0.8rem;
     scroll-behavior: smooth;
     overflow-y: auto;
     transition: all ease-in-out 0.3s;

@@ -143,9 +143,15 @@ const check_valid = computed(() => {
 </script>
 
 <template>
-  <Modal ref="installModal" header="Install mod to instance">
+  <Modal ref="installModal" header="Install project to instance">
     <div class="modal-body">
-      <input v-model="searchFilter" type="text" class="search" placeholder="Search for a profile" />
+      <input
+        v-model="searchFilter"
+        autocomplete="off"
+        type="text"
+        class="search"
+        placeholder="Search for an instance"
+      />
       <div class="profiles" :class="{ 'hide-creation': !showCreation }">
         <div v-for="profile in profiles" :key="profile.metadata.name" class="option">
           <Button
@@ -181,7 +187,13 @@ const check_valid = computed(() => {
             </div>
           </div>
           <div class="creation-settings">
-            <input v-model="name" type="text" placeholder="Name" class="creation-input" />
+            <input
+              v-model="name"
+              autocomplete="off"
+              type="text"
+              placeholder="Name"
+              class="creation-input"
+            />
             <Button :disabled="creatingInstance === true || !check_valid" @click="createInstance()">
               <RightArrowIcon />
               {{ creatingInstance ? 'Creating...' : 'Create' }}
@@ -189,7 +201,7 @@ const check_valid = computed(() => {
           </div>
         </div>
       </Card>
-      <div class="footer">
+      <div class="input-group push-right">
         <Button :color="showCreation ? '' : 'primary'" @click="toggleCreation()">
           <PlusIcon />
           {{ showCreation ? 'Hide New Instance' : 'Create new instance' }}
@@ -301,13 +313,5 @@ const check_valid = computed(() => {
 
 .profile-image {
   --size: 2rem !important;
-}
-
-.footer {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  margin-left: auto;
 }
 </style>

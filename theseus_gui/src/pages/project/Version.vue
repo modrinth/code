@@ -22,7 +22,6 @@
         <a
           :href="`https://modrinth.com/mod/${route.params.id}/version/${route.params.version}`"
           rel="external"
-          target="_blank"
           class="btn"
         >
           <ExternalIcon />
@@ -145,7 +144,6 @@
             <a
               :href="`https://modrinth.com/user/${author.user.username}`"
               rel="external"
-              target="_blank"
               class="metadata-value btn author"
             >
               <Avatar size="sm" :src="author.user.avatar_url" circle />

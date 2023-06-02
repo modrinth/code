@@ -3,29 +3,55 @@
     <div class="card-row">
       <div class="iconified-input">
         <SearchIcon />
-        <input v-model="searchFilter" type="text" placeholder="Search Mods" class="text-input" />
+        <input
+          v-model="searchFilter"
+          type="text"
+          :placeholder="`Search ${search.length} ${(['All', 'Other'].includes(selectedProjectType)
+            ? 'projects'
+            : selectedProjectType.toLowerCase()
+          ).slice(0, search.length === 1 ? -1 : 64)}...`"
+          class="text-input"
+          autocomplete="off"
+        />
       </div>
       <span class="manage">
         <span class="text-combo">
-          <span class="no-wrap sort"> Sort By </span>
+          <span class="no-wrap sort"> Sort by </span>
           <DropdownSelect
             v-model="sortFilter"
             name="sort-by"
-            :options="['Name', 'Version', 'Author']"
+            :options="['Name', 'Version', 'Author', 'Enabled']"
             default-value="Name"
             class="dropdown"
           />
         </span>
-        <Button color="primary" @click="router.push({ path: '/browse/mod' })">
+        <Button
+          color="primary"
+          @click="
+            router.push({
+              path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+            })
+          "
+        >
           <PlusIcon />
-          <span class="no-wrap"> Add Content </span>
+          <span class="no-wrap"> Add content </span>
         </Button>
       </span>
     </div>
+    <Chips
+      v-if="Object.keys(selectableProjectTypes).length > 1"
+      v-model="selectedProjectType"
+      :items="Object.keys(selectableProjectTypes)"
+    />
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
-          <Button icon-only :disabled="!projects.some((x) => x.outdated)" @click="updateAll">
+          <Button
+            v-tooltip="'Update all projects'"
+            icon-only
+            :disabled="!projects.some((x) => x.outdated)"
+            @click="updateAll"
+          >
             <UpdatedIcon />
           </Button>
         </div>
@@ -37,7 +63,13 @@
       <div v-for="mod in search" :key="mod.file_name" class="table-row">
         <div class="table-cell table-text">
           <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <Button v-else :disabled="!mod.outdated" icon-only @click="updateProject(mod)">
+          <Button
+            v-else
+            v-tooltip="'Update project'"
+            :disabled="!mod.outdated"
+            icon-only
+            @click="updateProject(mod)"
+          >
             <UpdatedIcon v-if="mod.outdated" />
             <CheckIcon v-else />
           </Button>
@@ -55,11 +87,12 @@
         <div class="table-cell table-text">{{ mod.version }}</div>
         <div class="table-cell table-text">{{ mod.author }}</div>
         <div class="table-cell table-text manage">
-          <Button icon-only @click="removeMod(mod)">
+          <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
             <TrashIcon />
           </Button>
           <input
             id="switch-1"
+            autocomplete="off"
             type="checkbox"
             class="switch stylized-toggle"
             :checked="!mod.disabled"
@@ -82,6 +115,8 @@ import {
   UpdatedIcon,
   DropdownSelect,
   AnimatedLogo,
+  Chips,
+  formatProjectType,
 } from 'omorphia'
 import { computed, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -120,6 +155,7 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       disabled: project.disabled,
       updateVersion: project.metadata.update_version,
       outdated: !!project.metadata.update_version,
+      project_type: project.metadata.project.project_type,
     })
   } else if (project.metadata.type === 'inferred') {
     projects.value.push({
@@ -131,6 +167,7 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       icon: project.metadata.icon ? convertFileSrc(project.metadata.icon) : null,
       disabled: project.disabled,
       outdated: false,
+      project_type: project.metadata.project_type,
     })
   } else {
     projects.value.push({
@@ -142,16 +179,33 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
       icon: null,
       disabled: project.disabled,
       outdated: false,
+      project_type: null,
     })
   }
 }
 
 const searchFilter = ref('')
 const sortFilter = ref('')
+const selectedProjectType = ref('All')
+
+const selectableProjectTypes = computed(() => {
+  const obj = { All: 'all' }
+
+  for (const project of projects.value) {
+    obj[project.project_type ? formatProjectType(project.project_type) + 's' : 'Other'] =
+      project.project_type
+  }
+
+  return obj
+})
 
 const search = computed(() => {
+  const projectType = selectableProjectTypes.value[selectedProjectType.value]
   const filtered = projects.value.filter((mod) => {
-    return mod.name.toLowerCase().includes(searchFilter.value.toLowerCase())
+    return (
+      mod.name.toLowerCase().includes(searchFilter.value.toLowerCase()) &&
+      (projectType === 'all' || mod.project_type === projectType)
+    )
   })
 
   return updateSort(filtered, sortFilter.value)
@@ -176,6 +230,16 @@ function updateSort(projects, sort) {
         }
         if (a.author > b.author) {
           return 1
+        }
+        return 0
+      })
+    case 'Enabled':
+      return projects.slice().sort((a, b) => {
+        if (a.disabled && !b.disabled) {
+          return 1
+        }
+        if (!a.disabled && b.disabled) {
+          return -1
         }
         return 0
       })
@@ -230,6 +294,8 @@ async function updateProject(mod) {
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
+  console.log(mod.disabled)
+  mod.disabled = !mod.disabled
 }
 
 async function removeMod(mod) {
@@ -246,6 +312,10 @@ async function removeMod(mod) {
 .manage {
   display: flex;
   gap: 0.5rem;
+}
+
+.table {
+  margin-block-start: 0;
 }
 
 .table-row {
@@ -284,14 +354,8 @@ async function removeMod(mod) {
   width: 7rem !important;
 }
 
-.no-wrap {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-
-  &.sort {
-    padding-left: 0.5rem;
-  }
+.sort {
+  padding-left: 0.5rem;
 }
 </style>
 <style lang="scss">
@@ -299,5 +363,9 @@ async function removeMod(mod) {
   svg {
     margin-left: 0.5rem !important;
   }
+}
+
+.v-popper--theme-tooltip .v-popper__inner {
+  background: #fff !important;
 }
 </style>

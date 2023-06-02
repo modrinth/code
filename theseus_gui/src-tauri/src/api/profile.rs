@@ -88,7 +88,7 @@ pub async fn profile_update_project(
     path: &Path,
     project_path: &Path,
 ) -> Result<PathBuf> {
-    Ok(profile::update_project(path, project_path).await?)
+    Ok(profile::update_project(path, project_path, None).await?)
 }
 
 // Adds a project to a profile from a version ID

@@ -5,6 +5,7 @@
 
 use theseus::prelude::*;
 
+use tauri::Manager;
 use tracing_error::ErrorLayer;
 use tracing_subscriber::EnvFilter;
 
@@ -20,28 +21,13 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
-// cfg only on mac os
-// disables mouseover and fixes a random crash error only fixed by recent versions of macos
-#[cfg(target_os = "macos")]
-#[tauri::command]
-async fn should_disable_mouseover() -> bool {
-    // We try to match version to 12.2 or higher. If unrecognizable to pattern or lower, we default to the css with disabled mouseover for safety
-    let os = os_info::get();
-    if let os_info::Version::Semantic(major, minor, _) = os.version() {
-        if *major >= 12 && *minor >= 3 {
-            // Mac os version is 12.3 or higher, we allow mouseover
-            return false;
-        }
-    }
-    true
-}
-#[cfg(not(target_os = "macos"))]
-#[tauri::command]
-async fn should_disable_mouseover() -> bool {
-    false
-}
-
 use tracing_subscriber::prelude::*;
+
+#[derive(Clone, serde::Serialize)]
+struct Payload {
+    args: Vec<String>,
+    cwd: String,
+}
 
 fn main() {
     /*
@@ -70,9 +56,13 @@ fn main() {
         .expect("setting default subscriber failed");
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
+            app.emit_all("single-instance", Payload { args: argv, cwd })
+                .unwrap();
+        }))
+        .plugin(tauri_plugin_window_state::Builder::default().build())
         .invoke_handler(tauri::generate_handler![
             initialize_state,
-            should_disable_mouseover,
             api::progress_bars_list,
             api::profile_create::profile_create_empty,
             api::profile_create::profile_create,
@@ -98,6 +88,7 @@ fn main() {
             api::pack::pack_install_file,
             api::auth::auth_authenticate_begin_flow,
             api::auth::auth_authenticate_await_completion,
+            api::auth::auth_cancel_flow,
             api::auth::auth_refresh,
             api::auth::auth_remove_user,
             api::auth::auth_has_user,
@@ -141,6 +132,8 @@ fn main() {
             api::logs::logs_get_stderr_by_datetime,
             api::logs::logs_delete_logs,
             api::logs::logs_delete_logs_by_datetime,
+            api::utils::show_in_folder,
+            api::utils::should_disable_mouseover,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

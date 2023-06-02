@@ -54,19 +54,12 @@ const handlePaginationDisplay = () => {
 
 onMounted(() => {
   if (props.canPaginate) window.addEventListener('resize', handlePaginationDisplay)
-
   handlePaginationDisplay()
 })
+
 onUnmounted(() => {
   if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
 })
-
-const handleLeftPage = (index) => {
-  modsRow.value[index].scrollLeft -= 170
-}
-const handleRightPage = (index) => {
-  modsRow.value[index].scrollLeft += 170
-}
 
 const handleInstanceRightClick = (event, e) => {
   console.log(event, e)
@@ -84,15 +77,13 @@ const handleOptionsClick = (args) => {
 </script>
 
 <template>
-  <div class="content">
-    <div v-for="(row, index) in instances" :key="row.label" class="row">
-      <div class="header">
-        <p>{{ row.label }}</p>
-        <hr aria-hidden="true" />
-        <div v-if="allowPagination[index]" class="pagination">
-          <ChevronLeftIcon role="button" @click="handleLeftPage(index)" />
-          <ChevronRightIcon role="button" @click="handleRightPage(index)" />
-        </div>
+  <div v-if="props.instances.length > 0" class="row">
+    <div class="header">
+      <p>{{ props.label }}</p>
+      <hr aria-hidden="true" />
+      <div v-if="allowPagination" class="pagination">
+        <ChevronLeftIcon role="button" @click="modsRow.value.scrollLeft -= 170" />
+        <ChevronRightIcon role="button" @click="modsRow.value.scrollLeft += 170" />
       </div>
       <section ref="modsRow" class="instances">
         <Instance
@@ -193,6 +184,7 @@ const handleOptionsClick = (args) => {
     gap: 1rem;
 
     p {
+      margin: 0;
       font-size: 1rem;
       white-space: nowrap;
       color: var(--color-contrast);
@@ -238,10 +230,13 @@ const handleOptionsClick = (args) => {
     width: 100%;
     gap: 1rem;
     margin-right: auto;
-    margin-top: 0.8rem;
     scroll-behavior: smooth;
     overflow-x: scroll;
     overflow-y: hidden;
+
+    :deep(.instance-card-item) {
+      margin-bottom: 0.1rem;
+    }
 
     &::-webkit-scrollbar {
       width: 0px;

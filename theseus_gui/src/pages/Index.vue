@@ -20,18 +20,20 @@ breadcrumbs.setRootContext({ name: 'Home', link: route.path })
 const recentInstances = shallowRef([])
 
 const getInstances = async () => {
-  filter.value = ''
   const profiles = await list(true).catch(handleError)
   recentInstances.value = Object.values(profiles)
 
-  const excludeIds = recentInstances.value.map((i) => i.metadata?.linked_data?.project_id)
-  excludeIds.forEach((id, index) => {
-    filter.value += `NOT"project_id"="${id}"`
-    if (index < excludeIds.length - 1) filter.value += ' AND '
-  })
+  let filters = []
+  for (const instance of recentInstances.value) {
+    if (instance.metadata.linked_data && instance.metadata.linked_data.project_id) {
+      filters.push(`NOT"project_id"="${instance.metadata.linked_data.project_id}"`)
+    }
+  }
+  filter.value = filters.join(' AND ')
 }
 
 const getFeaturedModpacks = async () => {
+  console.log(filter.value)
   const response = await useFetch(
     `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
     'featured modpacks'
@@ -40,7 +42,7 @@ const getFeaturedModpacks = async () => {
 }
 const getFeaturedMods = async () => {
   const response = await useFetch(
-    `https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows&filters=${filter.value}`,
+    'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
     'featured mods'
   )
   featuredMods.value = response.hits

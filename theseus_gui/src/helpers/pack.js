@@ -6,8 +6,8 @@
 import { invoke } from '@tauri-apps/api/tauri'
 
 // Installs pack from a version ID
-export async function install(versionId, packTitle, packIcon) {
-  return await invoke('pack_install_version_id', { versionId, packTitle, packIcon })
+export async function install(projectId, versionId, packTitle, packIcon) {
+  return await invoke('pack_install_version_id', { projectId, versionId, packTitle, packIcon })
 }
 
 // Installs pack from a path

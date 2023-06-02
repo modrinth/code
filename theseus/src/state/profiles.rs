@@ -403,14 +403,6 @@ impl Profile {
             }
         }
 
-        emit_profile(
-            self.uuid,
-            self.path.clone(),
-            &self.metadata.name,
-            ProfilePayloadType::Synced,
-        )
-        .await?;
-
         Ok(path)
     }
 

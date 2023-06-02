@@ -1,5 +1,3 @@
-@import 'inter.scss';
-
 :root {
   font-family: var(--font-standard);
   color-scheme: dark;
@@ -7,10 +5,15 @@
   --expanded-view-width: calc(100% - 13rem);
 }
 
+body {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 .card-divider {
@@ -41,130 +44,7 @@ a {
 }
 
 input {
-  border: none;
-}
-
-.multiselect {
-  color: var(--color-base) !important;
-  outline: 2px solid transparent;
-  max-width: 15rem;
-  width: 100% !important;
-
-  .multiselect__input:focus-visible {
-    outline: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    min-height: 0 !important;
-    font-weight: normal !important;
-    margin-left: 0.5rem;
-    margin-bottom: 10px;
-  }
-
-  input {
-    background: transparent;
-    box-shadow: none;
-    border: none !important;
-
-    &:focus {
-      box-shadow: none;
-    }
-  }
-
-  input::placeholder {
-    color: var(--color-base);
-  }
-
-  .multiselect__tags {
-    border-radius: var(--radius-md);
-    background: var(--color-button-bg);
-    box-shadow: var(--shadow-inset-sm);
-    border: none;
-    cursor: pointer;
-    padding-left: 0.5rem;
-    font-size: 1rem;
-
-    transition: background-color 0.1s ease-in-out;
-
-    &:active {
-      filter: brightness(1.25);
-
-      .multiselect__spinner {
-        filter: brightness(1.25);
-      }
-    }
-
-    .multiselect__single {
-      background: transparent;
-    }
-
-    .multiselect__tag {
-      border-radius: var(--radius-md);
-      color: var(--color-base);
-      background: transparent;
-      border: 2px solid var(--color-brand);
-    }
-
-    .multiselect__tag-icon {
-      background: transparent;
-
-      &:after {
-        color: var(--color-contrast);
-      }
-    }
-
-    .multiselect__placeholder {
-      color: var(--color-base);
-      margin-left: 0.5rem;
-      opacity: 0.6;
-      font-size: 1rem;
-      line-height: 1.25rem;
-    }
-  }
-
-  .multiselect__content-wrapper {
-    background: var(--color-button-bg);
-    border: none;
-    overflow-x: hidden;
-    box-shadow: var(--shadow-inset-sm), var(--shadow-floating);
-    width: 100%;
-
-    .multiselect__element {
-      .multiselect__option--highlight {
-        background: var(--color-button-bg);
-        filter: brightness(1.25);
-        color: var(--color-contrast);
-      }
-
-      .multiselect__option--selected {
-        background: var(--color-brand);
-        font-weight: bold;
-        color: var(--color-accent-contrast);
-      }
-    }
-  }
-
-  .multiselect__spinner {
-    background: var(--color-button-bg);
-
-    &:active {
-      filter: brightness(1.25);
-    }
-  }
-
-  &.multiselect--disabled {
-    background: none;
-
-    .multiselect__current,
-    .multiselect__select {
-      background: none;
-    }
-  }
-}
-
-.multiselect--above .multiselect__content-wrapper {
-  border-top: none !important;
-  border-top-left-radius: var(--radius-md) !important;
-  border-top-right-radius: var(--radius-md) !important;
+  border: none !important;
 }
 
 .mod-text {
@@ -172,8 +52,4 @@ input {
   align-items: center;
   gap: 1rem;
   color: var(--color-contrast);
-}
-
-input {
-  border: none !important;
 }

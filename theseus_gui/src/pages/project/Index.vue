@@ -43,7 +43,6 @@
           <a
             :href="`https://modrinth.com/${data.project_type}/${data.slug}`"
             rel="external"
-            target="_blank"
             class="btn"
           >
             <ExternalIcon />
@@ -97,7 +96,6 @@
             :href="data.issues_url"
             class="title"
             rel="noopener nofollow ugc external"
-            target="_blank"
           >
             <IssuesIcon aria-hidden="true" />
             <span>Issues</span>
@@ -106,7 +104,6 @@
             v-if="data.source_url"
             :href="data.source_url"
             class="title"
-            target="_blank"
             rel="noopener nofollow ugc external"
           >
             <CodeIcon aria-hidden="true" />
@@ -117,7 +114,6 @@
             :href="data.wiki_url"
             class="title"
             rel="noopener nofollow ugc external"
-            target="_blank"
           >
             <WikiIcon aria-hidden="true" />
             <span>Wiki</span>
@@ -127,7 +123,6 @@
             :href="data.wiki_url"
             class="title"
             rel="noopener nofollow ugc external"
-            target="_blank"
           >
             <DiscordIcon aria-hidden="true" />
             <span>Discord</span>
@@ -136,7 +131,6 @@
             v-for="(donation, index) in data.donation_urls"
             :key="index"
             :href="donation.url"
-            target="_blank"
             rel="noopener nofollow ugc external"
           >
             <BuyMeACoffeeIcon v-if="donation.id === 'bmac'" aria-hidden="true" />
@@ -322,11 +316,19 @@ async function install(version) {
         .map((value) => value.metadata)
         .find((pack) => pack.linked_data?.project_id === data.value.id)
     ) {
-      await packInstall(queuedVersionData.id, data.value.title, data.value.icon_url).catch(
-        handleError
-      )
+      await packInstall(
+        data.value.id,
+        queuedVersionData.id,
+        data.value.title,
+        data.value.icon_url
+      ).catch(handleError)
     } else {
-      confirmModal.value.show(queuedVersionData.id, data.value.title, data.value.icon_url)
+      confirmModal.value.show(
+        data.value.id,
+        queuedVersionData.id,
+        data.value.title,
+        data.value.icon_url
+      )
     }
   } else {
     if (instance.value) {

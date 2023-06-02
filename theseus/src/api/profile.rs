@@ -71,6 +71,8 @@ where
 
     match profiles.0.get_mut(path) {
         Some(ref mut profile) => {
+            action(profile).await?;
+
             emit_profile(
                 profile.uuid,
                 profile.path.clone(),
@@ -79,7 +81,7 @@ where
             )
             .await?;
 
-            action(profile).await
+            Ok(())
         }
         None => Err(crate::ErrorKind::UnmanagedProfileError(
             path.display().to_string(),
@@ -102,6 +104,15 @@ pub async fn edit_icon(
 
         match profiles.0.get_mut(path) {
             Some(ref mut profile) => {
+                profile
+                    .set_icon(
+                        &state.directories.caches_dir(),
+                        &state.io_semaphore,
+                        bytes::Bytes::from(bytes),
+                        &icon.to_string_lossy(),
+                    )
+                    .await?;
+
                 emit_profile(
                     profile.uuid,
                     profile.path.clone(),
@@ -110,14 +121,7 @@ pub async fn edit_icon(
                 )
                 .await?;
 
-                profile
-                    .set_icon(
-                        &state.directories.caches_dir(),
-                        &state.io_semaphore,
-                        bytes::Bytes::from(bytes),
-                        &icon.to_string_lossy(),
-                    )
-                    .await
+                Ok(())
             }
             None => Err(crate::ErrorKind::UnmanagedProfileError(
                 path.display().to_string(),
@@ -265,7 +269,8 @@ pub async fn update_all(
 
                 async move {
                     let new_path =
-                        update_project(profile_path, &project).await?;
+                        update_project(profile_path, &project, Some(true))
+                            .await?;
 
                     map.write().await.insert(project, new_path);
 
@@ -273,6 +278,14 @@ pub async fn update_all(
                 }
                 .await
             },
+        )
+        .await?;
+
+        emit_profile(
+            profile.uuid,
+            profile.path,
+            &profile.metadata.name,
+            ProfilePayloadType::Edited,
         )
         .await?;
 
@@ -290,6 +303,7 @@ pub async fn update_all(
 pub async fn update_project(
     profile_path: &Path,
     project_path: &Path,
+    skip_send_event: Option<bool>,
 ) -> crate::Result<PathBuf> {
     if let Some(profile) = get(profile_path, None).await? {
         if let Some(project) = profile.projects.get(project_path) {
@@ -322,6 +336,16 @@ pub async fn update_project(
                     }
                 }
 
+                if !skip_send_event.unwrap_or(false) {
+                    emit_profile(
+                        profile.uuid,
+                        profile.path,
+                        &profile.metadata.name,
+                        ProfilePayloadType::Edited,
+                    )
+                    .await?;
+                }
+
                 return Ok(path);
             }
         }
@@ -346,6 +370,14 @@ pub async fn add_project_from_version(
 ) -> crate::Result<PathBuf> {
     if let Some(profile) = get(profile_path, None).await? {
         let (path, _) = profile.add_project_version(version_id).await?;
+
+        emit_profile(
+            profile.uuid,
+            profile.path,
+            &profile.metadata.name,
+            ProfilePayloadType::Edited,
+        )
+        .await?;
 
         Ok(path)
     } else {
@@ -379,6 +411,14 @@ pub async fn add_project_from_path(
             )
             .await?;
 
+        emit_profile(
+            profile.uuid,
+            profile.path,
+            &profile.metadata.name,
+            ProfilePayloadType::Edited,
+        )
+        .await?;
+
         Ok(path)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
@@ -395,7 +435,17 @@ pub async fn toggle_disable_project(
     project: &Path,
 ) -> crate::Result<PathBuf> {
     if let Some(profile) = get(profile, None).await? {
-        Ok(profile.toggle_disable_project(project).await?)
+        let res = profile.toggle_disable_project(project).await?;
+
+        emit_profile(
+            profile.uuid,
+            profile.path,
+            &profile.metadata.name,
+            ProfilePayloadType::Edited,
+        )
+        .await?;
+
+        Ok(res)
     } else {
         Err(crate::ErrorKind::UnmanagedProfileError(
             profile.display().to_string(),
@@ -412,6 +462,14 @@ pub async fn remove_project(
 ) -> crate::Result<()> {
     if let Some(profile) = get(profile, None).await? {
         profile.remove_project(project, None).await?;
+
+        emit_profile(
+            profile.uuid,
+            profile.path,
+            &profile.metadata.name,
+            ProfilePayloadType::Edited,
+        )
+        .await?;
 
         Ok(())
     } else {

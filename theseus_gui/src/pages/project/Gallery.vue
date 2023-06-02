@@ -50,7 +50,6 @@
             </Button>
             <a
               class="open btn icon-only"
-              target="_blank"
               :href="
                 expandedGalleryItem.url
                   ? expandedGalleryItem.url

@@ -35,6 +35,8 @@ defineProps({
   svg {
     width: 12rem;
     height: 12rem;
+    fill: var(--color-brand);
+    color: var(--color-brand);
   }
 }
 </style>
