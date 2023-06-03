@@ -7,6 +7,7 @@ import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import dayjs from 'dayjs'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -21,7 +22,9 @@ const recentInstances = shallowRef([])
 
 const getInstances = async () => {
   const profiles = await list(true).catch(handleError)
-  recentInstances.value = Object.values(profiles)
+  recentInstances.value = Object.values(profiles).sort((a, b) => {
+    return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
+  })
 
   let filters = []
   for (const instance of recentInstances.value) {

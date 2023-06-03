@@ -19,7 +19,7 @@ fetchSettings.javaArgs = fetchSettings.custom_java_args.join(' ')
 fetchSettings.envArgs = fetchSettings.custom_env_args.map((x) => x.join('=')).join(' ')
 
 const settings = ref(fetchSettings)
-const maxMemory = ref((await get_max_memory().catch(handleError)) / 1024)
+const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
 watch(settings.value, async (oldSettings, newSettings) => {
   const setSettings = JSON.parse(JSON.stringify(newSettings))
