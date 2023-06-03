@@ -1,19 +1,21 @@
 <script setup>
 import { onUnmounted, ref, useSlots, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
-import {convertFileSrc} from '@tauri-apps/api/tauri'
+import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
-import {install as pack_install} from '@/helpers/pack'
-import {get, list, remove, run} from '@/helpers/profile'
+import { install as pack_install } from '@/helpers/pack'
+import { get, list, remove, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
-import {process_listener} from '@/helpers/events'
-import {useFetch} from '@/helpers/fetch.js'
-import {handleError, useSearch} from '@/store/state.js'
+import { process_listener } from '@/helpers/events'
+import { useFetch } from '@/helpers/fetch.js'
+import { handleError, useSearch } from '@/store/state.js'
+import { showInFolder } from '@/helpers/utils.js'
+import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 
 const searchStore = useSearch()
 
@@ -137,12 +139,12 @@ const deleteInstance = async () => {
 }
 
 const openFolder = async () => {
-  //showInFolder(props.instance.path)
+  await showInFolder(props.instance.path)
 }
 
 const addContent = async () => {
   searchStore.instanceContext = await get(props.instance.path).catch(handleError)
-  await router.push({path: '/browse/mod'})
+  await router.push({ path: '/browse/mod' })
 }
 
 defineExpose({
@@ -239,7 +241,7 @@ onUnmounted(() => unlisten())
         @click="stop"
         @mousehover="checkProcess"
       >
-        <XIcon />
+        <StopCircleIcon />
       </div>
       <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     </template>

@@ -3,13 +3,14 @@ import Instance from '@/components/ui/Instance.vue'
 import { ref } from 'vue'
 import {
   ClipboardCopyIcon,
-  EditIcon,
   FolderOpenIcon,
-  PlayIcon, PlusIcon,
+  PlayIcon,
+  PlusIcon,
   TrashIcon,
-  StopCircleIcon
-} from "omorphia";
-import ContextMenu from "@/components/ui/ContextMenu.vue";
+  StopCircleIcon,
+  EyeIcon,
+} from 'omorphia'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 
 const props = defineProps({
   instances: {
@@ -25,41 +26,43 @@ const props = defineProps({
 })
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
-const baseOptions = [
-  { name: 'add_content' },
-  { name: 'divider' },
-  { name: 'edit' },
-  { name: 'open' },
-  { name: 'copy' },
-  { name: 'divider' },
-  {
-    name: 'delete',
-    color: 'danger',
-  },
-]
 
-const playingOptions = ref([
-  {
-    name: 'play',
-    color: 'primary',
-  },
-  ... baseOptions
-])
+const handleRightClick = (event, item) => {
+  const baseOptions = [
+    { name: 'add_content' },
+    { type: 'divider' },
+    { name: 'edit' },
+    { name: 'open' },
+    { name: 'copy' },
+    { type: 'divider' },
+    {
+      name: 'delete',
+      color: 'danger',
+    },
+  ]
 
-const stoppingOptions = ref([
-  {
-    name: 'stop',
-    color: 'danger',
-  },
-  ... baseOptions
-])
-
-const handleRightClick = (event, e, passedOptions) => {
-  console.log(event, e)
-  instanceOptions.value.showMenu(event, e, passedOptions)
+  instanceOptions.value.showMenu(
+    event,
+    item,
+    item.playing
+      ? [
+          {
+            name: 'stop',
+            color: 'danger',
+          },
+          ...baseOptions,
+        ]
+      : [
+          {
+            name: 'play',
+            color: 'primary',
+          },
+          ...baseOptions,
+        ]
+  )
 }
 
-const handleOptionsClick = (args) => {
+const handleOptionsClick = async (args) => {
   console.log(args)
   switch (args.option) {
     case 'play':
@@ -68,17 +71,20 @@ const handleOptionsClick = (args) => {
     case 'stop':
       args.item.stop()
       break
+    case 'add_content':
+      await args.item.addContent()
+      break
     case 'edit':
-      args.item.seeInstance()
+      await args.item.seeInstance()
       break
     case 'delete':
-      args.item.deleteInstance()
+      await args.item.deleteInstance()
       break
     case 'open':
-      args.item.openFolder()
+      await args.item.openFolder()
       break
     case 'copy':
-      navigator.clipboard.writeText(args.item.instance.path)
+      await navigator.clipboard.writeText(args.item.instance.path)
       break
   }
 }
@@ -95,36 +101,18 @@ const handleOptionsClick = (args) => {
         ref="instanceComponents"
         :key="instance.id"
         :instance="instance"
-        @contextmenu.prevent.stop="event => handleRightClick(event, instanceComponents[index], !instanceComponents[index].playing ? playingOptions : stoppingOptions)"
+        @contextmenu.prevent.stop="(event) => handleRightClick(event, instanceComponents[index])"
       />
     </section>
   </div>
-  <ContextMenu
-    ref="instanceOptions"
-    :element-id="`instance-options`"
-    @option-clicked="handleOptionsClick"
-  >
-    <template #play>
-      <PlayIcon /> Play
-    </template>
-    <template #stop>
-      <StopCircleIcon /> Stop
-    </template>
-    <template #add_content>
-      <PlusIcon /> Add content
-    </template>
-    <template #edit>
-      <EditIcon /> Edit
-    </template>
-    <template #delete>
-      <TrashIcon /> Delete
-    </template>
-    <template #open>
-      <FolderOpenIcon /> Open folder
-    </template>
-    <template #copy>
-      <ClipboardCopyIcon /> Copy path
-    </template>
+  <ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
+    <template #play> <PlayIcon /> Play </template>
+    <template #stop> <StopCircleIcon /> Stop </template>
+    <template #add_content> <PlusIcon /> Add content </template>
+    <template #edit> <EyeIcon /> View instance </template>
+    <template #delete> <TrashIcon /> Delete </template>
+    <template #open> <FolderOpenIcon /> Open folder </template>
+    <template #copy> <ClipboardCopyIcon /> Copy path </template>
   </ContextMenu>
 </template>
 <style lang="scss" scoped>

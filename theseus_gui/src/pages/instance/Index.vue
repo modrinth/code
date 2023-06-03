@@ -1,7 +1,7 @@
 <template>
   <div class="instance-container">
     <div class="side-cards">
-      <Card class="instance-card">
+      <Card class="instance-card" @contextmenu.prevent.stop="handleRightClick">
         <Avatar
           size="lg"
           :src="
@@ -28,7 +28,7 @@
             @click="stopInstance"
             @mouseover="checkProcess"
           >
-            <XIcon />
+            <StopCircleIcon />
             Stop
           </Button>
           <Button
@@ -78,40 +78,60 @@
       <RouterView v-slot="{ Component }">
         <template v-if="Component">
           <Suspense @pending="loadingBar.startLoading()" @resolve="loadingBar.stopLoading()">
-            <component :is="Component" :instance="instance"></component>
+            <component :is="Component" :instance="instance" :options="options"></component>
           </Suspense>
         </template>
       </RouterView>
     </div>
   </div>
+  <ContextMenu ref="options" @option-clicked="handleOptionsClick">
+    <template #play> <PlayIcon /> Play </template>
+    <template #stop> <StopCircleIcon /> Stop </template>
+    <template #add_content> <PlusIcon /> Add Content </template>
+    <template #edit> <EditIcon /> Edit </template>
+    <template #copy_path> <ClipboardCopyIcon /> Copy Path </template>
+    <template #open_folder> <ClipboardCopyIcon /> Open Folder </template>
+    <template #copy_link> <ClipboardCopyIcon /> Copy Link </template>
+    <template #open_link> <ClipboardCopyIcon /> Open In Modrinth <ExternalIcon /> </template>
+    <template #repair> <HammerIcon /> Repair </template>
+    <template #delete> <TrashIcon /> Delete </template>
+  </ContextMenu>
 </template>
 <script setup>
 import {
   BoxIcon,
   SettingsIcon,
   FileIcon,
-  XIcon,
   Button,
   Avatar,
   Card,
   Promotion,
   PlayIcon,
+  StopCircleIcon,
+  EditIcon,
+  HammerIcon,
+  TrashIcon,
   FolderOpenIcon,
+  ClipboardCopyIcon,
+  PlusIcon,
+  ExternalIcon,
 } from 'omorphia'
-import { get, run } from '@/helpers/profile'
+import { get, install, remove, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
   kill_by_uuid,
 } from '@/helpers/process'
 import { process_listener, profile_listener } from '@/helpers/events'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { handleError, useBreadcrumbs, useLoading, useSearch } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 
 const route = useRoute()
+const router = useRouter()
 const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
@@ -129,6 +149,7 @@ const loadingBar = useLoading()
 const uuid = ref(null)
 const playing = ref(false)
 const loading = ref(false)
+const options = ref(null)
 
 const startInstance = async () => {
   loading.value = true
@@ -169,6 +190,91 @@ const unlistenProfiles = await profile_listener(async (event) => {
 const unlistenProcesses = await process_listener((e) => {
   if (e.event === 'finished' && uuid.value === e.uuid) playing.value = false
 })
+
+const handleRightClick = (event) => {
+  const baseOptions = [
+    { name: 'add_content' },
+    { type: 'divider' },
+    { name: 'edit' },
+    { name: 'open_folder' },
+    { name: 'copy_path' },
+    { type: 'divider' },
+    {
+      name: 'repair',
+      color: 'contrast',
+    },
+    {
+      name: 'delete',
+      color: 'danger',
+    },
+  ]
+
+  options.value.showMenu(
+    event,
+    instance.value,
+    playing.value
+      ? [
+          {
+            name: 'stop',
+            color: 'danger',
+          },
+          ...baseOptions,
+        ]
+      : [
+          {
+            name: 'play',
+            color: 'primary',
+          },
+          ...baseOptions,
+        ]
+  )
+}
+
+const handleOptionsClick = async (args) => {
+  console.log(args)
+  switch (args.option) {
+    case 'play':
+      await startInstance()
+      break
+    case 'stop':
+      await stopInstance()
+      break
+    case 'add_content':
+      await router.push({
+        path: `/browse/${instance.value.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+      })
+      break
+    case 'edit':
+      await router.push({
+        path: `/instance/${encodeURIComponent(route.params.id)}/options`,
+      })
+      break
+    case 'repair':
+      await install(instance.value.path).catch(handleError)
+      break
+    case 'delete':
+      await remove(instance.value.path).catch(handleError)
+      break
+    case 'open_folder':
+      await showInFolder(instance.value.path)
+      break
+    case 'copy_path':
+      await navigator.clipboard.writeText(instance.value.path)
+      break
+    case 'open_link':
+      window.__TAURI_INVOKE__('tauri', {
+        __tauriModule: 'Shell',
+        message: {
+          cmd: 'open',
+          path: args.item.link,
+        },
+      })
+      break
+    case 'copy_link':
+      await navigator.clipboard.writeText(args.item.link)
+      break
+  }
+}
 
 onUnmounted(() => {
   unlistenProcesses()

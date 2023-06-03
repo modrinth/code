@@ -68,18 +68,18 @@ onUnmounted(() => unlisten())
         {
           label: 'Jump back in',
           instances: recentInstances,
-          downloaded: true
+          downloaded: true,
         },
         {
           label: 'Popular packs',
           instances: featuredModpacks,
-          downloaded: false
+          downloaded: false,
         },
         {
           label: 'Popular mods',
           instances: featuredMods,
-          downloaded: false
-        }
+          downloaded: false,
+        },
       ]"
       :can-paginate="true"
     />

@@ -2,16 +2,20 @@
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
-  ClipboardCopyIcon, EditIcon,
-  FolderOpenIcon, PlayIcon,
+  ClipboardCopyIcon,
+  FolderOpenIcon,
+  PlayIcon,
   PlusIcon,
   TrashIcon,
   DownloadIcon,
-  GlobeIcon, StopCircleIcon
+  GlobeIcon,
+  StopCircleIcon,
+  ExternalIcon,
+  EyeIcon,
 } from 'omorphia'
 import Instance from '@/components/ui/Instance.vue'
 import { onMounted, onUnmounted, ref } from 'vue'
-import ContextMenu from "@/components/ui/ContextMenu.vue";
+import ContextMenu from '@/components/ui/ContextMenu.vue'
 
 const props = defineProps({
   instances: {
@@ -32,47 +36,7 @@ const modsRow = ref(null)
 const instanceOptions = ref(null)
 const instanceComponents = ref(null)
 
-const baseOptions = [
-  { name: 'add_content' },
-  { name: 'divider' },
-  { name: 'edit' },
-  { name: 'open_folder' },
-  { name: 'copy_path' },
-  { name: 'divider' },
-  {
-    name: 'delete',
-    color: 'danger',
-  },
-]
-
-const playingOptions = ref([
-  {
-    name: 'play',
-    color: 'primary',
-  },
-  ... baseOptions
-])
-
-const stoppingOptions = ref([
-  {
-    name: 'stop',
-    color: 'danger',
-  },
-  ... baseOptions
-])
-
-const projectOptions = ref([
-  {
-    name: 'install',
-    color: 'primary',
-  },
-  { name: 'divider' },
-  { name: 'open_link'},
-  { name: 'copy_link'}
-])
-
 const handlePaginationDisplay = () => {
-
   for (let i = 0; i < props.instances.length; i++) {
     let parentsRow = modsRow.value[i]
 
@@ -100,12 +64,51 @@ onUnmounted(() => {
   if (props.canPaginate) window.removeEventListener('resize', handlePaginationDisplay)
 })
 
-const handleInstanceRightClick = (event, e) => {
-  console.log(event, e)
-  instanceOptions.value.showMenu(event, e)
+const handleInstanceRightClick = (event, passedInstance) => {
+  const baseOptions = [
+    { name: 'add_content' },
+    { type: 'divider' },
+    { name: 'edit' },
+    { name: 'open_folder' },
+    { name: 'copy_path' },
+    { type: 'divider' },
+    {
+      name: 'delete',
+      color: 'danger',
+    },
+  ]
 
-const handleInstanceRightClick = (event, e, passedOptions) => {
-  instanceOptions.value.showMenu(event, e, passedOptions)
+  const options = !passedInstance.instance.path
+    ? [
+        {
+          name: 'install',
+          color: 'primary',
+        },
+        { type: 'divider' },
+        {
+          name: 'open_link',
+        },
+        {
+          name: 'copy_link',
+        },
+      ]
+    : passedInstance.playing
+    ? [
+        {
+          name: 'stop',
+          color: 'danger',
+        },
+        ...baseOptions,
+      ]
+    : [
+        {
+          name: 'play',
+          color: 'primary',
+        },
+        ...baseOptions,
+      ]
+
+  instanceOptions.value.showMenu(event, passedInstance, options)
 }
 
 const handleOptionsClick = async (args) => {
@@ -135,10 +138,18 @@ const handleOptionsClick = async (args) => {
       args.item.install()
       break
     case 'open_link':
-      window.open(args.item.instance.project_url, '_blank')
+      window.__TAURI_INVOKE__('tauri', {
+        __tauriModule: 'Shell',
+        message: {
+          cmd: 'open',
+          path: `https://modrinth.com/${args.item.instance.project_type}/${args.item.instance.slug}`,
+        },
+      })
       break
     case 'copy_link':
-      await navigator.clipboard.writeText(args.item.instance.project_url)
+      await navigator.clipboard.writeText(
+        `https://modrinth.com/${args.item.instance.project_type}/${args.item.instance.slug}`
+      )
       break
   }
 }
@@ -170,46 +181,28 @@ const getInstanceIndex = (rowIndex, index) => {
           ref="instanceComponents"
           :key="instance?.project_id || instance?.id"
           :instance="instance"
-          @contextmenu.prevent.stop="event => handleInstanceRightClick(event, instanceComponents[getInstanceIndex(rowIndex, instanceIndex)], !row.downloaded ? projectOptions : instanceComponents[getInstanceIndex(rowIndex, instanceIndex)].playing ? stoppingOptions : playingOptions)"
+          @contextmenu.prevent.stop="
+            (event) =>
+              handleInstanceRightClick(
+                event,
+                instanceComponents[getInstanceIndex(rowIndex, instanceIndex)]
+              )
+          "
         />
       </section>
     </div>
   </div>
-  <ContextMenu
-    ref="instanceOptions"
-    :element-id="`instance-options`"
-    @option-clicked="handleOptionsClick"
-  >
-    <template #play>
-      <PlayIcon /> Play
-    </template>
-    <template #stop>
-      <StopCircleIcon /> Stop
-    </template>
-    <template #add_content>
-      <PlusIcon /> Add content
-    </template>
-    <template #edit>
-      <EditIcon /> Edit
-    </template>
-    <template #delete>
-      <TrashIcon /> Delete
-    </template>
-    <template #open_folder>
-      <FolderOpenIcon /> Open folder
-    </template>
-    <template #copy_path>
-      <ClipboardCopyIcon /> Copy path
-    </template>
-    <template #install>
-      <DownloadIcon /> Install
-    </template>
-    <template #open_link>
-      <GlobeIcon /> Open in Modrinth
-    </template>
-    <template #copy_link>
-      <ClipboardCopyIcon /> Copy link
-    </template>
+  <ContextMenu ref="instanceOptions" @option-clicked="handleOptionsClick">
+    <template #play> <PlayIcon /> Play </template>
+    <template #stop> <StopCircleIcon /> Stop </template>
+    <template #add_content> <PlusIcon /> Add content </template>
+    <template #edit> <EyeIcon /> View instance </template>
+    <template #delete> <TrashIcon /> Delete </template>
+    <template #open_folder> <FolderOpenIcon /> Open folder </template>
+    <template #copy_path> <ClipboardCopyIcon /> Copy path </template>
+    <template #install> <DownloadIcon /> Install </template>
+    <template #open_link> <GlobeIcon /> Open in Modrinth <ExternalIcon /> </template>
+    <template #copy_link> <ClipboardCopyIcon /> Copy link </template>
   </ContextMenu>
 </template>
 <style lang="scss" scoped>
