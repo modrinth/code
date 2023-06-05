@@ -1,5 +1,13 @@
 <template>
-  <Card class="card button-base" @click="$router.push(`/project/${project.project_id}/`)">
+  <Card
+    class="card button-base"
+    @click="
+      $router.push({
+        path: `/project/${project.project_id}/`,
+        query: { i: props.instance ? props.instance.path : undefined },
+      })
+    "
+  >
     <div class="icon">
       <Avatar :src="project.icon_url" size="md" class="search-icon" />
     </div>
@@ -117,14 +125,7 @@ const props = defineProps({
 })
 
 const installing = ref(false)
-
-const installed = ref(
-  props.instance
-    ? Object.values(props.instance.projects).some(
-        (p) => p.metadata?.project?.id === props.project.project_id
-      )
-    : false
-)
+const installed = ref(props.project.installed)
 
 async function install() {
   installing.value = true

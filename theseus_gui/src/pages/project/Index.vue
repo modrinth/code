@@ -231,7 +231,12 @@ import {
 } from '@/assets/external'
 import { get_categories, get_loaders } from '@/helpers/tags'
 import { install as packInstall } from '@/helpers/pack'
-import { list, add_project_from_version as installMod, check_installed } from '@/helpers/profile'
+import {
+  list,
+  add_project_from_version as installMod,
+  check_installed,
+  get as getInstance,
+} from '@/helpers/profile'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRoute, useRouter } from 'vue-router'
@@ -240,13 +245,10 @@ import { installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
-import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
-
-const searchStore = useSearch()
 
 const route = useRoute()
 const router = useRouter()
@@ -255,10 +257,9 @@ const breadcrumbs = useBreadcrumbs()
 const confirmModal = ref(null)
 const modInstallModal = ref(null)
 const incompatibilityWarning = ref(null)
-const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
 
-const [data, versions, members, dependencies, categories, loaders] = await Promise.all([
+const [data, versions, members, dependencies, categories, loaders, instance] = await Promise.all([
   useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project').then(shallowRef),
   useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project').then(
     shallowRef
@@ -271,6 +272,7 @@ const [data, versions, members, dependencies, categories, loaders] = await Promi
   ),
   get_loaders().then(ref).catch(handleError),
   get_categories().then(ref).catch(handleError),
+  route.query.i ? getInstance(route.query.i, true).then(ref) : Promise.resolve().then(ref),
 ])
 
 const installed = ref(

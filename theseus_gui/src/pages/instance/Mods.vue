@@ -30,6 +30,7 @@
           @click="
             router.push({
               path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+              query: { i: $route.params.id },
             })
           "
         >
@@ -75,7 +76,11 @@
           </Button>
         </div>
         <div class="table-cell table-text name-cell">
-          <router-link v-if="mod.slug" :to="`/project/${mod.slug}/`" class="mod-text">
+          <router-link
+            v-if="mod.slug"
+            :to="{ path: `/project/${mod.slug}/`, query: { i: props.instance.path } }"
+            class="mod-text"
+          >
             <Avatar :src="mod.icon" />
             {{ mod.name }}
           </router-link>

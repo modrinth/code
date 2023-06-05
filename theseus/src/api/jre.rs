@@ -156,7 +156,7 @@ pub async fn auto_install_java(java_version: u32) -> crate::Result<PathBuf> {
                 "Failed to extract java zip".to_string(),
             ))
         })?;
-        emit_loading(&loading_bar, 100.0, Some("Done extracting java")).await?;
+        emit_loading(&loading_bar, 10.0, Some("Done extracting java")).await?;
         Ok(path
             .join(
                 download

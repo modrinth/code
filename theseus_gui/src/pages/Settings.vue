@@ -21,35 +21,39 @@ fetchSettings.envArgs = fetchSettings.custom_env_args.map((x) => x.join('=')).jo
 const settings = ref(fetchSettings)
 const maxMemory = ref(Math.floor((await get_max_memory().catch(handleError)) / 1024))
 
-watch(settings.value, async (oldSettings, newSettings) => {
-  const setSettings = JSON.parse(JSON.stringify(newSettings))
+watch(
+  settings,
+  async (oldSettings, newSettings) => {
+    const setSettings = JSON.parse(JSON.stringify(newSettings))
 
-  if (setSettings.java_globals.JAVA_8?.path === '') {
-    setSettings.java_globals.JAVA_8 = undefined
-  }
-  if (setSettings.java_globals.JAVA_17?.path === '') {
-    setSettings.java_globals.JAVA_17 = undefined
-  }
+    if (setSettings.java_globals.JAVA_8?.path === '') {
+      setSettings.java_globals.JAVA_8 = undefined
+    }
+    if (setSettings.java_globals.JAVA_17?.path === '') {
+      setSettings.java_globals.JAVA_17 = undefined
+    }
 
-  setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
-  setSettings.custom_env_args = setSettings.envArgs
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((x) => x.split('=').filter(Boolean))
+    setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
+    setSettings.custom_env_args = setSettings.envArgs
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((x) => x.split('=').filter(Boolean))
 
-  if (!setSettings.hooks.pre_launch) {
-    setSettings.hooks.pre_launch = null
-  }
-  if (!setSettings.hooks.wrapper) {
-    setSettings.hooks.wrapper = null
-  }
-  if (!setSettings.hooks.post_exit) {
-    setSettings.hooks.post_exit = null
-  }
+    if (!setSettings.hooks.pre_launch) {
+      setSettings.hooks.pre_launch = null
+    }
+    if (!setSettings.hooks.wrapper) {
+      setSettings.hooks.wrapper = null
+    }
+    if (!setSettings.hooks.post_exit) {
+      setSettings.hooks.post_exit = null
+    }
 
-  await set(setSettings)
-})
+    await set(setSettings)
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -119,7 +123,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
           id="max-downloads"
           v-model="settings.max_concurrent_downloads"
           :min="1"
-          :max="100"
+          :max="10"
           :step="1"
         />
       </div>
@@ -136,7 +140,7 @@ watch(settings.value, async (oldSettings, newSettings) => {
           id="max-writes"
           v-model="settings.max_concurrent_writes"
           :min="1"
-          :max="100"
+          :max="50"
           :step="1"
         />
       </div>

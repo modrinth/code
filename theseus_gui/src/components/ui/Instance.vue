@@ -38,11 +38,14 @@ const modLoading = ref(
   props.instance.install_stage ? props.instance.install_stage !== 'installed' : false
 )
 
-watch(props.instance, () => {
-  modLoading.value = props.instance.install_stage
-    ? props.instance.install_stage !== 'installed'
-    : false
-})
+watch(
+  () => props.instance,
+  () => {
+    modLoading.value = props.instance.install_stage
+      ? props.instance.install_stage !== 'installed'
+      : false
+  }
+)
 
 const slots = useSlots()
 
@@ -286,7 +289,7 @@ onUnmounted(() => unlisten())
   &:hover {
     .cta {
       opacity: 1;
-      bottom: 5.5rem;
+      bottom: 4.75rem;
     }
 
     .instance-card-item {
@@ -323,7 +326,7 @@ onUnmounted(() => unlisten())
   width: 3rem;
   height: 3rem;
   right: 1.25rem;
-  bottom: 5rem;
+  bottom: 4.25rem;
   opacity: 0;
   transition: 0.2s ease-in-out bottom, 0.1s ease-in-out opacity, 0.1s ease-in-out filter !important;
   cursor: pointer;

@@ -105,8 +105,8 @@
         placeholder="Select categories..."
         @tag="
           (newTag) => {
-            groups.push(newTag)
-            availableGroups.push(newTag)
+            groups.push(newTag.trim().substring(0, 32))
+            availableGroups.push(newTag.trim().substring(0, 32))
           }
         "
       />
@@ -398,7 +398,8 @@ const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 watch(
   [
     title,
-    groups.value,
+    groups,
+    groups,
     overrideJavaInstall,
     javaInstall,
     overrideJavaArgs,
@@ -406,17 +407,17 @@ watch(
     overrideEnvVars,
     envVars,
     overrideMemorySettings,
-    memory.value,
+    memory,
     overrideWindowSettings,
-    resolution.value,
+    resolution,
     overrideHooks,
-    hooks.value,
+    hooks,
   ],
   async () => {
     const editProfile = {
       metadata: {
-        name: title.value,
-        groups: groups.value,
+        name: title.value.trim().substring(0, 16) ?? 'Instance',
+        groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
       },
       java: {},
     }
@@ -456,7 +457,8 @@ watch(
     }
 
     await edit(props.instance.path, editProfile)
-  }
+  },
+  { deep: true }
 )
 
 const repairing = ref(false)

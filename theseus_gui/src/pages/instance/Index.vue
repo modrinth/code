@@ -108,20 +108,19 @@ import { process_listener, profile_listener } from '@/helpers/events'
 import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import { handleError, useBreadcrumbs, useLoading, useSearch } from '@/store/state'
+import { handleError, useBreadcrumbs, useLoading } from '@/store/state'
 import { showInFolder } from '@/helpers/utils.js'
 
 const route = useRoute()
-const searchStore = useSearch()
 const breadcrumbs = useBreadcrumbs()
 
 const instance = ref(await get(route.params.id).catch(handleError))
 
-searchStore.instanceContext = instance.value
 breadcrumbs.setName('Instance', instance.value.metadata.name)
 breadcrumbs.setContext({
   name: instance.value.metadata.name,
   link: route.path,
+  query: route.query,
 })
 
 const loadingBar = useLoading()
@@ -162,7 +161,6 @@ const stopInstance = async () => {
 const unlistenProfiles = await profile_listener(async (event) => {
   if (event.path === route.params.id) {
     instance.value = await get(route.params.id).catch(handleError)
-    searchStore.instanceContext = instance.value
   }
 })
 
