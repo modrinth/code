@@ -1,7 +1,29 @@
 <template>
   <div class="root-container">
     <div v-if="data" class="project-sidebar">
-      <Instance v-if="instance" :instance="instance" small />
+      <div v-if="instance" class="small-instance">
+        <div class="instance">
+          <Avatar
+            :src="
+              !instance.metadata.icon ||
+              (instance.metadata.icon && instance.metadata.icon.startsWith('http'))
+                ? instance.metadata.icon
+                : convertFileSrc(instance.metadata?.icon)
+            "
+            :alt="instance.metadata.name"
+            size="sm"
+          />
+          <div class="small-instance_info">
+            <span class="title">{{ instance.metadata.name }}</span>
+            <span>
+              {{
+                instance.metadata.loader.charAt(0).toUpperCase() + instance.metadata.loader.slice(1)
+              }}
+              {{ instance.metadata.game_version }}
+            </span>
+          </div>
+        </div>
+      </div>
       <Card class="sidebar-card">
         <Avatar size="lg" :src="data.icon_url" />
         <div class="instance-info">
@@ -244,7 +266,6 @@ import { ref, shallowRef, watch } from 'vue'
 import { installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
-import Instance from '@/components/ui/Instance.vue'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
@@ -547,6 +568,30 @@ async function install(version) {
 
   :deep(svg) {
     color: var(--color-contrast);
+  }
+}
+
+.small-instance {
+  background: var(--color-bg);
+  padding: var(--gap-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--gap-md);
+
+  .instance {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    .title {
+      font-weight: 600;
+      color: var(--color-contrast);
+    }
+  }
+
+  .small-instance_info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
   }
 }
 </style>

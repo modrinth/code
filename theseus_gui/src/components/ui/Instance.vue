@@ -1,5 +1,5 @@
 <script setup>
-import { onUnmounted, ref, useSlots, watch } from 'vue'
+import { onUnmounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
@@ -23,10 +23,6 @@ const props = defineProps({
       return {}
     },
   },
-  small: {
-    type: Boolean,
-    default: false,
-  },
 })
 
 const confirmModal = ref(null)
@@ -46,8 +42,6 @@ watch(
       : false
   }
 )
-
-const slots = useSlots()
 
 const router = useRouter()
 
@@ -143,41 +137,7 @@ onUnmounted(() => unlisten())
 
 <template>
   <div class="instance">
-    <Card v-if="props.small" class="instance-small-card" :class="{ 'button-base': !slots.content }">
-      <div
-        class="instance-small-card__description"
-        :class="{ 'button-base': slots.content }"
-        @click="seeInstance"
-      >
-        <Avatar
-          :src="
-            !props.instance.metadata.icon ||
-            (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
-              ? props.instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
-          "
-          :alt="props.instance.metadata.name"
-          size="sm"
-        />
-        <div class="instance-small-card__info">
-          <span class="title">{{ props.instance.metadata.name }}</span>
-          {{
-            props.instance.metadata.loader.charAt(0).toUpperCase() +
-            props.instance.metadata.loader.slice(1)
-          }}
-          {{ props.instance.metadata.game_version }}
-        </div>
-      </div>
-      <div v-if="slots.content" class="instance-small-card__content">
-        <slot name="content" />
-      </div>
-    </Card>
-    <Card
-      v-else
-      class="instance-card-item button-base"
-      @click="seeInstance"
-      @mouseenter="checkProcess"
-    >
+    <Card class="instance-card-item button-base" @click="seeInstance" @mouseenter="checkProcess">
       <Avatar
         size="none"
         :src="
@@ -185,7 +145,7 @@ onUnmounted(() => unlisten())
             ? !props.instance.metadata.icon ||
               (props.instance.metadata.icon && props.instance.metadata.icon.startsWith('http'))
               ? props.instance.metadata.icon
-              : convertFileSrc(instance.metadata?.icon)
+              : convertFileSrc(props.instance.metadata?.icon)
             : props.instance.icon_url
         "
         alt="Mod card"
@@ -199,27 +159,25 @@ onUnmounted(() => unlisten())
         </p>
       </div>
     </Card>
-    <template v-if="!props.small">
-      <div
-        v-if="props.instance.metadata && playing === false && modLoading === false"
-        class="install cta button-base"
-        @click="play"
-      >
-        <PlayIcon />
-      </div>
-      <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
-        <AnimatedLogo class="loading-indicator" />
-      </div>
-      <div
-        v-else-if="playing === true"
-        class="stop cta button-base"
-        @click="stop"
-        @mousehover="checkProcess"
-      >
-        <XIcon />
-      </div>
-      <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
-    </template>
+    <div
+      v-if="props.instance.metadata && playing === false && modLoading === false"
+      class="install cta button-base"
+      @click="play"
+    >
+      <PlayIcon />
+    </div>
+    <div v-else-if="modLoading === true && playing === false" class="cta loading-cta">
+      <AnimatedLogo class="loading-indicator" />
+    </div>
+    <div
+      v-else-if="playing === true"
+      class="stop cta button-base"
+      @click="stop"
+      @mousehover="checkProcess"
+    >
+      <XIcon />
+    </div>
+    <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
     <InstanceInstallModal ref="modInstallModal" />
   </div>
@@ -238,51 +196,6 @@ onUnmounted(() => unlisten())
 </style>
 
 <style lang="scss" scoped>
-.instance-small-card {
-  background-color: var(--color-bg) !important;
-  display: flex;
-  flex-direction: column;
-  min-height: min-content !important;
-  gap: 0.5rem;
-  align-items: flex-start;
-  padding: 0;
-
-  .instance-small-card__description {
-    display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    gap: 1rem;
-    flex-grow: 1;
-    padding: var(--gap-xl);
-    padding-bottom: 0;
-    width: 100%;
-
-    &:not(.button-base) {
-      padding-bottom: var(--gap-xl);
-    }
-  }
-
-  .instance-small-card__info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-
-    .title {
-      color: var(--color-contrast);
-      font-weight: bolder;
-    }
-  }
-
-  .instance-small-card__content {
-    padding: var(--gap-xl);
-    padding-top: 0;
-  }
-
-  .cta {
-    display: none;
-  }
-}
-
 .instance {
   position: relative;
 
@@ -304,9 +217,7 @@ onUnmounted(() => unlisten())
       background: hsl(0, 0%, 91%) !important;
     }
   }
-}
 
-.light-mode {
   .instance-card-item {
     background: hsl(0, 0%, 100%) !important;
 

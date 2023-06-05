@@ -21,14 +21,15 @@ import { handleError } from '@/store/state'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import { get_categories, get_loaders, get_game_versions } from '@/helpers/tags'
 import { useRoute, useRouter } from 'vue-router'
+import { Avatar } from 'omorphia'
 import SearchCard from '@/components/ui/SearchCard.vue'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
-import Instance from '@/components/ui/Instance.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
 import { check_installed, get as getInstance } from '@/helpers/profile.js'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const router = useRouter()
 const route = useRoute()
@@ -465,22 +466,42 @@ const showLoaders = computed(
 <template>
   <div class="search-container">
     <aside class="filter-panel">
-      <Instance v-if="instanceContext" :instance="instanceContext" small>
-        <template #content>
-          <Checkbox
-            v-model="ignoreInstanceGameVersions"
-            label="Override game versions"
-            class="filter-checkbox"
-            @update:model-value="onSearchChangeToTop(1)"
+      <div v-if="instanceContext" class="small-instance">
+        <div class="instance">
+          <Avatar
+            :src="
+              !instanceContext.metadata.icon ||
+              (instanceContext.metadata.icon && instanceContext.metadata.icon.startsWith('http'))
+                ? instanceContext.metadata.icon
+                : convertFileSrc(instanceContext.metadata?.icon)
+            "
+            :alt="instanceContext.metadata.name"
+            size="sm"
           />
-          <Checkbox
-            v-model="ignoreInstanceLoaders"
-            label="Override loaders"
-            class="filter-checkbox"
-            @update:model-value="onSearchChangeToTop(1)"
-          />
-        </template>
-      </Instance>
+          <div class="small-instance_info">
+            <span class="title">{{ instanceContext.metadata.name }}</span>
+            <span>
+              {{
+                instanceContext.metadata.loader.charAt(0).toUpperCase() +
+                instanceContext.metadata.loader.slice(1)
+              }}
+              {{ instanceContext.metadata.game_version }}
+            </span>
+          </div>
+        </div>
+        <Checkbox
+          v-model="ignoreInstanceGameVersions"
+          label="Override game versions"
+          class="filter-checkbox"
+          @update:model-value="onSearchChangeToTop(1)"
+        />
+        <Checkbox
+          v-model="ignoreInstanceLoaders"
+          label="Override loaders"
+          class="filter-checkbox"
+          @update:model-value="onSearchChangeToTop(1)"
+        />
+      </div>
       <Card class="search-panel-card">
         <Button
           role="button"
@@ -671,6 +692,30 @@ const showLoaders = computed(
 
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 <style lang="scss">
+.small-instance {
+  background: var(--color-bg);
+  padding: var(--gap-lg);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--gap-md);
+
+  .instance {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+
+    .title {
+      font-weight: 600;
+      color: var(--color-contrast);
+    }
+  }
+
+  .small-instance_info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
 .filter-checkbox {
   margin-bottom: 0.3rem;
   font-size: 1rem;
