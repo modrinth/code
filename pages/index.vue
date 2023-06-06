@@ -63,7 +63,7 @@
       <div class="users-section">
         <div class="section-header">
           <div class="section-label green">For Players</div>
-          <h2 class="section-tagline">Discover over 5,000 creations</h2>
+          <h2 class="section-tagline">Discover over 10,000 creations</h2>
           <p class="section-description">
             From magical biomes to cursed dungeons, you can be sure to find content to bring your
             gameplay to the next level.
@@ -73,7 +73,7 @@
           <div class="blob-text">
             <h3>Find what you want, quickly and easily</h3>
             <p>
-              Modrinth’s lightning-fast search and powerful filters let you find what you want as
+              Modrinth's lightning-fast search and powerful filters let you find what you want as
               you type.
             </p>
           </div>
@@ -278,7 +278,7 @@
           </div>
           <h3>Discovery</h3>
           <p>
-            Get your project discovered by thousands of users through search, our home page, discord
+            Get your project discovered by thousands of users through search, our home page, Discord
             server, and more ways to come in the future!
           </p>
         </div>
@@ -307,7 +307,6 @@
           <h3>Team Management</h3>
           <p>Invite your teammates and manage roles and permissions with ease</p>
         </div>
-
         <div class="feature gradient-border">
           <div class="icon gradient-border">
             <svg viewBox="0 0 42 30" fill="none">
@@ -387,7 +386,7 @@
             </svg>
           </div>
           <div class="additional-label">Coming soon</div>
-          <h3>Data & Statistics</h3>
+          <h3>Data and Statistics</h3>
           <p>Get detailed reports on page views, download counts, and revenue</p>
         </div>
         <div class="feature gradient-border">
@@ -508,7 +507,7 @@
           <strong class="main-header-strong">Modrinth</strong>
         </h2>
         <a
-          href="https://blog.modrinth.com/subscribe?utm_source=website&utm_source=homepage&utm_campaign=newsletter"
+          href="https://blog.modrinth.com/?utm_source=website&utm_source=homepage&utm_campaign=newsletter"
           class="iconified-button brand-button"
         >
           Visit the blog
