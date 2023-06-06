@@ -313,7 +313,7 @@
             :searchable="false"
             :close-on-select="true"
             :show-labels="false"
-            :allow-empty="true"
+            :allow-empty="false"
           />
           <input
             v-model="newDependencyId"
