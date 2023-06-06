@@ -1,7 +1,7 @@
 {
   "name": "omorphia",
   "type": "module",
-  "version": "0.4.23",
+  "version": "0.4.24",
   "files": [
     "dist",
     "lib"

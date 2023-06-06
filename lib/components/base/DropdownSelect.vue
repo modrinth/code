@@ -7,6 +7,7 @@
     class="animated-dropdown"
     @focus="onFocus"
     @blur="onBlur"
+    @focusout="onBlur"
     @mousedown.prevent
     @keydown.enter.prevent="toggleDropdown"
     @keydown.up.prevent="focusPreviousOption"
@@ -72,15 +73,15 @@ const props = defineProps({
     required: true,
   },
   defaultValue: {
-    type: String,
+    type: [String, Number, Object],
     default: null,
   },
   placeholder: {
-    type: String,
+    type: [String, Number],
     default: null,
   },
   modelValue: {
-    type: String,
+    type: [String, Number, Object],
     default: null,
   },
   renderUp: {
@@ -147,6 +148,7 @@ const onFocus = () => {
 }
 
 const onBlur = (event) => {
+  console.log(event)
   if (!isChildOfDropdown(event.relatedTarget)) {
     dropdownVisible.value = false
   }
@@ -176,7 +178,7 @@ const focusNextOptionOrOpen = () => {
 const isChildOfDropdown = (element) => {
   let currentNode = element
   while (currentNode) {
-    if (currentNode === this.$el) {
+    if (currentNode === dropdown.value) {
       return true
     }
     currentNode = currentNode.parentNode
@@ -243,7 +245,7 @@ const isChildOfDropdown = (element) => {
 
   .options {
     z-index: 10;
-    max-height: min(12rem);
+    max-height: 18.75rem;
     overflow-y: auto;
     box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 

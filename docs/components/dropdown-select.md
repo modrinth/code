@@ -1,8 +1,11 @@
 # Dropdown
 <script setup>
-import { ref } from "vue";
+import {ref} from "vue";
 
-const value = ref(null)
+const value = ref(null);
+
+const newValue = ref(null);
+const options = ref([{ test: 'hello', display: 'no' }, { test: 'nob', display: 'yes' },  { test: 'ball', display: 'eat' }]);
 </script>
 
 <DemoContainer>
@@ -24,10 +27,10 @@ const value = ref(null)
     disabled
   />
   <DropdownSelect
-    v-model="value"
-    :options="['Daily', 'Weekly', 'Monthly', 'Tomorrow', 'Yesterday', 'Today', 'Biweekly', 'Tuesday', 'January']"
+    v-model="newValue"
+    :options="options"
     placeholder="Choose Frequency"
-    :display-name="(name) => name?.toUpperCase()"
+    :display-name="(name) => name?.display"
   />
 </DemoContainer>
 

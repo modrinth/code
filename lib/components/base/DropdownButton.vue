@@ -238,7 +238,7 @@ onBeforeUnmount(() => {
 
   .options {
     z-index: 10;
-    max-height: min(12rem);
+    max-height: 18.75remq;
     overflow-y: auto;
     box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
