@@ -22,7 +22,7 @@ use tokio::fs;
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
-struct PackFormat {
+pub struct PackFormat {
     pub game: String,
     pub format_version: i32,
     pub version_id: String,
@@ -34,7 +34,7 @@ struct PackFormat {
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
 #[serde(rename_all = "camelCase")]
-struct PackFile {
+pub struct PackFile {
     pub path: String,
     pub hashes: HashMap<PackFileHash, String>,
     pub env: Option<HashMap<EnvType, SideType>>,
@@ -44,7 +44,7 @@ struct PackFile {
 
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[serde(rename_all = "camelCase", from = "String")]
-enum PackFileHash {
+pub enum PackFileHash {
     Sha1,
     Sha512,
     Unknown(String),
@@ -62,14 +62,14 @@ impl From<String> for PackFileHash {
 
 #[derive(Serialize, Deserialize, Eq, PartialEq, Hash)]
 #[serde(rename_all = "camelCase")]
-enum EnvType {
+pub enum EnvType {
     Client,
     Server,
 }
 
 #[derive(Serialize, Deserialize, Clone, Hash, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
-enum PackDependency {
+pub enum PackDependency {
     Forge,
     FabricLoader,
     QuiltLoader,

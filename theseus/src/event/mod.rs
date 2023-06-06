@@ -173,6 +173,10 @@ pub enum LoadingBarType {
         profile_path: PathBuf,
         profile_name: String,
     },
+    ZipExtract {
+        profile_path: PathBuf,
+        profile_name: String,
+    },
 }
 
 #[derive(Serialize, Clone)]

@@ -3,6 +3,7 @@ use crate::event::emit::{init_loading, loading_try_for_each_concurrent};
 use crate::event::LoadingBarType;
 use crate::prelude::JavaVersion;
 use crate::state::ProjectMetadata;
+use crate::util::export;
 use crate::{
     auth::{self, refresh},
     event::{emit::emit_profile, ProfilePayloadType},
@@ -478,6 +479,56 @@ pub async fn remove_project(
         )
         .as_error())
     }
+}
+
+/// Exports the profile to a Modrinth-formatted .mrpack file
+// Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
+#[tracing::instrument]
+pub async fn export_mrpack(
+    profile_path: &Path,
+    export_path: PathBuf,
+    version_id: Option<String>,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let io_semaphore = state.io_semaphore.0.read().await;
+    let permit: tokio::sync::SemaphorePermit = io_semaphore.acquire().await?;
+
+    let profile = get(profile_path, None).await?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to export a nonexistent or unloaded profile at path {}!",
+            profile_path.display()
+        ))
+    })?;
+    export::export_mrpack(
+        &profile,
+        &export_path,
+        version_id.unwrap_or("1.0.0".to_string()),
+        true,
+        &permit,
+    )
+    .await?;
+    Ok(())
+}
+
+/// Exports the profile to a simple .zip file
+// Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
+#[tracing::instrument]
+pub async fn export_zip(
+    profile_path: &Path,
+    export_path: PathBuf,
+) -> crate::Result<()> {
+    let state = State::get().await?;
+    let io_semaphore = state.io_semaphore.0.read().await;
+    let permit: tokio::sync::SemaphorePermit = io_semaphore.acquire().await?;
+
+    let profile = get(profile_path, None).await?.ok_or_else(|| {
+        crate::ErrorKind::OtherError(format!(
+            "Tried to export a nonexistent or unloaded profile at path {}!",
+            profile_path.display()
+        ))
+    })?;
+    export::export_zip(&profile, &export_path, true, &permit).await?;
+    Ok(())
 }
 
 /// Run Minecraft using a profile and the default credentials, logged in credentials,

@@ -77,6 +77,8 @@ fn main() {
             api::profile::profile_add_project_from_path,
             api::profile::profile_toggle_disable_project,
             api::profile::profile_remove_project,
+            api::profile::profile_export_mrpack,
+            api::profile::profile_export_zip,
             api::profile::profile_run,
             api::profile::profile_run_wait,
             api::profile::profile_run_credentials,
