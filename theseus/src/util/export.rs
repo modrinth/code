@@ -221,7 +221,7 @@ pub fn create_mrpack_json(
 
     Ok(PackFormat {
         game: "minecraft".to_string(),
-        format_version: profile.metadata.format_version as i32,
+        format_version: 1,
         version_id,
         name: profile.metadata.name.clone(),
         summary: None,

@@ -562,8 +562,6 @@ async function saveGvLoaderEdits() {
   editing.value = false
   changeVersionsModal.value.hide()
 }
-
-onMounted(() => console.log(loader.value))
 </script>
 
 <style scoped lang="scss">
