@@ -50,12 +50,14 @@ export const configuredXss = new xss.FilterXSS({
     }
 
     // For Highlight.JS
-    if (
-      name === 'class' &&
-      ['pre', 'code', 'span'].includes(tag) &&
-      (value.startsWith('hljs-') || value.startsWith('language-'))
-    ) {
-      return name + '="' + xss.escapeAttrValue(value) + '"'
+    if (name === 'class' && ['pre', 'code', 'span'].includes(tag)) {
+      const allowedClasses = []
+      for (const className of value.split(/\s/g)) {
+        if (className.startsWith('hljs-') || className.startsWith('language-')) {
+          allowedClasses.push(className)
+        }
+      }
+      return name + '="' + xss.escapeAttrValue(allowedClasses.join(' ')) + '"'
     }
   },
   safeAttrValue(tag, name, value, cssFilter) {
