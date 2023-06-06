@@ -33,6 +33,19 @@ watch(
       setSettings.java_globals.JAVA_17 = undefined
     }
 
+    if (setSettings.java_globals.JAVA_8?.path) {
+      setSettings.java_globals.JAVA_8.path = setSettings.java_globals.JAVA_8.path.replace(
+        'java.exe',
+        'javaw.exe'
+      )
+    }
+    if (setSettings.java_globals.JAVA_17?.path) {
+      setSettings.java_globals.JAVA_17.path = setSettings.java_globals.JAVA_17?.path.replace(
+        'java.exe',
+        'javaw.exe'
+      )
+    }
+
     setSettings.custom_java_args = setSettings.javaArgs.trim().split(/\s+/).filter(Boolean)
     setSettings.custom_env_args = setSettings.envArgs
       .trim()

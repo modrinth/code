@@ -425,6 +425,10 @@ watch(
     if (overrideJavaInstall.value) {
       if (javaInstall.value.path !== '') {
         editProfile.java.override_version = javaInstall.value
+        editProfile.java.override_version.path = editProfile.java.override_version.path.replace(
+          'java.exe',
+          'javaw.exe'
+        )
       }
     }
 
