@@ -5,24 +5,33 @@
     role="combobox"
     :aria-expanded="dropdownVisible"
     class="animated-dropdown"
-    @focus="onFocus"
-    @blur="onBlur"
-    @mousedown.prevent
-    @keydown.enter.prevent="toggleDropdown"
-    @keydown.up.prevent="focusPreviousOption"
-    @keydown.down.prevent="focusNextOptionOrOpen"
   >
-    <div
-      class="selected"
-      :class="{
-        disabled: disabled,
-        'render-down': dropdownVisible && !renderUp && !disabled,
-        'render-up': dropdownVisible && renderUp && !disabled,
-      }"
-      @click="toggleDropdown"
-    >
-      <span>{{ selectedOption }}</span>
-      <i class="arrow" :class="{ rotate: dropdownVisible }"></i>
+    <div class="dropdown-row">
+      <Button
+        class="dropdown-button"
+        :class="{
+          'render-down': dropdownVisible && !renderUp && !disabled,
+          'render-up': dropdownVisible && renderUp && !disabled,
+        }"
+        :disabled="disabled"
+        @click="clickOption"
+      >
+        <slot :name="selectedOption" />
+      </Button>
+      <div
+        class="selected"
+        :class="{
+          disabled: disabled,
+          'button-base': !disabled,
+          'render-down': dropdownVisible && !renderUp && !disabled,
+          'render-up': dropdownVisible && renderUp && !disabled,
+        }"
+        @click="toggleDropdown"
+      >
+        <div class="arrow" :class="{ rotate: dropdownVisible }">
+          <DropdownIcon />
+        </div>
+      </div>
     </div>
     <div class="options-wrapper" :class="{ down: !renderUp, up: renderUp }">
       <transition name="options">
@@ -51,7 +60,9 @@
               :value="option"
               :name="name"
             />
-            <label :for="`${name}-${index}`">{{ displayName(option) }}</label>
+            <label :for="`${name}-${index}`" class="slot">
+              <slot :name="option" />
+            </label>
           </div>
         </div>
       </transition>
@@ -60,7 +71,8 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { Button, DropdownIcon } from '@/components'
 
 const props = defineProps({
   options: {
@@ -72,10 +84,6 @@ const props = defineProps({
     required: true,
   },
   defaultValue: {
-    type: String,
-    default: null,
-  },
-  placeholder: {
     type: String,
     default: null,
   },
@@ -91,22 +99,17 @@ const props = defineProps({
     type: Boolean,
     default: false,
   },
-  displayName: {
-    type: Function,
-    default: (option) => option,
-  },
 })
 
-const emit = defineEmits(['input', 'change', 'update:modelValue'])
+const emit = defineEmits(['input', 'change', 'update:modelValue', 'option-click'])
 
 const dropdownVisible = ref(false)
 const selectedValue = ref(props.modelValue || props.defaultValue)
-const focusedOptionIndex = ref(null)
 const dropdown = ref(null)
 const optionElements = ref(null)
 
 const selectedOption = computed(() => {
-  return props.displayName(selectedValue.value) || props.placeholder || 'Select an option'
+  return selectedValue.value
 })
 
 const radioValue = computed({
@@ -139,60 +142,57 @@ const selectOption = (option, index) => {
   dropdownVisible.value = false
 }
 
-const onFocus = () => {
-  if (!props.disabled) {
-    focusedOptionIndex.value = props.options.findIndex((option) => option === selectedValue.value)
-    dropdownVisible.value = true
-  }
+const clickOption = () => {
+  emit('option-click', { option: selectedOption.value })
+  dropdownVisible.value = false
 }
 
-const onBlur = (event) => {
-  if (!isChildOfDropdown(event.relatedTarget)) {
+const handleClickOutside = (event) => {
+  const elements = document.elementsFromPoint(event.clientX, event.clientY)
+  if (
+    dropdown.value.$el !== event.target &&
+    !elements.includes(dropdown.value.$el) &&
+    !dropdown.value.contains(event.target)
+  ) {
     dropdownVisible.value = false
   }
 }
 
-const focusPreviousOption = () => {
-  if (!props.disabled) {
-    if (!dropdownVisible.value) {
-      toggleDropdown()
-    }
-    focusedOptionIndex.value =
-      (focusedOptionIndex.value + props.options.length - 1) % props.options.length
-    optionElements.value[focusedOptionIndex.value].focus()
-  }
-}
+onMounted(() => {
+  window.addEventListener('click', handleClickOutside)
+})
 
-const focusNextOptionOrOpen = () => {
-  if (!props.disabled) {
-    if (!dropdownVisible.value) {
-      toggleDropdown()
-    }
-    focusedOptionIndex.value = (focusedOptionIndex.value + 1) % props.options.length
-    optionElements.value[focusedOptionIndex.value].focus()
-  }
-}
-
-const isChildOfDropdown = (element) => {
-  let currentNode = element
-  while (currentNode) {
-    if (currentNode === this.$el) {
-      return true
-    }
-    currentNode = currentNode.parentNode
-  }
-  return false
-}
+onBeforeUnmount(() => {
+  window.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style lang="scss" scoped>
 .animated-dropdown {
-  width: 20rem;
   position: relative;
   display: inline-block;
 
   &:focus {
     outline: 0;
+  }
+
+  .dropdown-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    .dropdown-button {
+      width: 100%;
+      border-radius: var(--radius-md) 0 0 var(--radius-md);
+
+      &.render-up {
+        border-radius: 0 0 0 var(--radius-md);
+      }
+
+      &.render-down {
+        border-radius: var(--radius-md) 0 0 0;
+      }
+    }
   }
 
   .selected {
@@ -203,7 +203,7 @@ const isChildOfDropdown = (element) => {
     background-color: var(--color-button-bg);
     cursor: pointer;
     user-select: none;
-    border-radius: var(--radius-md);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
     box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
     &.disabled {
@@ -213,11 +213,11 @@ const isChildOfDropdown = (element) => {
     }
 
     &.render-up {
-      border-radius: 0 0 var(--radius-md) var(--radius-md);
+      border-radius: 0 0 var(--radius-md) 0;
     }
 
     &.render-down {
-      border-radius: var(--radius-md) var(--radius-md) 0 0;
+      border-radius: 0 var(--radius-md) 0 0;
     }
 
     &:focus {
@@ -228,13 +228,8 @@ const isChildOfDropdown = (element) => {
 
     .arrow {
       display: inline-block;
-      width: 0;
-      height: 0;
-      margin-left: 0.4rem;
-      border-left: 0.4rem solid transparent;
-      border-right: 0.4rem solid transparent;
-      border-top: 0.4rem solid var(--color-base);
       transition: transform 0.2s ease;
+      padding: 1px;
       &.rotate {
         transform: rotate(180deg);
       }
@@ -254,6 +249,13 @@ const isChildOfDropdown = (element) => {
       padding: var(--gap-md);
       cursor: pointer;
       user-select: none;
+
+      .slot {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: var(--gap-sm);
+      }
 
       &:hover {
         filter: brightness(0.85);

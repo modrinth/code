@@ -29,6 +29,7 @@ export default {
           { text: 'Pagination', link: '/components/pagination' },
           { text: 'Modal', link: '/components/modal' },
           { text: 'Dropdown Select', link: '/components/dropdown-select' },
+          { text: 'Dropdown Button', link: '/components/dropdown-button' },
           { text: 'Project Card', link: '/components/project-card' },
           { text: 'Environment Indicator', link: '/components/environment-indicator' },
           { text: 'Categories', link: '/components/categories' },
