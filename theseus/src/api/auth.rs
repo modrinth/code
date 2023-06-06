@@ -1,6 +1,6 @@
 //! Authentication flow interface
 use crate::{launcher::auth as inner, State};
-use futures::prelude::*;
+use chrono::Utc;
 use tokio::sync::oneshot;
 
 use crate::state::AuthTask;
@@ -71,22 +71,20 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
     let state = State::get().await?;
     let mut users = state.users.write().await;
 
-    let fetch_semaphore = &state.fetch_semaphore;
-    futures::future::ready(users.get(user).ok_or_else(|| {
+    let mut credentials = users.get(user).ok_or_else(|| {
         crate::ErrorKind::OtherError(
             "You are not logged in with a Minecraft account!".to_string(),
         )
         .as_error()
-    }))
-    .and_then(|mut credentials| async move {
-        if chrono::offset::Utc::now() > credentials.expires {
-            inner::refresh_credentials(&mut credentials, fetch_semaphore)
-                .await?;
-        }
-        users.insert(&credentials).await?;
-        Ok(credentials)
-    })
-    .await
+    })?;
+
+    let fetch_semaphore = &state.fetch_semaphore;
+    if Utc::now() > credentials.expires {
+        inner::refresh_credentials(&mut credentials, fetch_semaphore).await?;
+    }
+    users.insert(&credentials).await?;
+
+    Ok(credentials)
 }
 
 /// Remove a user account from the database

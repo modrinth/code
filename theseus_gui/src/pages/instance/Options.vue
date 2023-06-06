@@ -82,6 +82,35 @@
         Edit versions
       </button>
     </div>
+
+    <div class="adjacent-input">
+      <label>
+        <span class="label__title">Categories</span>
+        <span class="label__description">
+          Set the categories of this instance, for display in the library page. This is purely
+          cosmetic.
+        </span>
+      </label>
+      <multiselect
+        v-model="groups"
+        :options="availableGroups"
+        :multiple="true"
+        :searchable="true"
+        :show-no-results="false"
+        :close-on-select="false"
+        :clear-search-on-select="false"
+        :show-labels="false"
+        :taggable="true"
+        tag-placeholder="Add new category"
+        placeholder="Select categories..."
+        @tag="
+          (newTag) => {
+            groups.push(newTag)
+            availableGroups.push(newTag)
+          }
+        "
+      />
+    </div>
   </section>
   <Card>
     <div class="label">
@@ -283,9 +312,10 @@ import {
   SaveIcon,
   HammerIcon,
 } from 'omorphia'
+import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
-import { edit, edit_icon, get_optimal_jre_key, install, remove } from '@/helpers/profile.js'
-import { computed, onMounted, readonly, ref, shallowRef, watch } from 'vue'
+import { edit, edit_icon, get_optimal_jre_key, install, list, remove } from '@/helpers/profile.js'
+import { computed, readonly, ref, shallowRef, watch } from 'vue'
 import { get_max_memory } from '@/helpers/jre.js'
 import { get } from '@/helpers/settings.js'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
@@ -306,6 +336,16 @@ const props = defineProps({
 
 const title = ref(props.instance.metadata.name)
 const icon = ref(props.instance.metadata.icon)
+const groups = ref(props.instance.metadata.groups)
+
+const instancesList = Object.values(await list(true))
+const availableGroups = ref([
+  ...new Set(
+    instancesList.reduce((acc, obj) => {
+      return acc.concat(obj.metadata.groups)
+    }, [])
+  ),
+])
 
 async function resetIcon() {
   icon.value = null
@@ -347,7 +387,7 @@ const envVars = ref(
 
 const overrideMemorySettings = ref(!!props.instance.memory)
 const memory = ref(props.instance.memory ?? globalSettings.memory)
-const maxMemory = (await get_max_memory().catch(handleError)) / 1024
+const maxMemory = Math.floor((await get_max_memory().catch(handleError)) / 1024)
 
 const overrideWindowSettings = ref(!!props.instance.resolution)
 const resolution = ref(props.instance.resolution ?? globalSettings.game_resolution)
@@ -358,6 +398,7 @@ const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 watch(
   [
     title,
+    groups.value,
     overrideJavaInstall,
     javaInstall,
     overrideJavaArgs,
@@ -375,6 +416,7 @@ watch(
     const editProfile = {
       metadata: {
         name: title.value,
+        groups: groups.value,
       },
       java: {},
     }

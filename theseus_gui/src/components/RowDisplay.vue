@@ -135,10 +135,13 @@ onUnmounted(() => {
     width: 100%;
     gap: 1rem;
     margin-right: auto;
-    margin-top: 0.8rem;
     scroll-behavior: smooth;
     overflow-x: scroll;
     overflow-y: hidden;
+
+    :deep(.instance-card-item) {
+      margin-bottom: 0.1rem;
+    }
 
     &::-webkit-scrollbar {
       width: 0px;
@@ -149,9 +152,7 @@ onUnmounted(() => {
 
 .dark-mode {
   .row {
-    &:nth-child(odd) {
-      background-color: rgb(30, 31, 34);
-    }
+    background-color: rgb(30, 31, 34);
   }
 }
 

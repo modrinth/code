@@ -30,8 +30,6 @@
       </div>
     </div>
     <div ref="logContainer" class="log-text">
-      <!--      {{ logs[1] }}-->
-
       <span v-for="line in logs[selectedLogIndex]?.stdout.split('\n')" :key="line" class="no-wrap">
         {{ line }} <br />
       </span>

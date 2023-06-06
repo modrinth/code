@@ -16,7 +16,7 @@
       </div>
       <span class="manage">
         <span class="text-combo">
-          <span class="sort"> Sort by </span>
+          <span class="no-wrap sort"> Sort by </span>
           <DropdownSelect
             v-model="sortFilter"
             name="sort-by"
@@ -34,7 +34,7 @@
           "
         >
           <PlusIcon />
-          <span> Add content </span>
+          <span class="no-wrap"> Add content </span>
         </Button>
       </span>
     </div>

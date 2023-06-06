@@ -34,15 +34,16 @@ pub fn show_in_folder(path: String) -> Result<()> {
 
         #[cfg(target_os = "linux")]
         {
+            use std::fs;
             use std::fs::metadata;
             use std::path::PathBuf;
 
-            if path.contains(',') {
+            if path.contains(",") {
                 // see https://gitlab.freedesktop.org/dbus/dbus/-/issues/76
                 let new_path = match metadata(&path)?.is_dir() {
-                    true => path,
+                    true => path.clone(),
                     false => {
-                        let mut path2 = PathBuf::from(path);
+                        let mut path2 = PathBuf::from(path.clone());
                         path2.pop();
                         path2.to_string_lossy().to_string()
                     }
