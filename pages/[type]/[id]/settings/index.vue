@@ -148,9 +148,41 @@
         <label for="project-visibility">
           <span class="label__title">Visibility</span>
           <span class="label__description">
-            Set the visibility of your project. Listed and archived projects are visible in search.
-            Unlisted projects are published, but not visible in search or on user profiles. Private
-            projects are only accessible by members of the project.
+            Listed and archived projects are visible in search. Unlisted projects are published, but
+            not visible in search or on user profiles. Private projects are only accessible by
+            members of the project.
+            <ul class="visibility-info">
+              <li>
+                <CheckIcon
+                  v-if="visibility === 'approved' || visibility === 'archived'"
+                  class="good"
+                />
+                <ExitIcon v-else class="bad" />
+                {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible in search
+              </li>
+              <li>
+                <ExitIcon
+                  v-if="visibility === 'unlisted' || visibility === 'private'"
+                  class="bad"
+                />
+                <CheckIcon v-else class="good" />
+                {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible on profile
+              </li>
+              <li>
+                <CheckIcon v-if="visibility !== 'private'" class="good" />
+                <IssuesIcon
+                  v-else
+                  v-tooltip="{
+                    content:
+                      visibility === 'private'
+                        ? 'Only members will be able to view the project.'
+                        : '',
+                  }"
+                  class="warn"
+                />
+                {{ hasModifiedVisibility() ? 'Will be v' : 'V' }}isible via URL
+              </li>
+            </ul>
           </span>
         </label>
         <Multiselect
@@ -211,6 +243,9 @@ import FileInput from '~/components/ui/FileInput'
 import UploadIcon from '~/assets/images/utils/upload.svg'
 import SaveIcon from '~/assets/images/utils/save.svg'
 import TrashIcon from '~/assets/images/utils/trash.svg'
+import ExitIcon from '~/assets/images/utils/x.svg'
+import IssuesIcon from '~/assets/images/utils/issues.svg'
+import CheckIcon from '~/assets/images/utils/check.svg'
 
 export default defineNuxtComponent({
   components: {
@@ -221,6 +256,9 @@ export default defineNuxtComponent({
     UploadIcon,
     SaveIcon,
     TrashIcon,
+    ExitIcon,
+    CheckIcon,
+    IssuesIcon,
   },
   props: {
     project: {
@@ -335,6 +373,13 @@ export default defineNuxtComponent({
     },
   },
   methods: {
+    hasModifiedVisibility() {
+      const originalVisibility = this.$tag.approvedStatuses.includes(this.project.status)
+        ? this.project.status
+        : this.project.requested_status
+
+      return originalVisibility !== this.visibility
+    },
     async saveChanges() {
       if (this.hasChanges) {
         await this.patchProject(this.patchData)
@@ -393,6 +438,25 @@ export default defineNuxtComponent({
 })
 </script>
 <style lang="scss" scoped>
+.visibility-info {
+  padding: 0;
+  list-style: none;
+}
+
+svg {
+  &.good {
+    color: var(--color-brand-green);
+  }
+
+  &.bad {
+    color: var(--color-special-red);
+  }
+
+  &.warn {
+    color: var(--color-special-orange);
+  }
+}
+
 .summary-input {
   min-height: 8rem;
   max-width: 24rem;
