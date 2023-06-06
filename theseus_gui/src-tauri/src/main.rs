@@ -78,6 +78,7 @@ fn main() {
             api::profile::profile_toggle_disable_project,
             api::profile::profile_remove_project,
             api::profile::profile_export_mrpack,
+            api::profile::profile_get_potential_override_folders,
             api::profile::profile_run,
             api::profile::profile_run_wait,
             api::profile::profile_run_credentials,

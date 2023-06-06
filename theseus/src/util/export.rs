@@ -9,11 +9,9 @@ use async_zip::tokio::write::ZipFileWriter;
 use async_zip::{Compression, ZipEntryBuilder};
 use std::collections::HashMap;
 use std::path::{Path, PathBuf};
+use tokio::fs::{self, File};
 use tokio::io::AsyncReadExt;
 use tokio::sync::SemaphorePermit;
-use tokio::{
-    fs::{self, File},
-};
 
 /// Creates a .mrpack (Modrinth zip file) for a given modpack
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
@@ -23,6 +21,7 @@ pub async fn export_mrpack(
     profile: &Profile,
     export_location: &Path,
     version_id: String,
+    included_overrides: Vec<String>, // which folders to include in the overrides
     loading_bar: bool,
     _semaphore: &SemaphorePermit<'_>,
 ) -> crate::Result<()> {
@@ -71,7 +70,26 @@ pub async fn export_mrpack(
         if let Some(ref loading_bar) = loading_bar {
             emit_loading(loading_bar, 1.0, None).await?;
         }
+
+        // Get local path of file, relative to profile folder
         let name = path.strip_prefix(profile_base_path)?;
+
+        // Get highest level folder ('a' in 'a/b/c')
+        // If the highest level folder is not in the included_overrides list, skip it
+        let topmost = name
+            .iter()
+            .next()
+            .ok_or_else(|| {
+                crate::ErrorKind::OtherError(
+                    "No topmost folder found".to_string(),
+                )
+            })?
+            .to_string_lossy()
+            .to_string();
+        if !included_overrides.contains(&topmost) {
+            continue;
+        }
+
         let name = name.to_string_lossy();
         let name = name.replace('\\', "/");
         let name = name.trim_start_matches('/').to_string();
@@ -228,4 +246,26 @@ pub async fn build_folder(
         }
     }
     Ok(())
+}
+
+// Given a folder path, populate a Vec of all the subfolders
+// Intended to be used for finding potential override folders
+// profile
+// -- folder1
+// -- folder2
+// -- file1
+// => [folder1, folder2]
+pub async fn get_potential_override_folders(
+    profile_path: PathBuf,
+) -> crate::Result<Vec<PathBuf>> {
+    let mut path_list = Vec::new();
+    let mut read_dir = fs::read_dir(&profile_path).await?;
+    while let Some(entry) = read_dir.next_entry().await? {
+        let path = entry.path();
+        if path.is_dir() {
+            let name = path.strip_prefix(&profile_path)?.to_path_buf();
+            path_list.push(name);
+        }
+    }
+    Ok(path_list)
 }

@@ -487,12 +487,12 @@ pub async fn remove_project(
 pub async fn export_mrpack(
     profile_path: &Path,
     export_path: PathBuf,
+    included_overrides: Vec<String>, // which folders to include in the overrides
     version_id: Option<String>,
 ) -> crate::Result<()> {
     let state = State::get().await?;
     let io_semaphore = state.io_semaphore.0.read().await;
     let permit: tokio::sync::SemaphorePermit = io_semaphore.acquire().await?;
-
     let profile = get(profile_path, None).await?.ok_or_else(|| {
         crate::ErrorKind::OtherError(format!(
             "Tried to export a nonexistent or unloaded profile at path {}!",
@@ -503,11 +503,26 @@ pub async fn export_mrpack(
         &profile,
         &export_path,
         version_id.unwrap_or("1.0.0".to_string()),
+        included_overrides,
         true,
         &permit,
     )
     .await?;
     Ok(())
+}
+
+// Given a folder path, populate a Vec of all the subfolders
+// Intended to be used for finding potential override folders
+// profile
+// -- folder1
+// -- folder2
+// -- file1
+// => [folder1, folder2]
+#[tracing::instrument]
+pub async fn get_potential_override_folders(
+    profile_path: PathBuf,
+) -> crate::Result<Vec<PathBuf>> {
+    export::get_potential_override_folders(profile_path).await
 }
 
 /// Run Minecraft using a profile and the default credentials, logged in credentials,

@@ -73,7 +73,9 @@ pub async fn refresh(user: uuid::Uuid) -> crate::Result<Credentials> {
 
     let fetch_semaphore = &state.fetch_semaphore;
     futures::future::ready(users.get(user).ok_or_else(|| {
-        crate::ErrorKind::OtherError("You are not logged in with a Minecraft account!".to_string())
+        crate::ErrorKind::OtherError(
+            "You are not logged in with a Minecraft account!".to_string(),
+        )
         .as_error()
     }))
     .and_then(|mut credentials| async move {
