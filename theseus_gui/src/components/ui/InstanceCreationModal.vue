@@ -64,6 +64,15 @@
           <p class="warning">Select a game version before you select a loader version</p>
         </div>
       </div>
+      <hr class="card-divider labeled-divider">
+      <div class="file-upload">
+        <Button>
+          <FolderOpenIcon/> Create from file
+        </Button>
+        <div>
+          <InfoIcon/> Or you can drag and drop your modpack file
+        </div>
+      </div>
       <div class="input-group push-right">
         <Button @click="toggle_advanced">
           <CodeIcon />
@@ -93,6 +102,8 @@ import {
   XIcon,
   CodeIcon,
   Checkbox,
+  FolderOpenIcon,
+  InfoIcon
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
@@ -283,5 +294,27 @@ const toggle_advanced = () => {
 
 .selector {
   max-width: 20rem;
+}
+
+.labeled-divider {
+  text-align: center;
+}
+
+.labeled-divider:after {
+  background-color: var(--color-raised-bg);
+  content: 'Or';
+  color: var(--color-base);
+  padding: var(--gap-sm);
+  position: relative;
+  top: -0.5rem;
+}
+
+.file-upload {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
 }
 </style>
