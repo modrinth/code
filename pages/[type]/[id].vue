@@ -402,11 +402,9 @@
           :collapsed="collapsedChecklist"
           :toggle-collapsed="() => (collapsedChecklist = !collapsedChecklist)"
         />
-        <div v-if="project.status === 'withheld'" class="card warning" aria-label="Warning">
-          {{ project.title }} is not viewable in search because it has been found to be in violation
-          of one of <nuxt-link to="/legal/rules"> Modrinth's content rules </nuxt-link>. Modrinth
-          makes no guarantees as to whether {{ project.title }} is safe for use in a multiplayer
-          context.
+        <div v-else-if="project.status === 'withheld'" class="card warning" aria-label="Warning">
+          {{ project.title }} has been removed from search by Modrinth's moderators. Please use
+          {{ project.title }} at your own risk.
         </div>
         <div v-if="project.status === 'archived'" class="card warning" aria-label="Warning">
           {{ project.title }} has been archived. {{ project.title }} will not receive any further
