@@ -14,14 +14,17 @@ export const configuredXss = new xss.FilterXSS({
     kbd: ['id'],
     input: ['checked', 'disabled', 'type'],
     iframe: ['width', 'height', 'allowfullscreen', 'frameborder', 'start', 'end'],
-    img: [...xss.whiteList.img, 'usemap'],
+    img: [...xss.whiteList.img, 'usemap', 'style'],
     map: ['name'],
     area: [...xss.whiteList.a, 'coords'],
     a: [...xss.whiteList.a, 'rel'],
+    td: [...xss.whiteList.td, 'style'],
+    th: [...xss.whiteList.th, 'style'],
   },
   css: {
     whiteList: {
       'image-rendering': /^pixelated$/,
+      'text-align': /^center|left|right$/,
     },
   },
   onIgnoreTagAttr: (tag, name, value) => {
