@@ -318,18 +318,6 @@ async function removeMod(mod) {
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 }
 
-const handleRightClick = (event, mod) => {
-  if (mod.slug && mod.project_type) {
-    props.options.showMenu(
-      event,
-      {
-        link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
-      },
-      [{ name: 'open_link' }, { name: 'copy_link' }]
-    )
-  }
-}
-
 const handleContentOptionClick = async (args) => {
   console.log(args)
   if (args.option === 'search') {
