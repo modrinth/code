@@ -147,16 +147,6 @@ pub async fn profile_export_mrpack(
     Ok(())
 }
 
-// Exports a profile to a .zip file (epxort_location should end in .zip)
-// invoke('profile_export_zip')
-#[tauri::command]
-pub async fn profile_export_zip(
-    path: &Path,
-    export_location: PathBuf,
-) -> Result<()> {
-    profile::export_zip(path, export_location).await?;
-    Ok(())
-}
 
 // Run minecraft using a profile using the default credentials
 // Returns the UUID, which can be used to poll

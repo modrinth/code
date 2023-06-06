@@ -95,12 +95,6 @@ export async function export_profile_mrpack(path, exportLocation, versionId) {
   return await invoke('profile_export_mrpack', { path, exportLocation, versionId })
 }
 
-// Export a profile to .zip
-// Version id is optional (ie: 1.1.5)
-export async function export_profile_zip(path, exportLocation) {
-  return await invoke('profile_export_zip', { path, exportLocation })
-}
-
 // Run Minecraft using a pathed profile
 // Returns PID of child
 export async function run(path) {

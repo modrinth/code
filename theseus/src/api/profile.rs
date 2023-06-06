@@ -510,27 +510,6 @@ pub async fn export_mrpack(
     Ok(())
 }
 
-/// Exports the profile to a simple .zip file
-// Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
-#[tracing::instrument]
-pub async fn export_zip(
-    profile_path: &Path,
-    export_path: PathBuf,
-) -> crate::Result<()> {
-    let state = State::get().await?;
-    let io_semaphore = state.io_semaphore.0.read().await;
-    let permit: tokio::sync::SemaphorePermit = io_semaphore.acquire().await?;
-
-    let profile = get(profile_path, None).await?.ok_or_else(|| {
-        crate::ErrorKind::OtherError(format!(
-            "Tried to export a nonexistent or unloaded profile at path {}!",
-            profile_path.display()
-        ))
-    })?;
-    export::export_zip(&profile, &export_path, true, &permit).await?;
-    Ok(())
-}
-
 /// Run Minecraft using a profile and the default credentials, logged in credentials,
 /// failing with an error if no credentials are available
 #[tracing::instrument]

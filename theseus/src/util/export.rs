@@ -15,62 +15,6 @@ use tokio::{
     fs::{self, File},
 };
 
-#[tracing::instrument(skip(_semaphore))]
-#[theseus_macros::debug_pin]
-pub async fn export_zip(
-    profile: &Profile,
-    export_location: &Path,
-    loading_bar: bool,
-    _semaphore: &SemaphorePermit<'_>,
-) -> crate::Result<()> {
-    let profile_base_path = &profile.path;
-
-    let mut file = File::create(export_location).await?;
-    let mut writer = ZipFileWriter::new(&mut file);
-
-    // Build vec of all files in the folder
-    let mut path_list = Vec::new();
-    build_folder(profile_base_path, &mut path_list).await?;
-
-    let loading_bar = if loading_bar {
-        Some(
-            init_loading(
-                LoadingBarType::ZipExtract {
-                    profile_path: profile_base_path.to_path_buf(),
-                    profile_name: profile.metadata.name.clone(),
-                },
-                path_list.len() as f64,
-                "Exporting profile to .zip",
-            )
-            .await?,
-        )
-    } else {
-        None
-    };
-
-    for path in path_list {
-        let name = path.strip_prefix(profile_base_path)?;
-        let name = name.to_string_lossy();
-        let name = name.replace('\\', "/");
-        let name = name.trim_start_matches('/');
-
-        if let Some(ref loading_bar) = loading_bar {
-            emit_loading(loading_bar, 1.0, None).await?;
-        }
-        if path.is_file() {
-            let mut file = File::open(&path).await?;
-            let mut data = Vec::new();
-            file.read_to_end(&mut data).await?;
-            let builder =
-                ZipEntryBuilder::new(name.into(), Compression::Deflate);
-            writer.write_entry_whole(builder, &data).await?;
-        }
-    }
-    writer.close().await?;
-
-    Ok(())
-}
-
 /// Creates a .mrpack (Modrinth zip file) for a given modpack
 // Version ID of uploaded version (ie 1.1.5), not the unique identifying ID of the version (nvrqJg44)
 #[tracing::instrument]
