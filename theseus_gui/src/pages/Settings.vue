@@ -116,6 +116,24 @@ watch(
           "
         />
       </div>
+      <div class="adjacent-input">
+        <label for="minimize-launcher">
+          <span class="label__title">Minimize launcher</span>
+          <span class="label__description"
+            >Minimize the launcher when a Minecraft process starts.</span
+          >
+        </label>
+        <Toggle
+          id="minimize-launcher"
+          :model-value="settings.hide_on_process"
+          :checked="settings.hide_on_process"
+          @update:model-value="
+            (e) => {
+              settings.hide_on_process = e
+            }
+          "
+        />
+      </div>
     </Card>
     <Card>
       <div class="label">

@@ -87,6 +87,10 @@ pub enum ErrorKind {
 
     #[error("File watching error: {0}")]
     NotifyError(#[from] notify::Error),
+
+    #[cfg(feature = "tauri")]
+    #[error("Tauri error: {0}")]
+    TauriError(#[from] tauri::Error),
 }
 
 #[derive(Debug)]

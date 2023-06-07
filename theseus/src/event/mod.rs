@@ -1,5 +1,6 @@
 //! Theseus state management system
 use serde::{Deserialize, Serialize};
+use tauri::Manager;
 use std::{collections::HashMap, path::PathBuf, sync::Arc};
 use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
@@ -50,6 +51,12 @@ impl EventState {
         Ok(EVENT_STATE.get().ok_or(EventError::NotInitialized)?.clone())
     }
 
+    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
+    #[cfg(not(feature = "tauri"))]
+    pub async fn get() -> crate::Result<Arc<Self>> {
+        Self::init().await
+    }
+    
     // Values provided should not be used directly, as they are clones and are not guaranteed to be up-to-date
     pub async fn list_progress_bars() -> crate::Result<HashMap<Uuid, LoadingBar>>
     {
@@ -64,11 +71,18 @@ impl EventState {
         Ok(display_list)
     }
 
-    // Initialization requires no app handle in non-tauri mode, so we can just use the same function
-    #[cfg(not(feature = "tauri"))]
-    pub async fn get() -> crate::Result<Arc<Self>> {
-        Self::init().await
+    pub async fn get_main_window() -> crate::Result<Option<tauri::Window>> {
+        let value = Self::get().await?;
+        #[cfg(feature = "tauri")]
+        {
+            Ok(value.app.get_window("main"))
+        }
+        #[cfg(not(feature = "tauri"))]
+        {
+            None
+        }
     }
+
 }
 
 #[derive(Serialize, Debug, Clone)]

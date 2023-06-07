@@ -1,4 +1,5 @@
 //! Logic for launching Minecraft
+use crate::EventState;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::jre::{JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
@@ -439,6 +440,16 @@ pub async fn launch_minecraft(
         async { Ok(()) }
     })
     .await?;
+
+    // If in tauri, and the 'minimize on launch' setting is enabled, minimize the window
+    let window = EventState::get_main_window().await?;
+    #[cfg(feature = "tauri")]
+    if let Some(window) = window {
+        let settings = state.settings.read().await;
+        if settings.hide_on_process {
+            window.minimize()?;
+        }
+    }
 
     // Create Minecraft child by inserting it into the state
     // This also spawns the process and prepares the subsequent processes

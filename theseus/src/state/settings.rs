@@ -27,6 +27,8 @@ pub struct Settings {
     pub version: u32,
     pub collapsed_navigation: bool,
     #[serde(default)]
+    pub hide_on_process: bool,
+    #[serde(default)]
     pub developer_mode: bool,
 }
 
@@ -45,6 +47,7 @@ impl Default for Settings {
             max_concurrent_writes: 10,
             version: CURRENT_FORMAT_VERSION,
             collapsed_navigation: false,
+            hide_on_process: false,
             developer_mode: false,
         }
     }
