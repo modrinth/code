@@ -125,17 +125,18 @@ import {
 } from 'omorphia'
 import { computed, ref } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
-import {useRouter} from 'vue-router'
+import { useRouter } from 'vue-router'
 import {
-  add_project_from_path, get,
+  add_project_from_path,
+  get,
   remove_project,
   toggle_disable_project,
   update_all,
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import {open} from "@tauri-apps/api/dialog";
-import {listen} from "@tauri-apps/api/event";
+import { open } from '@tauri-apps/api/dialog'
+import { listen } from '@tauri-apps/api/event'
 
 const router = useRouter()
 
@@ -197,7 +198,6 @@ const initProjects = (initInstance) => {
 }
 
 initProjects(props.instance)
-
 
 const searchFilter = ref('')
 const sortFilter = ref('')
@@ -337,7 +337,7 @@ const handleContentOptionClick = async (args) => {
   }
 }
 
-listen('tauri://file-drop', async event => {
+listen('tauri://file-drop', async (event) => {
   console.log(event)
   for (const file of event.payload) {
     await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)

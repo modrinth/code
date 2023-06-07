@@ -78,14 +78,10 @@
           {{ creating ? 'Creating...' : 'Create' }}
         </Button>
       </div>
-      <hr class="card-divider labeled-divider">
+      <hr class="card-divider labeled-divider" />
       <div class="file-upload">
-        <Button @click="openFile">
-          <FolderOpenIcon/> Import a project from a file
-        </Button>
-        <div class="info">
-          <InfoIcon/> Or drag and drop your modpack file
-        </div>
+        <Button @click="openFile"> <FolderOpenIcon /> Import a project from a file </Button>
+        <div class="info"><InfoIcon /> Or drag and drop your modpack file</div>
       </div>
     </div>
   </Modal>
@@ -103,7 +99,7 @@ import {
   CodeIcon,
   Checkbox,
   FolderOpenIcon,
-  InfoIcon
+  InfoIcon,
 } from 'omorphia'
 import { computed, ref, shallowRef } from 'vue'
 import { get_loaders } from '@/helpers/tags'
@@ -118,8 +114,8 @@ import {
 } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
-import {listen} from "@tauri-apps/api/event";
-import {install_from_file} from "@/helpers/pack.js";
+import { listen } from '@tauri-apps/api/event'
+import { install_from_file } from '@/helpers/pack.js'
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -256,7 +252,7 @@ const openFile = async () => {
   modal.value.hide()
 }
 
-listen('tauri://file-drop', async event => {
+listen('tauri://file-drop', async (event) => {
   console.log(event)
   await install_from_file(event.payload[0]).catch(handleError)
   modal.value.hide()
