@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::state::SafeProcesses;
 pub use crate::{
     state::{
         Hooks, JavaSettings, MemorySettings, Profile, Settings, WindowSize,
@@ -39,5 +40,11 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
     }
 
     State::sync().await?;
+    Ok(())
+}
+
+pub async fn await_sync() -> crate::Result<()> {
+    SafeProcesses::wait_for_completion(crate::state::ProcessType::SaveSettings)
+        .await?;
     Ok(())
 }

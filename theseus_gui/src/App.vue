@@ -13,13 +13,15 @@ import {
 import { handleError, useLoading, useTheming } from '@/store/state'
 import AccountsCard from '@/components/ui/AccountsCard.vue'
 import InstanceCreationModal from '@/components/ui/InstanceCreationModal.vue'
-import { get } from '@/helpers/settings'
+import { await_sync, get } from '@/helpers/settings'
 import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
 import { useNotifications } from '@/store/notifications.js'
 import { warning_listener } from '@/helpers/events.js'
+import { window } from '@tauri-apps/api'
+import { TauriEvent } from '@tauri-apps/api/event'
 
 const themeStore = useTheming()
 
@@ -36,6 +38,12 @@ onMounted(async () => {
       type: 'warn',
     })
   )
+
+  window.getCurrent().listen(TauriEvent.WINDOW_CLOSE_REQUESTED, () => {
+    await_sync().then(() => {
+      window.getCurrent().close()
+    })
+  })
 })
 
 defineExpose({

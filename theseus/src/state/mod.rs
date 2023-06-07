@@ -46,6 +46,9 @@ pub use self::tags::*;
 mod java_globals;
 pub use self::java_globals::*;
 
+mod safe_processes;
+pub use self::safe_processes::*;
+
 // Global state
 static LAUNCHER_STATE: OnceCell<Arc<State>> = OnceCell::const_new();
 pub struct State {
@@ -75,6 +78,8 @@ pub struct State {
     pub(crate) users: RwLock<Users>,
     /// Launcher tags
     pub(crate) tags: RwLock<Tags>,
+    /// Launcher processes that should be safely exited on shutdown
+    pub(crate) safety_processes: RwLock<SafeProcesses>,
 
     /// File watcher debouncer
     pub(crate) file_watcher: RwLock<Debouncer<RecommendedWatcher>>,
@@ -132,6 +137,7 @@ impl State {
 
                     let children = Children::new();
                     let auth_flow = AuthTask::new();
+                    let safety_processes = SafeProcesses::new();
                     emit_loading(&loading_bar, 10.0, None).await?;
 
                     Ok(Arc::new(Self {
@@ -151,6 +157,7 @@ impl State {
                         children: RwLock::new(children),
                         auth_flow: RwLock::new(auth_flow),
                         tags: RwLock::new(tags),
+                        safety_processes: RwLock::new(safety_processes),
                         file_watcher: RwLock::new(file_watcher),
                     }))
                 }
