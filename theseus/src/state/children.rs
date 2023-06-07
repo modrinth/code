@@ -10,9 +10,9 @@ use tokio::process::{ChildStderr, ChildStdout};
 use tokio::sync::RwLock;
 use tracing::error;
 
-use crate::EventState;
 use crate::event::emit::emit_process;
 use crate::event::ProcessPayloadType;
+use crate::EventState;
 use tokio::task::JoinHandle;
 use uuid::Uuid;
 
@@ -135,13 +135,9 @@ impl Children {
 
         // If in tauri, window should show itself again after process exists if it was hidden
         let window = EventState::get_main_window().await?;
-        println!("window: {:?}", window);
         #[cfg(feature = "tauri")]
         if let Some(window) = window {
-            println!("unminimizing");
             window.unminimize()?;
-            println!("unminimized {:?}", window.is_minimized()?);
-            window.maximize()?;
         }
 
         if !mc_exit_status.success() {

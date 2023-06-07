@@ -1,10 +1,10 @@
 //! Logic for launching Minecraft
-use crate::EventState;
 use crate::event::emit::{emit_loading, init_or_edit_loading};
 use crate::event::{LoadingBarId, LoadingBarType};
 use crate::jre::{JAVA_17_KEY, JAVA_18PLUS_KEY, JAVA_8_KEY};
 use crate::prelude::JavaVersion;
 use crate::state::ProfileInstallStage;
+use crate::EventState;
 use crate::{
     process,
     state::{self as st, MinecraftChild},
