@@ -54,6 +54,12 @@ pub async fn progress_bars_list(
     Ok(res)
 }
 
+// Check if there are any safe loading bars running
+#[tauri::command]
+pub async fn check_safe_loading_bars() -> Result<bool> {
+    Ok(theseus::safety::check_safe_loading_bars().await?)
+}
+
 // This is a very simple macro that implements a very basic Serializable for each variant of TheseusSerializableError,
 // where the field is the string. (This allows easy extension to errors without many match arms)
 macro_rules! impl_serialize {

@@ -38,7 +38,7 @@ pub async fn settings_set(settings: Settings) -> Result<()> {
 
 // Waits for settings to be synced
 #[tauri::command]
-pub async fn settings_await_sync() -> Result<()> {
-    settings::await_sync().await?;
+pub async fn settings_await_settings_sync() -> Result<()> {
+    settings::await_settings_sync().await?;
     Ok(())
 }

@@ -43,7 +43,7 @@ pub async fn set(settings: Settings) -> crate::Result<()> {
     Ok(())
 }
 
-pub async fn await_sync() -> crate::Result<()> {
+pub async fn await_settings_sync() -> crate::Result<()> {
     SafeProcesses::wait_for_completion(crate::state::ProcessType::SaveSettings)
         .await?;
     Ok(())

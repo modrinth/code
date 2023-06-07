@@ -39,6 +39,6 @@ export async function set(settings) {
 }
 
 // Wait for settings to sync
-export async function await_sync() {
-  return await invoke('settings_await_sync')
+export async function await_settings_sync() {
+  return await invoke('settings_await_settings_sync')
 }

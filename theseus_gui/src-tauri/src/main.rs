@@ -64,6 +64,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             api::progress_bars_list,
+            api::check_safe_loading_bars,
             api::profile_create::profile_create_empty,
             api::profile_create::profile_create,
             api::profile::profile_remove,
@@ -102,7 +103,7 @@ fn main() {
             api::tags::tags_get_tag_bundle,
             api::settings::settings_get,
             api::settings::settings_set,
-            api::settings::settings_await_sync,
+            api::settings::settings_await_settings_sync,
             api::jre::jre_get_all_jre,
             api::jre::jre_autodetect_java_globals,
             api::jre::jre_find_jre_18plus_jres,

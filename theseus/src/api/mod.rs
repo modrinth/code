@@ -7,6 +7,7 @@ pub mod pack;
 pub mod process;
 pub mod profile;
 pub mod profile_create;
+pub mod safety;
 pub mod settings;
 pub mod tags;
 

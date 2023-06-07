@@ -1,8 +1,7 @@
 //! Theseus state management system
-use crate::event::emit::emit_loading;
+use crate::event::emit::{emit_loading, init_loading_unsafe};
 use std::path::PathBuf;
 
-use crate::event::emit::init_loading;
 use crate::event::LoadingBarType;
 use crate::loading_join;
 
@@ -93,7 +92,7 @@ impl State {
         LAUNCHER_STATE
             .get_or_try_init(|| {
                 async {
-                    let loading_bar = init_loading(
+                    let loading_bar = init_loading_unsafe(
                         LoadingBarType::StateInit,
                         100.0,
                         "Initializing launcher",

@@ -1,7 +1,10 @@
 use super::LoadingBarId;
-use crate::event::{
-    EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
-    ProfilePayloadType,
+use crate::{
+    event::{
+        EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
+        ProfilePayloadType,
+    },
+    state::{ProcessType, SafeProcesses},
 };
 use futures::prelude::*;
 use std::path::PathBuf;
@@ -52,6 +55,17 @@ pub async fn init_loading(
     total: f64,
     title: &str,
 ) -> crate::Result<LoadingBarId> {
+    let key = init_loading_unsafe(bar_type, total, title).await?;
+    SafeProcesses::add_uuid(ProcessType::LoadingBar, key.0).await?;
+    Ok(key)
+}
+
+#[theseus_macros::debug_pin]
+pub async fn init_loading_unsafe(
+    bar_type: LoadingBarType,
+    total: f64,
+    title: &str,
+) -> crate::Result<LoadingBarId> {
     let event_state = crate::EventState::get().await?;
     let key = LoadingBarId(Uuid::new_v4());
 
@@ -76,8 +90,6 @@ pub async fn init_loading(
                         ).unwrap()
                         .progress_chars("#>-"),
                 );
-                //pb.set_message(title);
-
                 pb
             },
         },

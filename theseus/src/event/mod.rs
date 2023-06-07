@@ -5,6 +5,8 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
+use crate::state::SafeProcesses;
+
 pub mod emit;
 
 // Global event state
@@ -91,8 +93,6 @@ pub struct LoadingBarId(Uuid);
 impl Drop for LoadingBarId {
     fn drop(&mut self) {
         let loader_uuid = self.0;
-        let _event = LoadingBarType::StateInit;
-        let _message = "finished".to_string();
         tokio::spawn(async move {
             if let Ok(event_state) = EventState::get().await {
                 let mut bars = event_state.loading_bars.write().await;
@@ -132,6 +132,11 @@ impl Drop for LoadingBarId {
                 #[cfg(not(any(feature = "tauri", feature = "cli")))]
                 bars.remove(&loader_uuid);
             }
+            let _ = SafeProcesses::complete(
+                crate::state::ProcessType::LoadingBar,
+                loader_uuid,
+            )
+            .await;
         });
     }
 }
