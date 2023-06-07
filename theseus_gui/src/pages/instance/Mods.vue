@@ -299,7 +299,6 @@ async function updateProject(mod) {
 
 async function toggleDisableMod(mod) {
   mod.path = await toggle_disable_project(props.instance.path, mod.path).catch(handleError)
-  console.log(mod.disabled)
   mod.disabled = !mod.disabled
 }
 

@@ -141,8 +141,8 @@
             <span>Wiki</span>
           </a>
           <a
-            v-if="data.wiki_url"
-            :href="data.wiki_url"
+            v-if="data.discord_url"
+            :href="data.discord_url"
             class="title"
             rel="noopener nofollow ugc external"
           >

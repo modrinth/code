@@ -1,5 +1,5 @@
 <script setup>
-import { computed, nextTick, ref, shallowReadonly, shallowRef, watch } from 'vue'
+import { computed, nextTick, ref, readonly, shallowRef, watch } from 'vue'
 import {
   Pagination,
   Checkbox,
@@ -49,14 +49,14 @@ const selectedVersions = ref([])
 const onlyOpenSource = ref(false)
 const showSnapshots = ref(false)
 const selectedEnvironments = ref([])
-const sortTypes = shallowReadonly([
+const sortTypes = readonly([
   { display: 'Relevance', name: 'relevance' },
   { display: 'Download count', name: 'downloads' },
   { display: 'Follow count', name: 'follows' },
   { display: 'Recently published', name: 'newest' },
   { display: 'Recently updated', name: 'updated' },
 ])
-const sortType = ref({ display: 'Relevance', name: 'relevance' })
+const sortType = ref(sortTypes[0])
 const maxResults = ref(20)
 const currentPage = ref(1)
 const projectType = ref(route.params.projectType)
@@ -639,10 +639,10 @@ const showLoaders = computed(
             v-model="maxResults"
             name="Max results"
             :options="[5, 10, 15, 20, 50, 100]"
-            :default-value="maxResults.toString()"
-            :model-value="maxResults.toString()"
+            :default-value="maxResults"
+            :model-value="maxResults"
             class="limit-dropdown"
-            @change="onSearchChange"
+            @change="onSearchChange(1)"
           />
         </div>
       </Card>

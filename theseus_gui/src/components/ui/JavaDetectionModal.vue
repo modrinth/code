@@ -52,14 +52,12 @@ const currentSelected = ref({})
 defineExpose({
   show: async (version, currentSelectedJava) => {
     if (version <= 8 && !!version) {
-      console.log(version)
       chosenInstallOptions.value = await find_jre_8_jres().catch(handleError)
     } else if (version >= 18) {
       chosenInstallOptions.value = await find_jre_18plus_jres().catch(handleError)
     } else if (version) {
       chosenInstallOptions.value = await find_jre_17_jres().catch(handleError)
     } else {
-      console.log('get all')
       chosenInstallOptions.value = await get_all_jre().catch(handleError)
     }
 
