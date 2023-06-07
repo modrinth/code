@@ -120,6 +120,7 @@ import {
   AnimatedLogo,
   Chips,
   FolderOpenIcon,
+  DropdownButton,
   formatProjectType,
 } from 'omorphia'
 import { computed, ref } from 'vue'
@@ -133,7 +134,6 @@ import {
   update_project,
 } from '@/helpers/profile.js'
 import { handleError } from '@/store/notifications.js'
-import DropdownButton from "@/components/ui/DropdownButton.vue";
 import {open} from "@tauri-apps/api/dialog";
 import {listen} from "@tauri-apps/api/event";
 

@@ -64,15 +64,6 @@
           <p class="warning">Select a game version before you select a loader version</p>
         </div>
       </div>
-      <hr class="card-divider labeled-divider">
-      <div class="file-upload">
-        <Button>
-          <FolderOpenIcon/> Create from file
-        </Button>
-        <div>
-          <InfoIcon/> Or you can drag and drop your modpack file
-        </div>
-      </div>
       <div class="input-group push-right">
         <Button @click="toggle_advanced">
           <CodeIcon />
@@ -86,6 +77,15 @@
           <PlusIcon v-if="!creating" />
           {{ creating ? 'Creating...' : 'Create' }}
         </Button>
+      </div>
+      <hr class="card-divider labeled-divider">
+      <div class="file-upload">
+        <Button @click="openFile">
+          <FolderOpenIcon/> Import a project from a file
+        </Button>
+        <div class="info">
+          <InfoIcon/> Or drag and drop your modpack file
+        </div>
       </div>
     </div>
   </Modal>
@@ -118,6 +118,8 @@ import {
 } from '@/helpers/metadata'
 import { handleError } from '@/store/notifications.js'
 import Multiselect from 'vue-multiselect'
+import {listen} from "@tauri-apps/api/event";
+import {install_from_file} from "@/helpers/pack.js";
 
 const profile_name = ref('')
 const game_version = ref('')
@@ -245,14 +247,28 @@ const selectable_versions = computed(() => {
 const toggle_advanced = () => {
   showAdvanced.value = !showAdvanced.value
 }
+
+const openFile = async () => {
+  const newProject = await open({ multiple: false })
+  if (!newProject) return
+
+  await install_from_file(newProject).catch(handleError)
+  modal.value.hide()
+}
+
+listen('tauri://file-drop', async event => {
+  console.log(event)
+  await install_from_file(event.payload[0]).catch(handleError)
+  modal.value.hide()
+})
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .modal-body {
   display: flex;
   flex-direction: column;
-  padding: 1rem;
-  gap: 1rem;
+  padding: var(--gap-lg);
+  gap: var(--gap-md);
 }
 
 .input-label {
@@ -316,5 +332,13 @@ const toggle_advanced = () => {
   justify-content: center;
   align-content: center;
   align-items: center;
+  margin-bottom: 1rem;
+
+  .info {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+  }
 }
 </style>
