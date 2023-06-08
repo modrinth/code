@@ -313,9 +313,12 @@ where
         let token: &str = token.trim_start_matches("Bearer ");
 
         // Tokens beginning with Ory are considered to be Kratos tokens (in reality, extracted cookies) and can be forwarded to Minos
-        let possible_user = match token.split_at(4) {
-            ("mod_", _) => get_user_from_pat(token, executor).await?,
-            ("ory_", _) => get_user_from_minos_session_token(token, executor).await?,
+        let possible_user = match token.split_once('_') {
+            Some(("modrinth", _)) => get_user_from_pat(token, executor).await?,
+            Some(("ory", _)) => get_user_from_minos_session_token(token, executor).await?,
+            Some(("github", _)) | Some(("gho", _)) | Some(("ghp", _)) => {
+                get_user_from_github_token(token, executor).await?
+            }
             _ => return Err(AuthenticationError::InvalidAuthMethod),
         };
         Ok(possible_user)
@@ -341,9 +344,34 @@ where
         );
     let res = req.send().await?.error_for_status()?;
     let minos_user: MinosUser = res.json().await?;
-
     let db_user = models::User::get_from_minos_kratos_id(minos_user.id.clone(), executor).await?;
     Ok(db_user)
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct GitHubUser {
+    pub id: u64,
+}
+// Get a database user from a GitHub PAT
+pub async fn get_user_from_github_token<'a, E>(
+    access_token: &str,
+    executor: E,
+) -> Result<Option<user_item::User>, AuthenticationError>
+where
+    E: sqlx::Executor<'a, Database = sqlx::Postgres>,
+{
+    let github_user: GitHubUser = reqwest::Client::new()
+        .get("https://api.github.com/user")
+        .header(reqwest::header::USER_AGENT, "Modrinth")
+        .header(
+            reqwest::header::AUTHORIZATION,
+            format!("token {access_token}"),
+        )
+        .send()
+        .await?
+        .json()
+        .await?;
+    Ok(user_item::User::get_from_github_id(github_user.id, executor).await?)
 }
 
 pub async fn check_is_moderator_from_headers<'a, 'b, E>(

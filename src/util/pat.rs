@@ -75,7 +75,7 @@ where
     Ok(None)
 }
 
-// Generate a new 128 char PAT token starting with 'mod_'
+// Generate a new 128 char PAT token starting with 'modrinth_pat_'
 pub async fn generate_pat(
     con: &mut sqlx::Transaction<'_, sqlx::Postgres>,
 ) -> Result<String, DatabaseError> {
@@ -86,9 +86,9 @@ pub async fn generate_pat(
     // First generate the PAT token as a random 128 char string. This may include uppercase and lowercase and numbers only.
     loop {
         let mut access_token = String::with_capacity(63);
-        access_token.push_str("mod_");
-        for _ in 0..60 {
-            let c = rng.gen_range(0..60);
+        access_token.push_str("modrinth_pat_");
+        for _ in 0..51 {
+            let c = rng.gen_range(0..62);
             if c < 10 {
                 access_token.push(char::from_u32(c + 48).unwrap()); // 0-9
             } else if c < 36 {

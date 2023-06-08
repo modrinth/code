@@ -78,7 +78,7 @@ pub async fn get_pats(req: HttpRequest, pool: Data<PgPool>) -> Result<HttpRespon
 
 // POST /pat
 // Create a new personal access token for the given user. Minos/Kratos cookie must be attached for it to work.
-// All PAT tokens are base62 encoded, and are prefixed with "mod_"
+// All PAT tokens are base62 encoded, and are prefixed with "modrinth_pat_"
 #[post("pat")]
 pub async fn create_pat(
     req: HttpRequest,

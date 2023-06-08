@@ -20,6 +20,7 @@ pub fn config(cfg: &mut web::ServiceConfig) {
         web::scope("admin")
             .service(count_download)
             .service(add_minos_user)
+            .service(edit_github_id)
             .service(get_legacy_account)
             .service(process_payout),
     );
@@ -35,6 +36,44 @@ pub async fn add_minos_user(
     let minos_new_user = minos_user.into_inner();
     let mut transaction = client.begin().await?;
     link_or_insert_new_user(&mut transaction, minos_new_user).await?;
+    transaction.commit().await?;
+    Ok(HttpResponse::Ok().finish())
+}
+
+// Add or update a user's GitHub ID by their kratos id
+// OIDC ids should be kept in Minos, but Github is duplicated in Labrinth for legacy support
+// This should not be directly useable by applications, only by the Minos backend
+// user id is passed in path, github id is passed in body
+#[derive(Deserialize)]
+pub struct EditGithubId {
+    github_id: Option<String>,
+}
+#[post("_edit_github_id/{kratos_id}", guard = "admin_key_guard")]
+pub async fn edit_github_id(
+    pool: web::Data<PgPool>,
+    kratos_id: web::Path<String>,
+    github_id: web::Json<EditGithubId>,
+) -> Result<HttpResponse, ApiError> {
+    let github_id = github_id.into_inner().github_id;
+    // Parse error if github inner id not a number
+    let github_id = github_id
+        .as_ref()
+        .map(|x| x.parse::<i64>())
+        .transpose()
+        .map_err(|_| ApiError::InvalidInput("Github id must be a number".to_string()))?;
+
+    let mut transaction = pool.begin().await?;
+    sqlx::query!(
+        "
+        UPDATE users
+        SET github_id = $1
+        WHERE kratos_id = $2
+        ",
+        github_id,
+        kratos_id.into_inner()
+    )
+    .execute(&mut transaction)
+    .await?;
     transaction.commit().await?;
     Ok(HttpResponse::Ok().finish())
 }

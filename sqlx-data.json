@@ -4827,6 +4827,19 @@
     },
     "query": "\n            DELETE FROM dependencies WHERE mod_dependency_id = NULL AND dependency_id = NULL AND dependency_file_name = NULL\n            "
   },
+  "af3f99ebd31aab8c911c9843dd8be814f302b41c9f7712944af14ab291fc0bdc": {
+    "describe": {
+      "columns": [],
+      "nullable": [],
+      "parameters": {
+        "Left": [
+          "Int8",
+          "Text"
+        ]
+      }
+    },
+    "query": "\n        UPDATE users\n        SET github_id = $1\n        WHERE kratos_id = $2\n        "
+  },
   "b0c29c51bd3ae5b93d487471a98ee9bbb43a4df468ba781852b137dd315b9608": {
     "describe": {
       "columns": [],
