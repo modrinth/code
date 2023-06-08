@@ -30,6 +30,10 @@ struct Payload {
 }
 
 fn main() {
+
+    tauri_plugin_deep_link::prepare("com.modrinth.theseus");
+
+
     /*
        tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
            ERROR > WARN > INFO > DEBUG > TRACE
@@ -61,6 +65,18 @@ fn main() {
                 .unwrap();
         }))
         .plugin(tauri_plugin_window_state::Builder::default().build())
+        .setup(|app| {
+            let handle = app.handle();
+            tauri_plugin_deep_link::register(
+                "theseus-scheme",
+                move |request: String| {
+                dbg!(&request);
+                handle.emit_all("scheme-request-received", request).unwrap();
+                },
+            ).unwrap();
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             initialize_state,
             api::progress_bars_list,

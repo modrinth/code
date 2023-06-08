@@ -2065,6 +2065,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "interprocess"
+version = "1.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "81f2533f3be42fffe3b5e63b71aeca416c1c3bc33e4e27be018521e76b1f38fb"
+dependencies = [
+ "cfg-if",
+ "libc",
+ "rustc_version",
+ "to_method",
+ "winapi",
+]
+
+[[package]]
 name = "io-lifetimes"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2635,6 +2648,28 @@ dependencies = [
  "objc",
  "objc_id",
 ]
+
+[[package]]
+name = "objc-sys"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da30ff0a93f6801dc6c4f384ebe70146a40aac8ebf34e4e8ff1f528e859318a3"
+
+[[package]]
+name = "objc2"
+version = "0.3.0-beta.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ef3a6024722b4230242a53e5b5759ce117548983696b8e4b7bc2fd1f8fce621e"
+dependencies = [
+ "objc-sys",
+ "objc2-encode",
+]
+
+[[package]]
+name = "objc2-encode"
+version = "2.0.0-pre.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8f8f7297b786454a87e392631e2b2754ed59a7b413effa8521225d93f46b2192"
 
 [[package]]
 name = "objc_exception"
@@ -4070,6 +4105,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "tauri-plugin-deep-link"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "33a3ae55bcfe692e5361edc4708bd9f415270cc02e1cdba8ab7768566208b4e2"
+dependencies = [
+ "dirs 5.0.1",
+ "interprocess",
+ "log",
+ "objc2",
+ "once_cell",
+ "tauri-utils",
+ "windows-sys 0.48.0",
+ "winreg 0.50.0",
+]
+
+[[package]]
 name = "tauri-plugin-single-instance"
 version = "0.0.0"
 source = "git+https://github.com/tauri-apps/plugins-workspace?branch=v1#07406f1c9d7817c95dc9ebf4bfe2cdb1ea352045"
@@ -4289,6 +4340,7 @@ dependencies = [
  "serde_json",
  "tauri",
  "tauri-build",
+ "tauri-plugin-deep-link",
  "tauri-plugin-single-instance",
  "tauri-plugin-window-state",
  "theseus",
@@ -4405,6 +4457,12 @@ name = "tinyvec_macros"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
+
+[[package]]
+name = "to_method"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c7c4ceeeca15c8384bbc3e011dbd8fccb7f068a440b752b7d9b32ceb0ca0e2e8"
 
 [[package]]
 name = "tokio"
