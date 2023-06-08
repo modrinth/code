@@ -29,6 +29,8 @@ pub struct Settings {
     #[serde(default)]
     pub hide_on_process: bool,
     #[serde(default)]
+    pub default_page: DefaultPage,
+    #[serde(default)]
     pub developer_mode: bool,
 }
 
@@ -48,6 +50,7 @@ impl Default for Settings {
             version: CURRENT_FORMAT_VERSION,
             collapsed_navigation: false,
             hide_on_process: false,
+            default_page: DefaultPage::Home,
             developer_mode: false,
         }
     }
@@ -156,4 +159,17 @@ pub struct Hooks {
     pub wrapper: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub post_exit: Option<String>,
+}
+
+/// Opening window to start with
+#[derive(Serialize, Deserialize, Debug, Clone, Copy)]
+pub enum DefaultPage {
+    Home,
+    Library
+}
+
+impl Default for DefaultPage {
+    fn default() -> Self {
+        Self::Home
+    }
 }

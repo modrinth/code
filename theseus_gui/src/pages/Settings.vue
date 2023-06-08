@@ -6,6 +6,8 @@ import { get, set } from '@/helpers/settings'
 import { get_max_memory } from '@/helpers/jre'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 
+const pageOptions = ['Home', 'Library']
+
 const themeStore = useTheming()
 
 const fetchSettings = await get().catch(handleError)
@@ -130,6 +132,25 @@ watch(
           @update:model-value="
             (e) => {
               settings.hide_on_process = e
+            }
+          "
+        />
+      </div>
+      <div class="opening-page">
+        <label for="opening-page">
+          <span class="label__title">Default landing page</span>
+          <span class="label__description">Change the page to which the launcher opens on.</span>
+        </label>
+        <DropdownSelect
+          id="opening-page"
+          name="Opening page dropdown"
+          :options="pageOptions"
+          :default-value="settings.default_page"
+          :model-value="settings.default_page"
+          class="opening-page"
+          @change="
+            (e) => {
+              settings.default_page = e.option
             }
           "
         />
