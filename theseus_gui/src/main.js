@@ -9,7 +9,6 @@ import FloatingVue from 'floating-vue'
 import { initialize_state } from '@/helpers/state'
 import loadCssMixin from './mixins/macCssFix.js'
 import { get } from '@/helpers/settings'
-import { command_listener } from '@/helpers/events'
 
 const pinia = createPinia()
 
@@ -20,10 +19,6 @@ app.use(FloatingVue)
 app.mixin(loadCssMixin)
 
 const mountedApp = app.mount('#app')
-
-await command_listener((event) => {
-  console.log(event)
-})
 
 initialize_state()
   .then(() => {

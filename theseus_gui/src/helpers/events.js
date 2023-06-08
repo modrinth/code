@@ -79,7 +79,6 @@ export async function profile_listener(callback) {
 */
 export async function command_listener(callback) {
   return await listen('command', (event) => {
-    console.log(event.payload)
     callback(event.payload)
   })
 }
