@@ -62,7 +62,11 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "wix": {
+          "fragmentPaths": [".msi/registry.wxs"],
+          "componentRefs": ["TheseusFragmentRegistryEntries"]
+        }
       }
     },
     "security": {
