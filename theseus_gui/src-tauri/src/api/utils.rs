@@ -73,3 +73,8 @@ pub fn show_in_folder(path: String) -> Result<()> {
 
     Ok(())
 }
+
+pub async fn handle_deep_link(url: String) -> Result<()> {
+    dbg!(&url);
+    Ok(theseus::handler::handle_url(&url).await?)
+}

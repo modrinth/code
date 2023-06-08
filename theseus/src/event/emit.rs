@@ -1,14 +1,15 @@
 use super::LoadingBarId;
 use crate::{
     event::{
-        EventError, LoadingBar, LoadingBarType, ProcessPayloadType,
-        ProfilePayloadType,
+        CommandPayload, EventError, LoadingBar, LoadingBarType,
+        ProcessPayloadType, ProfilePayloadType,
     },
+    handler,
     state::{ProcessType, SafeProcesses},
 };
 use futures::prelude::*;
 use std::path::PathBuf;
-use tracing::warn;
+use tracing::{debug, warn};
 
 #[cfg(feature = "tauri")]
 use crate::event::{
@@ -228,6 +229,25 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
             .map_err(EventError::from)?;
     }
     warn!("{}", message);
+    Ok(())
+}
+
+// emit_warning(message)
+#[allow(dead_code)]
+#[allow(unused_variables)]
+pub async fn emit_command(
+    command: handler::DeepLinkCommandType,
+    id: String,
+) -> crate::Result<()> {
+    debug!("{} {}", serde_json::to_string(&command)?, &id);
+    #[cfg(feature = "tauri")]
+    {
+        let event_state = crate::EventState::get().await?;
+        event_state
+            .app
+            .emit_all("command", CommandPayload { command, id })
+            .map_err(EventError::from)?;
+    }
     Ok(())
 }
 

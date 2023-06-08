@@ -165,7 +165,7 @@ pub struct Hooks {
 #[derive(Serialize, Deserialize, Debug, Clone, Copy)]
 pub enum DefaultPage {
     Home,
-    Library
+    Library,
 }
 
 impl Default for DefaultPage {

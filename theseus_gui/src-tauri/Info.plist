@@ -13,7 +13,6 @@
                 <array>
                     <!-- register the myapp:// and myscheme:// schemes -->
                     <string>modrinth</string>
-                    <string>theseus-scheme</string>
                 </array>
             </dict>
         </array>

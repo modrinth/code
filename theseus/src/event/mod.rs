@@ -5,6 +5,7 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
+use crate::handler::DeepLinkCommandType;
 use crate::state::SafeProcesses;
 
 pub mod emit;
@@ -196,6 +197,12 @@ pub struct LoadingPayload {
 #[derive(Serialize, Clone)]
 pub struct WarningPayload {
     pub message: String,
+}
+
+#[derive(Serialize, Clone)]
+pub struct CommandPayload {
+    pub command: DeepLinkCommandType,
+    pub id: String,
 }
 
 #[derive(Serialize, Clone)]
