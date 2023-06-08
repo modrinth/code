@@ -104,8 +104,11 @@ export default defineNuxtConfig({
         donationPlatforms?: any[]
         reportTypes?: any[]
       } = {}
+      let homePageProjects: any[] = []
+
       try {
         state = JSON.parse(await fs.readFile('./generated/state.json', 'utf8'))
+        homePageProjects = JSON.parse(await fs.readFile('./generated/homepage.json', 'utf8'))
       } catch {
         // File doesn't exist, create folder
         await fs.mkdir('./generated', { recursive: true })
@@ -118,7 +121,8 @@ export default defineNuxtConfig({
         state.lastGenerated &&
         new Date(state.lastGenerated).getTime() + TTL > new Date().getTime() &&
         // ...but only if the API URL is the same
-        state.apiUrl === API_URL
+        state.apiUrl === API_URL &&
+        homePageProjects.length !== 0
       ) {
         return
       }
@@ -133,23 +137,25 @@ export default defineNuxtConfig({
         },
       }
 
-      const [categories, loaders, gameVersions, donationPlatforms, reportTypes] = await Promise.all(
-        [
+      const [categories, loaders, gameVersions, donationPlatforms, reportTypes, projects] =
+        await Promise.all([
           $fetch(`${API_URL}tag/category`, headers),
           $fetch(`${API_URL}tag/loader`, headers),
           $fetch(`${API_URL}tag/game_version`, headers),
           $fetch(`${API_URL}tag/donation_platform`, headers),
           $fetch(`${API_URL}tag/report_type`, headers),
-        ]
-      )
+          $fetch(`${API_URL}projects_random?count=40`, headers),
+        ])
 
       state.categories = categories
       state.loaders = loaders
       state.gameVersions = gameVersions
       state.donationPlatforms = donationPlatforms
       state.reportTypes = reportTypes
+      homePageProjects = projects
 
       await fs.writeFile('./generated/state.json', JSON.stringify(state))
+      await fs.writeFile('./generated/homepage.json', JSON.stringify(homePageProjects))
 
       console.log('Tags generated!')
     },
