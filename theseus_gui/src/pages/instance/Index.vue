@@ -109,7 +109,7 @@ import { useRoute } from 'vue-router'
 import { ref, onUnmounted } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { handleError, useBreadcrumbs, useLoading, useSearch } from '@/store/state'
-import { showInFolder } from '@/helpers/utils.js'
+import { showInFolder } from '@/helpers/utils'
 
 const route = useRoute()
 const searchStore = useSearch()

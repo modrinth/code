@@ -199,7 +199,7 @@
   <IncompatibilityWarningModal ref="incompatibilityWarning" />
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   Card,
   Avatar,
@@ -236,15 +236,15 @@ import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useRoute, useRouter } from 'vue-router'
 import { ref, shallowRef, watch } from 'vue'
-import { installVersionDependencies } from '@/helpers/utils'
+import { getBaseUrl, installVersionDependencies } from '@/helpers/utils'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import Instance from '@/components/ui/Instance.vue'
 import { useSearch } from '@/store/search'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/notifications.js'
+import { useFetch } from '@/helpers/fetch'
+import { handleError } from '@/store/notifications'
 
 const searchStore = useSearch()
 
@@ -259,14 +259,14 @@ const instance = ref(searchStore.instanceContext)
 const installing = ref(false)
 
 const [data, versions, members, dependencies, categories, loaders] = await Promise.all([
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}`, 'project').then(shallowRef),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/version`, 'project').then(
+  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}`, 'project').then(shallowRef),
+  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/version`, 'project').then(
     shallowRef
   ),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/members`, 'project').then(
+  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/members`, 'project').then(
     shallowRef
   ),
-  useFetch(`https://api.modrinth.com/v2/project/${route.params.id}/dependencies`, 'project').then(
+  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/dependencies`, 'project').then(
     shallowRef
   ),
   get_loaders().then(ref).catch(handleError),

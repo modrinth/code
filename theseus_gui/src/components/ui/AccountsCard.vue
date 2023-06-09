@@ -64,7 +64,7 @@ import {
 } from '@/helpers/auth'
 import { get, set } from '@/helpers/settings'
 import { WebviewWindow } from '@tauri-apps/api/window'
-import { handleError } from '@/store/state.js'
+import { handleError } from '@/store/state'
 
 defineProps({
   expanded: {
@@ -101,9 +101,9 @@ const refreshValues = async () => {
   )
 }
 
-let showCard = ref(false)
-let card = ref(null)
-let button = ref(null)
+const showCard = ref(false)
+const card = ref(null)
+const button = ref(null)
 
 const setAccount = async (account) => {
   settings.value.default_user = account.id

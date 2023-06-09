@@ -21,7 +21,7 @@ const allowPagination = ref(false)
 const modsRow = ref(null)
 
 const handlePaginationDisplay = () => {
-  let parentsRow = modsRow.value
+  const parentsRow = modsRow.value
 
   // This is wrapped in a setTimeout because the HtmlCollection seems to struggle
   // with getting populated sometimes. It's a flaky error, but providing a bit of

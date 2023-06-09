@@ -18,7 +18,7 @@ import { open } from '@tauri-apps/api/dialog'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { create } from '@/helpers/profile'
 import { installVersionDependencies } from '@/helpers/utils'
-import { handleError } from '@/store/notifications.js'
+import { handleError } from '@/store/notifications'
 
 const versions = ref([])
 const project = ref('')
@@ -80,7 +80,7 @@ async function getData() {
       )
     })
 
-  for (let profile of filtered) {
+  for (const profile of filtered) {
     profile.installing = false
     profile.installedMod = await check_installed(profile.path, project.value).catch(handleError)
   }

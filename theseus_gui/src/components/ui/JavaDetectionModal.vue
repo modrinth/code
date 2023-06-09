@@ -37,13 +37,8 @@
 <script setup>
 import { Modal, PlusIcon, CheckIcon, Button, XIcon } from 'omorphia'
 import { ref } from 'vue'
-import {
-  find_jre_17_jres,
-  find_jre_18plus_jres,
-  find_jre_8_jres,
-  get_all_jre,
-} from '@/helpers/jre.js'
-import { handleError } from '@/store/notifications.js'
+import { find_jre_17_jres, find_jre_18plus_jres, find_jre_8_jres, get_all_jre } from '@/helpers/jre'
+import { handleError } from '@/store/notifications'
 
 const chosenInstallOptions = ref([])
 const detectJavaModal = ref(null)

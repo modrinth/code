@@ -54,7 +54,7 @@
 import { Button, Modal, XIcon, DownloadIcon, DropdownSelect, formatCategory } from 'omorphia'
 import { add_project_from_version as installMod } from '@/helpers/profile'
 import { defineExpose, ref } from 'vue'
-import { handleError } from '@/store/state.js'
+import { handleError } from '@/store/state'
 
 const instance = ref(null)
 const projectTitle = ref(null)

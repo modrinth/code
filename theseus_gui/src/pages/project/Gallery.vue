@@ -80,7 +80,7 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   Card,
   ExpandIcon,
@@ -101,9 +101,15 @@ const props = defineProps({
   },
 })
 
-let expandedGalleryItem = ref(null)
-let expandedGalleryIndex = ref(0)
-let zoomedIn = ref(false)
+interface GalleryItem {
+  url: string
+  title: string
+  description: string
+}
+
+const expandedGalleryItem = ref<null | GalleryItem>(null)
+const expandedGalleryIndex = ref(0)
+const zoomedIn = ref(false)
 
 const nextImage = () => {
   expandedGalleryIndex.value++
@@ -121,7 +127,7 @@ const previousImage = () => {
   expandedGalleryItem.value = props.project.gallery[expandedGalleryIndex.value]
 }
 
-const expandImage = (item, index) => {
+const expandImage = (item: GalleryItem, index: number) => {
   expandedGalleryItem.value = item
   expandedGalleryIndex.value = index
   zoomedIn.value = false

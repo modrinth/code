@@ -126,8 +126,8 @@ import {
   toggle_disable_project,
   update_all,
   update_project,
-} from '@/helpers/profile.js'
-import { handleError } from '@/store/notifications.js'
+} from '@/helpers/profile'
+import { handleError } from '@/store/notifications'
 
 const router = useRouter()
 
@@ -143,7 +143,7 @@ const props = defineProps({
 const projects = ref([])
 for (const [path, project] of Object.entries(props.instance.projects)) {
   if (project.metadata.type === 'modrinth') {
-    let owner = project.metadata.members.find((x) => x.role === 'Owner')
+    const owner = project.metadata.members.find((x) => x.role === 'Owner')
     projects.value.push({
       path,
       name: project.metadata.project.title,

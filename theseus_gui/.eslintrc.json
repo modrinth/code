@@ -1,10 +1,17 @@
 {
+  "root": true,
   "env": {
     "browser": true,
     "es2021": true,
     "node": true
   },
-  "extends": ["eslint:recommended", "plugin:vue/vue3-recommended", "prettier"],
+  "extends": [
+    "eslint:recommended",
+    "plugin:vue/vue3-recommended",
+    "prettier",
+    "@vue/typescript/recommended",
+    "@vue/prettier"
+  ],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
@@ -16,6 +23,11 @@
     "comma-dangle": ["error", "only-multiline"],
     "vue/comment-directive": "off",
     "vue/multi-word-component-names": "off",
-    "import/no-named-as-default": "off"
+    "import/no-named-as-default": "off",
+    "@typescript-eslint/triple-slash-reference": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/ban-ts-comment": "off",
+    "prettier/prettier": "off"
   }
 }

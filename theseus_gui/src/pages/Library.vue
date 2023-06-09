@@ -1,11 +1,11 @@
 <script setup>
 import { onUnmounted, shallowRef } from 'vue'
 import GridDisplay from '@/components/GridDisplay.vue'
-import { list } from '@/helpers/profile.js'
+import { list } from '@/helpers/profile'
 import { useRoute } from 'vue-router'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { profile_listener } from '@/helpers/events.js'
-import { handleError } from '@/store/notifications.js'
+import { profile_listener } from '@/helpers/events'
+import { handleError } from '@/store/notifications'
 
 const route = useRoute()
 const breadcrumbs = useBreadcrumbs()

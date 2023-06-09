@@ -40,7 +40,24 @@ export default defineConfig({
   // prevent vite from obscuring rust errors
   clearScreen: false,
   // tauri expects a fixed port, fail if that port is not available
-  server: {
+  server: process.env.TAURI_WEB_DEV ? {
+    port: 4000,
+    strictPort: true,
+
+    hmr: {
+      port: 4001,
+      clientPort: 443,
+      protocol: "wss",
+    },
+
+    proxy: {
+      '/v2': {
+        target: 'https://api.modrinth.com',
+        changeOrigin: true,
+        ws: true,
+      },
+    },
+  } : {
     port: 1420,
     strictPort: true,
   },

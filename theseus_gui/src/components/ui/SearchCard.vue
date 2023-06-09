@@ -56,7 +56,7 @@
   </Card>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   Avatar,
   Card,
@@ -74,11 +74,11 @@ import {
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { ref } from 'vue'
-import { add_project_from_version as installMod, list } from '@/helpers/profile.js'
-import { install as packInstall } from '@/helpers/pack.js'
-import { installVersionDependencies } from '@/helpers/utils.js'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/notifications.js'
+import { add_project_from_version as installMod, list } from '@/helpers/profile'
+import { install as packInstall } from '@/helpers/pack'
+import { getBaseUrl, installVersionDependencies } from '@/helpers/utils'
+import { useFetch } from '@/helpers/fetch'
+import { handleError } from '@/store/notifications'
 dayjs.extend(relativeTime)
 
 const props = defineProps({
@@ -129,7 +129,7 @@ const installed = ref(
 async function install() {
   installing.value = true
   const versions = await useFetch(
-    `https://api.modrinth.com/v2/project/${props.project.project_id}/version`,
+    `${getBaseUrl()}/v2/project/${props.project.project_id}/version`,
     'project versions'
   )
   let queuedVersionData

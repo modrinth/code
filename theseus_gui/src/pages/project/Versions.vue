@@ -129,8 +129,8 @@ import Multiselect from 'vue-multiselect'
 import { releaseColor } from '@/helpers/utils'
 import { ref } from 'vue'
 
-let filterVersions = ref(null)
-let filterLoader = ref(null)
+const filterVersions = ref(null)
+const filterLoader = ref(null)
 
 const clearFilters = () => {
   filterVersions.value = null

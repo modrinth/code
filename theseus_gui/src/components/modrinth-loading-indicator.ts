@@ -71,13 +71,13 @@ export default defineComponent({
   },
 })
 
-function useLoadingIndicator(opts) {
+function useLoadingIndicator(opts: any) {
   const progress = ref(0)
   const isLoading = ref(false)
   const step = computed(() => 10000 / opts.duration)
 
-  let _timer = null
-  let _throttle = null
+  let _timer: number | null = null
+  let _throttle: number | null = null
 
   function start() {
     clear()
@@ -86,7 +86,7 @@ function useLoadingIndicator(opts) {
       _throttle = setTimeout(() => {
         isLoading.value = true
         _startTimer()
-      }, opts.throttle)
+      }, opts.throttle) as any
     } else {
       isLoading.value = true
       _startTimer()
@@ -98,13 +98,13 @@ function useLoadingIndicator(opts) {
   }
 
   function clear() {
-    clearInterval(_timer)
-    clearTimeout(_throttle)
+    clearInterval(_timer || -1)
+    clearTimeout(_throttle || -1)
     _timer = null
     _throttle = null
   }
 
-  function _increase(num) {
+  function _increase(num: number) {
     progress.value = Math.min(100, progress.value + num)
   }
 
@@ -121,7 +121,7 @@ function useLoadingIndicator(opts) {
   function _startTimer() {
     _timer = setInterval(() => {
       _increase(step.value)
-    }, 100)
+    }, 100) as any
   }
 
   return {

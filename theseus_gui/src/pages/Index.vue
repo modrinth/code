@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onUnmounted, shallowRef } from 'vue'
 import { useRoute } from 'vue-router'
 import RowDisplay from '@/components/RowDisplay.vue'
-import { list } from '@/helpers/profile.js'
+import { list } from '@/helpers/profile'
 import { profile_listener } from '@/helpers/events'
 import { useBreadcrumbs } from '@/store/breadcrumbs'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/notifications.js'
+import { useFetch } from '@/helpers/fetch'
+import { handleError } from '@/store/notifications'
 import dayjs from 'dayjs'
+import { getBaseUrl } from '@/helpers/utils'
 
 const featuredModpacks = ref({})
 const featuredMods = ref({})
@@ -26,7 +27,7 @@ const getInstances = async () => {
     return dayjs(b.metadata.last_played ?? 0).diff(dayjs(a.metadata.last_played ?? 0))
   })
 
-  let filters = []
+  const filters = []
   for (const instance of recentInstances.value) {
     if (instance.metadata.linked_data && instance.metadata.linked_data.project_id) {
       filters.push(`NOT"project_id"="${instance.metadata.linked_data.project_id}"`)
@@ -38,14 +39,14 @@ const getInstances = async () => {
 const getFeaturedModpacks = async () => {
   console.log(filter.value)
   const response = await useFetch(
-    `https://api.modrinth.com/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
+    `${getBaseUrl()}/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
     'featured modpacks'
   )
   featuredModpacks.value = response.hits
 }
 const getFeaturedMods = async () => {
   const response = await useFetch(
-    'https://api.modrinth.com/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows',
+    `${getBaseUrl()}/v2/search?facets=[["project_type:mod"]]&limit=10&index=follows`,
     'featured mods'
   )
   featuredMods.value = response.hits

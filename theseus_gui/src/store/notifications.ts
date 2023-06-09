@@ -5,21 +5,23 @@ export const useNotifications = defineStore('notificationsStore', {
     notificationsWrapper: null,
   }),
   actions: {
-    setNotifs(notifs) {
+    setNotifs(notifs: any) {
       this.notificationsWrapper = notifs
     },
-    addNotification(notif) {
-      this.notificationsWrapper.addNotification(notif)
+    addNotification(notif: any) {
+      (this.notificationsWrapper as any).addNotification(notif)
     },
   },
 })
 
-export const handleError = (err) => {
+export const handleError = (err: any) => {
   const notifs = useNotifications()
+
   notifs.addNotification({
     title: 'An error occurred',
     text: err.message ?? err,
     type: 'error',
   })
+
   console.error(err)
 }

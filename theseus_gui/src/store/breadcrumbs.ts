@@ -7,10 +7,10 @@ export const useBreadcrumbs = defineStore('breadcrumbsStore', {
     rootContext: null,
   }),
   actions: {
-    getName(route) {
+    getName(route: string) {
       return this.names.get(route) ?? route
     },
-    setName(route, title) {
+    setName(route: string, title: string) {
       this.names.set(route, title)
     },
     setContext(context) {

@@ -24,7 +24,9 @@ export const useSearch = defineStore('searchStore', {
   }),
   actions: {
     getQueryString() {
-      let andFacets = [`project_type:${this.projectType === 'datapack' ? 'mod' : this.projectType}`]
+      const andFacets = [
+        `project_type:${this.projectType === 'datapack' ? 'mod' : this.projectType}`,
+      ]
 
       if (this.instanceContext && !this.ignoreInstance) {
         this.activeVersions = [this.instanceContext.metadata.game_version]

@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { RouterView, RouterLink } from 'vue-router'
 import {
@@ -18,8 +18,8 @@ import Breadcrumbs from '@/components/ui/Breadcrumbs.vue'
 import RunningAppBar from '@/components/ui/RunningAppBar.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import ModrinthLoadingIndicator from '@/components/modrinth-loading-indicator'
-import { useNotifications } from '@/store/notifications.js'
-import { warning_listener } from '@/helpers/events.js'
+import { useNotifications } from '@/store/notifications'
+import { warning_listener } from '@/helpers/events'
 
 const themeStore = useTheming()
 
@@ -30,7 +30,7 @@ onMounted(async () => {
   themeStore.collapsedNavigation = collapsed_navigation
 
   await warning_listener((e) =>
-    notificationsWrapper.value.addNotification({
+    notificationsWrapper.value?.addNotification({
       title: 'Warning',
       text: e.message,
       type: 'warn',
@@ -55,7 +55,7 @@ watch(notificationsWrapper, () => {
 })
 
 // Link handler
-document.querySelector('body').addEventListener('click', function (e) {
+document.querySelector('body')?.addEventListener('click', function (e) {
   let target = e.target
   while (target != null) {
     if (target.matches('a')) {

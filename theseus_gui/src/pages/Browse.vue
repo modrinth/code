@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue'
 import {
   Pagination,
@@ -27,7 +27,8 @@ import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
 import SplashScreen from '@/components/ui/SplashScreen.vue'
 import Instance from '@/components/ui/Instance.vue'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
-import { useFetch } from '@/helpers/fetch.js'
+import { useFetch } from '@/helpers/fetch'
+import { getBaseUrl } from '@/helpers/utils'
 
 const route = useRoute()
 
@@ -95,7 +96,7 @@ const sortedCategories = computed(() => {
 const getSearchResults = async () => {
   const queryString = searchStore.getQueryString()
   const response = await useFetch(
-    `https://api.modrinth.com/v2/search${queryString}`,
+    `${getBaseUrl()}/v2/search${queryString}`,
     'search results'
   )
   searchStore.setSearchResults(response)

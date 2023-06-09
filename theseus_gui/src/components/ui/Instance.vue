@@ -1,4 +1,4 @@
-<script setup>
+<script setup lang="ts">
 import { onUnmounted, ref, useSlots, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { Card, DownloadIcon, XIcon, Avatar, AnimatedLogo, PlayIcon } from 'omorphia'
@@ -11,10 +11,11 @@ import {
   get_uuids_by_profile_path,
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
-import { useFetch } from '@/helpers/fetch.js'
-import { handleError } from '@/store/state.js'
+import { useFetch } from '@/helpers/fetch'
+import { handleError } from '@/store/state'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
+import { getBaseUrl } from '@/helpers/utils'
 
 const props = defineProps({
   instance: {
@@ -72,7 +73,7 @@ const install = async (e) => {
   e.stopPropagation()
   modLoading.value = true
   const versions = await useFetch(
-    `https://api.modrinth.com/v2/project/${props.instance.project_id}/version`,
+    `${getBaseUrl()}/v2/project/${props.instance.project_id}/version`,
     'project versions'
   )
 

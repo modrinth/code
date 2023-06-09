@@ -314,16 +314,16 @@ import {
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
-import { edit, edit_icon, get_optimal_jre_key, install, list, remove } from '@/helpers/profile.js'
+import { edit, edit_icon, get_optimal_jre_key, install, list, remove } from '@/helpers/profile'
 import { computed, readonly, ref, shallowRef, watch } from 'vue'
-import { get_max_memory } from '@/helpers/jre.js'
-import { get } from '@/helpers/settings.js'
+import { get_max_memory } from '@/helpers/jre'
+import { get } from '@/helpers/settings'
 import JavaSelector from '@/components/ui/JavaSelector.vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { open } from '@tauri-apps/api/dialog'
-import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata.js'
-import { get_game_versions, get_loaders } from '@/helpers/tags.js'
-import { handleError } from '@/store/notifications.js'
+import { get_fabric_versions, get_forge_versions, get_quilt_versions } from '@/helpers/metadata'
+import { get_game_versions, get_loaders } from '@/helpers/tags'
+import { handleError } from '@/store/notifications'
 
 const router = useRouter()
 

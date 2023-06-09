@@ -48,7 +48,7 @@
 
 <script setup>
 import { Button, SearchIcon, PlayIcon, CheckIcon, XIcon, FolderSearchIcon } from 'omorphia'
-import { get_jre } from '@/helpers/jre.js'
+import { get_jre } from '@/helpers/jre'
 import { ref } from 'vue'
 import { open } from '@tauri-apps/api/dialog'
 import JavaDetectionModal from '@/components/ui/JavaDetectionModal.vue'
@@ -81,7 +81,7 @@ const testingJava = ref(false)
 const testingJavaSuccess = ref(null)
 async function testJava() {
   testingJava.value = true
-  let result = await get_jre(props.modelValue ? props.modelValue.path : '')
+  const result = await get_jre(props.modelValue ? props.modelValue.path : '')
   testingJava.value = false
   testingJavaSuccess.value = !!result
 
@@ -91,7 +91,7 @@ async function testJava() {
 }
 
 async function handleJavaFileInput() {
-  let filePath = await open()
+  const filePath = await open()
 
   if (filePath) {
     let result = await get_jre(filePath)

@@ -47,14 +47,14 @@ import {
   SendIcon,
   TrashIcon,
 } from 'omorphia'
-import { delete_logs_by_datetime, get_logs, get_stdout_by_datetime } from '@/helpers/logs.js'
+import { delete_logs_by_datetime, get_logs, get_stdout_by_datetime } from '@/helpers/logs'
 import { nextTick, onBeforeUnmount, onMounted, onUnmounted, ref, watch } from 'vue'
 import dayjs from 'dayjs'
 import calendar from 'dayjs/plugin/calendar'
-import { get_stdout_by_uuid, get_uuids_by_profile_path } from '@/helpers/process.js'
+import { get_stdout_by_uuid, get_uuids_by_profile_path } from '@/helpers/process'
 import { useRoute } from 'vue-router'
-import { process_listener } from '@/helpers/events.js'
-import { handleError } from '@/store/notifications.js'
+import { process_listener } from '@/helpers/events'
+import { handleError } from '@/store/notifications'
 
 dayjs.extend(calendar)
 
@@ -122,7 +122,7 @@ watch(selectedLogIndex, async (newIndex) => {
 
 const deleteLog = async () => {
   if (logs.value[selectedLogIndex.value] && selectedLogIndex.value !== 0) {
-    let deleteIndex = selectedLogIndex.value
+    const deleteIndex = selectedLogIndex.value
     selectedLogIndex.value = deleteIndex - 1
     await delete_logs_by_datetime(
       props.instance.uuid,

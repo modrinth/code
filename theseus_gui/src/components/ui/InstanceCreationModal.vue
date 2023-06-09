@@ -105,7 +105,7 @@ import {
   get_forge_versions,
   get_quilt_versions,
 } from '@/helpers/metadata'
-import { handleError } from '@/store/notifications.js'
+import { handleError } from '@/store/notifications'
 import Multiselect from 'vue-multiselect'
 
 const profile_name = ref('')

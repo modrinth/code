@@ -3,8 +3,10 @@ import cssContent from '@/assets/stylesheets/macFix.css?inline'
 
 export default {
   async mounted() {
+    // @ts-ignore
     await this.checkDisableMouseover()
   },
+
   methods: {
     async checkDisableMouseover() {
       try {

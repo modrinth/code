@@ -56,4 +56,5 @@
   "rust-analyzer.linkedProjects": [
     "./theseus/Cargo.toml"
   ],
+  "prettier.prettierPath": "./theseus_gui/node_modules/prettier"
 }
