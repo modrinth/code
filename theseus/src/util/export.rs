@@ -74,23 +74,32 @@ pub async fn export_mrpack(
         // Get local path of file, relative to profile folder
         let name = path.strip_prefix(profile_base_path)?;
 
-        // Get highest level folder ('a' in 'a/b/c')
-        // If the highest level folder is not in the included_overrides list, skip it
-        let topmost = name
+        // Get highest level folder pair ('a/b' in 'a/b/c', 'a' in 'a')
+        // We only go one layer deep for the sake of not having a huge list of overrides
+        let topmost_two = name
             .iter()
-            .next()
-            .ok_or_else(|| {
-                crate::ErrorKind::OtherError(
+            .take(2)
+            .map(|os| os.to_string_lossy().to_string())
+            .collect::<Vec<_>>();
+
+        // a,b => a/b
+        // a => a
+        let topmost = match topmost_two.len() {
+            2 => topmost_two.join("/"),
+            1 => topmost_two[0].clone(),
+            _ => {
+                return Err(crate::ErrorKind::OtherError(
                     "No topmost folder found".to_string(),
                 )
-            })?
-            .to_string_lossy()
-            .to_string();
+                .into())
+            }
+        };
+
         if !included_overrides.contains(&topmost) {
             continue;
         }
 
-        let name = name.to_string_lossy();
+        let name: std::borrow::Cow<str> = name.to_string_lossy();
         let name = name.replace('\\', "/");
         let name = name.trim_start_matches('/').to_string();
 
@@ -253,16 +262,28 @@ pub async fn build_folder(
 // profile
 // -- folder1
 // -- folder2
+// ----- file2
+// ----- folder3
+// ------- folder4
 // -- file1
-// => [folder1, folder2]
+// => [folder1, folder2, fil2, folder3, file1]
 pub async fn get_potential_override_folders(
     profile_path: PathBuf,
 ) -> crate::Result<Vec<PathBuf>> {
-    let mut path_list = Vec::new();
+    let mut path_list: Vec<PathBuf> = Vec::new();
     let mut read_dir = fs::read_dir(&profile_path).await?;
     while let Some(entry) = read_dir.next_entry().await? {
-        let path = entry.path();
+        let path: PathBuf = entry.path();
         if path.is_dir() {
+            // Two layers of files/folders if its a folder
+            let mut read_dir = fs::read_dir(&path).await?;
+            while let Some(entry) = read_dir.next_entry().await? {
+                let path: PathBuf = entry.path();
+                let name = path.strip_prefix(&profile_path)?.to_path_buf();
+                path_list.push(name);
+            }
+        } else {
+            // One layer of files/folders if its a file
             let name = path.strip_prefix(&profile_path)?.to_path_buf();
             path_list.push(name);
         }
