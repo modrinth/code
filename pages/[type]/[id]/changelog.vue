@@ -111,7 +111,6 @@ const filteredVersions = computed(() => {
   const selectedLoaders = getArrayOrString(route.query.l) ?? []
   const selectedVersionTypes = getArrayOrString(route.query.c) ?? []
 
-  currentPage.value = 1
   return props.versions.filter(
     (projectVersion) =>
       (selectedGameVersions.length === 0 ||
