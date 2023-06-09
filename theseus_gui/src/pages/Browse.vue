@@ -95,10 +95,7 @@ const sortedCategories = computed(() => {
 
 const getSearchResults = async () => {
   const queryString = searchStore.getQueryString()
-  const response = await useFetch(
-    `${getBaseUrl()}/v2/search${queryString}`,
-    'search results'
-  )
+  const response = await useFetch(`${getBaseUrl()}/v2/search${queryString}`, 'search results')
   searchStore.setSearchResults(response)
 }
 

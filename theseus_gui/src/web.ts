@@ -38,33 +38,33 @@ export const createWebTauri = () => {
         return []
 
       case 'profile_create_empty':
-        return "/"
+        return '/'
 
       case 'profile_create':
-        return "/"
+        return '/'
 
       case 'profile_remove':
         return
 
       case 'profile_get':
         return {
-          game_version: "1.20",
-          loader_version: "latest",
-          modloader: "quilt",
-          name: "Test"
+          game_version: '1.20',
+          loader_version: 'latest',
+          modloader: 'quilt',
+          name: 'Test',
         } as Profile
 
       case 'profile_get_optimal_jre_key':
-        return "/"
+        return '/'
 
       case 'profile_list':
         return {
-          "/": {
-            game_version: "1.20",
-            loader_version: "latest",
-            modloader: "quilt",
-            name: "Test"
-          }
+          '/': {
+            game_version: '1.20',
+            loader_version: 'latest',
+            modloader: 'quilt',
+            name: 'Test',
+          },
         } as unknown as Map<string, Profile>
 
       case 'profile_install':
@@ -72,7 +72,7 @@ export const createWebTauri = () => {
       case 'profile_update_project':
       case 'profile_add_project_from_version':
       case 'profile_add_project_from_path':
-        return "/"
+        return '/'
 
       case 'profile_run':
       case 'profile_run_wait':

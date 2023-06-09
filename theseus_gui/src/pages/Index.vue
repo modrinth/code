@@ -39,7 +39,9 @@ const getInstances = async () => {
 const getFeaturedModpacks = async () => {
   console.log(filter.value)
   const response = await useFetch(
-    `${getBaseUrl()}/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${filter.value}`,
+    `${getBaseUrl()}/v2/search?facets=[["project_type:modpack"]]&limit=10&index=follows&filters=${
+      filter.value
+    }`,
     'featured modpacks'
   )
   featuredModpacks.value = response.hits

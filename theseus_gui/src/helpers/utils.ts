@@ -130,5 +130,5 @@ export const installVersionDependencies = async (profile: Profile, version: Modr
 }
 
 export const getBaseUrl = () => {
-  return import.meta.env.TAURI_WEB_DEV ? "" : "https://api.modrinth.com"
-};
+  return import.meta.env.TAURI_WEB_DEV ? '' : 'https://api.modrinth.com'
+}

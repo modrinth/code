@@ -260,12 +260,8 @@ const installing = ref(false)
 
 const [data, versions, members, dependencies, categories, loaders] = await Promise.all([
   useFetch(`${getBaseUrl()}/v2/project/${route.params.id}`, 'project').then(shallowRef),
-  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/version`, 'project').then(
-    shallowRef
-  ),
-  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/members`, 'project').then(
-    shallowRef
-  ),
+  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/version`, 'project').then(shallowRef),
+  useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/members`, 'project').then(shallowRef),
   useFetch(`${getBaseUrl()}/v2/project/${route.params.id}/dependencies`, 'project').then(
     shallowRef
   ),

@@ -12,7 +12,7 @@ import { createWebTauri } from './web'
 
 // @ts-ignore
 if (import.meta.env.TAURI_WEB_DEV) {
-  createWebTauri();
+  createWebTauri()
 }
 
 const pinia = createPinia()

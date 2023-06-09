@@ -9,7 +9,7 @@ export const useNotifications = defineStore('notificationsStore', {
       this.notificationsWrapper = notifs
     },
     addNotification(notif: any) {
-      (this.notificationsWrapper as any).addNotification(notif)
+      ;(this.notificationsWrapper as any).addNotification(notif)
     },
   },
 })
