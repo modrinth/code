@@ -4333,6 +4333,7 @@ version = "0.0.0"
 dependencies = [
  "chrono",
  "daedalus",
+ "dirs 5.0.1",
  "futures",
  "os_info",
  "regex",
@@ -4348,6 +4349,7 @@ dependencies = [
  "tokio",
  "tokio-stream",
  "tracing",
+ "tracing-appender",
  "tracing-error 0.1.2",
  "tracing-subscriber 0.2.25",
  "url",
@@ -4589,6 +4591,17 @@ dependencies = [
  "pin-project-lite",
  "tracing-attributes",
  "tracing-core",
+]
+
+[[package]]
+name = "tracing-appender"
+version = "0.1.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9965507e507f12c8901432a33e31131222abac31edd90cabbcf85cf544b7127a"
+dependencies = [
+ "chrono",
+ "crossbeam-channel",
+ "tracing-subscriber 0.2.25",
 ]
 
 [[package]]

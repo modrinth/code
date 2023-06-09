@@ -1,7 +1,7 @@
 use theseus::{handler, prelude::CommandPayload};
 
 use crate::api::Result;
-use std::{process::Command, env};
+use std::{env, process::Command};
 
 // cfg only on mac os
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
@@ -83,16 +83,17 @@ pub fn show_in_folder(path: String) -> Result<()> {
 #[tauri::command]
 pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
     // Tauri is not CLI, we use arguments as path to file to call
-    let path_arg = env::args_os().nth(2);
-    let path_arg = path_arg.map(|path|path.to_string_lossy().to_string());
-    if let Some(path) = path_arg {
-        return Ok(Some(handler::parse_mrpack_command(&path).await?));
-    } 
+    let cmd_arg = env::args_os().nth(1);
+    let cmd_arg = cmd_arg.map(|path| path.to_string_lossy().to_string());
+    if let Some(cmd) = cmd_arg {
+        tracing::info!("Opening command: {:?}", cmd);
+        return Ok(Some(handler::parse_command(&cmd).await?));
+    }
     Ok(None)
 }
 
-
-// helper function called when redirected by a weblink (ie: modrith://do-something)
-pub async fn handle_deep_link(url: String) -> Result<()> {
-    Ok(theseus::handler::handle_url(&url).await?)
+// helper function called when redirected by a weblink (ie: modrith://do-something) or when redirected by a .mrpack file (in which case its a filepath)
+// We hijack the deep link library (which also contains functionality for instance-checking)
+pub async fn handle_command(command: String) -> Result<()> {
+    Ok(theseus::handler::parse_and_emit_command(&command).await?)
 }

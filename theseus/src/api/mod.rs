@@ -24,13 +24,12 @@ pub mod prelude {
     pub use crate::{
         auth::{self, Credentials},
         data::*,
+        event::CommandPayload,
         jre, metadata, pack, process,
         profile::{self, Profile},
         profile_create, settings,
         state::JavaGlobals,
         util::jre::JavaVersion,
         State,
-        event::CommandPayload,
-
     };
 }

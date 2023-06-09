@@ -6,11 +6,10 @@
 use theseus::prelude::*;
 
 use tauri::Manager;
-use tracing_error::ErrorLayer;
-use tracing_subscriber::EnvFilter;
 
 mod api;
 mod error;
+mod logger;
 
 // Should be called in launcher initialization
 #[tauri::command]
@@ -21,41 +20,34 @@ async fn initialize_state(app: tauri::AppHandle) -> api::Result<()> {
     Ok(())
 }
 
-use tracing_subscriber::prelude::*;
-
 #[derive(Clone, serde::Serialize)]
 struct Payload {
     args: Vec<String>,
     cwd: String,
 }
 
+// if Tauri app is called with arguments, then those arguments will be treated as commands
+// ie: deep links or filepaths for .mrpacks
 fn main() {
     tauri_plugin_deep_link::prepare("com.modrinth.theseus");
 
     /*
-       tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
-           ERROR > WARN > INFO > DEBUG > TRACE
-       eg. RUST_LOG=info will show info, warn, and error logs
-           RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
-           RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
+        tracing is set basd on the environment variable RUST_LOG=xxx, depending on the amount of logs to show
+            ERROR > WARN > INFO > DEBUG > TRACE
+        eg. RUST_LOG=info will show info, warn, and error logs
+            RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
+            RUST_LOG="theseus=trace" will show *all* messages but from theseus only (and not dependencies using similar crates)
 
-       Error messages returned to Tauri will display as traced error logs if they return an error.
-       This will also include an attached span trace if the error is from a tracing error, and the level is set to info, debug, or trace
+        Error messages returned to Tauri will display as traced error logs if they return an error.
+        This will also include an attached span trace if the error is from a tracing error, and the level is set to info, debug, or trace
 
-       on unix:
-           RUST_LOG="theseus=trace" {run command}
+        on unix:
+            RUST_LOG="theseus=trace" {run command}
 
     */
-    let filter = EnvFilter::try_from_default_env()
-        .unwrap_or_else(|_| EnvFilter::new("theseus=info"));
+    let _guard = logger::start_logger();
 
-    let subscriber = tracing_subscriber::registry()
-        .with(tracing_subscriber::fmt::layer())
-        .with(filter)
-        .with(ErrorLayer::default());
-
-    tracing::subscriber::set_global_default(subscriber)
-        .expect("setting default subscriber failed");
+    tracing::info!("Initialized tracing subscriber. Loading Modrinth App!");
 
     tauri::Builder::default()
         .plugin(tauri_plugin_single_instance::init(|app, argv, cwd| {
@@ -65,7 +57,7 @@ fn main() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         .setup(|_app| {
             tauri_plugin_deep_link::register("modrinth", |request: String| {
-                tauri::async_runtime::spawn(api::utils::handle_deep_link(
+                tauri::async_runtime::spawn(api::utils::handle_command(
                     request,
                 ));
             })

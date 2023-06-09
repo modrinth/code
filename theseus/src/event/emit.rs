@@ -4,7 +4,6 @@ use crate::{
         CommandPayload, EventError, LoadingBar, LoadingBarType,
         ProcessPayloadType, ProfilePayloadType,
     },
-    handler,
     state::{ProcessType, SafeProcesses},
 };
 use futures::prelude::*;
@@ -232,12 +231,10 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
     Ok(())
 }
 
-// emit_warning(message)
+// emit_command(CommandPayload::Something { something })
 #[allow(dead_code)]
 #[allow(unused_variables)]
-pub async fn emit_command(
-    command: CommandPayload,
-) -> crate::Result<()> {
+pub async fn emit_command(command: CommandPayload) -> crate::Result<()> {
     debug!("{}", serde_json::to_string(&command)?);
     emit_warning(&serde_json::to_string(&command)?).await?; // dbg remove me println
     #[cfg(feature = "tauri")]

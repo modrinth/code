@@ -118,7 +118,8 @@
                 <!-- THESEUS -->
                 <ProgId Id="theseus.mrpack.Document" Description="Modrinth File">
                     <Extension Id="mrpack" ContentType="application/mrpack">
-                     <Verb Id="open" Command="Open" TargetFile="Path" Argument="-e &quot;%1&quot;" />
+                    <!-- no flags on argument, so we can hijack deep link library-->
+                     <Verb Id="open" Command="Open" TargetFile="Path" Argument="&quot;%1&quot;" />
                     </Extension>
                 </ProgId>
                 <!-- /THESEUS -->

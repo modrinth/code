@@ -210,10 +210,10 @@ pub enum CommandPayload {
     InstallModpack {
         id: String,
     },
-    RunMRPack { // run or install .mrpack
-        path: PathBuf
-    }, 
-   
+    RunMRPack {
+        // run or install .mrpack
+        path: PathBuf,
+    },
 }
 
 #[derive(Serialize, Clone)]

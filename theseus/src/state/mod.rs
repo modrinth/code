@@ -101,7 +101,7 @@ impl State {
 
                     let mut file_watcher = init_watcher().await?;
 
-                    let directories = DirectoryInfo::init().await?;
+                    let directories = DirectoryInfo::init()?;
                     emit_loading(&loading_bar, 10.0, None).await?;
 
                     // Settings
