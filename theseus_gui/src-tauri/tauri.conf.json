@@ -64,8 +64,7 @@
         "digestAlgorithm": "sha256",
         "timestampUrl": "",
         "wix": {
-          "fragmentPaths": [".msi/registry.wxs"],
-          "componentRefs": ["TheseusFragmentRegistryEntries"]
+          "template": "./msi/main.wxs"
         }
       }
     },

@@ -20,3 +20,11 @@ export async function progress_bars_list() {
 export async function check_safe_loading_bars_complete() {
   return await invoke('check_safe_loading_bars')
 }
+
+// Get opening command
+// For example, if a user clicks on an .mrpack to open the app.
+// This should be called once and only when the app is done booting up and ready to receive a command
+// Returns a Command struct- see events.js
+export async function get_opening_command() {
+  return await invoke('get_opening_command')
+}

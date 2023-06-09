@@ -30,5 +30,7 @@ pub mod prelude {
         state::JavaGlobals,
         util::jre::JavaVersion,
         State,
+        event::CommandPayload,
+
     };
 }

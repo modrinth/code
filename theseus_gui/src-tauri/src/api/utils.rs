@@ -1,5 +1,7 @@
+use theseus::{handler, prelude::CommandPayload};
+
 use crate::api::Result;
-use std::process::Command;
+use std::{process::Command, env};
 
 // cfg only on mac os
 // disables mouseover and fixes a random crash error only fixed by recent versions of macos
@@ -74,6 +76,23 @@ pub fn show_in_folder(path: String) -> Result<()> {
     Ok(())
 }
 
+// Get opening command
+// For example, if a user clicks on an .mrpack to open the app.
+// This should be called once and only when the app is done booting up and ready to receive a command
+// Returns a Command struct- see events.js
+#[tauri::command]
+pub async fn get_opening_command() -> Result<Option<CommandPayload>> {
+    // Tauri is not CLI, we use arguments as path to file to call
+    let path_arg = env::args_os().nth(2);
+    let path_arg = path_arg.map(|path|path.to_string_lossy().to_string());
+    if let Some(path) = path_arg {
+        return Ok(Some(handler::parse_mrpack_command(&path).await?));
+    } 
+    Ok(None)
+}
+
+
+// helper function called when redirected by a weblink (ie: modrith://do-something)
 pub async fn handle_deep_link(url: String) -> Result<()> {
     Ok(theseus::handler::handle_url(&url).await?)
 }

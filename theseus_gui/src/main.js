@@ -6,7 +6,7 @@ import 'omorphia/dist/style.css'
 import '@/assets/stylesheets/global.scss'
 import 'floating-vue/dist/style.css'
 import FloatingVue from 'floating-vue'
-import { initialize_state } from '@/helpers/state'
+import { get_opening_command, initialize_state } from '@/helpers/state'
 import loadCssMixin from './mixins/macCssFix.js'
 import { get } from '@/helpers/settings'
 
@@ -34,6 +34,9 @@ initialize_state()
       })
       .finally(() => {
         mountedApp.initialize()
+        get_opening_command().then((command) => {
+          console.log(JSON.stringify(command)) // change me to use whatever FE command handler is made
+        })
       })
   })
   .catch((err) => {

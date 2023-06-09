@@ -148,6 +148,7 @@ fn main() {
             api::logs::logs_delete_logs_by_datetime,
             api::utils::show_in_folder,
             api::utils::should_disable_mouseover,
+            api::utils::get_opening_command,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -5,7 +5,6 @@ use tokio::sync::OnceCell;
 use tokio::sync::RwLock;
 use uuid::Uuid;
 
-use crate::handler::DeepLinkCommandType;
 use crate::state::SafeProcesses;
 
 pub mod emit;
@@ -200,9 +199,21 @@ pub struct WarningPayload {
 }
 
 #[derive(Serialize, Clone)]
-pub struct CommandPayload {
-    pub command: DeepLinkCommandType,
-    pub id: String,
+#[serde(tag = "event")]
+pub enum CommandPayload {
+    InstallMod {
+        id: String,
+    },
+    InstallVersion {
+        id: String,
+    },
+    InstallModpack {
+        id: String,
+    },
+    RunMRPack { // run or install .mrpack
+        path: PathBuf
+    }, 
+   
 }
 
 #[derive(Serialize, Clone)]

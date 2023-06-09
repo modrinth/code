@@ -236,16 +236,16 @@ pub async fn emit_warning(message: &str) -> crate::Result<()> {
 #[allow(dead_code)]
 #[allow(unused_variables)]
 pub async fn emit_command(
-    command: handler::DeepLinkCommandType,
-    id: String,
+    command: CommandPayload,
 ) -> crate::Result<()> {
-    debug!("{} {}", serde_json::to_string(&command)?, &id);
+    debug!("{}", serde_json::to_string(&command)?);
+    emit_warning(&serde_json::to_string(&command)?).await?; // dbg remove me println
     #[cfg(feature = "tauri")]
     {
         let event_state = crate::EventState::get().await?;
         event_state
             .app
-            .emit_all("command", CommandPayload { command, id })
+            .emit_all("command", command)
             .map_err(EventError::from)?;
     }
     Ok(())
