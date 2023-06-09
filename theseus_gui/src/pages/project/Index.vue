@@ -270,6 +270,7 @@ import { useBreadcrumbs } from '@/store/breadcrumbs'
 import IncompatibilityWarningModal from '@/components/ui/IncompatibilityWarningModal.vue'
 import { useFetch } from '@/helpers/fetch.js'
 import { handleError } from '@/store/notifications.js'
+import { convertFileSrc } from '@tauri-apps/api/tauri'
 
 const route = useRoute()
 const router = useRouter()
@@ -591,7 +592,8 @@ async function install(version) {
   .small-instance_info {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    justify-content: space-between;
+    padding: 0.25rem 0;
   }
 }
 </style>
