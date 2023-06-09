@@ -35,6 +35,8 @@ pub enum AuthenticationError {
     InvalidCredentials,
     #[error("Authentication method was not valid")]
     InvalidAuthMethod,
+    #[error("GitHub Token from incorrect Client ID")]
+    InvalidClientId,
 }
 
 // A user as stored in the Minos database
@@ -360,17 +362,26 @@ pub async fn get_user_from_github_token<'a, E>(
 where
     E: sqlx::Executor<'a, Database = sqlx::Postgres>,
 {
-    let github_user: GitHubUser = reqwest::Client::new()
+    let response = reqwest::Client::new()
         .get("https://api.github.com/user")
         .header(reqwest::header::USER_AGENT, "Modrinth")
-        .header(
-            reqwest::header::AUTHORIZATION,
-            format!("token {access_token}"),
-        )
+        .header(AUTHORIZATION, format!("token {access_token}"))
         .send()
-        .await?
-        .json()
         .await?;
+
+    if access_token.starts_with("gho_") {
+        let client_id = response
+            .headers()
+            .get("x-oauth-client-id")
+            .and_then(|x| x.to_str().ok());
+
+        if client_id != Some(&*dotenvy::var("GITHUB_CLIENT_ID").unwrap()) {
+            return Err(AuthenticationError::InvalidClientId);
+        }
+    }
+
+    let github_user: GitHubUser = response.json().await?;
+
     Ok(user_item::User::get_from_github_id(github_user.id, executor).await?)
 }
 

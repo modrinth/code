@@ -91,7 +91,7 @@ pub async fn send_discord_webhook(
             FROM mods m
             LEFT OUTER JOIN mods_categories mc ON joining_mod_id = m.id AND mc.is_additional = FALSE
             LEFT OUTER JOIN categories c ON mc.joining_category_id = c.id
-            LEFT OUTER JOIN versions v ON v.mod_id = m.id AND v.status != ANY($2)
+            LEFT OUTER JOIN versions v ON v.mod_id = m.id AND v.status != ALL($2)
             LEFT OUTER JOIN game_versions_versions gvv ON gvv.joining_version_id = v.id
             LEFT OUTER JOIN game_versions gv ON gvv.game_version_id = gv.id
             LEFT OUTER JOIN loaders_versions lv ON lv.version_id = v.id

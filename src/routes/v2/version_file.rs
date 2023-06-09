@@ -61,9 +61,9 @@ pub async fn get_version_from_hash(
         SELECT f.version_id version_id
         FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v on f.version_id = v.id AND v.status != ANY($1)
+        INNER JOIN versions v on f.version_id = v.id AND v.status != ALL($1)
         INNER JOIN mods m on v.mod_id = m.id
-        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
+        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ALL($4)
         ORDER BY v.date_published ASC
         ",
         &*crate::models::projects::VersionStatus::iterator()
@@ -121,9 +121,9 @@ pub async fn download_version(
         "
         SELECT f.url url, f.id id, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ALL($1)
         INNER JOIN mods m on v.mod_id = m.id
-        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
+        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ALL($4)
         ORDER BY v.date_published ASC
         ",
         &*crate::models::projects::VersionStatus::iterator()
@@ -278,9 +278,9 @@ pub async fn get_update_from_hash(
         "
         SELECT v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ALL($1)
         INNER JOIN mods m on v.mod_id = m.id
-        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ANY($4)
+        WHERE h.algorithm = $3 AND h.hash = $2 AND m.status != ALL($4)
         ORDER BY v.date_published ASC
         ",
         &*crate::models::projects::VersionStatus::iterator()
@@ -358,9 +358,9 @@ pub async fn get_versions_from_hashes(
         "
         SELECT h.hash hash, h.algorithm algorithm, f.version_id version_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ALL($1)
         INNER JOIN mods m on v.mod_id = m.id
-        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ALL($4)
         ",
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_hidden())
@@ -419,9 +419,9 @@ pub async fn get_projects_from_hashes(
         "
         SELECT h.hash hash, h.algorithm algorithm, m.id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ALL($1)
         INNER JOIN mods m on v.mod_id = m.id
-        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ALL($4)
         ",
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_hidden())
@@ -482,9 +482,9 @@ pub async fn download_files(
         "
         SELECT f.url url, h.hash hash, h.algorithm algorithm, f.version_id version_id, v.mod_id project_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ALL($1)
         INNER JOIN mods m on v.mod_id = m.id
-        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ALL($4)
         ",
         &*crate::models::projects::VersionStatus::iterator().filter(|x| x.is_hidden()).map(|x| x.to_string()).collect::<Vec<String>>(),
         hashes_parsed.as_slice(),
@@ -536,9 +536,9 @@ pub async fn update_files(
         "
         SELECT h.hash, v.mod_id FROM hashes h
         INNER JOIN files f ON h.file_id = f.id
-        INNER JOIN versions v ON v.id = f.version_id AND v.status != ANY($1)
+        INNER JOIN versions v ON v.id = f.version_id AND v.status != ALL($1)
         INNER JOIN mods m on v.mod_id = m.id
-        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ANY($4)
+        WHERE h.algorithm = $3 AND h.hash = ANY($2::bytea[]) AND m.status != ALL($4)
         ",
         &*crate::models::projects::VersionStatus::iterator()
             .filter(|x| x.is_hidden())

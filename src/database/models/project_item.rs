@@ -776,7 +776,7 @@ impl Project {
                 FROM versions v
                      INNER JOIN game_versions_versions gvv ON v.id = gvv.joining_version_id
                      INNER JOIN game_versions gv on gvv.game_version_id = gv.id
-                WHERE v.mod_id = mods.id AND v.status != ANY($2)
+                WHERE v.mod_id = mods.id AND v.status != ALL($2)
             )
             WHERE id = $1
             ",
@@ -801,7 +801,7 @@ impl Project {
                 FROM versions v
                      INNER JOIN loaders_versions lv ON lv.version_id = v.id
                      INNER JOIN loaders l on lv.loader_id = l.id
-                WHERE v.mod_id = mods.id AND v.status != ANY($2)
+                WHERE v.mod_id = mods.id AND v.status != ALL($2)
             )
             WHERE id = $1
             ",
