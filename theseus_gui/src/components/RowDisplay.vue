@@ -171,8 +171,8 @@ const getInstanceIndex = (rowIndex, index) => {
         <p>{{ row.label }}</p>
         <hr aria-hidden="true" />
         <div v-if="allowPagination[rowIndex]" class="pagination">
-          <ChevronLeftIcon role="button" @click="modsRow.value.scrollLeft -= 170" />
-          <ChevronRightIcon role="button" @click="modsRow.value.scrollLeft += 170" />
+          <ChevronLeftIcon role="button" @click="modsRow[rowIndex].scrollLeft -= 170" />
+          <ChevronRightIcon role="button" @click="modsRow[rowIndex].scrollLeft += 170" />
         </div>
       </div>
       <section ref="modsRow" class="instances">
