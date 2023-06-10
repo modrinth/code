@@ -229,7 +229,8 @@ onBeforeUnmount(() => {
     .arrow {
       display: inline-block;
       transition: transform 0.2s ease;
-      padding: 1px;
+      height: 18px;
+
       &.rotate {
         transform: rotate(180deg);
       }
@@ -238,7 +239,7 @@ onBeforeUnmount(() => {
 
   .options {
     z-index: 10;
-    max-height: 18.75remq;
+    max-height: 18.75rem;
     overflow-y: auto;
     box-shadow: var(--shadow-inset-sm), 0 0 0 0 transparent;
 
