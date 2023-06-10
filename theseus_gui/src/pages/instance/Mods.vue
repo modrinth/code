@@ -13,7 +13,7 @@
           class="text-input"
           autocomplete="off"
         />
-        <Button @click="() => searchFilter = ''">
+        <Button @click="() => (searchFilter = '')">
           <XIcon />
         </Button>
       </div>
@@ -166,7 +166,7 @@ import {
   GlobeIcon,
   HashIcon,
   Modal,
-  XIcon
+  XIcon,
 } from 'omorphia'
 import { computed, ref, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'

@@ -15,7 +15,7 @@ import {
   formatCategoryHeader,
   formatCategory,
   Promotion,
-  XIcon
+  XIcon,
 } from 'omorphia'
 import Multiselect from 'vue-multiselect'
 import { handleError, useSearch } from '@/store/state'
@@ -309,8 +309,8 @@ const selectableProjectTypes = computed(() => {
             :placeholder="`Search ${searchStore.projectType}s...`"
             @input="getSearchResults"
           />
-          <Button @click="() => searchStore.searchInput = ''">
-            <XIcon/>
+          <Button @click="() => (searchStore.searchInput = '')">
+            <XIcon />
           </Button>
         </div>
         <div class="inline-option">

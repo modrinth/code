@@ -1,7 +1,7 @@
 <script setup>
 import Instance from '@/components/ui/Instance.vue'
 import { computed, ref } from 'vue'
-import {SearchIcon, DropdownSelect, Card, formatCategoryHeader, Button} from 'omorphia'
+import { SearchIcon, DropdownSelect, Card, formatCategoryHeader, Button } from 'omorphia'
 import dayjs from 'dayjs'
 
 const props = defineProps({
@@ -112,8 +112,8 @@ const filteredResults = computed(() => {
     <div class="iconified-input">
       <SearchIcon />
       <input v-model="search" type="text" placeholder="Search" class="search-input" />
-      <Button @click="() => search = ''">
-        <XIcon/>
+      <Button @click="() => (search = '')">
+        <XIcon />
       </Button>
     </div>
     <div class="labeled_button">
