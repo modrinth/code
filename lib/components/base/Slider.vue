@@ -22,12 +22,8 @@
           @input="onInput($refs.input.value)"
         />
         <div class="slider-range">
-          <span>
-            {{ min }}
-          </span>
-          <span>
-            {{ max }}
-          </span>
+          <span> {{ min }} {{ unit }} </span>
+          <span> {{ max }} {{ unit }} </span>
         </div>
       </div>
     </div>
@@ -71,6 +67,10 @@ const props = defineProps({
   disabled: {
     type: Boolean,
     default: false,
+  },
+  unit: {
+    type: String,
+    default: '',
   },
 })
 
@@ -178,6 +178,7 @@ const onInput = (value) => {
 }
 
 .disabled {
-  filter: brightness(0.8);
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 </style>

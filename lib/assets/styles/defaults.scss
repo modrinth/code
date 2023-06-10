@@ -99,7 +99,7 @@ input[type='number'] {
   position: relative;
 
   input {
-    padding-left: 2.25rem;
+    padding: 0 2.5rem;
     width: 100%;
   }
 
@@ -117,6 +117,19 @@ input[type='number'] {
 
     color: var(--color-base);
     opacity: 0.6;
+  }
+
+  .btn {
+    @extend .transparent, .icon-only;
+
+    position: absolute;
+    right: 0.25rem;
+    z-index: 1;
+
+    svg {
+      position: relative;
+      left: 0;
+    }
   }
 }
 
