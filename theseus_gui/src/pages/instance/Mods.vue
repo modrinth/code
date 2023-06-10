@@ -38,22 +38,44 @@
         </Button>
       </span>
     </div>
-    <Chips
-      v-if="Object.keys(selectableProjectTypes).length > 1"
-      v-model="selectedProjectType"
-      :items="Object.keys(selectableProjectTypes)"
-    />
+    <div class="second-row">
+      <Chips
+        v-if="Object.keys(selectableProjectTypes).length > 1"
+        v-model="selectedProjectType"
+        :items="Object.keys(selectableProjectTypes)"
+      />
+      <Button :disabled="!projects.some((x) => x.outdated)" class="no-wrap" @click="updateAll">
+        <UpdatedIcon />
+        Update {{ selected.length > 0 ? 'selected' : 'all' }}
+      </Button>
+      <Button v-if="selected.length > 0" class="no-wrap" @click="deleteWarning.show()">
+        <TrashIcon />
+        Remove selected
+      </Button>
+      <DropdownButton
+        v-if="selected.length > 0"
+        :options="['copy_name', 'copy_url', 'copy_slug']"
+        default-value="copy_name"
+        @option-click="copySelected"
+      >
+        <template #copy_name>
+          <EditIcon />
+          Copy names
+        </template>
+        <template #copy_slug>
+          <HashIcon />
+          Copy slugs
+        </template>
+        <template #copy_url>
+          <GlobeIcon />
+          Copy URLs
+        </template>
+      </DropdownButton>
+    </div>
     <div class="table">
       <div class="table-row table-head">
         <div class="table-cell table-text">
-          <Button
-            v-tooltip="'Update all projects'"
-            icon-only
-            :disabled="!projects.some((x) => x.outdated)"
-            @click="updateAll"
-          >
-            <UpdatedIcon />
-          </Button>
+          <Checkbox v-model="selectAll" class="select-checkbox" />
         </div>
         <div class="table-cell table-text name-cell">Name</div>
         <div class="table-cell table-text">Version</div>
@@ -62,17 +84,7 @@
       </div>
       <div v-for="mod in search" :key="mod.file_name" class="table-row">
         <div class="table-cell table-text">
-          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
-          <Button
-            v-else
-            v-tooltip="'Update project'"
-            :disabled="!mod.outdated"
-            icon-only
-            @click="updateProject(mod)"
-          >
-            <UpdatedIcon v-if="mod.outdated" />
-            <CheckIcon v-else />
-          </Button>
+          <Checkbox v-model="mod.selected" class="select-checkbox" />
         </div>
         <div class="table-cell table-text name-cell">
           <router-link v-if="mod.slug" :to="`/project/${mod.slug}/`" class="mod-text">
@@ -90,6 +102,17 @@
           <Button v-tooltip="'Remove project'" icon-only @click="removeMod(mod)">
             <TrashIcon />
           </Button>
+          <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
+          <Button
+            v-else
+            v-tooltip="'Update project'"
+            :disabled="!mod.outdated"
+            icon-only
+            @click="updateProject(mod)"
+          >
+            <UpdatedIcon v-if="mod.outdated" />
+            <CheckIcon v-else />
+          </Button>
           <input
             id="switch-1"
             autocomplete="off"
@@ -102,6 +125,23 @@
       </div>
     </div>
   </Card>
+  <Modal ref="deleteWarning" header="Are you sure?">
+    <div class="modal-body">
+      <p>
+        Are you sure you want to remove <strong>{{ selected.length }} projects</strong> from
+        {{ instance.metadata.name }}?
+        <br />
+        This action <strong>cannot</strong> be undone.
+      </p>
+      <div class="button-group push-right">
+        <Button @click="deleteWarning.hide()"> Cancel </Button>
+        <Button color="danger" @click="deleteSelected">
+          <TrashIcon />
+          Remove
+        </Button>
+      </div>
+    </div>
+  </Modal>
 </template>
 <script setup>
 import {
@@ -116,9 +156,15 @@ import {
   DropdownSelect,
   AnimatedLogo,
   Chips,
+  Checkbox,
   formatProjectType,
+  DropdownButton,
+  EditIcon,
+  GlobeIcon,
+  HashIcon,
+  Modal,
 } from 'omorphia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { useRouter } from 'vue-router'
 import {
@@ -185,8 +231,11 @@ for (const [path, project] of Object.entries(props.instance.projects)) {
 }
 
 const searchFilter = ref('')
+const selectAll = ref(false)
 const sortFilter = ref('')
 const selectedProjectType = ref('All')
+const selected = computed(() => projects.value.filter((mod) => mod.selected))
+const deleteWarning = ref(null)
 
 const selectableProjectTypes = computed(() => {
   const obj = { All: 'all' }
@@ -258,7 +307,7 @@ function updateSort(projects, sort) {
 
 async function updateAll() {
   const setProjects = []
-  for (const [i, project] of projects.value.entries()) {
+  for (const [i, project] of selected.value ?? projects.value.entries()) {
     if (project.outdated) {
       project.updating = true
       setProjects.push(i)
@@ -302,6 +351,47 @@ async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
 }
+
+async function deleteSelected() {
+  for (const project of selected.value) {
+    await remove_project(props.instance.path, project.path).catch(handleError)
+  }
+  projects.value = projects.value.filter((x) => !x.selected)
+  deleteWarning.value.hide()
+}
+
+async function copySelected(args) {
+  switch (args.option) {
+    case 'copy_name':
+      console.log('Name copied')
+      await navigator.clipboard.writeText(selected.value.map((x) => x.name).join('\n'))
+      break
+    case 'copy_slug':
+      console.log('Slug copied')
+      await navigator.clipboard.writeText(
+        selected.value
+          .filter((x) => x.slug)
+          .map((x) => x.slug)
+          .join('\n')
+      )
+      break
+    case 'copy_url':
+      console.log('URL copied')
+      await navigator.clipboard.writeText(
+        selected.value
+          .filter((x) => x.slug)
+          .map((x) => `https://modrinth.com/${x.project_type}/${x.slug}`)
+          .join('\n')
+      )
+      break
+  }
+}
+
+watch(selectAll, () => {
+  for (const project of projects.value) {
+    project.selected = selectAll.value
+  }
+})
 </script>
 
 <style scoped lang="scss">
@@ -319,7 +409,7 @@ async function removeMod(mod) {
 }
 
 .table-row {
-  grid-template-columns: min-content 2fr 1fr 1fr 8rem;
+  grid-template-columns: min-content 2fr 1fr 1fr 11rem;
 }
 
 .table-cell {
@@ -357,6 +447,34 @@ async function removeMod(mod) {
 .sort {
   padding-left: 0.5rem;
 }
+
+.second-row {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: var(--gap-sm);
+
+  .chips {
+    flex-grow: 1;
+  }
+}
+
+.modal-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: var(--gap-lg);
+
+  .button-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+
+  strong {
+    color: var(--color-contrast);
+  }
+}
 </style>
 <style lang="scss">
 .updating-indicator {
@@ -367,5 +485,11 @@ async function removeMod(mod) {
 
 .v-popper--theme-tooltip .v-popper__inner {
   background: #fff !important;
+}
+
+.select-checkbox {
+  button.checkbox {
+    border: none;
+  }
 }
 </style>
