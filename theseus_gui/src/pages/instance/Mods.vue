@@ -60,7 +60,12 @@
         <div class="table-cell table-text">Author</div>
         <div class="table-cell table-text">Actions</div>
       </div>
-      <div v-for="mod in search" :key="mod.file_name" class="table-row">
+      <div
+        v-for="mod in search"
+        :key="mod.file_name"
+        class="table-row"
+        @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
+      >
         <div class="table-cell table-text">
           <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
           <Button
@@ -133,6 +138,12 @@ const router = useRouter()
 
 const props = defineProps({
   instance: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
+  options: {
     type: Object,
     default() {
       return {}
@@ -301,6 +312,18 @@ async function toggleDisableMod(mod) {
 async function removeMod(mod) {
   await remove_project(props.instance.path, mod.path).catch(handleError)
   projects.value = projects.value.filter((x) => mod.path !== x.path)
+}
+
+const handleRightClick = (event, mod) => {
+  if (mod.slug && mod.project_type) {
+    props.options.showMenu(
+      event,
+      {
+        link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
+      },
+      [{ name: 'open_link' }, { name: 'copy_link' }]
+    )
+  }
 }
 </script>
 

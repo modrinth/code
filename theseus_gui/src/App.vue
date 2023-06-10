@@ -54,7 +54,8 @@ watch(notificationsWrapper, () => {
   notifications.setNotifs(notificationsWrapper.value)
 })
 
-// Link handler
+document.addEventListener('contextmenu', (event) => event.preventDefault())
+
 document.querySelector('body').addEventListener('click', function (e) {
   let target = e.target
   while (target != null) {
