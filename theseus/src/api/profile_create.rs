@@ -1,4 +1,5 @@
 //! Theseus profile management interface
+use crate::pack::LoaderVersionString;
 use crate::state::LinkedData;
 use crate::{
     event::{emit::emit_profile, ProfilePayloadType},
@@ -45,8 +46,8 @@ pub async fn profile_create(
     name: String,         // the name of the profile, and relative path
     game_version: String, // the game version of the profile
     modloader: ModLoader, // the modloader to use
-    loader_version: Option<String>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
-    icon: Option<PathBuf>,          // the icon for the profile
+    loader_version: Option<LoaderVersionString>, // the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
+    icon: Option<PathBuf>,                       // the icon for the profile
     icon_url: Option<String>, // the URL icon for a profile (ONLY USED FOR TEMPORARY PROFILES)
     linked_data: Option<LinkedData>, // the linked project ID (mainly for modpacks)- used for updating
     skip_install_profile: Option<bool>,
@@ -154,17 +155,27 @@ pub async fn profile_create(
 pub(crate) async fn get_loader_version_from_loader(
     game_version: String,
     loader: ModLoader,
-    loader_version: Option<String>,
+    loader_version: Option<LoaderVersionString>,
 ) -> crate::Result<Option<LoaderVersion>> {
     let state = State::get().await?;
     let metadata = state.metadata.read().await;
 
-    let version = loader_version.unwrap_or_else(|| "latest".to_string());
+    let version = loader_version
+        .unwrap_or_else(|| "latest".to_string().into())
+        .0;
 
-    let filter = |it: &LoaderVersion| match version.as_str() {
-        "latest" => true,
-        "stable" => it.stable,
-        id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
+    let filter = |it: &LoaderVersion| {
+        tracing::trace!(
+            "Checking loader version: {} to match version: {}",
+            it.id,
+            version.as_str()
+        );
+
+        match version.as_str() {
+            "latest" => true,
+            "stable" => it.stable,
+            id => it.id == *id || format!("{}-{}", game_version, id) == it.id,
+        }
     };
 
     let loader_data = match loader {

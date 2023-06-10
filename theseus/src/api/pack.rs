@@ -14,7 +14,7 @@ use crate::util::fetch::{
 use crate::State;
 use async_zip::tokio::read::seek::ZipFileReader;
 use reqwest::Method;
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 use std::collections::HashMap;
 use std::io::Cursor;
 use std::path::{Component, PathBuf};
@@ -29,7 +29,7 @@ pub struct PackFormat {
     pub name: String,
     pub summary: Option<String>,
     pub files: Vec<PackFile>,
-    pub dependencies: HashMap<PackDependency, String>,
+    pub dependencies: HashMap<PackDependency, LoaderVersionString>,
 }
 
 #[derive(Serialize, Deserialize, Eq, PartialEq)]
@@ -74,6 +74,31 @@ pub enum PackDependency {
     FabricLoader,
     QuiltLoader,
     Minecraft,
+}
+
+// the modloader version to use, set to "latest", "stable", or the ID of your chosen loader. defaults to latest
+// This may differ from a String, because it considers forge version IDs which may include a hyphen separating two versions
+// This only considers the last part of the version string, after the hyphen, in these cases
+#[derive(Serialize, Eq, PartialEq, Debug, Clone)]
+#[serde(transparent)]
+pub struct LoaderVersionString(pub String);
+impl<'de> Deserialize<'de> for LoaderVersionString {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let s = String::deserialize(deserializer)?;
+
+        // if there's a hyphen, only take the part after the hyphen, if there's no hyphen, take the whole thing
+        Ok(LoaderVersionString::from(s))
+    }
+}
+// if there's a hyphen, only take the part after the hyphen, if there's no hyphen, take the whole thing
+// This is designed with Forge versions in mind, such as 1.20-1.2.2 (the minecraft version is 1.20, the forge version is 1.2.2)
+impl From<String> for LoaderVersionString {
+    fn from(s: String) -> Self {
+        LoaderVersionString(s.split('-').last().unwrap_or(&s).to_string())
+    }
 }
 
 #[tracing::instrument]
@@ -299,7 +324,9 @@ async fn install_pack(
                         mod_loader = Some(ModLoader::Quilt);
                         loader_version = Some(value);
                     }
-                    PackDependency::Minecraft => game_version = Some(value),
+                    PackDependency::Minecraft => {
+                        game_version = Some(value.0.clone())
+                    }
                 }
             }
 

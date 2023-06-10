@@ -129,7 +129,7 @@ impl Drop for LoadingBar {
                             loader_uuid,
                         },
                     );
-                    tracing::debug!(
+                    tracing::trace!(
                         "Exited at {fraction} for loading bar: {:?}",
                         loader_uuid
                     );

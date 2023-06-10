@@ -167,6 +167,12 @@ pub fn create_mrpack_json(
         profile.metadata.game_version.clone(),
     );
 
+    // Converts a HashMap<String, String> to a HashMap<String, LoaderVersionString>
+    let dependencies = dependencies
+        .into_iter()
+        .map(|(k, v)| (k, v.into()))
+        .collect::<HashMap<_, _>>();
+
     let base_path = &profile.path;
     let files: Result<Vec<PackFile>, crate::ErrorKind> = profile
         .projects
