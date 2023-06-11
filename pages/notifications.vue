@@ -87,9 +87,9 @@ import ClearIcon from '~/assets/images/utils/clear.svg'
 import SettingsIcon from '~/assets/images/utils/settings.svg'
 import CalendarIcon from '~/assets/images/utils/calendar.svg'
 import UpToDate from '~/assets/images/illustrations/up_to_date.svg'
-import NavStack from '~/components/ui/NavStack'
-import NavStackItem from '~/components/ui/NavStackItem'
-import { renderString } from '~/helpers/parse'
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
+import { renderString } from '~/helpers/parse.js'
 
 export default defineNuxtComponent({
   components: {

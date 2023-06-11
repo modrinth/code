@@ -135,8 +135,8 @@
 </template>
 
 <script>
-import ModalConfirm from '~/components/ui/ModalConfirm'
-import Modal from '~/components/ui/Modal'
+import ModalConfirm from '~/components/ui/ModalConfirm.vue'
+import Modal from '~/components/ui/Modal.vue'
 
 import CrossIcon from '~/assets/images/utils/x.svg'
 import RightArrowIcon from '~/assets/images/utils/right-arrow.svg'

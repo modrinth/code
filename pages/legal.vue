@@ -26,8 +26,8 @@
 </template>
 
 <script setup>
-import NavStack from '~/components/ui/NavStack'
-import NavStackItem from '~/components/ui/NavStackItem'
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
 
 import TermsIcon from '~/assets/images/utils/heart-handshake.svg'
 import PrivacyIcon from '~/assets/images/utils/lock.svg'

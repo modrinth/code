@@ -91,7 +91,7 @@
 
 <script>
 import { Multiselect } from 'vue-multiselect'
-import Chips from '~/components/ui/Chips'
+import Chips from '~/components/ui/Chips.vue'
 import SaveIcon from '~/assets/images/utils/save.svg'
 import TrashIcon from '~/assets/images/utils/trash.svg'
 import EditIcon from '~/assets/images/utils/edit.svg'

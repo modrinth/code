@@ -343,11 +343,11 @@
 </template>
 <script>
 import { Multiselect } from 'vue-multiselect'
-import ProjectCard from '~/components/ui/ProjectCard'
-import Pagination from '~/components/ui/Pagination'
-import SearchFilter from '~/components/ui/search/SearchFilter'
-import Checkbox from '~/components/ui/Checkbox'
-import LogoAnimated from '~/components/brand/LogoAnimated'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import Pagination from '~/components/ui/Pagination.vue'
+import SearchFilter from '~/components/ui/search/SearchFilter.vue'
+import Checkbox from '~/components/ui/Checkbox.vue'
+import LogoAnimated from '~/components/brand/LogoAnimated.vue'
 
 import ClientIcon from '~/assets/images/categories/client.svg'
 import ServerIcon from '~/assets/images/categories/server.svg'

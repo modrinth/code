@@ -107,7 +107,7 @@ import RequiredIcon from '~/assets/images/utils/asterisk.svg'
 import SuggestionIcon from '~/assets/images/utils/lightbulb.svg'
 import ModerationIcon from '~/assets/images/sidebar/admin.svg'
 import SendIcon from '~/assets/images/utils/send.svg'
-import Checkbox from '~/components/ui/Checkbox'
+import Checkbox from '~/components/ui/Checkbox.vue'
 
 export default {
   components: {

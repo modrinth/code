@@ -238,9 +238,9 @@
   </div>
 </template>
 <script setup>
-import ProjectCard from '~/components/ui/ProjectCard'
-import Badge from '~/components/ui/Badge'
-import Promotion from '~/components/ads/Promotion'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import Badge from '~/components/ui/Badge.vue'
+import Promotion from '~/components/ads/Promotion.vue'
 
 import GitHubIcon from '~/assets/images/utils/github.svg'
 import ReportIcon from '~/assets/images/utils/report.svg'
@@ -257,12 +257,12 @@ import GridIcon from '~/assets/images/utils/grid.svg'
 import ListIcon from '~/assets/images/utils/list.svg'
 import ImageIcon from '~/assets/images/utils/image.svg'
 import UploadIcon from '~/assets/images/utils/upload.svg'
-import FileInput from '~/components/ui/FileInput'
-import ModalReport from '~/components/ui/ModalReport'
-import ModalCreation from '~/components/ui/ModalCreation'
-import NavRow from '~/components/ui/NavRow'
-import CopyCode from '~/components/ui/CopyCode'
-import Avatar from '~/components/ui/Avatar'
+import FileInput from '~/components/ui/FileInput.vue'
+import ModalReport from '~/components/ui/ModalReport.vue'
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import NavRow from '~/components/ui/NavRow.vue'
+import CopyCode from '~/components/ui/CopyCode.vue'
+import Avatar from '~/components/ui/Avatar.vue'
 
 const data = useNuxtApp()
 const route = useRoute()

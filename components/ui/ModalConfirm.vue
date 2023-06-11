@@ -36,8 +36,8 @@
 <script>
 import CrossIcon from '~/assets/images/utils/x.svg'
 import TrashIcon from '~/assets/images/utils/trash.svg'
-import Modal from '~/components/ui/Modal'
-import { renderString } from '~/helpers/parse'
+import Modal from '~/components/ui/Modal.vue'
+import { renderString } from '~/helpers/parse.js'
 
 export default {
   components: {

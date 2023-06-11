@@ -107,7 +107,7 @@
 </template>
 
 <script>
-import Checkbox from '~/components/ui/Checkbox'
+import Checkbox from '~/components/ui/Checkbox.vue'
 import StarIcon from '~/assets/images/utils/star.svg'
 import SaveIcon from '~/assets/images/utils/save.svg'
 

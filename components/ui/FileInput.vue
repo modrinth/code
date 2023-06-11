@@ -18,7 +18,7 @@
 </template>
 
 <script>
-import { fileIsValid } from '~/helpers/fileUtils'
+import { fileIsValid } from '~/helpers/fileUtils.js'
 
 export default {
   components: {},

@@ -104,15 +104,15 @@
   </div>
 </template>
 <script setup>
-import { acceptFileFromProjectType } from '~/helpers/fileUtils'
+import { acceptFileFromProjectType } from '~/helpers/fileUtils.js'
 import DownloadIcon from '~/assets/images/utils/download.svg'
 import UploadIcon from '~/assets/images/utils/upload.svg'
 import InfoIcon from '~/assets/images/utils/info.svg'
-import VersionBadge from '~/components/ui/Badge'
-import FileInput from '~/components/ui/FileInput'
-import DropArea from '~/components/ui/DropArea'
-import Pagination from '~/components/ui/Pagination'
-import VersionFilterControl from '~/components/ui/VersionFilterControl'
+import VersionBadge from '~/components/ui/Badge.vue'
+import FileInput from '~/components/ui/FileInput.vue'
+import DropArea from '~/components/ui/DropArea.vue'
+import Pagination from '~/components/ui/Pagination.vue'
+import VersionFilterControl from '~/components/ui/VersionFilterControl.vue'
 
 const props = defineProps({
   project: {

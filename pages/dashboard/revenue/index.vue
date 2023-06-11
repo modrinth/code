@@ -94,7 +94,7 @@
 import TransferIcon from '~/assets/images/utils/transfer.svg'
 import SettingsIcon from '~/assets/images/utils/settings.svg'
 import HistoryIcon from '~/assets/images/utils/history.svg'
-import ModalTransfer from '~/components/ui/ModalTransfer'
+import ModalTransfer from '~/components/ui/ModalTransfer.vue'
 
 export default defineNuxtComponent({
   components: { TransferIcon, SettingsIcon, HistoryIcon, ModalTransfer },

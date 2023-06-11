@@ -25,8 +25,8 @@
   </div>
 </template>
 <script setup>
-import NavStack from '~/components/ui/NavStack'
-import NavStackItem from '~/components/ui/NavStackItem'
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
 
 import DashboardIcon from '~/assets/images/utils/dashboard.svg'
 import CurrencyIcon from '~/assets/images/utils/currency.svg'

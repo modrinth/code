@@ -76,8 +76,8 @@
 import CrossIcon from '~/assets/images/utils/x.svg'
 import TransferIcon from '~/assets/images/utils/transfer.svg'
 import SettingsIcon from '~/assets/images/utils/settings.svg'
-import Modal from '~/components/ui/Modal'
-import Checkbox from '~/components/ui/Checkbox'
+import Modal from '~/components/ui/Modal.vue'
+import Checkbox from '~/components/ui/Checkbox.vue'
 
 export default {
   components: {

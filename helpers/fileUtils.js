@@ -1,4 +1,4 @@
-import { formatBytes } from '~/plugins/shorthands'
+import { formatBytes } from '~/plugins/shorthands.js'
 
 export const fileIsValid = (file, validationOptions) => {
   const { maxSize, alertOnInvalid } = validationOptions

@@ -236,9 +236,9 @@
 
 <script>
 import { Multiselect } from 'vue-multiselect'
-import Avatar from '~/components/ui/Avatar'
-import ModalConfirm from '~/components/ui/ModalConfirm'
-import FileInput from '~/components/ui/FileInput'
+import Avatar from '~/components/ui/Avatar.vue'
+import ModalConfirm from '~/components/ui/ModalConfirm.vue'
+import FileInput from '~/components/ui/FileInput.vue'
 
 import UploadIcon from '~/assets/images/utils/upload.svg'
 import SaveIcon from '~/assets/images/utils/save.svg'

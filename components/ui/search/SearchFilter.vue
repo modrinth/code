@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import Checkbox from '~/components/ui/Checkbox'
+import Checkbox from '~/components/ui/Checkbox.vue'
 
 export default {
   components: {

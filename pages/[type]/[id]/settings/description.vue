@@ -50,9 +50,9 @@
 </template>
 
 <script>
-import Chips from '~/components/ui/Chips'
+import Chips from '~/components/ui/Chips.vue'
 import SaveIcon from '~/assets/images/utils/save.svg'
-import { renderHighlightedString } from '~/helpers/highlight'
+import { renderHighlightedString } from '~/helpers/highlight.js'
 
 export default defineNuxtComponent({
   components: {

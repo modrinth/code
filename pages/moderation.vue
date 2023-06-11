@@ -107,8 +107,8 @@
 </template>
 
 <script>
-import ProjectCard from '~/components/ui/ProjectCard'
-import Badge from '~/components/ui/Badge'
+import ProjectCard from '~/components/ui/ProjectCard.vue'
+import Badge from '~/components/ui/Badge.vue'
 
 import CheckIcon from '~/assets/images/utils/check.svg'
 import UnlistIcon from '~/assets/images/utils/eye-off.svg'
@@ -116,10 +116,10 @@ import CrossIcon from '~/assets/images/utils/x.svg'
 import TrashIcon from '~/assets/images/utils/trash.svg'
 import CalendarIcon from '~/assets/images/utils/calendar.svg'
 import Security from '~/assets/images/illustrations/security.svg'
-import NavStack from '~/components/ui/NavStack'
-import NavStackItem from '~/components/ui/NavStackItem'
-import ModalModeration from '~/components/ui/ModalModeration'
-import { renderHighlightedString } from '~/helpers/highlight'
+import NavStack from '~/components/ui/NavStack.vue'
+import NavStackItem from '~/components/ui/NavStackItem.vue'
+import ModalModeration from '~/components/ui/ModalModeration.vue'
+import { renderHighlightedString } from '~/helpers/highlight.js'
 
 export default defineNuxtComponent({
   components: {

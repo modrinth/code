@@ -294,10 +294,10 @@ import InfoIcon from '~/assets/images/utils/info.svg'
 import ImageIcon from '~/assets/images/utils/image.svg'
 import TransferIcon from '~/assets/images/utils/transfer.svg'
 
-import FileInput from '~/components/ui/FileInput'
-import DropArea from '~/components/ui/DropArea'
-import ModalConfirm from '~/components/ui/ModalConfirm'
-import Modal from '~/components/ui/Modal'
+import FileInput from '~/components/ui/FileInput.vue'
+import DropArea from '~/components/ui/DropArea.vue'
+import ModalConfirm from '~/components/ui/ModalConfirm.vue'
+import Modal from '~/components/ui/Modal.vue'
 
 export default defineNuxtComponent({
   components: {

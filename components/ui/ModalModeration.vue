@@ -57,11 +57,11 @@
 <script>
 import TrashIcon from '~/assets/images/utils/trash.svg'
 import CrossIcon from '~/assets/images/utils/x.svg'
-import Modal from '~/components/ui/Modal'
-import Chips from '~/components/ui/Chips'
-import Badge from '~/components/ui/Badge'
+import Modal from '~/components/ui/Modal.vue'
+import Chips from '~/components/ui/Chips.vue'
+import Badge from '~/components/ui/Badge.vue'
 import CheckIcon from '~/assets/images/utils/check.svg'
-import { renderString } from '~/helpers/parse'
+import { renderString } from '~/helpers/parse.js'
 
 export default {
   components: {

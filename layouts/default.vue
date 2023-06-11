@@ -353,9 +353,9 @@ import HeartIcon from '~/assets/images/utils/heart.svg'
 import ChartIcon from '~/assets/images/utils/chart.svg'
 
 import GitHubIcon from '~/assets/images/utils/github.svg'
-import NavRow from '~/components/ui/NavRow'
-import ModalCreation from '~/components/ui/ModalCreation'
-import Avatar from '~/components/ui/Avatar'
+import NavRow from '~/components/ui/NavRow.vue'
+import ModalCreation from '~/components/ui/ModalCreation.vue'
+import Avatar from '~/components/ui/Avatar.vue'
 
 const auth = await useAuth()
 const user = await useUser()

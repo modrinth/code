@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { renderHighlightedString } from '~/helpers/highlight'
+import { renderHighlightedString } from '~/helpers/highlight.js'
 
 export default defineNuxtComponent({
   props: {

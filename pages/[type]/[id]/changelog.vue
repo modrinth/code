@@ -75,9 +75,9 @@
 </template>
 <script setup>
 import DownloadIcon from '~/assets/images/utils/download.svg'
-import { renderHighlightedString } from '~/helpers/highlight'
-import VersionFilterControl from '~/components/ui/VersionFilterControl'
-import Pagination from '~/components/ui/Pagination'
+import { renderHighlightedString } from '~/helpers/highlight.js'
+import VersionFilterControl from '~/components/ui/VersionFilterControl.vue'
+import Pagination from '~/components/ui/Pagination.vue'
 
 const props = defineProps({
   project: {

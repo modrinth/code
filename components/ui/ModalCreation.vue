@@ -66,8 +66,8 @@
 <script>
 import CrossIcon from '~/assets/images/utils/x.svg'
 import CheckIcon from '~/assets/images/utils/right-arrow.svg'
-import Modal from '~/components/ui/Modal'
-import Chips from '~/components/ui/Chips'
+import Modal from '~/components/ui/Modal.vue'
+import Chips from '~/components/ui/Chips.vue'
 
 export default {
   components: {

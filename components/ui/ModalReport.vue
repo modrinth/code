@@ -60,9 +60,9 @@
 import { Multiselect } from 'vue-multiselect'
 import CrossIcon from '~/assets/images/utils/x.svg'
 import CheckIcon from '~/assets/images/utils/check.svg'
-import Modal from '~/components/ui/Modal'
-import Chips from '~/components/ui/Chips'
-import { renderString } from '~/helpers/parse'
+import Modal from '~/components/ui/Modal.vue'
+import Chips from '~/components/ui/Chips.vue'
+import { renderString } from '~/helpers/parse.js'
 
 export default {
   components: {
