@@ -25,7 +25,7 @@
           <p>Selected</p>
         </div>
         <Button v-tooltip="'Log out'" icon-only color="raised" @click="logout(selectedAccount.id)">
-          <XIcon />
+          <TrashIcon />
         </Button>
       </div>
       <div v-else class="logged-out account">
@@ -41,7 +41,7 @@
             <p>{{ account.username }}</p>
           </Button>
           <Button v-tooltip="'Log out'" icon-only @click="logout(account.id)">
-            <XIcon />
+            <TrashIcon />
           </Button>
         </div>
       </div>
@@ -54,7 +54,7 @@
 </template>
 
 <script setup>
-import { Avatar, Button, Card, PlusIcon, XIcon, UsersIcon, LogInIcon } from 'omorphia'
+import { Avatar, Button, Card, PlusIcon, TrashIcon, UsersIcon, LogInIcon } from 'omorphia'
 import { ref, defineProps, computed, onMounted, onBeforeUnmount } from 'vue'
 import {
   users,
