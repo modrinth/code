@@ -569,17 +569,13 @@
               <ChevronRightIcon class="featured-header-chevron" aria-hidden="true" />
             </nuxt-link>
           </div>
-          <div
+          <NuxtLink
             v-for="version in featuredVersions"
             :key="version.id"
             class="featured-version button-transparent"
-            @click="
-              $router.push(
-                `/${project.project_type}/${
-                  project.slug ? project.slug : project.id
-                }/version/${encodeURI(version.displayUrlEnding)}`
-              )
-            "
+            :to="`/${project.project_type}/${
+              project.slug ? project.slug : project.id
+            }/version/${encodeURI(version.displayUrlEnding)}`"
           >
             <a
               v-tooltip="
@@ -609,7 +605,7 @@
               <Badge v-else-if="version.version_type === 'beta'" type="beta" color="orange" />
               <Badge v-else-if="version.version_type === 'alpha'" type="alpha" color="red" />
             </div>
-          </div>
+          </NuxtLink>
           <hr class="card-divider" />
         </template>
         <h2 class="card-header">Project members</h2>
