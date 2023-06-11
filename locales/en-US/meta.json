@@ -1,0 +1,6 @@
+{
+  "displayName": {
+    "description": "The name of the language in dialect form (e.g. Français canadien for French spoken in Canada, not French (Canada))",
+    "message": "American English"
+  }
+}

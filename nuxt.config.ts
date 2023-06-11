@@ -1,8 +1,11 @@
 import { promises as fs } from 'fs'
+import { pathToFileURL } from 'node:url'
 import svgLoader from 'vite-svg-loader'
-import { resolve } from 'pathe'
+import { resolve, basename } from 'pathe'
 import { defineNuxtConfig } from 'nuxt/config'
 import { $fetch } from 'ofetch'
+import { globIterate } from 'glob'
+import { match as matchLocale } from '@formatjs/intl-localematcher'
 
 const STAGING_API_URL = 'https://staging-api.modrinth.com/v2/'
 const STAGING_ARIADNE_URL = 'https://staging-ariadne.modrinth.com/v1/'
@@ -38,6 +41,14 @@ const meta = {
   'twitter:card': 'summary',
   'twitter:site': '@modrinth',
 }
+
+/**
+ * Tags of locales that are auto-discovered besides the default locale.
+ *
+ * Preferably only the locales that reach a certain threshold of complete
+ * translations would be included in this array.
+ */
+const ENABLED_LOCALES: string[] = []
 
 export default defineNuxtConfig({
   app: {
@@ -176,6 +187,75 @@ export default defineNuxtConfig({
         })
       )
     },
+    async 'vintl:extendOptions'(opts) {
+      opts.locales ??= []
+
+      const resolveCompactNumberDataImport = await (async () => {
+        const compactNumberLocales: string[] = []
+        const resolvedImports = new Map<string, string>()
+
+        for await (const localeFile of globIterate(
+          'node_modules/@vintl/compact-number/dist/locale-data/*.mjs',
+          { ignore: '**/*.data.mjs' }
+        )) {
+          const tag = basename(localeFile, '.mjs')
+          compactNumberLocales.push(tag)
+          resolvedImports.set(tag, String(pathToFileURL(resolve(localeFile))))
+        }
+
+        function resolveImport(tag: string) {
+          const matchedTag = matchLocale([tag], compactNumberLocales, 'en-x-placeholder')
+          return matchedTag === 'en-x-placeholder'
+            ? undefined
+            : `@vintl/compact-number/locale-data/${matchedTag}`
+        }
+
+        return resolveImport
+      })()
+
+      for await (const localeDir of globIterate('locales/*/', { posix: true })) {
+        const tag = basename(localeDir)
+        if (!ENABLED_LOCALES.includes(tag) && opts.defaultLocale !== tag) continue
+
+        const locale =
+          opts.locales.find((locale) => locale.tag === tag) ??
+          opts.locales[opts.locales.push({ tag }) - 1]
+
+        for await (const localeFile of globIterate(`${localeDir}/*`, { posix: true })) {
+          const fileName = basename(localeFile)
+          if (fileName === 'index.json') {
+            if (locale.file == null) {
+              locale.file = {
+                from: `./${localeFile}`,
+                format: 'crowdin',
+              }
+            } else {
+              ;(locale.files ??= []).push({
+                from: `./${localeFile}`,
+                format: 'crowdin',
+              })
+            }
+          } else if (fileName === 'meta.json') {
+            /** @type {Record<string, { message: string }>} */
+            const meta = await fs.readFile(localeFile, 'utf8').then((date) => JSON.parse(date))
+            locale.meta ??= {}
+            for (const key in meta) {
+              locale.meta[key] = meta[key].message
+            }
+          } else {
+            ;(locale.resources ??= {})[fileName] = `./${localeFile}`
+          }
+        }
+
+        const cnDataImport = resolveCompactNumberDataImport(tag)
+        if (cnDataImport != null) {
+          ;(locale.additionalImports ??= []).push({
+            from: cnDataImport,
+            resolve: false,
+          })
+        }
+      }
+    },
   },
   runtimeConfig: {
     apiBaseUrl: process.env.BASE_URL ?? getApiUrl(),
@@ -201,6 +281,15 @@ export default defineNuxtConfig({
         allowImportingTsExtensions: true,
       },
     },
+  },
+  modules: ['@vintl/nuxt'],
+  vintl: {
+    defaultLocale: 'en-US',
+    storage: 'cookie',
+    parserless: 'only-prod',
+  },
+  nitro: {
+    moduleSideEffects: ['@vintl/compact-number/locale-data'],
   },
 })
 

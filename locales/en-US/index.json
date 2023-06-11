@@ -1,0 +1,17 @@
+{
+  "frog": {
+    "message": "You've been frogged! 🐸"
+  },
+  "frog.altText": {
+    "message": "A photorealistic painting of a frog labyrinth"
+  },
+  "frog.froggedPeople": {
+    "message": "{count, plural, one {{count} more person} other {{count} more people}} were also frogged!"
+  },
+  "frog.sinceOpened": {
+    "message": "This page was opened {ago}"
+  },
+  "frog.title": {
+    "message": "Frog"
+  }
+}
