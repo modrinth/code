@@ -195,6 +195,12 @@ export default defineNuxtConfig({
     shim: false,
     strict: true,
     typeCheck: true,
+    tsConfig: {
+      compilerOptions: {
+        moduleResolution: 'bundler',
+        allowImportingTsExtensions: true,
+      },
+    },
   },
 })
 
