@@ -64,7 +64,12 @@
         <div class="table-cell table-text">Author</div>
         <div class="table-cell table-text">Actions</div>
       </div>
-      <div v-for="mod in search" :key="mod.file_name" class="table-row">
+      <div
+        v-for="mod in search"
+        :key="mod.file_name"
+        class="table-row"
+        @contextmenu.prevent.stop="(c) => handleRightClick(c, mod)"
+      >
         <div class="table-cell table-text">
           <AnimatedLogo v-if="mod.updating" class="btn icon-only updating-indicator"></AnimatedLogo>
           <Button
@@ -142,6 +147,12 @@ const router = useRouter()
 
 const props = defineProps({
   instance: {
+    type: Object,
+    default() {
+      return {}
+    },
+  },
+  options: {
     type: Object,
     default() {
       return {}
@@ -319,7 +330,6 @@ async function removeMod(mod) {
 }
 
 const handleContentOptionClick = async (args) => {
-  console.log(args)
   if (args.option === 'search') {
     await router.push({
       path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
@@ -338,12 +348,23 @@ const handleContentOptionClick = async (args) => {
 }
 
 listen('tauri://file-drop', async (event) => {
-  console.log(event)
   for (const file of event.payload) {
     await add_project_from_path(props.instance.path, file, 'mod').catch(handleError)
     initProjects(await get(props.instance.path).catch(handleError))
   }
 })
+
+const handleRightClick = (event, mod) => {
+  if (mod.slug && mod.project_type) {
+    props.options.showMenu(
+      event,
+      {
+        link: `https://modrinth.com/${mod.project_type}/${mod.slug}`,
+      },
+      [{ name: 'open_link' }, { name: 'copy_link' }]
+    )
+  }
+}
 </script>
 
 <style scoped lang="scss">
