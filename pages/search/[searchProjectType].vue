@@ -158,8 +158,8 @@
           <h3 class="sidebar-menu-heading">Minecraft versions</h3>
           <Checkbox
             v-model="showSnapshots"
-            label="Include snapshots"
-            description="Include snapshots"
+            label="Show all versions"
+            description="Show all versions"
             style="margin-bottom: 0.5rem"
             :border="false"
           />

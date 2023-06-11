@@ -615,8 +615,8 @@
             />
             <Checkbox
               v-model="showSnapshots"
-              label="Include snapshots"
-              description="Include snapshots"
+              label="Show all versions"
+              description="Show all versions"
               style="margin-top: 0.5rem"
               :border="false"
             />

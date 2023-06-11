@@ -59,8 +59,8 @@
         gameVersionFilters.some((v) => v.version_type !== 'release')
       "
       v-model="includeSnapshots"
-      label="Include snapshots"
-      description="Include snapshots"
+      label="Show all versions"
+      description="Show all versions"
       :border="false"
       @update:model-value="updateQuery"
     />
