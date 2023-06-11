@@ -840,7 +840,7 @@ if (project.value.project_type !== route.params.type || route.params.id !== proj
     `/${project.value.project_type}/${project.value.slug}${
       path.length > 0 ? `/${path.join('/')}` : ''
     }`,
-    { redirectCode: 301 }
+    { redirectCode: 301, replace: true }
   )
 }
 
