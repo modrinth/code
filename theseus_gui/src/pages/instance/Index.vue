@@ -241,6 +241,7 @@ const handleOptionsClick = async (args) => {
     case 'add_content':
       await router.push({
         path: `/browse/${instance.value.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+        query: { i: route.params.id },
       })
       break
     case 'edit':

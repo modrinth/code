@@ -5,7 +5,7 @@ import { Card, DownloadIcon, StopCircleIcon, Avatar, AnimatedLogo, PlayIcon } fr
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import InstallConfirmModal from '@/components/ui/InstallConfirmModal.vue'
 import { install as pack_install } from '@/helpers/pack'
-import { get, list, remove, run } from '@/helpers/profile'
+import { list, remove, run } from '@/helpers/profile'
 import {
   get_all_running_profile_paths,
   get_uuids_by_profile_path,
@@ -13,11 +13,9 @@ import {
 } from '@/helpers/process'
 import { process_listener } from '@/helpers/events'
 import { useFetch } from '@/helpers/fetch.js'
-import { handleError, useSearch } from '@/store/state.js'
+import { handleError } from '@/store/state.js'
 import { showInFolder } from '@/helpers/utils.js'
 import InstanceInstallModal from '@/components/ui/InstanceInstallModal.vue'
-
-const searchStore = useSearch()
 
 const props = defineProps({
   instance: {
@@ -140,8 +138,10 @@ const openFolder = async () => {
 }
 
 const addContent = async () => {
-  searchStore.instanceContext = await get(props.instance.path).catch(handleError)
-  await router.push({ path: '/browse/mod' })
+  await router.push({
+    path: `/browse/${props.instance.metadata.loader === 'vanilla' ? 'datapack' : 'mod'}`,
+    query: { i: props.instance.path },
+  })
 }
 
 defineExpose({
@@ -205,7 +205,6 @@ onUnmounted(() => unlisten())
     >
       <StopCircleIcon />
     </div>
-    <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <div v-else class="install cta button-base" @click="install"><DownloadIcon /></div>
     <InstallConfirmModal ref="confirmModal" />
     <InstanceInstallModal ref="modInstallModal" />
