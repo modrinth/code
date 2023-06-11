@@ -233,8 +233,19 @@ pub struct FeatureRule {
     /// Whether the user is in demo mode
     pub is_demo_user: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    /// Whether the user is using the demo resolution
-    pub has_demo_resolution: Option<bool>,
+    /// Whether the user is using a custom resolution
+    pub has_custom_resolution: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// Whether the launcher has quick plays support
+    pub has_quick_plays_support: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// Whether the instance is being launched to a single-player world
+    pub is_quick_play_singleplayer: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    /// Whether the instance is being launched to a multi-player world
+    pub is_quick_play_multiplayer: Option<bool>,
+    ///  Whether the instance is being launched to a realms world
+    pub is_quick_play_realms: Option<bool>,
 }
 
 #[cfg_attr(feature = "bincode", derive(Encode, Decode))]
