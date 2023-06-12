@@ -861,7 +861,7 @@ export default defineNuxtComponent({
 
       .mobile-navbar {
         display: flex;
-        height: var(--size-mobile-navbar-height);
+        height: calc(var(--size-mobile-navbar-height) + env(safe-area-inset-bottom));
         border-radius: var(--size-rounded-card) var(--size-rounded-card) 0 0;
         padding-bottom: env(safe-area-inset-bottom);
         position: fixed;
