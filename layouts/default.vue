@@ -88,7 +88,7 @@
                     <span class="title">Moderation</span>
                   </NuxtLink>
                   <hr class="divider" />
-                  <button class="item button-transparent" @click="logout">
+                  <button class="item button-transparent" @click="logout()">
                     <LogOutIcon class="icon" />
                     <span class="dropdown-item__text">Log out</span>
                   </button>
@@ -162,7 +162,7 @@
           </div>
           <div class="links">
             <template v-if="auth.user">
-              <button class="iconified-button danger-button" @click="logout">
+              <button class="iconified-button danger-button" @click="logout()">
                 <LogOutIcon aria-hidden="true" />
                 Log out
               </button>
@@ -471,27 +471,21 @@ export default defineNuxtComponent({
         this.isMobileMenuOpen = false
       }
     },
-    async logout() {
+    logout() {
       useCookie('auth-token').value = null
 
-      // If users logs out on dashboard, force redirect on the home page to clear cookies
-      if (
-        this.$route.path.startsWith('/settings/') ||
-        this.$route.path.startsWith('/dashboard/') ||
-        this.$route.path.startsWith('/moderation') ||
-        this.$route.path.startsWith('/notifications')
-      ) {
-        window.location.href = '/'
-      } else {
-        await this.$router.go(null)
+      this.$notify({
+        group: 'main',
+        title: 'Logged Out',
+        text: 'You have logged out successfully!',
+        type: 'success',
+      })
 
-        this.$notify({
-          group: 'main',
-          title: 'Logged Out',
-          text: 'You have logged out successfully!',
-          type: 'success',
+      useRouter()
+        .push('/')
+        .then(() => {
+          useRouter().go()
         })
-      }
     },
     changeTheme() {
       this.isThemeSwitchOnHold = true
