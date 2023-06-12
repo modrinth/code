@@ -29,6 +29,7 @@
           :options="['search', 'from_file']"
           default-value="search"
           name="add-content-dropdown"
+          color="primary"
           @option-click="handleContentOptionClick"
         >
           <template #search>
