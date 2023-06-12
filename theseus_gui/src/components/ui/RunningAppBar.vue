@@ -67,7 +67,7 @@ const showCard = ref(false)
 
 const currentProcesses = ref(await getRunningProfiles().catch(handleError))
 
-await process_listener(async () => {
+const unlistenProcess = await process_listener(async () => {
   await refresh()
 })
 
@@ -91,7 +91,7 @@ const goToTerminal = () => {
 
 const currentLoadingBars = ref(Object.values(await progress_bars_list().catch(handleError)))
 
-await loading_listener(async () => {
+const unlistenLoading = await loading_listener(async () => {
   await refreshInfo()
 })
 
@@ -128,6 +128,8 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('click', handleClickOutside)
+  unlistenProcess()
+  unlistenLoading()
 })
 </script>
 

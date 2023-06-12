@@ -1,4 +1,12 @@
 <template>
+  <ModalConfirm
+    ref="modal_confirm"
+    title="Are you sure you want to delete this instance?"
+    description="If you proceed, all data for your instance will be removed. You will not be able to recover it."
+    :has-to-type="false"
+    proceed-label="Delete"
+    @proceed="removeProfile"
+  />
   <Modal ref="changeVersionsModal" header="Change instance versions">
     <div class="change-versions-modal universal-body">
       <div class="input-row">
@@ -105,8 +113,8 @@
         placeholder="Select categories..."
         @tag="
           (newTag) => {
-            groups.push(newTag)
-            availableGroups.push(newTag)
+            groups.push(newTag.trim().substring(0, 32))
+            availableGroups.push(newTag.trim().substring(0, 32))
           }
         "
       />
@@ -288,7 +296,7 @@
         id="delete-profile"
         class="btn btn-danger"
         :disabled="removing"
-        @click="removeProfile"
+        @click="$refs.modal_confirm.show()"
       >
         <TrashIcon /> Delete
       </button>
@@ -311,6 +319,7 @@ import {
   XIcon,
   SaveIcon,
   HammerIcon,
+  ModalConfirm,
 } from 'omorphia'
 import { Multiselect } from 'vue-multiselect'
 import { useRouter } from 'vue-router'
@@ -398,7 +407,8 @@ const hooks = ref(props.instance.hooks ?? globalSettings.hooks)
 watch(
   [
     title,
-    groups.value,
+    groups,
+    groups,
     overrideJavaInstall,
     javaInstall,
     overrideJavaArgs,
@@ -406,17 +416,17 @@ watch(
     overrideEnvVars,
     envVars,
     overrideMemorySettings,
-    memory.value,
+    memory,
     overrideWindowSettings,
-    resolution.value,
+    resolution,
     overrideHooks,
-    hooks.value,
+    hooks,
   ],
   async () => {
     const editProfile = {
       metadata: {
-        name: title.value,
-        groups: groups.value,
+        name: title.value.trim().substring(0, 16) ?? 'Instance',
+        groups: groups.value.map((x) => x.trim().substring(0, 32)).filter((x) => x.length > 0),
       },
       java: {},
     }
@@ -424,6 +434,10 @@ watch(
     if (overrideJavaInstall.value) {
       if (javaInstall.value.path !== '') {
         editProfile.java.override_version = javaInstall.value
+        editProfile.java.override_version.path = editProfile.java.override_version.path.replace(
+          'java.exe',
+          'javaw.exe'
+        )
       }
     }
 
@@ -456,7 +470,8 @@ watch(
     }
 
     await edit(props.instance.path, editProfile)
-  }
+  },
+  { deep: true }
 )
 
 const repairing = ref(false)
